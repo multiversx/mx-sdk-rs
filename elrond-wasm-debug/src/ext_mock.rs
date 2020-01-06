@@ -4,7 +4,6 @@ use elrond_wasm::Address;
 use elrond_wasm::StorageKey;
 
 use crate::big_int_mock::*;
-use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
 
@@ -323,7 +322,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt> for ArwenMockRef {
     }
 
     fn check_not_payable(&self) -> bool {
-        if RustBigInt::compare(&self.get_call_value_big_int(), &RustBigInt::from(0)) > 0 {
+        if &self.get_call_value_big_int() > &0.into() {
             self.signal_error();
             return false;
         }

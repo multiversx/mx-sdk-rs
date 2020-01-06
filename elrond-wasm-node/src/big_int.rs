@@ -6,6 +6,7 @@ use core::ops::Sub;
 use core::ops::SubAssign;
 use core::ops::Mul;
 use core::ops::MulAssign;
+use core::cmp::Ordering;
 
 use alloc::vec::Vec;
 
@@ -30,6 +31,14 @@ impl From<i64> for ArwenBigInt {
     fn from(item: i64) -> Self {
         unsafe {
             ArwenBigInt{ handle: bigIntNew(item) }
+        }
+    }
+}
+
+impl From<i32> for ArwenBigInt {
+    fn from(item: i32) -> Self {
+        unsafe {
+            ArwenBigInt{ handle: bigIntNew(item.into()) }
         }
     }
 }
@@ -118,13 +127,38 @@ impl MulAssign for ArwenBigInt {
     }
 }
 
-impl elrond_wasm::BigIntApi for ArwenBigInt {
-    fn compare(b1: &Self, b2: &Self) -> i32 {
-        unsafe {
-            bigIntCmp(b1.handle, b2.handle)
+impl PartialEq for ArwenBigInt {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
+        arwen_cmp == 0
+    }
+}
+
+impl Eq for ArwenBigInt{}
+
+impl Ord for ArwenBigInt {
+    #[inline]
+    fn cmp(&self, other: &Self) -> Ordering {
+        let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
+        if arwen_cmp == 0 {
+            Ordering::Equal
+        } else if arwen_cmp > 0 {
+            Ordering::Greater
+        } else {
+            Ordering::Less
         }
     }
+}
 
+impl PartialOrd for ArwenBigInt {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl elrond_wasm::BigIntApi for ArwenBigInt {
     fn byte_length(&self) -> i32 {
         unsafe { bigIntByteLength(self.handle) }
     }

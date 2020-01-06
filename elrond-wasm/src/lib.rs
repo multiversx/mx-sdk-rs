@@ -61,14 +61,16 @@ use core::ops::SubAssign;
 pub trait BigIntApi: 
         core::marker::Sized + 
         From<i64> +
+        From<i32> +
         Add + 
         AddAssign + 
         Sub + 
         SubAssign +
+        PartialEq +
+        Eq +
+        PartialOrd +
+        Ord +
 {
-
-    fn compare(b1: &Self, b2: &Self) -> i32;
-
     fn byte_length(&self) -> i32;
 
     fn copy_to_slice(&self, slice: &mut [u8]) -> i32;
