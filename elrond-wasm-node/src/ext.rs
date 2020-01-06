@@ -4,7 +4,6 @@ use elrond_wasm::Address;
 use elrond_wasm::StorageKey;
 
 use crate::big_int::*;
-use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
 
 //use alloc::boxed::Box;
@@ -142,7 +141,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     fn check_not_payable(&self) -> bool {
-        if ArwenBigInt::compare(&self.get_call_value_big_int(), &ArwenBigInt::from(0)) > 0 {
+        if &self.get_call_value_big_int() > &0.into() {
             self.signal_error();
             return false;
         }

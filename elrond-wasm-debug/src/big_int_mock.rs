@@ -20,6 +20,12 @@ impl From<i64> for RustBigInt {
     }
 }
 
+impl From<i32> for RustBigInt {
+    fn from(item: i32) -> Self {
+        RustBigInt(item.into())
+    }
+}
+
 impl From<BigInt> for RustBigInt {
     fn from(item: BigInt) -> Self {
         RustBigInt(item)
@@ -80,16 +86,30 @@ impl MulAssign for RustBigInt {
     }
 }
 
-impl elrond_wasm::BigIntApi for RustBigInt {
-    fn compare(b1: &Self, b2: &Self) -> i32 {
-        let ord = b1.0.cmp(&b2.0);
-        match ord {
-            Ordering::Less => -1,
-            Ordering::Equal => 0,
-            Ordering::Greater => 1,
-        }
+impl PartialEq for RustBigInt {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        PartialEq::eq(&self.0, &other.0)
     }
+}
 
+impl Eq for RustBigInt{}
+
+impl Ord for RustBigInt {
+    #[inline]
+    fn cmp(&self, other: &Self) -> Ordering {
+        Ord::cmp(&self.0, &other.0)
+    }
+}
+
+impl PartialOrd for RustBigInt {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        PartialOrd::partial_cmp(&self.0, &other.0)
+    }
+}
+
+impl elrond_wasm::BigIntApi for RustBigInt {
     fn byte_length(&self) -> i32 {
         panic!("byte_length not yet implemented")
     }
