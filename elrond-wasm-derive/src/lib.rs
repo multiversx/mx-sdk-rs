@@ -43,7 +43,6 @@ pub fn contract(
 
     let contract_struct = contract.struct_name.clone();
     let trait_name = contract.trait_name.clone();
-    let method_sigs = contract.extract_method_sigs();
     let method_impls = contract.extract_method_impls();
 
     let call_methods = contract.generate_call_methods();
@@ -62,8 +61,13 @@ pub fn contract(
       use elrond_wasm_node::*;
       use core::ops::{AddAssign, SubAssign};
 
-      pub trait #trait_name<BI>: ContractHookApi<BI> where BI: BigIntApi {
-        #(#method_sigs)*
+      pub trait #trait_name<BI>: ContractHookApi<BI> + Sized 
+      where 
+          BI: BigIntApi + 'static,
+          for<'b> BI: AddAssign<&'b BI>,
+          for<'b> BI: SubAssign<&'b BI>,
+      {
+        #(#method_impls)*
       }
 
       pub struct #contract_struct<T, BI>
@@ -142,7 +146,6 @@ pub fn contract(
           for<'b> BI: SubAssign<&'b BI>,
           T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
       {
-        #(#method_impls)*
       }
 
       impl <T, BI> #contract_struct<T, BI>

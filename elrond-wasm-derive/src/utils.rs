@@ -54,6 +54,8 @@ fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMethod>
 }
 
 impl Contract {
+    // can extract trait method signatures
+    // currently not used
     pub fn extract_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
         self.trait_methods.iter().map(|m| {
             let mattrs = &m.attrs;
