@@ -32,6 +32,12 @@ impl From<BigInt> for RustBigInt {
     }
 }
 
+impl Clone for RustBigInt {
+    fn clone(&self) -> Self {
+        RustBigInt(self.0.clone())
+    }
+}
+
 impl Add for RustBigInt {
     type Output = RustBigInt;
 
@@ -138,10 +144,32 @@ impl elrond_wasm::BigIntApi for RustBigInt {
             res
         }
     }
+
+    fn phantom() -> Self {
+        RustBigInt::from(0)
+    }
 }
 
 impl RustBigInt {
     pub fn to_signed_bytes_be(&self) -> Vec<u8>{
         self.0.to_signed_bytes_be()
+    }
+}
+
+pub struct RustBigUint(num_bigint::BigInt);
+
+impl From<RustBigInt> for RustBigUint {
+    fn from(item: RustBigInt) -> Self {
+        RustBigUint(item.0)
+    }
+}
+
+impl elrond_wasm::BigUintApi<RustBigInt> for RustBigUint {
+    fn into_signed(self) -> RustBigInt {
+        RustBigInt(self.0)
+    }
+
+    fn phantom() -> Self {
+        RustBigUint::from(RustBigInt::from(0))
     }
 }

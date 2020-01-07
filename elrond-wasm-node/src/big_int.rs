@@ -12,6 +12,8 @@ use alloc::vec::Vec;
 
 extern {
     fn bigIntNew(value: i64) -> i32;
+    fn bigIntClone(reference: i32) -> i32;
+    fn bigIntDestruct(reference: i32);
 
     fn bigIntByteLength(x: i32) -> i32;
     fn bigIntGetBytes(reference: i32, byte_ptr: *mut u8) -> i32;
@@ -48,6 +50,21 @@ impl ArwenBigInt {
         unsafe {
             ArwenBigInt{ handle: bigIntNew(value) }
         }
+    }
+}
+
+impl Clone for ArwenBigInt {
+    fn clone(&self) -> Self {
+        let new_handle = unsafe {
+            bigIntClone(self.handle)
+        };
+        ArwenBigInt {handle: new_handle}
+    }
+}
+
+impl Drop for ArwenBigInt {
+    fn drop(&mut self) {
+        unsafe { bigIntDestruct(self.handle) };
     }
 }
 
@@ -159,6 +176,7 @@ impl PartialOrd for ArwenBigInt {
 }
 
 impl elrond_wasm::BigIntApi for ArwenBigInt {
+    #[inline]
     fn byte_length(&self) -> i32 {
         unsafe { bigIntByteLength(self.handle) }
     }
@@ -191,5 +209,33 @@ impl elrond_wasm::BigIntApi for ArwenBigInt {
             }
             vec
         }
+    }
+
+    #[inline]
+    fn phantom() -> Self {
+        ArwenBigInt{ handle: -1 }
+    }
+}
+
+pub struct ArwenBigUint {
+    pub handle: i32 // TODO: make private, only finish method uses it
+}
+
+impl From<ArwenBigInt> for ArwenBigUint {
+    #[inline]
+    fn from(item: ArwenBigInt) -> Self {
+        ArwenBigUint{ handle: item.handle }
+    }
+}
+
+impl elrond_wasm::BigUintApi<ArwenBigInt> for ArwenBigUint {
+    #[inline]
+    fn into_signed(self) -> ArwenBigInt {
+        ArwenBigInt{ handle: self.handle }
+    }
+
+    #[inline]
+    fn phantom() -> Self {
+        ArwenBigUint{ handle: -1 }
     }
 }

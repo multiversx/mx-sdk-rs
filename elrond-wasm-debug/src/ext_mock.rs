@@ -6,6 +6,7 @@ use elrond_wasm::StorageKey;
 use crate::big_int_mock::*;
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
+use elrond_wasm::BigUintApi;
 
 use num_bigint::BigInt;
 use num_traits::cast::ToPrimitive;
@@ -306,7 +307,7 @@ impl ArwenMockState {
     }
 }
 
-impl elrond_wasm::ContractIOApi<RustBigInt> for ArwenMockRef {
+impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     fn check_num_arguments(&self, expected: i32) -> bool {
         let state = self.state_ref.borrow();
@@ -348,10 +349,16 @@ impl elrond_wasm::ContractIOApi<RustBigInt> for ArwenMockRef {
     }
     
     #[inline]
-    fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
+    fn get_argument_big_int_signed(&self, arg_index: i32) -> RustBigInt {
         let state = self.state_ref.borrow();
         let bytes = state.get_argument(arg_index);
         BigInt::from_signed_bytes_be(&bytes).into()
+    }
+
+    #[inline]
+    fn get_argument_big_int_unsigned(&self, arg_index: i32) -> RustBigUint {
+        let signed = self.get_argument_big_int_signed(arg_index);
+        signed.into()
     }
 
     #[inline]
@@ -367,13 +374,18 @@ impl elrond_wasm::ContractIOApi<RustBigInt> for ArwenMockRef {
     }
 
     #[inline]
-    fn finish_big_int(&self, b: RustBigInt) {
+    fn finish_big_int_signed(&self, bi: RustBigInt) {
         let mut state = self.state_ref.borrow_mut();
-        state.add_result(b.to_signed_bytes_be());
+        state.add_result(bi.to_signed_bytes_be());
+    }
+
+    #[inline]
+    fn finish_big_int_unsigned(&self, bu: RustBigUint) {
+        self.finish_big_int_signed(bu.into_signed());
     }
     
     #[inline]
     fn finish_i64(&self, value: i64) {
-        self.finish_big_int(value.into());
+        self.finish_big_int_signed(value.into());
     }
 }

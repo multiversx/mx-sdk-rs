@@ -58,7 +58,8 @@ extern {
     fn bigIntStorageStore(key_ptr: *const u8, source: i32) -> i32;
     fn bigIntStorageLoad(key_ptr: *const u8, destination: i32) -> i32;
     
-    fn bigIntGetArgument(arg_id: i32, dest: i32);
+    fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
+    fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetCallValue(dest: i32);
     fn bigIntFinish(bih: i32);
 
@@ -129,7 +130,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 }
 
-impl elrond_wasm::ContractIOApi<ArwenBigInt> for ArwenApiImpl {
+impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     fn check_num_arguments(&self, expected: i32) -> bool {
         let nr_arg = unsafe { getNumArguments() };
@@ -167,10 +168,19 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt> for ArwenApiImpl {
     }
     
     #[inline]
-    fn get_argument_big_int(&self, arg_id: i32) -> ArwenBigInt {
+    fn get_argument_big_int_unsigned(&self, arg_id: i32) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
-            bigIntGetArgument(arg_id, result);
+            bigIntGetUnsignedArgument(arg_id, result);
+            ArwenBigUint {handle: result}
+        }
+    }
+
+    #[inline]
+    fn get_argument_big_int_signed(&self, arg_id: i32) -> ArwenBigInt {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntGetSignedArgument(arg_id, result);
             ArwenBigInt {handle: result}
         }
     }
@@ -181,7 +191,14 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     #[inline]
-    fn finish_big_int(&self, b: ArwenBigInt) {
+    fn finish_big_int_signed(&self, b: ArwenBigInt) {
+        unsafe {
+            bigIntFinish(b.handle);
+        }
+    }
+
+    #[inline]
+    fn finish_big_int_unsigned(&self, b: ArwenBigUint) {
         unsafe {
             bigIntFinish(b.handle);
         }

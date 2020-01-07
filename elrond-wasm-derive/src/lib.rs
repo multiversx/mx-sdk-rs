@@ -57,51 +57,59 @@ pub fn contract(
       use elrond_wasm::ContractHookApi;
       use elrond_wasm::ContractIOApi;
       use elrond_wasm::BigIntApi;
+      use elrond_wasm::BigUintApi;
       use elrond_wasm_node::ArwenBigInt;
+      use elrond_wasm_node::ArwenBigUint;
       use elrond_wasm_node::*;
       use core::ops::{AddAssign, SubAssign};
 
-      pub trait #trait_name<BI>: ContractHookApi<BI> + Sized 
+      pub trait #trait_name<BI, BU>: ContractHookApi<BI> + Sized 
       where 
           BI: BigIntApi + 'static,
+          BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
       {
         #(#method_impls)*
       }
 
-      pub struct #contract_struct<T, BI>
+      pub struct #contract_struct<T, BI, BU>
       where 
           BI: BigIntApi + 'static,
+          BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
+          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
           api: T,
-          _phantom: BI
+          _phantom1: BI,
+          _phantom2: BU,
       }
 
-      impl <T, BI> #contract_struct<T, BI>
+      impl <T, BI, BU> #contract_struct<T, BI, BU>
       where 
           BI: BigIntApi + 'static,
+          BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
+          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         pub fn new(api: T) -> Self {
           #contract_struct {
             api: api,
-            _phantom: BI::from(0), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+            _phantom1: BI::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+            _phantom2: BU::phantom(),
           }
         }
       }
 
-      impl <T, BI> ContractHookApi<BI> for #contract_struct<T, BI>
+      impl <T, BI, BU> ContractHookApi<BI> for #contract_struct<T, BI, BU>
       where 
           BI: BigIntApi + 'static,
+          BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
+          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         #[inline]
         fn get_owner(&self) -> Address {
@@ -139,21 +147,23 @@ pub fn contract(
         }  
       }
 
-      impl <T, BI> #trait_name<BI> for #contract_struct<T, BI> 
+      impl <T, BI, BU> #trait_name<BI, BU> for #contract_struct<T, BI, BU> 
       where 
           BI: BigIntApi + 'static,
+          BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
+          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
       }
 
-      impl <T, BI> #contract_struct<T, BI>
+      impl <T, BI, BU> #contract_struct<T, BI, BU>
         where 
             BI: BigIntApi + 'static,
+            BU: BigUintApi<BI> + 'static,
             for<'b> BI: AddAssign<&'b BI>,
             for<'b> BI: SubAssign<&'b BI>,
-            T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
+            T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         #(#call_methods)*
       }
@@ -165,10 +175,11 @@ pub fn contract(
       proc_macro::TokenStream::from(quote! {
         #main_definition
 
-        fn new_arwen_instance() -> #contract_struct<ArwenApiImpl, ArwenBigInt> {
+        fn new_arwen_instance() -> #contract_struct<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
           #contract_struct {
             api: ArwenApiImpl{},
-            _phantom: ArwenBigInt::from(0), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+            _phantom1: ArwenBigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+            _phantom2: ArwenBigUint::phantom(),
           }
         }
 
@@ -181,12 +192,13 @@ pub fn contract(
         #main_definition
   
         use elrond_wasm::CallableContract;
-        impl <T, BI> CallableContract for #contract_struct<T, BI> 
+        impl <T, BI, BU> CallableContract for #contract_struct<T, BI, BU> 
         where 
             BI: BigIntApi + 'static,
+            BU: BigUintApi<BI> + 'static,
             for<'b> BI: AddAssign<&'b BI>,
             for<'b> BI: SubAssign<&'b BI>,
-            T: ContractHookApi<BI> + ContractIOApi<BI> + Clone + 'static
+            T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
         {
           fn call(&self, fn_name: &'static str) {
             #function_selector_body
@@ -195,7 +207,8 @@ pub fn contract(
           fn clone_contract(&self) -> Box<dyn CallableContract> {
             Box::new(#contract_struct {
               api: self.api.clone(),
-              _phantom: BI::from(0), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+              _phantom1: BI::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+              _phantom2: BU::phantom(),
             })
           }
         }
