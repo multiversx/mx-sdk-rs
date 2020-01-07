@@ -143,11 +143,15 @@ fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2:
                             },
                         "BigInt" =>
                             quote!{
-                                let #pat = self.api.get_argument_big_int(#arg_index_i32);
+                                let #pat = self.api.get_argument_big_int_signed(#arg_index_i32);
                             },
                         "BI" =>
                             quote!{
-                                let #pat = self.api.get_argument_big_int(#arg_index_i32);
+                                let #pat = self.api.get_argument_big_int_signed(#arg_index_i32);
+                            },
+                        "BU" =>
+                            quote!{
+                                let #pat = self.api.get_argument_big_int_unsigned(#arg_index_i32);
                             },
                         "i64" =>
                             quote!{
@@ -168,11 +172,15 @@ fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2:
                             match type_str.as_str() {
                                 "BigInt" =>
                                     quote!{
-                                        let #pat: BigInt = self.api.get_argument_big_int(#arg_index_i32);
+                                        let #pat: BigInt = self.api.get_argument_big_int_signed(#arg_index_i32);
                                     },
                                 "BI" =>
                                     quote!{
-                                        let #pat = self.api.get_argument_big_int(#arg_index_i32);
+                                        let #pat = self.api.get_argument_big_int_signed(#arg_index_i32);
+                                    },
+                                "BU" =>
+                                    quote!{
+                                        let #pat = self.api.get_argument_big_int_unsigned(#arg_index_i32);
                                     },
                                 other_stype_str => {
                                     panic!("Unsupported reference argument type: {:?}", other_stype_str)
@@ -204,11 +212,15 @@ fn generate_result_finish_snippet(result_name: &str, ty: &syn::Type) -> proc_mac
                     },
                 "BigInt" =>
                     quote!{
-                        self.api.finish_big_int(#result_ident);
+                        self.api.finish_big_int_signed(#result_ident);
                     },
                 "BI" =>
                     quote!{
-                        self.api.finish_big_int(#result_ident);
+                        self.api.finish_big_int_signed(#result_ident);
+                    },
+                "BU" =>
+                    quote!{
+                        self.api.finish_big_int_unsigned(#result_ident);
                     },
                 "i64" =>
                     quote!{

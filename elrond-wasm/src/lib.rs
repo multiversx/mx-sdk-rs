@@ -34,7 +34,7 @@ pub trait ContractHookApi<BI> {
     fn get_call_value_big_int(&self) -> BI;
 }
 
-pub trait ContractIOApi<BI> {
+pub trait ContractIOApi<BI, BU> {
 
     fn check_num_arguments(&self, expected: i32) -> bool;
 
@@ -44,11 +44,15 @@ pub trait ContractIOApi<BI> {
     
     fn get_argument_address(&self, arg_index: i32) -> Address;
     
-    fn get_argument_big_int(&self, arg_id: i32) -> BI;
+    fn get_argument_big_int_signed(&self, arg_id: i32) -> BI;
+
+    fn get_argument_big_int_unsigned(&self, arg_id: i32) -> BU;
     
     fn get_argument_i64(&self, arg_id: i32) -> i64;
     
-    fn finish_big_int(&self, b : BI);
+    fn finish_big_int_signed(&self, b: BI);
+
+    fn finish_big_int_unsigned(&self, b: BU);
 
     fn finish_i64(&self, value: i64);
 }
@@ -59,9 +63,10 @@ use core::ops::Sub;
 use core::ops::SubAssign;
 
 pub trait BigIntApi: 
-        core::marker::Sized + 
+        Sized + 
         From<i64> +
         From<i32> +
+        Clone +
         Add + 
         AddAssign + 
         Sub + 
@@ -78,7 +83,22 @@ pub trait BigIntApi:
     fn get_bytes_big_endian(&self) -> Vec<u8>;
 
     fn get_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8>;
-    
+
+    // only needed at compilation, value will never be used
+    fn phantom() -> Self;
+}
+
+// we just use it to signal the api to interpret inputs as unsigned
+// so minimal logic, just convert to/from signed
+pub trait BigUintApi<BI>: 
+    Sized +
+    From<BI>
+{
+    // convert to the signed big int, consuming self
+    fn into_signed(self) -> BI;
+
+    // only needed at compilation, value will never be used
+    fn phantom() -> Self;
 }
 
 pub trait CallableContract {
