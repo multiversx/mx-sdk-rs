@@ -28,7 +28,7 @@ extern {
     fn callValue(resultOffset: *const u8) -> i32;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn returnData(dataOffset: *const u8, length: i32);
-    fn signalError() -> !;
+    fn signalError();
 
     fn getGasLeft() -> i64;
     fn getBlockTimestamp() -> i64;
