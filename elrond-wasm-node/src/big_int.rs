@@ -136,8 +136,16 @@ impl Mul for ArwenBigInt {
     }
 }
 
-impl MulAssign for ArwenBigInt {
+impl MulAssign<ArwenBigInt> for ArwenBigInt {
     fn mul_assign(&mut self, other: Self) {
+        unsafe {
+            bigIntMul(self.handle, self.handle, other.handle);
+        }
+    }
+}
+
+impl MulAssign<&ArwenBigInt> for ArwenBigInt {
+    fn mul_assign(&mut self, other: &ArwenBigInt) {
         unsafe {
             bigIntMul(self.handle, self.handle, other.handle);
         }

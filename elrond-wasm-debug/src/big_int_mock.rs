@@ -1,11 +1,7 @@
 
 
-use core::ops::Add;
-use core::ops::AddAssign;
-use core::ops::Sub;
-use core::ops::SubAssign;
-use core::ops::Mul;
-use core::ops::MulAssign;
+use core::ops::{Add, Sub, Mul};
+use core::ops::{AddAssign, SubAssign, MulAssign};
 
 use alloc::vec::Vec;
 
@@ -86,9 +82,15 @@ impl Mul for RustBigInt {
     }
 }
 
-impl MulAssign for RustBigInt {
+impl MulAssign<RustBigInt> for RustBigInt {
     fn mul_assign(&mut self, other: Self) {
         BigInt::mul_assign(&mut self.0, other.0)
+    }
+}
+
+impl MulAssign<&RustBigInt> for RustBigInt {
+    fn mul_assign(&mut self, other: &RustBigInt) {
+        BigInt::mul_assign(&mut self.0, &other.0)
     }
 }
 

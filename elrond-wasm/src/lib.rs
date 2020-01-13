@@ -57,10 +57,8 @@ pub trait ContractIOApi<BI, BU> {
     fn finish_i64(&self, value: i64);
 }
 
-use core::ops::Add;
-use core::ops::AddAssign;
-use core::ops::Sub;
-use core::ops::SubAssign;
+use core::ops::{Add, Sub, Mul};
+use core::ops::{AddAssign, SubAssign, MulAssign};
 
 pub trait BigIntApi: 
         Sized + 
@@ -71,6 +69,8 @@ pub trait BigIntApi:
         AddAssign + 
         Sub + 
         SubAssign +
+        Mul +
+        MulAssign +
         PartialEq +
         Eq +
         PartialOrd +
