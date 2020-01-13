@@ -10,6 +10,7 @@ edition = "2018"
 proc-macro2 = "0.4"
 quote = "0.6.8"
 syn = "0.15"
+hex = "0.4.0"
 
 [features]
 default = ["syn/full", "syn/parsing", "syn/extra-traits"]
