@@ -46,6 +46,8 @@ pub fn contract(
     let method_impls = contract.extract_method_impls();
 
     let call_methods = contract.generate_call_methods();
+    let event_defs = contract.generate_event_defs();
+    let event_impls = contract.generate_event_impls();
     let endpoints = contract.generate_endpoints();
     let function_selector_body = contract.generate_function_selector_body();
 
@@ -71,6 +73,8 @@ pub fn contract(
           for<'b> BI: SubAssign<&'b BI>,
       {
         #(#method_impls)*
+
+        #(#event_defs)*
       }
 
       pub struct #contract_struct<T, BI, BU>
@@ -155,6 +159,7 @@ pub fn contract(
           for<'b> BI: SubAssign<&'b BI>,
           T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
+        #(#event_impls)*
       }
 
       impl <T, BI, BU> #contract_struct<T, BI, BU>

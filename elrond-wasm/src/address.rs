@@ -101,4 +101,9 @@ impl H256 {
     pub fn as_fixed_bytes(&self) -> &[u8; 32] {
         &self.0
     }
+
+    #[inline]
+    pub fn copy_to_array(&self, target: &mut [u8; 32]) {
+        target.copy_from_slice(&self.0[..]);
+    }
 }

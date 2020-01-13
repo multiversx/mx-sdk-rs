@@ -9,7 +9,8 @@ pub struct Contract {
     pub trait_name: proc_macro2::Ident,
     pub struct_name: proc_macro2::Ident,
     pub debugger_name: proc_macro2::Ident,
-    trait_methods: Vec<syn::TraitItemMethod>,
+    public_methods: Vec<syn::TraitItemMethod>,
+    event_methods: Vec<syn::TraitItemMethod>,
 }
 
 impl Contract {
@@ -18,11 +19,14 @@ impl Contract {
         let struct_name = format_ident!(contract_trait.ident, "{}Inst");
         let debugger_name = format_ident!(contract_trait.ident, "{}Debug");
         let trait_methods = extract_methods(&contract_trait);
+        let public_methods = extract_public_methods(&trait_methods);
+        let event_methods = extract_event_methods(&trait_methods);
         Contract {
             trait_name: trait_name,
             struct_name: struct_name,
             debugger_name: debugger_name,
-            trait_methods: trait_methods,
+            public_methods: public_methods,
+            event_methods: event_methods,
         }
     }
 }
@@ -53,11 +57,27 @@ fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMethod>
         }).collect()
 }
 
+fn extract_public_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn::TraitItemMethod> {
+    trait_methods
+        .iter()
+        .filter(|m| !has_attribute(&m.attrs, "event"))
+        .cloned()
+        .collect()
+}
+
+fn extract_event_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn::TraitItemMethod> {
+    trait_methods
+        .iter()
+        .filter(|m| has_attribute(&m.attrs, "event"))
+        .cloned()
+        .collect()
+}
+
 impl Contract {
     // can extract trait method signatures
     // currently not used
     pub fn extract_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
-        self.trait_methods.iter().map(|m| {
+        self.public_methods.iter().map(|m| {
             let mattrs = &m.attrs;
             let msig = &m.sig;
             let sig = quote! {
@@ -69,7 +89,7 @@ impl Contract {
     }
 
     pub fn extract_method_impls(&self) -> Vec<proc_macro2::TokenStream> {
-        self.trait_methods.iter().map(|m| {
+        self.public_methods.iter().map(|m| {
             let msig = &m.sig;
             let body = match m.default {
                 Some(ref mbody) => {
@@ -88,11 +108,60 @@ impl Contract {
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 	attrs.iter().any(|attr| {
-		if let Some(first_seg) = attr.path.segments.first() {
+        if let Some(first_seg) = attr.path.segments.first() {
 			return first_seg.value().ident == name
 		};
 		false
 	})
+}
+
+fn event_id_value(attrs: &[syn::Attribute]) -> Vec<u8>{
+    let event_attr = attrs.iter().find(|attr| {
+        if let Some(first_seg) = attr.path.segments.first() {
+            first_seg.value().ident == "event"
+        } else {
+            false
+        }
+    });
+    match event_attr {        
+        None => panic!("Event not found"),
+        Some(attr) => {
+            let result_str: String;
+            let mut iter = attr.clone().tts.into_iter();
+            match iter.next() {
+                Some(proc_macro2::TokenTree::Group(group)) => {
+                    if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
+                        panic!("event paranthesis expected");
+                    }
+                    let mut iter2 = group.stream().into_iter();
+                    match iter2.next() {
+                        Some(proc_macro2::TokenTree::Literal(lit)) => {
+                            let str_val = lit.to_string();
+                            if !str_val.starts_with("\"0x") || !str_val.ends_with("\"") {
+                                panic!("string literal expected in event id");
+                            }
+                            if str_val.len() != 64 + 4 {
+                                panic!("event id should be 64 characters long");
+                            }
+                            let substr = &str_val[3..str_val.len()-1];
+                            result_str = substr.to_string();
+                        },
+                        _ => panic!("literal expected as event identifier")
+                    }
+                },
+                _ => panic!("missing event identifier")
+            }
+
+            if let Some(_) = iter.next() {
+                panic!("event too many tokens in event attribute");
+            }
+            
+            match hex::decode(result_str) {
+                Ok(v) => v,
+                Err(_) => panic!("could not parse event id"),
+            }
+        }
+    }
 }
 
 fn generate_arg_call_name(arg: &syn::FnArg, arg_index: isize) -> Option<proc_macro2::TokenStream> {
@@ -302,7 +371,7 @@ impl Contract {
         let payable_snippet = generate_payable_snippet(&m);
 
         if m.default == None {
-            panic!("Methods without implementation not allowed in contract trait");
+            panic!("Methods without implementation (other than events) not allowed in contract trait");
         }
 
         let fn_ident = &m.sig.ident;
@@ -327,13 +396,153 @@ impl Contract {
     }
 
     pub fn generate_call_methods(&self) -> Vec<proc_macro2::TokenStream> {
-        self.trait_methods.iter().map(|m| 
+        self.public_methods.iter().map(|m| 
             self.generate_call_method(m)
         ).collect()
     }
 
+    pub fn generate_event_defs(&self) -> Vec<proc_macro2::TokenStream> {
+        self.event_methods.iter().map(|m| {
+            let msig = &m.sig;
+            quote! {
+                #msig ;
+            }
+        }).collect()
+    }
+
+    fn generate_topic_conversion_code(&self, arg: &syn::FnArg, arg_index: usize) -> proc_macro2::TokenStream {
+        match arg {
+            syn::FnArg::SelfRef(ref selfref) => {
+                if !selfref.mutability.is_none() || arg_index != 0 {
+                    panic!("event method must have `&self` as its first argument.");
+                }
+                quote!{}
+            },
+            syn::FnArg::Captured(arg_captured) => {
+                let pat = &arg_captured.pat;
+                let ty = &arg_captured.ty;
+                //let arg_index_i32 = arg_index as i32;
+                match ty {                
+                    syn::Type::Reference(type_reference) => {
+                        if type_reference.mutability != None {
+                            panic!("[Event topic] Mutable references not supported as contract method arguments");
+                        }
+                        match &*type_reference.elem {
+                            syn::Type::Path(type_path) => {
+                                let type_str = type_path.path.segments.last().unwrap().value().ident.to_string();
+                                match type_str.as_str() {
+                                    "Address" =>
+                                        quote!{
+                                            #pat.copy_to_array(&mut topics[#arg_index]);
+                                        },
+                                    other_stype_str => {
+                                        panic!("[Event topic] Unsupported reference argument type: {:?}", other_stype_str)
+                                    }
+                                }
+                            },
+                            _ => {
+                                panic!("[Event topic] Unsupported reference argument type: {:?}", type_reference)
+                            }
+                        }
+                        
+                    },
+                    other_arg => panic!("[Event topic] Unsupported argument type: {:?}, should be reference", other_arg)
+                }
+            }
+            other_arg => panic!("[Event topic] Unsupported argument type: {:?}, not captured", other_arg)
+        }
+    }
+
+    fn generate_event_data_conversion_code(&self, arg: &syn::FnArg, arg_index: i32) -> proc_macro2::TokenStream {
+        match arg {
+            syn::FnArg::SelfRef(ref selfref) => {
+                if !selfref.mutability.is_none() || arg_index != 0 {
+                    panic!("[Event data] method must have `&self` as its first argument.");
+                }
+                quote!{}
+            },
+            syn::FnArg::Captured(arg_captured) => {
+                let pat = &arg_captured.pat;
+                let ty = &arg_captured.ty;
+                match ty {                
+                    syn::Type::Reference(type_reference) => {
+                        if type_reference.mutability != None {
+                            panic!("[Event data] Mutable references not supported as contract method arguments");
+                        }
+                        match &*type_reference.elem {
+                            syn::Type::Path(type_path) => {
+                                let type_str = type_path.path.segments.last().unwrap().value().ident.to_string();
+                                match type_str.as_str() {
+                                    "BI" =>
+                                        quote!{
+                                            #pat.get_bytes_big_endian_pad_right(32)
+                                        },
+                                    other_stype_str => {
+                                        panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)
+                                    }
+                                }
+                            },
+                            _ => {
+                                panic!("[Event data] Unsupported reference argument type: {:?}", type_reference)
+                            }
+                        }
+                        
+                    },
+                    other_arg => panic!("[Event data] Unsupported argument type: {:?}, should be reference", other_arg)
+                }
+            }
+            other_arg => panic!("[Event data] Unsupported argument type: {:?}, not captured", other_arg)
+        }
+    }
+
+    fn generate_event_impl(&self, m: &syn::TraitItemMethod) -> proc_macro2::TokenStream {
+        let msig = &m.sig;
+        let nr_args_no_self = msig.decl.inputs.len() - 1;
+        if nr_args_no_self == 0 {
+            panic!("events need at least 1 argument, for the data");
+        }
+        let nr_topics = nr_args_no_self as usize; // -1 data, +1 event id
+
+        let mut arg_index: usize = 0;
+        let topic_conv_snippets: Vec<proc_macro2::TokenStream> = 
+            msig.decl.inputs
+                .iter()
+                .map(|arg| {
+                    let result =
+                        if arg_index < nr_args_no_self {
+                            let conversion = self.generate_topic_conversion_code(arg, arg_index);
+                            quote! {
+                                #conversion
+                            }
+                        } else {
+                            let conversion = self.generate_event_data_conversion_code(arg, arg_index as i32);
+                            quote! {
+                                let data_vec = #conversion;
+                            }
+                        };
+                    arg_index=arg_index+1;
+                    result
+                })
+                .collect();
+        let event_id_bytes = event_id_value(&m.attrs);
+        quote! {
+            #msig {
+                let mut topics = [[0u8; 32]; #nr_topics];
+                topics[0] =  [ #(#event_id_bytes),* ];
+                #(#topic_conv_snippets)*
+                self.write_log(&topics[..], &data_vec.as_slice());
+            }
+        }
+    }
+
+    pub fn generate_event_impls(&self) -> Vec<proc_macro2::TokenStream> {
+        self.event_methods.iter().map(|m|
+            self.generate_event_impl(m)
+        ).collect()
+    }
+
     pub fn generate_endpoints(&self) -> Vec<proc_macro2::TokenStream> {
-        self.trait_methods.iter().map(|m| {
+        self.public_methods.iter().map(|m| {
             let fn_ident = &m.sig.ident;
             let call_method_ident = generate_call_method_name(&m.sig.ident);
             quote! { 
@@ -349,7 +558,7 @@ impl Contract {
     
     pub fn generate_function_selector_body(&self) -> proc_macro2::TokenStream {
         let match_arms: Vec<proc_macro2::TokenStream> = 
-            self.trait_methods.iter().map(|m| {
+            self.public_methods.iter().map(|m| {
                 let fn_name_str = &m.sig.ident.to_string();
                 let call_method_ident = generate_call_method_name(&m.sig.ident);
                 quote! {                     
