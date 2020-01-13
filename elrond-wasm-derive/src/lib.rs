@@ -63,7 +63,7 @@ pub fn contract(
       use elrond_wasm_node::ArwenBigInt;
       use elrond_wasm_node::ArwenBigUint;
       use elrond_wasm_node::*;
-      use core::ops::{AddAssign, SubAssign};
+      use core::ops::{AddAssign, SubAssign, MulAssign};
 
       pub trait #trait_name<BI, BU>: ContractHookApi<BI> + Sized 
       where 
@@ -71,6 +71,7 @@ pub fn contract(
           BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
+          for<'b> BI: MulAssign<&'b BI>,
       {
         #(#method_impls)*
 
@@ -83,6 +84,7 @@ pub fn contract(
           BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
+          for<'b> BI: MulAssign<&'b BI>,
           T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
           api: T,
@@ -96,6 +98,7 @@ pub fn contract(
           BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
+          for<'b> BI: MulAssign<&'b BI>,
           T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         pub fn new(api: T) -> Self {
@@ -113,6 +116,7 @@ pub fn contract(
           BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
+          for<'b> BI: MulAssign<&'b BI>,
           T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         #[inline]
@@ -157,6 +161,7 @@ pub fn contract(
           BU: BigUintApi<BI> + 'static,
           for<'b> BI: AddAssign<&'b BI>,
           for<'b> BI: SubAssign<&'b BI>,
+          for<'b> BI: MulAssign<&'b BI>,
           T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         #(#event_impls)*
@@ -168,6 +173,7 @@ pub fn contract(
             BU: BigUintApi<BI> + 'static,
             for<'b> BI: AddAssign<&'b BI>,
             for<'b> BI: SubAssign<&'b BI>,
+            for<'b> BI: MulAssign<&'b BI>,
             T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
       {
         #(#call_methods)*
@@ -203,6 +209,7 @@ pub fn contract(
             BU: BigUintApi<BI> + 'static,
             for<'b> BI: AddAssign<&'b BI>,
             for<'b> BI: SubAssign<&'b BI>,
+            for<'b> BI: MulAssign<&'b BI>,
             T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
         {
           fn call(&self, fn_name: &'static str) {
