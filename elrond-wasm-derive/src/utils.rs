@@ -5,10 +5,14 @@ macro_rules! format_ident {
     };
 }
 
+static ATTR_PRIVATE: &str = "private";
+static ATTR_EVENT: &str = "event";
+
 pub struct Contract {
     pub trait_name: proc_macro2::Ident,
     pub struct_name: proc_macro2::Ident,
     pub debugger_name: proc_macro2::Ident,
+    implemented_methods: Vec<syn::TraitItemMethod>,
     public_methods: Vec<syn::TraitItemMethod>,
     event_methods: Vec<syn::TraitItemMethod>,
 }
@@ -19,12 +23,14 @@ impl Contract {
         let struct_name = format_ident!(contract_trait.ident, "{}Inst");
         let debugger_name = format_ident!(contract_trait.ident, "{}Debug");
         let trait_methods = extract_methods(&contract_trait);
+        let implemented_methods = extract_implemented_methods(&trait_methods);
         let public_methods = extract_public_methods(&trait_methods);
         let event_methods = extract_event_methods(&trait_methods);
         Contract {
             trait_name: trait_name,
             struct_name: struct_name,
             debugger_name: debugger_name,
+            implemented_methods: implemented_methods,
             public_methods: public_methods,
             event_methods: event_methods,
         }
@@ -60,7 +66,15 @@ fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMethod>
 fn extract_public_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn::TraitItemMethod> {
     trait_methods
         .iter()
-        .filter(|m| !has_attribute(&m.attrs, "event"))
+        .filter(|m| !has_attribute(&m.attrs, ATTR_EVENT) && !has_attribute(&m.attrs, ATTR_PRIVATE))
+        .cloned()
+        .collect()
+}
+
+fn extract_implemented_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn::TraitItemMethod> {
+    trait_methods
+        .iter()
+        .filter(|m| !has_attribute(&m.attrs, ATTR_EVENT))
         .cloned()
         .collect()
 }
@@ -68,7 +82,7 @@ fn extract_public_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn:
 fn extract_event_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn::TraitItemMethod> {
     trait_methods
         .iter()
-        .filter(|m| has_attribute(&m.attrs, "event"))
+        .filter(|m| has_attribute(&m.attrs, ATTR_EVENT))
         .cloned()
         .collect()
 }
@@ -89,7 +103,7 @@ impl Contract {
     }
 
     pub fn extract_method_impls(&self) -> Vec<proc_macro2::TokenStream> {
-        self.public_methods.iter().map(|m| {
+        self.implemented_methods.iter().map(|m| {
             let msig = &m.sig;
             let body = match m.default {
                 Some(ref mbody) => {
@@ -118,7 +132,7 @@ fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 fn event_id_value(attrs: &[syn::Attribute]) -> Vec<u8>{
     let event_attr = attrs.iter().find(|attr| {
         if let Some(first_seg) = attr.path.segments.first() {
-            first_seg.value().ident == "event"
+            first_seg.value().ident == ATTR_EVENT
         } else {
             false
         }
