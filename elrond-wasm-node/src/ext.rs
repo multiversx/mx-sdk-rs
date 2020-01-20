@@ -4,10 +4,11 @@ use elrond_wasm::Address;
 use elrond_wasm::StorageKey;
 
 use crate::big_int::*;
+use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
 
 //use alloc::boxed::Box;
-//use alloc::vec::Vec;
+use alloc::vec::Vec;
 
 const ADDRESS_LENGTH: usize = 32;
 const KEY_LENGTH: usize = 32;
@@ -17,7 +18,7 @@ const TOPIC_LENGTH: usize = 32;
 extern {
     fn getOwner(resultOffset: *mut u8);
     fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
-    fn transferValue(gasLimit: i64, dstOffset: *mut u8, sndOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
+    fn transferValue(gasLimit: i64, dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
     fn getNumArguments() -> i32;
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
     fn getFunction(functionOffset: *const u8) -> i32;
@@ -29,6 +30,7 @@ extern {
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn returnData(dataOffset: *const u8, length: i32);
     fn signalError();
+    fn signalExit(exitCode: i32);
 
     fn getGasLeft() -> i64;
     fn getBlockTimestamp() -> i64;
@@ -94,6 +96,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
         unsafe { signalError() }
     }
 
+    #[inline]
+    fn signal_exit(&self, exit_code: i32) {
+        unsafe { signalExit(exit_code) }
+    }
+
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
         let mut topics_raw = [0u8; TOPIC_LENGTH * 10]; // hopefully we never have more than 10 topics
         for i in 0..topics.len() {
@@ -101,6 +108,39 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
         }
         unsafe {
             writeLog(data.as_ptr(), data.len() as i32, topics_raw.as_ptr(), topics.len() as i32);
+        }
+    }
+    
+    fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
+        unsafe {
+            storageStore(key.as_ref().as_ptr(), value.as_ptr(), value.len() as i32);
+        }
+    }
+
+    fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
+        // TODO: create and call method storageSize to determine size of result before copying data
+        let mut res = Vec::with_capacity(100);
+        unsafe {
+            let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
+            res.set_len(len as usize);
+        }
+        res
+    }
+
+    fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
+        unsafe {
+            storageStore(key.as_ref().as_ptr(), value.as_ptr(), 32);
+        }
+    }
+    
+    fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
+        unsafe {
+            let mut res = [0u8; 32];
+            let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
+            if len != 32 {
+                self.signal_error();
+            }
+            res
         }
     }
 
@@ -128,6 +168,25 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             ArwenBigInt {handle: result}
         }
     }
+
+    fn send_tx(&self, to: &Address, amount: &ArwenBigInt, message: &str) {
+        let gas_left = self.get_gas_left();
+        let amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
+        unsafe {
+            transferValue(
+                gas_left,
+                to.as_ref().as_ptr(),
+                amount_bytes32.as_ptr(),
+                message.as_ptr(),
+                message.len() as i32
+            );
+        }
+    }
+
+    #[inline]
+    fn get_gas_left(&self) -> i64 {
+        unsafe { getGasLeft() }
+    }
 }
 
 impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
@@ -135,7 +194,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn check_num_arguments(&self, expected: i32) -> bool {
         let nr_arg = unsafe { getNumArguments() };
         if nr_arg != expected {
-            self.signal_error();
+            self.signal_exit(2);
             return false;
         }
         return true;

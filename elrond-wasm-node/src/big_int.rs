@@ -189,14 +189,14 @@ impl elrond_wasm::BigIntApi for ArwenBigInt {
         unsafe { bigIntByteLength(self.handle) }
     }
 
-    fn copy_to_slice(&self, slice: &mut [u8]) -> i32 {
+    fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32 {
         unsafe {
             let byte_len = bigIntGetBytes(self.handle, slice.as_mut_ptr());
             byte_len
         }
     }
 
-    fn get_bytes_big_endian(&self) -> Vec<u8> {
+    fn to_bytes_big_endian(&self) -> Vec<u8> {
         unsafe {
             let byte_len = bigIntByteLength(self.handle);
             let mut vec = vec![0u8; byte_len as usize];
@@ -205,7 +205,7 @@ impl elrond_wasm::BigIntApi for ArwenBigInt {
         }
     }
 
-    fn get_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
+    fn to_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
         unsafe {
             let byte_len = bigIntByteLength(self.handle) as usize;
             if byte_len > nr_bytes {
