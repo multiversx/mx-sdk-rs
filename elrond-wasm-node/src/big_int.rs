@@ -12,8 +12,6 @@ use alloc::vec::Vec;
 
 extern {
     fn bigIntNew(value: i64) -> i32;
-    fn bigIntClone(reference: i32) -> i32;
-    fn bigIntDestruct(reference: i32);
 
     fn bigIntByteLength(x: i32) -> i32;
     fn bigIntGetBytes(reference: i32, byte_ptr: *mut u8) -> i32;
@@ -55,16 +53,11 @@ impl ArwenBigInt {
 
 impl Clone for ArwenBigInt {
     fn clone(&self) -> Self {
-        let new_handle = unsafe {
-            bigIntClone(self.handle)
-        };
-        ArwenBigInt {handle: new_handle}
-    }
-}
-
-impl Drop for ArwenBigInt {
-    fn drop(&mut self) {
-        unsafe { bigIntDestruct(self.handle) };
+        unsafe {
+            let clone_handle = bigIntNew(0);
+            bigIntAdd(clone_handle, clone_handle, self.handle);
+            ArwenBigInt {handle: clone_handle}
+        }        
     }
 }
 
