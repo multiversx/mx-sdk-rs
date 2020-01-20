@@ -10,6 +10,12 @@ use core::cmp::Ordering;
 
 pub struct RustBigInt(num_bigint::BigInt);
 
+impl RustBigInt {
+    pub fn value(&self) -> &BigInt {
+        &self.0
+    }
+}
+
 impl From<i64> for RustBigInt {
     fn from(item: i64) -> Self {
         RustBigInt(item.into())
@@ -122,16 +128,16 @@ impl elrond_wasm::BigIntApi for RustBigInt {
         panic!("byte_length not yet implemented")
     }
 
-    fn copy_to_slice(&self, _slice: &mut [u8]) -> i32 {
+    fn copy_to_slice_big_endian(&self, _slice: &mut [u8]) -> i32 {
         panic!("copy_to_slice not yet implemented")
     }
 
-    fn get_bytes_big_endian(&self) -> Vec<u8> {
+    fn to_bytes_big_endian(&self) -> Vec<u8> {
         let (_, be) = self.0.to_bytes_be();
         be
     }
 
-    fn get_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
+    fn to_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
         let (_, bytes_be) = self.0.to_bytes_be();
         if bytes_be.len() > nr_bytes {
             panic!("Number doesn't fit requested bytes");

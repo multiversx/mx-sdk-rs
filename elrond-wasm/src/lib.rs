@@ -25,13 +25,28 @@ pub trait ContractHookApi<BI> {
 
     fn signal_error(&self);
 
+    // TODO: abstract away into SC method result (as Result<..., Err>)
+    fn signal_exit(&self, exit_code: i32);
+
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
+    
+    fn storage_store(&self, key: &StorageKey, value: &Vec<u8>);
+
+    fn storage_load(&self, key: &StorageKey) -> Vec<u8>;
+
+    fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]);
+    
+    fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32];
 
     fn storage_store_big_int(&self, key: &StorageKey, value: &BI);
     
     fn storage_load_big_int(&self, key: &StorageKey) -> BI;
     
     fn get_call_value_big_int(&self) -> BI;
+
+    fn send_tx(&self, to: &Address, amount: &BI, message: &str);
+
+    fn get_gas_left(&self) -> i64;
 }
 
 pub trait ContractIOApi<BI, BU> {
@@ -78,11 +93,19 @@ pub trait BigIntApi:
 {
     fn byte_length(&self) -> i32;
 
-    fn copy_to_slice(&self, slice: &mut [u8]) -> i32;
+    fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32;
 
-    fn get_bytes_big_endian(&self) -> Vec<u8>;
+    fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
+        let byte_len = self.byte_length() as usize;
+        if byte_len > 32 {
+            panic!();
+        }
+        self.copy_to_slice_big_endian(&mut target[32 - byte_len ..]);
+    }
 
-    fn get_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8>;
+    fn to_bytes_big_endian(&self) -> Vec<u8>;
+
+    fn to_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8>;
 
     // only needed at compilation, value will never be used
     fn phantom() -> Self;

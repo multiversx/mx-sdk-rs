@@ -14,8 +14,6 @@ use num_traits::cast::ToPrimitive;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-// use hashbrown::HashMap;
-// use core::fmt;
 use std::collections::HashMap;
 use std::fmt;
 
@@ -94,7 +92,7 @@ impl TxData {
 
 #[derive(Debug, Clone)]
 pub struct TxResult {
-    pub result_status: u32,
+    pub result_status: i32,
     pub result_values: Vec<Vec<u8>>,
 }
 
@@ -153,7 +151,7 @@ impl ArwenMockState {
         }
     }
 
-    pub fn set_result_status(&mut self, status: u32) {
+    pub fn set_result_status(&mut self, status: i32) {
         self.current_result.result_status = status;
     }
     
@@ -244,24 +242,27 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         panic!("signal_error was called");
     }
 
+    fn signal_exit(&self, exit_code: i32) {
+        let mut state = self.state_ref.borrow_mut();
+        state.set_result_status(exit_code);
+    }
+
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
         print!("write_log not yet implemented\n");
     }
 
-    #[inline]
-    fn storage_store_big_int(&self, key: &StorageKey, value: &RustBigInt) {
+    fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
         let sc_address = self.get_owner();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&sc_address) {
             None => panic!("Account not found!"),
             Some(acct) => {
-                acct.storage.insert(key.clone(), value.to_signed_bytes_be());
+                acct.storage.insert(key.clone(), value.clone());
             }
         }
     }
 
-    #[inline]
-    fn storage_load_big_int(&self, key: &StorageKey) -> RustBigInt {
+    fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
         let state = self.state_ref.borrow();
         match &state.current_tx {
             None => panic!("Tx not initialized!"),
@@ -270,16 +271,43 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
                     None => panic!("Account not found!"),
                     Some(acct) => {
                         match acct.storage.get(key) {
-                            None => 0.into(),
+                            None => Vec::with_capacity(0),
                             Some(value) => {
-                                let bi = BigInt::from_signed_bytes_be(value.as_slice());
-                                bi.into()
+                                value.clone()
                             },
                         }
                     }
                 }
             }
         }
+    }
+
+    fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
+        let mut vector = Vec::with_capacity(32);
+        for i in value.iter() {
+            vector.push(*i);
+        }
+        self.storage_store(key, &vector);
+    }
+    
+    fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
+        let value = self.storage_load(key);
+        let mut res = [0u8; 32];
+        let offset = 32 - value.len();
+        for i in 0..value.len()-1 {
+            res[offset+i] = value[i];
+        }
+        res
+    }
+
+    fn storage_store_big_int(&self, key: &StorageKey, value: &RustBigInt) {
+        self.storage_store(key, &value.to_signed_bytes_be());
+    }
+
+    fn storage_load_big_int(&self, key: &StorageKey) -> RustBigInt {
+        let value = self.storage_load(key);
+        let bi = BigInt::from_signed_bytes_be(value.as_slice());
+        bi.into()
     }
 
     #[inline]
@@ -289,6 +317,27 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.call_value.clone().into(),
         }
+    }
+
+    fn send_tx(&self, to: &Address, amount: &RustBigInt, _message: &str) {
+        let owner = self.get_owner();
+        let mut state = self.state_ref.borrow_mut();
+        match state.accounts.get_mut(&owner) {
+            None => panic!("Account not found!"),
+            Some(acct) => {
+                acct.balance -= amount.value();
+            }
+        }
+        match state.accounts.get_mut(to) {
+            None => panic!("Account not found!"),
+            Some(acct) => {
+                acct.balance += amount.value();
+            }
+        }
+    }
+
+    fn get_gas_left(&self) -> i64 {
+        0
     }
 }
 

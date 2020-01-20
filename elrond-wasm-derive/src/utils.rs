@@ -253,6 +253,10 @@ fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2:
                         syn::Type::Path(type_path) => {
                             let type_str = type_path.path.segments.last().unwrap().value().ident.to_string();
                             match type_str.as_str() {
+                                "Address" =>
+                                    quote!{
+                                        let #pat: Address = self.api.get_argument_address(#arg_index_i32);
+                                    },
                                 "BigInt" =>
                                     quote!{
                                         let #pat: BigInt = self.api.get_argument_big_int_signed(#arg_index_i32);
@@ -271,7 +275,7 @@ fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2:
                             }
                         },
                         _ => {
-                            panic!("Unsupported reference argument type: {:?}", type_reference)
+                            panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
                         }
                     }
                     
@@ -449,6 +453,10 @@ impl Contract {
                                         quote!{
                                             #pat.copy_to_array(&mut topics[#arg_index]);
                                         },
+                                    "BI" =>
+                                        quote!{
+                                            #pat.copy_to_array_big_endian_pad_right(&mut topics[#arg_index]);
+                                        },
                                     other_stype_str => {
                                         panic!("[Event topic] Unsupported reference argument type: {:?}", other_stype_str)
                                     }
@@ -489,7 +497,7 @@ impl Contract {
                                 match type_str.as_str() {
                                     "BI" =>
                                         quote!{
-                                            #pat.get_bytes_big_endian_pad_right(32)
+                                            #pat.to_bytes_big_endian_pad_right(32)
                                         },
                                     other_stype_str => {
                                         panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)

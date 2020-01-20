@@ -133,10 +133,35 @@ pub fn contract(
         fn signal_error(&self) {
           self.api.signal_error();
         }
+
+        #[inline]
+        fn signal_exit(&self, exit_code: i32) {
+          self.api.signal_exit(exit_code);
+        }
     
         #[inline]
         fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
           self.api.write_log(topics, data);
+        }
+
+        #[inline]
+        fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
+          self.api.storage_store(key, value);
+        }
+
+        #[inline]
+        fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
+          self.api.storage_load(key)
+        }
+
+        #[inline]
+        fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
+          self.api.storage_store_bytes32(key, value);
+        }
+        
+        #[inline]
+        fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
+          self.api.storage_load_bytes32(key)
         }
     
         #[inline]
@@ -152,7 +177,17 @@ pub fn contract(
         #[inline]
         fn get_call_value_big_int(&self) -> BI {
           self.api.get_call_value_big_int()
-        }  
+        }
+
+        #[inline]
+        fn send_tx(&self, to: &Address, amount: &BI, message: &str) {
+          self.api.send_tx(to, amount, message);
+        }
+
+        #[inline]
+        fn get_gas_left(&self) -> i64 {
+          self.api.get_gas_left()
+        }
       }
 
       impl <T, BI, BU> #trait_name<BI, BU> for #contract_struct<T, BI, BU> 
