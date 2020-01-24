@@ -130,13 +130,8 @@ pub fn contract(
         }
 
         #[inline]
-        fn signal_error(&self) {
-          self.api.signal_error();
-        }
-
-        #[inline]
-        fn signal_exit(&self, exit_code: i32) {
-          self.api.signal_exit(exit_code);
+        fn signal_error(&self, message: &str) {
+          self.api.signal_error(message);
         }
     
         #[inline]

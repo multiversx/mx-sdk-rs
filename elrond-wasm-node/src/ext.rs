@@ -29,8 +29,7 @@ extern {
     fn callValue(resultOffset: *const u8) -> i32;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn returnData(dataOffset: *const u8, length: i32);
-    fn signalError();
-    fn signalExit(exitCode: i32);
+    fn signalError(messageOffset: *const u8, messageLength: i32);
 
     fn getGasLeft() -> i64;
     fn getBlockTimestamp() -> i64;
@@ -92,13 +91,8 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     #[inline]
-    fn signal_error(&self) {
-        unsafe { signalError() }
-    }
-
-    #[inline]
-    fn signal_exit(&self, exit_code: i32) {
-        unsafe { signalExit(exit_code) }
+    fn signal_error(&self, message: &str) {
+        unsafe { signalError(message.as_ptr(), message.len() as i32) }
     }
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
@@ -138,7 +132,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             let mut res = [0u8; 32];
             let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
             if len != 32 {
-                self.signal_error();
+                self.signal_error("32 bytes of data expected in storage at key");
             }
             res
         }
@@ -195,7 +189,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn check_num_arguments(&self, expected: i32) -> bool {
         let nr_arg = unsafe { getNumArguments() };
         if nr_arg != expected {
-            self.signal_exit(2);
+            self.signal_error("wrong number of arguments");
             return false;
         }
         return true;
@@ -203,7 +197,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     fn check_not_payable(&self) -> bool {
         if &self.get_call_value_big_int() > &0.into() {
-            self.signal_error();
+            self.signal_error("attempted to transfer funds via a non-payable function");
             return false;
         }
         return true;

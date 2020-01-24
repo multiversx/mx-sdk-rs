@@ -23,10 +23,7 @@ pub trait ContractHookApi<BI> {
 
     fn get_caller(&self) -> Address;
 
-    fn signal_error(&self);
-
-    // TODO: abstract away into SC method result (as Result<..., Err>)
-    fn signal_exit(&self, exit_code: i32);
+    fn signal_error(&self, message: &str);
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
     
