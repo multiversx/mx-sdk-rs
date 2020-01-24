@@ -238,13 +238,8 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
     }
 
     #[inline]
-    fn signal_error(&self) {
-        panic!("signal_error was called");
-    }
-
-    fn signal_exit(&self, exit_code: i32) {
-        let mut state = self.state_ref.borrow_mut();
-        state.set_result_status(exit_code);
+    fn signal_error(&self, message: &str) {
+        panic!("signal_error was called with message: {}", message);
     }
 
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
@@ -365,7 +360,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
             Some(tx) => tx.args.len(),
         };
         if nr_args != expected as usize {
-            self.signal_error();
+            self.signal_error("wrong number of arguments");
             return false;
         }
         return true;
@@ -373,7 +368,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     fn check_not_payable(&self) -> bool {
         if &self.get_call_value_big_int() > &0.into() {
-            self.signal_error();
+            self.signal_error("attempted to transfer funds via a non-payable function");
             return false;
         }
         return true;

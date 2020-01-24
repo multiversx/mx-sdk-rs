@@ -56,19 +56,20 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 
 extern {
-    fn signalError() -> !;
+    fn signalError(messageOffset: *const u8, messageLength: i32) -> !;
 }
 
 #[cfg(target_arch = "wasm32")]
 #[alloc_error_handler]
 fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
     panic!("allocation error: {:?}", layout)
-}
+} 
 
 #[cfg(target_arch = "wasm32")]
 #[panic_handler]
 fn panic_fmt(_info: &core::panic::PanicInfo) -> ! {
-    unsafe { signalError() }
+    let panic_msg = "panic occured!";
+    unsafe { signalError(panic_msg.as_ptr(), panic_msg.len() as i32) } // TODO: transmit actual panic message
 }
 
 #[cfg(target_arch = "wasm32")]
