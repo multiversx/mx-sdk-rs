@@ -54,7 +54,9 @@ pub trait ContractIOApi<BI, BU> {
 
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32];
     
-    fn get_argument_address(&self, arg_index: i32) -> Address;
+    fn get_argument_address(&self, arg_index: i32) -> Address {
+        self.get_argument_bytes32(arg_index).into()
+    }
     
     fn get_argument_big_int_signed(&self, arg_id: i32) -> BI;
 

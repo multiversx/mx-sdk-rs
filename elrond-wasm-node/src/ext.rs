@@ -213,15 +213,6 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
     
     #[inline]
-    fn get_argument_address(&self, arg_index: i32) -> Address {
-        unsafe {
-            let mut res = [0u8; 32];
-            getArgument(arg_index, res.as_mut_ptr());
-            res.into()
-        }
-    }
-    
-    #[inline]
     fn get_argument_big_int_unsigned(&self, arg_id: i32) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);

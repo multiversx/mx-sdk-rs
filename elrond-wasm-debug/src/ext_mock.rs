@@ -387,12 +387,6 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
     
     #[inline]
-    fn get_argument_address(&self, arg_index: i32) -> Address {
-        let bytes = self.get_argument_bytes32(arg_index);
-        bytes.into()
-    }
-    
-    #[inline]
     fn get_argument_big_int_signed(&self, arg_index: i32) -> RustBigInt {
         let state = self.state_ref.borrow();
         let bytes = state.get_argument(arg_index);
