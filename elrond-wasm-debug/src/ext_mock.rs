@@ -237,11 +237,6 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
-    #[inline]
-    fn signal_error(&self, message: &str) {
-        panic!("signal_error was called with message: {}", message);
-    }
-
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
         print!("write_log not yet implemented\n");
     }
@@ -425,5 +420,13 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     #[inline]
     fn finish_i64(&self, value: i64) {
         self.finish_big_int_signed(value.into());
+    }
+
+    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) {
+        let s = unsafe {
+            let slice = std::slice::from_raw_parts(message_ptr, message_len);
+            std::str::from_utf8(slice)
+        };
+        panic!("signal_error was called with message: {}", s.unwrap());
     }
 }
