@@ -6,12 +6,11 @@ extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 
-// mod ext;
-// mod ext_int64;
-//mod big_int;
 mod address;
+mod err;
 
 pub use address::*;
+pub use err::*;
 
 // Note: contracts and the api are not mutable.
 // They simply pass on/retrieve data to/from the protocol.
@@ -22,8 +21,6 @@ pub trait ContractHookApi<BI> {
     fn get_owner(&self) -> Address;
 
     fn get_caller(&self) -> Address;
-
-    fn signal_error(&self, message: &str);
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
     
@@ -69,6 +66,15 @@ pub trait ContractIOApi<BI, BU> {
     fn finish_big_int_unsigned(&self, b: BU);
 
     fn finish_i64(&self, value: i64);
+
+    #[inline]
+    fn signal_error(&self, message: &str) {
+        self.signal_error_raw(message.as_ptr(), message.len());
+    }
+
+    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize);
+
+
 }
 
 use core::ops::{Add, Sub, Mul};

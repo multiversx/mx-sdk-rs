@@ -31,6 +31,7 @@ extern crate alloc;
 // And now you can use `alloc` types!
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
+pub use alloc::string::String;
 
 // Use `wee_alloc` as the global allocator.
 // more info: https://os.phil-opp.com/heap-allocation/#local-and-static-variables
@@ -67,9 +68,17 @@ fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
 
 #[cfg(target_arch = "wasm32")]
 #[panic_handler]
-fn panic_fmt(_info: &core::panic::PanicInfo) -> ! {
-    let panic_msg = "panic occured!";
-    unsafe { signalError(panic_msg.as_ptr(), panic_msg.len() as i32) } // TODO: transmit actual panic message
+fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
+    let panic_msg = 
+        if let Some(s) = info.payload().downcast_ref::<&str>() {
+            format!("panic occurred: {:?}", s)
+        } else {
+            String::from("panic occurred")
+        };
+
+    unsafe {
+        signalError(panic_msg.as_ptr(), panic_msg.len() as i32) 
+    }
 }
 
 #[cfg(target_arch = "wasm32")]

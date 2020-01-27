@@ -56,6 +56,7 @@ pub fn contract(
       use elrond_wasm;
       use elrond_wasm::Address;
       use elrond_wasm::StorageKey;
+      use elrond_wasm::ErrorMessage;
       use elrond_wasm::ContractHookApi;
       use elrond_wasm::ContractIOApi;
       use elrond_wasm::BigIntApi;
@@ -127,11 +128,6 @@ pub fn contract(
         #[inline]
         fn get_caller(&self) -> Address {
           self.api.get_caller()
-        }
-
-        #[inline]
-        fn signal_error(&self, message: &str) {
-          self.api.signal_error(message);
         }
     
         #[inline]

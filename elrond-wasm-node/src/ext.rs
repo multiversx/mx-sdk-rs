@@ -90,11 +90,6 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
         }
     }
 
-    #[inline]
-    fn signal_error(&self, message: &str) {
-        unsafe { signalError(message.as_ptr(), message.len() as i32) }
-    }
-
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
         let mut topics_raw = [0u8; TOPIC_LENGTH * 10]; // hopefully we never have more than 10 topics
         for i in 0..topics.len() {
@@ -132,7 +127,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             let mut res = [0u8; 32];
             let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
             if len != 32 {
-                self.signal_error("32 bytes of data expected in storage at key");
+                panic!("32 bytes of data expected in storage at key");
             }
             res
         }
@@ -252,6 +247,11 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn finish_i64(&self, value: i64) {
         unsafe { int64finish(value); }
+    }
+
+    #[inline]
+    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) {
+        unsafe { signalError(message_ptr, message_len as i32) }
     }
 }
 

@@ -371,9 +371,9 @@ fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type) -> 
 }
 
 fn generate_result_err_snippet(err_ident: &syn::Ident, _ty: &syn::Type) -> proc_macro2::TokenStream {
-    // TODO: better error handling, I don't think we should be using &str directly
     quote! {
-        self.signal_error(#err_ident);
+        let (message_ptr, message_len) = ErrorMessage::message_ptr_and_len(#err_ident);
+        self.api.signal_error_raw(message_ptr, message_len);
     }
 }
 
