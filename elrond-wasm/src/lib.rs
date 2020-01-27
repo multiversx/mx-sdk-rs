@@ -49,6 +49,8 @@ pub trait ContractIOApi<BI, BU> {
 
     fn check_not_payable(&self) -> bool;
 
+    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8>;
+
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32];
     
     fn get_argument_address(&self, arg_index: i32) -> Address {
@@ -61,6 +63,8 @@ pub trait ContractIOApi<BI, BU> {
     
     fn get_argument_i64(&self, arg_id: i32) -> i64;
     
+    fn finish_vec(&self, v: Vec<u8>);
+
     fn finish_big_int_signed(&self, b: BI);
 
     fn finish_big_int_unsigned(&self, b: BU);

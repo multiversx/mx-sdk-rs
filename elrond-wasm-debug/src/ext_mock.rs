@@ -332,7 +332,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
 }
 
 impl ArwenMockState {
-    fn get_argument(&self, arg_index: i32) -> Vec<u8> {
+    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
         let arg_idx_usize: usize = arg_index as usize;
         match &self.current_tx {
             None => panic!("Tx not initialized!"),
@@ -369,10 +369,15 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         return true;
     }
 
-    #[inline]
+    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
+        let state = self.state_ref.borrow();
+        let arg = state.get_argument_vec(arg_index);
+        arg.clone()
+    }
+
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
         let state = self.state_ref.borrow();
-        let arg = state.get_argument(arg_index);
+        let arg = state.get_argument_vec(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
         for i in 0..arg.len()-1 {
@@ -381,10 +386,9 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         res
     }
     
-    #[inline]
     fn get_argument_big_int_signed(&self, arg_index: i32) -> RustBigInt {
         let state = self.state_ref.borrow();
-        let bytes = state.get_argument(arg_index);
+        let bytes = state.get_argument_vec(arg_index);
         BigInt::from_signed_bytes_be(&bytes).into()
     }
 
@@ -397,13 +401,18 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     #[inline]
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
         let state = self.state_ref.borrow();
-        let bytes = state.get_argument(arg_index);
+        let bytes = state.get_argument_vec(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
         if let Some(v) = bi.to_i64() {
             v
         } else {
             panic!("Argument does not fit in an i64.")
         }
+    }
+
+    fn finish_vec(&self, v: Vec<u8>) {
+        let mut state = self.state_ref.borrow_mut();
+        state.add_result(v.clone());
     }
 
     #[inline]
