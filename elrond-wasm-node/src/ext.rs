@@ -20,6 +20,7 @@ extern {
     fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
     fn transferValue(gasLimit: i64, dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
     fn getNumArguments() -> i32;
+    fn getArgumentLength(id: i32) -> i32;
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
     fn getFunction(functionOffset: *const u8) -> i32;
     fn storageStore(keyOffset: *const u8, dataOffset: *const u8, dataLength: i32) -> i32;
@@ -28,7 +29,7 @@ extern {
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
-    fn returnData(dataOffset: *const u8, length: i32);
+    fn finish(dataOffset: *const u8, length: i32);
     fn signalError(messageOffset: *const u8, messageLength: i32);
 
     fn getGasLeft() -> i64;
@@ -198,6 +199,16 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         return true;
     }
 
+    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
+        unsafe {
+            let len = getArgumentLength(arg_index);
+            let mut res = Vec::with_capacity(len as usize);
+            res.set_len(len as usize);
+            getArgument(arg_index, res.as_mut_ptr());
+            res
+        }
+    }
+
     #[inline]
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
         unsafe {
@@ -228,6 +239,13 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_argument_i64(&self, arg_id: i32) -> i64 {
         unsafe { int64getArgument(arg_id) }
+    }
+    
+    #[inline]
+    fn finish_vec(&self, v: Vec<u8>) {
+        unsafe {
+            finish(v.as_ptr(), v.len() as i32);
+        }
     }
 
     #[inline]

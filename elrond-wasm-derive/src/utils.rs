@@ -224,6 +224,10 @@ fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2:
                             quote!{
                                 let #pat: Address = self.api.get_argument_address(#arg_index_i32);
                             },
+                        "Vec" =>
+                            quote!{
+                                let #pat: Vec<u8> = self.api.get_argument_vec(#arg_index_i32);
+                            },
                         "BigInt" =>
                             quote!{
                                 let #pat = self.api.get_argument_big_int_signed(#arg_index_i32);
@@ -256,6 +260,10 @@ fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2:
                                 "Address" =>
                                     quote!{
                                         let #pat: Address = self.api.get_argument_address(#arg_index_i32);
+                                    },
+                                "Vec" =>
+                                    quote!{
+                                        let #pat: Vec<u8> = self.api.get_argument_vec(#arg_index_i32);
                                     },
                                 "BigInt" =>
                                     quote!{
@@ -328,6 +336,10 @@ fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type) -> 
                 "Address" =>
                     quote!{
                         self.api.finish(&#result_ident[0], 32);
+                    },
+                "Vec" => // TODO: better solution here, must capture type argument <u8>
+                    quote!{
+                        self.api.finish_vec(#result_ident);
                     },
                 "BigInt" =>
                     quote!{
