@@ -14,6 +14,8 @@
 // custom panic handler.
 #![feature(alloc, core_intrinsics)]
 
+#![feature(panic_info_message)]
+
 mod ext;
 mod ext_int64;
 mod big_int;
@@ -64,16 +66,29 @@ extern {
 #[alloc_error_handler]
 fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
     panic!("allocation error: {:?}", layout)
-} 
+}
+
+// for future reference, the PanicInfo struct looks like this:
+// PanicInfo {
+//     payload: Any,
+//     message: Some(
+//         example panic message,
+//     ),
+//     location: Location {
+//         file: "features/src/lib.rs",
+//         line: 19,
+//         col: 9,
+//     },
+// }
 
 #[cfg(target_arch = "wasm32")]
 #[panic_handler]
 fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
-    let panic_msg = 
-        if let Some(s) = info.payload().downcast_ref::<&str>() {
+    let panic_msg =
+        if let Some(s) = info.message() {
             format!("panic occurred: {:?}", s)
         } else {
-            String::from("panic occurred")
+            String::from("unknown panic occurred")
         };
 
     unsafe {
