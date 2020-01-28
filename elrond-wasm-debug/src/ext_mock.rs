@@ -237,10 +237,6 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
-    fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
-        print!("write_log not yet implemented\n");
-    }
-
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
         let sc_address = self.get_owner();
         let mut state = self.state_ref.borrow_mut();
@@ -437,5 +433,9 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
             std::str::from_utf8(slice)
         };
         panic!("signal_error was called with message: {}", s.unwrap());
+    }
+
+    fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
+        print!("write_log not yet implemented\n");
     }
 }

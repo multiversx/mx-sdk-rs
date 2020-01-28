@@ -21,8 +21,6 @@ pub trait ContractHookApi<BI> {
     fn get_owner(&self) -> Address;
 
     fn get_caller(&self) -> Address;
-
-    fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
     
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>);
 
@@ -78,7 +76,7 @@ pub trait ContractIOApi<BI, BU> {
 
     fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize);
 
-
+    fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
 
 use core::ops::{Add, Sub, Mul};
