@@ -24,6 +24,7 @@ extern {
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
     fn getFunction(functionOffset: *const u8) -> i32;
     fn storageStore(keyOffset: *const u8, dataOffset: *const u8, dataLength: i32) -> i32;
+    fn storageGetValueLength(keyOffset: *const u8) -> i32;
     fn storageLoad(keyOffset: *const u8, dataOffset: *mut u8) -> i32;
 
     fn getCaller(resultOffset: *mut u8);
@@ -108,13 +109,13 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
-        // TODO: create and call method storageSize to determine size of result before copying data
-        let mut res = Vec::with_capacity(100);
-        unsafe {
-            let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
-            res.set_len(len as usize);
+         unsafe {
+            let value_len = storageGetValueLength(key.as_ref().as_ptr()) as usize;
+            let mut res = Vec::with_capacity(value_len);
+            storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
+            res.set_len(value_len);
+            res
         }
-        res
     }
 
     fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
