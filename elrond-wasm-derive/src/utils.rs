@@ -609,7 +609,7 @@ impl Contract {
                 let mut topics = [[0u8; 32]; #nr_topics];
                 topics[0] =  [ #(#event_id_bytes),* ];
                 #(#topic_conv_snippets)*
-                self.write_log(&topics[..], &data_vec.as_slice());
+                self.api.write_log(&topics[..], &data_vec.as_slice());
             }
         }
     }

@@ -129,11 +129,6 @@ pub fn contract(
         fn get_caller(&self) -> Address {
           self.api.get_caller()
         }
-    
-        #[inline]
-        fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
-          self.api.write_log(topics, data);
-        }
 
         #[inline]
         fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {

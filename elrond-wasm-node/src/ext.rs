@@ -91,16 +91,6 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             res.into()
         }
     }
-
-    fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
-        let mut topics_raw = [0u8; TOPIC_LENGTH * 10]; // hopefully we never have more than 10 topics
-        for i in 0..topics.len() {
-            topics_raw[TOPIC_LENGTH*i..TOPIC_LENGTH*(i+1)].copy_from_slice(&topics[i]);
-        }
-        unsafe {
-            writeLog(data.as_ptr(), data.len() as i32, topics_raw.as_ptr(), topics.len() as i32);
-        }
-    }
     
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
         unsafe {
@@ -271,6 +261,16 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) {
         unsafe { signalError(message_ptr, message_len as i32) }
+    }
+
+    fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {
+        let mut topics_raw = [0u8; TOPIC_LENGTH * 10]; // hopefully we never have more than 10 topics
+        for i in 0..topics.len() {
+            topics_raw[TOPIC_LENGTH*i..TOPIC_LENGTH*(i+1)].copy_from_slice(&topics[i]);
+        }
+        unsafe {
+            writeLog(data.as_ptr(), data.len() as i32, topics_raw.as_ptr(), topics.len() as i32);
+        }
     }
 }
 
