@@ -1,5 +1,5 @@
 
-use super::utils::ATTR_EVENT;
+use super::gen::ATTR_EVENT;
 
 // parses "event attribute"
 fn event_id_value(attrs: &[syn::Attribute]) -> Vec<u8>{
