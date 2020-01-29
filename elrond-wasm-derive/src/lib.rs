@@ -15,6 +15,11 @@ extern crate syn;
 extern crate quote;
 
 mod utils;
+mod gen_arg;
+mod gen_event;
+mod gen_finish;
+mod gen_payable;
+
 use utils::*;
 
 fn wasm32_mode() -> bool {
