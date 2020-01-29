@@ -51,6 +51,25 @@ pub fn contract(
     let endpoints = contract.generate_endpoints();
     let function_selector_body = contract.generate_function_selector_body();
 
+    let bi_where = quote! {
+      where 
+          BI: BigIntApi + 'static,
+          BU: BigUintApi<BI> + 'static,
+          for<'b> BI: AddAssign<&'b BI>,
+          for<'b> BI: SubAssign<&'b BI>,
+          for<'b> BI: MulAssign<&'b BI>,
+    };
+
+    let api_where = quote! {
+      where 
+        BI: BigIntApi + 'static,
+        BU: BigUintApi<BI> + 'static,
+        for<'b> BI: AddAssign<&'b BI>,
+        for<'b> BI: SubAssign<&'b BI>,
+        for<'b> BI: MulAssign<&'b BI>,
+        T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+    };
+
     // this definition is common to release and debug mode
     let main_definition = quote! {
       use elrond_wasm;
@@ -67,12 +86,7 @@ pub fn contract(
       use core::ops::{AddAssign, SubAssign, MulAssign};
 
       pub trait #trait_name<BI, BU>: ContractHookApi<BI> + Sized 
-      where 
-          BI: BigIntApi + 'static,
-          BU: BigUintApi<BI> + 'static,
-          for<'b> BI: AddAssign<&'b BI>,
-          for<'b> BI: SubAssign<&'b BI>,
-          for<'b> BI: MulAssign<&'b BI>,
+      #bi_where
       {
         #(#method_impls)*
 
@@ -80,13 +94,7 @@ pub fn contract(
       }
 
       pub struct #contract_struct<T, BI, BU>
-      where 
-          BI: BigIntApi + 'static,
-          BU: BigUintApi<BI> + 'static,
-          for<'b> BI: AddAssign<&'b BI>,
-          for<'b> BI: SubAssign<&'b BI>,
-          for<'b> BI: MulAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+      #api_where
       {
           api: T,
           _phantom1: BI,
@@ -112,13 +120,7 @@ pub fn contract(
       }
 
       impl <T, BI, BU> ContractHookApi<BI> for #contract_struct<T, BI, BU>
-      where 
-          BI: BigIntApi + 'static,
-          BU: BigUintApi<BI> + 'static,
-          for<'b> BI: AddAssign<&'b BI>,
-          for<'b> BI: SubAssign<&'b BI>,
-          for<'b> BI: MulAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+      #api_where
       {
         #[inline]
         fn get_owner(&self) -> Address {
@@ -177,25 +179,13 @@ pub fn contract(
       }
 
       impl <T, BI, BU> #trait_name<BI, BU> for #contract_struct<T, BI, BU> 
-      where 
-          BI: BigIntApi + 'static,
-          BU: BigUintApi<BI> + 'static,
-          for<'b> BI: AddAssign<&'b BI>,
-          for<'b> BI: SubAssign<&'b BI>,
-          for<'b> BI: MulAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+      #api_where
       {
         #(#event_impls)*
       }
 
       impl <T, BI, BU> #contract_struct<T, BI, BU>
-        where 
-            BI: BigIntApi + 'static,
-            BU: BigUintApi<BI> + 'static,
-            for<'b> BI: AddAssign<&'b BI>,
-            for<'b> BI: SubAssign<&'b BI>,
-            for<'b> BI: MulAssign<&'b BI>,
-            T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+      #api_where
       {
         #(#call_methods)*
       }
@@ -225,13 +215,7 @@ pub fn contract(
   
         use elrond_wasm::CallableContract;
         impl <T, BI, BU> CallableContract for #contract_struct<T, BI, BU> 
-        where 
-            BI: BigIntApi + 'static,
-            BU: BigUintApi<BI> + 'static,
-            for<'b> BI: AddAssign<&'b BI>,
-            for<'b> BI: SubAssign<&'b BI>,
-            for<'b> BI: MulAssign<&'b BI>,
-            T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+        #api_where
         {
           fn call(&self, fn_name: &'static str) {
             #function_selector_body
