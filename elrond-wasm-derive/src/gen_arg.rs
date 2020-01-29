@@ -20,16 +20,39 @@ pub fn generate_arg_call_name(arg: &syn::FnArg, arg_index: isize) -> Option<proc
     }
 }
 
-fn generate_snippet_for_arg_type_path(type_ident: &syn::Ident, pat: &syn::Pat, arg_index_i32: i32) -> proc_macro2::TokenStream {
-    let type_str = type_ident.to_string();
+fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn::Pat, arg_index_i32: i32) -> proc_macro2::TokenStream {
+    let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
         "Address" =>
             quote!{
                 let #pat: Address = self.api.get_argument_address(#arg_index_i32);
             },
-        "Vec" =>
-            quote!{
-                let #pat: Vec<u8> = self.api.get_argument_vec(#arg_index_i32);
+        "Vec" => {
+                match &type_path_segment.arguments {
+                    syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+                        if args.len() != 1 {
+                            panic!("Vec type must have exactly 1 generic type argument");
+                        }
+                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
+                            match vec_type {                
+                                syn::Type::Path(type_path) => {
+                                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                                    let type_str = type_path_segment.ident.to_string();
+                                    match type_str.as_str() {
+                                        "u8" => quote!{
+                                            let #pat: Vec<u8> = self.api.get_argument_vec(#arg_index_i32);
+                                        },
+                                        other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
+                                    }
+                                },
+                                other_type => panic!("Unsupported vec generic type: {:?}, not a path", other_type)
+                            }
+                        } else {
+                            panic!("Vec type arguments must be types")
+                        }
+                    },
+                    _ => panic!("Vec angle brackets expected")
+                }
             },
         "BigInt" =>
             quote!{
@@ -67,8 +90,8 @@ pub fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_mac
             let arg_index_i32 = arg_index as i32;
             match ty {                
                 syn::Type::Path(type_path) => {
-                    let type_ident = type_path.path.segments.last().unwrap().value().ident.clone();
-                    generate_snippet_for_arg_type_path(&type_ident, pat, arg_index_i32)
+                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                    generate_snippet_for_arg_type(&type_path_segment, pat, arg_index_i32)
                 },             
                 syn::Type::Reference(type_reference) => {
                     if type_reference.mutability != None {
@@ -76,8 +99,8 @@ pub fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_mac
                     }
                     match &*type_reference.elem {
                         syn::Type::Path(type_path) => {
-                            let type_ident = type_path.path.segments.last().unwrap().value().ident.clone();
-                            generate_snippet_for_arg_type_path(&type_ident, pat, arg_index_i32)
+                            let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                            generate_snippet_for_arg_type(&type_path_segment, pat, arg_index_i32)
                         },
                         _ => {
                             panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
