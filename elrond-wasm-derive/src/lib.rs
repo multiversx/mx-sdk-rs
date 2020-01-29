@@ -14,13 +14,13 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
-mod utils;
+mod gen;
 mod gen_arg;
 mod gen_event;
 mod gen_finish;
 mod gen_payable;
 
-use utils::*;
+use gen::*;
 
 fn wasm32_mode() -> bool {
   // this checks if we set --release or not in the command line
