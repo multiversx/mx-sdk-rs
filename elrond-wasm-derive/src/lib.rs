@@ -58,21 +58,16 @@ pub fn contract(
 
     let bi_where = quote! {
       where 
-          BI: BigIntApi + 'static,
-          BU: BigUintApi<BI> + 'static,
-          for<'b> BI: AddAssign<&'b BI>,
-          for<'b> BI: SubAssign<&'b BI>,
-          for<'b> BI: MulAssign<&'b BI>,
+          BigInt: BigIntApi + 'static,
+          BigUint: BigUintApi<BigInt> + 'static,
+          for<'b> BigInt: AddAssign<&'b BigInt>,
+          for<'b> BigInt: SubAssign<&'b BigInt>,
+          for<'b> BigInt: MulAssign<&'b BigInt>,
     };
 
     let api_where = quote! {
-      where 
-        BI: BigIntApi + 'static,
-        BU: BigUintApi<BI> + 'static,
-        for<'b> BI: AddAssign<&'b BI>,
-        for<'b> BI: SubAssign<&'b BI>,
-        for<'b> BI: MulAssign<&'b BI>,
-        T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+      #bi_where
+        T: ContractHookApi<BigInt> + ContractIOApi<BigInt, BigUint> + Clone + 'static
     };
 
     // this definition is common to release and debug mode
@@ -90,7 +85,7 @@ pub fn contract(
       use elrond_wasm_node::*;
       use core::ops::{AddAssign, SubAssign, MulAssign};
 
-      pub trait #trait_name<BI, BU>: ContractHookApi<BI> + Sized 
+      pub trait #trait_name<BigInt, BigUint>: ContractHookApi<BigInt> + Sized 
       #bi_where
       {
         #(#method_impls)*
@@ -98,33 +93,33 @@ pub fn contract(
         #(#event_defs)*
       }
 
-      pub struct #contract_struct<T, BI, BU>
+      pub struct #contract_struct<T, BigInt, BigUint>
       #api_where
       {
           api: T,
-          _phantom1: BI,
-          _phantom2: BU,
+          _phantom1: BigInt,
+          _phantom2: BigUint,
       }
 
-      impl <T, BI, BU> #contract_struct<T, BI, BU>
+      impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
       where 
-          BI: BigIntApi + 'static,
-          BU: BigUintApi<BI> + 'static,
-          for<'b> BI: AddAssign<&'b BI>,
-          for<'b> BI: SubAssign<&'b BI>,
-          for<'b> BI: MulAssign<&'b BI>,
-          T: ContractHookApi<BI> + ContractIOApi<BI, BU> + Clone + 'static
+          BigInt: BigIntApi + 'static,
+          BigUint: BigUintApi<BigInt> + 'static,
+          for<'b> BigInt: AddAssign<&'b BigInt>,
+          for<'b> BigInt: SubAssign<&'b BigInt>,
+          for<'b> BigInt: MulAssign<&'b BigInt>,
+          T: ContractHookApi<BigInt> + ContractIOApi<BigInt, BigUint> + Clone + 'static
       {
         pub fn new(api: T) -> Self {
           #contract_struct {
             api: api,
-            _phantom1: BI::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
-            _phantom2: BU::phantom(),
+            _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+            _phantom2: BigUint::phantom(),
           }
         }
       }
 
-      impl <T, BI, BU> ContractHookApi<BI> for #contract_struct<T, BI, BU>
+      impl <T, BigInt, BigUint> ContractHookApi<BigInt> for #contract_struct<T, BigInt, BigUint>
       #api_where
       {
         #[inline]
@@ -158,22 +153,22 @@ pub fn contract(
         }
     
         #[inline]
-        fn storage_store_big_int(&self, key: &StorageKey, value: &BI) {
+        fn storage_store_big_int(&self, key: &StorageKey, value: &BigInt) {
           self.api.storage_store_big_int(key, value);
         }
         
         #[inline]
-        fn storage_load_big_int(&self, key: &StorageKey) -> BI {
+        fn storage_load_big_int(&self, key: &StorageKey) -> BigInt {
           self.api.storage_load_big_int(key)
         }
         
         #[inline]
-        fn get_call_value_big_int(&self) -> BI {
+        fn get_call_value_big_int(&self) -> BigInt {
           self.api.get_call_value_big_int()
         }
 
         #[inline]
-        fn send_tx(&self, to: &Address, amount: &BI, message: &str) {
+        fn send_tx(&self, to: &Address, amount: &BigInt, message: &str) {
           self.api.send_tx(to, amount, message);
         }
 
@@ -183,13 +178,13 @@ pub fn contract(
         }
       }
 
-      impl <T, BI, BU> #trait_name<BI, BU> for #contract_struct<T, BI, BU> 
+      impl <T, BigInt, BigUint> #trait_name<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint> 
       #api_where
       {
         #(#event_impls)*
       }
 
-      impl <T, BI, BU> #contract_struct<T, BI, BU>
+      impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
       #api_where
       {
         #(#call_methods)*
@@ -219,7 +214,7 @@ pub fn contract(
         #main_definition
   
         use elrond_wasm::CallableContract;
-        impl <T, BI, BU> CallableContract for #contract_struct<T, BI, BU> 
+        impl <T, BigInt, BigUint> CallableContract for #contract_struct<T, BigInt, BigUint> 
         #api_where
         {
           fn call(&self, fn_name: &'static str) {
@@ -229,8 +224,8 @@ pub fn contract(
           fn clone_contract(&self) -> Box<dyn CallableContract> {
             Box::new(#contract_struct {
               api: self.api.clone(),
-              _phantom1: BI::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
-              _phantom2: BU::phantom(),
+              _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+              _phantom2: BigUint::phantom(),
             })
           }
         }

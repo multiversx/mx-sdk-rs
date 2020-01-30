@@ -58,11 +58,7 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
             quote!{
                 let #pat = self.api.get_argument_big_int_signed(#arg_index_i32);
             },
-        "BI" =>
-            quote!{
-                let #pat = self.api.get_argument_big_int_signed(#arg_index_i32);
-            },
-        "BU" =>
+        "BigUint" =>
             quote!{
                 let #pat = self.api.get_argument_big_int_unsigned(#arg_index_i32);
             },
