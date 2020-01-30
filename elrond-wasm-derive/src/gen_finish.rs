@@ -41,10 +41,33 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
                     quote!{
                         self.api.finish(&#result_ident[0], 32);
                     },
-                "Vec" => // TODO: better solution here, must capture type argument <u8>
-                    quote!{
-                        self.api.finish_vec(#result_ident);
-                    },
+                "Vec" => {
+                    match &type_path_segment.arguments {
+                        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+                            if args.len() != 1 {
+                                panic!("Vec type must have exactly 1 generic type argument");
+                            }
+                            if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
+                                match vec_type {                
+                                    syn::Type::Path(type_path) => {
+                                        let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                                        let type_str = type_path_segment.ident.to_string();
+                                        match type_str.as_str() {
+                                            "u8" => quote!{
+                                                self.api.finish_vec(#result_ident);
+                                            },
+                                            other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
+                                        }
+                                    },
+                                    other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
+                                }
+                            } else {
+                                panic!("Vec type arguments must be types")
+                            }
+                        },
+                        _ => panic!("Vec angle brackets expected")
+                    }
+                },
                 "BigInt" =>
                     quote!{
                         self.api.finish_big_int_signed(#result_ident);
