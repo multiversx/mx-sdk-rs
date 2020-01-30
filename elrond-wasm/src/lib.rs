@@ -16,7 +16,7 @@ pub use err::*;
 // They simply pass on/retrieve data to/from the protocol.
 // When mocking the blockchain state, we use the Rc/RefCell pattern 
 // to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BI> {
+pub trait ContractHookApi<BigInt> {
 
     fn get_owner(&self) -> Address;
 
@@ -30,18 +30,18 @@ pub trait ContractHookApi<BI> {
     
     fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32];
 
-    fn storage_store_big_int(&self, key: &StorageKey, value: &BI);
+    fn storage_store_big_int(&self, key: &StorageKey, value: &BigInt);
     
-    fn storage_load_big_int(&self, key: &StorageKey) -> BI;
+    fn storage_load_big_int(&self, key: &StorageKey) -> BigInt;
     
-    fn get_call_value_big_int(&self) -> BI;
+    fn get_call_value_big_int(&self) -> BigInt;
 
-    fn send_tx(&self, to: &Address, amount: &BI, message: &str);
+    fn send_tx(&self, to: &Address, amount: &BigInt, message: &str);
 
     fn get_gas_left(&self) -> i64;
 }
 
-pub trait ContractIOApi<BI, BU> {
+pub trait ContractIOApi<BigInt, BigUint> {
 
     fn check_num_arguments(&self, expected: i32) -> bool;
 
@@ -55,17 +55,17 @@ pub trait ContractIOApi<BI, BU> {
         self.get_argument_bytes32(arg_index).into()
     }
     
-    fn get_argument_big_int_signed(&self, arg_id: i32) -> BI;
+    fn get_argument_big_int_signed(&self, arg_id: i32) -> BigInt;
 
-    fn get_argument_big_int_unsigned(&self, arg_id: i32) -> BU;
+    fn get_argument_big_int_unsigned(&self, arg_id: i32) -> BigUint;
     
     fn get_argument_i64(&self, arg_id: i32) -> i64;
     
     fn finish_vec(&self, v: Vec<u8>);
 
-    fn finish_big_int_signed(&self, b: BI);
+    fn finish_big_int_signed(&self, b: BigInt);
 
-    fn finish_big_int_unsigned(&self, b: BU);
+    fn finish_big_int_unsigned(&self, b: BigUint);
 
     fn finish_i64(&self, value: i64);
 
@@ -120,12 +120,12 @@ pub trait BigIntApi:
 
 // we just use it to signal the api to interpret inputs as unsigned
 // so minimal logic, just convert to/from signed
-pub trait BigUintApi<BI>: 
+pub trait BigUintApi<BigInt>: 
     Sized +
-    From<BI>
+    From<BigInt>
 {
     // convert to the signed big int, consuming self
-    fn into_signed(self) -> BI;
+    fn into_signed(self) -> BigInt;
 
     // only needed at compilation, value will never be used
     fn phantom() -> Self;

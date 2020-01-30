@@ -72,11 +72,7 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
                     quote!{
                         self.api.finish_big_int_signed(#result_ident);
                     },
-                "BI" =>
-                    quote!{
-                        self.api.finish_big_int_signed(#result_ident);
-                    },
-                "BU" =>
+                "BigUint" =>
                     quote!{
                         self.api.finish_big_int_unsigned(#result_ident);
                     },

@@ -76,7 +76,7 @@ fn generate_topic_conversion_code(arg: &syn::FnArg, arg_index: usize) -> proc_ma
                                     quote!{
                                         #pat.copy_to_array(&mut topics[#arg_index]);
                                     },
-                                "BI" =>
+                                "BigInt" =>
                                     quote!{
                                         #pat.copy_to_array_big_endian_pad_right(&mut topics[#arg_index]);
                                     },
@@ -118,7 +118,7 @@ fn generate_event_data_conversion_code(arg: &syn::FnArg, arg_index: i32) -> proc
                         syn::Type::Path(type_path) => {
                             let type_str = type_path.path.segments.last().unwrap().value().ident.to_string();
                             match type_str.as_str() {
-                                "BI" =>
+                                "BigInt" =>
                                     quote!{
                                         #pat.to_bytes_big_endian_pad_right(32)
                                     },
