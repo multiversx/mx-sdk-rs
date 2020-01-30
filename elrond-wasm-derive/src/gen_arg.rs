@@ -45,7 +45,7 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
                                         other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
                                     }
                                 },
-                                other_type => panic!("Unsupported vec generic type: {:?}, not a path", other_type)
+                                other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
                             }
                         } else {
                             panic!("Vec type arguments must be types")
