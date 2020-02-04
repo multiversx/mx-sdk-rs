@@ -41,7 +41,10 @@ pub struct AccountData {
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut storage_buf = String::new();
-        for (key, value) in &self.storage {
+        let mut keys: Vec<StorageKey> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+        keys.sort_by(|k1, k2| k1.as_bytes().cmp(k2.as_bytes()));
+        for key in &keys {
+            let value = self.storage.get(&key).unwrap();
             write!(&mut storage_buf, "\n\t\t{} -> 0x{}", address_hex(key), hex::encode(value.as_slice())).unwrap();
         }
         
