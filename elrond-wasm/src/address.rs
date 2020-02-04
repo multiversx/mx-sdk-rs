@@ -1,5 +1,5 @@
 
-#[derive(Hash, Eq, PartialEq, Clone, Debug)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct H256([u8;32]);
 
 pub type Address = H256;

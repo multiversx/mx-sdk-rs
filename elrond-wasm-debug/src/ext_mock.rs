@@ -1,7 +1,6 @@
 
 
-use elrond_wasm::Address;
-use elrond_wasm::StorageKey;
+use elrond_wasm::{H256, Address, StorageKey};
 
 use crate::big_int_mock::*;
 use elrond_wasm::ContractHookApi;
@@ -16,13 +15,20 @@ use alloc::vec::Vec;
 
 use std::collections::HashMap;
 use std::fmt;
+use std::fmt::Write;
 
 use core::cell::RefCell;
 use alloc::rc::Rc;
 
+use sha3::{Sha3_256, Keccak256, Digest};
+
 const ADDRESS_LENGTH: usize = 32;
 const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
+
+fn address_hex(address: &H256) -> alloc::string::String {
+    alloc::format!("0x{}", hex::encode(address.as_bytes()))
+}
 
 pub struct AccountData {
     pub address: Address,
@@ -32,13 +38,17 @@ pub struct AccountData {
     pub contract: Option<Box<dyn CallableContract>>,
 }
 
-impl fmt::Debug for AccountData {
+impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "AccountData {{ address: {:?}, nonce: {}, balance: {:?}, storage: {:?} }}", 
-            self.address, 
+        let mut storage_buf = String::new();
+        for (key, value) in &self.storage {
+            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", address_hex(key), hex::encode(value.as_slice())).unwrap();
+        }
+        
+        write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
             self.nonce, 
             self.balance,
-            self.storage)
+            storage_buf)
     }
 }
 
@@ -51,14 +61,14 @@ pub struct TxData {
     to: Address,
 }
 
-impl fmt::Debug for TxData {
+impl fmt::Display for TxData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "TxData {{ func: {}, args: {:?}, call_value: {}, from: {:?}, to: {:?} }}", 
+        write!(f, "TxData {{ func: {}, args: {:?}, call_value: {}, from: 0x{}, to: 0x{}\n}}", 
             self.func_name, 
             self.args, 
-            self.call_value, 
-            self.from, 
-            self.to)
+            self.call_value,
+            address_hex(&self.from), 
+            address_hex(&self.to))
     }
 }
 
@@ -90,10 +100,17 @@ impl TxData {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct TxResult {
     pub result_status: i32,
     pub result_values: Vec<Vec<u8>>,
+}
+
+impl fmt::Display for TxResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let results_hex: Vec<String> = self.result_values.iter().map(|r| format!("0x{}", hex::encode(r))).collect();
+        write!(f, "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}", self.result_status, results_hex)
+    }
 }
 
 impl TxResult {
@@ -104,11 +121,10 @@ impl TxResult {
         }
     }
     pub fn print(&self) {
-        print!("[{:#?}]\n", self);
+        print!("{}\n", self);
     }
 }
 
-#[derive(Debug)]
 pub struct ArwenMockState {
     current_tx: Option<TxData>,
     current_result: TxResult,
@@ -214,7 +230,11 @@ impl ArwenMockRef {
 
     pub fn print_accounts(&self) {
         let state = self.state_ref.borrow();
-        print!("{:#?}", state.accounts);
+        let mut accounts_buf = String::new();
+        for (address, account) in &state.accounts {
+            write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
+        }
+        print!("Accounts: {}\n", &accounts_buf);
     }
 }
 
@@ -324,6 +344,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
 
     fn get_gas_left(&self) -> i64 {
         0
+    }
+
+    fn sha256(&self, data: &Vec<u8>) -> [u8; 32] {
+        let mut hasher = Sha3_256::new();
+        hasher.input(data.as_slice());
+        hasher.result().into()
+    }
+
+    fn keccak256(&self, data: &Vec<u8>) -> [u8; 32] {
+        let mut hasher = Keccak256::new();
+        hasher.input(data.as_slice());
+        hasher.result().into()
     }
 }
 

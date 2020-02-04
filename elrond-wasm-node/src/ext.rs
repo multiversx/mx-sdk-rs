@@ -70,6 +70,9 @@ extern {
     //fn int64storageStore(keyOffset: *const u8, value: i64) -> i32;
     //fn int64storageLoad(keyOffset: *const u8) -> i64;
     fn int64finish(value: i64);
+
+    fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+    fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 }
 
 pub struct ArwenApiImpl {}
@@ -169,6 +172,22 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     fn get_gas_left(&self) -> i64 {
         unsafe { getGasLeft() }
     }
+
+    fn sha256(&self, data: &Vec<u8>) -> [u8; 32] {
+        unsafe {
+            let mut res = [0u8; 32];
+            sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
+            res
+        }
+    }
+
+    fn keccak256(&self, data: &Vec<u8>) -> [u8; 32] {
+        unsafe {
+            let mut res = [0u8; 32];
+            keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
+            res
+        }
+    }
 }
 
 impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
@@ -204,7 +223,10 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
         unsafe {
             let mut res = [0u8; 32];
-            getArgument(arg_index, res.as_mut_ptr());
+            let len = getArgument(arg_index, res.as_mut_ptr());
+            if len != 32 {
+                self.signal_error("32 bytes of data expected as argument value");
+            }
             res
         }
     }
