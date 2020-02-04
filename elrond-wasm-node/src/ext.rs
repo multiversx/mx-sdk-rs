@@ -122,7 +122,8 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             let mut res = [0u8; 32];
             let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
             if len != 32 {
-                panic!("32 bytes of data expected in storage at key");
+                let message = "32 bytes of data expected in storage at key";
+                signalError(message.as_ptr(), message.len() as i32);
             }
             res
         }
