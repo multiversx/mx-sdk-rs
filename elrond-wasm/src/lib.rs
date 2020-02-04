@@ -39,6 +39,10 @@ pub trait ContractHookApi<BigInt> {
     fn send_tx(&self, to: &Address, amount: &BigInt, message: &str);
 
     fn get_gas_left(&self) -> i64;
+
+    fn sha256(&self, data: &Vec<u8>) -> [u8; 32];
+
+    fn keccak256(&self, data: &Vec<u8>) -> [u8; 32];
 }
 
 pub trait ContractIOApi<BigInt, BigUint> {

@@ -176,6 +176,16 @@ pub fn contract(
         fn get_gas_left(&self) -> i64 {
           self.api.get_gas_left()
         }
+
+        #[inline]
+        fn sha256(&self, data: &Vec<u8>) -> [u8; 32] {
+          self.api.sha256(data)
+        }
+    
+        #[inline]
+        fn keccak256(&self, data: &Vec<u8>) -> [u8; 32] {
+          self.api.keccak256(data)
+        }
       }
 
       impl <T, BigInt, BigUint> #trait_name<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint> 
