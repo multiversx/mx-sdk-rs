@@ -14,5 +14,5 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [dependencies]
+elrond-wasm = "0.1.0"
 wee_alloc = "0.4"
-elrond-wasm = { path = "../elrond-wasm" }
