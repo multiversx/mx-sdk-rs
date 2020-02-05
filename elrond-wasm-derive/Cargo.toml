@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-derive"
-version = "1.0.0"
+version = "0.1.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -12,7 +12,6 @@ documentation = "https://docs.elrond.com/"
 description = "Elrond WebAssembly smart contract API procedural macros"
 keywords = ["elrond", "blockchain", "contract"]
 categories = ["cryptography::cryptocurrencies", "development-tools::procedural-macro-helpers"]
-maintenance = { status = "actively-developed" }
 
 [dependencies]
 proc-macro2 = "0.4"
