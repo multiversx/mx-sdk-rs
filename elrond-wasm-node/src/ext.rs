@@ -7,7 +7,6 @@ use crate::big_int::*;
 use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
 
-//use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 const ADDRESS_LENGTH: usize = 32;

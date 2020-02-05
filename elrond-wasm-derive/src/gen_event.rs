@@ -62,7 +62,6 @@ fn generate_topic_conversion_code(arg: &syn::FnArg, arg_index: usize) -> proc_ma
         syn::FnArg::Captured(arg_captured) => {
             let pat = &arg_captured.pat;
             let ty = &arg_captured.ty;
-            //let arg_index_i32 = arg_index as i32;
             match ty {                
                 syn::Type::Reference(type_reference) => {
                     if type_reference.mutability != None {
