@@ -1,10 +1,18 @@
 [package]
 name = "elrond-wasm-derive"
-version = "0.1.0"
-authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
+version = "1.0.0"
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
+license = "GNU General Public License, version 3"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://elrond.com/"
+documentation = "https://docs.elrond.com/"
+description = "Elrond WebAssembly smart contract API procedural macros"
+keywords = ["elrond", "blockchain", "contract"]
+categories = ["cryptography::cryptocurrencies", "development-tools::procedural-macro-helpers"]
+maintenance = { status = "actively-developed" }
 
 [dependencies]
 proc-macro2 = "0.4"
