@@ -19,18 +19,13 @@
 mod ext;
 mod ext_int64;
 mod big_int;
-//mod ext_big_int;
-//mod address;
 
 pub use ext::*;
 pub use ext_int64::*;
 pub use big_int::*;
-//pub use ext_big_int::*;
-//pub use address::*;
 
 #[macro_use]
 extern crate alloc;
-// And now you can use `alloc` types!
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 pub use alloc::string::String;
