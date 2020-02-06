@@ -2,12 +2,14 @@ use super::*;
 use super::gen::*;
 
 pub fn process_contract(
-    _args: proc_macro::TokenStream,
+    args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
 
+    let args_input = parse_macro_input!(args as syn::AttributeArgs);
     let proc_input = &parse_macro_input!(input as syn::ItemTrait);
-    let contract = Contract::new(proc_input);
+
+    let contract = Contract::new(args_input, proc_input);
 
     let contract_struct = contract.struct_name.clone();
     let trait_name = contract.trait_name.clone();
