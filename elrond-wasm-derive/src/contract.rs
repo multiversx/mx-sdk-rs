@@ -43,9 +43,6 @@ pub fn process_contract(
       use elrond_wasm::ContractIOApi;
       use elrond_wasm::BigIntApi;
       use elrond_wasm::BigUintApi;
-      use elrond_wasm_node::ArwenBigInt;
-      use elrond_wasm_node::ArwenBigUint;
-      use elrond_wasm_node::*;
       use core::ops::{AddAssign, SubAssign, MulAssign};
 
       pub trait #trait_name<BigInt, BigUint>: ContractHookApi<BigInt> + Sized 
@@ -169,6 +166,9 @@ pub fn process_contract(
       // release mode adds endpoints for wasmer 
       proc_macro::TokenStream::from(quote! {
         #main_definition
+
+        use elrond_wasm_node::{ArwenBigInt, ArwenBigUint};
+        use elrond_wasm_node::*;
 
         fn new_arwen_instance() -> #contract_struct<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
           #contract_struct {
