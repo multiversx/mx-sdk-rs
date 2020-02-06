@@ -15,11 +15,12 @@ extern crate syn;
 extern crate quote;
 
 mod contract;
-mod gen;
-mod gen_arg;
-mod gen_event;
-mod gen_finish;
-mod gen_payable;
+mod callable;
+mod contract_gen;
+mod contract_gen_arg;
+mod contract_gen_event;
+mod contract_gen_finish;
+mod contract_gen_payable;
 
 fn wasm32_mode() -> bool {
   // this checks if we set --release or not in the command line
