@@ -37,15 +37,10 @@ pub fn process_contract(
 
     // this definition is common to release and debug mode
     let main_definition = quote! {
-      use elrond_wasm;
-      use elrond_wasm::Address;
-      use elrond_wasm::StorageKey;
-      use elrond_wasm::ErrorMessage;
-      use elrond_wasm::ContractHookApi;
-      use elrond_wasm::ContractIOApi;
-      use elrond_wasm::BigIntApi;
-      use elrond_wasm::BigUintApi;
-      use core::ops::{AddAssign, SubAssign, MulAssign};
+      use elrond_wasm::{Box, Vec};
+      use elrond_wasm::{Address, StorageKey, ErrorMessage};
+      use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
+
 
       pub trait #trait_name<BigInt, BigUint>: ContractHookApi<BigInt> + Sized 
       #bi_where
