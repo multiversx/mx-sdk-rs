@@ -16,17 +16,15 @@ pub static ATTR_EVENT: &str = "event";
 pub struct Contract {
     pub trait_name: proc_macro2::Ident,
     pub struct_name: proc_macro2::Ident,
-    pub debugger_name: proc_macro2::Ident,
     implemented_methods: Vec<syn::TraitItemMethod>,
     public_methods: Vec<syn::TraitItemMethod>,
     event_methods: Vec<syn::TraitItemMethod>,
 }
 
 impl Contract {
-    pub fn new(contract_trait: &syn::ItemTrait) -> Self {
+    pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
         let trait_name =  format_ident!(contract_trait.ident, "{}");
-        let struct_name = format_ident!(contract_trait.ident, "{}Inst");
-        let debugger_name = format_ident!(contract_trait.ident, "{}Debug");
+        let struct_name = extract_struct_name(args);
         let trait_methods = extract_methods(&contract_trait);
         let implemented_methods = extract_implemented_methods(&trait_methods);
         let public_methods = extract_public_methods(&trait_methods);
@@ -34,11 +32,22 @@ impl Contract {
         Contract {
             trait_name: trait_name,
             struct_name: struct_name,
-            debugger_name: debugger_name,
             implemented_methods: implemented_methods,
             public_methods: public_methods,
             event_methods: event_methods,
         }
+    }
+}
+
+fn extract_struct_name(args: syn::AttributeArgs) -> proc_macro2::Ident {
+    if args.len() != 1 {
+        panic!("Exactly one argument expected in contract annotation, specifying the implementation struct name.");
+    }
+
+    if let syn::NestedMeta::Meta(syn::Meta::Word(ident)) = args.get(0).unwrap() {
+        ident.clone()
+    } else {
+        panic!("Malformed contract implementation struct name")
     }
 }
 
