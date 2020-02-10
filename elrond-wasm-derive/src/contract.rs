@@ -1,5 +1,5 @@
 use super::*;
-use super::gen::*;
+use super::contract_gen::*;
 
 pub fn process_contract(
     args: proc_macro::TokenStream,
@@ -11,7 +11,7 @@ pub fn process_contract(
 
     let contract = Contract::new(args_input, proc_input);
 
-    let contract_struct = contract.struct_name.clone();
+    let contract_struct = contract.contract_impl_name.clone();
     let trait_name = contract.trait_name.clone();
     let method_impls = contract.extract_method_impls();
 
@@ -40,14 +40,16 @@ pub fn process_contract(
       use elrond_wasm::{Box, Vec};
       use elrond_wasm::{Address, StorageKey, ErrorMessage};
       use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
+      use core::ops::{AddAssign, SubAssign, MulAssign};
 
-
-      pub trait #trait_name<BigInt, BigUint>: ContractHookApi<BigInt> + Sized 
-      #bi_where
+      pub trait #trait_name<T, BigInt, BigUint>: ContractHookApi<BigInt> + Sized 
+      #api_where
       {
         #(#method_impls)*
 
         #(#event_defs)*
+
+        fn other_contract(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
       }
 
       pub struct #contract_struct<T, BigInt, BigUint>
@@ -58,14 +60,17 @@ pub fn process_contract(
           _phantom2: BigUint,
       }
 
+      pub struct OtherContractHandle<T, BigInt, BigUint>
+      #api_where
+      {
+          api: T,
+          address: Address,
+          _phantom1: BigInt,
+          _phantom2: BigUint,
+      }
+
       impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
-      where 
-          BigInt: BigIntApi + 'static,
-          BigUint: BigUintApi<BigInt> + 'static,
-          for<'b> BigInt: AddAssign<&'b BigInt>,
-          for<'b> BigInt: SubAssign<&'b BigInt>,
-          for<'b> BigInt: MulAssign<&'b BigInt>,
-          T: ContractHookApi<BigInt> + ContractIOApi<BigInt, BigUint> + Clone + 'static
+      #api_where
       {
         pub fn new(api: T) -> Self {
           #contract_struct {
@@ -145,10 +150,20 @@ pub fn process_contract(
         }
       }
 
-      impl <T, BigInt, BigUint> #trait_name<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint> 
+      impl <T, BigInt, BigUint> #trait_name<T, BigInt, BigUint> for #contract_struct<T, BigInt, BigUint> 
       #api_where
       {
         #(#event_impls)*
+
+        fn other_contract(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
+          let other_contract = OtherContractHandle {
+            api: self.api.clone(),
+            address: address.clone(),
+            _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
+            _phantom2: BigUint::phantom(),
+          };
+          Box::new(other_contract)
+        }
       }
 
       impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
@@ -168,11 +183,8 @@ pub fn process_contract(
         use elrond_wasm_node::*;
 
         fn new_arwen_instance() -> #contract_struct<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
-          #contract_struct {
-            api: ArwenApiImpl{},
-            _phantom1: ArwenBigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
-            _phantom2: ArwenBigUint::phantom(),
-          }
+          let api = ArwenApiImpl{};
+          #contract_struct::new(api)
         }
 
         #(#endpoints)*       
@@ -192,11 +204,7 @@ pub fn process_contract(
           }
   
           fn clone_contract(&self) -> Box<dyn CallableContract> {
-            Box::new(#contract_struct {
-              api: self.api.clone(),
-              _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
-              _phantom2: BigUint::phantom(),
-            })
+            Box::new(#contract_struct::new(self.api.clone()))
           }
         }
       })

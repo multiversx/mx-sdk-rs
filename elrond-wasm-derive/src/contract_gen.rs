@@ -1,21 +1,15 @@
-use super::gen_arg::*;
-use super::gen_event::*;
-use super::gen_finish::*;
-use super::gen_payable::*;
-
-
-macro_rules! format_ident {
-    ($ident:expr, $fstr:expr) => {
-        syn::Ident::new(&format!($fstr, $ident), $ident.span())
-    };
-}
+use super::contract_gen_arg::*;
+use super::contract_gen_event::*;
+use super::contract_gen_finish::*;
+use super::contract_gen_payable::*;
+use super::util::*;
 
 pub static ATTR_PRIVATE: &str = "private";
 pub static ATTR_EVENT: &str = "event";
 
 pub struct Contract {
     pub trait_name: proc_macro2::Ident,
-    pub struct_name: proc_macro2::Ident,
+    pub contract_impl_name: proc_macro2::Ident,
     implemented_methods: Vec<syn::TraitItemMethod>,
     public_methods: Vec<syn::TraitItemMethod>,
     event_methods: Vec<syn::TraitItemMethod>,
@@ -23,58 +17,19 @@ pub struct Contract {
 
 impl Contract {
     pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
-        let trait_name =  format_ident!(contract_trait.ident, "{}");
-        let struct_name = extract_struct_name(args);
+        let contract_impl_name = extract_struct_name(args);
         let trait_methods = extract_methods(&contract_trait);
         let implemented_methods = extract_implemented_methods(&trait_methods);
         let public_methods = extract_public_methods(&trait_methods);
         let event_methods = extract_event_methods(&trait_methods);
         Contract {
-            trait_name: trait_name,
-            struct_name: struct_name,
+            trait_name: contract_trait.ident.clone(),
+            contract_impl_name: contract_impl_name,
             implemented_methods: implemented_methods,
             public_methods: public_methods,
             event_methods: event_methods,
         }
     }
-}
-
-fn extract_struct_name(args: syn::AttributeArgs) -> proc_macro2::Ident {
-    if args.len() != 1 {
-        panic!("Exactly one argument expected in contract annotation, specifying the implementation struct name.");
-    }
-
-    if let syn::NestedMeta::Meta(syn::Meta::Word(ident)) = args.get(0).unwrap() {
-        ident.clone()
-    } else {
-        panic!("Malformed contract implementation struct name")
-    }
-}
-
-fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMethod> {
-    contract_trait
-        .items
-        .iter()
-        .filter_map(|itm| match itm {
-            syn::TraitItem::Method(m) => {
-                let msig = &m.sig;
-                let bad_self_ref = format!(
-                    "ABI function `{}` must have `&self` as its first argument.",
-                    msig.ident.to_string()
-                );
-                match msig.decl.inputs[0] {
-                    syn::FnArg::SelfRef(ref selfref) => {
-                        if !selfref.mutability.is_none() {
-                            panic!(bad_self_ref)
-                        }
-                    }
-                    _ => panic!(bad_self_ref),
-                }
-
-                Some(m.clone())
-            }
-            _ => None,
-        }).collect()
 }
 
 fn extract_public_methods(trait_methods: &Vec<syn::TraitItemMethod>) -> Vec<syn::TraitItemMethod> {
@@ -132,20 +87,6 @@ impl Contract {
             body        
         }).collect()
     }
-}
-
-pub fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
-	attrs.iter().any(|attr| {
-        if let Some(first_seg) = attr.path.segments.first() {
-			return first_seg.value().ident == name
-		};
-		false
-	})
-}
-
-fn generate_call_method_name(method_ident: &proc_macro2::Ident) -> proc_macro2::Ident {
-    let call_method_name = format_ident!(method_ident, "call_{}");
-    call_method_name
 }
 
 impl Contract {

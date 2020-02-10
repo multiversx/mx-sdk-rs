@@ -15,12 +15,16 @@ extern crate syn;
 extern crate quote;
 
 mod contract;
-mod callable;
 mod contract_gen;
 mod contract_gen_arg;
 mod contract_gen_event;
 mod contract_gen_finish;
 mod contract_gen_payable;
+
+mod callable;
+mod callable_gen;
+
+mod util;
 
 fn wasm32_mode() -> bool {
   // this checks if we set --release or not in the command line
@@ -44,5 +48,15 @@ pub fn contract(
 ) -> proc_macro::TokenStream {
 
   contract::process_contract(args, input)
+
+}
+
+#[proc_macro_attribute]
+pub fn callable(
+  args: proc_macro::TokenStream,
+  input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+
+  callable::process_callable(args, input)
 
 }
