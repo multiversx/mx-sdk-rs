@@ -147,3 +147,12 @@ pub trait CallableContract {
 
     fn clone_contract(&self) -> Box<dyn CallableContract>;
 }
+
+/// Handy way of casting to a contract proxy trait.
+/// Would make more sense to be in elrond-wasm-derive, but Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
+#[macro_export]
+macro_rules! contract_proxy {
+    ($s:expr, $address:expr, $proxy_trait:ident) => {
+      $s.contract_proxy($address) as Box<dyn $proxy_trait<BigInt, BigUint>>
+  };
+}
