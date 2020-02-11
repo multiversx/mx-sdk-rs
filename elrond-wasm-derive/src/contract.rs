@@ -37,7 +37,9 @@ pub fn process_contract(
 
     // this definition is common to release and debug mode
     let main_definition = quote! {
-      use elrond_wasm::{Box, Vec};
+      #[macro_use]
+      extern crate elrond_wasm;
+      use elrond_wasm::{Box, Vec, String};
       use elrond_wasm::{Address, StorageKey, ErrorMessage};
       use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
       use core::ops::{AddAssign, SubAssign, MulAssign};
@@ -49,7 +51,7 @@ pub fn process_contract(
 
         #(#event_defs)*
 
-        fn other_contract(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
+        fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
       }
 
       pub struct #contract_struct<T, BigInt, BigUint>
@@ -135,6 +137,11 @@ pub fn process_contract(
         }
 
         #[inline]
+        fn async_call(&self, to: &Address, amount: &BigInt, data: &str) {
+          self.api.async_call(to, amount, data);
+        }
+
+        #[inline]
         fn get_gas_left(&self) -> i64 {
           self.api.get_gas_left()
         }
@@ -155,14 +162,14 @@ pub fn process_contract(
       {
         #(#event_impls)*
 
-        fn other_contract(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
-          let other_contract = OtherContractHandle {
+        fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
+          let contract_proxy = OtherContractHandle {
             api: self.api.clone(),
             address: address.clone(),
             _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
             _phantom2: BigUint::phantom(),
           };
-          Box::new(other_contract)
+          Box::new(contract_proxy)
         }
       }
 
@@ -187,7 +194,11 @@ pub fn process_contract(
           #contract_struct::new(api)
         }
 
-        #(#endpoints)*       
+        #(#endpoints)*
+
+        #[no_mangle]
+        pub fn callBack () {
+        }
       })
     } else {
       // debug mode adds the contract interface, that we use for the mocks

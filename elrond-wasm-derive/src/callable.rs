@@ -13,7 +13,7 @@ pub fn process_callable(
 
     let method_sigs = callable.extract_method_sigs();
     let trait_name = callable.trait_name.clone();
-    let callable_impl_name = callable.contract_impl_name.clone();
+    //let callable_impl_name = callable.contract_impl_name.clone();
     //let contract_impl_name = callable.contract_impl_name.clone();
 
     let method_impls = callable.generate_method_impl();

@@ -345,6 +345,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
+    fn async_call(&self, _to: &Address, _amount: &RustBigInt, _data: &str) {
+
+    }
+
     fn get_gas_left(&self) -> i64 {
         0
     }
