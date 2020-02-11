@@ -17,7 +17,6 @@ const TOPIC_LENGTH: usize = 32;
 extern {
     fn getOwner(resultOffset: *mut u8);
     fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
-    fn transferValue(gasLimit: i64, dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
     fn getNumArguments() -> i32;
     fn getArgumentLength(id: i32) -> i32;
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
@@ -25,6 +24,9 @@ extern {
     fn storageStore(keyOffset: *const u8, dataOffset: *const u8, dataLength: i32) -> i32;
     fn storageGetValueLength(keyOffset: *const u8) -> i32;
     fn storageLoad(keyOffset: *const u8, dataOffset: *mut u8) -> i32;
+
+    fn transferValue(gasLimit: i64, dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
+    fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
 
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
@@ -164,6 +166,19 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
                 amount_bytes32.as_ptr(),
                 message.as_ptr(),
                 message.len() as i32
+            );
+        }
+    }
+
+    fn async_call(&self, to: &Address, amount: &ArwenBigInt, data: &str) {
+        let mut amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
+        amount_bytes32.reverse(); // we need little endian
+        unsafe {
+            asyncCall(
+                to.as_ref().as_ptr(),
+                amount_bytes32.as_ptr(),
+                data.as_ptr(),
+                data.len() as i32
             );
         }
     }

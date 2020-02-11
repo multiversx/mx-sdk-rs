@@ -3,9 +3,11 @@
 extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
+pub use alloc::string::String;
 
 mod address;
 mod err;
+pub mod str_util;
 
 pub use address::*;
 pub use err::*;
@@ -37,6 +39,8 @@ pub trait ContractHookApi<BigInt> {
     fn get_call_value_big_int(&self) -> BigInt;
 
     fn send_tx(&self, to: &Address, amount: &BigInt, message: &str);
+
+    fn async_call(&self, to: &Address, amount: &BigInt, data: &str);
 
     fn get_gas_left(&self) -> i64;
 
