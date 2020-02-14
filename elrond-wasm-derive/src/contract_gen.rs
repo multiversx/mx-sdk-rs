@@ -88,48 +88,56 @@ impl Method {
             metadata = MethodMetadata::Public(payable_opt);
         }
         
-        let mut arg_index: isize = -1; // ignore the first argument, which is &self
-        let public_args: Vec<PublicArg> =  
-            m.sig.decl.inputs
-                .iter()
-                .filter_map(|arg| {
-                    let arg_opt = match arg {
-                        syn::FnArg::SelfRef(ref selfref) => {
-                            if !selfref.mutability.is_none() || arg_index != -1 {
-                                panic!("Trait method must have `&self` as its first argument.");
-                            }
-                            None
-                        },
-                        captured @ syn::FnArg::Captured(_) => {
-                            let mut is_payment_arg = false;
-                            if let MethodMetadata::Public(Some(PayableAttribute{ payment_arg: Some(p_attr) })) = &metadata {
-                                if p_attr == captured {
-                                    is_payment_arg = true;
-                                }
-                            }
-                            if is_payment_arg {
-                                None // do not add payment arg to public args
-                            } else {
-                                Some(PublicArg{
-                                    index: arg_index as i32,
-                                    syn_arg: captured.clone()
-                                })
-                            }
-                        },
-                        other_arg => panic!("Unsupported argument type {:?}, nor captured", other_arg),
-                    };
-
-                    arg_index=arg_index+1;
-                    arg_opt
-                })
-                .collect();
-
+        let payable_opt: Option<PayableAttribute> = if let MethodMetadata::Public(payable_opt) = &metadata {
+            payable_opt.clone()
+        } else {
+            None
+        };
+        let public_args = extract_public_args(m, &payable_opt);
+        
         Method {
             metadata: metadata.clone(),
             public_args: public_args,
             syn_m: m.clone(),
         }
     }
+}
+
+pub fn extract_public_args(m: &syn::TraitItemMethod, payable_opt: &Option<PayableAttribute>) -> Vec<PublicArg> {
+    let mut arg_index: isize = -1; // ignore the first argument, which is &self
+    m.sig.decl.inputs
+        .iter()
+        .filter_map(|arg| {
+            let arg_opt = match arg {
+                syn::FnArg::SelfRef(ref selfref) => {
+                    if !selfref.mutability.is_none() || arg_index != -1 {
+                        panic!("Trait method must have `&self` as its first argument.");
+                    }
+                    None
+                },
+                captured @ syn::FnArg::Captured(_) => {
+                    let mut is_payment_arg = false;
+                    if let Some(PayableAttribute{ payment_arg: Some(p_attr) }) = &payable_opt {
+                        if p_attr == captured {
+                            is_payment_arg = true;
+                        }
+                    }
+                    if is_payment_arg {
+                        None // do not add payment arg to public args
+                    } else {
+                        Some(PublicArg{
+                            index: arg_index as i32,
+                            syn_arg: captured.clone()
+                        })
+                    }
+                },
+                other_arg => panic!("Unsupported argument type {:?}, nor captured", other_arg),
+            };
+
+            arg_index=arg_index+1;
+            arg_opt
+        })
+        .collect()
 }
 
 impl Contract {
