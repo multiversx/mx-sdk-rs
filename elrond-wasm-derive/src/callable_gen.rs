@@ -1,30 +1,62 @@
 use super::util::*;
+use super::parse_attr::*;
+use super::contract_gen::*;
 
+#[derive(Clone, Debug)]
+pub struct CallableMethod {
+    pub payable: Option<PayableAttribute>,
+    pub public_args: Vec<PublicArg>,
+    pub syn_m: syn::TraitItemMethod,
+}
+
+impl CallableMethod {
+    pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
+        let payable_opt = PayableAttribute::parse(m);
+        let public_args = extract_public_args(m, &payable_opt);
+        CallableMethod {
+            payable: payable_opt,
+            public_args: public_args,
+            syn_m: m.clone(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Callable {
     pub trait_name: proc_macro2::Ident,
     pub callable_impl_name: proc_macro2::Ident,
     pub contract_impl_name: proc_macro2::Ident,
-    trait_methods: Vec<syn::TraitItemMethod>,
+    methods: Vec<CallableMethod>,
 }
 
 impl Callable {
     pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
         let callable_impl_name = generate_callable_interface_impl_struct_name(&contract_trait.ident);
         let contract_impl_name = extract_struct_name(args);
-        let trait_methods = extract_methods(&contract_trait);
+
+        let methods: Vec<CallableMethod> = contract_trait
+            .items
+            .iter()
+            .map(|itm| match itm {
+                syn::TraitItem::Method(m) => CallableMethod::parse(m),
+                _ => panic!("Only methods allowed in callable traits")
+            })
+            .collect();
+
+        //let trait_methods = extract_methods(&contract_trait);
         Callable {
             trait_name: contract_trait.ident.clone(),
             callable_impl_name: callable_impl_name,
             contract_impl_name: contract_impl_name,
-            trait_methods: trait_methods,
+            methods: methods,
         }
     }
 }
 
 impl Callable {
     pub fn extract_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
-        self.trait_methods.iter().map(|m| {
-            let msig = &m.sig;
+        self.methods.iter().map(|m| {
+            let msig = &m.syn_m.sig;
             let sig = quote! {
                 #msig;
             };
@@ -33,23 +65,38 @@ impl Callable {
     }
 
     pub fn generate_method_impl(&self) -> Vec<proc_macro2::TokenStream> {
-        self.trait_methods.iter().map(|m| {
-            let msig = &m.sig;
-            let mut arg_index = -1;
+        self.methods.iter().map(|m| {
+            let msig = &m.syn_m.sig;
             let arg_push_snippets: Vec<proc_macro2::TokenStream> = 
-                msig.decl.inputs
+                m.public_args
                     .iter()
-                    .map(|arg| {
-                        let snippet = generate_arg_push_snippet(arg, arg_index);
-                        arg_index=arg_index+1;
-                        snippet
-                    })
+                    .map(|arg| generate_arg_push_snippet(arg))
                     .collect();
+
+            let amount_snippet = if let Some(payment_arg) = &m.payable {
+                if let Some(payment_fn_attr) = &payment_arg.payment_arg {
+                    match &payment_fn_attr {
+                        syn::FnArg::Captured(arg_captured) => {
+                            let pat = &arg_captured.pat;
+                            quote! {
+                                let amount = #pat;
+                            }
+                        },
+                        _ => panic!("Payment arg not captured")
+                    }
+                } else {
+                    panic!("Explicit payment arg required in callable function")
+                }
+            } else {
+                quote! {
+                    let amount = BigInt::from(0);
+                }
+            };
 
             let msig_str = msig.ident.to_string();
             let sig = quote! {
                 #msig {
-                    let amount = BigInt::from(0);
+                    #amount_snippet
                     let mut data = String::from(#msig_str);
                     #(#arg_push_snippets)*
                     self.api.async_call(&self.address, &amount, data.as_str());
@@ -110,22 +157,16 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
     }
 }
 
-pub fn generate_arg_push_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2::TokenStream {
-    match arg {
-        syn::FnArg::SelfRef(ref selfref) => {
-            if !selfref.mutability.is_none() || arg_index != -1 {
-                panic!("ABI function must have `&self` as its first argument.");
-            }
-            quote!{}
-        },
+pub fn generate_arg_push_snippet(arg: &PublicArg) -> proc_macro2::TokenStream {
+    match &arg.syn_arg {
         syn::FnArg::Captured(arg_captured) => {
             let pat = &arg_captured.pat;
             let ty = &arg_captured.ty;
-            let arg_index_i32 = arg_index as i32;
+            let arg_index = arg.index;
             match ty {                
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                    generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index_i32)
+                    generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index)
                 },             
                 syn::Type::Reference(type_reference) => {
                     if type_reference.mutability != None {
@@ -134,7 +175,7 @@ pub fn generate_arg_push_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_mac
                     match &*type_reference.elem {
                         syn::Type::Path(type_path) => {
                             let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                            generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index_i32)
+                            generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index)
                         },
                         _ => {
                             panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
