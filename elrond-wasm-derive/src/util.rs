@@ -50,13 +50,3 @@ pub fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMet
             _ => None,
         }).collect()
 }
-
-pub fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
-	attrs.iter().any(|attr| {
-        if let Some(first_seg) = attr.path.segments.first() {
-			return first_seg.value().ident == name
-		};
-		false
-	})
-}
-

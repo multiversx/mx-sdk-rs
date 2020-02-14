@@ -1,12 +1,9 @@
 
-pub fn generate_arg_call_name(arg: &syn::FnArg, arg_index: isize) -> Option<proc_macro2::TokenStream> {
+use super::contract_gen::*;
+
+pub fn generate_arg_call_name(arg: &syn::FnArg) -> Option<proc_macro2::TokenStream> {
     match arg {
-        syn::FnArg::SelfRef(ref selfref) => {
-            if !selfref.mutability.is_none() || arg_index != -1 {
-                panic!("ABI function must have `&self` as its first argument.");
-            }
-            None
-        },
+        syn::FnArg::SelfRef(_) => None,
         syn::FnArg::Captured(arg_captured) => {
             let pat = &arg_captured.pat;
             let ty = &arg_captured.ty;
@@ -14,7 +11,7 @@ pub fn generate_arg_call_name(arg: &syn::FnArg, arg_index: isize) -> Option<proc
                 syn::Type::Path(_) => Some(quote!{ #pat }),
                 syn::Type::Reference(_) => Some(quote!{ &#pat }),
                 other_arg => panic!("Unsupported argument type {:?} in generate_arg_call_name", other_arg),
-            }            
+            }
         },
         other_arg => panic!("Unsupported argument type {:?} in generate_arg_call_name, neither self, nor captured", other_arg)
     }
@@ -72,22 +69,16 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
     }
 }
 
-pub fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_macro2::TokenStream {
-    match arg {
-        syn::FnArg::SelfRef(ref selfref) => {
-            if !selfref.mutability.is_none() || arg_index != -1 {
-                panic!("ABI function must have `&self` as its first argument.");
-            }
-            quote!{}
-        },
+pub fn generate_arg_init_snippet(arg: &PublicArg) -> proc_macro2::TokenStream {
+    match &arg.syn_arg {
         syn::FnArg::Captured(arg_captured) => {
             let pat = &arg_captured.pat;
             let ty = &arg_captured.ty;
-            let arg_index_i32 = arg_index as i32;
+            let arg_index = arg.index;
             match ty {                
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                    generate_snippet_for_arg_type(&type_path_segment, pat, arg_index_i32)
+                    generate_snippet_for_arg_type(&type_path_segment, pat, arg_index)
                 },             
                 syn::Type::Reference(type_reference) => {
                     if type_reference.mutability != None {
@@ -96,7 +87,7 @@ pub fn generate_arg_init_snippet(arg: &syn::FnArg, arg_index: isize) -> proc_mac
                     match &*type_reference.elem {
                         syn::Type::Path(type_path) => {
                             let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                            generate_snippet_for_arg_type(&type_path_segment, pat, arg_index_i32)
+                            generate_snippet_for_arg_type(&type_path_segment, pat, arg_index)
                         },
                         _ => {
                             panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)

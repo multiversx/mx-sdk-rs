@@ -20,6 +20,7 @@ mod contract_gen_arg;
 mod contract_gen_event;
 mod contract_gen_finish;
 mod contract_gen_payable;
+mod parse_attr;
 
 mod callable;
 mod callable_gen;

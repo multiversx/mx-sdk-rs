@@ -1,55 +1,5 @@
 
-use super::contract_gen::ATTR_EVENT;
-
-// parses "event attribute"
-fn event_id_value(attrs: &[syn::Attribute]) -> Vec<u8>{
-    let event_attr = attrs.iter().find(|attr| {
-        if let Some(first_seg) = attr.path.segments.first() {
-            first_seg.value().ident == ATTR_EVENT
-        } else {
-            false
-        }
-    });
-    match event_attr {        
-        None => panic!("Event not found"),
-        Some(attr) => {
-            let result_str: String;
-            let mut iter = attr.clone().tts.into_iter();
-            match iter.next() {
-                Some(proc_macro2::TokenTree::Group(group)) => {
-                    if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-                        panic!("event paranthesis expected");
-                    }
-                    let mut iter2 = group.stream().into_iter();
-                    match iter2.next() {
-                        Some(proc_macro2::TokenTree::Literal(lit)) => {
-                            let str_val = lit.to_string();
-                            if !str_val.starts_with("\"0x") || !str_val.ends_with("\"") {
-                                panic!("string literal expected in event id");
-                            }
-                            if str_val.len() != 64 + 4 {
-                                panic!("event id should be 64 characters long");
-                            }
-                            let substr = &str_val[3..str_val.len()-1];
-                            result_str = substr.to_string();
-                        },
-                        _ => panic!("literal expected as event identifier")
-                    }
-                },
-                _ => panic!("missing event identifier")
-            }
-
-            if let Some(_) = iter.next() {
-                panic!("event too many tokens in event attribute");
-            }
-            
-            match hex::decode(result_str) {
-                Ok(v) => v,
-                Err(_) => panic!("could not parse event id"),
-            }
-        }
-    }
-}
+use super::parse_attr::*;
 
 fn generate_topic_conversion_code(arg: &syn::FnArg, arg_index: usize) -> proc_macro2::TokenStream {
     match arg {
@@ -168,7 +118,7 @@ pub fn generate_event_impl(m: &syn::TraitItemMethod) -> proc_macro2::TokenStream
                 result
             })
             .collect();
-    let event_id_bytes = event_id_value(&m.attrs);
+    let event_id_bytes = EventAttribute::parse(m).unwrap().identifier;
     quote! {
         #msig {
             let mut topics = [[0u8; 32]; #nr_topics];
