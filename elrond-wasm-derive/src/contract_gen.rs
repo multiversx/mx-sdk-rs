@@ -125,6 +125,7 @@ pub fn extract_public_args(m: &syn::TraitItemMethod, payable_opt: &Option<Payabl
                     if is_payment_arg {
                         None // do not add payment arg to public args
                     } else {
+                        arg_index=arg_index+1;
                         Some(PublicArg{
                             index: arg_index as i32,
                             syn_arg: captured.clone()
@@ -133,8 +134,7 @@ pub fn extract_public_args(m: &syn::TraitItemMethod, payable_opt: &Option<Payabl
                 },
                 other_arg => panic!("Unsupported argument type {:?}, nor captured", other_arg),
             };
-
-            arg_index=arg_index+1;
+            
             arg_opt
         })
         .collect()
