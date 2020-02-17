@@ -68,10 +68,10 @@ extern {
     fn bigIntFinish(bih: i32);
 
     fn int64getArgument(id: i32) -> i64;
-    //fn int64storageStore(keyOffset: *const u8, value: i64) -> i32;
-    //fn int64storageLoad(keyOffset: *const u8) -> i64;
     fn int64finish(value: i64);
-
+    fn int64storageStore(keyOffset: *const u8, value: i64) -> i32;
+    fn int64storageLoad(keyOffset: *const u8) -> i64;
+    
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 }
@@ -143,6 +143,20 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             let result = bigIntNew(0);
             bigIntStorageLoad(key.as_ref().as_ptr(), result);
             ArwenBigInt {handle: result}
+        }
+    }
+
+    #[inline]
+    fn storage_store_i64(&self, key: &StorageKey, value: i64) {
+        unsafe {
+            int64storageStore(key.as_ref().as_ptr(), value);
+        }
+    }
+    
+    #[inline]
+    fn storage_load_i64(&self, key: &StorageKey) -> Option<i64> {
+        unsafe{
+            Some(int64storageLoad(key.as_ref().as_ptr()))
         }
     }
 

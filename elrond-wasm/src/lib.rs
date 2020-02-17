@@ -35,6 +35,10 @@ pub trait ContractHookApi<BigInt> {
     fn storage_store_big_int(&self, key: &StorageKey, value: &BigInt);
     
     fn storage_load_big_int(&self, key: &StorageKey) -> BigInt;
+
+    fn storage_store_i64(&self, key: &StorageKey, value: i64);
+    
+    fn storage_load_i64(&self, key: &StorageKey) -> Option<i64>;
     
     fn get_call_value_big_int(&self) -> BigInt;
 

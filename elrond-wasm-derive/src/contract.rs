@@ -125,6 +125,16 @@ pub fn process_contract(
         fn storage_load_big_int(&self, key: &StorageKey) -> BigInt {
           self.api.storage_load_big_int(key)
         }
+
+        #[inline]
+        fn storage_store_i64(&self, key: &StorageKey, value: i64) {
+          self.api.storage_store_i64(key, value);
+        }
+        
+        #[inline]
+        fn storage_load_i64(&self, key: &StorageKey) -> Option<i64> {
+          self.api.storage_load_i64(key)
+        }
         
         #[inline]
         fn get_call_value_big_int(&self) -> BigInt {
