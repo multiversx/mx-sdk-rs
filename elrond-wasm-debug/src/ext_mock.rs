@@ -319,6 +319,16 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         bi.into()
     }
 
+    fn storage_store_i64(&self, key: &StorageKey, value: i64) {
+        self.storage_store_big_int(key, &RustBigInt::from(value));
+    }
+
+    fn storage_load_i64(&self, key: &StorageKey) -> Option<i64> {
+        unsafe{
+            int64storageLoad(key.as_ref().as_ptr())
+        }
+    }
+
     #[inline]
     fn get_call_value_big_int(&self) -> RustBigInt {
         let state = self.state_ref.borrow();
