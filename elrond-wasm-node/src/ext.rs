@@ -221,13 +221,9 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
 
 impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
-    fn check_num_arguments(&self, expected: i32) -> bool {
-        let nr_arg = unsafe { getNumArguments() };
-        if nr_arg != expected {
-            self.signal_error("wrong number of arguments");
-            return false;
-        }
-        return true;
+    #[inline]
+    fn get_num_arguments(&self) -> i32 {
+        unsafe { getNumArguments() }
     }
 
     fn check_not_payable(&self) -> bool {

@@ -69,13 +69,13 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
     }
 }
 
-pub fn generate_arg_init_snippet(arg: &PublicArg) -> proc_macro2::TokenStream {
+pub fn generate_arg_init_snippet(arg: &PublicArg, arg_offset: i32) -> proc_macro2::TokenStream {
     match &arg.syn_arg {
         syn::FnArg::Captured(arg_captured) => {
             let pat = &arg_captured.pat;
             let ty = &arg_captured.ty;
-            let arg_index = arg.index;
-            match ty {                
+            let arg_index = arg.index + arg_offset;
+            match ty {
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
                     generate_snippet_for_arg_type(&type_path_segment, pat, arg_index)

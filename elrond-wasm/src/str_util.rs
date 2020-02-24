@@ -12,6 +12,22 @@ fn from_digit(num: u8) -> char {
     }
 }
 
+pub fn push_empty(s: &mut String) {
+    s.push(SEPARATOR);
+}
+
+fn push_byte(s: &mut String, byte: u8) {
+    s.push(from_digit(byte>>4));
+    s.push(from_digit(byte&0x0f));
+}
+
+pub fn push_bytes(s: &mut String, bytes: &[u8]) {
+    s.push(SEPARATOR);
+    for byte in bytes.iter() {
+        push_byte(s, *byte);
+    }
+}
+
 pub fn push_i32(s: &mut String, arg: i32) {
     push_i64(s, arg as i64);
 }
@@ -34,8 +50,7 @@ pub fn push_i64(s: &mut String, arg: i64) {
         x = x >> 8;
     }
     for byte in temp.iter().rev() {
-        s.push(from_digit(byte>>4));
-        s.push(from_digit(byte&0x0f));
+        push_byte(s, *byte);
     }
 }
 

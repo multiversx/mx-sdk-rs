@@ -5,6 +5,7 @@ use super::contract_gen::*;
 #[derive(Clone, Debug)]
 pub struct CallableMethod {
     pub payable: Option<PayableAttribute>,
+    pub callback: Option<CallbackCallAttribute>,
     pub public_args: Vec<PublicArg>,
     pub syn_m: syn::TraitItemMethod,
 }
@@ -12,9 +13,11 @@ pub struct CallableMethod {
 impl CallableMethod {
     pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
         let payable_opt = PayableAttribute::parse(m);
+        let callback_opt = CallbackCallAttribute::parse(m);
         let public_args = extract_public_args(m, &payable_opt);
         CallableMethod {
             payable: payable_opt,
+            callback: callback_opt,
             public_args: public_args,
             syn_m: m.clone(),
         }
@@ -93,12 +96,25 @@ impl Callable {
                 }
             };
 
+            let callback_snippet = if let Some(callback_ident) = &m.callback {
+                let cb_name_str = &callback_ident.arg.to_string();
+                let cb_name_literal = array_literal(cb_name_str.as_bytes());
+                quote! {
+                    elrond_wasm::str_util::push_bytes(&mut data, & #cb_name_literal);
+                }
+            } else {
+                quote! {
+                    elrond_wasm::str_util::push_empty(&mut data);
+                }
+            };
+
             let msig_str = msig.ident.to_string();
             let sig = quote! {
                 #msig {
                     #amount_snippet
                     let mut data = String::from(#msig_str);
                     #(#arg_push_snippets)*
+                    #callback_snippet
                     self.api.async_call(&self.address, &amount, data.as_str());
                 }
             };

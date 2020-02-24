@@ -50,3 +50,7 @@ pub fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMet
             _ => None,
         }).collect()
 }
+
+pub fn array_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
+    quote! { [ #(#bytes),* ] }
+}
