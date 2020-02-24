@@ -392,17 +392,13 @@ impl ArwenMockState {
 
 impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
-    fn check_num_arguments(&self, expected: i32) -> bool {
+    fn get_num_arguments(&self) -> i32 {
         let state = self.state_ref.borrow();
         let nr_args = match &state.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.args.len(),
         };
-        if nr_args != expected as usize {
-            self.signal_error("wrong number of arguments");
-            return false;
-        }
-        return true;
+        nr_args as i32
     }
 
     fn check_not_payable(&self) -> bool {

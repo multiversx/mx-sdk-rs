@@ -57,7 +57,21 @@ pub trait ContractHookApi<BigInt> {
 /// The smart contract code doesn't have access to these methods directly.
 pub trait ContractIOApi<BigInt, BigUint> {
 
-    fn check_num_arguments(&self, expected: i32) -> bool;
+    fn get_num_arguments(&self) -> i32;
+
+    fn check_num_arguments(&self, expected: i32) -> bool {
+        let nr_args = self.get_num_arguments();
+        if nr_args == expected + 1 {
+            let callback_name_arg = self.get_argument_vec(nr_args - 1);
+            self.finish_vec(callback_name_arg); // callback method argument
+            return true;
+        }
+        if nr_args != expected {
+            self.signal_error("wrong number of arguments");
+            return false;
+        }
+        return true;
+    }
 
     fn check_not_payable(&self) -> bool;
 

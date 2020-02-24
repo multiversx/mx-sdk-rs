@@ -20,6 +20,7 @@ pub fn process_contract(
     let event_impls = contract.generate_event_impls();
     let endpoints = contract.generate_endpoints();
     let function_selector_body = contract.generate_function_selector_body();
+    let callback_body = contract.generate_callback_body();
 
     let bi_where = quote! {
       where 
@@ -52,6 +53,8 @@ pub fn process_contract(
         #(#event_defs)*
 
         fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
+
+        fn callback(&self);
       }
 
       pub struct #contract_struct<T, BigInt, BigUint>
@@ -181,6 +184,10 @@ pub fn process_contract(
           };
           Box::new(contract_proxy)
         }
+
+        fn callback(&self) {
+          #callback_body
+        }
       }
 
       impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
@@ -208,6 +215,8 @@ pub fn process_contract(
 
         #[no_mangle]
         pub fn callBack () {
+          let inst = new_arwen_instance();
+          inst.callback();
         }
       })
     } else {

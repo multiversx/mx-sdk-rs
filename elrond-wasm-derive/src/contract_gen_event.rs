@@ -1,5 +1,6 @@
 
 use super::parse_attr::*;
+use super::util::*;
 
 fn generate_topic_conversion_code(arg: &syn::FnArg, arg_index: usize) -> proc_macro2::TokenStream {
     match arg {
@@ -119,10 +120,11 @@ pub fn generate_event_impl(m: &syn::TraitItemMethod) -> proc_macro2::TokenStream
             })
             .collect();
     let event_id_bytes = EventAttribute::parse(m).unwrap().identifier;
+    let event_id_literal = array_literal(event_id_bytes.as_slice());
     quote! {
         #msig {
             let mut topics = [[0u8; 32]; #nr_topics];
-            topics[0] =  [ #(#event_id_bytes),* ];
+            topics[0] = #event_id_literal;
             #(#topic_conv_snippets)*
             self.api.write_log(&topics[..], &data_vec.as_slice());
         }

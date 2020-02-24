@@ -40,6 +40,7 @@ pub enum MethodMetadata {
     Public(Option<PayableAttribute>),
     Private(),
     Event(Vec<u8>),
+    Callback(),
 }
 
 #[derive(Clone, Debug)]
@@ -59,6 +60,7 @@ impl Method {
     pub fn parse(m: &syn::TraitItemMethod) -> Method {
         let payable_opt = PayableAttribute::parse(m);
         let private = is_private(m);
+        let callback = is_callback_decl(m);
         let event_opt = EventAttribute::parse(m);
 
         let metadata: MethodMetadata;
@@ -69,10 +71,24 @@ impl Method {
             if private {
                 panic!("Events cannot be marked private, they are private by definition.");
             }
+            if callback {
+                panic!("Events cannot be callbacks.");
+            }
             if let Some(_) = m.default {
                 panic!("Events cannot have provided implementations in the trait.");
             }
             metadata = MethodMetadata::Event(event_attr.identifier);
+        } else if callback {
+            if let Some(_) = payable_opt {
+                panic!("Callback methods cannot be marked payable.");
+            }
+            if private {
+                panic!("Callbacks cannot be marked private, they are private by definition.");
+            }
+            if m.default == None {
+                panic!("Callback methods need an implementation.");
+            }
+            metadata = MethodMetadata::Callback();
         } else if private {
             if let Some(_) = payable_opt {
                 panic!("Private methods cannot be marked payable.");
@@ -166,7 +182,7 @@ impl Contract {
         self.methods.iter()
         .filter_map(|m| {
             match m.metadata {
-                MethodMetadata::Public(_) | MethodMetadata::Private() => {
+                MethodMetadata::Public(_) | MethodMetadata::Private() | MethodMetadata::Callback() => {
                     let msig = &m.syn_m.sig;
                     let body = match m.syn_m.default {
                         Some(ref mbody) => {
@@ -199,7 +215,7 @@ impl Method {
         let pub_arg_init_snippets: Vec<proc_macro2::TokenStream> = 
             self.public_args
                 .iter()
-                .map(|arg| generate_arg_init_snippet(arg))
+                .map(|arg| generate_arg_init_snippet(arg, 0))
                 .collect();
 
         let nr_args = self.public_args.len() as i32;
@@ -284,7 +300,7 @@ impl Contract {
                             #[no_mangle]
                             pub fn #fn_ident ()
                             {
-                                let mut inst = new_arwen_instance();
+                                let inst = new_arwen_instance();
                                 inst.#call_method_ident();
                             }
                         }  ;  
@@ -321,6 +337,64 @@ impl Contract {
             match fn_name {
                 #(#match_arms)*
                 other => panic!("No function named `{}` exists in contract.", other)
+            }
+        }
+    }
+
+    pub fn generate_callback_body(&self) -> proc_macro2::TokenStream {
+        let match_arms: Vec<proc_macro2::TokenStream> = 
+            self.methods.iter()
+                .filter_map(|m| {
+                    let all_arg_names: Vec<proc_macro2::TokenStream> =  
+                        m.syn_m.sig.decl.inputs
+                            .iter()
+                            .filter_map(|arg| generate_arg_call_name(arg))
+                            .collect();
+
+                    let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
+                        m.public_args
+                            .iter()
+                            .map(|arg| generate_arg_init_snippet(arg, 1))
+                            .collect();
+
+                    match m.metadata {
+                        MethodMetadata::Callback() => {
+                            let fn_ident = &m.syn_m.sig.ident;
+                            let fn_name_str = &fn_ident.to_string();
+                            let fn_name_literal = array_literal(fn_name_str.as_bytes());
+                            let expected_num_args = (m.public_args.len() + 1) as i32;
+                            let match_arm = quote! {                     
+                                #fn_name_literal =>
+                                {
+                                    if nr_args != #expected_num_args {
+                                        self.api.signal_error("wrong number of callback arguments");
+                                        return;
+                                    }
+                                    #(#arg_init_snippets)*
+                                    self.#fn_ident (#(#all_arg_names),*);
+                                },
+                            };
+                            Some(match_arm)
+                        },
+                        _ => None
+                    }
+                })
+                .collect();
+        quote! {
+            let nr_args = self.api.get_num_arguments();
+            if nr_args == 0 {
+                return;
+            }
+            let cb_name = self.api.get_argument_vec(0i32);
+            match cb_name.as_slice() {
+                [] => {
+                    if nr_args != 1i32 {
+                        self.api.signal_error("wrong number of callback arguments");
+                        return;
+                    }
+                }
+                #(#match_arms)*
+                other => panic!("No callback function with that name exists in contract.")
             }
         }
     }
