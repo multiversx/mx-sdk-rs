@@ -25,7 +25,7 @@ extern {
     fn storageGetValueLength(keyOffset: *const u8) -> i32;
     fn storageLoad(keyOffset: *const u8, dataOffset: *mut u8) -> i32;
 
-    fn transferValue(gasLimit: i64, dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
+    fn transferValue(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
     fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
 
     fn getCaller(resultOffset: *mut u8);
@@ -170,12 +170,10 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     fn send_tx(&self, to: &Address, amount: &ArwenBigInt, message: &str) {
-        let gas_left = self.get_gas_left();
         let mut amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
         amount_bytes32.reverse(); // we need little endian
         unsafe {
             transferValue(
-                gas_left,
                 to.as_ref().as_ptr(),
                 amount_bytes32.as_ptr(),
                 message.as_ptr(),
