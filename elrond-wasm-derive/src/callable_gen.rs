@@ -156,7 +156,9 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
                 }
             },
         "BigInt" =>
-            panic!("[callable] BigInt arguments not yet supported"),
+            quote!{
+                elrond_wasm::str_util::push_bytes(&mut data, #pat.to_bytes_big_endian().as_slice());
+            },
         "BigUint" =>
             panic!("[callable] BigUint arguments not yet supported"),
         "i32" =>
