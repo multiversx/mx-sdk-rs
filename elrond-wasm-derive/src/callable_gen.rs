@@ -126,8 +126,9 @@ impl Callable {
 fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn::Pat, _arg_index_i32: i32) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
-        "Address" =>
-            panic!("[callable] Address arguments not yet supported"),
+        "Address" => quote!{
+            elrond_wasm::str_util::push_bytes(&mut data, #pat.as_bytes());
+        },
         "Vec" => {
                 match &type_path_segment.arguments {
                     syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
@@ -141,7 +142,7 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
                                     let type_str = type_path_segment.ident.to_string();
                                     match type_str.as_str() {
                                         "u8" => quote!{
-                                            panic!("[callable] Vec<u8> arguments not yet supported"),
+                                            elrond_wasm::str_util::push_bytes(&mut data, #pat.as_slice());
                                         },
                                         other_type => panic!("[callable] Unsupported type: Vec<{:?}>", other_type)
                                     }
@@ -185,7 +186,7 @@ pub fn generate_arg_push_snippet(arg: &PublicArg) -> proc_macro2::TokenStream {
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
                     generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index)
-                },             
+                },
                 syn::Type::Reference(type_reference) => {
                     if type_reference.mutability != None {
                         panic!("Mutable references not supported as contract method arguments");
