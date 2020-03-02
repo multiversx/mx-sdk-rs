@@ -345,20 +345,18 @@ impl Contract {
         let match_arms: Vec<proc_macro2::TokenStream> = 
             self.methods.iter()
                 .filter_map(|m| {
-                    let all_arg_names: Vec<proc_macro2::TokenStream> =  
-                        m.syn_m.sig.decl.inputs
-                            .iter()
-                            .filter_map(|arg| generate_arg_call_name(arg))
-                            .collect();
-
-                    let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
-                        m.public_args
-                            .iter()
-                            .map(|arg| generate_arg_init_snippet(arg, 1))
-                            .collect();
-
                     match m.metadata {
                         MethodMetadata::Callback() => {
+                            let all_arg_names: Vec<proc_macro2::TokenStream> =  
+                                m.syn_m.sig.decl.inputs
+                                    .iter()
+                                    .filter_map(|arg| generate_arg_call_name(arg))
+                                    .collect();
+                            let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
+                                m.public_args
+                                    .iter()
+                                    .map(|arg| generate_arg_init_snippet(arg, 1))
+                                    .collect();
                             let fn_ident = &m.syn_m.sig.ident;
                             let fn_name_str = &fn_ident.to_string();
                             let fn_name_literal = array_literal(fn_name_str.as_bytes());
