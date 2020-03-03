@@ -100,6 +100,11 @@ pub fn process_contract(
         }
 
         #[inline]
+        fn get_balance(&self, address: &Address) -> BigInt {
+          self.api.get_balance(address)
+        }
+
+        #[inline]
         fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
           self.api.storage_store(key, value);
         }
