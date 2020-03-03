@@ -50,15 +50,6 @@ extern {
 
     fn bigIntNew(value: i64) -> i32;
 
-    fn bigIntByteLength(x: i32) -> i32;
-    fn bigIntGetBytes(reference: i32, byte_ptr: *mut u8) -> i32;
-    fn bigIntSetBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
-
-    fn bigIntAdd(dest: i32, x: i32, y: i32);
-    fn bigIntSub(dest: i32, x: i32, y: i32);
-    fn bigIntMul(dest: i32, x: i32, y: i32);
-    fn bigIntCmp(x: i32, y: i32) -> i32;
-
     fn bigIntStorageStore(key_ptr: *const u8, source: i32) -> i32;
     fn bigIntStorageLoad(key_ptr: *const u8, destination: i32) -> i32;
     

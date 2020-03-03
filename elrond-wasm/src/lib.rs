@@ -115,8 +115,8 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
 
-use core::ops::{Add, Sub, Mul};
-use core::ops::{AddAssign, SubAssign, MulAssign};
+use core::ops::{Add, Sub, Mul, Div, Rem};
+use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
 /// Definition of the BigInt type required by the API.
 /// The API doesn't care about the actual BigInt implementation.
@@ -133,6 +133,10 @@ pub trait BigIntApi:
         SubAssign +
         Mul +
         MulAssign +
+        Div +
+        DivAssign +
+        Rem +
+        RemAssign +
         PartialEq +
         Eq +
         PartialOrd +
