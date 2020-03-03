@@ -242,7 +242,6 @@ impl ArwenMockRef {
 }
 
 impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
-    #[inline]
     fn get_owner(&self) -> Address {
         let state = self.state_ref.borrow();
         match &state.current_tx {
@@ -251,13 +250,16 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
-    #[inline]
     fn get_caller(&self) -> Address {
         let state = self.state_ref.borrow();
         match &state.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.from.clone(),
         }
+    }
+
+    fn get_balance(&self, _address: &Address) -> RustBigInt {
+        panic!("get_balance not yet implemented")
     }
 
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {

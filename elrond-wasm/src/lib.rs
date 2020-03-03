@@ -8,9 +8,11 @@ pub use alloc::string::String;
 mod address;
 mod err;
 pub mod str_util;
+pub mod serialization;
 
 pub use address::*;
 pub use err::*;
+pub use serialization::*;
 
 /// Interface to be used by the actual smart contract code.
 /// 
@@ -23,6 +25,12 @@ pub trait ContractHookApi<BigInt> {
     fn get_owner(&self) -> Address;
 
     fn get_caller(&self) -> Address;
+
+    fn get_balance(&self, address: &Address) -> BigInt;
+
+    fn get_own_balance(&self) -> BigInt {
+        self.get_balance(&self.get_owner())
+    }
     
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>);
 
