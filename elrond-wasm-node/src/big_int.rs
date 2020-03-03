@@ -1,11 +1,7 @@
 
 
-use core::ops::Add;
-use core::ops::AddAssign;
-use core::ops::Sub;
-use core::ops::SubAssign;
-use core::ops::Mul;
-use core::ops::MulAssign;
+use core::ops::{Add, Sub, Mul, Div, Rem};
+use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
@@ -20,6 +16,8 @@ extern {
     fn bigIntAdd(dest: i32, x: i32, y: i32);
     fn bigIntSub(dest: i32, x: i32, y: i32);
     fn bigIntMul(dest: i32, x: i32, y: i32);
+    fn bigIntTDiv(dest: i32, x: i32, y: i32);
+    fn bigIntTMod(dest: i32, x: i32, y: i32);
     fn bigIntCmp(x: i32, y: i32) -> i32;
 }
 
@@ -141,6 +139,62 @@ impl MulAssign<&ArwenBigInt> for ArwenBigInt {
     fn mul_assign(&mut self, other: &ArwenBigInt) {
         unsafe {
             bigIntMul(self.handle, self.handle, other.handle);
+        }
+    }
+}
+
+impl Div for ArwenBigInt {
+    type Output = ArwenBigInt;
+
+    fn div(self, other: ArwenBigInt) -> ArwenBigInt {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntTDiv(result, self.handle, other.handle);
+            ArwenBigInt {handle: result}
+        }
+    }
+}
+
+impl DivAssign<ArwenBigInt> for ArwenBigInt {
+    fn div_assign(&mut self, other: Self) {
+        unsafe {
+            bigIntTDiv(self.handle, self.handle, other.handle);
+        }
+    }
+}
+
+impl DivAssign<&ArwenBigInt> for ArwenBigInt {
+    fn div_assign(&mut self, other: &ArwenBigInt) {
+        unsafe {
+            bigIntTDiv(self.handle, self.handle, other.handle);
+        }
+    }
+}
+
+impl Rem for ArwenBigInt {
+    type Output = ArwenBigInt;
+
+    fn rem(self, other: ArwenBigInt) -> ArwenBigInt {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntTDiv(result, self.handle, other.handle);
+            ArwenBigInt {handle: result}
+        }
+    }
+}
+
+impl RemAssign<ArwenBigInt> for ArwenBigInt {
+    fn rem_assign(&mut self, other: Self) {
+        unsafe {
+            bigIntTDiv(self.handle, self.handle, other.handle);
+        }
+    }
+}
+
+impl RemAssign<&ArwenBigInt> for ArwenBigInt {
+    fn rem_assign(&mut self, other: &ArwenBigInt) {
+        unsafe {
+            bigIntTDiv(self.handle, self.handle, other.handle);
         }
     }
 }

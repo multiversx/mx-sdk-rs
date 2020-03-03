@@ -1,7 +1,7 @@
 
 
-use core::ops::{Add, Sub, Mul};
-use core::ops::{AddAssign, SubAssign, MulAssign};
+use core::ops::{Add, Sub, Mul, Div, Rem};
+use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
 use alloc::vec::Vec;
 
@@ -97,6 +97,46 @@ impl MulAssign<RustBigInt> for RustBigInt {
 impl MulAssign<&RustBigInt> for RustBigInt {
     fn mul_assign(&mut self, other: &RustBigInt) {
         BigInt::mul_assign(&mut self.0, &other.0)
+    }
+}
+
+impl Div for RustBigInt {
+    type Output = RustBigInt;
+
+    fn div(self, other: RustBigInt) -> RustBigInt {
+        RustBigInt(self.0 / other.0)
+    }
+}
+
+impl DivAssign<RustBigInt> for RustBigInt {
+    fn div_assign(&mut self, other: Self) {
+        BigInt::div_assign(&mut self.0, &other.0)
+    }
+}
+
+impl DivAssign<&RustBigInt> for RustBigInt {
+    fn div_assign(&mut self, other: &RustBigInt) {
+        BigInt::div_assign(&mut self.0, &other.0)
+    }
+}
+
+impl Rem for RustBigInt {
+    type Output = RustBigInt;
+
+    fn rem(self, other: RustBigInt) -> RustBigInt {
+        RustBigInt(self.0 % other.0)
+    }
+}
+
+impl RemAssign<RustBigInt> for RustBigInt {
+    fn rem_assign(&mut self, other: Self) {
+        BigInt::rem_assign(&mut self.0, &other.0)
+    }
+}
+
+impl RemAssign<&RustBigInt> for RustBigInt {
+    fn rem_assign(&mut self, other: &RustBigInt) {
+        BigInt::rem_assign(&mut self.0, &other.0)
     }
 }
 
