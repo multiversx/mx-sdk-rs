@@ -62,6 +62,7 @@ extern {
     fn bigIntStorageStore(key_ptr: *const u8, source: i32) -> i32;
     fn bigIntStorageLoad(key_ptr: *const u8, destination: i32) -> i32;
     
+    fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetCallValue(dest: i32);
@@ -93,6 +94,14 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
             let mut res = [0u8; 32];
             getCaller(res.as_mut_ptr());
             res.into()
+        }
+    }
+
+    fn get_balance(&self, address: &Address) -> ArwenBigInt {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntGetExternalBalance(address.as_ref().as_ptr(), result);
+            ArwenBigInt {handle: result}
         }
     }
     
