@@ -18,19 +18,8 @@ pub fn process_callable(
 
     let method_impls = callable.generate_method_impl();
 
-    let bi_where = quote! {
-      where 
-          BigInt: BigIntApi + 'static,
-          BigUint: BigUintApi<BigInt> + 'static,
-          for<'b> BigInt: AddAssign<&'b BigInt>,
-          for<'b> BigInt: SubAssign<&'b BigInt>,
-          for<'b> BigInt: MulAssign<&'b BigInt>,
-    };
-
-    let api_where = quote! {
-      #bi_where
-        T: ContractHookApi<BigInt> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
-    };
+    let bi_where = snippets::big_int_where();
+    let api_where = snippets::api_where();
 
     // this definition is common to release and debug mode
     let main_definition = quote! {
