@@ -21,11 +21,11 @@ mod contract_gen_event;
 mod contract_gen_finish;
 mod contract_gen_payable;
 mod parse_attr;
+mod snippets;
+mod util;
 
 mod callable;
 mod callable_gen;
-
-mod util;
 
 fn wasm32_mode() -> bool {
   // this checks if we set --release or not in the command line
