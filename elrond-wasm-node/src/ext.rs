@@ -170,8 +170,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     fn send_tx(&self, to: &Address, amount: &ArwenBigInt, message: &str) {
-        let mut amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
-        amount_bytes32.reverse(); // we need little endian
+        let amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
         unsafe {
             transferValue(
                 to.as_ref().as_ptr(),
@@ -183,8 +182,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     fn async_call(&self, to: &Address, amount: &ArwenBigInt, data: &str) {
-        let mut amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
-        amount_bytes32.reverse(); // we need little endian
+        let amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
         unsafe {
             asyncCall(
                 to.as_ref().as_ptr(),
