@@ -141,6 +141,8 @@ pub trait BigIntApi:
         Eq +
         PartialOrd<Self> +
         Ord +
+        PartialEq<i64> +
+        PartialOrd<i64> +
 {
     fn byte_length(&self) -> i32;
 
