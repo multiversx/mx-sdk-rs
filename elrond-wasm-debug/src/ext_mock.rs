@@ -404,7 +404,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn check_not_payable(&self) -> bool {
-        if &self.get_call_value_big_int() > &0.into() {
+        if self.get_call_value_big_int() > 0 {
             self.signal_error("attempted to transfer funds via a non-payable function");
             return false;
         }
