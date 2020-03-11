@@ -140,7 +140,7 @@ impl RemAssign<&RustBigInt> for RustBigInt {
     }
 }
 
-impl PartialEq for RustBigInt {
+impl PartialEq<Self> for RustBigInt {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         PartialEq::eq(&self.0, &other.0)
@@ -149,6 +149,13 @@ impl PartialEq for RustBigInt {
 
 impl Eq for RustBigInt{}
 
+impl PartialOrd<Self> for RustBigInt {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        PartialOrd::partial_cmp(&self.0, &other.0)
+    }
+}
+
 impl Ord for RustBigInt {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -156,10 +163,17 @@ impl Ord for RustBigInt {
     }
 }
 
-impl PartialOrd for RustBigInt {
+impl PartialEq<i64> for RustBigInt {
     #[inline]
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        PartialOrd::partial_cmp(&self.0, &other.0)
+    fn eq(&self, other: &i64) -> bool {
+        PartialEq::eq(&self.0, &BigInt::from(*other))
+    }
+}
+
+impl PartialOrd<i64> for RustBigInt {
+    #[inline]
+    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
+        PartialOrd::partial_cmp(&self.0, &BigInt::from(*other))
     }
 }
 

@@ -209,6 +209,13 @@ impl PartialEq for ArwenBigInt {
 
 impl Eq for ArwenBigInt{}
 
+impl PartialOrd for ArwenBigInt {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 impl Ord for ArwenBigInt {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -223,10 +230,17 @@ impl Ord for ArwenBigInt {
     }
 }
 
-impl PartialOrd for ArwenBigInt {
+impl PartialEq<i64> for ArwenBigInt {
     #[inline]
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+    fn eq(&self, other: &i64) -> bool {
+        PartialEq::eq(self, &ArwenBigInt::from(*other))
+    }
+}
+
+impl PartialOrd<i64> for ArwenBigInt {
+    #[inline]
+    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
+        PartialOrd::partial_cmp(self, &ArwenBigInt::from(*other))
     }
 }
 
