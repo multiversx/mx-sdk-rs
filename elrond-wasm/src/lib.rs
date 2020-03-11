@@ -127,19 +127,19 @@ pub trait BigIntApi:
         From<i64> +
         From<i32> +
         Clone +
-        Add + 
+        Add<Output=Self> + 
         AddAssign + 
-        Sub + 
+        Sub<Output=Self> + 
         SubAssign +
-        Mul +
+        Mul<Output=Self> +
         MulAssign +
-        Div +
+        Div<Output=Self> +
         DivAssign +
-        Rem +
+        Rem<Output=Self> +
         RemAssign +
-        PartialEq +
+        PartialEq<Self> +
         Eq +
-        PartialOrd +
+        PartialOrd<Self> +
         Ord +
 {
     fn byte_length(&self) -> i32;
