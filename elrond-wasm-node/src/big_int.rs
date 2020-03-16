@@ -9,9 +9,11 @@ use alloc::vec::Vec;
 extern {
     fn bigIntNew(value: i64) -> i32;
 
-    fn bigIntByteLength(x: i32) -> i32;
-    fn bigIntGetBytes(reference: i32, byte_ptr: *mut u8) -> i32;
-    fn bigIntSetBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
+    fn bigIntUnsignedByteLength(x: i32) -> i32;
+    fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
+    fn bigIntGetSignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
+    fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
+    fn bigIntSetSignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
 
     fn bigIntAdd(dest: i32, x: i32, y: i32);
     fn bigIntSub(dest: i32, x: i32, y: i32);
@@ -247,34 +249,34 @@ impl PartialOrd<i64> for ArwenBigInt {
 impl elrond_wasm::BigIntApi for ArwenBigInt {
     #[inline]
     fn byte_length(&self) -> i32 {
-        unsafe { bigIntByteLength(self.handle) }
+        unsafe { bigIntUnsignedByteLength(self.handle) }
     }
 
     fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32 {
         unsafe {
-            let byte_len = bigIntGetBytes(self.handle, slice.as_mut_ptr());
+            let byte_len = bigIntGetUnsignedBytes(self.handle, slice.as_mut_ptr());
             byte_len
         }
     }
 
     fn to_bytes_big_endian(&self) -> Vec<u8> {
         unsafe {
-            let byte_len = bigIntByteLength(self.handle);
+            let byte_len = bigIntUnsignedByteLength(self.handle);
             let mut vec = vec![0u8; byte_len as usize];
-            bigIntGetBytes(self.handle, vec.as_mut_ptr());
+            bigIntGetUnsignedBytes(self.handle, vec.as_mut_ptr());
             vec
         }
     }
 
     fn to_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
         unsafe {
-            let byte_len = bigIntByteLength(self.handle) as usize;
+            let byte_len = bigIntUnsignedByteLength(self.handle) as usize;
             if byte_len > nr_bytes {
                 panic!();
             }
             let mut vec = vec![0u8; nr_bytes];
             if byte_len > 0 {
-                bigIntGetBytes(self.handle, &mut vec[nr_bytes - byte_len]);
+                bigIntGetUnsignedBytes(self.handle, &mut vec[nr_bytes - byte_len]);
             }
             vec
         }
