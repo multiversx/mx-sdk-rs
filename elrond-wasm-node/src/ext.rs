@@ -283,6 +283,14 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
+    fn finish_bytes32(&self, bytes: &[u8; 32]) {
+        unsafe {
+            finish(bytes.as_ptr(), 32i32);
+        }
+        panic!("finish_bytes32");
+    }
+
+    #[inline]
     fn finish_big_int_signed(&self, b: ArwenBigInt) {
         unsafe {
             bigIntFinish(b.handle);
