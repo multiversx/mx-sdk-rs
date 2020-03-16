@@ -457,6 +457,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         state.add_result(v.clone());
     }
 
+    fn finish_bytes32(&self, bytes: &[u8; 32]) {
+        self.finish_vec(bytes.to_vec());
+    }
+
     #[inline]
     fn finish_big_int_signed(&self, bi: RustBigInt) {
         let mut state = self.state_ref.borrow_mut();

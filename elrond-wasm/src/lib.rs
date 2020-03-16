@@ -99,6 +99,8 @@ pub trait ContractIOApi<BigInt, BigUint> {
     
     fn finish_vec(&self, v: Vec<u8>);
 
+    fn finish_bytes32(&self, bytes: &[u8; 32]);
+
     fn finish_big_int_signed(&self, b: BigInt);
 
     fn finish_big_int_unsigned(&self, b: BigUint);

@@ -39,7 +39,7 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
                 },
                 "Address" =>
                     quote!{
-                        self.api.finish(&#result_ident[0], 32);
+                        self.api.finish_bytes32(#result_ident.as_fixed_bytes());
                     },
                 "Vec" => {
                     match &type_path_segment.arguments {
