@@ -50,8 +50,8 @@ extern {
 
     fn bigIntNew(value: i64) -> i32;
 
-    fn bigIntStorageStore(key_ptr: *const u8, source: i32) -> i32;
-    fn bigIntStorageLoad(key_ptr: *const u8, destination: i32) -> i32;
+    fn bigIntStorageStoreUnsigned(key_ptr: *const u8, source: i32) -> i32;
+    fn bigIntStorageLoadUnsigned(key_ptr: *const u8, destination: i32) -> i32;
     
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
@@ -133,7 +133,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     #[inline]
     fn storage_store_big_int(&self, key: &StorageKey, value: &ArwenBigInt) {
         unsafe {
-            bigIntStorageStore(key.as_ref().as_ptr(), value.handle);
+            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), value.handle);
         }
     }
 
@@ -141,7 +141,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     fn storage_load_big_int(&self, key: &StorageKey) -> ArwenBigInt {
         unsafe {
             let result = bigIntNew(0);
-            bigIntStorageLoad(key.as_ref().as_ptr(), result);
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), result);
             ArwenBigInt {handle: result}
         }
     }
