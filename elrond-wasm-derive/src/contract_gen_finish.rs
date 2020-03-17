@@ -1,93 +1,23 @@
 
 pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type) -> proc_macro2::TokenStream {
-    match ty {                
-        syn::Type::Path(type_path) => {
-            let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-            let type_str = type_path_segment.ident.to_string();
-            match type_str.as_str() {
-                "Result" => {    
-                    match &type_path_segment.arguments {
-                        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
-                            if args.len() != 2 {
-                                panic!("Result type must have exactly 2 generic type arguments");
-                            }
-
-                            if let (syn::GenericArgument::Type(result_type), syn::GenericArgument::Type(err_type)) =
-                                   (args.first().unwrap().into_value(), args.last().unwrap().into_value()) {
-                                let ok_res_ident = syn::Ident::new("ok_res", proc_macro2::Span::call_site());
-                                let ok_snippet = generate_result_finish_snippet(&ok_res_ident, result_type);
-                                let err_res_ident = syn::Ident::new("err_res", proc_macro2::Span::call_site());
-                                let err_snippet = generate_result_err_snippet(&err_res_ident, err_type);
-
-                                quote!{
-                                    match #result_ident {
-                                        Ok(#ok_res_ident) => {
-                                            #ok_snippet
-                                        },
-                                        Err(#err_res_ident) => {
-                                            #err_snippet
-                                        }
-                                    }
-                                }                                
-                            } else {
-                                panic!("Result type arguments must be types")
-                            }
-                        },
-                        _ => panic!("Result angle brackets expected")
-                    }
-                    
+    match ty {     
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability != None {
+                panic!("Mutable references not supported as contract method arguments");
+            }
+            match &*type_reference.elem {
+                syn::Type::Path(type_path) => {
+                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                    generate_result_finish_snippet_for_arg_type(type_path_segment, result_ident, true)
                 },
-                "Address" =>
-                    quote!{
-                        self.api.finish_bytes32(#result_ident.as_fixed_bytes());
-                    },
-                "Vec" => {
-                    match &type_path_segment.arguments {
-                        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
-                            if args.len() != 1 {
-                                panic!("Vec type must have exactly 1 generic type argument");
-                            }
-                            if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
-                                match vec_type {                
-                                    syn::Type::Path(type_path) => {
-                                        let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                                        let type_str = type_path_segment.ident.to_string();
-                                        match type_str.as_str() {
-                                            "u8" => quote!{
-                                                self.api.finish_vec(#result_ident);
-                                            },
-                                            other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
-                                        }
-                                    },
-                                    other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
-                                }
-                            } else {
-                                panic!("Vec type arguments must be types")
-                            }
-                        },
-                        _ => panic!("Vec angle brackets expected")
-                    }
-                },
-                "BigInt" =>
-                    quote!{
-                        self.api.finish_big_int(#result_ident);
-                    },
-                "BigUint" =>
-                    quote!{
-                        self.api.finish_big_uint(#result_ident);
-                    },
-                "i64" =>
-                    quote!{
-                        self.api.finish_i64(#result_ident);
-                    },
-                "bool" =>
-                    quote!{
-                        self.api.finish_i64( if #result_ident { 1i64 } else { 0i64 });
-                    },
-                other_stype_str => {
-                    panic!("Unsupported return type: {:?}", other_stype_str)
+                _ => {
+                    panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
                 }
             }
+        },
+        syn::Type::Path(type_path) => {
+            let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+            generate_result_finish_snippet_for_arg_type(type_path_segment, result_ident, false)
         },
         syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
             let mut i = 0;
@@ -102,6 +32,113 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
             quote!{ #(#tuple_snippets)* }
         },
         other_type => panic!("Unsupported return type: {:#?}, not a path", other_type)
+    }
+}
+
+fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegment, result_ident: &syn::Ident, ref_return: bool) -> proc_macro2::TokenStream {
+    let type_str = type_path_segment.ident.to_string();
+    match type_str.as_str() {
+        "Result" => {    
+            match &type_path_segment.arguments {
+                syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+                    if args.len() != 2 {
+                        panic!("Result type must have exactly 2 generic type arguments");
+                    }
+
+                    if let (syn::GenericArgument::Type(result_type), syn::GenericArgument::Type(err_type)) =
+                           (args.first().unwrap().into_value(), args.last().unwrap().into_value()) {
+                        let ok_res_ident = syn::Ident::new("ok_res", proc_macro2::Span::call_site());
+                        let ok_snippet = generate_result_finish_snippet(&ok_res_ident, result_type);
+                        let err_res_ident = syn::Ident::new("err_res", proc_macro2::Span::call_site());
+                        let err_snippet = generate_result_err_snippet(&err_res_ident, err_type);
+
+                        quote!{
+                            match #result_ident {
+                                Ok(#ok_res_ident) => {
+                                    #ok_snippet
+                                },
+                                Err(#err_res_ident) => {
+                                    #err_snippet
+                                }
+                            }
+                        }                                
+                    } else {
+                        panic!("Result type arguments must be types")
+                    }
+                },
+                _ => panic!("Result angle brackets expected")
+            }
+            
+        },
+        "Address" =>
+            quote!{
+                self.api.finish_bytes32(#result_ident.as_fixed_bytes());
+            },
+        "Vec" => {
+            match &type_path_segment.arguments {
+                syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+                    if args.len() != 1 {
+                        panic!("Vec type must have exactly 1 generic type argument");
+                    }
+                    if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
+                        match vec_type {                
+                            syn::Type::Path(type_path) => {
+                                let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                                let type_str = type_path_segment.ident.to_string();
+                                match type_str.as_str() {
+                                    "u8" => 
+                                        if ref_return {
+                                            quote!{
+                                                self.api.finish_vec(#result_ident);
+                                            }
+                                        } else {
+                                            quote!{
+                                                self.api.finish_vec(& #result_ident);
+                                            }
+                                        },
+                                    other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
+                                }
+                            },
+                            other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
+                        }
+                    } else {
+                        panic!("Vec type arguments must be types")
+                    }
+                },
+                _ => panic!("Vec angle brackets expected")
+            }
+        },
+        "BigInt" =>
+            if ref_return {
+                quote!{
+                    self.api.finish_big_int(#result_ident);
+                }
+            } else {
+                quote!{
+                    self.api.finish_big_int(& #result_ident);
+                }
+            },
+        "BigUint" =>
+            if ref_return {
+                quote!{
+                    self.api.finish_big_uint(#result_ident);
+                }
+            } else {
+                quote!{
+                    self.api.finish_big_uint(& #result_ident);
+                }
+            },
+        "i64" =>
+            quote!{
+                self.api.finish_i64(#result_ident);
+            },
+        "bool" =>
+            quote!{
+                self.api.finish_i64( if #result_ident { 1i64 } else { 0i64 });
+            },
+        other_stype_str => {
+            panic!("Unsupported return type: {:?}", other_stype_str)
+        }
     }
 }
 

@@ -297,7 +297,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
     
     #[inline]
-    fn finish_vec(&self, v: Vec<u8>) {
+    fn finish_vec(&self, v: &Vec<u8>) {
         unsafe {
             finish(v.as_ptr(), v.len() as i32);
         }
@@ -312,14 +312,14 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn finish_big_int(&self, b: ArwenBigInt) {
+    fn finish_big_int(&self, b: &ArwenBigInt) {
         unsafe {
             bigIntFinishSigned(b.handle);
         }
     }
 
     #[inline]
-    fn finish_big_uint(&self, b: ArwenBigUint) {
+    fn finish_big_uint(&self, b: &ArwenBigUint) {
         unsafe {
             bigIntFinishUnsigned(b.handle);
         }
