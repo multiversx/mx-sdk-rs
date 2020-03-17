@@ -1,22 +1,19 @@
 
-
-use crate::big_uint::*;
+//use crate::big_int::*;
 
 use core::ops::{Add, Sub, Mul, Div, Rem};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::cmp::Ordering;
 
-//use alloc::vec::Vec;
+use alloc::vec::Vec;
 
 extern {
     fn bigIntNew(value: i64) -> i32;
 
     fn bigIntUnsignedByteLength(x: i32) -> i32;
     fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
-    fn bigIntGetSignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
     fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
-    fn bigIntSetSignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
-
+    
     fn bigIntAdd(dest: i32, x: i32, y: i32);
     fn bigIntSub(dest: i32, x: i32, y: i32);
     fn bigIntMul(dest: i32, x: i32, y: i32);
@@ -25,64 +22,57 @@ extern {
     fn bigIntCmp(x: i32, y: i32) -> i32;
 }
 
-pub struct ArwenBigInt {
+pub struct ArwenBigUint {
     pub handle: i32 // TODO: fix visibility
 }
 
-impl From<ArwenBigUint> for ArwenBigInt {
-    #[inline]
-    fn from(item: ArwenBigUint) -> Self {
-        ArwenBigInt{ handle: item.handle }
-    }
-}
-
-impl From<i64> for ArwenBigInt {
+impl From<i64> for ArwenBigUint {
     fn from(item: i64) -> Self {
         unsafe {
-            ArwenBigInt{ handle: bigIntNew(item) }
+            ArwenBigUint{ handle: bigIntNew(item) }
         }
     }
 }
 
-impl From<i32> for ArwenBigInt {
+impl From<i32> for ArwenBigUint {
     fn from(item: i32) -> Self {
         unsafe {
-            ArwenBigInt{ handle: bigIntNew(item.into()) }
+            ArwenBigUint{ handle: bigIntNew(item.into()) }
         }
     }
 }
 
-impl ArwenBigInt {
-    pub fn from_i64(value: i64) -> ArwenBigInt {
+impl ArwenBigUint {
+    pub fn from_i64(value: i64) -> ArwenBigUint {
         unsafe {
-            ArwenBigInt{ handle: bigIntNew(value) }
+            ArwenBigUint{ handle: bigIntNew(value) }
         }
     }
 }
 
-impl Clone for ArwenBigInt {
+impl Clone for ArwenBigUint {
     fn clone(&self) -> Self {
         unsafe {
             let clone_handle = bigIntNew(0);
             bigIntAdd(clone_handle, clone_handle, self.handle);
-            ArwenBigInt {handle: clone_handle}
+            ArwenBigUint {handle: clone_handle}
         }        
     }
 }
 
-impl Add for ArwenBigInt {
-    type Output = ArwenBigInt;
+impl Add for ArwenBigUint {
+    type Output = ArwenBigUint;
 
-    fn add(self, other: ArwenBigInt) -> ArwenBigInt {
+    fn add(self, other: ArwenBigUint) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntAdd(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
 }
 
-impl AddAssign<ArwenBigInt> for ArwenBigInt {
+impl AddAssign<ArwenBigUint> for ArwenBigUint {
     fn add_assign(&mut self, other: Self) {
         unsafe {
             bigIntAdd(self.handle, self.handle, other.handle);
@@ -90,27 +80,27 @@ impl AddAssign<ArwenBigInt> for ArwenBigInt {
     }
 }
 
-impl AddAssign<&ArwenBigInt> for ArwenBigInt {
-    fn add_assign(&mut self, other: &ArwenBigInt) {
+impl AddAssign<&ArwenBigUint> for ArwenBigUint {
+    fn add_assign(&mut self, other: &ArwenBigUint) {
         unsafe {
             bigIntAdd(self.handle, self.handle, other.handle);
         }
     }
 }
 
-impl Sub for ArwenBigInt {
-    type Output = ArwenBigInt;
+impl Sub for ArwenBigUint {
+    type Output = ArwenBigUint;
 
-    fn sub(self, other: ArwenBigInt) -> ArwenBigInt {
+    fn sub(self, other: ArwenBigUint) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntSub(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
 }
 
-impl SubAssign<ArwenBigInt> for ArwenBigInt {
+impl SubAssign<ArwenBigUint> for ArwenBigUint {
     fn sub_assign(&mut self, other: Self) {
         unsafe {
             bigIntSub(self.handle, self.handle, other.handle);
@@ -118,27 +108,27 @@ impl SubAssign<ArwenBigInt> for ArwenBigInt {
     }
 }
 
-impl SubAssign<&ArwenBigInt> for ArwenBigInt {
-    fn sub_assign(&mut self, other: &ArwenBigInt) {
+impl SubAssign<&ArwenBigUint> for ArwenBigUint {
+    fn sub_assign(&mut self, other: &ArwenBigUint) {
         unsafe {
             bigIntSub(self.handle, self.handle, other.handle);
         }
     }
 }
 
-impl Mul for ArwenBigInt {
-    type Output = ArwenBigInt;
+impl Mul for ArwenBigUint {
+    type Output = ArwenBigUint;
 
-    fn mul(self, other: ArwenBigInt) -> ArwenBigInt {
+    fn mul(self, other: ArwenBigUint) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntMul(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
 }
 
-impl MulAssign<ArwenBigInt> for ArwenBigInt {
+impl MulAssign<ArwenBigUint> for ArwenBigUint {
     fn mul_assign(&mut self, other: Self) {
         unsafe {
             bigIntMul(self.handle, self.handle, other.handle);
@@ -146,27 +136,27 @@ impl MulAssign<ArwenBigInt> for ArwenBigInt {
     }
 }
 
-impl MulAssign<&ArwenBigInt> for ArwenBigInt {
-    fn mul_assign(&mut self, other: &ArwenBigInt) {
+impl MulAssign<&ArwenBigUint> for ArwenBigUint {
+    fn mul_assign(&mut self, other: &ArwenBigUint) {
         unsafe {
             bigIntMul(self.handle, self.handle, other.handle);
         }
     }
 }
 
-impl Div for ArwenBigInt {
-    type Output = ArwenBigInt;
+impl Div for ArwenBigUint {
+    type Output = ArwenBigUint;
 
-    fn div(self, other: ArwenBigInt) -> ArwenBigInt {
+    fn div(self, other: ArwenBigUint) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntTDiv(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
 }
 
-impl DivAssign<ArwenBigInt> for ArwenBigInt {
+impl DivAssign<ArwenBigUint> for ArwenBigUint {
     fn div_assign(&mut self, other: Self) {
         unsafe {
             bigIntTDiv(self.handle, self.handle, other.handle);
@@ -174,27 +164,27 @@ impl DivAssign<ArwenBigInt> for ArwenBigInt {
     }
 }
 
-impl DivAssign<&ArwenBigInt> for ArwenBigInt {
-    fn div_assign(&mut self, other: &ArwenBigInt) {
+impl DivAssign<&ArwenBigUint> for ArwenBigUint {
+    fn div_assign(&mut self, other: &ArwenBigUint) {
         unsafe {
             bigIntTDiv(self.handle, self.handle, other.handle);
         }
     }
 }
 
-impl Rem for ArwenBigInt {
-    type Output = ArwenBigInt;
+impl Rem for ArwenBigUint {
+    type Output = ArwenBigUint;
 
-    fn rem(self, other: ArwenBigInt) -> ArwenBigInt {
+    fn rem(self, other: ArwenBigUint) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntTDiv(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
 }
 
-impl RemAssign<ArwenBigInt> for ArwenBigInt {
+impl RemAssign<ArwenBigUint> for ArwenBigUint {
     fn rem_assign(&mut self, other: Self) {
         unsafe {
             bigIntTDiv(self.handle, self.handle, other.handle);
@@ -202,15 +192,15 @@ impl RemAssign<ArwenBigInt> for ArwenBigInt {
     }
 }
 
-impl RemAssign<&ArwenBigInt> for ArwenBigInt {
-    fn rem_assign(&mut self, other: &ArwenBigInt) {
+impl RemAssign<&ArwenBigUint> for ArwenBigUint {
+    fn rem_assign(&mut self, other: &ArwenBigUint) {
         unsafe {
             bigIntTDiv(self.handle, self.handle, other.handle);
         }
     }
 }
 
-impl PartialEq for ArwenBigInt {
+impl PartialEq for ArwenBigUint {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
@@ -218,16 +208,16 @@ impl PartialEq for ArwenBigInt {
     }
 }
 
-impl Eq for ArwenBigInt{}
+impl Eq for ArwenBigUint{}
 
-impl PartialOrd for ArwenBigInt {
+impl PartialOrd for ArwenBigUint {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for ArwenBigInt {
+impl Ord for ArwenBigUint {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
@@ -241,28 +231,58 @@ impl Ord for ArwenBigInt {
     }
 }
 
-impl PartialEq<i64> for ArwenBigInt {
+impl PartialEq<i64> for ArwenBigUint {
     #[inline]
     fn eq(&self, other: &i64) -> bool {
-        PartialEq::eq(self, &ArwenBigInt::from(*other))
+        PartialEq::eq(self, &ArwenBigUint::from(*other))
     }
 }
 
-impl PartialOrd<i64> for ArwenBigInt {
+impl PartialOrd<i64> for ArwenBigUint {
     #[inline]
     fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        PartialOrd::partial_cmp(self, &ArwenBigInt::from(*other))
+        PartialOrd::partial_cmp(self, &ArwenBigUint::from(*other))
     }
 }
 
-impl elrond_wasm::BigIntApi<ArwenBigUint> for ArwenBigInt {
-    
-    fn abs(&self) -> ArwenBigUint {
-        panic!("abs not yet implemented")
+impl elrond_wasm::BigUintApi for ArwenBigUint {
+    #[inline]
+    fn byte_length(&self) -> i32 {
+        unsafe { bigIntUnsignedByteLength(self.handle) }
+    }
+
+    fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32 {
+        unsafe {
+            let byte_len = bigIntGetUnsignedBytes(self.handle, slice.as_mut_ptr());
+            byte_len
+        }
+    }
+
+    fn to_bytes_be(&self) -> Vec<u8> {
+        unsafe {
+            let byte_len = bigIntUnsignedByteLength(self.handle);
+            let mut vec = vec![0u8; byte_len as usize];
+            bigIntGetUnsignedBytes(self.handle, vec.as_mut_ptr());
+            vec
+        }
+    }
+
+    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
+        unsafe {
+            let byte_len = bigIntUnsignedByteLength(self.handle) as usize;
+            if byte_len > nr_bytes {
+                panic!();
+            }
+            let mut vec = vec![0u8; nr_bytes];
+            if byte_len > 0 {
+                bigIntGetUnsignedBytes(self.handle, &mut vec[nr_bytes - byte_len]);
+            }
+            vec
+        }
     }
 
     #[inline]
     fn phantom() -> Self {
-        ArwenBigInt{ handle: -1 }
+        ArwenBigUint{ handle: -1 }
     }
 }

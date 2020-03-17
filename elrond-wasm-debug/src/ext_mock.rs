@@ -3,6 +3,8 @@
 use elrond_wasm::{H256, Address, StorageKey};
 
 use crate::big_int_mock::*;
+use crate::big_uint_mock::*;
+
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
 use elrond_wasm::BigUintApi;
@@ -241,7 +243,7 @@ impl ArwenMockRef {
     }
 }
 
-impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
+impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     fn get_owner(&self) -> Address {
         let state = self.state_ref.borrow();
         match &state.current_tx {
@@ -258,7 +260,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
-    fn get_balance(&self, _address: &Address) -> RustBigInt {
+    fn get_balance(&self, _address: &Address) -> RustBigUint {
         panic!("get_balance not yet implemented")
     }
 
@@ -311,14 +313,22 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         res
     }
 
-    fn storage_store_big_int(&self, key: &StorageKey, value: &RustBigInt) {
-        self.storage_store(key, &value.to_signed_bytes_be());
+    fn storage_store_big_uint(&self, key: &StorageKey, value: &RustBigUint) {
+        self.storage_store(key, &value.to_bytes_be());
     }
 
-    fn storage_load_big_int(&self, key: &StorageKey) -> RustBigInt {
+    fn storage_load_big_uint(&self, key: &StorageKey) -> RustBigUint {
         let value = self.storage_load(key);
         let bi = BigInt::from_signed_bytes_be(value.as_slice());
         bi.into()
+    }
+
+    fn storage_store_big_int(&self, _key: &StorageKey, _value: &RustBigInt) {
+        panic!("storage_store_big_int not yet implemented")
+    }
+
+    fn storage_load_big_int(&self, _key: &StorageKey) -> RustBigInt {
+        panic!("storage_load_big_int not yet implemented")
     }
 
     fn storage_store_i64(&self, key: &StorageKey, value: i64) {
@@ -331,7 +341,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
     }
 
     #[inline]
-    fn get_call_value_big_int(&self) -> RustBigInt {
+    fn get_call_value_big_uint(&self) -> RustBigUint {
         let state = self.state_ref.borrow();
         match &state.current_tx {
             None => panic!("Tx not initialized!"),
@@ -339,7 +349,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
-    fn send_tx(&self, to: &Address, amount: &RustBigInt, _message: &str) {
+    fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
         let owner = self.get_owner();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&owner) {
@@ -356,8 +366,8 @@ impl elrond_wasm::ContractHookApi<RustBigInt> for ArwenMockRef {
         }
     }
 
-    fn async_call(&self, _to: &Address, _amount: &RustBigInt, _data: &str) {
-
+    fn async_call(&self, _to: &Address, _amount: &RustBigUint, _data: &str) {
+        panic!("async_call not yet implemented");
     }
 
     fn get_gas_left(&self) -> i64 {
@@ -404,7 +414,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn check_not_payable(&self) -> bool {
-        if self.get_call_value_big_int() > 0 {
+        if self.get_call_value_big_uint() > 0 {
             self.signal_error("attempted to transfer funds via a non-payable function");
             return false;
         }
@@ -428,16 +438,15 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         res
     }
     
-    fn get_argument_big_int_signed(&self, arg_index: i32) -> RustBigInt {
+    fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
         let state = self.state_ref.borrow();
         let bytes = state.get_argument_vec(arg_index);
         BigInt::from_signed_bytes_be(&bytes).into()
     }
 
     #[inline]
-    fn get_argument_big_int_unsigned(&self, arg_index: i32) -> RustBigUint {
-        let signed = self.get_argument_big_int_signed(arg_index);
-        signed.into()
+    fn get_argument_big_uint(&self, _arg_index: i32) -> RustBigUint {
+        panic!("get_argument_big_uint not yet implemented")
     }
 
     #[inline]
@@ -462,19 +471,20 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     #[inline]
-    fn finish_big_int_signed(&self, bi: RustBigInt) {
+    fn finish_big_int(&self, bi: RustBigInt) {
         let mut state = self.state_ref.borrow_mut();
         state.add_result(bi.to_signed_bytes_be());
     }
 
     #[inline]
-    fn finish_big_int_unsigned(&self, bu: RustBigUint) {
-        self.finish_big_int_signed(bu.into_signed());
+    fn finish_big_uint(&self, bu: RustBigUint) {
+        let mut state = self.state_ref.borrow_mut();
+        state.add_result(bu.to_bytes_be());
     }
     
     #[inline]
     fn finish_i64(&self, value: i64) {
-        self.finish_big_int_signed(value.into());
+        self.finish_big_int(value.into());
     }
 
     fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) {
