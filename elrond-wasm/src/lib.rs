@@ -75,7 +75,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         let nr_args = self.get_num_arguments();
         if nr_args == expected + 1 {
             let callback_name_arg = self.get_argument_vec(nr_args - 1);
-            self.finish_vec(callback_name_arg); // callback method argument
+            self.finish_vec(&callback_name_arg); // callback method argument
             return true;
         }
         if nr_args != expected {
@@ -101,13 +101,13 @@ pub trait ContractIOApi<BigInt, BigUint> {
     
     fn get_argument_i64(&self, arg_id: i32) -> i64;
     
-    fn finish_vec(&self, v: Vec<u8>);
+    fn finish_vec(&self, v: &Vec<u8>);
 
     fn finish_bytes32(&self, bytes: &[u8; 32]);
 
-    fn finish_big_int(&self, b: BigInt);
+    fn finish_big_int(&self, b: &BigInt);
 
-    fn finish_big_uint(&self, b: BigUint);
+    fn finish_big_uint(&self, b: &BigUint);
 
     fn finish_i64(&self, value: i64);
 
