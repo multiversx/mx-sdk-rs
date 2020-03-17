@@ -1,4 +1,5 @@
 
+use crate::big_uint_mock::*;
 
 use core::ops::{Add, Sub, Mul, Div, Rem};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -8,11 +9,17 @@ use alloc::vec::Vec;
 use num_bigint::BigInt;
 use core::cmp::Ordering;
 
-pub struct RustBigInt(num_bigint::BigInt);
+pub struct RustBigInt(pub num_bigint::BigInt);
 
 impl RustBigInt {
     pub fn value(&self) -> &BigInt {
         &self.0
+    }
+}
+
+impl From<RustBigUint> for RustBigInt {
+    fn from(item: RustBigUint) -> Self {
+        RustBigInt(item.0)
     }
 }
 
@@ -177,34 +184,10 @@ impl PartialOrd<i64> for RustBigInt {
     }
 }
 
-impl elrond_wasm::BigIntApi for RustBigInt {
-    fn byte_length(&self) -> i32 {
-        panic!("byte_length not yet implemented")
-    }
-
-    fn copy_to_slice_big_endian(&self, _slice: &mut [u8]) -> i32 {
-        panic!("copy_to_slice not yet implemented")
-    }
-
-    fn to_bytes_big_endian(&self) -> Vec<u8> {
-        let (_, be) = self.0.to_bytes_be();
-        be
-    }
-
-    fn to_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
-        let (_, bytes_be) = self.0.to_bytes_be();
-        if bytes_be.len() > nr_bytes {
-            panic!("Number doesn't fit requested bytes");
-        } else if bytes_be.len() == nr_bytes {
-            bytes_be
-        } else {
-            let mut res = vec![0u8; nr_bytes];
-            let offset = nr_bytes - bytes_be.len();
-            for i in 0..bytes_be.len()-1 {
-                res[offset+i] = bytes_be[i];
-            }
-            res
-        }
+impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
+    
+    fn abs(&self) -> RustBigUint {
+        panic!("RustBigInt::abs not yet implemented")
     }
 
     fn phantom() -> Self {
@@ -215,23 +198,5 @@ impl elrond_wasm::BigIntApi for RustBigInt {
 impl RustBigInt {
     pub fn to_signed_bytes_be(&self) -> Vec<u8>{
         self.0.to_signed_bytes_be()
-    }
-}
-
-pub struct RustBigUint(num_bigint::BigInt);
-
-impl From<RustBigInt> for RustBigUint {
-    fn from(item: RustBigInt) -> Self {
-        RustBigUint(item.0)
-    }
-}
-
-impl elrond_wasm::BigUintApi<RustBigInt> for RustBigUint {
-    fn into_signed(self) -> RustBigInt {
-        RustBigInt(self.0)
-    }
-
-    fn phantom() -> Self {
-        RustBigUint::from(RustBigInt::from(0))
     }
 }

@@ -70,7 +70,7 @@ fn generate_event_data_conversion_code(arg: &syn::FnArg, arg_index: i32) -> proc
                             match type_str.as_str() {
                                 "BigInt" =>
                                     quote!{
-                                        #pat.to_bytes_big_endian_pad_right(32)
+                                        #pat.to_bytes_be_pad_right(32)
                                     },
                                 other_stype_str => {
                                     panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)

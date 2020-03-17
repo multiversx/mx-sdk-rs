@@ -20,15 +20,15 @@ pub use serialization::*;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern 
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BigInt> {
+pub trait ContractHookApi<BigInt, BigUint> {
 
     fn get_owner(&self) -> Address;
 
     fn get_caller(&self) -> Address;
 
-    fn get_balance(&self, address: &Address) -> BigInt;
+    fn get_balance(&self, address: &Address) -> BigUint;
 
-    fn get_own_balance(&self) -> BigInt {
+    fn get_own_balance(&self) -> BigUint {
         self.get_balance(&self.get_owner())
     }
     
@@ -40,6 +40,10 @@ pub trait ContractHookApi<BigInt> {
     
     fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32];
 
+    fn storage_store_big_uint(&self, key: &StorageKey, value: &BigUint);
+    
+    fn storage_load_big_uint(&self, key: &StorageKey) -> BigUint;
+
     fn storage_store_big_int(&self, key: &StorageKey, value: &BigInt);
     
     fn storage_load_big_int(&self, key: &StorageKey) -> BigInt;
@@ -48,11 +52,11 @@ pub trait ContractHookApi<BigInt> {
     
     fn storage_load_i64(&self, key: &StorageKey) -> Option<i64>;
     
-    fn get_call_value_big_int(&self) -> BigInt;
+    fn get_call_value_big_uint(&self) -> BigUint;
 
-    fn send_tx(&self, to: &Address, amount: &BigInt, message: &str);
+    fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
 
-    fn async_call(&self, to: &Address, amount: &BigInt, data: &str);
+    fn async_call(&self, to: &Address, amount: &BigUint, data: &str);
 
     fn get_gas_left(&self) -> i64;
 
@@ -91,9 +95,9 @@ pub trait ContractIOApi<BigInt, BigUint> {
         self.get_argument_bytes32(arg_index).into()
     }
     
-    fn get_argument_big_int_signed(&self, arg_id: i32) -> BigInt;
+    fn get_argument_big_int(&self, arg_id: i32) -> BigInt;
 
-    fn get_argument_big_int_unsigned(&self, arg_id: i32) -> BigUint;
+    fn get_argument_big_uint(&self, arg_id: i32) -> BigUint;
     
     fn get_argument_i64(&self, arg_id: i32) -> i64;
     
@@ -101,9 +105,9 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn finish_bytes32(&self, bytes: &[u8; 32]);
 
-    fn finish_big_int_signed(&self, b: BigInt);
+    fn finish_big_int(&self, b: BigInt);
 
-    fn finish_big_int_unsigned(&self, b: BigUint);
+    fn finish_big_uint(&self, b: BigUint);
 
     fn finish_i64(&self, value: i64);
 
@@ -120,31 +124,34 @@ pub trait ContractIOApi<BigInt, BigUint> {
 use core::ops::{Add, Sub, Mul, Div, Rem};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
-/// Definition of the BigInt type required by the API.
+/// Definition of the BigUint type required by the API.
 /// The API doesn't care about the actual BigInt implementation.
 /// The Arwen VM provides an implementation directly in the protocol.
 /// For debugging we use a different implementation, based on Rust's BigInt.
-pub trait BigIntApi: 
-        Sized + 
-        From<i64> +
-        From<i32> +
-        Clone +
-        Add<Output=Self> + 
-        AddAssign + 
-        Sub<Output=Self> + 
-        SubAssign +
-        Mul<Output=Self> +
-        MulAssign +
-        Div<Output=Self> +
-        DivAssign +
-        Rem<Output=Self> +
-        RemAssign +
-        PartialEq<Self> +
-        Eq +
-        PartialOrd<Self> +
-        Ord +
-        PartialEq<i64> +
-        PartialOrd<i64> +
+/// 
+/// Since most values in smart contracts will not be signed, as well as for safety,
+/// most of the functionality if provided for unsigned integers.
+pub trait BigUintApi: 
+    Sized +
+    From<i64> +
+    From<i32> +
+    Clone +
+    Add<Output=Self> + 
+    AddAssign + 
+    Sub<Output=Self> + 
+    SubAssign +
+    Mul<Output=Self> +
+    MulAssign +
+    Div<Output=Self> +
+    DivAssign +
+    Rem<Output=Self> +
+    RemAssign +
+    PartialEq<Self> +
+    Eq +
+    PartialOrd<Self> +
+    Ord +
+    PartialEq<i64> +
+    PartialOrd<i64> +
 {
     fn byte_length(&self) -> i32;
 
@@ -158,22 +165,42 @@ pub trait BigIntApi:
         self.copy_to_slice_big_endian(&mut target[32 - byte_len ..]);
     }
 
-    fn to_bytes_big_endian(&self) -> Vec<u8>;
+    fn to_bytes_be(&self) -> Vec<u8>;
 
-    fn to_bytes_big_endian_pad_right(&self, nr_bytes: usize) -> Vec<u8>;
+    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Vec<u8>;
 
     // only needed at compilation, value will never be used
     fn phantom() -> Self;
 }
 
-/// The BigUint type is only used to signal the API to interpret inputs as unsigned.
-/// Therefore, we only provide minimal logic, to convert to/from signed.
-pub trait BigUintApi<BigInt>: 
-    Sized +
-    From<BigInt>
+// BigInt sign.
+pub enum Sign {
+    Minus,
+    NoSign,
+    Plus,
+}
+
+/// Definition of the BigInt type required by the API.
+pub trait BigIntApi<BigUint>: 
+        Sized +
+        From<BigUint> +
+        From<i64> +
+        From<i32> +
+        Clone +
+        Add<Output=Self> + 
+        AddAssign + 
+        Sub<Output=Self> + 
+        SubAssign +
+        Mul<Output=Self> +
+        MulAssign +
+        PartialEq<Self> +
+        Eq +
+        PartialOrd<Self> +
+        Ord +
+        PartialEq<i64> +
+        PartialOrd<i64> +
 {
-    // convert to the signed big int, consuming self
-    fn into_signed(self) -> BigInt;
+    fn abs(&self) -> BigUint;
 
     // only needed at compilation, value will never be used
     fn phantom() -> Self;

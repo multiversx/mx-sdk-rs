@@ -34,7 +34,7 @@ pub fn process_contract(
 
       #contract_imports
 
-      pub trait #trait_name<T, BigInt, BigUint>: ContractHookApi<BigInt> + Sized 
+      pub trait #trait_name<T, BigInt, BigUint>: ContractHookApi<BigInt, BigUint> + Sized 
       #api_where
       {
         #(#method_impls)*

@@ -10,7 +10,7 @@ pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
                     syn::FnArg::Captured(arg_captured) => {
                         let pat = &arg_captured.pat;
                         quote!{
-                            let #pat = self.api.get_call_value_big_int();
+                            let #pat = self.api.get_call_value_big_uint();
                         }
                     },
                     _ => panic!("payable argument must be captured")

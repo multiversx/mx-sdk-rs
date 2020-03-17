@@ -4,7 +4,9 @@ use elrond_wasm::Address;
 use elrond_wasm::StorageKey;
 
 use crate::big_int::*;
-use elrond_wasm::BigIntApi;
+use crate::big_uint::*;
+use elrond_wasm::BigUintApi;
+//use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
 
 use alloc::vec::Vec;
@@ -52,7 +54,7 @@ extern {
 
     fn bigIntStorageStoreUnsigned(key_ptr: *const u8, source: i32) -> i32;
     fn bigIntStorageLoadUnsigned(key_ptr: *const u8, destination: i32) -> i32;
-    
+
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
@@ -69,7 +71,7 @@ extern {
 }
 
 pub struct ArwenApiImpl {}
-impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
+impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_owner(&self) -> Address {
         unsafe {
@@ -88,11 +90,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
         }
     }
 
-    fn get_balance(&self, address: &Address) -> ArwenBigInt {
+    fn get_balance(&self, address: &Address) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntGetExternalBalance(address.as_ref().as_ptr(), result);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
     
@@ -131,8 +133,25 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     #[inline]
+    fn storage_store_big_uint(&self, key: &StorageKey, value: &ArwenBigUint) {
+        unsafe {
+            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), value.handle);
+        }
+    }
+
+    #[inline]
+    fn storage_load_big_uint(&self, key: &StorageKey) -> ArwenBigUint {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), result);
+            ArwenBigUint {handle: result}
+        }
+    }
+
+    #[inline]
     fn storage_store_big_int(&self, key: &StorageKey, value: &ArwenBigInt) {
         unsafe {
+            // TODO: convert to 2's complement
             bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), value.handle);
         }
     }
@@ -141,6 +160,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     fn storage_load_big_int(&self, key: &StorageKey) -> ArwenBigInt {
         unsafe {
             let result = bigIntNew(0);
+            // TODO: convert from 2's complement
             bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), result);
             ArwenBigInt {handle: result}
         }
@@ -161,16 +181,16 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
     }
 
     #[inline]
-    fn get_call_value_big_int(&self) -> ArwenBigInt {
+    fn get_call_value_big_uint(&self) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntGetCallValue(result);
-            ArwenBigInt {handle: result}
+            ArwenBigUint {handle: result}
         }
     }
 
-    fn send_tx(&self, to: &Address, amount: &ArwenBigInt, message: &str) {
-        let amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
+    fn send_tx(&self, to: &Address, amount: &ArwenBigUint, message: &str) {
+        let amount_bytes32 = amount.to_bytes_be_pad_right(32);
         unsafe {
             transferValue(
                 to.as_ref().as_ptr(),
@@ -181,8 +201,8 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt> for ArwenApiImpl {
         }
     }
 
-    fn async_call(&self, to: &Address, amount: &ArwenBigInt, data: &str) {
-        let amount_bytes32 = amount.to_bytes_big_endian_pad_right(32);
+    fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &str) {
+        let amount_bytes32 = amount.to_bytes_be_pad_right(32);
         unsafe {
             asyncCall(
                 to.as_ref().as_ptr(),
@@ -223,7 +243,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     fn check_not_payable(&self) -> bool {
-        if self.get_call_value_big_int() > 0 {
+        if self.get_call_value_big_uint() > 0 {
             self.signal_error("attempted to transfer funds via a non-payable function");
             return false;
         }
@@ -253,7 +273,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
     
     #[inline]
-    fn get_argument_big_int_unsigned(&self, arg_id: i32) -> ArwenBigUint {
+    fn get_argument_big_uint(&self, arg_id: i32) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
             bigIntGetUnsignedArgument(arg_id, result);
@@ -262,7 +282,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn get_argument_big_int_signed(&self, arg_id: i32) -> ArwenBigInt {
+    fn get_argument_big_int(&self, arg_id: i32) -> ArwenBigInt {
         unsafe {
             let result = bigIntNew(0);
             bigIntGetSignedArgument(arg_id, result);
@@ -291,14 +311,14 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn finish_big_int_signed(&self, b: ArwenBigInt) {
+    fn finish_big_int(&self, b: ArwenBigInt) {
         unsafe {
             bigIntFinish(b.handle);
         }
     }
 
     #[inline]
-    fn finish_big_int_unsigned(&self, b: ArwenBigUint) {
+    fn finish_big_uint(&self, b: ArwenBigUint) {
         unsafe {
             bigIntFinish(b.handle);
         }

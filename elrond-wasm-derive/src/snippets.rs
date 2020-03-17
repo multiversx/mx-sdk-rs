@@ -11,13 +11,16 @@ pub fn contract_imports() -> proc_macro2::TokenStream {
 pub fn big_int_where() -> proc_macro2::TokenStream {
     quote! {
         where 
-            BigInt: BigIntApi + 'static,
-            BigUint: BigUintApi<BigInt> + 'static,
+            BigUint: BigUintApi + 'static,
+            for<'b> BigUint: AddAssign<&'b BigUint>,
+            for<'b> BigUint: SubAssign<&'b BigUint>,
+            for<'b> BigUint: MulAssign<&'b BigUint>,
+            for<'b> BigUint: DivAssign<&'b BigUint>,
+            for<'b> BigUint: RemAssign<&'b BigUint>,
+            BigInt: BigIntApi<BigUint> + 'static,
             for<'b> BigInt: AddAssign<&'b BigInt>,
             for<'b> BigInt: SubAssign<&'b BigInt>,
             for<'b> BigInt: MulAssign<&'b BigInt>,
-            for<'b> BigInt: DivAssign<&'b BigInt>,
-            for<'b> BigInt: RemAssign<&'b BigInt>,
     }
 }
 
@@ -26,14 +29,14 @@ pub fn api_where() -> proc_macro2::TokenStream {
 
     quote! {
       #bi_where
-        T: ContractHookApi<BigInt> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
+        T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
     }
 }
 
 pub fn contract_trait_api_impl(contract_struct: &syn::Ident) -> proc_macro2::TokenStream {
     let api_where = api_where();
     quote! {
-      impl <T, BigInt, BigUint> ContractHookApi<BigInt> for #contract_struct<T, BigInt, BigUint>
+      impl <T, BigInt, BigUint> ContractHookApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>
       #api_where
       {
         #[inline]
@@ -47,7 +50,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Ident) -> proc_macro2::Tok
         }
 
         #[inline]
-        fn get_balance(&self, address: &Address) -> BigInt {
+        fn get_balance(&self, address: &Address) -> BigUint {
           self.api.get_balance(address)
         }
 
@@ -69,6 +72,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Ident) -> proc_macro2::Tok
         #[inline]
         fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
           self.api.storage_load_bytes32(key)
+        }
+
+        #[inline]
+        fn storage_store_big_uint(&self, key: &StorageKey, value: &BigUint) {
+          self.api.storage_store_big_uint(key, value);
+        }
+        
+        #[inline]
+        fn storage_load_big_uint(&self, key: &StorageKey) -> BigUint {
+          self.api.storage_load_big_uint(key)
         }
     
         #[inline]
@@ -92,17 +105,17 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Ident) -> proc_macro2::Tok
         }
         
         #[inline]
-        fn get_call_value_big_int(&self) -> BigInt {
-          self.api.get_call_value_big_int()
+        fn get_call_value_big_uint(&self) -> BigUint {
+          self.api.get_call_value_big_uint()
         }
 
         #[inline]
-        fn send_tx(&self, to: &Address, amount: &BigInt, message: &str) {
+        fn send_tx(&self, to: &Address, amount: &BigUint, message: &str) {
           self.api.send_tx(to, amount, message);
         }
 
         #[inline]
-        fn async_call(&self, to: &Address, amount: &BigInt, data: &str) {
+        fn async_call(&self, to: &Address, amount: &BigUint, data: &str) {
           self.api.async_call(to, amount, data);
         }
 
