@@ -59,7 +59,8 @@ extern {
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetCallValue(dest: i32);
-    fn bigIntFinish(bih: i32);
+    fn bigIntFinishUnsigned(bih: i32);
+    fn bigIntFinishSigned(bih: i32);
 
     fn int64getArgument(id: i32) -> i64;
     fn int64finish(value: i64);
@@ -313,14 +314,14 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn finish_big_int(&self, b: ArwenBigInt) {
         unsafe {
-            bigIntFinish(b.handle);
+            bigIntFinishSigned(b.handle);
         }
     }
 
     #[inline]
     fn finish_big_uint(&self, b: ArwenBigUint) {
         unsafe {
-            bigIntFinish(b.handle);
+            bigIntFinishUnsigned(b.handle);
         }
     }
     
