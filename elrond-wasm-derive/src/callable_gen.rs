@@ -92,7 +92,7 @@ impl Callable {
                 }
             } else {
                 quote! {
-                    let amount = BigInt::from(0);
+                    let amount = BigUint::from(0);
                 }
             };
 
@@ -157,11 +157,14 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
                 }
             },
         "BigInt" =>
+            // quote!{
+            //     elrond_wasm::str_util::push_bytes(&mut data, #pat.to_bytes_be().as_slice());
+            // },
+            panic!("[callable] BigInt arguments not yet supported"),
+        "BigUint" =>
             quote!{
                 elrond_wasm::str_util::push_bytes(&mut data, #pat.to_bytes_be().as_slice());
             },
-        "BigUint" =>
-            panic!("[callable] BigUint arguments not yet supported"),
         "i32" =>
             quote!{
                 elrond_wasm::str_util::push_i32(&mut data, #pat);
