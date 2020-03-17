@@ -2,19 +2,19 @@
 
 use crate::big_uint::*;
 
-use core::ops::{Add, Sub, Mul, Div, Rem};
+use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::cmp::Ordering;
 
-//use alloc::vec::Vec;
+use alloc::vec::Vec;
+
+use elrond_wasm::Sign;
 
 extern {
     fn bigIntNew(value: i64) -> i32;
 
-    fn bigIntUnsignedByteLength(x: i32) -> i32;
-    fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
+    fn bigIntSignedByteLength(x: i32) -> i32;
     fn bigIntGetSignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
-    fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
     fn bigIntSetSignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
 
     fn bigIntAdd(dest: i32, x: i32, y: i32);
@@ -22,6 +22,10 @@ extern {
     fn bigIntMul(dest: i32, x: i32, y: i32);
     fn bigIntTDiv(dest: i32, x: i32, y: i32);
     fn bigIntTMod(dest: i32, x: i32, y: i32);
+
+    fn bigIntAbs(dest: i32, x: i32);
+    fn bigIntNeg(dest: i32, x: i32);
+    fn bigIntSign(x: i32) -> i32;
     fn bigIntCmp(x: i32, y: i32) -> i32;
 }
 
@@ -210,6 +214,16 @@ impl RemAssign<&ArwenBigInt> for ArwenBigInt {
     }
 }
 
+fn ordering(i: i32) -> Ordering {
+    if i == 0 {
+        Ordering::Equal
+    } else if i > 0 {
+        Ordering::Greater
+    } else {
+        Ordering::Less
+    }
+}
+
 impl PartialEq for ArwenBigInt {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -231,12 +245,16 @@ impl Ord for ArwenBigInt {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
-        if arwen_cmp == 0 {
-            Ordering::Equal
-        } else if arwen_cmp > 0 {
-            Ordering::Greater
+        ordering(arwen_cmp)
+    }
+}
+
+fn arwen_cmp_i64(bi: &ArwenBigInt, other: i64) -> i32 {
+    unsafe {
+        if other == 0 {
+            bigIntSign(bi.handle)
         } else {
-            Ordering::Less
+            bigIntCmp(bi.handle, bigIntNew(other))
         }
     }
 }
@@ -244,21 +262,60 @@ impl Ord for ArwenBigInt {
 impl PartialEq<i64> for ArwenBigInt {
     #[inline]
     fn eq(&self, other: &i64) -> bool {
-        PartialEq::eq(self, &ArwenBigInt::from(*other))
+        arwen_cmp_i64(&self, *other) == 0
     }
 }
 
 impl PartialOrd<i64> for ArwenBigInt {
     #[inline]
     fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        PartialOrd::partial_cmp(self, &ArwenBigInt::from(*other))
+        let arwen_cmp = arwen_cmp_i64(&self, *other);
+        Some(ordering(arwen_cmp))
+    }
+}
+
+impl Neg for ArwenBigInt {
+    type Output = ArwenBigInt;
+
+    fn neg(self) -> Self::Output {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntNeg(result, self.handle);
+            ArwenBigInt {handle: result}
+        }
     }
 }
 
 impl elrond_wasm::BigIntApi<ArwenBigUint> for ArwenBigInt {
-    
-    fn abs(&self) -> ArwenBigUint {
-        panic!("abs not yet implemented")
+
+    fn abs_uint(&self) -> ArwenBigUint {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntAbs(result, self.handle);
+            ArwenBigUint {handle: result}
+        }
+    }
+
+    fn sign(&self) -> Sign {
+        unsafe {
+            let s = bigIntSign(self.handle);
+            if s == 0 {
+                Sign::NoSign
+            } else if s > 0 {
+                Sign::Plus
+            } else {
+                Sign::Minus
+            }
+        }
+    }
+
+    fn to_signed_bytes_be(&self) -> Vec<u8> {
+        unsafe {
+            let byte_len = bigIntSignedByteLength(self.handle);
+            let mut vec = vec![0u8; byte_len as usize];
+            bigIntGetSignedBytes(self.handle, vec.as_mut_ptr());
+            vec
+        }
     }
 
     #[inline]

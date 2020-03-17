@@ -1,9 +1,9 @@
 
 use crate::big_uint_mock::*;
 
-use core::ops::{Add, Sub, Mul, Div, Rem};
+use num_traits::sign::Signed;
+use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
-
 use alloc::vec::Vec;
 
 use num_bigint::BigInt;
@@ -147,6 +147,14 @@ impl RemAssign<&RustBigInt> for RustBigInt {
     }
 }
 
+impl Neg for RustBigInt {
+    type Output = RustBigInt;
+
+    fn neg(self) -> Self::Output {
+        RustBigInt(-self.0)
+    }
+}
+
 impl PartialEq<Self> for RustBigInt {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -186,8 +194,20 @@ impl PartialOrd<i64> for RustBigInt {
 
 impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
     
-    fn abs(&self) -> RustBigUint {
-        panic!("RustBigInt::abs not yet implemented")
+    fn abs_uint(&self) -> RustBigUint {
+        RustBigUint(self.0.abs())
+    }
+
+    fn sign(&self) -> elrond_wasm::Sign {
+        match self.0.sign() {
+            num_bigint::Sign::Minus => elrond_wasm::Sign::NoSign,
+            num_bigint::Sign::NoSign => elrond_wasm::Sign::NoSign,
+            num_bigint::Sign::Plus => elrond_wasm::Sign::Plus,
+        }
+    }
+
+    fn to_signed_bytes_be(&self) -> Vec<u8> {
+        self.0.to_signed_bytes_be()
     }
 
     fn phantom() -> Self {
