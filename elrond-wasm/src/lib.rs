@@ -121,7 +121,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
 
-use core::ops::{Add, Sub, Mul, Div, Rem};
+use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
 /// Definition of the BigUint type required by the API.
@@ -193,6 +193,7 @@ pub trait BigIntApi<BigUint>:
         SubAssign +
         Mul<Output=Self> +
         MulAssign +
+        Neg +
         PartialEq<Self> +
         Eq +
         PartialOrd<Self> +
@@ -200,7 +201,11 @@ pub trait BigIntApi<BigUint>:
         PartialEq<i64> +
         PartialOrd<i64> +
 {
-    fn abs(&self) -> BigUint;
+    fn abs_uint(&self) -> BigUint;
+
+    fn sign(&self) -> Sign;
+
+    fn to_signed_bytes_be(&self) -> Vec<u8>;
 
     // only needed at compilation, value will never be used
     fn phantom() -> Self;
