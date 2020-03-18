@@ -3,6 +3,8 @@
 
 use core::ops::{Add, Sub, Mul, Div, Rem};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
+use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
@@ -22,6 +24,13 @@ extern {
 
     fn bigIntCmp(x: i32, y: i32) -> i32;
     fn bigIntSign(x: i32) -> i32;
+
+    fn bigIntNot(dest: i32, x: i32);
+    fn bigIntAnd(dest: i32, x: i32, y: i32);
+    fn bigIntOr(dest: i32, x: i32, y: i32);
+    fn bigIntXor(dest: i32, x: i32, y: i32);
+    fn bigIntShr(dest: i32, x: i32, bits: i32);
+    fn bigIntShl(dest: i32, x: i32, bits: i32);
 
     fn signalError(messageOffset: *const u8, messageLength: i32) -> !;
 }
@@ -108,6 +117,10 @@ binary_operator!{Mul, mul, bigIntMul}
 binary_operator!{Div, div, bigIntTDiv}
 binary_operator!{Rem, rem, bigIntTMod}
 
+binary_operator!{BitAnd, bitand, bigIntAnd}
+binary_operator!{BitOr, bitor, bigIntOr}
+binary_operator!{BitXor, bitxor, bigIntXor}
+
 macro_rules! binary_assign_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
         impl $trait<ArwenBigUint> for ArwenBigUint {
@@ -133,6 +146,57 @@ binary_assign_operator!{SubAssign, sub_assign, big_uint_safe_sub}
 binary_assign_operator!{MulAssign, mul_assign, bigIntMul}
 binary_assign_operator!{DivAssign, div_assign, bigIntTDiv}
 binary_assign_operator!{RemAssign, rem_assign, bigIntTMod}
+
+binary_assign_operator!{BitAndAssign, bitand_assign, bigIntAnd}
+binary_assign_operator!{BitOrAssign,  bitor_assign,  bigIntOr}
+binary_assign_operator!{BitXorAssign, bitxor_assign, bigIntXor}
+
+macro_rules! shift_traits {
+    ($shift_trait:ident, $method:ident, $api_func:ident) => {
+        impl $shift_trait<i32> for ArwenBigUint {
+            type Output = ArwenBigUint;
+
+            fn $method(self, rhs: i32) -> ArwenBigUint {
+                unsafe {
+                    $api_func(self.handle, self.handle, rhs);
+                    self
+                }
+            }
+        }
+        
+        impl<'a> $shift_trait<i32> for &'a ArwenBigUint {
+            type Output = ArwenBigUint;
+
+            fn $method(self, rhs: i32) -> ArwenBigUint {
+                unsafe {
+                    let result = bigIntNew(0);
+                    $api_func(result, self.handle, rhs);
+                    ArwenBigUint {handle: result}
+                }
+            }
+        }
+    }
+}
+
+shift_traits!{Shl, shl, bigIntShl}
+shift_traits!{Shr, shr, bigIntShr}
+
+macro_rules! shift_assign_traits {
+    ($shift_assign_trait:ident, $method:ident, $api_func:ident) => {
+        impl $shift_assign_trait<i32> for ArwenBigUint {
+            fn $method(&mut self, rhs: i32) {
+                unsafe {
+                    let result = bigIntNew(0);
+                    $api_func(result, self.handle, rhs);
+                }
+            }
+        }
+    }
+}
+
+shift_assign_traits!{ShlAssign, shl_assign, bigIntShl}
+shift_assign_traits!{ShrAssign, shr_assign, bigIntShr}
+
 
 impl PartialEq for ArwenBigUint {
     #[inline]

@@ -3,7 +3,8 @@
 
 use core::ops::{Add, Sub, Mul, Div, Rem};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
-
+use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
+use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use alloc::vec::Vec;
 
 use num_bigint::BigInt;
@@ -66,6 +67,10 @@ binary_operator!{Mul, mul}
 binary_operator!{Div, div}
 binary_operator!{Rem, rem}
 
+binary_operator!{BitAnd, bitand}
+binary_operator!{BitOr, bitor}
+binary_operator!{BitXor, bitxor}
+
 fn check_sub_result(result: &BigInt) {
     if result.sign() == num_bigint::Sign::Minus {
         panic!(b"Cannot subtract because result would be negative")
@@ -113,6 +118,10 @@ binary_assign_operator!{MulAssign, mul_assign}
 binary_assign_operator!{DivAssign, div_assign}
 binary_assign_operator!{RemAssign, rem_assign}
 
+binary_assign_operator!{BitAndAssign, bitand_assign}
+binary_assign_operator!{BitOrAssign,  bitor_assign}
+binary_assign_operator!{BitXorAssign, bitxor_assign}
+
 impl SubAssign<RustBigUint> for RustBigUint {
     fn sub_assign(&mut self, other: Self) {
         BigInt::sub_assign(&mut self.0, other.0);
@@ -126,6 +135,46 @@ impl SubAssign<&RustBigUint> for RustBigUint {
         check_sub_result(&self.0);
     }
 }
+
+macro_rules! shift_traits {
+    ($shift_trait:ident, $method:ident, $api_func:ident) => {
+        impl $shift_trait<i32> for RustBigUint {
+            type Output = RustBigUint;
+
+            fn $method(self, rhs: i32) -> RustBigUint {
+                let result = $shift_trait::$method(self.0, rhs as usize);
+                RustBigUint(result)
+            }
+        }
+        
+        impl<'a> $shift_trait<i32> for &'a RustBigUint {
+            type Output = RustBigUint;
+
+            fn $method(self, rhs: i32) -> RustBigUint {
+                let result = $shift_trait::$method(&self.0, rhs as usize);
+                RustBigUint(result)
+            }
+        }
+    }
+}
+
+shift_traits!{Shl, shl, bigIntShl}
+shift_traits!{Shr, shr, bigIntShr}
+
+macro_rules! shift_assign_traits {
+    ($shift_assign_trait:ident, $method:ident, $api_func:ident) => {
+        impl $shift_assign_trait<i32> for RustBigUint {
+            fn $method(&mut self, rhs: i32) {
+                $shift_assign_trait::$method(&mut self.0, rhs as usize);
+            }
+        }
+    }
+}
+
+shift_assign_traits!{ShlAssign, shl_assign, bigIntShl}
+shift_assign_traits!{ShrAssign, shr_assign, bigIntShr}
+
+
 
 impl PartialEq<Self> for RustBigUint {
     #[inline]
