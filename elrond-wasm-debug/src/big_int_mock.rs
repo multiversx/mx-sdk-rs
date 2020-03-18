@@ -47,105 +47,53 @@ impl Clone for RustBigInt {
     }
 }
 
-impl Add for RustBigInt {
-    type Output = RustBigInt;
+macro_rules! binary_operator {
+    ($trait:ident, $method:ident) => {
+        impl $trait for RustBigInt {
+            type Output = RustBigInt;
+        
+            fn $method(self, other: RustBigInt) -> RustBigInt {
+                RustBigInt((self.0).$method(other.0))
+            }
+        }
 
-    fn add(self, other: RustBigInt) -> RustBigInt {
-        RustBigInt(self.0 + other.0)
+        impl<'a, 'b> $trait<&'b RustBigInt> for &'a RustBigInt {
+            type Output = RustBigInt;
+        
+            fn $method(self, other: &RustBigInt) -> RustBigInt {
+                RustBigInt(self.0.clone().$method(other.0.clone()))
+            }
+        }
     }
 }
 
-impl AddAssign<RustBigInt> for RustBigInt {
-    fn add_assign(&mut self, other: Self) {
-        BigInt::add_assign(&mut self.0, other.0)
+binary_operator!{Add, add}
+binary_operator!{Sub, sub}
+binary_operator!{Mul, mul}
+binary_operator!{Div, div}
+binary_operator!{Rem, rem}
+
+macro_rules! binary_assign_operator {
+    ($trait:ident, $method:ident) => {
+        impl $trait<RustBigInt> for RustBigInt {
+            fn $method(&mut self, other: Self) {
+                BigInt::$method(&mut self.0, other.0)
+            }
+        }
+        
+        impl $trait<&RustBigInt> for RustBigInt {
+            fn $method(&mut self, other: &RustBigInt) {
+                BigInt::$method(&mut self.0, &other.0)
+            }
+        }
     }
 }
 
-impl AddAssign<&RustBigInt> for RustBigInt {
-    fn add_assign(&mut self, other: &RustBigInt) {
-        BigInt::add_assign(&mut self.0, &other.0)
-    }
-}
-
-impl Sub for RustBigInt {
-    type Output = RustBigInt;
-
-    fn sub(self, other: RustBigInt) -> RustBigInt {
-        RustBigInt(self.0 - other.0)
-    }
-}
-
-impl SubAssign<RustBigInt> for RustBigInt {
-    fn sub_assign(&mut self, other: Self) {
-        BigInt::sub_assign(&mut self.0, other.0)
-    }
-}
-
-impl SubAssign<&RustBigInt> for RustBigInt {
-    fn sub_assign(&mut self, other: &RustBigInt) {
-        BigInt::sub_assign(&mut self.0, &other.0)
-    }
-}
-
-impl Mul for RustBigInt {
-    type Output = RustBigInt;
-
-    fn mul(self, other: RustBigInt) -> RustBigInt {
-        RustBigInt(self.0 * other.0)
-    }
-}
-
-impl MulAssign<RustBigInt> for RustBigInt {
-    fn mul_assign(&mut self, other: Self) {
-        BigInt::mul_assign(&mut self.0, other.0)
-    }
-}
-
-impl MulAssign<&RustBigInt> for RustBigInt {
-    fn mul_assign(&mut self, other: &RustBigInt) {
-        BigInt::mul_assign(&mut self.0, &other.0)
-    }
-}
-
-impl Div for RustBigInt {
-    type Output = RustBigInt;
-
-    fn div(self, other: RustBigInt) -> RustBigInt {
-        RustBigInt(self.0 / other.0)
-    }
-}
-
-impl DivAssign<RustBigInt> for RustBigInt {
-    fn div_assign(&mut self, other: Self) {
-        BigInt::div_assign(&mut self.0, &other.0)
-    }
-}
-
-impl DivAssign<&RustBigInt> for RustBigInt {
-    fn div_assign(&mut self, other: &RustBigInt) {
-        BigInt::div_assign(&mut self.0, &other.0)
-    }
-}
-
-impl Rem for RustBigInt {
-    type Output = RustBigInt;
-
-    fn rem(self, other: RustBigInt) -> RustBigInt {
-        RustBigInt(self.0 % other.0)
-    }
-}
-
-impl RemAssign<RustBigInt> for RustBigInt {
-    fn rem_assign(&mut self, other: Self) {
-        BigInt::rem_assign(&mut self.0, &other.0)
-    }
-}
-
-impl RemAssign<&RustBigInt> for RustBigInt {
-    fn rem_assign(&mut self, other: &RustBigInt) {
-        BigInt::rem_assign(&mut self.0, &other.0)
-    }
-}
+binary_assign_operator!{AddAssign, add_assign}
+binary_assign_operator!{SubAssign, sub_assign}
+binary_assign_operator!{MulAssign, mul_assign}
+binary_assign_operator!{DivAssign, div_assign}
+binary_assign_operator!{RemAssign, rem_assign}
 
 impl Neg for RustBigInt {
     type Output = RustBigInt;

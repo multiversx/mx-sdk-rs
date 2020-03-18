@@ -4,6 +4,7 @@ pub fn contract_imports() -> proc_macro2::TokenStream {
         use elrond_wasm::{Box, Vec, String};
         use elrond_wasm::{Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
+        use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
     }
 }
@@ -12,15 +13,28 @@ pub fn big_int_where() -> proc_macro2::TokenStream {
     quote! {
         where 
             BigUint: BigUintApi + 'static,
+            for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output=BigUint>,
+            for<'a, 'b> &'a BigUint: Sub<&'b BigUint, Output=BigUint>,
+            for<'a, 'b> &'a BigUint: Mul<&'b BigUint, Output=BigUint>,
+            for<'a, 'b> &'a BigUint: Div<&'b BigUint, Output=BigUint>,
+            for<'a, 'b> &'a BigUint: Rem<&'b BigUint, Output=BigUint>,
             for<'b> BigUint: AddAssign<&'b BigUint>,
             for<'b> BigUint: SubAssign<&'b BigUint>,
             for<'b> BigUint: MulAssign<&'b BigUint>,
             for<'b> BigUint: DivAssign<&'b BigUint>,
             for<'b> BigUint: RemAssign<&'b BigUint>,
+
             BigInt: BigIntApi<BigUint> + 'static,
+            for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,
+            for<'a, 'b> &'a BigInt: Sub<&'b BigInt, Output=BigInt>,
+            for<'a, 'b> &'a BigInt: Mul<&'b BigInt, Output=BigInt>,
+            for<'a, 'b> &'a BigInt: Div<&'b BigInt, Output=BigInt>,
+            for<'a, 'b> &'a BigInt: Rem<&'b BigInt, Output=BigInt>,
             for<'b> BigInt: AddAssign<&'b BigInt>,
             for<'b> BigInt: SubAssign<&'b BigInt>,
             for<'b> BigInt: MulAssign<&'b BigInt>,
+            for<'b> BigInt: DivAssign<&'b BigInt>,
+            for<'b> BigInt: RemAssign<&'b BigInt>,
     }
 }
 
