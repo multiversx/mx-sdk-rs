@@ -14,6 +14,11 @@ pub use address::*;
 pub use err::*;
 pub use serialization::*;
 
+use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
+use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
+use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
+
 /// Interface to be used by the actual smart contract code.
 /// 
 /// Note: contracts and the api are not mutable.
@@ -121,9 +126,6 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
 
-use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
-use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
-
 /// Definition of the BigUint type required by the API.
 /// The API doesn't care about the actual BigInt implementation.
 /// The Arwen VM provides an implementation directly in the protocol.
@@ -146,6 +148,16 @@ pub trait BigUintApi:
     DivAssign +
     Rem<Output=Self> +
     RemAssign +
+    BitAnd<Output=Self> +
+    BitAndAssign +
+    BitOr<Output=Self> +
+    BitOrAssign +
+    BitXor<Output=Self> +
+    BitXorAssign +
+    Shr<i32, Output=Self> +
+    ShrAssign<i32> +
+    Shl<i32, Output=Self> +
+    ShlAssign<i32> +
     PartialEq<Self> +
     Eq +
     PartialOrd<Self> +

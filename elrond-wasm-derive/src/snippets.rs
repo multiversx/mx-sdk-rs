@@ -6,6 +6,8 @@ pub fn contract_imports() -> proc_macro2::TokenStream {
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+        use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
+        use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
     }
 }
 
@@ -23,6 +25,14 @@ pub fn big_int_where() -> proc_macro2::TokenStream {
             for<'b> BigUint: MulAssign<&'b BigUint>,
             for<'b> BigUint: DivAssign<&'b BigUint>,
             for<'b> BigUint: RemAssign<&'b BigUint>,
+            for<'a, 'b> &'a BigUint: BitAnd<&'b BigUint, Output=BigUint>,
+            for<'a, 'b> &'a BigUint: BitOr<&'b BigUint, Output=BigUint>,
+            for<'a, 'b> &'a BigUint: BitXor<&'b BigUint, Output=BigUint>,
+            for<'b> BigUint: BitAndAssign<&'b BigUint>,
+            for<'b> BigUint: BitOrAssign<&'b BigUint>,
+            for<'b> BigUint: BitXorAssign<&'b BigUint>,
+            for<'a> &'a BigUint: Shr<i32, Output=BigUint>,
+            for<'a> &'a BigUint: Shl<i32, Output=BigUint>,
 
             BigInt: BigIntApi<BigUint> + 'static,
             for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,
