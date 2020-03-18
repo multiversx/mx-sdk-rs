@@ -74,145 +74,65 @@ impl Clone for ArwenBigInt {
     }
 }
 
-impl Add for ArwenBigInt {
-    type Output = ArwenBigInt;
+macro_rules! binary_operator {
+    ($trait:ident, $method:ident, $api_func:ident) => {
+        impl $trait for ArwenBigInt {
+            type Output = ArwenBigInt;
+        
+            fn $method(self, other: ArwenBigInt) -> ArwenBigInt {
+                unsafe {
+                    let result = bigIntNew(0);
+                    $api_func(result, self.handle, other.handle);
+                    ArwenBigInt {handle: result}
+                }
+            }
+        }
 
-    fn add(self, other: ArwenBigInt) -> ArwenBigInt {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntAdd(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
+        impl<'a, 'b> $trait<&'b ArwenBigInt> for &'a ArwenBigInt {
+            type Output = ArwenBigInt;
+        
+            fn $method(self, other: &ArwenBigInt) -> ArwenBigInt {
+                unsafe {
+                    let result = bigIntNew(0);
+                    $api_func(result, self.handle, other.handle);
+                    ArwenBigInt {handle: result}
+                }
+            }
         }
     }
 }
 
-impl AddAssign<ArwenBigInt> for ArwenBigInt {
-    fn add_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntAdd(self.handle, self.handle, other.handle);
+binary_operator!{Add, add, bigIntAdd}
+binary_operator!{Sub, sub, bigIntSub}
+binary_operator!{Mul, mul, bigIntMul}
+binary_operator!{Div, div, bigIntTDiv}
+binary_operator!{Rem, rem, bigIntTMod}
+
+macro_rules! binary_assign_operator {
+    ($trait:ident, $method:ident, $api_func:ident) => {
+        impl $trait<ArwenBigInt> for ArwenBigInt {
+            fn $method(&mut self, other: Self) {
+                unsafe {
+                    $api_func(self.handle, self.handle, other.handle);
+                }
+            }
+        }
+        
+        impl $trait<&ArwenBigInt> for ArwenBigInt {
+            fn $method(&mut self, other: &ArwenBigInt) {
+                unsafe {
+                    $api_func(self.handle, self.handle, other.handle);
+                }
+            }
         }
     }
 }
 
-impl AddAssign<&ArwenBigInt> for ArwenBigInt {
-    fn add_assign(&mut self, other: &ArwenBigInt) {
-        unsafe {
-            bigIntAdd(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Sub for ArwenBigInt {
-    type Output = ArwenBigInt;
-
-    fn sub(self, other: ArwenBigInt) -> ArwenBigInt {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntSub(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
-        }
-    }
-}
-
-impl SubAssign<ArwenBigInt> for ArwenBigInt {
-    fn sub_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntSub(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl SubAssign<&ArwenBigInt> for ArwenBigInt {
-    fn sub_assign(&mut self, other: &ArwenBigInt) {
-        unsafe {
-            bigIntSub(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Mul for ArwenBigInt {
-    type Output = ArwenBigInt;
-
-    fn mul(self, other: ArwenBigInt) -> ArwenBigInt {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntMul(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
-        }
-    }
-}
-
-impl MulAssign<ArwenBigInt> for ArwenBigInt {
-    fn mul_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntMul(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl MulAssign<&ArwenBigInt> for ArwenBigInt {
-    fn mul_assign(&mut self, other: &ArwenBigInt) {
-        unsafe {
-            bigIntMul(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Div for ArwenBigInt {
-    type Output = ArwenBigInt;
-
-    fn div(self, other: ArwenBigInt) -> ArwenBigInt {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntTDiv(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
-        }
-    }
-}
-
-impl DivAssign<ArwenBigInt> for ArwenBigInt {
-    fn div_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl DivAssign<&ArwenBigInt> for ArwenBigInt {
-    fn div_assign(&mut self, other: &ArwenBigInt) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Rem for ArwenBigInt {
-    type Output = ArwenBigInt;
-
-    fn rem(self, other: ArwenBigInt) -> ArwenBigInt {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntTDiv(result, self.handle, other.handle);
-            ArwenBigInt {handle: result}
-        }
-    }
-}
-
-impl RemAssign<ArwenBigInt> for ArwenBigInt {
-    fn rem_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl RemAssign<&ArwenBigInt> for ArwenBigInt {
-    fn rem_assign(&mut self, other: &ArwenBigInt) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
+binary_assign_operator!{AddAssign, add_assign, bigIntAdd}
+binary_assign_operator!{SubAssign, sub_assign, bigIntSub}
+binary_assign_operator!{MulAssign, mul_assign, bigIntMul}
+binary_assign_operator!{DivAssign, div_assign, bigIntTDiv}
+binary_assign_operator!{RemAssign, rem_assign, bigIntTMod}
 
 fn ordering(i: i32) -> Ordering {
     if i == 0 {

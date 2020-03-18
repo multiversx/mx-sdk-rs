@@ -193,6 +193,10 @@ pub trait BigIntApi<BigUint>:
         SubAssign +
         Mul<Output=Self> +
         MulAssign +
+        Div<Output=Self> +
+        DivAssign +
+        Rem<Output=Self> +
+        RemAssign +
         Neg +
         PartialEq<Self> +
         Eq +

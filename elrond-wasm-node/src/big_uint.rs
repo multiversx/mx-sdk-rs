@@ -19,7 +19,11 @@ extern {
     fn bigIntMul(dest: i32, x: i32, y: i32);
     fn bigIntTDiv(dest: i32, x: i32, y: i32);
     fn bigIntTMod(dest: i32, x: i32, y: i32);
+
     fn bigIntCmp(x: i32, y: i32) -> i32;
+    fn bigIntSign(x: i32) -> i32;
+
+    fn signalError(messageOffset: *const u8, messageLength: i32) -> !;
 }
 
 pub struct ArwenBigUint {
@@ -60,145 +64,75 @@ impl Clone for ArwenBigUint {
     }
 }
 
-impl Add for ArwenBigUint {
-    type Output = ArwenBigUint;
+/// Subtracts, but panics if the result is negative.
+/// The same behaviour can be seen in rust BigUint.
+unsafe fn big_uint_safe_sub(dest: i32, x: i32, y: i32) {
+    bigIntSub(dest, x, y);
+    if bigIntSign(dest) < 0 {
+        let err_msg = b"Cannot subtract because result would be negative";
+        signalError(err_msg.as_ptr(), err_msg.len() as i32)
+    }
+}
 
-    fn add(self, other: ArwenBigUint) -> ArwenBigUint {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntAdd(result, self.handle, other.handle);
-            ArwenBigUint {handle: result}
+macro_rules! binary_operator {
+    ($trait:ident, $method:ident, $api_func:ident) => {
+        impl $trait for ArwenBigUint {
+            type Output = ArwenBigUint;
+        
+            fn $method(self, other: ArwenBigUint) -> ArwenBigUint {
+                unsafe {
+                    let result = bigIntNew(0);
+                    $api_func(result, self.handle, other.handle);
+                    ArwenBigUint {handle: result}
+                }
+            }
+        }
+
+        impl<'a, 'b> $trait<&'b ArwenBigUint> for &'a ArwenBigUint {
+            type Output = ArwenBigUint;
+        
+            fn $method(self, other: &ArwenBigUint) -> ArwenBigUint {
+                unsafe {
+                    let result = bigIntNew(0);
+                    $api_func(result, self.handle, other.handle);
+                    ArwenBigUint {handle: result}
+                }
+            }
         }
     }
 }
 
-impl AddAssign<ArwenBigUint> for ArwenBigUint {
-    fn add_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntAdd(self.handle, self.handle, other.handle);
+binary_operator!{Add, add, bigIntAdd}
+binary_operator!{Sub, sub, big_uint_safe_sub}
+binary_operator!{Mul, mul, bigIntMul}
+binary_operator!{Div, div, bigIntTDiv}
+binary_operator!{Rem, rem, bigIntTMod}
+
+macro_rules! binary_assign_operator {
+    ($trait:ident, $method:ident, $api_func:ident) => {
+        impl $trait<ArwenBigUint> for ArwenBigUint {
+            fn $method(&mut self, other: Self) {
+                unsafe {
+                    $api_func(self.handle, self.handle, other.handle);
+                }
+            }
+        }
+        
+        impl $trait<&ArwenBigUint> for ArwenBigUint {
+            fn $method(&mut self, other: &ArwenBigUint) {
+                unsafe {
+                    $api_func(self.handle, self.handle, other.handle);
+                }
+            }
         }
     }
 }
 
-impl AddAssign<&ArwenBigUint> for ArwenBigUint {
-    fn add_assign(&mut self, other: &ArwenBigUint) {
-        unsafe {
-            bigIntAdd(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Sub for ArwenBigUint {
-    type Output = ArwenBigUint;
-
-    fn sub(self, other: ArwenBigUint) -> ArwenBigUint {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntSub(result, self.handle, other.handle);
-            ArwenBigUint {handle: result}
-        }
-    }
-}
-
-impl SubAssign<ArwenBigUint> for ArwenBigUint {
-    fn sub_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntSub(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl SubAssign<&ArwenBigUint> for ArwenBigUint {
-    fn sub_assign(&mut self, other: &ArwenBigUint) {
-        unsafe {
-            bigIntSub(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Mul for ArwenBigUint {
-    type Output = ArwenBigUint;
-
-    fn mul(self, other: ArwenBigUint) -> ArwenBigUint {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntMul(result, self.handle, other.handle);
-            ArwenBigUint {handle: result}
-        }
-    }
-}
-
-impl MulAssign<ArwenBigUint> for ArwenBigUint {
-    fn mul_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntMul(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl MulAssign<&ArwenBigUint> for ArwenBigUint {
-    fn mul_assign(&mut self, other: &ArwenBigUint) {
-        unsafe {
-            bigIntMul(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Div for ArwenBigUint {
-    type Output = ArwenBigUint;
-
-    fn div(self, other: ArwenBigUint) -> ArwenBigUint {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntTDiv(result, self.handle, other.handle);
-            ArwenBigUint {handle: result}
-        }
-    }
-}
-
-impl DivAssign<ArwenBigUint> for ArwenBigUint {
-    fn div_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl DivAssign<&ArwenBigUint> for ArwenBigUint {
-    fn div_assign(&mut self, other: &ArwenBigUint) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl Rem for ArwenBigUint {
-    type Output = ArwenBigUint;
-
-    fn rem(self, other: ArwenBigUint) -> ArwenBigUint {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntTDiv(result, self.handle, other.handle);
-            ArwenBigUint {handle: result}
-        }
-    }
-}
-
-impl RemAssign<ArwenBigUint> for ArwenBigUint {
-    fn rem_assign(&mut self, other: Self) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
-
-impl RemAssign<&ArwenBigUint> for ArwenBigUint {
-    fn rem_assign(&mut self, other: &ArwenBigUint) {
-        unsafe {
-            bigIntTDiv(self.handle, self.handle, other.handle);
-        }
-    }
-}
+binary_assign_operator!{AddAssign, add_assign, bigIntAdd}
+binary_assign_operator!{SubAssign, sub_assign, big_uint_safe_sub}
+binary_assign_operator!{MulAssign, mul_assign, bigIntMul}
+binary_assign_operator!{DivAssign, div_assign, bigIntTDiv}
+binary_assign_operator!{RemAssign, rem_assign, bigIntTMod}
 
 impl PartialEq for ArwenBigUint {
     #[inline]
