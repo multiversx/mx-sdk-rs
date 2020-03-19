@@ -23,6 +23,7 @@ mod contract_gen_payable;
 mod parse_attr;
 mod snippets;
 mod util;
+mod reserved;
 
 mod callable;
 mod callable_gen;

@@ -4,6 +4,7 @@ use super::contract_gen_finish::*;
 use super::contract_gen_payable::*;
 use super::parse_attr::*;
 use super::util::*;
+use super::reserved;
 
 //use super::parse_attr::*;
 
@@ -101,6 +102,11 @@ impl Method {
             if m.default == None {
                 panic!("Public methods need an implementation.");
             }
+            let fn_name_str = &m.sig.ident.to_string();
+            if reserved::is_reserved(fn_name_str) {
+                panic!("Cannot declare public method with name '{}', because that name is reserved by the Arwen API.", fn_name_str);
+            }
+
             metadata = MethodMetadata::Public(payable_opt);
         }
         
