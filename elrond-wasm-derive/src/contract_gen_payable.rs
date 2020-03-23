@@ -7,8 +7,8 @@ pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
         if let Some(PayableAttribute{ payment_arg: payment_arg_opt }) = payable_opt {
             if let Some(payment_arg) = payment_arg_opt {
                 match payment_arg {
-                    syn::FnArg::Captured(arg_captured) => {
-                        let pat = &arg_captured.pat;
+                    syn::FnArg::Typed(pat_typed) => {
+                        let pat = &pat_typed.pat;
                         quote!{
                             let #pat = self.api.get_call_value_big_uint();
                         }

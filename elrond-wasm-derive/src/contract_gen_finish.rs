@@ -2,12 +2,12 @@
 pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type) -> proc_macro2::TokenStream {
     match ty {     
         syn::Type::Reference(type_reference) => {
-            if type_reference.mutability != None {
+            if type_reference.mutability.is_some() {
                 panic!("Mutable references not supported as contract method arguments");
             }
             match &*type_reference.elem {
                 syn::Type::Path(type_path) => {
-                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                    let type_path_segment = type_path.path.segments.last().unwrap();
                     generate_result_finish_snippet_for_arg_type(type_path_segment, result_ident, true)
                 },
                 _ => {
@@ -16,7 +16,7 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
             }
         },
         syn::Type::Path(type_path) => {
-            let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+            let type_path_segment = type_path.path.segments.last().unwrap();
             generate_result_finish_snippet_for_arg_type(type_path_segment, result_ident, false)
         },
         syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
@@ -46,7 +46,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
                     }
 
                     if let (syn::GenericArgument::Type(result_type), syn::GenericArgument::Type(err_type)) =
-                           (args.first().unwrap().into_value(), args.last().unwrap().into_value()) {
+                           (args.first().unwrap(), args.last().unwrap()) {
                         let ok_res_ident = syn::Ident::new("ok_res", proc_macro2::Span::call_site());
                         let ok_snippet = generate_result_finish_snippet(&ok_res_ident, result_type);
                         let err_res_ident = syn::Ident::new("err_res", proc_macro2::Span::call_site());
@@ -80,10 +80,10 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
                     if args.len() != 1 {
                         panic!("Vec type must have exactly 1 generic type argument");
                     }
-                    if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
+                    if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
                         match vec_type {                
                             syn::Type::Path(type_path) => {
-                                let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                                let type_path_segment = type_path.path.segments.last().unwrap().clone();
                                 let type_str = type_path_segment.ident.to_string();
                                 match type_str.as_str() {
                                     "u8" => 

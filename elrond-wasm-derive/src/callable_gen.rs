@@ -28,7 +28,7 @@ impl CallableMethod {
 pub struct Callable {
     pub trait_name: proc_macro2::Ident,
     pub callable_impl_name: proc_macro2::Ident,
-    pub contract_impl_name: proc_macro2::Ident,
+    pub contract_impl_name: syn::Path,
     methods: Vec<CallableMethod>,
 }
 
@@ -79,8 +79,8 @@ impl Callable {
             let amount_snippet = if let Some(payment_arg) = &m.payable {
                 if let Some(payment_fn_attr) = &payment_arg.payment_arg {
                     match &payment_fn_attr {
-                        syn::FnArg::Captured(arg_captured) => {
-                            let pat = &arg_captured.pat;
+                        syn::FnArg::Typed(pat_typed) => {
+                            let pat = &pat_typed.pat;
                             quote! {
                                 let amount = #pat;
                             }
@@ -135,10 +135,10 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
                         if args.len() != 1 {
                             panic!("[callable] Vec type must have exactly 1 generic type argument");
                         }
-                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
-                            match vec_type {                
+                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
+                            match vec_type {
                                 syn::Type::Path(type_path) => {
-                                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
                                     let type_str = type_path_segment.ident.to_string();
                                     match type_str.as_str() {
                                         "u8" => quote!{
@@ -181,23 +181,23 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
 
 pub fn generate_arg_push_snippet(arg: &PublicArg) -> proc_macro2::TokenStream {
     match &arg.syn_arg {
-        syn::FnArg::Captured(arg_captured) => {
-            let pat = &arg_captured.pat;
-            let ty = &arg_captured.ty;
+        syn::FnArg::Typed(pat_type) => {
+            let pat = &*pat_type.pat;
+            let ty = &*pat_type.ty;
             let arg_index = arg.index;
             match ty {                
                 syn::Type::Path(type_path) => {
-                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                    generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index)
+                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
+                    generate_push_snippet_for_arg_type(&type_path_segment, &pat, arg_index)
                 },
                 syn::Type::Reference(type_reference) => {
-                    if type_reference.mutability != None {
+                    if type_reference.mutability.is_some() {
                         panic!("Mutable references not supported as contract method arguments");
                     }
                     match &*type_reference.elem {
                         syn::Type::Path(type_path) => {
-                            let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                            generate_push_snippet_for_arg_type(&type_path_segment, pat, arg_index)
+                            let type_path_segment = type_path.path.segments.last().unwrap().clone();
+                            generate_push_snippet_for_arg_type(&type_path_segment, &pat, arg_index)
                         },
                         _ => {
                             panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)

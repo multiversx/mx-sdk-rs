@@ -7,7 +7,7 @@ static ATTR_CALLBACK_CALL: &str = "callback";
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 	attrs.iter().any(|attr| {
         if let Some(first_seg) = attr.path.segments.first() {
-			return first_seg.value().ident == name
+			return first_seg.ident == name
 		};
 		false
 	})
@@ -30,7 +30,7 @@ impl PayableAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<PayableAttribute> {
         let payable_attr = m.attrs.iter().find(|attr| {
             if let Some(first_seg) = attr.path.segments.first() {
-                first_seg.value().ident == ATTR_PAYABLE
+                first_seg.ident == ATTR_PAYABLE
             } else {
                 false
             }
@@ -39,7 +39,7 @@ impl PayableAttribute {
         match payable_attr {        
             None => None,
             Some(attr) => {
-                let mut iter = attr.clone().tts.into_iter();
+                let mut iter = attr.clone().tokens.into_iter();
                 let payment_arg_ident: Option<syn::Ident> =
                     match iter.next() {
                         Some(proc_macro2::TokenTree::Group(group)) => {
@@ -61,13 +61,12 @@ impl PayableAttribute {
 
                 // find the payment argument
                 let payment_arg = if let Some(arg_ident) = payment_arg_ident {
-                    let arg_opt = m.sig.decl.inputs
+                    let arg_opt = m.sig.inputs
                         .iter()
                         .find(|arg| {
                             match *arg {
-                                syn::FnArg::Captured(arg_captured) => {
-                                    let pat = &arg_captured.pat;
-                                    match pat {
+                                syn::FnArg::Typed(pat_typed) => {
+                                    match &*pat_typed.pat {
                                         syn::Pat::Ident(pat_ident) => {
                                             pat_ident.ident == arg_ident
                                         },
@@ -102,7 +101,7 @@ impl EventAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<EventAttribute> {
         let event_attr = m.attrs.iter().find(|attr| {
             if let Some(first_seg) = attr.path.segments.first() {
-                first_seg.value().ident == ATTR_EVENT
+                first_seg.ident == ATTR_EVENT
             } else {
                 false
             }
@@ -111,7 +110,7 @@ impl EventAttribute {
             None => None,
             Some(attr) => {
                 let result_str: String;
-                let mut iter = attr.clone().tts.into_iter();
+                let mut iter = attr.clone().tokens.into_iter();
                 match iter.next() {
                     Some(proc_macro2::TokenTree::Group(group)) => {
                         if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
@@ -158,7 +157,7 @@ impl CallbackCallAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<CallbackCallAttribute> {
         let cc_attr = m.attrs.iter().find(|attr| {
             if let Some(first_seg) = attr.path.segments.first() {
-                first_seg.value().ident == ATTR_CALLBACK_CALL
+                first_seg.ident == ATTR_CALLBACK_CALL
             } else {
                 false
             }
@@ -167,7 +166,7 @@ impl CallbackCallAttribute {
         match cc_attr {        
             None => None,
             Some(attr) => {
-                let mut iter = attr.clone().tts.into_iter();
+                let mut iter = attr.clone().tokens.into_iter();
                 let callback_method_ident: syn::Ident =
                     match iter.next() {
                         Some(proc_macro2::TokenTree::Group(group)) => {

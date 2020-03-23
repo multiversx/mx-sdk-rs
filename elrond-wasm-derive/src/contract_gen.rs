@@ -10,7 +10,7 @@ use super::reserved;
 
 pub struct Contract {
     pub trait_name: proc_macro2::Ident,
-    pub contract_impl_name: proc_macro2::Ident,
+    pub contract_impl_name: syn::Path,
     methods: Vec<Method>,
 }
 
@@ -127,17 +127,17 @@ impl Method {
 
 pub fn extract_public_args(m: &syn::TraitItemMethod, payable_opt: &Option<PayableAttribute>) -> Vec<PublicArg> {
     let mut arg_index: isize = -1; // ignore the first argument, which is &self
-    m.sig.decl.inputs
+    m.sig.inputs
         .iter()
         .filter_map(|arg| {
             let arg_opt = match arg {
-                syn::FnArg::SelfRef(ref selfref) => {
-                    if !selfref.mutability.is_none() || arg_index != -1 {
+                syn::FnArg::Receiver(ref selfref) => {
+                    if selfref.mutability.is_some() || arg_index != -1 {
                         panic!("Trait method must have `&self` as its first argument.");
                     }
                     None
                 },
-                captured @ syn::FnArg::Captured(_) => {
+                captured @ syn::FnArg::Typed(_) => {
                     let mut is_payment_arg = false;
                     if let Some(PayableAttribute{ payment_arg: Some(p_attr) }) = &payable_opt {
                         if p_attr == captured {
@@ -153,8 +153,7 @@ pub fn extract_public_args(m: &syn::TraitItemMethod, payable_opt: &Option<Payabl
                             syn_arg: captured.clone()
                         })
                     }
-                },
-                other_arg => panic!("Unsupported argument type {:?}, nor captured", other_arg),
+                }
             };
             
             arg_opt
@@ -213,7 +212,7 @@ impl Method {
     pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
         let msig = &self.syn_m.sig;
         let all_arg_names: Vec<proc_macro2::TokenStream> =  
-            msig.decl.inputs
+            msig.inputs
                 .iter()
                 .filter_map(|arg| generate_arg_call_name(arg))
                 .collect();
@@ -234,7 +233,7 @@ impl Method {
         let call = quote! {
             self.#fn_ident (#(#all_arg_names),*)
         };
-        let body_with_result = generate_body_with_result(&msig.decl.output, &call);
+        let body_with_result = generate_body_with_result(&msig.output, &call);
 
         quote! {
             #[inline]
@@ -354,7 +353,7 @@ impl Contract {
                     match m.metadata {
                         MethodMetadata::Callback() => {
                             let all_arg_names: Vec<proc_macro2::TokenStream> =  
-                                m.syn_m.sig.decl.inputs
+                                m.syn_m.sig.inputs
                                     .iter()
                                     .filter_map(|arg| generate_arg_call_name(arg))
                                     .collect();

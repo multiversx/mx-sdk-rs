@@ -13,13 +13,13 @@ pub fn generate_callable_interface_impl_struct_name(trait_ident: &proc_macro2::I
     format_ident!(trait_ident, "{}Impl")
 }
 
-pub fn extract_struct_name(args: syn::AttributeArgs) -> proc_macro2::Ident {
+pub fn extract_struct_name(args: syn::AttributeArgs) -> syn::Path {
     if args.len() != 1 {
         panic!("Exactly one argument expected in contract annotation, specifying the implementation struct name.");
     }
 
-    if let syn::NestedMeta::Meta(syn::Meta::Word(ident)) = args.get(0).unwrap() {
-        ident.clone()
+    if let syn::NestedMeta::Meta(syn::Meta::Path(path)) = args.get(0).unwrap() {
+        path.clone()
     } else {
         panic!("Malformed contract implementation struct name")
     }
@@ -36,8 +36,8 @@ pub fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMet
                     "ABI function `{}` must have `&self` as its first argument.",
                     msig.ident.to_string()
                 );
-                match msig.decl.inputs[0] {
-                    syn::FnArg::SelfRef(ref selfref) => {
+                match msig.inputs[0] {
+                    syn::FnArg::Receiver(ref selfref) => {
                         if !selfref.mutability.is_none() {
                             panic!(bad_self_ref)
                         }
