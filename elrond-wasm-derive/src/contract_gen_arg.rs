@@ -3,17 +3,16 @@ use super::contract_gen::*;
 
 pub fn generate_arg_call_name(arg: &syn::FnArg) -> Option<proc_macro2::TokenStream> {
     match arg {
-        syn::FnArg::SelfRef(_) => None,
-        syn::FnArg::Captured(arg_captured) => {
-            let pat = &arg_captured.pat;
-            let ty = &arg_captured.ty;
+        syn::FnArg::Receiver(_) => None,
+        syn::FnArg::Typed(pat_typed) => {
+            let pat = &*pat_typed.pat;
+            let ty = &*pat_typed.ty;
             match ty {                
                 syn::Type::Path(_) => Some(quote!{ #pat }),
                 syn::Type::Reference(_) => Some(quote!{ &#pat }),
                 other_arg => panic!("Unsupported argument type {:?} in generate_arg_call_name", other_arg),
             }
-        },
-        other_arg => panic!("Unsupported argument type {:?} in generate_arg_call_name, neither self, nor captured", other_arg)
+        }
     }
 }
 
@@ -30,10 +29,10 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
                         if args.len() != 1 {
                             panic!("Vec type must have exactly 1 generic type argument");
                         }
-                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap().into_value() {
+                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
                             match vec_type {                
                                 syn::Type::Path(type_path) => {
-                                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
+                                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
                                     let type_str = type_path_segment.ident.to_string();
                                     match type_str.as_str() {
                                         "u8" => quote!{
@@ -71,23 +70,23 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
 
 pub fn generate_arg_init_snippet(arg: &PublicArg, arg_offset: i32) -> proc_macro2::TokenStream {
     match &arg.syn_arg {
-        syn::FnArg::Captured(arg_captured) => {
-            let pat = &arg_captured.pat;
-            let ty = &arg_captured.ty;
+        syn::FnArg::Typed(pat_typed) => {
+            let pat = &*pat_typed.pat;
+            let ty = &*pat_typed.ty;
             let arg_index = arg.index + arg_offset;
             match ty {
                 syn::Type::Path(type_path) => {
-                    let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                    generate_snippet_for_arg_type(&type_path_segment, pat, arg_index)
+                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
+                    generate_snippet_for_arg_type(&type_path_segment, &pat, arg_index)
                 },             
                 syn::Type::Reference(type_reference) => {
-                    if type_reference.mutability != None {
+                    if type_reference.mutability.is_some() {
                         panic!("Mutable references not supported as contract method arguments");
                     }
                     match &*type_reference.elem {
                         syn::Type::Path(type_path) => {
-                            let type_path_segment = type_path.path.segments.last().unwrap().value().clone();
-                            generate_snippet_for_arg_type(&type_path_segment, pat, arg_index)
+                            let type_path_segment = type_path.path.segments.last().unwrap().clone();
+                            generate_snippet_for_arg_type(&type_path_segment, &pat, arg_index)
                         },
                         _ => {
                             panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
