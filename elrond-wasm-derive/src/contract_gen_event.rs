@@ -1,100 +1,79 @@
-
-use super::parse_attr::*;
+use super::contract_gen_method::*;
+use super::contract_gen_arg::*;
+//use super::parse_attr::*;
 use super::util::*;
 
-fn generate_topic_conversion_code(arg: &syn::FnArg, arg_index: usize) -> proc_macro2::TokenStream {
-    match arg {
-        syn::FnArg::Receiver(ref selfref) => {
-            if !selfref.mutability.is_none() || arg_index != 0 {
-                panic!("event method must have `&self` as its first argument.");
+fn generate_topic_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStream {
+    let pat = &arg.pat;
+    let arg_index = arg.index as usize;
+    match &arg.ty {
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability.is_some() {
+                panic!("[Event topic] Mutable references not supported as contract method arguments");
             }
-            quote!{}
-        },
-        syn::FnArg::Typed(pat_typed) => {
-            let pat = &*pat_typed.pat;
-            let ty = &*pat_typed.ty;
-            match ty {                
-                syn::Type::Reference(type_reference) => {
-                    if type_reference.mutability.is_some() {
-                        panic!("[Event topic] Mutable references not supported as contract method arguments");
-                    }
-                    match &*type_reference.elem {
-                        syn::Type::Path(type_path) => {
-                            let type_str = type_path.path.segments.last().unwrap().ident.to_string();
-                            match type_str.as_str() {
-                                "Address" =>
-                                    quote!{
-                                        #pat.copy_to_array(&mut topics[#arg_index]);
-                                    },
-                                "BigInt" =>
-                                    panic!("[Event data] BigInt argument type currently not supported"),
-                                "BigUint" =>
-                                    quote!{
-                                        #pat.copy_to_array_big_endian_pad_right(&mut topics[#arg_index]);
-                                    },
-                                other_stype_str => {
-                                    panic!("[Event topic] Unsupported reference argument type: {:?}", other_stype_str)
-                                }
-                            }
-                        },
-                        _ => {
-                            panic!("[Event topic] Unsupported reference argument type: {:?}", type_reference)
+            match &*type_reference.elem {
+                syn::Type::Path(type_path) => {
+                    let type_str = type_path.path.segments.last().unwrap().ident.to_string();
+                    match type_str.as_str() {
+                        "Address" =>
+                            quote!{
+                                #pat.copy_to_array(&mut topics[#arg_index]);
+                            },
+                        "BigInt" =>
+                            panic!("[Event data] BigInt argument type currently not supported"),
+                        "BigUint" =>
+                            quote!{
+                                #pat.copy_to_array_big_endian_pad_right(&mut topics[#arg_index]);
+                            },
+                        other_stype_str => {
+                            panic!("[Event topic] Unsupported reference argument type: {:?}", other_stype_str)
                         }
                     }
-                    
                 },
-                other_arg => panic!("[Event topic] Unsupported argument type: {:?}, should be reference", other_arg)
+                _ => {
+                    panic!("[Event topic] Unsupported reference argument type: {:?}", type_reference)
+                }
             }
-        }
+            
+        },
+        other_arg => panic!("[Event topic] Unsupported argument type: {:?}, should be reference", other_arg)
     }
 }
 
-fn generate_event_data_conversion_code(arg: &syn::FnArg, arg_index: i32) -> proc_macro2::TokenStream {
-    match arg {
-        syn::FnArg::Receiver(ref selfref) => {
-            if !selfref.mutability.is_none() || arg_index != 0 {
-                panic!("[Event data] method must have `&self` as its first argument.");
+fn generate_event_data_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStream {
+    let pat = &arg.pat;
+    match &arg.ty {            
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability.is_some() {
+                panic!("[Event data] Mutable references not supported as event arguments");
             }
-            quote!{}
-        },
-        syn::FnArg::Typed(pat_typed) => {
-            let pat = &*pat_typed.pat;
-            let ty = &*pat_typed.ty;
-            match ty {                
-                syn::Type::Reference(type_reference) => {
-                    if type_reference.mutability.is_some() {
-                        panic!("[Event data] Mutable references not supported as event arguments");
-                    }
-                    match &*type_reference.elem {
-                        syn::Type::Path(type_path) => {
-                            let type_str = type_path.path.segments.last().unwrap().ident.to_string();
-                            match type_str.as_str() {
-                                "BigInt" =>
-                                    panic!("[Event data] BigInt argument type currently not supported"),
-                                "BigUint" =>
-                                    quote!{
-                                        #pat.to_bytes_be_pad_right(32)
-                                    },
-                                other_stype_str => {
-                                    panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)
-                                }
-                            }
-                        },
-                        _ => {
-                            panic!("[Event data] Unsupported reference argument type: {:?}", type_reference)
+            match &*type_reference.elem {
+                syn::Type::Path(type_path) => {
+                    let type_str = type_path.path.segments.last().unwrap().ident.to_string();
+                    match type_str.as_str() {
+                        "BigInt" =>
+                            panic!("[Event data] BigInt argument type currently not supported"),
+                        "BigUint" =>
+                            quote!{
+                                #pat.to_bytes_be_pad_right(32)
+                            },
+                        other_stype_str => {
+                            panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)
                         }
                     }
-                    
                 },
-                other_arg => panic!("[Event data] Unsupported argument type: {:?}, should be reference", other_arg)
+                _ => {
+                    panic!("[Event data] Unsupported reference argument type: {:?}", type_reference)
+                }
             }
-        }
+            
+        },
+        other_arg => panic!("[Event data] Unsupported argument type: {:?}, should be reference", other_arg)
     }
 }
 
-pub fn generate_event_impl(m: &syn::TraitItemMethod) -> proc_macro2::TokenStream {
-    let msig = &m.sig;
-    let nr_args_no_self = msig.inputs.len() - 1;
+pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
+    let nr_args_no_self = m.method_args.len() - 1;
     if nr_args_no_self == 0 {
         panic!("events need at least 1 argument, for the data");
     }
@@ -102,17 +81,17 @@ pub fn generate_event_impl(m: &syn::TraitItemMethod) -> proc_macro2::TokenStream
 
     let mut arg_index: usize = 0;
     let topic_conv_snippets: Vec<proc_macro2::TokenStream> = 
-        msig.inputs
+        m.method_args
             .iter()
             .map(|arg| {
                 let result =
                     if arg_index < nr_args_no_self {
-                        let conversion = generate_topic_conversion_code(arg, arg_index);
+                        let conversion = generate_topic_conversion_code(arg);
                         quote! {
                             #conversion
                         }
                     } else {
-                        let conversion = generate_event_data_conversion_code(arg, arg_index as i32);
+                        let conversion = generate_event_data_conversion_code(arg);
                         quote! {
                             let data_vec = #conversion;
                         }
@@ -121,7 +100,7 @@ pub fn generate_event_impl(m: &syn::TraitItemMethod) -> proc_macro2::TokenStream
                 result
             })
             .collect();
-    let event_id_bytes = EventAttribute::parse(m).unwrap().identifier;
+    let msig = m.generate_sig();
     let event_id_literal = array_literal(event_id_bytes.as_slice());
     quote! {
         #msig {
