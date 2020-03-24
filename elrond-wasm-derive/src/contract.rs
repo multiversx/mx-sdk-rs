@@ -11,8 +11,8 @@ pub fn process_contract(
 
     let contract = Contract::new(args_input, proc_input);
 
-    let contract_struct = contract.contract_impl_name.clone();
-    let trait_name = contract.trait_name.clone();
+    let contract_impl_ident = contract.contract_impl_name.clone();
+    let trait_name_ident = contract.trait_name.clone();
     let method_impls = contract.extract_method_impls();
 
     let call_methods = contract.generate_call_methods();
@@ -25,7 +25,7 @@ pub fn process_contract(
     let contract_imports = snippets::contract_imports();
     let api_where = snippets::api_where();
 
-    let contract_trait_api_impl = snippets::contract_trait_api_impl(&contract_struct);
+    let contract_trait_api_impl = snippets::contract_trait_api_impl(&contract_impl_ident);
 
     // this definition is common to release and debug mode
     let main_definition = quote! {
@@ -34,7 +34,7 @@ pub fn process_contract(
 
       #contract_imports
 
-      pub trait #trait_name<T, BigInt, BigUint>: ContractHookApi<BigInt, BigUint> + Sized 
+      pub trait #trait_name_ident<T, BigInt, BigUint>: ContractHookApi<BigInt, BigUint> + Sized 
       #api_where
       {
         #(#method_impls)*
@@ -46,7 +46,7 @@ pub fn process_contract(
         fn callback(&self);
       }
 
-      pub struct #contract_struct<T, BigInt, BigUint>
+      pub struct #contract_impl_ident<T, BigInt, BigUint>
       #api_where
       {
           api: T,
@@ -63,11 +63,11 @@ pub fn process_contract(
           _phantom2: BigUint,
       }
 
-      impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
+      impl <T, BigInt, BigUint> #contract_impl_ident<T, BigInt, BigUint>
       #api_where
       {
         pub fn new(api: T) -> Self {
-          #contract_struct {
+          #contract_impl_ident {
             api: api,
             _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
             _phantom2: BigUint::phantom(),
@@ -77,7 +77,7 @@ pub fn process_contract(
 
       #contract_trait_api_impl
 
-      impl <T, BigInt, BigUint> #trait_name<T, BigInt, BigUint> for #contract_struct<T, BigInt, BigUint> 
+      impl <T, BigInt, BigUint> #trait_name_ident<T, BigInt, BigUint> for #contract_impl_ident<T, BigInt, BigUint> 
       #api_where
       {
         #(#event_impls)*
@@ -97,7 +97,7 @@ pub fn process_contract(
         }
       }
 
-      impl <T, BigInt, BigUint> #contract_struct<T, BigInt, BigUint>
+      impl <T, BigInt, BigUint> #contract_impl_ident<T, BigInt, BigUint>
       #api_where
       {
         #(#call_methods)*
@@ -113,9 +113,9 @@ pub fn process_contract(
         use elrond_wasm_node::{ArwenBigInt, ArwenBigUint};
         use elrond_wasm_node::*;
 
-        fn new_arwen_instance() -> #contract_struct<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
+        fn new_arwen_instance() -> #contract_impl_ident<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
           let api = ArwenApiImpl{};
-          #contract_struct::new(api)
+          #contract_impl_ident::new(api)
         }
 
         #(#endpoints)*
@@ -133,7 +133,7 @@ pub fn process_contract(
         #main_definition
   
         use elrond_wasm::CallableContract;
-        impl <T, BigInt, BigUint> CallableContract for #contract_struct<T, BigInt, BigUint> 
+        impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
         #api_where
         {
           fn call(&self, fn_name: &'static str) {
@@ -141,7 +141,7 @@ pub fn process_contract(
           }
   
           fn clone_contract(&self) -> Box<dyn CallableContract> {
-            Box::new(#contract_struct::new(self.api.clone()))
+            Box::new(#contract_impl_ident::new(self.api.clone()))
           }
         }
       })
