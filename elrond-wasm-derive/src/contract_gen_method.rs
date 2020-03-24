@@ -85,7 +85,6 @@ impl Method {
     pub fn parse(m: &syn::TraitItemMethod) -> Method {
         let metadata = extract_metadata(m);
         let method_args = extract_method_args(m, is_payable(m));
-        //print!("{:#?}", &m.sig);
         Method {
             metadata: metadata,
             name: m.sig.ident.clone(),
@@ -133,6 +132,7 @@ impl Method {
     pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
         let payable_snippet = generate_payable_snippet(self);
 
+        let mut nr_args = 0i32;
         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
             self.method_args
                 .iter()
@@ -140,12 +140,12 @@ impl Method {
                     if let ArgMetadata::Payment = arg.metadata {
                         generate_payment_snippet(arg) // #[payment]
                     } else {
+                        nr_args += 1;
                         generate_arg_init_snippet(arg, 0)
                     }
                 })
                 .collect();
 
-        let nr_args = self.method_args.len() as i32;
         let call_method_ident = generate_call_method_name(&self.name);
         let call = self.generate_call_to_method();
         let body_with_result = generate_body_with_result(&self.return_type, &call);
