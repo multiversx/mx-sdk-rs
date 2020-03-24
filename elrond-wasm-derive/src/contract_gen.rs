@@ -85,7 +85,8 @@ impl Contract {
             .filter_map(|m| {
                 match m.metadata {
                     MethodMetadata::Event(_) => {
-                        Some(m.generate_sig())
+                        let sig = m.generate_sig();
+                        Some(quote! { #sig ; })
                     },
                     _ => None
                 }

@@ -70,7 +70,8 @@ impl Callable {
 impl Callable {
     pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter().map(|m| {
-            m.generate_sig()
+            let sig = m.generate_sig();
+            quote! { #sig ; }
         }).collect()
     }
 
