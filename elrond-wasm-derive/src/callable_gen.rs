@@ -1,26 +1,37 @@
 use super::util::*;
 use super::parse_attr::*;
-use super::contract_gen::*;
+use super::contract_gen_method::*;
+use super::contract_gen_arg::*;
+//use super::contract_gen_payable::*;
 
 #[derive(Clone, Debug)]
 pub struct CallableMethod {
-    pub payable: Option<PayableAttribute>,
+    pub name: syn::Ident,
+    pub payable: bool,
     pub callback: Option<CallbackCallAttribute>,
-    pub public_args: Vec<PublicArg>,
-    pub syn_m: syn::TraitItemMethod,
+    pub method_args: Vec<MethodArg>,
 }
 
 impl CallableMethod {
     pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
-        let payable_opt = PayableAttribute::parse(m);
+        let payable = is_payable(m);
         let callback_opt = CallbackCallAttribute::parse(m);
-        let public_args = extract_public_args(m, &payable_opt);
+        let method_args = extract_method_args(m, payable);
         CallableMethod {
-            payable: payable_opt,
+            name: m.sig.ident.clone(),
+            payable: payable,
             callback: callback_opt,
-            public_args: public_args,
-            syn_m: m.clone(),
+            method_args: method_args,
         }
+    }
+
+    // TODO: deduplicate
+    pub fn generate_sig(&self) -> proc_macro2::TokenStream {
+        let method_name = &self.name;
+        let span = self.name.span();
+        let arg_decl = arg_declarations(&self.method_args);
+        let result = quote_spanned!{span=> fn #method_name ( &self , #(#arg_decl),* ) -> () };
+        result
     }
 }
 
@@ -57,43 +68,36 @@ impl Callable {
 }
 
 impl Callable {
-    pub fn extract_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
+    pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter().map(|m| {
-            let msig = &m.syn_m.sig;
-            let sig = quote! {
-                #msig;
-            };
-            sig
+            m.generate_sig()
         }).collect()
     }
 
     pub fn generate_method_impl(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter().map(|m| {
-            let msig = &m.syn_m.sig;
+            let msig = m.generate_sig();
+
+            let mut payment_count = 0;
             let arg_push_snippets: Vec<proc_macro2::TokenStream> = 
-                m.public_args
+                m.method_args
                     .iter()
-                    .map(|arg| generate_arg_push_snippet(arg))
+                    .map(|arg| {
+                        if let ArgMetadata::Payment = arg.metadata {
+                            // #[payment]
+                            payment_count += 1;
+                            let pat = &arg.pat;
+                            quote! { let amount = #pat; }
+                        } else {
+                            generate_arg_push_snippet(arg)
+                        }
+                    })
                     .collect();
 
-            let amount_snippet = if let Some(payment_arg) = &m.payable {
-                if let Some(payment_fn_attr) = &payment_arg.payment_arg {
-                    match &payment_fn_attr {
-                        syn::FnArg::Typed(pat_typed) => {
-                            let pat = &pat_typed.pat;
-                            quote! {
-                                let amount = #pat;
-                            }
-                        },
-                        _ => panic!("Payment arg not captured")
-                    }
-                } else {
-                    panic!("Explicit payment arg required in callable function")
-                }
-            } else {
-                quote! {
-                    let amount = BigUint::from(0);
-                }
+            let amount_snippet = match payment_count {
+                0 => quote! { let amount = BigUint::from(0); },
+                1 => quote! {},
+                _ => panic!("Only one payment argument allowed in call proxy")
             };
 
             let callback_snippet = if let Some(callback_ident) = &m.callback {
@@ -108,11 +112,11 @@ impl Callable {
                 }
             };
 
-            let msig_str = msig.ident.to_string();
+            let m_name_str = m.name.to_string();
             let sig = quote! {
                 #msig {
                     #amount_snippet
-                    let mut data = String::from(#msig_str);
+                    let mut data = String::from(#m_name_str);
                     #(#arg_push_snippets)*
                     #callback_snippet
                     self.api.async_call(&self.address, &amount, data.as_str());
@@ -179,34 +183,27 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat:
     }
 }
 
-pub fn generate_arg_push_snippet(arg: &PublicArg) -> proc_macro2::TokenStream {
-    match &arg.syn_arg {
-        syn::FnArg::Typed(pat_type) => {
-            let pat = &*pat_type.pat;
-            let ty = &*pat_type.ty;
-            let arg_index = arg.index;
-            match ty {                
+pub fn generate_arg_push_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
+    let arg_index = arg.index;
+    match &arg.ty {                
+        syn::Type::Path(type_path) => {
+            let type_path_segment = type_path.path.segments.last().unwrap().clone();
+            generate_push_snippet_for_arg_type(&type_path_segment, &arg.pat, arg_index)
+        },
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability.is_some() {
+                panic!("Mutable references not supported as contract method arguments");
+            }
+            match &*type_reference.elem {
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                    generate_push_snippet_for_arg_type(&type_path_segment, &pat, arg_index)
+                    generate_push_snippet_for_arg_type(&type_path_segment, &arg.pat, arg_index)
                 },
-                syn::Type::Reference(type_reference) => {
-                    if type_reference.mutability.is_some() {
-                        panic!("Mutable references not supported as contract method arguments");
-                    }
-                    match &*type_reference.elem {
-                        syn::Type::Path(type_path) => {
-                            let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                            generate_push_snippet_for_arg_type(&type_path_segment, &pat, arg_index)
-                        },
-                        _ => {
-                            panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
-                        }
-                    }
-                },
-                other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
-			}
-        }
-        other_arg => panic!("Unsupported argument type: {:?}, not captured", other_arg)
+                _ => {
+                    panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
+                }
+            }
+        },
+        other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
     }
 }
