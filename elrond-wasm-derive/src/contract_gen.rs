@@ -165,11 +165,29 @@ impl Contract {
                 .filter_map(|m| {
                     match m.metadata {
                         MethodMetadata::Callback() => {
+                            let mut arg_index = 0i32; // first argument is the function name
+
                             let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
                                 m.method_args
                                     .iter()
-                                    .map(|arg| generate_arg_init_snippet(arg, 1))
+                                    .map(|arg| {
+                                        match &arg.metadata {
+                                            ArgMetadata::None => {
+                                                arg_index += 1;
+                                                let pat = &arg.pat;
+                                                let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
+                                                quote! {
+                                                    let #pat = #arg_get; 
+                                                }
+                                            },
+                                            ArgMetadata::Payment =>
+                                                panic!("payment args not allowed in callbacks"),
+                                            ArgMetadata::Multi(_) =>
+                                                panic!("multi-args not allowed in callbacks"),
+                                        }
+                                    })
                                     .collect();
+
                             let fn_ident = &m.name;
                             let fn_name_str = &fn_ident.to_string();
                             let fn_name_literal = array_literal(fn_name_str.as_bytes());

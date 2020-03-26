@@ -130,18 +130,42 @@ impl Method {
     }
 
     pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
+        let has_variable_nr_args = 
+            self.method_args.iter()
+                .any(|arg| {
+                    match &arg.metadata {
+                        ArgMetadata::Multi(_) => true,
+                        _ => false,
+                    }
+                });
+        if has_variable_nr_args {
+            self.generate_call_method_variable_nr_args()
+        } else {
+            self.generate_call_method_fixed_args()
+        }
+    }
+
+    pub fn generate_call_method_fixed_args(&self) -> proc_macro2::TokenStream {
         let payable_snippet = generate_payable_snippet(self);
 
-        let mut nr_args = 0i32;
+        let mut arg_index = -1i32;
         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
             self.method_args
                 .iter()
                 .map(|arg| {
-                    if let ArgMetadata::Payment = arg.metadata {
-                        generate_payment_snippet(arg) // #[payment]
-                    } else {
-                        nr_args += 1;
-                        generate_arg_init_snippet(arg, 0)
+                    match &arg.metadata {
+                        ArgMetadata::None => {
+                            arg_index += 1;
+                            let pat = &arg.pat;
+                            let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
+                            quote! {
+                                let #pat = #arg_get; 
+                            }
+                        },
+                        ArgMetadata::Payment =>
+                            generate_payment_snippet(arg), // #[payment]
+                        ArgMetadata::Multi(_) =>
+                            panic!("multi-args not accepted in function generate_call_method_fixed_args"),
                     }
                 })
                 .collect();
@@ -149,6 +173,7 @@ impl Method {
         let call_method_ident = generate_call_method_name(&self.name);
         let call = self.generate_call_to_method();
         let body_with_result = generate_body_with_result(&self.return_type, &call);
+        let nr_args = arg_index + 1;
 
         quote! {
             #[inline]
@@ -162,4 +187,78 @@ impl Method {
             }
         }
     }
+
+
+    fn generate_call_method_variable_nr_args(&self) -> proc_macro2::TokenStream {
+        let payable_snippet = generate_payable_snippet(self);
+
+        let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
+            self.method_args
+                .iter()
+                .map(|arg| {
+                    match &arg.metadata {
+                        ArgMetadata::None => {
+                            let pat = &arg.pat;
+                            let arg_get = generate_get_arg_snippet(arg, &quote!{ ___current_arg });
+                            quote! {
+                                if ___current_arg >= ___nr_args {
+                                    self.api.signal_error("wrong number of arguments");
+                                    return;
+                                }
+                                let #pat = #arg_get;
+                                ___current_arg += 1;
+                            }
+                        },
+                        ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
+                        ArgMetadata::Multi(multi_attr) => { // #[multi(...)]
+                            let pat = &arg.pat;
+                            let count_expr = &multi_attr.count_expr;
+                            let push_snippet = generate_multi_arg_push_snippet(&arg, &quote!{ ___current_arg });
+                            quote! {
+                                let mut #pat = Vec::with_capacity(#count_expr as usize);
+                                for _ in 0..#pat.capacity() {
+                                    if ___current_arg >= ___nr_args {
+                                        self.api.signal_error("wrong number of arguments");
+                                        return;
+                                    }
+                                    #push_snippet
+                                    ___current_arg += 1;
+                                }
+                            }
+                        }
+                    }
+                })
+                .collect();
+
+        let call_method_ident = generate_call_method_name(&self.name);
+        let call = self.generate_call_to_method();
+        let body_with_result = generate_body_with_result(&self.return_type, &call);
+
+        quote! {
+            #[inline]
+            fn #call_method_ident (&self) {
+                #payable_snippet
+
+                let ___nr_args = self.api.get_num_arguments();
+                let mut ___current_arg = 0i32;
+
+                #(#arg_init_snippets)*
+
+                match ___nr_args - ___current_arg {
+                    0 => {},
+                    1 => {
+                        let callback_name_arg = self.api.get_argument_vec(___nr_args - 1);
+                        self.api.finish_vec(&callback_name_arg); // callback method argument
+                    },
+                    _ => {
+                        self.api.signal_error("wrong number of arguments");
+                        return;
+                    }
+                }
+
+                #body_with_result
+            }
+        }
+    }
+
 }

@@ -54,3 +54,24 @@ pub fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMet
 pub fn array_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
     quote! { [ #(#bytes),* ] }
 }
+
+pub fn vec_generic_arg_type_segment(parent_path_segment: &syn::PathSegment) -> syn::PathSegment {
+    match &parent_path_segment.arguments {
+        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+            if args.len() != 1 {
+                panic!("Vec type must have exactly 1 generic type argument");
+            }
+            if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
+                match vec_type {                
+                    syn::Type::Path(type_path) => {
+                        type_path.path.segments.last().unwrap().clone()
+                    },
+                    other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
+                }
+            } else {
+                panic!("Vec type arguments must be types")
+            }
+        },
+        _ => panic!("Vec angle brackets expected")
+    }
+}
