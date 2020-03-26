@@ -98,7 +98,6 @@ impl Callable {
                                 let pat = &arg.pat;
                                 let count_expr = &multi_attr.count_expr;
                                 let vec_iter_push = generate_multi_arg_push_snippet(&arg, &quote! { multi_arg_elem });
-                                //print!("{}", vec_iter_push);
                                 quote! {
                                     if #pat.len() != (#count_expr as usize) {
                                         self.api.signal_error("wrong number of arguments in async call");
