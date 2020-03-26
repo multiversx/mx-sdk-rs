@@ -1,6 +1,7 @@
 
 //use super::contract_gen::*;
 use super::parse_attr::*;
+use super::util::*;
 
 #[derive(Clone, Debug)]
 pub struct MethodArg {
@@ -13,7 +14,8 @@ pub struct MethodArg {
 #[derive(Clone, Debug)]
 pub enum ArgMetadata {
     None,
-    Payment
+    Payment,
+    Multi(MultiAttribute),
 }
 
 pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool) -> Vec<MethodArg> {
@@ -32,7 +34,14 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool) ->
                     let pat = &*pat_typed.pat;
                     let ty = &*pat_typed.ty;
 
-                    if is_payment(&pat_typed) {
+                    if let Some(multi_attr) = MultiAttribute::parse(&pat_typed) {
+                        Some(MethodArg{
+                            index: -1, // TODO: move to metadata
+                            pat: pat.clone(),
+                            ty: ty.clone(), // TODO: check that it is BigUint
+                            metadata: ArgMetadata::Multi(multi_attr),
+                        })
+                    } else if is_payment(&pat_typed) {
                         if !is_method_payable {
                             panic!("Cannot have payment arguments to non-payable methods.");
                         }
@@ -68,51 +77,34 @@ pub fn generate_arg_call_name(arg: &MethodArg) -> proc_macro2::TokenStream {
     }
 }
 
-fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn::Pat, arg_index_i32: i32) -> proc_macro2::TokenStream {
+fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
         "Address" =>
             quote!{
-                let #pat: Address = self.api.get_argument_address(#arg_index_i32);
+                self.api.get_argument_address(#arg_index_expr)
             },
         "Vec" => {
-                match &type_path_segment.arguments {
-                    syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
-                        if args.len() != 1 {
-                            panic!("Vec type must have exactly 1 generic type argument");
-                        }
-                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
-                            match vec_type {                
-                                syn::Type::Path(type_path) => {
-                                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                                    let type_str = type_path_segment.ident.to_string();
-                                    match type_str.as_str() {
-                                        "u8" => quote!{
-                                            let #pat: Vec<u8> = self.api.get_argument_vec(#arg_index_i32);
-                                        },
-                                        other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
-                                    }
-                                },
-                                other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
-                            }
-                        } else {
-                            panic!("Vec type arguments must be types")
-                        }
+                let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+                let type_str = vec_generic_type_segm.ident.to_string();
+                match type_str.as_str() {
+                    "u8" => quote!{
+                        self.api.get_argument_vec(#arg_index_expr)
                     },
-                    _ => panic!("Vec angle brackets expected")
+                    other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
                 }
             },
         "BigInt" =>
             quote!{
-                let #pat = self.api.get_argument_big_int(#arg_index_i32);
+                self.api.get_argument_big_int(#arg_index_expr)
             },
         "BigUint" =>
             quote!{
-                let #pat = self.api.get_argument_big_uint(#arg_index_i32);
+                self.api.get_argument_big_uint(#arg_index_expr)
             },
         "i64" =>
             quote!{
-                let #pat: i64 = self.api.get_argument_i64(#arg_index_i32);
+                self.api.get_argument_i64(#arg_index_expr)
             },
         other_stype_str => {
             panic!("Unsupported argument type {:?} for arg init snippet", other_stype_str)
@@ -120,12 +112,11 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, pat: &syn
     }
 }
 
-pub fn generate_arg_init_snippet(arg: &MethodArg, arg_offset: i32) -> proc_macro2::TokenStream {
-    let arg_index = arg.index + arg_offset;
+pub fn generate_get_arg_snippet(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     match &arg.ty {
         syn::Type::Path(type_path) => {
             let type_path_segment = type_path.path.segments.last().unwrap().clone();
-            generate_snippet_for_arg_type(&type_path_segment, &arg.pat, arg_index)
+            generate_snippet_for_arg_type(&type_path_segment, arg_index_expr)
         },             
         syn::Type::Reference(type_reference) => {
             if type_reference.mutability.is_some() {
@@ -134,10 +125,33 @@ pub fn generate_arg_init_snippet(arg: &MethodArg, arg_offset: i32) -> proc_macro
             match &*type_reference.elem {
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                    generate_snippet_for_arg_type(&type_path_segment, &arg.pat, arg_index)
+                    generate_snippet_for_arg_type(&type_path_segment, arg_index_expr)
                 },
                 _ => {
                     panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
+                }
+            }
+        },
+        other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
+    }
+}
+
+pub fn generate_multi_arg_push_snippet(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    match &arg.ty {
+        syn::Type::Path(type_path) => {
+            let type_path_segment = type_path.path.segments.last().unwrap().clone();
+            let type_str = type_path_segment.ident.to_string();
+            match type_str.as_str() {
+                "Vec" => {
+                    let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+                    let get_snippet = generate_snippet_for_arg_type(&vec_generic_type_segm, arg_index_expr);
+                    let pat = &arg.pat;
+                    quote! {
+                        #pat.push(#get_snippet);
+                    }
+                },
+                other_stype_str => {
+                    panic!("Unsupported argument type {:?} for multi argument", other_stype_str)
                 }
             }
         },

@@ -4,6 +4,7 @@ static ATTR_EVENT: &str = "event";
 static ATTR_PRIVATE: &str = "private";
 static ATTR_CALLBACK_DECL: &str = "callback";
 static ATTR_CALLBACK_CALL: &str = "callback";
+static ATTR_MULTI: &str = "multi";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 	attrs.iter().any(|attr| {
@@ -125,6 +126,57 @@ impl CallbackCallAttribute {
                 
                 Some(CallbackCallAttribute {
                     arg: callback_method_ident
+                })
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct MultiAttribute {
+    pub count_expr: proc_macro2::TokenStream
+}
+
+impl MultiAttribute { 
+    pub fn parse(pat: &syn::PatType) -> Option<MultiAttribute> {
+        let multi_attr = pat.attrs.iter().find(|attr| {
+            if let Some(first_seg) = attr.path.segments.first() {
+                first_seg.ident == ATTR_MULTI
+            } else {
+                false
+            }
+        });
+
+        match multi_attr {        
+            None => None,
+            Some(attr) => {
+                let mut iter = attr.clone().tokens.into_iter();
+                let count_expr: proc_macro2::TokenStream =
+                    match iter.next() {
+                        Some(count_expr_group) => {
+                            // some validation
+                            match &count_expr_group {
+                                proc_macro2::TokenTree::Group(group_data) => {
+                                    match group_data.delimiter() {
+                                        proc_macro2::Delimiter::Parenthesis | proc_macro2::Delimiter::Bracket => { /* ok */ },
+                                        _ => panic!("paranetheses of brackets expected in #[multi] attribute")
+                                    }
+                                }
+                                _ => panic!("illegal argument in #[multi] attribute")
+                            }
+
+                            // simply flatten to token stream and return
+                            quote! { #count_expr_group }
+                        },
+                        _ => panic!("callback argument expected")
+                    };
+
+                if let Some(_) = iter.next() {
+                    panic!("too many tokens in payable attribute");
+                }
+                
+                Some(MultiAttribute {
+                    count_expr: count_expr,
                 })
             }
         }
