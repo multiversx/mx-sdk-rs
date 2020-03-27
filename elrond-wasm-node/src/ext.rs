@@ -107,7 +107,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
          unsafe {
-            let value_len = storageGetValueLength(key.as_ref().as_ptr()) as usize;
+            let value_len = self.storage_load_len(key);
             let mut res = Vec::with_capacity(value_len);
             storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
             res.set_len(value_len);
@@ -115,6 +115,12 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
+    #[inline]
+    fn storage_load_len(&self, key: &StorageKey) -> usize {
+        unsafe { storageGetValueLength(key.as_ref().as_ptr()) as usize }
+    }
+
+    #[inline]
     fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
         unsafe {
             storageStore(key.as_ref().as_ptr(), value.as_ptr(), 32);

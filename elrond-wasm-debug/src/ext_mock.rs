@@ -295,6 +295,11 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         }
     }
 
+    #[inline]
+    fn storage_load_len(&self, key: &StorageKey) -> usize {
+        self.storage_load(key).len()
+    }
+
     fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
         let mut vector = Vec::with_capacity(32);
         for i in value.iter() {
