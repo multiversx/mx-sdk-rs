@@ -1,4 +1,6 @@
 
+use super::util::*;
+
 pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type) -> proc_macro2::TokenStream {
     match ty {     
         syn::Type::Reference(type_reference) => {
@@ -75,37 +77,20 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
                 self.api.finish_bytes32(#result_ident.as_fixed_bytes());
             },
         "Vec" => {
-            match &type_path_segment.arguments {
-                syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
-                    if args.len() != 1 {
-                        panic!("Vec type must have exactly 1 generic type argument");
-                    }
-                    if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
-                        match vec_type {                
-                            syn::Type::Path(type_path) => {
-                                let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                                let type_str = type_path_segment.ident.to_string();
-                                match type_str.as_str() {
-                                    "u8" => 
-                                        if ref_return {
-                                            quote!{
-                                                self.api.finish_vec(#result_ident);
-                                            }
-                                        } else {
-                                            quote!{
-                                                self.api.finish_vec(& #result_ident);
-                                            }
-                                        },
-                                    other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
-                                }
-                            },
-                            other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
+            let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+            let type_str = vec_generic_type_segm.ident.to_string();
+            match type_str.as_str() {
+                "u8" => 
+                    if ref_return {
+                        quote!{
+                            self.api.finish_vec(#result_ident);
                         }
                     } else {
-                        panic!("Vec type arguments must be types")
-                    }
-                },
-                _ => panic!("Vec angle brackets expected")
+                        quote!{
+                            self.api.finish_vec(& #result_ident);
+                        }
+                    },
+                other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
             }
         },
         "BigInt" =>
