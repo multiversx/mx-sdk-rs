@@ -3,23 +3,12 @@ use super::util::*;
 
 pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type) -> proc_macro2::TokenStream {
     match ty {     
-        syn::Type::Reference(type_reference) => {
-            if type_reference.mutability.is_some() {
-                panic!("Mutable references not supported as contract method arguments");
-            }
-            match &*type_reference.elem {
-                syn::Type::Path(type_path) => {
-                    let type_path_segment = type_path.path.segments.last().unwrap();
-                    generate_result_finish_snippet_for_arg_type(type_path_segment, result_ident, true)
-                },
-                _ => {
-                    panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
-                }
-            }
+        syn::Type::Reference(_) => {
+            panic!("Cannot return reference")
         },
         syn::Type::Path(type_path) => {
             let type_path_segment = type_path.path.segments.last().unwrap();
-            generate_result_finish_snippet_for_arg_type(type_path_segment, result_ident, false)
+            generate_result_finish_snippet_for_arg_type(type_path_segment, &quote! { #result_ident })
         },
         syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
             let mut i = 0;
@@ -37,7 +26,7 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
     }
 }
 
-fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegment, result_ident: &syn::Ident, ref_return: bool) -> proc_macro2::TokenStream {
+fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegment, result_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
         "Result" => {    
@@ -55,7 +44,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
                         let err_snippet = generate_result_err_snippet(&err_res_ident, err_type);
 
                         quote!{
-                            match #result_ident {
+                            match #result_expr {
                                 Ok(#ok_res_ident) => {
                                     #ok_snippet
                                 },
@@ -74,52 +63,43 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
         },
         "Address" =>
             quote!{
-                self.api.finish_bytes32(#result_ident.as_fixed_bytes());
+                self.api.finish_bytes32(#result_expr.as_fixed_bytes());
             },
         "Vec" => {
             let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
             let type_str = vec_generic_type_segm.ident.to_string();
             match type_str.as_str() {
                 "u8" => 
-                    if ref_return {
-                        quote!{
-                            self.api.finish_vec(#result_ident);
-                        }
-                    } else {
-                        quote!{
-                            self.api.finish_vec(& #result_ident);
-                        }
+                    quote!{
+                        self.api.finish_vec(& #result_expr);
                     },
-                other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
+                _ => {
+                    let elem_finish_snippet = generate_result_finish_snippet_for_arg_type(
+                        &vec_generic_type_segm, 
+                        &quote! { elem });
+                    quote!{
+                        for (_, elem) in #result_expr.iter().enumerate() {
+                            #elem_finish_snippet
+                        }
+                    }
+                }
             }
         },
         "BigInt" =>
-            if ref_return {
-                quote!{
-                    self.api.finish_big_int(#result_ident);
-                }
-            } else {
-                quote!{
-                    self.api.finish_big_int(& #result_ident);
-                }
+            quote!{
+                self.api.finish_big_int(& #result_expr);
             },
         "BigUint" =>
-            if ref_return {
-                quote!{
-                    self.api.finish_big_uint(#result_ident);
-                }
-            } else {
-                quote!{
-                    self.api.finish_big_uint(& #result_ident);
-                }
+            quote!{
+                self.api.finish_big_uint(& #result_expr);
             },
         "i64" =>
             quote!{
-                self.api.finish_i64(#result_ident);
+                self.api.finish_i64(#result_expr);
             },
         "bool" =>
             quote!{
-                self.api.finish_i64( if #result_ident { 1i64 } else { 0i64 });
+                self.api.finish_i64( if #result_expr { 1i64 } else { 0i64 });
             },
         other_stype_str => {
             panic!("Unsupported return type: {:?}", other_stype_str)
