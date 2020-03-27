@@ -89,6 +89,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
+        fn storage_load_len(&self, key: &StorageKey) -> usize {
+          self.api.storage_load_len(key)
+        }
+
+        #[inline]
         fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
           self.api.storage_store_bytes32(key, value);
         }

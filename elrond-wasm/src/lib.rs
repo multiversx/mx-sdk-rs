@@ -41,6 +41,8 @@ pub trait ContractHookApi<BigInt, BigUint> {
 
     fn storage_load(&self, key: &StorageKey) -> Vec<u8>;
 
+    fn storage_load_len(&self, key: &StorageKey) -> usize;
+
     fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]);
     
     fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32];
