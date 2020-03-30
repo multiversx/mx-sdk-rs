@@ -11,6 +11,7 @@ pub enum MethodMetadata {
     Private(),
     Event(Vec<u8>),
     Callback(),
+    CallbackRaw(),
 }
 
 #[derive(Clone, Debug)]
@@ -31,6 +32,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let payable = is_payable(m);
     let private = is_private(m);
     let callback = is_callback_decl(m);
+    let callback_raw = is_callback_raw_decl(m);
     let event_opt = EventAttribute::parse(m);
 
     if let Some(event_attr) = event_opt {
@@ -47,7 +49,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Events cannot have provided implementations in the trait.");
         }
         MethodMetadata::Event(event_attr.identifier)
-    } else if callback {
+    } else if callback || callback_raw {
         if payable {
             panic!("Callback methods cannot be marked payable.");
         }
@@ -57,7 +59,14 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default == None {
             panic!("Callback methods need an implementation.");
         }
-        MethodMetadata::Callback()
+        if callback && callback_raw {
+            panic!("It is either the default callback, or regular callback, not both.");
+        }
+        if callback_raw {
+            MethodMetadata::CallbackRaw()
+        } else {
+            MethodMetadata::Callback()
+        }
     } else if private {
         if payable {
             panic!("Private methods cannot be marked payable.");

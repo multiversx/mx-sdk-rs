@@ -1,6 +1,7 @@
-use super::contract_gen_arg::*;
+
 use super::contract_gen_event::*;
 use super::contract_gen_method::*;
+use super::contract_gen_callback::*;
 use super::util::*;
 
 pub struct Contract {
@@ -47,7 +48,7 @@ impl Contract {
         self.methods.iter()
         .filter_map(|m| {
             match m.metadata {
-                MethodMetadata::Public(_) | MethodMetadata::Private() | MethodMetadata::Callback() => {
+                MethodMetadata::Public(_) | MethodMetadata::Private() | MethodMetadata::Callback() | MethodMetadata::CallbackRaw() => {
                     let body = match m.body {
                         Some(ref mbody) => {
                             let msig = m.generate_sig();
@@ -160,73 +161,6 @@ impl Contract {
     }
 
     pub fn generate_callback_body(&self) -> proc_macro2::TokenStream {
-        let match_arms: Vec<proc_macro2::TokenStream> = 
-            self.methods.iter()
-                .filter_map(|m| {
-                    match m.metadata {
-                        MethodMetadata::Callback() => {
-                            let mut arg_index = 0i32; // first argument is the function name
-
-                            let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
-                                m.method_args
-                                    .iter()
-                                    .map(|arg| {
-                                        match &arg.metadata {
-                                            ArgMetadata::None => {
-                                                arg_index += 1;
-                                                let pat = &arg.pat;
-                                                let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
-                                                quote! {
-                                                    let #pat = #arg_get; 
-                                                }
-                                            },
-                                            ArgMetadata::Payment =>
-                                                panic!("payment args not allowed in callbacks"),
-                                            ArgMetadata::Multi(_) =>
-                                                panic!("multi-args not allowed in callbacks"),
-                                        }
-                                    })
-                                    .collect();
-
-                            let fn_ident = &m.name;
-                            let fn_name_str = &fn_ident.to_string();
-                            let fn_name_literal = array_literal(fn_name_str.as_bytes());
-                            let expected_num_args = (m.method_args.len() + 1) as i32;
-                            let call = m.generate_call_to_method();
-
-                            let match_arm = quote! {                     
-                                #fn_name_literal =>
-                                {
-                                    if nr_args != #expected_num_args {
-                                        self.api.signal_error("wrong number of callback arguments");
-                                        return;
-                                    }
-                                    #(#arg_init_snippets)*
-                                    #call ;
-                                },
-                            };
-                            Some(match_arm)
-                        },
-                        _ => None
-                    }
-                })
-                .collect();
-        quote! {
-            let nr_args = self.api.get_num_arguments();
-            if nr_args == 0 {
-                return;
-            }
-            let cb_name = self.api.get_argument_vec(0i32);
-            match cb_name.as_slice() {
-                [] => {
-                    if nr_args != 1i32 {
-                        self.api.signal_error("wrong number of callback arguments");
-                        return;
-                    }
-                }
-                #(#match_arms)*
-                other => panic!("No callback function with that name exists in contract.")
-            }
-        }
+        generate_callback_body(&self.methods)
     }
 }
