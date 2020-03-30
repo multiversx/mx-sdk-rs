@@ -3,6 +3,7 @@ static ATTR_PAYMENT: &str = "payment";
 static ATTR_EVENT: &str = "event";
 static ATTR_PRIVATE: &str = "private";
 static ATTR_CALLBACK_DECL: &str = "callback";
+static ATTR_CALLBACK_RAW_DECL: &str = "callback_raw";
 static ATTR_CALLBACK_CALL: &str = "callback";
 static ATTR_MULTI: &str = "multi";
 
@@ -21,6 +22,10 @@ pub fn is_private(m: &syn::TraitItemMethod) -> bool {
 
 pub fn is_callback_decl(m: &syn::TraitItemMethod) -> bool {
     has_attribute(&m.attrs, ATTR_CALLBACK_DECL)
+}
+
+pub fn is_callback_raw_decl(m: &syn::TraitItemMethod) -> bool {
+    has_attribute(&m.attrs, ATTR_CALLBACK_RAW_DECL)
 }
 
 pub fn is_payable(m: &syn::TraitItemMethod) -> bool {
