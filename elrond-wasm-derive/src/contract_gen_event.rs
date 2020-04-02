@@ -55,7 +55,7 @@ fn generate_event_data_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStr
                             panic!("[Event data] BigInt argument type currently not supported"),
                         "BigUint" =>
                             quote!{
-                                #pat.to_bytes_be_pad_right(32)
+                                #pat.to_bytes_be_pad_right(32).unwrap()
                             },
                         other_stype_str => {
                             panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)

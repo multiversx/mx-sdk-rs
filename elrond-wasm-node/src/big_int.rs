@@ -111,6 +111,7 @@ binary_operator!{Rem, rem, bigIntTMod}
 macro_rules! binary_assign_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
         impl $trait<ArwenBigInt> for ArwenBigInt {
+            #[inline]
             fn $method(&mut self, other: Self) {
                 unsafe {
                     $api_func(self.handle, self.handle, other.handle);
@@ -119,6 +120,7 @@ macro_rules! binary_assign_operator {
         }
         
         impl $trait<&ArwenBigInt> for ArwenBigInt {
+            #[inline]
             fn $method(&mut self, other: &ArwenBigInt) {
                 unsafe {
                     $api_func(self.handle, self.handle, other.handle);

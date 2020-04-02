@@ -171,17 +171,11 @@ pub trait BigUintApi:
 
     fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32;
 
-    fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
-        let byte_len = self.byte_length() as usize;
-        if byte_len > 32 {
-            panic!();
-        }
-        self.copy_to_slice_big_endian(&mut target[32 - byte_len ..]);
-    }
+    fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]);
 
     fn to_bytes_be(&self) -> Vec<u8>;
 
-    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Vec<u8>;
+    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
 
     // only needed at compilation, value will never be used
     fn phantom() -> Self;
