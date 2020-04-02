@@ -157,10 +157,6 @@ impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
     fn to_signed_bytes_be(&self) -> Vec<u8> {
         self.0.to_signed_bytes_be()
     }
-
-    fn phantom() -> Self {
-        RustBigInt::from(0)
-    }
 }
 
 impl RustBigInt {
