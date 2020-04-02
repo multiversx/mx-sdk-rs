@@ -223,24 +223,28 @@ impl elrond_wasm::BigUintApi for RustBigUint {
         panic!("copy_to_slice not yet implemented")
     }
 
+    fn copy_to_array_big_endian_pad_right(&self, _target: &mut [u8; 32]) {
+        panic!("copy_to_array_big_endian_pad_right not yet implemented")
+    }
+
     fn to_bytes_be(&self) -> Vec<u8> {
         let (_, be) = self.0.to_bytes_be();
         be
     }
 
-    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
+    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>> {
         let (_, bytes_be) = self.0.to_bytes_be();
         if bytes_be.len() > nr_bytes {
-            panic!("Number doesn't fit requested bytes");
+            None
         } else if bytes_be.len() == nr_bytes {
-            bytes_be
+            Some(bytes_be)
         } else {
             let mut res = vec![0u8; nr_bytes];
             let offset = nr_bytes - bytes_be.len();
             for i in 0..bytes_be.len()-1 {
                 res[offset+i] = bytes_be[i];
             }
-            res
+            Some(res)
         }
     }
 

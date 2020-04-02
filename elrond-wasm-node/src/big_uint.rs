@@ -1,5 +1,5 @@
 
-//use crate::big_int::*;
+use crate::error;
 
 use core::ops::{Add, Sub, Mul, Div, Rem};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -31,8 +31,6 @@ extern {
     fn bigIntXor(dest: i32, x: i32, y: i32);
     fn bigIntShr(dest: i32, x: i32, bits: i32);
     fn bigIntShl(dest: i32, x: i32, bits: i32);
-
-    fn signalError(messageOffset: *const u8, messageLength: i32) -> !;
 }
 
 pub struct ArwenBigUint {
@@ -79,7 +77,7 @@ unsafe fn big_uint_safe_sub(dest: i32, x: i32, y: i32) {
     bigIntSub(dest, x, y);
     if bigIntSign(dest) < 0 {
         let err_msg = b"Cannot subtract because result would be negative";
-        signalError(err_msg.as_ptr(), err_msg.len() as i32)
+        error::signal_error_raw(err_msg.as_ptr(), err_msg.len())
     }
 }
 
@@ -124,6 +122,7 @@ binary_operator!{BitXor, bitxor, bigIntXor}
 macro_rules! binary_assign_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
         impl $trait<ArwenBigUint> for ArwenBigUint {
+            #[inline]
             fn $method(&mut self, other: Self) {
                 unsafe {
                     $api_func(self.handle, self.handle, other.handle);
@@ -132,6 +131,7 @@ macro_rules! binary_assign_operator {
         }
         
         impl $trait<&ArwenBigUint> for ArwenBigUint {
+            #[inline]
             fn $method(&mut self, other: &ArwenBigUint) {
                 unsafe {
                     $api_func(self.handle, self.handle, other.handle);
@@ -156,6 +156,7 @@ macro_rules! shift_traits {
         impl $shift_trait<i32> for ArwenBigUint {
             type Output = ArwenBigUint;
 
+            #[inline]
             fn $method(self, rhs: i32) -> ArwenBigUint {
                 unsafe {
                     $api_func(self.handle, self.handle, rhs);
@@ -256,6 +257,14 @@ impl elrond_wasm::BigUintApi for ArwenBigUint {
         }
     }
 
+    fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
+        let byte_len = self.byte_length() as usize;
+        if byte_len > 32 {
+            error::signal_error("big uint value does not fit to target slice")
+        }
+        self.copy_to_slice_big_endian(&mut target[32 - byte_len ..]);
+    }
+
     fn to_bytes_be(&self) -> Vec<u8> {
         unsafe {
             let byte_len = bigIntUnsignedByteLength(self.handle);
@@ -265,17 +274,17 @@ impl elrond_wasm::BigUintApi for ArwenBigUint {
         }
     }
 
-    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Vec<u8> {
+    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>> {
         unsafe {
             let byte_len = bigIntUnsignedByteLength(self.handle) as usize;
             if byte_len > nr_bytes {
-                panic!();
+                return None
             }
             let mut vec = vec![0u8; nr_bytes];
             if byte_len > 0 {
                 bigIntGetUnsignedBytes(self.handle, &mut vec[nr_bytes - byte_len]);
             }
-            vec
+            Some(vec)
         }
     }
 

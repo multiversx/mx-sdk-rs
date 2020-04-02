@@ -7,12 +7,14 @@ pub trait ErrorMessage {
 }
 
 impl ErrorMessage for str {
+    #[inline]
     fn message_ptr_and_len(&self) -> (*const u8, usize) {
         (str::as_ptr(self), str::len(self))
     }
 }
 
 impl ErrorMessage for String {
+    #[inline]
     fn message_ptr_and_len(&self) -> (*const u8, usize) {
         (str::as_ptr(self), str::len(self))
     }

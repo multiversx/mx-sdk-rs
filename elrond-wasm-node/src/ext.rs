@@ -5,6 +5,7 @@ use elrond_wasm::StorageKey;
 
 use crate::big_int::*;
 use crate::big_uint::*;
+use crate::error;
 use elrond_wasm::BigUintApi;
 //use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
@@ -34,7 +35,6 @@ extern {
     fn callValue(resultOffset: *const u8) -> i32;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn finish(dataOffset: *const u8, length: i32);
-    fn signalError(messageOffset: *const u8, messageLength: i32);
 
     fn getGasLeft() -> i64;
     fn getBlockTimestamp() -> i64;
@@ -133,7 +133,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
             if len != 32 {
                 let message = "32 bytes of data expected in storage at key";
-                signalError(message.as_ptr(), message.len() as i32);
+                error::signal_error(&message);
             }
             res
         }
@@ -197,7 +197,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     fn send_tx(&self, to: &Address, amount: &ArwenBigUint, message: &str) {
-        let amount_bytes32 = amount.to_bytes_be_pad_right(32);
+        let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap();
         unsafe {
             transferValue(
                 to.as_ref().as_ptr(),
@@ -209,7 +209,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &str) {
-        let amount_bytes32 = amount.to_bytes_be_pad_right(32);
+        let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap();
         unsafe {
             asyncCall(
                 to.as_ref().as_ptr(),
@@ -314,7 +314,6 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         unsafe {
             finish(bytes.as_ptr(), 32i32);
         }
-        panic!("finish_bytes32");
     }
 
     #[inline]
@@ -338,7 +337,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     #[inline]
     fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) {
-        unsafe { signalError(message_ptr, message_len as i32) }
+        error::signal_error_raw(message_ptr, message_len)
     }
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {

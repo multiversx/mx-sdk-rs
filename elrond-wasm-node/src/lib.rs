@@ -20,6 +20,7 @@ mod ext;
 mod ext_int64;
 mod big_int;
 mod big_uint;
+mod error;
 
 pub use ext::*;
 pub use ext_int64::*;
@@ -53,16 +54,10 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 // }
 
 
-
-
-extern {
-    fn signalError(messageOffset: *const u8, messageLength: i32) -> !;
-}
-
 #[cfg(target_arch = "wasm32")]
 #[alloc_error_handler]
-fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
-    panic!("allocation error: {:?}", layout)
+fn alloc_error_handler(_layout: alloc::alloc::Layout) -> ! {
+    error::signal_error("allocation error")
 }
 
 // for future reference, the PanicInfo struct looks like this:
@@ -88,9 +83,7 @@ fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
             String::from("unknown panic occurred")
         };
 
-    unsafe {
-        signalError(panic_msg.as_ptr(), panic_msg.len() as i32) 
-    }
+    error::signal_error_raw(panic_msg.as_ptr(), panic_msg.len())
 }
 
 #[cfg(target_arch = "wasm32")]
