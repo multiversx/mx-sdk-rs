@@ -247,8 +247,4 @@ impl elrond_wasm::BigUintApi for RustBigUint {
             Some(res)
         }
     }
-
-    fn phantom() -> Self {
-        RustBigUint::from(0)
-    }
 }

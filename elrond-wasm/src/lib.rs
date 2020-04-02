@@ -176,9 +176,6 @@ pub trait BigUintApi:
     fn to_bytes_be(&self) -> Vec<u8>;
 
     fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
-
-    // only needed at compilation, value will never be used
-    fn phantom() -> Self;
 }
 
 // BigInt sign.
@@ -218,9 +215,6 @@ pub trait BigIntApi<BigUint>:
     fn sign(&self) -> Sign;
 
     fn to_signed_bytes_be(&self) -> Vec<u8>;
-
-    // only needed at compilation, value will never be used
-    fn phantom() -> Self;
 }
 
 /// CallableContract is the means by which the debugger calls methods in the contract.

@@ -287,9 +287,4 @@ impl elrond_wasm::BigUintApi for ArwenBigUint {
             Some(vec)
         }
     }
-
-    #[inline]
-    fn phantom() -> Self {
-        ArwenBigUint{ handle: -1 }
-    }
 }

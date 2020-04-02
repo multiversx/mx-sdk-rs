@@ -50,8 +50,8 @@ pub fn process_contract(
       #api_where
       {
           api: T,
-          _phantom1: BigInt,
-          _phantom2: BigUint,
+          _phantom1: core::marker::PhantomData<BigInt>,
+          _phantom2: core::marker::PhantomData<BigUint>,
       }
 
       pub struct OtherContractHandle<T, BigInt, BigUint>
@@ -59,8 +59,8 @@ pub fn process_contract(
       {
           api: T,
           address: Address,
-          _phantom1: BigInt,
-          _phantom2: BigUint,
+          _phantom1: core::marker::PhantomData<BigInt>,
+          _phantom2: core::marker::PhantomData<BigUint>,
       }
 
       impl <T, BigInt, BigUint> #contract_impl_ident<T, BigInt, BigUint>
@@ -69,8 +69,8 @@ pub fn process_contract(
         pub fn new(api: T) -> Self {
           #contract_impl_ident {
             api: api,
-            _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
-            _phantom2: BigUint::phantom(),
+            _phantom1: core::marker::PhantomData,
+            _phantom2: core::marker::PhantomData,
           }
         }
       }
@@ -86,8 +86,8 @@ pub fn process_contract(
           let contract_proxy = OtherContractHandle {
             api: self.api.clone(),
             address: address.clone(),
-            _phantom1: BigInt::phantom(), // TODO: figure out a way to make this an *ACTUAL* phantom in no_std
-            _phantom2: BigUint::phantom(),
+            _phantom1: core::marker::PhantomData,
+            _phantom2: core::marker::PhantomData,
           };
           Box::new(contract_proxy)
         }
