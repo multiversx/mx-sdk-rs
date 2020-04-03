@@ -3,9 +3,8 @@ use super::contract_gen_arg::*;
 //use super::parse_attr::*;
 use super::util::*;
 
-fn generate_topic_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStream {
+fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_macro2::TokenStream {
     let pat = &arg.pat;
-    let arg_index = arg.index as usize;
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
             if type_reference.mutability.is_some() {
@@ -17,13 +16,13 @@ fn generate_topic_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStream {
                     match type_str.as_str() {
                         "Address" =>
                             quote!{
-                                #pat.copy_to_array(&mut topics[#arg_index]);
+                                #pat.copy_to_array(&mut topics[#topic_index]);
                             },
                         "BigInt" =>
                             panic!("[Event data] BigInt argument type currently not supported"),
                         "BigUint" =>
                             quote!{
-                                #pat.copy_to_array_big_endian_pad_right(&mut topics[#arg_index]);
+                                #pat.copy_to_array_big_endian_pad_right(&mut topics[#topic_index]);
                             },
                         other_stype_str => {
                             panic!("[Event topic] Unsupported reference argument type: {:?}", other_stype_str)
@@ -73,20 +72,20 @@ fn generate_event_data_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStr
 }
 
 pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
-    let nr_args_no_self = m.method_args.len() - 1;
+    let nr_args_no_self = m.method_args.len();
     if nr_args_no_self == 0 {
         panic!("events need at least 1 argument, for the data");
     }
     let nr_topics = nr_args_no_self as usize; // -1 data, +1 event id
 
-    let mut arg_index: usize = 0;
+    let mut topic_index: usize = 1;
     let topic_conv_snippets: Vec<proc_macro2::TokenStream> = 
         m.method_args
             .iter()
             .map(|arg| {
                 let result =
-                    if arg_index < nr_args_no_self {
-                        let conversion = generate_topic_conversion_code(arg);
+                    if topic_index < nr_args_no_self {
+                        let conversion = generate_topic_conversion_code(topic_index, arg);
                         quote! {
                             #conversion
                         }
@@ -96,7 +95,7 @@ pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::
                             let data_vec = #conversion;
                         }
                     };
-                arg_index=arg_index+1;
+                topic_index += 1;
                 result
             })
             .collect();
