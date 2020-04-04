@@ -421,7 +421,6 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     fn check_not_payable(&self) -> bool {
         if self.get_call_value_big_uint() > 0 {
             self.signal_error("attempted to transfer funds via a non-payable function");
-            return false;
         }
         return true;
     }
@@ -492,12 +491,12 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         self.finish_big_int(&value.into());
     }
 
-    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) {
+    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) -> ! {
         let s = unsafe {
             let slice = std::slice::from_raw_parts(message_ptr, message_len);
             std::str::from_utf8(slice)
         };
-        panic!("signal_error was called with message: {}", s.unwrap());
+        panic!("signal_error was called with message: {}", s.unwrap())
     }
 
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {

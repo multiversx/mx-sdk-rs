@@ -101,7 +101,6 @@ pub trait ContractIOApi<BigInt, BigUint> {
         }
         if nr_args != expected {
             self.signal_error("wrong number of arguments");
-            return false;
         }
         return true;
     }
@@ -126,6 +125,17 @@ pub trait ContractIOApi<BigInt, BigUint> {
     get_argument_cast!{get_argument_u32, u32}
     get_argument_cast!{get_argument_isize, isize}
     get_argument_cast!{get_argument_usize, usize}
+    get_argument_cast!{get_argument_i8, i8}
+    get_argument_cast!{get_argument_u8, u8}
+
+    fn get_argument_bool (&self, arg_id: i32) -> bool {
+        let arg_i64 = self.get_argument_i64(arg_id);
+        match arg_i64 {
+            1 => true,
+            0 => false,
+            _ => self.signal_error("argument out of range")
+        }
+    }
     
     fn finish_vec(&self, v: &Vec<u8>);
 
@@ -138,11 +148,11 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_i64(&self, value: i64);
 
     #[inline]
-    fn signal_error(&self, message: &str) {
+    fn signal_error(&self, message: &str) -> ! {
         self.signal_error_raw(message.as_ptr(), message.len());
     }
 
-    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize);
+    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) -> !;
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
