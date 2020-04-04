@@ -17,13 +17,11 @@
 #![feature(panic_info_message)]
 
 mod ext;
-mod ext_int64;
 mod big_int;
 mod big_uint;
 mod error;
 
 pub use ext::*;
-pub use ext_int64::*;
 pub use big_int::*;
 pub use big_uint::*;
 

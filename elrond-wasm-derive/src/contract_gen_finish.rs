@@ -66,14 +66,14 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
                 self.api.finish_bytes32(#result_expr.as_fixed_bytes());
             },
         "Vec" => {
-            let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+            let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
             let type_str = vec_generic_type_segm.ident.to_string();
             match type_str.as_str() {
                 "u8" => 
                     quote!{
                         self.api.finish_vec(& #result_expr);
                     },
-                _ => {
+                _ => { // Vec<...> => multiple results
                     let elem_finish_snippet = generate_result_finish_snippet_for_arg_type(
                         &vec_generic_type_segm, 
                         &quote! { elem });
@@ -97,10 +97,25 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
             quote!{
                 self.api.finish_i64(#result_expr);
             },
+        "i32" | "u32" | "isize" | "usize" =>
+            quote!{
+                self.api.finish_i64(#result_expr as i64);
+            },
         "bool" =>
             quote!{
                 self.api.finish_i64( if #result_expr { 1i64 } else { 0i64 });
             },
+        "Option" => {
+            let option_generic_type_segm = generic_type_single_arg_segment(&"Option", &type_path_segment);
+            let opt_some_finish_snippet = generate_result_finish_snippet_for_arg_type(
+                &option_generic_type_segm, 
+                &quote! { opt_some_value });
+            quote!{
+                if let Some(opt_some_value) = #result_expr {
+                    #opt_some_finish_snippet
+                }
+            }
+        },
         other_stype_str => {
             panic!("Unsupported return type: {:?}", other_stype_str)
         }
