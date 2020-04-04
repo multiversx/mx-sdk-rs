@@ -122,6 +122,18 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, arg_index
             quote!{
                 self.api.get_argument_usize(#arg_index_expr)
             },
+        "i8" =>
+            quote!{
+                self.api.get_argument_i8(#arg_index_expr)
+            },
+        "u8" =>
+            quote!{
+                self.api.get_argument_u8(#arg_index_expr)
+            },
+        "bool" =>
+            quote!{
+                self.api.get_argument_i64(#arg_index_expr) != 0
+            },
         other_stype_str => {
             panic!("Unsupported argument type {:?} for arg init snippet", other_stype_str)
         }

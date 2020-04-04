@@ -97,7 +97,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
             quote!{
                 self.api.finish_i64(#result_expr);
             },
-        "i32" | "u32" | "isize" | "usize" =>
+        "i32" | "u32" | "isize" | "usize" | "i8" | "u8" =>
             quote!{
                 self.api.finish_i64(#result_expr as i64);
             },

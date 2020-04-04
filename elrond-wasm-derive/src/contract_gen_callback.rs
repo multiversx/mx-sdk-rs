@@ -75,7 +75,6 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                             {
                                 if nr_args != #expected_num_args {
                                     self.api.signal_error("wrong number of callback arguments");
-                                    return;
                                 }
                                 #(#arg_init_snippets)*
                                 #call ;
@@ -97,7 +96,6 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             [] => {
                 if nr_args != 1i32 {
                     self.api.signal_error("wrong number of callback arguments");
-                    return;
                 }
             }
             #(#match_arms)*
