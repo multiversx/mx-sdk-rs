@@ -55,23 +55,23 @@ pub fn array_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
     quote! { [ #(#bytes),* ] }
 }
 
-pub fn vec_generic_arg_type_segment(parent_path_segment: &syn::PathSegment) -> syn::PathSegment {
+pub fn generic_type_single_arg_segment(type_name: &str, parent_path_segment: &syn::PathSegment) -> syn::PathSegment {
     match &parent_path_segment.arguments {
         syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
             if args.len() != 1 {
-                panic!("Vec type must have exactly 1 generic type argument");
+                panic!("{} type must have exactly 1 generic type argument", type_name);
             }
             if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
                 match vec_type {                
                     syn::Type::Path(type_path) => {
                         type_path.path.segments.last().unwrap().clone()
                     },
-                    other_type => panic!("Unsupported Vec generic type: {:?}, not a path", other_type)
+                    other_type => panic!("Unsupported {} generic type: {:?}, not a path", type_name, other_type)
                 }
             } else {
-                panic!("Vec type arguments must be types")
+                panic!("{} type arguments must be types", type_name)
             }
         },
-        _ => panic!("Vec angle brackets expected")
+        _ => panic!("{} angle brackets expected", type_name)
     }
 }

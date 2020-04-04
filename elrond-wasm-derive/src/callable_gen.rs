@@ -233,7 +233,7 @@ pub fn generate_multi_arg_push_snippet(arg: &MethodArg, var_name: &proc_macro2::
             let type_str = type_path_segment.ident.to_string();
             match type_str.as_str() {
                 "Vec" => {
-                    let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+                    let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
                     generate_push_snippet_for_arg_type(&vec_generic_type_segm, var_name)
                 },
                 other_stype_str => {

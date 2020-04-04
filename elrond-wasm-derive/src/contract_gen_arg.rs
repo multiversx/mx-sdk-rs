@@ -85,7 +85,7 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, arg_index
                 self.api.get_argument_address(#arg_index_expr)
             },
         "Vec" => {
-                let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+                let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
                 let type_str = vec_generic_type_segm.ident.to_string();
                 match type_str.as_str() {
                     "u8" => quote!{
@@ -105,6 +105,22 @@ fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, arg_index
         "i64" =>
             quote!{
                 self.api.get_argument_i64(#arg_index_expr)
+            },
+        "i32" =>
+            quote!{
+                self.api.get_argument_i32(#arg_index_expr)
+            },
+        "u32" =>
+            quote!{
+                self.api.get_argument_u32(#arg_index_expr)
+            },
+        "isize" =>
+            quote!{
+                self.api.get_argument_isize(#arg_index_expr)
+            },
+        "usize" =>
+            quote!{
+                self.api.get_argument_usize(#arg_index_expr)
             },
         other_stype_str => {
             panic!("Unsupported argument type {:?} for arg init snippet", other_stype_str)
@@ -143,7 +159,7 @@ pub fn generate_multi_arg_push_snippet(arg: &MethodArg, arg_index_expr: &proc_ma
             let type_str = type_path_segment.ident.to_string();
             match type_str.as_str() {
                 "Vec" => {
-                    let vec_generic_type_segm = vec_generic_arg_type_segment(&type_path_segment);
+                    let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
                     let get_snippet = generate_snippet_for_arg_type(&vec_generic_type_segm, arg_index_expr);
                     let pat = &arg.pat;
                     quote! {
