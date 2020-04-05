@@ -256,11 +256,25 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         return true;
     }
 
-    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
+    #[inline]
+    fn get_argument_len(&self, arg_index: i32) -> usize {
+        unsafe { getArgumentLength(arg_index) as usize }
+    }
+
+    fn copy_argument_to_slice(&self, arg_index: i32, slice: &mut [u8]) {
         unsafe {
-            let len = getArgumentLength(arg_index);
-            let mut res = Vec::with_capacity(len as usize);
-            res.set_len(len as usize);
+            let byte_len = getArgument(arg_index, slice.as_mut_ptr()) as usize;
+            if byte_len != slice.len() {
+                self.signal_error("argument has wrong length");
+            }
+        }
+    }
+
+    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
+        let len = self.get_argument_len(arg_index);
+        unsafe {
+            let mut res = Vec::with_capacity(len);
+            res.set_len(len);
             getArgument(arg_index, res.as_mut_ptr());
             res
         }
@@ -302,9 +316,9 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
     
     #[inline]
-    fn finish_vec(&self, v: &Vec<u8>) {
+    fn finish_slice_u8(&self, slice: &[u8]) {
         unsafe {
-            finish(v.as_ptr(), v.len() as i32);
+            finish(slice.as_ptr(), slice.len() as i32);
         }
     }
 
