@@ -186,13 +186,17 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, var_
             quote!{
                 elrond_wasm::str_util::push_bytes(&mut data, #var_name.to_bytes_be().as_slice());
             },
+        "i64" =>
+            quote!{
+                elrond_wasm::str_util::push_i64(&mut data, #var_name);
+            },
         "i32" =>
             quote!{
                 elrond_wasm::str_util::push_i32(&mut data, #var_name);
             },
-        "i64" =>
+        "u32" | "isize" | "usize" | "i8" | "u8" =>
             quote!{
-                elrond_wasm::str_util::push_i64(&mut data, #var_name);
+                elrond_wasm::str_util::push_i64(&mut data, #var_name as i64);
             },
         other_stype_str => {
             panic!("[callable] Unsupported argument type {:?} for arg init snippet", other_stype_str)
