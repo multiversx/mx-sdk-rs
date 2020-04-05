@@ -220,10 +220,10 @@ impl Method {
                         ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(multi_attr) => { // #[multi(...)]
                             let pat = &arg.pat;
-                            let count_expr = &multi_attr.count_expr;
+                            let count_expr = &multi_attr.count_expr; // TODO: parse count_expr and make sure it is a an expression in parantheses
                             let push_snippet = generate_multi_arg_push_snippet(&arg, &quote!{ ___current_arg });
                             quote! {
-                                let mut #pat = Vec::with_capacity(#count_expr as usize);
+                                let mut #pat = Vec::with_capacity #count_expr ;
                                 for _ in 0..#pat.capacity() {
                                     if ___current_arg >= ___nr_args {
                                         self.api.signal_error("wrong number of arguments");
