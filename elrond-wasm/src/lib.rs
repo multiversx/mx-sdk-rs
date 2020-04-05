@@ -96,7 +96,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         let nr_args = self.get_num_arguments();
         if nr_args == expected + 1 {
             let callback_name_arg = self.get_argument_vec(nr_args - 1);
-            self.finish_vec(&callback_name_arg); // callback method argument
+            self.finish_slice_u8(&callback_name_arg.as_slice()); // callback method argument
             return true;
         }
         if nr_args != expected {
@@ -106,6 +106,10 @@ pub trait ContractIOApi<BigInt, BigUint> {
     }
 
     fn check_not_payable(&self) -> bool;
+
+    fn get_argument_len(&self, arg_index: i32) -> usize;
+
+    fn copy_argument_to_slice(&self, arg_index: i32, slice: &mut [u8]);
 
     fn get_argument_vec(&self, arg_index: i32) -> Vec<u8>;
 
@@ -137,7 +141,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         }
     }
     
-    fn finish_vec(&self, v: &Vec<u8>);
+    fn finish_slice_u8(&self, slice: &[u8]);
 
     fn finish_bytes32(&self, bytes: &[u8; 32]);
 

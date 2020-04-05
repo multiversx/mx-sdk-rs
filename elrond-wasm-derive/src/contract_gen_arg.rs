@@ -71,7 +71,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool) ->
 pub fn generate_arg_call_name(arg: &MethodArg) -> proc_macro2::TokenStream {
     let pat = &arg.pat;
     match &arg.ty {                
-        syn::Type::Path(_) => quote!{ #pat },
+        syn::Type::Path(_) | syn::Type::Array(_) => quote!{ #pat },
         syn::Type::Reference(_) => quote!{ &#pat },
         other_arg => panic!("Unsupported argument type {:?} in generate_arg_call_name", other_arg),
     }
@@ -160,7 +160,29 @@ pub fn generate_get_arg_snippet(arg: &MethodArg, arg_index_expr: &proc_macro2::T
                 }
             }
         },
-        other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
+        syn::Type::Array(arr) => {
+            let arr_len = &arr.len;
+            match &*arr.elem {
+                syn::Type::Path(type_path) => {
+                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
+                    let type_str = type_path_segment.ident.to_string();
+                    match type_str.as_str() {
+                        "u8" => {
+                            quote! {
+                                {
+                                    let mut arr = [0u8; #arr_len];
+                                    self.api.copy_argument_to_slice(#arg_index_expr, &mut arr);
+                                    arr
+                                }
+                            }
+                        },
+                        _ => panic!("Only array of u8 allowed as arguments")
+                    }
+                },
+                _ => panic!("Array type is not Path. Only array of u8 allowed as arguments")
+            }
+        },
+        other_arg => panic!("Unsupported argument type. Only path, reference, array or slice allowed. Found: {:?}", other_arg)
     }
 }
 

@@ -22,7 +22,24 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
             });
             quote!{ #(#tuple_snippets)* }
         },
-        other_type => panic!("Unsupported return type: {:#?}, not a path", other_type)
+        syn::Type::Array(arr) => {
+            match &*arr.elem {
+                syn::Type::Path(type_path) => {
+                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
+                    let type_str = type_path_segment.ident.to_string();
+                    match type_str.as_str() {
+                        "u8" => {
+                            quote! {
+                                self.api.finish_slice_u8(& #result_ident);
+                            }
+                        },
+                        _ => panic!("Only array of u8 allowed as result")
+                    }
+                },
+                _ => panic!("Array type is not Path. Only array of u8 allowed as result")
+            }
+        },
+        other_type => panic!("Unsupported return type. Expected path, tuple or array. Found: {:#?}", other_type)
     }
 }
 
@@ -71,7 +88,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
             match type_str.as_str() {
                 "u8" => 
                     quote!{
-                        self.api.finish_vec(& #result_expr);
+                        self.api.finish_slice_u8(& #result_expr.as_slice());
                     },
                 _ => { // Vec<...> => multiple results
                     let elem_finish_snippet = generate_result_finish_snippet_for_arg_type(

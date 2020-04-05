@@ -425,6 +425,16 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         return true;
     }
 
+    fn get_argument_len(&self, arg_index: i32) -> usize {
+        let state = self.state_ref.borrow();
+        let arg = state.get_argument_vec(arg_index);
+        arg.len()
+    }
+
+    fn copy_argument_to_slice(&self, _arg_index: i32, _slice: &mut [u8]) {
+        panic!("copy_argument_to_slice not yet implemented")
+    }
+
     fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
         let state = self.state_ref.borrow();
         let arg = state.get_argument_vec(arg_index);
@@ -465,13 +475,15 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         }
     }
 
-    fn finish_vec(&self, v: &Vec<u8>) {
+    fn finish_slice_u8(&self, slice: &[u8]) {
         let mut state = self.state_ref.borrow_mut();
-        state.add_result(v.clone());
+        let mut v = vec![0u8; slice.len()];
+        v.copy_from_slice(slice);
+        state.add_result(v);
     }
 
     fn finish_bytes32(&self, bytes: &[u8; 32]) {
-        self.finish_vec(&bytes.to_vec());
+        self.finish_slice_u8(&*bytes);
     }
 
     #[inline]
