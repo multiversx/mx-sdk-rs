@@ -212,7 +212,6 @@ impl Method {
                             quote! {
                                 if ___current_arg >= ___nr_args {
                                     self.api.signal_error("wrong number of arguments");
-                                    return;
                                 }
                                 let #pat = #arg_get;
                                 ___current_arg += 1;
@@ -228,7 +227,6 @@ impl Method {
                                 for _ in 0..#pat.capacity() {
                                     if ___current_arg >= ___nr_args {
                                         self.api.signal_error("wrong number of arguments");
-                                        return;
                                     }
                                     #push_snippet
                                     ___current_arg += 1;
@@ -257,11 +255,10 @@ impl Method {
                     0 => {},
                     1 => {
                         let callback_name_arg = self.api.get_argument_vec(___nr_args - 1);
-                        self.api.finish_vec(&callback_name_arg.as_slice()); // callback method argument
+                        self.api.finish_slice_u8(&callback_name_arg.as_slice()); // callback method argument
                     },
                     _ => {
                         self.api.signal_error("wrong number of arguments");
-                        return;
                     }
                 }
 
