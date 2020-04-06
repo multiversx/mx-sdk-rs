@@ -64,8 +64,8 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
       #api_where
       {
         #[inline]
-        fn get_owner(&self) -> Address {
-          self.api.get_owner()
+        fn get_own_address(&self) -> Address {
+          self.api.get_own_address()
         }
 
         #[inline]
