@@ -74,7 +74,7 @@ extern {
 pub struct ArwenApiImpl {}
 impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
-    fn get_owner(&self) -> Address {
+    fn get_own_address(&self) -> Address {
         unsafe {
             let mut res = [0u8; 32];
             getOwner(res.as_mut_ptr());

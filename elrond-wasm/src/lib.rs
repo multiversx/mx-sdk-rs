@@ -27,14 +27,14 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractHookApi<BigInt, BigUint> {
 
-    fn get_owner(&self) -> Address;
+    fn get_own_address(&self) -> Address;
 
     fn get_caller(&self) -> Address;
 
     fn get_balance(&self, address: &Address) -> BigUint;
 
     fn get_own_balance(&self) -> BigUint {
-        self.get_balance(&self.get_owner())
+        self.get_balance(&self.get_own_address())
     }
     
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>);

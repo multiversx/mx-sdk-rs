@@ -9,7 +9,7 @@ use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
 use elrond_wasm::BigUintApi;
 
-use num_bigint::BigInt;
+use num_bigint::{BigInt};
 use num_traits::cast::ToPrimitive;
 
 use alloc::boxed::Box;
@@ -244,7 +244,7 @@ impl ArwenMockRef {
 }
 
 impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
-    fn get_owner(&self) -> Address {
+    fn get_own_address(&self) -> Address {
         let state = self.state_ref.borrow();
         match &state.current_tx {
             None => panic!("Tx not initialized!"),
@@ -265,7 +265,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
-        let sc_address = self.get_owner();
+        let sc_address = self.get_own_address();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&sc_address) {
             None => panic!("Account not found!"),
@@ -312,8 +312,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         let value = self.storage_load(key);
         let mut res = [0u8; 32];
         let offset = 32 - value.len();
-        for i in 0..value.len()-1 {
-            res[offset+i] = value[i];
+        if value.len() > 0 {
+            for i in 0..value.len()-1 {
+                res[offset+i] = value[i];
+            }
         }
         res
     }
@@ -324,16 +326,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     fn storage_load_big_uint(&self, key: &StorageKey) -> RustBigUint {
         let value = self.storage_load(key);
-        let bi = BigInt::from_signed_bytes_be(value.as_slice());
+        let bi = BigInt::from_bytes_be(num_bigint::Sign::Plus, value.as_slice());
         bi.into()
     }
 
-    fn storage_store_big_int(&self, _key: &StorageKey, _value: &RustBigInt) {
-        panic!("storage_store_big_int not yet implemented")
+    fn storage_store_big_int(&self, key: &StorageKey, value: &RustBigInt) {
+        self.storage_store(key, &value.to_signed_bytes_be());
     }
 
-    fn storage_load_big_int(&self, _key: &StorageKey) -> RustBigInt {
-        panic!("storage_load_big_int not yet implemented")
+    fn storage_load_big_int(&self, key: &StorageKey) -> RustBigInt {
+        let value = self.storage_load(key);
+        let bi = BigInt::from_signed_bytes_be(value.as_slice());
+        bi.into()
     }
 
     fn storage_store_i64(&self, key: &StorageKey, value: i64) {
@@ -355,7 +359,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
-        let owner = self.get_owner();
+        let owner = self.get_own_address();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&owner) {
             None => panic!("Account not found!"),
