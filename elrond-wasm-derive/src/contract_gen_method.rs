@@ -201,6 +201,16 @@ impl Method {
     fn generate_call_method_variable_nr_args(&self) -> proc_macro2::TokenStream {
         let payable_snippet = generate_payable_snippet(self);
 
+        let arg_expr = quote!{
+            {
+                if ___current_arg >= ___nr_args {
+                    self.api.signal_error("wrong number of arguments");
+                }
+                ___current_arg += 1;
+                ___current_arg - 1
+            }
+        };
+
         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
             self.method_args
                 .iter()
@@ -208,28 +218,21 @@ impl Method {
                     match &arg.metadata {
                         ArgMetadata::None => {
                             let pat = &arg.pat;
-                            let arg_get = generate_get_arg_snippet(arg, &quote!{ ___current_arg });
+                            let arg_get = generate_get_arg_snippet(arg, &arg_expr);
                             quote! {
-                                if ___current_arg >= ___nr_args {
-                                    self.api.signal_error("wrong number of arguments");
-                                }
                                 let #pat = #arg_get;
-                                ___current_arg += 1;
                             }
                         },
                         ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(multi_attr) => { // #[multi(...)]
                             let pat = &arg.pat;
                             let count_expr = &multi_attr.count_expr; // TODO: parse count_expr and make sure it is a an expression in parantheses
-                            let push_snippet = generate_multi_arg_push_snippet(&arg, &quote!{ ___current_arg });
+                            
+                            let push_snippet = generate_multi_arg_push_snippet(&arg, &arg_expr);
                             quote! {
                                 let mut #pat = Vec::with_capacity #count_expr ;
                                 for _ in 0..#pat.capacity() {
-                                    if ___current_arg >= ___nr_args {
-                                        self.api.signal_error("wrong number of arguments");
-                                    }
                                     #push_snippet
-                                    ___current_arg += 1;
                                 }
                             }
                         }
