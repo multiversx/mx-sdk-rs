@@ -8,7 +8,7 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
         },
         syn::Type::Path(type_path) => {
             let type_path_segment = type_path.path.segments.last().unwrap();
-            generate_result_finish_snippet_for_arg_type(type_path_segment, &quote! { #result_ident })
+            generate_result_finish_snippet_for_type(type_path_segment, &quote! { #result_ident })
         },
         syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
             let mut i = 0;
@@ -43,7 +43,7 @@ pub fn generate_result_finish_snippet(result_ident: &syn::Ident, ty: &syn::Type)
     }
 }
 
-fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegment, result_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment, result_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
         "Result" => {    
@@ -78,7 +78,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
             }
             
         },
-        "Address" =>
+        "Address" | "StorageKey" | "H256" =>
             quote!{
                 self.api.finish_bytes32(#result_expr.as_fixed_bytes());
             },
@@ -91,7 +91,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
                         self.api.finish_slice_u8(& #result_expr.as_slice());
                     },
                 _ => { // Vec<...> => multiple results
-                    let elem_finish_snippet = generate_result_finish_snippet_for_arg_type(
+                    let elem_finish_snippet = generate_result_finish_snippet_for_type(
                         &vec_generic_type_segm, 
                         &quote! { elem });
                     quote!{
@@ -124,7 +124,7 @@ fn generate_result_finish_snippet_for_arg_type(type_path_segment: &syn::PathSegm
             },
         "Option" => {
             let option_generic_type_segm = generic_type_single_arg_segment(&"Option", &type_path_segment);
-            let opt_some_finish_snippet = generate_result_finish_snippet_for_arg_type(
+            let opt_some_finish_snippet = generate_result_finish_snippet_for_type(
                 &option_generic_type_segm, 
                 &quote! { opt_some_value });
             quote!{

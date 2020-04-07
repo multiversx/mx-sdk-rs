@@ -147,7 +147,7 @@ impl Callable {
 fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, var_name: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
-        "Address" => quote!{
+        "Address" | "StorageKey" | "H256" => quote!{
             elrond_wasm::str_util::push_bytes(&mut data, #var_name.as_bytes());
         },
         "Vec" => {

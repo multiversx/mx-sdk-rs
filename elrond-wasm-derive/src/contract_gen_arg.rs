@@ -80,7 +80,7 @@ pub fn generate_arg_call_name(arg: &MethodArg) -> proc_macro2::TokenStream {
 fn generate_snippet_for_arg_type(type_path_segment: &syn::PathSegment, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
-        "Address" =>
+        "Address" | "StorageKey" | "H256" =>
             quote!{
                 self.api.get_argument_address(#arg_index_expr)
             },
