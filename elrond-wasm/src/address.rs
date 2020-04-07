@@ -43,6 +43,18 @@ impl<'a> From<&'a mut [u8; 32]> for H256 {
     }
 }
 
+impl H256 {
+    pub fn from_slice(slice: &[u8]) -> Self {
+        let mut i = 0;
+        let mut arr = [0u8; 32];
+        while i < 32 && i < slice.len() {
+            arr[i] = slice[i];
+            i += 1;
+        }
+        H256(arr)
+    }
+}
+
 impl From<H256> for [u8; 32] {
     #[inline]
     fn from(s: H256) -> Self {
