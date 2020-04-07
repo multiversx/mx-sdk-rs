@@ -67,6 +67,16 @@ fn generate_event_data_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStr
             }
             
         },
+        syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
+            // allow empty tuple as event data
+            if elems.len() == 0 {
+                quote! {
+                    Vec::with_capacity(0)
+                }
+            } else {
+                panic!("Only empty tuples accepted as event data")
+            }
+        },
         other_arg => panic!("[Event data] Unsupported argument type: {:?}, should be reference", other_arg)
     }
 }
