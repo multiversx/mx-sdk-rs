@@ -65,6 +65,8 @@ pub trait ContractHookApi<BigInt, BigUint> {
 
     fn async_call(&self, to: &Address, amount: &BigUint, data: &str);
 
+    fn get_tx_hash(&self) -> H256;
+
     fn get_gas_left(&self) -> i64;
 
     fn sha256(&self, data: &Vec<u8>) -> [u8; 32];

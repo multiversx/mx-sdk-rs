@@ -1,13 +1,11 @@
 
 
-use elrond_wasm::Address;
-use elrond_wasm::StorageKey;
+use elrond_wasm::{H256, Address, StorageKey};
 
 use crate::big_int::*;
 use crate::big_uint::*;
 use crate::error;
 use elrond_wasm::BigUintApi;
-//use elrond_wasm::BigIntApi;
 use elrond_wasm::ContractHookApi;
 
 use alloc::vec::Vec;
@@ -15,6 +13,8 @@ use alloc::vec::Vec;
 const ADDRESS_LENGTH: usize = 32;
 const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
+
+const TEMP_TX_HASH_FOR_TESTING: [u8; 32] = *b"tx_hash_________________________";
 
 
 extern {
@@ -218,6 +218,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
                 data.len() as i32
             );
         }
+    }
+
+    #[inline]
+    fn get_tx_hash(&self) -> H256 {
+        TEMP_TX_HASH_FOR_TESTING.into()
     }
 
     #[inline]
