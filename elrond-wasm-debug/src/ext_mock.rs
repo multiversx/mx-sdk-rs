@@ -379,6 +379,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         panic!("async_call not yet implemented");
     }
 
+    fn get_tx_hash(&self) -> H256 {
+        panic!("get_tx_hash not yet implemented");
+    }
+
     fn get_gas_left(&self) -> i64 {
         0
     }
