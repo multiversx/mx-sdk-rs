@@ -7,11 +7,12 @@ pub use alloc::string::String;
 
 mod address;
 mod err;
-pub mod str_util;
+pub mod call_data;
 pub mod serialization;
 
 pub use address::*;
 pub use err::*;
+pub use call_data::*;
 pub use serialization::*;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
@@ -63,7 +64,7 @@ pub trait ContractHookApi<BigInt, BigUint> {
 
     fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
 
-    fn async_call(&self, to: &Address, amount: &BigUint, data: &str);
+    fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
     fn get_tx_hash(&self) -> H256;
 
@@ -96,11 +97,6 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn check_num_arguments(&self, expected: i32) -> bool {
         let nr_args = self.get_num_arguments();
-        if nr_args == expected + 1 {
-            let callback_name_arg = self.get_argument_vec(nr_args - 1);
-            self.finish_slice_u8(&callback_name_arg.as_slice()); // callback method argument
-            return true;
-        }
         if nr_args != expected {
             self.signal_error("wrong number of arguments");
         }

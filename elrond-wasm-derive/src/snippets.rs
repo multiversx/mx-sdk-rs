@@ -2,7 +2,7 @@
 pub fn contract_imports() -> proc_macro2::TokenStream {
     quote! {
         use elrond_wasm::{Box, Vec, String};
-        use elrond_wasm::{Address, StorageKey, ErrorMessage};
+        use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -144,8 +144,13 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn async_call(&self, to: &Address, amount: &BigUint, data: &str) {
+        fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]) {
           self.api.async_call(to, amount, data);
+        }
+
+        #[inline]
+        fn get_tx_hash(&self) -> H256 {
+          self.api.get_tx_hash()
         }
 
         #[inline]

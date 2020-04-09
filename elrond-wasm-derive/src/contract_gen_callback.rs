@@ -41,7 +41,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             .filter_map(|m| {
                 match m.metadata {
                     MethodMetadata::Callback() => {
-                        let mut arg_index = 0i32; // first argument is the function name
+                        let mut arg_index = -1i32;
 
                         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
                             m.method_args
@@ -67,7 +67,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                         let fn_ident = &m.name;
                         let fn_name_str = &fn_ident.to_string();
                         let fn_name_literal = array_literal(fn_name_str.as_bytes());
-                        let expected_num_args = (m.method_args.len() + 1) as i32;
+                        let expected_num_args = m.method_args.len()as i32;
                         let call = m.generate_call_to_method();
 
                         let match_arm = quote! {                     
@@ -87,20 +87,18 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             })
             .collect();
     quote! {
+        let cb_name = self.api.storage_load(&self.api.get_tx_hash());
         let nr_args = self.api.get_num_arguments();
-        if nr_args == 0 {
-            return;
-        }
-        let cb_name = self.api.get_argument_vec(0i32);
         match cb_name.as_slice() {
             [] => {
-                if nr_args != 1i32 {
+                if nr_args != 0i32 {
                     self.api.signal_error("wrong number of callback arguments");
                 }
             }
             #(#match_arms)*
             other => panic!("No callback function with that name exists in contract.")
         }
+        self.api.storage_store(&self.api.get_tx_hash(), &Vec::with_capacity(0));
     }
 }
 

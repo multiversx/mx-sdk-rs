@@ -121,22 +121,21 @@ impl Callable {
                 let cb_name_str = &callback_ident.arg.to_string();
                 let cb_name_literal = array_literal(cb_name_str.as_bytes());
                 quote! {
-                    elrond_wasm::str_util::push_bytes(&mut data, & #cb_name_literal);
+                    let mut callback_data = elrond_wasm::CallData::new( & #cb_name_literal );
+                    self.api.storage_store(&self.api.get_tx_hash(), &callback_data.as_slice().to_vec());
                 }
             } else {
-                quote! {
-                    elrond_wasm::str_util::push_empty(&mut data);
-                }
+                quote! {}
             };
 
-            let m_name_str = m.name.to_string();
+            let m_name_literal = array_literal(m.name.to_string().as_bytes());
             let sig = quote! {
                 #msig {
                     #amount_snippet
-                    let mut data = String::from(#m_name_str);
+                    let mut call_data = elrond_wasm::CallData::new( & #m_name_literal );
                     #(#arg_push_snippets)*
                     #callback_snippet
-                    self.api.async_call(&self.address, &amount, data.as_str());
+                    self.api.async_call(&self.address, &amount, call_data.as_slice());
                 }
             };
             sig
@@ -148,7 +147,7 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, var_
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
         "Address" | "StorageKey" | "H256" => quote!{
-            elrond_wasm::str_util::push_bytes(&mut data, #var_name.as_bytes());
+            call_data.push_bytes(#var_name.as_bytes());
         },
         "Vec" => {
                 match &type_path_segment.arguments {
@@ -163,7 +162,7 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, var_
                                     let type_str = type_path_segment.ident.to_string();
                                     match type_str.as_str() {
                                         "u8" => quote!{
-                                            elrond_wasm::str_util::push_bytes(&mut data, #var_name.as_slice());
+                                            call_data.push_bytes(#var_name.as_slice());
                                         },
                                         other_type => panic!("[callable] Unsupported type: Vec<{:?}>", other_type)
                                     }
@@ -178,25 +177,22 @@ fn generate_push_snippet_for_arg_type(type_path_segment: &syn::PathSegment, var_
                 }
             },
         "BigInt" =>
-            // quote!{
-            //     elrond_wasm::str_util::push_bytes(&mut data, #var_name.to_bytes_be().as_slice());
-            // },
             panic!("[callable] BigInt arguments not yet supported"),
         "BigUint" =>
             quote!{
-                elrond_wasm::str_util::push_bytes(&mut data, #var_name.to_bytes_be().as_slice());
+                call_data.push_bytes(#var_name.to_bytes_be().as_slice());
             },
         "i64" =>
             quote!{
-                elrond_wasm::str_util::push_i64(&mut data, #var_name);
+                call_data.push_i64(#var_name);
             },
         "i32" =>
             quote!{
-                elrond_wasm::str_util::push_i32(&mut data, #var_name);
+                call_data.push_i32(#var_name);
             },
         "u32" | "isize" | "usize" | "i8" | "u8" =>
             quote!{
-                elrond_wasm::str_util::push_i64(&mut data, #var_name as i64);
+                call_data.push_i64(#var_name as i64);
             },
         other_stype_str => {
             panic!("[callable] Unsupported argument type {:?} for arg init snippet", other_stype_str)
