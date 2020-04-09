@@ -93,7 +93,8 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 impl Method {
     pub fn parse(m: &syn::TraitItemMethod) -> Method {
         let metadata = extract_metadata(m);
-        let method_args = extract_method_args(m, is_payable(m));
+        let allow_callback_args = if let MethodMetadata::Callback() = metadata { true } else { false };
+        let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
         Method {
             metadata: metadata,
             name: m.sig.ident.clone(),
@@ -162,8 +163,12 @@ impl Method {
             self.method_args
                 .iter()
                 .map(|arg| {
+                    if arg.is_callback_arg {
+                        panic!("callback args not allowed in public functions");
+                    }
+
                     match &arg.metadata {
-                        ArgMetadata::None => {
+                        ArgMetadata::Single => {
                             arg_index += 1;
                             let pat = &arg.pat;
                             let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
@@ -174,7 +179,7 @@ impl Method {
                         ArgMetadata::Payment =>
                             generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(_) =>
-                            panic!("multi-args not accepted in function generate_call_method_fixed_args"),
+                            panic!("multi args not accepted in function generate_call_method_fixed_args"),
                     }
                 })
                 .collect();
@@ -215,8 +220,12 @@ impl Method {
             self.method_args
                 .iter()
                 .map(|arg| {
+                    if arg.is_callback_arg {
+                        panic!("callback args not allowed in public functions");
+                    }
+
                     match &arg.metadata {
-                        ArgMetadata::None => {
+                        ArgMetadata::Single => {
                             let pat = &arg.pat;
                             let arg_get = generate_get_arg_snippet(arg, &arg_expr);
                             quote! {
