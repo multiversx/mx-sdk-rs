@@ -98,7 +98,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             #(#match_arms)*
             other => panic!("No callback function with that name exists in contract.")
         }
-        self.api.storage_store(&self.api.get_tx_hash(), &Vec::with_capacity(0));
+        self.api.storage_store(&self.api.get_tx_hash(), &[]);
     }
 }
 

@@ -99,7 +99,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
     
-    fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
+    fn storage_store(&self, key: &StorageKey, value: &[u8]) {
         unsafe {
             storageStore(key.as_ref().as_ptr(), value.as_ptr(), value.len() as i32);
         }

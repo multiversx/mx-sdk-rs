@@ -122,7 +122,7 @@ impl Callable {
                 let cb_name_literal = array_literal(cb_name_str.as_bytes());
                 quote! {
                     let mut callback_data = elrond_wasm::CallData::new( & #cb_name_literal );
-                    self.api.storage_store(&self.api.get_tx_hash(), &callback_data.as_slice().to_vec());
+                    self.api.storage_store(&self.api.get_tx_hash(), callback_data.as_slice());
                 }
             } else {
                 quote! {}
