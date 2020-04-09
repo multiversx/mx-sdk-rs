@@ -208,7 +208,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &str) {
+    fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
         let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap();
         unsafe {
             asyncCall(

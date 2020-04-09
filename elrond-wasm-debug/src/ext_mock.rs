@@ -375,7 +375,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         }
     }
 
-    fn async_call(&self, _to: &Address, _amount: &RustBigUint, _data: &str) {
+    fn async_call(&self, _to: &Address, _amount: &RustBigUint, _data: &[u8]) {
         panic!("async_call not yet implemented");
     }
 
