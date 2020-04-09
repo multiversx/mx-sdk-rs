@@ -5,6 +5,7 @@ static ATTR_PRIVATE: &str = "private";
 static ATTR_CALLBACK_DECL: &str = "callback";
 static ATTR_CALLBACK_RAW_DECL: &str = "callback_raw";
 static ATTR_CALLBACK_CALL: &str = "callback";
+static ATTR_CALLBACK_ARG: &str = "callback_arg";
 static ATTR_MULTI: &str = "multi";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
@@ -34,6 +35,10 @@ pub fn is_payable(m: &syn::TraitItemMethod) -> bool {
 
 pub fn is_payment(pat: &syn::PatType) -> bool {
     has_attribute(&pat.attrs, ATTR_PAYMENT)
+}
+
+pub fn is_callback_arg(pat: &syn::PatType) -> bool {
+    has_attribute(&pat.attrs, ATTR_CALLBACK_ARG)
 }
 
 pub struct EventAttribute {
@@ -139,7 +144,7 @@ impl CallbackCallAttribute {
 
 #[derive(Clone, Debug)]
 pub struct MultiAttribute {
-    pub count_expr: proc_macro2::TokenStream
+    pub count_expr: proc_macro2::TokenStream,
 }
 
 impl MultiAttribute { 

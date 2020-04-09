@@ -48,7 +48,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                 .iter()
                                 .map(|arg| {
                                     match &arg.metadata {
-                                        ArgMetadata::None => {
+                                        ArgMetadata::Single => {
                                             arg_index += 1;
                                             let pat = &arg.pat;
                                             let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
