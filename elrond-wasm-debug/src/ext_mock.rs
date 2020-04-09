@@ -264,13 +264,13 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         panic!("get_balance not yet implemented")
     }
 
-    fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
+    fn storage_store(&self, key: &StorageKey, value: &[u8]) {
         let sc_address = self.get_own_address();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&sc_address) {
             None => panic!("Account not found!"),
             Some(acct) => {
-                acct.storage.insert(key.clone(), value.clone());
+                acct.storage.insert(key.clone(), value.to_vec());
             }
         }
     }

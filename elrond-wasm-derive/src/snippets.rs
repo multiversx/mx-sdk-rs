@@ -79,7 +79,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store(&self, key: &StorageKey, value: &Vec<u8>) {
+        fn storage_store(&self, key: &StorageKey, value: &[u8]) {
           self.api.storage_store(key, value);
         }
 

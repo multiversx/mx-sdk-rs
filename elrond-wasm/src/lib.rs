@@ -38,7 +38,7 @@ pub trait ContractHookApi<BigInt, BigUint> {
         self.get_balance(&self.get_own_address())
     }
     
-    fn storage_store(&self, key: &StorageKey, value: &Vec<u8>);
+    fn storage_store(&self, key: &StorageKey, value: &[u8]);
 
     fn storage_load(&self, key: &StorageKey) -> Vec<u8>;
 
