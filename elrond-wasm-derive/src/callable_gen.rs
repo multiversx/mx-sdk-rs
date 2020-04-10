@@ -110,7 +110,7 @@ impl Callable {
                                     &quote! { multi_arg_elem });
                                 quote! {
                                     if #pat.len() != (#count_expr as usize) {
-                                        self.api.signal_error("wrong number of arguments in async call");
+                                        self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
                                     }
                                     for (_, multi_arg_elem) in #pat.iter().enumerate() {
                                         #vec_iter_push ;

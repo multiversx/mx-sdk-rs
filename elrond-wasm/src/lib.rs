@@ -7,6 +7,7 @@ pub use alloc::string::String;
 
 mod address;
 mod err;
+pub mod err_msg;
 pub mod call_data;
 pub mod serialization;
 
@@ -82,7 +83,7 @@ macro_rules! get_argument_cast {
             let min = <$type>::MIN as i64;
             let max = <$type>::MAX as i64;
             if arg_i64 < min || arg_i64 > max {
-                self.signal_error("argument out of range")
+                self.signal_error(err_msg::ARG_OUT_OF_RANGE)
             }
             arg_i64 as $type
         }
@@ -98,7 +99,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn check_num_arguments(&self, expected: i32) -> bool {
         let nr_args = self.get_num_arguments();
         if nr_args != expected {
-            self.signal_error("wrong number of arguments");
+            self.signal_error(err_msg::ARG_WRONG_NUMBER);
         }
         return true;
     }
@@ -135,7 +136,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         match arg_i64 {
             1 => true,
             0 => false,
-            _ => self.signal_error("argument out of range")
+            _ => self.signal_error(err_msg::ARG_WRONG_NUMBER)
         }
     }
     

@@ -8,6 +8,7 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
+use elrond_wasm::err_msg;
 
 extern {
     fn bigIntNew(value: i64) -> i32;
@@ -71,13 +72,12 @@ impl Clone for ArwenBigUint {
     }
 }
 
-/// Subtracts, but panics if the result is negative.
+/// Subtracts, but exits with error if the result is negative.
 /// The same behaviour can be seen in rust BigUint.
 unsafe fn big_uint_safe_sub(dest: i32, x: i32, y: i32) {
     bigIntSub(dest, x, y);
     if bigIntSign(dest) < 0 {
-        let err_msg = b"Cannot subtract because result would be negative";
-        error::signal_error_raw(err_msg.as_ptr(), err_msg.len())
+        error::signal_error(err_msg::BIG_UINT_SUB_NEGATIVE)
     }
 }
 
@@ -260,7 +260,7 @@ impl elrond_wasm::BigUintApi for ArwenBigUint {
     fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
         let byte_len = self.byte_length() as usize;
         if byte_len > 32 {
-            error::signal_error("big uint value does not fit to target slice")
+            error::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE)
         }
         self.copy_to_slice_big_endian(&mut target[32 - byte_len ..]);
     }

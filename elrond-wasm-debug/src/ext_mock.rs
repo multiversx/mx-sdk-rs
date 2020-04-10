@@ -8,6 +8,7 @@ use crate::big_uint_mock::*;
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
 use elrond_wasm::BigUintApi;
+use elrond_wasm::err_msg;
 
 use num_bigint::{BigInt};
 use num_traits::cast::ToPrimitive;
@@ -428,7 +429,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     fn check_not_payable(&self) -> bool {
         if self.get_call_value_big_uint() > 0 {
-            self.signal_error("attempted to transfer funds via a non-payable function");
+            self.signal_error(err_msg::NON_PAYABLE);
         }
         return true;
     }
