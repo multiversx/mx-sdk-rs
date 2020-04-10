@@ -7,6 +7,7 @@ use crate::big_uint::*;
 use crate::error;
 use elrond_wasm::BigUintApi;
 use elrond_wasm::ContractHookApi;
+use elrond_wasm::err_msg;
 
 use alloc::vec::Vec;
 
@@ -256,7 +257,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     fn check_not_payable(&self) -> bool {
         if self.get_call_value_big_uint() > 0 {
-            self.signal_error("attempted to transfer funds via a non-payable function");
+            self.signal_error(err_msg::NON_PAYABLE);
         }
         return true;
     }
@@ -270,7 +271,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         unsafe {
             let byte_len = getArgument(arg_index, slice.as_mut_ptr()) as usize;
             if byte_len != slice.len() {
-                self.signal_error("argument has wrong length");
+                self.signal_error(err_msg::ARG_BAD_LENGTH);
             }
         }
     }
@@ -291,7 +292,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             let mut res = [0u8; 32];
             let len = getArgument(arg_index, res.as_mut_ptr());
             if len != 32 {
-                self.signal_error("32 bytes of data expected as argument value");
+                self.signal_error(err_msg::ARG_BAD_LENGTH_32);
             }
             res
         }

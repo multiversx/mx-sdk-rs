@@ -211,7 +211,7 @@ impl Method {
         let arg_expr = quote!{
             {
                 if ___current_arg >= ___nr_args {
-                    self.api.signal_error("wrong number of arguments");
+                    self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
                 }
                 ___current_arg += 1;
                 ___current_arg - 1
@@ -272,7 +272,7 @@ impl Method {
                         self.api.finish_slice_u8(&callback_name_arg.as_slice()); // callback method argument
                     },
                     _ => {
-                        self.api.signal_error("wrong number of arguments");
+                        self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
                     }
                 }
 

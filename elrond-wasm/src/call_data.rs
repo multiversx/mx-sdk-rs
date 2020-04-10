@@ -1,7 +1,8 @@
 
 use alloc::vec::Vec;
-use crate::address::*;
+use super::address::*;
 use core::convert::TryInto;
+use super::err_msg;
 
 const SEPARATOR: u8 = b'@';
 
@@ -163,13 +164,13 @@ impl<'a> CallDataDeserializer<'a> {
             Err(e) => Err(e),
             Res(data_raw) => {
                 if data_raw.len() != 64 {
-                    return Err("call data deserialization error: 32 bytes expected");
+                    return Err(err_msg::DESERIALIZATION_NOT_32_BYTES);
                 }
                 let mut arr = [0u8; 32];
                 for i in 0..32 {
                     match deserialize_byte(data_raw[2*i], data_raw[2*i+1]) {
                         None => {
-                            return Err("call data deserialization error: not a valid byte");
+                            return Err(err_msg::DESERIALIZATION_INVALID_BYTE);
                         },
                         Some(byte) => {
                             arr[i] = byte;

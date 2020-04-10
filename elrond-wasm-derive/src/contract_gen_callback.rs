@@ -93,7 +93,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                             #fn_name_literal =>
                             {
                                 if nr_args != #nr_returned_args {
-                                    self.api.signal_error("wrong number of arguments returned by async call");
+                                    self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
                                 }
                                 #(#arg_init_snippets)*
                                 #call ;
@@ -110,7 +110,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         let cb_data = elrond_wasm::CallData::from_raw_data(cb_data_raw);
         let mut cb_data_deserializer = cb_data.deserializer();
         let cb_name = match cb_data_deserializer.next_raw_bytes() {
-            elrond_wasm::DeserializerResult::NoMore => self.api.signal_error("insufficient callback args provided"), // actually unreachable
+            elrond_wasm::DeserializerResult::NoMore => self.api.signal_error(err_msg::ARG_CALLBACK_TOO_FEW), // actually unreachable
             elrond_wasm::DeserializerResult::Err(e) => self.api.signal_error(e), // also unreachable
             elrond_wasm::DeserializerResult::Res(cb_name) => cb_name,
         };
@@ -118,7 +118,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         match cb_name {
             [] => {
                 if nr_args != 0i32 {
-                    self.api.signal_error("wrong number of arguments returned by async call");
+                    self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
                 }
             }
             #(#match_arms)*
@@ -129,7 +129,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                 self.api.storage_store(&self.api.get_tx_hash(), &[]); // cleanup
             },
             _ => {
-                self.api.signal_error("too many callback arguments provided");
+                self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);
             }
         };
         
