@@ -109,7 +109,11 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash());
         let cb_data = elrond_wasm::CallData::from_raw_data(cb_data_raw);
         let mut cb_data_deserializer = cb_data.deserializer();
-        let cb_name = cb_data_deserializer.next_raw_bytes().unwrap();
+        let cb_name = match cb_data_deserializer.next_raw_bytes() {
+            elrond_wasm::DeserializerResult::NoMore => self.api.signal_error("insufficient callback args provided"), // actually unreachable
+            elrond_wasm::DeserializerResult::Err(e) => self.api.signal_error(e), // also unreachable
+            elrond_wasm::DeserializerResult::Res(cb_name) => cb_name,
+        };
         let nr_args = self.api.get_num_arguments();
         match cb_name {
             [] => {
@@ -120,10 +124,15 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             #(#match_arms)*
             other => panic!("No callback function with that name exists in contract.")
         }
-        if cb_data_deserializer.next_raw_bytes().is_some() {
-            self.api.signal_error("too many callback arguments provided");
-        }
-        self.api.storage_store(&self.api.get_tx_hash(), &[]);
+        match cb_data_deserializer.next_raw_bytes() {
+            elrond_wasm::DeserializerResult::NoMore => {
+                self.api.storage_store(&self.api.get_tx_hash(), &[]); // cleanup
+            },
+            _ => {
+                self.api.signal_error("too many callback arguments provided");
+            }
+        };
+        
     }
 }
 

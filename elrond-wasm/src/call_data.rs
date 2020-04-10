@@ -123,48 +123,60 @@ impl CallData {
     }
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum DeserializerResult<T, E> {
+    Res(T),
+    NoMore,
+    Err(E),
+}
+
+use DeserializerResult::*;
+
 impl<'a> CallDataDeserializer<'a> {
-    pub fn next_raw_bytes(&mut self) -> Option<&'a [u8]> {
+    pub fn next_raw_bytes(&mut self) -> DeserializerResult<&'a [u8], &str> {
         let initial_index = self.index;
         loop {
             if self.index > self.data.0.len() {
-                return None;
+                return NoMore;
             }
 
             if self.index == self.data.0.len() {
                 let slice = &self.data.0[initial_index..self.index];
-                self.index += 1; // make index = len + 1 to signal that we are done, and return None from the next call on
-                return Some(slice);
+                self.index += 1; // make index = len + 1 to signal that we are done, and return NoMore from the next call on
+                return Res(slice);
             }
             
             let c = self.data.0[self.index];
             if c == SEPARATOR {
                 let slice = &self.data.0[initial_index..self.index];
                 self.index += 1;
-                return Some(slice);
+                return Res(slice);
             }
 
             self.index += 1;
         }
     }
 
-    pub fn next_h256(&mut self) -> Option<H256> {
+    pub fn next_h256(&mut self) -> DeserializerResult<H256, &str> {
         match self.next_raw_bytes() {
-            None => None,
-            Some(data_raw) => {
+            NoMore => NoMore,
+            Err(e) => Err(e),
+            Res(data_raw) => {
                 if data_raw.len() != 64 {
-                    panic!("call data deserialization error: 32 bytes expected");
+                    return Err("call data deserialization error: 32 bytes expected");
                 }
                 let mut arr = [0u8; 32];
                 for i in 0..32 {
                     match deserialize_byte(data_raw[2*i], data_raw[2*i+1]) {
-                        None => panic!("call data deserialization error: not a valid byte"),
+                        None => {
+                            return Err("call data deserialization error: not a valid byte");
+                        },
                         Some(byte) => {
                             arr[i] = byte;
                         }
                     }
                 }
-                Some(arr.into())
+                Res(arr.into())
             }
         }
     }
@@ -194,86 +206,86 @@ mod tests {
     fn test_next_raw_bytes_1() {
         let cd = CallData::from_raw_data((&b"func@1111@2222").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&b"func"[..]));
-        assert_eq!(de.next_raw_bytes(), Some(&b"1111"[..]));
-        assert_eq!(de.next_raw_bytes(), Some(&b"2222"[..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_raw_bytes(), Res(&b"1111"[..]));
+        assert_eq!(de.next_raw_bytes(), Res(&b"2222"[..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_empty() {
         let cd = CallData::from_raw_data(Vec::with_capacity(0));
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_only_func() {
         let cd = CallData::from_raw_data((&b"func").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&b"func"[..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_some_empty() {
         let cd = CallData::from_raw_data((&b"func@@2222").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&b"func"[..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&b"2222"[..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&b"2222"[..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_ends_empty() {
         let cd = CallData::from_raw_data((&b"func@").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&b"func"[..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_many_empty() {
         let cd = CallData::from_raw_data((&b"func@@2222@@").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&b"func"[..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&b"2222"[..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&b"2222"[..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_all_empty() {
         let cd = CallData::from_raw_data((&b"@@@").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
     fn test_next_raw_bytes_all_empty_but_last() {
         let cd = CallData::from_raw_data((&b"@@@123").to_vec());
         let mut de = cd.deserializer();
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&[][..]));
-        assert_eq!(de.next_raw_bytes(), Some(&b"123"[..]));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&[][..]));
+        assert_eq!(de.next_raw_bytes(), Res(&b"123"[..]));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 
     #[test]
@@ -285,9 +297,9 @@ mod tests {
                                   0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
                                   0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef
                                  ];
-        assert_eq!(de.next_raw_bytes(), Some(&b"func"[..]));
-        assert!(de.next_h256() == Some(Address::from(expected)));
-        assert_eq!(de.next_raw_bytes(), None);
-        assert_eq!(de.next_raw_bytes(), None);
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert!(de.next_h256() == Res(Address::from(expected)));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
     }
 }

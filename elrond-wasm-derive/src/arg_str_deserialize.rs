@@ -31,8 +31,9 @@ fn arg_deserialize_next_single(type_path_segment: &syn::PathSegment) -> proc_mac
         "Address" | "StorageKey" | "H256" =>
             quote!{
                 match cb_data_deserializer.next_h256() {
-                    None => panic!("insufficient callback args provided"),
-                    Some(h256) => h256,
+                    elrond_wasm::DeserializerResult::NoMore => self.api.signal_error("insufficient callback args provided"),
+                    elrond_wasm::DeserializerResult::Err(e) => self.api.signal_error(e),
+                    elrond_wasm::DeserializerResult::Res(h256) => h256,
                 }
             },
         other_stype_str => {
