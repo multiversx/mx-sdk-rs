@@ -1,5 +1,5 @@
 use super::contract_gen_method::*;
-use super::contract_gen_arg::*;
+use super::arg_def::*;
 //use super::parse_attr::*;
 use super::util::*;
 

@@ -1,4 +1,6 @@
-use super::contract_gen_arg::*;
+use super::arg_def::*;
+use super::arg_extract::*;
+use super::arg_regular::*;
 use super::contract_gen_finish::*;
 use super::contract_gen_payable::*;
 use super::parse_attr::*;
@@ -171,7 +173,7 @@ impl Method {
                         ArgMetadata::Single => {
                             arg_index += 1;
                             let pat = &arg.pat;
-                            let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
+                            let arg_get = arg_regular(arg, &quote!{ #arg_index });
                             quote! {
                                 let #pat = #arg_get; 
                             }
@@ -227,7 +229,7 @@ impl Method {
                     match &arg.metadata {
                         ArgMetadata::Single => {
                             let pat = &arg.pat;
-                            let arg_get = generate_get_arg_snippet(arg, &arg_expr);
+                            let arg_get = arg_regular(arg, &arg_expr);
                             quote! {
                                 let #pat = #arg_get;
                             }
@@ -237,7 +239,7 @@ impl Method {
                             let pat = &arg.pat;
                             let count_expr = &multi_attr.count_expr; // TODO: parse count_expr and make sure it is a an expression in parantheses
                             
-                            let push_snippet = generate_multi_arg_push_snippet(&arg, &arg_expr);
+                            let push_snippet = arg_regular_multi(&arg, &arg_expr);
                             quote! {
                                 let mut #pat = Vec::with_capacity #count_expr ;
                                 for _ in 0..#pat.capacity() {

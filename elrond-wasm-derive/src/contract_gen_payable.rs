@@ -1,7 +1,7 @@
 // use super::util::*;
 // use super::parse_attr::*;
 use super::contract_gen_method::*;
-use super::contract_gen_arg::*;
+use super::arg_def::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
     if let MethodMetadata::Public(pub_data) = &m.metadata {

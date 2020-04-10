@@ -14,9 +14,13 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
+mod arg_def;
+mod arg_extract;
+mod arg_regular;
+mod arg_str_deserialize;
+mod arg_str_serialize;
 mod contract;
 mod contract_gen;
-mod contract_gen_arg;
 mod contract_gen_callback;
 mod contract_gen_event;
 mod contract_gen_finish;
