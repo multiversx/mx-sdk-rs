@@ -1,5 +1,7 @@
 
-use super::contract_gen_arg::*;
+use super::arg_def::*;
+use super::arg_regular::*;
+use super::arg_str_deserialize::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
@@ -42,24 +44,42 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                 match m.metadata {
                     MethodMetadata::Callback() => {
                         let mut arg_index = -1i32;
+                        let mut nr_returned_args = 0i32;
 
                         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
                             m.method_args
                                 .iter()
                                 .map(|arg| {
-                                    match &arg.metadata {
-                                        ArgMetadata::Single => {
-                                            arg_index += 1;
-                                            let pat = &arg.pat;
-                                            let arg_get = generate_get_arg_snippet(arg, &quote!{ #arg_index });
-                                            quote! {
-                                                let #pat = #arg_get; 
-                                            }
-                                        },
-                                        ArgMetadata::Payment =>
-                                            panic!("payment args not allowed in callbacks"),
-                                        ArgMetadata::Multi(_) =>
-                                            panic!("multi-args not allowed in callbacks"),
+                                    if arg.is_callback_arg {
+                                        match &arg.metadata {
+                                            ArgMetadata::Single => {
+                                                let pat = &arg.pat;
+                                                let arg_get = arg_deserialize_next(arg);
+                                                quote! {
+                                                    let #pat = #arg_get; 
+                                                }
+                                            },
+                                            ArgMetadata::Payment =>
+                                                panic!("payment args not allowed in callbacks"),
+                                            ArgMetadata::Multi(_) =>
+                                                panic!("callback multi args not yet supported"),
+                                        }
+                                    } else {
+                                        nr_returned_args += 1;
+                                        match &arg.metadata {
+                                            ArgMetadata::Single => {
+                                                arg_index += 1;
+                                                let pat = &arg.pat;
+                                                let arg_get = arg_regular(arg, &quote!{ #arg_index });
+                                                quote! {
+                                                    let #pat = #arg_get; 
+                                                }
+                                            },
+                                            ArgMetadata::Payment =>
+                                                panic!("payment args not allowed in callbacks"),
+                                            ArgMetadata::Multi(_) =>
+                                                panic!("multi-args not allowed in callbacks"),
+                                        }
                                     }
                                 })
                                 .collect();
@@ -67,14 +87,13 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                         let fn_ident = &m.name;
                         let fn_name_str = &fn_ident.to_string();
                         let fn_name_literal = array_literal(fn_name_str.as_bytes());
-                        let expected_num_args = m.method_args.len()as i32;
                         let call = m.generate_call_to_method();
 
                         let match_arm = quote! {                     
                             #fn_name_literal =>
                             {
-                                if nr_args != #expected_num_args {
-                                    self.api.signal_error("wrong number of callback arguments");
+                                if nr_args != #nr_returned_args {
+                                    self.api.signal_error("wrong number of arguments returned by async call");
                                 }
                                 #(#arg_init_snippets)*
                                 #call ;
@@ -87,16 +106,22 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             })
             .collect();
     quote! {
-        let cb_name = self.api.storage_load(&self.api.get_tx_hash());
+        let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash());
+        let cb_data = elrond_wasm::CallData::from_raw_data(cb_data_raw);
+        let mut cb_data_deserializer = cb_data.deserializer();
+        let cb_name = cb_data_deserializer.next_raw_bytes().unwrap();
         let nr_args = self.api.get_num_arguments();
-        match cb_name.as_slice() {
+        match cb_name {
             [] => {
                 if nr_args != 0i32 {
-                    self.api.signal_error("wrong number of callback arguments");
+                    self.api.signal_error("wrong number of arguments returned by async call");
                 }
             }
             #(#match_arms)*
             other => panic!("No callback function with that name exists in contract.")
+        }
+        if cb_data_deserializer.next_raw_bytes().is_some() {
+            self.api.signal_error("too many callback arguments provided");
         }
         self.api.storage_store(&self.api.get_tx_hash(), &[]);
     }
