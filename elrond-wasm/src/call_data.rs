@@ -1,7 +1,6 @@
 
 use alloc::vec::Vec;
 use super::address::*;
-use core::convert::TryInto;
 use super::err_msg;
 
 const SEPARATOR: u8 = b'@';
@@ -78,30 +77,34 @@ impl CallData {
         }
     }
 
+    #[inline]
     pub fn push_i32(&mut self, arg: i32) {
-        self.push_i64(arg as i64);
+        self.push_u32(arg as u32);
     }
 
-    pub fn push_i64(&mut self, arg: i64) {
+    pub fn push_u32(&mut self, arg: u32) {
         self.0.push(SEPARATOR);
-        let mut x = arg;
-        if x == 0 {
-            self.0.push(b'0');
-            return;
-        }
-        if x < 0 {
-            self.0.push(b'-');
-            x = -x;
-        }
-        let mut temp: Vec<u8> = Vec::with_capacity(8);
-        while x > 0 {
-            let last_byte: u8 = (x & 0xffi64).try_into().unwrap();
-            temp.push(last_byte);
-            x = x >> 8;
-        }
-        for byte in temp.iter().rev() {
-            self.push_byte(*byte);
-        }
+        self.push_byte((arg >> 24 & 0xff) as u8);
+        self.push_byte((arg >> 16 & 0xff) as u8);
+        self.push_byte((arg >>  8 & 0xff) as u8);
+        self.push_byte((arg       & 0xff) as u8);
+    }
+
+    #[inline]
+    pub fn push_i64(&mut self, arg: i64) {
+        self.push_u64(arg as u64);
+    }
+
+    pub fn push_u64(&mut self, arg: u64) {
+        self.0.push(SEPARATOR);
+        self.push_byte((arg >> 56 & 0xff) as u8);
+        self.push_byte((arg >> 48 & 0xff) as u8);
+        self.push_byte((arg >> 40 & 0xff) as u8);
+        self.push_byte((arg >> 32 & 0xff) as u8);
+        self.push_byte((arg >> 24 & 0xff) as u8);
+        self.push_byte((arg >> 16 & 0xff) as u8);
+        self.push_byte((arg >>  8 & 0xff) as u8);
+        self.push_byte((arg       & 0xff) as u8);
     }
 }
 
@@ -191,16 +194,58 @@ mod tests {
 
     #[test]
     fn test_push_i32_1() {
-        let mut cd = CallData::new(&*b"abc");
+        let mut cd = CallData::new(&*b"func");
         cd.push_i32(15);
-        assert_eq!(cd.as_slice(), *b"abc@0f");
+        assert_eq!(cd.as_slice(), &b"func@0000000f"[..]);
     }
 
     #[test]
     fn test_push_i32_2() {
-        let mut cd = CallData::new(&*b"abc");
+        let mut cd = CallData::new(&*b"func");
         cd.push_i32(256);
-        assert_eq!(cd.as_slice(), *b"abc@0100");
+        assert_eq!(cd.as_slice(), &b"func@00000100"[..]);
+    }
+
+    #[test]
+    fn test_push_i32_3() {
+        let mut cd = CallData::new(&*b"func");
+        cd.push_i32(-1);
+        assert_eq!(cd.as_slice(), &b"func@ffffffff"[..]);
+    }
+
+    #[test]
+    fn test_push_i32_4() {
+        let mut cd = CallData::new(&*b"func");
+        cd.push_i32(0x12345678);
+        assert_eq!(cd.as_slice(), &b"func@12345678"[..]);
+    }
+
+    #[test]
+    fn test_push_i64_1() {
+        let mut cd = CallData::new(&*b"func");
+        cd.push_i64(15);
+        assert_eq!(cd.as_slice(), &b"func@000000000000000f"[..]);
+    }
+
+    #[test]
+    fn test_push_i64_2() {
+        let mut cd = CallData::new(&*b"func");
+        cd.push_i64(256);
+        assert_eq!(cd.as_slice(), &b"func@0000000000000100"[..]);
+    }
+
+    #[test]
+    fn test_push_i64_3() {
+        let mut cd = CallData::new(&*b"func");
+        cd.push_i64(-1);
+        assert_eq!(cd.as_slice(), &b"func@ffffffffffffffff"[..]);
+    }
+
+    #[test]
+    fn test_push_i64_4() {
+        let mut cd = CallData::new(&*b"func");
+        cd.push_i64(0x0123456789abcdef);
+        assert_eq!(cd.as_slice(), &b"func@0123456789abcdef"[..]);
     }
 
     #[test]
