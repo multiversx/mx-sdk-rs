@@ -45,17 +45,37 @@ fn arg_serialize_push_single(
             quote!{
                 #arg_accumulator.push_bytes(#var_name.to_bytes_be().as_slice());
             },
+        "u64" =>
+            quote!{
+                #arg_accumulator.push_u64(#var_name);
+            },
         "i64" =>
             quote!{
                 #arg_accumulator.push_i64(#var_name);
+            },
+        "u32" =>
+            quote!{
+                #arg_accumulator.push_u32(#var_name);
             },
         "i32" =>
             quote!{
                 #arg_accumulator.push_i32(#var_name);
             },
-        "u32" | "isize" | "usize" | "i8" | "u8" =>
+        "usize" =>
             quote!{
-                #arg_accumulator.push_i64(#var_name as i64);
+                #arg_accumulator.push_u32(#var_name as u32);
+            },
+        "isize" =>
+            quote!{
+                #arg_accumulator.push_i32(#var_name as i32);
+            },
+        "u8" =>
+            quote!{
+                #arg_accumulator.push_byte(#var_name);
+            },
+        "i8" =>
+            quote!{
+                #arg_accumulator.push_byte(#var_name as u8);
             },
         other_stype_str => {
             panic!("[callable] Unsupported argument type {:?} for arg init snippet", other_stype_str)
