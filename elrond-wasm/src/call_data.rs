@@ -4,6 +4,8 @@ use super::address::*;
 use super::err_msg;
 
 const SEPARATOR: u8 = b'@';
+const U64_NUM_DIGITS: usize = 16; // 2 digits * (64 / 8) bytes
+const U32_NUM_DIGITS: usize = 8;  // 2 digits * (32 / 8) bytes
 
 fn to_single_digit(num: u8) -> u8 {
     if num < 10 {
@@ -184,6 +186,64 @@ impl<'a> CallDataDeserializer<'a> {
             }
         }
     }
+
+    fn next_number(&mut self, max_num_digits: usize) -> DeserializerResult<u64, &str> {
+        match self.next_raw_bytes() {
+            NoMore => NoMore,
+            Err(e) => Err(e),
+            Res(data_raw) => {
+                if data_raw.len() > max_num_digits {
+                    return Err(err_msg::DESERIALIZATION_ARG_OUT_OF_RANGE);
+                }
+                let mut x = 0u64;
+                for digit in data_raw {
+                    match from_single_digit(*digit) {
+                        None => {
+                            return Err(err_msg::DESERIALIZATION_INVALID_BYTE);
+                            //return Res(*digit as u64)
+                        },
+                        Some(byte) => {
+                            x <<= 4;
+                            x |= byte as u64;
+                        }
+                    }
+                }
+                Res(x)
+            }
+        }
+    }
+
+    #[inline]
+    pub fn next_u64(&mut self) -> DeserializerResult<u64, &str> {
+        self.next_number(U64_NUM_DIGITS)
+    }
+
+    #[inline]
+    pub fn next_i64(&mut self) -> DeserializerResult<i64, &str> {
+        match self.next_number(U64_NUM_DIGITS) {
+            NoMore => NoMore,
+            Err(e) => Err(e),
+            Res(num) => Res(num as i64),
+        }
+    }
+
+    #[inline]
+    pub fn next_u32(&mut self) -> DeserializerResult<u32, &str> {
+        match self.next_number(U32_NUM_DIGITS) {
+            NoMore => NoMore,
+            Err(e) => Err(e),
+            Res(num) => Res(num as u32),
+        }
+    }
+
+    #[inline]
+    pub fn next_i32(&mut self) -> DeserializerResult<i32, &str> {
+        match self.next_number(U32_NUM_DIGITS) {
+            NoMore => NoMore,
+            Err(e) => Err(e),
+            Res(num) => Res(num as i32),
+        }
+    }
 }
 
 
@@ -347,5 +407,85 @@ mod tests {
         assert!(de.next_h256() == Res(Address::from(expected)));
         assert_eq!(de.next_raw_bytes(), NoMore);
         assert_eq!(de.next_raw_bytes(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u64_1() {
+        let cd = CallData::from_raw_data((&b"func@5").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u64(), Res(0x05));
+        assert_eq!(de.next_u64(), NoMore);
+        assert_eq!(de.next_u64(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u64_2() {
+        let cd = CallData::from_raw_data((&b"func@05").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u64(), Res(0x05));
+        assert_eq!(de.next_u64(), NoMore);
+        assert_eq!(de.next_u64(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u64_3() {
+        let cd = CallData::from_raw_data((&b"func@e105").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u64(), Res(0xe105));
+        assert_eq!(de.next_u64(), NoMore);
+        assert_eq!(de.next_u64(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u64_4() {
+        let cd = CallData::from_raw_data((&b"func@1234567890abcdef").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u64(), Res(0x1234567890abcdef));
+        assert_eq!(de.next_u64(), NoMore);
+        assert_eq!(de.next_u64(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u64_too_long() {
+        let cd = CallData::from_raw_data((&b"func@010000000000000000").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u64(), Err(err_msg::DESERIALIZATION_ARG_OUT_OF_RANGE));
+        assert_eq!(de.next_u64(), NoMore);
+        assert_eq!(de.next_u64(), NoMore);
+    }
+
+    #[test]
+    fn test_next_i64_1() {
+        let cd = CallData::from_raw_data((&b"func@ffffffffffffffff").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_i64(), Res(-1));
+        assert_eq!(de.next_i64(), NoMore);
+        assert_eq!(de.next_i64(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u32_1() {
+        let cd = CallData::from_raw_data((&b"func@e105").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u32(), Res(0xe105));
+        assert_eq!(de.next_u32(), NoMore);
+        assert_eq!(de.next_u32(), NoMore);
+    }
+
+    #[test]
+    fn test_next_u32_too_long() {
+        let cd = CallData::from_raw_data((&b"func@0100000000").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_u32(), Err(err_msg::DESERIALIZATION_ARG_OUT_OF_RANGE));
+        assert_eq!(de.next_u32(), NoMore);
+        assert_eq!(de.next_u32(), NoMore);
     }
 }
