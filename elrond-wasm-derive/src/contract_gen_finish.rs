@@ -90,12 +90,27 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
                     quote!{
                         self.api.finish_slice_u8(& #result_expr.as_slice());
                     },
-                _ => { // Vec<...> => multiple results
+                "u64" | "i64" | "u32" | "i32" | "usize" | "isize" => {
+                    // Vec<number> => multiple results, iterate over values
+                    // TODO: unite with match arm below
                     let elem_finish_snippet = generate_result_finish_snippet_for_type(
                         &vec_generic_type_segm, 
                         &quote! { elem });
                     quote!{
-                        for (_, elem) in #result_expr.iter().enumerate() {
+                        for &elem in #result_expr.iter() {
+                            #elem_finish_snippet
+                        }
+                    }
+
+                },
+                _ => {
+                    // Vec<...> => multiple results, iterate over references
+                    // TODO: unite with match arm above
+                    let elem_finish_snippet = generate_result_finish_snippet_for_type(
+                        &vec_generic_type_segm, 
+                        &quote! { elem });
+                    quote!{
+                        for elem in #result_expr.iter() {
                             #elem_finish_snippet
                         }
                     }
