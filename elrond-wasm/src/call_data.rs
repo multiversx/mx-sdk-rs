@@ -66,7 +66,7 @@ impl CallData {
         self.0.push(SEPARATOR);
     }
 
-    fn push_byte(&mut self, byte: u8) {
+    pub fn push_byte(&mut self, byte: u8) {
         let (digit1, digit2) = serialize_byte(byte);
         self.0.push(digit1);
         self.0.push(digit2);
