@@ -15,4 +15,5 @@ pub static BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would b
 
 pub static DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub static DESERIALIZATION_NOT_32_BYTES: &str = "call data deserialization error: 32 bytes expected";
+pub static DESERIALIZATION_ODD_DIGITS: &str = "call data deserialization error: odd number of digits in hex representation";
 pub static DESERIALIZATION_ARG_OUT_OF_RANGE: &str = "call data deserialization error: argument out of range";

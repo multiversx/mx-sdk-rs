@@ -163,6 +163,31 @@ impl<'a> CallDataDeserializer<'a> {
         }
     }
 
+    pub fn next_vec_u8(&mut self) -> DeserializerResult<Vec<u8>, &str> {
+        match self.next_raw_bytes() {
+            NoMore => NoMore,
+            Err(e) => Err(e),
+            Res(data_raw) => {
+                if data_raw.len() % 2 != 0 {
+                    return Err(err_msg::DESERIALIZATION_ODD_DIGITS);
+                }
+                let res_len = data_raw.len() / 2;
+                let mut res_vec = Vec::with_capacity(res_len);
+                for i in 0..res_len {
+                    match deserialize_byte(data_raw[2*i], data_raw[2*i+1]) {
+                        None => {
+                            return Err(err_msg::DESERIALIZATION_INVALID_BYTE);
+                        },
+                        Some(byte) => {
+                            res_vec.push(byte);
+                        }
+                    }
+                }
+                Res(res_vec)
+            }
+        }
+    }
+
     pub fn next_h256(&mut self) -> DeserializerResult<H256, &str> {
         match self.next_raw_bytes() {
             NoMore => NoMore,
@@ -405,6 +430,31 @@ mod tests {
                                  ];
         assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
         assert!(de.next_h256() == Res(Address::from(expected)));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
+    }
+
+    #[test]
+    fn test_next_vec_u8() {
+        let cd = CallData::from_raw_data((&b"func@0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef").to_vec());
+        let mut de = cd.deserializer();
+        let expected: [u8; 32] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
+                                  0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
+                                  0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
+                                  0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef
+                                 ];
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_vec_u8(), Res(expected[..].to_vec()));
+        assert_eq!(de.next_raw_bytes(), NoMore);
+        assert_eq!(de.next_raw_bytes(), NoMore);
+    }
+
+    #[test]
+    fn test_next_vec_odd() {
+        let cd = CallData::from_raw_data((&b"func@123").to_vec());
+        let mut de = cd.deserializer();
+        assert_eq!(de.next_raw_bytes(), Res(&b"func"[..]));
+        assert_eq!(de.next_vec_u8(),  Err(err_msg::DESERIALIZATION_ODD_DIGITS));
         assert_eq!(de.next_raw_bytes(), NoMore);
         assert_eq!(de.next_raw_bytes(), NoMore);
     }
