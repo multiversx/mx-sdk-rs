@@ -137,42 +137,42 @@ impl SubAssign<&RustBigUint> for RustBigUint {
 }
 
 macro_rules! shift_traits {
-    ($shift_trait:ident, $method:ident, $api_func:ident) => {
-        impl $shift_trait<i32> for RustBigUint {
+    ($shift_trait:ident, $method:ident) => {
+        impl $shift_trait<usize> for RustBigUint {
             type Output = RustBigUint;
 
-            fn $method(self, rhs: i32) -> RustBigUint {
-                let result = $shift_trait::$method(self.0, rhs as usize);
+            fn $method(self, rhs: usize) -> RustBigUint {
+                let result = $shift_trait::$method(self.0, rhs);
                 RustBigUint(result)
             }
         }
         
-        impl<'a> $shift_trait<i32> for &'a RustBigUint {
+        impl<'a> $shift_trait<usize> for &'a RustBigUint {
             type Output = RustBigUint;
 
-            fn $method(self, rhs: i32) -> RustBigUint {
-                let result = $shift_trait::$method(&self.0, rhs as usize);
+            fn $method(self, rhs: usize) -> RustBigUint {
+                let result = $shift_trait::$method(&self.0, rhs);
                 RustBigUint(result)
             }
         }
     }
 }
 
-shift_traits!{Shl, shl, bigIntShl}
-shift_traits!{Shr, shr, bigIntShr}
+shift_traits!{Shl, shl}
+shift_traits!{Shr, shr}
 
 macro_rules! shift_assign_traits {
-    ($shift_assign_trait:ident, $method:ident, $api_func:ident) => {
-        impl $shift_assign_trait<i32> for RustBigUint {
-            fn $method(&mut self, rhs: i32) {
-                $shift_assign_trait::$method(&mut self.0, rhs as usize);
+    ($shift_assign_trait:ident, $method:ident) => {
+        impl $shift_assign_trait<usize> for RustBigUint {
+            fn $method(&mut self, rhs: usize) {
+                $shift_assign_trait::$method(&mut self.0, rhs);
             }
         }
     }
 }
 
-shift_assign_traits!{ShlAssign, shl_assign, bigIntShl}
-shift_assign_traits!{ShrAssign, shr_assign, bigIntShr}
+shift_assign_traits!{ShlAssign, shl_assign}
+shift_assign_traits!{ShrAssign, shr_assign}
 
 
 
