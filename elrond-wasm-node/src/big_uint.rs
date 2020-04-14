@@ -153,25 +153,25 @@ binary_assign_operator!{BitXorAssign, bitxor_assign, bigIntXor}
 
 macro_rules! shift_traits {
     ($shift_trait:ident, $method:ident, $api_func:ident) => {
-        impl $shift_trait<i32> for ArwenBigUint {
+        impl $shift_trait<usize> for ArwenBigUint {
             type Output = ArwenBigUint;
 
             #[inline]
-            fn $method(self, rhs: i32) -> ArwenBigUint {
+            fn $method(self, rhs: usize) -> ArwenBigUint {
                 unsafe {
-                    $api_func(self.handle, self.handle, rhs);
+                    $api_func(self.handle, self.handle, rhs as i32);
                     self
                 }
             }
         }
         
-        impl<'a> $shift_trait<i32> for &'a ArwenBigUint {
+        impl<'a> $shift_trait<usize> for &'a ArwenBigUint {
             type Output = ArwenBigUint;
 
-            fn $method(self, rhs: i32) -> ArwenBigUint {
+            fn $method(self, rhs: usize) -> ArwenBigUint {
                 unsafe {
                     let result = bigIntNew(0);
-                    $api_func(result, self.handle, rhs);
+                    $api_func(result, self.handle, rhs as i32);
                     ArwenBigUint {handle: result}
                 }
             }
@@ -184,11 +184,11 @@ shift_traits!{Shr, shr, bigIntShr}
 
 macro_rules! shift_assign_traits {
     ($shift_assign_trait:ident, $method:ident, $api_func:ident) => {
-        impl $shift_assign_trait<i32> for ArwenBigUint {
-            fn $method(&mut self, rhs: i32) {
+        impl $shift_assign_trait<usize> for ArwenBigUint {
+            #[inline]
+            fn $method(&mut self, rhs: usize) {
                 unsafe {
-                    let result = bigIntNew(0);
-                    $api_func(result, self.handle, rhs);
+                    $api_func(self.handle, self.handle, rhs as i32);
                 }
             }
         }

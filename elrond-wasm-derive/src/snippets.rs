@@ -32,8 +32,8 @@ pub fn big_int_where() -> proc_macro2::TokenStream {
             for<'b> BigUint: BitAndAssign<&'b BigUint>,
             for<'b> BigUint: BitOrAssign<&'b BigUint>,
             for<'b> BigUint: BitXorAssign<&'b BigUint>,
-            for<'a> &'a BigUint: Shr<i32, Output=BigUint>,
-            for<'a> &'a BigUint: Shl<i32, Output=BigUint>,
+            for<'a> &'a BigUint: Shr<usize, Output=BigUint>,
+            for<'a> &'a BigUint: Shl<usize, Output=BigUint>,
 
             BigInt: BigIntApi<BigUint> + 'static,
             for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,

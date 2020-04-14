@@ -188,10 +188,10 @@ pub trait BigUintApi:
     BitOrAssign +
     BitXor<Output=Self> +
     BitXorAssign +
-    Shr<i32, Output=Self> +
-    ShrAssign<i32> +
-    Shl<i32, Output=Self> +
-    ShlAssign<i32> +
+    Shr<usize, Output=Self> +
+    ShrAssign<usize> +
+    Shl<usize, Output=Self> +
+    ShlAssign<usize> +
     PartialEq<Self> +
     Eq +
     PartialOrd<Self> +
