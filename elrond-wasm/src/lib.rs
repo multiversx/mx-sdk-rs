@@ -39,27 +39,27 @@ pub trait ContractHookApi<BigInt, BigUint> {
         self.get_balance(&self.get_own_address())
     }
     
-    fn storage_store(&self, key: &StorageKey, value: &[u8]);
+    fn storage_store(&self, key: &[u8], value: &[u8]);
 
-    fn storage_load(&self, key: &StorageKey) -> Vec<u8>;
+    fn storage_load(&self, key: &[u8]) -> Vec<u8>;
 
-    fn storage_load_len(&self, key: &StorageKey) -> usize;
+    fn storage_load_len(&self, key: &[u8]) -> usize;
 
-    fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]);
+    fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]);
     
-    fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32];
+    fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32];
 
-    fn storage_store_big_uint(&self, key: &StorageKey, value: &BigUint);
+    fn storage_store_big_uint(&self, key: &[u8], value: &BigUint);
     
-    fn storage_load_big_uint(&self, key: &StorageKey) -> BigUint;
+    fn storage_load_big_uint(&self, key: &[u8]) -> BigUint;
 
-    fn storage_store_big_int(&self, key: &StorageKey, value: &BigInt);
+    fn storage_store_big_int(&self, key: &[u8], value: &BigInt);
     
-    fn storage_load_big_int(&self, key: &StorageKey) -> BigInt;
+    fn storage_load_big_int(&self, key: &[u8]) -> BigInt;
 
-    fn storage_store_i64(&self, key: &StorageKey, value: i64);
+    fn storage_store_i64(&self, key: &[u8], value: i64);
     
-    fn storage_load_i64(&self, key: &StorageKey) -> Option<i64>;
+    fn storage_load_i64(&self, key: &[u8]) -> Option<i64>;
     
     fn get_call_value_big_uint(&self) -> BigUint;
 
@@ -71,9 +71,9 @@ pub trait ContractHookApi<BigInt, BigUint> {
 
     fn get_gas_left(&self) -> i64;
 
-    fn sha256(&self, data: &Vec<u8>) -> [u8; 32];
+    fn sha256(&self, data: &[u8]) -> [u8; 32];
 
-    fn keccak256(&self, data: &Vec<u8>) -> [u8; 32];
+    fn keccak256(&self, data: &[u8]) -> [u8; 32];
 }
 
 macro_rules! get_argument_cast {

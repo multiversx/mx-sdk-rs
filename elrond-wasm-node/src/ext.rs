@@ -1,6 +1,6 @@
 
 
-use elrond_wasm::{H256, Address, StorageKey};
+use elrond_wasm::{H256, Address};
 
 use crate::big_int::*;
 use crate::big_uint::*;
@@ -100,38 +100,45 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
     
-    fn storage_store(&self, key: &StorageKey, value: &[u8]) {
+    fn storage_store(&self, key: &[u8], value: &[u8]) {
         unsafe {
-            storageStore(key.as_ref().as_ptr(), value.as_ptr(), value.len() as i32);
+            let key_hash = self.keccak256(key);
+            storageStore(key_hash.as_ref().as_ptr(), value.as_ptr(), value.len() as i32);
         }
     }
 
-    fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
+    fn storage_load(&self, key: &[u8]) -> Vec<u8> {
          unsafe {
             let value_len = self.storage_load_len(key);
             let mut res = Vec::with_capacity(value_len);
-            storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
+            let key_hash = self.keccak256(key);
+            storageLoad(key_hash.as_ref().as_ptr(), res.as_mut_ptr());
             res.set_len(value_len);
             res
         }
     }
 
     #[inline]
-    fn storage_load_len(&self, key: &StorageKey) -> usize {
-        unsafe { storageGetValueLength(key.as_ref().as_ptr()) as usize }
+    fn storage_load_len(&self, key: &[u8]) -> usize {
+        unsafe { 
+            let key_hash = self.keccak256(key);
+            storageGetValueLength(key_hash.as_ref().as_ptr()) as usize 
+        }
     }
 
     #[inline]
-    fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
+    fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
         unsafe {
-            storageStore(key.as_ref().as_ptr(), value.as_ptr(), 32);
+            let key_hash = self.keccak256(key);
+            storageStore(key_hash.as_ref().as_ptr(), value.as_ptr(), 32);
         }
     }
     
-    fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
+    fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
         unsafe {
             let mut res = [0u8; 32];
-            let len = storageLoad(key.as_ref().as_ptr(), res.as_mut_ptr());
+            let key_hash = self.keccak256(key);
+            let len = storageLoad(key_hash.as_ref().as_ptr(), res.as_mut_ptr());
             if len != 32 {
                 let message = "32 bytes of data expected in storage at key";
                 error::signal_error(&message);
@@ -141,50 +148,56 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn storage_store_big_uint(&self, key: &StorageKey, value: &ArwenBigUint) {
+    fn storage_store_big_uint(&self, key: &[u8], value: &ArwenBigUint) {
         unsafe {
-            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), value.handle);
+            let key_hash = self.keccak256(key);
+            bigIntStorageStoreUnsigned(key_hash.as_ref().as_ptr(), value.handle);
         }
     }
 
     #[inline]
-    fn storage_load_big_uint(&self, key: &StorageKey) -> ArwenBigUint {
+    fn storage_load_big_uint(&self, key: &[u8]) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
-            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), result);
+            let key_hash = self.keccak256(key);
+            bigIntStorageLoadUnsigned(key_hash.as_ref().as_ptr(), result);
             ArwenBigUint {handle: result}
         }
     }
 
     #[inline]
-    fn storage_store_big_int(&self, key: &StorageKey, value: &ArwenBigInt) {
+    fn storage_store_big_int(&self, key: &[u8], value: &ArwenBigInt) {
         unsafe {
             // TODO: convert to 2's complement
-            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), value.handle);
+            let key_hash = self.keccak256(key);
+            bigIntStorageStoreUnsigned(key_hash.as_ref().as_ptr(), value.handle);
         }
     }
 
     #[inline]
-    fn storage_load_big_int(&self, key: &StorageKey) -> ArwenBigInt {
+    fn storage_load_big_int(&self, key: &[u8]) -> ArwenBigInt {
         unsafe {
             let result = bigIntNew(0);
             // TODO: convert from 2's complement
-            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), result);
+            let key_hash = self.keccak256(key);
+            bigIntStorageLoadUnsigned(key_hash.as_ref().as_ptr(), result);
             ArwenBigInt {handle: result}
         }
     }
 
     #[inline]
-    fn storage_store_i64(&self, key: &StorageKey, value: i64) {
+    fn storage_store_i64(&self, key: &[u8], value: i64) {
         unsafe {
-            int64storageStore(key.as_ref().as_ptr(), value);
+            let key_hash = self.keccak256(key);
+            int64storageStore(key_hash.as_ref().as_ptr(), value);
         }
     }
     
     #[inline]
-    fn storage_load_i64(&self, key: &StorageKey) -> Option<i64> {
+    fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
         unsafe{
-            Some(int64storageLoad(key.as_ref().as_ptr()))
+            let key_hash = self.keccak256(key);
+            Some(int64storageLoad(key_hash.as_ref().as_ptr()))
         }
     }
 
@@ -231,7 +244,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         unsafe { getGasLeft() }
     }
 
-    fn sha256(&self, data: &Vec<u8>) -> [u8; 32] {
+    fn sha256(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
             let mut res = [0u8; 32];
             sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
@@ -239,7 +252,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    fn keccak256(&self, data: &Vec<u8>) -> [u8; 32] {
+    fn keccak256(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
             let mut res = [0u8; 32];
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());

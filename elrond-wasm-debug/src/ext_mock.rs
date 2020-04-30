@@ -1,6 +1,6 @@
 
 
-use elrond_wasm::{H256, Address, StorageKey};
+use elrond_wasm::{H256, Address};
 
 use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
@@ -33,22 +33,26 @@ fn address_hex(address: &H256) -> alloc::string::String {
     alloc::format!("0x{}", hex::encode(address.as_bytes()))
 }
 
+fn key_hex(address: &Vec<u8>) -> alloc::string::String {
+    alloc::format!("0x{}", hex::encode(address.as_slice()))
+}
+
 pub struct AccountData {
     pub address: Address,
     pub nonce: u64,
     pub balance: BigInt,
-    pub storage: HashMap<StorageKey, Vec<u8>>,
+    pub storage: HashMap<Vec<u8>, Vec<u8>>,
     pub contract: Option<Box<dyn CallableContract>>,
 }
 
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut storage_buf = String::new();
-        let mut keys: Vec<StorageKey> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-        keys.sort_by(|k1, k2| k1.as_bytes().cmp(k2.as_bytes()));
+        let mut keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+        keys.sort_by(|k1, k2| k1.cmp(k2));
         for key in &keys {
-            let value = self.storage.get(&key).unwrap();
-            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", address_hex(key), hex::encode(value.as_slice())).unwrap();
+            let value = self.storage.get(key).unwrap();
+            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key), hex::encode(value.as_slice())).unwrap();
         }
         
         write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
@@ -265,18 +269,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         panic!("get_balance not yet implemented")
     }
 
-    fn storage_store(&self, key: &StorageKey, value: &[u8]) {
+    fn storage_store(&self, key: &[u8], value: &[u8]) {
         let sc_address = self.get_own_address();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&sc_address) {
             None => panic!("Account not found!"),
             Some(acct) => {
-                acct.storage.insert(key.clone(), value.to_vec());
+                acct.storage.insert(key.to_vec(), value.to_vec());
             }
         }
     }
 
-    fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
+    fn storage_load(&self, key: &[u8]) -> Vec<u8> {
         let state = self.state_ref.borrow();
         match &state.current_tx {
             None => panic!("Tx not initialized!"),
@@ -284,7 +288,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
                 match state.accounts.get(&tx.to) {
                     None => panic!("Account not found!"),
                     Some(acct) => {
-                        match acct.storage.get(key) {
+                        match acct.storage.get(&key.to_vec()) {
                             None => Vec::with_capacity(0),
                             Some(value) => {
                                 value.clone()
@@ -297,11 +301,11 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     #[inline]
-    fn storage_load_len(&self, key: &StorageKey) -> usize {
+    fn storage_load_len(&self, key: &[u8]) -> usize {
         self.storage_load(key).len()
     }
 
-    fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
+    fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
         let mut vector = Vec::with_capacity(32);
         for i in value.iter() {
             vector.push(*i);
@@ -309,7 +313,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         self.storage_store(key, &vector);
     }
     
-    fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
+    fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
         let value = self.storage_load(key);
         let mut res = [0u8; 32];
         let offset = 32 - value.len();
@@ -321,31 +325,31 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         res
     }
 
-    fn storage_store_big_uint(&self, key: &StorageKey, value: &RustBigUint) {
+    fn storage_store_big_uint(&self, key: &[u8], value: &RustBigUint) {
         self.storage_store(key, &value.to_bytes_be());
     }
 
-    fn storage_load_big_uint(&self, key: &StorageKey) -> RustBigUint {
+    fn storage_load_big_uint(&self, key: &[u8]) -> RustBigUint {
         let value = self.storage_load(key);
         let bi = BigInt::from_bytes_be(num_bigint::Sign::Plus, value.as_slice());
         bi.into()
     }
 
-    fn storage_store_big_int(&self, key: &StorageKey, value: &RustBigInt) {
+    fn storage_store_big_int(&self, key: &[u8], value: &RustBigInt) {
         self.storage_store(key, &value.to_signed_bytes_be());
     }
 
-    fn storage_load_big_int(&self, key: &StorageKey) -> RustBigInt {
+    fn storage_load_big_int(&self, key: &[u8]) -> RustBigInt {
         let value = self.storage_load(key);
         let bi = BigInt::from_signed_bytes_be(value.as_slice());
         bi.into()
     }
 
-    fn storage_store_i64(&self, key: &StorageKey, value: i64) {
+    fn storage_store_i64(&self, key: &[u8], value: i64) {
         self.storage_store_big_int(key, &RustBigInt::from(value));
     }
 
-    fn storage_load_i64(&self, key: &StorageKey) -> Option<i64> {
+    fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
         let bi = self.storage_load_big_int(key);
         bi.value().to_i64()
     }
@@ -388,15 +392,15 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         0
     }
 
-    fn sha256(&self, data: &Vec<u8>) -> [u8; 32] {
+    fn sha256(&self, data: &[u8]) -> [u8; 32] {
         let mut hasher = Sha3_256::new();
-        hasher.input(data.as_slice());
+        hasher.input(data);
         hasher.result().into()
     }
 
-    fn keccak256(&self, data: &Vec<u8>) -> [u8; 32] {
+    fn keccak256(&self, data: &[u8]) -> [u8; 32] {
         let mut hasher = Keccak256::new();
-        hasher.input(data.as_slice());
+        hasher.input(data);
         hasher.result().into()
     }
 }
