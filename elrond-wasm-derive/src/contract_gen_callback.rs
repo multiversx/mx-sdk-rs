@@ -106,7 +106,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             })
             .collect();
     quote! {
-        let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash());
+        let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
         let cb_data = elrond_wasm::CallData::from_raw_data(cb_data_raw);
         let mut cb_data_deserializer = cb_data.deserializer();
         let cb_name = match cb_data_deserializer.next_raw_bytes() {
@@ -126,7 +126,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         }
         match cb_data_deserializer.next_raw_bytes() {
             elrond_wasm::DeserializerResult::NoMore => {
-                self.api.storage_store(&self.api.get_tx_hash(), &[]); // cleanup
+                self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); // cleanup
             },
             _ => {
                 self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);

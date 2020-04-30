@@ -80,57 +80,57 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store(&self, key: &StorageKey, value: &[u8]) {
+        fn storage_store(&self, key: &[u8], value: &[u8]) {
           self.api.storage_store(key, value);
         }
 
         #[inline]
-        fn storage_load(&self, key: &StorageKey) -> Vec<u8> {
+        fn storage_load(&self, key: &[u8]) -> Vec<u8> {
           self.api.storage_load(key)
         }
 
         #[inline]
-        fn storage_load_len(&self, key: &StorageKey) -> usize {
+        fn storage_load_len(&self, key: &[u8]) -> usize {
           self.api.storage_load_len(key)
         }
 
         #[inline]
-        fn storage_store_bytes32(&self, key: &StorageKey, value: &[u8; 32]) {
+        fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
           self.api.storage_store_bytes32(key, value);
         }
         
         #[inline]
-        fn storage_load_bytes32(&self, key: &StorageKey) -> [u8; 32] {
+        fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
           self.api.storage_load_bytes32(key)
         }
 
         #[inline]
-        fn storage_store_big_uint(&self, key: &StorageKey, value: &BigUint) {
+        fn storage_store_big_uint(&self, key: &[u8], value: &BigUint) {
           self.api.storage_store_big_uint(key, value);
         }
         
         #[inline]
-        fn storage_load_big_uint(&self, key: &StorageKey) -> BigUint {
+        fn storage_load_big_uint(&self, key: &[u8]) -> BigUint {
           self.api.storage_load_big_uint(key)
         }
     
         #[inline]
-        fn storage_store_big_int(&self, key: &StorageKey, value: &BigInt) {
+        fn storage_store_big_int(&self, key: &[u8], value: &BigInt) {
           self.api.storage_store_big_int(key, value);
         }
         
         #[inline]
-        fn storage_load_big_int(&self, key: &StorageKey) -> BigInt {
+        fn storage_load_big_int(&self, key: &[u8]) -> BigInt {
           self.api.storage_load_big_int(key)
         }
 
         #[inline]
-        fn storage_store_i64(&self, key: &StorageKey, value: i64) {
+        fn storage_store_i64(&self, key: &[u8], value: i64) {
           self.api.storage_store_i64(key, value);
         }
         
         #[inline]
-        fn storage_load_i64(&self, key: &StorageKey) -> Option<i64> {
+        fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
           self.api.storage_load_i64(key)
         }
         
@@ -160,12 +160,12 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn sha256(&self, data: &Vec<u8>) -> [u8; 32] {
+        fn sha256(&self, data: &[u8]) -> [u8; 32] {
           self.api.sha256(data)
         }
     
         #[inline]
-        fn keccak256(&self, data: &Vec<u8>) -> [u8; 32] {
+        fn keccak256(&self, data: &[u8]) -> [u8; 32] {
           self.api.keccak256(data)
         }
       }
