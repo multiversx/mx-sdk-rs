@@ -7,18 +7,24 @@ use super::parse_attr::*;
 use super::util::*;
 use super::reserved;
 
+/// Method visibility from the point of view of the smart contract
 #[derive(Clone, Debug)]
-pub enum MethodMetadata {
-    Public(PublicMethodMetadata),
-    Private(),
-    Event(Vec<u8>),
-    Callback(),
-    CallbackRaw(),
+pub enum Visibility {
+    /// Means it gets a smart contract function generated for it
+    Public,
+
+    /// Can be used only inside the smart contract, even if it is public in the module.
+    Private
 }
 
 #[derive(Clone, Debug)]
-pub struct PublicMethodMetadata {
-    pub payable: bool,
+pub enum MethodMetadata {
+    Regular{ visibility: Visibility, payable: bool },
+    Event{ ident: Vec<u8> },
+    Callback,
+    CallbackRaw,
+    // StorageGetValue,
+    // StorageSetValue,
 }
 
 #[derive(Clone, Debug)]
@@ -50,7 +56,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if let Some(_) = m.default {
             panic!("Events cannot have provided implementations in the trait.");
         }
-        MethodMetadata::Event(event_attr.identifier)
+        MethodMetadata::Event{ ident: event_attr.identifier }
     } else if callback || callback_raw {
         if payable {
             panic!("Callback methods cannot be marked payable.");
@@ -65,9 +71,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("It is either the default callback, or regular callback, not both.");
         }
         if callback_raw {
-            MethodMetadata::CallbackRaw()
+            MethodMetadata::CallbackRaw
         } else {
-            MethodMetadata::Callback()
+            MethodMetadata::Callback
         }
     } else if private {
         if payable {
@@ -76,7 +82,10 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default == None {
             panic!("Private methods need an implementation.");
         }
-        MethodMetadata::Private()
+        MethodMetadata::Regular{
+            visibility: Visibility::Private,
+            payable: false,
+        }
     } else {
         if m.default == None {
             panic!("Public methods need an implementation.");
@@ -86,16 +95,17 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Cannot declare public method with name '{}', because that name is reserved by the Arwen API.", fn_name_str);
         }
 
-        MethodMetadata::Public(PublicMethodMetadata{
+        MethodMetadata::Regular{
+            visibility: Visibility::Public,
             payable: payable,
-        })
+        }
     }
 }
 
 impl Method {
     pub fn parse(m: &syn::TraitItemMethod) -> Method {
         let metadata = extract_metadata(m);
-        let allow_callback_args = if let MethodMetadata::Callback() = metadata { true } else { false };
+        let allow_callback_args = if let MethodMetadata::Callback = metadata { true } else { false };
         let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
         Method {
             metadata: metadata,

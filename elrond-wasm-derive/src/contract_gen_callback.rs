@@ -18,7 +18,7 @@ fn find_raw_callback(methods: &Vec<Method>) -> Option<Method> {
     methods.iter()
         .find(|m| {
             match m.metadata {
-                MethodMetadata::CallbackRaw() => true,
+                MethodMetadata::CallbackRaw => true,
                 _ => false
             }
         })
@@ -42,7 +42,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         methods.iter()
             .filter_map(|m| {
                 match m.metadata {
-                    MethodMetadata::Callback() => {
+                    MethodMetadata::Callback => {
                         let mut arg_index = -1i32;
                         let mut nr_returned_args = 0i32;
 

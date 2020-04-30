@@ -4,8 +4,8 @@ use super::contract_gen_method::*;
 use super::arg_def::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-    if let MethodMetadata::Public(pub_data) = &m.metadata {
-        if pub_data.payable {
+    if let MethodMetadata::Regular{ payable, .. } = &m.metadata {
+        if *payable {
             quote!{}
         } else {
             quote!{
