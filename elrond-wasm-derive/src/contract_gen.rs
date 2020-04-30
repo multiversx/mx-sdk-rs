@@ -35,7 +35,7 @@ impl Contract {
         self.methods.iter()
             .filter_map(|m| {
                 match m.metadata {
-                    MethodMetadata::Public(_) => {
+                    MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
                         Some(m.generate_sig())
                     },
                     _ => None
@@ -48,7 +48,9 @@ impl Contract {
         self.methods.iter()
         .filter_map(|m| {
             match m.metadata {
-                MethodMetadata::Public(_) | MethodMetadata::Private() | MethodMetadata::Callback() | MethodMetadata::CallbackRaw() => {
+                MethodMetadata::Regular{..} | 
+                MethodMetadata::Callback | 
+                MethodMetadata::CallbackRaw => {
                     let body = match m.body {
                         Some(ref mbody) => {
                             let msig = m.generate_sig();
@@ -72,7 +74,7 @@ impl Contract {
         self.methods.iter()
             .filter_map(|m| {
                 match m.metadata {
-                    MethodMetadata::Public(_) => {
+                    MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
                         Some(m.generate_call_method())
                     },
                     _ => None
@@ -85,7 +87,7 @@ impl Contract {
         self.methods.iter()
             .filter_map(|m| {
                 match m.metadata {
-                    MethodMetadata::Event(_) => {
+                    MethodMetadata::Event{ ident: _ } => {
                         let sig = m.generate_sig();
                         Some(quote! { #sig ; })
                     },
@@ -99,8 +101,8 @@ impl Contract {
         self.methods.iter()
             .filter_map(|m| {
                 match &m.metadata {
-                    MethodMetadata::Event(event_id_bytes) => {
-                        Some(generate_event_impl(&m, event_id_bytes.clone()))
+                    MethodMetadata::Event{ ident } => {
+                        Some(generate_event_impl(&m, ident.clone()))
                     },
                     _ => None
                 }
@@ -112,7 +114,7 @@ impl Contract {
         self.methods.iter()
             .filter_map(|m| {
                 match m.metadata {
-                    MethodMetadata::Public(_) => {
+                    MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
                         let fn_ident = &m.name;
                         let call_method_ident = generate_call_method_name(&fn_ident);
                         let endpoint = quote! { 
@@ -136,7 +138,7 @@ impl Contract {
             self.methods.iter()
                 .filter_map(|m| {
                     match m.metadata {
-                        MethodMetadata::Public(_) => {
+                        MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
                             let fn_ident = &m.name;
                             let fn_name_str = &fn_ident.to_string();
                             let call_method_ident = generate_call_method_name(&fn_ident);
