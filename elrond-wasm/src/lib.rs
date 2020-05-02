@@ -10,11 +10,19 @@ mod err;
 pub mod err_msg;
 pub mod call_data;
 pub mod serialization;
+pub mod ser_storage;
+mod bytes_ser;
+mod bytes_de;
+mod bytes_de_util;
+mod bytes_err;
 
 pub use address::*;
 pub use err::*;
 pub use call_data::*;
+pub use ser_storage::*;
 pub use serialization::*;
+pub use bytes_ser::to_bytes;
+pub use bytes_de_util::BytesVisitor;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -198,6 +206,7 @@ pub trait BigUintApi:
     Ord +
     PartialEq<i64> +
     PartialOrd<i64> +
+    serde::Serialize +
 {
     fn byte_length(&self) -> i32;
 
@@ -208,6 +217,8 @@ pub trait BigUintApi:
     fn to_bytes_be(&self) -> Vec<u8>;
 
     fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
+
+    fn from_bytes_be(bytes: &[u8]) -> Self;
 }
 
 // BigInt sign.
@@ -241,12 +252,15 @@ pub trait BigIntApi<BigUint>:
         Ord +
         PartialEq<i64> +
         PartialOrd<i64> +
+        serde::Serialize +
 {
     fn abs_uint(&self) -> BigUint;
 
     fn sign(&self) -> Sign;
 
     fn to_signed_bytes_be(&self) -> Vec<u8>;
+
+    fn from_signed_bytes_be(bytes: &[u8]) -> Self;
 }
 
 /// CallableContract is the means by which the debugger calls methods in the contract.

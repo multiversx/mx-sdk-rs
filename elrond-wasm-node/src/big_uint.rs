@@ -8,6 +8,8 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
+
+use elrond_wasm::BigUintApi;
 use elrond_wasm::err_msg;
 
 extern {
@@ -244,7 +246,27 @@ impl PartialOrd<i64> for ArwenBigUint {
     }
 }
 
-impl elrond_wasm::BigUintApi for ArwenBigUint {
+impl serde::Serialize for ArwenBigUint {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let bytes = self.to_bytes_be();
+        serializer.serialize_bytes(bytes.as_slice())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ArwenBigUint {
+    fn deserialize<D>(deserializer: D) -> Result<ArwenBigUint, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let bytes = deserializer.deserialize_bytes(elrond_wasm::BytesVisitor)?;
+        Ok(ArwenBigUint::from_bytes_be(bytes))
+    }
+}
+
+impl BigUintApi for ArwenBigUint {
     #[inline]
     fn byte_length(&self) -> i32 {
         unsafe { bigIntUnsignedByteLength(self.handle) }
@@ -285,6 +307,14 @@ impl elrond_wasm::BigUintApi for ArwenBigUint {
                 bigIntGetUnsignedBytes(self.handle, &mut vec[nr_bytes - byte_len]);
             }
             Some(vec)
+        }
+    }
+
+    fn from_bytes_be(bytes: &[u8]) -> Self {
+        unsafe {
+            let handle = bigIntNew(0);
+            bigIntSetUnsignedBytes(handle, bytes.as_ptr(), bytes.len() as i32);
+            ArwenBigUint{ handle: handle }
         }
     }
 }
