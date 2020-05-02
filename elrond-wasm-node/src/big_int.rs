@@ -8,6 +8,7 @@ use core::cmp::Ordering;
 
 use alloc::vec::Vec;
 
+use elrond_wasm::BigIntApi;
 use elrond_wasm::Sign;
 
 extern {
@@ -208,7 +209,27 @@ impl Neg for ArwenBigInt {
     }
 }
 
-impl elrond_wasm::BigIntApi<ArwenBigUint> for ArwenBigInt {
+impl serde::Serialize for ArwenBigInt {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let bytes = self.to_signed_bytes_be();
+        serializer.serialize_bytes(bytes.as_slice())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ArwenBigInt {
+    fn deserialize<D>(deserializer: D) -> Result<ArwenBigInt, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let bytes = deserializer.deserialize_bytes(elrond_wasm::BytesVisitor)?;
+        Ok(ArwenBigInt::from_signed_bytes_be(bytes))
+    }
+}
+
+impl BigIntApi<ArwenBigUint> for ArwenBigInt {
 
     fn abs_uint(&self) -> ArwenBigUint {
         unsafe {
@@ -237,6 +258,14 @@ impl elrond_wasm::BigIntApi<ArwenBigUint> for ArwenBigInt {
             let mut vec = vec![0u8; byte_len as usize];
             bigIntGetSignedBytes(self.handle, vec.as_mut_ptr());
             vec
+        }
+    }
+
+    fn from_signed_bytes_be(bytes: &[u8]) -> Self {
+        unsafe {
+            let handle = bigIntNew(0);
+            bigIntSetSignedBytes(handle, bytes.as_ptr(), bytes.len() as i32);
+            ArwenBigInt{ handle: handle }
         }
     }
 }

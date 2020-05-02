@@ -9,6 +9,7 @@ pub fn contract_imports() -> proc_macro2::TokenStream {
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
         use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
         use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
+        use serde;
     }
 }
 
@@ -34,6 +35,7 @@ pub fn big_int_where() -> proc_macro2::TokenStream {
             for<'b> BigUint: BitXorAssign<&'b BigUint>,
             for<'a> &'a BigUint: Shr<usize, Output=BigUint>,
             for<'a> &'a BigUint: Shl<usize, Output=BigUint>,
+            for<'de> BigUint: serde::Deserialize<'de>,
 
             BigInt: BigIntApi<BigUint> + 'static,
             for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,
@@ -46,6 +48,7 @@ pub fn big_int_where() -> proc_macro2::TokenStream {
             for<'b> BigInt: MulAssign<&'b BigInt>,
             for<'b> BigInt: DivAssign<&'b BigInt>,
             for<'b> BigInt: RemAssign<&'b BigInt>,
+            for<'de> BigInt: serde::Deserialize<'de>,
     }
 }
 

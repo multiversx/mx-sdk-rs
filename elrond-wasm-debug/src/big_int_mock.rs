@@ -140,6 +140,27 @@ impl PartialOrd<i64> for RustBigInt {
     }
 }
 
+impl serde::Serialize for RustBigInt {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let bytes = self.to_signed_bytes_be();
+        serializer.serialize_bytes(bytes.as_slice())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for RustBigInt {
+    fn deserialize<D>(deserializer: D) -> Result<RustBigInt, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let bytes = deserializer.deserialize_bytes(elrond_wasm::BytesVisitor)?;
+        use elrond_wasm::BigIntApi;
+        Ok(RustBigInt::from_signed_bytes_be(bytes))
+    }
+}
+
 impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
     
     fn abs_uint(&self) -> RustBigUint {
@@ -156,6 +177,11 @@ impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
 
     fn to_signed_bytes_be(&self) -> Vec<u8> {
         self.0.to_signed_bytes_be()
+    }
+
+    fn from_signed_bytes_be(bytes: &[u8]) -> Self {
+        let bi = BigInt::from_signed_bytes_be(bytes);
+        bi.into()
     }
 }
 
