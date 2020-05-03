@@ -1,7 +1,7 @@
 use serde::{ser, Serialize};
 
-use crate::bytes_err::{SDError, Result};
-pub use alloc::vec::Vec;
+use super::bytes_err::{SDError, Result};
+use alloc::vec::Vec;
 
 pub struct ErdSerializer {
     output: Vec<u8>,
@@ -484,45 +484,52 @@ impl<'a> ser::SerializeStructVariant for &'a mut ErdSerializer {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[test]
-fn test_struct() {
-    #[derive(Serialize)]
-    struct Test {
-        int: u16,
-        seq: Vec<u8>,
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_struct() {
+        #[derive(Serialize)]
+        struct Test {
+            int: u16,
+            seq: Vec<u8>,
+            another_byte: u8,
+        }
+
+        let test = Test {
+            int: 1,
+            seq: [5, 6].to_vec(),
+            another_byte: 7,
+        };
+        let expected: Vec<u8> = [0, 1, 0, 0, 0, 2, 5, 6, 7].to_vec();
+        assert_eq!(to_bytes(&test).unwrap(), expected);
     }
 
-    let test = Test {
-        int: 1,
-        seq: [5, 6].to_vec(),
-    };
-    let expected: Vec<u8> = [0, 1, 0, 0, 0, 2, 5, 6].to_vec();
-    assert_eq!(to_bytes(&test).unwrap(), expected);
+    // #[test]
+    // fn test_enum() {
+    //     #[derive(Serialize)]
+    //     enum E {
+    //         Unit,
+    //         Newtype(u32),
+    //         Tuple(u32, u32),
+    //         Struct { a: u32 },
+    //     }
+
+    //     let u = E::Unit;
+    //     let expected = r#""Unit""#;
+    //     assert_eq!(to_string(&u).unwrap(), expected);
+
+    //     let n = E::Newtype(1);
+    //     let expected = r#"{"Newtype":1}"#;
+    //     assert_eq!(to_string(&n).unwrap(), expected);
+
+    //     let t = E::Tuple(1, 2);
+    //     let expected = r#"{"Tuple":[1,2]}"#;
+    //     assert_eq!(to_string(&t).unwrap(), expected);
+
+    //     let s = E::Struct { a: 1 };
+    //     let expected = r#"{"Struct":{"a":1}}"#;
+    //     assert_eq!(to_string(&s).unwrap(), expected);
+    // }
 }
-
-// #[test]
-// fn test_enum() {
-//     #[derive(Serialize)]
-//     enum E {
-//         Unit,
-//         Newtype(u32),
-//         Tuple(u32, u32),
-//         Struct { a: u32 },
-//     }
-
-//     let u = E::Unit;
-//     let expected = r#""Unit""#;
-//     assert_eq!(to_string(&u).unwrap(), expected);
-
-//     let n = E::Newtype(1);
-//     let expected = r#"{"Newtype":1}"#;
-//     assert_eq!(to_string(&n).unwrap(), expected);
-
-//     let t = E::Tuple(1, 2);
-//     let expected = r#"{"Tuple":[1,2]}"#;
-//     assert_eq!(to_string(&t).unwrap(), expected);
-
-//     let s = E::Struct { a: 1 };
-//     let expected = r#"{"Struct":{"a":1}}"#;
-//     assert_eq!(to_string(&s).unwrap(), expected);
-// }

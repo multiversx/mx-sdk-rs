@@ -229,7 +229,7 @@ impl<'de> serde::Deserialize<'de> for RustBigUint {
     where
         D: serde::Deserializer<'de>,
     {
-        let bytes = deserializer.deserialize_bytes(elrond_wasm::BytesVisitor)?;
+        let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
         use elrond_wasm::BigUintApi;
         Ok(RustBigUint::from_bytes_be(bytes))
     }

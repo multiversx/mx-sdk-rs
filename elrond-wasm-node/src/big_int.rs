@@ -224,7 +224,7 @@ impl<'de> serde::Deserialize<'de> for ArwenBigInt {
     where
         D: serde::Deserializer<'de>,
     {
-        let bytes = deserializer.deserialize_bytes(elrond_wasm::BytesVisitor)?;
+        let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))
     }
 }
