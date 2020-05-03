@@ -14,6 +14,11 @@ pub enum SDError {
     UnsupportedOperation,
     NotImplemented,
     SequenceLengthRequired,
+
+    InputTooShort,
+    InputTooLong,
+    InvalidValue,
+
     /// A custom error message from Serde.
     Custom(String),
 }
@@ -24,6 +29,9 @@ impl fmt::Display for SDError {
             SDError::UnsupportedOperation => write!(fmt, "unsupported operation"),
             SDError::NotImplemented => write!(fmt, "not yet implemented"),
             SDError::SequenceLengthRequired => write!(fmt, "sequence length required"),
+            SDError::InputTooShort => write!(fmt, "input too short"),
+            SDError::InputTooLong => write!(fmt, "input too long"),
+            SDError::InvalidValue => write!(fmt, "invalid value"),
             SDError::Custom(ref s) => s.fmt(fmt),
         }
     }

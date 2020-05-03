@@ -9,20 +9,16 @@ mod address;
 mod err;
 pub mod err_msg;
 pub mod call_data;
+pub mod serializer;
 pub mod serialization;
 pub mod ser_storage;
-mod bytes_ser;
-mod bytes_de;
-mod bytes_de_util;
-mod bytes_err;
+pub mod serialize_util;
 
 pub use address::*;
 pub use err::*;
 pub use call_data::*;
 pub use ser_storage::*;
 pub use serialization::*;
-pub use bytes_ser::to_bytes;
-pub use bytes_de_util::BytesVisitor;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};

@@ -1,8 +1,8 @@
 use core::fmt;
 
-pub struct BytesVisitor;
+pub struct BorrowedBytesVisitor;
 
-impl<'a> serde::de::Visitor<'a> for BytesVisitor {
+impl<'a> serde::de::Visitor<'a> for BorrowedBytesVisitor {
     type Value = &'a [u8];
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {

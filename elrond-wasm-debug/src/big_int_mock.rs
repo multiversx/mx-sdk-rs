@@ -155,7 +155,7 @@ impl<'de> serde::Deserialize<'de> for RustBigInt {
     where
         D: serde::Deserializer<'de>,
     {
-        let bytes = deserializer.deserialize_bytes(elrond_wasm::BytesVisitor)?;
+        let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
         use elrond_wasm::BigIntApi;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
     }
