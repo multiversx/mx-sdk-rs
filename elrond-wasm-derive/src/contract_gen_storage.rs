@@ -115,7 +115,7 @@ pub fn generate_getter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
     let msig = m.generate_sig();
     let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
     match m.return_type.clone() {
-        syn::ReturnType::Default => panic!("setter should return some value"),
+        syn::ReturnType::Default => panic!("getter should return some value"),
         syn::ReturnType::Type(_, ty) => {
             let load_snippet = storage_load_snippet(&ty);
             quote! {
