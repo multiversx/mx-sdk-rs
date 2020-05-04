@@ -40,18 +40,18 @@ pub struct ArwenBigUint {
     pub handle: i32 // TODO: fix visibility
 }
 
-impl From<i64> for ArwenBigUint {
-    fn from(item: i64) -> Self {
+impl From<u64> for ArwenBigUint {
+    fn from(item: u64) -> Self {
         unsafe {
-            ArwenBigUint{ handle: bigIntNew(item) }
+            ArwenBigUint{ handle: bigIntNew(item as i64) }
         }
     }
 }
 
-impl From<i32> for ArwenBigUint {
-    fn from(item: i32) -> Self {
+impl From<u32> for ArwenBigUint {
+    fn from(item: u32) -> Self {
         unsafe {
-            ArwenBigUint{ handle: bigIntNew(item.into()) }
+            ArwenBigUint{ handle: bigIntNew(item as i64) }
         }
     }
 }
@@ -232,16 +232,16 @@ impl Ord for ArwenBigUint {
     }
 }
 
-impl PartialEq<i64> for ArwenBigUint {
+impl PartialEq<u64> for ArwenBigUint {
     #[inline]
-    fn eq(&self, other: &i64) -> bool {
+    fn eq(&self, other: &u64) -> bool {
         PartialEq::eq(self, &ArwenBigUint::from(*other))
     }
 }
 
-impl PartialOrd<i64> for ArwenBigUint {
+impl PartialOrd<u64> for ArwenBigUint {
     #[inline]
-    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
         PartialOrd::partial_cmp(self, &ArwenBigUint::from(*other))
     }
 }

@@ -19,15 +19,15 @@ impl RustBigUint {
     }
 }
 
-impl From<i64> for RustBigUint {
-    fn from(item: i64) -> Self {
-        RustBigUint(item.into())
+impl From<u64> for RustBigUint {
+    fn from(item: u64) -> Self {
+        RustBigUint((item as i64).into())
     }
 }
 
-impl From<i32> for RustBigUint {
-    fn from(item: i32) -> Self {
-        RustBigUint(item.into())
+impl From<u32> for RustBigUint {
+    fn from(item: u32) -> Self {
+        RustBigUint((item as i32).into())
     }
 }
 
@@ -200,17 +200,17 @@ impl Ord for RustBigUint {
     }
 }
 
-impl PartialEq<i64> for RustBigUint {
+impl PartialEq<u64> for RustBigUint {
     #[inline]
-    fn eq(&self, other: &i64) -> bool {
-        PartialEq::eq(&self.0, &BigInt::from(*other))
+    fn eq(&self, other: &u64) -> bool {
+        PartialEq::eq(&self.0, &BigInt::from(*other as i64))
     }
 }
 
-impl PartialOrd<i64> for RustBigUint {
+impl PartialOrd<u64> for RustBigUint {
     #[inline]
-    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        PartialOrd::partial_cmp(&self.0, &BigInt::from(*other))
+    fn partial_cmp(&self, other: &u64) -> Option<Ordering> {
+        PartialOrd::partial_cmp(&self.0, &BigInt::from(*other as i64))
     }
 }
 
