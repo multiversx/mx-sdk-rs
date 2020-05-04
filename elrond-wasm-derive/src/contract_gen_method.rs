@@ -20,11 +20,31 @@ pub enum Visibility {
 #[derive(Clone, Debug)]
 pub enum MethodMetadata {
     Regular{ visibility: Visibility, payable: bool },
-    Event{ ident: Vec<u8> },
+    Event{ identifier: Vec<u8> },
     Callback,
     CallbackRaw,
-    // StorageGetValue,
-    // StorageSetValue,
+    StorageGetter{ visibility: Visibility, identifier: String },
+    StorageSetter{ visibility: Visibility, identifier: String },
+}
+
+impl MethodMetadata {
+    pub fn is_public(&self) -> bool {
+        match self {
+            MethodMetadata::Regular{ visibility: Visibility::Public, ..} |
+            MethodMetadata::StorageGetter{ visibility: Visibility::Public, ..} |
+            MethodMetadata::StorageSetter{ visibility: Visibility::Public, ..} => true,
+            _ => false
+        }
+    }
+
+    pub fn has_implementation(&self) -> bool {
+        match self {
+            MethodMetadata::Regular{..} | 
+            MethodMetadata::Callback | 
+            MethodMetadata::CallbackRaw => true,
+            _ => false
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -39,9 +59,12 @@ pub struct Method {
 fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let payable = is_payable(m);
     let private = is_private(m);
+    let visibility = if private { Visibility::Private } else { Visibility::Public };
     let callback = is_callback_decl(m);
     let callback_raw = is_callback_raw_decl(m);
     let event_opt = EventAttribute::parse(m);
+    let storage_get_opt = StorageGetAttribute::parse(m);
+    let storage_set_opt = StorageSetAttribute::parse(m);
 
     if let Some(event_attr) = event_opt {
         if payable {
@@ -50,13 +73,19 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if private {
             panic!("Events cannot be marked private, they are private by definition.");
         }
-        if callback {
+        if callback || callback_raw {
             panic!("Events cannot be callbacks.");
         }
-        if let Some(_) = m.default {
-            panic!("Events cannot have provided implementations in the trait.");
+        if storage_get_opt.is_some() {
+            panic!("Events cannot be storage getters.");
         }
-        MethodMetadata::Event{ ident: event_attr.identifier }
+        if storage_set_opt.is_some() {
+            panic!("Events cannot be storage setters.");
+        }
+        if m.default.is_some() {
+            panic!("Events cannot have an implementations provided in the trait.");
+        }
+        MethodMetadata::Event{ identifier: event_attr.identifier }
     } else if callback || callback_raw {
         if payable {
             panic!("Callback methods cannot be marked payable.");
@@ -64,7 +93,13 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if private {
             panic!("Callbacks cannot be marked private, they are private by definition.");
         }
-        if m.default == None {
+        if storage_get_opt.is_some() {
+            panic!("Callbacks cannot be storage getters.");
+        }
+        if storage_set_opt.is_some() {
+            panic!("Callbacks cannot be storage setters.");
+        }
+        if m.default.is_none() {
             panic!("Callback methods need an implementation.");
         }
         if callback && callback_raw {
@@ -75,28 +110,40 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         } else {
             MethodMetadata::Callback
         }
-    } else if private {
+    } else if let Some(storage_get) = storage_get_opt {
         if payable {
-            panic!("Private methods cannot be marked payable.");
+            panic!("Storage getters cannot be marked payable.");
         }
-        if m.default == None {
-            panic!("Private methods need an implementation.");
+        if m.default.is_some() {
+            panic!("Storage getters cannot have an implementations provided in the trait.");
         }
-        MethodMetadata::Regular{
-            visibility: Visibility::Private,
-            payable: false,
+        MethodMetadata::StorageGetter{
+            visibility: visibility,
+            identifier: storage_get.identifier,
+        }
+    } else if let Some(storage_set) = storage_set_opt {
+        if payable {
+            panic!("Storage setters cannot be marked payable.");
+        }
+        if m.default.is_some() {
+            panic!("Storage setters cannot have an implementations provided in the trait.");
+        }
+        MethodMetadata::StorageSetter{
+            visibility: visibility,
+            identifier: storage_set.identifier,
         }
     } else {
-        if m.default == None {
-            panic!("Public methods need an implementation.");
+        if m.default.is_none() {
+            panic!("Regular methods need an implementation.");
         }
-        let fn_name_str = &m.sig.ident.to_string();
-        if reserved::is_reserved(fn_name_str) {
-            panic!("Cannot declare public method with name '{}', because that name is reserved by the Arwen API.", fn_name_str);
+        if !private {
+            let fn_name_str = &m.sig.ident.to_string();
+            if reserved::is_reserved(fn_name_str) {
+                panic!("Cannot declare public method with name '{}', because that name is reserved by the Arwen API.", fn_name_str);
+            }
         }
-
         MethodMetadata::Regular{
-            visibility: Visibility::Public,
+            visibility: visibility,
             payable: payable,
         }
     }

@@ -16,8 +16,8 @@ pub fn process_contract(
     let method_impls = contract.extract_method_impls();
 
     let call_methods = contract.generate_call_methods();
-    let event_defs = contract.generate_event_defs();
-    let event_impls = contract.generate_event_impls();
+    let auto_impl_defs = contract.generate_auto_impl_defs();
+    let auto_impls = contract.generate_auto_impls();
     let endpoints = contract.generate_endpoints();
     let function_selector_body = contract.generate_function_selector_body();
     let callback_body = contract.generate_callback_body();
@@ -39,7 +39,7 @@ pub fn process_contract(
       {
         #(#method_impls)*
 
-        #(#event_defs)*
+        #(#auto_impl_defs)*
 
         fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
 
@@ -80,7 +80,7 @@ pub fn process_contract(
       impl <T, BigInt, BigUint> #trait_name_ident<T, BigInt, BigUint> for #contract_impl_ident<T, BigInt, BigUint> 
       #api_where
       {
-        #(#event_impls)*
+        #(#auto_impls)*
 
         fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
           let contract_proxy = OtherContractHandle {

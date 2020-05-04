@@ -1,5 +1,6 @@
 
 use super::contract_gen_event::*;
+use super::contract_gen_storage::*;
 use super::contract_gen_method::*;
 use super::contract_gen_callback::*;
 use super::util::*;
@@ -34,11 +35,10 @@ impl Contract {
     pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                match m.metadata {
-                    MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
-                        Some(m.generate_sig())
-                    },
-                    _ => None
+                if m.metadata.is_public() {
+                    Some(m.generate_sig())
+                } else {
+                    None
                 }
             })
             .collect()
@@ -47,24 +47,21 @@ impl Contract {
     pub fn extract_method_impls(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
         .filter_map(|m| {
-            match m.metadata {
-                MethodMetadata::Regular{..} | 
-                MethodMetadata::Callback | 
-                MethodMetadata::CallbackRaw => {
-                    let body = match m.body {
-                        Some(ref mbody) => {
-                            let msig = m.generate_sig();
-                            quote! { 
-                                #msig { 
-                                    #mbody 
-                                } 
-                            }
+            if m.metadata.has_implementation() {
+                let body = match m.body {
+                    Some(ref mbody) => {
+                        let msig = m.generate_sig();
+                        quote! { 
+                            #msig { 
+                                #mbody 
+                            } 
                         }
-                        None => quote! {},
-                    };
-                    Some(body)
-                },
-                _ => None
+                    }
+                    None => quote! {},
+                };
+                Some(body)
+            } else {
+                None
             }
         })
         .collect()
@@ -73,21 +70,23 @@ impl Contract {
     pub fn generate_call_methods(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                match m.metadata {
-                    MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
-                        Some(m.generate_call_method())
-                    },
-                    _ => None
+                if m.metadata.is_public() {
+                    Some(m.generate_call_method())
+                } else {
+                    None
                 }
             })
             .collect()
     }
 
-    pub fn generate_event_defs(&self) -> Vec<proc_macro2::TokenStream> {
+    /// Definitions for methods that get auto-generated implementations: events, getters, setters
+    pub fn generate_auto_impl_defs(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
                 match m.metadata {
-                    MethodMetadata::Event{ ident: _ } => {
+                    MethodMetadata::Event{ .. } |
+                    MethodMetadata::StorageGetter{ .. } |
+                    MethodMetadata::StorageSetter{ .. } => {
                         let sig = m.generate_sig();
                         Some(quote! { #sig ; })
                     },
@@ -97,12 +96,29 @@ impl Contract {
             .collect()
     }
 
-    pub fn generate_event_impls(&self) -> Vec<proc_macro2::TokenStream> {
+    /// Implementations for methods that get auto-generated implementations: events, getters, setters
+    pub fn generate_auto_impls(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
                 match &m.metadata {
-                    MethodMetadata::Event{ ident } => {
-                        Some(generate_event_impl(&m, ident.clone()))
+                    MethodMetadata::Event{ identifier } => 
+                        Some(generate_event_impl(&m, identifier.clone())),
+                    MethodMetadata::StorageGetter{ visibility: _, identifier } =>
+                        Some(generate_getter_impl(&m, identifier.clone())),
+                    MethodMetadata::StorageSetter{ visibility: _, identifier } =>
+                        Some(generate_setter_impl(&m, identifier.clone())),
+                    _ => None
+                }
+            })
+            .collect()
+    }
+
+    pub fn generate_storage_impls(&self) -> Vec<proc_macro2::TokenStream> {
+        self.methods.iter()
+            .filter_map(|m| {
+                match &m.metadata {
+                    MethodMetadata::Event{ identifier } => {
+                        Some(generate_event_impl(&m, identifier.clone()))
                     },
                     _ => None
                 }
@@ -113,9 +129,8 @@ impl Contract {
     pub fn generate_endpoints(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                match m.metadata {
-                    MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
-                        let fn_ident = &m.name;
+                if m.metadata.is_public() {
+                    let fn_ident = &m.name;
                         let call_method_ident = generate_call_method_name(&fn_ident);
                         let endpoint = quote! { 
                             #[no_mangle]
@@ -126,8 +141,8 @@ impl Contract {
                             }
                         }  ;  
                         Some(endpoint)
-                    },
-                    _ => None
+                } else {
+                    None
                 }
             })
             .collect()
@@ -137,20 +152,19 @@ impl Contract {
         let match_arms: Vec<proc_macro2::TokenStream> = 
             self.methods.iter()
                 .filter_map(|m| {
-                    match m.metadata {
-                        MethodMetadata::Regular{ visibility: Visibility::Public, ..} => {
-                            let fn_ident = &m.name;
-                            let fn_name_str = &fn_ident.to_string();
-                            let call_method_ident = generate_call_method_name(&fn_ident);
-                            let match_arm = quote! {                     
-                                #fn_name_str =>
-                                {
-                                    self.#call_method_ident();
-                                },
-                            };
-                            Some(match_arm)
-                        },
-                        _ => None
+                    if m.metadata.is_public() {
+                        let fn_ident = &m.name;
+                        let fn_name_str = &fn_ident.to_string();
+                        let call_method_ident = generate_call_method_name(&fn_ident);
+                        let match_arm = quote! {                     
+                            #fn_name_str =>
+                            {
+                                self.#call_method_ident();
+                            },
+                        };
+                        Some(match_arm)
+                    } else {
+                        None
                     }
                 })
                 .collect();
