@@ -4,17 +4,22 @@ use super::parse_attr::*;
 
 pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, allow_callback_args: bool) -> Vec<MethodArg> {
     let mut arg_index: isize = -1; // ignore the first argument, which is &self
+    let mut receiver_processed = false;
     m.sig.inputs
         .iter()
         .filter_map(|arg| {
             let arg_opt = match arg {
                 syn::FnArg::Receiver(ref selfref) => {
-                    if selfref.mutability.is_some() || arg_index != -1 {
+                    if selfref.mutability.is_some() || receiver_processed {
                         panic!("Trait method must have `&self` as its first argument.");
                     }
+                    receiver_processed = true;
                     None
                 },
                 syn::FnArg::Typed(pat_typed) => {
+                    if !receiver_processed {
+                        panic!("Trait method must have `&self` as its first argument.");
+                    }
                     let pat = &*pat_typed.pat;
                     let ty = &*pat_typed.ty;
 
