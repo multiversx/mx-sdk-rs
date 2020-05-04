@@ -171,8 +171,8 @@ pub trait ContractIOApi<BigInt, BigUint> {
 /// most of the functionality if provided for unsigned integers.
 pub trait BigUintApi: 
     Sized +
-    From<i64> +
-    From<i32> +
+    From<u64> +
+    From<u32> +
     Clone +
     Add<Output=Self> + 
     AddAssign + 
@@ -198,8 +198,8 @@ pub trait BigUintApi:
     Eq +
     PartialOrd<Self> +
     Ord +
-    PartialEq<i64> +
-    PartialOrd<i64> +
+    PartialEq<u64> +
+    PartialOrd<u64> +
     serde::Serialize +
 {
     fn byte_length(&self) -> i32;
