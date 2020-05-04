@@ -9,6 +9,7 @@ use alloc::vec::Vec;
 use num_bigint::BigInt;
 use core::cmp::Ordering;
 
+#[derive(Debug)]
 pub struct RustBigInt(pub num_bigint::BigInt);
 
 impl RustBigInt {
