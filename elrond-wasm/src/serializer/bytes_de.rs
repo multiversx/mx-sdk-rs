@@ -125,11 +125,24 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
     where
         V: serde::de::Visitor<'de>,
     {
-        let value = self.next_byte()?;
-        match value {
-            1 => visitor.visit_bool(true),
-            0 => visitor.visit_bool(false),
-            _ => Err(SDError::InvalidValue)
+        if self.top_level {
+            // top level bool is either [1] or []
+            if self.input.len() > 0 {
+                match self.next_byte()? {
+                    1 => visitor.visit_bool(true),
+                    _ => Err(SDError::InvalidValue)
+                }
+            } else {
+                visitor.visit_bool(false)
+            }
+        } else {
+            // regular bool is either [1] or [0]
+            let value = self.next_byte()?;
+            match value {
+                1 => visitor.visit_bool(true),
+                0 => visitor.visit_bool(false),
+                _ => Err(SDError::InvalidValue)
+            }
         }
     }
 
