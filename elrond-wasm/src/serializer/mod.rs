@@ -66,7 +66,6 @@ pub mod tests {
 
     #[test]
     fn test_top_compacted_bool() {
-        // zero
         ser_deser_ok(true,    &[1]);
         ser_deser_ok(false,   &[]);
     }
@@ -109,6 +108,20 @@ pub mod tests {
             another_byte: 7,
         };
         the_same(test);
+    }
+
+    #[test]
+    fn test_wrapped_array() {
+        #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+        struct WrappedArray([u8; 5]);
+
+        let wa = WrappedArray([1, 2, 3, 4, 5]);
+        ser_deser_ok(wa, &[1, 2, 3, 4, 5]);
+
+        let mut v: Vec<WrappedArray> = Vec::new();
+        v.push(wa);
+        v.push(WrappedArray([6, 7, 8, 9, 0]));
+        ser_deser_ok(v, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
     }
 
 }
