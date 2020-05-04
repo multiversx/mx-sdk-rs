@@ -541,6 +541,14 @@ mod tests {
     }
 
     #[test]
+    fn test_top_compacted_bool() {
+        ser_ok(true,    &[1]);
+        ser_ok(false,   &[]);
+        ser_ok(&true,   &[1]);
+        ser_ok(&false,  &[]);
+    }
+
+    #[test]
     fn test_top_compacted_empty_bytes() {
         let empty_byte_slice: &[u8] = &[];
         ser_ok(empty_byte_slice, empty_byte_slice);
