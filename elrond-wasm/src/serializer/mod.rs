@@ -37,7 +37,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_top_numbers_compacted() {
+    fn test_top_compacted_numbers() {
         // zero
         ser_deser_ok(0u8,    &[]);
         ser_deser_ok(0u16,   &[]);
@@ -62,6 +62,13 @@ pub mod tests {
         ser_deser_ok(-5i32,   &[251]);
         ser_deser_ok(-5i64,   &[251]);
         ser_deser_ok(-5isize, &[251]);
+    }
+
+    #[test]
+    fn test_top_compacted_bool() {
+        // zero
+        ser_deser_ok(true,    &[1]);
+        ser_deser_ok(false,   &[]);
     }
 
     #[test]
