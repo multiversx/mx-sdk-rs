@@ -7,6 +7,8 @@ static ATTR_CALLBACK_RAW_DECL: &str = "callback_raw";
 static ATTR_CALLBACK_CALL: &str = "callback";
 static ATTR_CALLBACK_ARG: &str = "callback_arg";
 static ATTR_MULTI: &str = "multi";
+static ATTR_STORAGE_GET: &str = "storage_get";
+static ATTR_STORAGE_SET: &str = "storage_set";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 	attrs.iter().any(|attr| {
@@ -41,56 +43,100 @@ pub fn is_callback_arg(pat: &syn::PatType) -> bool {
     has_attribute(&pat.attrs, ATTR_CALLBACK_ARG)
 }
 
+fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option<String> {
+    let event_attr = m.attrs.iter().find(|attr| {
+        if let Some(first_seg) = attr.path.segments.first() {
+            first_seg.ident == attr_name
+        } else {
+            false
+        }
+    });
+    match event_attr {        
+        None => None,
+        Some(attr) => {
+            let result_str: String;
+            let mut iter = attr.clone().tokens.into_iter();
+            match iter.next() {
+                Some(proc_macro2::TokenTree::Group(group)) => {
+                    if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
+                        panic!("event paranthesis expected");
+                    }
+                    let mut iter2 = group.stream().into_iter();
+                    match iter2.next() {
+                        Some(proc_macro2::TokenTree::Literal(lit)) => {
+                            let str_val = lit.to_string();
+                            if !str_val.starts_with("\"") || !str_val.ends_with("\"") {
+                                panic!("string literal expected as attribute argument");
+                            }
+                            let substr = &str_val[1..str_val.len()-1];
+                            result_str = substr.to_string();
+                        },
+                        _ => panic!("literal expected as event identifier")
+                    }
+                },
+                _ => panic!("missing event identifier")
+            }
+
+            if let Some(_) = iter.next() {
+                panic!("event too many tokens in event attribute");
+            }
+
+            Some(result_str)
+        }
+    }
+}
+
 pub struct EventAttribute {
     pub identifier: Vec<u8>
 }
 
 impl EventAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<EventAttribute> {
-        let event_attr = m.attrs.iter().find(|attr| {
-            if let Some(first_seg) = attr.path.segments.first() {
-                first_seg.ident == ATTR_EVENT
-            } else {
-                false
-            }
-        });
-        match event_attr {        
+        match find_attr_one_string_arg(m, ATTR_EVENT) {
             None => None,
-            Some(attr) => {
-                let result_str: String;
-                let mut iter = attr.clone().tokens.into_iter();
-                match iter.next() {
-                    Some(proc_macro2::TokenTree::Group(group)) => {
-                        if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-                            panic!("event paranthesis expected");
-                        }
-                        let mut iter2 = group.stream().into_iter();
-                        match iter2.next() {
-                            Some(proc_macro2::TokenTree::Literal(lit)) => {
-                                let str_val = lit.to_string();
-                                if !str_val.starts_with("\"0x") || !str_val.ends_with("\"") {
-                                    panic!("string literal expected in event id");
-                                }
-                                if str_val.len() != 64 + 4 {
-                                    panic!("event id should be 64 characters long");
-                                }
-                                let substr = &str_val[3..str_val.len()-1];
-                                result_str = substr.to_string();
-                            },
-                            _ => panic!("literal expected as event identifier")
-                        }
-                    },
-                    _ => panic!("missing event identifier")
+            Some(event_str) => {
+                if !event_str.starts_with("0x") {
+                    panic!("event id should start with '0x'");
                 }
-
-                if let Some(_) = iter.next() {
-                    panic!("event too many tokens in event attribute");
+                if event_str.len() != 64 + 2 {
+                    panic!("event id should be 64 characters long (32 bytes)");
                 }
-                
+                let substr = &event_str[2..];
+                let result_str = substr.to_string();
                 match hex::decode(result_str) {
                     Ok(v) => Some(EventAttribute{ identifier: v }),
                     Err(_) => panic!("could not parse event id"),
                 }
+            }
+        }
+    }
+}
+
+pub struct StorageGetAttribute {
+    pub identifier: String
+}
+
+impl StorageGetAttribute {
+    pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageGetAttribute> {
+        match find_attr_one_string_arg(m, ATTR_STORAGE_GET) {
+            None => None,
+            Some(arg_str) => {
+                Some(StorageGetAttribute{identifier: arg_str})
+            }
+        }
+    }
+}
+
+pub struct StorageSetAttribute {
+    pub identifier: String
+}
+
+impl StorageSetAttribute {
+    pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageSetAttribute> {
+        match find_attr_one_string_arg(m, ATTR_STORAGE_SET) {
+            None => None,
+            Some(arg_str) => {
+                Some(StorageSetAttribute{identifier: arg_str})
             }
         }
     }
