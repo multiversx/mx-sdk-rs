@@ -202,6 +202,10 @@ pub trait BigUintApi:
     PartialOrd<u64> +
     serde::Serialize +
 {
+    fn zero() -> Self {
+        0u64.into()
+    }
+
     fn byte_length(&self) -> i32;
 
     fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32;
@@ -248,6 +252,10 @@ pub trait BigIntApi<BigUint>:
         PartialOrd<i64> +
         serde::Serialize +
 {
+    fn zero() -> Self {
+        0i64.into()
+    }
+
     fn abs_uint(&self) -> BigUint;
 
     fn sign(&self) -> Sign;
