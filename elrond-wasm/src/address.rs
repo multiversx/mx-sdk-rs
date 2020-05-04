@@ -1,5 +1,8 @@
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+use serde::{Serialize, Deserialize};
+use core::fmt::Debug;
+
+#[derive(Hash, Eq, PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct H256([u8;32]);
 
 pub type Address = H256;
@@ -117,5 +120,17 @@ impl H256 {
     #[inline]
     pub fn copy_to_array(&self, target: &mut [u8; 32]) {
         target.copy_from_slice(&self.0[..]);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::serializer::tests::ser_deser_ok;
+
+    #[test]
+    fn test_address() {
+        let addr = Address::from([4u8; 32]);
+        ser_deser_ok(addr, &[4u8; 32]);
     }
 }
