@@ -8,13 +8,13 @@ pub use bytes_de::from_bytes;
 
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use core::fmt::Debug;
     use alloc::vec::Vec;
     use serde::{Serialize, Deserialize};
 
-    fn the_same<V>(element: V)
+    pub fn the_same<V>(element: V)
     where
         V: serde::Serialize + serde::de::DeserializeOwned + PartialEq + Debug + 'static,
     {
@@ -23,7 +23,7 @@ mod tests {
         assert_eq!(deserialized, element);
     }
 
-    fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
+    pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
     where
         V: serde::Serialize + serde::de::DeserializeOwned + PartialEq + Debug + 'static,
     {
