@@ -5,6 +5,7 @@ use alloc::vec::Vec;
 
 pub struct ErdSerializer {
     output: Vec<u8>,
+    top_level: bool,
 }
 
 // By convention, the public API of a Serde serializer is one or more `to_abc`
@@ -18,37 +19,49 @@ where
 {
     let mut serializer = ErdSerializer {
         output: Vec::new(),
+        top_level: true,
     };
     value.serialize(&mut serializer)?;
     Ok(serializer.output)
 }
 
 impl ErdSerializer {
-    fn push_u8(&mut self, value: u8) {
+    fn push_byte(&mut self, value: u8) {
         self.output.push(value);
     }
 
-    fn push_u16(&mut self, arg: u16) {
-        self.output.push((arg >>  8 & 0xff) as u8);
-        self.output.push((arg       & 0xff) as u8);
+    /// Adds number to output buffer.
+    /// No generics here, because we want the executable binary as small as possible.
+    fn push_number(&mut self, x: u64, size_in_bits: usize, signed: bool, mut compact: bool) {
+        let negative = 
+            compact && // only relevant when compact flag
+            signed &&  // only possible when signed flag
+            x >> (size_in_bits - 1) & 1 == 1; // compute by checking first bit
+        
+        let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
+        let mut bit_offset = size_in_bits as isize - 8;
+        while bit_offset >= 0 {
+            // going byte by byte from most to least significant
+            let byte = (x >> (bit_offset as usize) & 0xffu64) as u8;
+            
+            if compact {
+                // compact means ignoring irrelvant leading bytes
+                // that is 000... for positives and fff... for negatives
+                if byte != irrelevant_byte {
+                    self.output.push(byte);
+                    compact = false;
+                }
+            } else {
+                self.output.push(byte);
+            }
+            
+            bit_offset -= 8;
+        }
     }
 
-    fn push_u32(&mut self, arg: u32) {
-        self.output.push((arg >> 24 & 0xff) as u8);
-        self.output.push((arg >> 16 & 0xff) as u8);
-        self.output.push((arg >>  8 & 0xff) as u8);
-        self.output.push((arg       & 0xff) as u8);
-    }
-
-    fn push_u64(&mut self, arg: u64) {
-        self.output.push((arg >> 56 & 0xff) as u8);
-        self.output.push((arg >> 48 & 0xff) as u8);
-        self.output.push((arg >> 40 & 0xff) as u8);
-        self.output.push((arg >> 32 & 0xff) as u8);
-        self.output.push((arg >> 24 & 0xff) as u8);
-        self.output.push((arg >> 16 & 0xff) as u8);
-        self.output.push((arg >>  8 & 0xff) as u8);
-        self.output.push((arg       & 0xff) as u8);
+    #[inline]
+    fn push_entity_size(&mut self, size: u32) {
+        self.push_number(size as u64, 32, false, false);
     }
 }
 
@@ -80,49 +93,48 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     // of the primitive types of the data model and map it to JSON by appending
     // into the output string.
     fn serialize_bool(self, v: bool) -> Result<()> {
-        self.push_u8(if v { 1u8 } else { 0u8 });
+        let byte = if v { 1u8 } else { 0u8 };
+        self.push_number(byte as u64, 8, false, self.top_level);
         Ok(())
     }
 
     fn serialize_i8(self, v: i8) -> Result<()> {
-        self.push_u8(v as u8);
+        self.push_number(v as u64, 8, true, self.top_level);
         Ok(())
     }
 
     fn serialize_i16(self, v: i16) -> Result<()> {
-        self.push_u16(v as u16);
+        self.push_number(v as u64, 16, true, self.top_level);
         Ok(())
     }
 
     fn serialize_i32(self, v: i32) -> Result<()> {
-        self.push_u32(v as u32);
+        self.push_number(v as u64, 32, true, self.top_level);
         Ok(())
     }
 
-    // Not particularly efficient but this is example code anyway. A more
-    // performant approach would be to use the `itoa` crate.
     fn serialize_i64(self, v: i64) -> Result<()> {
-        self.push_u64(v as u64);
+        self.push_number(v as u64, 64, true, self.top_level);
         Ok(())
     }
 
     fn serialize_u8(self, v: u8) -> Result<()> {
-        self.push_u8(v as u8);
+        self.push_number(v as u64, 8, false, self.top_level);
         Ok(())
     }
 
     fn serialize_u16(self, v: u16) -> Result<()> {
-        self.push_u16(v);
+        self.push_number(v as u64, 16, false, self.top_level);
         Ok(())
     }
 
     fn serialize_u32(self, v: u32) -> Result<()> {
-        self.push_u32(v);
+        self.push_number(v as u64, 32, false, self.top_level);
         Ok(())
     }
 
     fn serialize_u64(self, v: u64) -> Result<()> {
-        self.push_u64(v);
+        self.push_number(v, 64, false, self.top_level);
         Ok(())
     }
 
@@ -151,14 +163,17 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     // string here. Binary formats will typically represent byte arrays more
     // compactly.
     fn serialize_bytes(self, v: &[u8]) -> Result<()> {
-        self.push_u32(v.len() as u32);
+        if !self.top_level {
+            // only save bytes length when bytes are embedded in another structure
+            // when they are the top level, the number of bytes is "encoded" in the length of the output
+            self.push_entity_size(v.len() as u32);
+        }
         self.output.extend_from_slice(v);
         Ok(())
     }
 
-    // An absent optional is represented as the JSON `null`.
     fn serialize_none(self) -> Result<()> {
-        self.push_u8(0u8); // one byte of 0 indicates that nothing comes after
+        self.push_byte(0u8); // one byte of 0 indicates that nothing comes after
         Ok(())
     }
 
@@ -166,12 +181,12 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     where
         T: ?Sized + Serialize,
     {
-        self.push_u8(1u8); // one byte of 0 indicates that something comes after
+        self.top_level = false;
+        self.push_byte(1u8); // one byte of 1 indicates that something comes after
         value.serialize(self)
     }
 
-    // In Serde, unit means an anonymous value containing no data. Map this to
-    // JSON as `null`.
+    // Nothing to save.
     fn serialize_unit(self) -> Result<()> {
         Ok(())
     }
@@ -193,7 +208,7 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
         variant_index: u32,
         _variant: &'static str,
     ) -> Result<()> {
-        self.push_u32(variant_index);
+        self.push_entity_size(variant_index);
         Ok(())
     }
 
@@ -225,7 +240,8 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     where
         T: ?Sized + Serialize,
     {
-        self.push_u32(variant_index);
+        self.top_level = false;
+        self.push_entity_size(variant_index);
         value.serialize(&mut *self)?;
         Ok(())
     }
@@ -243,7 +259,11 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
         match len {
             Some(l) => {
-                self.push_u32(l as u32);
+                if !self.top_level {
+                    // again, if it is top level, we can infer the size from the size of the serialized bytes
+                    self.push_entity_size(l as u32);
+                }
+                self.top_level = false;
                 Ok(self)
             }
             None => Err(SDError::SequenceLengthRequired)
@@ -255,6 +275,7 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     // means that the corresponding `Deserialize implementation will know the
     // length without needing to look at the serialized data.
     fn serialize_tuple(self, _len: usize) -> Result<Self::SerializeTuple> {
+        self.top_level = false;
         Ok(self)
     }
 
@@ -300,6 +321,7 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
         _name: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStruct> {
+        self.top_level = false;
         Ok(self)
     }
 
@@ -312,7 +334,7 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
         variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStructVariant> {
-        self.push_u32(variant_index);
+        self.push_entity_size(variant_index);
         variant.serialize(&mut *self)?;
         Ok(self)
     }
@@ -487,10 +509,64 @@ impl<'a> ser::SerializeStructVariant for &'a mut ErdSerializer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use core::fmt::Debug;
+
+    fn ser_ok<V>(element: V, bytes: &[u8])
+    where
+        V: Serialize + PartialEq + Debug + 'static,
+    {
+        assert_eq!(to_bytes(&element).unwrap().as_slice(), bytes);
+    }
+
+    #[test]
+    fn test_top_compacted_numbers() {
+        // unsigned positive
+        ser_ok(5u8, &[5]);
+        ser_ok(5u16, &[5]);
+        ser_ok(5u32, &[5]);
+        ser_ok(5u64, &[5]);
+        ser_ok(5usize, &[5]);
+        // signed positive
+        ser_ok(5i8, &[5]);
+        ser_ok(5i16, &[5]);
+        ser_ok(5i32, &[5]);
+        ser_ok(5i64, &[5]);
+        ser_ok(5isize, &[5]);
+        // signed negative
+        ser_ok(-5i8, &[251]);
+        ser_ok(-5i16, &[251]);
+        ser_ok(-5i32, &[251]);
+        ser_ok(-5i64, &[251]);
+        ser_ok(-5isize, &[251]);
+    }
+
+    #[test]
+    fn test_top_compacted_empty_bytes() {
+        let empty_byte_slice: &[u8] = &[];
+        ser_ok(empty_byte_slice, empty_byte_slice);
+    }
+
+    #[test]
+    fn test_top_compacted_bytes() {
+        ser_ok(&[1u8, 2u8, 3u8], &[1u8, 2u8, 3u8]);
+    }
+
+    #[test]
+    fn test_top_compacted_vec_u8() {
+        let some_vec = [1u8, 2u8, 3u8].to_vec();
+        ser_ok(some_vec, &[1u8, 2u8, 3u8]);
+    }
+
+    #[test]
+    fn test_top_compacted_vec_i32() {
+        let some_vec = [1i32, 2i32, 3i32].to_vec();
+        let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
+        ser_ok(some_vec, expected);
+    }
 
     #[test]
     fn test_struct() {
-        #[derive(Serialize)]
+        #[derive(Serialize, PartialEq, Debug)]
         struct Test {
             int: u16,
             seq: Vec<u8>,
@@ -502,8 +578,13 @@ mod tests {
             seq: [5, 6].to_vec(),
             another_byte: 7,
         };
-        let expected: Vec<u8> = [0, 1, 0, 0, 0, 2, 5, 6, 7].to_vec();
-        assert_eq!(to_bytes(&test).unwrap(), expected);
+
+        ser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
+    }
+
+    #[test]
+    fn test_tuple() {
+        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
     }
 
     // #[test]

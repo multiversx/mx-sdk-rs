@@ -42,8 +42,22 @@ where
     }
 }
 
-fn unsigned_bytes_to_number(bytes: &[u8]) -> u64 {
-    let mut result = 0u64;
+/// Handles both signed and unsigned of any length.
+/// No generics here, because we want the executable binary as small as possible.
+fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
+    if bytes.len() == 0 {
+        return 0;
+    }
+    let negative = signed && bytes[0] >> 7 == 1;
+    let mut result = 
+        if negative {
+            // start with all bits set to 1, 
+            // to ensure that if there are fewer bytes than the result type width,
+            // the leading bits will be 1 instead of 0
+            0xffffffffffffffffu64 
+        } else { 
+            0u64 
+        };
     for byte in bytes.iter() {
         result <<= 8;
         result |= *byte as u64;
@@ -80,7 +94,7 @@ impl<'de> ErdDeserializer<'de> {
 }
 
 macro_rules! impl_nums {
-    ($ty:ty, $deser_method:ident, $visitor_method:ident, $num_bytes:expr) => {
+    ($ty:ty, $deser_method:ident, $visitor_method:ident, $num_bytes:expr, $signed:expr) => {
         #[inline]
         fn $deser_method<V>(self, visitor: V) -> Result<V::Value>
             where V: serde::de::Visitor<'de>,
@@ -91,7 +105,7 @@ macro_rules! impl_nums {
                 self.next_bytes($num_bytes)?
             };
             
-            visitor.$visitor_method(unsigned_bytes_to_number(bytes) as $ty)
+            visitor.$visitor_method(bytes_to_number(bytes, $signed) as $ty)
         }
     }
 }
@@ -119,30 +133,16 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
         }
     }
 
-    impl_nums!(u16, deserialize_u16, visit_u16, 2);
-    impl_nums!(u32, deserialize_u32, visit_u32, 4);
-    impl_nums!(u64, deserialize_u64, visit_u64, 8);
-    impl_nums!(i16, deserialize_i16, visit_i16, 2);
-    impl_nums!(i32, deserialize_i32, visit_i32, 4);
-    impl_nums!(i64, deserialize_i64, visit_i64, 8);
+    impl_nums!(u8 , deserialize_u8 , visit_u8 , 1, false);
+    impl_nums!(u16, deserialize_u16, visit_u16, 2, false);
+    impl_nums!(u32, deserialize_u32, visit_u32, 4, false);
+    impl_nums!(u64, deserialize_u64, visit_u64, 8, false);
 
 
-    #[inline]
-    fn deserialize_u8<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: serde::de::Visitor<'de>,
-    {
-        let byte = self.next_byte()?;
-        visitor.visit_u8(byte)
-    }
-
-    fn deserialize_i8<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: serde::de::Visitor<'de>,
-    {
-        let byte = self.next_byte()?;
-        visitor.visit_i8(byte as i8)
-    }
+    impl_nums!(i8 , deserialize_i8 , visit_i8 , 1, true);
+    impl_nums!(i16, deserialize_i16, visit_i16, 2, true);
+    impl_nums!(i32, deserialize_i32, visit_i32, 4, true);
+    impl_nums!(i64, deserialize_i64, visit_i64, 8, true);
 
     #[inline]
     fn deserialize_f32<V>(self, _visitor: V) -> Result<V::Value>
@@ -196,7 +196,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
             self.flush()
         } else {
             let size_bytes = self.next_bytes(USIZE_SIZE)?;
-            let size = unsigned_bytes_to_number(size_bytes) as usize;
+            let size = bytes_to_number(size_bytes, false) as usize;
             self.next_bytes(size)?
         };
         visitor.visit_borrowed_bytes(bytes)
@@ -243,7 +243,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
         self.top_level = false;
         visitor.visit_seq(Access {
             deserializer: self,
-            remaining_items: len,
+            remaining_items_hint: Some(len),
         })
     }
 
@@ -264,9 +264,19 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
     where
         V: serde::de::Visitor<'de>,
     {
-        let size_bytes = self.next_bytes(USIZE_SIZE)?;
-        let size = unsigned_bytes_to_number(size_bytes) as usize;
-        self.deserialize_tuple(size, visitor)
+        let remaining_items_hint = if self.top_level {
+            None // we will know we ran out of items when the input runs out
+        } else {
+            let size_bytes = self.next_bytes(USIZE_SIZE)?;
+            let size = bytes_to_number(size_bytes, false) as usize;
+            Some(size)
+        };
+
+        self.top_level = false;
+        visitor.visit_seq(Access {
+            deserializer: self,
+            remaining_items_hint: remaining_items_hint,
+        })
     }
 
     fn deserialize_map<V>(self, _visitor: V) -> Result<V::Value>
@@ -366,7 +376,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
 
 struct Access<'a, 'de: 'a> {
     deserializer: &'a mut ErdDeserializer<'de>,
-    remaining_items: usize,
+    remaining_items_hint: Option<usize>,
 }
 
 impl<'a, 'de> serde::de::SeqAccess<'de> for Access<'a, 'de> {
@@ -376,17 +386,29 @@ impl<'a, 'de> serde::de::SeqAccess<'de> for Access<'a, 'de> {
     where
         T: serde::de::DeserializeSeed<'de>,
     {
-        if self.remaining_items > 0 {
-            self.remaining_items -= 1;
-            let value = seed.deserialize(&mut *self.deserializer)?;
-            Ok(Some(value))
-        } else {
-            Ok(None)
+        match self.remaining_items_hint {
+            Some(remaining_items) => {
+                if remaining_items > 0 {
+                    self.remaining_items_hint = Some(remaining_items - 1);
+                    let value = seed.deserialize(&mut *self.deserializer)?;
+                    Ok(Some(value))
+                } else {
+                    Ok(None)
+                }
+            },
+            None => {
+                match seed.deserialize(&mut *self.deserializer) {
+                    Ok(value) => Ok(Some(value)),
+                    Err(SDError::InputTooShort) => Ok(None),
+                    Err(other_err) => Err(other_err),
+                }
+            }
         }
+        
     }
 
     fn size_hint(&self) -> Option<usize> {
-        Some(self.remaining_items)
+        self.remaining_items_hint
     }
 }
 
@@ -407,8 +429,25 @@ mod tests {
     }
 
     #[test]
-    fn test_num() {
-        deser_ok(5u8, &[5u8]);
+    fn test_top_numbers_decompacted() {
+        // unsigned positive
+        deser_ok(5u8, &[5]);
+        deser_ok(5u16, &[5]);
+        deser_ok(5u32, &[5]);
+        deser_ok(5u64, &[5]);
+        deser_ok(5usize, &[5]);
+        // signed positive
+        deser_ok(5i8, &[5]);
+        deser_ok(5i16, &[5]);
+        deser_ok(5i32, &[5]);
+        deser_ok(5i64, &[5]);
+        deser_ok(5isize, &[5]);
+        // signed negative
+        deser_ok(-5i8, &[251]);
+        deser_ok(-5i16, &[251]);
+        deser_ok(-5i32, &[251]);
+        deser_ok(-5i64, &[251]);
+        deser_ok(-5isize, &[251]);
     }
 
     #[test]

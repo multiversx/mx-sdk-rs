@@ -23,26 +23,68 @@ mod tests {
         assert_eq!(deserialized, element);
     }
 
+    fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
+    where
+        V: serde::Serialize + serde::de::DeserializeOwned + PartialEq + Debug + 'static,
+    {
+        // serialize
+        let serialized_bytes = to_bytes(&element).unwrap();
+        assert_eq!(serialized_bytes.as_slice(), expected_bytes);
+
+        // deserialize
+        let deserialized: V = from_bytes(serialized_bytes.as_slice()).unwrap();
+        assert_eq!(deserialized, element);
+    }
+
     #[test]
-    fn test_numbers() {
+    fn test_top_numbers_compacted() {
+        // zero
+        ser_deser_ok(0u8,    &[]);
+        ser_deser_ok(0u16,   &[]);
+        ser_deser_ok(0u32,   &[]);
+        ser_deser_ok(0u64,   &[]);
+        ser_deser_ok(0usize, &[]);
         // unsigned positive
-        the_same(5u8);
-        the_same(5u16);
-        the_same(5u32);
-        the_same(5u64);
-        the_same(5usize);
+        ser_deser_ok(5u8,    &[5]);
+        ser_deser_ok(5u16,   &[5]);
+        ser_deser_ok(5u32,   &[5]);
+        ser_deser_ok(5u64,   &[5]);
+        ser_deser_ok(5usize, &[5]);
         // signed positive
-        the_same(5i8);
-        the_same(5i16);
-        the_same(5i32);
-        the_same(5i64);
-        the_same(5isize);
+        ser_deser_ok(5i8,    &[5]);
+        ser_deser_ok(5i16,   &[5]);
+        ser_deser_ok(5i32,   &[5]);
+        ser_deser_ok(5i64,   &[5]);
+        ser_deser_ok(5isize, &[5]);
         // signed negative
-        the_same(-5i8);
-        the_same(-5i16);
-        the_same(-5i32);
-        the_same(-5i64);
-        the_same(-5isize);
+        ser_deser_ok(-5i8,    &[251]);
+        ser_deser_ok(-5i16,   &[251]);
+        ser_deser_ok(-5i32,   &[251]);
+        ser_deser_ok(-5i64,   &[251]);
+        ser_deser_ok(-5isize, &[251]);
+    }
+
+    #[test]
+    fn test_top_bytes_compacted() {
+        ser_deser_ok(Vec::<u8>::new(), &[]);
+        ser_deser_ok([1u8, 2u8, 3u8].to_vec(), &[1u8, 2u8, 3u8]);
+    }
+
+    #[test]
+    fn test_vec_i32_compacted() {
+        let v = [1i32, 2i32, 3i32].to_vec();
+        let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
+        ser_deser_ok(v, expected);
+    }
+
+    #[test]
+    fn test_option_vec_i32() {
+        let some_v = Some([1i32, 2i32, 3i32].to_vec());
+        let expected: &[u8] = &[/*opt*/ 1, /*size*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
+        ser_deser_ok(some_v, expected);
+
+        let none_v: Option<Vec<i32>> = None;
+        ser_deser_ok(none_v, &[0]);
     }
 
     #[test]
