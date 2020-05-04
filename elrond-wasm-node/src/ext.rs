@@ -268,11 +268,10 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         unsafe { getNumArguments() }
     }
 
-    fn check_not_payable(&self) -> bool {
+    fn check_not_payable(&self) {
         if self.get_call_value_big_uint() > 0 {
             self.signal_error(err_msg::NON_PAYABLE);
         }
-        return true;
     }
 
     #[inline]

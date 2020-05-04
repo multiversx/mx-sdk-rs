@@ -4,18 +4,20 @@ use super::contract_gen_method::*;
 use super::arg_def::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-    if let MethodMetadata::Regular{ payable, .. } = &m.metadata {
-        if *payable {
-            quote!{}
-        } else {
-            quote!{
-                if !self.api.check_not_payable() {
-                    return;
-                }
+    let not_payable_snippet = quote!{
+        self.api.check_not_payable();
+    };
+    match &m.metadata {
+        MethodMetadata::Regular{ payable, .. } => {
+            if *payable {
+                quote!{}
+            } else {
+                not_payable_snippet
             }
-        }
-    } else {
-        quote!{}
+        },
+        MethodMetadata::StorageGetter{ .. } => not_payable_snippet,
+        MethodMetadata::StorageSetter{ .. } => not_payable_snippet,
+        _ => quote!{},
     }
 }
 

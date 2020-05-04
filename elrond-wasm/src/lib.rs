@@ -108,7 +108,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         return true;
     }
 
-    fn check_not_payable(&self) -> bool;
+    fn check_not_payable(&self);
 
     fn get_argument_len(&self, arg_index: i32) -> usize;
 

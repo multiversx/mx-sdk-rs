@@ -431,11 +431,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         nr_args as i32
     }
 
-    fn check_not_payable(&self) -> bool {
+    fn check_not_payable(&self) {
         if self.get_call_value_big_uint() > 0 {
             self.signal_error(err_msg::NON_PAYABLE);
         }
-        return true;
     }
 
     fn get_argument_len(&self, arg_index: i32) -> usize {
