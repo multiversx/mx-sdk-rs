@@ -1,8 +1,7 @@
 
-use serde::{Serialize, Deserialize};
 use core::fmt::Debug;
 
-#[derive(Hash, Eq, PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct H256([u8;32]);
 
 pub type Address = H256;
@@ -122,6 +121,53 @@ impl H256 {
         target.copy_from_slice(&self.0[..]);
     }
 }
+
+use serde::ser::{Serialize, Serializer, SerializeTuple};
+use serde::de::{Deserialize, Deserializer, Visitor, SeqAccess, Error};
+
+impl Serialize for H256 {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_tuple(32)?;
+        for i in 0..32 {
+            seq.serialize_element(&self.0[i])?;
+        }
+        seq.end()
+    }
+}
+
+struct H256Visitor;
+
+impl<'a> Visitor<'a> for H256Visitor {
+    type Value = H256;
+
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
+        formatter.write_str("H256")
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<H256, A::Error>
+        where A: SeqAccess<'a>
+    {
+        let mut arr = [0u8; 32];
+        for i in 0..32 {
+            arr[i] = seq.next_element()?
+                .ok_or_else(|| Error::invalid_length(i, &self))?;
+        }
+        Ok(H256(arr))
+    }
+}
+
+impl<'de> Deserialize<'de> for H256 {
+    fn deserialize<D>(deserializer: D) -> Result<H256, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_tuple(32, H256Visitor)
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
