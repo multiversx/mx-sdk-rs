@@ -18,7 +18,7 @@ const RESERVED: &'static [&'static str] = &[
     "getFunction",
     "getNumArguments",
     "getArgumentLength",
-    "storageGetValueLength",
+    "storageLoadLength",
     "storageStore",
     "storageLoad",
     "getCaller",
