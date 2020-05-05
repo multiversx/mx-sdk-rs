@@ -10,13 +10,15 @@ fn storage_store_snippet_for_type(type_path_segment: &syn::PathSegment, value_ex
             quote!{
                 self.api.storage_store_big_uint(key, #value_expr);
             },
-        _ =>
+        type_name =>
             quote!{
                 match elrond_wasm::serializer::to_bytes(#value_expr) {
                     Ok(bytes) => {
                         self.api.storage_store(key, &bytes);
                     },
-                    Err(_) => self.api.signal_error("serialization error")
+                    Err(sd_err) => {
+                        self.api.signal_sd_error("storage serialization error", #type_name, sd_err);
+                    }
                 }
             }
     }
@@ -54,16 +56,15 @@ fn storage_load_snippet_for_type(type_path_segment: &syn::PathSegment) -> proc_m
             quote!{
                 self.api.storage_load_big_uint(key)
             },
-        _ =>
+        type_name => {
             quote!{
                 let value_bytes = self.api.storage_load(key);
                 match elrond_wasm::serializer::from_bytes(value_bytes.as_slice()) {
-                    Ok(v) => {
-                        v
-                    },
-                    Err(_) => self.api.signal_error("deserialization error")
+                    Ok(v) => v,
+                    Err(sd_err) => self.api.signal_sd_error("storage deserialization error", #type_name, sd_err)
                 }
             }
+        }
     }
 }
 
@@ -104,7 +105,7 @@ fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macr
         quote! {
             let key_bytes = match elrond_wasm::serializer::to_bytes(&(&#id_literal, #(#arg_pats),* )) {
                 Ok(bytes) => bytes,
-                Err(_) => self.api.signal_error("key serialization error")
+                Err(sd_err) => self.api.signal_sd_error("storage serialization error", "key", sd_err)
             };
             let key = key_bytes.as_slice();
         }
