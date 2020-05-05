@@ -19,7 +19,7 @@ impl<'de> ErdDeserializer<'de> {
     // That way basic use cases are satisfied by something like
     // `serde_json::from_str(...)` while advanced use cases that require a
     // deserializer can make one with `serde_json::Deserializer::from_str(...)`.
-    fn from_bytes(input: &'de [u8]) -> Self {
+    fn new(input: &'de [u8]) -> Self {
         ErdDeserializer { input, top_level: true }
     }
 }
@@ -33,7 +33,7 @@ pub fn from_bytes<'a, T>(bytes: &'a [u8]) -> Result<T>
 where
     T: Deserialize<'a>,
 {
-    let mut deserializer = ErdDeserializer::from_bytes(bytes);
+    let mut deserializer = ErdDeserializer::new(bytes);
     let t = T::deserialize(&mut deserializer)?;
     if deserializer.input.is_empty() {
         Ok(t)

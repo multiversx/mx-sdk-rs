@@ -45,6 +45,6 @@ mod serialization_tests {
 
     #[test]
     fn test_big_uint_serialization() {
-        ser_deser_ok(RustBigUint::from(5), &[5u8]);
+        ser_deser_ok(RustBigUint::from(5u32), &[5u8]);
     }
 }
