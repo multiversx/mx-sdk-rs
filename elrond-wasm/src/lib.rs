@@ -154,7 +154,17 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     #[inline]
     fn signal_error(&self, message: &str) -> ! {
-        self.signal_error_raw(message.as_ptr(), message.len());
+        self.signal_error_raw(message.as_ptr(), message.len())
+    }
+
+    fn signal_sd_error(&self, ser_type: &str, type_name: &str, e: serializer::SDError) -> ! {
+        let mut message: Vec<u8> = Vec::new();
+        message.extend_from_slice(ser_type.as_bytes());
+        message.extend_from_slice(b" (");
+        message.extend_from_slice(type_name.as_bytes());
+        message.extend_from_slice(b"): ");
+        message.extend_from_slice(e.err_msg_bytes());
+        self.signal_error_raw(message.as_ptr(), message.len())
     }
 
     fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) -> !;

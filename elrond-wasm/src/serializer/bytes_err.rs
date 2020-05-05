@@ -1,7 +1,8 @@
-use alloc::string::String;
+
+use alloc::vec::Vec;
+use core::fmt::Write;
 
 use core::fmt;
-use alloc::string::ToString;
 
 use serde;
 
@@ -20,31 +21,72 @@ pub enum SDError {
     InvalidValue,
 
     /// A custom error message from Serde.
-    Custom(String),
+    Custom(ErrorBuffer),
 }
 
 impl fmt::Display for SDError {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "sd error")
+    }
+}
+
+impl SDError {
+    pub fn err_msg_bytes(&self) -> &[u8] {
         match *self {
-            SDError::UnsupportedOperation => write!(fmt, "unsupported operation"),
-            SDError::NotImplemented => write!(fmt, "not yet implemented"),
-            SDError::SequenceLengthRequired => write!(fmt, "sequence length required"),
-            SDError::InputTooShort => write!(fmt, "input too short"),
-            SDError::InputTooLong => write!(fmt, "input too long"),
-            SDError::InvalidValue => write!(fmt, "invalid value"),
-            SDError::Custom(ref s) => s.fmt(fmt),
+            SDError::UnsupportedOperation => b"unsupported operation",
+            SDError::NotImplemented => b"not yet implemented",
+            SDError::SequenceLengthRequired => b"sequence length required",
+            SDError::InputTooShort => b"input too short",
+            SDError::InputTooLong => b"input too long",
+            SDError::InvalidValue => b"invalid value",
+            SDError::Custom(ref ebuf) => ebuf.err_msg_slice(),
         }
     }
 }
 
 impl serde::de::Error for SDError {
-    fn custom<T: fmt::Display>(desc: T) -> SDError {
-        SDError::Custom(desc.to_string())
+    fn custom<T: fmt::Display>(msg: T) -> SDError {
+        SDError::Custom(ErrorBuffer::from_display(msg))
     }
 }
 
 impl serde::ser::Error for SDError {
     fn custom<T: fmt::Display>(msg: T) -> Self {
-        SDError::Custom(msg.to_string())
+        SDError::Custom(ErrorBuffer::from_display(msg))
+    }
+}
+
+#[derive(Debug)]
+pub struct ErrorBuffer {
+    output: Vec<u8>,
+}
+
+/// Relays custom error messages as byte array.
+impl ErrorBuffer {
+    pub fn new() -> Self {
+        ErrorBuffer {
+            output: Vec::new(),
+        }
+    }
+
+    fn from_display<T: fmt::Display>(msg: T) -> Self {
+        let mut ebuf = ErrorBuffer::new();
+        match ebuf.write_fmt(format_args!("{}", msg)) {
+            Err(_) => ebuf.output.extend_from_slice(b"fmt err"),
+            _ => {},
+        }
+        ebuf
+    }
+
+    #[inline]
+    pub fn err_msg_slice(&self) -> &[u8] {
+        self.output.as_slice()
+    }
+}
+
+impl fmt::Write for ErrorBuffer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.output.extend_from_slice(s.as_bytes());
+        Ok(())
     }
 }

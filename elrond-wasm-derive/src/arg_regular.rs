@@ -61,9 +61,16 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
             quote!{
                 self.api.get_argument_i64(#arg_index_expr) != 0
             },
-        other_stype_str => {
-            panic!("Unsupported argument type {:?} for arg init snippet", other_stype_str)
-        }
+        type_name =>
+            quote!{
+                {
+                    let arg_bytes = self.api.get_argument_vec(#arg_index_expr);
+                    match elrond_wasm::serializer::from_bytes(arg_bytes.as_slice()) {
+                        Ok(v) => v,
+                        Err(sd_err) => self.api.signal_sd_error("argument deserialization error", #type_name, sd_err)
+                    }
+                }
+            },
     }
 }
 

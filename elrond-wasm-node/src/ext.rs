@@ -200,7 +200,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     fn send_tx(&self, to: &Address, amount: &ArwenBigUint, message: &str) {
-        let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap();
+        let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
         unsafe {
             transferValue(
                 to.as_ref().as_ptr(),
@@ -212,7 +212,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
-        let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap();
+        let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
         unsafe {
             asyncCall(
                 to.as_ref().as_ptr(),

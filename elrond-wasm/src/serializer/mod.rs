@@ -5,7 +5,7 @@ mod bytes_err;
 
 pub use bytes_ser::to_bytes;
 pub use bytes_de::from_bytes;
-
+pub use bytes_err::SDError;
 
 #[cfg(test)]
 pub mod tests {

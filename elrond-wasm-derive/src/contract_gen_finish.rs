@@ -148,8 +148,17 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
                 }
             }
         },
-        other_stype_str => {
-            panic!("Unsupported return type: {:?}", other_stype_str)
+        type_name => {
+            quote!{
+                match elrond_wasm::serializer::to_bytes(&#result_expr) {
+                    Ok(finish_bytes) => {
+                        self.api.finish_slice_u8(&finish_bytes.as_slice());
+                    },
+                    Err(sd_err) => {
+                        self.api.signal_sd_error("result serialization error", #type_name, sd_err);
+                    }
+                }
+            }
         }
     }
 }
@@ -163,12 +172,14 @@ pub fn generate_result_err_snippet(err_ident: &syn::Ident, _ty: &syn::Type) -> p
 
 pub fn generate_body_with_result(return_type: &syn::ReturnType, mbody: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     match return_type.clone() {
-        syn::ReturnType::Default => quote!{#mbody;},
+        syn::ReturnType::Default => quote!{
+            #mbody;
+        },
         syn::ReturnType::Type(_, ty) => {
             let result_ident = syn::Ident::new("result", proc_macro2::Span::call_site());
             let finish = generate_result_finish_snippet(&result_ident, &ty);
             quote!{
-                let #result_ident = { #mbody };
+                let #result_ident = #mbody;
                 #finish
             }
         },
