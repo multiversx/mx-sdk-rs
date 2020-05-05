@@ -39,12 +39,12 @@ impl fmt::Display for SDError {
 
 impl serde::de::Error for SDError {
     fn custom<T: fmt::Display>(desc: T) -> SDError {
-        SDError::Custom(desc.to_string()).into()
+        SDError::Custom(desc.to_string())
     }
 }
 
 impl serde::ser::Error for SDError {
     fn custom<T: fmt::Display>(msg: T) -> Self {
-        SDError::Custom(msg.to_string()).into()
+        SDError::Custom(msg.to_string())
     }
 }
