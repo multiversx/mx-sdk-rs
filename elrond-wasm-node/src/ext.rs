@@ -25,9 +25,9 @@ extern {
     fn getArgumentLength(id: i32) -> i32;
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
     fn getFunction(functionOffset: *const u8) -> i32;
-    fn storageStore(keyOffset: *const u8, dataOffset: *const u8, dataLength: i32) -> i32;
-    fn storageGetValueLength(keyOffset: *const u8) -> i32;
-    fn storageLoad(keyOffset: *const u8, dataOffset: *mut u8) -> i32;
+    fn storageStore(keyOffset: *const u8, keyLength: i32, dataOffset: *const u8, dataLength: i32) -> i32;
+    fn storageLoadLength(keyOffset: *const u8, keyLength: i32) -> i32;
+    fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
     fn transferValue(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
     fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
@@ -53,8 +53,8 @@ extern {
 
     fn bigIntNew(value: i64) -> i32;
 
-    fn bigIntStorageStoreUnsigned(key_ptr: *const u8, source: i32) -> i32;
-    fn bigIntStorageLoadUnsigned(key_ptr: *const u8, destination: i32) -> i32;
+    fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
+    fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
 
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
@@ -65,8 +65,8 @@ extern {
 
     fn int64getArgument(id: i32) -> i64;
     fn int64finish(value: i64);
-    fn int64storageStore(keyOffset: *const u8, value: i64) -> i32;
-    fn int64storageLoad(keyOffset: *const u8) -> i64;
+    fn int64storageStore(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
+    fn int64storageLoad(keyOffset: *const u8, keyLength: i32) -> i64;
     
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
@@ -102,8 +102,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     
     fn storage_store(&self, key: &[u8], value: &[u8]) {
         unsafe {
-            let key_hash = self.keccak256(key);
-            storageStore(key_hash.as_ref().as_ptr(), value.as_ptr(), value.len() as i32);
+            storageStore(key.as_ref().as_ptr(), key.len() as i32, value.as_ptr(), value.len() as i32);
         }
     }
 
@@ -111,8 +110,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
          unsafe {
             let value_len = self.storage_load_len(key);
             let mut res = Vec::with_capacity(value_len);
-            let key_hash = self.keccak256(key);
-            storageLoad(key_hash.as_ref().as_ptr(), res.as_mut_ptr());
+            storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             res.set_len(value_len);
             res
         }
@@ -121,24 +119,21 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn storage_load_len(&self, key: &[u8]) -> usize {
         unsafe { 
-            let key_hash = self.keccak256(key);
-            storageGetValueLength(key_hash.as_ref().as_ptr()) as usize 
+            storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize 
         }
     }
 
     #[inline]
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
         unsafe {
-            let key_hash = self.keccak256(key);
-            storageStore(key_hash.as_ref().as_ptr(), value.as_ptr(), 32);
+            storageStore(key.as_ref().as_ptr(), key.len() as i32, value.as_ptr(), 32);
         }
     }
     
     fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
         unsafe {
             let mut res = [0u8; 32];
-            let key_hash = self.keccak256(key);
-            let len = storageLoad(key_hash.as_ref().as_ptr(), res.as_mut_ptr());
+            let len = storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             if len != 32 {
                 let message = "32 bytes of data expected in storage at key";
                 error::signal_error(&message);
@@ -150,8 +145,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn storage_store_big_uint(&self, key: &[u8], value: &ArwenBigUint) {
         unsafe {
-            let key_hash = self.keccak256(key);
-            bigIntStorageStoreUnsigned(key_hash.as_ref().as_ptr(), value.handle);
+            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value.handle);
         }
     }
 
@@ -159,8 +153,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn storage_load_big_uint(&self, key: &[u8]) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
-            let key_hash = self.keccak256(key);
-            bigIntStorageLoadUnsigned(key_hash.as_ref().as_ptr(), result);
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, result);
             ArwenBigUint {handle: result}
         }
     }
@@ -169,8 +162,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn storage_store_big_int(&self, key: &[u8], value: &ArwenBigInt) {
         unsafe {
             // TODO: convert to 2's complement
-            let key_hash = self.keccak256(key);
-            bigIntStorageStoreUnsigned(key_hash.as_ref().as_ptr(), value.handle);
+            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value.handle);
         }
     }
 
@@ -179,8 +171,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         unsafe {
             let result = bigIntNew(0);
             // TODO: convert from 2's complement
-            let key_hash = self.keccak256(key);
-            bigIntStorageLoadUnsigned(key_hash.as_ref().as_ptr(), result);
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, result);
             ArwenBigInt {handle: result}
         }
     }
@@ -188,16 +179,14 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn storage_store_i64(&self, key: &[u8], value: i64) {
         unsafe {
-            let key_hash = self.keccak256(key);
-            int64storageStore(key_hash.as_ref().as_ptr(), value);
+            int64storageStore(key.as_ref().as_ptr(), key.len() as i32, value);
         }
     }
     
     #[inline]
     fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
         unsafe{
-            let key_hash = self.keccak256(key);
-            Some(int64storageLoad(key_hash.as_ref().as_ptr()))
+            Some(int64storageLoad(key.as_ref().as_ptr(), key.len() as i32))
         }
     }
 
