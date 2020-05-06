@@ -21,3 +21,4 @@ num-traits = "0.2"
 hex = "0.4.0"
 sha3 = "0.8.2"
 wee_alloc = "0.4"
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }

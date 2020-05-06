@@ -17,3 +17,4 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 elrond-wasm = "0.3.2"
 #elrond-wasm = { path = "../elrond-wasm" } #use during development
 wee_alloc = "0.4"
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
