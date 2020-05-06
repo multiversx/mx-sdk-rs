@@ -174,6 +174,7 @@ mod tests {
     use super::*;
     use alloc::vec::Vec;
     use crate::serializer::tests::ser_deser_ok;
+    use crate::serializer::to_bytes;
 
     #[test]
     fn test_address() {
@@ -188,5 +189,15 @@ mod tests {
         expected.push(1u8);
         expected.extend_from_slice(&[4u8; 32]);
         ser_deser_ok(Some(addr), expected.as_slice());
+    }
+
+    #[test]
+    fn test_ser_address_ref() {
+        let addr = Address::from([4u8; 32]);
+        let expected_bytes: &[u8] = &[4u8; 32*3];
+
+        let tuple = (&addr, &&&addr, addr.clone());
+        let serialized_bytes = to_bytes(&tuple).unwrap();
+        assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     }
 }
