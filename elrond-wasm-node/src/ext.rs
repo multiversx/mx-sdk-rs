@@ -67,7 +67,7 @@ extern {
     fn int64finish(value: i64);
     fn int64storageStore(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
     fn int64storageLoad(keyOffset: *const u8, keyLength: i32) -> i64;
-    
+
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 }
@@ -231,6 +231,26 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_gas_left(&self) -> i64 {
         unsafe { getGasLeft() }
+    }
+
+    #[inline]
+    fn get_block_timestamp(&self) -> u64 {
+        unsafe{ getBlockTimestamp() as u64 }
+    }
+
+    #[inline]
+    fn get_block_nonce(&self) -> u64 {
+        unsafe{ getBlockNonce() as u64 }
+    }
+
+    #[inline]
+    fn get_block_round(&self) -> u64 {
+        unsafe{ getBlockRound() as u64 }
+    }
+
+    #[inline]
+    fn get_block_epoch(&self) -> u64 {
+        unsafe{ getBlockEpoch() as u64 }
     }
 
     fn sha256(&self, data: &[u8]) -> [u8; 32] {
