@@ -73,6 +73,14 @@ pub trait ContractHookApi<BigInt, BigUint> {
 
     fn get_gas_left(&self) -> i64;
 
+    fn get_block_timestamp(&self) -> u64;
+
+    fn get_block_nonce(&self) -> u64;
+
+    fn get_block_round(&self) -> u64;
+    
+    fn get_block_epoch(&self) -> u64;
+
     fn sha256(&self, data: &[u8]) -> [u8; 32];
 
     fn keccak256(&self, data: &[u8]) -> [u8; 32];

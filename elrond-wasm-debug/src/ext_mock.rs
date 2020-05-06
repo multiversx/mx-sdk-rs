@@ -392,6 +392,22 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         0
     }
 
+    fn get_block_timestamp(&self) -> u64 {
+        0
+    }
+
+    fn get_block_nonce(&self) -> u64 {
+        0
+    }
+
+    fn get_block_round(&self) -> u64 {
+        0
+    }
+
+    fn get_block_epoch(&self) -> u64 {
+        0
+    }
+
     fn sha256(&self, data: &[u8]) -> [u8; 32] {
         let mut hasher = Sha3_256::new();
         hasher.input(data);
