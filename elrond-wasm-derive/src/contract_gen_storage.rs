@@ -6,9 +6,21 @@ use super::util::*;
 fn storage_store_snippet_for_type(type_path_segment: &syn::PathSegment, value_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
+        "Address" | "StorageKey" | "H256" =>
+            quote!{
+                self.api.storage_store(key, #value_expr.as_bytes());
+            },
         "BigUint" =>
             quote!{
                 self.api.storage_store_big_uint(key, #value_expr);
+            },
+        "i64" | "u64" | "i32" | "u32" | "isize" | "usize" | "i8" | "u8" =>
+            quote!{
+                self.api.storage_store_i64(key, * #value_expr as i64);
+            },
+        "bool" =>
+            quote!{
+                self.api.storage_store_i64(key, if *#value_expr { 1i64 } else { 0i64 });
             },
         type_name =>
             quote!{
@@ -50,11 +62,27 @@ fn storage_store_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
 }
 
 fn storage_load_snippet_for_type(type_path_segment: &syn::PathSegment) -> proc_macro2::TokenStream {
+    let type_ident = type_path_segment;
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
+        "Address" | "StorageKey" | "H256" =>
+            quote!{
+                #type_ident::from_slice(self.api.storage_load(key).as_slice())
+            },
         "BigUint" =>
             quote!{
                 self.api.storage_load_big_uint(key)
+            },
+        "i64" | "u64" | "i32" | "u32" | "isize" | "usize" | "i8" | "u8" =>
+            quote!{
+                match self.api.storage_load_i64(key) {
+                    Some(v) => v as #type_ident,
+                    None => self.api.signal_error("storage not i64")
+                }
+            },
+        "bool" =>
+            quote!{
+                self.api.storage_load_len(key) > 0
             },
         type_name => {
             quote!{
