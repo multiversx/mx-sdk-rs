@@ -52,9 +52,8 @@ impl Contract {
                     Some(ref mbody) => {
                         let msig = m.generate_sig();
                         quote! { 
-                            #msig { 
-                                #mbody 
-                            } 
+                            #msig
+                            #mbody
                         }
                     }
                     None => quote! {},
