@@ -122,7 +122,7 @@ impl Callable {
                     .collect();
 
             let amount_snippet = match payment_count {
-                0 => quote! { let amount = BigUint::from(0); },
+                0 => quote! { let amount = BigUint::zero(); },
                 1 => quote! {},
                 _ => panic!("Only one payment argument allowed in call proxy")
             };
