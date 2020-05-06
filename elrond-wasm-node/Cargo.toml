@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-node"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -14,7 +14,7 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [dependencies]
-elrond-wasm = "0.3.2"
+elrond-wasm = "0.4.0"
 #elrond-wasm = { path = "../elrond-wasm" } #use during development
 wee_alloc = "0.4"
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
