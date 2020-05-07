@@ -7,6 +7,7 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
+use elrond_wasm::serde as serde;
 
 use elrond_wasm::BigIntApi;
 use elrond_wasm::Sign;

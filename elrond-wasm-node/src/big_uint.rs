@@ -8,6 +8,7 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
+use elrond_wasm::serde as serde;
 
 use elrond_wasm::BigUintApi;
 use elrond_wasm::err_msg;
