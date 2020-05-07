@@ -5,6 +5,7 @@ pub fn contract_imports() -> proc_macro2::TokenStream {
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi};
         use elrond_wasm::err_msg;
+        use elrond_wasm::serde as serde;
         use elrond_wasm::serializer::{to_bytes, from_bytes};
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};

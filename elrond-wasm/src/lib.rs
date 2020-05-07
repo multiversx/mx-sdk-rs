@@ -1,9 +1,14 @@
 #![no_std]
 
+// re-export basic heap types
 extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 pub use alloc::string::String;
+
+// re-export serde so smart contracts don't have to explicitly add as dependency
+// serde must still be imported explicitly in order to use #[derive(Serialize, Deserialize)]
+pub use serde;
 
 mod address;
 mod err;
