@@ -155,8 +155,8 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     // This only works for strings that don't require escape sequences but you
     // get the idea. For example it would emit invalid JSON if the input string
     // contains a '"' character.
-    fn serialize_str(self, v: &str) -> Result<()> {
-        self.serialize_bytes(v.as_bytes())
+    fn serialize_str(self, _v: &str) -> Result<()> {
+        Err(SDError::NotImplemented)
     }
 
     // Serialize a byte array as an array of bytes. Could also use a base64
