@@ -6,6 +6,7 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use alloc::vec::Vec;
+use elrond_wasm::serde as serde;
 
 use num_bigint::BigInt;
 use core::cmp::Ordering;
