@@ -4,7 +4,9 @@ use crate::big_uint_mock::*;
 use num_traits::sign::Signed;
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+
 use alloc::vec::Vec;
+use elrond_wasm::serde as serde;
 
 use num_bigint::BigInt;
 use core::cmp::Ordering;
