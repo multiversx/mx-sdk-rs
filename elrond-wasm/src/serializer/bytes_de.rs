@@ -3,6 +3,7 @@
 
 use serde;
 use serde::Deserialize;
+use serde::de::IntoDeserializer;
 use super::bytes_err::{SDError, Result};
 
 const USIZE_SIZE: usize = 4; // wasm32
@@ -226,27 +227,13 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
         self,
         _enum: &'static str,
         _variants: &'static [&'static str],
-        _visitor: V,
+        visitor: V,
     ) -> Result<V::Value>
     where
         V: serde::de::Visitor<'de>,
     {
-        // impl<'de, 'a, R: 'a, O> serde::de::EnumAccess<'de> for &'a mut Deserializer<R, O>
-        // where R: BincodeRead<'de>, O: Options {
-        //     type Error = Error;
-        //     type Variant = Self;
 
-        //     fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant)>
-        //         where V: serde::de::DeserializeSeed<'de>,
-        //     {
-        //         let idx: u32 = try!(serde::de::Deserialize::deserialize(&mut *self));
-        //         let val: Result<_> = seed.deserialize(idx.into_deserializer());
-        //         Ok((try!(val), self))
-        //     }
-        // }
-
-        // visitor.visit_enum(self)
-        Err(SDError::NotImplemented)
+        visitor.visit_enum(self)
     }
 
     fn deserialize_tuple<V>(self, len: usize, visitor: V) -> Result<V::Value>
@@ -356,36 +343,49 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
     }
 }
 
-// impl<'de, 'a, R, O> serde::de::VariantAccess<'de> for &'a mut Deserializer<R, O>
-// where R: BincodeRead<'de>, O: Options{
-//     type Error = Error;
+impl<'de, 'a> serde::de::EnumAccess<'de> for &'a mut ErdDeserializer<'de> {
+    type Error = SDError;
+    type Variant = Self;
 
-//     fn unit_variant(self) -> Result<()> {
-//         Ok(())
-//     }
+    fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant)>
+        where V: serde::de::DeserializeSeed<'de>,
+    {
+        self.top_level = false;
+        let idx: u32 = serde::de::Deserialize::deserialize(&mut *self)?;
+        let val: V::Value = seed.deserialize(idx.into_deserializer())?;
+        Ok((val, self))
+    }
+}
 
-//     fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value>
-//         where T: serde::de::DeserializeSeed<'de>,
-//     {
-//         serde::de::DeserializeSeed::deserialize(seed, self)
-//     }
+impl<'de, 'a> serde::de::VariantAccess<'de> for &'a mut ErdDeserializer<'de> {
+    type Error = SDError;
 
-//     fn tuple_variant<V>(self,
-//                       len: usize,
-//                       visitor: V) -> Result<V::Value>
-//         where V: serde::de::Visitor<'de>,
-//     {
-//         serde::de::Deserializer::deserialize_tuple(self, len, visitor)
-//     }
+    fn unit_variant(self) -> Result<()> {
+        Ok(())
+    }
 
-//     fn struct_variant<V>(self,
-//                        fields: &'static [&'static str],
-//                        visitor: V) -> Result<V::Value>
-//         where V: serde::de::Visitor<'de>,
-//     {
-//         serde::de::Deserializer::deserialize_tuple(self, fields.len(), visitor)
-//     }
-// }
+    fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value>
+        where T: serde::de::DeserializeSeed<'de>,
+    {
+        serde::de::DeserializeSeed::deserialize(seed, self)
+    }
+
+    fn tuple_variant<V>(self,
+                      len: usize,
+                      visitor: V) -> Result<V::Value>
+        where V: serde::de::Visitor<'de>,
+    {
+        serde::de::Deserializer::deserialize_tuple(self, len, visitor)
+    }
+
+    fn struct_variant<V>(self,
+                       fields: &'static [&'static str],
+                       visitor: V) -> Result<V::Value>
+        where V: serde::de::Visitor<'de>,
+    {
+        serde::de::Deserializer::deserialize_tuple(self, fields.len(), visitor)
+    }
+}
 
 struct Access<'a, 'de: 'a> {
     deserializer: &'a mut ErdDeserializer<'de>,
@@ -480,4 +480,30 @@ mod tests {
         deser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
     }
 
+    #[test]
+    fn test_enum() {
+        #[derive(Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
+        enum E {
+            Unit,
+            Newtype(u32),
+            Tuple(u32, u32),
+            Struct { a: u32 },
+        }
+
+        let u = E::Unit;
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
+        deser_ok(u, expected);
+
+        let n = E::Newtype(1);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
+        deser_ok(n, expected);
+
+        let t = E::Tuple(1, 2);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+        deser_ok(t, expected);
+
+        let s = E::Struct { a: 1 };
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
+        deser_ok(s, expected);
+    }
 }
