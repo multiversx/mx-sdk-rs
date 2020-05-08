@@ -10,7 +10,7 @@ fn arg_serialize_push_single(
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
         "Address" | "StorageKey" | "H256" => quote!{
-            #arg_accumulator.push_bytes(#var_name.as_bytes());
+            #arg_accumulator.push_argument_bytes(#var_name.as_bytes());
         },
         "Vec" => {
                 match &type_path_segment.arguments {
@@ -25,7 +25,7 @@ fn arg_serialize_push_single(
                                     let type_str = type_path_segment.ident.to_string();
                                     match type_str.as_str() {
                                         "u8" => quote!{
-                                            #arg_accumulator.push_bytes(#var_name.as_slice());
+                                            #arg_accumulator.push_argument_bytes(#var_name.as_slice());
                                         },
                                         other_type => panic!("[callable] Unsupported type: Vec<{:?}>", other_type)
                                     }
@@ -43,39 +43,19 @@ fn arg_serialize_push_single(
             panic!("[callable] BigInt arguments not yet supported"),
         "BigUint" =>
             quote!{
-                #arg_accumulator.push_bytes(#var_name.to_bytes_be().as_slice());
+                #arg_accumulator.push_argument_bytes(#var_name.to_bytes_be().as_slice());
             },
-        "u64" =>
+        "i64" | "u64" | "i32" | "u32" | "isize" | "usize" | "i8" | "u8" | "bool" =>
             quote!{
-                #arg_accumulator.push_u64(#var_name);
-            },
-        "i64" =>
-            quote!{
-                #arg_accumulator.push_i64(#var_name);
-            },
-        "u32" =>
-            quote!{
-                #arg_accumulator.push_u32(#var_name);
-            },
-        "i32" =>
-            quote!{
-                #arg_accumulator.push_i32(#var_name);
-            },
-        "usize" =>
-            quote!{
-                #arg_accumulator.push_u32(#var_name as u32);
-            },
-        "isize" =>
-            quote!{
-                #arg_accumulator.push_i32(#var_name as i32);
-            },
-        "u8" =>
-            quote!{
-                #arg_accumulator.push_byte(#var_name);
-            },
-        "i8" =>
-            quote!{
-                #arg_accumulator.push_byte(#var_name as u8);
+                match elrond_wasm::serializer::to_bytes(#var_name) {
+                    Ok(bytes) => {
+                        #arg_accumulator.push_argument_bytes(bytes.as_slice());
+                    },
+                    Err(sd_err) => {
+                        self.api.signal_sd_error("async call serialization error", #type_str, sd_err);
+                    }
+                }
+                
             },
         other_stype_str => {
             panic!("[callable] Unsupported argument type {:?} for arg init snippet", other_stype_str)

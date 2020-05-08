@@ -322,15 +322,8 @@ impl Method {
 
                 #(#arg_init_snippets)*
 
-                match ___nr_args - ___current_arg {
-                    0 => {},
-                    1 => {
-                        let callback_name_arg = self.api.get_argument_vec(___nr_args - 1);
-                        self.api.finish_slice_u8(&callback_name_arg.as_slice()); // callback method argument
-                    },
-                    _ => {
-                        self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
-                    }
+                if ___current_arg < ___nr_args {
+                    self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
                 }
 
                 #body_with_result

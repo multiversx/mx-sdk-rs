@@ -43,14 +43,14 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             .filter_map(|m| {
                 match m.metadata {
                     MethodMetadata::Callback => {
-                        let mut arg_index = -1i32;
-                        let mut nr_returned_args = 0i32;
+                        let mut nr_regular_args = 0i32;
 
                         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
                             m.method_args
                                 .iter()
                                 .map(|arg| {
                                     if arg.is_callback_arg {
+                                        // callback args, loaded from storage via the tx hash
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
                                                 let pat = &arg.pat;
@@ -65,12 +65,23 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                                 panic!("callback multi args not yet supported"),
                                         }
                                     } else {
-                                        nr_returned_args += 1;
+                                        // AsyncCallResult argument, wraps what comes from the async call
+                                        nr_regular_args += 1;
+                                        
+                                        let arg_expr = quote!{
+                                            {
+                                                if ___async_res_arg >= ___nr_args {
+                                                    self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
+                                                }
+                                                ___async_res_arg += 1;
+                                                ___async_res_arg - 1
+                                            }
+                                        };
+
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
-                                                arg_index += 1;
                                                 let pat = &arg.pat;
-                                                let arg_get = arg_regular(arg, &quote!{ #arg_index });
+                                                let arg_get = arg_regular_callback(arg, &arg_expr);
                                                 quote! {
                                                     let #pat = #arg_get; 
                                                 }
@@ -84,6 +95,10 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                 })
                                 .collect();
 
+                        if nr_regular_args != 1 {
+                            panic!("Callback method exactly 1 AsyncCallResult regular arg.");
+                        }
+
                         let fn_ident = &m.name;
                         let fn_name_str = &fn_ident.to_string();
                         let fn_name_literal = array_literal(fn_name_str.as_bytes());
@@ -92,9 +107,6 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                         let match_arm = quote! {                     
                             #fn_name_literal =>
                             {
-                                if nr_args != #nr_returned_args {
-                                    self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
-                                }
                                 #(#arg_init_snippets)*
                                 #call ;
                             },
@@ -107,32 +119,23 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             .collect();
     quote! {
         let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
-        let cb_data = elrond_wasm::CallData::from_raw_data(cb_data_raw);
-        let mut cb_data_deserializer = cb_data.deserializer();
-        let cb_name = match cb_data_deserializer.next_raw_bytes() {
-            elrond_wasm::DeserializerResult::NoMore => self.api.signal_error(err_msg::ARG_CALLBACK_TOO_FEW), // actually unreachable
-            elrond_wasm::DeserializerResult::Err(e) => self.api.signal_error(e), // also unreachable
-            elrond_wasm::DeserializerResult::Res(cb_name) => cb_name,
-        };
-        let nr_args = self.api.get_num_arguments();
-        match cb_name {
-            [] => {
-                if nr_args != 0i32 {
-                    self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
-                }
-            }
+        let cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
+        let ___nr_args = self.api.get_num_arguments();
+        if ___nr_args == 0 {
+            self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
+        }
+        let mut ___async_res_arg = 0i32;
+        match cb_data_deserializer.get_func_name() {
+            [] => {}
             #(#match_arms)*
             other => panic!("No callback function with that name exists in contract.")
         }
-        match cb_data_deserializer.next_raw_bytes() {
-            elrond_wasm::DeserializerResult::NoMore => {
-                self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); // cleanup
-            },
-            _ => {
-                self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);
-            }
-        };
-        
+        if cb_data_deserializer.has_next() {
+            self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);
+        }
+
+        // cleanup
+        self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); 
     }
 }
 

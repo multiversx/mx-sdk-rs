@@ -116,6 +116,16 @@ pub fn arg_regular(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -
                 _ => panic!("Array type is not Path. Only array of u8 allowed as arguments")
             }
         },
+        syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
+            // allow empty tuples as arguments, nothing happens
+            if elems.len() == 0 {
+                quote! {
+                    ()
+                }
+            } else {
+                panic!("Only empty tuples accepted as arguments for now")
+            }
+        },
         other_arg => panic!("Unsupported argument type. Only path, reference, array or slice allowed. Found: {:?}", other_arg)
     }
 }
@@ -142,3 +152,62 @@ pub fn arg_regular_multi(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStr
         other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
     }
 }
+
+pub fn arg_regular_callback(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    match &arg.ty {
+        syn::Type::Path(type_path) => {
+            let type_path_segment = type_path.path.segments.last().unwrap().clone();
+            let type_str = type_path_segment.ident.to_string();
+            match type_str.as_str() {
+                "AsyncCallResult" => {
+                    let type_name = &"AsyncCallResult";
+                    //let vec_generic_type_segm = generic_type_single_arg_segment(&"AsyncCallResult", &type_path_segment);
+                    let get_snippet = match &type_path_segment.arguments {
+                        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+                            if args.len() != 1 {
+                                panic!("{} type must have exactly 1 generic type argument", type_name);
+                            }
+                            if let syn::GenericArgument::Type(gen_type) = args.first().unwrap() {
+                                match gen_type {                
+                                    syn::Type::Path(type_path) => {
+                                        let generic_type_segm = type_path.path.segments.last().unwrap().clone();
+                                        arg_regular_single(&generic_type_segm, arg_index_expr)
+                                    },
+                                    syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
+                                        // allow empty tuple (for now)
+                                        if elems.len() == 0 {
+                                            quote! { () }
+                                        } else {
+                                            panic!("Only empty tuples accepted in AsyncCallResult")
+                                        }
+                                    },
+                                    other_type => panic!("Unsupported {} generic type: {:?}, not a path", type_name, other_type)
+                                }
+                            } else {
+                                panic!("{} type arguments must be types", type_name)
+                            }
+                        },
+                        _ => panic!("{} angle brackets expected", type_name)
+                    };
+                    // let get_snippet = arg_regular_single(&vec_generic_type_segm, arg_index_expr); // TODO: support tuples
+                    // let pat = &arg.pat;
+                    quote! {
+                        match self.api.get_argument_i64(#arg_index_expr) {
+                            0 => AsyncCallResult::Ok(#get_snippet),
+                            err_code => AsyncCallResult::Err(AsyncCallError{
+                                err_code: err_code as i32,
+                                err_msg: self.api.get_argument_vec(#arg_index_expr),
+                            })
+                        }
+                    }
+                },
+                other_stype_str => {
+                    panic!("Unsupported argument type {:?} for callback argument", other_stype_str)
+                }
+            }
+        },
+        other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
+    }
+}
+
+
