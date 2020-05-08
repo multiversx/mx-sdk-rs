@@ -72,7 +72,7 @@ impl<'a> CallDataDeserializer<'a> {
     fn next_argument_hex(&mut self) -> Option<&'a [u8]> {
         let initial_index = self.index;
         loop {
-            if self.index > self.source.len() {
+            if !self.has_next() {
                 return None;
             }
 
@@ -91,6 +91,11 @@ impl<'a> CallDataDeserializer<'a> {
 
             self.index += 1;
         }
+    }
+
+    #[inline]
+    pub fn has_next(&self) -> bool {
+        self.index <= self.source.len()
     }
 
     /// Gets the next argument, deserializes from hex and returns the resulting bytes.
