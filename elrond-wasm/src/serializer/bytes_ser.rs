@@ -63,6 +63,11 @@ impl ErdSerializer {
     fn push_entity_size(&mut self, size: u32) {
         self.push_number(size as u64, 32, false, false);
     }
+
+    #[inline]
+    fn push_variant_index(&mut self, variant_index: u32) {
+        self.push_number(variant_index as u64, 32, false, false);
+    }
 }
 
 impl<'a> ser::Serializer for &'a mut ErdSerializer {
@@ -208,7 +213,7 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
         variant_index: u32,
         _variant: &'static str,
     ) -> Result<()> {
-        self.push_entity_size(variant_index);
+        self.push_variant_index(variant_index);
         Ok(())
     }
 
@@ -241,7 +246,7 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
         T: ?Sized + Serialize,
     {
         self.top_level = false;
-        self.push_entity_size(variant_index);
+        self.push_variant_index(variant_index);
         value.serialize(&mut *self)?;
         Ok(())
     }
@@ -293,15 +298,13 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
     fn serialize_tuple_variant(
         self,
         _name: &'static str,
-        _variant_index: u32,
+        variant_index: u32,
         _variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeTupleVariant> {
-        // self.output += "{";
-        // variant.serialize(&mut *self)?;
-        // self.output += ":[";
-        // Ok(self)
-        Err(SDError::NotImplemented)
+        self.top_level = false;
+        self.push_variant_index(variant_index);
+        Ok(self)
     }
 
     // Maps are represented in JSON as `{ K: V, K: V, ... }`.
@@ -331,11 +334,11 @@ impl<'a> ser::Serializer for &'a mut ErdSerializer {
         self,
         _name: &'static str,
         variant_index: u32,
-        variant: &'static str,
+        _variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStructVariant> {
-        self.push_entity_size(variant_index);
-        variant.serialize(&mut *self)?;
+        self.top_level = false;
+        self.push_variant_index(variant_index);
         Ok(self)
     }
 }
@@ -600,30 +603,30 @@ mod tests {
         ser_ok((), &[]);
     }
 
-    // #[test]
-    // fn test_enum() {
-    //     #[derive(Serialize)]
-    //     enum E {
-    //         Unit,
-    //         Newtype(u32),
-    //         Tuple(u32, u32),
-    //         Struct { a: u32 },
-    //     }
+    #[test]
+    fn test_enum() {
+        #[derive(Serialize, Hash, Eq, PartialEq, Clone, Debug)]
+        enum E {
+            Unit,
+            Newtype(u32),
+            Tuple(u32, u32),
+            Struct { a: u32 },
+        }
 
-    //     let u = E::Unit;
-    //     let expected = r#""Unit""#;
-    //     assert_eq!(to_string(&u).unwrap(), expected);
+        let u = E::Unit;
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
+        ser_ok(u, expected);
 
-    //     let n = E::Newtype(1);
-    //     let expected = r#"{"Newtype":1}"#;
-    //     assert_eq!(to_string(&n).unwrap(), expected);
+        let n = E::Newtype(1);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
+        ser_ok(n, expected);
 
-    //     let t = E::Tuple(1, 2);
-    //     let expected = r#"{"Tuple":[1,2]}"#;
-    //     assert_eq!(to_string(&t).unwrap(), expected);
+        let t = E::Tuple(1, 2);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+        ser_ok(t, expected);
 
-    //     let s = E::Struct { a: 1 };
-    //     let expected = r#"{"Struct":{"a":1}}"#;
-    //     assert_eq!(to_string(&s).unwrap(), expected);
-    // }
+        let s = E::Struct { a: 1 };
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
+        ser_ok(s, expected);
+    }
 }
