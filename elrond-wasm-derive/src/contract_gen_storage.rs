@@ -26,7 +26,7 @@ fn storage_store_snippet_for_type(type_path_segment: &syn::PathSegment, value_ex
             quote!{
                 match elrond_wasm::serializer::to_bytes(#value_expr) {
                     Ok(bytes) => {
-                        self.api.storage_store(key, &bytes);
+                        self.api.storage_store(key, bytes.as_slice());
                     },
                     Err(sd_err) => {
                         self.api.signal_sd_error("storage serialization error", #type_name, sd_err);

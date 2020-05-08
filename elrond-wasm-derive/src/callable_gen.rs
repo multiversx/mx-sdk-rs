@@ -86,9 +86,9 @@ impl Callable {
                     .iter()
                     .map(|arg| {
                         let arg_accumulator = if arg.is_callback_arg {
-                            quote! { callback_data }
+                            quote! { callback_data_ser }
                         } else {
-                            quote! { call_data }
+                            quote! { call_data_ser }
                         };
 
                         match &arg.metadata {
@@ -131,10 +131,10 @@ impl Callable {
                 let cb_name_str = &callback_ident.arg.to_string();
                 let cb_name_literal = array_literal(cb_name_str.as_bytes());
                 let callback_init = quote! {
-                    let mut callback_data = elrond_wasm::CallData::new( & #cb_name_literal );
+                    let mut callback_data_ser = elrond_wasm::call_data::CallDataSerializer::new( & #cb_name_literal );
                 };
                 let callback_store = quote! {
-                    self.api.storage_store(&self.api.get_tx_hash().as_ref(), callback_data.as_slice());
+                    self.api.storage_store(&self.api.get_tx_hash().as_ref(), callback_data_ser.as_slice());
                 };
                 (callback_init, callback_store)
             } else {
@@ -145,11 +145,11 @@ impl Callable {
             let sig = quote! {
                 #msig {
                     #amount_snippet
-                    let mut call_data = elrond_wasm::CallData::new( & #m_name_literal );
+                    let mut call_data_ser = elrond_wasm::call_data::CallDataSerializer::new( & #m_name_literal );
                     #callback_init
                     #(#arg_push_snippets)*
                     #callback_store
-                    self.api.async_call(&self.address, &amount, call_data.as_slice());
+                    self.api.async_call(&self.address, &amount, call_data_ser.as_slice());
                 }
             };
             sig
