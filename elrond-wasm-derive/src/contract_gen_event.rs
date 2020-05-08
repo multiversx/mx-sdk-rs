@@ -39,48 +39,6 @@ fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_m
     }
 }
 
-fn generate_event_data_conversion_code(arg: &MethodArg) -> proc_macro2::TokenStream {
-    let pat = &arg.pat;
-    match &arg.ty {            
-        syn::Type::Reference(type_reference) => {
-            if type_reference.mutability.is_some() {
-                panic!("[Event data] Mutable references not supported as event arguments");
-            }
-            match &*type_reference.elem {
-                syn::Type::Path(type_path) => {
-                    let type_str = type_path.path.segments.last().unwrap().ident.to_string();
-                    match type_str.as_str() {
-                        "BigInt" =>
-                            panic!("[Event data] BigInt argument type currently not supported"),
-                        "BigUint" =>
-                            quote!{
-                                #pat.to_bytes_be_pad_right(32).unwrap()
-                            },
-                        other_stype_str => {
-                            panic!("[Event data] Unsupported reference argument type: {:?}", other_stype_str)
-                        }
-                    }
-                },
-                _ => {
-                    panic!("[Event data] Unsupported reference argument type: {:?}", type_reference)
-                }
-            }
-            
-        },
-        syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
-            // allow empty tuple as event data
-            if elems.len() == 0 {
-                quote! {
-                    Vec::with_capacity(0)
-                }
-            } else {
-                panic!("Only empty tuples accepted as event data")
-            }
-        },
-        other_arg => panic!("[Event data] Unsupported argument type: {:?}, should be reference", other_arg)
-    }
-}
-
 pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
     let nr_args_no_self = m.method_args.len();
     if nr_args_no_self == 0 {
@@ -100,9 +58,14 @@ pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::
                             #conversion
                         }
                     } else {
-                        let conversion = generate_event_data_conversion_code(arg);
+                        let pat = &arg.pat;
                         quote! {
-                            let data_vec = #conversion;
+                            let data_vec = match elrond_wasm::serializer::to_bytes(#pat) {
+                                Ok(data_bytes) => data_bytes,
+                                Err(sd_err) => {
+                                    self.api.signal_sd_error("event serialization error", "data", sd_err);
+                                }
+                            };
                         }
                     };
                 topic_index += 1;

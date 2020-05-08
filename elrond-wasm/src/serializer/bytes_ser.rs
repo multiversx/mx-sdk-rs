@@ -595,6 +595,11 @@ mod tests {
         ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
     }
 
+    #[test]
+    fn test_unit() {
+        ser_ok((), &[]);
+    }
+
     // #[test]
     // fn test_enum() {
     //     #[derive(Serialize)]
