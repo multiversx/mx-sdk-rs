@@ -13,7 +13,7 @@ pub struct ErdSerializer {
 // Rust types the serializer is able to produce as output.
 //
 // This basic serializer supports only `to_string`.
-pub fn to_bytes<T>(value: &T) -> Result<Vec<u8>>
+pub fn to_bytes<T>(value: T) -> Result<Vec<u8>>
 where
     T: Serialize,
 {
