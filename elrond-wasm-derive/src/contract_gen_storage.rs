@@ -131,7 +131,7 @@ fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macr
     } else {
         // build key from arguments
         quote! {
-            let key_bytes = match elrond_wasm::serializer::to_bytes(&(&#id_literal, #(#arg_pats),* )) {
+            let key_bytes = match elrond_wasm::serializer::to_bytes((&#id_literal, #(#arg_pats),* )) {
                 Ok(bytes) => bytes,
                 Err(sd_err) => self.api.signal_sd_error("storage serialization error", "key", sd_err)
             };
