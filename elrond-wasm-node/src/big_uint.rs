@@ -57,6 +57,14 @@ impl From<u32> for ArwenBigUint {
     }
 }
 
+impl From<usize> for ArwenBigUint {
+    fn from(item: usize) -> Self {
+        unsafe {
+            ArwenBigUint{ handle: bigIntNew(item as i64) }
+        }
+    }
+}
+
 impl ArwenBigUint {
     pub fn from_i64(value: i64) -> ArwenBigUint {
         unsafe {

@@ -32,6 +32,12 @@ impl From<u32> for RustBigUint {
     }
 }
 
+impl From<usize> for RustBigUint {
+    fn from(item: usize) -> Self {
+        RustBigUint((item as i32).into())
+    }
+}
+
 impl From<BigInt> for RustBigUint {
     fn from(item: BigInt) -> Self {
         RustBigUint(item)
