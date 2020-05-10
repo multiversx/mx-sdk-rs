@@ -204,6 +204,7 @@ pub trait BigUintApi:
     Sized +
     From<u64> +
     From<u32> +
+    From<usize> +
     Clone +
     Add<Output=Self> + 
     AddAssign + 
