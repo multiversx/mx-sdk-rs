@@ -45,7 +45,7 @@ fn arg_serialize_push_single(
             quote!{
                 #arg_accumulator.push_argument_bytes(#var_name.to_bytes_be().as_slice());
             },
-        "i64" | "u64" | "i32" | "u32" | "isize" | "usize" | "i8" | "u8" | "bool" =>
+        _ =>
             quote!{
                 match elrond_wasm::serializer::to_bytes(#var_name) {
                     Ok(bytes) => {
@@ -57,9 +57,6 @@ fn arg_serialize_push_single(
                 }
                 
             },
-        other_stype_str => {
-            panic!("[callable] Unsupported argument type {:?} for arg init snippet", other_stype_str)
-        }
     }
 }
 
