@@ -36,6 +36,14 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, al
                             is_callback_arg: is_callback_arg,
                             metadata: ArgMetadata::Multi(multi_attr),
                         })
+                    } else if is_var_args(&pat_typed) {
+                        Some(MethodArg{
+                            index: -1,
+                            pat: pat.clone(),
+                            ty: ty.clone(),
+                            is_callback_arg: is_callback_arg,
+                            metadata: ArgMetadata::VarArgs,
+                        })
                     } else if is_payment(&pat_typed) {
                         if !is_method_payable {
                             panic!("Cannot have payment arguments to non-payable methods.");

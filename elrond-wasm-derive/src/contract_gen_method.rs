@@ -204,6 +204,7 @@ impl Method {
                 .any(|arg| {
                     match &arg.metadata {
                         ArgMetadata::Multi(_) => true,
+                        ArgMetadata::VarArgs => true,
                         _ => false,
                     }
                 });
@@ -239,6 +240,8 @@ impl Method {
                             generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(_) =>
                             panic!("multi args not accepted in function generate_call_method_fixed_args"),
+                        ArgMetadata::VarArgs =>
+                            panic!("var_args not accepted in function generate_call_method_fixed_args"),
                     }
                 })
                 .collect();
@@ -300,6 +303,16 @@ impl Method {
                             quote! {
                                 let mut #pat = Vec::with_capacity #count_expr ;
                                 for _ in 0..#pat.capacity() {
+                                    #push_snippet
+                                }
+                            }
+                        }
+                        ArgMetadata::VarArgs => { // #[var_args]
+                            let pat = &arg.pat;
+                            let push_snippet = arg_regular_multi(&arg, &arg_expr);
+                            quote! {
+                                let mut #pat = Vec::with_capacity((___nr_args - ___current_arg) as usize);
+                                while ___current_arg < ___nr_args {
                                     #push_snippet
                                 }
                             }
