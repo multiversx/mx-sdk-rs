@@ -63,6 +63,8 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                                 panic!("payment args not allowed in callbacks"),
                                             ArgMetadata::Multi(_) =>
                                                 panic!("callback multi args not yet supported"),
+                                            ArgMetadata::VarArgs =>
+                                                panic!("callback var_args not yet supported"),
                                         }
                                     } else {
                                         // AsyncCallResult argument, wraps what comes from the async call
@@ -89,7 +91,9 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                             ArgMetadata::Payment =>
                                                 panic!("payment args not allowed in callbacks"),
                                             ArgMetadata::Multi(_) =>
-                                                panic!("multi-args not allowed in callbacks"),
+                                                panic!("multi args not allowed in callbacks"),
+                                            ArgMetadata::VarArgs =>
+                                                panic!("var_args not allowed in callbacks"),
                                         }
                                     }
                                 })

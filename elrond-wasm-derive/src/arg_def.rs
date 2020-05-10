@@ -15,6 +15,7 @@ pub enum ArgMetadata {
     Payment,
     Single,
     Multi(MultiAttribute),
+    VarArgs,
 }
 
 pub fn generate_arg_call_name(arg: &MethodArg) -> proc_macro2::TokenStream {

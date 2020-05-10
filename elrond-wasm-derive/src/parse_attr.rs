@@ -1,5 +1,6 @@
 static ATTR_PAYABLE: &str = "payable";
 static ATTR_PAYMENT: &str = "payment";
+static ATTR_VAR_ARGS: &str = "var_args";
 static ATTR_EVENT: &str = "event";
 static ATTR_PRIVATE: &str = "private";
 static ATTR_CALLBACK_DECL: &str = "callback";
@@ -37,6 +38,10 @@ pub fn is_payable(m: &syn::TraitItemMethod) -> bool {
 
 pub fn is_payment(pat: &syn::PatType) -> bool {
     has_attribute(&pat.attrs, ATTR_PAYMENT)
+}
+
+pub fn is_var_args(pat: &syn::PatType) -> bool {
+    has_attribute(&pat.attrs, ATTR_VAR_ARGS)
 }
 
 pub fn is_callback_arg(pat: &syn::PatType) -> bool {
