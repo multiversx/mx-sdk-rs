@@ -105,12 +105,26 @@ pub trait ContractHookApi<BigInt, BigUint> {
     fn keccak256(&self, data: &[u8]) -> [u8; 32];
 }
 
-macro_rules! get_argument_cast {
+macro_rules! get_argument_signed_cast {
     ($method_name:ident, $type:ty) => {
         fn $method_name (&self, arg_id: i32) -> $type {
             let arg_i64 = self.get_argument_i64(arg_id);
             let min = <$type>::MIN as i64;
             let max = <$type>::MAX as i64;
+            if arg_i64 < min || arg_i64 > max {
+                self.signal_error(err_msg::ARG_OUT_OF_RANGE)
+            }
+            arg_i64 as $type
+        }
+  };
+}
+
+macro_rules! get_argument_unsigned_cast {
+    ($method_name:ident, $type:ty) => {
+        fn $method_name (&self, arg_id: i32) -> $type {
+            let arg_i64 = self.get_argument_u64(arg_id);
+            let min = <$type>::MIN as u64;
+            let max = <$type>::MAX as u64;
             if arg_i64 < min || arg_i64 > max {
                 self.signal_error(err_msg::ARG_OUT_OF_RANGE)
             }
@@ -151,14 +165,20 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn get_argument_big_uint(&self, arg_id: i32) -> BigUint;
     
+    // signed
     fn get_argument_i64(&self, arg_id: i32) -> i64;
+    get_argument_signed_cast!{get_argument_i32, i32}
+    get_argument_signed_cast!{get_argument_isize, isize}
+    get_argument_signed_cast!{get_argument_i8, i8}
 
-    get_argument_cast!{get_argument_i32, i32}
-    get_argument_cast!{get_argument_u32, u32}
-    get_argument_cast!{get_argument_isize, isize}
-    get_argument_cast!{get_argument_usize, usize}
-    get_argument_cast!{get_argument_i8, i8}
-    get_argument_cast!{get_argument_u8, u8}
+    // unsigned
+    fn get_argument_u64(&self, arg_id: i32) -> u64 {
+        let bytes = self.get_argument_vec(arg_id);
+        serializer::bytes_to_number(bytes.as_slice(), false)
+    }
+    get_argument_unsigned_cast!{get_argument_u32, u32}
+    get_argument_unsigned_cast!{get_argument_usize, usize}
+    get_argument_unsigned_cast!{get_argument_u8, u8}
 
     fn get_argument_bool (&self, arg_id: i32) -> bool {
         let arg_i64 = self.get_argument_i64(arg_id);
