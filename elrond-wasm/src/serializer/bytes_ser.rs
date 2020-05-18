@@ -25,6 +25,16 @@ where
     Ok(serializer.output)
 }
 
+/// Temporary solution to serialize u64 until wasm compilation issue is fixed.
+pub fn u64_to_bytes(v: u64) -> Vec<u8> {
+    let mut serializer = ErdSerializer {
+        output: Vec::new(),
+        top_level: true,
+    };
+    serializer.push_number(v, 64, false, true);
+    serializer.output
+}
+
 impl ErdSerializer {
     fn push_byte(&mut self, value: u8) {
         self.output.push(value);

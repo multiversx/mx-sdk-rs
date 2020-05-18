@@ -33,6 +33,10 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
             quote!{
                 self.api.get_argument_i64(#arg_index_expr)
             },
+        "u64" =>
+            quote!{
+                self.api.get_argument_u64(#arg_index_expr)
+            },
         "i32" =>
             quote!{
                 self.api.get_argument_i32(#arg_index_expr)
