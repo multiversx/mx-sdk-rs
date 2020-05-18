@@ -11,6 +11,7 @@ pub use alloc::string::String;
 pub use serde;
 
 mod address;
+mod elrond_protected_storage;
 mod err;
 pub mod err_msg;
 pub mod call_data;
@@ -75,6 +76,11 @@ pub trait ContractHookApi<BigInt, BigUint> {
     fn storage_store_i64(&self, key: &[u8], value: i64);
     
     fn storage_load_i64(&self, key: &[u8]) -> Option<i64>;
+
+    #[inline]
+    fn storage_load_cumulated_validator_reward(&self) -> BigUint {
+        self.storage_load_big_uint(elrond_protected_storage::ELROND_REWARD_KEY)
+    }
     
     fn get_call_value_big_uint(&self) -> BigUint;
 
