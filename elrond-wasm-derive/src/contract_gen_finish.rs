@@ -129,9 +129,17 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
             quote!{
                 self.api.finish_i64(#result_expr);
             },
-        "i32" | "u32" | "isize" | "usize" | "i8" | "u8" =>
+        "i32" | "isize" | "i8" =>
             quote!{
                 self.api.finish_i64(#result_expr as i64);
+            },
+        "u64" =>
+            quote!{
+                self.api.finish_u64(#result_expr);
+            },
+        "u32" | "usize" | "u8" =>
+            quote!{
+                self.api.finish_u64(#result_expr as u64);
             },
         "bool" =>
             quote!{

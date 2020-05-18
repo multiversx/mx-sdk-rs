@@ -174,6 +174,9 @@ pub trait ContractIOApi<BigInt, BigUint> {
     // unsigned
     fn get_argument_u64(&self, arg_id: i32) -> u64 {
         let bytes = self.get_argument_vec(arg_id);
+        if bytes.len() > 8 {
+            self.signal_error(err_msg::ARG_OUT_OF_RANGE);
+        }
         serializer::bytes_to_number(bytes.as_slice(), false)
     }
     get_argument_unsigned_cast!{get_argument_u32, u32}
@@ -198,6 +201,11 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_big_uint(&self, b: &BigUint);
 
     fn finish_i64(&self, value: i64);
+
+    fn finish_u64(&self, value: u64) {
+        let bytes = serializer::u64_to_bytes(value);
+        self.finish_slice_u8(bytes.as_slice());
+    }
 
     #[inline]
     fn signal_error(&self, message: &str) -> ! {
