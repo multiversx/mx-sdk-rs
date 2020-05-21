@@ -25,6 +25,7 @@ pub enum MethodMetadata {
     CallbackRaw,
     StorageGetter{ visibility: Visibility, identifier: String },
     StorageSetter{ visibility: Visibility, identifier: String },
+    Module{ impl_path: proc_macro2::TokenTree },
 }
 
 impl MethodMetadata {
@@ -65,6 +66,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let event_opt = EventAttribute::parse(m);
     let storage_get_opt = StorageGetAttribute::parse(m);
     let storage_set_opt = StorageSetAttribute::parse(m);
+    let module_opt = ModuleAttribute::parse(m);
 
     if let Some(event_attr) = event_opt {
         if payable {
@@ -82,6 +84,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if storage_set_opt.is_some() {
             panic!("Events cannot be storage setters.");
         }
+        if module_opt.is_some() {
+            panic!("Events cannot be modules.");
+        }
         if m.default.is_some() {
             panic!("Events cannot have an implementations provided in the trait.");
         }
@@ -98,6 +103,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         }
         if storage_set_opt.is_some() {
             panic!("Callbacks cannot be storage setters.");
+        }
+        if module_opt.is_some() {
+            panic!("Callbacks cannot be modules.");
         }
         if m.default.is_none() {
             panic!("Callback methods need an implementation.");
@@ -117,6 +125,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default.is_some() {
             panic!("Storage getters cannot have an implementations provided in the trait.");
         }
+        if module_opt.is_some() {
+            panic!("Storage getters cannot be modules.");
+        }
         MethodMetadata::StorageGetter{
             visibility: visibility,
             identifier: storage_get.identifier,
@@ -128,9 +139,19 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default.is_some() {
             panic!("Storage setters cannot have an implementations provided in the trait.");
         }
+        if module_opt.is_some() {
+            panic!("Storage setters cannot be modules.");
+        }
         MethodMetadata::StorageSetter{
             visibility: visibility,
             identifier: storage_set.identifier,
+        }
+    } else if let Some(module_attr) = module_opt {
+        if m.default.is_some() {
+            panic!("Storage getters cannot have an implementations provided in the trait.");
+        }
+        MethodMetadata::Module{
+            impl_path: module_attr.arg,
         }
     } else {
         if m.default.is_none() {
