@@ -13,6 +13,7 @@ pub use serde;
 mod address;
 mod elrond_protected_storage;
 mod err;
+mod proxy;
 pub mod err_msg;
 pub mod call_data;
 pub mod serializer;
@@ -21,6 +22,7 @@ pub mod serialize_util;
 pub use address::*;
 pub use err::*;
 pub use call_data::*;
+pub use proxy::OtherContractHandle;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
