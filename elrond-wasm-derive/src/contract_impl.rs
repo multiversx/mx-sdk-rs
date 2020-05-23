@@ -54,15 +54,6 @@ pub fn contract_implementation(
           _phantom2: core::marker::PhantomData<BigUint>,
       }
 
-      pub struct OtherContractHandle<T, BigInt, BigUint>
-      #api_where
-      {
-          api: T,
-          address: Address,
-          _phantom1: core::marker::PhantomData<BigInt>,
-          _phantom2: core::marker::PhantomData<BigUint>,
-      }
-
       impl <T, BigInt, BigUint> #contract_impl_ident<T, BigInt, BigUint>
       #api_where
       {
@@ -85,12 +76,7 @@ pub fn contract_implementation(
         #(#auto_impls)*
 
         fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
-          let contract_proxy = OtherContractHandle {
-            api: self.api.clone(),
-            address: address.clone(),
-            _phantom1: core::marker::PhantomData,
-            _phantom2: core::marker::PhantomData,
-          };
+          let contract_proxy = OtherContractHandle::new(self.api.clone(), address);
           Box::new(contract_proxy)
         }
 
