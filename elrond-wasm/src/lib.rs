@@ -18,6 +18,7 @@ pub mod err_msg;
 pub mod call_data;
 pub mod serializer;
 pub mod serialize_util;
+pub mod codec;
 
 pub use address::*;
 pub use err::*;
