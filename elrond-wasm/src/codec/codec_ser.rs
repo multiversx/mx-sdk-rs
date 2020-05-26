@@ -3,7 +3,7 @@
 
 // use super::bytes_err::{SDError, Result};
 use alloc::vec::Vec;
-
+use super::TypeInfo;
 
 /// Trait that allows writing of data.
 pub trait Output {
@@ -20,16 +20,6 @@ impl Output for Vec<u8> {
 	fn write(&mut self, bytes: &[u8]) {
 		self.extend_from_slice(bytes)
 	}
-}
-
-/// !INTERNAL USE ONLY!
-///
-/// This enum provides type information to optimize encoding/decoding by doing fake specialization.
-#[doc(hidden)]
-pub enum TypeInfo {
-	/// Default value of [`Encode::TYPE_INFO`] to not require implementors to set this value in the trait.
-	Unknown,
-	U8,
 }
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
@@ -97,10 +87,7 @@ impl Encode for u8 {
 	}
 }
 
-impl<T> Encode for &[T] 
-where T: Encode
-{
-	#[inline]
+impl<T: Encode> Encode for &[T] {
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
 		// push size
 		using_encoded_number(self.len() as u64, 32, false, false, |buf| dest.write(buf));
@@ -138,9 +125,7 @@ where T: Encode
 	}
 }
 
-impl<T> Encode for Vec<T>
-where T: Encode
-{
+impl<T: Encode> Encode for Vec<T> {
 	#[inline]
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
 		self.as_slice().dep_encode_to(dest);
@@ -156,7 +141,7 @@ where T: Encode
 /// Adds number to output buffer.
 /// No argument generics here, because we want the executable binary as small as possible.
 /// Smaller types need to be converted to u64 before using this function.
-/// TODO: there might be a quicker version of this using transmute.
+/// TODO: there might be a quicker version of this using transmute + reverse bytes.
 pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signed: bool, mut compact: bool, f: F) {
 	let mut result = [0u8; 8];
 	let mut result_size = 0usize;
@@ -230,11 +215,35 @@ impl Encode for bool {
 	}
 }
 
+impl<T: Encode> Encode for Option<T> {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+		match self {
+			Some(v) => {
+				using_encoded_number(1u64, 8, false, false, |buf| dest.write(buf));
+				v.dep_encode_to(dest);
+			},
+			None => {
+				using_encoded_number(0u64, 8, false, false, |buf| dest.write(buf));
+			}
+		}
+	}
+
+	// fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	// 	match self {
+	// 		Some(v) => {
+	// 			v.using_top_encoded(f);
+	// 		},
+	// 		None => {}
+	// 	}
+	// }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+	use super::*;
+	use super::super::test_struct::*;
     use core::fmt::Debug;
 
     fn ser_ok<V>(element: V, bytes: &[u8])
@@ -295,21 +304,6 @@ mod tests {
         let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
         ser_ok(some_vec, expected);
 	}
-	
-	#[derive(PartialEq, Debug)]
-	struct Test {
-		int: u16,
-		seq: Vec<u8>,
-		another_byte: u8,
-	}
-
-	impl Encode for Test {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-			self.int.dep_encode_to(dest);
-			self.seq.dep_encode_to(dest);
-			self.another_byte.dep_encode_to(dest);
-		}
-	}
 
     #[test]
     fn test_struct() {
@@ -332,30 +326,22 @@ mod tests {
         ser_ok((), &[]);
     }
 
-    // #[test]
-    // fn test_enum() {
-    //     #[derive(Encode, Hash, Eq, PartialEq, Clone, Debug)]
-    //     enum E {
-    //         Unit,
-    //         Newtype(u32),
-    //         Tuple(u32, u32),
-    //         Struct { a: u32 },
-    //     }
+    #[test]
+    fn test_enum() {
+        let u = E::Unit;
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
+        ser_ok(u, expected);
 
-    //     let u = E::Unit;
-    //     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-    //     ser_ok(u, expected);
+        let n = E::Newtype(1);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
+        ser_ok(n, expected);
 
-    //     let n = E::Newtype(1);
-    //     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-    //     ser_ok(n, expected);
+        let t = E::Tuple(1, 2);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+        ser_ok(t, expected);
 
-    //     let t = E::Tuple(1, 2);
-    //     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
-    //     ser_ok(t, expected);
-
-    //     let s = E::Struct { a: 1 };
-    //     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-    //     ser_ok(s, expected);
-    // }
+        let s = E::Struct { a: 1 };
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
+        ser_ok(s, expected);
+    }
 }
