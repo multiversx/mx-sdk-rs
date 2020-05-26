@@ -88,6 +88,14 @@ pub trait Decode: Sized {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError>;
 }
 
+/// Convenience method, to avoid having to specify type when calling `top_decode`.
+/// Especially useful in the macros.
+#[inline]
+pub fn decode_from_byte_slice<D: Decode>(input: &[u8]) -> Result<D, DeError> {
+    // the input doesn't need to be mutable because we are not changing the underlying data 
+    D::top_decode(&mut &*input)
+}
+
 impl Decode for () {
 	fn dep_decode<I: Input>(_: &mut I) -> Result<(), DeError> {
 		Ok(())

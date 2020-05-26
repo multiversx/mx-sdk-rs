@@ -122,6 +122,22 @@ impl H256 {
     }
 }
 
+use crate::esd_light::*;
+
+impl Encode for H256 {
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+        dest.write(&self.0[..]);
+    }
+}
+
+impl Decode for H256 {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let mut arr = [0u8; 32];
+        input.read_into(&mut arr)?;
+        Ok(H256(arr))
+    }
+}
+
 use serde::ser::{Serialize, Serializer, SerializeTuple};
 use serde::de::{Deserialize, Deserializer, Visitor, SeqAccess, Error};
 
@@ -168,9 +184,41 @@ impl<'de> Deserialize<'de> for H256 {
     }
 }
 
+#[cfg(test)]
+mod esd_light_tests {
+    use super::*;
+    use alloc::vec::Vec;
+    use crate::esd_light::tests::ser_deser_ok;
+
+    #[test]
+    fn test_address() {
+        let addr = Address::from([4u8; 32]);
+        ser_deser_ok(addr, &[4u8; 32]);
+    }
+
+    #[test]
+    fn test_opt_address() {
+        let addr = Address::from([4u8; 32]);
+        let mut expected: Vec<u8> = Vec::new();
+        expected.push(1u8);
+        expected.extend_from_slice(&[4u8; 32]);
+        ser_deser_ok(Some(addr), expected.as_slice());
+    }
+
+    // #[test]
+    // fn test_ser_address_ref() {
+    //     let addr = Address::from([4u8; 32]);
+    //     let expected_bytes: &[u8] = &[4u8; 32*3];
+
+    //     let tuple = (&addr, &&&addr, addr.clone());
+    //     let serialized_bytes = tuple.top_encode();
+    //     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
+    // }
+}
+
 
 #[cfg(test)]
-mod tests {
+mod esd_serde_tests {
     use super::*;
     use alloc::vec::Vec;
     use crate::esd_serde::tests::ser_deser_ok;

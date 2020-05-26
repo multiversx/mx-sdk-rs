@@ -156,16 +156,11 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
                 }
             }
         },
-        type_name => {
+        _ => {
             quote!{
-                match elrond_wasm::esd_serde::to_bytes(#result_expr) {
-                    Ok(finish_bytes) => {
-                        self.api.finish_slice_u8(finish_bytes.as_slice());
-                    },
-                    Err(sd_err) => {
-                        self.api.signal_sd_error("result serialization error", #type_name, sd_err);
-                    }
-                }
+                #result_expr.using_top_encoded(|bytes| {
+                    self.api.finish_slice_u8(bytes);
+                });
             }
         }
     }

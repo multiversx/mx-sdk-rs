@@ -284,11 +284,14 @@ mod tests {
 	use super::super::test_struct::*;
     use core::fmt::Debug;
 
-    fn ser_ok<V>(element: V, bytes: &[u8])
+    fn ser_ok<V>(element: V, expected_bytes: &[u8])
     where
         V: Encode + PartialEq + Debug + 'static,
     {
-        assert_eq!(element.top_encode().as_slice(), bytes);
+		V::using_top_encoded(&element, |bytes| {
+			assert_eq!(bytes, expected_bytes);
+		});
+        
     }
 
     #[test]
