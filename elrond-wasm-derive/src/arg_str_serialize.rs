@@ -48,7 +48,7 @@ fn arg_serialize_push_single(
         _ =>
             quote!{
                 #var_name.using_top_encoded(|bytes| {
-                    #arg_accumulator.push_argument_bytes(bytes.as_slice());
+                    #arg_accumulator.push_argument_bytes(bytes);
                 });
             },
     }
