@@ -24,7 +24,7 @@ pub use std::collections::HashMap;
 mod serialization_tests {
     use super::*;
     use core::fmt::Debug;
-    use elrond_wasm::serializer::{to_bytes, from_bytes};
+    use elrond_wasm::esd_serde::{to_bytes, from_bytes};
     use elrond_wasm::serde as serde;
 
     pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])

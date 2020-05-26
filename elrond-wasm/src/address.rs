@@ -173,8 +173,8 @@ impl<'de> Deserialize<'de> for H256 {
 mod tests {
     use super::*;
     use alloc::vec::Vec;
-    use crate::serializer::tests::ser_deser_ok;
-    use crate::serializer::to_bytes;
+    use crate::esd_serde::tests::ser_deser_ok;
+    use crate::esd_serde::to_bytes;
 
     #[test]
     fn test_address() {
