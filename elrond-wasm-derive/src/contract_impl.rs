@@ -19,8 +19,6 @@ pub fn contract_implementation(
     let endpoints = contract.generate_endpoints();
     let function_selector_body = contract.generate_function_selector_body();
     let callback_body = contract.generate_callback_body();
-
-    let contract_imports = snippets::contract_imports();
     let api_where = snippets::api_where();
 
     let supertrait_impls = contract.generate_supertrait_impls();
@@ -28,9 +26,6 @@ pub fn contract_implementation(
 
     // this definition is common to release and debug mode
     let main_definition = quote! {
-
-      #contract_imports
-
       pub trait #trait_name_ident<T, BigInt, BigUint>: 
       ContractHookApi<BigInt, BigUint>
       // #( + #supertrait_paths <T, BigInt, BigUint>)* // currently not supported
