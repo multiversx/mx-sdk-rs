@@ -180,7 +180,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         if bytes.len() > 8 {
             self.signal_error(err_msg::ARG_OUT_OF_RANGE);
         }
-        esd_serde::bytes_to_number(bytes.as_slice(), false)
+        esd_light::bytes_to_number(bytes.as_slice(), false)
     }
     get_argument_unsigned_cast!{get_argument_u32, u32}
     get_argument_unsigned_cast!{get_argument_usize, usize}
@@ -206,8 +206,10 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_i64(&self, value: i64);
 
     fn finish_u64(&self, value: u64) {
-        let bytes = esd_serde::u64_to_bytes(value);
-        self.finish_slice_u8(bytes.as_slice());
+        use esd_light::Encode;
+        value.using_top_encoded(|bytes| {
+            self.finish_slice_u8(bytes);
+        });
     }
 
     #[inline]
