@@ -122,7 +122,7 @@ pub mod tests {
         V: Encode + Decode + PartialEq + Debug + 'static,
     {
         let serialized_bytes = element.top_encode();
-        let deserialized: V = V::top_decode(&mut &serialized_bytes[..]).unwrap();
+        let deserialized: V = decode_from_byte_slice(&mut &serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
 

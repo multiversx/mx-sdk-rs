@@ -215,7 +215,18 @@ pub trait ContractIOApi<BigInt, BigUint> {
         self.signal_error_raw(message.as_ptr(), message.len())
     }
 
-    fn signal_sd_error(&self, ser_type: &str, type_name: &str, e: esd_serde::SDError) -> ! {
+    fn signal_esd_light_error(&self, ser_type: &[u8], type_name: &[u8], specific_msg: &[u8]) -> ! {
+        // TODO: optimize
+        let mut message: Vec<u8> = Vec::new();
+        message.extend_from_slice(ser_type);
+        message.extend_from_slice(b" (");
+        message.extend_from_slice(type_name);
+        message.extend_from_slice(b"): ");
+        message.extend_from_slice(specific_msg);
+        self.signal_error_raw(message.as_ptr(), message.len())
+    }
+
+    fn signal_esd_serde_error(&self, ser_type: &str, type_name: &str, e: esd_serde::SDError) -> ! {
         let mut message: Vec<u8> = Vec::new();
         message.extend_from_slice(ser_type.as_bytes());
         message.extend_from_slice(b" (");
@@ -269,6 +280,8 @@ pub trait BigUintApi:
     Ord +
     PartialEq<u64> +
     PartialOrd<u64> +
+    esd_light::Encode +
+    esd_light::Decode +
     serde::Serialize +
 {
     fn zero() -> Self {
@@ -319,6 +332,8 @@ pub trait BigIntApi<BigUint>:
         Ord +
         PartialEq<i64> +
         PartialOrd<i64> +
+        esd_light::Encode +
+        esd_light::Decode +
         serde::Serialize +
 {
     fn zero() -> Self {

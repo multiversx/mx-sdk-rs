@@ -210,6 +210,34 @@ impl Neg for ArwenBigInt {
     }
 }
 
+use elrond_wasm::esd_light::*;
+
+impl Encode for ArwenBigInt {
+    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+        let bytes = self.to_signed_bytes_be();
+        f(&bytes);
+    }
+    
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+        // TODO: vector allocation can be avoided by writing directly to dest
+        let bytes = self.to_signed_bytes_be();
+        dest.write(&bytes);
+    }
+}
+
+impl Decode for ArwenBigInt {
+    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let bytes = input.flush()?;
+        Ok(ArwenBigInt::from_signed_bytes_be(bytes))
+    }
+
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let size = usize::dep_decode(input)?;
+        let bytes = input.read_slice(size)?;
+        Ok(ArwenBigInt::from_signed_bytes_be(bytes))
+    }
+}
+
 impl serde::Serialize for ArwenBigInt {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

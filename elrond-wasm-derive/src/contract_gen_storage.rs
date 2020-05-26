@@ -22,16 +22,11 @@ fn storage_store_snippet_for_type(type_path_segment: &syn::PathSegment, value_ex
             quote!{
                 self.api.storage_store_i64(key, if *#value_expr { 1i64 } else { 0i64 });
             },
-        type_name =>
+        _ =>
             quote!{
-                match elrond_wasm::esd_serde::to_bytes(#value_expr) {
-                    Ok(bytes) => {
-                        self.api.storage_store(key, bytes.as_slice());
-                    },
-                    Err(sd_err) => {
-                        self.api.signal_sd_error("storage serialization error", #type_name, sd_err);
-                    }
-                }
+                #value_expr.using_top_encoded(|bytes| {
+                    self.api.storage_store(key, bytes);
+                });
             }
     }
 }
@@ -85,14 +80,18 @@ fn storage_load_snippet_for_type(type_path_segment: &syn::PathSegment) -> proc_m
                 self.api.storage_load_len(key) > 0
             },
         type_name => {
+            let main_err = byte_slice_literal(&b"storage deserialization error"[..]);
+            let type_name_bytes = byte_slice_literal(type_name.as_bytes());
             quote!{
-                let value_bytes = self.api.storage_load(key);
-                match elrond_wasm::esd_serde::from_bytes(value_bytes.as_slice()) {
-                    Ok(v) => v,
-                    Err(sd_err) => self.api.signal_sd_error("storage deserialization error", #type_name, sd_err)
+                {
+                    let value_bytes = self.api.storage_load(key);
+                    match elrond_wasm::esd_light::decode_from_byte_slice(value_bytes.as_slice()) {
+                        Ok(v) => v,
+                        Err(de_err) => self.api.signal_esd_light_error(#main_err, #type_name_bytes, de_err.message_bytes()),
+                    }
                 }
             }
-        }
+        },
     }
 }
 
@@ -122,7 +121,6 @@ fn storage_load_snippet(ty: &syn::Type) -> proc_macro2::TokenStream {
 
 fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macro2::TokenStream {
     let id_literal = array_literal(identifier.as_bytes());
-    let arg_pats: Vec<syn::Pat> = key_args.iter().map(|arg| arg.pat.clone()).collect();
     if key_args.len() == 0 {
         // hardcode key
         quote! {
@@ -130,11 +128,15 @@ fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macr
         }
     } else {
         // build key from arguments
+        let key_appends: Vec<proc_macro2::TokenStream> = key_args.iter().map(|arg| {
+            let arg_pat = &arg.pat;
+            quote! {
+                #arg_pat.dep_encode_to(&mut key_bytes);
+            }
+        }).collect();
         quote! {
-            let key_bytes = match elrond_wasm::esd_serde::to_bytes((&#id_literal, #(#arg_pats),* )) {
-                Ok(bytes) => bytes,
-                Err(sd_err) => self.api.signal_sd_error("storage serialization error", "key", sd_err)
-            };
+            let mut key_bytes: Vec<u8> = #id_literal.to_vec();
+            #(#key_appends)*
             let key = key_bytes.as_slice();
         }
     }

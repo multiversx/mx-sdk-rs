@@ -65,16 +65,19 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
             quote!{
                 self.api.get_argument_i64(#arg_index_expr) != 0
             },
-        type_name =>
+        type_name => {
+            let main_err = byte_slice_literal(&b"argument deserialization error"[..]);
+            let type_name_bytes = byte_slice_literal(type_name.as_bytes());
             quote!{
                 {
                     let arg_bytes = self.api.get_argument_vec(#arg_index_expr);
-                    match elrond_wasm::esd_serde::from_bytes(arg_bytes.as_slice()) {
+                    match elrond_wasm::esd_light::decode_from_byte_slice(arg_bytes.as_slice()) {
                         Ok(v) => v,
-                        Err(sd_err) => self.api.signal_sd_error("argument deserialization error", #type_name, sd_err)
+                        Err(de_err) => self.api.signal_esd_light_error(#main_err, #type_name_bytes, de_err.message_bytes()),
                     }
                 }
-            },
+            }
+        },
     }
 }
 

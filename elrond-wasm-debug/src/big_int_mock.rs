@@ -6,6 +6,7 @@ use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
 use alloc::vec::Vec;
+use elrond_wasm::BigIntApi;
 use elrond_wasm::serde as serde;
 
 use num_bigint::BigInt;
@@ -143,6 +144,33 @@ impl PartialOrd<i64> for RustBigInt {
     }
 }
 
+use elrond_wasm::esd_light::*;
+
+impl Encode for RustBigInt {
+    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+        let bytes = self.to_signed_bytes_be();
+        f(&bytes);
+    }
+    
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+        let bytes = self.to_signed_bytes_be();
+        dest.write(&bytes);
+    }
+}
+
+impl Decode for RustBigInt {
+    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let bytes = input.flush()?;
+        Ok(RustBigInt::from_signed_bytes_be(bytes))
+    }
+
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let size = usize::dep_decode(input)?;
+        let bytes = input.read_slice(size)?;
+        Ok(RustBigInt::from_signed_bytes_be(bytes))
+    }
+}
+
 impl serde::Serialize for RustBigInt {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -159,7 +187,6 @@ impl<'de> serde::Deserialize<'de> for RustBigInt {
         D: serde::Deserializer<'de>,
     {
         let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
-        use elrond_wasm::BigIntApi;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
     }
 }
