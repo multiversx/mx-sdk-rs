@@ -282,7 +282,6 @@ pub trait BigUintApi:
     PartialOrd<u64> +
     esd_light::Encode +
     esd_light::Decode +
-    serde::Serialize +
 {
     fn zero() -> Self {
         0u64.into()
@@ -334,7 +333,6 @@ pub trait BigIntApi<BigUint>:
         PartialOrd<i64> +
         esd_light::Encode +
         esd_light::Decode +
-        serde::Serialize +
 {
     fn zero() -> Self {
         0i64.into()
@@ -372,8 +370,8 @@ macro_rules! imports {
         use elrond_wasm::{Box, Vec, String};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
+        use elrond_wasm::esd_light::{Encode, Decode, DeError};
         use elrond_wasm::err_msg;
-        use elrond_wasm::serde as serde;
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
         use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};

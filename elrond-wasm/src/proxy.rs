@@ -21,7 +21,6 @@ where
     for<'b> BigUint: BitXorAssign<&'b BigUint>,
     for<'a> &'a BigUint: Shr<usize, Output=BigUint>,
     for<'a> &'a BigUint: Shl<usize, Output=BigUint>,
-    for<'de> BigUint: serde::Deserialize<'de>,
 
     BigInt: BigIntApi<BigUint> + 'static,
     for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,
@@ -34,7 +33,6 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    for<'de> BigInt: serde::Deserialize<'de>,
 
     T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
@@ -64,7 +62,6 @@ impl<T, BigInt, BigUint> OtherContractHandle<T, BigInt, BigUint>where
     for<'b> BigUint: BitXorAssign<&'b BigUint>,
     for<'a> &'a BigUint: Shr<usize, Output=BigUint>,
     for<'a> &'a BigUint: Shl<usize, Output=BigUint>,
-    for<'de> BigUint: serde::Deserialize<'de>,
 
     BigInt: BigIntApi<BigUint> + 'static,
     for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,
@@ -77,7 +74,6 @@ impl<T, BigInt, BigUint> OtherContractHandle<T, BigInt, BigUint>where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    for<'de> BigInt: serde::Deserialize<'de>,
 
     T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
