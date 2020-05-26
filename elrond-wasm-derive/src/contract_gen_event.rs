@@ -60,7 +60,7 @@ pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::
                     } else {
                         let pat = &arg.pat;
                         quote! {
-                            let data_vec = match elrond_wasm::serializer::to_bytes(#pat) {
+                            let data_vec = match elrond_wasm::esd_serde::to_bytes(#pat) {
                                 Ok(data_bytes) => data_bytes,
                                 Err(sd_err) => {
                                     self.api.signal_sd_error("event serialization error", "data", sd_err);

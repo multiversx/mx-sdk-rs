@@ -16,9 +16,9 @@ mod err;
 mod proxy;
 pub mod err_msg;
 pub mod call_data;
-pub mod serializer;
+pub mod esd_light;
+pub mod esd_serde;
 pub mod serialize_util;
-pub mod codec;
 
 pub use address::*;
 pub use err::*;
@@ -180,7 +180,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         if bytes.len() > 8 {
             self.signal_error(err_msg::ARG_OUT_OF_RANGE);
         }
-        serializer::bytes_to_number(bytes.as_slice(), false)
+        esd_serde::bytes_to_number(bytes.as_slice(), false)
     }
     get_argument_unsigned_cast!{get_argument_u32, u32}
     get_argument_unsigned_cast!{get_argument_usize, usize}
@@ -206,7 +206,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_i64(&self, value: i64);
 
     fn finish_u64(&self, value: u64) {
-        let bytes = serializer::u64_to_bytes(value);
+        let bytes = esd_serde::u64_to_bytes(value);
         self.finish_slice_u8(bytes.as_slice());
     }
 
@@ -215,7 +215,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         self.signal_error_raw(message.as_ptr(), message.len())
     }
 
-    fn signal_sd_error(&self, ser_type: &str, type_name: &str, e: serializer::SDError) -> ! {
+    fn signal_sd_error(&self, ser_type: &str, type_name: &str, e: esd_serde::SDError) -> ! {
         let mut message: Vec<u8> = Vec::new();
         message.extend_from_slice(ser_type.as_bytes());
         message.extend_from_slice(b" (");

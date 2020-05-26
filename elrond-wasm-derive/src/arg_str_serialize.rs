@@ -47,7 +47,7 @@ fn arg_serialize_push_single(
             },
         _ =>
             quote!{
-                match elrond_wasm::serializer::to_bytes(#var_name) {
+                match elrond_wasm::esd_serde::to_bytes(#var_name) {
                     Ok(bytes) => {
                         #arg_accumulator.push_argument_bytes(bytes.as_slice());
                     },
