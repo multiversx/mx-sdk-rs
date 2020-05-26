@@ -217,4 +217,11 @@ pub mod tests {
         ser_deser_ok(v, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
     }
 
+    #[test]
+    fn test_tuple() {
+        let t = (1i8, 2u32, (), 3i16);
+        let expected: &[u8] = &[1, 0, 0, 0, 2, 0, 3];
+        ser_deser_ok(t, expected);
+    }
+
 }

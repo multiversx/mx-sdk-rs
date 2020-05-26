@@ -238,6 +238,44 @@ impl<T: Encode> Encode for Option<T> {
 	// }
 }
 
+macro_rules! tuple_impls {
+    ($(($($n:tt $name:ident)+))+) => {
+        $(
+            impl<$($name),+> Encode for ($($name,)+)
+            where
+                $($name: Encode,)+
+            {
+				#[inline]
+				fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+					$(
+                        self.$n.dep_encode_to(dest);
+                    )+
+					
+				}
+            }
+        )+
+    }
+}
+
+tuple_impls! {
+    (0 T0)
+    (0 T0 1 T1)
+    (0 T0 1 T1 2 T2)
+    (0 T0 1 T1 2 T2 3 T3)
+    (0 T0 1 T1 2 T2 3 T3 4 T4)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
@@ -316,10 +354,10 @@ mod tests {
         ser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
     }
 
-    // #[test]
-    // fn test_tuple() {
-    //     ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
-    // }
+    #[test]
+    fn test_tuple() {
+        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
+    }
 
     #[test]
     fn test_unit() {
