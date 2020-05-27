@@ -121,25 +121,31 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                 }
             })
             .collect();
-    quote! {
-        let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
-        let cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
-        let ___nr_args = self.api.get_num_arguments();
-        if ___nr_args == 0 {
-            self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
+    if match_arms.len() == 0 {
+        quote! {
+            self.api.signal_error("No callbacks in contract.")
         }
-        let mut ___async_res_arg = 0i32;
-        match cb_data_deserializer.get_func_name() {
-            [] => {}
-            #(#match_arms)*
-            other => panic!("No callback function with that name exists in contract.")
-        }
-        if cb_data_deserializer.has_next() {
-            self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);
-        }
+    } else {
+        quote! {
+            let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
+            let cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
+            let ___nr_args = self.api.get_num_arguments();
+            if ___nr_args == 0 {
+                self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
+            }
+            let mut ___async_res_arg = 0i32;
+            match cb_data_deserializer.get_func_name() {
+                [] => {}
+                #(#match_arms)*
+                other => self.api.signal_error("No callback function with that name exists in contract.")
+            }
+            if cb_data_deserializer.has_next() {
+                self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);
+            }
 
-        // cleanup
-        self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); 
+            // cleanup
+            self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); 
+        }
     }
 }
 
