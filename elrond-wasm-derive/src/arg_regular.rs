@@ -11,16 +11,16 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
             quote!{
                 self.api.get_argument_address(#arg_index_expr)
             },
-        "Vec" => {
-                let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
-                let type_str = vec_generic_type_segm.ident.to_string();
-                match type_str.as_str() {
-                    "u8" => quote!{
-                        self.api.get_argument_vec(#arg_index_expr)
-                    },
-                    other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
-                }
-            },
+        // "Vec" => {
+        //         let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
+        //         let type_str = vec_generic_type_segm.ident.to_string();
+        //         match type_str.as_str() {
+        //             "u8" => quote!{
+        //                 self.api.get_argument_vec(#arg_index_expr)
+        //             },
+        //             other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
+        //         }
+        //     },
         "BigInt" =>
             quote!{
                 self.api.get_argument_big_int(#arg_index_expr)

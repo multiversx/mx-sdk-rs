@@ -52,6 +52,7 @@ impl MethodMetadata {
 pub struct Method {
     pub metadata: MethodMetadata,
     pub name: syn::Ident,
+    pub generics: syn::Generics,
     pub method_args: Vec<MethodArg>,
     pub return_type: syn::ReturnType,
     pub body: Option<syn::Block>,
@@ -178,6 +179,7 @@ impl Method {
         Method {
             metadata: metadata,
             name: m.sig.ident.clone(),
+            generics: m.sig.generics.clone(),
             method_args: method_args,
             return_type: m.sig.output.clone(),
             body: m.default.clone(),
@@ -199,12 +201,14 @@ pub fn arg_declarations(method_args: &Vec<MethodArg>) -> Vec<proc_macro2::TokenS
 impl Method {
     pub fn generate_sig(&self) -> proc_macro2::TokenStream {
         let method_name = &self.name;
+        let generics = &self.generics;
+        let generics_where = &self.generics.where_clause;
         let arg_decl = arg_declarations(&self.method_args);
         let ret_tok = match &self.return_type {
             syn::ReturnType::Default => quote!{},
             syn::ReturnType::Type(_, ty) => quote!{ -> #ty },
         };
-        let result = quote!{ fn #method_name ( &self , #(#arg_decl),* ) #ret_tok };
+        let result = quote!{ fn #method_name #generics ( &self , #(#arg_decl),* ) #ret_tok #generics_where };
         result
     }
 

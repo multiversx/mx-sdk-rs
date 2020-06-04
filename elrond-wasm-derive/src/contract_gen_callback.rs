@@ -54,9 +54,11 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
                                                 let pat = &arg.pat;
-                                                let arg_get = arg_deserialize_next(arg);
+                                                let arg_get = arg_deserialize_next(
+                                                    &quote!{ cb_data_deserializer },
+                                                    arg);
                                                 quote! {
-                                                    let #pat = #arg_get; 
+                                                    let #pat = #arg_get;
                                                 }
                                             },
                                             ArgMetadata::Payment =>
@@ -128,7 +130,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
     } else {
         quote! {
             let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
-            let cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
+            let mut cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
             let ___nr_args = self.api.get_num_arguments();
             if ___nr_args == 0 {
                 self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
