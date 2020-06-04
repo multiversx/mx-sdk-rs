@@ -1,5 +1,6 @@
 
 use core::fmt::Debug;
+use alloc::vec::Vec;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct H256([u8;32]);
@@ -119,6 +120,11 @@ impl H256 {
     #[inline]
     pub fn copy_to_array(&self, target: &mut [u8; 32]) {
         target.copy_from_slice(&self.0[..]);
+    }
+
+    #[inline]
+    pub fn to_vec(&self) -> Vec<u8> {
+        self.0[..].to_vec()
     }
 }
 
