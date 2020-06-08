@@ -154,6 +154,7 @@ impl Encode for RustBigInt {
     
     fn dep_encode_to<O: Output>(&self, dest: &mut O) {
         let bytes = self.to_signed_bytes_be();
+        bytes.len().dep_encode_to(dest);
         dest.write(&bytes);
     }
 }
