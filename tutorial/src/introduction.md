@@ -26,8 +26,8 @@ It can work for small contracts, but it becomes difficult as the contracts becom
 ## Why not Solidity?
 
 In order to help developers migrate their projects from Ethereum to Elrond, we tried bringing a Solidity to WASM compiler to the stack. There are 2 main problems though:
-    * The [SOLL compiler](https://github.com/second-state/soll) is not yet fully featured.
-    * More importantly, Elrond's architecture is fundamentally different from Ethereum and many concepts do not translate well. Especially contracts calling one another function differently in a sharded architecture.
+* The [SOLL compiler](https://github.com/second-state/soll) is not yet fully featured.
+* More importantly, Elrond's architecture is fundamentally different from Ethereum and many concepts do not translate well. Especially contracts calling one another function differently in a sharded architecture.
 
 If you already have a smart contract on Ethereum that you want to bring to Elrond, it is probably easier to simply rewrite it from scratch in Rust. For instance, it took a developer just a few hours to translate BUSD from [this](https://github.com/paxosglobal/busd-contract) to [this](https://github.com/ElrondNetwork/sc-busd-rs).
 
