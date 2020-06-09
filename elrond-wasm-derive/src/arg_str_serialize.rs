@@ -9,36 +9,36 @@ fn arg_serialize_push_single(
 
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
-        "Address" | "StorageKey" | "H256" => quote!{
-            #arg_accumulator.push_argument_bytes(#var_name.as_bytes());
-        },
-        "Vec" => {
-                match &type_path_segment.arguments {
-                    syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
-                        if args.len() != 1 {
-                            panic!("[callable] Vec type must have exactly 1 generic type argument");
-                        }
-                        if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
-                            match vec_type {
-                                syn::Type::Path(type_path) => {
-                                    let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                                    let type_str = type_path_segment.ident.to_string();
-                                    match type_str.as_str() {
-                                        "u8" => quote!{
-                                            #arg_accumulator.push_argument_bytes(#var_name.as_slice());
-                                        },
-                                        other_type => panic!("[callable] Unsupported type: Vec<{:?}>", other_type)
-                                    }
-                                },
-                                other_type => panic!("[callable] Unsupported Vec generic type: {:?}, not a path", other_type)
-                            }
-                        } else {
-                            panic!("[callable] Vec type arguments must be types")
-                        }
-                    },
-                    _ => panic!("[callable] Vec angle brackets expected")
-                }
-            },
+        // "Address" | "StorageKey" | "H256" => quote!{
+        //     #arg_accumulator.push_argument_bytes(#var_name.as_bytes());
+        // },
+        // "Vec" => {
+        //         match &type_path_segment.arguments {
+        //             syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
+        //                 if args.len() != 1 {
+        //                     panic!("[callable] Vec type must have exactly 1 generic type argument");
+        //                 }
+        //                 if let syn::GenericArgument::Type(vec_type) = args.first().unwrap() {
+        //                     match vec_type {
+        //                         syn::Type::Path(type_path) => {
+        //                             let type_path_segment = type_path.path.segments.last().unwrap().clone();
+        //                             let type_str = type_path_segment.ident.to_string();
+        //                             match type_str.as_str() {
+        //                                 "u8" => quote!{
+        //                                     #arg_accumulator.push_argument_bytes(#var_name.as_slice());
+        //                                 },
+        //                                 other_type => panic!("[callable] Unsupported type: Vec<{:?}>", other_type)
+        //                             }
+        //                         },
+        //                         other_type => panic!("[callable] Unsupported Vec generic type: {:?}, not a path", other_type)
+        //                     }
+        //                 } else {
+        //                     panic!("[callable] Vec type arguments must be types")
+        //                 }
+        //             },
+        //             _ => panic!("[callable] Vec angle brackets expected")
+        //         }
+        //     },
         "BigInt" =>
             panic!("[callable] BigInt arguments not yet supported"),
         "BigUint" =>
@@ -47,15 +47,9 @@ fn arg_serialize_push_single(
             },
         _ =>
             quote!{
-                match elrond_wasm::serializer::to_bytes(#var_name) {
-                    Ok(bytes) => {
-                        #arg_accumulator.push_argument_bytes(bytes.as_slice());
-                    },
-                    Err(sd_err) => {
-                        self.api.signal_sd_error("async call serialization error", #type_str, sd_err);
-                    }
-                }
-                
+                #var_name.using_top_encoded(|bytes| {
+                    #arg_accumulator.push_argument_bytes(bytes);
+                });
             },
     }
 }

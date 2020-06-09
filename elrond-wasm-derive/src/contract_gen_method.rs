@@ -25,6 +25,7 @@ pub enum MethodMetadata {
     CallbackRaw,
     StorageGetter{ visibility: Visibility, identifier: String },
     StorageSetter{ visibility: Visibility, identifier: String },
+    Module{ impl_path: proc_macro2::TokenTree },
 }
 
 impl MethodMetadata {
@@ -51,6 +52,7 @@ impl MethodMetadata {
 pub struct Method {
     pub metadata: MethodMetadata,
     pub name: syn::Ident,
+    pub generics: syn::Generics,
     pub method_args: Vec<MethodArg>,
     pub return_type: syn::ReturnType,
     pub body: Option<syn::Block>,
@@ -65,6 +67,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let event_opt = EventAttribute::parse(m);
     let storage_get_opt = StorageGetAttribute::parse(m);
     let storage_set_opt = StorageSetAttribute::parse(m);
+    let module_opt = ModuleAttribute::parse(m);
 
     if let Some(event_attr) = event_opt {
         if payable {
@@ -82,6 +85,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if storage_set_opt.is_some() {
             panic!("Events cannot be storage setters.");
         }
+        if module_opt.is_some() {
+            panic!("Events cannot be modules.");
+        }
         if m.default.is_some() {
             panic!("Events cannot have an implementations provided in the trait.");
         }
@@ -98,6 +104,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         }
         if storage_set_opt.is_some() {
             panic!("Callbacks cannot be storage setters.");
+        }
+        if module_opt.is_some() {
+            panic!("Callbacks cannot be modules.");
         }
         if m.default.is_none() {
             panic!("Callback methods need an implementation.");
@@ -117,6 +126,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default.is_some() {
             panic!("Storage getters cannot have an implementations provided in the trait.");
         }
+        if module_opt.is_some() {
+            panic!("Storage getters cannot be modules.");
+        }
         MethodMetadata::StorageGetter{
             visibility: visibility,
             identifier: storage_get.identifier,
@@ -128,9 +140,19 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default.is_some() {
             panic!("Storage setters cannot have an implementations provided in the trait.");
         }
+        if module_opt.is_some() {
+            panic!("Storage setters cannot be modules.");
+        }
         MethodMetadata::StorageSetter{
             visibility: visibility,
             identifier: storage_set.identifier,
+        }
+    } else if let Some(module_attr) = module_opt {
+        if m.default.is_some() {
+            panic!("Storage getters cannot have an implementations provided in the trait.");
+        }
+        MethodMetadata::Module{
+            impl_path: module_attr.arg,
         }
     } else {
         if m.default.is_none() {
@@ -157,6 +179,7 @@ impl Method {
         Method {
             metadata: metadata,
             name: m.sig.ident.clone(),
+            generics: m.sig.generics.clone(),
             method_args: method_args,
             return_type: m.sig.output.clone(),
             body: m.default.clone(),
@@ -178,12 +201,14 @@ pub fn arg_declarations(method_args: &Vec<MethodArg>) -> Vec<proc_macro2::TokenS
 impl Method {
     pub fn generate_sig(&self) -> proc_macro2::TokenStream {
         let method_name = &self.name;
+        let generics = &self.generics;
+        let generics_where = &self.generics.where_clause;
         let arg_decl = arg_declarations(&self.method_args);
         let ret_tok = match &self.return_type {
             syn::ReturnType::Default => quote!{},
             syn::ReturnType::Type(_, ty) => quote!{ -> #ty },
         };
-        let result = quote!{ fn #method_name ( &self , #(#arg_decl),* ) #ret_tok };
+        let result = quote!{ fn #method_name #generics ( &self , #(#arg_decl),* ) #ret_tok #generics_where };
         result
     }
 

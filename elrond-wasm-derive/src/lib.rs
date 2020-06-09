@@ -19,14 +19,17 @@ mod arg_extract;
 mod arg_regular;
 mod arg_str_deserialize;
 mod arg_str_serialize;
-mod contract;
 mod contract_gen;
 mod contract_gen_callback;
 mod contract_gen_event;
 mod contract_gen_finish;
 mod contract_gen_method;
+mod contract_gen_module;
 mod contract_gen_payable;
 mod contract_gen_storage;
+mod contract_impl;
+mod contract_macro_main;
+mod contract_macro_module;
 mod parse_attr;
 mod snippets;
 mod util;
@@ -56,7 +59,17 @@ pub fn contract(
   input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
 
-  contract::process_contract(args, input)
+  contract_macro_main::process_contract(args, input)
+
+}
+
+#[proc_macro_attribute]
+pub fn module(
+  args: proc_macro::TokenStream,
+  input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+
+  contract_macro_module::process_module(args, input)
 
 }
 

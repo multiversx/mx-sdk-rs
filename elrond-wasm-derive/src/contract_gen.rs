@@ -2,19 +2,30 @@
 use super::contract_gen_event::*;
 use super::contract_gen_storage::*;
 use super::contract_gen_method::*;
+use super::contract_gen_module::*;
 use super::contract_gen_callback::*;
+use super::snippets;
 use super::util::*;
 
 pub struct Contract {
     pub trait_name: proc_macro2::Ident,
     pub contract_impl_name: syn::Path,
+    pub supertrait_paths: Vec<syn::Path>,
     methods: Vec<Method>,
 }
 
 impl Contract {
     pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
         let contract_impl_name = extract_struct_name(args);
-        //let trait_methods = extract_methods(&contract_trait);
+        
+        let supertrait_paths: Vec<syn::Path> = contract_trait
+            .supertraits
+            .iter()
+            .map(|supertrait| match supertrait {
+                syn::TypeParamBound::Trait(t) => t.path.clone(),
+                _ => panic!("Contract trait can only extend other traits.")
+            })
+            .collect();
 
         let methods: Vec<Method> = contract_trait
             .items
@@ -28,6 +39,7 @@ impl Contract {
         Contract {
             trait_name: contract_trait.ident.clone(),
             contract_impl_name: contract_impl_name,
+            supertrait_paths: supertrait_paths,
             methods: methods,
         }
     }
@@ -85,7 +97,8 @@ impl Contract {
                 match m.metadata {
                     MethodMetadata::Event{ .. } |
                     MethodMetadata::StorageGetter{ .. } |
-                    MethodMetadata::StorageSetter{ .. } => {
+                    MethodMetadata::StorageSetter{ .. } |
+                    MethodMetadata::Module{ .. } => {
                         let sig = m.generate_sig();
                         Some(quote! { #sig ; })
                     },
@@ -106,6 +119,8 @@ impl Contract {
                         Some(generate_getter_impl(&m, identifier.clone())),
                     MethodMetadata::StorageSetter{ visibility: _, identifier } =>
                         Some(generate_setter_impl(&m, identifier.clone())),
+                    MethodMetadata::Module{ impl_path } =>
+                        Some(generate_module_getter_impl(&m, &impl_path)),
                     _ => None
                 }
             })
@@ -121,6 +136,19 @@ impl Contract {
                     },
                     _ => None
                 }
+            })
+            .collect()
+    }
+
+    pub fn generate_supertrait_impls(&self) -> Vec<proc_macro2::TokenStream> {
+        let contract_impl_ident = self.contract_impl_name.clone();
+        let api_where = snippets::api_where();
+        self.supertrait_paths.iter()
+            .map(|supertrait_path| quote!{
+                impl <T, BigInt, BigUint> #supertrait_path<T, BigInt, BigUint> for #contract_impl_ident<T, BigInt, BigUint> 
+                #api_where
+                {}
+
             })
             .collect()
     }

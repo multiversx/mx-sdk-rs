@@ -1,5 +1,5 @@
 use core::fmt::Debug;
-use elrond_wasm::serializer::{to_bytes, from_bytes};
+use elrond_wasm::esd_serde::{to_bytes, from_bytes};
 use elrond_wasm::serde as serde;
 
 pub fn the_same<V>(element: V)

@@ -45,7 +45,7 @@ where
 
 /// Handles both signed and unsigned of any length.
 /// No generics here, because we want the executable binary as small as possible.
-fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
+pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
     if bytes.len() == 0 {
         return 0;
     }

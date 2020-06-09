@@ -11,15 +11,19 @@ pub use alloc::string::String;
 pub use serde;
 
 mod address;
+mod elrond_protected_storage;
 mod err;
+mod proxy;
 pub mod err_msg;
 pub mod call_data;
-pub mod serializer;
+pub mod esd_light;
+pub mod esd_serde;
 pub mod serialize_util;
 
 pub use address::*;
 pub use err::*;
 pub use call_data::*;
+pub use proxy::OtherContractHandle;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -75,6 +79,11 @@ pub trait ContractHookApi<BigInt, BigUint> {
     fn storage_store_i64(&self, key: &[u8], value: i64);
     
     fn storage_load_i64(&self, key: &[u8]) -> Option<i64>;
+
+    #[inline]
+    fn storage_load_cumulated_validator_reward(&self) -> BigUint {
+        self.storage_load_big_uint(elrond_protected_storage::ELROND_REWARD_KEY)
+    }
     
     fn get_call_value_big_uint(&self) -> BigUint;
 
@@ -99,12 +108,26 @@ pub trait ContractHookApi<BigInt, BigUint> {
     fn keccak256(&self, data: &[u8]) -> [u8; 32];
 }
 
-macro_rules! get_argument_cast {
+macro_rules! get_argument_signed_cast {
     ($method_name:ident, $type:ty) => {
         fn $method_name (&self, arg_id: i32) -> $type {
             let arg_i64 = self.get_argument_i64(arg_id);
             let min = <$type>::MIN as i64;
             let max = <$type>::MAX as i64;
+            if arg_i64 < min || arg_i64 > max {
+                self.signal_error(err_msg::ARG_OUT_OF_RANGE)
+            }
+            arg_i64 as $type
+        }
+  };
+}
+
+macro_rules! get_argument_unsigned_cast {
+    ($method_name:ident, $type:ty) => {
+        fn $method_name (&self, arg_id: i32) -> $type {
+            let arg_i64 = self.get_argument_u64(arg_id);
+            let min = <$type>::MIN as u64;
+            let max = <$type>::MAX as u64;
             if arg_i64 < min || arg_i64 > max {
                 self.signal_error(err_msg::ARG_OUT_OF_RANGE)
             }
@@ -145,14 +168,23 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn get_argument_big_uint(&self, arg_id: i32) -> BigUint;
     
+    // signed
     fn get_argument_i64(&self, arg_id: i32) -> i64;
+    get_argument_signed_cast!{get_argument_i32, i32}
+    get_argument_signed_cast!{get_argument_isize, isize}
+    get_argument_signed_cast!{get_argument_i8, i8}
 
-    get_argument_cast!{get_argument_i32, i32}
-    get_argument_cast!{get_argument_u32, u32}
-    get_argument_cast!{get_argument_isize, isize}
-    get_argument_cast!{get_argument_usize, usize}
-    get_argument_cast!{get_argument_i8, i8}
-    get_argument_cast!{get_argument_u8, u8}
+    // unsigned
+    fn get_argument_u64(&self, arg_id: i32) -> u64 {
+        let bytes = self.get_argument_vec(arg_id);
+        if bytes.len() > 8 {
+            self.signal_error(err_msg::ARG_OUT_OF_RANGE);
+        }
+        esd_light::bytes_to_number(bytes.as_slice(), false)
+    }
+    get_argument_unsigned_cast!{get_argument_u32, u32}
+    get_argument_unsigned_cast!{get_argument_usize, usize}
+    get_argument_unsigned_cast!{get_argument_u8, u8}
 
     fn get_argument_bool (&self, arg_id: i32) -> bool {
         let arg_i64 = self.get_argument_i64(arg_id);
@@ -173,12 +205,30 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn finish_i64(&self, value: i64);
 
+    fn finish_u64(&self, value: u64) {
+        use esd_light::Encode;
+        value.using_top_encoded(|bytes| {
+            self.finish_slice_u8(bytes);
+        });
+    }
+
     #[inline]
     fn signal_error(&self, message: &str) -> ! {
         self.signal_error_raw(message.as_ptr(), message.len())
     }
 
-    fn signal_sd_error(&self, ser_type: &str, type_name: &str, e: serializer::SDError) -> ! {
+    fn signal_esd_light_error(&self, ser_type: &[u8], type_name: &[u8], specific_msg: &[u8]) -> ! {
+        // TODO: optimize
+        let mut message: Vec<u8> = Vec::new();
+        message.extend_from_slice(ser_type);
+        message.extend_from_slice(b" (");
+        message.extend_from_slice(type_name);
+        message.extend_from_slice(b"): ");
+        message.extend_from_slice(specific_msg);
+        self.signal_error_raw(message.as_ptr(), message.len())
+    }
+
+    fn signal_esd_serde_error(&self, ser_type: &str, type_name: &str, e: esd_serde::SDError) -> ! {
         let mut message: Vec<u8> = Vec::new();
         message.extend_from_slice(ser_type.as_bytes());
         message.extend_from_slice(b" (");
@@ -232,7 +282,8 @@ pub trait BigUintApi:
     Ord +
     PartialEq<u64> +
     PartialOrd<u64> +
-    serde::Serialize +
+    esd_light::Encode +
+    esd_light::Decode +
 {
     fn zero() -> Self {
         0u64.into()
@@ -282,7 +333,8 @@ pub trait BigIntApi<BigUint>:
         Ord +
         PartialEq<i64> +
         PartialOrd<i64> +
-        serde::Serialize +
+        esd_light::Encode +
+        esd_light::Decode +
 {
     fn zero() -> Self {
         0i64.into()
@@ -310,5 +362,21 @@ pub trait CallableContract {
 macro_rules! contract_proxy {
     ($s:expr, $address:expr, $proxy_trait:ident) => {
       $s.contract_proxy($address) as Box<dyn $proxy_trait<BigInt, BigUint>>
+  };
+}
+
+/// Getting all imports needed for a smart contract.
+#[macro_export]
+macro_rules! imports {
+    () => {
+        use elrond_wasm::{Box, Vec, String};
+        use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
+        use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
+        use elrond_wasm::esd_light::{Encode, Decode, DeError};
+        use elrond_wasm::err_msg;
+        use core::ops::{Add, Sub, Mul, Div, Rem};
+        use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+        use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
+        use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
   };
 }

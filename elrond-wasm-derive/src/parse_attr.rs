@@ -10,6 +10,7 @@ static ATTR_CALLBACK_ARG: &str = "callback_arg";
 static ATTR_MULTI: &str = "multi";
 static ATTR_STORAGE_GET: &str = "storage_get";
 static ATTR_STORAGE_SET: &str = "storage_set";
+static ATTR_MODULE: &str = "module";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 	attrs.iter().any(|attr| {
@@ -147,48 +148,73 @@ impl StorageSetAttribute {
     }
 }
 
+/// Finds a method attribute with given name and 1 single argument, which is 
+fn find_attr_with_one_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option<proc_macro2::TokenTree> {
+    let cc_attr = m.attrs.iter().find(|attr| {
+        if let Some(first_seg) = attr.path.segments.first() {
+            first_seg.ident == attr_name
+        } else {
+            false
+        }
+    });
+
+    match cc_attr {        
+        None => None,
+        Some(attr) => {
+            let mut iter = attr.clone().tokens.into_iter();
+            let arg_token_tree: proc_macro2::TokenTree =
+                match iter.next() {
+                    Some(proc_macro2::TokenTree::Group(group)) => {
+                        if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
+                            panic!("attribute paranthesis expected");
+                        }
+                        let mut iter2 = group.stream().into_iter();
+                        match iter2.next() {
+                            Some(token_tree) => token_tree,
+                            _ => panic!("attribute argument expected")
+                        }
+                    },
+                    _ => panic!("attribute argument expected")
+                };
+
+            if let Some(_) = iter.next() {
+                panic!("too many tokens in attribute");
+            }
+            
+            Some(arg_token_tree)
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct CallbackCallAttribute {
     pub arg: syn::Ident
 }
 
-impl CallbackCallAttribute { 
+impl CallbackCallAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<CallbackCallAttribute> {
-        let cc_attr = m.attrs.iter().find(|attr| {
-            if let Some(first_seg) = attr.path.segments.first() {
-                first_seg.ident == ATTR_CALLBACK_CALL
-            } else {
-                false
-            }
-        });
-
-        match cc_attr {        
+        match find_attr_with_one_token_tree_arg(m, ATTR_CALLBACK_CALL) {
             None => None,
-            Some(attr) => {
-                let mut iter = attr.clone().tokens.into_iter();
-                let callback_method_ident: syn::Ident =
-                    match iter.next() {
-                        Some(proc_macro2::TokenTree::Group(group)) => {
-                            if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-                                panic!("callback paranthesis expected");
-                            }
-                            let mut iter2 = group.stream().into_iter();
-                            match iter2.next() {
-                                Some(proc_macro2::TokenTree::Ident(ident)) => ident,
-                                _ => panic!("callback argument name expected")
-                            }
-                        },
-                        _ => panic!("callback argument expected")
-                    };
+            Some(proc_macro2::TokenTree::Ident(ident)) => Some(CallbackCallAttribute {
+                arg: ident,
+            }),
+            _ => panic!("single identifier expected as callback argument"),
+        }
+    }
+}
 
-                if let Some(_) = iter.next() {
-                    panic!("too many tokens in payable attribute");
-                }
-                
-                Some(CallbackCallAttribute {
-                    arg: callback_method_ident
-                })
-            }
+#[derive(Clone, Debug)]
+pub struct ModuleAttribute {
+    pub arg: proc_macro2::TokenTree
+}
+
+impl ModuleAttribute {
+    pub fn parse(m: &syn::TraitItemMethod) -> Option<ModuleAttribute> {
+        match find_attr_with_one_token_tree_arg(m, ATTR_MODULE) {
+            None => None,
+            Some(arg) => Some(ModuleAttribute {
+                arg: arg.clone(),
+            })
         }
     }
 }

@@ -7,6 +7,7 @@ use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use alloc::vec::Vec;
 use elrond_wasm::serde as serde;
+use elrond_wasm::BigUintApi;
 
 use num_bigint::BigInt;
 use core::cmp::Ordering;
@@ -221,12 +222,39 @@ impl PartialOrd<u64> for RustBigUint {
     }
 }
 
+use elrond_wasm::esd_light::*;
+
+impl Encode for RustBigUint {
+    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+        let bytes = self.to_bytes_be();
+        f(&bytes);
+    }
+    
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+        let bytes = self.to_bytes_be();
+        bytes.len().dep_encode_to(dest);
+        dest.write(&bytes);
+    }
+}
+
+impl Decode for RustBigUint {
+    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let bytes = input.flush()?;
+        Ok(RustBigUint::from_bytes_be(bytes))
+    }
+
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        let size = usize::dep_decode(input)?;
+        let bytes = input.read_slice(size)?;
+        Ok(RustBigUint::from_bytes_be(bytes))
+    }
+}
+
 impl serde::Serialize for RustBigUint {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        use elrond_wasm::BigUintApi;
         let bytes = self.to_bytes_be();
         serializer.serialize_bytes(bytes.as_slice())
     }
@@ -238,7 +266,6 @@ impl<'de> serde::Deserialize<'de> for RustBigUint {
         D: serde::Deserializer<'de>,
     {
         let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
-        use elrond_wasm::BigUintApi;
         Ok(RustBigUint::from_bytes_be(bytes))
     }
 }

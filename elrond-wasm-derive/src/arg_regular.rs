@@ -11,16 +11,16 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
             quote!{
                 self.api.get_argument_address(#arg_index_expr)
             },
-        "Vec" => {
-                let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
-                let type_str = vec_generic_type_segm.ident.to_string();
-                match type_str.as_str() {
-                    "u8" => quote!{
-                        self.api.get_argument_vec(#arg_index_expr)
-                    },
-                    other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
-                }
-            },
+        // "Vec" => {
+        //         let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
+        //         let type_str = vec_generic_type_segm.ident.to_string();
+        //         match type_str.as_str() {
+        //             "u8" => quote!{
+        //                 self.api.get_argument_vec(#arg_index_expr)
+        //             },
+        //             other_type => panic!("Unsupported type: Vec<{:?}>", other_type)
+        //         }
+        //     },
         "BigInt" =>
             quote!{
                 self.api.get_argument_big_int(#arg_index_expr)
@@ -32,6 +32,10 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
         "i64" =>
             quote!{
                 self.api.get_argument_i64(#arg_index_expr)
+            },
+        "u64" =>
+            quote!{
+                self.api.get_argument_u64(#arg_index_expr)
             },
         "i32" =>
             quote!{
@@ -61,16 +65,19 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
             quote!{
                 self.api.get_argument_i64(#arg_index_expr) != 0
             },
-        type_name =>
+        type_name => {
+            let main_err = byte_slice_literal(&b"argument deserialization error"[..]);
+            let type_name_bytes = byte_slice_literal(type_name.as_bytes());
             quote!{
                 {
                     let arg_bytes = self.api.get_argument_vec(#arg_index_expr);
-                    match elrond_wasm::serializer::from_bytes(arg_bytes.as_slice()) {
+                    match elrond_wasm::esd_light::decode_from_byte_slice(arg_bytes.as_slice()) {
                         Ok(v) => v,
-                        Err(sd_err) => self.api.signal_sd_error("argument deserialization error", #type_name, sd_err)
+                        Err(de_err) => self.api.signal_esd_light_error(#main_err, #type_name_bytes, de_err.message_bytes()),
                     }
                 }
-            },
+            }
+        },
     }
 }
 
