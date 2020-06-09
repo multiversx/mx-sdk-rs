@@ -3,6 +3,14 @@ use super::arg_def::*;
 //use super::parse_attr::*;
 use super::util::*;
 
+fn storage_store_default_impl(value_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    quote!{
+        #value_expr.using_top_encoded(|bytes| {
+            self.api.storage_store(key, bytes);
+        });
+    }
+}
+
 fn storage_store_snippet_for_type(type_path_segment: &syn::PathSegment, value_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let type_str = type_path_segment.ident.to_string();
     match type_str.as_str() {
@@ -22,12 +30,7 @@ fn storage_store_snippet_for_type(type_path_segment: &syn::PathSegment, value_ex
             quote!{
                 self.api.storage_store_i64(key, if *#value_expr { 1i64 } else { 0i64 });
             },
-        _ =>
-            quote!{
-                #value_expr.using_top_encoded(|bytes| {
-                    self.api.storage_store(key, bytes);
-                });
-            }
+        _ => storage_store_default_impl(value_expr)
     }
 }
 
@@ -42,14 +45,13 @@ fn storage_store_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
             if type_reference.mutability.is_some() {
                 panic!("Mutable references not supported in setters");
             }
+            let value_expr = &quote!{ #pat };
             match &*type_reference.elem {
                 syn::Type::Path(type_path) => {
                     let type_path_segment = type_path.path.segments.last().unwrap().clone();
-                    storage_store_snippet_for_type(&type_path_segment, &quote!{ #pat })
+                    storage_store_snippet_for_type(&type_path_segment, value_expr)
                 },
-                _ => {
-                    panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference)
-                }
+                _ => storage_store_default_impl(value_expr)
             }
         },
         other_arg => panic!("Unsupported argument type. Only path, reference, array or slice allowed. Found: {:?}", other_arg)
