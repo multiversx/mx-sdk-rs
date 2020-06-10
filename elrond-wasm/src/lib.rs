@@ -30,6 +30,10 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 
+pub type VarArgs<T> = Vec<T>;
+
+pub type MultiResultVec<T> = Vec<T>;
+
 pub struct AsyncCallError {
     pub err_code: i32,
     pub err_msg: Vec<u8>,
@@ -369,7 +373,7 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String};
+        use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DeError};
