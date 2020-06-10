@@ -160,7 +160,11 @@ pub fn arg_regular_multi(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStr
     }
 }
 
-pub fn arg_regular_callback(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn arg_regular_callback(
+            arg: &MethodArg, 
+            arg_index_expr: &proc_macro2::TokenStream,
+            nr_args_expr: &proc_macro2::TokenStream,
+        ) -> proc_macro2::TokenStream {
     match &arg.ty {
         syn::Type::Path(type_path) => {
             let type_path_segment = type_path.path.segments.last().unwrap().clone();
@@ -178,7 +182,32 @@ pub fn arg_regular_callback(arg: &MethodArg, arg_index_expr: &proc_macro2::Token
                                 match gen_type {                
                                     syn::Type::Path(type_path) => {
                                         let generic_type_segm = type_path.path.segments.last().unwrap().clone();
-                                        arg_regular_single(&generic_type_segm, arg_index_expr)
+                                        let type_str = generic_type_segm.ident.to_string();
+                                        if type_str == "VarArgs" {
+                                            let var_args_generic_type_segm = generic_type_single_arg_segment(&"VarArgs", &generic_type_segm);
+                                            let var_arg_elem = arg_regular_single(&var_args_generic_type_segm, arg_index_expr);
+                                            quote! {
+                                                {
+                                                    let mut var_args: #gen_type = Vec::new();
+                                                    while #arg_index_expr < #nr_args_expr {
+                                                        var_args.push(#var_arg_elem);
+                                                        #arg_index_expr += 1;
+                                                    }
+                                                    var_args
+                                                }
+                                            }
+                                        } else {
+                                            let checked_arg_index_expr = quote!{
+                                                {
+                                                    if #arg_index_expr >= #nr_args_expr {
+                                                        self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
+                                                    }
+                                                    #arg_index_expr += 1;
+                                                    #arg_index_expr - 1
+                                                }
+                                            };
+                                            arg_regular_single(&generic_type_segm, &checked_arg_index_expr)
+                                        }
                                     },
                                     syn::Type::Tuple(syn::TypeTuple{elems, ..}) => {
                                         // allow empty tuple (for now)
