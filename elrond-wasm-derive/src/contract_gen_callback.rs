@@ -72,20 +72,13 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                         // AsyncCallResult argument, wraps what comes from the async call
                                         nr_regular_args += 1;
                                         
-                                        let arg_expr = quote!{
-                                            {
-                                                if ___async_res_arg >= ___nr_args {
-                                                    self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
-                                                }
-                                                ___async_res_arg += 1;
-                                                ___async_res_arg - 1
-                                            }
-                                        };
+                                        let arg_index_expr = quote!{ ___async_res_arg };
+                                        let nr_args_expr = quote! { ___nr_args };
 
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
                                                 let pat = &arg.pat;
-                                                let arg_get = arg_regular_callback(arg, &arg_expr);
+                                                let arg_get = arg_regular_callback(arg, &arg_index_expr, &nr_args_expr);
                                                 quote! {
                                                     let #pat = #arg_get; 
                                                 }
