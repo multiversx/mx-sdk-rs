@@ -78,37 +78,26 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
             }
             
         },
-        "Address" | "StorageKey" | "H256" =>
-            quote!{
-                self.api.finish_bytes32(#result_expr.as_fixed_bytes());
-            },
-        "Vec" => {
-            let vec_generic_type_segm = generic_type_single_arg_segment(&"Vec", &type_path_segment);
+        "MultiResultVec" => {
+            // MultiResultVec<...> => multiple results, one result for each element
+            let vec_generic_type_segm = generic_type_single_arg_segment(&"MultiResultVec", &type_path_segment);
             let type_str = vec_generic_type_segm.ident.to_string();
+            let elem_finish_snippet = generate_result_finish_snippet_for_type(
+                &vec_generic_type_segm, 
+                &quote! { elem });
             match type_str.as_str() {
-                "u8" => 
-                    quote!{
-                        self.api.finish_slice_u8(& #result_expr.as_slice());
-                    },
-                "u64" | "i64" | "u32" | "i32" | "usize" | "isize" => {
-                    // Vec<number> => multiple results, iterate over values
-                    // TODO: unite with match arm below
-                    let elem_finish_snippet = generate_result_finish_snippet_for_type(
-                        &vec_generic_type_segm, 
-                        &quote! { elem });
+                "u64" | "i64" | "u32" | "i32" | "usize" | "isize" | "u8" | "i8" | "bool" => {
+                    // iterate over values
+                    // TODO: replace with more elegant solution involving traits
                     quote!{
                         for &elem in #result_expr.iter() {
                             #elem_finish_snippet
                         }
                     }
-
                 },
                 _ => {
-                    // Vec<...> => multiple results, iterate over references
-                    // TODO: unite with match arm above
-                    let elem_finish_snippet = generate_result_finish_snippet_for_type(
-                        &vec_generic_type_segm, 
-                        &quote! { elem });
+                    // iterate over references
+                    // TODO: replace with more elegant solution involving traits
                     quote!{
                         for elem in #result_expr.iter() {
                             #elem_finish_snippet
@@ -117,6 +106,10 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
                 }
             }
         },
+        "Address" | "StorageKey" | "H256" =>
+            quote!{
+                self.api.finish_bytes32(#result_expr.as_fixed_bytes());
+            },
         "BigInt" =>
             quote!{
                 self.api.finish_big_int(& #result_expr);
