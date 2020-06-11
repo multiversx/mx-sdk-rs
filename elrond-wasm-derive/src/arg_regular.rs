@@ -228,7 +228,7 @@ pub fn arg_regular_callback(
                     // let get_snippet = arg_regular_single(&vec_generic_type_segm, arg_index_expr); // TODO: support tuples
                     // let pat = &arg.pat;
                     quote! {
-                        match self.api.get_argument_i64(#arg_index_expr) {
+                        match { let err_code = self.api.get_argument_i64(#arg_index_expr); #arg_index_expr += 1; err_code } {
                             0 => AsyncCallResult::Ok(#get_snippet),
                             err_code => AsyncCallResult::Err(AsyncCallError{
                                 err_code: err_code as i32,
