@@ -4,13 +4,13 @@
 
 [Prerequisites](./prerequisites.md)
 
-- [Getting started](./getting_started.md)
+- [Writing a basic crowdfunding contract](./crowdfunder/index.md)
 
-- [Writing the first contract](./crowdfunder/index.md)
+    - [Specifications](./crowdfunder/spec.md)
 
-    - [Specifications](./crowdfunder/index.md)
+    - [Setting up the project](./crowdfunder/setup.md)
 
-    - [...](./crowdfunder/index.md)
+    - [Building the project](./crowdfunder/build.md)
 
 - [Testing with scenarios](./testing.md)
 
