@@ -74,7 +74,7 @@ fn storage_load_snippet_for_type(type_path_segment: &syn::PathSegment) -> proc_m
             quote!{
                 match self.api.storage_load_i64(key) {
                     Some(v) => v as #type_ident,
-                    None => self.api.signal_error("storage not i64")
+                    None => self.api.signal_error(err_msg::STORAGE_NOT_I64)
                 }
             },
         "bool" =>

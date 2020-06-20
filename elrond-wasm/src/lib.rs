@@ -12,7 +12,7 @@ pub use serde;
 
 mod address;
 mod elrond_protected_storage;
-mod err;
+mod sc_error;
 mod proxy;
 pub mod err_msg;
 pub mod call_data;
@@ -21,7 +21,7 @@ pub mod esd_serde;
 pub mod serialize_util;
 
 pub use address::*;
-pub use err::*;
+pub use sc_error::*;
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
 
@@ -216,10 +216,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         });
     }
 
-    #[inline]
-    fn signal_error(&self, message: &str) -> ! {
-        self.signal_error_raw(message.as_ptr(), message.len())
-    }
+    fn signal_error(&self, message: &[u8]) -> !;
 
     fn signal_esd_light_error(&self, ser_type: &[u8], type_name: &[u8], specific_msg: &[u8]) -> ! {
         // TODO: optimize
@@ -229,7 +226,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         message.extend_from_slice(type_name);
         message.extend_from_slice(b"): ");
         message.extend_from_slice(specific_msg);
-        self.signal_error_raw(message.as_ptr(), message.len())
+        self.signal_error(message.as_slice())
     }
 
     fn signal_esd_serde_error(&self, ser_type: &str, type_name: &str, e: esd_serde::SDError) -> ! {
@@ -239,10 +236,8 @@ pub trait ContractIOApi<BigInt, BigUint> {
         message.extend_from_slice(type_name.as_bytes());
         message.extend_from_slice(b"): ");
         message.extend_from_slice(e.err_msg_bytes());
-        self.signal_error_raw(message.as_ptr(), message.len())
+        self.signal_error(message.as_slice())
     }
-
-    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) -> !;
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
@@ -373,7 +368,7 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec};
+        use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec, SCError};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DeError};
@@ -383,4 +378,12 @@ macro_rules! imports {
         use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
         use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
   };
+}
+
+/// Compact way of returning a static error message.
+#[macro_export]
+macro_rules! sc_error {
+    ($s:expr) => {
+        Err(SCError::Static($s.as_bytes()))
+    }
 }
