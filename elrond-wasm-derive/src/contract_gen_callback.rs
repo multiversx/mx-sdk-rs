@@ -118,7 +118,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             .collect();
     if match_arms.len() == 0 {
         quote! {
-            self.api.signal_error("No callbacks in contract.")
+            self.api.signal_error(err_msg::CALLBACK_NONE)
         }
     } else {
         quote! {
@@ -132,7 +132,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             match cb_data_deserializer.get_func_name() {
                 [] => {}
                 #(#match_arms)*
-                other => self.api.signal_error("No callback function with that name exists in contract.")
+                other => self.api.signal_error(err_msg::CALLBACK_BAD_FUNC)
             }
             if cb_data_deserializer.has_next() {
                 self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);

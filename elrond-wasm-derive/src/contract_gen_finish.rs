@@ -161,8 +161,7 @@ fn generate_result_finish_snippet_for_type(type_path_segment: &syn::PathSegment,
 
 pub fn generate_result_err_snippet(err_ident: &syn::Ident, _ty: &syn::Type) -> proc_macro2::TokenStream {
     quote! {
-        let (message_ptr, message_len) = ErrorMessage::message_ptr_and_len(#err_ident);
-        self.api.signal_error_raw(message_ptr, message_len);
+        ErrorMessage::with_message_slice(&#err_ident, |msg_bytes| self.api.signal_error(msg_bytes));
     }
 }
 

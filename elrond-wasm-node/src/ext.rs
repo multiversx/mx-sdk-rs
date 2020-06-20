@@ -4,7 +4,7 @@ use elrond_wasm::{H256, Address};
 
 use crate::big_int::*;
 use crate::big_uint::*;
-use crate::error;
+use crate::ext_error;
 use elrond_wasm::BigUintApi;
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::err_msg;
@@ -135,8 +135,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             let mut res = [0u8; 32];
             let len = storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             if len != 32 {
-                let message = "32 bytes of data expected in storage at key";
-                error::signal_error(&message);
+                ext_error::signal_error(err_msg::STORAGE_NOT_32_BYTES);
             }
             res
         }
@@ -376,8 +375,8 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) -> ! {
-        error::signal_error_raw(message_ptr, message_len)
+    fn signal_error(&self, message: &[u8]) -> ! {
+        ext_error::signal_error(message)
     }
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]) {

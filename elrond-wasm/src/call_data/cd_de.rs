@@ -1,5 +1,6 @@
 use alloc::vec::Vec;
 use crate::err_msg;
+use crate::sc_error::*;
 use super::SEPARATOR;
 
 fn hex_digit_to_half_byte(digit: u8) -> Option<u8> {
@@ -99,19 +100,19 @@ impl<'a> CallDataDeserializer<'a> {
     }
 
     /// Gets the next argument, deserializes from hex and returns the resulting bytes.
-    pub fn next_argument(&mut self) -> Result<Option<Vec<u8>>, &str> {
+    pub fn next_argument(&mut self) -> Result<Option<Vec<u8>>, SCError> {
         match self.next_argument_hex() {
             None => Ok(None),
             Some(arg_hex) => {
                 if arg_hex.len() % 2 != 0 {
-                    return Err(err_msg::DESERIALIZATION_ODD_DIGITS);
+                    return Err(SCError::Static(err_msg::DESERIALIZATION_ODD_DIGITS));
                 }
                 let res_len = arg_hex.len() / 2;
                 let mut res_vec = Vec::with_capacity(res_len);
                 for i in 0..res_len {
                     match hex_to_byte(arg_hex[2*i], arg_hex[2*i+1]) {
                         None => {
-                            return Err(err_msg::DESERIALIZATION_INVALID_BYTE);
+                            return Err(SCError::Static(err_msg::DESERIALIZATION_INVALID_BYTE));
                         },
                         Some(byte) => {
                             res_vec.push(byte);
@@ -235,7 +236,7 @@ mod tests {
         let input: &[u8] = b"func@123";
         let mut de = CallDataDeserializer::new(input);
         assert_eq!(de.get_func_name(), &b"func"[..]);
-        assert_eq!(de.next_argument(),  Err(err_msg::DESERIALIZATION_ODD_DIGITS));
+        assert_eq!(de.next_argument(),  Err(SCError::Static(err_msg::DESERIALIZATION_ODD_DIGITS)));
         assert_eq!(de.next_argument(), Ok(None));
         assert_eq!(de.next_argument(), Ok(None));
     }

@@ -531,11 +531,8 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         self.finish_big_int(&value.into());
     }
 
-    fn signal_error_raw(&self, message_ptr: *const u8, message_len: usize) -> ! {
-        let s = unsafe {
-            let slice = std::slice::from_raw_parts(message_ptr, message_len);
-            std::str::from_utf8(slice)
-        };
+    fn signal_error(&self, message: &[u8]) -> ! {
+        let s = std::str::from_utf8(message);
         panic!("signal_error was called with message: {}", s.unwrap())
     }
 
