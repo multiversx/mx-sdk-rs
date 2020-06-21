@@ -227,12 +227,12 @@ impl Encode for ArwenBigInt {
 }
 
 impl Decode for ArwenBigInt {
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))
     }
 
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))

@@ -371,7 +371,7 @@ macro_rules! imports {
         use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec, SCError};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
-        use elrond_wasm::esd_light::{Encode, Decode, DeError};
+        use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};

@@ -160,12 +160,12 @@ impl Encode for RustBigInt {
 }
 
 impl Decode for RustBigInt {
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
     }
 
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(RustBigInt::from_signed_bytes_be(bytes))

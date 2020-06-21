@@ -5,7 +5,7 @@ mod codec_err;
 
 pub use codec_ser::*;
 pub use codec_de::*;
-pub use codec_err::DeError;
+pub use codec_err::DecodeError;
 
 /// !INTERNAL USE ONLY!
 ///
@@ -40,7 +40,7 @@ pub mod test_struct {
     }
     
     impl Decode for Test {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
             Ok(Test{
                 int: u16::dep_decode(input)?,
                 seq: Vec::<u8>::dep_decode(input)?,
@@ -81,13 +81,13 @@ pub mod test_struct {
     }
     
     impl Decode for E {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
             match u32::dep_decode(input)? {
                 0 => Ok(E::Unit),
                 1 => Ok(E::Newtype(u32::dep_decode(input)?)),
                 2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
                 3 => Ok(E::Struct{ a: u32::dep_decode(input)? }),
-                _ => Err(DeError::InvalidValue),
+                _ => Err(DecodeError::InvalidValue),
             }
         }
     }
@@ -102,7 +102,7 @@ pub mod test_struct {
     }
     
     impl Decode for WrappedArray {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
             let mut arr = [0u8; 5];
             input.read_into(&mut arr)?;
             Ok(WrappedArray(arr))

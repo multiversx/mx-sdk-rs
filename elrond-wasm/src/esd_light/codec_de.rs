@@ -1,6 +1,6 @@
 
 use alloc::vec::Vec;
-use super::codec_err::DeError;
+use super::codec_err::DecodeError;
 use super::TypeInfo;
 
 /// Trait that allows reading of data into a slice.
@@ -18,19 +18,19 @@ pub trait Input {
     }
 
 	/// Read the exact number of bytes required to fill the given buffer.
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DeError>;
+    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError>;
 
 	/// Read a single byte from the input.
-	fn read_byte(&mut self) -> Result<u8, DeError> {
+	fn read_byte(&mut self) -> Result<u8, DecodeError> {
 		let mut buf = [0u8];
 		self.read_into(&mut buf[..])?;
 		Ok(buf[0])
     }
 
     /// Read the exact number of bytes required to fill the given buffer.
-	fn read_slice(&mut self, length: usize) -> Result<&[u8], DeError>;
+	fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError>;
     
-    fn flush(&mut self) -> Result<&[u8], DeError>;
+    fn flush(&mut self) -> Result<&[u8], DecodeError>;
 
 }
 
@@ -39,9 +39,9 @@ impl<'a> Input for &'a [u8] {
 		self.len()
     }
 
-	fn read_into(&mut self, into: &mut [u8]) -> Result<(), DeError> {
+	fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
 		if into.len() > self.len() {
-			return Err(DeError::InputTooShort);
+			return Err(DecodeError::InputTooShort);
 		}
 		let len = into.len();
 		into.copy_from_slice(&self[..len]);
@@ -49,9 +49,9 @@ impl<'a> Input for &'a [u8] {
 		Ok(())
     }
 
-    fn read_slice(&mut self, length: usize) -> Result<&[u8], DeError> {
+    fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError> {
         if length > self.len() {
-            return Err(DeError::InputTooShort);
+            return Err(DecodeError::InputTooShort);
         }
 
         let (result, rest) = self.split_at(length);
@@ -59,7 +59,7 @@ impl<'a> Input for &'a [u8] {
         return Ok(result);
     }
     
-    fn flush(&mut self) -> Result<&[u8], DeError> {
+    fn flush(&mut self) -> Result<&[u8], DecodeError> {
         let result = &self[..];
         *self = &[];
         return Ok(result);
@@ -74,10 +74,10 @@ pub trait Decode: Sized {
 	const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
     
     /// Attempt to deserialise the value from input.
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let result = Self::dep_decode(input)?;
         if input.remaining_len() > 0 {
-            return Err(DeError::InputTooLong);
+            return Err(DecodeError::InputTooLong);
         }
         Ok(result)
     }
@@ -85,19 +85,19 @@ pub trait Decode: Sized {
     /// Attempt to deserialise the value from input,
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError>;
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError>;
 }
 
 /// Convenience method, to avoid having to specify type when calling `top_decode`.
 /// Especially useful in the macros.
 #[inline]
-pub fn decode_from_byte_slice<D: Decode>(input: &[u8]) -> Result<D, DeError> {
+pub fn decode_from_byte_slice<D: Decode>(input: &[u8]) -> Result<D, DecodeError> {
     // the input doesn't need to be mutable because we are not changing the underlying data 
     D::top_decode(&mut &*input)
 }
 
 impl Decode for () {
-	fn dep_decode<I: Input>(_: &mut I) -> Result<(), DeError> {
+	fn dep_decode<I: Input>(_: &mut I) -> Result<(), DecodeError> {
 		Ok(())
 	}
 }
@@ -105,22 +105,22 @@ impl Decode for () {
 impl Decode for u8 {
     const TYPE_INFO: TypeInfo = TypeInfo::U8;
     
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         match bytes.len() {
             0 => Ok(0u8),
             1 => Ok(bytes[0]),
-            _ => Err(DeError::InputTooLong),
+            _ => Err(DecodeError::InputTooLong),
         }
     }
     
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         input.read_byte()
     }
 }
 
 impl<T: Decode> Decode for Vec<T> {
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match T::TYPE_INFO {
 			TypeInfo::U8 => {
                 let bytes = input.flush()?;
@@ -138,7 +138,7 @@ impl<T: Decode> Decode for Vec<T> {
         }
     }
     
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         match T::TYPE_INFO {
 			TypeInfo::U8 => {
@@ -184,16 +184,16 @@ pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
 macro_rules! impl_nums {
     ($ty:ty, $num_bytes:expr, $signed:expr) => {
         impl Decode for $ty {
-            fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+            fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.flush()?;
                 if bytes.len() > $num_bytes {
-                    return Err(DeError::InputTooLong)
+                    return Err(DecodeError::InputTooLong)
                 }
                 let num = bytes_to_number(bytes, $signed) as $ty;
                 Ok(num)
             }
             
-            fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+            fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.read_slice($num_bytes)?;
                 let num = bytes_to_number(bytes, $signed) as $ty;
                 Ok(num)
@@ -215,30 +215,30 @@ impl_nums!(isize, 4, true);
 impl_nums!(i64, 8, true);
 
 impl Decode for bool {
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         match bytes.len() {
             0 => Ok(false),
             1 => match bytes[0] {
                 0 => Ok(false),
                 1 => Ok(true),
-                _ => Err(DeError::InvalidValue),
+                _ => Err(DecodeError::InvalidValue),
             }
-            _ => Err(DeError::InputTooLong),
+            _ => Err(DecodeError::InputTooLong),
         }
     }
     
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match input.read_byte()? {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(DeError::InvalidValue),
+            _ => Err(DecodeError::InvalidValue),
         }
     }
 }
 
 impl<T: Decode> Decode for Option<T> {
-	// fn top_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+	// fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
     //     if input.empty() {
     //         Ok(None)
     //     } else {
@@ -246,11 +246,11 @@ impl<T: Decode> Decode for Option<T> {
     //     }
     // }
     
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match input.read_byte()? {
 			0 => Ok(None),
 			1 => Ok(Some(T::dep_decode(input)?)),
-			_ => Err(DeError::InvalidValue),
+			_ => Err(DecodeError::InvalidValue),
 		}
     }
 }
@@ -263,7 +263,7 @@ macro_rules! tuple_impls {
                 $($name: Decode,)+
             {
                 #[inline]
-                fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+                fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                     let tuple = (
                         $(
                             $name::dep_decode(input)?,

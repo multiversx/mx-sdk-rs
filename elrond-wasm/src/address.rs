@@ -137,7 +137,7 @@ impl Encode for H256 {
 }
 
 impl Decode for H256 {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DeError> {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let mut arr = [0u8; 32];
         input.read_into(&mut arr)?;
         Ok(H256(arr))
