@@ -213,6 +213,8 @@ impl Neg for ArwenBigInt {
 use elrond_wasm::esd_light::*;
 
 impl Encode for ArwenBigInt {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+
     fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
         let bytes = self.to_signed_bytes_be();
         f(&bytes);
@@ -227,6 +229,8 @@ impl Encode for ArwenBigInt {
 }
 
 impl Decode for ArwenBigInt {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+    
     fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))

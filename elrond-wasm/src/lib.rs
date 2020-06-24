@@ -14,6 +14,7 @@ mod address;
 mod elrond_protected_storage;
 mod sc_error;
 mod proxy;
+mod finish;
 pub mod err_msg;
 pub mod call_data;
 pub mod esd_light;
@@ -24,6 +25,8 @@ pub use address::*;
 pub use sc_error::*;
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
+pub use finish::*;
+use crate::esd_light::*;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -31,8 +34,6 @@ use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 
 pub type VarArgs<T> = Vec<T>;
-
-pub type MultiResultVec<T> = Vec<T>;
 
 pub struct AsyncCallError {
     pub err_code: i32,
@@ -50,7 +51,11 @@ pub enum AsyncCallResult<T> {
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern 
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BigInt, BigUint> {
+pub trait ContractHookApi<BigInt, BigUint>
+where
+    BigInt: Encode + 'static,
+    BigUint: Encode + 'static,
+{
 
     fn get_own_address(&self) -> Address;
 
@@ -210,7 +215,6 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_i64(&self, value: i64);
 
     fn finish_u64(&self, value: u64) {
-        use esd_light::Encode;
         value.using_top_encoded(|bytes| {
             self.finish_slice_u8(bytes);
         });
@@ -368,9 +372,9 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec, SCError};
+        use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec, OptionalResult, SCError};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
-        use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
+        use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError, EndpointResult};
         use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};

@@ -58,7 +58,10 @@ pub trait Encode: Sized {
 	}
 }
 
+// TODO: consider removing altogether when possible
 impl Encode for () {
+	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
+
 	fn dep_encode_to<O: Output>(&self, _dest: &mut O) {
 	}
 
@@ -122,6 +125,19 @@ impl<T: Encode> Encode for &[T] {
 				f(result.as_slice())
 			}
 		}
+	}
+}
+
+impl Encode for &str {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+		// push size
+		using_encoded_number(self.len() as u64, 32, false, false, |buf| dest.write(buf));
+		// actual data
+		dest.write(self.as_bytes());
+	}
+
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+		f(self.as_bytes())
 	}
 }
 

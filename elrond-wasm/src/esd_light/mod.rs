@@ -14,7 +14,11 @@ pub use codec_err::DecodeError;
 pub enum TypeInfo {
 	/// Default value of [`Encode::TYPE_INFO`] to not require implementors to set this value in the trait.
 	Unknown,
-	U8,
+    U8,
+    BigUint,
+    BigInt,
+    Unit,
+
 }
 
 /// Until we have derive capabilities, here are some structures with explicit encode/decode, for testing.
