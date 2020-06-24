@@ -170,12 +170,12 @@ pub fn generate_body_with_result(return_type: &syn::ReturnType, mbody: &proc_mac
         syn::ReturnType::Default => quote!{
             #mbody;
         },
-        syn::ReturnType::Type(_, ty) => {
-            let result_ident = syn::Ident::new("result", proc_macro2::Span::call_site());
-            let finish = generate_result_finish_snippet(&result_ident, &ty);
+        syn::ReturnType::Type(_, _) => {
+            // let result_ident = syn::Ident::new("result", proc_macro2::Span::call_site());
+            // let finish = generate_result_finish_snippet(&result_ident, &ty);
             quote!{
-                let #result_ident = #mbody;
-                #finish
+                let result = #mbody;
+                EndpointResult::<T, BigInt, BigUint>::finish(&result, &self.api);
             }
         },
     }

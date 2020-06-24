@@ -225,6 +225,8 @@ impl PartialOrd<u64> for RustBigUint {
 use elrond_wasm::esd_light::*;
 
 impl Encode for RustBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+
     fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
         let bytes = self.to_bytes_be();
         f(&bytes);
@@ -238,6 +240,8 @@ impl Encode for RustBigUint {
 }
 
 impl Decode for RustBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+    
     fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(RustBigUint::from_bytes_be(bytes))

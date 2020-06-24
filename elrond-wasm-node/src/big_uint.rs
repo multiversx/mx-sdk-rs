@@ -258,6 +258,8 @@ impl PartialOrd<u64> for ArwenBigUint {
 use elrond_wasm::esd_light::*;
 
 impl Encode for ArwenBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+
     fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
         let bytes = self.to_bytes_be();
         f(&bytes);
@@ -272,6 +274,8 @@ impl Encode for ArwenBigUint {
 }
 
 impl Decode for ArwenBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+
     fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(ArwenBigUint::from_bytes_be(bytes))
