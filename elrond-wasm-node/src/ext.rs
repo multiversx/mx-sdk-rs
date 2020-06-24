@@ -19,7 +19,7 @@ const TEMP_TX_HASH_FOR_TESTING: [u8; 32] = *b"tx_hash_________________________";
 
 
 extern {
-    fn getOwner(resultOffset: *mut u8);
+    fn getSCAddress(resultOffset: *mut u8);
     fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
     fn getNumArguments() -> i32;
     fn getArgumentLength(id: i32) -> i32;
@@ -78,7 +78,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn get_own_address(&self) -> Address {
         unsafe {
             let mut res = [0u8; 32];
-            getOwner(res.as_mut_ptr());
+            getSCAddress(res.as_mut_ptr());
             res.into()
         }
     }
