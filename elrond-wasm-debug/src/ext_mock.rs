@@ -249,12 +249,16 @@ impl ArwenMockRef {
 }
 
 impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
-    fn get_own_address(&self) -> Address {
+    fn get_sc_address(&self) -> Address {
         let state = self.state_ref.borrow();
         match &state.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.to.clone(),
         }
+    }
+
+    fn get_owner_address(&self) -> Address {
+        panic!("get_sc_address not yet implemented")
     }
 
     fn get_caller(&self) -> Address {
@@ -270,7 +274,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {
-        let sc_address = self.get_own_address();
+        let sc_address = self.get_sc_address();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&sc_address) {
             None => panic!("Account not found!"),
@@ -364,7 +368,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
-        let owner = self.get_own_address();
+        let owner = self.get_sc_address();
         let mut state = self.state_ref.borrow_mut();
         match state.accounts.get_mut(&owner) {
             None => panic!("Account not found!"),

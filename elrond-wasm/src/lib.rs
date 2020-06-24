@@ -57,14 +57,16 @@ where
     BigUint: Encode + 'static,
 {
 
-    fn get_own_address(&self) -> Address;
+    fn get_sc_address(&self) -> Address;
+
+    fn get_owner_address(&self) -> Address;
 
     fn get_caller(&self) -> Address;
 
     fn get_balance(&self, address: &Address) -> BigUint;
 
-    fn get_own_balance(&self) -> BigUint {
-        self.get_balance(&self.get_own_address())
+    fn get_sc_balance(&self) -> BigUint {
+        self.get_balance(&self.get_sc_address())
     }
     
     fn storage_store(&self, key: &[u8], value: &[u8]);
