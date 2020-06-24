@@ -14,7 +14,7 @@ mod address;
 mod elrond_protected_storage;
 mod sc_error;
 mod proxy;
-mod finish;
+pub mod finish;
 pub mod err_msg;
 pub mod call_data;
 pub mod esd_light;
@@ -372,10 +372,11 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, VarArgs, MultiResultVec, OptionalResult, SCError};
+        use elrond_wasm::{Box, Vec, String, VarArgs, SCError};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
-        use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError, EndpointResult};
+        use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
+        use elrond_wasm::finish::*;
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
