@@ -15,10 +15,16 @@ pub enum TypeInfo {
 	/// Default value of [`Encode::TYPE_INFO`] to not require implementors to set this value in the trait.
 	Unknown,
     U8,
+    I8,
+    U16,
+    I16,
+    U32,
+    I32,
+    U64,
+    I64,
     BigUint,
     BigInt,
     Unit,
-
 }
 
 /// Until we have derive capabilities, here are some structures with explicit encode/decode, for testing.

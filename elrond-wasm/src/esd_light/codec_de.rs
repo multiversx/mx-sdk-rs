@@ -97,6 +97,8 @@ pub fn decode_from_byte_slice<D: Decode>(input: &[u8]) -> Result<D, DecodeError>
 }
 
 impl Decode for () {
+    const TYPE_INFO: TypeInfo = TypeInfo::Unit;
+
 	fn dep_decode<I: Input>(_: &mut I) -> Result<(), DecodeError> {
 		Ok(())
 	}
@@ -182,8 +184,10 @@ pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
 }
 
 macro_rules! impl_nums {
-    ($ty:ty, $num_bytes:expr, $signed:expr) => {
+    ($ty:ty, $num_bytes:expr, $signed:expr, $type_info:expr) => {
         impl Decode for $ty {
+            const TYPE_INFO: TypeInfo = $type_info;
+            
             fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.flush()?;
                 if bytes.len() > $num_bytes {
@@ -202,17 +206,16 @@ macro_rules! impl_nums {
     }
 }
 
-impl_nums!(u16, 2, false);
-impl_nums!(u32, 4, false);
-impl_nums!(usize, 4, false);
-impl_nums!(u64, 8, false);
+impl_nums!(u16, 2, false, TypeInfo::U16);
+impl_nums!(u32, 4, false, TypeInfo::U32);
+impl_nums!(usize, 4, false, TypeInfo::U32);
+impl_nums!(u64, 8, false, TypeInfo::U64);
 
-
-impl_nums!(i8 , 1, true);
-impl_nums!(i16, 2, true);
-impl_nums!(i32, 4, true);
-impl_nums!(isize, 4, true);
-impl_nums!(i64, 8, true);
+impl_nums!(i8 , 1, true, TypeInfo::I8);
+impl_nums!(i16, 2, true, TypeInfo::I16);
+impl_nums!(i32, 4, true, TypeInfo::I32);
+impl_nums!(isize, 4, true, TypeInfo::I32);
+impl_nums!(i64, 8, true, TypeInfo::I64);
 
 impl Decode for bool {
 	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {

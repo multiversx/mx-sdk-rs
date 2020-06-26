@@ -35,16 +35,6 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 
-pub struct AsyncCallError {
-    pub err_code: i32,
-    pub err_msg: Vec<u8>,
-}
-
-pub enum AsyncCallResult<T> {
-    Ok(T),
-    Err(AsyncCallError)
-}
-
 /// Interface to be used by the actual smart contract code.
 /// 
 /// Note: contracts and the api are not mutable.

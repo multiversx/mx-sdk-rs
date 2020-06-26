@@ -76,11 +76,20 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                         let nr_args_expr = quote! { ___nr_args };
 
                                         match &arg.metadata {
+                                            // ArgMetadata::Single | ArgMetadata::VarArgs => {
+                                            //     let pat = &arg.pat;
+                                            //     let arg_load = arg_varargs_new(arg,
+                                            //         &quote! { ___async_res_arg },
+                                            //         &quote! { ___nr_args });
+                                            //     quote! {
+                                            //         let #pat = #arg_load;
+                                            //     }
+                                            // },
                                             ArgMetadata::Single => {
                                                 let pat = &arg.pat;
-                                                let arg_get = arg_regular_callback(arg, &arg_index_expr, &nr_args_expr);
+                                                let arg_get = arg_regular_callback_new(arg, &arg_index_expr, &nr_args_expr);
                                                 quote! {
-                                                    let #pat = #arg_get; 
+                                                    let #pat = #arg_get;
                                                 }
                                             },
                                             ArgMetadata::Payment =>
@@ -88,7 +97,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                             ArgMetadata::Multi(_) =>
                                                 panic!("multi args not allowed in callbacks"),
                                             ArgMetadata::VarArgs =>
-                                                panic!("var_args not allowed in callbacks"),
+                                                panic!("var_args annotation not allowed in callbacks, callbacks always have variable number of arguments"),
                                         }
                                     }
                                 })

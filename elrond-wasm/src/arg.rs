@@ -8,6 +8,7 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
+    // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
         TypeInfo::BigUint => {
             // self must be of type BigUint
@@ -15,6 +16,21 @@ where
             let big_uint_arg = api.get_argument_big_uint(index);
             let cast_big_uint: T = unsafe { core::mem::transmute_copy(&big_uint_arg) };
             cast_big_uint
+        },
+        TypeInfo::I64 => {
+            let arg_i64 = api.get_argument_i64(index);
+            let arg_t: T = unsafe { core::mem::transmute_copy(&arg_i64) };
+            arg_t
+        },
+        TypeInfo::I32 => {
+            let arg_i64 = api.get_argument_i32(index);
+            let arg_t: T = unsafe { core::mem::transmute_copy(&arg_i64) };
+            arg_t
+        },
+        TypeInfo::I8 => {
+            let arg_i64 = api.get_argument_i8(index);
+            let arg_t: T = unsafe { core::mem::transmute_copy(&arg_i64) };
+            arg_t
         },
         _ => {
             let arg_bytes = api.get_argument_vec(index);
@@ -37,17 +53,18 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static 
 {
-    fn load(api: &A, starting_index: i32, num_args: i32) -> (Self, i32);
+    fn load(api: &A, index: &mut i32, num_args: i32) -> Self;
 
-    fn load_multi_exact(api: &A, starting_index: i32, num_args_to_load: i32, num_args: i32) -> (Self, i32) {
-        if starting_index + num_args_to_load > num_args {
+    fn load_multi_exact(api: &A, index: &mut i32, num_args_to_load: i32, num_args: i32) -> Self {
+        let expected_end_index = *index + num_args_to_load;
+        if expected_end_index > num_args {
             api.signal_error(err_msg::ARG_WRONG_NUMBER);
         }
-        let (result, new_index) = Self::load(api, starting_index, num_args_to_load);
-        if new_index != starting_index + num_args_to_load {
+        let result = Self::load(api, index, expected_end_index);
+        if *index != expected_end_index {
             api.signal_error(err_msg::ARG_WRONG_NUMBER);
         }
-        (result, new_index)
+        result
     }
 }
 
@@ -58,13 +75,20 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
-    fn load(api: &A, starting_index: i32, num_args: i32) -> (Self, i32) {
-        if starting_index >= num_args {
+    fn load(api: &A, index: &mut i32, num_args: i32) -> Self {
+        if let TypeInfo::Unit = T::TYPE_INFO {
+            // unit type returns without loading anything
+            let cast_big_uint: T = unsafe { core::mem::transmute_copy(&()) };
+            return cast_big_uint;
+        }
+
+        if *index >= num_args {
             api.signal_error(err_msg::ARG_WRONG_NUMBER);
         }
 
-        let arg: T = load_single_arg(api, starting_index);
-        (arg, starting_index+1)
+        let arg: T = load_single_arg(api, *index);
+        *index += 1;
+        arg
     }
 }
 
@@ -83,12 +107,7 @@ impl<T> VarArgs<T> {
     }
 
     #[inline]
-    pub fn push(&mut self, value: T) {
-        self.0.push(value);
-    }
-
-    #[inline]
-    pub fn to_vec(self) -> Vec<T> {
+    pub fn into_vec(self) -> Vec<T> {
         self.0
     }
 
@@ -96,6 +115,22 @@ impl<T> VarArgs<T> {
     pub fn as_slice(&self) -> &[T] {
         self.0.as_slice()
     }
+
+    #[inline]
+    pub fn push(&mut self, value: T) {
+        self.0.push(value);
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        self.0.iter()
+    }
+
 }
 
 impl<A, BigInt, BigUint, T> EndpointVarArgs<A, BigInt, BigUint> for VarArgs<T>
@@ -105,39 +140,76 @@ where
     BigUint: BigUintApi + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
-    fn load(api: &A, starting_index: i32, num_args: i32) -> (Self, i32) {
-        let mut current_index = starting_index;
+    fn load(api: &A, index: &mut i32, num_args: i32) -> Self {
         let mut result_vec: Vec<T> = Vec::new();
-        while current_index < num_args - 1 {
-            let (arg, new_index) = T::load(api, current_index, num_args);
+        while *index < num_args {
+            let arg = T::load(api, index, num_args);
             result_vec.push(arg);
-            current_index = new_index;
         }
-        (VarArgs(result_vec), num_args)
+        VarArgs(result_vec)
     }
 }
 
-// pub enum OptionalArg<T> {
-//     Some(T),
-//     None
-// }
+pub enum OptionalArg<T> {
+    Some(T),
+    None
+}
 
-// impl<A, BigInt, BigUint, T> EndpointVarArgs<A, BigInt, BigUint> for OptionalArg<T>
-// where
-//     T: EndpointVarArgs<A, BigInt, BigUint>,
-//     BigInt: BigIntApi<BigUint> + 'static,
-//     BigUint: BigUintApi + 'static,
-//     A: ContractIOApi<BigInt, BigUint> + 'static
-// {
-//     fn load(api: &A, starting_index: i32, num_args: i32) -> (Self, i32) {
-//         if starting_index < num_args - 1 {
-//             let (arg, new_index) = T::load(api, starting_index, num_args);
-//             (OptionalArg::Some(arg), new_index)
-//         } else {
-//             (OptionalArg::None, starting_index)
-//         }
-//     }
-// }
+impl<A, BigInt, BigUint, T> EndpointVarArgs<A, BigInt, BigUint> for OptionalArg<T>
+where
+    T: EndpointVarArgs<A, BigInt, BigUint>,
+    BigInt: BigIntApi<BigUint> + 'static,
+    BigUint: BigUintApi + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'static
+{
+    fn load(api: &A, index: &mut i32, num_args: i32) -> Self {
+        if *index < num_args - 1 {
+            let arg = T::load(api, index, num_args);
+            OptionalArg::Some(arg)
+        } else {
+            OptionalArg::None
+        }
+    }
+}
+
+pub struct AsyncCallError {
+    pub err_code: i32,
+    pub err_msg: Vec<u8>,
+}
+
+pub enum AsyncCallResult<T> {
+    Ok(T),
+    Err(AsyncCallError)
+}
+
+impl<A, BigInt, BigUint, T> EndpointVarArgs<A, BigInt, BigUint> for AsyncCallResult<T>
+where
+    T: EndpointVarArgs<A, BigInt, BigUint>,
+    BigInt: BigIntApi<BigUint> + 'static,
+    BigUint: BigUintApi + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'static
+{
+    fn load(api: &A, index: &mut i32, num_args: i32) -> Self {
+        if *index >= num_args {
+            api.signal_error(err_msg::ARG_WRONG_NUMBER);
+        }
+        let err_code: i32 = load_single_arg(api, *index);
+        *index += 1;
+        if err_code == 0 {
+            let arg = T::load(api, index, num_args);
+            AsyncCallResult::Ok(arg)
+        } else {
+            if *index >= num_args {
+                api.signal_error(err_msg::ARG_WRONG_NUMBER);
+            }
+            let err_msg_bytes = api.get_argument_vec(*index);
+            AsyncCallResult::Err(AsyncCallError {
+                err_code: err_code,
+                err_msg: err_msg_bytes,
+            })
+        }
+    }
+}
 
 // macro_rules! tuple_impls {
 //     ($(($mr:ident $($n:tt $name:ident)+) )+) => {

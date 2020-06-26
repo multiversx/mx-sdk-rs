@@ -192,8 +192,10 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 }
 
 macro_rules! encode_num {
-    ($num_type:ident, $size_in_bits:expr, $signed:expr) => {
+    ($num_type:ident, $size_in_bits:expr, $signed:expr, $type_info:expr) => {
 		impl Encode for $num_type {
+			const TYPE_INFO: TypeInfo = $type_info;
+
 			#[inline]
             fn dep_encode_to<O: Output>(&self, dest: &mut O) {
 				using_encoded_number(*self as u64, $size_in_bits, $signed, false, |buf| dest.write(buf))
@@ -207,15 +209,15 @@ macro_rules! encode_num {
     }
 }
 
-encode_num!{u64, 64, false}
-encode_num!{i64, 64, true}
-encode_num!{u32, 32, false}
-encode_num!{i32, 32, true}
-encode_num!{usize, 32, false}
-encode_num!{isize, 32, true}
-encode_num!{u16, 16, false}
-encode_num!{i16, 16, true}
-encode_num!{i8, 8, true}
+encode_num!{u64, 64, false, TypeInfo::U64}
+encode_num!{i64, 64, true, TypeInfo::I64}
+encode_num!{u32, 32, false, TypeInfo::U32}
+encode_num!{i32, 32, true, TypeInfo::I32}
+encode_num!{usize, 32, false, TypeInfo::U32}
+encode_num!{isize, 32, true, TypeInfo::I32}
+encode_num!{u16, 16, false, TypeInfo::U16}
+encode_num!{i16, 16, true, TypeInfo::I16}
+encode_num!{i8, 8, true, TypeInfo::I8}
 
 impl Encode for bool {
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
