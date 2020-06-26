@@ -211,54 +211,54 @@ where
     }
 }
 
-// macro_rules! tuple_impls {
-//     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
-//         $(
-//             pub struct $mr<$($name,)+>(pub ($($name,)+));
+macro_rules! multi_arg_impls {
+    ($(($mr:ident $($n:tt $name:ident)+) )+) => {
+        $(
+            pub struct $mr<$($name,)+>(pub ($($name,)+));
 
-//             impl<A, BigInt, BigUint, $($name),+> EndpointSingleArg<A, BigInt, BigUint> for $mr<$($name,)+>
-//             where
-//                 $($name: EndpointSingleArg<A, BigInt, BigUint>,)+
-//                 BigInt: BigIntApi<BigUint> + 'static,
-//                 BigUint: BigUintApi + 'static,
-//                 A: ContractIOApi<BigInt, BigUint> + 'static
-//             {
-//                 #[inline]
-// 				fn finish(&self, api: &A) {
-//                     $(
-//                         (self.0).$n.finish(api);
-//                     )+
-//                 }
-//             }
+            impl<A, BigInt, BigUint, $($name),+> EndpointVarArgs<A, BigInt, BigUint> for $mr<$($name,)+>
+            where
+                $($name: EndpointVarArgs<A, BigInt, BigUint>,)+
+                BigInt: BigIntApi<BigUint> + 'static,
+                BigUint: BigUintApi + 'static,
+                A: ContractIOApi<BigInt, BigUint> + 'static
+            {
+                fn load(api: &A, index: &mut i32, num_args: i32) -> Self {
+                    $mr((
+                        $(
+                            $name::load(api, index, num_args)
+                        ),+
+                    ))
+                }
+            }
 
-//             impl<$($name),+> From<($($name,)+)> for $mr<$($name,)+> {
-//                 #[inline]
-//                 fn from(tuple: ($($name,)+)) -> Self {
-//                     $mr(tuple)
-//                 }
-//             }
-//         )+
-//     }
-// }
+            impl<$($name,)+> $mr<$($name,)+> {
+                #[inline]
+                pub fn into_tuple(self) -> ($($name,)+) {
+                    self.0
+                }
+            }
+        )+
+    }
+}
 
-// tuple_impls! {
-//     (MultiResult1  0 T0)
-//     (MultiResult2  0 T0 1 T1)
-//     (MultiResult3  0 T0 1 T1 2 T2)
-//     (MultiResult4  0 T0 1 T1 2 T2 3 T3)
-//     (MultiResult5  0 T0 1 T1 2 T2 3 T3 4 T4)
-//     (MultiResult6  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-//     (MultiResult7  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-//     (MultiResult8  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-//     (MultiResult9  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-//     (MultiResult10 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-//     (MultiResult11 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-//     (MultiResult12 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-//     (MultiResult13 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-//     (MultiResult14 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-//     (MultiResult15 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-//     (MultiResult16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
-// }
+multi_arg_impls! {
+    (MultiArg2  0 T0 1 T1)
+    (MultiArg3  0 T0 1 T1 2 T2)
+    (MultiArg4  0 T0 1 T1 2 T2 3 T3)
+    (MultiArg5  0 T0 1 T1 2 T2 3 T3 4 T4)
+    (MultiArg6  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
+    (MultiArg7  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
+    (MultiArg8  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
+    (MultiArg9  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
+    (MultiArg10 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
+    (MultiArg11 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
+    (MultiArg12 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
+    (MultiArg13 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
+    (MultiArg14 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
+    (MultiArg15 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
+    (MultiArg16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+}
 
 // pub trait EndpointMultiArgs<A, BigInt, BigUint>: Sized
 // where
