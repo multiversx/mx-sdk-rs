@@ -14,6 +14,7 @@ mod address;
 mod elrond_protected_storage;
 mod sc_error;
 mod proxy;
+pub mod arg;
 pub mod finish;
 pub mod err_msg;
 pub mod call_data;
@@ -25,6 +26,7 @@ pub use address::*;
 pub use sc_error::*;
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
+pub use arg::*;
 pub use finish::*;
 use crate::esd_light::*;
 
@@ -32,8 +34,6 @@ use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
-
-pub type VarArgs<T> = Vec<T>;
 
 pub struct AsyncCallError {
     pub err_code: i32,
@@ -378,6 +378,7 @@ macro_rules! imports {
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
+        use elrond_wasm::arg::*;
         use elrond_wasm::finish::*;
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};

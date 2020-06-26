@@ -81,6 +81,26 @@ fn arg_regular_single(type_path_segment: &syn::PathSegment, arg_index_expr: &pro
     }
 }
 
+pub fn arg_regular_new(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let arg_ty = &arg.ty;
+    match &arg.ty {
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability.is_some() {
+                panic!("Mutable references not supported as contract method arguments");
+            }
+            let referenced_type = &*type_reference.elem;
+            quote! {
+                & elrond_wasm::arg::load_single_arg::<T, BigInt, BigUint, #referenced_type>(&self.api, #arg_index_expr)
+            }
+        },
+        _ => {
+            quote! {
+                elrond_wasm::arg::load_single_arg::<T, BigInt, BigUint, #arg_ty>(&self.api, #arg_index_expr)
+            }
+        },
+    }
+}
+
 pub fn arg_regular(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     match &arg.ty {
         syn::Type::Path(type_path) => {
@@ -134,6 +154,69 @@ pub fn arg_regular(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -
             }
         },
         other_arg => panic!("Unsupported argument type. Only path, reference, array or slice allowed. Found: {:?}", other_arg)
+    }
+}
+
+pub fn arg_varargs_new(arg: &MethodArg,
+        arg_index_expr: &proc_macro2::TokenStream,
+        arg_num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+
+    let arg_ty = &arg.ty;
+    match &arg.ty {
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability.is_some() {
+                panic!("Mutable references not supported as contract method arguments");
+            }
+            let referenced_type = &*type_reference.elem;
+            quote! {
+                &{
+                    let (arg, new_index) = <#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, #arg_index_expr, #arg_num_expr);
+                    #arg_index_expr += new_index;
+                    arg
+                }
+            }
+        },
+        _ => {
+            quote! {
+                {
+                    let (arg, new_index) = <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, #arg_index_expr, #arg_num_expr);
+                    #arg_index_expr += new_index;
+                    arg
+                }
+            }
+        },
+    }
+}
+
+pub fn arg_multi_new(arg: &MethodArg,
+        arg_index_expr: &proc_macro2::TokenStream,
+        arg_count_expr: &proc_macro2::TokenStream,
+        arg_num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+
+    let arg_ty = &arg.ty;
+    match &arg.ty {
+        syn::Type::Reference(type_reference) => {
+            if type_reference.mutability.is_some() {
+                panic!("Mutable references not supported as contract method arguments");
+            }
+            let referenced_type = &*type_reference.elem;
+            quote! {
+                &{
+                    let (arg, new_index) = <#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, #arg_index_expr, #arg_count_expr, #arg_num_expr);
+                    #arg_index_expr += new_index;
+                    arg
+                }
+            }
+        },
+        _ => {
+            quote! {
+                {
+                    let (arg, new_index) = <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, #arg_index_expr, #arg_count_expr, #arg_num_expr);
+                    #arg_index_expr += new_index;
+                    arg
+                }
+            }
+        },
     }
 }
 
