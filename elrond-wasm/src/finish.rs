@@ -18,6 +18,7 @@ where
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
     fn finish(&self, api: &A) {
+        // the compiler is smart enough to evaluate this match at compile time
         match T::TYPE_INFO {
             TypeInfo::Unit => {},
 			TypeInfo::BigUint => {
@@ -25,7 +26,19 @@ where
                 // performing a forceful cast
                 let cast_big_uint: &BigUint = unsafe { core::mem::transmute(self) };
                 api.finish_big_uint(cast_big_uint);
-			},
+            },
+            TypeInfo::I64 => {
+                let arg_i64: i64 = unsafe { core::mem::transmute_copy(self) };
+                api.finish_i64(arg_i64);
+            },
+            TypeInfo::I32 => {
+                let arg_i32: i32 = unsafe { core::mem::transmute_copy(self) };
+                api.finish_i64(arg_i32 as i64);
+            },
+            TypeInfo::I8 => {
+                let arg_i8: i8 = unsafe { core::mem::transmute_copy(self) };
+                api.finish_i64(arg_i8 as i64);
+            },
 			_ => {
 				self.using_top_encoded(|buf| api.finish_slice_u8(buf));
 			}

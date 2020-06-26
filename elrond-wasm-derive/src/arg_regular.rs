@@ -169,20 +169,12 @@ pub fn arg_varargs_new(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                &{
-                    let (arg, new_index) = <#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, #arg_index_expr, #arg_num_expr);
-                    #arg_index_expr += new_index;
-                    arg
-                }
+                &<#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, &mut #arg_index_expr, #arg_num_expr)
             }
         },
         _ => {
             quote! {
-                {
-                    let (arg, new_index) = <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, #arg_index_expr, #arg_num_expr);
-                    #arg_index_expr += new_index;
-                    arg
-                }
+                <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, &mut #arg_index_expr, #arg_num_expr)
             }
         },
     }
@@ -201,20 +193,12 @@ pub fn arg_multi_new(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                &{
-                    let (arg, new_index) = <#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, #arg_index_expr, #arg_count_expr, #arg_num_expr);
-                    #arg_index_expr += new_index;
-                    arg
-                }
+                &<#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, &mut #arg_index_expr, #arg_count_expr, #arg_num_expr)
             }
         },
         _ => {
             quote! {
-                {
-                    let (arg, new_index) = <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, #arg_index_expr, #arg_count_expr, #arg_num_expr);
-                    #arg_index_expr += new_index;
-                    arg
-                }
+                <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, &mut #arg_index_expr, #arg_count_expr, #arg_num_expr)
             }
         },
     }
@@ -240,6 +224,29 @@ pub fn arg_regular_multi(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStr
             }
         },
         other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
+    }
+}
+
+pub fn arg_regular_callback_new(
+        arg: &MethodArg, 
+        arg_index_expr: &proc_macro2::TokenStream,
+        nr_args_expr: &proc_macro2::TokenStream,
+    ) -> proc_macro2::TokenStream {
+
+    match &arg.ty {
+    syn::Type::Path(type_path) => {
+        let type_path_segment = type_path.path.segments.last().unwrap().clone();
+        let type_str = type_path_segment.ident.to_string();
+        match type_str.as_str() {
+            "AsyncCallResult" => {
+                arg_varargs_new(arg, arg_index_expr, nr_args_expr)
+            },
+            other_stype_str => {
+                panic!("Unsupported argument type {:?} for callback argument", other_stype_str)
+            }
+        }
+    },
+    other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
     }
 }
 
