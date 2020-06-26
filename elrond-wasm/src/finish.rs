@@ -110,7 +110,7 @@ where
     }
 }
 
-macro_rules! tuple_impls {
+macro_rules! multi_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
         $(
             pub struct $mr<$($name,)+>(pub ($($name,)+));
@@ -140,7 +140,7 @@ macro_rules! tuple_impls {
     }
 }
 
-tuple_impls! {
+multi_result_impls! {
     (MultiResult1  0 T0)
     (MultiResult2  0 T0 1 T1)
     (MultiResult3  0 T0 1 T1 2 T2)
