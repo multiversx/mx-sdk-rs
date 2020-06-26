@@ -223,17 +223,19 @@ impl Method {
         }
     }
 
+    pub fn has_variable_nr_args(&self) -> bool {
+        self.method_args.iter()
+            .any(|arg| {
+                match &arg.metadata {
+                    ArgMetadata::Multi(_) => true,
+                    ArgMetadata::VarArgs => true,
+                    _ => false,
+                }
+            })
+    }
+
     pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
-        let has_variable_nr_args = 
-            self.method_args.iter()
-                .any(|arg| {
-                    match &arg.metadata {
-                        ArgMetadata::Multi(_) => true,
-                        ArgMetadata::VarArgs => true,
-                        _ => false,
-                    }
-                });
-        if has_variable_nr_args {
+        if self.has_variable_nr_args() {
             self.generate_call_method_variable_nr_args()
         } else {
             self.generate_call_method_fixed_args()
@@ -249,14 +251,14 @@ impl Method {
                 .iter()
                 .map(|arg| {
                     if arg.is_callback_arg {
-                        panic!("callback args not allowed in public functions");
+                        panic!("callback args not allowed in endpoints");
                     }
 
                     match &arg.metadata {
                         ArgMetadata::Single => {
                             arg_index += 1;
                             let pat = &arg.pat;
-                            let arg_get = arg_regular(arg, &quote!{ #arg_index });
+                            let arg_get = arg_regular_new(arg, &quote!{ #arg_index });
                             quote! {
                                 let #pat = #arg_get; 
                             }
@@ -293,15 +295,15 @@ impl Method {
     fn generate_call_method_variable_nr_args(&self) -> proc_macro2::TokenStream {
         let payable_snippet = generate_payable_snippet(self);
 
-        let arg_expr = quote!{
-            {
-                if ___current_arg >= ___nr_args {
-                    self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
-                }
-                ___current_arg += 1;
-                ___current_arg - 1
-            }
-        };
+        // let arg_expr = quote!{
+        //     {
+        //         if ___current_arg >= ___nr_args {
+        //             self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
+        //         }
+        //         ___current_arg += 1;
+        //         ___current_arg - 1
+        //     }
+        // };
 
         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
             self.method_args
@@ -312,11 +314,13 @@ impl Method {
                     }
 
                     match &arg.metadata {
-                        ArgMetadata::Single => {
+                        ArgMetadata::Single | ArgMetadata::VarArgs => {
                             let pat = &arg.pat;
-                            let arg_get = arg_regular(arg, &arg_expr);
+                            let arg_load = arg_varargs_new(arg,
+                                &quote! { ___current_arg },
+                                &quote! { ___nr_args });
                             quote! {
-                                let #pat = #arg_get;
+                                let #pat = #arg_load;
                             }
                         },
                         ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
@@ -324,24 +328,24 @@ impl Method {
                             let pat = &arg.pat;
                             let count_expr = &multi_attr.count_expr; // TODO: parse count_expr and make sure it is a an expression in parantheses
                             
-                            let push_snippet = arg_regular_multi(&arg, &arg_expr);
+                            let arg_load = arg_multi_new(arg,
+                                &quote! { ___current_arg },
+                                &quote! { #count_expr as i32 },
+                                &quote! { ___nr_args });
                             quote! {
-                                let mut #pat = Vec::with_capacity #count_expr ;
-                                for _ in 0..#pat.capacity() {
-                                    #push_snippet
-                                }
+                                let #pat = #arg_load;
                             }
                         }
-                        ArgMetadata::VarArgs => { // #[var_args]
-                            let pat = &arg.pat;
-                            let push_snippet = arg_regular_multi(&arg, &arg_expr);
-                            quote! {
-                                let mut #pat = Vec::with_capacity((___nr_args - ___current_arg) as usize);
-                                while ___current_arg < ___nr_args {
-                                    #push_snippet
-                                }
-                            }
-                        }
+                        // ArgMetadata::VarArgs => { // #[var_args]
+                        //     let pat = &arg.pat;
+                        //     let push_snippet = arg_regular_multi(&arg, &arg_expr);
+                        //     quote! {
+                        //         let mut #pat = Vec::with_capacity((___nr_args - ___current_arg) as usize);
+                        //         while ___current_arg < ___nr_args {
+                        //             #push_snippet
+                        //         }
+                        //     }
+                        // }
                     }
                 })
                 .collect();

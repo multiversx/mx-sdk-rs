@@ -17,7 +17,6 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
-    #[inline]
     fn finish(&self, api: &A) {
         match T::TYPE_INFO {
             TypeInfo::Unit => {},
