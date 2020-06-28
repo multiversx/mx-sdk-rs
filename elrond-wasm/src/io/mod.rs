@@ -2,6 +2,7 @@ pub mod arg_types;
 pub mod arg_loader_endpoint;
 pub mod arg_loader_cd;
 pub mod arg_loader_err;
+pub mod arg_serialize;
 pub mod finish;
 pub mod sc_error;
 
@@ -9,6 +10,7 @@ pub use arg_types::*;
 pub use arg_loader_endpoint::*;
 pub use arg_loader_cd::*;
 pub use arg_loader_err::*;
+pub use arg_serialize::*;
 pub use finish::*;
 pub use sc_error::*;
 
@@ -35,6 +37,16 @@ pub mod test_arg_load {
         let arg2: &i32 = &load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
         assert_eq!(arg2, &0x2222i32);
 
+        assert!(!DynArgLoader::<()>::has_next(&cd_loader));
+    }
+
+    #[test]
+    fn test_simple_vec_arg() {
+        let input: &[u8] = b"some_other_func@000000020000000300000006";
+        let de = CallDataDeserializer::new(input);
+        let mut cd_loader = CallDataArgLoader::new(de);
+        let arg1: Vec<usize> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
+        assert_eq!(arg1, [2usize, 3usize, 6usize].to_vec());
         assert!(!DynArgLoader::<()>::has_next(&cd_loader));
     }
 
@@ -104,6 +116,22 @@ pub mod test_arg_load {
                 let tuple = tuple_arg.into_tuple();
                 assert_eq!(tuple.0, 0x1111i32);
                 assert_eq!(tuple.1, 0x2222i32);
+            },
+            AsyncCallResult::Err(_) => {
+                panic!("AsyncCallResult::Ok expected");
+            }
+        }
+    }
+
+    #[test]
+    fn test_async_call_result_ok2() {
+        let input: &[u8] = b"func@00";
+        let de = CallDataDeserializer::new(input);
+        let mut cd_loader = CallDataArgLoader::new(de);
+        let acr: AsyncCallResult<VarArgs<MultiArg2<i32, i32>>> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
+        match acr {
+            AsyncCallResult::Ok(var_args) => {
+                assert_eq!(var_args.len(), 0);
             },
             AsyncCallResult::Err(_) => {
                 panic!("AsyncCallResult::Ok expected");
