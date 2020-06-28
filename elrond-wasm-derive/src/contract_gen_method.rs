@@ -315,26 +315,18 @@ impl Method {
 
                     match &arg.metadata {
                         ArgMetadata::Single | ArgMetadata::VarArgs => {
-                            let pat = &arg.pat;
-                            let arg_load = arg_varargs_new(arg,
-                                &quote! { ___current_arg },
-                                &quote! { ___nr_args });
-                            quote! {
-                                let #pat = #arg_load;
-                            }
+                            dyn_endpoint_args_init(arg,
+                                &quote! { &mut ___arg_loader },
+                                &quote! { &___err_handler })
                         },
                         ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(multi_attr) => { // #[multi(...)]
-                            let pat = &arg.pat;
                             let count_expr = &multi_attr.count_expr; // TODO: parse count_expr and make sure it is a an expression in parantheses
                             
-                            let arg_load = arg_multi_new(arg,
-                                &quote! { ___current_arg },
-                                &quote! { #count_expr as i32 },
-                                &quote! { ___nr_args });
-                            quote! {
-                                let #pat = #arg_load;
-                            }
+                            dyn_endpoint_multi_args_init(arg,
+                                &quote! { &mut ___arg_loader },
+                                &quote! { &___err_handler },
+                                &quote! { #count_expr })
                         }
                         // ArgMetadata::VarArgs => { // #[var_args]
                         //     let pat = &arg.pat;
@@ -359,16 +351,16 @@ impl Method {
             fn #call_method_ident (&self) {
                 #payable_snippet
 
-                let ___nr_args = self.api.get_num_arguments();
-                let mut ___current_arg = 0i32;
+                let ___arg_loader = DynEndpointArgLoader::new(&self.api);
+                let ___err_handler = DynEndpointErrHandler::new(&self.api);
 
                 #(#arg_init_snippets)*
 
-                if ___current_arg < ___nr_args {
-                    self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
-                }
+                // if ___current_arg < ___nr_args {
+                //     self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
+                // }
 
-                #body_with_result
+                //#body_with_result
             }
         }
     }

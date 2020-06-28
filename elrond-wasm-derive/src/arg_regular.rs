@@ -90,12 +90,12 @@ pub fn arg_regular_new(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStrea
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                & elrond_wasm::arg::load_single_arg::<T, BigInt, BigUint, #referenced_type>(&self.api, #arg_index_expr)
+                & elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(&self.api, #arg_index_expr)
             }
         },
         _ => {
             quote! {
-                elrond_wasm::arg::load_single_arg::<T, BigInt, BigUint, #arg_ty>(&self.api, #arg_index_expr)
+                elrond_wasm::load_single_arg::<T, BigInt, BigUint, #arg_ty>(&self.api, #arg_index_expr)
             }
         },
     }
@@ -157,10 +157,11 @@ pub fn arg_regular(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -
     }
 }
 
-pub fn arg_varargs_new(arg: &MethodArg,
-        arg_index_expr: &proc_macro2::TokenStream,
-        arg_num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn dyn_endpoint_args_init(arg: &MethodArg,
+        loader_expr: &proc_macro2::TokenStream,
+        err_handler_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 
+    let pat = &arg.pat;
     let arg_ty = &arg.ty;
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
@@ -169,22 +170,23 @@ pub fn arg_varargs_new(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                &<#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, &mut #arg_index_expr, #arg_num_expr)
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #err_handler_expr);
             }
         },
         _ => {
             quote! {
-                <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load(&self.api, &mut #arg_index_expr, #arg_num_expr)
+                let #pat: #arg_ty = elrond_wasm::load_dyn_arg(#loader_expr, #err_handler_expr);
             }
         },
     }
 }
 
-pub fn arg_multi_new(arg: &MethodArg,
-        arg_index_expr: &proc_macro2::TokenStream,
-        arg_count_expr: &proc_macro2::TokenStream,
-        arg_num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn dyn_endpoint_multi_args_init(arg: &MethodArg,
+    loader_expr: &proc_macro2::TokenStream,
+    err_handler_expr: &proc_macro2::TokenStream,
+    num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 
+    let pat = &arg.pat;
     let arg_ty = &arg.ty;
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
@@ -193,16 +195,40 @@ pub fn arg_multi_new(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                &<#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, &mut #arg_index_expr, #arg_count_expr, #arg_num_expr)
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_multi_arg(#loader_expr, #err_handler_expr, #num_expr);
             }
         },
         _ => {
             quote! {
-                <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, &mut #arg_index_expr, #arg_count_expr, #arg_num_expr)
+                let #pat: #arg_ty = elrond_wasm::load_dyn_multi_arg(#loader_expr, #err_handler_expr, #num_expr);
             }
         },
     }
 }
+
+// pub fn arg_multi_new(arg: &MethodArg,
+//         arg_index_expr: &proc_macro2::TokenStream,
+//         arg_count_expr: &proc_macro2::TokenStream,
+//         arg_num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+
+//     let arg_ty = &arg.ty;
+//     match &arg.ty {
+//         syn::Type::Reference(type_reference) => {
+//             if type_reference.mutability.is_some() {
+//                 panic!("Mutable references not supported as contract method arguments");
+//             }
+//             let referenced_type = &*type_reference.elem;
+//             quote! {
+//                 &<#referenced_type as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, &mut #arg_index_expr, #arg_count_expr, #arg_num_expr)
+//             }
+//         },
+//         _ => {
+//             quote! {
+//                 <#arg_ty as EndpointVarArgs<T, BigInt, BigUint>>::load_multi_exact(&self.api, &mut #arg_index_expr, #arg_count_expr, #arg_num_expr)
+//             }
+//         },
+//     }
+// }
 
 pub fn arg_regular_multi(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     match &arg.ty {
@@ -227,28 +253,28 @@ pub fn arg_regular_multi(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStr
     }
 }
 
-pub fn arg_regular_callback_new(
-        arg: &MethodArg, 
-        arg_index_expr: &proc_macro2::TokenStream,
-        nr_args_expr: &proc_macro2::TokenStream,
-    ) -> proc_macro2::TokenStream {
+// pub fn arg_regular_callback_new(
+//         arg: &MethodArg, 
+//         arg_index_expr: &proc_macro2::TokenStream,
+//         nr_args_expr: &proc_macro2::TokenStream,
+//     ) -> proc_macro2::TokenStream {
 
-    match &arg.ty {
-    syn::Type::Path(type_path) => {
-        let type_path_segment = type_path.path.segments.last().unwrap().clone();
-        let type_str = type_path_segment.ident.to_string();
-        match type_str.as_str() {
-            "AsyncCallResult" => {
-                arg_varargs_new(arg, arg_index_expr, nr_args_expr)
-            },
-            other_stype_str => {
-                panic!("Unsupported argument type {:?} for callback argument", other_stype_str)
-            }
-        }
-    },
-    other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
-    }
-}
+//     match &arg.ty {
+//     syn::Type::Path(type_path) => {
+//         let type_path_segment = type_path.path.segments.last().unwrap().clone();
+//         let type_str = type_path_segment.ident.to_string();
+//         match type_str.as_str() {
+//             "AsyncCallResult" => {
+//                 arg_varargs_new(arg, arg_index_expr, nr_args_expr)
+//             },
+//             other_stype_str => {
+//                 panic!("Unsupported argument type {:?} for callback argument", other_stype_str)
+//             }
+//         }
+//     },
+//     other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg)
+//     }
+// }
 
 pub fn arg_regular_callback(
             arg: &MethodArg, 

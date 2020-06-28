@@ -1,7 +1,7 @@
 
 use super::arg_def::*;
 use super::arg_regular::*;
-use super::arg_str_deserialize::*;
+// use super::arg_str_deserialize::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
@@ -43,7 +43,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             .filter_map(|m| {
                 match m.metadata {
                     MethodMetadata::Callback => {
-                        let mut nr_regular_args = 0i32;
+                        // let mut nr_regular_args = 0i32;
 
                         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
                             m.method_args
@@ -53,13 +53,16 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                         // callback args, loaded from storage via the tx hash
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
-                                                let pat = &arg.pat;
-                                                let arg_get = arg_deserialize_next(
-                                                    &quote!{ cb_data_deserializer },
-                                                    arg);
-                                                quote! {
-                                                    let #pat = #arg_get;
-                                                }
+                                                // let pat = &arg.pat;
+                                                // let arg_get = arg_deserialize_next(
+                                                //     &quote!{ cb_data_deserializer },
+                                                //     arg);
+                                                // quote! {
+                                                //     let #pat = #arg_get;
+                                                // }
+                                                dyn_endpoint_args_init(arg,
+                                                    &quote! { &mut ___cb_arg_loader },
+                                                    &quote! { &___err_handler })
                                             },
                                             ArgMetadata::Payment =>
                                                 panic!("payment args not allowed in callbacks"),
@@ -70,42 +73,38 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                         }
                                     } else {
                                         // AsyncCallResult argument, wraps what comes from the async call
-                                        nr_regular_args += 1;
+                                        // nr_regular_args += 1;
                                         
-                                        let arg_index_expr = quote!{ ___async_res_arg };
-                                        let nr_args_expr = quote! { ___nr_args };
+                                        // let arg_index_expr = quote!{ ___async_res_arg };
+                                        // let nr_args_expr = quote! { ___nr_args };
 
                                         match &arg.metadata {
-                                            // ArgMetadata::Single | ArgMetadata::VarArgs => {
+                                            ArgMetadata::Single | ArgMetadata::VarArgs => {
+                                                dyn_endpoint_args_init(arg,
+                                                    &quote! { &mut ___arg_loader },
+                                                    &quote! { &___err_handler })
+                                            },
+                                            // ArgMetadata::Single => {
                                             //     let pat = &arg.pat;
-                                            //     let arg_load = arg_varargs_new(arg,
-                                            //         &quote! { ___async_res_arg },
-                                            //         &quote! { ___nr_args });
+                                            //     let arg_get = arg_regular_callback_new(arg, &arg_index_expr, &nr_args_expr);
                                             //     quote! {
-                                            //         let #pat = #arg_load;
+                                            //         let #pat = #arg_get;
                                             //     }
                                             // },
-                                            ArgMetadata::Single => {
-                                                let pat = &arg.pat;
-                                                let arg_get = arg_regular_callback_new(arg, &arg_index_expr, &nr_args_expr);
-                                                quote! {
-                                                    let #pat = #arg_get;
-                                                }
-                                            },
                                             ArgMetadata::Payment =>
                                                 panic!("payment args not allowed in callbacks"),
                                             ArgMetadata::Multi(_) =>
                                                 panic!("multi args not allowed in callbacks"),
-                                            ArgMetadata::VarArgs =>
-                                                panic!("var_args annotation not allowed in callbacks, callbacks always have variable number of arguments"),
+                                            // ArgMetadata::VarArgs =>
+                                            //     panic!("var_args annotation not allowed in callbacks, callbacks always have variable number of arguments"),
                                         }
                                     }
                                 })
                                 .collect();
 
-                        if nr_regular_args != 1 {
-                            panic!("Callback method exactly 1 AsyncCallResult regular arg.");
-                        }
+                        // if nr_regular_args != 1 {
+                        //     panic!("Callback method exactly 1 AsyncCallResult regular arg.");
+                        // }
 
                         let fn_ident = &m.name;
                         let fn_name_str = &fn_ident.to_string();
@@ -133,11 +132,15 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         quote! {
             let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
             let mut cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
-            let ___nr_args = self.api.get_num_arguments();
-            if ___nr_args == 0 {
-                self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
-            }
-            let mut ___async_res_arg = 0i32;
+            // let ___nr_args = self.api.get_num_arguments();
+            // if ___nr_args == 0 {
+            //     self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
+            // }
+
+            let ___cb_arg_loader = DynEndpointArgLoader::new(&self.api);
+            let ___arg_loader = DynEndpointArgLoader::new(&self.api);
+            let ___err_handler = DynEndpointErrHandler::new(&self.api);
+
             match cb_data_deserializer.get_func_name() {
                 [] => {}
                 #(#match_arms)*
