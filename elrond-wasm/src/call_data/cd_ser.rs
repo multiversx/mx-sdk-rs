@@ -41,7 +41,7 @@ impl CallDataSerializer {
         self.0.as_slice()
     }
 
-    pub fn push_byte(&mut self, byte: u8) {
+    fn push_byte(&mut self, byte: u8) {
         let (digit1, digit2) = byte_to_hex(byte);
         self.0.push(digit1);
         self.0.push(digit2);

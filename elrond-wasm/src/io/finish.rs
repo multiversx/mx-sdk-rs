@@ -1,4 +1,4 @@
-use super::*;
+use crate::*;
 use crate::esd_light::*;
 
 pub trait EndpointResult<A, BigInt, BigUint>: Sized
