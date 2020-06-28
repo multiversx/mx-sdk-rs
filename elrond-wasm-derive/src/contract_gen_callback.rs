@@ -114,8 +114,10 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                         let match_arm = quote! {                     
                             #fn_name_literal =>
                             {
+                                let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer);
                                 #(#arg_init_snippets)*
                                 #call ;
+                                elrond_wasm::check_no_more_args(&___cb_arg_loader, &___err_handler);
                             },
                         };
                         Some(match_arm)
@@ -132,12 +134,6 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
         quote! {
             let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
             let mut cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
-            // let ___nr_args = self.api.get_num_arguments();
-            // if ___nr_args == 0 {
-            //     self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
-            // }
-
-            let mut ___cb_arg_loader = DynEndpointArgLoader::new(&self.api);
             let mut ___arg_loader = DynEndpointArgLoader::new(&self.api);
             let ___err_handler = DynEndpointErrHandler::new(&self.api);
 
@@ -146,9 +142,8 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                 #(#match_arms)*
                 other => self.api.signal_error(err_msg::CALLBACK_BAD_FUNC)
             }
-            if cb_data_deserializer.has_next() {
-                self.api.signal_error(err_msg::ARG_CALLBACK_TOO_MANY);
-            }
+            
+            elrond_wasm::check_no_more_args(&___arg_loader, &___err_handler);
 
             // cleanup
             self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); 
