@@ -95,6 +95,15 @@ pub enum OptionalResult<T> {
     None
 }
 
+impl<T> From<Option<T>> for OptionalResult<T> {
+    fn from(v: Option<T>) -> Self {
+        match v {
+            Some(result) => OptionalResult::Some(result),
+            None => OptionalResult::None,
+        }
+    }
+}
+
 impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for OptionalResult<T>
 where
     T: EndpointResult<A, BigInt, BigUint>,
