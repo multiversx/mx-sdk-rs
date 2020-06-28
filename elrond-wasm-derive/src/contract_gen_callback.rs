@@ -137,8 +137,8 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             //     self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
             // }
 
-            let ___cb_arg_loader = DynEndpointArgLoader::new(&self.api);
-            let ___arg_loader = DynEndpointArgLoader::new(&self.api);
+            let mut ___cb_arg_loader = DynEndpointArgLoader::new(&self.api);
+            let mut ___arg_loader = DynEndpointArgLoader::new(&self.api);
             let ___err_handler = DynEndpointErrHandler::new(&self.api);
 
             match cb_data_deserializer.get_func_name() {

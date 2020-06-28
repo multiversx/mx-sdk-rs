@@ -326,7 +326,7 @@ impl Method {
                             dyn_endpoint_multi_args_init(arg,
                                 &quote! { &mut ___arg_loader },
                                 &quote! { &___err_handler },
-                                &quote! { #count_expr })
+                                &quote! { #count_expr as usize })
                         }
                         // ArgMetadata::VarArgs => { // #[var_args]
                         //     let pat = &arg.pat;
@@ -351,16 +351,14 @@ impl Method {
             fn #call_method_ident (&self) {
                 #payable_snippet
 
-                let ___arg_loader = DynEndpointArgLoader::new(&self.api);
+                let mut ___arg_loader = DynEndpointArgLoader::new(&self.api);
                 let ___err_handler = DynEndpointErrHandler::new(&self.api);
 
                 #(#arg_init_snippets)*
 
-                // if ___current_arg < ___nr_args {
-                //     self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
-                // }
+                elrond_wasm::check_no_more_args(&___arg_loader, &___err_handler);
 
-                //#body_with_result
+                #body_with_result
             }
         }
     }
