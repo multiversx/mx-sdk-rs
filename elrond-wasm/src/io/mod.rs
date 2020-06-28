@@ -20,7 +20,7 @@ pub mod test_arg_load {
 
     impl DynArgErrHandler for PanickingDynArgErrHandler {
         fn handle_sc_error(&self, _err: SCError) -> ! {
-            panic!()
+            panic!("PanickingDynArgErrHandler panicked")
         }
     }
     
@@ -34,6 +34,8 @@ pub mod test_arg_load {
 
         let arg2: &i32 = &load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
         assert_eq!(arg2, &0x2222i32);
+
+        assert!(!DynArgLoader::<()>::has_next(&cd_loader));
     }
 
     #[test]
@@ -55,6 +57,20 @@ pub mod test_arg_load {
         let mut cd_loader = CallDataArgLoader::new(de);
         let tuple_arg: MultiArg2<i32, i32> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
         let tuple = tuple_arg.into_tuple();
+        assert_eq!(tuple.0, 0x1111i32);
+        assert_eq!(tuple.1, 0x2222i32);
+    }
+
+    #[test]
+    fn test_var_multi_arg_2() {
+        let input: &[u8] = b"func@1111@2222";
+        let de = CallDataDeserializer::new(input);
+        let mut cd_loader = CallDataArgLoader::new(de);
+        let tuple_arg: VarArgs<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
+        let tuple_vec = tuple_arg.into_vec();
+        assert_eq!(tuple_vec.len(), 1);
+        let mut iter = tuple_vec.into_iter();
+        let tuple = iter.next().unwrap().into_tuple();
         assert_eq!(tuple.0, 0x1111i32);
         assert_eq!(tuple.1, 0x2222i32);
     }

@@ -20,7 +20,7 @@ pub trait ArgType<D>: Sized {
 #[inline]
 pub fn load_dyn_arg<T, D, E>(loader: &mut D, err_handler: &E) -> T
 where
-    T: ArgType<D> + 'static,
+    T: ArgType<D>,
     E: DynArgErrHandler,
 {
     match T::load(loader) {
@@ -32,7 +32,7 @@ where
 #[inline]
 pub fn load_dyn_multi_arg<T, D, E>(loader: &mut D, err_handler: &E, num: usize) -> T
 where
-    T: ArgType<D> + 'static,
+    T: ArgType<D>,
     E: DynArgErrHandler,
 {
     match T::load_exact(loader, num) {
@@ -41,10 +41,21 @@ where
     }
 }
 
+#[inline]
+pub fn check_no_more_args<D, E>(loader: &D, err_handler: &E)
+where
+    D: DynArgLoader<()>,
+    E: DynArgErrHandler,
+{
+    if D::has_next(loader) {
+        err_handler.handle_sc_error(SCError::Static(err_msg::ARG_WRONG_NUMBER));
+    }
+}
+
 impl<T, D> ArgType<D> for T
 where
     T: Decode,
-    D: DynArgLoader<T> + 'static,
+    D: DynArgLoader<T>,
 {
     fn load(loader: &mut D) -> Result<Self, SCError> {
         if let TypeInfo::Unit = T::TYPE_INFO {
@@ -105,48 +116,27 @@ impl<T> VarArgs<T> {
 impl<T, D> ArgType<D> for VarArgs<T>
 where
     T: ArgType<D>,
-    D: DynArgLoader<T> + 'static,
+    D: DynArgLoader<()>,
 {
     fn load(loader: &mut D) -> Result<Self, SCError> {
         let mut result_vec: Vec<T> = Vec::new();
-        loop {
-            match loader.next_arg() {
-                Ok(Some(arg)) => {
-                    result_vec.push(arg);
-                },
-                Ok(None) => {
-                    return Ok(VarArgs(result_vec));
-                }
-                Err(sc_err) => {
-                    return Err(sc_err);
-                }
-            }
+        while DynArgLoader::<()>::has_next(&*loader) {
+            result_vec.push(T::load(loader)?);
         }
+        Ok(VarArgs(result_vec))
     }
 
     fn load_exact(loader: &mut D, num: usize) -> Result<Self, SCError> {
         let mut result_vec: Vec<T> = Vec::new();
         let mut i = 0usize;
-        loop {
-            if i == num {
-                return Ok(VarArgs(result_vec));
-            }
-            i += 1;
-            match loader.next_arg() {
-                Ok(Some(arg)) => {
-                    result_vec.push(arg);
-                },
-                Ok(None) => {
-                    if i < num {
-                        return Err(SCError::Static(err_msg::ARG_WRONG_NUMBER));
-                    }
-                    return Ok(VarArgs(result_vec));
-                }
-                Err(sc_err) => {
-                    return Err(sc_err);
-                }
-            }
+        while DynArgLoader::<()>::has_next(&*loader) && i < num {
+            result_vec.push(T::load(loader)?);
+            i += 1
         }
+        if i < num {
+            return Err(SCError::Static(err_msg::ARG_WRONG_NUMBER));
+        }
+        Ok(VarArgs(result_vec))
     }
 }
 
@@ -176,7 +166,7 @@ impl<T> OptionalArg<T> {
 impl<T, D> ArgType<D> for OptionalArg<T>
 where
     T: ArgType<D>,
-    D: DynArgLoader<T> + 'static,
+    D: DynArgLoader<T>,
 {
     fn load(loader: &mut D) -> Result<Self, SCError> {
         match loader.next_arg() {
@@ -199,7 +189,7 @@ pub enum AsyncCallResult<T> {
 impl<T, D> ArgType<D> for AsyncCallResult<T>
 where
     T: ArgType<D>,
-    D: DynArgLoader<T> + DynArgLoader<i32> + DynArgLoader<Vec<u8>> + 'static,
+    D: DynArgLoader<T> + DynArgLoader<i32> + DynArgLoader<Vec<u8>>,
 {
     fn load(loader: &mut D) -> Result<Self, SCError> {
         let err_code: i32 = match loader.next_arg() {
@@ -233,7 +223,7 @@ macro_rules! multi_arg_impls {
             impl<$($name,)+ D> ArgType<D> for $mr<$($name,)+>
             where
                 $($name: ArgType<D>,)+
-                D: $(DynArgLoader<$name> + )+ 'static
+                D: $(DynArgLoader<$name> + )+ Sized
             {
                 fn load(loader: &mut D) -> Result<Self, SCError> {
                     Ok($mr((
@@ -272,30 +262,3 @@ multi_arg_impls! {
     (MultiArg16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }
 
-// pub trait EndpointMultiArgs<A, BigInt, BigUint>: Sized
-// where
-//     BigUint: BigUintApi + 'static,
-//     BigInt: BigIntApi<BigUint> + 'static,
-//     A: ContractIOApi<BigInt, BigUint> + 'static 
-// {
-//     fn load(api: &A, starting_index: i32, num_args_to_load: i32, num_args: i32) -> (Self, i32);
-// }
-
-// impl<A, BigInt, BigUint, T> EndpointMultiArgs<A, BigInt, BigUint> for VarArgs<T>
-// where
-//     T: EndpointVarArgs<A, BigInt, BigUint>,
-//     BigInt: BigIntApi<BigUint> + 'static,
-//     BigUint: BigUintApi + 'static,
-//     A: ContractIOApi<BigInt, BigUint> + 'static
-// {
-//     fn load(api: &A, starting_index: i32, num_args_to_load: i32, num_args: i32) -> (Self, i32) {
-//         let mut current_index = starting_index;
-//         let mut result_vec: Vec<T> = Vec::new();
-//         while current_index < num_args - 1 {
-//             let (arg, new_index) = T::load(api, current_index, num_args);
-//             result_vec.push(arg);
-//             current_index = new_index;
-//         }
-//         (VarArgs(result_vec), num_args)
-//     }
-// }
