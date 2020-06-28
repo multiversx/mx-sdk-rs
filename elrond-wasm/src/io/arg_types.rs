@@ -166,12 +166,13 @@ impl<T> OptionalArg<T> {
 impl<T, D> ArgType<D> for OptionalArg<T>
 where
     T: ArgType<D>,
-    D: DynArgLoader<T>,
+    D: DynArgLoader<()>,
 {
     fn load(loader: &mut D) -> Result<Self, SCError> {
-        match loader.next_arg() {
-            Ok(opt) => Ok(opt.into()),
-            Err(sc_err) => Err(sc_err),
+        if DynArgLoader::<()>::has_next(&*loader) {
+            Ok(OptionalArg::Some(T::load(loader)?))
+        } else {
+            Ok(OptionalArg::None)
         }
     }
 }
@@ -189,19 +190,10 @@ pub enum AsyncCallResult<T> {
 impl<T, D> ArgType<D> for AsyncCallResult<T>
 where
     T: ArgType<D>,
-    D: DynArgLoader<T> + DynArgLoader<i32> + DynArgLoader<Vec<u8>>,
+    D: DynArgLoader<()> + DynArgLoader<i32> + DynArgLoader<Vec<u8>>,
 {
     fn load(loader: &mut D) -> Result<Self, SCError> {
-        let err_code: i32 = match loader.next_arg() {
-            Ok(Some(arg)) => arg,
-            Ok(None) => {
-                return Err(SCError::Static(err_msg::ARG_WRONG_NUMBER));
-            },
-            Err(sc_err) => {
-                return Err(sc_err);
-            }
-        };
-
+        let err_code = i32::load(loader)?;
         if err_code == 0 {
             let arg = T::load(loader)?;
             Ok(AsyncCallResult::Ok(arg))

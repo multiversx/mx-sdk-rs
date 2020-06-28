@@ -74,4 +74,57 @@ pub mod test_arg_load {
         assert_eq!(tuple.0, 0x1111i32);
         assert_eq!(tuple.1, 0x2222i32);
     }
+
+    #[test]
+    fn test_opt_multi_arg_2() {
+        let input: &[u8] = b"func@1111@2222";
+        let de = CallDataDeserializer::new(input);
+        let mut cd_loader = CallDataArgLoader::new(de);
+        let opt_tuple_arg: OptionalArg<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
+        match opt_tuple_arg {
+            OptionalArg::Some(tuple_arg) => {
+                let tuple = tuple_arg.into_tuple();
+                assert_eq!(tuple.0, 0x1111i32);
+                assert_eq!(tuple.1, 0x2222i32);
+            },
+            OptionalArg::None => {
+                panic!("OptionalArg::Some expected");
+            }
+        }
+    }
+
+    #[test]
+    fn test_async_call_result_ok() {
+        let input: &[u8] = b"func@@1111@2222";
+        let de = CallDataDeserializer::new(input);
+        let mut cd_loader = CallDataArgLoader::new(de);
+        let acr: AsyncCallResult<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
+        match acr {
+            AsyncCallResult::Ok(tuple_arg) => {
+                let tuple = tuple_arg.into_tuple();
+                assert_eq!(tuple.0, 0x1111i32);
+                assert_eq!(tuple.1, 0x2222i32);
+            },
+            AsyncCallResult::Err(_) => {
+                panic!("AsyncCallResult::Ok expected");
+            }
+        }
+    }
+
+    #[test]
+    fn test_async_call_result_err() {
+        let input: &[u8] = b"func@0123@1111";
+        let de = CallDataDeserializer::new(input);
+        let mut cd_loader = CallDataArgLoader::new(de);
+        let acr: AsyncCallResult<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, &PanickingDynArgErrHandler);
+        match acr {
+            AsyncCallResult::Ok(_) => {
+                panic!("AsyncCallResult::Err expected");
+            },
+            AsyncCallResult::Err(async_call_error) => {
+                assert_eq!(async_call_error.err_code, 0x0123);
+                assert_eq!(async_call_error.err_msg, [0x11u8, 0x11u8].to_vec());
+            }
+        }
+    }
 }
