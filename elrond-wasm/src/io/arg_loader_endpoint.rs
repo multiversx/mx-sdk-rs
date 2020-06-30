@@ -3,7 +3,7 @@ use crate::*;
 use crate::esd_light::*;
 use core::marker::PhantomData;
 
-pub fn load_single_arg<'a, A, BigInt, BigUint, T>(api: &'a A, index: i32) -> T 
+pub fn load_single_arg<'a, A, BigInt, BigUint, T>(api: &'a A, index: i32, arg_id: ArgId) -> T 
 where
     T: Decode,
     BigUint: BigUintApi + 'static,
@@ -40,7 +40,9 @@ where
                 Ok(v) => v,
                 Err(de_err) => {
                     let mut decode_err_message: Vec<u8> = Vec::new();
-                    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR);
+                    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
+                    decode_err_message.extend_from_slice(arg_id);
+                    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
                     decode_err_message.extend_from_slice(de_err.message_bytes());
                     api.signal_error(decode_err_message.as_slice())
                 }
@@ -91,11 +93,11 @@ where
         self.current_index < self.num_arguments
     }
 
-    fn next_arg(&mut self) -> Result<Option<T>, SCError> {
+    fn next_arg(&mut self, arg_id: ArgId) -> Result<Option<T>, SCError> {
         if self.current_index >= self.num_arguments {
             Ok(None)
         } else {
-            let arg: T = load_single_arg(self.api, self.current_index);
+            let arg: T = load_single_arg(self.api, self.current_index, arg_id);
             self.current_index += 1;
             Ok(Some(arg))
         }
