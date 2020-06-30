@@ -2,7 +2,7 @@ static ATTR_PAYABLE: &str = "payable";
 static ATTR_PAYMENT: &str = "payment";
 static ATTR_VAR_ARGS: &str = "var_args";
 static ATTR_EVENT: &str = "event";
-static ATTR_PRIVATE: &str = "private";
+static ATTR_ENDPOINT: &str = "endpoint";
 static ATTR_CALLBACK_DECL: &str = "callback";
 static ATTR_CALLBACK_RAW_DECL: &str = "callback_raw";
 static ATTR_CALLBACK_CALL: &str = "callback";
@@ -19,10 +19,6 @@ fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 		};
 		false
 	})
-}
-
-pub fn is_private(m: &syn::TraitItemMethod) -> bool {
-    has_attribute(&m.attrs, ATTR_PRIVATE)
 }
 
 pub fn is_callback_decl(m: &syn::TraitItemMethod) -> bool {
@@ -148,8 +144,9 @@ impl StorageSetAttribute {
     }
 }
 
-/// Finds a method attribute with given name and 1 single argument, which is 
-fn find_attr_with_one_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option<proc_macro2::TokenTree> {
+/// Finds a method attribute with given name and 1 single optional argument.
+/// In the result, the first option is for the attribute, the second for the argument.
+fn find_attr_with_one_opt_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option<Option<proc_macro2::TokenTree>> {
     let cc_attr = m.attrs.iter().find(|attr| {
         if let Some(first_seg) = attr.path.segments.first() {
             first_seg.ident == attr_name
@@ -162,7 +159,7 @@ fn find_attr_with_one_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &str) 
         None => None,
         Some(attr) => {
             let mut iter = attr.clone().tokens.into_iter();
-            let arg_token_tree: proc_macro2::TokenTree =
+            let arg_token_tree: Option<proc_macro2::TokenTree> =
                 match iter.next() {
                     Some(proc_macro2::TokenTree::Group(group)) => {
                         if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
@@ -170,11 +167,12 @@ fn find_attr_with_one_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &str) 
                         }
                         let mut iter2 = group.stream().into_iter();
                         match iter2.next() {
-                            Some(token_tree) => token_tree,
+                            Some(token_tree) => Some(token_tree),
                             _ => panic!("attribute argument expected")
                         }
                     },
-                    _ => panic!("attribute argument expected")
+                    Some(_) => panic!("unexpected attribute argument tokens"),
+                    None => None,
                 };
 
             if let Some(_) = iter.next() {
@@ -187,15 +185,35 @@ fn find_attr_with_one_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &str) 
 }
 
 #[derive(Clone, Debug)]
+pub struct EndpointAttribute {
+    pub endpoint_name: Option<syn::Ident>
+}
+
+impl EndpointAttribute {
+    pub fn parse(m: &syn::TraitItemMethod) -> Option<EndpointAttribute> {
+        match find_attr_with_one_opt_token_tree_arg(m, ATTR_ENDPOINT) {
+            None => None,
+            Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(EndpointAttribute {
+                endpoint_name: Some(ident),
+            }),
+            Some(None) => Some(EndpointAttribute {
+                endpoint_name: None,
+            }),
+            _ => panic!("unexpected endpoint argument tokens"),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct CallbackCallAttribute {
     pub arg: syn::Ident
 }
 
 impl CallbackCallAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<CallbackCallAttribute> {
-        match find_attr_with_one_token_tree_arg(m, ATTR_CALLBACK_CALL) {
+        match find_attr_with_one_opt_token_tree_arg(m, ATTR_CALLBACK_CALL) {
             None => None,
-            Some(proc_macro2::TokenTree::Ident(ident)) => Some(CallbackCallAttribute {
+            Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(CallbackCallAttribute {
                 arg: ident,
             }),
             _ => panic!("single identifier expected as callback argument"),
@@ -210,11 +228,12 @@ pub struct ModuleAttribute {
 
 impl ModuleAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<ModuleAttribute> {
-        match find_attr_with_one_token_tree_arg(m, ATTR_MODULE) {
+        match find_attr_with_one_opt_token_tree_arg(m, ATTR_MODULE) {
             None => None,
-            Some(arg) => Some(ModuleAttribute {
+            Some(Some(arg)) => Some(ModuleAttribute {
                 arg: arg.clone(),
-            })
+            }),
+            Some(_) => panic!("module name required")
         }
     }
 }
