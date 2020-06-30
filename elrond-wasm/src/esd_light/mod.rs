@@ -197,6 +197,30 @@ pub mod tests {
     }
 
     #[test]
+    fn test_array_16384() {
+        let arr = [7i32; 16384];
+        let mut expected_bytes = Vec::<u8>::with_capacity(16384 * 4);
+        for _ in 0..16384 {
+            expected_bytes.push(0);
+            expected_bytes.push(0);
+            expected_bytes.push(0);
+            expected_bytes.push(7);
+        }
+
+        // serialize
+        let serialized_bytes = arr.top_encode();
+        assert_eq!(serialized_bytes, expected_bytes);
+
+        // deserialize
+        let deserialized = <[i32; 16384]>::top_decode(&mut &serialized_bytes[..]).unwrap();
+        for i in 0..16384 {
+            assert_eq!(deserialized[i], 7i32);
+        }
+    }
+
+    
+
+    #[test]
     fn test_option_vec_i32() {
         let some_v = Some([1i32, 2i32, 3i32].to_vec());
         let expected: &[u8] = &[/*opt*/ 1, /*size*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
