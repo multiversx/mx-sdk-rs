@@ -1,6 +1,9 @@
 
 const RESERVED: &'static [&'static str] = &[
-    "getOwner",
+    "getSCAddress",
+    "getOwnerAddress",
+    "getShardOfAddress",
+    "isSmartContract",
     "getExternalBalance",
     "getBlockHash",
     "getBlockNonce",
