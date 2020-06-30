@@ -17,7 +17,6 @@ extern crate quote;
 mod arg_def;
 mod arg_extract;
 mod arg_regular;
-mod arg_str_deserialize;
 mod arg_str_serialize;
 mod contract_gen;
 mod contract_gen_callback;
