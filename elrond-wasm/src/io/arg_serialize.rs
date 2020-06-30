@@ -4,6 +4,10 @@ use crate::call_data::*;
 
 pub trait AsynCallArg: Sized {
     fn push_async_arg(&self, serializer: &mut CallDataSerializer);
+
+    fn push_async_arg_exact(&self, _serializer: &mut CallDataSerializer, _expected_len: usize) -> Result<(), SCError> {
+        Err(SCError::Static(&b"not supported"[..]))
+    }
 }
 
 impl<T> AsynCallArg for T
@@ -20,11 +24,18 @@ impl<T> AsynCallArg for VarArgs<T>
 where
     T: AsynCallArg,
 {
-    #[inline]
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) {
         for elem in self.0.iter() {
             elem.push_async_arg(serializer);
         }
+    }
+
+    fn push_async_arg_exact(&self, serializer: &mut CallDataSerializer, expected_len: usize) -> Result<(), SCError> {
+        if self.len() != expected_len {
+            return Err(SCError::Static(err_msg::ARG_ASYNC_WRONG_NUMBER));
+        }
+        self.push_async_arg(serializer);
+        Ok(())
     }
 }
 

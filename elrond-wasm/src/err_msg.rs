@@ -2,6 +2,7 @@
 pub const NON_PAYABLE: &[u8] = "attempted to transfer funds via a non-payable function".as_bytes();
 
 pub const ARG_WRONG_NUMBER: &[u8] = "wrong number of arguments".as_bytes();
+pub const ARG_ASYNC_WRONG_NUMBER: &[u8] = "wrong number of arguments provided to async call".as_bytes();
 pub const ARG_ASYNC_RETURN_WRONG_NUMBER: &[u8] = "wrong number of arguments returned by async call".as_bytes();
 pub const ARG_CALLBACK_TOO_FEW:  &[u8] = "too few callback arguments provided".as_bytes();
 pub const ARG_CALLBACK_TOO_MANY: &[u8] = "too many callback arguments provided".as_bytes();

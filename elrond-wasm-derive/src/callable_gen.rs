@@ -92,7 +92,7 @@ impl Callable {
                         };
 
                         match &arg.metadata {
-                            ArgMetadata::Single => {
+                            ArgMetadata::Single | ArgMetadata::VarArgs => {
                                 arg_serialize_push(arg, &arg_accumulator)
                             },
                             ArgMetadata::Payment => {
@@ -103,34 +103,35 @@ impl Callable {
                             },
                             ArgMetadata::Multi(multi_attr) => {
                                 // #[multi(...)]
-                                let pat = &arg.pat;
+                                // let pat = &arg.pat;
                                 let count_expr = &multi_attr.count_expr;
-                                let vec_iter_push = arg_serialize_push_multi(
-                                    &arg,
-                                    &arg_accumulator,
-                                    &quote! { multi_arg_elem });
-                                quote! {
-                                    if #pat.len() != (#count_expr as usize) {
-                                        self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
-                                    }
-                                    for (_, multi_arg_elem) in #pat.iter().enumerate() {
-                                        #vec_iter_push ;
-                                    }
-                                }
+                                arg_serialize_push_multi(arg, &arg_accumulator, &quote!{ #count_expr as usize })
+                                // let vec_iter_push = arg_serialize_push_multi(
+                                //     &arg,
+                                //     &arg_accumulator,
+                                //     &quote! { multi_arg_elem });
+                                // quote! {
+                                //     if #pat.len() != (#count_expr as usize) {
+                                //         self.api.signal_error(err_msg::ARG_ASYNC_RETURN_WRONG_NUMBER);
+                                //     }
+                                //     for (_, multi_arg_elem) in #pat.iter().enumerate() {
+                                //         #vec_iter_push ;
+                                //     }
+                                // }
                             },
-                            ArgMetadata::VarArgs => {
-                                // #[var_args]
-                                let pat = &arg.pat;
-                                let vec_iter_push = arg_serialize_push_multi(
-                                    &arg,
-                                    &arg_accumulator,
-                                    &quote! { multi_arg_elem });
-                                quote! {
-                                    for (_, multi_arg_elem) in #pat.iter().enumerate() {
-                                        #vec_iter_push ;
-                                    }
-                                }
-                            },
+                            // ArgMetadata::VarArgs => {
+                            //     // #[var_args]
+                            //     let pat = &arg.pat;
+                            //     let vec_iter_push = arg_serialize_push_multi(
+                            //         &arg,
+                            //         &arg_accumulator,
+                            //         &quote! { multi_arg_elem });
+                            //     quote! {
+                            //         for (_, multi_arg_elem) in #pat.iter().enumerate() {
+                            //             #vec_iter_push ;
+                            //         }
+                            //     }
+                            // },
                         }
                     })
                     .collect();
