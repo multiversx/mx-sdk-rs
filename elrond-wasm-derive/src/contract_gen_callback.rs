@@ -1,7 +1,6 @@
 
 use super::arg_def::*;
 use super::arg_regular::*;
-// use super::arg_str_deserialize::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
@@ -43,8 +42,6 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             .filter_map(|m| {
                 match m.metadata {
                     MethodMetadata::Callback => {
-                        // let mut nr_regular_args = 0i32;
-
                         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
                             m.method_args
                                 .iter()
@@ -53,14 +50,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                         // callback args, loaded from storage via the tx hash
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
-                                                // let pat = &arg.pat;
-                                                // let arg_get = arg_deserialize_next(
-                                                //     &quote!{ cb_data_deserializer },
-                                                //     arg);
-                                                // quote! {
-                                                //     let #pat = #arg_get;
-                                                // }
-                                                dyn_endpoint_args_init(arg,
+                                                generate_load_dyn_arg(arg,
                                                     &quote! { &mut ___cb_arg_loader },
                                                     &quote! { &___err_handler })
                                             },
@@ -72,39 +62,22 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                                                 panic!("callback var_args not yet supported"),
                                         }
                                     } else {
-                                        // AsyncCallResult argument, wraps what comes from the async call
-                                        // nr_regular_args += 1;
-                                        
-                                        // let arg_index_expr = quote!{ ___async_res_arg };
-                                        // let nr_args_expr = quote! { ___nr_args };
-
+                                        // Should be an AsyncCallResult argument that wraps what comes from the async call.
+                                        // But in principle, one can express it it any way.
                                         match &arg.metadata {
                                             ArgMetadata::Single | ArgMetadata::VarArgs => {
-                                                dyn_endpoint_args_init(arg,
+                                                generate_load_dyn_arg(arg,
                                                     &quote! { &mut ___arg_loader },
                                                     &quote! { &___err_handler })
                                             },
-                                            // ArgMetadata::Single => {
-                                            //     let pat = &arg.pat;
-                                            //     let arg_get = arg_regular_callback_new(arg, &arg_index_expr, &nr_args_expr);
-                                            //     quote! {
-                                            //         let #pat = #arg_get;
-                                            //     }
-                                            // },
                                             ArgMetadata::Payment =>
                                                 panic!("payment args not allowed in callbacks"),
                                             ArgMetadata::Multi(_) =>
                                                 panic!("multi args not allowed in callbacks"),
-                                            // ArgMetadata::VarArgs =>
-                                            //     panic!("var_args annotation not allowed in callbacks, callbacks always have variable number of arguments"),
                                         }
                                     }
                                 })
                                 .collect();
-
-                        // if nr_regular_args != 1 {
-                        //     panic!("Callback method exactly 1 AsyncCallResult regular arg.");
-                        // }
 
                         let fn_ident = &m.name;
                         let fn_name_str = &fn_ident.to_string();

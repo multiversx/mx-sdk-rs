@@ -258,7 +258,7 @@ impl Method {
                         ArgMetadata::Single => {
                             arg_index += 1;
                             let pat = &arg.pat;
-                            let arg_get = arg_regular_new(arg, &quote!{ #arg_index });
+                            let arg_get = generate_load_single_arg(arg, &quote!{ #arg_index });
                             quote! {
                                 let #pat = #arg_get; 
                             }
@@ -295,16 +295,6 @@ impl Method {
     fn generate_call_method_variable_nr_args(&self) -> proc_macro2::TokenStream {
         let payable_snippet = generate_payable_snippet(self);
 
-        // let arg_expr = quote!{
-        //     {
-        //         if ___current_arg >= ___nr_args {
-        //             self.api.signal_error(err_msg::ARG_WRONG_NUMBER);
-        //         }
-        //         ___current_arg += 1;
-        //         ___current_arg - 1
-        //     }
-        // };
-
         let arg_init_snippets: Vec<proc_macro2::TokenStream> = 
             self.method_args
                 .iter()
@@ -315,29 +305,18 @@ impl Method {
 
                     match &arg.metadata {
                         ArgMetadata::Single | ArgMetadata::VarArgs => {
-                            dyn_endpoint_args_init(arg,
+                            generate_load_dyn_arg(arg,
                                 &quote! { &mut ___arg_loader },
                                 &quote! { &___err_handler })
                         },
                         ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(multi_attr) => { // #[multi(...)]
-                            let count_expr = &multi_attr.count_expr; // TODO: parse count_expr and make sure it is a an expression in parantheses
-                            
-                            dyn_endpoint_multi_args_init(arg,
+                            let count_expr = &multi_attr.count_expr;
+                            generate_load_dyn_multi_arg(arg,
                                 &quote! { &mut ___arg_loader },
                                 &quote! { &___err_handler },
                                 &quote! { #count_expr as usize })
                         }
-                        // ArgMetadata::VarArgs => { // #[var_args]
-                        //     let pat = &arg.pat;
-                        //     let push_snippet = arg_regular_multi(&arg, &arg_expr);
-                        //     quote! {
-                        //         let mut #pat = Vec::with_capacity((___nr_args - ___current_arg) as usize);
-                        //         while ___current_arg < ___nr_args {
-                        //             #push_snippet
-                        //         }
-                        //     }
-                        // }
                     }
                 })
                 .collect();
