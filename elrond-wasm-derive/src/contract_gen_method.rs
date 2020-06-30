@@ -58,20 +58,33 @@ pub struct Method {
     pub body: Option<syn::Block>,
 }
 
+const INIT_ENDPOINT_NAME: &str = "init";
+
 fn process_visibility(m: &syn::TraitItemMethod, endpoint_attr_opt: Option<EndpointAttribute>) -> Visibility {
-    match endpoint_attr_opt {
-        Some(endpoint_attr) => {
-            let endpoint_ident = match endpoint_attr.endpoint_name {
-                Some(ident) => ident,
-                None => m.sig.ident.clone(),
-            };
-            let endpoint_name_str = &m.sig.ident.to_string();
-            if reserved::is_reserved(endpoint_name_str) {
-                panic!("Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
-            }
-            Visibility::Endpoint(endpoint_ident)
-        },
-        None => Visibility::Private,
+    let init = is_init(m);
+    if init {
+        if let Some(_) = endpoint_attr_opt {
+            panic!("Cannot annotate with both #[init] and #[endpoint].");
+        }
+        Visibility::Endpoint(syn::Ident::new(INIT_ENDPOINT_NAME, m.sig.ident.span()))
+    } else {
+        match endpoint_attr_opt {
+            Some(endpoint_attr) => {
+                let endpoint_ident = match endpoint_attr.endpoint_name {
+                    Some(ident) => ident,
+                    None => m.sig.ident.clone(),
+                };
+                let endpoint_name_str = &endpoint_ident.to_string();
+                if endpoint_name_str == INIT_ENDPOINT_NAME {
+                    panic!("Cannot declare endpoint with name 'init'. Use #[init] instead.")
+                }
+                if reserved::is_reserved(endpoint_name_str) {
+                    panic!("Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
+                }
+                Visibility::Endpoint(endpoint_ident)
+            },
+            None => Visibility::Private,
+        }
     }
 }
 

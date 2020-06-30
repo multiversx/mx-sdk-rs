@@ -2,6 +2,7 @@ static ATTR_PAYABLE: &str = "payable";
 static ATTR_PAYMENT: &str = "payment";
 static ATTR_VAR_ARGS: &str = "var_args";
 static ATTR_EVENT: &str = "event";
+static ATTR_INIT: &str = "init";
 static ATTR_ENDPOINT: &str = "endpoint";
 static ATTR_CALLBACK_DECL: &str = "callback";
 static ATTR_CALLBACK_RAW_DECL: &str = "callback_raw";
@@ -27,6 +28,10 @@ pub fn is_callback_decl(m: &syn::TraitItemMethod) -> bool {
 
 pub fn is_callback_raw_decl(m: &syn::TraitItemMethod) -> bool {
     has_attribute(&m.attrs, ATTR_CALLBACK_RAW_DECL)
+}
+
+pub fn is_init(m: &syn::TraitItemMethod) -> bool {
+    has_attribute(&m.attrs, ATTR_INIT)
 }
 
 pub fn is_payable(m: &syn::TraitItemMethod) -> bool {
