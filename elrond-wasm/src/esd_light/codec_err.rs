@@ -8,6 +8,7 @@ pub enum DecodeError {
     InputTooLong,
     InvalidValue,
     UnsupportedOperation,
+    ArrayDecodeErr,
     Custom(&'static [u8]),
 }
 
@@ -18,6 +19,7 @@ impl DecodeError {
             DecodeError::InputTooLong => &b"input too long"[..],
             DecodeError::InvalidValue => &b"invalid value"[..],
             DecodeError::UnsupportedOperation => &b"unsupported operation"[..],
+            DecodeError::ArrayDecodeErr => &b"array decode error"[..],
             DecodeError::Custom(msg) => msg,
         }
     }
