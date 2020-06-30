@@ -11,7 +11,7 @@ use super::reserved;
 #[derive(Clone, Debug)]
 pub enum Visibility {
     /// Means it gets a smart contract function generated for it
-    Public,
+    Endpoint(syn::Ident),
 
     /// Can be used only inside the smart contract, even if it is public in the module.
     Private
@@ -29,12 +29,12 @@ pub enum MethodMetadata {
 }
 
 impl MethodMetadata {
-    pub fn is_public(&self) -> bool {
+    pub fn endpoint_name(&self) -> Option<&syn::Ident> {
         match self {
-            MethodMetadata::Regular{ visibility: Visibility::Public, ..} |
-            MethodMetadata::StorageGetter{ visibility: Visibility::Public, ..} |
-            MethodMetadata::StorageSetter{ visibility: Visibility::Public, ..} => true,
-            _ => false
+            MethodMetadata::Regular{ visibility: Visibility::Endpoint(e), ..} |
+            MethodMetadata::StorageGetter{ visibility: Visibility::Endpoint(e), ..} |
+            MethodMetadata::StorageSetter{ visibility: Visibility::Endpoint(e), ..} => Some(e),
+            _ => None,
         }
     }
 
@@ -58,10 +58,28 @@ pub struct Method {
     pub body: Option<syn::Block>,
 }
 
+fn process_visibility(m: &syn::TraitItemMethod, endpoint_attr_opt: Option<EndpointAttribute>) -> Visibility {
+    match endpoint_attr_opt {
+        Some(endpoint_attr) => {
+            let endpoint_ident = match endpoint_attr.endpoint_name {
+                Some(ident) => ident,
+                None => m.sig.ident.clone(),
+            };
+            let endpoint_name_str = &m.sig.ident.to_string();
+            if reserved::is_reserved(endpoint_name_str) {
+                panic!("Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
+            }
+            Visibility::Endpoint(endpoint_ident)
+        },
+        None => Visibility::Private,
+    }
+}
+
 fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let payable = is_payable(m);
-    let private = is_private(m);
-    let visibility = if private { Visibility::Private } else { Visibility::Public };
+    let endpoint_opt = EndpointAttribute::parse(m);
+    
+    // let visibility = if private { Visibility::Private } else { Visibility::Public };
     let callback = is_callback_decl(m);
     let callback_raw = is_callback_raw_decl(m);
     let event_opt = EventAttribute::parse(m);
@@ -73,8 +91,8 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if payable {
             panic!("Events cannot be payable.");
         }
-        if private {
-            panic!("Events cannot be marked private, they are private by definition.");
+        if let Some(_) = endpoint_opt {
+            panic!("Events cannot be endpoints.");
         }
         if callback || callback_raw {
             panic!("Events cannot be callbacks.");
@@ -96,8 +114,8 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if payable {
             panic!("Callback methods cannot be marked payable.");
         }
-        if private {
-            panic!("Callbacks cannot be marked private, they are private by definition.");
+        if let Some(_) = endpoint_opt {
+            panic!("Callbacks cannot be endpoints.");
         }
         if storage_get_opt.is_some() {
             panic!("Callbacks cannot be storage getters.");
@@ -130,7 +148,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Storage getters cannot be modules.");
         }
         MethodMetadata::StorageGetter{
-            visibility: visibility,
+            visibility: process_visibility(m, endpoint_opt),
             identifier: storage_get.identifier,
         }
     } else if let Some(storage_set) = storage_set_opt {
@@ -144,7 +162,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Storage setters cannot be modules.");
         }
         MethodMetadata::StorageSetter{
-            visibility: visibility,
+            visibility: process_visibility(m, endpoint_opt),
             identifier: storage_set.identifier,
         }
     } else if let Some(module_attr) = module_opt {
@@ -158,14 +176,8 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if m.default.is_none() {
             panic!("Regular methods need an implementation.");
         }
-        if !private {
-            let fn_name_str = &m.sig.ident.to_string();
-            if reserved::is_reserved(fn_name_str) {
-                panic!("Cannot declare public method with name '{}', because that name is reserved by the Arwen API.", fn_name_str);
-            }
-        }
         MethodMetadata::Regular{
-            visibility: visibility,
+            visibility: process_visibility(m, endpoint_opt),
             payable: payable,
         }
     }

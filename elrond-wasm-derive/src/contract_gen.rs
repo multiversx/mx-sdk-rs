@@ -47,7 +47,7 @@ impl Contract {
     pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                if m.metadata.is_public() {
+                if let Some(_) = m.metadata.endpoint_name() {
                     Some(m.generate_sig())
                 } else {
                     None
@@ -81,7 +81,7 @@ impl Contract {
     pub fn generate_call_methods(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                if m.metadata.is_public() {
+                if let Some(_) = m.metadata.endpoint_name() {
                     Some(m.generate_call_method())
                 } else {
                     None
@@ -156,18 +156,18 @@ impl Contract {
     pub fn generate_endpoints(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                if m.metadata.is_public() {
+                if let Some(endpoint_name) = m.metadata.endpoint_name() {
                     let fn_ident = &m.name;
-                        let call_method_ident = generate_call_method_name(&fn_ident);
-                        let endpoint = quote! { 
-                            #[no_mangle]
-                            pub fn #fn_ident ()
-                            {
-                                let inst = new_arwen_instance();
-                                inst.#call_method_ident();
-                            }
-                        }  ;  
-                        Some(endpoint)
+                    let call_method_ident = generate_call_method_name(&fn_ident);
+                    let endpoint = quote! { 
+                        #[no_mangle]
+                        pub fn #endpoint_name ()
+                        {
+                            let inst = new_arwen_instance();
+                            inst.#call_method_ident();
+                        }
+                    }  ;  
+                    Some(endpoint)
                 } else {
                     None
                 }
@@ -179,12 +179,12 @@ impl Contract {
         let match_arms: Vec<proc_macro2::TokenStream> = 
             self.methods.iter()
                 .filter_map(|m| {
-                    if m.metadata.is_public() {
+                    if let Some(endpoint_name) = m.metadata.endpoint_name() {
                         let fn_ident = &m.name;
-                        let fn_name_str = &fn_ident.to_string();
-                        let call_method_ident = generate_call_method_name(&fn_ident);
+                        let call_method_ident = generate_call_method_name(fn_ident);
+                        let endpoint_name_str = endpoint_name.to_string();
                         let match_arm = quote! {                     
-                            #fn_name_str =>
+                            #endpoint_name_str =>
                             {
                                 self.#call_method_ident();
                             },
