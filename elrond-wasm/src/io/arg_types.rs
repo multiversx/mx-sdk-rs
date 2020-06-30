@@ -1,41 +1,30 @@
 use crate::*;
 use crate::esd_light::*;
 
+/// Some info to display in endpoint argument deserialization error messages,
+/// to help users identify the faulty argument.
+/// Generated automatically.
+/// Current version uses argument names,
+/// but in principle it could be changed to argument index to save some bytes from the wasm output.
+pub type ArgId = &'static [u8];
 
 pub trait DynArgLoader<T>: Sized {
     fn has_next(&self) -> bool;
 
-    fn next_arg(&mut self) -> Result<Option<T>, SCError>;
+    fn next_arg(&mut self, arg_id: ArgId) -> Result<Option<T>, SCError>;
 }
 
 pub trait ArgType<D>: Sized {
-    fn load(loader: &mut D) -> Result<Self, SCError>;
-
-    #[inline]
-    fn load_exact(_loader: &mut D, _num: usize) -> Result<Self, SCError> {
-        Err(SCError::Static(&b"multi arg not supported"[..]))
-    }
+    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError>;
 }
 
 #[inline]
-pub fn load_dyn_arg<T, D, E>(loader: &mut D, err_handler: &E) -> T
+pub fn load_dyn_arg<T, D, E>(loader: &mut D, err_handler: &E, arg_id: ArgId) -> T
 where
     T: ArgType<D>,
     E: DynArgErrHandler,
 {
-    match T::load(loader) {
-        Ok(arg) => arg,
-        Err(sc_err) => err_handler.handle_sc_error(sc_err),
-    }
-}
-
-#[inline]
-pub fn load_dyn_multi_arg<T, D, E>(loader: &mut D, err_handler: &E, num: usize) -> T
-where
-    T: ArgType<D>,
-    E: DynArgErrHandler,
-{
-    match T::load_exact(loader, num) {
+    match T::load(loader, arg_id) {
         Ok(arg) => arg,
         Err(sc_err) => err_handler.handle_sc_error(sc_err),
     }
@@ -57,14 +46,14 @@ where
     T: Decode,
     D: DynArgLoader<T>,
 {
-    fn load(loader: &mut D) -> Result<Self, SCError> {
+    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
         if let TypeInfo::Unit = T::TYPE_INFO {
             // unit type returns without loading anything
             let cast_unit: T = unsafe { core::mem::transmute_copy(&()) };
             return Ok(cast_unit);
         }
 
-        match loader.next_arg() {
+        match loader.next_arg(arg_id) {
             Ok(Some(arg)) => Ok(arg),
             Ok(None) => Err(SCError::Static(err_msg::ARG_WRONG_NUMBER)),
             Err(sc_err) => Err(sc_err),
@@ -118,23 +107,10 @@ where
     T: ArgType<D>,
     D: DynArgLoader<()>,
 {
-    fn load(loader: &mut D) -> Result<Self, SCError> {
+    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
         let mut result_vec: Vec<T> = Vec::new();
         while DynArgLoader::<()>::has_next(&*loader) {
-            result_vec.push(T::load(loader)?);
-        }
-        Ok(VarArgs(result_vec))
-    }
-
-    fn load_exact(loader: &mut D, num: usize) -> Result<Self, SCError> {
-        let mut result_vec: Vec<T> = Vec::new();
-        let mut i = 0usize;
-        while DynArgLoader::<()>::has_next(&*loader) && i < num {
-            result_vec.push(T::load(loader)?);
-            i += 1
-        }
-        if i < num {
-            return Err(SCError::Static(err_msg::ARG_WRONG_NUMBER));
+            result_vec.push(T::load(loader, arg_id)?);
         }
         Ok(VarArgs(result_vec))
     }
@@ -168,9 +144,9 @@ where
     T: ArgType<D>,
     D: DynArgLoader<()>,
 {
-    fn load(loader: &mut D) -> Result<Self, SCError> {
+    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
         if DynArgLoader::<()>::has_next(&*loader) {
-            Ok(OptionalArg::Some(T::load(loader)?))
+            Ok(OptionalArg::Some(T::load(loader, arg_id)?))
         } else {
             Ok(OptionalArg::None)
         }
@@ -192,13 +168,13 @@ where
     T: ArgType<D>,
     D: DynArgLoader<()> + DynArgLoader<i32> + DynArgLoader<Vec<u8>>,
 {
-    fn load(loader: &mut D) -> Result<Self, SCError> {
-        let err_code = i32::load(loader)?;
+    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
+        let err_code = i32::load(loader, arg_id)?;
         if err_code == 0 {
-            let arg = T::load(loader)?;
+            let arg = T::load(loader, arg_id)?;
             Ok(AsyncCallResult::Ok(arg))
         } else {
-            let err_msg_bytes = Vec::<u8>::load(loader)?;
+            let err_msg_bytes = Vec::<u8>::load(loader, arg_id)?;
             Ok(AsyncCallResult::Err(AsyncCallError {
                 err_code: err_code,
                 err_msg: err_msg_bytes,
@@ -217,10 +193,10 @@ macro_rules! multi_arg_impls {
                 $($name: ArgType<D>,)+
                 D: $(DynArgLoader<$name> + )+ Sized
             {
-                fn load(loader: &mut D) -> Result<Self, SCError> {
+                fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
                     Ok($mr((
                         $(
-                            $name::load(loader)?
+                            $name::load(loader, arg_id)?
                         ),+
                     )))
                 }

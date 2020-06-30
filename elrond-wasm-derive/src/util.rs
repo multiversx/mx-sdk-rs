@@ -60,6 +60,11 @@ pub fn byte_slice_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
     quote! { &#arr_lit[..] }
 }
 
+pub fn pat_literal(pat: &syn::Pat) -> proc_macro2::TokenStream {
+    let pat_str = quote::ToTokens::to_token_stream(pat).to_string();
+    byte_slice_literal(pat_str.as_bytes())
+}
+
 pub fn generic_type_single_arg_segment(type_name: &str, parent_path_segment: &syn::PathSegment) -> syn::PathSegment {
     match &parent_path_segment.arguments {
         syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments{args, ..}) => {
