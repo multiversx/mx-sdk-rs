@@ -16,6 +16,7 @@ const RESERVED: &'static [&'static str] = &[
     "getPrevBlockRound",
     "getPrevBlockEpoch",
     "getPrevBlockRandomSeed",
+    "getOriginalTxHash",
     "transferValue",
     "getArgument",
     "getFunction",
