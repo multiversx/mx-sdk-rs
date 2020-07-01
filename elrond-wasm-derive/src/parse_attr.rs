@@ -3,6 +3,7 @@ static ATTR_PAYMENT: &str = "payment";
 static ATTR_VAR_ARGS: &str = "var_args";
 static ATTR_EVENT: &str = "event";
 static ATTR_INIT: &str = "init";
+static ATTR_VIEW: &str = "view";
 static ATTR_ENDPOINT: &str = "endpoint";
 static ATTR_CALLBACK_DECL: &str = "callback";
 static ATTR_CALLBACK_RAW_DECL: &str = "callback_raw";
@@ -203,6 +204,26 @@ impl EndpointAttribute {
             }),
             Some(None) => Some(EndpointAttribute {
                 endpoint_name: None,
+            }),
+            _ => panic!("unexpected endpoint argument tokens"),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct ViewAttribute {
+    pub view_name: Option<syn::Ident>
+}
+
+impl ViewAttribute {
+    pub fn parse(m: &syn::TraitItemMethod) -> Option<ViewAttribute> {
+        match find_attr_with_one_opt_token_tree_arg(m, ATTR_VIEW) {
+            None => None,
+            Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(ViewAttribute {
+                view_name: Some(ident),
+            }),
+            Some(None) => Some(ViewAttribute {
+                view_name: None,
             }),
             _ => panic!("unexpected endpoint argument tokens"),
         }
