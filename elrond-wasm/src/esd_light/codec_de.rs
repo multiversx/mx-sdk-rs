@@ -219,6 +219,8 @@ impl_nums!(isize, 4, true, TypeInfo::I32);
 impl_nums!(i64, 8, true, TypeInfo::I64);
 
 impl Decode for bool {
+    const TYPE_INFO: TypeInfo = TypeInfo::Bool;
+    
 	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         match bytes.len() {

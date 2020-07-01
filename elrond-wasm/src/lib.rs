@@ -14,6 +14,7 @@ mod address;
 mod elrond_protected_storage;
 pub mod io;
 mod proxy;
+pub mod storage;
 pub mod err_msg;
 pub mod call_data;
 pub mod esd_light;
@@ -22,6 +23,7 @@ pub mod serialize_util;
 
 pub use address::*;
 pub use io::*;
+pub use storage::{storage_get, storage_set};
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
 use crate::esd_light::*;
@@ -209,27 +211,6 @@ pub trait ContractIOApi<BigInt, BigUint> {
     }
 
     fn signal_error(&self, message: &[u8]) -> !;
-
-    fn signal_esd_light_error(&self, ser_type: &[u8], type_name: &[u8], specific_msg: &[u8]) -> ! {
-        // TODO: optimize
-        let mut message: Vec<u8> = Vec::new();
-        message.extend_from_slice(ser_type);
-        message.extend_from_slice(b" (");
-        message.extend_from_slice(type_name);
-        message.extend_from_slice(b"): ");
-        message.extend_from_slice(specific_msg);
-        self.signal_error(message.as_slice())
-    }
-
-    fn signal_esd_serde_error(&self, ser_type: &str, type_name: &str, e: esd_serde::SDError) -> ! {
-        let mut message: Vec<u8> = Vec::new();
-        message.extend_from_slice(ser_type.as_bytes());
-        message.extend_from_slice(b" (");
-        message.extend_from_slice(type_name.as_bytes());
-        message.extend_from_slice(b"): ");
-        message.extend_from_slice(e.err_msg_bytes());
-        self.signal_error(message.as_slice())
-    }
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
 }
