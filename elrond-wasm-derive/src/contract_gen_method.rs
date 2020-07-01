@@ -60,39 +60,70 @@ pub struct Method {
 
 const INIT_ENDPOINT_NAME: &str = "init";
 
-fn process_visibility(m: &syn::TraitItemMethod, endpoint_attr_opt: Option<EndpointAttribute>) -> Visibility {
+fn process_visibility(m: &syn::TraitItemMethod) -> Visibility {
+    let endpoint_attr_opt = EndpointAttribute::parse(m);
+    let view_attr_opt = ViewAttribute::parse(m);
+    
+    // init
     let init = is_init(m);
     if init {
         if let Some(_) = endpoint_attr_opt {
             panic!("Cannot annotate with both #[init] and #[endpoint].");
         }
-        Visibility::Endpoint(syn::Ident::new(INIT_ENDPOINT_NAME, m.sig.ident.span()))
-    } else {
-        match endpoint_attr_opt {
-            Some(endpoint_attr) => {
-                let endpoint_ident = match endpoint_attr.endpoint_name {
-                    Some(ident) => ident,
-                    None => m.sig.ident.clone(),
-                };
-                let endpoint_name_str = &endpoint_ident.to_string();
-                if endpoint_name_str == INIT_ENDPOINT_NAME {
-                    panic!("Cannot declare endpoint with name 'init'. Use #[init] instead.")
-                }
-                if reserved::is_reserved(endpoint_name_str) {
-                    panic!("Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
-                }
-                Visibility::Endpoint(endpoint_ident)
-            },
-            None => Visibility::Private,
+        if let Some(_) = view_attr_opt {
+            panic!("Cannot annotate with both #[init] and #[view].");
         }
+        return Visibility::Endpoint(syn::Ident::new(INIT_ENDPOINT_NAME, m.sig.ident.span()))
     }
+
+    // endpoint
+    match endpoint_attr_opt {
+        Some(endpoint_attr) => {
+            if let Some(_) = view_attr_opt {
+                panic!("Cannot annotate with both #[endpoint] and #[view].");
+            }
+            let endpoint_ident = match endpoint_attr.endpoint_name {
+                Some(ident) => ident,
+                None => m.sig.ident.clone(),
+            };
+            let endpoint_name_str = &endpoint_ident.to_string();
+            if endpoint_name_str == INIT_ENDPOINT_NAME {
+                panic!("Cannot declare endpoint with name 'init'. Use #[init] instead.")
+            }
+            if reserved::is_reserved(endpoint_name_str) {
+                panic!("Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
+            }
+            return Visibility::Endpoint(endpoint_ident);
+        },
+        None => {},
+    }
+
+    // view
+    match view_attr_opt {
+        Some(view_attr) => {
+            let view_ident = match view_attr.view_name {
+                Some(ident) => ident,
+                None => m.sig.ident.clone(),
+            };
+            let view_name_str = &view_ident.to_string();
+            if view_name_str == INIT_ENDPOINT_NAME {
+                panic!("Cannot declare view with name 'init'. Use #[init] instead.")
+            }
+            if reserved::is_reserved(view_name_str) {
+                panic!("Cannot declare view with name '{}', because that name is reserved by the Arwen API.", view_name_str);
+            }
+            return Visibility::Endpoint(view_ident);
+        },
+        None => {},
+    }
+
+    Visibility::Private
 }
 
 fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let payable = is_payable(m);
-    let endpoint_opt = EndpointAttribute::parse(m);
     
-    // let visibility = if private { Visibility::Private } else { Visibility::Public };
+    let visibility = process_visibility(m);
     let callback = is_callback_decl(m);
     let callback_raw = is_callback_raw_decl(m);
     let event_opt = EventAttribute::parse(m);
@@ -104,7 +135,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if payable {
             panic!("Events cannot be payable.");
         }
-        if let Some(_) = endpoint_opt {
+        if let Visibility::Endpoint(_) = visibility {
             panic!("Events cannot be endpoints.");
         }
         if callback || callback_raw {
@@ -127,7 +158,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         if payable {
             panic!("Callback methods cannot be marked payable.");
         }
-        if let Some(_) = endpoint_opt {
+        if let Visibility::Endpoint(_) = visibility {
             panic!("Callbacks cannot be endpoints.");
         }
         if storage_get_opt.is_some() {
@@ -161,7 +192,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Storage getters cannot be modules.");
         }
         MethodMetadata::StorageGetter{
-            visibility: process_visibility(m, endpoint_opt),
+            visibility: visibility,
             identifier: storage_get.identifier,
         }
     } else if let Some(storage_set) = storage_set_opt {
@@ -175,7 +206,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Storage setters cannot be modules.");
         }
         MethodMetadata::StorageSetter{
-            visibility: process_visibility(m, endpoint_opt),
+            visibility: visibility,
             identifier: storage_set.identifier,
         }
     } else if let Some(module_attr) = module_opt {
@@ -190,7 +221,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             panic!("Regular methods need an implementation.");
         }
         MethodMetadata::Regular{
-            visibility: process_visibility(m, endpoint_opt),
+            visibility: visibility,
             payable: payable,
         }
     }
