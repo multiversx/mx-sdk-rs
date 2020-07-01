@@ -22,6 +22,7 @@ pub enum TypeInfo {
     I32,
     U64,
     I64,
+    Bool,
     BigUint,
     BigInt,
     Unit,

@@ -220,6 +220,8 @@ encode_num!{i16, 16, true, TypeInfo::I16}
 encode_num!{i8, 8, true, TypeInfo::I8}
 
 impl Encode for bool {
+	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
+
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
 		dest.write(&[*self as u8][..]);
 	}

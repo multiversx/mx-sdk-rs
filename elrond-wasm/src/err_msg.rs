@@ -12,6 +12,7 @@ pub const ARG_BAD_LENGTH: &[u8] = "argument has wrong length".as_bytes();
 pub const ARG_BAD_LENGTH_32: &[u8] = "argument has wrong length: 32 bytes expected".as_bytes();
 pub const ARG_DECODE_ERROR_1: &[u8] = "argument decode error (".as_bytes();
 pub const ARG_DECODE_ERROR_2: &[u8] = "): ".as_bytes();
+pub const STORAGE_DECODE_ERROR: &[u8] = "storage decode error: ".as_bytes();
 
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = "big uint as_bytes exceed target slice".as_bytes();
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = "cannot subtract because result would be negative".as_bytes();
