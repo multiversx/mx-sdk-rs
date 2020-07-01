@@ -15,9 +15,6 @@ const ADDRESS_LENGTH: usize = 32;
 const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
 
-const TEMP_TX_HASH_FOR_TESTING: [u8; 32] = *b"tx_hash_________________________";
-
-
 extern {
     fn getSCAddress(resultOffset: *mut u8);
     fn getOwnerAddress(resultOffset: *mut u8);
@@ -50,6 +47,7 @@ extern {
     fn getPrevBlockRound() -> i64;
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
+    fn getOriginalTxHash(resultOffset: *const u8);
 
 
     fn bigIntNew(value: i64) -> i32;
@@ -234,7 +232,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     #[inline]
     fn get_tx_hash(&self) -> H256 {
-        TEMP_TX_HASH_FOR_TESTING.into()
+        unsafe {
+            let mut res = [0u8; 32];
+            getOriginalTxHash(res.as_mut_ptr());
+            res.into()
+        }
     }
 
     #[inline]
