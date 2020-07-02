@@ -21,10 +21,6 @@ fn storage_store_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
     }
 }
 
-// fn storage_load_snippet_for_type(_type_path_segment: &syn::PathSegment) -> proc_macro2::TokenStream {
-    
-// }
-
 fn storage_load_snippet(_ty: &syn::Type) -> proc_macro2::TokenStream {
     quote! {
         elrond_wasm::storage_get(&self.api, &key[..])

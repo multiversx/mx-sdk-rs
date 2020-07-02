@@ -1,6 +1,7 @@
 use crate::*;
 use crate::esd_light::*;
 
+#[inline]
 pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)
 where
     'a: 'k,
@@ -51,6 +52,7 @@ where
     }
 }
 
+#[inline]
 pub fn storage_get<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8]) -> T
 where
     'a: 'k,
