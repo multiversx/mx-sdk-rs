@@ -1,0 +1,18 @@
+[package]
+name = "elrond-wasm-serde"
+version = "0.1.0"
+edition = "2018"
+
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://elrond.com/"
+documentation = "https://docs.elrond.com/"
+description = "Elrond WebAssembly Serde serializer"
+keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
+
+[dependencies]
+wee_alloc = "0.4"
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }

@@ -4,4 +4,5 @@ members = [
   "elrond-wasm-debug",
   "elrond-wasm-derive",
   "elrond-wasm-node",
+  "elrond-wasm-serde",
 ]
