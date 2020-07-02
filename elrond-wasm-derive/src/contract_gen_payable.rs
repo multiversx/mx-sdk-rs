@@ -17,6 +17,7 @@ pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
         },
         MethodMetadata::StorageGetter{ .. } => not_payable_snippet,
         MethodMetadata::StorageSetter{ .. } => not_payable_snippet,
+        MethodMetadata::StorageGetMut{ .. } => not_payable_snippet,
         _ => quote!{},
     }
 }

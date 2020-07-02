@@ -12,6 +12,7 @@ static ATTR_CALLBACK_ARG: &str = "callback_arg";
 static ATTR_MULTI: &str = "multi";
 static ATTR_STORAGE_GET: &str = "storage_get";
 static ATTR_STORAGE_SET: &str = "storage_set";
+static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
 static ATTR_MODULE: &str = "module";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
@@ -142,6 +143,21 @@ pub struct StorageSetAttribute {
 impl StorageSetAttribute {
     pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageSetAttribute> {
         match find_attr_one_string_arg(m, ATTR_STORAGE_SET) {
+            None => None,
+            Some(arg_str) => {
+                Some(StorageSetAttribute{identifier: arg_str})
+            }
+        }
+    }
+}
+
+pub struct StorageGetMutAttribute {
+    pub identifier: String
+}
+
+impl StorageGetMutAttribute {
+    pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageSetAttribute> {
+        match find_attr_one_string_arg(m, ATTR_STORAGE_GET_MUT) {
             None => None,
             Some(arg_str) => {
                 Some(StorageSetAttribute{identifier: arg_str})
