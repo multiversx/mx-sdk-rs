@@ -4,20 +4,8 @@ use super::util::*;
 
 fn storage_store_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
     let pat = &arg.pat;
-    match &arg.ty {
-        syn::Type::Reference(type_reference) => {
-            if type_reference.mutability.is_some() {
-                panic!("Mutable references not supported in setters");
-            }
-            quote! {
-                elrond_wasm::storage_set(&self.api, &key[..], #pat);
-            }
-        },
-        _ => {
-            quote! {
-                elrond_wasm::storage_set(&self.api, &key[..], & #pat);
-            }
-        },
+    quote! {
+        elrond_wasm::storage_set(&self.api, &key[..], & #pat);
     }
 }
 
