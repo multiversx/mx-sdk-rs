@@ -128,6 +128,18 @@ impl<T: Encode> Encode for &[T] {
 	}
 }
 
+impl<T: Encode> Encode for &T {
+	#[inline]
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+		(*self).dep_encode_to(dest);
+	}
+
+	#[inline]
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+		(*self).using_top_encoded(f)
+	}
+}
+
 impl Encode for &str {
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
 		// push size
