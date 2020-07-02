@@ -3,6 +3,7 @@ use core::ops::Deref;
 use core::ops::DerefMut;
 use core::marker::PhantomData;
 
+/// Internal key container for BorrowedMutStorage.
 enum BorrowedMutStorageKey {
     Const(&'static [u8]),
     Generated(Vec<u8>),
@@ -17,6 +18,11 @@ impl BorrowedMutStorageKey {
     }
 }
 
+/// Contains a value taken from storage and a reference to the api.
+/// The value can be changed and will be saved back to storage 
+/// when the lifetime of the BorrowedMutStorage expires.
+/// Optimization: will only save back to storage if the value is referenced with deref_mut(),
+/// because only in such way can it be changed.
 pub struct BorrowedMutStorage<'a, A, BigInt, BigUint, T>
 where
     BigInt: Encode + 'static,
@@ -27,6 +33,7 @@ where
     api: &'a A,
     key: BorrowedMutStorageKey,
     value: T,
+    dirty: bool,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
@@ -44,6 +51,7 @@ where
             api: api,
             key : BorrowedMutStorageKey::Const(key),
             value: value,
+            dirty: false,
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
@@ -55,6 +63,7 @@ where
             api: api,
             key : BorrowedMutStorageKey::Generated(key),
             value: value,
+            dirty: false,
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
@@ -70,7 +79,9 @@ where
     T: Encode + Decode,
 {
     fn drop(&mut self) {
-        storage_set(self.api, self.key.as_bytes(), &self.value);
+        if self.dirty {
+            storage_set(self.api, self.key.as_bytes(), &self.value);
+        }
     }
 }
 
@@ -96,6 +107,7 @@ where
     T: Encode + Decode,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
+        self.dirty = true;
         &mut self.value
     }
 }
