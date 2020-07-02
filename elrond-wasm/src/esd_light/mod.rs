@@ -228,7 +228,7 @@ pub mod tests {
         ser_deser_ok(some_v, expected);
 
         let none_v: Option<Vec<i32>> = None;
-        ser_deser_ok(none_v, &[0]);
+        ser_deser_ok(none_v, &[]);
     }
 
     #[test]

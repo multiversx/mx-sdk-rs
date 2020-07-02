@@ -244,13 +244,17 @@ impl Decode for bool {
 }
 
 impl<T: Decode> Decode for Option<T> {
-	// fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-    //     if input.empty() {
-    //         Ok(None)
-    //     } else {
-    //         Ok(Some(T::top_decode(input)?))
-    //     }
-    // }
+	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        if input.empty() {
+            Ok(None)
+        } else {
+            let result = Self::dep_decode(input);
+            if input.remaining_len() > 0 {
+                return Err(DecodeError::InputTooLong);
+            }
+            result
+        }
+    }
     
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match input.read_byte()? {
