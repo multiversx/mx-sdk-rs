@@ -1,12 +1,13 @@
 use crate::*;
 use crate::esd_light::*;
 
-pub fn storage_set<A, BigInt, BigUint, T>(api: &A, key: &[u8], value: &T)
+pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)
 where
+    'a: 'k,
     T: Encode,
-    BigUint: BigUintApi + 'static,
-    BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + 'static
+    BigInt: Encode + 'static,
+    BigUint: Encode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + 'a
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
@@ -50,12 +51,13 @@ where
     }
 }
 
-pub fn storage_get<A, BigInt, BigUint, T>(api: &A, key: &[u8]) -> T
+pub fn storage_get<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8]) -> T
 where
+    'a: 'k,
     T: Decode,
-    BigUint: BigUintApi + 'static,
-    BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
+    BigInt: Encode + 'static,
+    BigUint: Encode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {

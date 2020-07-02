@@ -98,6 +98,7 @@ impl Contract {
                     MethodMetadata::Event{ .. } |
                     MethodMetadata::StorageGetter{ .. } |
                     MethodMetadata::StorageSetter{ .. } |
+                    MethodMetadata::StorageGetMut{ .. } |
                     MethodMetadata::Module{ .. } => {
                         let sig = m.generate_sig();
                         Some(quote! { #sig ; })
@@ -119,6 +120,8 @@ impl Contract {
                         Some(generate_getter_impl(&m, identifier.clone())),
                     MethodMetadata::StorageSetter{ visibility: _, identifier } =>
                         Some(generate_setter_impl(&m, identifier.clone())),
+                    MethodMetadata::StorageGetMut{ visibility: _, identifier } =>
+                        Some(generate_borrow_impl(&m, identifier.clone())),
                     MethodMetadata::Module{ impl_path } =>
                         Some(generate_module_getter_impl(&m, &impl_path)),
                     _ => None

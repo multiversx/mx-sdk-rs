@@ -25,6 +25,7 @@ pub enum MethodMetadata {
     CallbackRaw,
     StorageGetter{ visibility: Visibility, identifier: String },
     StorageSetter{ visibility: Visibility, identifier: String },
+    StorageGetMut{ visibility: Visibility, identifier: String },
     Module{ impl_path: proc_macro2::TokenTree },
 }
 
@@ -33,7 +34,8 @@ impl MethodMetadata {
         match self {
             MethodMetadata::Regular{ visibility: Visibility::Endpoint(e), ..} |
             MethodMetadata::StorageGetter{ visibility: Visibility::Endpoint(e), ..} |
-            MethodMetadata::StorageSetter{ visibility: Visibility::Endpoint(e), ..} => Some(e),
+            MethodMetadata::StorageSetter{ visibility: Visibility::Endpoint(e), ..} |
+            MethodMetadata::StorageGetMut{ visibility: Visibility::Endpoint(e), ..} => Some(e),
             _ => None,
         }
     }
@@ -129,6 +131,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
     let event_opt = EventAttribute::parse(m);
     let storage_get_opt = StorageGetAttribute::parse(m);
     let storage_set_opt = StorageSetAttribute::parse(m);
+    let storage_get_mut_opt = StorageGetMutAttribute::parse(m);
     let module_opt = ModuleAttribute::parse(m);
 
     if let Some(event_attr) = event_opt {
@@ -146,6 +149,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         }
         if storage_set_opt.is_some() {
             panic!("Events cannot be storage setters.");
+        }
+        if storage_get_mut_opt.is_some() {
+            panic!("Events cannot be storage borrow getters.");
         }
         if module_opt.is_some() {
             panic!("Events cannot be modules.");
@@ -166,6 +172,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
         }
         if storage_set_opt.is_some() {
             panic!("Callbacks cannot be storage setters.");
+        }
+        if storage_get_mut_opt.is_some() {
+            panic!("Callbacks cannot be storage borrow getters.");
         }
         if module_opt.is_some() {
             panic!("Callbacks cannot be modules.");
@@ -209,9 +218,23 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
             visibility: visibility,
             identifier: storage_set.identifier,
         }
+    } else if let Some(storage_get_mut) = storage_get_mut_opt {
+        if payable {
+            panic!("Storage mutable getters cannot be marked payable.");
+        }
+        if m.default.is_some() {
+            panic!("Storage mutable getters cannot have an implementations provided in the trait.");
+        }
+        if module_opt.is_some() {
+            panic!("Storage mutable getters cannot be modules.");
+        }
+        MethodMetadata::StorageGetMut{
+            visibility: visibility,
+            identifier: storage_get_mut.identifier,
+        }
     } else if let Some(module_attr) = module_opt {
         if m.default.is_some() {
-            panic!("Storage getters cannot have an implementations provided in the trait.");
+            panic!("Module declarations cannot have an implementations provided in the trait.");
         }
         MethodMetadata::Module{
             impl_path: module_attr.arg,

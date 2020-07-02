@@ -23,7 +23,7 @@ pub mod serialize_util;
 
 pub use address::*;
 pub use io::*;
-pub use storage::{storage_get, storage_set};
+pub use storage::{storage_get, storage_set, BorrowedMutStorage};
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
 use crate::esd_light::*;
@@ -39,7 +39,7 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern 
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BigInt, BigUint>
+pub trait ContractHookApi<BigInt, BigUint>: Sized
 where
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
@@ -341,7 +341,7 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, VarArgs, SCError};
+        use elrond_wasm::{Box, Vec, String, VarArgs, SCError, BorrowedMutStorage};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
@@ -361,3 +361,11 @@ macro_rules! sc_error {
         Err(SCError::Static($s.as_bytes()))
     }
 }
+
+/// Compact way of returning a static error message.
+#[macro_export]
+macro_rules! mut_storage (
+    ($t:ty) => (
+        BorrowedMutStorage<'_, T, BigInt, BigUint, $t>
+    )
+);
