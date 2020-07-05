@@ -22,7 +22,6 @@ pub const DESERIALIZATION_NOT_32_BYTES: &[u8] = "call data deserialization error
 pub const DESERIALIZATION_ODD_DIGITS: &[u8] = "call data deserialization error: odd number of digits in hex representation".as_bytes();
 pub const DESERIALIZATION_ARG_OUT_OF_RANGE: &[u8] = "call data deserialization error: argument out of range".as_bytes();
 
-pub const CALLBACK_NONE: &[u8] = "no callbacks in contract".as_bytes();
 pub const CALLBACK_BAD_FUNC: &[u8] = "no callback function with that name exists in contract".as_bytes();
 
 pub const STORAGE_NOT_I64: &[u8] = "storage not i64".as_bytes();
