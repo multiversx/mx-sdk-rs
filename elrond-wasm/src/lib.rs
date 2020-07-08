@@ -341,7 +341,7 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, VarArgs, SCError, BorrowedMutStorage};
+        use elrond_wasm::{Box, Vec, String, Queue, VarArgs, SCError, BorrowedMutStorage};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
