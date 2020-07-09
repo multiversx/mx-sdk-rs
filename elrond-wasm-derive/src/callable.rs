@@ -36,16 +36,7 @@ pub fn process_callable(
       }
     };
 
-    if wasm32_mode() {
-      // release mode adds endpoints for wasmer 
-      proc_macro::TokenStream::from(quote! {
-        #main_definition
-      })
-    } else {
-      // debug mode adds the contract interface, that we use for the mocks
-      // this interface also relies on "call" methods with no parameter and a function selector
-      proc_macro::TokenStream::from(quote! {
-        #main_definition
-      })
-    }
+    proc_macro::TokenStream::from(quote! {
+      #main_definition
+    })
 }

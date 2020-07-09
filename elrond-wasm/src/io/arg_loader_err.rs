@@ -26,7 +26,7 @@ where
 {
     pub fn new(api: &'a A) -> Self {
         DynEndpointErrHandler {
-            api: api,
+            api,
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }

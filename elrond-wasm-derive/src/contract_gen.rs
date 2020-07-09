@@ -38,16 +38,16 @@ impl Contract {
 
         Contract {
             trait_name: contract_trait.ident.clone(),
-            contract_impl_name: contract_impl_name,
-            supertrait_paths: supertrait_paths,
-            methods: methods,
+            contract_impl_name,
+            supertrait_paths,
+            methods,
         }
     }
 
     pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                if let Some(_) = m.metadata.endpoint_name() {
+                if m.metadata.endpoint_name().is_some() {
                     Some(m.generate_sig())
                 } else {
                     None
@@ -81,7 +81,7 @@ impl Contract {
     pub fn generate_call_methods(&self) -> Vec<proc_macro2::TokenStream> {
         self.methods.iter()
             .filter_map(|m| {
-                if let Some(_) = m.metadata.endpoint_name() {
+                if m.metadata.endpoint_name().is_some() {
                     Some(m.generate_call_method())
                 } else {
                     None

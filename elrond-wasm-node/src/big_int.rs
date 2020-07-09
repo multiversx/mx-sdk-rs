@@ -137,16 +137,6 @@ binary_assign_operator!{MulAssign, mul_assign, bigIntMul}
 binary_assign_operator!{DivAssign, div_assign, bigIntTDiv}
 binary_assign_operator!{RemAssign, rem_assign, bigIntTMod}
 
-fn ordering(i: i32) -> Ordering {
-    if i == 0 {
-        Ordering::Equal
-    } else if i > 0 {
-        Ordering::Greater
-    } else {
-        Ordering::Less
-    }
-}
-
 impl PartialEq for ArwenBigInt {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -168,7 +158,7 @@ impl Ord for ArwenBigInt {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
-        ordering(arwen_cmp)
+        arwen_cmp.cmp(&0)
     }
 }
 
@@ -193,7 +183,7 @@ impl PartialOrd<i64> for ArwenBigInt {
     #[inline]
     fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
         let arwen_cmp = arwen_cmp_i64(&self, *other);
-        Some(ordering(arwen_cmp))
+        Some(arwen_cmp.cmp(&0))
     }
 }
 
@@ -255,12 +245,10 @@ impl BigIntApi<ArwenBigUint> for ArwenBigInt {
     fn sign(&self) -> Sign {
         unsafe {
             let s = bigIntSign(self.handle);
-            if s == 0 {
-                Sign::NoSign
-            } else if s > 0 {
-                Sign::Plus
-            } else {
-                Sign::Minus
+            match s.cmp(&0) {
+                Ordering::Greater => Sign::Plus,
+                Ordering::Equal => Sign::NoSign,
+                Ordering::Less => Sign::Minus,
             }
         }
     }
@@ -278,7 +266,7 @@ impl BigIntApi<ArwenBigUint> for ArwenBigInt {
         unsafe {
             let handle = bigIntNew(0);
             bigIntSetSignedBytes(handle, bytes.as_ptr(), bytes.len() as i32);
-            ArwenBigInt{ handle: handle }
+            ArwenBigInt{ handle }
         }
     }
 }

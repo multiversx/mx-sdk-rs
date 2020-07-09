@@ -11,7 +11,7 @@ enum BorrowedMutStorageKey {
 }
 
 impl BorrowedMutStorageKey {
-    fn as_bytes<'k>(&'k self) -> &'k [u8] {
+    fn as_bytes(&self) -> &[u8] {
         match self {
             BorrowedMutStorageKey::Generated(v) => v.as_slice(),
             BorrowedMutStorageKey::Const(v) => v,
@@ -49,9 +49,9 @@ where
     pub fn with_const_key(api: &'a A, key: &'static [u8]) -> Self {
         let value: T = storage_get(api, key);
         BorrowedMutStorage {
-            api: api,
+            api,
             key : BorrowedMutStorageKey::Const(key),
-            value: value,
+            value,
             dirty: false,
             _phantom1: PhantomData,
             _phantom2: PhantomData,
@@ -61,9 +61,9 @@ where
     pub fn with_generated_key(api: &'a A, key: Vec<u8>) -> Self {
         let value: T = storage_get(api, key.as_slice());
         BorrowedMutStorage {
-            api: api,
+            api,
             key : BorrowedMutStorageKey::Generated(key),
-            value: value,
+            value,
             dirty: false,
             _phantom1: PhantomData,
             _phantom2: PhantomData,

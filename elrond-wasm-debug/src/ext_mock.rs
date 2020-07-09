@@ -33,8 +33,8 @@ fn address_hex(address: &H256) -> alloc::string::String {
     alloc::format!("0x{}", hex::encode(address.as_bytes()))
 }
 
-fn key_hex(address: &Vec<u8>) -> alloc::string::String {
-    alloc::format!("0x{}", hex::encode(address.as_slice()))
+fn key_hex(address: &[u8]) -> alloc::string::String {
+    alloc::format!("0x{}", hex::encode(address))
 }
 
 pub struct AccountData {
@@ -49,10 +49,10 @@ impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut storage_buf = String::new();
         let mut keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-        keys.sort_by(|k1, k2| k1.cmp(k2));
+        keys.sort();
         for key in &keys {
             let value = self.storage.get(key).unwrap();
-            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key), hex::encode(value.as_slice())).unwrap();
+            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
         }
         
         write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
@@ -89,19 +89,19 @@ impl TxData {
             new_contract: Some(new_contract),
             args: Vec::new(),
             call_value: 0.into(),
-            from: from,
-            to: to,
+            from,
+            to,
         }
     }
 
     pub fn new_call(func_name: &'static str, from: Address, to: Address) -> Self {
         TxData{
-            func_name: func_name,
+            func_name,
             new_contract: None,
             args: Vec::new(),
             call_value: 0.into(),
-            from: from,
-            to: to,
+            from,
+            to,
         }
     }
 
@@ -131,7 +131,7 @@ impl TxResult {
         }
     }
     pub fn print(&self) {
-        print!("{}\n", self);
+        println!("{}", self);
     }
 }
 
@@ -152,14 +152,14 @@ impl Clone for ArwenMockRef {
 }
 
 impl ArwenMockState {
-    pub fn new() -> ArwenMockRef {
+    pub fn new_ref() -> ArwenMockRef {
         let state = ArwenMockState{
             current_tx: None,
             current_result: TxResult::empty(),
             accounts: HashMap::new(),
         };
         let state_ref = Rc::new(RefCell::new(state));
-        ArwenMockRef{ state_ref: state_ref }
+        ArwenMockRef{ state_ref }
     }
 
     fn create_account_if_necessary(&mut self, tx: &mut TxData) {
@@ -217,17 +217,14 @@ impl ArwenMockRef {
             state.clear_result();
         }
         
-        let func_name = {
-            let state = self.state_ref.borrow();
-            let tx_ref = &state.current_tx.as_ref().unwrap();
-            &tx_ref.func_name.clone()
-        };
+        let state = self.state_ref.borrow();
+        let tx_ref = state.current_tx.as_ref().unwrap();
         
         let contract = self.get_contract();
 
         // contract call
         // important: state cannot be borrowed at this point
-        contract.call(&func_name);
+        contract.call(tx_ref.func_name);
         
         let state = self.state_ref.borrow();
         state.get_result()
@@ -244,7 +241,7 @@ impl ArwenMockRef {
         for (address, account) in &state.accounts {
             write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
         }
-        print!("Accounts: {}\n", &accounts_buf);
+        println!("Accounts: {}", &accounts_buf);
     }
 }
 
@@ -321,10 +318,11 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         let value = self.storage_load(key);
         let mut res = [0u8; 32];
         let offset = 32 - value.len();
-        if value.len() > 0 {
-            for i in 0..value.len()-1 {
-                res[offset+i] = value[i];
-            }
+        if !value.is_empty() {
+            res[offset..(value.len()-1 + offset)].clone_from_slice(&value[..value.len()-1]);
+            // for i in 0..value.len()-1 {
+            //     res[offset+i] = value[i];
+            // }
         }
         res
     }
@@ -469,8 +467,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
         let state = self.state_ref.borrow();
-        let arg = state.get_argument_vec(arg_index);
-        arg.clone()
+        state.get_argument_vec(arg_index)
     }
 
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
@@ -478,9 +475,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         let arg = state.get_argument_vec(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
-        for i in 0..arg.len()-1 {
-            res[offset+i] = arg[i];
-        }
+        res[offset..(arg.len()-1 + offset)].clone_from_slice(&arg[..arg.len()-1]);
         res
     }
     
@@ -541,6 +536,6 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
-        print!("write_log not yet implemented\n");
+        println!("write_log not yet implemented");
     }
 }

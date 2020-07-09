@@ -1,5 +1,5 @@
 
-const RESERVED: &'static [&'static str] = &[
+const RESERVED: &[&str] = &[
     "getSCAddress",
     "getOwnerAddress",
     "getShardOfAddress",

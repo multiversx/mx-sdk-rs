@@ -74,7 +74,7 @@ fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option
                     match iter2.next() {
                         Some(proc_macro2::TokenTree::Literal(lit)) => {
                             let str_val = lit.to_string();
-                            if !str_val.starts_with("\"") || !str_val.ends_with("\"") {
+                            if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
                                 panic!("string literal expected as attribute argument");
                             }
                             let substr = &str_val[1..str_val.len()-1];
@@ -86,7 +86,7 @@ fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option
                 _ => panic!("missing event identifier")
             }
 
-            if let Some(_) = iter.next() {
+            if iter.next().is_some() {
                 panic!("event too many tokens in event attribute");
             }
 
@@ -197,7 +197,7 @@ fn find_attr_with_one_opt_token_tree_arg(m: &syn::TraitItemMethod, attr_name: &s
                     None => None,
                 };
 
-            if let Some(_) = iter.next() {
+            if iter.next().is_some() {
                 panic!("too many tokens in attribute");
             }
             
@@ -273,7 +273,7 @@ impl ModuleAttribute {
         match find_attr_with_one_opt_token_tree_arg(m, ATTR_MODULE) {
             None => None,
             Some(Some(arg)) => Some(ModuleAttribute {
-                arg: arg.clone(),
+                arg,
             }),
             Some(_) => panic!("module name required")
         }
@@ -319,12 +319,12 @@ impl MultiAttribute {
                         _ => panic!("callback argument expected")
                     };
 
-                if let Some(_) = iter.next() {
+                if iter.next().is_some() {
                     panic!("too many tokens in payable attribute");
                 }
                 
                 Some(MultiAttribute {
-                    count_expr: count_expr,
+                    count_expr,
                 })
             }
         }

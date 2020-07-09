@@ -8,7 +8,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, al
     m.sig.inputs
         .iter()
         .filter_map(|arg| {
-            let arg_opt = match arg {
+            match arg {
                 syn::FnArg::Receiver(ref selfref) => {
                     if selfref.mutability.is_some() || receiver_processed {
                         panic!("Trait method must have `&self` as its first argument.");
@@ -33,7 +33,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, al
                             index: -1,
                             pat: pat.clone(),
                             ty: ty.clone(),
-                            is_callback_arg: is_callback_arg,
+                            is_callback_arg,
                             metadata: ArgMetadata::Multi(multi_attr),
                         })
                     } else if is_var_args(&pat_typed) {
@@ -41,7 +41,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, al
                             index: -1,
                             pat: pat.clone(),
                             ty: ty.clone(),
-                            is_callback_arg: is_callback_arg,
+                            is_callback_arg,
                             metadata: ArgMetadata::VarArgs,
                         })
                     } else if is_payment(&pat_typed) {
@@ -55,23 +55,21 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, al
                             index: -1,
                             pat: pat.clone(),
                             ty: ty.clone(), // TODO: check that it is BigUint
-                            is_callback_arg: is_callback_arg,
+                            is_callback_arg,
                             metadata: ArgMetadata::Payment,
                         })
                     } else {
-                        arg_index=arg_index+1;
+                        arg_index += 1;
                         Some(MethodArg{
                             index: arg_index as i32,
                             pat: pat.clone(),
                             ty: ty.clone(),
-                            is_callback_arg: is_callback_arg,
+                            is_callback_arg,
                             metadata: ArgMetadata::Single,
                         })
                     }
                 }
-            };
-            
-            arg_opt
+            }
         })
         .collect()
 }

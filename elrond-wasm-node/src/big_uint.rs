@@ -230,13 +230,7 @@ impl Ord for ArwenBigUint {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         let arwen_cmp = unsafe { bigIntCmp(self.handle, other.handle) };
-        if arwen_cmp == 0 {
-            Ordering::Equal
-        } else if arwen_cmp > 0 {
-            Ordering::Greater
-        } else {
-            Ordering::Less
-        }
+        arwen_cmp.cmp(&0)
     }
 }
 
@@ -295,8 +289,7 @@ impl BigUintApi for ArwenBigUint {
 
     fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32 {
         unsafe {
-            let byte_len = bigIntGetUnsignedBytes(self.handle, slice.as_mut_ptr());
-            byte_len
+            bigIntGetUnsignedBytes(self.handle, slice.as_mut_ptr())
         }
     }
 
@@ -335,7 +328,7 @@ impl BigUintApi for ArwenBigUint {
         unsafe {
             let handle = bigIntNew(0);
             bigIntSetUnsignedBytes(handle, bytes.as_ptr(), bytes.len() as i32);
-            ArwenBigUint{ handle: handle }
+            ArwenBigUint{ handle }
         }
     }
 }

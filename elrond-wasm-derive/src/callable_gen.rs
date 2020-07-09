@@ -20,9 +20,9 @@ impl CallableMethod {
         let method_args = extract_method_args(m, payable, callback_opt.is_some());
         CallableMethod {
             name: m.sig.ident.clone(),
-            payable: payable,
+            payable,
             callback: callback_opt,
-            method_args: method_args,
+            method_args,
         }
     }
 
@@ -61,9 +61,9 @@ impl Callable {
         //let trait_methods = extract_methods(&contract_trait);
         Callable {
             trait_name: contract_trait.ident.clone(),
-            callable_impl_name: callable_impl_name,
-            contract_impl_name: contract_impl_name,
-            methods: methods,
+            callable_impl_name,
+            contract_impl_name,
+            methods,
         }
     }
 }

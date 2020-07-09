@@ -1,7 +1,5 @@
 
 
-
-use serde;
 use serde::Deserialize;
 use serde::de::IntoDeserializer;
 use super::bytes_err::{SDError, Result};
@@ -46,7 +44,7 @@ where
 /// Handles both signed and unsigned of any length.
 /// No generics here, because we want the executable binary as small as possible.
 pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
-    if bytes.len() == 0 {
+    if bytes.is_empty() {
         return 0;
     }
     let negative = signed && bytes[0] >> 7 == 1;
@@ -68,7 +66,7 @@ pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
 
 impl<'de> ErdDeserializer<'de> {
     fn next_byte(&mut self) -> Result<u8> {
-        if self.input.len() > 0 {
+        if !self.input.is_empty() {
             let result = self.input[0];
             self.input = &self.input[1..];
             Ok(result)
@@ -128,7 +126,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
     {
         if self.top_level {
             // top level bool is either [1] or []
-            if self.input.len() > 0 {
+            if !self.input.is_empty() {
                 match self.next_byte()? {
                     1 => visitor.visit_bool(true),
                     _ => Err(SDError::InvalidValue)
@@ -275,7 +273,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
         self.top_level = false;
         visitor.visit_seq(Access {
             deserializer: self,
-            remaining_items_hint: remaining_items_hint,
+            remaining_items_hint,
         })
     }
 

@@ -9,7 +9,7 @@ pub fn contract_implementation(
     let trait_name_ident = contract.trait_name.clone();
     let method_impls = contract.extract_method_impls();
 
-    if contract.supertrait_paths.len() > 0 {
+    if !contract.supertrait_paths.is_empty() {
       panic!("contract inheritance currently not supported");
     }
 
@@ -54,7 +54,7 @@ pub fn contract_implementation(
       {
         pub fn new(api: T) -> Self {
           #contract_impl_ident {
-            api: api,
+            api,
             _phantom1: core::marker::PhantomData,
             _phantom2: core::marker::PhantomData,
           }

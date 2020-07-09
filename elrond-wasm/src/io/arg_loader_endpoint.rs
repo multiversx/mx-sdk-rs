@@ -2,7 +2,7 @@ use crate::*;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
-pub fn load_single_arg<'a, A, BigInt, BigUint, T>(api: &'a A, index: i32, arg_id: ArgId) -> T 
+pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
 where
     T: Decode,
     BigUint: BigUintApi + 'static,
@@ -71,7 +71,7 @@ where
 {
     pub fn new(api: &'a A) -> Self {
         DynEndpointArgLoader {
-            api: api,
+            api,
             current_index : 0,
             num_arguments: api.get_num_arguments(),
             _phantom1: PhantomData,
