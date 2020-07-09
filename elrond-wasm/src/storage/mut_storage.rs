@@ -2,6 +2,7 @@ use crate::*;
 use core::ops::Deref;
 use core::ops::DerefMut;
 use core::marker::PhantomData;
+use elrond_codec::*;
 
 /// Internal key container for BorrowedMutStorage.
 enum BorrowedMutStorageKey {

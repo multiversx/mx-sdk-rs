@@ -14,5 +14,6 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [dependencies]
+elrond-codec = { version = "0.1.0", path = "../elrond-codec" }
 wee_alloc = "0.4"
 arrayvec = { version = "0.5.1", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }

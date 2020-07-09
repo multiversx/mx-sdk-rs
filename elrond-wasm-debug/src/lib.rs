@@ -21,7 +21,7 @@ pub use std::collections::HashMap;
 #[cfg(test)]
 mod esd_light_tests {
     use super::*;
-    use elrond_wasm::esd_light::*;
+    use elrond_wasm::elrond_codec::*;
     use core::fmt::Debug;
 
     pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])

@@ -1,7 +1,11 @@
+#![no_std]
+
+extern crate alloc;
 
 mod codec_ser;
 mod codec_de;
 mod codec_err;
+pub mod test_util;
 
 pub use codec_ser::*;
 pub use codec_de::*;
@@ -125,6 +129,7 @@ pub mod test_struct {
 pub mod tests {
     use super::*;
     use super::test_struct::*;
+    use crate::test_util::ser_deser_ok;
     use core::fmt::Debug;
     use alloc::vec::Vec;
 
@@ -134,19 +139,6 @@ pub mod tests {
     {
         let serialized_bytes = element.top_encode();
         let deserialized: V = decode_from_byte_slice(&mut &serialized_bytes[..]).unwrap();
-        assert_eq!(deserialized, element);
-    }
-
-    pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
-    where
-        V: Encode + Decode + PartialEq + Debug + 'static,
-    {
-        // serialize
-        let serialized_bytes = element.top_encode();
-        assert_eq!(serialized_bytes.as_slice(), expected_bytes);
-
-        // deserialize
-        let deserialized: V = V::top_decode(&mut &serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
 

@@ -209,7 +209,7 @@ impl Neg for ArwenBigInt {
     }
 }
 
-use elrond_wasm::esd_light::*;
+use elrond_wasm::elrond_codec::*;
 
 impl Encode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;

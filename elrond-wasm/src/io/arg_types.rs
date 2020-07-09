@@ -1,5 +1,5 @@
 use crate::*;
-use crate::esd_light::*;
+use elrond_codec::*;
 
 /// Some info to display in endpoint argument deserialization error messages,
 /// to help users identify the faulty argument.

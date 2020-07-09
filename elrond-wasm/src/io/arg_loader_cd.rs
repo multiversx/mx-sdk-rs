@@ -1,7 +1,7 @@
 
 use crate::*;
 use crate::call_data::*;
-// use alloc::vec::Vec;
+use elrond_codec::*;
 
 pub struct CallDataArgLoader<'a>{
     deser: CallDataDeserializer<'a>,
@@ -27,7 +27,7 @@ where
     fn next_arg(&mut self, arg_id: ArgId) -> Result<Option<T>, SCError> {
         match self.deser.next_argument() {
             Ok(Some(arg_bytes)) => {
-                match esd_light::decode_from_byte_slice(arg_bytes.as_slice()) {
+                match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
                     Ok(v) => Ok(Some(v)),
                     Err(de_err) => {
                         let mut decode_err_message: Vec<u8> = Vec::new();

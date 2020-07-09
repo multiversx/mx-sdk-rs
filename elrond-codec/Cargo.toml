@@ -1,6 +1,6 @@
 [package]
-name = "elrond-wasm-node"
-version = "0.5.2"
+name = "elrond-codec"
+version = "0.1.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -9,10 +9,10 @@ readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://elrond.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly VM API wrapper"
+description = "Lightweight binary serializer/deserializer, written especially for Elrond smart contracts"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
-categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [dependencies]
-elrond-wasm = { version = "0.5.2", path = "../elrond-wasm" }
 wee_alloc = "0.4"
+arrayvec = { version = "0.5.1", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }

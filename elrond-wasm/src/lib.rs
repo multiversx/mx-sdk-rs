@@ -6,6 +6,8 @@ pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 pub use alloc::string::String;
 
+pub use elrond_codec;
+
 mod types;
 mod elrond_protected_storage;
 pub mod io;
@@ -13,14 +15,13 @@ mod proxy;
 pub mod storage;
 pub mod err_msg;
 pub mod call_data;
-pub mod esd_light;
 
 pub use types::*;
 pub use io::*;
 pub use storage::{storage_get, storage_set, BorrowedMutStorage};
+pub use finish::SCResult;
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
-use crate::esd_light::*;
 
 use core::ops::{Add, Sub, Mul, Div, Rem, Neg};
 use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
@@ -35,8 +36,8 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractHookApi<BigInt, BigUint>: Sized
 where
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: elrond_codec::Encode + 'static,
+    BigUint: elrond_codec::Encode + 'static,
 {
 
     fn get_sc_address(&self) -> Address;
@@ -173,7 +174,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         if bytes.len() > 8 {
             self.signal_error(err_msg::ARG_OUT_OF_RANGE);
         }
-        esd_light::bytes_to_number(bytes.as_slice(), false)
+        elrond_codec::bytes_to_number(bytes.as_slice(), false)
     }
     get_argument_unsigned_cast!{get_argument_u32, u32}
     get_argument_unsigned_cast!{get_argument_usize, usize}
@@ -199,7 +200,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_i64(&self, value: i64);
 
     fn finish_u64(&self, value: u64) {
-        value.using_top_encoded(|bytes| {
+        elrond_codec::Encode::using_top_encoded(&value, |bytes| {
             self.finish_slice_u8(bytes);
         });
     }
@@ -248,8 +249,8 @@ pub trait BigUintApi:
     Ord +
     PartialEq<u64> +
     PartialOrd<u64> +
-    esd_light::Encode +
-    esd_light::Decode +
+    elrond_codec::Encode +
+    elrond_codec::Decode +
 {
     fn zero() -> Self {
         0u64.into()
@@ -299,8 +300,8 @@ pub trait BigIntApi<BigUint>:
         Ord +
         PartialEq<i64> +
         PartialOrd<i64> +
-        esd_light::Encode +
-        esd_light::Decode +
+        elrond_codec::Encode +
+        elrond_codec::Decode +
 {
     fn zero() -> Self {
         0i64.into()
@@ -335,10 +336,11 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, Queue, VarArgs, SCError, BorrowedMutStorage};
+        use elrond_wasm::{Box, Vec, String, Queue, VarArgs, BorrowedMutStorage};
+        use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
-        use elrond_wasm::esd_light::{Encode, Decode, DecodeError};
+        use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
         use elrond_wasm::io::*;
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};
@@ -352,7 +354,19 @@ macro_rules! imports {
 #[macro_export]
 macro_rules! sc_error {
     ($s:expr) => {
-        Err(SCError::Static($s.as_bytes()))
+        elrond_wasm::SCResult::Err(elrond_wasm::SCError::Static($s.as_bytes()))
+    }
+}
+
+/// Equivalent of the ? operator for SCResult.
+#[macro_export]
+macro_rules! sc_try {
+    ($s:expr) => {
+        match $s {
+            elrond_wasm::SCResult::Ok(t) => t,
+            elrond_wasm::SCResult::Err(e) => { return elrond_wasm::SCResult::Err(e); }
+        }
+        
     }
 }
 

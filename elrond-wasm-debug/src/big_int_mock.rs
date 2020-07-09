@@ -143,7 +143,7 @@ impl PartialOrd<i64> for RustBigInt {
     }
 }
 
-use elrond_wasm::esd_light::*;
+use elrond_wasm::elrond_codec::*;
 
 impl Encode for RustBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
