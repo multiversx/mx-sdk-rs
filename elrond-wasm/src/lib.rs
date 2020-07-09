@@ -6,10 +6,6 @@ pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 pub use alloc::string::String;
 
-// re-export serde so smart contracts don't have to explicitly add as dependency
-// serde must still be imported explicitly in order to use #[derive(Serialize, Deserialize)]
-pub use serde;
-
 mod types;
 mod elrond_protected_storage;
 pub mod io;
@@ -18,8 +14,6 @@ pub mod storage;
 pub mod err_msg;
 pub mod call_data;
 pub mod esd_light;
-pub mod esd_serde;
-pub mod serialize_util;
 
 pub use types::*;
 pub use io::*;

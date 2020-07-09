@@ -15,5 +15,4 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [dependencies]
 wee_alloc = "0.4"
-serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 arrayvec = { version = "0.5.1", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }

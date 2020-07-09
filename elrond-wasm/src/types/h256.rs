@@ -144,52 +144,6 @@ impl Decode for H256 {
     }
 }
 
-use serde::ser::{Serialize, Serializer, SerializeTuple};
-use serde::de::{Deserialize, Deserializer, Visitor, SeqAccess, Error};
-
-impl Serialize for H256 {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut seq = serializer.serialize_tuple(32)?;
-        for i in 0..32 {
-            seq.serialize_element(&self.0[i])?;
-        }
-        seq.end()
-    }
-}
-
-struct H256Visitor;
-
-impl<'a> Visitor<'a> for H256Visitor {
-    type Value = H256;
-
-    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
-        formatter.write_str("H256")
-    }
-
-    fn visit_seq<A>(self, mut seq: A) -> Result<H256, A::Error>
-        where A: SeqAccess<'a>
-    {
-        let mut arr = [0u8; 32];
-        for i in 0..32 {
-            arr[i] = seq.next_element()?
-                .ok_or_else(|| Error::invalid_length(i, &self))?;
-        }
-        Ok(H256(arr))
-    }
-}
-
-impl<'de> Deserialize<'de> for H256 {
-    fn deserialize<D>(deserializer: D) -> Result<H256, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_tuple(32, H256Visitor)
-    }
-}
-
 #[cfg(test)]
 mod esd_light_tests {
     use super::*;
@@ -220,38 +174,4 @@ mod esd_light_tests {
     //     let serialized_bytes = tuple.top_encode();
     //     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     // }
-}
-
-
-#[cfg(test)]
-mod esd_serde_tests {
-    use super::*;
-    use alloc::vec::Vec;
-    use crate::esd_serde::tests::ser_deser_ok;
-    use crate::esd_serde::to_bytes;
-
-    #[test]
-    fn test_address() {
-        let addr = Address::from([4u8; 32]);
-        ser_deser_ok(addr, &[4u8; 32]);
-    }
-
-    #[test]
-    fn test_opt_address() {
-        let addr = Address::from([4u8; 32]);
-        let mut expected: Vec<u8> = Vec::new();
-        expected.push(1u8);
-        expected.extend_from_slice(&[4u8; 32]);
-        ser_deser_ok(Some(addr), expected.as_slice());
-    }
-
-    #[test]
-    fn test_ser_address_ref() {
-        let addr = Address::from([4u8; 32]);
-        let expected_bytes: &[u8] = &[4u8; 32*3];
-
-        let tuple = (&addr, &&&addr, addr.clone());
-        let serialized_bytes = to_bytes(&tuple).unwrap();
-        assert_eq!(serialized_bytes.as_slice(), expected_bytes);
-    }
 }
