@@ -100,8 +100,8 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             })
             .collect();
     if match_arms.len() == 0 {
+        // no callback code needed
         quote! {
-            self.api.signal_error(err_msg::CALLBACK_NONE)
         }
     } else {
         quote! {
@@ -111,7 +111,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
             let ___err_handler = DynEndpointErrHandler::new(&self.api);
 
             match cb_data_deserializer.get_func_name() {
-                [] => {}
+                [] => { return; }
                 #(#match_arms)*
                 other => self.api.signal_error(err_msg::CALLBACK_BAD_FUNC)
             }

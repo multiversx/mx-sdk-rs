@@ -10,7 +10,7 @@ pub use alloc::string::String;
 // serde must still be imported explicitly in order to use #[derive(Serialize, Deserialize)]
 pub use serde;
 
-mod address;
+mod types;
 mod elrond_protected_storage;
 pub mod io;
 mod proxy;
@@ -21,7 +21,7 @@ pub mod esd_light;
 pub mod esd_serde;
 pub mod serialize_util;
 
-pub use address::*;
+pub use types::*;
 pub use io::*;
 pub use storage::{storage_get, storage_set, BorrowedMutStorage};
 pub use call_data::*;
@@ -341,7 +341,7 @@ macro_rules! contract_proxy {
 #[macro_export]
 macro_rules! imports {
     () => {
-        use elrond_wasm::{Box, Vec, String, VarArgs, SCError, BorrowedMutStorage};
+        use elrond_wasm::{Box, Vec, String, Queue, VarArgs, SCError, BorrowedMutStorage};
         use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::esd_light::{Encode, Decode, DecodeError};

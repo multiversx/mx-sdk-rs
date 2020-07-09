@@ -260,14 +260,21 @@ impl<T: Encode> Encode for Option<T> {
 		}
 	}
 
-	// fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
-	// 	match self {
-	// 		Some(v) => {
-	// 			v.using_top_encoded(f);
-	// 		},
-	// 		None => {}
-	// 	}
-	// }
+	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
+	/// to allow disambiguation between e.g. Some(0) and None.
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+		match self {
+			Some(v) => {
+				let mut dest: Vec<u8> = Vec::new();
+				dest.push(1u8);
+				v.dep_encode_to(&mut dest);
+				f(dest.as_slice())
+			},
+			None => {
+				f(&[]);
+			}
+		}
+	}
 }
 
 macro_rules! tuple_impls {
