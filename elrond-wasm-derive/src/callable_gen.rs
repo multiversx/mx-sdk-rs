@@ -29,9 +29,11 @@ impl CallableMethod {
     // TODO: deduplicate
     pub fn generate_sig(&self) -> proc_macro2::TokenStream {
         let method_name = &self.name;
-        let span = self.name.span();
         let arg_decl = arg_declarations(&self.method_args);
-        let result = quote_spanned!{span=> fn #method_name ( &self , #(#arg_decl),* ) -> () };
+        let result = quote!{
+            #[allow(non_snake_case)]
+            fn #method_name ( &self , #(#arg_decl),* ) -> ()
+        };
         result
     }
 }

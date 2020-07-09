@@ -101,7 +101,12 @@ pub fn contract_implementation(
           #contract_impl_ident::new(api)
         }
 
-        #(#endpoints)*
+        #[allow(non_snake_case)]
+        mod endpoints {
+          use super::*;
+
+          #(#endpoints)*
+        }
       }
     } else {
       // debug mode adds the contract interface, that we use for the mocks
