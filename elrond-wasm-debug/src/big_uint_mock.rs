@@ -221,7 +221,7 @@ impl PartialOrd<u64> for RustBigUint {
     }
 }
 
-use elrond_wasm::esd_light::*;
+use elrond_wasm::elrond_codec::*;
 
 impl Encode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;

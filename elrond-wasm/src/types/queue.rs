@@ -1,6 +1,6 @@
 
 use alloc::vec::Vec;
-use crate::esd_light::*;
+use elrond_codec::*;
 
 /// A simple queue struct that is able to push and pop without moving elements.
 /// New items are pushed at the end, just like for a regular Vec.

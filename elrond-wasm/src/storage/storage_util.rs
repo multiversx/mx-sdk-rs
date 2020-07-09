@@ -1,5 +1,5 @@
 use crate::*;
-use crate::esd_light::*;
+use elrond_codec::*;
 
 #[inline]
 pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)

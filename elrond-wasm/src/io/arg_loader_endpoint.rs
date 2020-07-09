@@ -1,5 +1,5 @@
 use crate::*;
-use crate::esd_light::*;
+use elrond_codec::*;
 use core::marker::PhantomData;
 
 pub fn load_single_arg<'a, A, BigInt, BigUint, T>(api: &'a A, index: i32, arg_id: ArgId) -> T 
@@ -35,7 +35,7 @@ where
         },
         _ => {
             let arg_bytes = api.get_argument_vec(index);
-            match esd_light::decode_from_byte_slice(arg_bytes.as_slice()) {
+            match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
                 Ok(v) => v,
                 Err(de_err) => {
                     let mut decode_err_message: Vec<u8> = Vec::new();

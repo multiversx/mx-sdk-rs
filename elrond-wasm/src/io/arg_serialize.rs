@@ -1,5 +1,5 @@
 use crate::*;
-use crate::esd_light::*;
+use elrond_codec::*;
 use crate::call_data::*;
 
 pub trait AsynCallArg: Sized {

@@ -128,7 +128,7 @@ impl H256 {
     }
 }
 
-use crate::esd_light::*;
+use elrond_codec::*;
 
 impl Encode for H256 {
     fn dep_encode_to<O: Output>(&self, dest: &mut O) {
@@ -148,7 +148,7 @@ impl Decode for H256 {
 mod esd_light_tests {
     use super::*;
     use alloc::vec::Vec;
-    use crate::esd_light::tests::ser_deser_ok;
+    use elrond_codec::test_util::ser_deser_ok;
 
     #[test]
     fn test_address() {

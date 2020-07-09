@@ -254,7 +254,7 @@ impl PartialOrd<u64> for ArwenBigUint {
     }
 }
 
-use elrond_wasm::esd_light::*;
+use elrond_wasm::elrond_codec::*;
 
 impl Encode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;

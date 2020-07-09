@@ -1,5 +1,6 @@
 use crate::*;
-use crate::esd_light::*;
+use crate::elrond_codec::*;
+
 
 pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
 where
@@ -46,7 +47,16 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint, T, E> EndpointResult<'a, A, BigInt, BigUint> for Result<T, E>
+/// Smart contract result, overrides the default Rust Result<T, E>.
+/// 
+/// We cannot use the default Rust Result because of a potential trait implementation collision
+/// causing the compiler to reject the implementation.
+pub enum GeneralSCResult<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+impl<'a, A, BigInt, BigUint, T, E> EndpointResult<'a, A, BigInt, BigUint> for GeneralSCResult<T, E>
 where
     T: EndpointResult<'a, A, BigInt, BigUint>,
     E: ErrorMessage,
@@ -57,12 +67,48 @@ where
     #[inline]
     fn finish(&self, api: &'a A) {
         match self {
-            Ok(t) => {
+            GeneralSCResult::Ok(t) => {
                 t.finish(api);
             },
-            Err(e) => {
+            GeneralSCResult::Err(e) => {
                 e.with_message_slice(|buf| api.signal_error(buf));
             }
+        }
+    }
+}
+
+/// Default way to optionally return an error from a smart contract endpoint.
+/// Equivalent to GeneralSCResult<T, SCError>, but defined as a separate type.
+pub enum SCResult<T> {
+    Ok(T),
+    Err(SCError),
+}
+
+impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for SCResult<T>
+where
+    T: EndpointResult<'a, A, BigInt, BigUint>,
+    BigInt: BigIntApi<BigUint> + 'static,
+    BigUint: BigUintApi + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a
+{
+    #[inline]
+    fn finish(&self, api: &'a A) {
+        match self {
+            SCResult::Ok(t) => {
+                t.finish(api);
+            },
+            SCResult::Err(e) => {
+                e.with_message_slice(|buf| api.signal_error(buf));
+            }
+        }
+    }
+}
+
+impl<T> SCResult<T> {
+    pub fn unwrap(self) -> T {
+        match self {
+            SCResult::Ok(t) => t,
+            SCResult::Err(_) => panic!("called `SCResult::unwrap()`"),
         }
     }
 }
