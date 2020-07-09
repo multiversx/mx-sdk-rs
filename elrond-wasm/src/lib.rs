@@ -9,7 +9,6 @@ pub use alloc::string::String;
 pub use elrond_codec;
 
 mod types;
-mod elrond_protected_storage;
 pub mod io;
 mod proxy;
 pub mod storage;
@@ -76,7 +75,7 @@ where
 
     #[inline]
     fn storage_load_cumulated_validator_reward(&self) -> BigUint {
-        self.storage_load_big_uint(elrond_protected_storage::ELROND_REWARD_KEY)
+        self.storage_load_big_uint(storage::protected_keys::ELROND_REWARD_KEY)
     }
     
     fn get_call_value_big_uint(&self) -> BigUint;
