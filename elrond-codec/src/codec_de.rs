@@ -57,13 +57,13 @@ impl<'a> Input for &'a [u8] {
 
         let (result, rest) = self.split_at(length);
         *self = rest;
-        return Ok(result);
+        Ok(result)
     }
     
     fn flush(&mut self) -> Result<&[u8], DecodeError> {
         let result = &self[..];
         *self = &[];
-        return Ok(result);
+        Ok(result)
     }
 }
 
@@ -164,7 +164,7 @@ impl<T: Decode> Decode for Vec<T> {
 /// Handles both signed and unsigned of any length.
 /// No generics here, because we want the executable binary as small as possible.
 pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
-    if bytes.len() == 0 {
+    if bytes.is_empty() {
         return 0;
     }
     let negative = signed && bytes[0] >> 7 == 1;

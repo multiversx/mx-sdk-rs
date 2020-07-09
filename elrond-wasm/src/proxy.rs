@@ -79,7 +79,7 @@ impl<T, BigInt, BigUint> OtherContractHandle<T, BigInt, BigUint>where
 {
     pub fn new(api: T, address: &Address) -> Self {
         OtherContractHandle {
-          api: api,
+          api,
           address: address.clone(),
           _phantom1: core::marker::PhantomData,
           _phantom2: core::marker::PhantomData,

@@ -10,7 +10,7 @@ pub struct CallDataArgLoader<'a>{
 impl<'a> CallDataArgLoader<'a> {
     pub fn new(deser: CallDataDeserializer<'a>) -> Self {
         CallDataArgLoader {
-            deser: deser,
+            deser,
         }
     }
 }

@@ -74,7 +74,16 @@ impl<T> VarArgs<T> {
     pub fn new() -> Self {
         VarArgs(Vec::new())
     }
+}
 
+impl<T> Default for VarArgs<T> {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<T> VarArgs<T> {
     #[inline]
     pub fn into_vec(self) -> Vec<T> {
         self.0
@@ -93,6 +102,11 @@ impl<T> VarArgs<T> {
     #[inline]
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 
     #[inline]
@@ -174,10 +188,10 @@ where
             let arg = T::load(loader, arg_id)?;
             Ok(AsyncCallResult::Ok(arg))
         } else {
-            let err_msg_bytes = Vec::<u8>::load(loader, arg_id)?;
+            let err_msg = Vec::<u8>::load(loader, arg_id)?;
             Ok(AsyncCallResult::Err(AsyncCallError {
-                err_code: err_code,
-                err_msg: err_msg_bytes,
+                err_code,
+                err_msg,
             }))
         }
     }

@@ -50,7 +50,7 @@ pub struct CallDataDeserializer<'a> {
 impl<'a> CallDataDeserializer<'a> {
     pub fn new(source: &'a [u8]) -> Self {
         let mut de = CallDataDeserializer {
-            source: source,
+            source,
             index: 0,
             func_name_output: &[],
         };

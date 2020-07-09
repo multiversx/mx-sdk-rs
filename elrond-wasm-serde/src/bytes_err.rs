@@ -4,8 +4,6 @@ use core::fmt::Write;
 
 use core::fmt;
 
-use serde;
-
 /// The result of a serialization or deserialization operation.
 pub type Result<T> = ::core::result::Result<T, SDError>;
 
@@ -68,12 +66,19 @@ impl ErrorBuffer {
             output: Vec::new(),
         }
     }
+}
 
+impl Default for ErrorBuffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ErrorBuffer {
     fn from_display<T: fmt::Display>(msg: T) -> Self {
         let mut ebuf = ErrorBuffer::new();
-        match ebuf.write_fmt(format_args!("{}", msg)) {
-            Err(_) => ebuf.output.extend_from_slice(b"fmt err"),
-            _ => {},
+        if ebuf.write_fmt(format_args!("{}", msg)).is_err() {
+            ebuf.output.extend_from_slice(b"fmt err");
         }
         ebuf
     }

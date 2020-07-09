@@ -20,10 +20,24 @@ impl<T> Queue<T> {
             start: 0,
         }
     }
+}
+
+impl<T> Default for Queue<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<T> Queue<T> {
 
     #[inline]
     pub fn len(&self) -> usize {
         self.vec.len() - self.start
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     #[inline]

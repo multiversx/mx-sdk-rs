@@ -4,7 +4,7 @@ use super::arg_regular::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
-pub fn generate_callback_body(methods: &Vec<Method>) -> proc_macro2::TokenStream {
+pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
     let raw_decl = find_raw_callback(methods);
     if let Some(raw) = raw_decl {
         generate_callback_body_raw(&raw)
@@ -13,7 +13,7 @@ pub fn generate_callback_body(methods: &Vec<Method>) -> proc_macro2::TokenStream
     }
 }
 
-fn find_raw_callback(methods: &Vec<Method>) -> Option<Method> {
+fn find_raw_callback(methods: &[Method]) -> Option<Method> {
     methods.iter()
         .find(|m| {
             match m.metadata {
@@ -21,7 +21,7 @@ fn find_raw_callback(methods: &Vec<Method>) -> Option<Method> {
                 _ => false
             }
         })
-        .map(|m| m.clone())
+        .cloned()
 }
 
 fn generate_callback_body_raw(raw_callback: &Method) -> proc_macro2::TokenStream {
@@ -36,7 +36,7 @@ fn generate_callback_body_raw(raw_callback: &Method) -> proc_macro2::TokenStream
     }
 }
 
-fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenStream {
+fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStream {
     let match_arms: Vec<proc_macro2::TokenStream> = 
         methods.iter()
             .filter_map(|m| {
@@ -99,7 +99,7 @@ fn generate_callback_body_regular(methods: &Vec<Method>) -> proc_macro2::TokenSt
                 }
             })
             .collect();
-    if match_arms.len() == 0 {
+    if match_arms.is_empty() {
         // no callback code needed
         quote! {
         }

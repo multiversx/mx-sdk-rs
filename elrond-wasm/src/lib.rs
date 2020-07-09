@@ -141,7 +141,7 @@ pub trait ContractIOApi<BigInt, BigUint> {
         if nr_args != expected {
             self.signal_error(err_msg::ARG_WRONG_NUMBER);
         }
-        return true;
+        true
     }
 
     fn check_not_payable(&self);

@@ -25,7 +25,7 @@ where
 			TypeInfo::BigUint => {
                 // self must be of type BigUint
                 // performing a forceful cast
-                let cast_big_uint: &BigUint = unsafe { core::mem::transmute(self) };
+                let cast_big_uint: &BigUint = unsafe { &*(self as *const T as *const BigUint) };
                 api.finish_big_uint(cast_big_uint);
             },
             TypeInfo::I64 => {

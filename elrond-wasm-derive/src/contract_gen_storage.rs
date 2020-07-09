@@ -17,7 +17,7 @@ fn storage_load_snippet(_ty: &syn::Type) -> proc_macro2::TokenStream {
 
 fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macro2::TokenStream {
     let id_literal = array_literal(identifier.as_bytes());
-    if key_args.len() == 0 {
+    if key_args.is_empty() {
         // hardcode key
         quote! {
             let key: &'static [u8] = &#id_literal;
@@ -56,7 +56,7 @@ pub fn generate_getter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 
 pub fn generate_setter_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
     let msig = m.generate_sig();
-    if m.method_args.len() == 0 {
+    if m.method_args.is_empty() {
         panic!("setter must have at least one argument, for the value");
     }
     if m.return_type != syn::ReturnType::Default {
@@ -77,7 +77,7 @@ pub fn generate_setter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
     let msig = m.generate_sig();
     let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
-    if m.method_args.len() == 0 {
+    if m.method_args.is_empty() {
         // const key
         quote! {
             #msig {

@@ -274,17 +274,15 @@ impl elrond_wasm::BigUintApi for RustBigUint {
 
     fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>> {
         let (_, bytes_be) = self.0.to_bytes_be();
-        if bytes_be.len() > nr_bytes {
-            None
-        } else if bytes_be.len() == nr_bytes {
-            Some(bytes_be)
-        } else {
-            let mut res = vec![0u8; nr_bytes];
-            let offset = nr_bytes - bytes_be.len();
-            for i in 0..bytes_be.len()-1 {
-                res[offset+i] = bytes_be[i];
+        match bytes_be.len().cmp(&nr_bytes) {
+            Ordering::Greater => None,
+            Ordering::Equal => Some(bytes_be),
+            Ordering::Less => {
+                let mut res = vec![0u8; nr_bytes];
+                let offset = nr_bytes - bytes_be.len();
+                res[offset..(bytes_be.len()-1 + offset)].clone_from_slice(&bytes_be[..bytes_be.len()-1]);
+                Some(res)
             }
-            Some(res)
         }
     }
 
