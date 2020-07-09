@@ -7,7 +7,6 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
 use alloc::vec::Vec;
 use elrond_wasm::BigIntApi;
-use elrond_wasm::serde as serde;
 
 use num_bigint::BigInt;
 use core::cmp::Ordering;
@@ -172,26 +171,6 @@ impl Decode for RustBigInt {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
-        Ok(RustBigInt::from_signed_bytes_be(bytes))
-    }
-}
-
-impl serde::Serialize for RustBigInt {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let bytes = self.to_signed_bytes_be();
-        serializer.serialize_bytes(bytes.as_slice())
-    }
-}
-
-impl<'de> serde::Deserialize<'de> for RustBigInt {
-    fn deserialize<D>(deserializer: D) -> Result<RustBigInt, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
     }
 }

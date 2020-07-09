@@ -5,12 +5,10 @@
 mod ext_mock;
 mod big_int_mock;
 mod big_uint_mock;
-mod test_util;
 
 pub use ext_mock::*;
 pub use big_int_mock::*;
 pub use big_uint_mock::*;
-pub use test_util::*;
 
 #[macro_use]
 extern crate alloc;
@@ -36,38 +34,6 @@ mod esd_light_tests {
 
         // deserialize
         let deserialized: V = V::top_decode(&mut &serialized_bytes[..]).unwrap();
-        assert_eq!(deserialized, element);
-    }
-
-    #[test]
-    fn test_big_int_serialization() {
-        ser_deser_ok(RustBigInt::from(5), &[5u8]);
-        ser_deser_ok(RustBigInt::from(-5), &[251u8]);
-    }
-
-    #[test]
-    fn test_big_uint_serialization() {
-        ser_deser_ok(RustBigUint::from(5u32), &[5u8]);
-    }
-}
-
-#[cfg(test)]
-mod esd_serde_tests {
-    use super::*;
-    use core::fmt::Debug;
-    use elrond_wasm::esd_serde::{to_bytes, from_bytes};
-    use elrond_wasm::serde as serde;
-
-    pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
-    where
-        V: serde::Serialize + serde::de::DeserializeOwned + PartialEq + Debug + 'static,
-    {
-        // serialize
-        let serialized_bytes = to_bytes(&element).unwrap();
-        assert_eq!(serialized_bytes.as_slice(), expected_bytes);
-
-        // deserialize
-        let deserialized: V = from_bytes(serialized_bytes.as_slice()).unwrap();
         assert_eq!(deserialized, element);
     }
 

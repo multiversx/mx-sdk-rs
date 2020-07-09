@@ -1,3 +1,4 @@
+extern crate alloc;
 
 mod bytes_ser;
 mod bytes_de;

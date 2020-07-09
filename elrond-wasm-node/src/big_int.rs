@@ -7,7 +7,6 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use core::cmp::Ordering;
 
 use alloc::vec::Vec;
-use elrond_wasm::serde as serde;
 
 use elrond_wasm::BigIntApi;
 use elrond_wasm::Sign;
@@ -239,26 +238,6 @@ impl Decode for ArwenBigInt {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
-        Ok(ArwenBigInt::from_signed_bytes_be(bytes))
-    }
-}
-
-impl serde::Serialize for ArwenBigInt {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let bytes = self.to_signed_bytes_be();
-        serializer.serialize_bytes(bytes.as_slice())
-    }
-}
-
-impl<'de> serde::Deserialize<'de> for ArwenBigInt {
-    fn deserialize<D>(deserializer: D) -> Result<ArwenBigInt, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let bytes = deserializer.deserialize_bytes(elrond_wasm::serialize_util::BorrowedBytesVisitor)?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))
     }
 }
