@@ -6,7 +6,7 @@ pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a 
 {
     fn finish(&self, api: &'a A);
 }
@@ -16,7 +16,7 @@ where
     T: Encode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     fn finish(&self, api: &'a A) {
         // the compiler is smart enough to evaluate this match at compile time
@@ -41,7 +41,10 @@ where
                 api.finish_i64(arg_i8 as i64);
             },
 			_ => {
-				self.using_top_encoded(|buf| api.finish_slice_u8(buf));
+                let res = self.using_top_encoded(|buf| api.finish_slice_u8(buf));
+                if let Err(encode_err_message) = res {
+                    api.signal_error(encode_err_message.message_bytes());
+                }
 			}
 		}
     }
@@ -62,7 +65,7 @@ where
     E: ErrorMessage,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     #[inline]
     fn finish(&self, api: &'a A) {
@@ -89,7 +92,7 @@ where
     T: EndpointResult<'a, A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     #[inline]
     fn finish(&self, api: &'a A) {
@@ -126,7 +129,7 @@ where
     T: EndpointResult<'a, A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     #[inline]
     fn finish(&self, api: &'a A) {
@@ -155,7 +158,7 @@ where
     T: EndpointResult<'a, A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     #[inline]
     fn finish(&self, api: &'a A) {
@@ -175,7 +178,7 @@ macro_rules! multi_result_impls {
                 $($name: EndpointResult<'a, A, BigInt, BigUint>,)+
                 BigInt: BigIntApi<BigUint> + 'static,
                 BigUint: BigUintApi + 'static,
-                A: ContractIOApi<BigInt, BigUint> + 'static
+                A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
             {
                 #[inline]
 				fn finish(&self, api: &'a A) {

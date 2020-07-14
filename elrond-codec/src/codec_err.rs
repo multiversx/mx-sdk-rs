@@ -1,26 +1,43 @@
+use alloc::vec::Vec;
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum EncodeError {
+    UnsupportedOperation,
+    Static(&'static [u8]),
+    Dynamic(Vec<u8>),
+}
 
-// TODO: also add an EncodeError
+impl EncodeError {
+    pub fn message_bytes(&self) -> &[u8] {
+        match self {
+            EncodeError::UnsupportedOperation => &b"unsupported operation"[..],
+            EncodeError::Static(msg) => msg,
+            EncodeError::Dynamic(msg) => msg.as_slice(),
+        }
+    }
+}
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum DecodeError {
     InputTooShort,
     InputTooLong,
     InvalidValue,
     UnsupportedOperation,
     ArrayDecodeErr,
-    Custom(&'static [u8]),
+    Static(&'static [u8]),
+    Dynamic(Vec<u8>),
 }
 
 impl DecodeError {
-    pub fn message_bytes(&self) -> &'static [u8] {
+    pub fn message_bytes(&self) -> &[u8] {
         match self {
             DecodeError::InputTooShort => &b"input too short"[..],
             DecodeError::InputTooLong => &b"input too long"[..],
             DecodeError::InvalidValue => &b"invalid value"[..],
             DecodeError::UnsupportedOperation => &b"unsupported operation"[..],
             DecodeError::ArrayDecodeErr => &b"array decode error"[..],
-            DecodeError::Custom(msg) => msg,
+            DecodeError::Static(msg) => msg,
+            DecodeError::Dynamic(msg) => msg.as_slice(),
         }
     }
 }

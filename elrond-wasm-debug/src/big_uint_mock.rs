@@ -226,15 +226,15 @@ use elrond_wasm::elrond_codec::*;
 impl Encode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
-    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
         let bytes = self.to_bytes_be();
         f(&bytes);
+        Ok(())
     }
     
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
         let bytes = self.to_bytes_be();
-        bytes.len().dep_encode_to(dest);
-        dest.write(&bytes);
+        bytes.as_slice().dep_encode_to(dest)
     }
 }
 

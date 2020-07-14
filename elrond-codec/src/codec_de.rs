@@ -1,7 +1,6 @@
-
 use alloc::vec::Vec;
-use super::codec_err::DecodeError;
-use super::TypeInfo;
+use crate::codec_err::DecodeError;
+use crate::TypeInfo;
 use arrayvec::ArrayVec;
 
 /// Trait that allows reading of data into a slice.

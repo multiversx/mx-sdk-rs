@@ -8,7 +8,7 @@ where
     T: Encode,
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
@@ -45,9 +45,12 @@ where
             api.storage_store_i64(key, if value_bool { 1i64 } else { 0i64 });
         },
         _ => {
-            value.using_top_encoded(|bytes| {
+            let res = value.using_top_encoded(|bytes| {
                 api.storage_store(key, bytes);
             });
+            if let Err(encode_err_message) = res {
+                api.signal_error(encode_err_message.message_bytes());
+            }
         }
     }
 }

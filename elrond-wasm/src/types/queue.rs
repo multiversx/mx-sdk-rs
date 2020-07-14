@@ -86,13 +86,13 @@ impl<T> Queue<T> {
 /// Serializes identically to a Vec, entries before start index are ignored.
 impl<T: Encode> Encode for Queue<T> {
 	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-        self.as_slice().dep_encode_to(dest);
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.as_slice().dep_encode_to(dest)
 	}
 
 	#[inline]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
-        self.as_slice().using_top_encoded(f);
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+        self.as_slice().using_top_encoded(f)
 	}
 }
 

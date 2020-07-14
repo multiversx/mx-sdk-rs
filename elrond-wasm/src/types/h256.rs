@@ -131,8 +131,9 @@ impl H256 {
 use elrond_codec::*;
 
 impl Encode for H256 {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
+        Ok(())
     }
 }
 

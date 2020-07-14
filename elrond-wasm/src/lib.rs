@@ -198,12 +198,6 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn finish_i64(&self, value: i64);
 
-    fn finish_u64(&self, value: u64) {
-        elrond_codec::Encode::using_top_encoded(&value, |bytes| {
-            self.finish_slice_u8(bytes);
-        });
-    }
-
     fn signal_error(&self, message: &[u8]) -> !;
 
     fn write_log(&self, topics: &[[u8;32]], data: &[u8]);
