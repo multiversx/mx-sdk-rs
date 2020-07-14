@@ -9,7 +9,7 @@ pub mod test_util;
 
 pub use codec_ser::*;
 pub use codec_de::*;
-pub use codec_err::DecodeError;
+pub use codec_err::{EncodeError, DecodeError};
 
 /// !INTERNAL USE ONLY!
 ///
@@ -47,10 +47,11 @@ pub mod test_struct {
 	}
 
 	impl Encode for Test {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-			self.int.dep_encode_to(dest);
-			self.seq.dep_encode_to(dest);
-			self.another_byte.dep_encode_to(dest);
+		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+			self.int.dep_encode_to(dest)?;
+			self.seq.dep_encode_to(dest)?;
+            self.another_byte.dep_encode_to(dest)?;
+            Ok(())
 		}
     }
     
@@ -73,7 +74,7 @@ pub mod test_struct {
     }
 
     impl Encode for E {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
             match self {
                 E::Unit => {
                     using_encoded_number(0u64, 32, false, false, |buf| dest.write(buf));
@@ -92,6 +93,7 @@ pub mod test_struct {
                     using_encoded_number(*a as u64, 32, false, false, |buf| dest.write(buf));
                 },
             }
+            Ok(())
 		}
     }
     
@@ -111,8 +113,9 @@ pub mod test_struct {
     pub struct WrappedArray(pub [u8; 5]);
 
     impl Encode for WrappedArray {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
             dest.write(&self.0[..]);
+            Ok(())
 		}
     }
     
@@ -137,7 +140,7 @@ pub mod tests {
     where
         V: Encode + Decode + PartialEq + Debug + 'static,
     {
-        let serialized_bytes = element.top_encode();
+        let serialized_bytes = element.top_encode().unwrap();
         let deserialized: V = decode_from_byte_slice(&mut &serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
@@ -201,7 +204,7 @@ pub mod tests {
         }
 
         // serialize
-        let serialized_bytes = arr.top_encode();
+        let serialized_bytes = arr.top_encode().unwrap();
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize

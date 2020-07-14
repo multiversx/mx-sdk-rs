@@ -6,7 +6,7 @@ where
     V: Encode + Decode + PartialEq + Debug + 'static,
 {
     // serialize
-    let serialized_bytes = element.top_encode();
+    let serialized_bytes = element.top_encode().unwrap();
     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
 
     // deserialize

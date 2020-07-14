@@ -60,7 +60,10 @@ pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::
                     } else {
                         let pat = &arg.pat;
                         quote! {
-                            let data_vec = #pat.top_encode();
+                            let data_vec = match #pat.top_encode() {
+                                Result::Ok(data_vec) => data_vec,
+                                Result::Err(encode_err) => self.api.signal_error(encode_err.message_bytes()),
+                            };
                         }
                     };
                 topic_index += 1;

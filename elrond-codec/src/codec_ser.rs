@@ -1,9 +1,6 @@
-
-
-
-// use super::bytes_err::{SDError, Result};
 use alloc::vec::Vec;
-use super::TypeInfo;
+use crate::codec_err::EncodeError;
+use crate::TypeInfo;
 
 /// Trait that allows writing of data.
 pub trait Output {
@@ -34,27 +31,28 @@ pub trait Encode: Sized {
 
 	/// Encode to output, using the format of an object nested inside another structure.
 	/// Does not provide compact version.
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-		self.using_top_encoded(|buf| dest.write(buf));
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.using_top_encoded(|buf| dest.write(buf))
 	}
 
 	/// Convert self to an owned vector.
 	/// Allowed to provide compact version.
 	/// Do not call for nested objects.
-	fn top_encode(&self) -> Vec<u8> {
+	fn top_encode(&self) -> Result<Vec<u8>, EncodeError> {
 		let mut dest = Vec::new();
-		self.using_top_encoded(|buf| dest.write(buf));
-		dest
+		self.using_top_encoded(|buf| dest.write(buf))?;
+		Ok(dest)
 	}
 
 	/// Convert self to a slice and then invoke the given closure with it.
 	/// Allowed to provide compact version.
 	/// Do not call for nested objects.
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		// default implementation simply use dep_encode_to
 		let mut dest: Vec<u8> = Vec::new();
-		self.dep_encode_to(&mut dest);
-		f(dest.as_slice())
+		self.dep_encode_to(&mut dest)?;
+		f(dest.as_slice());
+		Ok(())
 	}
 }
 
@@ -62,36 +60,40 @@ pub trait Encode: Sized {
 impl Encode for () {
 	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-	fn dep_encode_to<O: Output>(&self, _dest: &mut O) {
+	fn dep_encode_to<O: Output>(&self, _dest: &mut O) -> Result<(), EncodeError> {
+		Ok(())
 	}
 
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
-		f(&[])
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+		f(&[]);
+		Ok(())
 	}
 
-	fn top_encode(&self) -> Vec<u8> {
-		Vec::new()
+	fn top_encode(&self) -> Result<Vec<u8>, EncodeError> {
+		Ok(Vec::with_capacity(0))
 	}
 }
 
 impl Encode for u8 {
 	const TYPE_INFO: TypeInfo = TypeInfo::U8;
 
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		dest.write(&[*self as u8][..]);
+		Ok(())
 	}
 
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		if *self == 0u8 {
-			f(&[])
+			f(&[]);
 		} else {
-			f(&[*self][..])
+			f(&[*self][..]);
 		}
+		Ok(())
 	}
 }
 
 impl<T: Encode> Encode for &[T] {
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
 		using_encoded_number(self.len() as u64, 32, false, false, |buf| dest.write(buf));
 		// actual data
@@ -103,14 +105,15 @@ impl<T: Encode> Encode for &[T] {
 			},
 			_ => {
 				for x in *self {
-					x.dep_encode_to(dest);
+					x.dep_encode_to(dest)?;
 				}
 			}
 		}
+		Ok(())
 	}
 
 	#[inline]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
 				// cast Vec<T> to &[u8]
@@ -120,48 +123,51 @@ impl<T: Encode> Encode for &[T] {
 			_ => {
 				let mut result: Vec<u8> = Vec::new();
 				for x in *self {
-					x.dep_encode_to(&mut result);
+					x.dep_encode_to(&mut result)?;
 				}
-				f(result.as_slice())
+				f(result.as_slice());
 			}
 		}
+		Ok(())
 	}
 }
 
 impl<T: Encode> Encode for &T {
 	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-		(*self).dep_encode_to(dest);
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		(*self).dep_encode_to(dest)
 	}
 
 	#[inline]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		(*self).using_top_encoded(f)
 	}
 }
 
 impl Encode for &str {
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
 		using_encoded_number(self.len() as u64, 32, false, false, |buf| dest.write(buf));
 		// actual data
 		dest.write(self.as_bytes());
+		Ok(())
 	}
 
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
-		f(self.as_bytes())
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+		f(self.as_bytes());
+		Ok(())
 	}
 }
 
 impl<T: Encode> Encode for Vec<T> {
 	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-		self.as_slice().dep_encode_to(dest);
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_slice().dep_encode_to(dest)
 	}
 
 	#[inline]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
-		self.as_slice().using_top_encoded(f);
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+		self.as_slice().using_top_encoded(f)
 	}
 }
 
@@ -209,13 +215,15 @@ macro_rules! encode_num {
 			const TYPE_INFO: TypeInfo = $type_info;
 
 			#[inline]
-            fn dep_encode_to<O: Output>(&self, dest: &mut O) {
-				using_encoded_number(*self as u64, $size_in_bits, $signed, false, |buf| dest.write(buf))
+            fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				using_encoded_number(*self as u64, $size_in_bits, $signed, false, |buf| dest.write(buf));
+				Ok(())
 			}
 		
 			#[inline]
-            fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
-				using_encoded_number(*self as u64, $size_in_bits, $signed, true, f)
+            fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+				using_encoded_number(*self as u64, $size_in_bits, $signed, true, f);
+				Ok(())
 			}
 		}
     }
@@ -234,46 +242,50 @@ encode_num!{i8, 8, true, TypeInfo::I8}
 impl Encode for bool {
 	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		dest.write(&[*self as u8][..]);
+		Ok(())
 	}
 
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		if *self {
-			f(&[1u8][..])
+			f(&[1u8][..]);
 		} else {
-			f(&[])
+			f(&[]);
 		}
+		Ok(())
 	}
 }
 
 impl<T: Encode> Encode for Option<T> {
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
 				using_encoded_number(1u64, 8, false, false, |buf| dest.write(buf));
-				v.dep_encode_to(dest);
+				v.dep_encode_to(dest)
 			},
 			None => {
 				using_encoded_number(0u64, 8, false, false, |buf| dest.write(buf));
+				Ok(())
 			}
 		}
 	}
 
 	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
 	/// to allow disambiguation between e.g. Some(0) and None.
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) {
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
 				let mut dest: Vec<u8> = Vec::new();
 				dest.push(1u8);
-				v.dep_encode_to(&mut dest);
-				f(dest.as_slice())
+				v.dep_encode_to(&mut dest)?;
+				f(dest.as_slice());
 			},
 			None => {
 				f(&[]);
 			}
 		}
+		Ok(())
 	}
 }
 
@@ -285,11 +297,11 @@ macro_rules! tuple_impls {
                 $($name: Encode,)+
             {
 				#[inline]
-				fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+				fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 					$(
-                        self.$n.dep_encode_to(dest);
+                        self.$n.dep_encode_to(dest)?;
                     )+
-					
+					Ok(())
 				}
             }
         )+
@@ -320,9 +332,9 @@ macro_rules! array_impls {
         $(
             impl<T: Encode> Encode for [T; $n] {
 				#[inline]
-				fn dep_encode_to<O: Output>(&self, dest: &mut O) {
+				fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 					// the top encoded slice does not serialize its length, so just like the array
-					(&self[..]).using_top_encoded(|buf| dest.write(buf));
+					(&self[..]).using_top_encoded(|buf| dest.write(buf))
 				}
             }
         )+
