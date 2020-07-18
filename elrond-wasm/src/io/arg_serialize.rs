@@ -18,7 +18,7 @@ where
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
         self
             .using_top_encoded(|buf| serializer.push_argument_bytes(buf))
-            .map_err(|e| SCError::PushAsyncEncodeErr(e))
+            .map_err(SCError::PushAsyncEncodeErr)
     }
 }
 
