@@ -1,5 +1,6 @@
 use crate::*;
 use crate::elrond_codec::*;
+use core::iter::FromIterator;
 
 
 pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
@@ -118,8 +119,28 @@ impl<T> SCResult<T> {
 
 pub struct MultiResultVec<T>(pub Vec<T>);
 
+impl<T> MultiResultVec<T> {
+    #[inline]
+    pub fn new() -> Self {
+        MultiResultVec(Vec::new())
+    }
+}
+
+impl<T> Default for MultiResultVec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> From<Vec<T>> for MultiResultVec<T> {
     fn from(v: Vec<T>) -> Self {
+        MultiResultVec(v)
+    }
+}
+
+impl<T> FromIterator<T> for MultiResultVec<T> {
+    fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
+        let v = Vec::<T>::from_iter(iter);
         MultiResultVec(v)
     }
 }
