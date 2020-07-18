@@ -374,7 +374,7 @@ mod tests {
     {
 		V::using_top_encoded(&element, |bytes| {
 			assert_eq!(bytes, expected_bytes);
-		});
+		}).unwrap();
         
     }
 
