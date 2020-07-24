@@ -6,7 +6,6 @@ use alloc::vec::Vec;
 pub struct H256([u8;32]);
 
 pub type Address = H256;
-pub type StorageKey = H256;
 
 impl From<[u8; 32]> for H256 {
     /// Constructs a hash type from the given bytes array of fixed length.
