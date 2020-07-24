@@ -14,7 +14,7 @@ fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_m
                 syn::Type::Path(type_path) => {
                     let type_str = type_path.path.segments.last().unwrap().ident.to_string();
                     match type_str.as_str() {
-                        "Address" | "StorageKey" | "H256" =>
+                        "Address" | "H256" =>
                             quote!{
                                 #pat.copy_to_array(&mut topics[#topic_index]);
                             },
