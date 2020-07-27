@@ -58,12 +58,12 @@ impl H256 {
     }
 }
 
-// impl From<H256> for [u8; 32] {
-//     #[inline]
-//     fn from(s: H256) -> Self {
-//         s.0
-//     }
-// }
+impl From<H256> for [u8; 32] {
+    #[inline]
+    fn from(s: H256) -> Self {
+        *(s.0)
+    }
+}
 
 impl AsRef<[u8]> for H256 {
     #[inline]
@@ -161,13 +161,13 @@ mod esd_light_tests {
         ser_deser_ok(Some(addr), expected.as_slice());
     }
 
-    // #[test]
-    // fn test_ser_address_ref() {
-    //     let addr = Address::from([4u8; 32]);
-    //     let expected_bytes: &[u8] = &[4u8; 32*3];
+    #[test]
+    fn test_ser_address_ref() {
+        let addr = Address::from([4u8; 32]);
+        let expected_bytes: &[u8] = &[4u8; 32*3];
 
-    //     let tuple = (&addr, &&&addr, addr.clone());
-    //     let serialized_bytes = tuple.top_encode();
-    //     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
-    // }
+        let tuple = (&addr, &&&addr, addr.clone());
+        let serialized_bytes = tuple.top_encode().unwrap();
+        assert_eq!(serialized_bytes.as_slice(), expected_bytes);
+    }
 }
