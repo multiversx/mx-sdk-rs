@@ -51,41 +51,45 @@ where
     }
 }
 
-/// Smart contract result, overrides the default Rust Result<T, E>.
-/// 
-/// We cannot use the default Rust Result because of a potential trait implementation collision
-/// causing the compiler to reject the implementation.
-pub enum GeneralSCResult<T, E> {
-    Ok(T),
-    Err(E),
-}
-
-impl<'a, A, BigInt, BigUint, T, E> EndpointResult<'a, A, BigInt, BigUint> for GeneralSCResult<T, E>
-where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
-    E: ErrorMessage,
-    BigInt: BigIntApi<BigUint> + 'static,
-    BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
-{
-    #[inline]
-    fn finish(&self, api: &'a A) {
-        match self {
-            GeneralSCResult::Ok(t) => {
-                t.finish(api);
-            },
-            GeneralSCResult::Err(e) => {
-                e.with_message_slice(|buf| api.signal_error(buf));
-            }
-        }
-    }
-}
-
 /// Default way to optionally return an error from a smart contract endpoint.
-/// Equivalent to GeneralSCResult<T, SCError>, but defined as a separate type.
+#[must_use]
 pub enum SCResult<T> {
     Ok(T),
     Err(SCError),
+}
+
+impl<T> SCResult<T> {
+    #[inline]
+    pub fn is_ok(&self) -> bool {
+        if let SCResult::Ok(_) = self {
+            true
+        } else {
+            false
+        }
+    }
+
+    #[inline]
+    pub fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
+
+    #[inline]
+    pub fn ok(self) -> Option<T> {
+        if let SCResult::Ok(t) = self {
+            Some(t)
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    pub fn err(self) -> Option<SCError> {
+        if let SCResult::Err(e) = self {
+            Some(e)
+        } else {
+            None
+        }
+    }
 }
 
 impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for SCResult<T>
@@ -115,6 +119,8 @@ impl<T> SCResult<T> {
             SCResult::Err(_) => panic!("called `SCResult::unwrap()`"),
         }
     }
+
+
 }
 
 pub struct MultiResultVec<T>(pub Vec<T>);

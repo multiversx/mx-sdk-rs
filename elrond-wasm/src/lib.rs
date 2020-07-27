@@ -331,7 +331,7 @@ macro_rules! imports {
     () => {
         use elrond_wasm::{Box, Vec, String, Queue, VarArgs, BorrowedMutStorage};
         use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
-        use elrond_wasm::{H256, Address, StorageKey, ErrorMessage};
+        use elrond_wasm::{H256, Address, ErrorMessage};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
         use elrond_wasm::io::*;
