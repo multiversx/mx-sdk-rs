@@ -162,7 +162,7 @@ impl ArwenMockState {
         ArwenMockRef{ state_ref }
     }
 
-    fn create_account_if_necessary(&mut self, tx: &mut TxData) {
+    fn create_account_if_necessary(&mut self, tx: &TxData) {
         if let Some(ref tx_contract) = tx.new_contract {
             if self.accounts.contains_key(&tx.to) {
                 panic!("Account already exists");
@@ -209,10 +209,10 @@ impl ArwenMockRef {
         }
     }
 
-    pub fn execute_tx(&self, mut tx: TxData) -> TxResult {
+    pub fn execute_tx(&self, tx: TxData) -> TxResult {
         {
             let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_necessary(&mut tx);    
+            state.create_account_if_necessary(&tx);    
             state.current_tx = Some(tx);
             state.clear_result();
         }
@@ -228,6 +228,25 @@ impl ArwenMockRef {
         
         let state = self.state_ref.borrow();
         state.get_result()
+    }
+
+    /// To be used for writing small tests.
+    pub fn set_dummy_tx(&self, addr: &Address) {
+        let tx = TxData {
+            func_name: "",
+            new_contract: None,
+            args: Vec::new(),
+            call_value: 0.into(),
+            from: addr.clone(),
+            to: addr.clone(),
+        };
+
+        {
+            let mut state = self.state_ref.borrow_mut();
+            state.create_account_if_necessary(&tx);    
+            state.current_tx = Some(tx);
+            state.clear_result();
+        }
     }
 
     pub fn add_account(&self, acct: AccountData) {
