@@ -31,6 +31,16 @@ where
             let value_u32: u32 = unsafe { core::mem::transmute_copy(value) };
             api.storage_store_i64(key, value_u32 as i64);
         },
+        TypeInfo::USIZE => {
+            // we have to be a bit careful with sign extension
+            let value_usize: usize = unsafe { core::mem::transmute_copy(value) };
+            api.storage_store_i64(key, value_usize as i64);
+        },
+        TypeInfo::ISIZE => {
+            // we have to be a bit careful with sign extension
+            let value_usize: isize = unsafe { core::mem::transmute_copy(value) };
+            api.storage_store_i64(key, value_usize as i64);
+        },
         TypeInfo::I8 => {
             let value_i8: i8 = unsafe { core::mem::transmute_copy(value) };
             api.storage_store_i64(key, value_i8 as i64);
@@ -95,6 +105,22 @@ where
                 None => api.signal_error(err_msg::STORAGE_NOT_I64),
             };
             let value_t: T = unsafe { core::mem::transmute_copy(&value_u32) };
+            value_t
+        },
+        TypeInfo::USIZE => {
+            let value_usize: usize = match api.storage_load_i64(key) {
+                Some(v) => v as usize,
+                None => api.signal_error(err_msg::STORAGE_NOT_I64),
+            };
+            let value_t: T = unsafe { core::mem::transmute_copy(&value_usize) };
+            value_t
+        },
+        TypeInfo::ISIZE => {
+            let value_isize: isize = match api.storage_load_i64(key) {
+                Some(v) => v as isize,
+                None => api.signal_error(err_msg::STORAGE_NOT_I64),
+            };
+            let value_t: T = unsafe { core::mem::transmute_copy(&value_isize) };
             value_t
         },
         TypeInfo::I8 => {
