@@ -410,7 +410,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_gas_left(&self) -> i64 {
-        0
+        1000000000
     }
 
     fn get_block_timestamp(&self) -> u64 {
