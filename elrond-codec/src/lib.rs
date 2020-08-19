@@ -24,6 +24,8 @@ pub enum TypeInfo {
     I16,
     U32,
     I32,
+    USIZE,
+    ISIZE,
     U64,
     I64,
     Bool,
