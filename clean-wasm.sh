@@ -10,6 +10,10 @@ cd examples/factorial/wasm
 cargo clean
 cd ../../..
 
+cd examples/simple-erc20/wasm
+cargo clean
+cd ../../..
+
 cd test-contracts/basic-features/wasm
 cargo clean
 cd ../../..
