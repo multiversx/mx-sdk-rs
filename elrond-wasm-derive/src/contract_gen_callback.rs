@@ -1,7 +1,7 @@
-
 use super::arg_def::*;
 use super::arg_regular::*;
 use super::contract_gen_method::*;
+use super::contract_gen_finish::*;
 use super::util::*;
 
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
@@ -83,13 +83,14 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
                         let fn_name_str = &fn_ident.to_string();
                         let fn_name_literal = array_literal(fn_name_str.as_bytes());
                         let call = m.generate_call_to_method();
+                        let body_with_result = generate_body_with_result(&m.return_type, &call);
 
                         let match_arm = quote! {                     
                             #fn_name_literal =>
                             {
                                 let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer);
                                 #(#arg_init_snippets)*
-                                #call ;
+                                #body_with_result ;
                                 elrond_wasm::check_no_more_args(&___cb_arg_loader, &___err_handler);
                             },
                         };
