@@ -6,4 +6,8 @@ members = [
   "elrond-wasm-node",
   "elrond-wasm-output",
   "elrond-wasm-serde",
+
+  "examples/adder",
+  "examples/adder/debug",
+  "examples/adder/wasm",
 ]
