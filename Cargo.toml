@@ -9,5 +9,4 @@ members = [
 
   "examples/adder",
   "examples/adder/debug",
-  "examples/adder/wasm",
 ]

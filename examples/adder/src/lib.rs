@@ -1,6 +1,5 @@
 
 #![no_std]
-#![allow(unused_attributes)]
 
 imports!();
 

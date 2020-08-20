@@ -16,4 +16,6 @@ panic = "abort"
 
 [dependencies]
 adder = { path = ".." }
-elrond-wasm-output = { path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
+elrond-wasm-output = { path = "../../../elrond-wasm-output", default-features=false, features=["wasm-output-mode"]}
+
+[workspace]
