@@ -13,6 +13,9 @@ description = "Elrond WebAssembly VM API wrapper"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
+[features]
+wasm-mode = []
+
 [dependencies]
 elrond-wasm = { version = "0.5.5", path = "../elrond-wasm" }
 wee_alloc = "0.4"
