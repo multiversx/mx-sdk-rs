@@ -23,9 +23,11 @@ where
         // the compiler is smart enough to evaluate this match at compile time
         match T::TYPE_INFO {
             TypeInfo::Unit => {},
-			TypeInfo::BigUint => {
-                // self must be of type BigUint
-                // performing a forceful cast
+            TypeInfo::BigInt => {
+                let cast_big_int: &BigInt = unsafe { &*(self as *const T as *const BigInt) };
+                api.finish_big_int(cast_big_int);
+            },
+            TypeInfo::BigUint => {
                 let cast_big_uint: &BigUint = unsafe { &*(self as *const T as *const BigUint) };
                 api.finish_big_uint(cast_big_uint);
             },
