@@ -457,4 +457,17 @@ pub trait BasicFeatures {
         self.keccak256(&input).as_ref().into()
     }
 
+    // MACROS
+
+    #[view]
+    fn require_owner_calls(&self) -> SCResult<()> {
+        require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
+        Ok(())
+    }
+
+    #[view]
+    fn return_error(&self) -> SCResult<()> {
+        sc_error!("return_error")
+    }
+
 }

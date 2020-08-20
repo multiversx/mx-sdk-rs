@@ -11,5 +11,5 @@ members = [
   "examples/adder/debug",
   "examples/factorial",
 
-  "test-contracts/basic-features"
+  "test-contracts/basic-features",
 ]
