@@ -6,6 +6,10 @@ cd examples/adder/wasm
 cargo clean
 cd ../../..
 
+cd examples/crypto-bubbles/wasm
+cargo clean
+cd ../../..
+
 cd examples/factorial/wasm
 cargo clean
 cd ../../..
