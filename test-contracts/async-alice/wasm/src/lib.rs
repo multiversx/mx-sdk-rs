@@ -1,5 +1,5 @@
 
 #![no_std]
 
-pub use async_alice_features::*;
+pub use async_alice::*;
 pub use elrond_wasm_output::*;
