@@ -52,7 +52,7 @@ RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.wasm
+cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
 cd ../..
 
 cd test-contracts/async-bob/wasm
@@ -60,5 +60,5 @@ RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
+cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.wasm
 cd ../..
