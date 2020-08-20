@@ -8,7 +8,7 @@ edition = "2018"
 path = "src/lib.rs"
 
 [dependencies]
-elrond-wasm = { version = "0.5.5", path = "../../elrond-wasm" }
-elrond-wasm-derive = { version = "0.5.5", path = "../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.5.5", path = "../../elrond-wasm-node"}
-elrond-wasm-debug = { version = "0.5.5", path = "../../elrond-wasm-debug" }
+elrond-wasm = { version = "0.6.0", path = "../../elrond-wasm" }
+elrond-wasm-derive = { version = "0.6.0", path = "../../elrond-wasm-derive" }
+elrond-wasm-node = { version = "0.6.0", path = "../../elrond-wasm-node"}
+elrond-wasm-debug = { version = "0.6.0", path = "../../elrond-wasm-debug" }
