@@ -40,16 +40,22 @@ mod callable_gen;
 fn wasm32_mode() -> bool {
   // this checks if we set --release or not in the command line
   // we should always set --release when building sc wasm and never when running the debugger, so this works
-  let debug_mode = cfg!(debug_assertions);
-  !debug_mode
+  // let debug_mode = cfg!(debug_assertions);
+  // !debug_mode
 
   // this is supposed to check whether or not the target starts with "wasm32-...
   // for some reason this no longer works, TODO: investigate
-  //cfg!(target_arch = "wasm32")
+  // cfg!(target_arch = "wasm32")
+
+  // feature check = best
+  // cfg!(feature = "sc-wasm-mode")
+
+  // feature check = best
+  // cfg!(feature = "elrond-wasm-node")
 
   // when debugging the macro output, the above methods don't seem to work
   // so just temporarily hardcode while bugfixing
-  //true
+  true
 }
 
 #[proc_macro_attribute]

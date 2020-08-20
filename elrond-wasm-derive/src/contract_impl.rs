@@ -85,47 +85,45 @@ pub fn contract_implementation(
       {
         #(#call_methods)*
       }
-
+      
     };
 
-    if wasm32_mode() {
-      // release mode adds endpoints for wasmer 
-      quote! {
-        #main_definition
-
-        use elrond_wasm_node::{ArwenBigInt, ArwenBigUint};
-        use elrond_wasm_node::*;
-
-        fn new_arwen_instance() -> #contract_impl_ident<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
-          let api = ArwenApiImpl{};
-          #contract_impl_ident::new(api)
-        }
-
+    let wasm_endpoints = quote! {
+      #[cfg(feature = "wasm-mode")]
         #[allow(non_snake_case)]
-        mod endpoints {
+        pub mod endpoints {
           use super::*;
+          use elrond_wasm_node::*;
+
+          fn new_arwen_instance() -> #contract_impl_ident<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
+            let api = ArwenApiImpl{};
+            #contract_impl_ident::new(api)
+          }
 
           #(#endpoints)*
         }
-      }
-    } else {
-      // debug mode adds the contract interface, that we use for the mocks
-      // this interface also relies on "call" methods with no parameter and a function selector
-      quote! {
-        #main_definition
-  
-        use elrond_wasm::CallableContract;
-        impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
-        #api_where
-        {
-          fn call(&self, fn_name: &'static str) {
-            #function_selector_body
-          }
-  
-          fn clone_contract(&self) -> Box<dyn CallableContract> {
-            Box::new(#contract_impl_ident::new(self.api.clone()))
-          }
+    };
+
+    let function_selector = quote! {
+      use elrond_wasm::CallableContract;
+      impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
+      #api_where
+      {
+        fn call(&self, fn_name: &'static str) {
+          #function_selector_body
+        }
+
+        fn clone_contract(&self) -> Box<dyn CallableContract> {
+          Box::new(#contract_impl_ident::new(self.api.clone()))
         }
       }
+    };
+
+    quote! {
+      #main_definition
+
+      #wasm_endpoints
+
+      #function_selector
     }
 }

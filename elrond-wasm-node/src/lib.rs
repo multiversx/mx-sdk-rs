@@ -52,7 +52,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 // }
 
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "wasm-mode")]
 #[alloc_error_handler]
 fn alloc_error_handler(_layout: alloc::alloc::Layout) -> ! {
     ext_error::signal_error(&b"allocation error"[..])
@@ -71,7 +71,7 @@ fn alloc_error_handler(_layout: alloc::alloc::Layout) -> ! {
 //     },
 // }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "wasm-mode")]
 #[panic_handler]
 fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
     let panic_msg =
@@ -84,6 +84,6 @@ fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
     ext_error::signal_error(panic_msg.as_bytes())
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "wasm-mode")]
 #[lang = "eh_personality"] fn eh_personality() {}
 

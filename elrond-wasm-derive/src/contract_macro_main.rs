@@ -13,29 +13,34 @@ pub fn process_contract(
     let contract = Contract::new(args_input, proc_input);
 
     let contract_impl = contract_implementation(&contract);
+    let contract_impl_ident = contract.contract_impl_name.clone();
 
-    if wasm32_mode() {
-        // release mode adds endpoints for wasmer 
-        proc_macro::TokenStream::from(quote! {
-            #[macro_use]
-            extern crate elrond_wasm;
-    
-            #contract_impl
+    let wasm_callback_endpoint = quote!{
+        #[cfg(feature = "wasm-mode")]
+        pub mod callback_endpoint {
+            use super::*;
+            use elrond_wasm_node::*;
+
+            fn new_arwen_instance() -> #contract_impl_ident<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
+                let api = ArwenApiImpl{};
+                #contract_impl_ident::new(api)
+            }
 
             #[no_mangle]
+            #[allow(non_snake_case)]
             pub fn callBack () {
-            let inst = new_arwen_instance();
-            inst.callback();
+                let inst = new_arwen_instance();
+                inst.callback();
             }
-        })
-      } else {
-        // debug mode adds the contract interface, that we use for the mocks
-        // this interface also relies on "call" methods with no parameter and a function selector
-        proc_macro::TokenStream::from(quote! {
-            #[macro_use]
-            extern crate elrond_wasm;
-    
-            #contract_impl
-        })
-      }
+        }
+    };
+
+    proc_macro::TokenStream::from(quote! {
+        #[macro_use]
+        extern crate elrond_wasm;
+
+        #contract_impl
+
+        #wasm_callback_endpoint
+    })
 }
