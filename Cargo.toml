@@ -10,4 +10,6 @@ members = [
   "examples/adder",
   "examples/adder/debug",
   "examples/factorial",
+
+  "test-contracts/basic-features"
 ]
