@@ -18,4 +18,5 @@ members = [
   "test-contracts/async-alice",
   "test-contracts/async-bob",
   "test-contracts/basic-features",
+  "test-contracts/use-module",
 ]
