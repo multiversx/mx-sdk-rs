@@ -89,7 +89,6 @@ pub fn contract_implementation(
     };
 
     let wasm_endpoints = quote! {
-      #[cfg(feature = "wasm-mode")]
         #[allow(non_snake_case)]
         pub mod endpoints {
           use super::*;
