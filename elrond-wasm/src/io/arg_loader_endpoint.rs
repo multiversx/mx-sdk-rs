@@ -11,9 +11,12 @@ where
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
+        TypeInfo::BigInt => {
+            let big_int_arg = api.get_argument_big_int(index);
+            let cast_big_int: T = unsafe { core::mem::transmute_copy(&big_int_arg) };
+            cast_big_int
+        },
         TypeInfo::BigUint => {
-            // self must be of type BigUint
-            // performing a forceful cast
             let big_uint_arg = api.get_argument_big_uint(index);
             let cast_big_uint: T = unsafe { core::mem::transmute_copy(&big_uint_arg) };
             cast_big_uint
