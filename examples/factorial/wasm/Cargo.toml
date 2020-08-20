@@ -1,5 +1,5 @@
 [package]
-name = "adder-wasm"
+name = "factorial-wasm"
 version = "0.2.0"
 authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
 edition = "2018"
@@ -15,7 +15,7 @@ debug = false
 panic = "abort"
 
 [dependencies]
-adder = { path = ".." }
+factorial = { path = ".." }
 elrond-wasm-output = { path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
 
 [workspace]
