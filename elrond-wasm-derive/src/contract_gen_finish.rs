@@ -1,7 +1,5 @@
-
-
 pub fn generate_body_with_result(return_type: &syn::ReturnType, mbody: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    match return_type.clone() {
+    match return_type {
         syn::ReturnType::Default => quote!{
             #mbody;
         },
