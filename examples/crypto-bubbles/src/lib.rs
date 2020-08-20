@@ -1,6 +1,7 @@
 
 #![no_std]
 #![allow(non_snake_case)]
+#![allow(clippy::string_lit_as_bytes)]
 
 // TODO: modernize this contract and improve tests
 

@@ -1,5 +1,6 @@
 
 #![no_std]
+#![allow(clippy::string_lit_as_bytes)]
 
 imports!();
 
@@ -64,7 +65,7 @@ pub trait SimpleErc20Token {
         // check if enough funds & decrease sender balance
         {
             let mut sender_balance = self.get_mut_balance(&sender);
-            if &amount > &*sender_balance {
+            if amount > *sender_balance {
                 return sc_error!("insufficient funds");
             }
             
@@ -113,7 +114,7 @@ pub trait SimpleErc20Token {
         let mut allowance = self.get_mut_allowance(&sender, &caller);
 
         // amount should not exceed allowance
-        if &amount > &*allowance {
+        if amount > *allowance {
             return sc_error!("allowance exceeded");
         }
 
