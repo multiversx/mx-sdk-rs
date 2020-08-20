@@ -1,5 +1,5 @@
 [package]
-name = "elrond-wasm-node"
+name = "elrond-wasm-output"
 version = "0.5.5"
 edition = "2018"
 
@@ -9,12 +9,13 @@ readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://elrond.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly VM API wrapper"
+description = "Elrond WebAssembly panic handler and allocator declaration for the .wasm output"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [features]
-wasm-mode = []
+wasm-output-mode = [] # crate functionality can be turned off, but just for running the framework tests
 
 [dependencies]
-elrond-wasm = { version = "0.5.5", path = "../elrond-wasm" }
+elrond-wasm-node = { version = "0.5.5", path = "../elrond-wasm-node" }
+wee_alloc = "0.4"

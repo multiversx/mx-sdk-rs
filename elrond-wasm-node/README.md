@@ -1,5 +1,5 @@
 # elrond-wasm-node
 
-Contains the actual calls to the Arwen VM API.
+Contains the actual calls to the Arwen VM API, and their wrapper.
 
-The crate is necessary to produce .wasm binaries that can interact with the VM.
+Can be build both for wasm or for debug mode, but will only be used in the wasm output.
