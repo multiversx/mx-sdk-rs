@@ -16,7 +16,6 @@ pub fn process_contract(
     let contract_impl_ident = contract.contract_impl_name.clone();
 
     let wasm_callback_endpoint = quote!{
-        #[cfg(feature = "wasm-mode")]
         pub mod callback_endpoint {
             use super::*;
             use elrond_wasm_node::*;
