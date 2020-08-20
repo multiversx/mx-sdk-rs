@@ -9,6 +9,8 @@ members = [
 
   "examples/adder",
   "examples/adder/debug",
+  "examples/crypto-bubbles",
+  "examples/crypto-bubbles/debug",
   "examples/factorial",
   "examples/simple-erc20",
   "examples/simple-erc20/debug",

@@ -12,12 +12,13 @@ mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/adder_wasm.wasm output/adder.wasm
 cd ../..
 
-# cd crypto-bubbles
-# RUSTFLAGS='-C link-arg=-s' \
-# cargo build --bin crypto-bubbles --target=wasm32-unknown-unknown --release
-# cd ..
-# cp target/wasm32-unknown-unknown/release/crypto-bubbles.wasm crypto-bubbles.wasm
-# # wasm-snip target/wasm32-unknown-unknown/release/crypto-bubbles.wasm -o crypto-bubbles.wasm --snip-rust-fmt-code --snip-rust-panicking-code
+cd examples/crypto-bubbles/wasm
+RUSTFLAGS='-C link-arg=-s' \
+cargo build --target=wasm32-unknown-unknown --release
+cd ..
+mkdir -p output
+cp wasm/target/wasm32-unknown-unknown/release/crypto_bubbles_wasm.wasm output/crypto-bubbles.wasm
+cd ../..
 
 cd examples/factorial/wasm
 RUSTFLAGS='-C link-arg=-s' \

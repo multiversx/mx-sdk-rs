@@ -1,0 +1,10 @@
+[package]
+name = "crypto-bubbles-debug"
+version = "0.0.1"
+authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
+edition = "2018"
+
+[dependencies]
+crypto-bubbles = { path = ".." }
+elrond-wasm = { version = "0.5.5", path = "../../../elrond-wasm" }
+elrond-wasm-debug = { version = "0.5.5", path = "../../../elrond-wasm-debug" }
