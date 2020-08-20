@@ -21,7 +21,7 @@ pub trait PayMe {
 
 #[elrond_wasm_derive::callable(MessageMeProxy)]
 pub trait MessageMe {
-    fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: &Vec<u8>, arg4: &Address);
+    fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &Address);
 }
 
 #[elrond_wasm_derive::callable(MessageMeProxy)]
@@ -61,7 +61,7 @@ pub trait Alice {
         let calee_address: Address = self.storage_load_bytes32(CALEE_STORAGE_KEY).into();
 
         let target_contract = contract_proxy!(self, &calee_address, MessageMe);
-        target_contract.messageMe(0x01, &BigUint::from(0x02u64), &create_a_vec(), &SOME_ADDRESS.into());
+        target_contract.messageMe(0x01, &BigUint::from(0x02u64), create_a_vec(), &SOME_ADDRESS.into());
     }
 
     #[endpoint]

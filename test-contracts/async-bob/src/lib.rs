@@ -33,10 +33,10 @@ pub trait Bob {
     }
 
     #[endpoint]
-    fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: &Vec<u8>, arg4: Address) {
+    fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: Address) {
         self.storage_store_i64(STORAGE_KEY_2, arg1);
         self.storage_store_big_uint(STORAGE_KEY_3, arg2);
-        self.storage_store(STORAGE_KEY_4, arg3);
+        self.storage_store(STORAGE_KEY_4, &arg3);
         self.storage_store_bytes32(STORAGE_KEY_5, &arg4.into());
     }
 }

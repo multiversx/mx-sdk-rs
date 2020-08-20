@@ -13,7 +13,7 @@ pub fn process_contract(
     let contract = Contract::new(args_input, proc_input);
 
     let contract_impl = contract_implementation(&contract);
-    let contract_impl_ident = contract.contract_impl_name.clone();
+    let contract_impl_ident = contract.contract_impl_name;
 
     let wasm_callback_endpoint = quote!{
         pub mod callback_endpoint {

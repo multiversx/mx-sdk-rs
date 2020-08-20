@@ -19,7 +19,7 @@ pub trait Factorial {
         let mut result = BigUint::from(1u32);
         let one = BigUint::from(1u32);
         let mut x = BigUint::from(1u32);
-        while &x <= &value {
+        while x <= value {
             result *= &x;
             x += &one;
         }
