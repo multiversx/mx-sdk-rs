@@ -4,5 +4,19 @@ members = [
   "elrond-wasm-debug",
   "elrond-wasm-derive",
   "elrond-wasm-node",
+  "elrond-wasm-output",
   "elrond-wasm-serde",
+
+  "examples/adder",
+  "examples/adder/debug",
+  "examples/crypto-bubbles",
+  "examples/crypto-bubbles/debug",
+  "examples/factorial",
+  "examples/simple-erc20",
+  "examples/simple-erc20/debug",
+
+  "test-contracts/async-alice",
+  "test-contracts/async-bob",
+  "test-contracts/basic-features",
+  "test-contracts/use-module",
 ]

@@ -233,8 +233,8 @@ encode_num!{u64, 64, false, TypeInfo::U64}
 encode_num!{i64, 64, true, TypeInfo::I64}
 encode_num!{u32, 32, false, TypeInfo::U32}
 encode_num!{i32, 32, true, TypeInfo::I32}
-encode_num!{usize, 32, false, TypeInfo::U32}
-encode_num!{isize, 32, true, TypeInfo::I32}
+encode_num!{usize, 32, false, TypeInfo::USIZE}
+encode_num!{isize, 32, true, TypeInfo::ISIZE}
 encode_num!{u16, 16, false, TypeInfo::U16}
 encode_num!{i16, 16, true, TypeInfo::I16}
 encode_num!{i8, 8, true, TypeInfo::I8}

@@ -363,7 +363,33 @@ macro_rules! sc_try {
     }
 }
 
-/// Compact way of returning a static error message.
+/// Allows us to write Solidity style `require!(<condition>, <error_msg>)` and avoid if statements.
+/// 
+/// It can only be used in a function that returns `SCResult<_>` where _ can be any type
+/// 
+/// ```rust
+/// # use elrond_wasm::{*, SCResult::Ok};
+/// # pub trait ExampleContract<BigInt, BigUint>: ContractHookApi<BigInt, BigUint>
+/// # where
+/// #     BigInt: elrond_codec::Encode + 'static,
+/// #     BigUint: elrond_codec::Encode + 'static,
+/// # {
+/// fn only_callable_by_owner(&self) -> SCResult<()> {
+///     require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
+///     Ok(())
+/// }
+/// # }
+/// ```
+#[macro_export]
+macro_rules! require {
+	($expression:expr, $error_msg:expr) => {
+		if (!($expression)) {
+			return sc_error!($error_msg)
+		}
+	};
+}
+
+/// Compact way to represent the BorrowedMutStorage type.
 #[macro_export]
 macro_rules! mut_storage (
     ($t:ty) => (
