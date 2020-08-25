@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-debug"
-version = "0.5.5"
+version = "0.6.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -14,8 +14,8 @@ keywords = ["elrond", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-elrond-wasm = { version = "0.5.5", path = "../elrond-wasm" }
-num-bigint = "0.2.3"
+elrond-wasm = { version = "0.6.0", path = "../elrond-wasm" }
+num-bigint = "0.3"
 num-traits = "0.2"
-hex = "0.4.0"
+hex = "0.4"
 sha3 = "0.8.2"

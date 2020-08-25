@@ -55,6 +55,7 @@ where
 
 /// Default way to optionally return an error from a smart contract endpoint.
 #[must_use]
+#[derive(Debug, PartialEq, Eq)]
 pub enum SCResult<T> {
     Ok(T),
     Err(SCError),

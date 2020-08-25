@@ -208,13 +208,13 @@ macro_rules! impl_nums {
 
 impl_nums!(u16, 2, false, TypeInfo::U16);
 impl_nums!(u32, 4, false, TypeInfo::U32);
-impl_nums!(usize, 4, false, TypeInfo::U32);
+impl_nums!(usize, 4, false, TypeInfo::USIZE);
 impl_nums!(u64, 8, false, TypeInfo::U64);
 
 impl_nums!(i8 , 1, true, TypeInfo::I8);
 impl_nums!(i16, 2, true, TypeInfo::I16);
 impl_nums!(i32, 4, true, TypeInfo::I32);
-impl_nums!(isize, 4, true, TypeInfo::I32);
+impl_nums!(isize, 4, true, TypeInfo::ISIZE);
 impl_nums!(i64, 8, true, TypeInfo::I64);
 
 impl Decode for bool {
