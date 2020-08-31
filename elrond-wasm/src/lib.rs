@@ -365,7 +365,7 @@ macro_rules! sc_try {
 
 /// Allows us to write Solidity style `require!(<condition>, <error_msg>)` and avoid if statements.
 /// 
-/// It can only be used in a function that returns `SCResult<_>` where _ can be any type
+/// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
 /// 
 /// ```rust
 /// # use elrond_wasm::{*, SCResult::Ok};
@@ -384,6 +384,32 @@ macro_rules! sc_try {
 macro_rules! require {
 	($expression:expr, $error_msg:expr) => {
 		if (!($expression)) {
+			return sc_error!($error_msg)
+		}
+	};
+}
+
+/// Very compact way of not allowing anyone but the owner to call a function.
+/// 
+/// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
+/// 
+/// ```rust
+/// # use elrond_wasm::{*, SCResult::Ok};
+/// # pub trait ExampleContract<BigInt, BigUint>: ContractHookApi<BigInt, BigUint>
+/// # where
+/// #     BigInt: elrond_codec::Encode + 'static,
+/// #     BigUint: elrond_codec::Encode + 'static,
+/// # {
+/// fn only_callable_by_owner(&self) -> SCResult<()> {
+///     only_owner!(self, "Caller must be owner");
+///     Ok(())
+/// }
+/// # }
+/// ```
+#[macro_export]
+macro_rules! only_owner {
+	($trait_self: expr, $error_msg:expr) => {
+		if ($trait_self.get_caller() != $trait_self.get_owner_address()) {
 			return sc_error!($error_msg)
 		}
 	};
