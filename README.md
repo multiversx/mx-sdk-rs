@@ -14,10 +14,16 @@ The framework is designed to be easiest to use with the Elrond IDE VSCode extens
 
 To build a smart contract without the IDE, run the following command in the contract crate:
 ```
-cargo build --bin wasm --target=wasm32-unknown-unknown --release
+./build-wasm.sh
 ```
 
-The resulting .wasm file will be in directory target/wasm32-unknown-unknown/release/wasm.wasm
+In case this doesn't work, you might not have rustc configured properly.
+Try:
+```
+rustup toolchain install nightly
+rustup default nightly
+rustup target add wasm32-unknown-unknown
+```
 
 # Debugging
 
