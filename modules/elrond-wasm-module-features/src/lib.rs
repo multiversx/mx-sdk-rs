@@ -7,6 +7,10 @@ extern crate elrond_wasm;
 
 imports!();
 
+pub const FEATURE_NOT_SET: u8 = 0;
+pub const FEATURE_ON: u8 = 1;
+pub const FEATURE_OFF: u8 = 2;
+
 /// Standard module for managing feature flags.
 #[elrond_wasm_derive::module(FeaturesModuleImpl)]
 pub trait FeaturesModule {
@@ -20,8 +24,8 @@ pub trait FeaturesModule {
     fn check_feature_on(&self, feature_name: &'static [u8], default: bool) -> SCResult<()> {
         let flag = self.get_feature_flag(FeatureName(feature_name));
         let value = match flag {
-            0 => default,
-            1 => true,
+            FEATURE_NOT_SET => default,
+            FEATURE_ON => true,
             _ => false,
         };
         if value {
@@ -35,12 +39,12 @@ pub trait FeaturesModule {
 
     #[endpoint(setFeatureFlag)]
     fn set_feature_flag_endpoint(&self, feature_name: Vec<u8>, value: bool) -> SCResult<()> {
-        if self.get_caller() != self.get_owner_address() {
-            return sc_error!("only owner allowed to change features");
-        }
+        require!(self.get_caller() == self.get_owner_address(),
+            "only owner allowed to change features");
+        
         self.set_feature_flag(
             FeatureName(feature_name.as_slice()),
-            if value { 1u8 } else { 2u8 });
+            if value { FEATURE_ON } else { FEATURE_OFF });
         Ok(())
     }
 
