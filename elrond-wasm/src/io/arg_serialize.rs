@@ -2,7 +2,7 @@ use crate::*;
 use elrond_codec::*;
 use crate::call_data::*;
 
-pub trait AsynCallArg: Sized {
+pub trait AsyncCallArg: Sized {
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError>;
 
     fn push_async_arg_exact(&self, _serializer: &mut CallDataSerializer, _expected_len: usize) -> Result<(), SCError> {
@@ -10,7 +10,7 @@ pub trait AsynCallArg: Sized {
     }
 }
 
-impl<T> AsynCallArg for T
+impl<T> AsyncCallArg for T
 where
     T: Encode,
 {
@@ -22,9 +22,9 @@ where
     }
 }
 
-impl<T> AsynCallArg for VarArgs<T>
+impl<T> AsyncCallArg for VarArgs<T>
 where
-    T: AsynCallArg,
+    T: AsyncCallArg,
 {
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
         for elem in self.0.iter() {
@@ -42,9 +42,9 @@ where
     }
 }
 
-impl<T> AsynCallArg for OptionalArg<T>
+impl<T> AsyncCallArg for OptionalArg<T>
 where
-    T: AsynCallArg,
+    T: AsyncCallArg,
 {
     #[inline]
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
@@ -58,9 +58,9 @@ where
 macro_rules! multi_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
         $(
-            impl<$($name),+> AsynCallArg for $mr<$($name,)+>
+            impl<$($name),+> AsyncCallArg for $mr<$($name,)+>
             where
-                $($name: AsynCallArg,)+
+                $($name: AsyncCallArg,)+
             {
                 #[inline]
                 fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
