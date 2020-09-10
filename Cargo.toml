@@ -7,6 +7,9 @@ members = [
   "elrond-wasm-output",
   "elrond-wasm-serde",
 
+  "modules/elrond-wasm-module-features",
+  "modules/elrond-wasm-module-pause",
+
   "examples/adder",
   "examples/adder/debug",
   "examples/crypto-bubbles",
