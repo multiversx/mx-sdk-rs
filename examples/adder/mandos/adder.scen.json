@@ -11,7 +11,14 @@
                     "storage": {},
                     "code": ""
                 }
-            }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "0xacc1000000000000000000000000000000000000000000000000000000001234",
+                    "creatorNonce": "5",
+                    "newAddress": "address:adder_address"
+                }
+            ]
         },
         {
             "step": "scDeploy",
@@ -39,7 +46,7 @@
             "txId": "2",
             "tx": {
                 "from": "0xacc1000000000000000000000000000000000000000000000000000000001234",
-                "to": "0x0000000000000000000011111111acc100000000000000000000000000051234",
+                "to": "address:adder_address",
                 "value": "0",
                 "function": "getSum",
                 "arguments": [],
@@ -61,7 +68,7 @@
             "txId": "3",
             "tx": {
                 "from": "0xacc1000000000000000000000000000000000000000000000000000000001234",
-                "to": "0x0000000000000000000011111111acc100000000000000000000000000051234",
+                "to": "address:adder_address",
                 "value": "0",
                 "function": "add",
                 "arguments": [
