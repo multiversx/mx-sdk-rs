@@ -18,7 +18,7 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234",
                 "value": "0",
-                "contractCode": "file:crypto-bubbles.wasm",
+                "contractCode": "file:../output/crypto-bubbles.wasm",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
@@ -46,7 +46,7 @@
                     "storage": {
                         "0x0000000000000000000000000000000000000000000000000000000000000000": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234"
                     },
-                    "code": "file:crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles.wasm"
                 }
             }
         }

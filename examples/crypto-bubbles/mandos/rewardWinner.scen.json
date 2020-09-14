@@ -18,7 +18,7 @@
                         "0xecd0fbc0b830c25b4e7580a58b78b7bd365ffc62e1df61a3c6e937dc080f8258": "0x100",
                         "0xde01ec8c240238f576e7126d8ddbfda535b64c6c22c150b2e08df20e226d9359": "0x100"
                     },
-                    "code": "file:crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles.wasm"
                 }
             }
         },
@@ -73,7 +73,7 @@
                         "0xecd0fbc0b830c25b4e7580a58b78b7bd365ffc62e1df61a3c6e937dc080f8258": "0x300",
                         "0xde01ec8c240238f576e7126d8ddbfda535b64c6c22c150b2e08df20e226d9359": "0x100"
                     },
-                    "code": "file:crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles.wasm"
                 }
             }
         }
