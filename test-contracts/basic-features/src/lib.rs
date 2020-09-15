@@ -13,6 +13,8 @@ use ser_ex1::*;
 use ser_ex2::*;
 use simple_enum::*;
 
+use core::num::NonZeroUsize;
+
 #[elrond_wasm_derive::contract(BasicFeaturesImpl)]
 pub trait BasicFeatures {
 
@@ -154,6 +156,11 @@ pub trait BasicFeatures {
     #[view]
     fn finish_simple_enum_variant_1(&self) -> SimpleEnum {
         SimpleEnum::Variant1
+    }
+
+    #[view]
+    fn echo_non_zero_usize(&self, nz: NonZeroUsize) -> NonZeroUsize {
+        nz
     }
 
     // OPERATIONS THAT HAVE CAUSED ISSUES IN THE PAST
