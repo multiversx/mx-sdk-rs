@@ -14,6 +14,7 @@ mod proxy;
 pub mod storage;
 pub mod err_msg;
 pub mod call_data;
+pub mod non_zero_util;
 
 pub use types::*;
 pub use io::*;
@@ -338,6 +339,7 @@ macro_rules! imports {
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
         use elrond_wasm::io::*;
+        use elrond_wasm::non_zero_util::*;
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};

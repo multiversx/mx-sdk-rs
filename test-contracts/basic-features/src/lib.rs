@@ -466,6 +466,17 @@ pub trait BasicFeatures {
     #[endpoint]
     fn shl_assign_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint { let mut r = a.clone(); r <<= b; r }
 
+    // NON ZERO EXTRA
+
+    #[view]
+    fn non_zero_usize_iter(&self, how_many: usize) -> MultiResultVec<NonZeroUsize> {
+        let mut result = Vec::<NonZeroUsize>::new();
+        for nz in NonZeroUsizeIterator::from_1_to_n(how_many) {
+            result.push(nz);
+        }
+        result.into()
+    }
+
     // CRYPTO FUNCTIONS
 
     #[endpoint(computeSha256)]
