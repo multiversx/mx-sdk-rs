@@ -54,6 +54,11 @@ pub trait Encode: Sized {
 		f(dest.as_slice());
 		Ok(())
 	}
+
+	#[inline]
+	fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
+		None
+	}
 }
 
 // TODO: consider removing altogether when possible
@@ -209,35 +214,61 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 	f(&result[0..result_size])
 }
 
-macro_rules! encode_num {
-    ($num_type:ident, $size_in_bits:expr, $signed:expr, $type_info:expr) => {
+macro_rules! encode_num_signed {
+    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
 		impl Encode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
 			#[inline]
             fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
-				using_encoded_number(*self as u64, $size_in_bits, $signed, false, |buf| dest.write(buf));
+				using_encoded_number(*self as u64, $size_in_bits, true, false, |buf| dest.write(buf));
 				Ok(())
 			}
 		
 			#[inline]
             fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-				using_encoded_number(*self as u64, $size_in_bits, $signed, true, f);
+				using_encoded_number(*self as u64, $size_in_bits, true, true, f);
+				Ok(())
+			}
+
+			#[inline]
+            fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
+				Some(Ok(*self as i64))
+			}
+		}
+    }
+}
+
+macro_rules! encode_num_unsigned {
+    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
+		impl Encode for $num_type {
+			const TYPE_INFO: TypeInfo = $type_info;
+
+			#[inline]
+            fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				using_encoded_number(*self as u64, $size_in_bits, false, false, |buf| dest.write(buf));
+				Ok(())
+			}
+		
+			#[inline]
+            fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+				using_encoded_number(*self as u64, $size_in_bits, false, true, f);
 				Ok(())
 			}
 		}
     }
 }
 
-encode_num!{u64, 64, false, TypeInfo::U64}
-encode_num!{i64, 64, true, TypeInfo::I64}
-encode_num!{u32, 32, false, TypeInfo::U32}
-encode_num!{i32, 32, true, TypeInfo::I32}
-encode_num!{usize, 32, false, TypeInfo::USIZE}
-encode_num!{isize, 32, true, TypeInfo::ISIZE}
-encode_num!{u16, 16, false, TypeInfo::U16}
-encode_num!{i16, 16, true, TypeInfo::I16}
-encode_num!{i8, 8, true, TypeInfo::I8}
+encode_num_unsigned!{u64, 64, TypeInfo::U64}
+encode_num_unsigned!{u32, 32, TypeInfo::U32}
+encode_num_unsigned!{usize, 32, TypeInfo::USIZE}
+encode_num_unsigned!{u16, 16, TypeInfo::U16}
+
+encode_num_signed!{i64, 64, TypeInfo::I64}
+encode_num_signed!{i32, 32, TypeInfo::I32}
+encode_num_signed!{isize, 32, TypeInfo::ISIZE}
+encode_num_signed!{i16, 16, TypeInfo::I16}
+encode_num_signed!{i8, 8, TypeInfo::I8}
 
 impl Encode for bool {
 	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
@@ -254,6 +285,15 @@ impl Encode for bool {
 			f(&[]);
 		}
 		Ok(())
+	}
+
+	#[inline]
+	fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
+		Some(if *self {
+			Ok(1i64)
+		} else {
+			Ok(0i64)
+		})
 	}
 }
 

@@ -21,6 +21,7 @@ impl EncodeError {
 pub enum DecodeError {
     InputTooShort,
     InputTooLong,
+    InputOutOfRange,
     InvalidValue,
     UnsupportedOperation,
     ArrayDecodeErr,
@@ -33,6 +34,7 @@ impl DecodeError {
         match self {
             DecodeError::InputTooShort => &b"input too short"[..],
             DecodeError::InputTooLong => &b"input too long"[..],
+            DecodeError::InputOutOfRange => &b"input out of range"[..],
             DecodeError::InvalidValue => &b"invalid value"[..],
             DecodeError::UnsupportedOperation => &b"unsupported operation"[..],
             DecodeError::ArrayDecodeErr => &b"array decode error"[..],

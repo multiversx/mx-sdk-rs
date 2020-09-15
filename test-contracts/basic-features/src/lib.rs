@@ -7,9 +7,11 @@ imports!();
 
 mod ser_ex1;
 mod ser_ex2;
+mod simple_enum;
 
 use ser_ex1::*;
 use ser_ex2::*;
+use simple_enum::*;
 
 #[elrond_wasm_derive::contract(BasicFeaturesImpl)]
 pub trait BasicFeatures {
@@ -142,6 +144,16 @@ pub trait BasicFeatures {
     #[endpoint]
     fn echo_ser_example_1(&self, se: SerExample1) -> SerExample1 {
         se
+    }
+
+    #[view]
+    fn echo_simple_enum(&self, se: SimpleEnum) -> SimpleEnum {
+        se
+    }
+
+    #[view]
+    fn finish_simple_enum_variant_1(&self) -> SimpleEnum {
+        SimpleEnum::Variant1
     }
 
     // OPERATIONS THAT HAVE CAUSED ISSUES IN THE PAST

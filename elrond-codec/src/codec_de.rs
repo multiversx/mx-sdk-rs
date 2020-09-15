@@ -69,10 +69,15 @@ impl<'a> Input for &'a [u8] {
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait Decode: Sized {
 	// !INTERNAL USE ONLY!
-	// This const helps SCALE to optimize the encoding/decoding by doing fake specialization.
+	// This const helps elrond-wasm to optimize the encoding/decoding by doing fake specialization.
 	#[doc(hidden)]
 	const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-    
+
+    /// Attempt to deserialise the value from input,
+    /// using the format of an object nested inside another structure.
+    /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError>;
+
     /// Attempt to deserialise the value from input.
 	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let result = Self::dep_decode(input)?;
@@ -82,10 +87,12 @@ pub trait Decode: Sized {
         Ok(result)
     }
 
-    /// Attempt to deserialise the value from input,
-    /// using the format of an object nested inside another structure.
-    /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError>;
+    /// Used to optimize handling of arguments/storage.
+    /// Optionally calls a closure that retrieves an i64 and if it returns Some(...), the result will be used.
+    #[inline]
+    fn top_decode_from_i64<I: FnOnce() -> i64>(_input: I) -> Option<Result<Self, DecodeError>> {
+        None
+    }
 }
 
 /// Convenience method, to avoid having to specify type when calling `top_decode`.
@@ -183,8 +190,8 @@ pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
     result
 }
 
-macro_rules! impl_nums {
-    ($ty:ty, $num_bytes:expr, $signed:expr, $type_info:expr) => {
+macro_rules! decode_num_unsigned {
+    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
         impl Decode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
@@ -193,29 +200,64 @@ macro_rules! impl_nums {
                 if bytes.len() > $num_bytes {
                     return Err(DecodeError::InputTooLong)
                 }
-                let num = bytes_to_number(bytes, $signed) as $ty;
+                let num = bytes_to_number(bytes, false) as $ty;
                 Ok(num)
             }
             
             fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.read_slice($num_bytes)?;
-                let num = bytes_to_number(bytes, $signed) as $ty;
+                let num = bytes_to_number(bytes, false) as $ty;
                 Ok(num)
             }
         }
     }
 }
 
-impl_nums!(u16, 2, false, TypeInfo::U16);
-impl_nums!(u32, 4, false, TypeInfo::U32);
-impl_nums!(usize, 4, false, TypeInfo::USIZE);
-impl_nums!(u64, 8, false, TypeInfo::U64);
+decode_num_unsigned!(u16, 2, TypeInfo::U16);
+decode_num_unsigned!(u32, 4, TypeInfo::U32);
+decode_num_unsigned!(usize, 4, TypeInfo::USIZE);
+decode_num_unsigned!(u64, 8, TypeInfo::U64);
 
-impl_nums!(i8 , 1, true, TypeInfo::I8);
-impl_nums!(i16, 2, true, TypeInfo::I16);
-impl_nums!(i32, 4, true, TypeInfo::I32);
-impl_nums!(isize, 4, true, TypeInfo::ISIZE);
-impl_nums!(i64, 8, true, TypeInfo::I64);
+macro_rules! decode_num_signed {
+    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
+        impl Decode for $ty {
+            const TYPE_INFO: TypeInfo = $type_info;
+            
+            fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+                let bytes = input.flush()?;
+                if bytes.len() > $num_bytes {
+                    return Err(DecodeError::InputTooLong)
+                }
+                let num = bytes_to_number(bytes, true) as $ty;
+                Ok(num)
+            }
+            
+            fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+                let bytes = input.read_slice($num_bytes)?;
+                let num = bytes_to_number(bytes, true) as $ty;
+                Ok(num)
+            }
+
+            #[inline]
+            fn top_decode_from_i64<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
+                let arg_i64 = input();
+                let min = <$ty>::MIN as i64;
+                let max = <$ty>::MAX as i64;
+                if arg_i64 < min || arg_i64 > max {
+                    Some(Err(DecodeError::InputOutOfRange))
+                } else {
+                    Some(Ok(arg_i64 as $ty))
+                }
+            }
+        }
+    }
+}
+
+decode_num_signed!(i8 , 1, TypeInfo::I8);
+decode_num_signed!(i16, 2, TypeInfo::I16);
+decode_num_signed!(i32, 4, TypeInfo::I32);
+decode_num_signed!(isize, 4, TypeInfo::ISIZE);
+decode_num_signed!(i64, 8, TypeInfo::I64);
 
 impl Decode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
@@ -239,6 +281,15 @@ impl Decode for bool {
             1 => Ok(true),
             _ => Err(DecodeError::InvalidValue),
         }
+    }
+
+    #[inline]
+    fn top_decode_from_i64<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
+        Some(match input() {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(DecodeError::InputOutOfRange),
+        })
     }
 }
 
