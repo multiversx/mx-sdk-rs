@@ -40,7 +40,6 @@ cd ../..
 ### TEST CONTRACTS ###
 
 cd test-contracts/basic-features/wasm
-RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output

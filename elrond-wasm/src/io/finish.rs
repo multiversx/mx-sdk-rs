@@ -31,22 +31,22 @@ where
                 let cast_big_uint: &BigUint = unsafe { &*(self as *const T as *const BigUint) };
                 api.finish_big_uint(cast_big_uint);
             },
-            TypeInfo::I64 => {
-                let arg_i64: i64 = unsafe { core::mem::transmute_copy(self) };
-                api.finish_i64(arg_i64);
-            },
-            TypeInfo::I32 => {
-                let arg_i32: i32 = unsafe { core::mem::transmute_copy(self) };
-                api.finish_i64(arg_i32 as i64);
-            },
-            TypeInfo::I8 => {
-                let arg_i8: i8 = unsafe { core::mem::transmute_copy(self) };
-                api.finish_i64(arg_i8 as i64);
-            },
 			_ => {
-                let res = self.using_top_encoded(|buf| api.finish_slice_u8(buf));
-                if let Err(encode_err_message) = res {
-                    api.signal_error(encode_err_message.message_bytes());
+                // the compiler is also smart enough to evaluate this if let at compile time
+                if let Some(res_i64) = self.top_encode_as_i64() {
+                    match res_i64 {
+                        Ok(encoded_i64) => {
+                            api.finish_i64(encoded_i64);
+                        },
+                        Err(encode_err_message) => {
+                            api.signal_error(encode_err_message.message_bytes());
+                        }
+                    }
+                } else {
+                    let res = self.using_top_encoded(|buf| api.finish_slice_u8(buf));
+                    if let Err(encode_err_message) = res {
+                        api.signal_error(encode_err_message.message_bytes());
+                    }
                 }
 			}
 		}
