@@ -427,3 +427,15 @@ macro_rules! mut_storage (
         BorrowedMutStorage<'_, T, BigInt, BigUint, $t>
     )
 );
+
+/// Converts usize to NonZeroUsize or returns SCError.
+#[macro_export]
+macro_rules! non_zero_usize {
+	($input: expr, $error_msg:expr) => {
+        if let Some(nz) = NonZeroUsize::new($input) {
+            nz
+        } else {
+			return sc_error!($error_msg)
+		}
+	};
+}
