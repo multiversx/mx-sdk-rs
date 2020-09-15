@@ -7,9 +7,13 @@ imports!();
 
 mod ser_ex1;
 mod ser_ex2;
+mod simple_enum;
 
 use ser_ex1::*;
 use ser_ex2::*;
+use simple_enum::*;
+
+use core::num::NonZeroUsize;
 
 #[elrond_wasm_derive::contract(BasicFeaturesImpl)]
 pub trait BasicFeatures {
@@ -142,6 +146,21 @@ pub trait BasicFeatures {
     #[endpoint]
     fn echo_ser_example_1(&self, se: SerExample1) -> SerExample1 {
         se
+    }
+
+    #[view]
+    fn echo_simple_enum(&self, se: SimpleEnum) -> SimpleEnum {
+        se
+    }
+
+    #[view]
+    fn finish_simple_enum_variant_1(&self) -> SimpleEnum {
+        SimpleEnum::Variant1
+    }
+
+    #[view]
+    fn echo_non_zero_usize(&self, nz: NonZeroUsize) -> NonZeroUsize {
+        nz
     }
 
     // OPERATIONS THAT HAVE CAUSED ISSUES IN THE PAST
@@ -446,6 +465,17 @@ pub trait BasicFeatures {
     fn shl_assign_big_uint(&self, a: BigUint, b: usize) -> BigUint      { let mut r = a.clone(); r <<= b; r }
     #[endpoint]
     fn shl_assign_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint { let mut r = a.clone(); r <<= b; r }
+
+    // NON ZERO EXTRA
+
+    #[view]
+    fn non_zero_usize_iter(&self, how_many: usize) -> MultiResultVec<NonZeroUsize> {
+        let mut result = Vec::<NonZeroUsize>::new();
+        for nz in NonZeroUsizeIterator::from_1_to_n(how_many) {
+            result.push(nz);
+        }
+        result.into()
+    }
 
     // CRYPTO FUNCTIONS
 

@@ -137,6 +137,7 @@ pub mod tests {
     use crate::test_util::ser_deser_ok;
     use core::fmt::Debug;
     use alloc::vec::Vec;
+    use core::num::NonZeroUsize;
 
     pub fn the_same<V>(element: V)
     where
@@ -173,6 +174,8 @@ pub mod tests {
         ser_deser_ok(-5i32,   &[251]);
         ser_deser_ok(-5i64,   &[251]);
         ser_deser_ok(-5isize, &[251]);
+        // non zero usize
+        ser_deser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
     }
 
     #[test]
