@@ -1,4 +1,6 @@
 use alloc::vec::Vec;
+use core::num::NonZeroUsize;
+
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
 
@@ -400,6 +402,18 @@ array_impls!(
 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
 );
 
+impl Encode for NonZeroUsize {
+	#[inline]
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.get().dep_encode_to(dest)
+	}
+
+	#[inline]
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+		self.get().using_top_encoded(f)
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
@@ -437,7 +451,9 @@ mod tests {
         ser_ok(-5i16, &[251]);
         ser_ok(-5i32, &[251]);
         ser_ok(-5i64, &[251]);
-        ser_ok(-5isize, &[251]);
+		ser_ok(-5isize, &[251]);
+		// non zero usize
+        ser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
     }
 
     #[test]

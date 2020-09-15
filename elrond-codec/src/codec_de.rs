@@ -1,7 +1,9 @@
 use alloc::vec::Vec;
+use arrayvec::ArrayVec;
+use core::num::NonZeroUsize;
+
 use crate::codec_err::DecodeError;
 use crate::TypeInfo;
-use arrayvec::ArrayVec;
 
 /// Trait that allows reading of data into a slice.
 pub trait Input {
@@ -394,6 +396,24 @@ array_impls!(
 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
 );
 
+fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
+    if let Some(nz) = NonZeroUsize::new(num) {
+        Ok(nz)
+    } else {
+        Err(DecodeError::InvalidValue)
+    }
+}
+
+impl Decode for NonZeroUsize {
+    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        decode_non_zero_usize(usize::top_decode(input)?)
+    }
+    
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        decode_non_zero_usize(usize::dep_decode(input)?)
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
@@ -431,6 +451,8 @@ mod tests {
         deser_ok(-5i32, &[251]);
         deser_ok(-5i64, &[251]);
         deser_ok(-5isize, &[251]);
+        // non zero usize
+        deser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
     }
 
     
