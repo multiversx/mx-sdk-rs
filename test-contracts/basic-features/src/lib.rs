@@ -492,8 +492,14 @@ pub trait BasicFeatures {
     // MACROS
 
     #[view]
-    fn require_owner_calls(&self) -> SCResult<()> {
-        require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
+    fn only_owner(&self) -> SCResult<()> {
+        only_owner!(self, "Caller must be owner");
+        Ok(())
+    }
+
+    #[view]
+    fn require_equals(&self, a: u32, b: u32) -> SCResult<()> {
+        require!(a == b, "a must equal b");
         Ok(())
     }
 
