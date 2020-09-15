@@ -1,6 +1,6 @@
 [package]
 name = "elrond-codec"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]

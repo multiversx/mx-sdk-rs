@@ -21,32 +21,32 @@ where
             let cast_big_uint: T = unsafe { core::mem::transmute_copy(&big_uint_arg) };
             cast_big_uint
         },
-        TypeInfo::I64 => {
-            let arg_i64 = api.get_argument_i64(index);
-            let arg_t: T = unsafe { core::mem::transmute_copy(&arg_i64) };
-            arg_t
-        },
-        TypeInfo::I32 => {
-            let arg_i64 = api.get_argument_i32(index);
-            let arg_t: T = unsafe { core::mem::transmute_copy(&arg_i64) };
-            arg_t
-        },
-        TypeInfo::I8 => {
-            let arg_i64 = api.get_argument_i8(index);
-            let arg_t: T = unsafe { core::mem::transmute_copy(&arg_i64) };
-            arg_t
-        },
         _ => {
-            let arg_bytes = api.get_argument_vec(index);
-            match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
-                Ok(v) => v,
-                Err(de_err) => {
-                    let mut decode_err_message: Vec<u8> = Vec::new();
-                    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-                    decode_err_message.extend_from_slice(arg_id);
-                    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-                    decode_err_message.extend_from_slice(de_err.message_bytes());
-                    api.signal_error(decode_err_message.as_slice())
+            // the compiler is also smart enough to evaluate this if let at compile time
+            if let Some(res_i64) = T::top_decode_from_i64(|| api.get_argument_i64(index)) {
+                match res_i64 {
+                    Ok(from_i64) => from_i64,
+                    Err(de_err) => {
+                        let mut decode_err_message: Vec<u8> = Vec::new();
+                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
+                        decode_err_message.extend_from_slice(arg_id);
+                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
+                        decode_err_message.extend_from_slice(de_err.message_bytes());
+                        api.signal_error(decode_err_message.as_slice())
+                    }
+                }
+            } else {
+                let arg_bytes = api.get_argument_vec(index);
+                match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
+                    Ok(v) => v,
+                    Err(de_err) => {
+                        let mut decode_err_message: Vec<u8> = Vec::new();
+                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
+                        decode_err_message.extend_from_slice(arg_id);
+                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
+                        decode_err_message.extend_from_slice(de_err.message_bytes());
+                        api.signal_error(decode_err_message.as_slice())
+                    }
                 }
             }
         }

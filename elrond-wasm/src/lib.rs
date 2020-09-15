@@ -14,6 +14,7 @@ mod proxy;
 pub mod storage;
 pub mod err_msg;
 pub mod call_data;
+pub mod non_zero_util;
 
 pub use types::*;
 pub use io::*;
@@ -101,6 +102,7 @@ where
     fn keccak256(&self, data: &[u8]) -> [u8; 32];
 }
 
+// deprecated, do not use
 macro_rules! get_argument_signed_cast {
     ($method_name:ident, $type:ty) => {
         fn $method_name (&self, arg_id: i32) -> $type {
@@ -115,6 +117,7 @@ macro_rules! get_argument_signed_cast {
   };
 }
 
+// deprecated, do not use
 macro_rules! get_argument_unsigned_cast {
     ($method_name:ident, $type:ty) => {
         fn $method_name (&self, arg_id: i32) -> $type {
@@ -163,9 +166,9 @@ pub trait ContractIOApi<BigInt, BigUint> {
     
     // signed
     fn get_argument_i64(&self, arg_id: i32) -> i64;
-    get_argument_signed_cast!{get_argument_i32, i32}
-    get_argument_signed_cast!{get_argument_isize, isize}
-    get_argument_signed_cast!{get_argument_i8, i8}
+    get_argument_signed_cast!{get_argument_i32, i32} // deprecated, do not use
+    get_argument_signed_cast!{get_argument_isize, isize} // deprecated, do not use
+    get_argument_signed_cast!{get_argument_i8, i8} // deprecated, do not use
 
     // unsigned
     fn get_argument_u64(&self, arg_id: i32) -> u64 {
@@ -175,10 +178,11 @@ pub trait ContractIOApi<BigInt, BigUint> {
         }
         elrond_codec::bytes_to_number(bytes.as_slice(), false)
     }
-    get_argument_unsigned_cast!{get_argument_u32, u32}
-    get_argument_unsigned_cast!{get_argument_usize, usize}
-    get_argument_unsigned_cast!{get_argument_u8, u8}
+    get_argument_unsigned_cast!{get_argument_u32, u32} // deprecated, do not use
+    get_argument_unsigned_cast!{get_argument_usize, usize} // deprecated, do not use
+    get_argument_unsigned_cast!{get_argument_u8, u8} // deprecated, do not use
 
+    /// deprecated, do not use
     fn get_argument_bool (&self, arg_id: i32) -> bool {
         let arg_i64 = self.get_argument_i64(arg_id);
         match arg_i64 {
@@ -335,6 +339,7 @@ macro_rules! imports {
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
         use elrond_wasm::io::*;
+        use elrond_wasm::non_zero_util::*;
         use elrond_wasm::err_msg;
         use core::ops::{Add, Sub, Mul, Div, Rem};
         use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
