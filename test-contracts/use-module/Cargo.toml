@@ -8,11 +8,11 @@ edition = "2018"
 path = "src/lib.rs"
 
 [dependencies]
-elrond-wasm = { version = "0.6.1", path = "../../elrond-wasm" }
-elrond-wasm-derive = { version = "0.6.1", path = "../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.6.1", path = "../../elrond-wasm-node"}
-elrond-wasm-debug = { version = "0.6.1", path = "../../elrond-wasm-debug" }
+elrond-wasm = { version = "0.6.2", path = "../../elrond-wasm" }
+elrond-wasm-derive = { version = "0.6.2", path = "../../elrond-wasm-derive" }
+elrond-wasm-node = { version = "0.6.2", path = "../../elrond-wasm-node"}
+elrond-wasm-debug = { version = "0.6.2", path = "../../elrond-wasm-debug" }
 
 # modules
-elrond-wasm-module-features = { version = "0.6.1", path = "../../modules/elrond-wasm-module-features" }
-elrond-wasm-module-pause = { version = "0.6.1", path = "../../modules/elrond-wasm-module-pause" }
+elrond-wasm-module-features = { version = "0.6.2", path = "../../modules/elrond-wasm-module-features" }
+elrond-wasm-module-pause = { version = "0.6.2", path = "../../modules/elrond-wasm-module-pause" }
