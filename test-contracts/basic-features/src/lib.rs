@@ -477,6 +477,12 @@ pub trait BasicFeatures {
         result.into()
     }
 
+    #[view]
+    fn non_zero_usize_macro(&self, number: usize) -> SCResult<NonZeroUsize> {
+        let nz = non_zero_usize!(number, "wans non-zero");
+        Ok(nz)
+    }
+
     // CRYPTO FUNCTIONS
 
     #[endpoint(computeSha256)]
