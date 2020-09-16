@@ -477,6 +477,12 @@ pub trait BasicFeatures {
         result.into()
     }
 
+    #[view]
+    fn non_zero_usize_macro(&self, number: usize) -> SCResult<NonZeroUsize> {
+        let nz = non_zero_usize!(number, "wans non-zero");
+        Ok(nz)
+    }
+
     // CRYPTO FUNCTIONS
 
     #[endpoint(computeSha256)]
@@ -492,8 +498,14 @@ pub trait BasicFeatures {
     // MACROS
 
     #[view]
-    fn require_owner_calls(&self) -> SCResult<()> {
-        require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
+    fn only_owner(&self) -> SCResult<()> {
+        only_owner!(self, "Caller must be owner");
+        Ok(())
+    }
+
+    #[view]
+    fn require_equals(&self, a: u32, b: u32) -> SCResult<()> {
+        require!(a == b, "a must equal b");
         Ok(())
     }
 
