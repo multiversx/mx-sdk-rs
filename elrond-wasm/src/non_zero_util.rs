@@ -1,12 +1,34 @@
 use core::num::NonZeroUsize;
 use core::iter::Iterator;
 
+/// This is safe because 1 != 0.
+#[inline]
+pub fn non_zero_usize_one() -> NonZeroUsize {
+    unsafe { NonZeroUsize::new_unchecked(1) }
+}
+
+/// This is safe because adding 1 to a positive number makes it greater than one.
+#[inline]
+pub fn non_zero_usize_from_n_plus_1(n: usize) -> NonZeroUsize {
+    unsafe { NonZeroUsize::new_unchecked(n+1) }
+}
+
+/// This is safe because adding a non-zero number with a positive one yields a non-zero number.
+#[inline]
+pub fn non_zero_usize_plus(a: NonZeroUsize, b: usize) -> NonZeroUsize {
+    unsafe { NonZeroUsize::new_unchecked(a.get() + b) }
+}
+
+/// Iterator that can give us a range of NonZeroUsize.
 pub struct NonZeroUsizeIterator {
     prev_num: usize,
     limit: usize,
 }
 
 impl NonZeroUsizeIterator {
+    /// Creates an Iterator that runs from 1 to n, inclusively.
+    /// The iterator will produce n numbers,
+    /// e.g. for 3 it will produce [1, 2, 3].
     pub fn from_1_to_n(n: usize) -> Self {
         NonZeroUsizeIterator{
             prev_num: 0,
