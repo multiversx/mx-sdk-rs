@@ -5,7 +5,6 @@ members = [
   "elrond-wasm-derive",
   "elrond-wasm-node",
   "elrond-wasm-output",
-  "elrond-wasm-serde",
 
   "modules/elrond-wasm-module-features",
   "modules/elrond-wasm-module-pause",
