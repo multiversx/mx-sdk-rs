@@ -13,7 +13,7 @@ fn main() {
     mock_ref.add_account(AccountData{
         address: ADDR1.into(),
         nonce: 0,
-        balance: 0.into(),
+        balance: 0u32.into(),
         storage: HashMap::new(),
         contract: None,
     });
