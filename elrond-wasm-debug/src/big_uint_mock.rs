@@ -8,15 +8,15 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 use alloc::vec::Vec;
 use elrond_wasm::BigUintApi;
 
-use num_bigint::BigInt;
+use num_bigint::{Sign, BigUint, BigInt};
 use core::cmp::Ordering;
 
 #[derive(Debug)]
 pub struct RustBigUint(pub num_bigint::BigInt);
 
 impl RustBigUint {
-    pub fn value(&self) -> &BigInt {
-        &self.0
+    pub fn value(&self) -> BigUint {
+        self.0.to_biguint().unwrap()
     }
 }
 
@@ -41,6 +41,12 @@ impl From<usize> for RustBigUint {
 impl From<BigInt> for RustBigUint {
     fn from(item: BigInt) -> Self {
         RustBigUint(item)
+    }
+}
+
+impl From<BigUint> for RustBigUint {
+    fn from(item: BigUint) -> Self {
+        RustBigUint(BigInt::from_biguint(Sign::Plus, item))
     }
 }
 

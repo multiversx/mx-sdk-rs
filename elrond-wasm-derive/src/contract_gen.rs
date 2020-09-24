@@ -185,7 +185,7 @@ impl Contract {
                     if let Some(endpoint_name) = m.metadata.endpoint_name() {
                         let fn_ident = &m.name;
                         let call_method_ident = generate_call_method_name(fn_ident);
-                        let endpoint_name_str = endpoint_name.to_string();
+                        let endpoint_name_str = array_literal(endpoint_name.to_string().as_bytes());
                         let match_arm = quote! {                     
                             #endpoint_name_str =>
                             {
@@ -201,7 +201,7 @@ impl Contract {
         quote! {      
             match fn_name {
                 #(#match_arms)*
-                other => panic!("No function named `{}` exists in contract.", other)
+                other => panic!("No function with this name exists in contract.")
             }
         }
     }

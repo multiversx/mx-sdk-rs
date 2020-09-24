@@ -108,7 +108,7 @@ pub fn contract_implementation(
       impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
       #api_where
       {
-        fn call(&self, fn_name: &'static str) {
+        fn call(&self, fn_name: &[u8]) {
           #function_selector_body
         }
 

@@ -11,4 +11,7 @@ path = "src/lib.rs"
 elrond-wasm = { version = "0.6.2", path = "../../elrond-wasm" }
 elrond-wasm-derive = { version = "0.6.2", path = "../../elrond-wasm-derive" }
 elrond-wasm-node = { version = "0.6.2", path = "../../elrond-wasm-node"}
+
+[dev-dependencies]
 elrond-wasm-debug = { version = "0.6.2", path = "../../elrond-wasm-debug" }
+# mandos-rs = { path = "../../../mandos-rs" }

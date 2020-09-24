@@ -10,7 +10,7 @@ use elrond_wasm::CallableContract;
 use elrond_wasm::BigUintApi;
 use elrond_wasm::err_msg;
 
-use num_bigint::{BigInt};
+use num_bigint::{BigInt, BigUint};
 use num_traits::cast::ToPrimitive;
 
 use alloc::boxed::Box;
@@ -40,9 +40,9 @@ fn key_hex(address: &[u8]) -> alloc::string::String {
 pub struct AccountData {
     pub address: Address,
     pub nonce: u64,
-    pub balance: BigInt,
+    pub balance: BigUint,
     pub storage: HashMap<Vec<u8>, Vec<u8>>,
-    pub contract: Option<Box<dyn CallableContract>>,
+    pub contract: Option<Vec<u8>>,
 }
 
 impl fmt::Display for AccountData {
@@ -63,50 +63,22 @@ impl fmt::Display for AccountData {
 }
 
 pub struct TxData {
-    func_name: &'static str,
-    new_contract: Option<Box<dyn CallableContract>>,
-    args: Vec<Vec<u8>>,
-    call_value: BigInt,
-    from: Address,
-    to: Address,
+    pub from: Address,
+    pub to: Address,
+    pub call_value: BigUint,
+    pub func_name: Vec<u8>,
+    pub new_contract: Option<Vec<u8>>,
+    pub args: Vec<Vec<u8>>,
 }
 
 impl fmt::Display for TxData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "TxData {{ func: {}, args: {:?}, call_value: {}, from: 0x{}, to: 0x{}\n}}", 
-            self.func_name, 
+            String::from_utf8(self.func_name.clone()).unwrap(), 
             self.args, 
             self.call_value,
             address_hex(&self.from), 
             address_hex(&self.to))
-    }
-}
-
-impl TxData {
-    pub fn new_create(new_contract: Box<dyn CallableContract>, from: Address, to: Address) -> Self {
-        TxData{
-            func_name: "init",
-            new_contract: Some(new_contract),
-            args: Vec::new(),
-            call_value: 0.into(),
-            from,
-            to,
-        }
-    }
-
-    pub fn new_call(func_name: &'static str, from: Address, to: Address) -> Self {
-        TxData{
-            func_name,
-            new_contract: None,
-            args: Vec::new(),
-            call_value: 0.into(),
-            from,
-            to,
-        }
-    }
-
-    pub fn add_arg(&mut self, arg: Vec<u8>) {
-        self.args.push(arg);
     }
 }
 
@@ -139,6 +111,8 @@ pub struct ArwenMockState {
     current_tx: Option<TxData>,
     current_result: TxResult,
     accounts: HashMap<Address, AccountData>,
+    new_addresses: HashMap<(Address, u64), Address>,
+    contract_factories: HashMap<Vec<u8>, Box<dyn Fn(ArwenMockRef) -> Box<dyn CallableContract>>>,
 }
 
 pub struct ArwenMockRef {
@@ -157,23 +131,34 @@ impl ArwenMockState {
             current_tx: None,
             current_result: TxResult::empty(),
             accounts: HashMap::new(),
+            new_addresses: HashMap::new(),
+            contract_factories: HashMap::new(),
         };
         let state_ref = Rc::new(RefCell::new(state));
         ArwenMockRef{ state_ref }
     }
 
-    fn create_account_if_necessary(&mut self, tx: &TxData) {
-        if let Some(ref tx_contract) = tx.new_contract {
-            if self.accounts.contains_key(&tx.to) {
-                panic!("Account already exists");
+    fn create_account_if_deploy(&mut self, tx: &mut TxData) {
+        if let Some(tx_contract) = &tx.new_contract {
+            if let Some(sender) = self.accounts.get(&tx.from) {
+                if let Some(new_address) = self.get_new_address(tx.from.clone(), sender.nonce) {
+                    if self.accounts.contains_key(&new_address) {
+                        panic!("Account already exists at deploy address.");
+                    }
+                    self.accounts.insert(new_address.clone(), AccountData{
+                        address: new_address.clone(),
+                        nonce: 0,
+                        balance: 0u32.into(),
+                        storage: HashMap::new(),
+                        contract: Some(tx_contract.clone()),
+                    });
+                    tx.to = new_address;
+                } else {
+                    panic!("Missing new address. Only explicit new deploy addresses supported.");
+                }
+            } else {
+                panic!("Unknown deployer");
             }
-            self.accounts.insert(tx.to.clone(), AccountData{
-                address: tx.to.clone(),
-                nonce: 0,
-                balance: 0.into(),
-                storage: HashMap::new(),
-                contract: Some(tx_contract.clone_contract()),
-            });
         }
     }
 
@@ -192,39 +177,53 @@ impl ArwenMockState {
     fn get_result(&self) -> TxResult {
         self.current_result.clone()
     }
+
+    fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
+        self.new_addresses
+            .get(&(creator_address, creator_nonce))
+            .map(|addr_ref| addr_ref.clone())
+    }
 }
 
 impl ArwenMockRef {
     fn get_contract(&self) -> Box<dyn CallableContract> {
         let state = self.state_ref.borrow();
         let tx_ref = &state.current_tx.as_ref().unwrap();
-        match state.accounts.get(&tx_ref.to) {
-            None => panic!("Account not found"),
-            Some(ref account) => {
-                match account.contract {
-                    None => panic!("Recipient account is not a smart contract"),
-                    Some(ref acct_contract) => acct_contract.clone_contract(),
+        if let Some(account) = state.accounts.get(&tx_ref.to) {
+            if let Some(contract_identifier) = &account.contract {
+                if let Some(new_contract_closure) = state.contract_factories.get(contract_identifier) {
+                    new_contract_closure(self.clone())
+                } else {
+                    panic!("Unknown contract");
                 }
+            } else {
+                panic!("Recipient account is not a smart contract");
             }
+        } else {
+            panic!("Account not found");
         }
     }
 
-    pub fn execute_tx(&self, tx: TxData) -> TxResult {
+    pub fn execute_tx(&self, mut tx: TxData) -> TxResult {
         {
             let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_necessary(&tx);    
+            state.create_account_if_deploy(&mut tx);    
             state.current_tx = Some(tx);
             state.clear_result();
         }
         
-        let state = self.state_ref.borrow();
-        let tx_ref = state.current_tx.as_ref().unwrap();
+        let func_name = {
+            let state = self.state_ref.borrow();
+            state.current_tx.as_ref().unwrap().func_name.clone()
+        };
         
+        {
         let contract = self.get_contract();
 
         // contract call
         // important: state cannot be borrowed at this point
-        contract.call(tx_ref.func_name);
+        contract.call(&func_name[..]);
+        }
         
         let state = self.state_ref.borrow();
         state.get_result()
@@ -232,18 +231,18 @@ impl ArwenMockRef {
 
     /// To be used for writing small tests.
     pub fn set_dummy_tx(&self, addr: &Address) {
-        let tx = TxData {
-            func_name: "",
+        let mut tx = TxData {
+            func_name: Vec::new(),
             new_contract: None,
             args: Vec::new(),
-            call_value: 0.into(),
+            call_value: 0u32.into(),
             from: addr.clone(),
             to: addr.clone(),
         };
 
         {
             let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_necessary(&tx);    
+            state.create_account_if_deploy(&mut tx);    
             state.current_tx = Some(tx);
             state.clear_result();
         }
@@ -261,6 +260,24 @@ impl ArwenMockRef {
             write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
         }
         println!("Accounts: {}", &accounts_buf);
+    }
+
+    pub fn put_new_address(&self, creator_address: Address, creator_nonce: u64, new_address: Address) {
+        let mut state = self.state_ref.borrow_mut();
+        state.new_addresses.insert((creator_address, creator_nonce), new_address);
+    }
+
+    pub fn register_contract(&self,
+        path: &str,
+        new_contract_closure: Box<dyn Fn(ArwenMockRef) -> Box<dyn CallableContract>>) {
+
+        let mut state = self.state_ref.borrow_mut();
+        state.contract_factories.insert(path.as_bytes().to_vec(), new_contract_closure);
+    }
+
+    pub fn clear_state(&self) {
+        let mut state = self.state_ref.borrow_mut();
+        state.contract_factories.clear();
     }
 }
 
