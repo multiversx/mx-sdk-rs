@@ -9,7 +9,7 @@ fn set_up_module_to_test() -> FactorialImpl<ArwenMockRef, RustBigInt, RustBigUin
     mock_ref.add_account(AccountData{
         address: Address::zero(),
         nonce: 0,
-        balance: 0.into(),
+        balance: 0u32.into(),
         storage: HashMap::new(),
         contract: None,
     });

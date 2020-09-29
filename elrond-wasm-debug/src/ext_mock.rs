@@ -82,6 +82,34 @@ impl fmt::Display for TxData {
     }
 }
 
+impl TxData {
+    pub fn new_create(new_contract: Vec<u8>, from: Address, to: Address) -> Self {
+        TxData{
+            func_name: b"init".to_vec(),
+            new_contract: Some(new_contract),
+            args: Vec::new(),
+            call_value: 0u32.into(),
+            from,
+            to,
+        }
+    }
+
+    pub fn new_call(func_name: &'static str, from: Address, to: Address) -> Self {
+        TxData{
+            func_name: func_name.as_bytes().to_vec(),
+            new_contract: None,
+            args: Vec::new(),
+            call_value: 0u32.into(),
+            from,
+            to,
+        }
+    }
+
+    pub fn add_arg(&mut self, arg: Vec<u8>) {
+        self.args.push(arg);
+    }
+}
+
 #[derive(Clone)]
 pub struct TxResult {
     pub result_status: i32,

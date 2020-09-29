@@ -16,7 +16,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 [dependencies]
 elrond-wasm = { version = "0.6.2", path = "../../elrond-wasm" }
 elrond-wasm-derive = { version = "0.6.2", path = "../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.6.2", path = "../../elrond-wasm-node"}
+elrond-wasm-node = { version = "0.6.2", path = "../../elrond-wasm-node", optional = true }
 
 [dev-dependencies]
 elrond-wasm-debug = { version = "0.6.2", path = "../../elrond-wasm-debug" }
