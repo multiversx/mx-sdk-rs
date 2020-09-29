@@ -8,10 +8,6 @@ use elrond_wasm_debug::*;
 fn test_mandos() {
     let mock_ref = ArwenMockState::new_ref();
 
-    // mock_ref.register_contract(
-    //     "file:../output/adder.wasm",
-    //     Box::new(AdderImpl::new(mock_ref.clone())));
-
     mock_ref.register_contract(
         "file:../output/adder.wasm",
         Box::new(|mock_ref| Box::new(AdderImpl::new(mock_ref))));

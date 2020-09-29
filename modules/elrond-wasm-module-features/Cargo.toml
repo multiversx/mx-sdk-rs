@@ -13,10 +13,13 @@ description = "Elrond WebAssembly smart contract module for adding feature flags
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
+[features]
+wasm-output-mode = ["elrond-wasm-node"]
+
 [dependencies]
 elrond-wasm = { version = "0.6.2", path = "../../elrond-wasm" }
 elrond-wasm-derive = { version = "0.6.2", path = "../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.6.2", path = "../../elrond-wasm-node"}
+elrond-wasm-node = { version = "0.6.2", path = "../../elrond-wasm-node", optional = true }
 
 [dev-dependencies]
 elrond-wasm-debug = { version = "0.6.2", path = "../../elrond-wasm-debug" }

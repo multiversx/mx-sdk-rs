@@ -15,7 +15,7 @@ debug = false
 panic = "abort"
 
 [dependencies]
-adder = { path = ".." }
-elrond-wasm-output = { path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
+adder = { path = "..", features=["wasm-output-mode"]}
+elrond-wasm-output = { version = "0.6.2", path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
 
 [workspace]

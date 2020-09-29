@@ -6,8 +6,6 @@
 // ensure we don't run out of macro stack
 #![recursion_limit="1024"]
 
-extern crate proc_macro;
-
 #[macro_use]
 extern crate syn;
 

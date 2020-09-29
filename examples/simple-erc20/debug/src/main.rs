@@ -5,6 +5,10 @@ use elrond_wasm_debug::HashMap;
 fn main() {
     let mock_ref = ArwenMockState::new_ref();
 
+    mock_ref.register_contract(
+        "file:../output/simple-erc20.wasm",
+        Box::new(|mock_ref| Box::new(SimpleErc20TokenImpl::new(mock_ref))));
+
     mock_ref.add_account(AccountData{
         address: [0x11u8; 32].into(),
         nonce: 0,
@@ -15,7 +19,7 @@ fn main() {
 
     // tx 1: init
     let mut tx1 = TxData::new_create(
-        Box::new(SimpleErc20TokenImpl::new(mock_ref.clone())), 
+        b"file:../output/simple-erc20.wasm".to_vec(),
         [0x11u8; 32].into(), 
         [0x22u8; 32].into());
     tx1.add_arg(vec![100u8]);

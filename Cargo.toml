@@ -3,8 +3,6 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
-  "elrond-wasm-node",
-  "elrond-wasm-output",
 
   "modules/elrond-wasm-module-features",
   "modules/elrond-wasm-module-pause",
@@ -12,7 +10,6 @@ members = [
   "examples/adder",
   "examples/adder/debug",
   "examples/crypto-bubbles",
-  "examples/crypto-bubbles/debug",
   "examples/factorial",
   "examples/simple-erc20",
   "examples/simple-erc20/debug",
@@ -21,4 +18,9 @@ members = [
   "test-contracts/async-bob",
   "test-contracts/basic-features",
   "test-contracts/use-module",
+]
+
+exclude = [
+  "elrond-wasm-node",
+  "elrond-wasm-output",
 ]
