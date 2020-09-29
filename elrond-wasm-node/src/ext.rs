@@ -108,7 +108,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
     
-    fn storage_store(&self, key: &[u8], value: &[u8]) {
+    fn storage_store(&mut self, key: &[u8], value: &[u8]) {
         unsafe {
             storageStore(key.as_ref().as_ptr(), key.len() as i32, value.as_ptr(), value.len() as i32);
         }
@@ -132,7 +132,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
+    fn storage_store_bytes32(&mut self, key: &[u8], value: &[u8; 32]) {
         unsafe {
             storageStore(key.as_ref().as_ptr(), key.len() as i32, value.as_ptr(), 32);
         }
@@ -150,7 +150,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn storage_store_big_uint(&self, key: &[u8], value: &ArwenBigUint) {
+    fn storage_store_big_uint(&mut self, key: &[u8], value: &ArwenBigUint) {
         unsafe {
             bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value.handle);
         }
@@ -166,7 +166,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn storage_store_big_int(&self, key: &[u8], value: &ArwenBigInt) {
+    fn storage_store_big_int(&mut self, key: &[u8], value: &ArwenBigInt) {
         unsafe {
             // TODO: convert to 2's complement
             bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value.handle);
@@ -184,7 +184,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn storage_store_i64(&self, key: &[u8], value: i64) {
+    fn storage_store_i64(&mut self, key: &[u8], value: i64) {
         unsafe {
             int64storageStore(key.as_ref().as_ptr(), key.len() as i32, value);
         }
@@ -206,7 +206,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    fn send_tx(&self, to: &Address, amount: &ArwenBigUint, message: &str) {
+    fn send_tx(&mut self, to: &Address, amount: &ArwenBigUint, message: &str) {
         let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
         unsafe {
             transferValue(
@@ -354,35 +354,35 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
     
     #[inline]
-    fn finish_slice_u8(&self, slice: &[u8]) {
+    fn finish_slice_u8(&mut self, slice: &[u8]) {
         unsafe {
             finish(slice.as_ptr(), slice.len() as i32);
         }
     }
 
     #[inline]
-    fn finish_bytes32(&self, bytes: &[u8; 32]) {
+    fn finish_bytes32(&mut self, bytes: &[u8; 32]) {
         unsafe {
             finish(bytes.as_ptr(), 32i32);
         }
     }
 
     #[inline]
-    fn finish_big_int(&self, b: &ArwenBigInt) {
+    fn finish_big_int(&mut self, b: &ArwenBigInt) {
         unsafe {
             bigIntFinishSigned(b.handle);
         }
     }
 
     #[inline]
-    fn finish_big_uint(&self, b: &ArwenBigUint) {
+    fn finish_big_uint(&mut self, b: &ArwenBigUint) {
         unsafe {
             bigIntFinishUnsigned(b.handle);
         }
     }
     
     #[inline]
-    fn finish_i64(&self, value: i64) {
+    fn finish_i64(&mut self, value: i64) {
         unsafe { int64finish(value); }
     }
 

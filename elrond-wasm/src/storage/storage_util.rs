@@ -2,7 +2,7 @@ use crate::*;
 use elrond_codec::*;
 
 #[inline]
-pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)
+pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a mut A, key: &'k [u8], value: &T)
 where
     'a: 'k,
     T: Encode,

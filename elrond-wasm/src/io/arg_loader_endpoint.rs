@@ -7,18 +7,20 @@ where
     T: Decode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'static
+    A: ContractIOApi<BigInt, BigUint>
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
         TypeInfo::BigInt => {
             let big_int_arg = api.get_argument_big_int(index);
             let cast_big_int: T = unsafe { core::mem::transmute_copy(&big_int_arg) };
+            core::mem::forget(big_int_arg); // otherwise the data behind big_int_arg/cast_big_int gets deallocated twice
             cast_big_int
         },
         TypeInfo::BigUint => {
             let big_uint_arg = api.get_argument_big_uint(index);
             let cast_big_uint: T = unsafe { core::mem::transmute_copy(&big_uint_arg) };
+            core::mem::forget(big_uint_arg); // otherwise the data gets deallocated twice
             cast_big_uint
         },
         _ => {

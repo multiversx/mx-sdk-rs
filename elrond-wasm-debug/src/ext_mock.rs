@@ -7,6 +7,7 @@ use crate::big_uint_mock::*;
 
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
+use elrond_wasm::ContractFactory;
 use elrond_wasm::BigUintApi;
 use elrond_wasm::err_msg;
 
@@ -20,8 +21,8 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Write;
 
-use core::cell::RefCell;
-use alloc::rc::Rc;
+// use core::cell::RefCell;
+// use alloc::rc::Rc;
 
 use sha3::{Sha3_256, Keccak256, Digest};
 
@@ -107,35 +108,61 @@ impl TxResult {
     }
 }
 
-pub struct ArwenMockState {
-    current_tx: Option<TxData>,
-    current_result: TxResult,
-    accounts: HashMap<Address, AccountData>,
-    new_addresses: HashMap<(Address, u64), Address>,
-    contract_factories: HashMap<Vec<u8>, Box<dyn Fn(ArwenMockRef) -> Box<dyn CallableContract>>>,
-}
+// pub trait ContractFactory {
+//     fn new_contract<'t>(&self, state_ref: &'t mut ArwenMockState) -> Box<dyn CallableContract + 't>;
+// }
 
-pub struct ArwenMockRef {
-    state_ref: Rc<RefCell<ArwenMockState>>
-}
+// pub struct ContactFactoryImpl<C: CallableContract> {
+//     phantom_data: core::marker::PhantomData<C>,
+// }
 
-impl Clone for ArwenMockRef {
-    fn clone(&self) -> Self {
-        ArwenMockRef{ state_ref: Rc::clone(&self.state_ref) }
+// impl<C: CallableContract> ContactFactoryImpl<C> {
+//     pub fn new() -> Self {
+//         ContactFactoryImpl{ phantom_data: core::marker::PhantomData }
+//     }
+// }
+
+// impl<C: CallableContract> ContractFactory for ContactFactoryImpl<C> {
+//     fn new_contract<'t>(&self, state_ref: &'t mut ArwenMockState) -> Box<dyn CallableContract + 't> {
+//         Box::new(C::new(state_ref))
+//     }
+// }
+
+pub struct ContractFactories(HashMap<Vec<u8>, Box<dyn ContractFactory<ArwenMockState>>>);
+
+impl ContractFactories {
+    pub fn new() -> Self {
+        ContractFactories(HashMap::new())
+    }
+
+    pub fn register_contract(&mut self,
+        path: &str,
+        contract_factory: Box<dyn ContractFactory<ArwenMockState>>) {
+
+        self.0.insert(path.as_bytes().to_vec(), contract_factory);
+    }
+
+    pub fn new_contract<'t>(&self, path: &str, state_ref: &'t mut ArwenMockState) -> Box<dyn CallableContract + 't> {
+        let factory = self.0.get(&path.as_bytes().to_vec()).unwrap();
+        factory.new_contract(state_ref)
     }
 }
 
+pub struct ArwenMockState {
+    pub current_tx: Option<TxData>,
+    pub current_result: TxResult,
+    pub accounts: HashMap<Address, AccountData>,
+    pub new_addresses: HashMap<(Address, u64), Address>,
+}
+
 impl ArwenMockState {
-    pub fn new_ref() -> ArwenMockRef {
-        let state = ArwenMockState{
+    pub fn new() -> ArwenMockState {
+        ArwenMockState{
             current_tx: None,
             current_result: TxResult::empty(),
             accounts: HashMap::new(),
             new_addresses: HashMap::new(),
-            contract_factories: HashMap::new(),
-        };
-        let state_ref = Rc::new(RefCell::new(state));
-        ArwenMockRef{ state_ref }
+        }
     }
 
     fn create_account_if_deploy(&mut self, tx: &mut TxData) {
@@ -170,7 +197,7 @@ impl ArwenMockState {
         self.current_result.result_values.push(result);
     }
     
-    fn clear_result(&mut self) {
+    pub fn clear_result(&mut self) {
         self.current_result = TxResult::empty();
     }
     
@@ -185,106 +212,106 @@ impl ArwenMockState {
     }
 }
 
-impl ArwenMockRef {
-    fn get_contract(&self) -> Box<dyn CallableContract> {
-        let state = self.state_ref.borrow();
-        let tx_ref = &state.current_tx.as_ref().unwrap();
-        if let Some(account) = state.accounts.get(&tx_ref.to) {
-            if let Some(contract_identifier) = &account.contract {
-                if let Some(new_contract_closure) = state.contract_factories.get(contract_identifier) {
-                    new_contract_closure(self.clone())
-                } else {
-                    panic!("Unknown contract");
-                }
-            } else {
-                panic!("Recipient account is not a smart contract");
-            }
-        } else {
-            panic!("Account not found");
-        }
-    }
+impl ArwenMockState {
+    // pub fn get_contract(&self) -> Box<dyn CallableContract> {
+    //     let tx_ref = self.current_tx.as_ref().unwrap();
+    //     if let Some(account) = self.accounts.get(&tx_ref.to) {
+    //         if let Some(contract_identifier) = &account.contract {
+    //             if let Some(new_contract_closure) = self.contract_factories.get(contract_identifier) {
+    //                 new_contract_closure(&mut self)
+    //             } else {
+    //                 panic!("Unknown contract");
+    //             }
+    //         } else {
+    //             panic!("Recipient account is not a smart contract");
+    //         }
+    //     } else {
+    //         panic!("Account not found");
+    //     }
+    // }
 
-    pub fn execute_tx(&self, mut tx: TxData) -> TxResult {
-        {
-            let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_deploy(&mut tx);    
-            state.current_tx = Some(tx);
-            state.clear_result();
-        }
+    // pub fn execute_tx(&self, mut tx: TxData) -> TxResult {
+    //     {
+    //         let mut state = self.state_ref.borrow_mut();
+    //         state.create_account_if_deploy(&mut tx);    
+    //         state.current_tx = Some(tx);
+    //         state.clear_result();
+    //     }
         
-        let func_name = {
-            let state = self.state_ref.borrow();
-            state.current_tx.as_ref().unwrap().func_name.clone()
-        };
+    //     let func_name = {
+    //         let state = self.state_ref.borrow();
+    //         state.current_tx.as_ref().unwrap().func_name.clone()
+    //     };
         
-        {
-        let contract = self.get_contract();
+    //     {
+    //     let mut contract = self.get_contract();
 
-        // contract call
-        // important: state cannot be borrowed at this point
-        contract.call(&func_name[..]);
-        }
+    //     // contract call
+    //     // important: state cannot be borrowed at this point
+    //     contract.call(&func_name[..]);
+    //     }
         
-        let state = self.state_ref.borrow();
-        state.get_result()
-    }
+    //     let state = self.state_ref.borrow();
+    //     state.get_result()
+    // }
 
     /// To be used for writing small tests.
-    pub fn set_dummy_tx(&self, addr: &Address) {
-        let mut tx = TxData {
-            func_name: Vec::new(),
-            new_contract: None,
-            args: Vec::new(),
-            call_value: 0u32.into(),
-            from: addr.clone(),
-            to: addr.clone(),
-        };
+    // pub fn set_dummy_tx(&self, addr: &Address) {
+    //     let mut tx = TxData {
+    //         func_name: Vec::new(),
+    //         new_contract: None,
+    //         args: Vec::new(),
+    //         call_value: 0u32.into(),
+    //         from: addr.clone(),
+    //         to: addr.clone(),
+    //     };
 
-        {
-            let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_deploy(&mut tx);    
-            state.current_tx = Some(tx);
-            state.clear_result();
-        }
-    }
+    //     {
+    //         // let mut state = self.state_ref.borrow_mut();
+    //         state.create_account_if_deploy(&mut tx);    
+    //         state.current_tx = Some(tx);
+    //         state.clear_result();
+    //     }
+    // }
 
-    pub fn add_account(&self, acct: AccountData) {
-        let mut state = self.state_ref.borrow_mut();
-        state.accounts.insert(acct.address.clone(), acct);
+    pub fn add_account(&mut self, acct: AccountData) {
+        // let mut state = self.state_ref.borrow_mut();
+        self.accounts.insert(acct.address.clone(), acct);
     }
 
     pub fn print_accounts(&self) {
-        let state = self.state_ref.borrow();
+        // let state = self.state_ref.borrow();
         let mut accounts_buf = String::new();
-        for (address, account) in &state.accounts {
+        for (address, account) in &self.accounts {
             write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
         }
         println!("Accounts: {}", &accounts_buf);
     }
 
-    pub fn put_new_address(&self, creator_address: Address, creator_nonce: u64, new_address: Address) {
-        let mut state = self.state_ref.borrow_mut();
-        state.new_addresses.insert((creator_address, creator_nonce), new_address);
+    pub fn put_new_address(&mut self, creator_address: Address, creator_nonce: u64, new_address: Address) {
+        // let mut state = self.state_ref.borrow_mut();
+        self.new_addresses.insert((creator_address, creator_nonce), new_address);
     }
 
-    pub fn register_contract(&self,
-        path: &str,
-        new_contract_closure: Box<dyn Fn(ArwenMockRef) -> Box<dyn CallableContract>>) {
+    // pub fn get_contract_factory(&self,
+    //     path: &str) -> Option<Box<dyn ContractFactory<ArwenMockState> + 'static>> {
 
-        let mut state = self.state_ref.borrow_mut();
-        state.contract_factories.insert(path.as_bytes().to_vec(), new_contract_closure);
-    }
+    //     self.contract_factories.get(path.as_bytes().to_vec())
+    // }
 
-    pub fn clear_state(&self) {
-        let mut state = self.state_ref.borrow_mut();
-        state.contract_factories.clear();
-    }
+    // pub fn clear_state(&self) {
+    //     let mut state = self.state_ref.borrow_mut();
+    //     state.contract_factories.clear();
+    //     state.accounts.clear();
+    //     state.new_addresses.clear();
+    //     state.current_tx = None;
+    // }
 }
 
-impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
+impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockState {
     fn get_sc_address(&self) -> Address {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
+        // let state = self.state_ref.borrow();
+        match &self.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.to.clone(),
         }
@@ -295,8 +322,8 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_caller(&self) -> Address {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
+        // let state = self.state_ref.borrow();
+        match &self.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.from.clone(),
         }
@@ -306,10 +333,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         panic!("get_balance not yet implemented")
     }
 
-    fn storage_store(&self, key: &[u8], value: &[u8]) {
+    fn storage_store(&mut self, key: &[u8], value: &[u8]) {
         let sc_address = self.get_sc_address();
-        let mut state = self.state_ref.borrow_mut();
-        match state.accounts.get_mut(&sc_address) {
+        // let mut state = self.state_ref.borrow_mut();
+        match self.accounts.get_mut(&sc_address) {
             None => panic!("Account not found!"),
             Some(acct) => {
                 acct.storage.insert(key.to_vec(), value.to_vec());
@@ -318,11 +345,11 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn storage_load(&self, key: &[u8]) -> Vec<u8> {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
+        // let state = self.state_ref.borrow();
+        match &self.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => {
-                match state.accounts.get(&tx.to) {
+                match self.accounts.get(&tx.to) {
                     None => panic!("Account not found!"),
                     Some(acct) => {
                         match acct.storage.get(&key.to_vec()) {
@@ -342,7 +369,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         self.storage_load(key).len()
     }
 
-    fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
+    fn storage_store_bytes32(&mut self, key: &[u8], value: &[u8; 32]) {
         let mut vector = Vec::with_capacity(32);
         for i in value.iter() {
             vector.push(*i);
@@ -363,7 +390,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         res
     }
 
-    fn storage_store_big_uint(&self, key: &[u8], value: &RustBigUint) {
+    fn storage_store_big_uint(&mut self, key: &[u8], value: &RustBigUint) {
         self.storage_store(key, &value.to_bytes_be());
     }
 
@@ -373,7 +400,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         bi.into()
     }
 
-    fn storage_store_big_int(&self, key: &[u8], value: &RustBigInt) {
+    fn storage_store_big_int(&mut self, key: &[u8], value: &RustBigInt) {
         self.storage_store(key, &value.to_signed_bytes_be());
     }
 
@@ -383,7 +410,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
         bi.into()
     }
 
-    fn storage_store_i64(&self, key: &[u8], value: i64) {
+    fn storage_store_i64(&mut self, key: &[u8], value: i64) {
         self.storage_store_big_int(key, &RustBigInt::from(value));
     }
 
@@ -394,23 +421,23 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     #[inline]
     fn get_call_value_big_uint(&self) -> RustBigUint {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
+        // let state = self.state_ref.borrow();
+        match &self.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.call_value.clone().into(),
         }
     }
 
-    fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
+    fn send_tx(&mut self, to: &Address, amount: &RustBigUint, _message: &str) {
         let owner = self.get_sc_address();
-        let mut state = self.state_ref.borrow_mut();
-        match state.accounts.get_mut(&owner) {
+        // let mut state = self.state_ref.borrow_mut();
+        match self.accounts.get_mut(&owner) {
             None => panic!("Account not found!"),
             Some(acct) => {
                 acct.balance -= amount.value();
             }
         }
-        match state.accounts.get_mut(to) {
+        match self.accounts.get_mut(to) {
             None => panic!("Account not found!"),
             Some(acct) => {
                 acct.balance += amount.value();
@@ -474,11 +501,11 @@ impl ArwenMockState {
     }
 }
 
-impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
+impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockState {
 
     fn get_num_arguments(&self) -> i32 {
-        let state = self.state_ref.borrow();
-        let nr_args = match &state.current_tx {
+        // let state = self.state_ref.borrow();
+        let nr_args = match &self.current_tx {
             None => panic!("Tx not initialized!"),
             Some(tx) => tx.args.len(),
         };
@@ -492,8 +519,8 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_argument_len(&self, arg_index: i32) -> usize {
-        let state = self.state_ref.borrow();
-        let arg = state.get_argument_vec(arg_index);
+        // let state = self.state_ref.borrow();
+        let arg = self.get_argument_vec(arg_index);
         arg.len()
     }
 
@@ -502,13 +529,13 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
-        let state = self.state_ref.borrow();
-        state.get_argument_vec(arg_index)
+        // let state = self.state_ref.borrow();
+        self.get_argument_vec(arg_index)
     }
 
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
-        let state = self.state_ref.borrow();
-        let arg = state.get_argument_vec(arg_index);
+        // let state = self.state_ref.borrow();
+        let arg = self.get_argument_vec(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
         res[offset..(arg.len()-1 + offset)].clone_from_slice(&arg[..arg.len()-1]);
@@ -516,8 +543,8 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
     
     fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
-        let state = self.state_ref.borrow();
-        let bytes = state.get_argument_vec(arg_index);
+        // let state = self.state_ref.borrow();
+        let bytes = self.get_argument_vec(arg_index);
         BigInt::from_signed_bytes_be(&bytes).into()
     }
 
@@ -528,8 +555,8 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     #[inline]
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
-        let state = self.state_ref.borrow();
-        let bytes = state.get_argument_vec(arg_index);
+        // let state = self.state_ref.borrow();
+        let bytes = self.get_argument_vec(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
         if let Some(v) = bi.to_i64() {
             v
@@ -538,31 +565,31 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
         }
     }
 
-    fn finish_slice_u8(&self, slice: &[u8]) {
-        let mut state = self.state_ref.borrow_mut();
+    fn finish_slice_u8(&mut self, slice: &[u8]) {
+        // let mut state = self.state_ref.borrow_mut();
         let mut v = vec![0u8; slice.len()];
         v.copy_from_slice(slice);
-        state.add_result(v);
+        self.add_result(v);
     }
 
-    fn finish_bytes32(&self, bytes: &[u8; 32]) {
+    fn finish_bytes32(&mut self, bytes: &[u8; 32]) {
         self.finish_slice_u8(&*bytes);
     }
 
     #[inline]
-    fn finish_big_int(&self, bi: &RustBigInt) {
-        let mut state = self.state_ref.borrow_mut();
-        state.add_result(bi.to_signed_bytes_be());
+    fn finish_big_int(&mut self, bi: &RustBigInt) {
+        // let mut state = self.state_ref.borrow_mut();
+        self.add_result(bi.to_signed_bytes_be());
     }
 
     #[inline]
-    fn finish_big_uint(&self, bu: &RustBigUint) {
-        let mut state = self.state_ref.borrow_mut();
-        state.add_result(bu.to_bytes_be());
+    fn finish_big_uint(&mut self, bu: &RustBigUint) {
+        // let mut state = self.state_ref.borrow_mut();
+        self.add_result(bu.to_bytes_be());
     }
     
     #[inline]
-    fn finish_i64(&self, value: i64) {
+    fn finish_i64(&mut self, value: i64) {
         self.finish_big_int(&value.into());
     }
 

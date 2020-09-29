@@ -1,17 +1,25 @@
 #![feature(prelude_import)]
+#![feature(prelude_import)]
 #![no_std]
-#![allow(unused_imports)] // for now
-#![allow(unused_mut)]
+#![allow(unused_imports)]
 #[prelude_import]
 use core::prelude::v1::*;
 #[macro_use]
 extern crate core;
+#[macro_use]
+extern crate compiler_builtins;
+#[prelude_import]
+use core::prelude::v1::*;
+#[macro_use]
+extern crate core;
+#[macro_use]
+extern crate compiler_builtins;
 use elrond_wasm::{Box, Vec, String, Queue, VarArgs, BorrowedMutStorage};
 use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
 use elrond_wasm::{H256, Address, ErrorMessage};
 use elrond_wasm::{
     ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult,
-    AsyncCallError, ContractFactory, ContractFactoryImpl
+    AsyncCallError,
 };
 use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
 use elrond_wasm::io::*;
@@ -23,7 +31,7 @@ use core::ops::{BitAnd, BitOr, BitXor, Shr, Shl};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 #[macro_use]
 extern crate elrond_wasm;
-pub trait Adder<'t, T, BigInt, BigUint>: ContractHookApi<BigInt, BigUint> + Sized
+pub trait Adder<T, BigInt, BigUint>: ContractHookApi<BigInt, BigUint> + Sized
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -55,23 +63,23 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
-    fn init(&mut self, initial_value: &BigInt) {
+    fn init(&self, initial_value: &BigInt) {
         self.set_sum(initial_value);
     }
-    fn add(&mut self, value: &BigInt) -> SCResult<()> {
+    fn add(&self, value: &BigInt) -> SCResult<()> {
         let mut sum = self.get_sum();
         sum += value;
         self.set_sum(&sum);
         Ok(())
     }
     fn get_sum(&self) -> BigInt;
-    fn set_sum(&mut self, sum: &BigInt);
+    fn set_sum(&self, sum: &BigInt);
     fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
     fn callback(&self);
 }
-pub struct AdderImpl<'t, T, BigInt, BigUint>
+pub struct AdderImpl<T, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -103,16 +111,13 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
-    api: &'t mut T,
+    api: T,
     _phantom1: core::marker::PhantomData<BigInt>,
     _phantom2: core::marker::PhantomData<BigUint>,
 }
-
-
-
-impl<'t, T, BigInt, BigUint> AdderImpl<'t, T, BigInt, BigUint>
+impl<T, BigInt, BigUint> AdderImpl<T, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -144,9 +149,9 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
-    pub fn new(api: &'t mut T) -> Self {
+    pub fn new(api: T) -> Self {
         AdderImpl {
             api,
             _phantom1: core::marker::PhantomData,
@@ -154,9 +159,7 @@ where
         }
     }
 }
-
-#[derive(Clone, Copy)]
-pub struct AdderFactory<T, BigInt, BigUint>
+impl<T, BigInt, BigUint> ContractHookApi<BigInt, BigUint> for AdderImpl<T, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -188,131 +191,7 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
-{
-    _phantom0: core::marker::PhantomData<T>,
-    _phantom1: core::marker::PhantomData<BigInt>,
-    _phantom2: core::marker::PhantomData<BigUint>,
-}
-
-
-impl<A, BigInt, BigUint> AdderFactory<A, BigInt, BigUint>
-where
-    BigUint: BigUintApi + 'static,
-    for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Sub<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Mul<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Div<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Rem<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: AddAssign<&'b BigUint>,
-    for<'b> BigUint: SubAssign<&'b BigUint>,
-    for<'b> BigUint: MulAssign<&'b BigUint>,
-    for<'b> BigUint: DivAssign<&'b BigUint>,
-    for<'b> BigUint: RemAssign<&'b BigUint>,
-    for<'a, 'b> &'a BigUint: BitAnd<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: BitOr<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: BitXor<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: BitAndAssign<&'b BigUint>,
-    for<'b> BigUint: BitOrAssign<&'b BigUint>,
-    for<'b> BigUint: BitXorAssign<&'b BigUint>,
-    for<'a> &'a BigUint: Shr<usize, Output = BigUint>,
-    for<'a> &'a BigUint: Shl<usize, Output = BigUint>,
-    BigInt: BigIntApi<BigUint> + 'static,
-    for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Sub<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Mul<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Div<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Rem<&'b BigInt, Output = BigInt>,
-    for<'b> BigInt: AddAssign<&'b BigInt>,
-    for<'b> BigInt: SubAssign<&'b BigInt>,
-    for<'b> BigInt: MulAssign<&'b BigInt>,
-    for<'b> BigInt: DivAssign<&'b BigInt>,
-    for<'b> BigInt: RemAssign<&'b BigInt>,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
-{
-    pub fn new() -> Self {
-        AdderFactory {
-            _phantom0: core::marker::PhantomData,
-            _phantom1: core::marker::PhantomData,
-            _phantom2: core::marker::PhantomData,
-        }
-    }
-}
-impl<A, BigInt, BigUint> ContractFactory<A> for AdderFactory<A, BigInt, BigUint>
-where
-    BigUint: BigUintApi + 'static,
-    for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Sub<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Mul<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Div<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Rem<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: AddAssign<&'b BigUint>,
-    for<'b> BigUint: SubAssign<&'b BigUint>,
-    for<'b> BigUint: MulAssign<&'b BigUint>,
-    for<'b> BigUint: DivAssign<&'b BigUint>,
-    for<'b> BigUint: RemAssign<&'b BigUint>,
-    for<'a, 'b> &'a BigUint: BitAnd<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: BitOr<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: BitXor<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: BitAndAssign<&'b BigUint>,
-    for<'b> BigUint: BitOrAssign<&'b BigUint>,
-    for<'b> BigUint: BitXorAssign<&'b BigUint>,
-    for<'a> &'a BigUint: Shr<usize, Output = BigUint>,
-    for<'a> &'a BigUint: Shl<usize, Output = BigUint>,
-    BigInt: BigIntApi<BigUint> + 'static,
-    for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Sub<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Mul<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Div<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Rem<&'b BigInt, Output = BigInt>,
-    for<'b> BigInt: AddAssign<&'b BigInt>,
-    for<'b> BigInt: SubAssign<&'b BigInt>,
-    for<'b> BigInt: MulAssign<&'b BigInt>,
-    for<'b> BigInt: DivAssign<&'b BigInt>,
-    for<'b> BigInt: RemAssign<&'b BigInt>,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
-{
-    fn new_contract<'t>(&self, state_ref: &'t mut A) -> Box<dyn CallableContract + 't> {
-        Box::new(AdderImpl {
-            api: state_ref,
-            _phantom1: core::marker::PhantomData,
-            _phantom2: core::marker::PhantomData,
-        })
-    }
-}
-impl<'t, T, BigInt, BigUint> ContractHookApi<BigInt, BigUint> for AdderImpl<'t, T, BigInt, BigUint>
-where
-    BigUint: BigUintApi + 'static,
-    for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Sub<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Mul<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Div<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: Rem<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: AddAssign<&'b BigUint>,
-    for<'b> BigUint: SubAssign<&'b BigUint>,
-    for<'b> BigUint: MulAssign<&'b BigUint>,
-    for<'b> BigUint: DivAssign<&'b BigUint>,
-    for<'b> BigUint: RemAssign<&'b BigUint>,
-    for<'a, 'b> &'a BigUint: BitAnd<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: BitOr<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: BitXor<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: BitAndAssign<&'b BigUint>,
-    for<'b> BigUint: BitOrAssign<&'b BigUint>,
-    for<'b> BigUint: BitXorAssign<&'b BigUint>,
-    for<'a> &'a BigUint: Shr<usize, Output = BigUint>,
-    for<'a> &'a BigUint: Shl<usize, Output = BigUint>,
-    BigInt: BigIntApi<BigUint> + 'static,
-    for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Sub<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Mul<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Div<&'b BigInt, Output = BigInt>,
-    for<'a, 'b> &'a BigInt: Rem<&'b BigInt, Output = BigInt>,
-    for<'b> BigInt: AddAssign<&'b BigInt>,
-    for<'b> BigInt: SubAssign<&'b BigInt>,
-    for<'b> BigInt: MulAssign<&'b BigInt>,
-    for<'b> BigInt: DivAssign<&'b BigInt>,
-    for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
     #[inline]
     fn get_sc_address(&self) -> Address {
@@ -419,7 +298,7 @@ where
         self.api.keccak256(data)
     }
 }
-impl<'t, T, BigInt, BigUint> Adder<'t, T, BigInt, BigUint> for AdderImpl<'t, T, BigInt, BigUint>
+impl<T, BigInt, BigUint> Adder<T, BigInt, BigUint> for AdderImpl<T, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -451,24 +330,23 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
     fn get_sum(&self) -> BigInt {
         let key: &'static [u8] = &[115u8, 117u8, 109u8];
-        elrond_wasm::storage_get(self.api, &key[..])
+        elrond_wasm::storage_get(&self.api, &key[..])
     }
-    fn set_sum(&mut self, sum: &BigInt) {
+    fn set_sum(&self, sum: &BigInt) {
         let key: &'static [u8] = &[115u8, 117u8, 109u8];
-        elrond_wasm::storage_set(self.api, &key[..], &sum);
+        elrond_wasm::storage_set(&self.api, &key[..], &sum);
     }
     fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
-        // let contract_proxy = OtherContractHandle::new(self.api.clone(), address);
-        // Box::new(contract_proxy)
-        panic!("contract_proxy")
+        let contract_proxy = OtherContractHandle::new(self.api.clone(), address);
+        Box::new(contract_proxy)
     }
     fn callback(&self) {}
 }
-impl<'t, T, BigInt, BigUint> AdderImpl<'t, T, BigInt, BigUint>
+impl<T, BigInt, BigUint> AdderImpl<T, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -500,19 +378,19 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
     #[inline]
-    fn call_get_sum(&mut self) {
+    fn call_get_sum(&self) {
         self.api.check_not_payable();
         if !self.api.check_num_arguments(0i32) {
             return;
         }
         let result = self.get_sum();
-        EndpointResult::<T, BigInt, BigUint>::finish(&result, &mut self.api);
+        EndpointResult::<'_, T, BigInt, BigUint>::finish(&result, &self.api);
     }
     #[inline]
-    fn call_init(&mut self) {
+    fn call_init(&self) {
         self.api.check_not_payable();
         if !self.api.check_num_arguments(1i32) {
             return;
@@ -528,7 +406,7 @@ where
         self.init(&initial_value);
     }
     #[inline]
-    fn call_add(&mut self) {
+    fn call_add(&self) {
         self.api.check_not_payable();
         if !self.api.check_num_arguments(1i32) {
             return;
@@ -539,41 +417,35 @@ where
             &[118u8, 97u8, 108u8, 117u8, 101u8][..],
         );
         let result = self.add(&value);
-        EndpointResult::<T, BigInt, BigUint>::finish(&result, &mut self.api);
+        EndpointResult::<'_, T, BigInt, BigUint>::finish(&result, &self.api);
     }
 }
 #[allow(non_snake_case)]
 pub mod endpoints {
     use super::*;
     use elrond_wasm_node::*;
-    // fn new_arwen_instance() -> AdderImpl<'static, ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
-    //     let mut api = ArwenApiImpl {};
-    //     AdderImpl::new(&mut api)
-    // }
+    fn new_arwen_instance() -> AdderImpl<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
+        let api = ArwenApiImpl {};
+        AdderImpl::new(api)
+    }
     #[no_mangle]
     pub fn getSum() {
-        let mut api = ArwenApiImpl {};
-        let mut inst = AdderImpl::new(&mut api);
-        // let inst = new_arwen_instance();
+        let inst = new_arwen_instance();
         inst.call_get_sum();
     }
     #[no_mangle]
     pub fn init() {
-        let mut api = ArwenApiImpl {};
-        let mut inst = AdderImpl::new(&mut api);
-        // let inst = new_arwen_instance();
+        let inst = new_arwen_instance();
         inst.call_init();
     }
     #[no_mangle]
     pub fn add() {
-        let mut api = ArwenApiImpl {};
-        let mut inst = AdderImpl::new(&mut api);
-        // let inst = new_arwen_instance();
+        let inst = new_arwen_instance();
         inst.call_add();
     }
 }
 use elrond_wasm::CallableContract;
-impl<'t, T, BigInt, BigUint> CallableContract for AdderImpl<'t, T, BigInt, BigUint>
+impl<T, BigInt, BigUint> CallableContract for AdderImpl<T, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output = BigUint>,
@@ -605,9 +477,9 @@ where
     for<'b> BigInt: MulAssign<&'b BigInt>,
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
 {
-    fn call(&mut self, fn_name: &[u8]) {
+    fn call(&self, fn_name: &[u8]) {
         match fn_name {
             [103u8, 101u8, 116u8, 83u8, 117u8, 109u8] => {
                 self.call_get_sum();
@@ -618,27 +490,24 @@ where
             [97u8, 100u8, 100u8] => {
                 self.call_add();
             }
-            _other => panic!("No function with this name exists in contract."),
+            other => ::core::panicking::panic("No function with this name exists in contract."),
         }
     }
     fn clone_contract(&self) -> Box<dyn CallableContract> {
-        // Box::new(AdderImpl::new(self.api.clone()))
-        panic!("clone_contract")
+        Box::new(AdderImpl::new(self.api.clone()))
     }
 }
 pub mod callback_endpoint {
     use super::*;
     use elrond_wasm_node::*;
-    // fn new_arwen_instance() -> AdderImpl<'static, ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
-    //     let api = ArwenApiImpl {};
-    //     AdderImpl::new(&mut api)
-    // }
+    fn new_arwen_instance() -> AdderImpl<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
+        let api = ArwenApiImpl {};
+        AdderImpl::new(api)
+    }
     #[no_mangle]
     #[allow(non_snake_case)]
     pub fn callBack() {
-        let mut api = ArwenApiImpl {};
-        let mut inst = AdderImpl::new(&mut api);
-        // let inst = new_arwen_instance();
+        let inst = new_arwen_instance();
         inst.callback();
     }
 }

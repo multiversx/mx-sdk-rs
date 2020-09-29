@@ -73,7 +73,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store(&self, key: &[u8], value: &[u8]) {
+        fn storage_store(&mut self, key: &[u8], value: &[u8]) {
           self.api.storage_store(key, value);
         }
 
@@ -88,7 +88,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
+        fn storage_store_bytes32(&mut self, key: &[u8], value: &[u8; 32]) {
           self.api.storage_store_bytes32(key, value);
         }
         
@@ -98,7 +98,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store_big_uint(&self, key: &[u8], value: &BigUint) {
+        fn storage_store_big_uint(&mut self, key: &[u8], value: &BigUint) {
           self.api.storage_store_big_uint(key, value);
         }
         
@@ -108,7 +108,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
     
         #[inline]
-        fn storage_store_big_int(&self, key: &[u8], value: &BigInt) {
+        fn storage_store_big_int(&mut self, key: &[u8], value: &BigInt) {
           self.api.storage_store_big_int(key, value);
         }
         
@@ -118,7 +118,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store_i64(&self, key: &[u8], value: i64) {
+        fn storage_store_i64(&mut self, key: &[u8], value: i64) {
           self.api.storage_store_i64(key, value);
         }
         
@@ -133,7 +133,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn send_tx(&self, to: &Address, amount: &BigUint, message: &str) {
+        fn send_tx(&mut self, to: &Address, amount: &BigUint, message: &str) {
           self.api.send_tx(to, amount, message);
         }
 

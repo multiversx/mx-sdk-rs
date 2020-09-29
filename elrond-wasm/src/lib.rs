@@ -52,25 +52,25 @@ where
         self.get_balance(&self.get_sc_address())
     }
     
-    fn storage_store(&self, key: &[u8], value: &[u8]);
+    fn storage_store(&mut self, key: &[u8], value: &[u8]);
 
     fn storage_load(&self, key: &[u8]) -> Vec<u8>;
 
     fn storage_load_len(&self, key: &[u8]) -> usize;
 
-    fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]);
+    fn storage_store_bytes32(&mut self, key: &[u8], value: &[u8; 32]);
     
     fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32];
 
-    fn storage_store_big_uint(&self, key: &[u8], value: &BigUint);
+    fn storage_store_big_uint(&mut self, key: &[u8], value: &BigUint);
     
     fn storage_load_big_uint(&self, key: &[u8]) -> BigUint;
 
-    fn storage_store_big_int(&self, key: &[u8], value: &BigInt);
+    fn storage_store_big_int(&mut self, key: &[u8], value: &BigInt);
     
     fn storage_load_big_int(&self, key: &[u8]) -> BigInt;
 
-    fn storage_store_i64(&self, key: &[u8], value: i64);
+    fn storage_store_i64(&mut self, key: &[u8], value: i64);
     
     fn storage_load_i64(&self, key: &[u8]) -> Option<i64>;
 
@@ -81,7 +81,7 @@ where
     
     fn get_call_value_big_uint(&self) -> BigUint;
 
-    fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
+    fn send_tx(&mut self, to: &Address, amount: &BigUint, message: &str);
 
     fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
@@ -192,15 +192,15 @@ pub trait ContractIOApi<BigInt, BigUint> {
         }
     }
     
-    fn finish_slice_u8(&self, slice: &[u8]);
+    fn finish_slice_u8(&mut self, slice: &[u8]);
 
-    fn finish_bytes32(&self, bytes: &[u8; 32]);
+    fn finish_bytes32(&mut self, bytes: &[u8; 32]);
 
-    fn finish_big_int(&self, b: &BigInt);
+    fn finish_big_int(&mut self, b: &BigInt);
 
-    fn finish_big_uint(&self, b: &BigUint);
+    fn finish_big_uint(&mut self, b: &BigUint);
 
-    fn finish_i64(&self, value: i64);
+    fn finish_i64(&mut self, value: i64);
 
     fn signal_error(&self, message: &[u8]) -> !;
 
@@ -315,9 +315,27 @@ pub trait BigIntApi<BigUint>:
 
 /// CallableContract is the means by which the debugger calls methods in the contract.
 pub trait CallableContract {
-    fn call(&self, fn_name: &[u8]);
+    fn call(&mut self, fn_name: &[u8]);
 
     fn clone_contract(&self) -> Box<dyn CallableContract>;
+}
+
+pub trait ContractFactory<A> {
+    fn new_contract<'t>(&self, state_ref: &'t mut A) -> Box<dyn CallableContract + 't>;
+}
+
+pub struct ContractFactoryImpl<C: CallableContract, A> {
+    _phantom1: core::marker::PhantomData<C>,
+    _phantom2: core::marker::PhantomData<A>,
+}
+
+impl<C: CallableContract, A> ContractFactoryImpl<C, A> {
+    pub fn new() -> Self {
+        ContractFactoryImpl{
+            _phantom1: core::marker::PhantomData,
+            _phantom2: core::marker::PhantomData,
+        }
+    }
 }
 
 /// Handy way of casting to a contract proxy trait.

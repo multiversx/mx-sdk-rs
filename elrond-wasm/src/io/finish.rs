@@ -3,23 +3,23 @@ use crate::elrond_codec::*;
 use core::iter::FromIterator;
 
 
-pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
+pub trait EndpointResult<A, BigInt, BigUint>: Sized
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> 
 {
-    fn finish(&self, api: &'a A);
+    fn finish(&self, api: &mut A);
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for T
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for T
 where
     T: Encode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>
 {
-    fn finish(&self, api: &'a A) {
+    fn finish(&self, api: &mut A) {
         // the compiler is smart enough to evaluate this match at compile time
         match T::TYPE_INFO {
             TypeInfo::Unit => {},
@@ -95,18 +95,30 @@ impl<T> SCResult<T> {
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for SCResult<T>
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for SCResult<T>
 where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
+    // 'a: 't,
+    T: EndpointResult<A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>
 {
     #[inline]
-    fn finish(&self, api: &'a A) {
+    fn finish(&self, api: &mut A) {
         match self {
             SCResult::Ok(t) => {
-                t.finish(api);
+                {
+                EndpointResult::finish(t, api);
+                }
+                // EndpointResult::finish(t, api);
+                {
+                    t.finish(api);
+                }
+                // {
+                //     t.finish(api);
+                // }
+                // api.finish_i64(5);
+                // api.finish_i64(6);
             },
             SCResult::Err(e) => {
                 e.with_message_slice(|buf| api.signal_error(buf));
@@ -154,15 +166,15 @@ impl<T> FromIterator<T> for MultiResultVec<T> {
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for MultiResultVec<T>
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for MultiResultVec<T>
 where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
+    T: EndpointResult<A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>
 {
     #[inline]
-    fn finish(&self, api: &'a A) {
+    fn finish(&self, api: &mut A) {
         for elem in self.0.iter() {
             elem.finish(api);
         }
@@ -183,15 +195,15 @@ impl<T> From<Option<T>> for OptionalResult<T> {
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for OptionalResult<T>
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for OptionalResult<T>
 where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
+    T: EndpointResult<A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>
 {
     #[inline]
-    fn finish(&self, api: &'a A) {
+    fn finish(&self, api: &mut A) {
         if let OptionalResult::Some(t) = self {
             t.finish(api);
         }
@@ -203,15 +215,15 @@ macro_rules! multi_result_impls {
         $(
             pub struct $mr<$($name,)+>(pub ($($name,)+));
 
-            impl<'a, A, BigInt, BigUint, $($name),+> EndpointResult<'a, A, BigInt, BigUint> for $mr<$($name,)+>
+            impl<A, BigInt, BigUint, $($name),+> EndpointResult<A, BigInt, BigUint> for $mr<$($name,)+>
             where
-                $($name: EndpointResult<'a, A, BigInt, BigUint>,)+
+                $($name: EndpointResult<A, BigInt, BigUint>,)+
                 BigInt: BigIntApi<BigUint> + 'static,
                 BigUint: BigUintApi + 'static,
-                A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+                A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>
             {
                 #[inline]
-				fn finish(&self, api: &'a A) {
+				fn finish(&self, api: &mut A) {
                     $(
                         (self.0).$n.finish(api);
                     )+
@@ -247,14 +259,14 @@ multi_result_impls! {
     (MultiResult16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
-where
-    BigInt: BigIntApi<BigUint> + 'static,
-    BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode + EndpointResult<'a, A, BigInt, BigUint>,
-{
-    fn finish(&self, api: &'a A) {
-        core::ops::Deref::deref(self).finish(api);
-    }
-}
+// impl<'a, A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+// where
+//     BigInt: BigIntApi<BigUint> + 'static,
+//     BigUint: BigUintApi + 'static,
+//     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>,
+//     T: Encode + Decode + EndpointResult<A, BigInt, BigUint>,
+// {
+//     fn finish(&self, api: &mut A) {
+//         core::ops::Deref::deref(self).finish(api);
+//     }
+// }

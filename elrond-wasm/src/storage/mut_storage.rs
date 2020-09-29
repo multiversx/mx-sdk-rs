@@ -31,7 +31,7 @@ where
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
     T: Encode + Decode,
 {
-    api: &'a A,
+    api: &'a mut A,
     key: BorrowedMutStorageKey,
     value: T,
     dirty: bool,
@@ -46,7 +46,7 @@ where
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
     T: Encode + Decode,
 {
-    pub fn with_const_key(api: &'a A, key: &'static [u8]) -> Self {
+    pub fn with_const_key(api: &'a mut A, key: &'static [u8]) -> Self {
         let value: T = storage_get(api, key);
         BorrowedMutStorage {
             api,
@@ -58,7 +58,7 @@ where
         }
     }
 
-    pub fn with_generated_key(api: &'a A, key: Vec<u8>) -> Self {
+    pub fn with_generated_key(api: &'a mut A, key: Vec<u8>) -> Self {
         let value: T = storage_get(api, key.as_slice());
         BorrowedMutStorage {
             api,

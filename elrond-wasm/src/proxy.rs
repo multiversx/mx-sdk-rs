@@ -34,7 +34,7 @@ where
     for<'b> BigInt: DivAssign<&'b BigInt>,
     for<'b> BigInt: RemAssign<&'b BigInt>,
 
-    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + Clone + 'static,
+    T: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
 {
     pub api: T,
     pub address: Address,
