@@ -21,9 +21,9 @@ default = [
 
 [dependencies]
 # modules
-elrond-wasm-module-features-wasm = { package = "elrond-wasm-module-features", version = "0.6.2", path = "../../modules/elrond-wasm-module-features", features = ["elrond-wasm-node"], optional = true }
+elrond-wasm-module-features-wasm = { package = "elrond-wasm-module-features", version = "0.6.2", path = "../../modules/elrond-wasm-module-features", features = ["wasm-output-mode"], optional = true }
 elrond-wasm-module-features-default = { package = "elrond-wasm-module-features", version = "0.6.2", path = "../../modules/elrond-wasm-module-features", optional = true }
-elrond-wasm-module-pause-wasm = { package = "elrond-wasm-module-pause", version = "0.6.2", path = "../../modules/elrond-wasm-module-pause", features = ["elrond-wasm-node"], optional = true }
+elrond-wasm-module-pause-wasm = { package = "elrond-wasm-module-pause", version = "0.6.2", path = "../../modules/elrond-wasm-module-pause", features = ["wasm-output-mode"], optional = true }
 elrond-wasm-module-pause-default = { package = "elrond-wasm-module-pause", version = "0.6.2", path = "../../modules/elrond-wasm-module-pause", optional = true }
 
 elrond-wasm = { version = "0.6.2", path = "../../elrond-wasm" }
