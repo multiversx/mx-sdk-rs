@@ -5,12 +5,12 @@ use elrond_wasm::*;
 use mandos_rs::*;
 use std::path::Path;
 
-pub fn parse_execute_mandos<P: AsRef<Path>>(mock_ref: &ArwenMockRef, path: P) {
+pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, mock_ref: &ArwenMockRef, contract_map: &ContractMap) {
     let scenario = mandos_rs::parse_scenario(path);
-    execute_mandos_scenario(mock_ref, scenario);
+    execute_mandos_scenario(scenario, mock_ref, contract_map);
 }
 
-pub fn execute_mandos_scenario(mock_ref: &ArwenMockRef, scenario: Scenario) {
+pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, contract_map: &ContractMap) {
     for step in scenario.steps.iter() {
         match step {
             Step::ExternalSteps {
@@ -55,7 +55,7 @@ pub fn execute_mandos_scenario(mock_ref: &ArwenMockRef, scenario: Scenario) {
                     new_contract: None,
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
-                let _ = mock_ref.execute_tx(call_tx);
+                let _ = mock_ref.execute_tx(call_tx, contract_map);
             },
             Step::ScDeploy {
                 tx_id,
@@ -71,7 +71,7 @@ pub fn execute_mandos_scenario(mock_ref: &ArwenMockRef, scenario: Scenario) {
                     new_contract: Some(tx.contract_code.value.clone()),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
-                let result = mock_ref.execute_tx(deploy_tx);
+                let result = mock_ref.execute_tx(deploy_tx, contract_map);
                 if let Some(tx_expect) = expect {
                     if !tx_expect.status.check(result.result_status as u64) {
                         panic!("Bad tx result status");
