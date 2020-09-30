@@ -33,7 +33,7 @@ RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/simple_erc20_wasm.wasm output/simple-coin.wasm
+cp wasm/target/wasm32-unknown-unknown/release/simple_erc20_wasm.wasm output/simple-erc20.wasm
 cd ../..
 
 
@@ -60,4 +60,12 @@ cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.wasm
+cd ../..
+
+cd test-contracts/use-module/wasm
+RUSTFLAGS='-C link-arg=-s' \
+cargo build --target=wasm32-unknown-unknown --release
+cd ..
+mkdir -p output
+cp wasm/target/wasm32-unknown-unknown/release/use_module_wasm.wasm output/use_module.wasm
 cd ../..
