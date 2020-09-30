@@ -5,11 +5,13 @@
 mod ext_mock;
 mod big_int_mock;
 mod big_uint_mock;
+mod contract_map;
 mod execute_mandos;
 
 pub use ext_mock::*;
 pub use big_int_mock::*;
 pub use big_uint_mock::*;
+pub use contract_map::*;
 pub use execute_mandos::*;
 
 #[macro_use]

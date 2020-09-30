@@ -4,13 +4,15 @@ use adder::*;
 use elrond_wasm_debug::*;
 
 fn main() {
-    let mock_ref = ArwenMockState::new_ref();
-
-    mock_ref.register_contract(
+    let mut contract_map = ContractMap::new();
+    contract_map.register_contract(
         "file:../output/adder.wasm",
         Box::new(|mock_ref| Box::new(AdderImpl::new(mock_ref))));
 
-    parse_execute_mandos(&mock_ref, "examples/adder/mandos/adder.scen.json");
+    let mock_ref = ArwenMockState::new_ref();
+
+
+    parse_execute_mandos("examples/adder/mandos/adder.scen.json", &mock_ref, &contract_map);
     
     println!("Ok");
     

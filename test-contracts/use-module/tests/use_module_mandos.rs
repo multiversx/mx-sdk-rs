@@ -4,16 +4,15 @@ use use_module::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn mock_state() -> ArwenMockRef {
-    let mock_ref = ArwenMockState::new_ref();
-    mock_ref.register_contract(
+fn contract_map() -> ContractMap {
+    let mut contract_map = ContractMap::new();
+    contract_map.register_contract(
         "file:../output/use_module.wasm",
         Box::new(|mock_ref| Box::new(UseModuleImpl::new(mock_ref))));
-    mock_ref
+    contract_map
 }
 
 #[test]
 fn use_module_features() {
-    parse_execute_mandos(&mock_state(), "mandos/use_module_features.scen.json");
-
+    parse_execute_mandos("mandos/use_module_features.scen.json", &ArwenMockState::new_ref(), &contract_map());
 }

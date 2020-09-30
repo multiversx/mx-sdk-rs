@@ -4,6 +4,7 @@ use elrond_wasm::{H256, Address};
 
 use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
+use crate::contract_map::*;
 
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::CallableContract;
@@ -143,7 +144,6 @@ pub struct ArwenMockState {
     current_result: TxResult,
     accounts: HashMap<Address, AccountData>,
     new_addresses: HashMap<(Address, u64), Address>,
-    contract_factories: HashMap<Vec<u8>, Box<dyn Fn(ArwenMockRef) -> Box<dyn CallableContract>>>,
 }
 
 pub struct ArwenMockRef {
@@ -163,7 +163,6 @@ impl ArwenMockState {
             current_result: TxResult::empty(),
             accounts: HashMap::new(),
             new_addresses: HashMap::new(),
-            contract_factories: HashMap::new(),
         };
         let state_ref = Rc::new(RefCell::new(state));
         ArwenMockRef{ state_ref }
@@ -219,16 +218,12 @@ impl ArwenMockState {
 }
 
 impl ArwenMockRef {
-    fn get_contract(&self) -> Box<dyn CallableContract> {
+    fn get_contract(&self, contract_map: &ContractMap) -> Box<dyn CallableContract> {
         let state = self.state_ref.borrow();
         let tx_ref = &state.current_tx.as_ref().unwrap();
         if let Some(account) = state.accounts.get(&tx_ref.to) {
             if let Some(contract_identifier) = &account.contract_path {
-                if let Some(new_contract_closure) = state.contract_factories.get(contract_identifier) {
-                    new_contract_closure(self.clone())
-                } else {
-                    panic!("Unknown contract");
-                }
+                contract_map.new_contract_instance(&contract_identifier, self)
             } else {
                 panic!("Recipient account is not a smart contract");
             }
@@ -237,7 +232,7 @@ impl ArwenMockRef {
         }
     }
 
-    pub fn execute_tx(&self, mut tx: TxData) -> TxResult {
+    pub fn execute_tx(&self, mut tx: TxData, contract_map: &ContractMap) -> TxResult {
         {
             let mut state = self.state_ref.borrow_mut();
             state.create_account_if_deploy(&mut tx);    
@@ -251,7 +246,7 @@ impl ArwenMockRef {
         };
         
         {
-        let contract = self.get_contract();
+        let contract = self.get_contract(contract_map);
 
         // contract call
         // important: state cannot be borrowed at this point
@@ -298,19 +293,6 @@ impl ArwenMockRef {
     pub fn put_new_address(&self, creator_address: Address, creator_nonce: u64, new_address: Address) {
         let mut state = self.state_ref.borrow_mut();
         state.new_addresses.insert((creator_address, creator_nonce), new_address);
-    }
-
-    pub fn register_contract(&self,
-        path: &str,
-        new_contract_closure: Box<dyn Fn(ArwenMockRef) -> Box<dyn CallableContract>>) {
-
-        let mut state = self.state_ref.borrow_mut();
-        state.contract_factories.insert(path.as_bytes().to_vec(), new_contract_closure);
-    }
-
-    pub fn clear_state(&self) {
-        let mut state = self.state_ref.borrow_mut();
-        state.contract_factories.clear();
     }
 }
 

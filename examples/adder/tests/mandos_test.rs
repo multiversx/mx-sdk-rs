@@ -6,15 +6,15 @@ use elrond_wasm_debug::*;
 
 #[test]
 fn test_mandos() {
-    let mock_ref = ArwenMockState::new_ref();
-
-    mock_ref.register_contract(
+    let mut contract_map = ContractMap::new();
+    contract_map.register_contract(
         "file:../output/adder.wasm",
         Box::new(|mock_ref| Box::new(AdderImpl::new(mock_ref))));
 
-    parse_execute_mandos(&mock_ref, "mandos/adder.scen.json");
+    let mock_ref = ArwenMockState::new_ref();
 
-    mock_ref.clear_state();
+    parse_execute_mandos("mandos/adder.scen.json", &mock_ref, &contract_map);
+
     println!("Ok");
 
 }
