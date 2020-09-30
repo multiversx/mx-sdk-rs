@@ -13,8 +13,8 @@ use elrond_wasm_module_pause_default::*;
 #[cfg(feature = "elrond-wasm-module-pause-wasm")]
 use elrond_wasm_module_pause_wasm::*;
 
-#[elrond_wasm_derive::contract(UseModuleExampleImpl)]
-pub trait UseModuleExample {
+#[elrond_wasm_derive::contract(UseModuleImpl)]
+pub trait UseModule {
 
     #[module(FeaturesModuleImpl)]
     fn features_module(&self) -> FeaturesModuleImpl<T, BigInt, BigUint>;

@@ -1,5 +1,6 @@
 use super::*;
 use super::contract_gen::*;
+use super::function_selector::*;
 
 pub fn contract_implementation(
     contract: &Contract,
@@ -17,7 +18,7 @@ pub fn contract_implementation(
     let auto_impl_defs = contract.generate_auto_impl_defs();
     let auto_impls = contract.generate_auto_impls();
     let endpoints = contract.generate_endpoints();
-    let function_selector_body = contract.generate_function_selector_body();
+    let function_selector_body = generate_function_selector_body(&contract);
     let callback_body = contract.generate_callback_body();
     let api_where = snippets::api_where();
 
@@ -109,7 +110,7 @@ pub fn contract_implementation(
       impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
       #api_where
       {
-        fn call(&self, fn_name: &[u8]) {
+        fn call(&self, fn_name: &[u8]) -> bool {
           #function_selector_body
         }
 

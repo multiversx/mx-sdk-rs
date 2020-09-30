@@ -42,7 +42,8 @@ pub struct AccountData {
     pub nonce: u64,
     pub balance: BigUint,
     pub storage: HashMap<Vec<u8>, Vec<u8>>,
-    pub contract: Option<Vec<u8>>,
+    pub contract_path: Option<Vec<u8>>,
+    pub contract_owner: Option<Address>,
 }
 
 impl fmt::Display for AccountData {
@@ -113,6 +114,7 @@ impl TxData {
 #[derive(Clone)]
 pub struct TxResult {
     pub result_status: i32,
+    pub result_message: Vec<u8>,
     pub result_values: Vec<Vec<u8>>,
 }
 
@@ -127,6 +129,7 @@ impl TxResult {
     pub fn empty() -> TxResult {
         TxResult {
             result_status: 0,
+            result_message: Vec::new(),
             result_values: Vec::new(),
         }
     }
@@ -166,6 +169,7 @@ impl ArwenMockState {
         ArwenMockRef{ state_ref }
     }
 
+    #[allow(mutable_borrow_reservation_conflict)] // TODO: refactoring
     fn create_account_if_deploy(&mut self, tx: &mut TxData) {
         if let Some(tx_contract) = &tx.new_contract {
             if let Some(sender) = self.accounts.get(&tx.from) {
@@ -178,7 +182,8 @@ impl ArwenMockState {
                         nonce: 0,
                         balance: 0u32.into(),
                         storage: HashMap::new(),
-                        contract: Some(tx_contract.clone()),
+                        contract_path: Some(tx_contract.clone()),
+                        contract_owner: Some(sender.address.clone()),
                     });
                     tx.to = new_address;
                 } else {
@@ -218,7 +223,7 @@ impl ArwenMockRef {
         let state = self.state_ref.borrow();
         let tx_ref = &state.current_tx.as_ref().unwrap();
         if let Some(account) = state.accounts.get(&tx_ref.to) {
-            if let Some(contract_identifier) = &account.contract {
+            if let Some(contract_identifier) = &account.contract_path {
                 if let Some(new_contract_closure) = state.contract_factories.get(contract_identifier) {
                     new_contract_closure(self.clone())
                 } else {
@@ -319,7 +324,22 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_owner_address(&self) -> Address {
-        panic!("get_sc_address not yet implemented")
+        let state = self.state_ref.borrow();
+        match &state.current_tx {
+            None => panic!("Tx not initialized!"),
+            Some(tx) => {
+                match state.accounts.get(&tx.to) {
+                    None => panic!("Account not found!"),
+                    Some(acct) => {
+                        if let Some(contract_owner) = &acct.contract_owner {
+                            contract_owner.clone()
+                        } else {
+                            panic!("Account is not a contract or does not have and owner specified")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fn get_caller(&self) -> Address {
@@ -331,7 +351,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_balance(&self, _address: &Address) -> RustBigUint {
-        panic!("get_balance not yet implemented")
+        let state = self.state_ref.borrow();
+        match &state.current_tx {
+            None => panic!("Tx not initialized!"),
+            Some(tx) => {
+                match state.accounts.get(&tx.to) {
+                    None => panic!("Account not found!"),
+                    Some(acct) => {
+                        acct.balance.clone().into()
+                    }
+                }
+            }
+        }
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {

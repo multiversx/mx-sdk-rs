@@ -27,6 +27,7 @@ mod contract_gen_storage;
 mod contract_impl;
 mod contract_macro_main;
 mod contract_macro_module;
+mod function_selector;
 mod parse_attr;
 mod snippets;
 mod util;

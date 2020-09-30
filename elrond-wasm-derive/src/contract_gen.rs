@@ -11,7 +11,7 @@ pub struct Contract {
     pub trait_name: proc_macro2::Ident,
     pub contract_impl_name: syn::Path,
     pub supertrait_paths: Vec<syn::Path>,
-    methods: Vec<Method>,
+    pub methods: Vec<Method>,
 }
 
 impl Contract {
@@ -178,34 +178,6 @@ impl Contract {
             .collect()
     }
     
-    pub fn generate_function_selector_body(&self) -> proc_macro2::TokenStream {
-        let match_arms: Vec<proc_macro2::TokenStream> = 
-            self.methods.iter()
-                .filter_map(|m| {
-                    if let Some(endpoint_name) = m.metadata.endpoint_name() {
-                        let fn_ident = &m.name;
-                        let call_method_ident = generate_call_method_name(fn_ident);
-                        let endpoint_name_str = array_literal(endpoint_name.to_string().as_bytes());
-                        let match_arm = quote! {                     
-                            #endpoint_name_str =>
-                            {
-                                self.#call_method_ident();
-                            },
-                        };
-                        Some(match_arm)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-        quote! {      
-            match fn_name {
-                #(#match_arms)*
-                other => panic!("No function with this name exists in contract.")
-            }
-        }
-    }
-
     pub fn generate_callback_body(&self) -> proc_macro2::TokenStream {
         generate_callback_body(&self.methods)
     }
