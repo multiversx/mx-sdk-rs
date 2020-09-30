@@ -30,7 +30,8 @@ pub fn execute_mandos_scenario(mock_ref: &ArwenMockRef, scenario: Scenario) {
                         nonce: account.nonce.value,
                         balance: account.balance.value.clone(),
                         storage: HashMap::new(),
-                        contract: account.code.as_ref().map(|bytes_value| bytes_value.value.clone()),
+                        contract_path: account.code.as_ref().map(|bytes_value| bytes_value.value.clone()),
+                        contract_owner: None, // TODO: add contract owner in mandos
                     });
                 }
                 for new_address in new_addresses.iter() {

@@ -14,7 +14,8 @@ fn main() {
         nonce: 0,
         balance: 0u32.into(),
         storage: HashMap::new(),
-        contract: None,
+        contract_path: None,
+        contract_owner: None,
     });
 
     // tx 1: init

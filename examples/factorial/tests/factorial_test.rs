@@ -11,7 +11,8 @@ fn set_up_module_to_test() -> FactorialImpl<ArwenMockRef, RustBigInt, RustBigUin
         nonce: 0,
         balance: 0u32.into(),
         storage: HashMap::new(),
-        contract: None,
+        contract_path: None,
+        contract_owner: None,
     });
     mock_ref.set_dummy_tx(&Address::zero());
 
