@@ -9,10 +9,10 @@ fn main() {
         "file:../output/adder.wasm",
         Box::new(|mock_ref| Box::new(AdderImpl::new(mock_ref))));
 
-    let mock_ref = ArwenMockState::new_ref();
+    let mut state = BlockchainMock::new();
 
 
-    parse_execute_mandos("examples/adder/mandos/adder.scen.json", &mock_ref, &contract_map);
+    parse_execute_mandos("examples/adder/mandos/adder.scen.json", &mut state, &contract_map);
     
     println!("Ok");
     
