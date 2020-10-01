@@ -5,12 +5,12 @@ use elrond_wasm::*;
 use mandos_rs::*;
 use std::path::Path;
 
-pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, mock_ref: &ArwenMockRef, contract_map: &ContractMap) {
+pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, state: &mut BlockchainMock, contract_map: &ContractMap) {
     let scenario = mandos_rs::parse_scenario(path);
-    execute_mandos_scenario(scenario, mock_ref, contract_map);
+    execute_mandos_scenario(scenario, state, contract_map);
 }
 
-pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, contract_map: &ContractMap) {
+pub fn execute_mandos_scenario(scenario: Scenario, state: &mut BlockchainMock, contract_map: &ContractMap) {
     for step in scenario.steps.iter() {
         match step {
             Step::ExternalSteps {
@@ -25,7 +25,7 @@ pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, cont
                 current_block_info,
             } => {
                 for (address, account) in accounts.iter() {
-                    mock_ref.add_account(AccountData{
+                    state.add_account(AccountData{
                         address: address.value.into(),
                         nonce: account.nonce.value,
                         balance: account.balance.value.clone(),
@@ -35,7 +35,7 @@ pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, cont
                     });
                 }
                 for new_address in new_addresses.iter() {
-                    mock_ref.put_new_address(
+                    state.put_new_address(
                         new_address.creator_address.value.into(),
                         new_address.creator_nonce.value,
                         new_address.new_address.value.into())
@@ -47,15 +47,39 @@ pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, cont
                 tx,
                 expect,
             } => {
-                let call_tx = TxData{
+                let tx_input = TxInput{
                     from: tx.from.value.into(),
                     to: tx.to.value.into(),
                     call_value: tx.value.value.clone(),
                     func_name: tx.function.as_bytes().to_vec(),
-                    new_contract: None,
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
-                let _ = mock_ref.execute_tx(call_tx, contract_map);
+                if let Some(account) = state.accounts.get(&tx.to.value.into()) {
+                    if let Some(contract_path) = &account.contract_path {
+                        let tx_context = TxContext::new(
+                            tx_input,
+                            TxMutableContext{
+                                contract_storage: account.storage.clone(),
+                                result: TxResult::empty(),
+                            });
+                        let tx_result = execute_tx(tx_context, contract_path, contract_map);
+
+                        if let Some(tx_expect) = expect {
+                            if let Some(expected_message) = &tx_expect.message {
+                                assert_eq!(
+                                    String::from_utf8(expected_message.value.clone()), 
+                                    String::from_utf8(tx_result.result_message));
+                            }
+                            
+                            assert_eq!(tx_expect.status.value as i32, tx_result.result_status);
+                        }
+                    } else {
+                        panic!("Recipient account is not a smart contract");
+                    }
+                } else {
+                    panic!("Account not found");
+                }
+                
             },
             Step::ScDeploy {
                 tx_id,
@@ -63,23 +87,41 @@ pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, cont
                 tx,
                 expect,
             } => {
-                let deploy_tx = TxData{
+                let tx_input = TxInput{
                     from: tx.from.value.into(),
                     to: H256::zero(),
                     call_value: tx.value.value.clone(),
                     func_name: b"init".to_vec(),
-                    new_contract: Some(tx.contract_code.value.clone()),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
-                let result = mock_ref.execute_tx(deploy_tx, contract_map);
-                if let Some(tx_expect) = expect {
-                    if !tx_expect.status.check(result.result_status as u64) {
-                        panic!("Bad tx result status");
-                    }
-                    if !tx_expect.out.check(result.result_values.as_slice()) {
-                        panic!("Bad tx output");
-                    }
-                }
+                let tx_context = TxContext::new(
+                    tx_input.clone(),
+                    TxMutableContext{
+                        contract_storage: HashMap::new(),
+                        result: TxResult::empty(),
+                    });
+                let contract_path = &tx.contract_code.value;
+                let _ = execute_tx(tx_context, contract_path, contract_map);
+
+                state.create_account_after_deploy(&tx_input, contract_path.clone());
+
+                // let deploy_tx = TxData{
+                //     from: tx.from.value.into(),
+                //     to: H256::zero(),
+                //     call_value: tx.value.value.clone(),
+                //     func_name: b"init".to_vec(),
+                //     new_contract: Some(tx.contract_code.value.clone()),
+                //     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
+                // };
+                // let result = state.execute_tx(deploy_tx, contract_map);
+                // if let Some(tx_expect) = expect {
+                //     if !tx_expect.status.check(result.result_status as u64) {
+                //         panic!("Bad tx result status");
+                //     }
+                //     if !tx_expect.out.check(result.result_values.as_slice()) {
+                //         panic!("Bad tx output");
+                //     }
+                // }
             },
             Step::Transfer {
                 tx_id,
@@ -96,7 +138,7 @@ pub fn execute_mandos_scenario(scenario: Scenario, mock_ref: &ArwenMockRef, cont
                 accounts,
             } => {},
             Step::DumpState {..} => {
-                mock_ref.print_accounts();
+                state.print_accounts();
             },
         }
     }
