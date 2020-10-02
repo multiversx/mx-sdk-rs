@@ -58,8 +58,8 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
 
-                state.subtract_tx_payment(
-                    &tx.from.value.into(),
+                state.increase_nonce(&tx.from.value.into());
+                state.subtract_tx_payment(&tx.from.value.into(),
                     &tx.call_value.value,
                     tx.gas_limit.value, tx.gas_price.value);
                 
@@ -106,8 +106,8 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
 
-                state.subtract_tx_payment(
-                    &tx.from.value.into(),
+                state.increase_nonce(&tx.from.value.into());
+                state.subtract_tx_payment(&tx.from.value.into(),
                     &tx.call_value.value,
                     tx.gas_limit.value, tx.gas_price.value);
 
@@ -152,15 +152,24 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                 comment,
                 accounts,
             } => {
-                for (address, expected_account) in accounts.accounts.iter() {
-                    if let Some(account) = state.accounts.get(&address.value.into()) {
-                        assert!(
-                            expected_account.balance.check(&account.balance),
-                            "bad account balance. Address: {}. Want: {}. Have: {}",
-                            address,
-                            expected_account.balance,
-                            account.balance);
-                    }
+                for (expected_address, expected_account) in accounts.accounts.iter() {
+                    let account = state.accounts.get(&expected_address.value.into())
+                        .unwrap_or_else(|| panic!("Expected account not found"));
+
+                    assert!(
+                        expected_account.nonce.check(account.nonce),
+                        "bad account nonce. Address: {}. Want: {}. Have: {}",
+                        expected_address,
+                        expected_account.nonce,
+                        account.nonce);
+
+                    assert!(
+                        expected_account.balance.check(&account.balance),
+                        "bad account balance. Address: {}. Want: {}. Have: {}",
+                        expected_address,
+                        expected_account.balance,
+                        account.balance);
+                    
                 }
             },
             Step::DumpState {..} => {
