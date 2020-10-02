@@ -4,15 +4,12 @@ use adder::*;
 use elrond_wasm_debug::*;
 
 fn main() {
-    let mut contract_map = ContractMap::new();
+    let mut contract_map = ContractMap::<TxContext>::new();
     contract_map.register_contract(
         "file:../output/adder.wasm",
         Box::new(|mock_ref| Box::new(AdderImpl::new(mock_ref))));
 
-    let mut state = BlockchainMock::new();
-
-
-    parse_execute_mandos("examples/adder/mandos/adder.scen.json", &mut state, &contract_map);
+    parse_execute_mandos("examples/adder/mandos/adder.scen.json", &contract_map);
     
     println!("Ok");
     

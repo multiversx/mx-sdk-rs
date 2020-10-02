@@ -2,12 +2,17 @@ use simple_erc20::*;
 use elrond_wasm_debug::*;
 use elrond_wasm_debug::HashMap;
 
-fn main() {
+fn contract_map() -> ContractMap<TxContext> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/simple-erc20.wasm",
-        Box::new(|mock_ref| Box::new(SimpleErc20TokenImpl::new(mock_ref))));
+        Box::new(|mock_ref| Box::new(BasicFeaturesImpl::new(mock_ref))));
+    contract_map
+}
 
+fn main() {
+    let contract_map = contract_map();
+    
     let mock_ref = ArwenMockState::new_ref();
 
     mock_ref.add_account(AccountData{

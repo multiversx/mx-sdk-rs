@@ -107,15 +107,19 @@ pub fn contract_implementation(
 
     let function_selector = quote! {
       use elrond_wasm::CallableContract;
-      impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
+      impl <T, BigInt, BigUint> CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint> 
       #api_where
       {
         fn call(&self, fn_name: &[u8]) -> bool {
           #function_selector_body
         }
 
-        fn clone_contract(&self) -> Box<dyn CallableContract> {
+        fn clone_contract(&self) -> Box<dyn CallableContract<T>> {
           Box::new(#contract_impl_ident::new(self.api.clone()))
+        }
+
+        fn into_api(self: Box<Self>) -> T {
+          self.api
         }
       }
     };

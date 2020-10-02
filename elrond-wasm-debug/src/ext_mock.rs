@@ -8,7 +8,7 @@ use crate::display_util::*;
 
 use elrond_wasm::ContractHookApi;
 // use elrond_wasm::CallableContract;
-use elrond_wasm::BigUintApi;
+use elrond_wasm::{BigUintApi, BigIntApi};
 use elrond_wasm::err_msg;
 
 use num_bigint::{BigInt, BigUint};
@@ -30,7 +30,12 @@ const ADDRESS_LENGTH: usize = 32;
 const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
 
-#[derive(Clone)]
+pub struct TxPanic {
+    pub status: u64,
+    pub message: Vec<u8>,
+}
+
+#[derive(Clone, Debug)]
 pub struct TxInput {
     pub from: Address,
     pub to: Address,
@@ -76,9 +81,9 @@ impl TxInput {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TxResult {
-    pub result_status: i32,
+    pub result_status: u64,
     pub result_message: Vec<u8>,
     pub result_values: Vec<Vec<u8>>,
 }
@@ -103,22 +108,51 @@ impl TxResult {
     }
 }
 
-pub struct TxMutableContext {
+#[derive(Debug)]
+pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
     pub result: TxResult,
 }
 
+impl Default for TxOutput {
+    fn default() -> Self {
+        TxOutput {
+            contract_storage: HashMap::new(),
+            result: TxResult::empty(),
+        }
+    }
+}
+
+impl TxOutput {
+    pub fn from_panic_obj(panic_obj: TxPanic) -> Self {
+        TxOutput {
+            contract_storage: HashMap::new(),
+            result: TxResult {
+                result_status: panic_obj.status,
+                result_message: panic_obj.message,
+                result_values: Vec::new(),
+            },
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct TxContext {
     pub tx_input: TxInput,
-    pub mut_context_cell: Rc<RefCell<TxMutableContext>>,
+    pub tx_output_cell: Rc<RefCell<TxOutput>>,
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, mut_context: TxMutableContext) -> Self {
+    pub fn new(tx_input: TxInput, tx_output: TxOutput) -> Self {
         TxContext {
             tx_input,
-            mut_context_cell: Rc::new(RefCell::new(mut_context)),
+            tx_output_cell: Rc::new(RefCell::new(tx_output)),
         }
+    }
+
+    pub fn into_output(self) -> TxOutput {
+        let ref_cell = Rc::try_unwrap(self.tx_output_cell).unwrap();
+        ref_cell.replace(TxOutput::default())
     }
 
     pub fn dummy() -> Self {
@@ -130,7 +164,7 @@ impl TxContext {
                 func_name: Vec::new(),
                 args: Vec::new(),
             },
-            mut_context_cell: Rc::new(RefCell::new(TxMutableContext{
+            tx_output_cell: Rc::new(RefCell::new(TxOutput{
                 contract_storage: HashMap::new(),
                 result: TxResult::empty(),
             })),
@@ -142,7 +176,7 @@ impl Clone for TxContext {
     fn clone(&self) -> Self {
         TxContext{
             tx_input: self.tx_input.clone(),
-            mut_context_cell: Rc::clone(&self.mut_context_cell),
+            tx_output_cell: Rc::clone(&self.tx_output_cell),
         }
     }
 }
@@ -154,7 +188,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     fn get_owner_address(&self) -> Address {
         self.get_caller() // TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // let state = self.mut_context_cell.borrow();
+        // let state = self.tx_output_cell.borrow();
         // match &state.current_tx {
         //     None => panic!("Tx not initialized!"),
         //     Some(tx) => {
@@ -178,7 +212,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_balance(&self, _address: &Address) -> RustBigUint {
-        // let state = self.mut_context_cell.borrow();
+        // let state = self.tx_output_cell.borrow();
         // match &state.current_tx {
         //     None => panic!("Tx not initialized!"),
         //     Some(tx) => {
@@ -194,13 +228,13 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {
-        let mut mut_context = self.mut_context_cell.borrow_mut();
-        mut_context.contract_storage.insert(key.to_vec(), value.to_vec());
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.contract_storage.insert(key.to_vec(), value.to_vec());
     }
 
     fn storage_load(&self, key: &[u8]) -> Vec<u8> {
-        let mut_context = self.mut_context_cell.borrow();
-        match mut_context.contract_storage.get(&key.to_vec()) {
+        let tx_output = self.tx_output_cell.borrow();
+        match tx_output.contract_storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
             Some(value) => {
                 value.clone()
@@ -270,13 +304,13 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     fn send_tx(&self, _to: &Address, _amount: &RustBigUint, _message: &str) {
         // let owner = self.get_sc_address();
-        // let mut state = self.mut_context_cell.borrow_mut();
+        // let mut state = self.tx_output_cell.borrow_mut();
         // match state.accounts.get_mut(&owner) {
         //     None => panic!("Account not found!"),
         //     Some(acct) => {
         //         acct.balance -= amount.value();
         //     }
-        // }
+        // } 
         // match state.accounts.get_mut(to) {
         //     None => panic!("Account not found!"),
         //     Some(acct) => {
@@ -381,15 +415,18 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         if let Some(v) = bi.to_i64() {
             v
         } else {
-            panic!("Argument does not fit in an i64.")
+            panic!(TxPanic{
+                status: 10,
+                message: b"argument out of range".to_vec(),
+            })
         }
     }
 
     fn finish_slice_u8(&self, slice: &[u8]) {
         let mut v = vec![0u8; slice.len()];
         v.copy_from_slice(slice);
-        let mut mut_context = self.mut_context_cell.borrow_mut();
-        mut_context.result.result_values.push(v)
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.result.result_values.push(v)
     }
 
     fn finish_bytes32(&self, bytes: &[u8; 32]) {
@@ -411,8 +448,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn signal_error(&self, message: &[u8]) -> ! {
-        let s = std::str::from_utf8(message);
-        panic!("{}", s.unwrap())
+        panic!(TxPanic{
+            status: 4,
+            message: message.to_vec(),
+        })
     }
 
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
