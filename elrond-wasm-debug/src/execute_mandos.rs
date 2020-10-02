@@ -3,7 +3,7 @@
 use super::*;
 use num_bigint::BigUint;
 use elrond_wasm::*;
-use mandos_rs::*;
+use mandos::*;
 use std::path::Path;
 
 pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<TxContext>) {
@@ -12,7 +12,7 @@ pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<
 }
 
 fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, contract_map: &ContractMap<TxContext>) {
-    let scenario = mandos_rs::parse_scenario(steps_path);
+    let scenario = mandos::parse_scenario(steps_path);
 
     for step in scenario.steps.iter() {
         match step {
