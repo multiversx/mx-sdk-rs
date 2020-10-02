@@ -28,7 +28,7 @@
                 "value": "0",
                 "function": "return_error",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {

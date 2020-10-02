@@ -30,7 +30,7 @@
                     "address:an_account",
                     "10000"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
