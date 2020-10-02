@@ -122,33 +122,36 @@ impl BlockchainMock {
         account.balance += amount;
     }
 
-    #[allow(mutable_borrow_reservation_conflict)] // TODO: refactor
+    pub fn increase_nonce(&mut self, address: &Address) {
+        let account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Account not found"));
+        account.nonce += 1;
+    }
+
     pub fn create_account_after_deploy(&mut self,
         tx_input: &TxInput,
         tx_output: TxOutput,
         call_value: BigUint,
         contract_path: Vec<u8>) {
 
-        if let Some(sender) = self.accounts.get(&tx_input.from) {
-            if let Some(new_address) = self.get_new_address(tx_input.from.clone(), sender.nonce) {
-                let old_value = self.accounts.insert(new_address.clone(), AccountData{
-                    address: new_address.clone(),
-                    nonce: 0,
-                    balance: call_value,
-                    storage: tx_output.contract_storage,
-                    contract_path: Some(contract_path),
-                    contract_owner: Some(sender.address.clone()),
-                });
-                if old_value.is_some() {
-                    panic!("Account already exists at deploy address.");
-                }
-            } else {
-                panic!("Missing new address. Only explicit new deploy addresses supported.");
-            }
-        } else {
-            panic!("Unknown deployer");
+        let sender = self.accounts.get(&tx_input.from)
+            .unwrap_or_else(|| panic!("Unknown deployer"));
+        let sender_nonce_before_tx = sender.nonce - 1;
+        let new_address = self.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
+            .unwrap_or_else(|| panic!("Missing new address. Only explicit new deploy addresses supported"));
+
+        let old_value = self.accounts.insert(new_address.clone(), AccountData{
+            address: new_address.clone(),
+            nonce: 0,
+            balance: call_value,
+            storage: tx_output.contract_storage,
+            contract_path: Some(contract_path),
+            contract_owner: Some(tx_input.from.clone()),
+        });
+        if old_value.is_some() {
+            panic!("Account already exists at deploy address.");
         }
-        
     }
 }
 
