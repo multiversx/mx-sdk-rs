@@ -15,7 +15,7 @@ debug = false
 panic = "abort"
 
 [dependencies]
-crypto-bubbles = { path = ".." }
-elrond-wasm-output = { path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
+crypto-bubbles = { path = "..", features=["wasm-output-mode"] }
+elrond-wasm-output = { path = "../../../elrond-wasm-output", features=["wasm-output-mode"] }
 
 [workspace]
