@@ -104,10 +104,29 @@ impl BlockchainMock {
         }
     }
 
+    pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint, gas_limit: u64, gas_price: u64) {
+        let sender_account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Sender account not found"));
+        let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
+        assert!(sender_account.balance >= gas_cost, "Not enough balance to pay gas upfront");
+        sender_account.balance -= &gas_cost;
+        assert!(&sender_account.balance >= call_value, "Not enough balance to send tx payment");
+        sender_account.balance -= call_value;
+    }
+
+    pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
+        let account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Receiver account not found"));
+        account.balance += amount;
+    }
+
     #[allow(mutable_borrow_reservation_conflict)] // TODO: refactor
     pub fn create_account_after_deploy(&mut self,
         tx_input: &TxInput,
         tx_output: TxOutput,
+        call_value: BigUint,
         contract_path: Vec<u8>) {
 
         if let Some(sender) = self.accounts.get(&tx_input.from) {
@@ -115,7 +134,7 @@ impl BlockchainMock {
                 let old_value = self.accounts.insert(new_address.clone(), AccountData{
                     address: new_address.clone(),
                     nonce: 0,
-                    balance: 0u32.into(),
+                    balance: call_value,
                     storage: tx_output.contract_storage,
                     contract_path: Some(contract_path),
                     contract_owner: Some(sender.address.clone()),
