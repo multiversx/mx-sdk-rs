@@ -228,6 +228,14 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {
+        // TODO: extract magic strings somewhere
+        if key.starts_with(&b"ELROND"[..]) {
+            panic!(TxPanic{
+                status: 10,
+                message: b"cannot write to storage under Elrond reserved key".to_vec(),
+            });
+        }
+        
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.contract_storage.insert(key.to_vec(), value.to_vec());
     }
@@ -400,15 +408,14 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     
     fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
         let bytes = self.get_argument_vec(arg_index);
-        BigInt::from_signed_bytes_be(&bytes).into()
+        RustBigInt::from_signed_bytes_be(&bytes)
     }
 
-    #[inline]
-    fn get_argument_big_uint(&self, _arg_index: i32) -> RustBigUint {
-        panic!("get_argument_big_uint not yet implemented")
+    fn get_argument_big_uint(&self, arg_index: i32) -> RustBigUint {
+        let bytes = self.get_argument_vec(arg_index);
+        RustBigUint::from_bytes_be(&bytes[..])
     }
 
-    #[inline]
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
         let bytes = self.get_argument_vec(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
@@ -437,12 +444,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         self.finish_slice_u8(bi.to_signed_bytes_be().as_slice());
     }
 
-    #[inline]
     fn finish_big_uint(&self, bu: &RustBigUint) {
         self.finish_slice_u8(bu.to_bytes_be().as_slice());
     }
     
-    #[inline]
     fn finish_i64(&self, value: i64) {
         self.finish_big_int(&value.into());
     }

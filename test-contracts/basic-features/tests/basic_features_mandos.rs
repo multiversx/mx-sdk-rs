@@ -26,3 +26,68 @@ fn echo_i64() {
 fn return_error() {
     parse_execute_mandos("mandos/return_error.scen.json", &contract_map());    
 }
+
+#[test]
+fn storage_addr() {
+    parse_execute_mandos("mandos/storage_addr.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_big_int() {
+    parse_execute_mandos("mandos/storage_big_int.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_big_uint() {
+    parse_execute_mandos("mandos/storage_big_uint.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_bool() {
+    parse_execute_mandos("mandos/storage_bool.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_i64() {
+    parse_execute_mandos("mandos/storage_i64.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_map1() {
+    parse_execute_mandos("mandos/storage_map1.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_map2() {
+    parse_execute_mandos("mandos/storage_map2.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_map3() {
+    parse_execute_mandos("mandos/storage_map3.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_opt_addr_err() {
+    parse_execute_mandos("mandos/storage_opt_addr_err.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_opt_addr() {
+    parse_execute_mandos("mandos/storage_opt_addr.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_reserved() {
+    parse_execute_mandos("mandos/storage_reserved.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_usize() {
+    parse_execute_mandos("mandos/storage_usize.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_vec_u8() {
+    parse_execute_mandos("mandos/storage_vec_u8.scen.json", &contract_map());    
+}

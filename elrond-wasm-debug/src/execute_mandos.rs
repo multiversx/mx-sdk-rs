@@ -31,7 +31,7 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                         address: address.value.into(),
                         nonce: account.nonce.value,
                         balance: account.balance.value.clone(),
-                        storage: HashMap::new(),
+                        storage: account.storage.iter().map(|(k, v)| (k.value.clone(), v.value.clone())).collect(),
                         contract_path: account.code.as_ref().map(|bytes_value| bytes_value.value.clone()),
                         contract_owner: None, // TODO: add contract owner in mandos
                     });
@@ -56,15 +56,20 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                     func_name: tx.function.as_bytes().to_vec(),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
-                if let Some(account) = state.accounts.get(&tx.to.value.into()) {
-                    if let Some(contract_path) = &account.contract_path {
+                if let Some(contract_account) = state.accounts.get_mut(&tx.to.value.into()) {
+                    if let Some(contract_path) = &contract_account.contract_path {
                         let tx_context = TxContext::new(
                             tx_input,
                             TxOutput{
-                                contract_storage: account.storage.clone(),
+                                contract_storage: contract_account.storage.clone(),
                                 result: TxResult::empty(),
                             });
                         let tx_output = execute_tx(tx_context, contract_path, contract_map);
+
+                        if tx_output.result.result_status == 0 {
+                            // replace storage with new one
+                            let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
+                        }
 
                         if let Some(tx_expect) = expect {
                             assert_eq!(tx_expect.out.len(), tx_output.result.result_values.len());
@@ -79,9 +84,11 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                             }
 
                             if let Some(expected_message) = &tx_expect.message {
-                                assert_eq!(
-                                    String::from_utf8(expected_message.value.clone()), 
-                                    String::from_utf8(tx_output.result.result_message));
+                                let want_str = String::from_utf8(expected_message.value.clone()).unwrap();
+                                let have_str = String::from_utf8(tx_output.result.result_message).unwrap();
+                                assert_eq!(want_str, have_str,
+                                    "bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"",
+                                    tx_id, want_str, have_str);
                             }
                             
                             assert_eq!(tx_expect.status.value, tx_output.result.result_status);
