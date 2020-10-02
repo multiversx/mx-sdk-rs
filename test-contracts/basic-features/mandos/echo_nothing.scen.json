@@ -1,0 +1,42 @@
+{
+    "name": "echo_nothing",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "``features_contract_____________s0": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {},
+                    "code": "file:../output/features.wasm"
+                },
+                "``an_account____________________s0": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "``an_account____________________s0",
+                "to": "``features_contract_____________s0",
+                "value": "0",
+                "function": "echo_nothing",
+                "arguments": [],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
