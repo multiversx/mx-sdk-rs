@@ -65,33 +65,15 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                                 result: TxResult::empty(),
                             });
                         let tx_output = execute_tx(tx_context, contract_path, contract_map);
+                        let tx_result = tx_output.result;
 
-                        if tx_output.result.result_status == 0 {
+                        if tx_result.result_status == 0 {
                             // replace storage with new one
                             let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
                         }
 
                         if let Some(tx_expect) = expect {
-                            assert_eq!(tx_expect.out.len(), tx_output.result.result_values.len());
-                            for (i, expected_out) in tx_expect.out.iter().enumerate() {
-                                let actual_value = &tx_output.result.result_values[i];
-                                assert!(
-                                    expected_out.check(actual_value.as_slice()),
-                                    "bad out value. Tx id: {}. Want: {}. Have: {}",
-                                    tx_id,
-                                    expected_out,
-                                    verbose_hex(actual_value.as_slice()));
-                            }
-
-                            if let Some(expected_message) = &tx_expect.message {
-                                let want_str = String::from_utf8(expected_message.value.clone()).unwrap();
-                                let have_str = String::from_utf8(tx_output.result.result_message).unwrap();
-                                assert_eq!(want_str, have_str,
-                                    "bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"",
-                                    tx_id, want_str, have_str);
-                            }
-                            
-                            assert_eq!(tx_expect.status.value, tx_output.result.result_status);
+                            check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
                         }
                     } else {
                         panic!("Recipient account is not a smart contract");
@@ -121,38 +103,30 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                         result: TxResult::empty(),
                     });
                 let contract_path = &tx.contract_code.value;
-                let _ = execute_tx(tx_context, contract_path, contract_map);
+                let tx_output = execute_tx(tx_context, contract_path, contract_map);
 
-                state.create_account_after_deploy(&tx_input, contract_path.clone());
+                if let Some(tx_expect) = expect {
+                    check_tx_output(tx_id.as_str(), &tx_expect, &tx_output.result);
+                }
 
-                // let deploy_tx = TxData{
-                //     from: tx.from.value.into(),
-                //     to: H256::zero(),
-                //     call_value: tx.value.value.clone(),
-                //     func_name: b"init".to_vec(),
-                //     new_contract: Some(tx.contract_code.value.clone()),
-                //     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
-                // };
-                // let result = state.execute_tx(deploy_tx, contract_map);
-                // if let Some(tx_expect) = expect {
-                //     if !tx_expect.status.check(result.result_status as u64) {
-                //         panic!("Bad tx result status");
-                //     }
-                //     if !tx_expect.out.check(result.result_values.as_slice()) {
-                //         panic!("Bad tx output");
-                //     }
-                // }
+                if tx_output.result.result_status == 0 {
+                    state.create_account_after_deploy(&tx_input, tx_output, contract_path.clone());
+                }
             },
             Step::Transfer {
                 tx_id,
                 comment,
                 tx,
-            } => {},
+            } => {
+                panic!("transfer step not yet supported");
+            },
             Step::ValidatorReward {
                 tx_id,
                 comment,
                 tx,
-            } => {},
+            } => {
+                panic!("ValidatorReward step not yet supported");
+            },
             Step::CheckState {
                 comment,
                 accounts,
@@ -162,4 +136,27 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
             },
         }
     }
+}
+
+fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
+    assert_eq!(tx_expect.out.len(), tx_result.result_values.len());
+    for (i, expected_out) in tx_expect.out.iter().enumerate() {
+        let actual_value = &tx_result.result_values[i];
+        assert!(
+            expected_out.check(actual_value.as_slice()),
+            "bad out value. Tx id: {}. Want: {}. Have: {}",
+            tx_id,
+            expected_out,
+            verbose_hex(actual_value.as_slice()));
+    }
+
+    if let Some(expected_message) = &tx_expect.message {
+        let want_str = std::str::from_utf8(expected_message.value.as_slice()).unwrap();
+        let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
+        assert_eq!(want_str, have_str,
+            "bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"",
+            tx_id, want_str, have_str);
+    }
+    
+    assert_eq!(tx_expect.status.value, tx_result.result_status);
 }

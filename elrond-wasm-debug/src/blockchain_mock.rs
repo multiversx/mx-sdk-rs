@@ -105,14 +105,18 @@ impl BlockchainMock {
     }
 
     #[allow(mutable_borrow_reservation_conflict)] // TODO: refactor
-    pub fn create_account_after_deploy(&mut self, tx: &TxInput, contract_path: Vec<u8>) {
-        if let Some(sender) = self.accounts.get(&tx.from) {
-            if let Some(new_address) = self.get_new_address(tx.from.clone(), sender.nonce) {
+    pub fn create_account_after_deploy(&mut self,
+        tx_input: &TxInput,
+        tx_output: TxOutput,
+        contract_path: Vec<u8>) {
+
+        if let Some(sender) = self.accounts.get(&tx_input.from) {
+            if let Some(new_address) = self.get_new_address(tx_input.from.clone(), sender.nonce) {
                 let old_value = self.accounts.insert(new_address.clone(), AccountData{
                     address: new_address.clone(),
                     nonce: 0,
                     balance: 0u32.into(),
-                    storage: HashMap::new(),
+                    storage: tx_output.contract_storage,
                     contract_path: Some(contract_path),
                     contract_owner: Some(sender.address.clone()),
                 });
