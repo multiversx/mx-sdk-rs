@@ -7,18 +7,22 @@ use mandos_rs::*;
 use std::path::Path;
 
 pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<TxContext>) {
-    let scenario = mandos_rs::parse_scenario(path);
-    execute_mandos_scenario(scenario, contract_map);
+    let mut state = BlockchainMock::new();
+    parse_execute_mandos_steps(path.as_ref(), &mut state, contract_map);
 }
 
-pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<TxContext>) {
-    let mut state = BlockchainMock::new();
+fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, contract_map: &ContractMap<TxContext>) {
+    let scenario = mandos_rs::parse_scenario(steps_path);
 
     for step in scenario.steps.iter() {
         match step {
             Step::ExternalSteps {
                 path,
-            } => {},
+            } => {
+                let parent_path = steps_path.parent().unwrap();
+                let new_path = parent_path.join(path);
+                parse_execute_mandos_steps(&new_path.as_path(), state, contract_map);
+            },
             Step::SetState {
                 comment,
                 accounts,
