@@ -132,32 +132,21 @@ impl BlockchainMock {
 pub fn execute_tx(
     tx_context: TxContext,
     contract_identifier: &Vec<u8>,
-    contract_map: &ContractMap) -> TxResult {
+    contract_map: &ContractMap<TxContext>) -> TxOutput {
 
     let func_name = tx_context.tx_input.func_name.clone();
     let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         contract_inst.call(func_name.as_slice());
-        TxResult {
-            result_status: 0,
-            result_message: Vec::new(),
-            result_values: Vec::new(),
-        }
+        let context = contract_inst.into_api();
+        context.into_output()
     }));
     match result {
         Ok(tx_result) => tx_result,
         Err(panic) => {
-            match panic.downcast::<String>() {
-                Ok(panic_msg) => {
-                    TxResult {
-                        result_status: 4,
-                        result_message: panic_msg.as_bytes().to_vec(),
-                        result_values: Vec::new(),
-                    }
-                }
-                Err(_) => {
-                    panic!("panic happend: unknown type.");
-                }
+            match panic.downcast::<TxPanic>() {
+                Ok(panic_obj) => TxOutput::from_panic_obj(*panic_obj),
+                Err(_) => panic!("panic happend: unknown type."),
             }
         }
     }

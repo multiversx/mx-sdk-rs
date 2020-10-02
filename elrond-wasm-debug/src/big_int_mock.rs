@@ -8,7 +8,7 @@ use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use alloc::vec::Vec;
 use elrond_wasm::BigIntApi;
 
-use num_bigint::BigInt;
+use num_bigint::{BigInt, Sign};
 use core::cmp::Ordering;
 
 #[derive(Debug)]
@@ -190,17 +190,16 @@ impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
     }
 
     fn to_signed_bytes_be(&self) -> Vec<u8> {
-        self.0.to_signed_bytes_be()
+        if self.0.sign() == Sign::NoSign {
+            Vec::new()
+        } else {
+            self.0.to_signed_bytes_be()
+        }
+        
     }
 
     fn from_signed_bytes_be(bytes: &[u8]) -> Self {
         let bi = BigInt::from_signed_bytes_be(bytes);
         bi.into()
-    }
-}
-
-impl RustBigInt {
-    pub fn to_signed_bytes_be(&self) -> Vec<u8>{
-        self.0.to_signed_bytes_be()
     }
 }

@@ -314,10 +314,12 @@ pub trait BigIntApi<BigUint>:
 }
 
 /// CallableContract is the means by which the debugger calls methods in the contract.
-pub trait CallableContract {
+pub trait CallableContract<A> {
     fn call(&self, fn_name: &[u8]) -> bool;
 
-    fn clone_contract(&self) -> Box<dyn CallableContract>;
+    fn clone_contract(&self) -> Box<dyn CallableContract<A>>;
+
+    fn into_api(self: Box<Self>) -> A;
 }
 
 /// Handy way of casting to a contract proxy trait.

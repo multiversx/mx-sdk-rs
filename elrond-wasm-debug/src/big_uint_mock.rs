@@ -274,8 +274,12 @@ impl elrond_wasm::BigUintApi for RustBigUint {
     }
 
     fn to_bytes_be(&self) -> Vec<u8> {
-        let (_, be) = self.0.to_bytes_be();
-        be
+        if self.0.sign() == Sign::NoSign {
+            Vec::new()
+        } else {
+            let (_, be) = self.0.to_bytes_be();
+            be
+        }
     }
 
     fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>> {

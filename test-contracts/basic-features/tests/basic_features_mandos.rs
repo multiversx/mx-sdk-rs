@@ -4,7 +4,7 @@ use basic_features::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn contract_map() -> ContractMap {
+fn contract_map() -> ContractMap<TxContext> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/features.wasm",
@@ -12,9 +12,17 @@ fn contract_map() -> ContractMap {
     contract_map
 }
 
+// #[test]
+// fn echo_i32() {
+//     parse_execute_mandos("mandos/echo_i32.scen.json", &contract_map());    
+// }
+
+#[test]
+fn echo_i64() {
+    parse_execute_mandos("mandos/echo_i64.scen.json", &contract_map());    
+}
+
 #[test]
 fn return_error() {
-    let contract_map = contract_map();
-    let mut state = BlockchainMock::new();
-    parse_execute_mandos("mandos/return_error.scen.json", &mut state, &contract_map);    
+    parse_execute_mandos("mandos/return_error.scen.json", &contract_map());    
 }

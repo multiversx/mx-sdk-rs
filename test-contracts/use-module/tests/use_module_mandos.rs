@@ -4,7 +4,7 @@ use use_module::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn contract_map() -> ContractMap {
+fn contract_map() -> ContractMap<TxContext> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/use_module.wasm",
@@ -14,9 +14,5 @@ fn contract_map() -> ContractMap {
 
 #[test]
 fn use_module_features() {
-    let contract_map = contract_map();
-
-    let mut state = BlockchainMock::new();
-
-    parse_execute_mandos("mandos/use_module_features.scen.json", &mut state, &contract_map);
+    parse_execute_mandos("mandos/use_module_features.scen.json", &contract_map());
 }

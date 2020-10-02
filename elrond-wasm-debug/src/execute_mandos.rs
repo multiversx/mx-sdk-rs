@@ -5,12 +5,14 @@ use elrond_wasm::*;
 use mandos_rs::*;
 use std::path::Path;
 
-pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, state: &mut BlockchainMock, contract_map: &ContractMap) {
+pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<TxContext>) {
     let scenario = mandos_rs::parse_scenario(path);
-    execute_mandos_scenario(scenario, state, contract_map);
+    execute_mandos_scenario(scenario, contract_map);
 }
 
-pub fn execute_mandos_scenario(scenario: Scenario, state: &mut BlockchainMock, contract_map: &ContractMap) {
+pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<TxContext>) {
+    let mut state = BlockchainMock::new();
+
     for step in scenario.steps.iter() {
         match step {
             Step::ExternalSteps {
@@ -58,20 +60,31 @@ pub fn execute_mandos_scenario(scenario: Scenario, state: &mut BlockchainMock, c
                     if let Some(contract_path) = &account.contract_path {
                         let tx_context = TxContext::new(
                             tx_input,
-                            TxMutableContext{
+                            TxOutput{
                                 contract_storage: account.storage.clone(),
                                 result: TxResult::empty(),
                             });
-                        let tx_result = execute_tx(tx_context, contract_path, contract_map);
+                        let tx_output = execute_tx(tx_context, contract_path, contract_map);
 
                         if let Some(tx_expect) = expect {
+                            assert_eq!(tx_expect.out.len(), tx_output.result.result_values.len());
+                            for (i, expected_out) in tx_expect.out.iter().enumerate() {
+                                let actual_value = &tx_output.result.result_values[i];
+                                assert!(
+                                    expected_out.check(actual_value.as_slice()),
+                                    "bad out value. Tx id: {}. Want: {}. Have: {}",
+                                    tx_id,
+                                    expected_out,
+                                    verbose_hex(actual_value.as_slice()));
+                            }
+
                             if let Some(expected_message) = &tx_expect.message {
                                 assert_eq!(
                                     String::from_utf8(expected_message.value.clone()), 
-                                    String::from_utf8(tx_result.result_message));
+                                    String::from_utf8(tx_output.result.result_message));
                             }
                             
-                            assert_eq!(tx_expect.status.value as i32, tx_result.result_status);
+                            assert_eq!(tx_expect.status.value, tx_output.result.result_status);
                         }
                     } else {
                         panic!("Recipient account is not a smart contract");
@@ -96,7 +109,7 @@ pub fn execute_mandos_scenario(scenario: Scenario, state: &mut BlockchainMock, c
                 };
                 let tx_context = TxContext::new(
                     tx_input.clone(),
-                    TxMutableContext{
+                    TxOutput{
                         contract_storage: HashMap::new(),
                         result: TxResult::empty(),
                     });

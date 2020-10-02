@@ -6,11 +6,11 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use std::collections::HashMap;
 
-pub struct ContractMap {
-    factories: HashMap<Vec<u8>, Box<dyn Fn(TxContext) -> Box<dyn CallableContract>>>,
+pub struct ContractMap<A> {
+    factories: HashMap<Vec<u8>, Box<dyn Fn(TxContext) -> Box<dyn CallableContract<A>>>>,
 }
 
-impl ContractMap {
+impl<A> ContractMap<A> {
     pub fn new() -> Self {
         ContractMap{
             factories: HashMap::new()
@@ -20,7 +20,7 @@ impl ContractMap {
     pub fn new_contract_instance(&self,
         contract_identifier: &Vec<u8>,
         tx_context: TxContext,
-    ) -> Box<dyn CallableContract> {
+    ) -> Box<dyn CallableContract<A>> {
 
         if let Some(new_contract_closure) = self.factories.get(contract_identifier) {
             new_contract_closure(tx_context)
@@ -31,7 +31,7 @@ impl ContractMap {
 
     pub fn register_contract(&mut self,
         path: &str,
-        new_contract_closure: Box<dyn Fn(TxContext) -> Box<dyn CallableContract>>) {
+        new_contract_closure: Box<dyn Fn(TxContext) -> Box<dyn CallableContract<A>>>) {
 
         self.factories.insert(path.as_bytes().to_vec(), new_contract_closure);
     }

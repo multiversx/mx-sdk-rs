@@ -35,11 +35,13 @@ pub fn address_hex(address: &H256) -> alloc::string::String {
     alloc::format!("0x{}", hex::encode(address.as_bytes()))
 }
 
-pub fn key_hex(address: &[u8]) -> alloc::string::String {
-    alloc::format!("0x{}", hex::encode(address))
+pub fn key_hex(key: &[u8]) -> alloc::string::String {
+    alloc::format!("0x{}", hex::encode(key))
 }
 
-
+pub fn verbose_hex(value: &[u8]) -> alloc::string::String {
+    alloc::format!("0x{}", hex::encode(value))
+}
 
 // impl fmt::Display for TxData {
 //     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
