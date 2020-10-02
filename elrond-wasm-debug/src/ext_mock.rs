@@ -124,12 +124,26 @@ impl Default for TxOutput {
 }
 
 impl TxOutput {
-    pub fn from_panic_obj(panic_obj: TxPanic) -> Self {
+    pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult {
                 result_status: panic_obj.status,
-                result_message: panic_obj.message,
+                result_message: panic_obj.message.clone(),
+                result_values: Vec::new(),
+            },
+        }
+    }
+
+    pub fn from_panic_string(panic_string: &str) -> Self {
+        let mut message = b"panic occurred: ".to_vec();
+        message.extend_from_slice(panic_string.as_bytes());
+
+        TxOutput {
+            contract_storage: HashMap::new(),
+            result: TxResult {
+                result_status: 4,
+                result_message: message,
                 result_values: Vec::new(),
             },
         }

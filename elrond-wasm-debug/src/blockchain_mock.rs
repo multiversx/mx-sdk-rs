@@ -143,11 +143,18 @@ pub fn execute_tx(
     }));
     match result {
         Ok(tx_result) => tx_result,
-        Err(panic) => {
-            match panic.downcast::<TxPanic>() {
-                Ok(panic_obj) => TxOutput::from_panic_obj(*panic_obj),
-                Err(_) => panic!("panic happend: unknown type."),
-            }
-        }
+        Err(panic_any) => panic_result(panic_any),
     }
+}
+
+fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
+    if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
+        return TxOutput::from_panic_obj(panic_obj);
+    }
+
+    if let Some(panic_string) = panic_any.downcast_ref::<String>() {
+        return TxOutput::from_panic_string(panic_string.as_str());
+    }
+
+    panic!("panic happened: unknown type.")
 }
