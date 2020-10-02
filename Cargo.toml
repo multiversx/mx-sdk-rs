@@ -22,4 +22,5 @@ members = [
 exclude = [
   "elrond-wasm-node",
   "elrond-wasm-output",
+  "tools",
 ]
