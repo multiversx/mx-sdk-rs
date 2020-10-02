@@ -20,7 +20,7 @@ fn main() {
     //     storage: HashMap::new(),
     //     contract: None,
     // });
-    // let scenario = mandos_rs::parse_scenario("mandos/adder.scen.json");
+    // let scenario = mandos::parse_scenario("mandos/adder.scen.json");
     // print!("{:?}", scenario);
 
 
