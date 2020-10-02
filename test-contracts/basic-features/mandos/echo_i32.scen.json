@@ -178,7 +178,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:argument out of range",
+                "message": "str:argument decode error (i): input out of range",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -201,7 +201,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:argument out of range",
+                "message": "str:argument decode error (i): input out of range",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

@@ -12,15 +12,70 @@ fn contract_map() -> ContractMap<TxContext> {
     contract_map
 }
 
-// #[test]
-// fn echo_i32() {
-//     parse_execute_mandos("mandos/echo_i32.scen.json", &contract_map());    
-// }
+#[test]
+fn count_ones() {
+    parse_execute_mandos("mandos/count_ones.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_array_u8() {
+    parse_execute_mandos("mandos/echo_array_u8.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_async_result_empty() {
+    parse_execute_mandos("mandos/echo_async_result_empty.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_i32() {
+    parse_execute_mandos("mandos/echo_i32.scen.json", &contract_map());    
+}
 
 #[test]
 fn echo_i64() {
     parse_execute_mandos("mandos/echo_i64.scen.json", &contract_map());    
 }
+
+#[test]
+fn echo_multi_i32() {
+    parse_execute_mandos("mandos/echo_multi_i32.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_nothing() {
+    parse_execute_mandos("mandos/echo_nothing.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_u64() {
+    parse_execute_mandos("mandos/echo_u64.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_usize() {
+    parse_execute_mandos("mandos/echo_usize.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_varags_tuples() {
+    parse_execute_mandos("mandos/echo_varags_tuples.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_varargs_u32() {
+    parse_execute_mandos("mandos/echo_varargs_u32.scen.json", &contract_map());    
+}
+
+#[test]
+fn echo_vec_u8() {
+    parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());    
+}
+
+// #[test]
+// fn panic() {
+//     parse_execute_mandos("mandos/panic.scen.json", &contract_map());    
+// }
 
 #[test]
 fn return_error() {
