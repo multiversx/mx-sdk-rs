@@ -72,10 +72,10 @@ fn echo_vec_u8() {
     parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());    
 }
 
-// #[test]
-// fn panic() {
-//     parse_execute_mandos("mandos/panic.scen.json", &contract_map());    
-// }
+#[test]
+fn panic() {
+    parse_execute_mandos("mandos/panic.scen.json", &contract_map());    
+}
 
 #[test]
 fn return_error() {
