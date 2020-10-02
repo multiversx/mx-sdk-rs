@@ -1,0 +1,16 @@
+{
+    "name": "test external steps resolution, does something minimal that we can check",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "3",
+                    "balance": "5",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

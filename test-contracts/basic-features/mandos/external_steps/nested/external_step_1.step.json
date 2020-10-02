@@ -1,0 +1,9 @@
+{
+    "name": "test external steps resolution",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "../external_step_2.step.json"
+        }
+    ]
+}
