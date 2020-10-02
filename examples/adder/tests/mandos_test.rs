@@ -8,7 +8,7 @@ fn contract_map() -> ContractMap<TxContext> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/adder.wasm",
-        Box::new(|mock_ref| Box::new(AdderImpl::new(mock_ref))));
+        Box::new(|context| Box::new(AdderImpl::new(context))));
     contract_map
 }
 

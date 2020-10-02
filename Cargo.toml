@@ -12,7 +12,6 @@ members = [
   "examples/crypto-bubbles",
   "examples/factorial",
   "examples/simple-erc20",
-  "examples/simple-erc20/debug",
 
   "test-contracts/async-alice",
   "test-contracts/async-bob",
