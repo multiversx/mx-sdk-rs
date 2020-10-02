@@ -8,7 +8,7 @@ fn contract_map() -> ContractMap<TxContext> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/features.wasm",
-        Box::new(|mock_ref| Box::new(BasicFeaturesImpl::new(mock_ref))));
+        Box::new(|context| Box::new(BasicFeaturesImpl::new(context))));
     contract_map
 }
 
