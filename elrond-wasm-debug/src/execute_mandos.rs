@@ -1,6 +1,7 @@
 #![allow(unused_variables)] // for now
 
 use super::*;
+use num_bigint::BigUint;
 use elrond_wasm::*;
 use mandos_rs::*;
 use std::path::Path;
@@ -52,36 +53,44 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                 let tx_input = TxInput{
                     from: tx.from.value.into(),
                     to: tx.to.value.into(),
-                    call_value: tx.value.value.clone(),
+                    call_value: tx.call_value.value.clone(),
                     func_name: tx.function.as_bytes().to_vec(),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
-                if let Some(contract_account) = state.accounts.get_mut(&tx.to.value.into()) {
-                    if let Some(contract_path) = &contract_account.contract_path {
-                        let tx_context = TxContext::new(
-                            tx_input,
-                            TxOutput{
-                                contract_storage: contract_account.storage.clone(),
-                                result: TxResult::empty(),
-                            });
-                        let tx_output = execute_tx(tx_context, contract_path, contract_map);
-                        let tx_result = tx_output.result;
 
-                        if tx_result.result_status == 0 {
-                            // replace storage with new one
-                            let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
-                        }
-
-                        if let Some(tx_expect) = expect {
-                            check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
-                        }
-                    } else {
-                        panic!("Recipient account is not a smart contract");
-                    }
-                } else {
-                    panic!("Account not found");
-                }
+                state.subtract_tx_payment(
+                    &tx.from.value.into(),
+                    &tx.call_value.value,
+                    tx.gas_limit.value, tx.gas_price.value);
                 
+                let contract_account = state.accounts
+                    .get_mut(&tx.to.value.into())
+                    .unwrap_or_else(|| panic!("Recipient account not found"));
+
+                let contract_path = &contract_account.contract_path.clone()
+                    .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
+                    
+                let tx_context = TxContext::new(
+                    tx_input,
+                    TxOutput{
+                        contract_storage: contract_account.storage.clone(),
+                        result: TxResult::empty(),
+                    });
+                let tx_output = execute_tx(tx_context, contract_path, contract_map);
+                let tx_result = tx_output.result;
+
+                if tx_result.result_status == 0 {
+                    // replace storage with new one
+                    let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
+
+                    state.increase_balance(&tx.to.value.into(), &tx.call_value.value);
+                } else {
+                    state.increase_balance(&tx.from.value.into(), &tx.call_value.value);
+                }
+
+                if let Some(tx_expect) = expect {
+                    check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
+                }
             },
             Step::ScDeploy {
                 tx_id,
@@ -92,10 +101,16 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                 let tx_input = TxInput{
                     from: tx.from.value.into(),
                     to: H256::zero(),
-                    call_value: tx.value.value.clone(),
+                    call_value: tx.call_value.value.clone(),
                     func_name: b"init".to_vec(),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
+
+                state.subtract_tx_payment(
+                    &tx.from.value.into(),
+                    &tx.call_value.value,
+                    tx.gas_limit.value, tx.gas_price.value);
+
                 let tx_context = TxContext::new(
                     tx_input.clone(),
                     TxOutput{
@@ -110,7 +125,13 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
                 }
 
                 if tx_output.result.result_status == 0 {
-                    state.create_account_after_deploy(&tx_input, tx_output, contract_path.clone());
+                    state.create_account_after_deploy(
+                        &tx_input,
+                        tx_output,
+                        tx.call_value.value.clone(),
+                        contract_path.clone());
+                } else {
+                    state.increase_balance(&tx.from.value.into(), &tx.call_value.value);
                 }
             },
             Step::Transfer {
@@ -130,7 +151,18 @@ pub fn execute_mandos_scenario(scenario: Scenario, contract_map: &ContractMap<Tx
             Step::CheckState {
                 comment,
                 accounts,
-            } => {},
+            } => {
+                for (address, expected_account) in accounts.accounts.iter() {
+                    if let Some(account) = state.accounts.get(&address.value.into()) {
+                        assert!(
+                            expected_account.balance.check(&account.balance),
+                            "bad account balance. Address: {}. Want: {}. Have: {}",
+                            address,
+                            expected_account.balance,
+                            account.balance);
+                    }
+                }
+            },
             Step::DumpState {..} => {
                 state.print_accounts();
             },
