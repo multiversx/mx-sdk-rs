@@ -1,0 +1,58 @@
+{
+    "name": "test external steps resolution",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "validatorReward",
+            "txId": "1",
+            "tx": {
+                "to": "address:A",
+                "value": "100"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {
+                        "str:ELRONDreward": "100"
+                    },
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "validatorReward",
+            "txId": "2",
+            "tx": {
+                "to": "address:A",
+                "value": "50"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "150",
+                    "storage": {
+                        "str:ELRONDreward": "150"
+                    },
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

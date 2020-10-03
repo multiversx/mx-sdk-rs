@@ -154,7 +154,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                 comment,
                 tx,
             } => {
-                panic!("ValidatorReward step not yet supported");
+                state.increase_validator_reward(&tx.to.value.into(), &tx.value.value);
             },
             Step::CheckState {
                 comment,

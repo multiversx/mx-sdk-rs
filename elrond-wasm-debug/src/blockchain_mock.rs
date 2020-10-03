@@ -15,7 +15,7 @@ use elrond_wasm::BigUintApi;
 use elrond_wasm::err_msg;
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::cast::ToPrimitive;
+use num_traits::{cast::ToPrimitive, Zero};
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -27,9 +27,7 @@ use std::fmt::Write;
 use core::cell::RefCell;
 use alloc::rc::Rc;
 
-const ADDRESS_LENGTH: usize = 32;
-const KEY_LENGTH: usize = 32;
-const TOPIC_LENGTH: usize = 32;
+const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
 pub struct AccountData {
     pub address: Address,
@@ -167,6 +165,20 @@ impl BlockchainMock {
         }
 
         new_address
+    }
+
+    pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
+        let account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Account not found"));
+        account.balance += amount;
+        let mut storage_v_rew = if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY){
+            BigUint::from_bytes_be(old_storage_value)
+        } else {
+            BigUint::zero()
+        };
+        storage_v_rew += amount;
+        account.storage.insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
     }
 }
 

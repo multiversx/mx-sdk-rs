@@ -24,7 +24,6 @@ use alloc::rc::Rc;
 use sha3::{Sha3_256, Keccak256, Digest};
 
 const ADDRESS_LENGTH: usize = 32;
-const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
 
 pub struct TxPanic {
