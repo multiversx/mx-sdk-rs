@@ -18,3 +18,7 @@ fn transfer() {
     parse_execute_mandos("tests/mandos/transfer.scen.json", &contract_map());    
 }
 
+#[test]
+fn validator_reward() {
+    parse_execute_mandos("tests/mandos/validatorReward.scen.json", &contract_map());    
+}
