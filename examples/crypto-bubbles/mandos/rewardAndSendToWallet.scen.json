@@ -19,6 +19,12 @@
                         "0xde01ec8c240238f576e7126d8ddbfda535b64c6c22c150b2e08df20e226d9359": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "0xacc1000000000000000000000000000000000000000000000000000000000000": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
                 }
             }
         },
