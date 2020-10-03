@@ -269,8 +269,12 @@ impl elrond_wasm::BigUintApi for RustBigUint {
         panic!("copy_to_slice not yet implemented")
     }
 
-    fn copy_to_array_big_endian_pad_right(&self, _target: &mut [u8; 32]) {
-        panic!("copy_to_array_big_endian_pad_right not yet implemented")
+    fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
+        if self.0.sign() == Sign::Plus {
+            let (_, bytes) = self.0.to_bytes_be();
+            let offset = 32 - bytes.len();
+            target[offset..].clone_from_slice(&bytes[..]);
+        }
     }
 
     fn to_bytes_be(&self) -> Vec<u8> {
@@ -290,7 +294,7 @@ impl elrond_wasm::BigUintApi for RustBigUint {
             Ordering::Less => {
                 let mut res = vec![0u8; nr_bytes];
                 let offset = nr_bytes - bytes_be.len();
-                res[offset..(bytes_be.len()-1 + offset)].clone_from_slice(&bytes_be[..bytes_be.len()-1]);
+                res[offset..].clone_from_slice(&bytes_be[..]);
                 Some(res)
             }
         }

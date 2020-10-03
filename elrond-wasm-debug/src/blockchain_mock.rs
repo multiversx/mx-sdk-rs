@@ -104,15 +104,21 @@ impl BlockchainMock {
         }
     }
 
-    pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint) {
+        let sender_account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Sender account not found"));
+        assert!(&sender_account.balance >= call_value, "Not enough balance to send tx payment");
+        sender_account.balance -= call_value;
+    }
+
+    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
         let sender_account = self.accounts
             .get_mut(address)
             .unwrap_or_else(|| panic!("Sender account not found"));
         let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
         assert!(sender_account.balance >= gas_cost, "Not enough balance to pay gas upfront");
         sender_account.balance -= &gas_cost;
-        assert!(&sender_account.balance >= call_value, "Not enough balance to send tx payment");
-        sender_account.balance -= call_value;
     }
 
     pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
@@ -120,6 +126,13 @@ impl BlockchainMock {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Receiver account not found"));
         account.balance += amount;
+    }
+
+    pub fn send_balance(&mut self, contract_address: &Address, send_balance_list: &[SendBalance]) {
+        for send_balance in send_balance_list {
+            self.subtract_tx_payment(contract_address, &send_balance.amount);
+            self.increase_balance(&send_balance.recipient, &send_balance.amount);
+        }
     }
 
     pub fn increase_nonce(&mut self, address: &Address) {
@@ -131,9 +144,9 @@ impl BlockchainMock {
 
     pub fn create_account_after_deploy(&mut self,
         tx_input: &TxInput,
-        tx_output: TxOutput,
+        new_storage: HashMap<Vec<u8>, Vec<u8>>,
         call_value: BigUint,
-        contract_path: Vec<u8>) {
+        contract_path: Vec<u8>) -> Address {
 
         let sender = self.accounts.get(&tx_input.from)
             .unwrap_or_else(|| panic!("Unknown deployer"));
@@ -145,13 +158,15 @@ impl BlockchainMock {
             address: new_address.clone(),
             nonce: 0,
             balance: call_value,
-            storage: tx_output.contract_storage,
+            storage: new_storage,
             contract_path: Some(contract_path),
             contract_owner: Some(tx_input.from.clone()),
         });
         if old_value.is_some() {
             panic!("Account already exists at deploy address.");
         }
+
+        new_address
     }
 }
 

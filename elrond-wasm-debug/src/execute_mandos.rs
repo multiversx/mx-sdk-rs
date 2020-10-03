@@ -62,10 +62,10 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
 
-                state.increase_nonce(&tx.from.value.into());
-                state.subtract_tx_payment(&tx.from.value.into(),
-                    &tx.call_value.value,
-                    tx.gas_limit.value, tx.gas_price.value);
+                let sender_address = &tx.from.value.into();
+                state.increase_nonce(sender_address);
+                state.subtract_tx_payment(sender_address, &tx.call_value.value);
+                state.subtract_tx_gas(sender_address, tx.gas_limit.value, tx.gas_price.value);
                 
                 let contract_account = state.accounts
                     .get_mut(&tx.to.value.into())
@@ -79,6 +79,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     TxOutput{
                         contract_storage: contract_account.storage.clone(),
                         result: TxResult::empty(),
+                        send_balance_list: Vec::new(),
                     });
                 let tx_output = execute_tx(tx_context, contract_path, contract_map);
                 let tx_result = tx_output.result;
@@ -88,8 +89,9 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
 
                     state.increase_balance(&tx.to.value.into(), &tx.call_value.value);
+                    state.send_balance(&tx.to.value.into(), tx_output.send_balance_list.as_slice());
                 } else {
-                    state.increase_balance(&tx.from.value.into(), &tx.call_value.value);
+                    state.increase_balance(sender_address, &tx.call_value.value);
                 }
 
                 if let Some(tx_expect) = expect {
@@ -110,17 +112,14 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
                 };
 
-                state.increase_nonce(&tx.from.value.into());
-                state.subtract_tx_payment(&tx.from.value.into(),
-                    &tx.call_value.value,
-                    tx.gas_limit.value, tx.gas_price.value);
+                let sender_address = &tx.from.value.into();
+                state.increase_nonce(sender_address);
+                state.subtract_tx_payment(sender_address, &tx.call_value.value);
+                state.subtract_tx_gas(sender_address, tx.gas_limit.value, tx.gas_price.value);
 
                 let tx_context = TxContext::new(
                     tx_input.clone(),
-                    TxOutput{
-                        contract_storage: HashMap::new(),
-                        result: TxResult::empty(),
-                    });
+                    TxOutput::default());
                 let contract_path = &tx.contract_code.value;
                 let tx_output = execute_tx(tx_context, contract_path, contract_map);
 
@@ -129,13 +128,14 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                 }
 
                 if tx_output.result.result_status == 0 {
-                    state.create_account_after_deploy(
+                    let new_address = state.create_account_after_deploy(
                         &tx_input,
-                        tx_output,
+                        tx_output.contract_storage,
                         tx.call_value.value.clone(),
                         contract_path.clone());
+                    state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
                 } else {
-                    state.increase_balance(&tx.from.value.into(), &tx.call_value.value);
+                    state.increase_balance(sender_address, &tx.call_value.value);
                 }
             },
             Step::Transfer {

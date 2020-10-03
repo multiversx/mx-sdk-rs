@@ -7,19 +7,16 @@ use crate::big_uint_mock::*;
 use crate::display_util::*;
 
 use elrond_wasm::ContractHookApi;
-// use elrond_wasm::CallableContract;
 use elrond_wasm::{BigUintApi, BigIntApi};
 use elrond_wasm::err_msg;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::cast::ToPrimitive;
 
-// use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 use std::collections::HashMap;
 use std::fmt;
-// use std::fmt::Write;
 
 use core::cell::RefCell;
 use alloc::rc::Rc;
@@ -109,9 +106,17 @@ impl TxResult {
 }
 
 #[derive(Debug)]
+pub struct SendBalance {
+    pub recipient: Address,
+    pub amount: BigUint,
+}
+
+#[derive(Debug)]
 pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
     pub result: TxResult,
+    pub send_balance_list: Vec<SendBalance>,
+
 }
 
 impl Default for TxOutput {
@@ -119,6 +124,7 @@ impl Default for TxOutput {
         TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult::empty(),
+            send_balance_list: Vec::new(),
         }
     }
 }
@@ -132,6 +138,7 @@ impl TxOutput {
                 result_message: panic_obj.message.clone(),
                 result_values: Vec::new(),
             },
+            send_balance_list: Vec::new(),
         }
     }
 
@@ -146,6 +153,7 @@ impl TxOutput {
                 result_message: message,
                 result_values: Vec::new(),
             },
+            send_balance_list: Vec::new(),
         }
     }
 }
@@ -178,10 +186,7 @@ impl TxContext {
                 func_name: Vec::new(),
                 args: Vec::new(),
             },
-            tx_output_cell: Rc::new(RefCell::new(TxOutput{
-                contract_storage: HashMap::new(),
-                result: TxResult::empty(),
-            })),
+            tx_output_cell: Rc::new(RefCell::new(TxOutput::default())),
         }
     }
 }
@@ -324,22 +329,12 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.tx_input.call_value.clone().into()
     }
 
-    fn send_tx(&self, _to: &Address, _amount: &RustBigUint, _message: &str) {
-        // let owner = self.get_sc_address();
-        // let mut state = self.tx_output_cell.borrow_mut();
-        // match state.accounts.get_mut(&owner) {
-        //     None => panic!("Account not found!"),
-        //     Some(acct) => {
-        //         acct.balance -= amount.value();
-        //     }
-        // } 
-        // match state.accounts.get_mut(to) {
-        //     None => panic!("Account not found!"),
-        //     Some(acct) => {
-        //         acct.balance += amount.value();
-        //     }
-        // }
-        panic!("send_tx not yet implemented");
+    fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.send_balance_list.push(SendBalance{
+            recipient: to.clone(),
+            amount: amount.value()
+        })
     }
 
     fn async_call(&self, _to: &Address, _amount: &RustBigUint, _data: &[u8]) {
@@ -474,6 +469,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
-        println!("write_log not yet implemented");
+        // does nothing yet
+        // TODO: implement at some point
     }
 }
