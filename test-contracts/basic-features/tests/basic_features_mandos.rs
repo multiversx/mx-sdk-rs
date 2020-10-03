@@ -12,13 +12,6 @@ fn contract_map() -> ContractMap<TxContext> {
     contract_map
 }
 
-/// This one doesn't really test the contract, but the testing framework.
-/// It just checks that externalSteps work fine.
-#[test]
-fn external_steps() {
-    parse_execute_mandos("mandos/external_steps/external_steps.scen.json", &contract_map());    
-}
-
 #[test]
 fn count_ones() {
     parse_execute_mandos("mandos/count_ones.scen.json", &contract_map());    
