@@ -1,6 +1,6 @@
 [package]
 name = "use-module"
-version = "0.0.1"
+version = "0.0.0"
 authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 
