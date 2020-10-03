@@ -4,13 +4,13 @@
         {
             "step": "setState",
             "accounts": {
-                "``features_contract_____________s0": {
+                "address:features_contract": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {},
                     "code": "file:../output/features.wasm"
                 },
-                "``an_account____________________s0": {
+                "address:an_account": {
                     "nonce": "0",
                     "balance": "0x300abc",
                     "storage": {},
@@ -22,8 +22,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "panicWithMessage",
                 "arguments": [],
@@ -42,13 +42,13 @@
         {
             "step": "checkState",
             "accounts": {
-                "``features_contract_____________s0": {
+                "address:features_contract": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {},
                     "code": "file:../output/features.wasm"
                 },
-                "``an_account____________________s0": {
+                "address:an_account": {
                     "nonce": "1",
                     "balance": "0x200abc",
                     "storage": {},

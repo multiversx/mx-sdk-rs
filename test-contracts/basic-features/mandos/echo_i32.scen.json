@@ -4,13 +4,13 @@
         {
             "step": "setState",
             "accounts": {
-                "``features_contract_____________s0": {
+                "address:features_contract": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {},
                     "code": "file:../output/features.wasm"
                 },
-                "``an_account____________________s0": {
+                "address:an_account": {
                     "nonce": "0",
                     "balance": "0x900abc",
                     "storage": {},
@@ -22,8 +22,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -46,8 +46,8 @@
             "step": "scCall",
             "txId": "2",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -70,8 +70,8 @@
             "step": "scCall",
             "txId": "3",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -94,8 +94,8 @@
             "step": "scCall",
             "txId": "4",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -117,8 +117,8 @@
             "step": "scCall",
             "txId": "5",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -141,8 +141,8 @@
             "step": "scCall",
             "txId": "6",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -165,8 +165,8 @@
             "step": "scCall",
             "txId": "7",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -188,8 +188,8 @@
             "step": "scCall",
             "txId": "8",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "echo_i32",
                 "arguments": [
@@ -210,13 +210,13 @@
         {
             "step": "checkState",
             "accounts": {
-                "``features_contract_____________s0": {
+                "address:features_contract": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {},
                     "code": "file:../output/features.wasm"
                 },
-                "``an_account____________________s0": {
+                "address:an_account": {
                     "nonce": "8",
                     "balance": "0x100abc",
                     "storage": {},

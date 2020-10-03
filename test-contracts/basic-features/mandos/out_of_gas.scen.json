@@ -4,13 +4,13 @@
         {
             "step": "setState",
             "accounts": {
-                "``features_contract_____________s0": {
+                "address:features_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../output/features.wasm"
                 },
-                "``an_account____________________s0": {
+                "address:an_account": {
                     "nonce": "0",
                     "balance": "100000000000000000",
                     "storage": {},
@@ -22,8 +22,8 @@
             "step": "scCall",
             "txId": "oog",
             "tx": {
-                "from": "``an_account____________________s0",
-                "to": "``features_contract_____________s0",
+                "from": "address:an_account",
+                "to": "address:features_contract",
                 "value": "0",
                 "function": "store_map3",
                 "arguments": [
