@@ -6,5 +6,5 @@ edition = "2018"
 
 [dependencies]
 adder = { path = ".." }
-elrond-wasm = { version = "0.6.2", path = "../../../elrond-wasm" }
-elrond-wasm-debug = { version = "0.6.2", path = "../../../elrond-wasm-debug" }
+elrond-wasm = { version = "0.7.0", path = "../../../elrond-wasm" }
+elrond-wasm-debug = { version = "0.7.0", path = "../../../elrond-wasm-debug" }
