@@ -143,7 +143,11 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                 comment,
                 tx,
             } => {
-                panic!("transfer step not yet supported");
+                let sender_address = &tx.from.value.into();
+                state.increase_nonce(sender_address);
+                state.subtract_tx_payment(sender_address, &tx.value.value);
+                let recipient_address = &tx.to.value.into();
+                state.increase_balance(recipient_address, &tx.value.value);
             },
             Step::ValidatorReward {
                 tx_id,
