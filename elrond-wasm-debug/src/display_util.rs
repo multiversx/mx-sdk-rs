@@ -35,21 +35,3 @@ pub fn key_hex(key: &[u8]) -> alloc::string::String {
 pub fn verbose_hex(value: &[u8]) -> alloc::string::String {
     alloc::format!("0x{}", hex::encode(value))
 }
-
-// impl fmt::Display for TxData {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         write!(f, "TxData {{ func: {}, args: {:?}, call_value: {}, from: 0x{}, to: 0x{}\n}}", 
-//             String::from_utf8(self.func_name.clone()).unwrap(), 
-//             self.args, 
-//             self.call_value,
-//             address_hex(&self.from), 
-//             address_hex(&self.to))
-//     }
-// }
-
-// impl fmt::Display for TxResult {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         let results_hex: Vec<String> = self.result_values.iter().map(|r| format!("0x{}", hex::encode(r))).collect();
-//         write!(f, "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}", self.result_status, results_hex)
-//     }
-// }

@@ -52,26 +52,6 @@ impl fmt::Display for TxInput {
 }
 
 impl TxInput {
-    // pub fn new_create(new_contract: Vec<u8>, from: Address, to: Address) -> Self {
-    //     TxInput{
-    //         func_name: b"init".to_vec(),
-    //         args: Vec::new(),
-    //         call_value: 0u32.into(),
-    //         from,
-    //         to,
-    //     }
-    // }
-
-    // pub fn new_call(func_name: &'static str, from: Address, to: Address) -> Self {
-    //     TxInput{
-    //         func_name: func_name.as_bytes().to_vec(),
-    //         args: Vec::new(),
-    //         call_value: 0u32.into(),
-    //         from,
-    //         to,
-    //     }
-    // }
-
     pub fn add_arg(&mut self, arg: Vec<u8>) {
         self.args.push(arg);
     }
@@ -217,23 +197,6 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     fn get_owner_address(&self) -> Address {
         self.get_caller() // TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // let state = self.tx_output_cell.borrow();
-        // match &state.current_tx {
-        //     None => panic!("Tx not initialized!"),
-        //     Some(tx) => {
-        //         match state.accounts.get(&tx.to) {
-        //             None => panic!("Account not found!"),
-        //             Some(acct) => {
-        //                 if let Some(contract_owner) = &acct.contract_owner {
-        //                     contract_owner.clone()
-        //                 } else {
-        //                     panic!("Account is not a contract or does not have and owner specified")
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        // panic!("get_owner_address not yet implemented")
     }
 
     fn get_caller(&self) -> Address {
@@ -241,18 +204,6 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_balance(&self, _address: &Address) -> RustBigUint {
-        // let state = self.tx_output_cell.borrow();
-        // match &state.current_tx {
-        //     None => panic!("Tx not initialized!"),
-        //     Some(tx) => {
-        //         match state.accounts.get(&tx.to) {
-        //             None => panic!("Account not found!"),
-        //             Some(acct) => {
-        //                 acct.balance.clone().into()
-        //             }
-        //         }
-        //     }
-        // }
         panic!("get balance not yet implemented")
     }
 

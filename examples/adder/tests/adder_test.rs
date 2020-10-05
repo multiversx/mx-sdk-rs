@@ -1,7 +1,6 @@
 
 extern crate adder;
 use adder::*;
-// use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 #[test]
