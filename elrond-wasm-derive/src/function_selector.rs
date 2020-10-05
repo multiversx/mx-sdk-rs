@@ -42,6 +42,7 @@ pub fn generate_function_selector_body(contract: &Contract) -> proc_macro2::Toke
             .collect();
     quote! {      
         if match fn_name {
+            b"callBack" => { self.callback(); return true; }
             #(#match_arms)*
             other => false
         } {

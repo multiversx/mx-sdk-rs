@@ -41,6 +41,7 @@ pub struct TxInput {
     pub args: Vec<Vec<u8>>,
     pub gas_limit: u64,
     pub gas_price: u64,
+    pub tx_hash: H256,
 }
 
 impl fmt::Display for TxInput {
@@ -193,6 +194,7 @@ impl TxContext {
                 args: Vec::new(),
                 gas_limit: 0,
                 gas_price: 0,
+                tx_hash: b"dummy...........................".into(),
             },
             tx_output_cell: Rc::new(RefCell::new(TxOutput::default())),
         }
@@ -283,11 +285,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
-        let mut vector = Vec::with_capacity(32);
-        for i in value.iter() {
-            vector.push(*i);
-        }
-        self.storage_store(key, &vector);
+        self.storage_store(key, &value[..].to_vec());
     }
     
     fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
@@ -295,10 +293,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         let mut res = [0u8; 32];
         let offset = 32 - value.len();
         if !value.is_empty() {
-            res[offset..(value.len()-1 + offset)].clone_from_slice(&value[..value.len()-1]);
-            // for i in 0..value.len()-1 {
-            //     res[offset+i] = value[i];
-            // }
+            res[offset..].clone_from_slice(&value[..]);
         }
         res
     }
@@ -351,11 +346,12 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
             to: to.clone(),
             call_value: amount.value(),
             call_data: data.to_vec(),
+            tx_hash: self.get_tx_hash(),
         });
     }
 
     fn get_tx_hash(&self) -> H256 {
-        panic!("get_tx_hash not yet implemented");
+        self.tx_input.tx_hash.clone()
     }
 
     fn get_gas_left(&self) -> i64 {
@@ -424,7 +420,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         let arg = self.get_argument_vec(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
-        res[offset..(arg.len()-1 + offset)].clone_from_slice(&arg[..arg.len()-1]);
+        res[offset..].copy_from_slice(&arg[..]);
         res
     }
     
