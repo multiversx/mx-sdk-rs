@@ -30,7 +30,7 @@ pub trait MessageMeWithCallback {
     fn messageMe(&self, arg1: i64, arg2: BigUint, arg3: Vec<u8>, arg4: Address);
 }
 
-#[elrond_wasm_derive::contract(BobImpl)]
+#[elrond_wasm_derive::contract(AliceImpl)]
 pub trait Alice {
 
     #[init]
