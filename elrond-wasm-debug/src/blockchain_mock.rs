@@ -143,7 +143,6 @@ impl BlockchainMock {
     pub fn create_account_after_deploy(&mut self,
         tx_input: &TxInput,
         new_storage: HashMap<Vec<u8>, Vec<u8>>,
-        call_value: BigUint,
         contract_path: Vec<u8>) -> Address {
 
         let sender = self.accounts.get(&tx_input.from)
@@ -155,7 +154,7 @@ impl BlockchainMock {
         let old_value = self.accounts.insert(new_address.clone(), AccountData{
             address: new_address.clone(),
             nonce: 0,
-            balance: call_value,
+            balance: tx_input.call_value.clone(),
             storage: new_storage,
             contract_path: Some(contract_path),
             contract_owner: Some(tx_input.from.clone()),

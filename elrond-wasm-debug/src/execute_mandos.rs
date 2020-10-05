@@ -60,41 +60,10 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     call_value: tx.call_value.value.clone(),
                     func_name: tx.function.as_bytes().to_vec(),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
+                    gas_limit: tx.gas_limit.value,
+                    gas_price: tx.gas_price.value,
                 };
-
-                let sender_address = &tx.from.value.into();
-                state.increase_nonce(sender_address);
-                state.subtract_tx_payment(sender_address, &tx.call_value.value);
-                state.subtract_tx_gas(sender_address, tx.gas_limit.value, tx.gas_price.value);
-                
-                let contract_account = state.accounts
-                    .get_mut(&tx.to.value.into())
-                    .unwrap_or_else(|| panic!("Recipient account not found"));
-
-                let contract_path = &contract_account.contract_path.clone()
-                    .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
-                    
-                let tx_context = TxContext::new(
-                    tx_input,
-                    TxOutput{
-                        contract_storage: contract_account.storage.clone(),
-                        result: TxResult::empty(),
-                        send_balance_list: Vec::new(),
-                        async_call: None,
-                    });
-                let tx_output = execute_tx(tx_context, contract_path, contract_map);
-                let tx_result = tx_output.result;
-
-                if tx_result.result_status == 0 {
-                    // replace storage with new one
-                    let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
-
-                    state.increase_balance(&tx.to.value.into(), &tx.call_value.value);
-                    state.send_balance(&tx.to.value.into(), tx_output.send_balance_list.as_slice());
-                } else {
-                    state.increase_balance(sender_address, &tx.call_value.value);
-                }
-
+                let tx_result = execute_sc_call(tx_input, state, contract_map);    
                 if let Some(tx_expect) = expect {
                     check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
                 }
@@ -111,32 +80,12 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     call_value: tx.call_value.value.clone(),
                     func_name: b"init".to_vec(),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
+                    gas_limit: tx.gas_limit.value,
+                    gas_price: tx.gas_price.value,
                 };
-
-                let sender_address = &tx.from.value.into();
-                state.increase_nonce(sender_address);
-                state.subtract_tx_payment(sender_address, &tx.call_value.value);
-                state.subtract_tx_gas(sender_address, tx.gas_limit.value, tx.gas_price.value);
-
-                let tx_context = TxContext::new(
-                    tx_input.clone(),
-                    TxOutput::default());
-                let contract_path = &tx.contract_code.value;
-                let tx_output = execute_tx(tx_context, contract_path, contract_map);
-
+                let tx_result = execute_sc_create(tx_input, &tx.contract_code.value, state, contract_map);
                 if let Some(tx_expect) = expect {
-                    check_tx_output(tx_id.as_str(), &tx_expect, &tx_output.result);
-                }
-
-                if tx_output.result.result_status == 0 {
-                    let new_address = state.create_account_after_deploy(
-                        &tx_input,
-                        tx_output.contract_storage,
-                        tx.call_value.value.clone(),
-                        contract_path.clone());
-                    state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
-                } else {
-                    state.increase_balance(sender_address, &tx.call_value.value);
+                    check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
                 }
             },
             Step::Transfer {
@@ -161,63 +110,89 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                 comment,
                 accounts,
             } => {
-                for (expected_address, expected_account) in accounts.accounts.iter() {
-                    if let Some(account) = state.accounts.get(&expected_address.value.into()) {
-                        assert!(
-                            expected_account.nonce.check(account.nonce),
-                            "bad account nonce. Address: {}. Want: {}. Have: {}",
-                            expected_address,
-                            expected_account.nonce,
-                            account.nonce);
-
-                        assert!(
-                            expected_account.balance.check(&account.balance),
-                            "bad account balance. Address: {}. Want: {}. Have: {}",
-                            expected_address,
-                            expected_account.balance,
-                            account.balance);
-
-                        if let CheckStorage::Equal(eq) = &expected_account.storage {
-                            let default_value = &Vec::new();
-                            for (expected_key, expected_value) in eq.iter() {
-                                let actual_value = account.storage
-                                    .get(&expected_key.value)
-                                    .unwrap_or(default_value);
-                                assert!(
-                                    expected_value.check(actual_value),
-                                    "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
-                                    expected_address,
-                                    expected_key,
-                                    expected_value,
-                                    verbose_hex(actual_value));
-                            }
-
-                            let default_check_value = CheckValue::Equal(BytesValue::empty());
-                            for (actual_key, actual_value) in account.storage.iter() {
-                                let expected_value = eq
-                                    .get(&actual_key.clone().into())
-                                    .unwrap_or(&default_check_value);
-                                assert!(
-                                    expected_value.check(actual_value),
-                                    "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
-                                    expected_address,
-                                    verbose_hex(actual_key),
-                                    expected_value,
-                                    verbose_hex(actual_value));
-                            }
-                        }
-                    } else {
-                        if !accounts.other_accounts_allowed {
-                            panic!("Expected account not found");
-                        }
-                    }
-                }
+                check_state(accounts, state);
             },
             Step::DumpState {..} => {
                 state.print_accounts();
             },
         }
     }
+}
+
+fn execute_sc_call(
+    tx_input: TxInput,
+    state: &mut BlockchainMock,
+    contract_map: &ContractMap<TxContext>) -> TxResult {
+
+    let from = tx_input.from.clone();
+    let to = tx_input.to.clone();
+    let call_value = tx_input.call_value.clone();
+
+    state.increase_nonce(&from);
+    state.subtract_tx_payment(&from, &call_value);
+    state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
+    
+    let contract_account = state.accounts
+        .get_mut(&to)
+        .unwrap_or_else(|| panic!("Recipient account not found"));
+
+    let contract_path = &contract_account.contract_path.clone()
+        .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
+        
+    let tx_context = TxContext::new(
+        tx_input,
+        TxOutput{
+            contract_storage: contract_account.storage.clone(),
+            result: TxResult::empty(),
+            send_balance_list: Vec::new(),
+            async_call: None,
+        });
+    let tx_output = execute_tx(tx_context, contract_path, contract_map);
+    let tx_result = tx_output.result;
+
+    if tx_result.result_status == 0 {
+        // replace storage with new one
+        let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
+
+        state.increase_balance(&to, &call_value);
+        state.send_balance(&to, tx_output.send_balance_list.as_slice());
+    } else {
+        state.increase_balance(&from, &call_value);
+    }
+
+    tx_result
+}
+
+fn execute_sc_create(
+    tx_input: TxInput,
+    contract_path: &Vec<u8>,
+    state: &mut BlockchainMock,
+    contract_map: &ContractMap<TxContext>) -> TxResult {
+
+    let from = tx_input.from.clone();
+    let to = tx_input.to.clone();
+    let call_value = tx_input.call_value.clone();
+
+    state.increase_nonce(&from);
+    state.subtract_tx_payment(&from, &call_value);
+    state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
+
+    let tx_context = TxContext::new(
+        tx_input.clone(),
+        TxOutput::default());
+    let tx_output = execute_tx(tx_context, contract_path, contract_map);
+
+    if tx_output.result.result_status == 0 {
+        let new_address = state.create_account_after_deploy(
+            &tx_input,
+            tx_output.contract_storage,
+            contract_path.clone());
+        state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
+    } else {
+        state.increase_balance(&from, &call_value);
+    }
+
+    tx_output.result
 }
 
 fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
@@ -241,4 +216,59 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
     }
     
     assert_eq!(tx_expect.status.value, tx_result.result_status);
+}
+
+
+fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
+    for (expected_address, expected_account) in accounts.accounts.iter() {
+        if let Some(account) = state.accounts.get(&expected_address.value.into()) {
+            assert!(
+                expected_account.nonce.check(account.nonce),
+                "bad account nonce. Address: {}. Want: {}. Have: {}",
+                expected_address,
+                expected_account.nonce,
+                account.nonce);
+
+            assert!(
+                expected_account.balance.check(&account.balance),
+                "bad account balance. Address: {}. Want: {}. Have: {}",
+                expected_address,
+                expected_account.balance,
+                account.balance);
+
+            if let CheckStorage::Equal(eq) = &expected_account.storage {
+                let default_value = &Vec::new();
+                for (expected_key, expected_value) in eq.iter() {
+                    let actual_value = account.storage
+                        .get(&expected_key.value)
+                        .unwrap_or(default_value);
+                    assert!(
+                        expected_value.check(actual_value),
+                        "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
+                        expected_address,
+                        expected_key,
+                        expected_value,
+                        verbose_hex(actual_value));
+                }
+
+                let default_check_value = CheckValue::Equal(BytesValue::empty());
+                for (actual_key, actual_value) in account.storage.iter() {
+                    let expected_value = eq
+                        .get(&actual_key.clone().into())
+                        .unwrap_or(&default_check_value);
+                    assert!(
+                        expected_value.check(actual_value),
+                        "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
+                        expected_address,
+                        verbose_hex(actual_key),
+                        expected_value,
+                        verbose_hex(actual_value));
+                }
+            }
+        } else {
+            if !accounts.other_accounts_allowed {
+                panic!("Expected account not found");
+            }
+        }
+    }
 }
