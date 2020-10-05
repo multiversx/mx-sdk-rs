@@ -111,10 +111,18 @@ pub struct SendBalance {
 }
 
 #[derive(Debug)]
+pub struct AsyncCallResult {
+    pub to: Address,
+    pub call_data: Vec<u8>,
+    pub call_value: BigUint,
+}
+
+#[derive(Debug)]
 pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
     pub result: TxResult,
     pub send_balance_list: Vec<SendBalance>,
+    pub async_call: Option<AsyncCallResult>,
 
 }
 
@@ -124,6 +132,7 @@ impl Default for TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult::empty(),
             send_balance_list: Vec::new(),
+            async_call: None,
         }
     }
 }
@@ -138,6 +147,7 @@ impl TxOutput {
                 result_values: Vec::new(),
             },
             send_balance_list: Vec::new(),
+            async_call: None,
         }
     }
 
@@ -153,6 +163,7 @@ impl TxOutput {
                 result_values: Vec::new(),
             },
             send_balance_list: Vec::new(),
+            async_call: None,
         }
     }
 }
@@ -336,8 +347,13 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         })
     }
 
-    fn async_call(&self, _to: &Address, _amount: &RustBigUint, _data: &[u8]) {
-        panic!("async_call not yet implemented");
+    fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.async_call = Some(AsyncCallResult{
+            to: to.clone(),
+            call_value: amount.value(),
+            call_data: data.to_vec(),
+        });
     }
 
     fn get_tx_hash(&self) -> H256 {

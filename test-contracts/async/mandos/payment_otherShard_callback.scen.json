@@ -1,0 +1,71 @@
+{
+    "name": "payment_otherShard_callback",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                    "nonce": "0",
+                    "balance": "0x10000000000000e8d4a51000",
+                    "storage": {},
+                    "code": ""
+                },
+                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5555"
+                    },
+                    "code": "file:../async-alice/output/alice.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234",
+                "to": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234",
+                "value": "0x123400",
+                "function": "forwardToOtherContractWithCallback",
+                "arguments": [],
+                "gasLimit": "0x1000000000000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                    "nonce": "1",
+                    "balance": "0xfffffffffff00e8d492dc00",
+                    "storage": {},
+                    "code": ""
+                },
+                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5555",
+                        "``1...............................": "``payCallback"
+                    },
+                    "code": "file:../async-alice/output/alice.wasm"
+                },
+                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5555": {
+                    "nonce": "0",
+                    "balance": "0x123400",
+                    "storage": {},
+                    "code": "",
+                    "asyncCallData": "str:payMeWithResult@56"
+                }
+            }
+        }
+    ]
+}

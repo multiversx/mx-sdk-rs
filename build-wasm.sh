@@ -46,21 +46,21 @@ mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/features.wasm
 cd ../..
 
-cd test-contracts/async-alice/wasm
+cd test-contracts/async/async-alice/wasm
 RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
-cd ../..
+cd ../../..
 
-cd test-contracts/async-bob/wasm
+cd test-contracts/async/async-bob/wasm
 RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.wasm
-cd ../..
+cd ../../..
 
 cd test-contracts/use-module/wasm
 RUSTFLAGS='-C link-arg=-s' \
