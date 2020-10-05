@@ -4,8 +4,9 @@
 
 ### EXAMPLES ###
 
+export RUSTFLAGS=${RUSTFLAGS-'-C link-arg=-s'}
+
 cd examples/adder/wasm
-RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
@@ -13,7 +14,6 @@ cp wasm/target/wasm32-unknown-unknown/release/adder_wasm.wasm output/adder.wasm
 cd ../..
 
 cd examples/crypto-bubbles/wasm
-RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
@@ -21,7 +21,6 @@ cp wasm/target/wasm32-unknown-unknown/release/crypto_bubbles_wasm.wasm output/cr
 cd ../..
 
 cd examples/factorial/wasm
-RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
@@ -29,7 +28,6 @@ cp wasm/target/wasm32-unknown-unknown/release/factorial_wasm.wasm output/factori
 cd ../..
 
 cd examples/simple-erc20/wasm
-RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
@@ -46,16 +44,14 @@ mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/features.wasm
 cd ../..
 
-cd test-contracts/async/async-alice/wasm
-RUSTFLAGS='-C link-arg=-s' \
+cd test-contracts/async-alice/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
 cd ../../..
 
-cd test-contracts/async/async-bob/wasm
-RUSTFLAGS='-C link-arg=-s' \
+cd test-contracts/async-bob/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
@@ -63,7 +59,6 @@ cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.was
 cd ../../..
 
 cd test-contracts/use-module/wasm
-RUSTFLAGS='-C link-arg=-s' \
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
