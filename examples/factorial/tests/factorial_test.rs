@@ -1,7 +1,6 @@
 
 extern crate factorial;
 use factorial::*;
-// use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 #[test]
