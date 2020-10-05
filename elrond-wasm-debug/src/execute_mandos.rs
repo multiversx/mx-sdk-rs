@@ -80,6 +80,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                         contract_storage: contract_account.storage.clone(),
                         result: TxResult::empty(),
                         send_balance_list: Vec::new(),
+                        async_call: None,
                     });
                 let tx_output = execute_tx(tx_context, contract_path, contract_map);
                 let tx_result = tx_output.result;
