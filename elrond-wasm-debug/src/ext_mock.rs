@@ -177,6 +177,7 @@ impl TxContext {
                 previous_block_info: BlockInfo::new(),
                 current_block_info: BlockInfo::new(),
                 contract_balance: 0u32.into(),
+                contract_owner: None,
             },
             tx_input: TxInput{
                 from: Address::zero(),
@@ -209,15 +210,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_owner_address(&self) -> Address {
-        self.get_caller() // TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        self.blockchain_info.contract_owner.clone().unwrap_or_else(|| panic!("contract owner address not set"))
     }
 
     fn get_caller(&self) -> Address {
         self.tx_input.from.clone()
     }
 
-    fn get_balance(&self, _address: &Address) -> RustBigUint {
-        panic!("get balance not yet implemented")
+    fn get_balance(&self, address: &Address) -> RustBigUint {
+        if address != &self.get_sc_address() {
+            panic!("get balance not yet implemented for accounts other than the contract itself");
+        }
+        self.blockchain_info.contract_balance.clone().into()
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {
