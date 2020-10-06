@@ -242,6 +242,7 @@ pub struct BlockchainTxInfo {
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_balance: BigUint,
+    pub contract_owner: Option<Address>
 }
 
 impl BlockchainMock {
@@ -251,12 +252,14 @@ impl BlockchainMock {
                 previous_block_info: self.previous_block_info.clone(),
                 current_block_info: self.current_block_info.clone(),
                 contract_balance: contract.balance.clone(),
+                contract_owner: contract.contract_owner.clone(),
             }
         } else {
             BlockchainTxInfo {
                 previous_block_info: self.previous_block_info.clone(),
                 current_block_info: self.current_block_info.clone(),
                 contract_balance: 0u32.into(),
+                contract_owner: None,
             }
         }
     }
