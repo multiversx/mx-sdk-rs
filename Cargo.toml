@@ -13,6 +13,7 @@ members = [
   "examples/factorial",
   "examples/simple-erc20",
 
+  "test-contracts/async",
   "test-contracts/async/async-alice",
   "test-contracts/async/async-bob",
   "test-contracts/basic-features",
