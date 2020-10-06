@@ -47,6 +47,34 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                         new_address.creator_nonce.value,
                         new_address.new_address.value.into())
                 }
+                if let Some(block_info_obj) = previous_block_info {
+                    if let Some(u64_value) = &block_info_obj.block_timestamp {
+                        state.previous_block_info.block_timestamp = u64_value.value;
+                    }
+                    if let Some(u64_value) = &block_info_obj.block_nonce {
+                        state.previous_block_info.block_nonce = u64_value.value;
+                    }
+                    if let Some(u64_value) = &block_info_obj.block_epoch {
+                        state.previous_block_info.block_epoch = u64_value.value;
+                    }
+                    if let Some(u64_value) = &block_info_obj.block_round {
+                        state.previous_block_info.block_round = u64_value.value;
+                    }
+                }
+                if let Some(block_info_obj) = current_block_info {
+                    if let Some(u64_value) = &block_info_obj.block_timestamp {
+                        state.current_block_info.block_timestamp = u64_value.value;
+                    }
+                    if let Some(u64_value) = &block_info_obj.block_nonce {
+                        state.current_block_info.block_nonce = u64_value.value;
+                    }
+                    if let Some(u64_value) = &block_info_obj.block_epoch {
+                        state.current_block_info.block_epoch = u64_value.value;
+                    }
+                    if let Some(u64_value) = &block_info_obj.block_round {
+                        state.current_block_info.block_round = u64_value.value;
+                    }
+                }
             },
             Step::ScCall {
                 tx_id,
@@ -158,6 +186,7 @@ fn execute_sc_call(
     let from = tx_input.from.clone();
     let to = tx_input.to.clone();
     let call_value = tx_input.call_value.clone();
+    let blockchain_info = state.create_tx_info(&to);
 
     state.subtract_tx_payment(&from, &call_value);
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
@@ -172,6 +201,7 @@ fn execute_sc_call(
         .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
         
     let tx_context = TxContext::new(
+        blockchain_info,
         tx_input,
         TxOutput{
             contract_storage: contract_account.storage.clone(),
@@ -204,11 +234,13 @@ fn execute_sc_create(
     let from = tx_input.from.clone();
     let to = tx_input.to.clone();
     let call_value = tx_input.call_value.clone();
+    let blockchain_info = state.create_tx_info(&to);
 
     state.subtract_tx_payment(&from, &call_value);
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     let tx_context = TxContext::new(
+        blockchain_info,
         tx_input.clone(),
         TxOutput::default());
     let tx_output = execute_tx(tx_context, contract_path, contract_map);

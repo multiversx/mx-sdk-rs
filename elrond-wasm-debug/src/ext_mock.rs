@@ -6,6 +6,7 @@ use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
 use crate::display_util::*;
 use crate::async_data::*;
+use crate::blockchain_mock::*;
 
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::{BigUintApi, BigIntApi};
@@ -147,13 +148,19 @@ impl TxOutput {
 
 #[derive(Debug)]
 pub struct TxContext {
+    pub blockchain_info: BlockchainTxInfo,
     pub tx_input: TxInput,
     pub tx_output_cell: Rc<RefCell<TxOutput>>,
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, tx_output: TxOutput) -> Self {
+    pub fn new(
+        blockchain_info: BlockchainTxInfo,
+        tx_input: TxInput,
+        tx_output: TxOutput) -> Self {
+
         TxContext {
+            blockchain_info,
             tx_input,
             tx_output_cell: Rc::new(RefCell::new(tx_output)),
         }
@@ -166,6 +173,11 @@ impl TxContext {
 
     pub fn dummy() -> Self {
         TxContext {
+            blockchain_info: BlockchainTxInfo {
+                previous_block_info: BlockInfo::new(),
+                current_block_info: BlockInfo::new(),
+                contract_balance: 0u32.into(),
+            },
             tx_input: TxInput{
                 from: Address::zero(),
                 to: Address::zero(),
@@ -184,6 +196,7 @@ impl TxContext {
 impl Clone for TxContext {
     fn clone(&self) -> Self {
         TxContext{
+            blockchain_info: self.blockchain_info.clone(),
             tx_input: self.tx_input.clone(),
             tx_output_cell: Rc::clone(&self.tx_output_cell),
         }
@@ -305,24 +318,24 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.tx_input.tx_hash.clone()
     }
 
-    fn get_gas_left(&self) -> i64 {
-        1000000000
+    fn get_gas_left(&self) -> u64 {
+        self.tx_input.gas_limit
     }
 
     fn get_block_timestamp(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_timestamp
     }
 
     fn get_block_nonce(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_nonce
     }
 
     fn get_block_round(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_round
     }
 
     fn get_block_epoch(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_epoch
     }
 
     fn sha256(&self, data: &[u8]) -> [u8; 32] {
