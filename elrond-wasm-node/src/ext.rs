@@ -239,8 +239,8 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn get_gas_left(&self) -> i64 {
-        unsafe { getGasLeft() }
+    fn get_gas_left(&self) -> u64 {
+        unsafe { getGasLeft() as u64 }
     }
 
     #[inline]

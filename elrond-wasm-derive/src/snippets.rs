@@ -148,7 +148,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn get_gas_left(&self) -> i64 {
+        fn get_gas_left(&self) -> u64 {
           self.api.get_gas_left()
         }
 

@@ -87,7 +87,7 @@ where
 
     fn get_tx_hash(&self) -> H256;
 
-    fn get_gas_left(&self) -> i64;
+    fn get_gas_left(&self) -> u64;
 
     fn get_block_timestamp(&self) -> u64;
 
