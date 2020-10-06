@@ -3,11 +3,18 @@
 
 imports!();
 
-use elrond_wasm_module_features::*;
-use elrond_wasm_module_pause::*;
+#[cfg(feature = "elrond-wasm-module-features-default")]
+use elrond_wasm_module_features_default::*;
+#[cfg(feature = "elrond-wasm-module-features-wasm")]
+use elrond_wasm_module_features_wasm::*;
 
-#[elrond_wasm_derive::contract(UseModuleExampleImpl)]
-pub trait UseModuleExample {
+#[cfg(feature = "elrond-wasm-module-pause-default")]
+use elrond_wasm_module_pause_default::*;
+#[cfg(feature = "elrond-wasm-module-pause-wasm")]
+use elrond_wasm_module_pause_wasm::*;
+
+#[elrond_wasm_derive::contract(UseModuleImpl)]
+pub trait UseModule {
 
     #[module(FeaturesModuleImpl)]
     fn features_module(&self) -> FeaturesModuleImpl<T, BigInt, BigUint>;

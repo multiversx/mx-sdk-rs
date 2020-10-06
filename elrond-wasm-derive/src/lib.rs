@@ -6,8 +6,6 @@
 // ensure we don't run out of macro stack
 #![recursion_limit="1024"]
 
-extern crate proc_macro;
-
 #[macro_use]
 extern crate syn;
 
@@ -29,6 +27,7 @@ mod contract_gen_storage;
 mod contract_impl;
 mod contract_macro_main;
 mod contract_macro_module;
+mod function_selector;
 mod parse_attr;
 mod snippets;
 mod util;

@@ -3,19 +3,19 @@ use core::iter::Iterator;
 
 /// This is safe because 1 != 0.
 #[inline]
-pub fn non_zero_usize_one() -> NonZeroUsize {
+pub const fn non_zero_usize_one() -> NonZeroUsize {
     unsafe { NonZeroUsize::new_unchecked(1) }
 }
 
 /// This is safe because adding 1 to a positive number makes it greater than one.
 #[inline]
-pub fn non_zero_usize_from_n_plus_1(n: usize) -> NonZeroUsize {
+pub const fn non_zero_usize_from_n_plus_1(n: usize) -> NonZeroUsize {
     unsafe { NonZeroUsize::new_unchecked(n+1) }
 }
 
 /// This is safe because adding a non-zero number with a positive one yields a non-zero number.
 #[inline]
-pub fn non_zero_usize_plus(a: NonZeroUsize, b: usize) -> NonZeroUsize {
+pub const fn non_zero_usize_plus(a: NonZeroUsize, b: usize) -> NonZeroUsize {
     unsafe { NonZeroUsize::new_unchecked(a.get() + b) }
 }
 
@@ -86,5 +86,16 @@ pub mod tests {
         }
 
         assert_eq!(v, [1, 2, 3].to_vec());
+    }
+
+    const ONE: NonZeroUsize = non_zero_usize_one();
+    const TWO: NonZeroUsize = non_zero_usize_from_n_plus_1(1);
+    const TEN: NonZeroUsize = non_zero_usize_plus(ONE, 9);
+
+    #[test]
+    fn test_const() {
+        assert_eq!(ONE.get(), 1);
+        assert_eq!(TWO.get(), 2);
+        assert_eq!(TEN.get(), 10);
     }
 }

@@ -76,6 +76,7 @@ where
             // performing a forceful cast
             let big_uint_value = api.storage_load_big_uint(key);
             let cast_big_uint: T = unsafe { core::mem::transmute_copy(&big_uint_value) };
+            core::mem::forget(big_uint_value); // otherwise the data gets deallocated twice
             cast_big_uint
         },
         TypeInfo::U64 => {

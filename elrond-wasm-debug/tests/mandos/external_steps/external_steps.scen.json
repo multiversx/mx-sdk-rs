@@ -1,0 +1,21 @@
+{
+    "name": "test external steps resolution",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "nested/external_step_1.step.json"
+        },
+        {
+            "step": "checkState",
+            "comment": "just checking that steps executed",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "3",
+                    "balance": "5",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}
