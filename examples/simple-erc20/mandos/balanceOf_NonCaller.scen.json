@@ -1,0 +1,67 @@
+{
+    "name": "balanceOf_NonCaller",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "``account_1_____________________s1": {
+                    "nonce": "0",
+                    "balance": "0xe8d4a51000",
+                    "storage": {},
+                    "code": ""
+                },
+                "``busd__________________________s1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``balance|``account_1_____________________s1": "0x2710",
+                        "``total_supply": "0x2710"
+                    },
+                    "code": "file:../output/simple-erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "``account_1_____________________s1",
+                "to": "``busd__________________________s1",
+                "value": "0",
+                "function": "balanceOf",
+                "arguments": [
+                    "0x1234123400000000000000000000000000000000000000000000000000000009"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [ "0" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "``account_1_____________________s1": {
+                    "nonce": "1",
+                    "balance": "0xe8d4951000",
+                    "storage": {},
+                    "code": ""
+                },
+                "``busd__________________________s1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``balance|``account_1_____________________s1": "0x2710",
+                        "``total_supply": "0x2710"
+                    },
+                    "code": "file:../output/simple-erc20.wasm"
+                }
+            }
+        }
+    ]
+}

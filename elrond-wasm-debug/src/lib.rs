@@ -1,14 +1,23 @@
 //#![no_std]
 
 #![allow(dead_code)]
+#![allow(unused_imports)]
 
 mod ext_mock;
 mod big_int_mock;
 mod big_uint_mock;
+mod contract_map;
+mod execute_mandos;
+mod display_util;
+mod blockchain_mock;
 
 pub use ext_mock::*;
 pub use big_int_mock::*;
 pub use big_uint_mock::*;
+pub use contract_map::*;
+pub use execute_mandos::*;
+pub use display_util::*;
+pub use blockchain_mock::*;
 
 #[macro_use]
 extern crate alloc;

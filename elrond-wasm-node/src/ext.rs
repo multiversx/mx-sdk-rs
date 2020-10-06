@@ -12,7 +12,6 @@ use elrond_wasm::err_msg;
 use alloc::vec::Vec;
 
 const ADDRESS_LENGTH: usize = 32;
-const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
 
 extern {

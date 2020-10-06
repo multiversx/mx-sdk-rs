@@ -1,0 +1,176 @@
+{
+    "name": "transferFrom_Exploratory-MultipleTransfersThrow",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "``account_1_____________________s1": {
+                    "nonce": "0",
+                    "balance": "0xe8d4a51000",
+                    "storage": {},
+                    "code": ""
+                },
+                "``busd__________________________s1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``allowance|``coin_holder_1_________________sx|``account_1_____________________s1": "0x28",
+                        "``balance|``coin_holder_1_________________sx": "0x2710",
+                        "``total_supply": "0x2710"
+                    },
+                    "code": "file:../output/simple-erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "``account_1_____________________s1",
+                "to": "``busd__________________________s1",
+                "value": "0",
+                "function": "transferFrom",
+                "arguments": [
+                    "``coin_holder_1_________________sx",
+                    "``coin_holder_2_________________sx",
+                    "0x0a"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "``busd__________________________s1",
+                        "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "``coin_holder_1_________________sx",
+                            "``coin_holder_2_________________sx"
+                        ],
+                        "data": "0x0a"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "``account_1_____________________s1",
+                "to": "``busd__________________________s1",
+                "value": "0",
+                "function": "transferFrom",
+                "arguments": [
+                    "``coin_holder_1_________________sx",
+                    "``account_6_____________________s1",
+                    "0x0a"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "``busd__________________________s1",
+                        "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "``coin_holder_1_________________sx",
+                            "``account_6_____________________s1"
+                        ],
+                        "data": "0x0a"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "``account_1_____________________s1",
+                "to": "``busd__________________________s1",
+                "value": "0",
+                "function": "transferFrom",
+                "arguments": [
+                    "``coin_holder_1_________________sx",
+                    "``coin_holder_1_________________sx",
+                    "0x0a"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "``busd__________________________s1",
+                        "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "``coin_holder_1_________________sx",
+                            "``coin_holder_1_________________sx"
+                        ],
+                        "data": "0x0a"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4",
+            "tx": {
+                "from": "``account_1_____________________s1",
+                "to": "``busd__________________________s1",
+                "value": "0",
+                "function": "transferFrom",
+                "arguments": [
+                    "``coin_holder_1_________________sx",
+                    "``account_1_____________________s1",
+                    "0x0b"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "0x04",
+                "message": "str:allowance exceeded",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "``account_1_____________________s1": {
+                    "nonce": "4",
+                    "balance": "0xe8d4651000",
+                    "storage": {},
+                    "code": ""
+                },
+                "``busd__________________________s1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``allowance|``coin_holder_1_________________sx|``account_1_____________________s1": "0x0a",
+                        "``balance|``coin_holder_1_________________sx": "0x26fc",
+                        "``balance|``coin_holder_2_________________sx": "0x0a",
+                        "``balance|``account_6_____________________s1": "0x0a",
+                        "``total_supply": "0x2710"
+                    },
+                    "code": "file:../output/simple-erc20.wasm"
+                }
+            }
+        }
+    ]
+}

@@ -1,5 +1,6 @@
 use super::*;
 use super::contract_gen::*;
+use super::function_selector::*;
 
 pub fn contract_implementation(
     contract: &Contract,
@@ -17,7 +18,7 @@ pub fn contract_implementation(
     let auto_impl_defs = contract.generate_auto_impl_defs();
     let auto_impls = contract.generate_auto_impls();
     let endpoints = contract.generate_endpoints();
-    let function_selector_body = contract.generate_function_selector_body();
+    let function_selector_body = generate_function_selector_body(&contract);
     let callback_body = contract.generate_callback_body();
     let api_where = snippets::api_where();
 
@@ -89,6 +90,7 @@ pub fn contract_implementation(
     };
 
     let wasm_endpoints = quote! {
+        #[cfg(feature = "wasm-output-mode")]
         #[allow(non_snake_case)]
         pub mod endpoints {
           use super::*;
@@ -105,15 +107,19 @@ pub fn contract_implementation(
 
     let function_selector = quote! {
       use elrond_wasm::CallableContract;
-      impl <T, BigInt, BigUint> CallableContract for #contract_impl_ident<T, BigInt, BigUint> 
+      impl <T, BigInt, BigUint> CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint> 
       #api_where
       {
-        fn call(&self, fn_name: &'static str) {
+        fn call(&self, fn_name: &[u8]) -> bool {
           #function_selector_body
         }
 
-        fn clone_contract(&self) -> Box<dyn CallableContract> {
+        fn clone_contract(&self) -> Box<dyn CallableContract<T>> {
           Box::new(#contract_impl_ident::new(self.api.clone()))
+        }
+
+        fn into_api(self: Box<Self>) -> T {
+          self.api
         }
       }
     };

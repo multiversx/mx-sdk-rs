@@ -4,21 +4,19 @@ use elrond_wasm::{H256, Address};
 
 use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
+use crate::display_util::*;
 
 use elrond_wasm::ContractHookApi;
-use elrond_wasm::CallableContract;
-use elrond_wasm::BigUintApi;
+use elrond_wasm::{BigUintApi, BigIntApi};
 use elrond_wasm::err_msg;
 
-use num_bigint::{BigInt};
+use num_bigint::{BigInt, BigUint};
 use num_traits::cast::ToPrimitive;
 
-use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 use std::collections::HashMap;
 use std::fmt;
-use std::fmt::Write;
 
 use core::cell::RefCell;
 use alloc::rc::Rc;
@@ -26,55 +24,26 @@ use alloc::rc::Rc;
 use sha3::{Sha3_256, Keccak256, Digest};
 
 const ADDRESS_LENGTH: usize = 32;
-const KEY_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
 
-fn address_hex(address: &H256) -> alloc::string::String {
-    alloc::format!("0x{}", hex::encode(address.as_bytes()))
+pub struct TxPanic {
+    pub status: u64,
+    pub message: Vec<u8>,
 }
 
-fn key_hex(address: &[u8]) -> alloc::string::String {
-    alloc::format!("0x{}", hex::encode(address))
+#[derive(Clone, Debug)]
+pub struct TxInput {
+    pub from: Address,
+    pub to: Address,
+    pub call_value: BigUint,
+    pub func_name: Vec<u8>,
+    pub args: Vec<Vec<u8>>,
 }
 
-pub struct AccountData {
-    pub address: Address,
-    pub nonce: u64,
-    pub balance: BigInt,
-    pub storage: HashMap<Vec<u8>, Vec<u8>>,
-    pub contract: Option<Box<dyn CallableContract>>,
-}
-
-impl fmt::Display for AccountData {
+impl fmt::Display for TxInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut storage_buf = String::new();
-        let mut keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-        keys.sort();
-        for key in &keys {
-            let value = self.storage.get(key).unwrap();
-            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
-        }
-        
-        write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
-            self.nonce, 
-            self.balance,
-            storage_buf)
-    }
-}
-
-pub struct TxData {
-    func_name: &'static str,
-    new_contract: Option<Box<dyn CallableContract>>,
-    args: Vec<Vec<u8>>,
-    call_value: BigInt,
-    from: Address,
-    to: Address,
-}
-
-impl fmt::Display for TxData {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "TxData {{ func: {}, args: {:?}, call_value: {}, from: 0x{}, to: 0x{}\n}}", 
-            self.func_name, 
+        write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, from: 0x{}, to: 0x{}\n}}", 
+            String::from_utf8(self.func_name.clone()).unwrap(), 
             self.args, 
             self.call_value,
             address_hex(&self.from), 
@@ -82,37 +51,16 @@ impl fmt::Display for TxData {
     }
 }
 
-impl TxData {
-    pub fn new_create(new_contract: Box<dyn CallableContract>, from: Address, to: Address) -> Self {
-        TxData{
-            func_name: "init",
-            new_contract: Some(new_contract),
-            args: Vec::new(),
-            call_value: 0.into(),
-            from,
-            to,
-        }
-    }
-
-    pub fn new_call(func_name: &'static str, from: Address, to: Address) -> Self {
-        TxData{
-            func_name,
-            new_contract: None,
-            args: Vec::new(),
-            call_value: 0.into(),
-            from,
-            to,
-        }
-    }
-
+impl TxInput {
     pub fn add_arg(&mut self, arg: Vec<u8>) {
         self.args.push(arg);
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TxResult {
-    pub result_status: i32,
+    pub result_status: u64,
+    pub result_message: Vec<u8>,
     pub result_values: Vec<Vec<u8>>,
 }
 
@@ -127,6 +75,7 @@ impl TxResult {
     pub fn empty() -> TxResult {
         TxResult {
             result_status: 0,
+            result_message: Vec::new(),
             result_values: Vec::new(),
         }
     }
@@ -135,188 +84,149 @@ impl TxResult {
     }
 }
 
-pub struct ArwenMockState {
-    current_tx: Option<TxData>,
-    current_result: TxResult,
-    accounts: HashMap<Address, AccountData>,
+#[derive(Debug)]
+pub struct SendBalance {
+    pub recipient: Address,
+    pub amount: BigUint,
 }
 
-pub struct ArwenMockRef {
-    state_ref: Rc<RefCell<ArwenMockState>>
+#[derive(Debug)]
+pub struct AsyncCallResult {
+    pub to: Address,
+    pub call_data: Vec<u8>,
+    pub call_value: BigUint,
 }
 
-impl Clone for ArwenMockRef {
+#[derive(Debug)]
+pub struct TxOutput {
+    pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
+    pub result: TxResult,
+    pub send_balance_list: Vec<SendBalance>,
+    pub async_call: Option<AsyncCallResult>,
+
+}
+
+impl Default for TxOutput {
+    fn default() -> Self {
+        TxOutput {
+            contract_storage: HashMap::new(),
+            result: TxResult::empty(),
+            send_balance_list: Vec::new(),
+            async_call: None,
+        }
+    }
+}
+
+impl TxOutput {
+    pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
+        TxOutput {
+            contract_storage: HashMap::new(),
+            result: TxResult {
+                result_status: panic_obj.status,
+                result_message: panic_obj.message.clone(),
+                result_values: Vec::new(),
+            },
+            send_balance_list: Vec::new(),
+            async_call: None,
+        }
+    }
+
+    pub fn from_panic_string(panic_string: &str) -> Self {
+        let mut message = b"panic occurred: ".to_vec();
+        message.extend_from_slice(panic_string.as_bytes());
+
+        TxOutput {
+            contract_storage: HashMap::new(),
+            result: TxResult {
+                result_status: 4,
+                result_message: message,
+                result_values: Vec::new(),
+            },
+            send_balance_list: Vec::new(),
+            async_call: None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TxContext {
+    pub tx_input: TxInput,
+    pub tx_output_cell: Rc<RefCell<TxOutput>>,
+}
+
+impl TxContext {
+    pub fn new(tx_input: TxInput, tx_output: TxOutput) -> Self {
+        TxContext {
+            tx_input,
+            tx_output_cell: Rc::new(RefCell::new(tx_output)),
+        }
+    }
+
+    pub fn into_output(self) -> TxOutput {
+        let ref_cell = Rc::try_unwrap(self.tx_output_cell).unwrap();
+        ref_cell.replace(TxOutput::default())
+    }
+
+    pub fn dummy() -> Self {
+        TxContext {
+            tx_input: TxInput{
+                from: Address::zero(),
+                to: Address::zero(),
+                call_value: 0u32.into(),
+                func_name: Vec::new(),
+                args: Vec::new(),
+            },
+            tx_output_cell: Rc::new(RefCell::new(TxOutput::default())),
+        }
+    }
+}
+
+impl Clone for TxContext {
     fn clone(&self) -> Self {
-        ArwenMockRef{ state_ref: Rc::clone(&self.state_ref) }
+        TxContext{
+            tx_input: self.tx_input.clone(),
+            tx_output_cell: Rc::clone(&self.tx_output_cell),
+        }
     }
 }
 
-impl ArwenMockState {
-    pub fn new_ref() -> ArwenMockRef {
-        let state = ArwenMockState{
-            current_tx: None,
-            current_result: TxResult::empty(),
-            accounts: HashMap::new(),
-        };
-        let state_ref = Rc::new(RefCell::new(state));
-        ArwenMockRef{ state_ref }
-    }
-
-    fn create_account_if_necessary(&mut self, tx: &TxData) {
-        if let Some(ref tx_contract) = tx.new_contract {
-            if self.accounts.contains_key(&tx.to) {
-                panic!("Account already exists");
-            }
-            self.accounts.insert(tx.to.clone(), AccountData{
-                address: tx.to.clone(),
-                nonce: 0,
-                balance: 0.into(),
-                storage: HashMap::new(),
-                contract: Some(tx_contract.clone_contract()),
-            });
-        }
-    }
-
-    pub fn set_result_status(&mut self, status: i32) {
-        self.current_result.result_status = status;
-    }
-    
-    pub fn add_result(&mut self, result: Vec<u8>) {
-        self.current_result.result_values.push(result);
-    }
-    
-    fn clear_result(&mut self) {
-        self.current_result = TxResult::empty();
-    }
-    
-    fn get_result(&self) -> TxResult {
-        self.current_result.clone()
-    }
-}
-
-impl ArwenMockRef {
-    fn get_contract(&self) -> Box<dyn CallableContract> {
-        let state = self.state_ref.borrow();
-        let tx_ref = &state.current_tx.as_ref().unwrap();
-        match state.accounts.get(&tx_ref.to) {
-            None => panic!("Account not found"),
-            Some(ref account) => {
-                match account.contract {
-                    None => panic!("Recipient account is not a smart contract"),
-                    Some(ref acct_contract) => acct_contract.clone_contract(),
-                }
-            }
-        }
-    }
-
-    pub fn execute_tx(&self, tx: TxData) -> TxResult {
-        {
-            let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_necessary(&tx);    
-            state.current_tx = Some(tx);
-            state.clear_result();
-        }
-        
-        let state = self.state_ref.borrow();
-        let tx_ref = state.current_tx.as_ref().unwrap();
-        
-        let contract = self.get_contract();
-
-        // contract call
-        // important: state cannot be borrowed at this point
-        contract.call(tx_ref.func_name);
-        
-        let state = self.state_ref.borrow();
-        state.get_result()
-    }
-
-    /// To be used for writing small tests.
-    pub fn set_dummy_tx(&self, addr: &Address) {
-        let tx = TxData {
-            func_name: "",
-            new_contract: None,
-            args: Vec::new(),
-            call_value: 0.into(),
-            from: addr.clone(),
-            to: addr.clone(),
-        };
-
-        {
-            let mut state = self.state_ref.borrow_mut();
-            state.create_account_if_necessary(&tx);    
-            state.current_tx = Some(tx);
-            state.clear_result();
-        }
-    }
-
-    pub fn add_account(&self, acct: AccountData) {
-        let mut state = self.state_ref.borrow_mut();
-        state.accounts.insert(acct.address.clone(), acct);
-    }
-
-    pub fn print_accounts(&self) {
-        let state = self.state_ref.borrow();
-        let mut accounts_buf = String::new();
-        for (address, account) in &state.accounts {
-            write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
-        }
-        println!("Accounts: {}", &accounts_buf);
-    }
-}
-
-impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
+impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     fn get_sc_address(&self) -> Address {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
-            None => panic!("Tx not initialized!"),
-            Some(tx) => tx.to.clone(),
-        }
+        self.tx_input.to.clone()
     }
 
     fn get_owner_address(&self) -> Address {
-        panic!("get_sc_address not yet implemented")
+        self.get_caller() // TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     fn get_caller(&self) -> Address {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
-            None => panic!("Tx not initialized!"),
-            Some(tx) => tx.from.clone(),
-        }
+        self.tx_input.from.clone()
     }
 
     fn get_balance(&self, _address: &Address) -> RustBigUint {
-        panic!("get_balance not yet implemented")
+        panic!("get balance not yet implemented")
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {
-        let sc_address = self.get_sc_address();
-        let mut state = self.state_ref.borrow_mut();
-        match state.accounts.get_mut(&sc_address) {
-            None => panic!("Account not found!"),
-            Some(acct) => {
-                acct.storage.insert(key.to_vec(), value.to_vec());
-            }
+        // TODO: extract magic strings somewhere
+        if key.starts_with(&b"ELROND"[..]) {
+            panic!(TxPanic{
+                status: 10,
+                message: b"cannot write to storage under Elrond reserved key".to_vec(),
+            });
         }
+        
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.contract_storage.insert(key.to_vec(), value.to_vec());
     }
 
     fn storage_load(&self, key: &[u8]) -> Vec<u8> {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
-            None => panic!("Tx not initialized!"),
-            Some(tx) => {
-                match state.accounts.get(&tx.to) {
-                    None => panic!("Account not found!"),
-                    Some(acct) => {
-                        match acct.storage.get(&key.to_vec()) {
-                            None => Vec::with_capacity(0),
-                            Some(value) => {
-                                value.clone()
-                            },
-                        }
-                    }
-                }
-            }
+        let tx_output = self.tx_output_cell.borrow();
+        match tx_output.contract_storage.get(&key.to_vec()) {
+            None => Vec::with_capacity(0),
+            Some(value) => {
+                value.clone()
+            },
         }
     }
 
@@ -377,32 +287,24 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
 
     #[inline]
     fn get_call_value_big_uint(&self) -> RustBigUint {
-        let state = self.state_ref.borrow();
-        match &state.current_tx {
-            None => panic!("Tx not initialized!"),
-            Some(tx) => tx.call_value.clone().into(),
-        }
+        self.tx_input.call_value.clone().into()
     }
 
     fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
-        let owner = self.get_sc_address();
-        let mut state = self.state_ref.borrow_mut();
-        match state.accounts.get_mut(&owner) {
-            None => panic!("Account not found!"),
-            Some(acct) => {
-                acct.balance -= amount.value();
-            }
-        }
-        match state.accounts.get_mut(to) {
-            None => panic!("Account not found!"),
-            Some(acct) => {
-                acct.balance += amount.value();
-            }
-        }
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.send_balance_list.push(SendBalance{
+            recipient: to.clone(),
+            amount: amount.value()
+        })
     }
 
-    fn async_call(&self, _to: &Address, _amount: &RustBigUint, _data: &[u8]) {
-        panic!("async_call not yet implemented");
+    fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.async_call = Some(AsyncCallResult{
+            to: to.clone(),
+            call_value: amount.value(),
+            call_data: data.to_vec(),
+        });
     }
 
     fn get_tx_hash(&self) -> H256 {
@@ -442,30 +344,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 }
 
-impl ArwenMockState {
-    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
-        let arg_idx_usize: usize = arg_index as usize;
-        match &self.current_tx {
-            None => panic!("Tx not initialized!"),
-            Some(tx) => {
-                if arg_idx_usize >= tx.args.len() {
-                    panic!("Tx arg index out of range");
-                }
-                tx.args[arg_idx_usize].clone()
-            },
-        }
-    }
-}
-
-impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
+impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 
     fn get_num_arguments(&self) -> i32 {
-        let state = self.state_ref.borrow();
-        let nr_args = match &state.current_tx {
-            None => panic!("Tx not initialized!"),
-            Some(tx) => tx.args.len(),
-        };
-        nr_args as i32
+        self.tx_input.args.len() as i32
     }
 
     fn check_not_payable(&self) {
@@ -475,8 +357,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_argument_len(&self, arg_index: i32) -> usize {
-        let state = self.state_ref.borrow();
-        let arg = state.get_argument_vec(arg_index);
+        let arg = self.get_argument_vec(arg_index);
         arg.len()
     }
 
@@ -485,13 +366,15 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
 
     fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
-        let state = self.state_ref.borrow();
-        state.get_argument_vec(arg_index)
+        let arg_idx_usize = arg_index as usize;
+        if arg_idx_usize >= self.tx_input.args.len() {
+            panic!("Tx arg index out of range");
+        }
+        self.tx_input.args[arg_idx_usize].clone()
     }
 
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
-        let state = self.state_ref.borrow();
-        let arg = state.get_argument_vec(arg_index);
+        let arg = self.get_argument_vec(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
         res[offset..(arg.len()-1 + offset)].clone_from_slice(&arg[..arg.len()-1]);
@@ -499,62 +382,60 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for ArwenMockRef {
     }
     
     fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
-        let state = self.state_ref.borrow();
-        let bytes = state.get_argument_vec(arg_index);
-        BigInt::from_signed_bytes_be(&bytes).into()
+        let bytes = self.get_argument_vec(arg_index);
+        RustBigInt::from_signed_bytes_be(&bytes)
     }
 
-    #[inline]
-    fn get_argument_big_uint(&self, _arg_index: i32) -> RustBigUint {
-        panic!("get_argument_big_uint not yet implemented")
+    fn get_argument_big_uint(&self, arg_index: i32) -> RustBigUint {
+        let bytes = self.get_argument_vec(arg_index);
+        RustBigUint::from_bytes_be(&bytes[..])
     }
 
-    #[inline]
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
-        let state = self.state_ref.borrow();
-        let bytes = state.get_argument_vec(arg_index);
+        let bytes = self.get_argument_vec(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
         if let Some(v) = bi.to_i64() {
             v
         } else {
-            panic!("Argument does not fit in an i64.")
+            panic!(TxPanic{
+                status: 10,
+                message: b"argument out of range".to_vec(),
+            })
         }
     }
 
     fn finish_slice_u8(&self, slice: &[u8]) {
-        let mut state = self.state_ref.borrow_mut();
         let mut v = vec![0u8; slice.len()];
         v.copy_from_slice(slice);
-        state.add_result(v);
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.result.result_values.push(v)
     }
 
     fn finish_bytes32(&self, bytes: &[u8; 32]) {
         self.finish_slice_u8(&*bytes);
     }
 
-    #[inline]
     fn finish_big_int(&self, bi: &RustBigInt) {
-        let mut state = self.state_ref.borrow_mut();
-        state.add_result(bi.to_signed_bytes_be());
+        self.finish_slice_u8(bi.to_signed_bytes_be().as_slice());
     }
 
-    #[inline]
     fn finish_big_uint(&self, bu: &RustBigUint) {
-        let mut state = self.state_ref.borrow_mut();
-        state.add_result(bu.to_bytes_be());
+        self.finish_slice_u8(bu.to_bytes_be().as_slice());
     }
     
-    #[inline]
     fn finish_i64(&self, value: i64) {
         self.finish_big_int(&value.into());
     }
 
     fn signal_error(&self, message: &[u8]) -> ! {
-        let s = std::str::from_utf8(message);
-        panic!("signal_error was called with message: {}", s.unwrap())
+        panic!(TxPanic{
+            status: 4,
+            message: message.to_vec(),
+        })
     }
 
     fn write_log(&self, _topics: &[[u8;32]], _data: &[u8]) {
-        println!("write_log not yet implemented");
+        // does nothing yet
+        // TODO: implement at some point
     }
 }
