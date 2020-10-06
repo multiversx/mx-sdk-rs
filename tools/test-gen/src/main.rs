@@ -16,17 +16,13 @@ fn {}() {{
 
 fn main() {
     print_mandos_tests(&[
-        "balanceOf",
-        "create",
-        "exceptions",
-        "joinGame",
-        "rewardAndSendToWallet",
-        "rewardWinner_Last",
-        "rewardWinner",
-        "topUp_ok",
-        "topUp_outOfFunds",
-        "topUp_withdraw",
-        "withdraw_Ok",
-        "withdraw_TooMuch",
+        "message_otherShard_callback",
+        "message_otherShard",
+        "message_sameShard_callback",
+        "message_sameShard",
+        "payment_otherShard_callback",
+        "payment_otherShard",
+        "payment_sameShard_callback",
+        "payment_sameShard",
     ]);
 }
