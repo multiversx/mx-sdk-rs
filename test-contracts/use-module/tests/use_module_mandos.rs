@@ -16,3 +16,8 @@ fn contract_map() -> ContractMap<TxContext> {
 fn use_module_features() {
     parse_execute_mandos("mandos/use_module_features.scen.json", &contract_map());
 }
+
+#[test]
+fn use_module_pause() {
+    parse_execute_mandos("mandos/use_module_pause.scen.json", &contract_map());
+}

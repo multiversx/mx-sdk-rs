@@ -55,9 +55,30 @@ impl fmt::Display for AccountData {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct BlockInfo {
+    pub block_timestamp: u64,
+    pub block_nonce: u64,
+    pub block_round: u64,
+    pub block_epoch: u64,
+}
+
+impl BlockInfo {
+    pub fn new() -> Self {
+        BlockInfo {
+            block_timestamp: 0,
+            block_nonce: 0,
+            block_round: 0,
+            block_epoch: 0,
+        }
+    }
+}
+
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
     pub new_addresses: HashMap<(Address, u64), Address>,
+    pub previous_block_info: BlockInfo,
+    pub current_block_info: BlockInfo,
 }
 
 impl BlockchainMock {
@@ -65,6 +86,8 @@ impl BlockchainMock {
         BlockchainMock {
             accounts: HashMap::new(),
             new_addresses: HashMap::new(),
+            previous_block_info: BlockInfo::new(),
+            current_block_info: BlockInfo::new(),
         }
     }
 
@@ -209,4 +232,35 @@ fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutp
     }
 
     panic!("panic happened: unknown type.")
+}
+
+/// Some data to get copied for the tx.
+/// Would be nice maybe at some point to have a reference to the full blockchain mock in the tx context,
+/// but for now, copying some data is enough.
+#[derive(Clone, Debug)]
+pub struct BlockchainTxInfo {
+    pub previous_block_info: BlockInfo,
+    pub current_block_info: BlockInfo,
+    pub contract_balance: BigUint,
+    pub contract_owner: Option<Address>
+}
+
+impl BlockchainMock {
+    pub fn create_tx_info(&self, contract_address: &Address) -> BlockchainTxInfo {
+        if let Some(contract) = self.accounts.get(contract_address) {
+            BlockchainTxInfo {
+                previous_block_info: self.previous_block_info.clone(),
+                current_block_info: self.current_block_info.clone(),
+                contract_balance: contract.balance.clone(),
+                contract_owner: contract.contract_owner.clone(),
+            }
+        } else {
+            BlockchainTxInfo {
+                previous_block_info: self.previous_block_info.clone(),
+                current_block_info: self.current_block_info.clone(),
+                contract_balance: 0u32.into(),
+                contract_owner: None,
+            }
+        }
+    }
 }
