@@ -44,14 +44,14 @@ mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/features.wasm
 cd ../..
 
-cd test-contracts/async-alice/wasm
+cd test-contracts/async/async-alice/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
 cd ../../..
 
-cd test-contracts/async-bob/wasm
+cd test-contracts/async/async-bob/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
