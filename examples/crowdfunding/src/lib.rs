@@ -5,16 +5,14 @@
 imports!();
 
 #[derive(PartialEq, Clone, Copy)]
-pub enum Status 
-{
+pub enum Status {
     FundingPeriod,
     Successful,
     Failed
 }
 
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
-pub trait Crowdfunding
-{
+pub trait Crowdfunding {
     #[storage_set("owner")]
     fn set_owner(&self, address: &Address);
 
@@ -44,8 +42,7 @@ pub trait Crowdfunding
     fn get_deposit(&self, donor: &Address) -> BigUint;
 
     #[init]
-    fn init(&self, target: &BigUint, deadline: u64)
-    {
+    fn init(&self, target: &BigUint, deadline: u64) {
         let my_address : Address = self.get_caller();
         self.set_owner(&my_address);
         self.set_target(target);
@@ -54,10 +51,8 @@ pub trait Crowdfunding
 
     #[payable]
     #[endpoint]
-    fn fund(&self, #[payment] payment: &BigUint) -> SCResult<()>
-    {
-        if self.get_block_nonce() > self.get_deadline()
-        {
+    fn fund(&self, #[payment] payment: &BigUint) -> SCResult<()> {
+        if self.get_block_nonce() > self.get_deadline() {
             return sc_error!("cannot fund after deadline");
         }
 
@@ -70,27 +65,19 @@ pub trait Crowdfunding
     }
 
     #[view]    
-    fn status(&self) -> Status 
-    {
-        if self.get_block_nonce() <= self.get_deadline() 
-        {
+    fn status(&self) -> Status {
+        if self.get_block_nonce() <= self.get_deadline() {
             return Status::FundingPeriod;
-        } 
-        else if self.get_sc_balance() >= self.get_target() 
-        {
+        } else if self.get_sc_balance() >= self.get_target() {
             return Status::Successful;
-        } 
-        else 
-        {
+        } else {
             return Status::Failed;
         }
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<()> 
-    {
-        match self.status() 
-        {
+    fn claim(&self) -> SCResult<()> {
+        match self.status() {
             Status::FundingPeriod => {
                 sc_error!("cannot claim before deadline")
             },
@@ -116,22 +103,17 @@ pub trait Crowdfunding
 
 use elrond_wasm::elrond_codec::*;
 
-impl Status 
-{
-    pub fn to_u8(&self) -> u8 
-    {
-        match self 
-        {
+impl Status {
+    pub fn to_u8(&self) -> u8 {
+        match self {
             Status::FundingPeriod => 0,
             Status::Successful => 1,
             Status::Failed => 2,
         }
     }
 
-    fn from_u8(v: u8) -> Result<Self, DecodeError> 
-    {
-        match v 
-        {
+    fn from_u8(v: u8) -> Result<Self, DecodeError> {
+        match v {
             0 => core::result::Result::Ok(Status::FundingPeriod),
             1 => core::result::Result::Ok(Status::Successful),
             2 => core::result::Result::Ok(Status::Failed),
@@ -140,18 +122,14 @@ impl Status
     }
 }
 
-impl Encode for Status 
-{
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError>
-    {
+impl Encode for Status {
+    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
         return self.to_u8().dep_encode_to(dest);
 	}
 }
 
-impl Decode for Status 
-{
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> 
-    {
+impl Decode for Status {
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         return Status::from_u8(u8::dep_decode(input)?);
     }
 }

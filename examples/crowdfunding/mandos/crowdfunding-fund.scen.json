@@ -8,7 +8,7 @@
       {
         "step": "setState",
         "accounts": {
-          "''donor_1_________________________": {
+          "address:donor1": {
             "nonce": "0",
             "balance": "400,000,000,000"
           }
@@ -18,8 +18,8 @@
         "step": "scCall",
         "txId": "fund-1",
         "tx": {
-            "from": "''donor_1_________________________",
-            "to": "''the_____crowdfunding____contract",
+            "from": "address:donor1",
+            "to": "address:the_crowdfunding_contract",
             "value": "250,000,000,000",
             "function": "fund",
             "arguments": [],
@@ -35,22 +35,22 @@
       {
         "step": "checkState",
         "accounts": {
-          "''my___personal__account___address": {
+          "address:my_address": {
             "nonce": "1",
             "balance": "1000000"
           },
-          "''donor_1_________________________": {
+          "address:donor1": {
             "nonce": "1",
             "balance": "150,000,000,000"
           },
-          "''the_____crowdfunding____contract": {
+          "address:the_crowdfunding_contract": {
             "nonce": "0",
             "balance": "250,000,000,000",
             "storage": {
-              "''owner": "''my___personal__account___address",
+              "''owner": "address:my_address",
               "''target": "500,000,000,000",
               "''deadline": "123,000",
-              "''deposit|''donor_1_________________________": "250,000,000,000"
+              "''deposit|address:donor1": "250,000,000,000"
             },
             "code": "file:../output/crowdfunding.wasm"
           }

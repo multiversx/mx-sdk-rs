@@ -14,5 +14,7 @@ fn contract_map() -> ContractMap<TxContext> {
 
 #[test]
 fn test_mandos() {
-    //parse_execute_mandos("mandos/crowdfunding.scen.json", &contract_map());
+    parse_execute_mandos("mandos/crowdfunding-fund-too-late.scen.json", &contract_map());
+    parse_execute_mandos("mandos/crowdfunding-fund.scen.json", &contract_map());
+    parse_execute_mandos("mandos/crowdfunding-init.scen.json", &contract_map());
 }
