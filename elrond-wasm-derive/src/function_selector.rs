@@ -3,7 +3,7 @@ use super::contract_gen::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
-pub fn generate_function_selector_body(contract: &Contract) -> proc_macro2::TokenStream {
+pub fn generate_function_selector_body(contract: &Contract, include_submodules: bool) -> proc_macro2::TokenStream {
     let match_arms: Vec<proc_macro2::TokenStream> = 
         contract.methods.iter()
             .filter_map(|m| {
@@ -26,21 +26,25 @@ pub fn generate_function_selector_body(contract: &Contract) -> proc_macro2::Toke
             .collect();
 
     let module_arms: Vec<proc_macro2::TokenStream> = 
-        contract.methods.iter()
-            .filter_map(|m| {
-                if let MethodMetadata::Module{ .. } = &m.metadata {
-                    let method_name = &m.name;
-                    Some(quote!{
-                        if self.#method_name().call(fn_name) {
-                            return true;
-                        }
-                    })
-                } else {
-                    None
-                }
-            })
-            .collect();
-    quote! {      
+        if include_submodules {
+            contract.methods.iter()
+                .filter_map(|m| {
+                    if let MethodMetadata::Module{ .. } = &m.metadata {
+                        let method_name = &m.name;
+                        Some(quote!{
+                            if self.#method_name().call(fn_name) {
+                                return true;
+                            }
+                        })
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        } else {
+            Vec::new()
+        };
+    quote! {
         if match fn_name {
             b"callBack" => { self.callback(); return true; }
             #(#match_arms)*

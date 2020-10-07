@@ -40,32 +40,12 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "txId": "call_mod_a",
             "tx": {
                 "from": "address:owner",
                 "to": "address:use_module_address",
                 "value": "0",
-                "function": "checkPause",
-                "arguments": [],
-                "gasLimit": "100,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [ "false" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "pause",
-            "tx": {
-                "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
-                "function": "pause",
+                "function": "call_mod_a",
                 "arguments": [],
                 "gasLimit": "100,000",
                 "gasPrice": "0"
@@ -80,58 +60,18 @@
         },
         {
             "step": "scCall",
-            "txId": "check paused",
+            "txId": "call_mod_a",
             "tx": {
                 "from": "address:owner",
                 "to": "address:use_module_address",
                 "value": "0",
-                "function": "checkPause",
-                "arguments": [],
-                "gasLimit": "100,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [ "true" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "unpause",
-            "tx": {
-                "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
-                "function": "unpause",
+                "function": "call_mod_b",
                 "arguments": [],
                 "gasLimit": "100,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "check unpaused",
-            "tx": {
-                "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
-                "function": "checkPause",
-                "arguments": [],
-                "gasLimit": "100,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [ "false" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
