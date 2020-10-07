@@ -4,8 +4,7 @@ use crowdfunding::*;
 use elrond_wasm_debug::*;
 
 #[test]
-fn test_status()
-{
+fn test_status() {
     let cf = CrowdfundingImpl::new(TxContext::dummy());
 
     cf.init(&RustBigUint::from(100u32), 5);

@@ -4,23 +4,23 @@
     {
       "step": "setState",
       "accounts": {
-        "''my___personal__account___address": {
+        "address:my_address": {
           "nonce": "0",
           "balance": "1,000,000"
         }
       },
       "newAddresses": [
         {
-          "creatorAddress": "''my___personal__account___address",
+          "creatorAddress": "address:my_address",
           "creatorNonce": "0",
-          "newAddress": "''the_____crowdfunding____contract"
+          "newAddress": "address:the_crowdfunding_contract"
         }
       ]
     },
     {
       "step": "scDeploy",
       "tx": {
-        "from": "''my___personal__account___address",
+        "from": "address:my_address",
         "contractCode": "file:../output/crowdfunding.wasm",
         "value": "0",
         "arguments": [
@@ -39,15 +39,15 @@
     {
       "step": "checkState",
       "accounts": {
-        "''my___personal__account___address": {
+        "address:my_address": {
           "nonce": "1",
           "balance": "1000000"
         },
-        "''the_____crowdfunding____contract": {
+        "address:the_crowdfunding_contract": {
           "nonce": "0",
           "balance": "0",
           "storage": {
-            "''owner": "''my___personal__account___address",
+            "''owner": "address:my_address",
             "''target": "500,000,000,000",
             "''deadline": "123,000"
           },
