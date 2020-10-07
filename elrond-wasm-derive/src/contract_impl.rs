@@ -4,6 +4,7 @@ use super::function_selector::*;
 
 pub fn contract_implementation(
     contract: &Contract,
+    is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
 
     let contract_impl_ident = contract.contract_impl_name.clone();
@@ -18,7 +19,7 @@ pub fn contract_implementation(
     let auto_impl_defs = contract.generate_auto_impl_defs();
     let auto_impls = contract.generate_auto_impls();
     let endpoints = contract.generate_endpoints();
-    let function_selector_body = generate_function_selector_body(&contract);
+    let function_selector_body = generate_function_selector_body(&contract, is_contract_main);
     let callback_body = contract.generate_callback_body();
     let api_where = snippets::api_where();
 

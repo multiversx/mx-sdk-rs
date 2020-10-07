@@ -25,7 +25,7 @@
             "tx": {
                 "from": "address:owner",
                 "value": "0",
-                "contractCode": "file:../output/use_module.wasm",
+                "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
                 "gasLimit": "100,000",
                 "gasPrice": "0"
