@@ -342,6 +342,22 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.blockchain_info.current_block_info.block_epoch
     }
 
+    fn get_prev_block_timestamp(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_timestamp
+    }
+
+    fn get_prev_block_nonce(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_nonce
+    }
+
+    fn get_prev_block_round(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_round
+    }
+
+    fn get_prev_block_epoch(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_epoch
+    }
+
     fn sha256(&self, data: &[u8]) -> [u8; 32] {
         let mut hasher = Sha3_256::new();
         hasher.input(data);

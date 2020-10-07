@@ -173,6 +173,26 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
+        fn get_prev_block_timestamp(&self) -> u64 {
+          self.api.get_prev_block_timestamp()
+        }
+
+        #[inline]
+        fn get_prev_block_nonce(&self) -> u64 {
+          self.api.get_prev_block_nonce()
+        }
+
+        #[inline]
+        fn get_prev_block_round(&self) -> u64 {
+          self.api.get_prev_block_round()
+        }
+
+        #[inline]
+        fn get_prev_block_epoch(&self) -> u64 {
+          self.api.get_prev_block_epoch()
+        }
+
+        #[inline]
         fn sha256(&self, data: &[u8]) -> [u8; 32] {
           self.api.sha256(data)
         }
