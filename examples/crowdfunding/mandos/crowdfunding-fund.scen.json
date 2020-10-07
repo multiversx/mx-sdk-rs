@@ -1,0 +1,60 @@
+{
+    "name": "crowdfunding funding",
+    "steps": [
+      {
+        "step": "externalSteps",
+        "path": "crowdfunding-init.scen.json"
+      },
+      {
+        "step": "setState",
+        "accounts": {
+          "''donor_1_________________________": {
+            "nonce": "0",
+            "balance": "400,000,000,000"
+          }
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "fund-1",
+        "tx": {
+            "from": "''donor_1_________________________",
+            "to": "''the_____crowdfunding____contract",
+            "value": "250,000,000,000",
+            "function": "fund",
+            "arguments": [],
+            "gasLimit": "100,000,000",
+            "gasPrice": "0"
+        },
+        "expect": {
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "checkState",
+        "accounts": {
+          "''my___personal__account___address": {
+            "nonce": "1",
+            "balance": "1000000"
+          },
+          "''donor_1_________________________": {
+            "nonce": "1",
+            "balance": "150,000,000,000"
+          },
+          "''the_____crowdfunding____contract": {
+            "nonce": "0",
+            "balance": "250,000,000,000",
+            "storage": {
+              "''owner": "''my___personal__account___address",
+              "''target": "500,000,000,000",
+              "''deadline": "123,000",
+              "''deposit|''donor_1_________________________": "250,000,000,000"
+            },
+            "code": "file:../output/crowdfunding.wasm"
+          }
+        }
+      }
+    ]
+  }

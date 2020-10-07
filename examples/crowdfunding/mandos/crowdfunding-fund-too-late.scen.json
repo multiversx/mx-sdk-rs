@@ -1,0 +1,77 @@
+{
+    "name": "trying to fund one block too late",
+    "steps": [
+      {
+        "step": "externalSteps",
+        "path": "crowdfunding-fund.scen.json"
+      },
+      {
+        "step": "setState",
+        "currentBlockInfo": {
+            "blockNonce": "123,001"
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "fund-too-late",
+        "tx": {
+            "from": "''donor_1_________________________",
+            "to": "''the_____crowdfunding____contract",
+            "value": "10,000,000,000",
+            "function": "fund",
+            "arguments": [],
+            "gasLimit": "100,000,000",
+            "gasPrice": "0"
+        },
+        "expect": {
+            "status": "4",
+            "message": "str:cannot fund after deadline",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "checkState",
+        "accounts": {
+          "''my___personal__account___address": {
+            "nonce": "1",
+            "balance": "1000000"
+          },
+          "''donor_1_________________________": {
+            "nonce": "*",
+            "balance": "150,000,000,000"
+          },
+          "''the_____crowdfunding____contract": {
+            "nonce": "0",
+            "balance": "250,000,000,000",
+            "storage": {
+              "''owner": "''my___personal__account___address",
+              "''target": "500,000,000,000",
+              "''deadline": "123,000",
+              "''deposit|''donor_1_________________________": "250,000,000,000"
+            },
+            "code": "file:../output/crowdfunding.wasm"
+          }
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "check-status",
+        "tx": {
+            "from": "''donor_1_________________________",
+            "to": "''the_____crowdfunding____contract",
+            "value": "0",
+            "function": "status",
+            "arguments": [],
+            "gasLimit": "100,000,000",
+            "gasPrice": "0"
+        },
+        "expect": {
+            "out": [ "2" ],
+            "status": "0",
+            "gas": "*",
+            "refund": "*"
+        }
+      }
+    ]
+  }

@@ -12,6 +12,7 @@ members = [
   "examples/crypto-bubbles",
   "examples/factorial",
   "examples/simple-erc20",
+  "examples/crowdfunding",
 
   "test-contracts/async/async-alice",
   "test-contracts/async/async-bob",
