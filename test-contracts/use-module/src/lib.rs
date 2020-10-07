@@ -1,6 +1,11 @@
 
 #![no_std]
 
+mod internal_mod_a;
+pub use internal_mod_a::*;
+mod internal_mod_b;
+pub use internal_mod_b::*;
+
 imports!();
 
 #[cfg(feature = "elrond-wasm-module-features-default")]
@@ -15,6 +20,12 @@ use elrond_wasm_module_pause_wasm::*;
 
 #[elrond_wasm_derive::contract(UseModuleImpl)]
 pub trait UseModule {
+
+    #[module(InteralModuleAImpl)]
+    fn internal_module_a(&self) -> InteralModuleAImpl<T, BigInt, BigUint>;
+
+    #[module(InteralModuleBImpl)]
+    fn internal_module_b(&self) -> InteralModuleBImpl<T, BigInt, BigUint>;
 
     #[module(FeaturesModuleImpl)]
     fn features_module(&self) -> FeaturesModuleImpl<T, BigInt, BigUint>;
