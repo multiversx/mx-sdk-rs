@@ -12,7 +12,7 @@ pub fn process_module(
 
     let contract = Contract::new(args_input, proc_input);
 
-    let contract_impl = contract_implementation(&contract);
+    let contract_impl = contract_implementation(&contract, false);
 
     proc_macro::TokenStream::from(quote! {
 
