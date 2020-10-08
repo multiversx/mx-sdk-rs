@@ -90,6 +90,11 @@ pub trait BasicFeatures {
     }
 
     #[endpoint]
+    fn echo_h256(&self, h: H256) -> H256 {
+        h
+    }
+
+    #[endpoint]
     fn echo_nothing(&self, #[var_args] nothing: ()) -> () {
         nothing
     }
