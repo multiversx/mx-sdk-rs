@@ -1,4 +1,3 @@
-
 #![no_std]
 
 pub use simple_erc20::*;
