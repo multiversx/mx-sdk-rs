@@ -6,7 +6,8 @@
       "accounts": {
         "address:my_address": {
           "nonce": "0",
-          "balance": "1,000,000"
+          "balance": "1,000,000",
+          "storage": {}
         }
       },
       "newAddresses": [
@@ -19,6 +20,7 @@
     },
     {
       "step": "scDeploy",
+      "txId": "deploy",
       "tx": {
         "from": "address:my_address",
         "contractCode": "file:../output/crowdfunding.wasm",
@@ -41,7 +43,8 @@
       "accounts": {
         "address:my_address": {
           "nonce": "1",
-          "balance": "1000000"
+          "balance": "1000000",
+          "storage": {}
         },
         "address:the_crowdfunding_contract": {
           "nonce": "0",

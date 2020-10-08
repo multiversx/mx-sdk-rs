@@ -10,7 +10,8 @@
         "accounts": {
           "address:donor1": {
             "nonce": "0",
-            "balance": "400,000,000,000"
+            "balance": "400,000,000,000",
+            "storage": {}
           }
         }
       },
@@ -37,11 +38,13 @@
         "accounts": {
           "address:my_address": {
             "nonce": "1",
-            "balance": "1000000"
+            "balance": "1000000",
+            "storage": {}
           },
           "address:donor1": {
             "nonce": "1",
-            "balance": "150,000,000,000"
+            "balance": "150,000,000,000",
+            "storage": {}
           },
           "address:the_crowdfunding_contract": {
             "nonce": "0",
