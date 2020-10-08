@@ -15,7 +15,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
 elrond-wasm = { version = "0.7.0", path = "../elrond-wasm" }
-mandos = "0.1.0"
+mandos = "0.1.1"
 
 num-bigint = "0.3"
 num-traits = "0.2"
