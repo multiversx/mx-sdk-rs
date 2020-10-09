@@ -13,8 +13,17 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn test_mandos() {
-    parse_execute_mandos("mandos/crowdfunding-fund-too-late.scen.json", &contract_map());
-    parse_execute_mandos("mandos/crowdfunding-fund.scen.json", &contract_map());
-    parse_execute_mandos("mandos/crowdfunding-init.scen.json", &contract_map());
+fn test_crowdfunding1() {
+parse_execute_mandos("mandos/crowdfunding-fund-too-late.scen.json", &contract_map());
 }
+
+#[test]
+fn test_crowdfunding2() {
+parse_execute_mandos("mandos/crowdfunding-fund.scen.json", &contract_map());
+}
+
+#[test]
+fn test_crowdfunding3() {
+parse_execute_mandos("mandos/crowdfunding-init.scen.json", &contract_map());
+}
+
