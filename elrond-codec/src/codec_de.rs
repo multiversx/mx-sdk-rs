@@ -1,4 +1,5 @@
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use arrayvec::ArrayVec;
 use core::num::NonZeroUsize;
 
@@ -314,6 +315,16 @@ impl<T: Decode> Decode for Option<T> {
 			1 => Ok(Some(T::dep_decode(input)?)),
 			_ => Err(DecodeError::InvalidValue),
 		}
+    }
+}
+
+impl<T: Decode> Decode for Box<T> {
+	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(Box::new(T::top_decode(input)?))
+    }
+    
+    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(Box::new(T::dep_decode(input)?))
     }
 }
 
