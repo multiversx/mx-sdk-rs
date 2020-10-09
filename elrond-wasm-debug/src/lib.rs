@@ -1,5 +1,3 @@
-//#![no_std]
-
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
@@ -10,6 +8,7 @@ mod contract_map;
 mod execute_mandos;
 mod display_util;
 mod blockchain_mock;
+mod async_data;
 
 pub use ext_mock::*;
 pub use big_int_mock::*;
@@ -18,13 +17,13 @@ pub use contract_map::*;
 pub use execute_mandos::*;
 pub use display_util::*;
 pub use blockchain_mock::*;
+pub use async_data::*;
 
 #[macro_use]
 extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 
-//pub use hashbrown::HashMap;
 pub use std::collections::HashMap;
 
 #[cfg(test)]

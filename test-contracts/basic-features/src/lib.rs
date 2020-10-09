@@ -329,6 +329,49 @@ pub trait BasicFeatures {
         self.send_tx(to, amount, "");
     }
 
+    // BLOCK INFO
+
+    #[view(get_block_timestamp)]
+    fn get_block_timestamp_view(&self) -> u64 {
+        self.get_block_timestamp()
+    }
+
+    #[view(get_block_nonce)]
+    fn get_block_nonce_view(&self) -> u64 {
+        self.get_block_nonce()
+    }
+
+    #[view(get_block_round)]
+    fn get_block_round_view(&self) -> u64 {
+        self.get_block_round()
+    }
+
+    #[view(get_block_epoch)]
+    fn get_block_epoch_view(&self) -> u64 {
+        self.get_block_epoch()
+    }
+
+    #[view(get_prev_block_timestamp)]
+    fn get_prev_block_timestamp_view(&self) -> u64 {
+        self.get_prev_block_timestamp()
+    }
+
+    #[view(get_prev_block_nonce)]
+    fn get_prev_block_nonce_view(&self) -> u64 {
+        self.get_prev_block_nonce()
+    }
+
+    #[view(get_prev_block_round)]
+    fn get_prev_block_round_view(&self) -> u64 {
+        self.get_prev_block_round()
+    }
+
+    #[view(get_prev_block_epoch)]
+    fn get_prev_block_epoch_view(&self) -> u64 {
+        self.get_prev_block_epoch()
+    }
+
+    // EVENTS
 
     #[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
     fn event_a(&self, data: &BigUint);

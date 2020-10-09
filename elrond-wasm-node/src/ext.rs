@@ -239,8 +239,8 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
-    fn get_gas_left(&self) -> i64 {
-        unsafe { getGasLeft() }
+    fn get_gas_left(&self) -> u64 {
+        unsafe { getGasLeft() as u64 }
     }
 
     #[inline]
@@ -261,6 +261,26 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_block_epoch(&self) -> u64 {
         unsafe{ getBlockEpoch() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_timestamp(&self) -> u64 {
+        unsafe{ getPrevBlockTimestamp() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_nonce(&self) -> u64 {
+        unsafe{ getPrevBlockNonce() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_round(&self) -> u64 {
+        unsafe{ getPrevBlockRound() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_epoch(&self) -> u64 {
+        unsafe{ getPrevBlockEpoch() as u64 }
     }
 
     fn sha256(&self, data: &[u8]) -> [u8; 32] {

@@ -148,7 +148,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn get_gas_left(&self) -> i64 {
+        fn get_gas_left(&self) -> u64 {
           self.api.get_gas_left()
         }
 
@@ -170,6 +170,26 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         #[inline]
         fn get_block_epoch(&self) -> u64 {
           self.api.get_block_epoch()
+        }
+
+        #[inline]
+        fn get_prev_block_timestamp(&self) -> u64 {
+          self.api.get_prev_block_timestamp()
+        }
+
+        #[inline]
+        fn get_prev_block_nonce(&self) -> u64 {
+          self.api.get_prev_block_nonce()
+        }
+
+        #[inline]
+        fn get_prev_block_round(&self) -> u64 {
+          self.api.get_prev_block_round()
+        }
+
+        #[inline]
+        fn get_prev_block_epoch(&self) -> u64 {
+          self.api.get_prev_block_epoch()
         }
 
         #[inline]
