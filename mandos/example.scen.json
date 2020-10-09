@@ -18,7 +18,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "``smart_contract_address________s1": {
+                "address:smart_contract_address": {
                     "nonce": "0x00",
                     "balance": "23,000",
                     "storage": {
@@ -42,9 +42,9 @@
             },
             "newAddresses": [
                 {
-                    "creatorAddress": "``creator_addr____________________",
+                    "creatorAddress": "address:creator",
                     "creatorNonce": "1234",
-                    "newAddress": "``creator_addr____________________"
+                    "newAddress": "address:creator"
                 }
             ],
             "blockHashes": [
@@ -109,7 +109,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "``smart_contract_address________s1",
+                        "address": "address:smart_contract_address",
                         "identifier": "0xf099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
                         "topics": [
                             "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -228,17 +228,10 @@
                     "storage": {},
                     "code": ""
                 },
-                "``account_with_defaults___________": {
+                "address:account_with_defaults": {
                     "storage": "*"
                 },
-                "``smart_contract_address_2______s1": {
-                    "nonce": "*",
-                    "balance": "*",
-                    "storage": "*",
-                    "code": "*",
-                    "asyncCallData": "``func@arg1@arg2"
-                },
-                "``smart_contract_address________s1": {
+                "address:smart_contract_address": {
                     "nonce": "0x00",
                     "balance": "23,000",
                     "storage": {
@@ -255,12 +248,19 @@
                     },
                     "code": "file:smart-contract.wasm"
                 },
+                "address:smart_contract_address_2": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": "*",
+                    "code": "*",
+                    "asyncCallData": "``func@arg1@arg2"
+                },
                 "+": ""
             }
         },
         {
             "step": "dumpState",
-            "comment": "print everything to consolecd"
+            "comment": "print everything to console"
         }
     ]
 }
