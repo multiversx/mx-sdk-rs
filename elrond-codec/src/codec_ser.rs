@@ -1,4 +1,5 @@
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::num::NonZeroUsize;
 
 use crate::codec_err::EncodeError;
@@ -328,6 +329,18 @@ impl<T: Encode> Encode for Option<T> {
 			}
 		}
 		Ok(())
+	}
+}
+
+impl<T: Encode> Encode for Box<T> {
+	#[inline]
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_ref().dep_encode_to(dest)
+	}
+
+	#[inline]
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+		self.as_ref().using_top_encoded(f)
 	}
 }
 
