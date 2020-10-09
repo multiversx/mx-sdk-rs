@@ -8,6 +8,7 @@
         {
             "step": "checkState",
             "comment": "just checking that steps executed",
+            "owner": "address:owner_address",
             "accounts": {
                 "address:an_account": {
                     "nonce": "3",

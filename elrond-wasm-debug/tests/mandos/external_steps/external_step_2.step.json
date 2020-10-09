@@ -3,6 +3,7 @@
     "steps": [
         {
             "step": "setState",
+            "owner": "address:owner_address",
             "accounts": {
                 "address:an_account": {
                     "nonce": "3",
