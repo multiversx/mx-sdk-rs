@@ -8,9 +8,9 @@
         {
             "step": "checkState",
             "comment": "just checking that steps executed",
-            "owner": "address:owner_address",
             "accounts": {
                 "address:an_account": {
+                    "owner": "address:owner_address",
                     "nonce": "3",
                     "balance": "5",
                     "storage": {},

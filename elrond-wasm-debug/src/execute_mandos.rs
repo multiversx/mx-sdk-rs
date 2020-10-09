@@ -25,7 +25,6 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
             },
             Step::SetState {
                 comment,
-                owner,
                 accounts,
                 new_addresses,
                 block_hashes,
@@ -168,7 +167,6 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
             },
             Step::CheckState {
                 comment,
-                owner,
                 accounts,
             } => {
                 check_state(accounts, state);

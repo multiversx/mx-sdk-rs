@@ -34,10 +34,6 @@ pub enum StepRaw {
         comment: Option<String>,
 
         #[serde(default)]
-        #[serde(skip_serializing_if = "Option::is_none")]
-        owner: Option<ValueSubTree>,
-
-        #[serde(default)]
         #[serde(skip_serializing_if = "BTreeMap::is_empty")]
         accounts: BTreeMap<String, AccountRaw>,
         
@@ -114,10 +110,6 @@ pub enum StepRaw {
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
         comment: Option<String>,
-
-        #[serde(default)]
-        #[serde(skip_serializing_if = "Option::is_none")]
-        owner: Option<ValueSubTree>,
 
         accounts: CheckAccountsRaw,
     },
