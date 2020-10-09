@@ -1,0 +1,55 @@
+{
+    "name": "test setState and checkState for optional field account.owner.",
+    "steps": [
+        {
+            "step": "setState",
+            "comment": "check without owner",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "3",
+                    "balance": "5",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "just checking that steps executed",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "3",
+                    "balance": "5",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "check with owner",
+            "accounts": {
+                "address:an_account": {
+                    "owner": "address:owner_address",
+                    "nonce": "3",
+                    "balance": "5",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "just checking that steps executed",
+            "accounts": {
+                "address:an_account": {
+                    "owner": "address:owner_address",
+                    "nonce": "3",
+                    "balance": "5",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}
