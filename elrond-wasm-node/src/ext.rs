@@ -31,6 +31,8 @@ extern {
 
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
+    fn getESDTValue(resultOffset: *const u8) -> i32;
+    fn getESDTTokenName(resultOffset: *const u8) -> i32;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn finish(dataOffset: *const u8, length: i32);
 
@@ -58,6 +60,7 @@ extern {
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetCallValue(dest: i32);
+    fn bigIntGetESDTCallValue(dest: i32);
     fn bigIntFinishUnsigned(bih: i32);
     fn bigIntFinishSigned(bih: i32);
 
@@ -202,6 +205,30 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             let result = bigIntNew(0);
             bigIntGetCallValue(result);
             ArwenBigUint {handle: result}
+        }
+    }
+
+    #[inline]
+    fn get_esdt_value_big_uint(&self) -> ArwenBigUint {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntGetESDTCallValue(result);
+            ArwenBigUint {handle: result}
+        }
+    }
+
+    #[inline]
+    fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+        unsafe {
+            let mut name = Vec::with_capacity(32);
+            let name_len = getESDTTokenName(name.as_mut_ptr());
+            match name_len {
+                0 => None,
+                _ => {
+                    name.set_len(name_len);
+                    Some(name)
+                }
+            }
         }
     }
 
