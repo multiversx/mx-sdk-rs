@@ -27,7 +27,6 @@ pub enum Step {
     },
     SetState {
         comment: Option<String>,
-        owner: Option<AddressValue>,
         accounts: BTreeMap<AddressKey, Account>,
         new_addresses: Vec<NewAddress>,
         block_hashes: Vec<BytesValue>,
@@ -58,7 +57,6 @@ pub enum Step {
     },
     CheckState {
         comment: Option<String>,
-        owner: Option<AddressValue>,
         accounts: CheckAccounts,
     },
     DumpState {
@@ -76,7 +74,6 @@ impl InterpretableFrom<StepRaw> for Step {
             },
             StepRaw::SetState {
                 comment,
-                owner,
                 accounts,
                 new_addresses,
                 block_hashes,
@@ -84,7 +81,6 @@ impl InterpretableFrom<StepRaw> for Step {
                 current_block_info,
             } => Step::SetState {
                 comment,
-                owner: owner.map(|o| AddressValue::interpret_from(o, context)),
                 accounts: accounts.into_iter().map(|(k, v)| (
                     AddressKey::interpret_from(k, context),
                     Account::interpret_from(v, context))).collect(),
@@ -135,11 +131,9 @@ impl InterpretableFrom<StepRaw> for Step {
             },
             StepRaw::CheckState {
                 comment,
-                owner,
                 accounts,
             } => Step::CheckState {
                 comment,
-                owner: owner.map(|o| AddressValue::interpret_from(o, context)),
                 accounts: CheckAccounts::interpret_from(accounts, context),
             },
             StepRaw::DumpState {

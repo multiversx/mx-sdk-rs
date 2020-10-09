@@ -12,6 +12,10 @@ pub struct AccountRaw {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
 
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<ValueSubTree>,
+
     pub nonce: ValueSubTree,
     pub balance: ValueSubTree,
     pub storage: BTreeMap<String, ValueSubTree>,
@@ -103,6 +107,10 @@ pub struct CheckAccountRaw {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<ValueSubTree>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "ValueSubTree::is_empty_string")]
