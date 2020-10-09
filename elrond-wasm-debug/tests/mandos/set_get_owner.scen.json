@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "setState",
-            "comment": "check without owner",
+            "comment": "set without owner",
             "accounts": {
                 "address:an_account": {
                     "nonce": "3",
@@ -15,7 +15,7 @@
         },
         {
             "step": "checkState",
-            "comment": "just checking that steps executed",
+            "comment": "check without owner",
             "accounts": {
                 "address:an_account": {
                     "nonce": "3",
@@ -27,7 +27,7 @@
         },
         {
             "step": "setState",
-            "comment": "check with owner",
+            "comment": "set with owner",
             "accounts": {
                 "address:an_account": {
                     "owner": "address:owner_address",
@@ -40,7 +40,7 @@
         },
         {
             "step": "checkState",
-            "comment": "just checking that steps executed",
+            "comment": "check with owner",
             "accounts": {
                 "address:an_account": {
                     "owner": "address:owner_address",
