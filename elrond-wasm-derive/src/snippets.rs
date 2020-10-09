@@ -133,6 +133,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
+        fn get_esdt_value_big_uint(&self) -> BigUint {
+            self.api.get_esdt_value_big_uint()
+        }
+
+        #[inline]
+        fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+            self.api.get_esdt_token_name()
+        }
+
+        #[inline]
         fn send_tx(&self, to: &Address, amount: &BigUint, message: &str) {
           self.api.send_tx(to, amount, message);
         }
