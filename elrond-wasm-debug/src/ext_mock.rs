@@ -5,6 +5,8 @@ use elrond_wasm::{H256, Address};
 use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
 use crate::display_util::*;
+use crate::async_data::*;
+use crate::blockchain_mock::*;
 
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::{BigUintApi, BigIntApi};
@@ -38,6 +40,9 @@ pub struct TxInput {
     pub call_value: BigUint,
     pub func_name: Vec<u8>,
     pub args: Vec<Vec<u8>>,
+    pub gas_limit: u64,
+    pub gas_price: u64,
+    pub tx_hash: H256,
 }
 
 impl fmt::Display for TxInput {
@@ -91,18 +96,11 @@ pub struct SendBalance {
 }
 
 #[derive(Debug)]
-pub struct AsyncCallResult {
-    pub to: Address,
-    pub call_data: Vec<u8>,
-    pub call_value: BigUint,
-}
-
-#[derive(Debug)]
 pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
     pub result: TxResult,
     pub send_balance_list: Vec<SendBalance>,
-    pub async_call: Option<AsyncCallResult>,
+    pub async_call: Option<AsyncCallTxData>,
 
 }
 
@@ -150,13 +148,19 @@ impl TxOutput {
 
 #[derive(Debug)]
 pub struct TxContext {
+    pub blockchain_info: BlockchainTxInfo,
     pub tx_input: TxInput,
     pub tx_output_cell: Rc<RefCell<TxOutput>>,
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, tx_output: TxOutput) -> Self {
+    pub fn new(
+        blockchain_info: BlockchainTxInfo,
+        tx_input: TxInput,
+        tx_output: TxOutput) -> Self {
+
         TxContext {
+            blockchain_info,
             tx_input,
             tx_output_cell: Rc::new(RefCell::new(tx_output)),
         }
@@ -169,12 +173,21 @@ impl TxContext {
 
     pub fn dummy() -> Self {
         TxContext {
+            blockchain_info: BlockchainTxInfo {
+                previous_block_info: BlockInfo::new(),
+                current_block_info: BlockInfo::new(),
+                contract_balance: 0u32.into(),
+                contract_owner: None,
+            },
             tx_input: TxInput{
                 from: Address::zero(),
                 to: Address::zero(),
                 call_value: 0u32.into(),
                 func_name: Vec::new(),
                 args: Vec::new(),
+                gas_limit: 0,
+                gas_price: 0,
+                tx_hash: b"dummy...........................".into(),
             },
             tx_output_cell: Rc::new(RefCell::new(TxOutput::default())),
         }
@@ -184,6 +197,7 @@ impl TxContext {
 impl Clone for TxContext {
     fn clone(&self) -> Self {
         TxContext{
+            blockchain_info: self.blockchain_info.clone(),
             tx_input: self.tx_input.clone(),
             tx_output_cell: Rc::clone(&self.tx_output_cell),
         }
@@ -196,15 +210,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_owner_address(&self) -> Address {
-        self.get_caller() // TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        self.blockchain_info.contract_owner.clone().unwrap_or_else(|| panic!("contract owner address not set"))
     }
 
     fn get_caller(&self) -> Address {
         self.tx_input.from.clone()
     }
 
-    fn get_balance(&self, _address: &Address) -> RustBigUint {
-        panic!("get balance not yet implemented")
+    fn get_balance(&self, address: &Address) -> RustBigUint {
+        if address != &self.get_sc_address() {
+            panic!("get balance not yet implemented for accounts other than the contract itself");
+        }
+        self.blockchain_info.contract_balance.clone().into()
     }
 
     fn storage_store(&self, key: &[u8], value: &[u8]) {
@@ -236,11 +253,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
-        let mut vector = Vec::with_capacity(32);
-        for i in value.iter() {
-            vector.push(*i);
-        }
-        self.storage_store(key, &vector);
+        self.storage_store(key, &value[..].to_vec());
     }
     
     fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
@@ -248,10 +261,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         let mut res = [0u8; 32];
         let offset = 32 - value.len();
         if !value.is_empty() {
-            res[offset..(value.len()-1 + offset)].clone_from_slice(&value[..value.len()-1]);
-            // for i in 0..value.len()-1 {
-            //     res[offset+i] = value[i];
-            // }
+            res[offset..].clone_from_slice(&value[..]);
         }
         res
     }
@@ -300,35 +310,52 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
-        tx_output.async_call = Some(AsyncCallResult{
+        tx_output.async_call = Some(AsyncCallTxData{
             to: to.clone(),
             call_value: amount.value(),
             call_data: data.to_vec(),
+            tx_hash: self.get_tx_hash(),
         });
     }
 
     fn get_tx_hash(&self) -> H256 {
-        panic!("get_tx_hash not yet implemented");
+        self.tx_input.tx_hash.clone()
     }
 
-    fn get_gas_left(&self) -> i64 {
-        1000000000
+    fn get_gas_left(&self) -> u64 {
+        self.tx_input.gas_limit
     }
 
     fn get_block_timestamp(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_timestamp
     }
 
     fn get_block_nonce(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_nonce
     }
 
     fn get_block_round(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_round
     }
 
     fn get_block_epoch(&self) -> u64 {
-        0
+        self.blockchain_info.current_block_info.block_epoch
+    }
+
+    fn get_prev_block_timestamp(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_timestamp
+    }
+
+    fn get_prev_block_nonce(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_nonce
+    }
+
+    fn get_prev_block_round(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_round
+    }
+
+    fn get_prev_block_epoch(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_epoch
     }
 
     fn sha256(&self, data: &[u8]) -> [u8; 32] {
@@ -377,7 +404,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         let arg = self.get_argument_vec(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
-        res[offset..(arg.len()-1 + offset)].clone_from_slice(&arg[..arg.len()-1]);
+        res[offset..].copy_from_slice(&arg[..]);
         res
     }
     

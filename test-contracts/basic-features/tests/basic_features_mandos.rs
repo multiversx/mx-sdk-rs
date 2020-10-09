@@ -13,6 +13,11 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
+fn block_info() {
+    parse_execute_mandos("mandos/block_info.scen.json", &contract_map());    
+}
+
+#[test]
 fn count_ones() {
     parse_execute_mandos("mandos/count_ones.scen.json", &contract_map());    
 }

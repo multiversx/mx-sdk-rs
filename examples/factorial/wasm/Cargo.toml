@@ -14,8 +14,14 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies]
-factorial = { path = "..", features=["wasm-output-mode"] }
-elrond-wasm-output = { version = "0.7.0", path = "../../../elrond-wasm-output", features=["wasm-output-mode"] }
+[dependencies.factorial]
+path = ".."
+features = ["wasm-output-mode"]
+default-features = false
+
+[dependencies.elrond-wasm-output]
+version = "0.7.1"
+path = "../../../elrond-wasm-output"
+features = ["wasm-output-mode"]
 
 [workspace]
