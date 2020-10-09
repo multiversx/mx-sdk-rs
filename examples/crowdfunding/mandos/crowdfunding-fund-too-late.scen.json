@@ -13,44 +13,6 @@
       },
       {
         "step": "scCall",
-        "txId": "check-block-nonce",
-        "tx": {
-            "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
-            "value": "0",
-            "function": "get_current_block_nonce",
-            "arguments": [],
-            "gasLimit": "100,000,000",
-            "gasPrice": "0"
-        },
-        "expect": {
-            "out": [ "123,001" ],
-            "status": "0",
-            "gas": "*",
-            "refund": "*"
-        }
-      },
-      {
-        "step": "scCall",
-        "txId": "check-status",
-        "tx": {
-            "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
-            "value": "0",
-            "function": "status",
-            "arguments": [],
-            "gasLimit": "100,000,000",
-            "gasPrice": "0"
-        },
-        "expect": {
-            "out": [ "2" ],
-            "status": "0",
-            "gas": "*",
-            "refund": "*"
-        }
-      },
-      {
-        "step": "scCall",
         "txId": "fund-too-late",
         "tx": {
             "from": "address:donor1",

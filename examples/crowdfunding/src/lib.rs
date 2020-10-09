@@ -64,11 +64,6 @@ pub trait Crowdfunding {
         return Ok(());
     }
 
-    #[view]
-    fn get_current_block_nonce(&self) -> u64 {
-        self.get_block_nonce()
-    }
-
     #[view]    
     fn status(&self) -> Status {
         if self.get_block_nonce() <= self.get_deadline() {
