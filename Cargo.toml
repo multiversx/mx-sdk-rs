@@ -3,6 +3,7 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
+  "mandos",
 
   "modules/elrond-wasm-module-features",
   "modules/elrond-wasm-module-pause",
