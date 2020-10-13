@@ -27,3 +27,17 @@ fn test_crowdfunding3() {
 parse_execute_mandos("mandos/crowdfunding-init.scen.json", &contract_map());
 }
 
+#[test]
+fn test_crowdfunding4() {
+    parse_execute_mandos("mandos/crowdfunding-claim-too-early.scen.json", &contract_map());
+}
+
+#[test]
+fn test_crowdfunding5() {
+    parse_execute_mandos("mandos/crowdfunding-claim-successful.scen.json", &contract_map());
+}
+
+#[test]
+fn test_crowdfunding6() {
+    parse_execute_mandos("mandos/crowdfunding-claim-failed.scen.json", &contract_map());
+}
