@@ -2,6 +2,20 @@ use crate::*;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
+fn load_arg_error<A, BigInt, BigUint>(api: &A, arg_id: ArgId, de_err: DecodeError) -> !
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'static
+{
+    let mut decode_err_message: Vec<u8> = Vec::new();
+    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
+    decode_err_message.extend_from_slice(arg_id);
+    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
+    decode_err_message.extend_from_slice(de_err.message_bytes());
+    api.signal_error(decode_err_message.as_slice())
+}
+
 pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
 where
     T: Decode,
@@ -28,27 +42,13 @@ where
             if let Some(res_i64) = T::top_decode_from_i64(|| api.get_argument_i64(index)) {
                 match res_i64 {
                     Ok(from_i64) => from_i64,
-                    Err(de_err) => {
-                        let mut decode_err_message: Vec<u8> = Vec::new();
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-                        decode_err_message.extend_from_slice(arg_id);
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-                        decode_err_message.extend_from_slice(de_err.message_bytes());
-                        api.signal_error(decode_err_message.as_slice())
-                    }
+                    Err(de_err) => load_arg_error(api, arg_id, de_err),
                 }
             } else {
                 let arg_bytes = api.get_argument_vec(index);
                 match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
                     Ok(v) => v,
-                    Err(de_err) => {
-                        let mut decode_err_message: Vec<u8> = Vec::new();
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-                        decode_err_message.extend_from_slice(arg_id);
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-                        decode_err_message.extend_from_slice(de_err.message_bytes());
-                        api.signal_error(decode_err_message.as_slice())
-                    }
+                    Err(de_err) => load_arg_error(api, arg_id, de_err),
                 }
             }
         }
