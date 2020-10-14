@@ -44,7 +44,7 @@ impl<'a> Input for &'a [u8] {
 
 	fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
 		if into.len() > self.len() {
-			return Err(DecodeError::InputTooShort);
+			return Err(DecodeError::INPUT_TOO_SHORT);
 		}
 		let len = into.len();
 		into.copy_from_slice(&self[..len]);
@@ -54,7 +54,7 @@ impl<'a> Input for &'a [u8] {
 
     fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError> {
         if length > self.len() {
-            return Err(DecodeError::InputTooShort);
+            return Err(DecodeError::INPUT_TOO_SHORT);
         }
 
         let (result, rest) = self.split_at(length);
@@ -85,7 +85,7 @@ pub trait Decode: Sized {
 	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let result = Self::dep_decode(input)?;
         if input.remaining_len() > 0 {
-            return Err(DecodeError::InputTooLong);
+            return Err(DecodeError::INPUT_TOO_LONG);
         }
         Ok(result)
     }
@@ -122,7 +122,7 @@ impl Decode for u8 {
         match bytes.len() {
             0 => Ok(0u8),
             1 => Ok(bytes[0]),
-            _ => Err(DecodeError::InputTooLong),
+            _ => Err(DecodeError::INPUT_TOO_LONG),
         }
     }
     
@@ -201,7 +201,7 @@ macro_rules! decode_num_unsigned {
             fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.flush()?;
                 if bytes.len() > $num_bytes {
-                    return Err(DecodeError::InputTooLong)
+                    return Err(DecodeError::INPUT_TOO_LONG)
                 }
                 let num = bytes_to_number(bytes, false) as $ty;
                 Ok(num)
@@ -229,7 +229,7 @@ macro_rules! decode_num_signed {
             fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.flush()?;
                 if bytes.len() > $num_bytes {
-                    return Err(DecodeError::InputTooLong)
+                    return Err(DecodeError::INPUT_TOO_LONG)
                 }
                 let num = bytes_to_number(bytes, true) as $ty;
                 Ok(num)
@@ -247,7 +247,7 @@ macro_rules! decode_num_signed {
                 let min = <$ty>::MIN as i64;
                 let max = <$ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {
-                    Some(Err(DecodeError::InputOutOfRange))
+                    Some(Err(DecodeError::INPUT_OUT_OF_RANGE))
                 } else {
                     Some(Ok(arg_i64 as $ty))
                 }
@@ -272,9 +272,9 @@ impl Decode for bool {
             1 => match bytes[0] {
                 0 => Ok(false),
                 1 => Ok(true),
-                _ => Err(DecodeError::InvalidValue),
+                _ => Err(DecodeError::INVALID_VALUE),
             }
-            _ => Err(DecodeError::InputTooLong),
+            _ => Err(DecodeError::INPUT_TOO_LONG),
         }
     }
     
@@ -282,7 +282,7 @@ impl Decode for bool {
         match input.read_byte()? {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(DecodeError::InvalidValue),
+            _ => Err(DecodeError::INVALID_VALUE),
         }
     }
 
@@ -291,7 +291,7 @@ impl Decode for bool {
         Some(match input() {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(DecodeError::InputOutOfRange),
+            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
         })
     }
 }
@@ -303,7 +303,7 @@ impl<T: Decode> Decode for Option<T> {
         } else {
             let result = Self::dep_decode(input);
             if input.remaining_len() > 0 {
-                return Err(DecodeError::InputTooLong);
+                return Err(DecodeError::INPUT_TOO_LONG);
             }
             result
         }
@@ -313,7 +313,7 @@ impl<T: Decode> Decode for Option<T> {
         match input.read_byte()? {
 			0 => Ok(None),
 			1 => Ok(Some(T::dep_decode(input)?)),
-			_ => Err(DecodeError::InvalidValue),
+			_ => Err(DecodeError::INVALID_VALUE),
 		}
     }
 }
@@ -371,7 +371,7 @@ macro_rules! array_impls {
     ($($n: tt,)+) => {
         $(
             impl<T: Decode> Decode for [T; $n] {
-				fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+                fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
 					let mut r = ArrayVec::new();
 					for _ in 0..$n {
 						r.push(T::dep_decode(input)?);
@@ -380,7 +380,7 @@ macro_rules! array_impls {
 
 					match i {
 						Ok(a) => Ok(a),
-						Err(_) => Err(DecodeError::ArrayDecodeErr),
+						Err(_) => Err(DecodeError::ARRAY_DECODE_ERROR),
 					}
 				}
             }
@@ -411,7 +411,7 @@ fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
     if let Some(nz) = NonZeroUsize::new(num) {
         Ok(nz)
     } else {
-        Err(DecodeError::InvalidValue)
+        Err(DecodeError::INVALID_VALUE)
     }
 }
 

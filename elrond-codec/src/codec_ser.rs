@@ -120,7 +120,6 @@ impl<T: Encode> Encode for &[T] {
 		Ok(())
 	}
 
-	#[inline]
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
@@ -333,6 +332,18 @@ impl<T: Encode> Encode for Option<T> {
 }
 
 impl<T: Encode> Encode for Box<T> {
+	#[inline]
+	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_ref().dep_encode_to(dest)
+	}
+
+	#[inline]
+	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
+		self.as_ref().using_top_encoded(f)
+	}
+}
+
+impl<T: Encode> Encode for Box<[T]> {
 	#[inline]
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_ref().dep_encode_to(dest)
