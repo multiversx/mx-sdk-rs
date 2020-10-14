@@ -14,6 +14,7 @@ wasm-output-mode = ["elrond-wasm-node"]
 elrond-wasm = { version = "0.7.0", path = "../../elrond-wasm" }
 elrond-wasm-derive = { version = "0.7.0", path = "../../elrond-wasm-derive" }
 elrond-wasm-node = { version = "0.7.0", path = "../../elrond-wasm-node", optional = true }
+simple-erc20 = { path = "../simple-erc20" }
 
 [dev-dependencies]
 elrond-wasm-debug = { version = "0.7.0", path = "../../elrond-wasm-debug" }

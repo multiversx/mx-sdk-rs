@@ -225,7 +225,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             match name_len {
                 0 => None,
                 _ => {
-                    name.set_len(name_len);
+                    name.set_len(name_len as usize);
                     Some(name)
                 }
             }

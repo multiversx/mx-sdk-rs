@@ -1,0 +1,9 @@
+{
+    "name": "fund without getting allowance first",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deploy_erc20_and_crowdfunding.scen.json"
+        }
+    ]
+}
