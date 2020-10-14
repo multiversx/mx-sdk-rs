@@ -58,7 +58,7 @@ where
                 t.finish(api);
             },
             SCResult::Err(e) => {
-                e.with_message_slice(|buf| api.signal_error(buf));
+                api.signal_error(e.as_bytes());
             }
         }
     }

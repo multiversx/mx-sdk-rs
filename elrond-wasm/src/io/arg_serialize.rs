@@ -6,7 +6,7 @@ pub trait AsyncCallArg: Sized {
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError>;
 
     fn push_async_arg_exact(&self, _serializer: &mut CallDataSerializer, _expected_len: usize) -> Result<(), SCError> {
-        Err(SCError::Static(&b"not supported"[..]))
+        Err(SCError::from(&b"not supported"[..]))
     }
 }
 
@@ -18,7 +18,7 @@ where
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
         self
             .using_top_encoded(|buf| serializer.push_argument_bytes(buf))
-            .map_err(SCError::PushAsyncEncodeErr)
+            .map_err(|err| SCError::from(err))
     }
 }
 
@@ -35,7 +35,7 @@ where
 
     fn push_async_arg_exact(&self, serializer: &mut CallDataSerializer, expected_len: usize) -> Result<(), SCError> {
         if self.len() != expected_len {
-            return Err(SCError::Static(err_msg::ARG_ASYNC_WRONG_NUMBER));
+            return Err(SCError::from(err_msg::ARG_ASYNC_WRONG_NUMBER));
         }
         self.push_async_arg(serializer)?;
         Ok(())

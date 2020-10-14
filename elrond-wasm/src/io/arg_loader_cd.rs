@@ -35,7 +35,7 @@ where
                         decode_err_message.extend_from_slice(arg_id);
                         decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
                         decode_err_message.extend_from_slice(de_err.message_bytes());
-                        Err(SCError::Dynamic(decode_err_message))
+                        Err(SCError::from(decode_err_message))
                     }
                 }
             },
