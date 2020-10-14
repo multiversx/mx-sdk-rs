@@ -5,11 +5,15 @@ extern crate alloc;
 mod codec_ser;
 mod codec_de;
 mod codec_err;
+mod input;
+mod output;
 pub mod test_util;
 
 pub use codec_ser::*;
 pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
+pub use crate::input::Input;
+pub use crate::output::Output;
 
 /// !INTERNAL USE ONLY!
 ///
@@ -106,7 +110,7 @@ pub mod test_struct {
                 1 => Ok(E::Newtype(u32::dep_decode(input)?)),
                 2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
                 3 => Ok(E::Struct{ a: u32::dep_decode(input)? }),
-                _ => Err(DecodeError::InvalidValue),
+                _ => Err(DecodeError::INVALID_VALUE),
             }
         }
     }

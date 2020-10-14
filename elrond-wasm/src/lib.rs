@@ -19,7 +19,7 @@ pub mod non_zero_util;
 pub use types::*;
 pub use io::*;
 pub use storage::{storage_get, storage_set, BorrowedMutStorage};
-pub use finish::SCResult;
+pub use io::SCResult;
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
 
@@ -337,7 +337,7 @@ macro_rules! imports {
     () => {
         use elrond_wasm::{Box, Vec, String, Queue, VarArgs, BorrowedMutStorage};
         use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
-        use elrond_wasm::{H256, Address, ErrorMessage};
+        use elrond_wasm::{H256, Address};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
         use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
         use elrond_wasm::io::*;
@@ -354,7 +354,7 @@ macro_rules! imports {
 #[macro_export]
 macro_rules! sc_error {
     ($s:expr) => {
-        elrond_wasm::SCResult::Err(elrond_wasm::SCError::Static($s.as_bytes()))
+        elrond_wasm::SCResult::Err(elrond_wasm::SCError::from($s.as_bytes()))
     }
 }
 

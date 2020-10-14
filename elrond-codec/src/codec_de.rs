@@ -5,69 +5,8 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::DecodeError;
 use crate::TypeInfo;
+use crate::input::Input;
 
-/// Trait that allows reading of data into a slice.
-pub trait Input {
-	/// Should return the remaining length of the input data. If no information about the input
-	/// length is available, `None` should be returned.
-	///
-	/// The length is used to constrain the preallocation while decoding. Returning a garbage
-	/// length can open the doors for a denial of service attack to your application.
-	/// Otherwise, returning `None` can decrease the performance of your application.
-    fn remaining_len(&mut self) -> usize;
-    
-    fn empty(&mut self)-> bool {
-        self.remaining_len() == 0
-    }
-
-	/// Read the exact number of bytes required to fill the given buffer.
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError>;
-
-	/// Read a single byte from the input.
-	fn read_byte(&mut self) -> Result<u8, DecodeError> {
-		let mut buf = [0u8];
-		self.read_into(&mut buf[..])?;
-		Ok(buf[0])
-    }
-
-    /// Read the exact number of bytes required to fill the given buffer.
-	fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError>;
-    
-    fn flush(&mut self) -> Result<&[u8], DecodeError>;
-
-}
-
-impl<'a> Input for &'a [u8] {
-	fn remaining_len(&mut self) -> usize {
-		self.len()
-    }
-
-	fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
-		if into.len() > self.len() {
-			return Err(DecodeError::INPUT_TOO_SHORT);
-		}
-		let len = into.len();
-		into.copy_from_slice(&self[..len]);
-		*self = &self[len..];
-		Ok(())
-    }
-
-    fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError> {
-        if length > self.len() {
-            return Err(DecodeError::INPUT_TOO_SHORT);
-        }
-
-        let (result, rest) = self.split_at(length);
-        *self = rest;
-        Ok(result)
-    }
-    
-    fn flush(&mut self) -> Result<&[u8], DecodeError> {
-        let result = &self[..];
-        *self = &[];
-        Ok(result)
-    }
-}
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait Decode: Sized {

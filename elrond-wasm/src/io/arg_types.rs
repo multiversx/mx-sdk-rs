@@ -37,7 +37,7 @@ where
     E: DynArgErrHandler,
 {
     if D::has_next(loader) {
-        err_handler.handle_sc_error(SCError::Static(err_msg::ARG_WRONG_NUMBER));
+        err_handler.handle_sc_error(SCError::from(err_msg::ARG_WRONG_NUMBER));
     }
 }
 
@@ -55,7 +55,7 @@ where
 
         match loader.next_arg(arg_id) {
             Ok(Some(arg)) => Ok(arg),
-            Ok(None) => Err(SCError::Static(err_msg::ARG_WRONG_NUMBER)),
+            Ok(None) => Err(SCError::from(err_msg::ARG_WRONG_NUMBER)),
             Err(sc_err) => Err(sc_err),
         }
     }

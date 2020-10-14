@@ -4,23 +4,7 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
-
-/// Trait that allows writing of data.
-pub trait Output {
-	/// Write to the output.
-	fn write(&mut self, bytes: &[u8]);
-
-	/// Write a single byte to the output.
-	fn push_byte(&mut self, byte: u8) {
-		self.write(&[byte]);
-	}
-}
-
-impl Output for Vec<u8> {
-	fn write(&mut self, bytes: &[u8]) {
-		self.extend_from_slice(bytes)
-	}
-}
+use crate::output::Output;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///

@@ -1,46 +1,42 @@
 
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use elrond_codec::EncodeError;
 
-/// All types that can be returned as error result from smart contracts should implement this trait.
-pub trait ErrorMessage {
-    fn with_message_slice<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R;
-}
-
 #[derive(Debug, PartialEq, Eq)]
-pub enum SCError {
-    Static(&'static [u8]),
-    Dynamic(Vec<u8>),
-    PushAsyncEncodeErr(EncodeError),
-}
+pub struct SCError(Box<[u8]>);
 
 impl SCError {
+    #[inline]
     pub fn as_bytes(&self) -> &[u8] {
-        match self {
-            SCError::Static(slice) => slice,
-            SCError::Dynamic(vec) => vec.as_slice(),
-            SCError::PushAsyncEncodeErr(err) => err.message_bytes(),
-        }
+        &*self.0
     }
 }
 
-impl<'a> ErrorMessage for SCError {
+impl From<&str> for SCError {
     #[inline]
-    fn with_message_slice<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R {
-        f(self.as_bytes())
+    fn from(s: &str) -> Self {
+        SCError(Box::from(s.as_bytes()))
     }
 }
 
-impl ErrorMessage for &str {
+impl From<&[u8]> for SCError {
     #[inline]
-    fn with_message_slice<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R {
-        f(self.as_bytes())
+    fn from(byte_slice: &[u8]) -> Self {
+        SCError(Box::from(byte_slice))
+    }
+}
+
+impl From<Vec<u8>> for SCError {
+    #[inline]
+    fn from(v: Vec<u8>) -> Self {
+        SCError(v.into_boxed_slice())
     }
 }
 
 impl From<EncodeError> for SCError {
     #[inline]
     fn from(err: EncodeError) -> Self {
-        SCError::PushAsyncEncodeErr(err)
+        SCError::from(err.message_bytes())
     }
 }
