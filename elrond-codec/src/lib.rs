@@ -85,20 +85,20 @@ pub mod test_struct {
 		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
             match self {
                 E::Unit => {
-                    using_encoded_number(0u64, 32, false, false, |buf| dest.write(buf));
+                    0u32.dep_encode_to(dest)?;
                 },
                 E::Newtype(arg1) => {
-                    using_encoded_number(1u64, 32, false, false, |buf| dest.write(buf));
-                    using_encoded_number(*arg1 as u64, 32, false, false, |buf| dest.write(buf));
+                    1u32.dep_encode_to(dest)?;
+                    arg1.dep_encode_to(dest)?;
                 },
                 E::Tuple(arg1, arg2) => {
-                    using_encoded_number(2u64, 32, false, false, |buf| dest.write(buf));
-                    using_encoded_number(*arg1 as u64, 32, false, false, |buf| dest.write(buf));
-                    using_encoded_number(*arg2 as u64, 32, false, false, |buf| dest.write(buf));
+                    2u32.dep_encode_to(dest)?;
+                    arg1.dep_encode_to(dest)?;
+                    arg2.dep_encode_to(dest)?;
                 },
                 E::Struct { a } => {
-                    using_encoded_number(3u64, 32, false, false, |buf| dest.write(buf));
-                    using_encoded_number(*a as u64, 32, false, false, |buf| dest.write(buf));
+                    3u32.dep_encode_to(dest)?;
+                    a.dep_encode_to(dest)?;
                 },
             }
             Ok(())

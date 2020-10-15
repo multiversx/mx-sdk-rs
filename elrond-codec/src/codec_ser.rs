@@ -5,7 +5,7 @@ use core::num::NonZeroUsize;
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
 use crate::output::Output;
-use crate::num_conv::using_encoded_number;
+use crate::num_conv::encode_number_to_output;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///
@@ -88,7 +88,7 @@ impl Encode for u8 {
 impl<T: Encode> Encode for &[T] {
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
-		using_encoded_number(self.len() as u64, 32, false, false, |buf| dest.write(buf));
+		encode_number_to_output(dest, self.len() as u64, 32, false, false);
 		// actual data
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
@@ -139,7 +139,7 @@ impl<T: Encode> Encode for &T {
 impl Encode for &str {
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
-		using_encoded_number(self.len() as u64, 32, false, false, |buf| dest.write(buf));
+		encode_number_to_output(dest, self.len() as u64, 32, false, false);
 		// actual data
 		dest.write(self.as_bytes());
 		Ok(())
@@ -170,13 +170,15 @@ macro_rules! encode_num_signed {
 
 			#[inline]
             fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
-				using_encoded_number(*self as u64, $size_in_bits, true, false, |buf| dest.write(buf));
+				encode_number_to_output(dest, *self as u64, $size_in_bits, true, false);
 				Ok(())
 			}
 		
 			#[inline]
             fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-				using_encoded_number(*self as u64, $size_in_bits, true, true, f);
+				let mut dest: Vec<u8> = Vec::new();
+				encode_number_to_output(&mut dest, *self as u64, $size_in_bits, true, true);
+				f(dest.as_slice());
 				Ok(())
 			}
 
@@ -195,13 +197,15 @@ macro_rules! encode_num_unsigned {
 
 			#[inline]
             fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
-				using_encoded_number(*self as u64, $size_in_bits, false, false, |buf| dest.write(buf));
+				encode_number_to_output(dest, *self as u64, $size_in_bits, false, false);
 				Ok(())
 			}
 		
 			#[inline]
             fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-				using_encoded_number(*self as u64, $size_in_bits, false, true, f);
+				let mut dest: Vec<u8> = Vec::new();
+				encode_number_to_output(&mut dest, *self as u64, $size_in_bits, false, true);
+				f(dest.as_slice());
 				Ok(())
 			}
 		}
@@ -250,11 +254,11 @@ impl<T: Encode> Encode for Option<T> {
 	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
-				using_encoded_number(1u64, 8, false, false, |buf| dest.write(buf));
+				encode_number_to_output(dest, 1u64, 8, false, false);
 				v.dep_encode_to(dest)
 			},
 			None => {
-				using_encoded_number(0u64, 8, false, false, |buf| dest.write(buf));
+				encode_number_to_output(dest, 0u64, 8, false, false);
 				Ok(())
 			}
 		}
