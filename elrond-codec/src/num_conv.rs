@@ -1,5 +1,4 @@
-
-
+use crate::output::Output;
 
 
 /// Adds number to output buffer.
@@ -37,6 +36,36 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 	}
 
 	f(&result[0..result_size])
+}
+
+pub fn encode_number_to_output<O: Output>(output: &mut O, x: u64, size_in_bits: usize, signed: bool, mut compact: bool) {
+	let negative = 
+		compact && // only relevant when compact flag
+		signed &&  // only possible when signed flag
+		x >> (size_in_bits - 1) & 1 == 1; // compute by checking first bit
+	
+	let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
+	let mut bit_offset = size_in_bits as isize;
+	loop {
+		bit_offset -= 8;
+		if bit_offset < 0 {
+			return;
+		}
+
+		// going byte by byte from most to least significant
+		let byte = (x >> (bit_offset as usize) & 0xffu64) as u8;
+		
+		if compact {
+			// compact means ignoring irrelvant leading bytes
+			// that is 000... for positives and fff... for negatives
+			if byte != irrelevant_byte {
+				output.push_byte(byte);
+				compact = false;
+			}
+		} else {
+			output.push_byte(byte);
+		}
+	}
 }
 
 /// Handles both signed and unsigned of any length.
