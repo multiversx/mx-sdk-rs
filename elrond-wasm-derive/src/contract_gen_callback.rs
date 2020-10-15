@@ -30,7 +30,7 @@ fn generate_callback_body_raw(raw_callback: &Method) -> proc_macro2::TokenStream
         let nr_args = self.api.get_num_arguments();
         let mut args: Vec<Vec<u8>> = Vec::with_capacity(nr_args as usize);
         for i in 0..nr_args {
-            args.push(self.api.get_argument_vec(i));
+            args.push(self.api.get_argument_vec_u8(i));
         }
         self.#fn_ident (args);
     }

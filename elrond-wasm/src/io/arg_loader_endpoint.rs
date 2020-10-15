@@ -45,7 +45,7 @@ where
                     Err(de_err) => load_arg_error(api, arg_id, de_err),
                 }
             } else {
-                let arg_bytes = api.get_argument_vec(index);
+                let arg_bytes = api.get_argument_vec_u8(index);
                 match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
                     Ok(v) => v,
                     Err(de_err) => load_arg_error(api, arg_id, de_err),
