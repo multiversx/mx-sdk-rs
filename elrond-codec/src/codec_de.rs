@@ -6,7 +6,7 @@ use core::num::NonZeroUsize;
 use crate::codec_err::DecodeError;
 use crate::TypeInfo;
 use crate::input::Input;
-
+use crate::num_conv::bytes_to_number;
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait Decode: Sized {
@@ -107,29 +107,6 @@ impl<T: Decode> Decode for Vec<T> {
 			}
         }
     }
-}
-
-/// Handles both signed and unsigned of any length.
-/// No generics here, because we want the executable binary as small as possible.
-pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
-    if bytes.is_empty() {
-        return 0;
-    }
-    let negative = signed && bytes[0] >> 7 == 1;
-    let mut result = 
-        if negative {
-            // start with all bits set to 1, 
-            // to ensure that if there are fewer bytes than the result type width,
-            // the leading bits will be 1 instead of 0
-            0xffffffffffffffffu64 
-        } else { 
-            0u64 
-        };
-    for byte in bytes.iter() {
-        result <<= 8;
-        result |= *byte as u64;
-    }
-    result
 }
 
 macro_rules! decode_num_unsigned {
