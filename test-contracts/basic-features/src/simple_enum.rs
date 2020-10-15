@@ -21,7 +21,7 @@ impl SimpleEnum {
             0 => Ok(SimpleEnum::Variant0),
             1 => Ok(SimpleEnum::Variant1),
             2 => Ok(SimpleEnum::Variant2),
-            _ => Err(DecodeError::InputOutOfRange),
+            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
         }
     }
 }

@@ -33,7 +33,7 @@ pub trait FeaturesModule {
         } else {
             let mut msg = feature_name.to_vec();
             msg.extend_from_slice(&b" currently disabled"[..]);
-            SCResult::Err(SCError::Dynamic(msg))
+            SCResult::Err(msg.into())
         }
     }
 
