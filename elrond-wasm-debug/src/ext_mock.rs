@@ -342,16 +342,18 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.blockchain_info.current_block_info.block_epoch
     }
 
-    fn sha256(&self, data: &[u8]) -> [u8; 32] {
+    fn sha256(&self, data: &[u8]) -> H256 {
         let mut hasher = Sha3_256::new();
         hasher.input(data);
-        hasher.result().into()
+        let hash: [u8; 32] = hasher.result().into();
+        hash.into()
     }
 
-    fn keccak256(&self, data: &[u8]) -> [u8; 32] {
+    fn keccak256(&self, data: &[u8]) -> H256 {
         let mut hasher = Keccak256::new();
         hasher.input(data);
-        hasher.result().into()
+        let hash: [u8; 32] = hasher.result().into();
+        hash.into()
     }
 }
 
@@ -368,7 +370,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_argument_len(&self, arg_index: i32) -> usize {
-        let arg = self.get_argument_vec(arg_index);
+        let arg = self.get_argument_vec_u8(arg_index);
         arg.len()
     }
 
@@ -376,7 +378,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         panic!("copy_argument_to_slice not yet implemented")
     }
 
-    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
+    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
         let arg_idx_usize = arg_index as usize;
         if arg_idx_usize >= self.tx_input.args.len() {
             panic!("Tx arg index out of range");
@@ -385,7 +387,7 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
-        let arg = self.get_argument_vec(arg_index);
+        let arg = self.get_argument_vec_u8(arg_index);
         let mut res = [0u8; 32];
         let offset = 32 - arg.len();
         res[offset..].copy_from_slice(&arg[..]);
@@ -393,17 +395,17 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     }
     
     fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
-        let bytes = self.get_argument_vec(arg_index);
+        let bytes = self.get_argument_vec_u8(arg_index);
         RustBigInt::from_signed_bytes_be(&bytes)
     }
 
     fn get_argument_big_uint(&self, arg_index: i32) -> RustBigUint {
-        let bytes = self.get_argument_vec(arg_index);
+        let bytes = self.get_argument_vec_u8(arg_index);
         RustBigUint::from_bytes_be(&bytes[..])
     }
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
-        let bytes = self.get_argument_vec(arg_index);
+        let bytes = self.get_argument_vec_u8(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
         if let Some(v) = bi.to_i64() {
             v
