@@ -7,6 +7,7 @@ mod codec_de;
 mod codec_err;
 mod input;
 mod output;
+mod num_conv;
 pub mod test_util;
 
 pub use codec_ser::*;
@@ -14,6 +15,7 @@ pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
 pub use crate::input::Input;
 pub use crate::output::Output;
+pub use crate::num_conv::{using_encoded_number, bytes_to_number};
 
 /// !INTERNAL USE ONLY!
 ///

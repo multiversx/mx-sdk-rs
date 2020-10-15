@@ -5,6 +5,7 @@ use core::num::NonZeroUsize;
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
 use crate::output::Output;
+use crate::num_conv::using_encoded_number;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///
@@ -160,44 +161,6 @@ impl<T: Encode> Encode for Vec<T> {
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		self.as_slice().using_top_encoded(f)
 	}
-}
-
-
-/// Adds number to output buffer.
-/// No argument generics here, because we want the executable binary as small as possible.
-/// Smaller types need to be converted to u64 before using this function.
-/// TODO: there might be a quicker version of this using transmute + reverse bytes.
-pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signed: bool, mut compact: bool, f: F) {
-	let mut result = [0u8; 8];
-	let mut result_size = 0usize;
-	let negative = 
-		compact && // only relevant when compact flag
-		signed &&  // only possible when signed flag
-		x >> (size_in_bits - 1) & 1 == 1; // compute by checking first bit
-	
-	let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
-	let mut bit_offset = size_in_bits as isize - 8;
-	while bit_offset >= 0 {
-		// going byte by byte from most to least significant
-		let byte = (x >> (bit_offset as usize) & 0xffu64) as u8;
-		
-		if compact {
-			// compact means ignoring irrelvant leading bytes
-			// that is 000... for positives and fff... for negatives
-			if byte != irrelevant_byte {
-				result[result_size] = byte;
-				result_size += 1;
-				compact = false;
-			}
-		} else {
-			result[result_size] = byte;
-			result_size += 1;
-		}
-		
-		bit_offset -= 8;
-	}
-
-	f(&result[0..result_size])
 }
 
 macro_rules! encode_num_signed {
