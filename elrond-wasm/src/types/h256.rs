@@ -82,9 +82,15 @@ impl AsMut<[u8]> for H256 {
 
 impl H256 {
     /// Returns a new zero-initialized fixed hash.
-    #[inline]
+    /// Allocates directly in heap.
+    /// Minimal resulting wasm code (14 bytes if not inlined).
+    #[inline(never)]
     pub fn zero() -> H256 {
-        H256(Box::new([0u8; 32]))
+        use alloc::alloc::{alloc, Layout};
+        unsafe {
+            let ptr = alloc(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
+            H256(Box::from_raw(ptr))
+        }
     }
 
     /// Returns the size of this hash in bytes.
