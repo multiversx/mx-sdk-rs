@@ -84,7 +84,6 @@ impl H256 {
     /// Returns a new zero-initialized fixed hash.
     /// Allocates directly in heap.
     /// Minimal resulting wasm code (14 bytes if not inlined).
-    #[inline(never)]
     pub fn zero() -> H256 {
         use alloc::alloc::{alloc, Layout};
         unsafe {
@@ -126,6 +125,13 @@ impl H256 {
     #[inline]
     pub fn to_vec(&self) -> Vec<u8> {
         self.0[..].to_vec()
+    }
+
+    /// Returns an unsafe mutable pointer to the data on the heap.
+    /// Used by the API to populate data.
+    #[inline]
+    pub fn as_mut_ptr(&mut self) -> *mut u8 {
+        self.0.as_mut_ptr()
     }
 }
 

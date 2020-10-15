@@ -263,17 +263,17 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         unsafe{ getBlockEpoch() as u64 }
     }
 
-    fn sha256(&self, data: &[u8]) -> [u8; 32] {
+    fn sha256(&self, data: &[u8]) -> H256 {
         unsafe {
-            let mut res = [0u8; 32];
+            let mut res = H256::zero();
             sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }
     }
 
-    fn keccak256(&self, data: &[u8]) -> [u8; 32] {
+    fn keccak256(&self, data: &[u8]) -> H256 {
         unsafe {
-            let mut res = [0u8; 32];
+            let mut res = H256::zero();
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }
@@ -307,7 +307,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    fn get_argument_vec(&self, arg_index: i32) -> Vec<u8> {
+    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
         let len = self.get_argument_len(arg_index);
         unsafe {
             let mut res = Vec::with_capacity(len);
