@@ -11,7 +11,7 @@ pub trait Erc20 {
     fn transferFrom(&self,
         sender: &Address,
         recipient: &Address,
-        token_amount: BigUint,
+        amount: BigUint,
         #[callback_arg] cb_sender: &Address,
         #[callback_arg] cb_amount: BigUint);
 

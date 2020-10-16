@@ -32,3 +32,13 @@ fn deploy_erc20_and_crowdfunding() {
 fn fund_without_allowance() {
     parse_execute_mandos("mandos/fund_without_allowance.scen.json", &contract_map());
 }
+
+#[test]
+fn fund_with_insufficient_allowance() {
+    parse_execute_mandos("mandos/fund_with_insufficient_allowance", &contract_map());
+}
+
+#[test]
+fn fund_with_sufficient_allowance() {
+    parse_execute_mandos("mandos/fund_with_sufficient_allowance", &contract_map());
+}
