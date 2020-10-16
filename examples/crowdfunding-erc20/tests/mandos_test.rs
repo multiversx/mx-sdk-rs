@@ -28,28 +28,7 @@ fn deploy_erc20_and_crowdfunding() {
     parse_execute_mandos("mandos/deploy_erc20_and_crowdfunding.scen.json", &contract_map());
 }
 
-/*#[test]
-fn test_crowdfunding1() {
-parse_execute_mandos("mandos/crowdfunding-fund-too-late.scen.json", &contract_map());
-}
-
 #[test]
-fn test_crowdfunding2() {
-parse_execute_mandos("mandos/crowdfunding-fund.scen.json", &contract_map());
+fn fund_without_allowance() {
+    parse_execute_mandos("mandos/fund_without_allowance.scen.json", &contract_map());
 }
-
-#[test]
-fn test_crowdfunding4() {
-    parse_execute_mandos("mandos/crowdfunding-claim-too-early.scen.json", &contract_map());
-}
-
-#[test]
-fn test_crowdfunding5() {
-    parse_execute_mandos("mandos/crowdfunding-claim-successful.scen.json", &contract_map());
-}
-
-#[test]
-fn test_crowdfunding6() {
-    parse_execute_mandos("mandos/crowdfunding-claim-failed.scen.json", &contract_map());
-}
-*/

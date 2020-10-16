@@ -9,11 +9,13 @@ imports!();
 pub trait Erc20 {
     #[callback(transfer_from_callback)]
     fn transferFrom(&self,
-        #[callback_arg] sender: Address,
-        recipient: Address,
-        #[callback_arg] amount: BigUint);
+        sender: &Address,
+        recipient: &Address,
+        token_amount: BigUint,
+        #[callback_arg] cb_sender: &Address,
+        #[callback_arg] cb_amount: BigUint);
 
-    fn transfer(&self, to: Address, amount: BigUint);
+    fn transfer(&self, to: &Address, amount: BigUint);
 }
 
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
@@ -30,7 +32,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn fund(&self, amount: BigUint) -> SCResult<()> {
+    fn fund(&self, token_amount: BigUint) -> SCResult<()> {
         if self.get_block_nonce() > self.get_deadline() {
             return sc_error!("cannot fund after deadline");
         }
@@ -40,10 +42,9 @@ pub trait Crowdfunding {
         let cf_contract_address = self.get_sc_address();
 
         let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
-        erc20_proxy.transferFrom(
-            caller,
-            cf_contract_address,
-            amount);
+        erc20_proxy.transferFrom(&caller, &cf_contract_address,
+            token_amount.clone(),
+            &caller, token_amount.clone());
 
         Ok(())
     }
@@ -73,9 +74,11 @@ pub trait Crowdfunding {
 
                 let erc20_address = self.get_erc20_contract_address();
                 let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
-                let balance = self.get_mut_total_balance();
+                let mut balance = self.get_mut_total_balance();
 
-                erc20_proxy.transfer( caller, balance.clone());
+                erc20_proxy.transfer( &caller, balance.clone());
+
+                *balance = BigUint::zero();
 
                 Ok(())
             },
@@ -87,7 +90,7 @@ pub trait Crowdfunding {
                     let erc20_address = self.get_erc20_contract_address();
                     let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
                     
-                    erc20_proxy.transfer( caller.clone(), deposit);
+                    erc20_proxy.transfer( &caller, deposit);
                     self.set_deposit(&caller, &BigUint::zero());
                 }
 
@@ -99,31 +102,29 @@ pub trait Crowdfunding {
     #[callback]
     fn transfer_from_callback(&self, 
         result: AsyncCallResult<()>,
-        #[callback_arg] sender: Address,
-        #[callback_arg] amount: BigUint) {
+        #[callback_arg] cb_sender: Address,
+        #[callback_arg] cb_amount: BigUint) {
 
         // transaction started before deadline, ended after -> refund
         if self.get_block_nonce() > self.get_deadline() {
             let erc20_address = self.get_erc20_contract_address();
             let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
             
-            erc20_proxy.transfer( sender, amount);
+            erc20_proxy.transfer( &cb_sender, cb_amount);
 
             return;
         }
 
         match result {
             AsyncCallResult::Ok(()) => {
-                let mut deposit = self.get_deposit(&sender);
+                let mut deposit = self.get_deposit(&cb_sender);
                 let mut balance = self.get_mut_total_balance();
-                deposit += amount.clone();
-                *balance += amount.clone();
+                deposit += &cb_amount;
+                *balance += &cb_amount;
 
-                self.set_deposit(&sender, &deposit);
+                self.set_deposit(&cb_sender, &deposit);
             },
-            AsyncCallResult::Err(_) => {
-                
-            }
+            AsyncCallResult::Err(_) => {}
         }
     }
 
@@ -163,7 +164,7 @@ pub trait Crowdfunding {
     fn get_erc20_contract_address(&self) -> Address;
 
     #[view]
-    #[storage_get_mut("total_balance")]
+    #[storage_get_mut("erc20_balance")]
     fn get_mut_total_balance(&self) -> mut_storage!(BigUint);
 }
 

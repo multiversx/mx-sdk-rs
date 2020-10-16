@@ -61,25 +61,25 @@ pub trait SimpleErc20Token {
     }
 
     /// This method is private, deduplicates logic from transfer and transferFrom.
-    fn perform_transfer(&self, sender: Address, recipient: Address, amount: BigUint) -> SCResult<()> {        
+    fn perform_transfer(&self, sender: Address, recipient: Address, token_amount: BigUint) -> SCResult<()> {        
         // check if enough funds & decrease sender balance
         {
             let mut sender_balance = self.get_mut_balance(&sender);
-            if amount > *sender_balance {
+            if token_amount > *sender_balance {
                 return sc_error!("insufficient funds");
             }
             
-            *sender_balance -= &amount; // saved automatically at the end of scope
+            *sender_balance -= &token_amount; // saved automatically at the end of scope
         }
 
         // increase recipient balance
         {
             let mut recipient_balance = self.get_mut_balance(&recipient);
-            *recipient_balance += &amount; // saved automatically at the end of scope
+            *recipient_balance += &token_amount; // saved automatically at the end of scope
         }
     
         // log operation
-        self.transfer_event(&sender, &recipient, &amount);
+        self.transfer_event(&sender, &recipient, &token_amount);
 
         Ok(())
     }
@@ -91,10 +91,10 @@ pub trait SimpleErc20Token {
     /// * `to` The address to transfer to.
     /// 
     #[endpoint]
-    fn transfer(&self, to: Address, amount: BigUint) -> SCResult<()> {
+    fn transfer(&self, to: Address, token_amount: BigUint) -> SCResult<()> {
         // the sender is the caller
         let sender = self.get_caller();
-        self.perform_transfer(sender, to, amount)
+        self.perform_transfer(sender, to, token_amount)
     }
  
     /// Use allowance to transfer funds between two accounts.
@@ -106,7 +106,7 @@ pub trait SimpleErc20Token {
     /// * `amount` the amount of tokens to be transferred.
     /// 
     #[endpoint(transferFrom)]
-    fn transfer_from(&self, sender: Address, recipient: Address, amount: BigUint) -> SCResult<()> {
+    fn transfer_from(&self, sender: Address, recipient: Address, token_amount: BigUint) -> SCResult<()> {
         // get caller
         let caller = self.get_caller();
 
@@ -114,15 +114,15 @@ pub trait SimpleErc20Token {
         let mut allowance = self.get_mut_allowance(&sender, &caller);
 
         // amount should not exceed allowance
-        if amount > *allowance {
+        if token_amount > *allowance {
             return sc_error!("allowance exceeded");
         }
 
         // update allowance
-        *allowance -= &amount; // saved automatically at the end of scope
+        *allowance -= &token_amount; // saved automatically at the end of scope
 
         // transfer
-        self.perform_transfer(sender, recipient, amount)
+        self.perform_transfer(sender, recipient, token_amount)
     }
 
     /// Approve the given address to spend the specified amount of tokens on behalf of the sender.
@@ -134,15 +134,15 @@ pub trait SimpleErc20Token {
     /// * `amount` The amount of tokens to be spent.
     /// 
     #[endpoint]
-    fn approve(&self, spender: Address, amount: BigUint) -> SCResult<()> {
+    fn approve(&self, spender: Address, token_amount: BigUint) -> SCResult<()> {
         // sender is the caller
         let caller = self.get_caller();
 
         // store allowance
-        self.set_allowance(&caller, &spender, &amount);
+        self.set_allowance(&caller, &spender, &token_amount);
       
         // log operation
-        self.approve_event(&caller, &spender, &amount);
+        self.approve_event(&caller, &spender, &token_amount);
         Ok(())
     }
 
@@ -152,12 +152,12 @@ pub trait SimpleErc20Token {
     fn transfer_event(&self,
         sender: &Address,
         recipient: &Address,
-        amount: &BigUint);
+        token_amount: &BigUint);
 
     #[event("0x0000000000000000000000000000000000000000000000000000000000000002")]
     fn approve_event(&self,
         sender: &Address,
         recipient: &Address,
-        amount: &BigUint);
+        token_amount: &BigUint);
 
 }
