@@ -17,5 +17,5 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 wasm-output-mode = [] # crate functionality can be turned off, but just for running the framework tests
 
 [dependencies]
-elrond-wasm-node = { version = "0.7.1", path = "../elrond-wasm-node" }
+elrond-wasm-node = { version = "0.7.2", path = "../elrond-wasm-node" }
 wee_alloc = "0.4"

@@ -14,7 +14,7 @@ keywords = ["elrond", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-elrond-wasm = { version = "0.7.1", path = "../elrond-wasm" }
+elrond-wasm = { version = "0.7.2", path = "../elrond-wasm" }
 mandos = { version = "0.1.1", path = "../mandos" }
 num-bigint = "0.3"
 num-traits = "0.2"
