@@ -5,7 +5,6 @@
             "step": "setState",
             "accounts": {
                 "address:an_account": {
-                    "owner": "address:owner_address",
                     "nonce": "3",
                     "balance": "5",
                     "storage": {},
