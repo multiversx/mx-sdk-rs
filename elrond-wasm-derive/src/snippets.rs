@@ -173,12 +173,12 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn sha256(&self, data: &[u8]) -> [u8; 32] {
+        fn sha256(&self, data: &[u8]) -> H256 {
           self.api.sha256(data)
         }
     
         #[inline]
-        fn keccak256(&self, data: &[u8]) -> [u8; 32] {
+        fn keccak256(&self, data: &[u8]) -> H256 {
           self.api.keccak256(data)
         }
       }

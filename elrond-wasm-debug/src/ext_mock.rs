@@ -386,6 +386,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         self.tx_input.args[arg_idx_usize].clone()
     }
 
+    fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
+        self.get_argument_vec_u8(arg_index).into_boxed_slice()
+    }
+
     fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
         let arg = self.get_argument_vec_u8(arg_index);
         let mut res = [0u8; 32];

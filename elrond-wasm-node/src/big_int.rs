@@ -217,7 +217,7 @@ impl Encode for ArwenBigInt {
     }
 }
 
-impl Decode for ArwenBigInt {
+impl NestedDecode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
     
     fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {

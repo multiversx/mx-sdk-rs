@@ -17,7 +17,7 @@ impl<'a> CallDataArgLoader<'a> {
 
 impl<'a, T> DynArgLoader<T> for CallDataArgLoader<'a>
 where
-    T: Decode,
+    T: NestedDecode,
 {
     #[inline]
     fn has_next(&self) -> bool {

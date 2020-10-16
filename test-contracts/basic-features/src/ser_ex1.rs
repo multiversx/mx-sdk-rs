@@ -17,7 +17,7 @@ impl Encode for SerExample1 {
     }
 }
 
-impl Decode for SerExample1 {
+impl NestedDecode for SerExample1 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(SerExample1{
             int: u16::dep_decode(input)?,

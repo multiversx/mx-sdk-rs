@@ -64,7 +64,7 @@ where
 pub fn storage_get<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8]) -> T
 where
     'a: 'k,
-    T: Decode,
+    T: NestedDecode,
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
@@ -112,7 +112,7 @@ where
             value_t
         },
         _ => {
-            if let Some(res_i64) = T::top_decode_from_i64(|| {
+            if let Some(res_i64) = T::top_decode_from_i64_old(|| {
                 match api.storage_load_i64(key) {
                     Some(v) => v,
                     None => api.signal_error(err_msg::STORAGE_NOT_I64),

@@ -25,7 +25,7 @@ pub trait CryptoBubbles
     fn _player_balance_key(&self, address: &Address) -> H256 {
         let mut raw_key: Vec<u8> = Vec::with_capacity(33);
         raw_key.push(1u8); // "1" is for balance keys
-        raw_key.extend_from_slice(address.as_fixed_bytes()); // append the entire address
+        raw_key.extend_from_slice(address.as_bytes()); // append the entire address
         let key = self.keccak256(&raw_key); // this compresses the key down to 32 bytes
         key.into()
     }

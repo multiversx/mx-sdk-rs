@@ -32,7 +32,7 @@ impl Encode for SerExample2 {
     }
 }
 
-impl Decode for SerExample2 {
+impl NestedDecode for SerExample2 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match u32::dep_decode(input)? {
             0 => Ok(SerExample2::Unit),

@@ -18,7 +18,7 @@ where
 
 pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
 where
-    T: Decode,
+    T: NestedDecode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
@@ -39,7 +39,7 @@ where
         },
         _ => {
             // the compiler is also smart enough to evaluate this if let at compile time
-            if let Some(res_i64) = T::top_decode_from_i64(|| api.get_argument_i64(index)) {
+            if let Some(res_i64) = T::top_decode_from_i64_old(|| api.get_argument_i64(index)) {
                 match res_i64 {
                     Ok(from_i64) => from_i64,
                     Err(de_err) => load_arg_error(api, arg_id, de_err),
@@ -87,7 +87,7 @@ where
 
 impl<'a, A, BigInt, BigUint, T> DynArgLoader<T> for DynEndpointArgLoader<'a, A, BigInt, BigUint>
 where
-    T: Decode,
+    T: NestedDecode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static

@@ -10,6 +10,7 @@ use elrond_wasm::ContractHookApi;
 use elrond_wasm::err_msg;
 
 use alloc::vec::Vec;
+use allow::boxed::Box;
 
 const ADDRESS_LENGTH: usize = 32;
 const TOPIC_LENGTH: usize = 32;
@@ -309,11 +310,24 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
         let len = self.get_argument_len(arg_index);
+        let mut res = Vec::with_capacity(len);
+        if len > 0 {
+            unsafe {
+                res.set_len(len);
+                getArgument(arg_index, res.as_mut_ptr());
+            }
+        }
+        res
+    }
+
+    fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
+        let len = self.get_argument_len(arg_index);
+        let mut res = Box::<[u8]>::new_uninit_slice(len);
         unsafe {
-            let mut res = Vec::with_capacity(len);
-            res.set_len(len);
-            getArgument(arg_index, res.as_mut_ptr());
-            res
+            if len > 0 {
+                getArgument(arg_index, res.as_mut_ptr());
+            }
+            res.assume_init()
         }
     }
 
