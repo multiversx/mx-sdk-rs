@@ -83,7 +83,7 @@ impl Callable {
             let msig = m.generate_sig();
 
             let mut payment_count = 0;
-            let mut pat : &syn::Pat = &syn::Pat::__Nonexhaustive;
+            let mut amount_snippet = quote! { BigUint::zero() };
             let arg_push_snippets: Vec<proc_macro2::TokenStream> = 
                 m.method_args
                     .iter()
@@ -101,8 +101,10 @@ impl Callable {
                             ArgMetadata::Payment => {
                                 // #[payment]
                                 payment_count += 1;
-                                pat = &arg.pat;
-                                quote! { }
+                                let pat = &arg.pat;
+                                amount_snippet = quote! { #pat };
+
+                                quote! {}
                             },
                             ArgMetadata::Multi(multi_attr) => {
                                 // #[multi(...)]
@@ -113,11 +115,9 @@ impl Callable {
                     })
                     .collect();
 
-            let amount_snippet = match payment_count {
-                0 => quote! { BigUint::zero() },
-                1 => quote! { #pat },
-                _ => panic!("Only one payment argument allowed in call proxy")
-            };
+            if payment_count > 1 {
+                panic!("Only one payment argument allowed in call proxy");
+            }
 
             let (callback_init, callback_store) = if let Some(callback_ident) = &m.callback {
                 let cb_name_str = &callback_ident.arg.to_string();
