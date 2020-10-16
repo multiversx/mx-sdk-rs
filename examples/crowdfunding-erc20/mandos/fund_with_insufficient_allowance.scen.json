@@ -1,5 +1,5 @@
 {
-    "name": "fund without getting allowance first",
+    "name": "fund with insufficient allowance",
     "steps": [
         {
             "step": "externalSteps",
@@ -11,7 +11,29 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-without-allowance",
+            "txId": "set-insufficient-allowance",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:the_erc20_contract",
+                "value": "0",
+                "function": "approve",
+                "arguments": [
+                    "address:the_crowdfunding_contract",
+                    "400,000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "gas": "*",
+                "refund": "*",
+                "logs": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "fund-with-insufficient-allowance",
             "tx": {
                 "from": "address:acc1",
                 "to": "address:the_crowdfunding_contract",
@@ -34,7 +56,7 @@
             "step": "checkState",
             "accounts": {
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "storage": {}
                 },
@@ -60,6 +82,7 @@
                     "''balance|address:erc20_owner_address": "1,000,000,000",
                     "''balance|address:acc1": "600,000",
                     "''allowance|address:erc20_owner_address|address:acc1": "400,000",
+                    "''allowance|address:acc1|address:the_crowdfunding_contract": "400,000",
                     "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../simple-erc20/output/simple-erc20.wasm"
