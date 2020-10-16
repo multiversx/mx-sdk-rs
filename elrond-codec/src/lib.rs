@@ -5,14 +5,18 @@ extern crate alloc;
 mod codec_ser;
 mod codec_de;
 mod codec_err;
+mod top_de;
 mod input;
 mod output;
 mod num_conv;
+mod transmute;
 pub mod test_util;
 
 pub use codec_ser::*;
 pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
+pub use top_de::*;
+pub use transmute::*;
 pub use crate::input::Input;
 pub use crate::output::Output;
 pub use crate::num_conv::{using_encoded_number, bytes_to_number};
@@ -63,7 +67,7 @@ pub mod test_struct {
 		}
     }
     
-    impl Decode for Test {
+    impl NestedDecode for Test {
         fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
             Ok(Test{
                 int: u16::dep_decode(input)?,
@@ -105,7 +109,7 @@ pub mod test_struct {
 		}
     }
     
-    impl Decode for E {
+    impl NestedDecode for E {
         fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
             match u32::dep_decode(input)? {
                 0 => Ok(E::Unit),
@@ -127,7 +131,7 @@ pub mod test_struct {
 		}
     }
     
-    impl Decode for WrappedArray {
+    impl NestedDecode for WrappedArray {
         fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
             let mut arr = [0u8; 5];
             input.read_into(&mut arr)?;
@@ -147,7 +151,7 @@ pub mod tests {
 
     pub fn the_same<V>(element: V)
     where
-        V: Encode + Decode + PartialEq + Debug + 'static,
+        V: Encode + NestedDecode + PartialEq + Debug + 'static,
     {
         let serialized_bytes = element.top_encode().unwrap();
         let deserialized: V = decode_from_byte_slice(&mut &serialized_bytes[..]).unwrap();
@@ -219,7 +223,7 @@ pub mod tests {
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize
-        let deserialized = <[i32; 16384]>::top_decode(&mut &serialized_bytes[..]).unwrap();
+        let deserialized = <[i32; 16384]>::top_decode_old(&mut &serialized_bytes[..]).unwrap();
         for i in 0..16384 {
             assert_eq!(deserialized[i], 7i32);
         }

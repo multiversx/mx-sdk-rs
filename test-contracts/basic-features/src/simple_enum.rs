@@ -37,13 +37,13 @@ impl Encode for SimpleEnum {
     }
 }
 
-impl Decode for SimpleEnum {
+impl NestedDecode for SimpleEnum {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         SimpleEnum::from_i64(i64::dep_decode(input)?)
     }
 
     #[inline]
-    fn top_decode_from_i64<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
+    fn top_decode_from_i64_old<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
         Some(SimpleEnum::from_i64(input()))
     }
 }

@@ -3,9 +3,12 @@ use core::fmt::Debug;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+/// Type that holds 32 bytes of data.
+/// Data is kept on the heap to keep wasm size low and avoid copies.
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct H256(Box<[u8;32]>);
 
+/// Alias for H256, just to make smart contract code more readable.
 pub type Address = H256;
 
 impl From<[u8; 32]> for H256 {
@@ -75,7 +78,7 @@ impl AsRef<[u8]> for H256 {
 impl AsMut<[u8]> for H256 {
     #[inline]
     fn as_mut(&mut self) -> &mut [u8] {
-        self.as_bytes_mut()
+        self.0.as_mut()
     }
 }
 
@@ -102,19 +105,6 @@ impl H256 {
     #[inline]
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_ref()
-    }
-
-    /// Extracts a mutable byte slice containing the entire fixed hash.
-    #[inline]
-    pub fn as_bytes_mut(&mut self) -> &mut [u8] {
-        self.0.as_mut()
-        // &mut self.0
-    }
-
-    /// Extracts a reference to the byte array containing the entire fixed hash.
-    #[inline]
-    pub fn as_fixed_bytes(&self) -> &[u8; 32] {
-        &self.0
     }
 
     #[inline]
@@ -144,7 +134,7 @@ impl Encode for H256 {
     }
 }
 
-impl Decode for H256 {
+impl NestedDecode for H256 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let mut arr = [0u8; 32];
         input.read_into(&mut arr)?;

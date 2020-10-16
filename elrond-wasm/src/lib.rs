@@ -204,7 +204,7 @@ pub trait BigUintApi:
     PartialEq<u64> +
     PartialOrd<u64> +
     elrond_codec::Encode +
-    elrond_codec::Decode +
+    elrond_codec::NestedDecode +
 {
     fn zero() -> Self {
         0u64.into()
@@ -255,7 +255,7 @@ pub trait BigIntApi<BigUint>:
         PartialEq<i64> +
         PartialOrd<i64> +
         elrond_codec::Encode +
-        elrond_codec::Decode +
+        elrond_codec::NestedDecode +
 {
     fn zero() -> Self {
         0i64.into()
@@ -296,7 +296,7 @@ macro_rules! imports {
         use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
         use elrond_wasm::{H256, Address};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
-        use elrond_wasm::elrond_codec::{Encode, Decode, DecodeError};
+        use elrond_wasm::elrond_codec::{Encode, NestedDecode, DecodeError};
         use elrond_wasm::io::*;
         use elrond_wasm::non_zero_util::*;
         use elrond_wasm::err_msg;

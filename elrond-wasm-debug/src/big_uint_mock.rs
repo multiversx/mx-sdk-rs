@@ -244,10 +244,10 @@ impl Encode for RustBigUint {
     }
 }
 
-impl Decode for RustBigUint {
+impl NestedDecode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
     
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+    fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(RustBigUint::from_bytes_be(bytes))
     }

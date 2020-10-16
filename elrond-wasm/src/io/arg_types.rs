@@ -43,7 +43,7 @@ where
 
 impl<T, D> ArgType<D> for T
 where
-    T: Decode,
+    T: NestedDecode,
     D: DynArgLoader<T>,
 {
     fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {

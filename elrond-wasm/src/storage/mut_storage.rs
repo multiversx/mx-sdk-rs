@@ -29,7 +29,7 @@ where
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: Encode + NestedDecode,
 {
     api: &'a A,
     key: BorrowedMutStorageKey,
@@ -44,7 +44,7 @@ where
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: Encode + NestedDecode,
 {
     pub fn with_const_key(api: &'a A, key: &'static [u8]) -> Self {
         let value: T = storage_get(api, key);
@@ -77,7 +77,7 @@ where
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: Encode + NestedDecode,
 {
     fn drop(&mut self) {
         if self.dirty {
@@ -91,7 +91,7 @@ where
     BigInt: Encode + 'static,
     BigUint: Encode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: Encode + NestedDecode,
 {
     type Target = T;
 
@@ -105,7 +105,7 @@ where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: Encode + NestedDecode,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.dirty = true;

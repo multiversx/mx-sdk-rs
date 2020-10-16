@@ -9,7 +9,7 @@ use crate::input::Input;
 use crate::num_conv::bytes_to_number;
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
-pub trait Decode: Sized {
+pub trait NestedDecode: Sized {
 	// !INTERNAL USE ONLY!
 	// This const helps elrond-wasm to optimize the encoding/decoding by doing fake specialization.
 	#[doc(hidden)]
@@ -21,7 +21,7 @@ pub trait Decode: Sized {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError>;
 
     /// Attempt to deserialise the value from input.
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let result = Self::dep_decode(input)?;
         if input.remaining_len() > 0 {
             return Err(DecodeError::INPUT_TOO_LONG);
@@ -32,20 +32,25 @@ pub trait Decode: Sized {
     /// Used to optimize handling of arguments/storage.
     /// Optionally calls a closure that retrieves an i64 and if it returns Some(...), the result will be used.
     #[inline]
-    fn top_decode_from_i64<I: FnOnce() -> i64>(_input: I) -> Option<Result<Self, DecodeError>> {
+    fn top_decode_from_i64_old<I: FnOnce() -> i64>(_input: I) -> Option<Result<Self, DecodeError>> {
         None
     }
 }
 
-/// Convenience method, to avoid having to specify type when calling `top_decode`.
+/// Convenience method, to avoid having to specify type when calling `top_decode_old`.
 /// Especially useful in the macros.
-#[inline]
-pub fn decode_from_byte_slice<D: Decode>(input: &[u8]) -> Result<D, DecodeError> {
-    // the input doesn't need to be mutable because we are not changing the underlying data 
-    D::top_decode(&mut &*input)
+/// Also checks that the entire slice was used.
+/// The input doesn't need to be mutable because we are not changing the underlying data.
+pub fn decode_from_byte_slice<D: NestedDecode>(input: &[u8]) -> Result<D, DecodeError> {
+    let mut_slice = &mut &*input;
+    let result = D::top_decode_old(mut_slice);
+    if !mut_slice.is_empty() {
+        return Err(DecodeError::INPUT_TOO_LONG);
+    }
+    result
 }
 
-impl Decode for () {
+impl NestedDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
 	fn dep_decode<I: Input>(_: &mut I) -> Result<(), DecodeError> {
@@ -53,10 +58,10 @@ impl Decode for () {
 	}
 }
 
-impl Decode for u8 {
+impl NestedDecode for u8 {
     const TYPE_INFO: TypeInfo = TypeInfo::U8;
     
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         match bytes.len() {
             0 => Ok(0u8),
@@ -70,8 +75,8 @@ impl Decode for u8 {
     }
 }
 
-impl<T: Decode> Decode for Vec<T> {
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+impl<T: NestedDecode> NestedDecode for Vec<T> {
+	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match T::TYPE_INFO {
 			TypeInfo::U8 => {
                 let bytes = input.flush()?;
@@ -111,10 +116,10 @@ impl<T: Decode> Decode for Vec<T> {
 
 macro_rules! decode_num_unsigned {
     ($ty:ty, $num_bytes:expr, $type_info:expr) => {
-        impl Decode for $ty {
+        impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
-            fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+            fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.flush()?;
                 if bytes.len() > $num_bytes {
                     return Err(DecodeError::INPUT_TOO_LONG)
@@ -139,10 +144,10 @@ decode_num_unsigned!(u64, 8, TypeInfo::U64);
 
 macro_rules! decode_num_signed {
     ($ty:ty, $num_bytes:expr, $type_info:expr) => {
-        impl Decode for $ty {
+        impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
-            fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+            fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.flush()?;
                 if bytes.len() > $num_bytes {
                     return Err(DecodeError::INPUT_TOO_LONG)
@@ -158,7 +163,7 @@ macro_rules! decode_num_signed {
             }
 
             #[inline]
-            fn top_decode_from_i64<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
+            fn top_decode_from_i64_old<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
                 let arg_i64 = input();
                 let min = <$ty>::MIN as i64;
                 let max = <$ty>::MAX as i64;
@@ -178,10 +183,10 @@ decode_num_signed!(i32, 4, TypeInfo::I32);
 decode_num_signed!(isize, 4, TypeInfo::ISIZE);
 decode_num_signed!(i64, 8, TypeInfo::I64);
 
-impl Decode for bool {
+impl NestedDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
     
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         match bytes.len() {
             0 => Ok(false),
@@ -203,7 +208,7 @@ impl Decode for bool {
     }
 
     #[inline]
-    fn top_decode_from_i64<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
+    fn top_decode_from_i64_old<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
         Some(match input() {
             0 => Ok(false),
             1 => Ok(true),
@@ -212,8 +217,8 @@ impl Decode for bool {
     }
 }
 
-impl<T: Decode> Decode for Option<T> {
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+impl<T: NestedDecode> NestedDecode for Option<T> {
+	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         if input.empty() {
             Ok(None)
         } else {
@@ -234,9 +239,9 @@ impl<T: Decode> Decode for Option<T> {
     }
 }
 
-impl<T: Decode> Decode for Box<T> {
-	fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(Box::new(T::top_decode(input)?))
+impl<T: NestedDecode> NestedDecode for Box<T> {
+	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(Box::new(T::top_decode_old(input)?))
     }
     
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
@@ -247,9 +252,9 @@ impl<T: Decode> Decode for Box<T> {
 macro_rules! tuple_impls {
     ($($len:expr => ($($n:tt $name:ident)+))+) => {
         $(
-            impl<$($name),+> Decode for ($($name,)+)
+            impl<$($name),+> NestedDecode for ($($name,)+)
             where
-                $($name: Decode,)+
+                $($name: NestedDecode,)+
             {
                 fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                     let tuple = (
@@ -286,7 +291,7 @@ tuple_impls! {
 macro_rules! array_impls {
     ($($n: tt,)+) => {
         $(
-            impl<T: Decode> Decode for [T; $n] {
+            impl<T: NestedDecode> NestedDecode for [T; $n] {
                 fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
 					let mut r = ArrayVec::new();
 					for _ in 0..$n {
@@ -331,9 +336,9 @@ fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
     }
 }
 
-impl Decode for NonZeroUsize {
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        decode_non_zero_usize(usize::top_decode(input)?)
+impl NestedDecode for NonZeroUsize {
+    fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        decode_non_zero_usize(usize::top_decode_old(input)?)
     }
     
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
@@ -351,10 +356,10 @@ mod tests {
 
     fn deser_ok<V>(element: V, bytes: &[u8])
     where
-        V: Decode + PartialEq + Debug + 'static,
+        V: NestedDecode + PartialEq + Debug + 'static,
     {
         let input = bytes.to_vec();
-        let deserialized: V = V::top_decode(&mut &input[..]).unwrap();
+        let deserialized: V = V::top_decode_old(&mut &input[..]).unwrap();
         assert_eq!(deserialized, element);
     }
 

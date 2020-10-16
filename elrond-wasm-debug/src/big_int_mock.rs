@@ -160,10 +160,10 @@ impl Encode for RustBigInt {
     }
 }
 
-impl Decode for RustBigInt {
+impl NestedDecode for RustBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+    fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
     }
