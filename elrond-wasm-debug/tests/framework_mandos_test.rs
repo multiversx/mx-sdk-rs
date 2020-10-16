@@ -22,8 +22,3 @@ fn transfer() {
 fn validator_reward() {
     parse_execute_mandos("tests/mandos/validatorReward.scen.json", &contract_map());    
 }
-
-#[test]
-fn set_get_owner() {
-    parse_execute_mandos("tests/mandos/set_get_owner.scen.json", &contract_map());
-}

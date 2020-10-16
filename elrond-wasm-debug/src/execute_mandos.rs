@@ -38,7 +38,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                         balance: account.balance.value.clone(),
                         storage: account.storage.iter().map(|(k, v)| (k.value.clone(), v.value.clone())).collect(),
                         contract_path: account.code.as_ref().map(|bytes_value| bytes_value.value.clone()),
-                        contract_owner: account.owner.as_ref().map(|o| Address::from(o.value)),
+                        contract_owner: None, // TODO: add contract owner in mandos
                     });
                 }
                 for new_address in new_addresses.iter() {
