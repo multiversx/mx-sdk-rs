@@ -3,6 +3,7 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
+  "mandos",
 
   "modules/elrond-wasm-module-features",
   "modules/elrond-wasm-module-pause",
@@ -12,6 +13,7 @@ members = [
   "examples/crypto-bubbles",
   "examples/factorial",
   "examples/simple-erc20",
+  "examples/crowdfunding",
 
   "test-contracts/async",
   "test-contracts/async/async-alice",
