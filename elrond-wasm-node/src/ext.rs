@@ -1,5 +1,3 @@
-
-
 use elrond_wasm::{H256, Address};
 
 use crate::big_int::*;
@@ -31,8 +29,8 @@ extern {
 
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
-    fn getESDTValue(resultOffset: *const u8) -> i32;
-    fn getESDTTokenName(resultOffset: *const u8) -> i32;
+    fn getESDTValue(resultOffset: *const u8) -> usize;
+    fn getESDTTokenName(resultOffset: *const u8) -> usize;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn finish(dataOffset: *const u8, length: i32);
 
