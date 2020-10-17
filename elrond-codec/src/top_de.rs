@@ -2,35 +2,11 @@ use alloc::vec::Vec;
 use alloc::boxed::Box;
 use core::num::NonZeroUsize;
 
+use crate::top_de_input::TopDecodeInput;
 use crate::codec_de::*;
 use crate::TypeInfo;
 use crate::codec_err::DecodeError;
-use crate::num_conv::bytes_to_number;
 use crate::transmute::*;
-
-pub trait TopDecodeInput: Sized {
-    fn byte_len(&self) -> usize;
-
-    fn into_boxed_slice(self) -> Box<[u8]>;
-
-    fn into_u64(self) -> u64 {
-        bytes_to_number(&*self.into_boxed_slice(), false)
-    }
-
-    fn into_i64(self) -> i64 {
-        bytes_to_number(&*self.into_boxed_slice(), true) as i64
-    }
-}
-
-impl TopDecodeInput for Box<[u8]> {
-    fn byte_len(&self) -> usize {
-        self.len()
-    }
-
-    fn into_boxed_slice(self) -> Box<[u8]> {
-        self
-    }
-}
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait TopDecode: Sized {
@@ -56,12 +32,12 @@ impl<T: TopDecode> TopDecode for Box<T> {
 // Allowed to implement this because [T] cannot implement NestedDecode, being ?Sized.
 impl<T: NestedDecode> TopDecode for Box<[T]> {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let bytes = input.into_boxed_slice();
         if let TypeInfo::U8 = T::TYPE_INFO {
+            let bytes = input.into_boxed_slice();
             let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
             Ok(cast_bytes)
         } else {
-            let vec: Vec<T> = decode_from_byte_slice(&*bytes)?;
+            let vec = Vec::<T>::top_decode(input)?;
             Ok(vec_into_boxed_slice(vec))
         }
     }
@@ -75,7 +51,13 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
             let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
             Ok(cast_vec)
         } else {
-            decode_from_byte_slice(&*bytes)
+            let slice = &*bytes;
+            let mut_slice = &mut &*slice;
+            let mut result: Vec<T> = Vec::new();
+            while !mut_slice.is_empty() {
+                result.push(T::dep_decode(mut_slice)?);
+            }
+            Ok(result)
         }
     }
 }
@@ -147,7 +129,7 @@ impl<T: NestedDecode> TopDecode for Option<T> {
         if bytes.is_empty() {
             Ok(None)
         } else {
-            let item = decode_from_byte_slice::<T>(&bytes[1..])?;
+            let item = dep_decode_from_byte_slice::<T>(&bytes[1..])?;
             Ok(Some(item))
         }
     }
@@ -162,7 +144,7 @@ macro_rules! tuple_impls {
             {
                 fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
                     let bytes = input.into_boxed_slice();
-                    decode_from_byte_slice(&*bytes)
+                    dep_decode_from_byte_slice(&*bytes)
 				}
             }
         )+
@@ -194,7 +176,7 @@ macro_rules! array_impls {
             impl<T: NestedDecode> TopDecode for [T; $n] {
                 fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
                     let bytes = input.into_boxed_slice();
-                    decode_from_byte_slice(&*bytes)
+                    dep_decode_from_byte_slice(&*bytes)
 				}
             }
         )+
@@ -244,10 +226,9 @@ mod tests {
 
     fn deser_ok<V>(element: V, bytes: &[u8])
     where
-        V: NestedDecode + PartialEq + Debug + 'static,
+        V: TopDecode + PartialEq + Debug + 'static,
     {
-        let input = bytes.to_vec();
-        let deserialized: V = V::top_decode_old(&mut &input[..]).unwrap();
+        let deserialized: V = V::top_decode(bytes).unwrap();
         assert_eq!(deserialized, element);
     }
 

@@ -5,6 +5,7 @@ extern crate alloc;
 mod codec_ser;
 mod codec_de;
 mod codec_err;
+mod top_de_input;
 mod top_de;
 mod input;
 mod output;
@@ -15,6 +16,7 @@ pub mod test_util;
 pub use codec_ser::*;
 pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
+pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 pub use crate::input::Input;
@@ -77,6 +79,13 @@ pub mod test_struct {
         }
     }
 
+    impl TopDecode for Test {
+        fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+            let bytes = input.into_boxed_slice();
+            dep_decode_from_byte_slice(&*bytes)
+        }
+    }
+
     #[derive(PartialEq, Clone, Debug)]
     pub enum E {
         Unit,
@@ -121,6 +130,13 @@ pub mod test_struct {
         }
     }
 
+    impl TopDecode for E {
+        fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+            let bytes = input.into_boxed_slice();
+            dep_decode_from_byte_slice(&*bytes)
+        }
+    }
+
     #[derive(PartialEq, Debug, Clone, Copy)]
     pub struct WrappedArray(pub [u8; 5]);
 
@@ -138,6 +154,13 @@ pub mod test_struct {
             Ok(WrappedArray(arr))
         }
     }
+
+    impl TopDecode for WrappedArray {
+        fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+            let bytes = input.into_boxed_slice();
+            dep_decode_from_byte_slice(&*bytes)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -151,10 +174,10 @@ pub mod tests {
 
     pub fn the_same<V>(element: V)
     where
-        V: Encode + NestedDecode + PartialEq + Debug + 'static,
+        V: Encode + TopDecode + PartialEq + Debug + 'static,
     {
         let serialized_bytes = element.top_encode().unwrap();
-        let deserialized: V = decode_from_byte_slice(&mut &serialized_bytes[..]).unwrap();
+        let deserialized = V::top_decode(&serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
 
@@ -223,7 +246,7 @@ pub mod tests {
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize
-        let deserialized = <[i32; 16384]>::top_decode_old(&mut &serialized_bytes[..]).unwrap();
+        let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..]).unwrap();
         for i in 0..16384 {
             assert_eq!(deserialized[i], 7i32);
         }
