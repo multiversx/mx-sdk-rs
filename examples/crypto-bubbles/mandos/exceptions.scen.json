@@ -39,7 +39,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:argument decode error (winner): input too long",
+                "message": "str:argument decode error (winner): bad H256 length",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -62,7 +62,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:argument decode error (subject): input too long",
+                "message": "str:argument decode error (subject): bad H256 length",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

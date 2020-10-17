@@ -259,6 +259,13 @@ impl NestedDecode for RustBigUint {
     }
 }
 
+impl TopDecode for RustBigUint {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        let bytes = input.into_boxed_slice();
+        Ok(RustBigUint::from_bytes_be(&*bytes))
+    }
+}
+
 impl elrond_wasm::BigUintApi for RustBigUint {
 
     fn byte_length(&self) -> i32 {

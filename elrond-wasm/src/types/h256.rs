@@ -142,6 +142,18 @@ impl NestedDecode for H256 {
     }
 }
 
+impl TopDecode for H256 {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        let bs = input.into_boxed_slice();
+        if bs.len() != 32 {
+            return Err(DecodeError::from(&b"bad H256 length"[..]));
+        }
+        let raw = Box::into_raw(bs);
+        let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
+        Ok(H256(array_box))
+    }
+}
+
 #[cfg(test)]
 mod esd_light_tests {
     use super::*;

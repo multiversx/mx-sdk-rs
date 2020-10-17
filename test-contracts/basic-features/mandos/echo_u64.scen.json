@@ -131,7 +131,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:argument decode error (i): input too long",
+                "message": "str:argument out of range",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

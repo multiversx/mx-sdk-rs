@@ -47,3 +47,10 @@ impl NestedDecode for SimpleEnum {
         Some(SimpleEnum::from_i64(input()))
     }
 }
+
+impl TopDecode for SimpleEnum {
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        let bytes = input.into_boxed_slice();
+        decode_from_byte_slice(&*bytes)
+    }
+}
