@@ -1,20 +1,7 @@
 use crate::*;
+use crate::arg_loader_err::load_arg_error;
 use elrond_codec::*;
 use core::marker::PhantomData;
-
-fn load_arg_error<A, BigInt, BigUint>(api: &A, arg_id: ArgId, de_err: DecodeError) -> !
-where
-    BigUint: BigUintApi + 'static,
-    BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'static
-{
-    let mut decode_err_message: Vec<u8> = Vec::new();
-    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-    decode_err_message.extend_from_slice(arg_id);
-    decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-    decode_err_message.extend_from_slice(de_err.message_bytes());
-    api.signal_error(decode_err_message.as_slice())
-}
 
 struct ArgInput<'a, A, BigInt, BigUint>
 where

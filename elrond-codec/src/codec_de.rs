@@ -19,31 +19,15 @@ pub trait NestedDecode: Sized {
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError>;
-
-    /// Attempt to deserialise the value from input.
-	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let result = Self::dep_decode(input)?;
-        if input.remaining_len() > 0 {
-            return Err(DecodeError::INPUT_TOO_LONG);
-        }
-        Ok(result)
-    }
-
-    /// Used to optimize handling of arguments/storage.
-    /// Optionally calls a closure that retrieves an i64 and if it returns Some(...), the result will be used.
-    #[inline]
-    fn top_decode_from_i64_old<I: FnOnce() -> i64>(_input: I) -> Option<Result<Self, DecodeError>> {
-        None
-    }
 }
 
-/// Convenience method, to avoid having to specify type when calling `top_decode_old`.
+/// Convenience method, to avoid having to specify type when calling `dep_decode`.
 /// Especially useful in the macros.
 /// Also checks that the entire slice was used.
 /// The input doesn't need to be mutable because we are not changing the underlying data.
-pub fn decode_from_byte_slice<D: NestedDecode>(input: &[u8]) -> Result<D, DecodeError> {
+pub fn dep_decode_from_byte_slice<D: NestedDecode>(input: &[u8]) -> Result<D, DecodeError> {
     let mut_slice = &mut &*input;
-    let result = D::top_decode_old(mut_slice);
+    let result = D::dep_decode(mut_slice);
     if !mut_slice.is_empty() {
         return Err(DecodeError::INPUT_TOO_LONG);
     }
@@ -61,39 +45,12 @@ impl NestedDecode for () {
 impl NestedDecode for u8 {
     const TYPE_INFO: TypeInfo = TypeInfo::U8;
     
-	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let bytes = input.flush()?;
-        match bytes.len() {
-            0 => Ok(0u8),
-            1 => Ok(bytes[0]),
-            _ => Err(DecodeError::INPUT_TOO_LONG),
-        }
-    }
-    
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         input.read_byte()
     }
 }
 
-impl<T: NestedDecode> NestedDecode for Vec<T> {
-	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        match T::TYPE_INFO {
-			TypeInfo::U8 => {
-                let bytes = input.flush()?;
-                let bytes_copy = bytes.to_vec(); // copy is needed because result might outlive input
-                let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_copy) };
-                Ok(cast_vec)
-			},
-			_ => {
-                let mut result: Vec<T> = Vec::new();
-                while input.remaining_len() > 0 {
-                    result.push(T::dep_decode(input)?);
-                }
-                Ok(result)
-			}
-        }
-    }
-    
+impl<T: NestedDecode> NestedDecode for Vec<T> { 
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         match T::TYPE_INFO {
@@ -119,15 +76,6 @@ macro_rules! decode_num_unsigned {
         impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
-            fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.flush()?;
-                if bytes.len() > $num_bytes {
-                    return Err(DecodeError::INPUT_TOO_LONG)
-                }
-                let num = bytes_to_number(bytes, false) as $ty;
-                Ok(num)
-            }
-            
             fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.read_slice($num_bytes)?;
                 let num = bytes_to_number(bytes, false) as $ty;
@@ -147,31 +95,10 @@ macro_rules! decode_num_signed {
         impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
-            fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.flush()?;
-                if bytes.len() > $num_bytes {
-                    return Err(DecodeError::INPUT_TOO_LONG)
-                }
-                let num = bytes_to_number(bytes, true) as $ty;
-                Ok(num)
-            }
-            
             fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
                 let bytes = input.read_slice($num_bytes)?;
                 let num = bytes_to_number(bytes, true) as $ty;
                 Ok(num)
-            }
-
-            #[inline]
-            fn top_decode_from_i64_old<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
-                let arg_i64 = input();
-                let min = <$ty>::MIN as i64;
-                let max = <$ty>::MAX as i64;
-                if arg_i64 < min || arg_i64 > max {
-                    Some(Err(DecodeError::INPUT_OUT_OF_RANGE))
-                } else {
-                    Some(Ok(arg_i64 as $ty))
-                }
             }
         }
     }
@@ -186,19 +113,6 @@ decode_num_signed!(i64, 8, TypeInfo::I64);
 impl NestedDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
     
-	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let bytes = input.flush()?;
-        match bytes.len() {
-            0 => Ok(false),
-            1 => match bytes[0] {
-                0 => Ok(false),
-                1 => Ok(true),
-                _ => Err(DecodeError::INVALID_VALUE),
-            }
-            _ => Err(DecodeError::INPUT_TOO_LONG),
-        }
-    }
-    
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match input.read_byte()? {
             0 => Ok(false),
@@ -206,30 +120,9 @@ impl NestedDecode for bool {
             _ => Err(DecodeError::INVALID_VALUE),
         }
     }
-
-    #[inline]
-    fn top_decode_from_i64_old<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
-        Some(match input() {
-            0 => Ok(false),
-            1 => Ok(true),
-            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
-        })
-    }
 }
 
 impl<T: NestedDecode> NestedDecode for Option<T> {
-	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        if input.empty() {
-            Ok(None)
-        } else {
-            let result = Self::dep_decode(input);
-            if input.remaining_len() > 0 {
-                return Err(DecodeError::INPUT_TOO_LONG);
-            }
-            result
-        }
-    }
-    
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match input.read_byte()? {
 			0 => Ok(None),
@@ -240,10 +133,6 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 }
 
 impl<T: NestedDecode> NestedDecode for Box<T> {
-	fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(Box::new(T::top_decode_old(input)?))
-    }
-    
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(Box::new(T::dep_decode(input)?))
     }
@@ -337,10 +226,6 @@ fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
 }
 
 impl NestedDecode for NonZeroUsize {
-    fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        decode_non_zero_usize(usize::top_decode_old(input)?)
-    }
-    
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         decode_non_zero_usize(usize::dep_decode(input)?)
     }
@@ -359,35 +244,33 @@ mod tests {
         V: NestedDecode + PartialEq + Debug + 'static,
     {
         let input = bytes.to_vec();
-        let deserialized: V = V::top_decode_old(&mut &input[..]).unwrap();
+        let deserialized: V = V::dep_decode(&mut &input[..]).unwrap();
         assert_eq!(deserialized, element);
     }
 
     #[test]
-    fn test_top_numbers_decompacted() {
+    fn test_dep_numbers_decompacted() {
         // unsigned positive
         deser_ok(5u8, &[5]);
-        deser_ok(5u16, &[5]);
-        deser_ok(5u32, &[5]);
-        deser_ok(5u64, &[5]);
-        deser_ok(5usize, &[5]);
+        deser_ok(5u16, &[0, 5]);
+        deser_ok(5u32, &[0, 0, 0, 5]);
+        deser_ok(5usize, &[0, 0, 0, 5]);
+        deser_ok(5u64, &[0, 0, 0, 0, 0, 0, 0, 5]);
         // signed positive
         deser_ok(5i8, &[5]);
-        deser_ok(5i16, &[5]);
-        deser_ok(5i32, &[5]);
-        deser_ok(5i64, &[5]);
-        deser_ok(5isize, &[5]);
+        deser_ok(5i16, &[0, 5]);
+        deser_ok(5i32, &[0, 0, 0, 5]);
+        deser_ok(5isize, &[0, 0, 0, 5]);
+        deser_ok(5i64, &[0, 0, 0, 0, 0, 0, 0, 5]);
         // signed negative
         deser_ok(-5i8, &[251]);
-        deser_ok(-5i16, &[251]);
-        deser_ok(-5i32, &[251]);
-        deser_ok(-5i64, &[251]);
-        deser_ok(-5isize, &[251]);
+        deser_ok(-5i16, &[255, 251]);
+        deser_ok(-5i32, &[255, 255, 255, 251]);
+        deser_ok(-5isize, &[255, 255, 255, 251]);
+        deser_ok(-5i64, &[255, 255, 255, 255, 255, 255, 255, 251]);
         // non zero usize
-        deser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
+        deser_ok(NonZeroUsize::new(5).unwrap(), &[0, 0, 0, 5]);
     }
-
-    
 
     #[test]
     fn test_struct() {

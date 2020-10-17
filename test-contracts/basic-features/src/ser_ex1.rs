@@ -30,6 +30,6 @@ impl NestedDecode for SerExample1 {
 impl TopDecode for SerExample1 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let bytes = input.into_boxed_slice();
-        decode_from_byte_slice(&*bytes)
+        dep_decode_from_byte_slice(&*bytes)
     }
 }
