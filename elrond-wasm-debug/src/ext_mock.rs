@@ -237,7 +237,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         tx_output.contract_storage.insert(key.to_vec(), value.to_vec());
     }
 
-    fn storage_load(&self, key: &[u8]) -> Vec<u8> {
+    fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
         let tx_output = self.tx_output_cell.borrow();
         match tx_output.contract_storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
@@ -249,7 +249,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     #[inline]
     fn storage_load_len(&self, key: &[u8]) -> usize {
-        self.storage_load(key).len()
+        self.storage_load_vec_u8(key).len()
     }
 
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
@@ -257,7 +257,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
     
     fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
-        let value = self.storage_load(key);
+        let value = self.storage_load_vec_u8(key);
         let mut res = [0u8; 32];
         let offset = 32 - value.len();
         if !value.is_empty() {
@@ -271,7 +271,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_load_big_uint(&self, key: &[u8]) -> RustBigUint {
-        let value = self.storage_load(key);
+        let value = self.storage_load_vec_u8(key);
         let bi = BigInt::from_bytes_be(num_bigint::Sign::Plus, value.as_slice());
         bi.into()
     }
@@ -281,7 +281,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_load_big_int(&self, key: &[u8]) -> RustBigInt {
-        let value = self.storage_load(key);
+        let value = self.storage_load_vec_u8(key);
         let bi = BigInt::from_signed_bytes_be(value.as_slice());
         bi.into()
     }
@@ -290,9 +290,9 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.storage_store_big_int(key, &RustBigInt::from(value));
     }
 
-    fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
+    fn storage_load_i64(&self, key: &[u8]) -> i64 {
         let bi = self.storage_load_big_int(key);
-        bi.value().to_i64()
+        bi.value().to_i64().unwrap_or_else(|| panic!("storage not i64"))
     }
 
     #[inline]

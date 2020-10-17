@@ -34,6 +34,7 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'a 
 {
+    #[inline]
     fn new(api: &'a A, arg_index: i32) -> Self {
         ArgInput {
             api,
