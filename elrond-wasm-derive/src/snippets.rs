@@ -78,8 +78,8 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_load(&self, key: &[u8]) -> Vec<u8> {
-          self.api.storage_load(key)
+        fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
+          self.api.storage_load_vec_u8(key)
         }
 
         #[inline]
@@ -123,7 +123,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
         
         #[inline]
-        fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
+        fn storage_load_i64(&self, key: &[u8]) -> i64 {
           self.api.storage_load_i64(key)
         }
         

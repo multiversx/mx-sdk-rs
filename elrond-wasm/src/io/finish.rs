@@ -179,7 +179,7 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + NestedDecode + EndpointResult<'a, A, BigInt, BigUint>,
+    T: Encode + TopDecode + EndpointResult<'a, A, BigInt, BigUint>,
 {
     fn finish(&self, api: &'a A) {
         core::ops::Deref::deref(self).finish(api);

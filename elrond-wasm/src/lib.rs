@@ -54,9 +54,13 @@ where
     
     fn storage_store(&self, key: &[u8], value: &[u8]);
 
-    fn storage_load(&self, key: &[u8]) -> Vec<u8>;
-
     fn storage_load_len(&self, key: &[u8]) -> usize;
+
+    fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8>;
+
+    fn storage_load_boxed_slice_u8(&self, key: &[u8]) -> Box<[u8]> {
+        self.storage_load_vec_u8(key).into_boxed_slice()
+    }
 
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]);
     
@@ -72,7 +76,7 @@ where
 
     fn storage_store_i64(&self, key: &[u8], value: i64);
     
-    fn storage_load_i64(&self, key: &[u8]) -> Option<i64>;
+    fn storage_load_i64(&self, key: &[u8]) -> i64;
 
     #[inline]
     fn storage_load_cumulated_validator_reward(&self) -> BigUint {

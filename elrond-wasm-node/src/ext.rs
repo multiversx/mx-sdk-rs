@@ -114,22 +114,33 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    fn storage_load(&self, key: &[u8]) -> Vec<u8> {
-         unsafe {
-            let value_len = self.storage_load_len(key);
-            let mut res = Vec::with_capacity(value_len);
-            storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
-            res.set_len(value_len);
-            res
-        }
-    }
-
     #[inline]
     fn storage_load_len(&self, key: &[u8]) -> usize {
         unsafe { 
             storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize 
         }
     }
+
+    fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
+        unsafe {
+           let value_len = self.storage_load_len(key);
+           let mut res = Vec::with_capacity(value_len);
+           storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
+           res.set_len(value_len);
+           res
+       }
+   }
+
+   fn storage_load_boxed_slice_u8(&self, key: &[u8]) -> Box<[u8]> {
+        let len = self.storage_load_len(key);
+        unsafe {
+            let mut res = Box::<[u8]>::new_uninit_slice(len).assume_init();
+            if len > 0 {
+                storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
+            }
+            res
+        }
+   }
 
     #[inline]
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
@@ -191,9 +202,9 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
     
     #[inline]
-    fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
+    fn storage_load_i64(&self, key: &[u8]) -> i64 {
         unsafe{
-            Some(int64storageLoad(key.as_ref().as_ptr(), key.len() as i32))
+            int64storageLoad(key.as_ref().as_ptr(), key.len() as i32)
         }
     }
 
