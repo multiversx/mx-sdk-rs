@@ -220,7 +220,7 @@ impl Encode for ArwenBigInt {
 impl NestedDecode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
     
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+    fn top_decode_old<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let bytes = input.flush()?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))
     }
@@ -229,6 +229,13 @@ impl NestedDecode for ArwenBigInt {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))
+    }
+}
+
+impl TopDecode for ArwenBigInt {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        let bytes = input.into_boxed_slice();
+        Ok(ArwenBigInt::from_signed_bytes_be(&*bytes))
     }
 }
 

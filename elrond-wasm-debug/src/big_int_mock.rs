@@ -175,6 +175,13 @@ impl NestedDecode for RustBigInt {
     }
 }
 
+impl TopDecode for RustBigInt {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        let bytes = input.into_boxed_slice();
+        Ok(RustBigInt::from_signed_bytes_be(&*bytes))
+    }
+}
+
 impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
     
     fn abs_uint(&self) -> RustBigUint {

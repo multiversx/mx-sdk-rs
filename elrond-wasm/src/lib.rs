@@ -108,12 +108,12 @@ pub trait ContractIOApi<BigInt, BigUint> {
 
     fn get_num_arguments(&self) -> i32;
 
-    fn check_num_arguments(&self, expected: i32) -> bool {
+    #[inline(never)] // prevent inline intentinally
+    fn check_num_arguments(&self, expected: i32) {
         let nr_args = self.get_num_arguments();
         if nr_args != expected {
             self.signal_error(err_msg::ARG_WRONG_NUMBER);
         }
-        true
     }
 
     fn check_not_payable(&self);
@@ -205,6 +205,7 @@ pub trait BigUintApi:
     PartialOrd<u64> +
     elrond_codec::Encode +
     elrond_codec::NestedDecode +
+    elrond_codec::TopDecode +
 {
     fn zero() -> Self {
         0u64.into()
@@ -256,6 +257,7 @@ pub trait BigIntApi<BigUint>:
         PartialOrd<i64> +
         elrond_codec::Encode +
         elrond_codec::NestedDecode +
+        elrond_codec::TopDecode +
 {
     fn zero() -> Self {
         0i64.into()
@@ -296,7 +298,7 @@ macro_rules! imports {
         use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
         use elrond_wasm::{H256, Address};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
-        use elrond_wasm::elrond_codec::{Encode, NestedDecode, DecodeError};
+        use elrond_wasm::elrond_codec::{Encode, NestedDecode, TopDecode, DecodeError};
         use elrond_wasm::io::*;
         use elrond_wasm::non_zero_util::*;
         use elrond_wasm::err_msg;

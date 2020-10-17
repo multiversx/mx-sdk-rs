@@ -43,3 +43,10 @@ impl NestedDecode for SerExample2 {
         }
     }
 }
+
+impl TopDecode for SerExample2 {
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        let bytes = input.into_boxed_slice();
+        decode_from_byte_slice(&*bytes)
+    }
+}

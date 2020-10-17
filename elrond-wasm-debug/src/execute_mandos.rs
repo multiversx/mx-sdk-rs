@@ -259,7 +259,12 @@ fn execute_sc_create(
 }
 
 fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
-    assert_eq!(tx_expect.out.len(), tx_result.result_values.len());
+    assert_eq!(tx_expect.out.len(), tx_result.result_values.len(),
+        "bad out value. Tx id: {}. Want: {:?}. Have: {:?}",
+        tx_id,
+        tx_expect.out,
+        tx_result.result_values
+    );
     for (i, expected_out) in tx_expect.out.iter().enumerate() {
         let actual_value = &tx_result.result_values[i];
         assert!(

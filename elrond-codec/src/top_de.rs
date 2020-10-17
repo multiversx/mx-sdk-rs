@@ -9,6 +9,8 @@ use crate::num_conv::bytes_to_number;
 use crate::transmute::*;
 
 pub trait TopDecodeInput: Sized {
+    fn byte_len(&self) -> usize;
+
     fn into_boxed_slice(self) -> Box<[u8]>;
 
     fn into_u64(self) -> u64 {
@@ -21,6 +23,10 @@ pub trait TopDecodeInput: Sized {
 }
 
 impl TopDecodeInput for Box<[u8]> {
+    fn byte_len(&self) -> usize {
+        self.len()
+    }
+
     fn into_boxed_slice(self) -> Box<[u8]> {
         self
     }
@@ -31,17 +37,9 @@ pub trait TopDecode: Sized {
     #[doc(hidden)]
     const TOP_TYPE_INFO: TypeInfo = TypeInfo::Unknown;
     
-    /// Attempt to deserialise the value from input.
+    /// Attempt to deserialize the value from input.
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError>;
 }
-
-// /// Convenience method, to avoid having to specify type when calling `top_decode`.
-// /// Especially useful in the macros.
-// #[inline]
-// pub fn decode_from_byte_slice<D: TopDecode>(input: &[u8]) -> Result<D, DecodeError> {
-//     // the input doesn't need to be mutable because we are not changing the underlying data 
-//     D::top_decode(&mut &*input)
-// }
 
 impl TopDecode for () {
 	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
@@ -49,6 +47,13 @@ impl TopDecode for () {
 	}
 }
 
+impl<T: TopDecode> TopDecode for Box<T> {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(Box::new(T::top_decode(input)?))
+    }
+}
+
+// Allowed to implement this because [T] cannot implement NestedDecode, being ?Sized.
 impl<T: NestedDecode> TopDecode for Box<[T]> {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let bytes = input.into_boxed_slice();
@@ -76,15 +81,15 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
 }
 
 macro_rules! decode_num_unsigned {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
+    ($ty:ty, $bounds_ty:ty, $type_info:expr) => {
         impl TopDecode for $ty {
             const TOP_TYPE_INFO: TypeInfo = $type_info;
             
             fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
                 let arg_u64 = input.into_u64();
-                let max = <$ty>::MAX as u64;
+                let max = <$bounds_ty>::MAX as u64;
                 if arg_u64 > max {
-                    Err(DecodeError::INPUT_OUT_OF_RANGE)
+                    Err(DecodeError::INPUT_TOO_LONG)
                 } else {
                     Ok(arg_u64 as $ty)
                 }
@@ -93,21 +98,21 @@ macro_rules! decode_num_unsigned {
     }
 }
 
-decode_num_unsigned!(u8, 1, TypeInfo::U8);
-decode_num_unsigned!(u16, 2, TypeInfo::U16);
-decode_num_unsigned!(u32, 4, TypeInfo::U32);
-decode_num_unsigned!(usize, 4, TypeInfo::USIZE);
-decode_num_unsigned!(u64, 8, TypeInfo::U64);
+decode_num_unsigned!(u8, u8, TypeInfo::U8);
+decode_num_unsigned!(u16, u16, TypeInfo::U16);
+decode_num_unsigned!(u32, u32, TypeInfo::U32);
+decode_num_unsigned!(usize, u32, TypeInfo::USIZE); // even if usize can be 64 bits on some platforms, we always deserialize as max 32 bits
+decode_num_unsigned!(u64, u64, TypeInfo::U64);
 
 macro_rules! decode_num_signed {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
+    ($ty:ty, $bounds_ty:ty, $type_info:expr) => {
         impl TopDecode for $ty {
             const TOP_TYPE_INFO: TypeInfo = $type_info;
             
             fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
                 let arg_i64 = input.into_i64();
-                let min = <$ty>::MIN as i64;
-                let max = <$ty>::MAX as i64;
+                let min = <$bounds_ty>::MIN as i64;
+                let max = <$bounds_ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {
                     Err(DecodeError::INPUT_OUT_OF_RANGE)
                 } else {
@@ -118,11 +123,11 @@ macro_rules! decode_num_signed {
     }
 }
 
-decode_num_signed!(i8 , 1, TypeInfo::I8);
-decode_num_signed!(i16, 2, TypeInfo::I16);
-decode_num_signed!(i32, 4, TypeInfo::I32);
-decode_num_signed!(isize, 4, TypeInfo::ISIZE);
-decode_num_signed!(i64, 8, TypeInfo::I64);
+decode_num_signed!(i8 , i8, TypeInfo::I8);
+decode_num_signed!(i16, i16, TypeInfo::I16);
+decode_num_signed!(i32, i32, TypeInfo::I32);
+decode_num_signed!(isize, i32, TypeInfo::ISIZE); // even if isize can be 64 bits on some platforms, we always deserialize as max 32 bits
+decode_num_signed!(i64, i64, TypeInfo::I64);
 
 impl TopDecode for bool {
     const TOP_TYPE_INFO: TypeInfo = TypeInfo::Bool;
@@ -148,84 +153,72 @@ impl<T: NestedDecode> TopDecode for Option<T> {
     }
 }
 
-// macro_rules! tuple_impls {
-//     ($($len:expr => ($($n:tt $name:ident)+))+) => {
-//         $(
-//             impl<$($name),+> TopDecode for ($($name,)+)
-//             where
-//                 $($name: TopDecode,)+
-//             {
-//                 fn dep_decode<I: Input>(input: I) -> Result<Self, DecodeError> {
-//                     let tuple = (
-//                         $(
-//                             $name::dep_decode(input)?,
-//                         )+
-//                     );
-//                     Ok(tuple)
-//                 }
-//             }
-//         )+
-//     }
-// }
+macro_rules! tuple_impls {
+    ($($len:expr => ($($n:tt $name:ident)+))+) => {
+        $(
+            impl<$($name),+> TopDecode for ($($name,)+)
+            where
+                $($name: NestedDecode,)+
+            {
+                fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+                    let bytes = input.into_boxed_slice();
+                    decode_from_byte_slice(&*bytes)
+				}
+            }
+        )+
+    }
+}
 
-// tuple_impls! {
-//     1 => (0 T0)
-//     2 => (0 T0 1 T1)
-//     3 => (0 T0 1 T1 2 T2)
-//     4 => (0 T0 1 T1 2 T2 3 T3)
-//     5 => (0 T0 1 T1 2 T2 3 T3 4 T4)
-//     6 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-//     7 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-//     8 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-//     9 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-//     10 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-//     11 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-//     12 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-//     13 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-//     14 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-//     15 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-//     16 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
-// }
+tuple_impls! {
+    1 => (0 T0)
+    2 => (0 T0 1 T1)
+    3 => (0 T0 1 T1 2 T2)
+    4 => (0 T0 1 T1 2 T2 3 T3)
+    5 => (0 T0 1 T1 2 T2 3 T3 4 T4)
+    6 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
+    7 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
+    8 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
+    9 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
+    10 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
+    11 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
+    12 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
+    13 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
+    14 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
+    15 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
+    16 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+}
 
-// macro_rules! array_impls {
-//     ($($n: tt,)+) => {
-//         $(
-//             impl<T: TopDecode> TopDecode for [T; $n] {
-//                 fn dep_decode<I: Input>(input: I) -> Result<Self, DecodeError> {
-// 					let mut r = ArrayVec::new();
-// 					for _ in 0..$n {
-// 						r.push(T::dep_decode(input)?);
-// 					}
-// 					let i = r.into_inner();
+macro_rules! array_impls {
+    ($($n: tt,)+) => {
+        $(
+            impl<T: NestedDecode> TopDecode for [T; $n] {
+                fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+                    let bytes = input.into_boxed_slice();
+                    decode_from_byte_slice(&*bytes)
+				}
+            }
+        )+
+    }
+}
 
-// 					match i {
-// 						Ok(a) => Ok(a),
-// 						Err(_) => Err(DecodeError::ARRAY_DECODE_ERROR),
-// 					}
-// 				}
-//             }
-//         )+
-//     }
-// }
-
-// array_impls!(
-// 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-// 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-// 	32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-// 	52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
-// 	72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91,
-// 	92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
-// 	109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124,
-// 	125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
-// 	141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156,
-// 	157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172,
-// 	173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188,
-// 	189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204,
-// 	205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220,
-// 	221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236,
-// 	237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252,
-// 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
-// );
+array_impls!(
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+	32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+	52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+	72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91,
+	92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
+	109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124,
+	125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
+	141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156,
+	157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172,
+	173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188,
+	189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204,
+	205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220,
+	221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236,
+	237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252,
+	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
+);
 
 fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
     if let Some(nz) = NonZeroUsize::new(num) {

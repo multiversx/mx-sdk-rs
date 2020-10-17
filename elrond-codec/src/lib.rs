@@ -16,7 +16,7 @@ pub use codec_ser::*;
 pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
 pub use top_de::*;
-pub use transmute::*;
+pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 pub use crate::input::Input;
 pub use crate::output::Output;
 pub use crate::num_conv::{using_encoded_number, bytes_to_number};

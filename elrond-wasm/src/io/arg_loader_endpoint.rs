@@ -16,15 +16,66 @@ where
     api.signal_error(decode_err_message.as_slice())
 }
 
+struct ArgInput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    api: &'a A,
+    arg_index: i32,
+    _phantom1: PhantomData<BigInt>,
+    _phantom2: PhantomData<BigUint>,
+}
+
+impl<'a, A, BigInt, BigUint> ArgInput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    fn new(api: &'a A, arg_index: i32) -> Self {
+        ArgInput {
+            api,
+            arg_index,
+            _phantom1: PhantomData,
+            _phantom2: PhantomData,
+        }
+    }
+}
+
+impl<'a, A, BigInt, BigUint> TopDecodeInput for ArgInput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    fn byte_len(&self) -> usize {
+        self.api.get_argument_len(self.arg_index)
+    }
+
+    fn into_boxed_slice(self) -> Box<[u8]> {
+        self.api.get_argument_boxed_slice_u8(self.arg_index)
+    }
+
+    fn into_u64(self) -> u64 {
+        self.api.get_argument_u64(self.arg_index)
+    }
+
+    fn into_i64(self) -> i64 {
+        self.api.get_argument_i64(self.arg_index)
+    }
+}
+
 pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
 where
-    T: NestedDecode,
+    T: TopDecode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
     // the compiler is smart enough to evaluate this match at compile time
-    match T::TYPE_INFO {
+    match T::TOP_TYPE_INFO {
         TypeInfo::BigInt => {
             let big_int_arg = api.get_argument_big_int(index);
             let cast_big_int: T = unsafe { core::mem::transmute_copy(&big_int_arg) };
@@ -38,18 +89,9 @@ where
             cast_big_uint
         },
         _ => {
-            // the compiler is also smart enough to evaluate this if let at compile time
-            if let Some(res_i64) = T::top_decode_from_i64_old(|| api.get_argument_i64(index)) {
-                match res_i64 {
-                    Ok(from_i64) => from_i64,
-                    Err(de_err) => load_arg_error(api, arg_id, de_err),
-                }
-            } else {
-                let arg_bytes = api.get_argument_vec_u8(index);
-                match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
-                    Ok(v) => v,
-                    Err(de_err) => load_arg_error(api, arg_id, de_err),
-                }
+            match T::top_decode(ArgInput::new(api, index)) {
+                Ok(v) => v,
+                Err(de_err) => load_arg_error(api, arg_id, de_err),
             }
         }
     }
@@ -87,7 +129,7 @@ where
 
 impl<'a, A, BigInt, BigUint, T> DynArgLoader<T> for DynEndpointArgLoader<'a, A, BigInt, BigUint>
 where
-    T: NestedDecode,
+    T: TopDecode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
