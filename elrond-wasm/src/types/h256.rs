@@ -136,21 +136,18 @@ impl Encode for H256 {
 
 impl NestedDecode for H256 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let mut arr = [0u8; 32];
-        input.read_into(&mut arr)?;
-        Ok(H256(Box::new(arr)))
+        let mut res = H256::zero();
+        input.read_into(res.as_mut())?;
+        Ok(res)
     }
 }
 
 impl TopDecode for H256 {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let bs = input.into_boxed_slice_u8();
-        if bs.len() != 32 {
-            return Err(DecodeError::from(&b"bad H256 length"[..]));
+        match Box::<[u8; 32]>::top_decode(input) {
+            Ok(array_box) => Ok(H256(array_box)),
+            Err(_) => Err(DecodeError::from(&b"bad H256 length"[..])),
         }
-        let raw = Box::into_raw(bs);
-        let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
-        Ok(H256(array_box))
     }
 }
 

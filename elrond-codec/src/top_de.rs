@@ -26,7 +26,15 @@ pub trait TopDecode: Sized {
     const TOP_TYPE_INFO: TypeInfo = TypeInfo::Unknown;
     
     /// Attempt to deserialize the value from input.
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError>;
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError>;
+    
+    /// Allows types to provide optimized implementations for their boxed version.
+    /// Especially designed for byte arrays that can be transmuted directly from the input sometimes.
+    #[doc(hidden)]
+    #[inline]
+    fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
+        Ok(Box::new(Self::top_decode(input)?))
+    }
 }
 
 impl TopDecode for () {
@@ -37,7 +45,7 @@ impl TopDecode for () {
 
 impl<T: TopDecode> TopDecode for Box<T> {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(Box::new(T::top_decode(input)?))
+        T::top_decode_boxed(input)
     }
 }
 
@@ -188,7 +196,22 @@ macro_rules! array_impls {
             impl<T: NestedDecode> TopDecode for [T; $n] {
                 fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
                     dep_decode_from_byte_slice(input.get_slice_u8())
-				}
+                }
+                
+                fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
+                    if let TypeInfo::U8 = T::TYPE_INFO {
+                        // transmute directly
+                        let bs = input.into_boxed_slice_u8();
+                        if bs.len() != $n {
+                            return Err(DecodeError::ARRAY_DECODE_ERROR);
+                        }
+                        let raw = Box::into_raw(bs);
+                        let array_box = unsafe { Box::<[T; $n]>::from_raw(raw as *mut [T; $n]) };
+                        Ok(array_box)
+                    } else {
+                        Ok(Box::new(Self::top_decode(input)?))
+                    }
+                }
             }
         )+
     }
