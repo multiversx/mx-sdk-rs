@@ -144,7 +144,7 @@ impl NestedDecode for H256 {
 
 impl TopDecode for H256 {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let bs = input.into_boxed_slice();
+        let bs = input.into_boxed_slice_u8();
         if bs.len() != 32 {
             return Err(DecodeError::from(&b"bad H256 length"[..]));
         }

@@ -11,6 +11,7 @@ where
 {
     api: &'a A,
     arg_index: i32,
+    boxed_value: Box<[u8]>,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
@@ -26,6 +27,7 @@ where
         ArgInput {
             api,
             arg_index,
+            boxed_value: Box::new([]),
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
@@ -42,15 +44,20 @@ where
         self.api.get_argument_len(self.arg_index)
     }
 
-    fn into_boxed_slice(self) -> Box<[u8]> {
+    fn get_slice_u8(&mut self) -> &[u8] {
+        self.boxed_value = self.api.get_argument_boxed_slice_u8(self.arg_index);
+        &*self.boxed_value
+    }
+
+    fn into_boxed_slice_u8(self) -> Box<[u8]> {
         self.api.get_argument_boxed_slice_u8(self.arg_index)
     }
 
-    fn into_u64(self) -> u64 {
+    fn get_u64(&mut self) -> u64 {
         self.api.get_argument_u64(self.arg_index)
     }
 
-    fn into_i64(self) -> i64 {
+    fn get_i64(&mut self) -> i64 {
         self.api.get_argument_i64(self.arg_index)
     }
 }

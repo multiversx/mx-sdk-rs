@@ -24,6 +24,7 @@ where
 {
     api: &'a A,
     key: &'k [u8],
+    boxed_value: Box<[u8]>,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
@@ -40,6 +41,7 @@ where
         StorageGetInput {
             api,
             key,
+            boxed_value: Box::from([]),
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
@@ -57,11 +59,16 @@ where
         self.api.storage_load_len(self.key)
     }
 
-    fn into_boxed_slice(self) -> Box<[u8]> {
+    fn get_slice_u8(&mut self) -> &[u8] {
+        self.boxed_value = self.api.storage_load_boxed_slice_u8(self.key);
+        &*self.boxed_value
+    }
+
+    fn into_boxed_slice_u8(self) -> Box<[u8]> {
         self.api.storage_load_boxed_slice_u8(self.key)
     }
 
-    fn into_i64(self) -> i64 {
+    fn get_i64(&mut self) -> i64 {
         self.api.storage_load_i64(self.key)
     }
 }
