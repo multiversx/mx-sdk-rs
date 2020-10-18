@@ -28,8 +28,7 @@ impl NestedDecode for SerExample1 {
 }
 
 impl TopDecode for SerExample1 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let bytes = input.into_boxed_slice();
-        dep_decode_from_byte_slice(&*bytes)
+    fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        dep_decode_from_byte_slice(input.get_slice_u8())
     }
 }

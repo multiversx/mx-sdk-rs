@@ -80,9 +80,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for Test {
-        fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-            let bytes = input.into_boxed_slice();
-            dep_decode_from_byte_slice(&*bytes)
+        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+            dep_decode_from_byte_slice(input.get_slice_u8())
         }
     }
 
@@ -131,9 +130,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for E {
-        fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-            let bytes = input.into_boxed_slice();
-            dep_decode_from_byte_slice(&*bytes)
+        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+            dep_decode_from_byte_slice(input.get_slice_u8())
         }
     }
 
@@ -156,9 +154,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for WrappedArray {
-        fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-            let bytes = input.into_boxed_slice();
-            dep_decode_from_byte_slice(&*bytes)
+        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+            dep_decode_from_byte_slice(input.get_slice_u8())
         }
     }
 }
