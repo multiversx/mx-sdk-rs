@@ -1,4 +1,4 @@
-use crate::output::OutputBuffer;
+use crate::nested_ser_output::OutputBuffer;
 
 
 /// Adds number to output buffer.

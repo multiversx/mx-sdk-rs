@@ -3,7 +3,7 @@ use alloc::boxed::Box;
 use core::num::NonZeroUsize;
 
 use crate::top_de_input::TopDecodeInput;
-use crate::codec_de::*;
+use crate::nested_de::*;
 use crate::TypeInfo;
 use crate::codec_err::DecodeError;
 use crate::transmute::*;

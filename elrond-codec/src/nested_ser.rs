@@ -4,7 +4,7 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
-use crate::output::OutputBuffer;
+use crate::nested_ser_output::OutputBuffer;
 use crate::num_conv::encode_number_to_output;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.

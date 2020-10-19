@@ -2,29 +2,29 @@
 
 extern crate alloc;
 
-mod codec_ser;
-mod codec_de;
+mod nested_ser_output;
+mod nested_ser;
+mod nested_de_input;
+mod nested_de;
 mod codec_err;
 mod top_ser_output;
 mod top_ser;
 mod top_de_input;
 mod top_de;
-mod input;
-mod output;
 mod num_conv;
 mod transmute;
 pub mod test_util;
 
-pub use codec_ser::*;
-pub use codec_de::*;
+pub use nested_ser::*;
+pub use nested_de::*;
 pub use codec_err::{EncodeError, DecodeError};
 pub use top_ser_output::TopEncodeOutput;
 pub use top_ser::{TopEncode, top_encode_to_vec};
 pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
-pub use crate::input::Input;
-pub use crate::output::OutputBuffer;
+pub use crate::nested_de_input::Input;
+pub use crate::nested_ser_output::OutputBuffer;
 pub use crate::num_conv::{using_encoded_number, bytes_to_number};
 
 /// !INTERNAL USE ONLY!

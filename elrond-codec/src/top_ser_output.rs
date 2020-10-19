@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use crate::output::OutputBuffer;
+use crate::nested_ser_output::OutputBuffer;
 use crate::num_conv::encode_number_to_output;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
