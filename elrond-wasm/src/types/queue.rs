@@ -89,11 +89,6 @@ impl<T: NestedEncode> NestedEncode for Queue<T> {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.as_slice().dep_encode_to(dest)
 	}
-
-	#[inline]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-        self.as_slice().using_top_encoded(f)
-	}
 }
 
 impl<T: NestedEncode> TopEncode for Queue<T> {

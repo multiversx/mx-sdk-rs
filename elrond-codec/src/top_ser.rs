@@ -3,7 +3,7 @@ use alloc::boxed::Box;
 use core::num::NonZeroUsize;
 
 use crate::codec_err::EncodeError;
-use crate::nested_ser::NestedEncode;
+use crate::nested_ser::{NestedEncode, dep_encode_slice_contents};
 use crate::TypeInfo;
 use crate::nested_ser_output::OutputBuffer;
 use crate::top_ser_output::TopEncodeOutput;
@@ -16,10 +16,10 @@ pub trait TopEncode: Sized {
 	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError>;
 }
 
-pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Vec<u8> {
+pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
 	let mut bytes = Vec::<u8>::new();
-	obj.top_encode(&mut bytes).unwrap();
-	bytes
+	obj.top_encode(&mut bytes)?;
+	Ok(bytes)
 }
 
 // TODO: consider removing altogether when possible
@@ -36,15 +36,16 @@ impl<T: NestedEncode> TopEncode for &[T] {
 	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
-				// cast Vec<T> to &[u8]
+				// transmute to &[u8]
+				// save directly, without passing through the buffer
 				let slice: &[u8] = unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
 				output.set_slice_u8(slice);
 			},
 			_ => {
-				let buffer = output.buffer_ref();
-				for x in *self {
-					x.dep_encode_to(buffer)?;
-				}
+				// only using `dep_encode_slice_contents` for non-u8,
+				// because it always appends to the buffer,
+				// which is not necessary here
+				dep_encode_slice_contents(self, output.buffer_ref())?;
 				output.flush_buffer();
 			}
 		}
@@ -247,7 +248,7 @@ mod tests {
     where
         V: TopEncode + PartialEq + Debug + 'static,
     {
-		let bytes = top_encode_to_vec(&element);
+		let bytes = top_encode_to_vec(&element).unwrap();
 		assert_eq!(bytes.as_slice(), expected_bytes);
     }
 
