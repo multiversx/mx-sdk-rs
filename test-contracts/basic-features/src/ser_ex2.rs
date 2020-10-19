@@ -9,7 +9,7 @@ pub enum SerExample2 {
 }
 
 impl NestedEncode for SerExample2 {
-    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         match self {
             SerExample2::Unit => {
                 0u32.dep_encode_to(dest)?;
@@ -33,10 +33,9 @@ impl NestedEncode for SerExample2 {
 }
 
 impl TopEncode for SerExample2 {
-    fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
-        let mut buffer = output.into_output_buffer();
-        self.dep_encode_to(&mut buffer)?;
-        buffer.save_buffer();
+    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
+        self.dep_encode_to(output.buffer_ref())?;
+        output.flush_buffer();
         Ok(())
     }
 }

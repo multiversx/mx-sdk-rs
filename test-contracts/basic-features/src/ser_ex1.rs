@@ -9,7 +9,7 @@ pub struct SerExample1 {
 }
 
 impl NestedEncode for SerExample1 {
-    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.int.dep_encode_to(dest)?;
         self.seq.dep_encode_to(dest)?;
         self.another_byte.dep_encode_to(dest)?;
@@ -18,10 +18,9 @@ impl NestedEncode for SerExample1 {
 }
 
 impl TopEncode for SerExample1 {
-    fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
-        let mut buffer = output.into_output_buffer();
-        self.dep_encode_to(&mut buffer)?;
-        buffer.save_buffer();
+    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
+        self.dep_encode_to(output.buffer_ref())?;
+        output.flush_buffer();
         Ok(())
     }
 }
