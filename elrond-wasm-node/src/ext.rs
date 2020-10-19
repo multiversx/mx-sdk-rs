@@ -1,5 +1,3 @@
-
-
 use elrond_wasm::{H256, Address};
 
 use crate::big_int::*;
@@ -32,6 +30,8 @@ extern {
 
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
+    fn getESDTValue(resultOffset: *const u8) -> usize;
+    fn getESDTTokenName(resultOffset: *const u8) -> usize;
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
     fn finish(dataOffset: *const u8, length: i32);
 
@@ -59,6 +59,7 @@ extern {
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetCallValue(dest: i32);
+    fn bigIntGetESDTCallValue(dest: i32);
     fn bigIntFinishUnsigned(bih: i32);
     fn bigIntFinishSigned(bih: i32);
 
@@ -217,6 +218,30 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
+    #[inline]
+    fn get_esdt_value_big_uint(&self) -> ArwenBigUint {
+        unsafe {
+            let result = bigIntNew(0);
+            bigIntGetESDTCallValue(result);
+            ArwenBigUint {handle: result}
+        }
+    }
+
+    #[inline]
+    fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+        unsafe {
+            let mut name = Vec::with_capacity(32);
+            let name_len = getESDTTokenName(name.as_mut_ptr());
+            match name_len {
+                0 => None,
+                _ => {
+                    name.set_len(name_len);
+                    Some(name)
+                }
+            }
+        }
+    }
+
     fn send_tx(&self, to: &Address, amount: &ArwenBigUint, message: &str) {
         let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
         unsafe {
@@ -273,6 +298,26 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_block_epoch(&self) -> u64 {
         unsafe{ getBlockEpoch() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_timestamp(&self) -> u64 {
+        unsafe{ getPrevBlockTimestamp() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_nonce(&self) -> u64 {
+        unsafe{ getPrevBlockNonce() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_round(&self) -> u64 {
+        unsafe{ getPrevBlockRound() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_epoch(&self) -> u64 {
+        unsafe{ getPrevBlockEpoch() as u64 }
     }
 
     fn sha256(&self, data: &[u8]) -> H256 {

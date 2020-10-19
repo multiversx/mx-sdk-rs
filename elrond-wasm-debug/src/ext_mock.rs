@@ -38,6 +38,8 @@ pub struct TxInput {
     pub from: Address,
     pub to: Address,
     pub call_value: BigUint,
+    pub esdt_value: BigUint,
+    pub esdt_token_name: Option<Vec<u8>>,
     pub func_name: Vec<u8>,
     pub args: Vec<Vec<u8>>,
     pub gas_limit: u64,
@@ -183,6 +185,8 @@ impl TxContext {
                 from: Address::zero(),
                 to: Address::zero(),
                 call_value: 0u32.into(),
+                esdt_value: 0u32.into(),
+                esdt_token_name: None,
                 func_name: Vec::new(),
                 args: Vec::new(),
                 gas_limit: 0,
@@ -300,6 +304,16 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.tx_input.call_value.clone().into()
     }
 
+    #[inline]
+    fn get_esdt_value_big_uint(&self) -> RustBigUint {
+        self.tx_input.esdt_value.clone().into()
+    }
+
+    #[inline]
+    fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+        self.tx_input.esdt_token_name.clone()
+    }
+
     fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance{
@@ -342,6 +356,22 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.blockchain_info.current_block_info.block_epoch
     }
 
+    fn get_prev_block_timestamp(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_timestamp
+    }
+
+    fn get_prev_block_nonce(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_nonce
+    }
+
+    fn get_prev_block_round(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_round
+    }
+
+    fn get_prev_block_epoch(&self) -> u64 {
+        self.blockchain_info.previous_block_info.block_epoch
+    }
+    
     fn sha256(&self, data: &[u8]) -> H256 {
         let mut hasher = Sha3_256::new();
         hasher.input(data);
