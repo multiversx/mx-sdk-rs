@@ -5,7 +5,7 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::DecodeError;
 use crate::TypeInfo;
-use crate::input::Input;
+use crate::nested_de_input::Input;
 use crate::num_conv::bytes_to_number;
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.

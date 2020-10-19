@@ -3,9 +3,9 @@ use alloc::boxed::Box;
 use core::num::NonZeroUsize;
 
 use crate::codec_err::EncodeError;
-use crate::codec_ser::NestedEncode;
+use crate::nested_ser::NestedEncode;
 use crate::TypeInfo;
-use crate::output::OutputBuffer;
+use crate::nested_ser_output::OutputBuffer;
 use crate::top_ser_output::TopEncodeOutput;
 
 pub trait TopEncode: Sized {
