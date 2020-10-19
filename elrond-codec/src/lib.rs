@@ -5,6 +5,8 @@ extern crate alloc;
 mod codec_ser;
 mod codec_de;
 mod codec_err;
+mod top_ser_output;
+mod top_ser;
 mod top_de_input;
 mod top_de;
 mod input;
@@ -16,11 +18,13 @@ pub mod test_util;
 pub use codec_ser::*;
 pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
+pub use top_ser_output::TopEncodeOutput;
+pub use top_ser::{TopEncode, top_encode_to_vec};
 pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 pub use crate::input::Input;
-pub use crate::output::Output;
+pub use crate::output::NestedOutputBuffer;
 pub use crate::num_conv::{using_encoded_number, bytes_to_number};
 
 /// !INTERNAL USE ONLY!
@@ -28,7 +32,7 @@ pub use crate::num_conv::{using_encoded_number, bytes_to_number};
 /// This enum provides type information to optimize encoding/decoding by doing fake specialization.
 #[doc(hidden)]
 pub enum TypeInfo {
-	/// Default value of [`Encode::TYPE_INFO`] to not require implementors to set this value in the trait.
+	/// Default value of [`NestedEncode::TYPE_INFO`] to not require implementors to set this value in the trait.
 	Unknown,
     U8,
     I8,
@@ -60,13 +64,19 @@ pub mod test_struct {
 		pub another_byte: u8,
 	}
 
-	impl Encode for Test {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+	impl NestedEncode for Test {
+		fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 			self.int.dep_encode_to(dest)?;
 			self.seq.dep_encode_to(dest)?;
             self.another_byte.dep_encode_to(dest)?;
             Ok(())
 		}
+    }
+
+    impl TopEncode for Test {
+        fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+            self.dep_encode_to(&mut output.into_output_buffer())
+        }
     }
     
     impl NestedDecode for Test {
@@ -93,8 +103,8 @@ pub mod test_struct {
         Struct { a: u32 },
     }
 
-    impl Encode for E {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    impl NestedEncode for E {
+		fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
             match self {
                 E::Unit => {
                     0u32.dep_encode_to(dest)?;
@@ -115,6 +125,12 @@ pub mod test_struct {
             }
             Ok(())
 		}
+    }
+
+    impl TopEncode for E {
+        fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+            self.dep_encode_to(&mut output.into_output_buffer())
+        }
     }
     
     impl NestedDecode for E {
@@ -138,8 +154,8 @@ pub mod test_struct {
     #[derive(PartialEq, Debug, Clone, Copy)]
     pub struct WrappedArray(pub [u8; 5]);
 
-    impl Encode for WrappedArray {
-		fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    impl NestedEncode for WrappedArray {
+		fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
             dest.write(&self.0[..]);
             Ok(())
 		}
@@ -171,9 +187,9 @@ pub mod tests {
 
     pub fn the_same<V>(element: V)
     where
-        V: Encode + TopDecode + PartialEq + Debug + 'static,
+        V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
-        let serialized_bytes = element.top_encode().unwrap();
+        let serialized_bytes = top_encode_to_vec(&element);
         let deserialized = V::top_decode(&serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
@@ -239,7 +255,7 @@ pub mod tests {
         }
 
         // serialize
-        let serialized_bytes = arr.top_encode().unwrap();
+        let serialized_bytes = arr.top_encode_old().unwrap();
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize

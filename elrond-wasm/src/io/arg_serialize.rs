@@ -12,7 +12,7 @@ pub trait AsyncCallArg: Sized {
 
 impl<T> AsyncCallArg for T
 where
-    T: Encode,
+    T: NestedEncode,
 {
     #[inline]
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {

@@ -4,8 +4,8 @@ use core::marker::PhantomData;
 
 fn storage_get_error<'a, A, BigInt, BigUint>(api: &'a A, de_err: DecodeError) -> !
 where
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     let mut decode_err_message: Vec<u8> = Vec::new();
@@ -18,8 +18,8 @@ where
 struct StorageGetInput<'a, 'k, A, BigInt, BigUint>
 where
     'a: 'k,
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     api: &'a A,
@@ -32,8 +32,8 @@ where
 impl<'a, 'k, A, BigInt, BigUint> StorageGetInput<'a, 'k, A, BigInt, BigUint>
 where
     'a: 'k,
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     #[inline]
@@ -51,8 +51,8 @@ where
 impl<'a, 'k, A, BigInt, BigUint> TopDecodeInput for StorageGetInput<'a, 'k, A, BigInt, BigUint>
 where
     'a: 'k,
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     fn byte_len(&self) -> usize {
@@ -77,8 +77,8 @@ pub fn storage_get<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8]) -> 
 where
     'a: 'k,
     T: TopDecode,
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     // the compiler is smart enough to evaluate this match at compile time

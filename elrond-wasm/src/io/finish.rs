@@ -14,7 +14,7 @@ where
 
 impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for T
 where
-    T: Encode,
+    T: NestedEncode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
@@ -179,7 +179,7 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + TopDecode + EndpointResult<'a, A, BigInt, BigUint>,
+    T: NestedEncode + TopDecode + EndpointResult<'a, A, BigInt, BigUint>,
 {
     fn finish(&self, api: &'a A) {
         core::ops::Deref::deref(self).finish(api);

@@ -127,9 +127,16 @@ impl H256 {
 
 use elrond_codec::*;
 
-impl Encode for H256 {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for H256 {
+    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
+        Ok(())
+    }
+}
+
+impl TopEncode for H256 {
+    fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_slice_u8(&self.0[..]);
         Ok(())
     }
 }
@@ -178,7 +185,7 @@ mod esd_light_tests {
         let expected_bytes: &[u8] = &[4u8; 32*3];
 
         let tuple = (&addr, &&&addr, addr.clone());
-        let serialized_bytes = tuple.top_encode().unwrap();
+        let serialized_bytes = tuple.top_encode_old().unwrap();
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     }
 }

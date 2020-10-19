@@ -8,8 +8,8 @@ pub enum SerExample2 {
     Struct { a: u32 },
 }
 
-impl Encode for SerExample2 {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for SerExample2 {
+    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         match self {
             SerExample2::Unit => {
                 0u32.dep_encode_to(dest)?;

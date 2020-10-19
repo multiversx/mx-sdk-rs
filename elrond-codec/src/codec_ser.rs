@@ -4,29 +4,29 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
-use crate::output::Output;
+use crate::output::NestedOutputBuffer;
 use crate::num_conv::encode_number_to_output;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///
 /// Implementations should override `using_top_encoded` for value types and `dep_encode_to` and `size_hint` for allocating types.
 /// Wrapper types should override all methods.
-pub trait Encode: Sized {
+pub trait NestedEncode: Sized {
 	// !INTERNAL USE ONLY!
 	// This const helps SCALE to optimize the encoding/decoding by doing fake specialization.
 	#[doc(hidden)]
 	const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
-	/// Encode to output, using the format of an object nested inside another structure.
+	/// NestedEncode to output, using the format of an object nested inside another structure.
 	/// Does not provide compact version.
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.using_top_encoded(|buf| dest.write(buf))
 	}
 
 	/// Convert self to an owned vector.
 	/// Allowed to provide compact version.
 	/// Do not call for nested objects.
-	fn top_encode(&self) -> Result<Vec<u8>, EncodeError> {
+	fn top_encode_old(&self) -> Result<Vec<u8>, EncodeError> {
 		let mut dest = Vec::new();
 		self.using_top_encoded(|buf| dest.write(buf))?;
 		Ok(dest)
@@ -43,17 +43,17 @@ pub trait Encode: Sized {
 		Ok(())
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
 		None
 	}
 }
 
 // TODO: consider removing altogether when possible
-impl Encode for () {
+impl NestedEncode for () {
 	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-	fn dep_encode_to<O: Output>(&self, _dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, _dest: &mut O) -> Result<(), EncodeError> {
 		Ok(())
 	}
 
@@ -62,15 +62,15 @@ impl Encode for () {
 		Ok(())
 	}
 
-	fn top_encode(&self) -> Result<Vec<u8>, EncodeError> {
+	fn top_encode_old(&self) -> Result<Vec<u8>, EncodeError> {
 		Ok(Vec::with_capacity(0))
 	}
 }
 
-impl Encode for u8 {
+impl NestedEncode for u8 {
 	const TYPE_INFO: TypeInfo = TypeInfo::U8;
 
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		dest.write(&[*self as u8][..]);
 		Ok(())
 	}
@@ -85,8 +85,8 @@ impl Encode for u8 {
 	}
 }
 
-impl<T: Encode> Encode for &[T] {
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<T: NestedEncode> NestedEncode for &[T] {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
 		encode_number_to_output(dest, self.len() as u64, 32, false, false);
 		// actual data
@@ -124,20 +124,20 @@ impl<T: Encode> Encode for &[T] {
 	}
 }
 
-impl<T: Encode> Encode for &T {
-	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<T: NestedEncode> NestedEncode for &T {
+	#[inline(never)]
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		(*self).dep_encode_to(dest)
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		(*self).using_top_encoded(f)
 	}
 }
 
-impl Encode for &str {
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for &str {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
 		encode_number_to_output(dest, self.len() as u64, 32, false, false);
 		// actual data
@@ -151,13 +151,13 @@ impl Encode for &str {
 	}
 }
 
-impl<T: Encode> Encode for Vec<T> {
-	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<T: NestedEncode> NestedEncode for Vec<T> {
+	#[inline(never)]
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_slice().dep_encode_to(dest)
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		self.as_slice().using_top_encoded(f)
 	}
@@ -165,16 +165,16 @@ impl<T: Encode> Encode for Vec<T> {
 
 macro_rules! encode_num_signed {
     ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
-		impl Encode for $num_type {
+		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
-			#[inline]
-            fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+			#[inline(never)]
+            fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 				encode_number_to_output(dest, *self as u64, $size_in_bits, true, false);
 				Ok(())
 			}
 		
-			#[inline]
+			#[inline(never)]
             fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 				let mut dest: Vec<u8> = Vec::new();
 				encode_number_to_output(&mut dest, *self as u64, $size_in_bits, true, true);
@@ -192,16 +192,16 @@ macro_rules! encode_num_signed {
 
 macro_rules! encode_num_unsigned {
     ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
-		impl Encode for $num_type {
+		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
-			#[inline]
-            fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+			#[inline(never)]
+            fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 				encode_number_to_output(dest, *self as u64, $size_in_bits, false, false);
 				Ok(())
 			}
 		
-			#[inline]
+			#[inline(never)]
             fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 				let mut dest: Vec<u8> = Vec::new();
 				encode_number_to_output(&mut dest, *self as u64, $size_in_bits, false, true);
@@ -223,10 +223,10 @@ encode_num_signed!{isize, 32, TypeInfo::ISIZE}
 encode_num_signed!{i16, 16, TypeInfo::I16}
 encode_num_signed!{i8, 8, TypeInfo::I8}
 
-impl Encode for bool {
+impl NestedEncode for bool {
 	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		dest.write(&[*self as u8][..]);
 		Ok(())
 	}
@@ -240,7 +240,7 @@ impl Encode for bool {
 		Ok(())
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
 		Some(if *self {
 			Ok(1i64)
@@ -250,8 +250,8 @@ impl Encode for bool {
 	}
 }
 
-impl<T: Encode> Encode for Option<T> {
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<T: NestedEncode> NestedEncode for Option<T> {
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
 				encode_number_to_output(dest, 1u64, 8, false, false);
@@ -282,25 +282,25 @@ impl<T: Encode> Encode for Option<T> {
 	}
 }
 
-impl<T: Encode> Encode for Box<T> {
-	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<T: NestedEncode> NestedEncode for Box<T> {
+	#[inline(never)]
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_ref().dep_encode_to(dest)
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		self.as_ref().using_top_encoded(f)
 	}
 }
 
-impl<T: Encode> Encode for Box<[T]> {
-	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<T: NestedEncode> NestedEncode for Box<[T]> {
+	#[inline(never)]
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_ref().dep_encode_to(dest)
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		self.as_ref().using_top_encoded(f)
 	}
@@ -309,12 +309,12 @@ impl<T: Encode> Encode for Box<[T]> {
 macro_rules! tuple_impls {
     ($(($($n:tt $name:ident)+))+) => {
         $(
-            impl<$($name),+> Encode for ($($name,)+)
+            impl<$($name),+> NestedEncode for ($($name,)+)
             where
-                $($name: Encode,)+
+                $($name: NestedEncode,)+
             {
-				#[inline]
-				fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				#[inline(never)]
+				fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 					$(
                         self.$n.dep_encode_to(dest)?;
                     )+
@@ -347,9 +347,9 @@ tuple_impls! {
 macro_rules! array_impls {
     ($($n: tt,)+) => {
         $(
-            impl<T: Encode> Encode for [T; $n] {
-				#[inline]
-				fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+            impl<T: NestedEncode> NestedEncode for [T; $n] {
+				#[inline(never)]
+				fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 					// the top encoded slice does not serialize its length, so just like the array
 					(&self[..]).using_top_encoded(|buf| dest.write(buf))
 				}
@@ -377,13 +377,13 @@ array_impls!(
 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
 );
 
-impl Encode for NonZeroUsize {
-	#[inline]
-	fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for NonZeroUsize {
+	#[inline(never)]
+	fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.get().dep_encode_to(dest)
 	}
 
-	#[inline]
+	#[inline(never)]
 	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
 		self.get().using_top_encoded(f)
 	}
@@ -399,7 +399,7 @@ mod tests {
 
     fn ser_ok<V>(element: V, expected_bytes: &[u8])
     where
-        V: Encode + PartialEq + Debug + 'static,
+        V: NestedEncode + PartialEq + Debug + 'static,
     {
 		V::using_top_encoded(&element, |bytes| {
 			assert_eq!(bytes, expected_bytes);
@@ -408,7 +408,7 @@ mod tests {
     }
 
     #[test]
-    fn test_top_compacted_numbers() {
+    fn test_dep_compacted_numbers() {
         // unsigned positive
         ser_ok(5u8, &[5]);
         ser_ok(5u16, &[5]);
@@ -432,30 +432,30 @@ mod tests {
     }
 
     #[test]
-    fn test_top_compacted_bool() {
+    fn test_dep_compacted_bool() {
         ser_ok(true,    &[1]);
         ser_ok(false,   &[]);
     }
 
     #[test]
-    fn test_top_compacted_empty_bytes() {
+    fn test_dep_compacted_empty_bytes() {
         let empty_byte_slice: &[u8] = &[];
         ser_ok(empty_byte_slice, empty_byte_slice);
     }
 
     #[test]
-    fn test_top_compacted_bytes() {
+    fn test_dep_compacted_bytes() {
         ser_ok(&[1u8, 2u8, 3u8][..], &[1u8, 2u8, 3u8]);
     }
 
     #[test]
-    fn test_top_compacted_vec_u8() {
+    fn test_dep_compacted_vec_u8() {
         let some_vec = [1u8, 2u8, 3u8].to_vec();
         ser_ok(some_vec, &[1u8, 2u8, 3u8]);
     }
 
     #[test]
-    fn test_top_compacted_vec_i32() {
+    fn test_dep_compacted_vec_i32() {
         let some_vec = [1i32, 2i32, 3i32].to_vec();
         let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
         ser_ok(some_vec, expected);

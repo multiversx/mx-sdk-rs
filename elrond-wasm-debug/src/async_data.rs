@@ -40,7 +40,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
 
 pub fn async_callback_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address, async_result: &TxResult) -> TxInput {
     let mut args: Vec<Vec<u8>> = Vec::new();
-    args.push(async_result.result_status.top_encode().unwrap());
+    args.push(async_result.result_status.top_encode_old().unwrap());
     if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
     } else {

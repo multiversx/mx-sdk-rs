@@ -201,7 +201,7 @@ impl Neg for ArwenBigInt {
 
 use elrond_wasm::elrond_codec::*;
 
-impl Encode for ArwenBigInt {
+impl NestedEncode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
     fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
@@ -210,11 +210,19 @@ impl Encode for ArwenBigInt {
         Ok(())
     }
     
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
         let bytes = self.to_signed_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
     }
+}
+
+impl TopEncode for ArwenBigInt {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+    
+	fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+		self.to_signed_bytes_be().top_encode(output)
+	}
 }
 
 impl NestedDecode for ArwenBigInt {

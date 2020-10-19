@@ -3,10 +3,10 @@ use core::fmt::Debug;
 
 pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
 where
-    V: Encode + TopDecode + PartialEq + Debug + 'static,
+    V: NestedEncode + TopDecode + PartialEq + Debug + 'static,
 {
     // serialize
-    let serialized_bytes = element.top_encode().unwrap();
+    let serialized_bytes = element.top_encode_old().unwrap();
     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
 
     // deserialize

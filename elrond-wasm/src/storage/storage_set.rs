@@ -5,9 +5,9 @@ use elrond_codec::*;
 pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)
 where
     'a: 'k,
-    T: Encode,
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    T: NestedEncode,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     // the compiler is smart enough to evaluate this match at compile time
