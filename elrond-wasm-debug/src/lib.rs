@@ -34,10 +34,10 @@ mod elrond_codec_tests {
 
     pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
     where
-        V: NestedEncode + TopDecode + PartialEq + Debug + 'static,
+        V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
         // serialize
-        let serialized_bytes = element.top_encode_old().unwrap();
+        let serialized_bytes = top_encode_to_vec(&element).unwrap();
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
 
         // deserialize

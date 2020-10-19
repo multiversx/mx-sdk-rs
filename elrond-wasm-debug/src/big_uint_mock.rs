@@ -231,12 +231,6 @@ use elrond_wasm::elrond_codec::*;
 
 impl NestedEncode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-
-    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-        let bytes = self.to_bytes_be();
-        f(&bytes);
-        Ok(())
-    }
     
     fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         let bytes = self.to_bytes_be();

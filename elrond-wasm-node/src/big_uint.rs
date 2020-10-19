@@ -252,12 +252,6 @@ use elrond_wasm::elrond_codec::*;
 
 impl NestedEncode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-
-    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-        let bytes = self.to_bytes_be();
-        f(&bytes);
-        Ok(())
-    }
     
     fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest

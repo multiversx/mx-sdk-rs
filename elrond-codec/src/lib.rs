@@ -164,6 +164,13 @@ pub mod test_struct {
             Ok(())
 		}
     }
+
+    impl TopEncode for WrappedArray {
+        fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+            output.set_slice_u8(&self.0[..]);
+            Ok(())
+        }
+    }
     
     impl NestedDecode for WrappedArray {
         fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
@@ -193,7 +200,7 @@ pub mod tests {
     where
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
-        let serialized_bytes = top_encode_to_vec(&element);
+        let serialized_bytes = top_encode_to_vec(&element).unwrap();
         let deserialized = V::top_decode(&serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
@@ -259,7 +266,7 @@ pub mod tests {
         }
 
         // serialize
-        let serialized_bytes = arr.top_encode_old().unwrap();
+        let serialized_bytes = top_encode_to_vec(&arr).unwrap();
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize
@@ -304,7 +311,7 @@ pub mod tests {
 
     #[test]
     fn test_tuple() {
-        let t = (1i8, 2u32, (), 3i16);
+        let t = (1i8, 2u32, 3i16);
         let expected: &[u8] = &[1, 0, 0, 0, 2, 0, 3];
         ser_deser_ok(t, expected);
     }

@@ -19,70 +19,27 @@ pub trait NestedEncode: Sized {
 
 	/// NestedEncode to output, using the format of an object nested inside another structure.
 	/// Does not provide compact version.
-	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.using_top_encoded(|buf| dest.write(buf))
-	}
+	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError>;
 
-	/// Convert self to an owned vector.
-	/// Allowed to provide compact version.
-	/// Do not call for nested objects.
-	fn top_encode_old(&self) -> Result<Vec<u8>, EncodeError> {
-		let mut dest = Vec::new();
-		self.using_top_encoded(|buf| dest.write(buf))?;
-		Ok(dest)
-	}
-
-	/// Convert self to a slice and then invoke the given closure with it.
-	/// Allowed to provide compact version.
-	/// Do not call for nested objects.
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		// default implementation simply use dep_encode_to
-		let mut dest: Vec<u8> = Vec::new();
-		self.dep_encode_to(&mut dest)?;
-		f(dest.as_slice());
-		Ok(())
-	}
-
-	#[inline(never)]
-	fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
-		None
-	}
 }
 
-// TODO: consider removing altogether when possible
-impl NestedEncode for () {
-	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
-
-	fn dep_encode_to<O: OutputBuffer>(&self, _dest: &mut O) -> Result<(), EncodeError> {
-		Ok(())
-	}
-
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		f(&[]);
-		Ok(())
-	}
-
-	fn top_encode_old(&self) -> Result<Vec<u8>, EncodeError> {
-		Ok(Vec::with_capacity(0))
-	}
-}
-
-impl NestedEncode for u8 {
-	const TYPE_INFO: TypeInfo = TypeInfo::U8;
-
-	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		dest.write(&[*self as u8][..]);
-		Ok(())
-	}
-
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		if *self == 0u8 {
-			f(&[]);
-		} else {
-			f(&[*self][..]);
+/// Adds the concantenated encoded contents of a slice to an output buffer,
+/// without serializing the slice length.
+/// Byte slice is treated separately, via direct transmute.
+pub fn dep_encode_slice_contents<T: NestedEncode, O: OutputBuffer>(slice: &[T], dest: &mut O) -> Result<(), EncodeError> {
+	match T::TYPE_INFO {
+		TypeInfo::U8 => {
+			// cast &[T] to &[u8]
+			let slice: &[u8] = unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
+			dest.write(slice);
+		},
+		_ => {
+			for x in slice {
+				x.dep_encode_to(dest)?;
+			}
 		}
-		Ok(())
 	}
+	Ok(())
 }
 
 impl<T: NestedEncode> NestedEncode for &[T] {
@@ -90,37 +47,7 @@ impl<T: NestedEncode> NestedEncode for &[T] {
 		// push size
 		encode_number_to_output(dest, self.len() as u64, 32, false, false);
 		// actual data
-		match T::TYPE_INFO {
-			TypeInfo::U8 => {
-				// cast &[T] to &[u8]
-				let slice: &[u8] = unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
-				dest.write(slice);
-			},
-			_ => {
-				for x in *self {
-					x.dep_encode_to(dest)?;
-				}
-			}
-		}
-		Ok(())
-	}
-
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		match T::TYPE_INFO {
-			TypeInfo::U8 => {
-				// cast Vec<T> to &[u8]
-				let slice: &[u8] = unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
-				f(slice);
-			},
-			_ => {
-				let mut result: Vec<u8> = Vec::new();
-				for x in *self {
-					x.dep_encode_to(&mut result)?;
-				}
-				f(result.as_slice());
-			}
-		}
-		Ok(())
+		dep_encode_slice_contents(self, dest)
 	}
 }
 
@@ -128,11 +55,6 @@ impl<T: NestedEncode> NestedEncode for &T {
 	#[inline(never)]
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		(*self).dep_encode_to(dest)
-	}
-
-	#[inline(never)]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		(*self).using_top_encoded(f)
 	}
 }
 
@@ -144,11 +66,6 @@ impl NestedEncode for &str {
 		dest.write(self.as_bytes());
 		Ok(())
 	}
-
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		f(self.as_bytes());
-		Ok(())
-	}
 }
 
 impl<T: NestedEncode> NestedEncode for Vec<T> {
@@ -156,10 +73,16 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_slice().dep_encode_to(dest)
 	}
+}
 
-	#[inline(never)]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		self.as_slice().using_top_encoded(f)
+/// Unlike the other number types, u8 doesn't need to pass through `encode_number_to_output`,
+/// can be added directly to buffer.
+impl NestedEncode for u8 {
+	const TYPE_INFO: TypeInfo = TypeInfo::U8;
+
+	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		dest.write(&[*self as u8][..]);
+		Ok(())
 	}
 }
 
@@ -173,19 +96,6 @@ macro_rules! encode_num_signed {
 				encode_number_to_output(dest, *self as u64, $size_in_bits, true, false);
 				Ok(())
 			}
-		
-			#[inline(never)]
-            fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-				let mut dest: Vec<u8> = Vec::new();
-				encode_number_to_output(&mut dest, *self as u64, $size_in_bits, true, true);
-				f(dest.as_slice());
-				Ok(())
-			}
-
-			#[inline]
-            fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
-				Some(Ok(*self as i64))
-			}
 		}
     }
 }
@@ -198,14 +108,6 @@ macro_rules! encode_num_unsigned {
 			#[inline(never)]
             fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 				encode_number_to_output(dest, *self as u64, $size_in_bits, false, false);
-				Ok(())
-			}
-		
-			#[inline(never)]
-            fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-				let mut dest: Vec<u8> = Vec::new();
-				encode_number_to_output(&mut dest, *self as u64, $size_in_bits, false, true);
-				f(dest.as_slice());
 				Ok(())
 			}
 		}
@@ -230,24 +132,6 @@ impl NestedEncode for bool {
 		dest.write(&[*self as u8][..]);
 		Ok(())
 	}
-
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		if *self {
-			f(&[1u8][..]);
-		} else {
-			f(&[]);
-		}
-		Ok(())
-	}
-
-	#[inline(never)]
-	fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
-		Some(if *self {
-			Ok(1i64)
-		} else {
-			Ok(0i64)
-		})
-	}
 }
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
@@ -263,23 +147,6 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
 			}
 		}
 	}
-
-	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
-	/// to allow disambiguation between e.g. Some(0) and None.
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		match self {
-			Some(v) => {
-				let mut dest: Vec<u8> = Vec::new();
-				dest.push(1u8);
-				v.dep_encode_to(&mut dest)?;
-				f(dest.as_slice());
-			},
-			None => {
-				f(&[]);
-			}
-		}
-		Ok(())
-	}
 }
 
 impl<T: NestedEncode> NestedEncode for Box<T> {
@@ -287,22 +154,12 @@ impl<T: NestedEncode> NestedEncode for Box<T> {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_ref().dep_encode_to(dest)
 	}
-
-	#[inline(never)]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		self.as_ref().using_top_encoded(f)
-	}
 }
 
 impl<T: NestedEncode> NestedEncode for Box<[T]> {
 	#[inline(never)]
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.as_ref().dep_encode_to(dest)
-	}
-
-	#[inline(never)]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		self.as_ref().using_top_encoded(f)
 	}
 }
 
@@ -348,10 +205,9 @@ macro_rules! array_impls {
     ($($n: tt,)+) => {
         $(
             impl<T: NestedEncode> NestedEncode for [T; $n] {
-				#[inline(never)]
+				#[inline]
 				fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-					// the top encoded slice does not serialize its length, so just like the array
-					(&self[..]).using_top_encoded(|buf| dest.write(buf))
+					dep_encode_slice_contents(&self[..], dest)
 				}
             }
         )+
@@ -382,11 +238,6 @@ impl NestedEncode for NonZeroUsize {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		self.get().dep_encode_to(dest)
 	}
-
-	#[inline(never)]
-	fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-		self.get().using_top_encoded(f)
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -401,63 +252,63 @@ mod tests {
     where
         V: NestedEncode + PartialEq + Debug + 'static,
     {
-		V::using_top_encoded(&element, |bytes| {
-			assert_eq!(bytes, expected_bytes);
-		}).unwrap();
+		let mut bytes = Vec::<u8>::new();
+		element.dep_encode_to(&mut bytes).unwrap();
+		assert_eq!(bytes.as_slice(), expected_bytes);
         
     }
 
     #[test]
-    fn test_dep_compacted_numbers() {
-        // unsigned positive
-        ser_ok(5u8, &[5]);
-        ser_ok(5u16, &[5]);
-        ser_ok(5u32, &[5]);
-        ser_ok(5u64, &[5]);
-        ser_ok(5usize, &[5]);
-        // signed positive
-        ser_ok(5i8, &[5]);
-        ser_ok(5i16, &[5]);
-        ser_ok(5i32, &[5]);
-        ser_ok(5i64, &[5]);
-        ser_ok(5isize, &[5]);
-        // signed negative
-        ser_ok(-5i8, &[251]);
-        ser_ok(-5i16, &[251]);
-        ser_ok(-5i32, &[251]);
-        ser_ok(-5i64, &[251]);
-		ser_ok(-5isize, &[251]);
+    fn test_dep_encode_numbers() {
+		// unsigned positive
+		ser_ok(5u8, &[5]);
+		ser_ok(5u16, &[0, 5]);
+		ser_ok(5u32, &[0, 0, 0, 5]);
+		ser_ok(5usize, &[0, 0, 0, 5]);
+		ser_ok(5u64, &[0, 0, 0, 0, 0, 0, 0, 5]);
+		// signed positive
+		ser_ok(5i8, &[5]);
+		ser_ok(5i16, &[0, 5]);
+		ser_ok(5i32, &[0, 0, 0, 5]);
+		ser_ok(5isize, &[0, 0, 0, 5]);
+		ser_ok(5i64, &[0, 0, 0, 0, 0, 0, 0, 5]);
+		// signed negative
+		ser_ok(-5i8, &[251]);
+		ser_ok(-5i16, &[255, 251]);
+		ser_ok(-5i32, &[255, 255, 255, 251]);
+		ser_ok(-5isize, &[255, 255, 255, 251]);
+		ser_ok(-5i64, &[255, 255, 255, 255, 255, 255, 255, 251]);
 		// non zero usize
-        ser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
+		ser_ok(NonZeroUsize::new(5).unwrap(), &[0, 0, 0, 5]);
     }
 
     #[test]
-    fn test_dep_compacted_bool() {
+    fn test_dep_encode_bool() {
         ser_ok(true,    &[1]);
-        ser_ok(false,   &[]);
+        ser_ok(false,   &[0]);
     }
 
     #[test]
-    fn test_dep_compacted_empty_bytes() {
+    fn test_dep_encode_empty_bytes() {
         let empty_byte_slice: &[u8] = &[];
-        ser_ok(empty_byte_slice, empty_byte_slice);
+        ser_ok(empty_byte_slice, &[0, 0, 0, 0]);
     }
 
     #[test]
-    fn test_dep_compacted_bytes() {
-        ser_ok(&[1u8, 2u8, 3u8][..], &[1u8, 2u8, 3u8]);
+    fn test_dep_encode_bytes() {
+        ser_ok(&[1u8, 2u8, 3u8][..], &[0, 0, 0, 3, 1u8, 2u8, 3u8]);
     }
 
     #[test]
-    fn test_dep_compacted_vec_u8() {
+    fn test_dep_encode_vec_u8() {
         let some_vec = [1u8, 2u8, 3u8].to_vec();
-        ser_ok(some_vec, &[1u8, 2u8, 3u8]);
+        ser_ok(some_vec, &[0, 0, 0, 3, 1u8, 2u8, 3u8]);
     }
 
     #[test]
-    fn test_dep_compacted_vec_i32() {
+    fn test_dep_encode_vec_i32() {
         let some_vec = [1i32, 2i32, 3i32].to_vec();
-        let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
+        let expected: &[u8] = &[0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
         ser_ok(some_vec, expected);
 	}
 
@@ -475,11 +326,6 @@ mod tests {
     #[test]
     fn test_tuple() {
         ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
-    }
-
-    #[test]
-    fn test_unit() {
-        ser_ok((), &[]);
     }
 
     #[test]

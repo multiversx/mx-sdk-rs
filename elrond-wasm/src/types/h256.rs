@@ -185,7 +185,7 @@ mod esd_light_tests {
         let expected_bytes: &[u8] = &[4u8; 32*3];
 
         let tuple = (&addr, &&&addr, addr.clone());
-        let serialized_bytes = tuple.top_encode_old().unwrap();
+        let serialized_bytes = top_encode_to_vec(&tuple).unwrap();
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     }
 }

@@ -249,7 +249,7 @@ mod tests {
     }
 
     #[test]
-    fn test_dep_numbers_decompacted() {
+    fn test_dep_decode_numbers() {
         // unsigned positive
         deser_ok(5u8, &[5]);
         deser_ok(5u16, &[0, 5]);
