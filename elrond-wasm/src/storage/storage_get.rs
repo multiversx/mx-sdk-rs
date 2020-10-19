@@ -82,7 +82,7 @@ where
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     // the compiler is smart enough to evaluate this match at compile time
-    match T::TOP_TYPE_INFO {
+    match T::TYPE_INFO {
         TypeInfo::BigUint => {
             // self must be of type BigUint
             // performing a forceful cast
