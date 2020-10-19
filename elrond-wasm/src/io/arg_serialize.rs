@@ -10,14 +10,45 @@ pub trait AsyncCallArg: Sized {
     }
 }
 
+struct AsyncCallArgOutput<'c> {
+    call_data_ser_ref: &'c mut CallDataSerializer,
+    buffer: Vec<u8>,
+}
+
+impl<'c> AsyncCallArgOutput<'c> {
+    #[inline]
+    fn new(call_data_ser_ref: &'c mut CallDataSerializer) -> Self {
+        AsyncCallArgOutput {
+            call_data_ser_ref,
+            buffer: Vec::new(),
+        }
+    }
+}
+
+impl<'c> TopEncodeOutput<'c, Vec<u8>> for AsyncCallArgOutput<'c> {
+    fn set_slice_u8(self, bytes: &[u8]) {
+        self.call_data_ser_ref.push_argument_bytes(bytes);
+    }
+
+    fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
+    where 'c: 'r {
+        &mut self.buffer
+    }
+
+    fn flush_buffer(self) {
+        self.call_data_ser_ref.push_argument_bytes(self.buffer.as_slice());
+    }
+}
+
+
 impl<T> AsyncCallArg for T
 where
-    T: NestedEncode,
+    T: TopEncode,
 {
     #[inline]
     fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
         self
-            .using_top_encoded(|buf| serializer.push_argument_bytes(buf))
+            .top_encode(AsyncCallArgOutput::new(serializer))
             .map_err(|err| SCError::from(err))
     }
 }
