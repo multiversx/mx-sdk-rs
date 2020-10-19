@@ -38,6 +38,8 @@ pub trait TopDecode: Sized {
 }
 
 impl TopDecode for () {
+    const TOP_TYPE_INFO: TypeInfo = TypeInfo::Unit;
+    
 	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
 		Ok(())
 	}

@@ -80,6 +80,7 @@ where
     fn finish(&self, api: &'a A);
 }
 
+/// All serializable objects can be used as smart contract function result.
 impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for T
 where
     T: TopEncode,

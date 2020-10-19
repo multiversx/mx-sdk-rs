@@ -22,7 +22,6 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> 
 	Ok(bytes)
 }
 
-// TODO: consider removing altogether when possible
 impl TopEncode for () {
 	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
