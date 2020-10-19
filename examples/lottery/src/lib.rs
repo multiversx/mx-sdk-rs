@@ -2,9 +2,6 @@
 
 imports!();
 
-const INVALID_TOTAL_TICKETS: i32 = -1;
-const INVALID_DEADLINE: u64 = 0;
-
 #[elrond_wasm_derive::contract(LotteryImpl)]
 pub trait Lottery {
     #[init]
@@ -14,7 +11,7 @@ pub trait Lottery {
 
     fn start(&self, 
         ticket_price: BigUint, 
-        total_tickets: i32, 
+        total_tickets: u32, 
         deadline: u64) 
         -> SCResult<()> {
 
@@ -38,7 +35,7 @@ pub trait Lottery {
     #[endpoint]
     fn start_limited_tickets_and_fixed_deadline(&self,
         ticket_price: BigUint, 
-        total_tickets: i32, 
+        total_tickets: u32, 
         deadline: u64) 
         -> SCResult<()> {
 
@@ -55,14 +52,14 @@ pub trait Lottery {
     #[endpoint]
     fn start_limited_tickets(&self, 
         ticket_price: BigUint, 
-        total_tickets: i32) 
+        total_tickets: u32) 
         -> SCResult<()> {
         
-        if total_tickets == 0 {
+        if total_tickets <= 0 {
             return sc_error!("Must have more than 0 tickets available!");
         }
 
-        self.start(ticket_price, total_tickets, INVALID_DEADLINE)
+        self.start(ticket_price, total_tickets, i64::MAX as u64)
     }
 
     #[endpoint]
@@ -75,7 +72,7 @@ pub trait Lottery {
             return sc_error!("Deadline can't be in the past!");
         }
 
-        self.start(ticket_price, INVALID_TOTAL_TICKETS, deadline)
+        self.start(ticket_price, u32::MAX, deadline)
     }
 
     #[endpoint]
@@ -95,12 +92,9 @@ pub trait Lottery {
                 let mut ticket_number = self.get_mut_current_ticket_number();
                 let mut tickets_left = self.get_mut_tickets_left();
 
-                if *tickets_left != INVALID_TOTAL_TICKETS {
-                    *tickets_left -= 1;
-                }
-
                 self.set_ticket_holder(*ticket_number, &self.get_caller());
                 *ticket_number += 1;
+                *tickets_left -= 1;
 
                 Ok(())
             },
@@ -115,11 +109,22 @@ pub trait Lottery {
         if self.get_owner_address() != self.get_caller() {
             return sc_error!("Only owner may call this function!");
         }
+        if self.status() == Status::Inactive {
+            return sc_error!("Lottery is inactive!");
+        }
+        if self.status() == Status::Running {
+            return sc_error!("Lottery is still running!");
+        }
 
-        let winning_ticket_id = self.random();
-        let winner_address = self.get_ticket_holder(winning_ticket_id);
+        let total_tickets = self.get_mut_current_ticket_number();
 
-        self.send_tx(&winner_address, &self.get_sc_balance(), "You won the lottery! Congratulations!");
+        if *total_tickets > 0 {
+            let winning_ticket_id = self.random() % *total_tickets;
+            let winner_address = self.get_ticket_holder(winning_ticket_id);
+
+            self.send_tx(&winner_address, &self.get_sc_balance(), "You won the lottery! Congratulations!");
+        }
+
         self.clear_storage();
 
         Ok(())
@@ -130,28 +135,17 @@ pub trait Lottery {
         if self.get_ticket_price() == 0 {
             return Status::Inactive;
         }
-        if self.deadline_passed() || self.tickets_sold_out() {
+        if self.get_block_nonce() > self.get_deadline() || 
+            *self.get_mut_tickets_left() == 0 {
             return Status::Ended;
         }
 
         return Status::Running;
     }
 
-    fn deadline_passed(&self) -> bool {
-        let deadline = self.get_deadline();
-
-        return deadline != INVALID_DEADLINE && deadline > self.get_block_nonce();
-    }
-
-    fn tickets_sold_out(&self) -> bool {
-        let tickets_left = self.get_mut_tickets_left();
-
-        return *tickets_left != INVALID_TOTAL_TICKETS && *tickets_left == 0;
-    }
-
     fn random(&self) -> u32 {
-        let hash = self.get_tx_hash();
-        let hash_array = hash.as_bytes();
+        let current_timestamp = self.get_block_timestamp();
+        let hash_array = self.sha256(&current_timestamp.to_be_bytes());
         let first_byte = (hash_array[28] as u32) << 24;
         let second_byte = (hash_array[29] as u32) << 16;
         let third_byte = (hash_array[30] as u32) << 8;
@@ -161,17 +155,18 @@ pub trait Lottery {
     }
 
     fn clear_storage(&self) {
-        self.set_deadline(0);
-        self.set_ticket_price(BigUint::zero());
-        self.set_tickets_left(0);
+        self.storage_store("deadline".as_bytes(), &[0u8; 0]);
+        self.storage_store("ticketPrice".as_bytes(), &[0u8; 0]);
+        self.storage_store("ticketsLeft".as_bytes(), &[0u8; 0]);
 
-        let mut last_ticket = self.get_mut_current_ticket_number();
+        let last_ticket = self.get_mut_current_ticket_number();
 
         for i in 0..*last_ticket {
-            self.set_ticket_holder(i, &Address::zero());
+            let key = ["ticketHolder".as_bytes(), &i.to_be_bytes()].concat();
+            self.storage_store(key.as_slice(), &[0u8; 0]);
         }
 
-        *last_ticket = 0;
+        self.storage_store("currentTicketNumber".as_bytes(), &[0u8; 0]);
     }
 
     #[storage_set("deadline")]
@@ -190,10 +185,10 @@ pub trait Lottery {
 
     #[view]
     #[storage_get_mut("ticketsLeft")]
-    fn get_mut_tickets_left(&self) -> mut_storage!(i32);
+    fn get_mut_tickets_left(&self) -> mut_storage!(u32);
 
     #[storage_set("ticketsLeft")]
-    fn set_tickets_left(&self, tickets: i32);
+    fn set_tickets_left(&self, tickets: u32);
 
     #[view]
     #[storage_get_mut("currentTicketNumber")]

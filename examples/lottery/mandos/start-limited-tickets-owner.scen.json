@@ -1,0 +1,60 @@
+{
+    "name": "owner start with limited tickets",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "lottery-init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "owner start limited tickets",
+            "tx": {
+                "from": "address:my_address",
+                "to": "address:the_lottery_contract",
+                "value": "0",
+                "function": "start_limited_tickets",
+                "arguments": [
+                    "100",
+                    "2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''ticketPrice": "100",
+                        "''ticketsLeft": "2",
+                        "''deadline": "0x7fffffffffffffff"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}

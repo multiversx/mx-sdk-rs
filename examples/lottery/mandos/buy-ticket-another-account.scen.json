@@ -1,0 +1,60 @@
+{
+    "name": "2nd ticket bought by another account",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy-ticket.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "buy-ticket-2-another-account",
+            "tx": {
+                "from": "address:acc2",
+                "to": "address:the_lottery_contract",
+                "value": "100",
+                "function": "buy_ticket",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "999,900",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "999,900",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "200",
+                    "storage": {
+                        "''ticketPrice": "100",
+                        "''ticketsLeft": "0",
+                        "''deadline": "123,456",
+                        "''currentTicketNumber": "2",
+                        "''ticketHolder|0x00000000": "address:acc1",
+                        "''ticketHolder|0x00000001": "address:acc2"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}

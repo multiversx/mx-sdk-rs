@@ -1,0 +1,60 @@
+{
+    "name": "owner start with fixed deadline",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "lottery-init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "owner start fixed deadline",
+            "tx": {
+                "from": "address:my_address",
+                "to": "address:the_lottery_contract",
+                "value": "0",
+                "function": "start_fixed_deadline",
+                "arguments": [
+                    "100",
+                    "123,456"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''ticketPrice": "100",
+                        "''ticketsLeft": "0xffffffff",
+                        "''deadline": "123,456"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}
