@@ -38,7 +38,7 @@ impl NestedEncode for SimpleEnum {
 }
 
 impl TopEncode for SimpleEnum {
-    fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
         output.set_i64(self.to_i64());
         Ok(())
     }

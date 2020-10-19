@@ -17,6 +17,15 @@ impl NestedEncode for SerExample1 {
     }
 }
 
+impl TopEncode for SerExample1 {
+    fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+        let mut buffer = output.into_output_buffer();
+        self.dep_encode_to(&mut buffer)?;
+        buffer.save_buffer();
+        Ok(())
+    }
+}
+
 impl NestedDecode for SerExample1 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(SerExample1{

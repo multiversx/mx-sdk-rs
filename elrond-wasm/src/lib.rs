@@ -208,6 +208,7 @@ pub trait BigUintApi:
     PartialEq<u64> +
     PartialOrd<u64> +
     elrond_codec::NestedEncode +
+    elrond_codec::TopEncode +
     elrond_codec::NestedDecode +
     elrond_codec::TopDecode +
 {

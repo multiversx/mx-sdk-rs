@@ -18,7 +18,7 @@ pub mod test_util;
 pub use codec_ser::*;
 pub use codec_de::*;
 pub use codec_err::{EncodeError, DecodeError};
-pub use top_ser_output::TopEncodeOutput;
+pub use top_ser_output::{TopEncodeOutput, TopEncodeBuffer};
 pub use top_ser::{TopEncode, top_encode_to_vec};
 pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
@@ -74,8 +74,11 @@ pub mod test_struct {
     }
 
     impl TopEncode for Test {
-        fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
-            self.dep_encode_to(&mut output.into_output_buffer())
+        fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+            let mut buffer = output.into_output_buffer();
+            self.dep_encode_to(&mut buffer)?;
+            buffer.save_buffer();
+            Ok(())
         }
     }
     
@@ -128,8 +131,11 @@ pub mod test_struct {
     }
 
     impl TopEncode for E {
-        fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
-            self.dep_encode_to(&mut output.into_output_buffer())
+        fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+            let mut buffer = output.into_output_buffer();
+            self.dep_encode_to(&mut buffer)?;
+            buffer.save_buffer();
+            Ok(())
         }
     }
     

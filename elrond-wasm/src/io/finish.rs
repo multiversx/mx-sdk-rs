@@ -1,7 +1,83 @@
 use crate::*;
 use crate::elrond_codec::*;
+// use crate::elrond_codec::num_conv::encode_number_to_output;
+// pub crate::top_ser_output::{TopEncodeOutput, TopEncodeBuffer};
 use core::iter::FromIterator;
+use core::marker::PhantomData;
 
+struct ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    api: &'a A,
+    buffer: Vec<u8>,
+    _phantom1: PhantomData<BigInt>,
+    _phantom2: PhantomData<BigUint>,
+}
+
+impl<'a, A, BigInt, BigUint> ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    #[inline]
+    fn new(api: &'a A) -> Self {
+        ApiOutput {
+            api,
+            buffer: Vec::new(),
+            _phantom1: PhantomData,
+            _phantom2: PhantomData,
+        }
+    }
+}
+
+impl<'a, A, BigInt, BigUint> NestedOutputBuffer for ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) {
+        self.buffer.extend_from_slice(bytes);
+    }
+}
+
+impl<'a, A, BigInt, BigUint> TopEncodeBuffer for ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    fn save_buffer(self){
+        self.api.finish_slice_u8(self.buffer.as_slice());
+    }
+}
+
+impl<'a, A, BigInt, BigUint> TopEncodeOutput<Self> for ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    fn set_slice_u8(self, bytes: &[u8]) {
+        self.api.finish_slice_u8(bytes);
+    }
+
+    fn into_output_buffer(self) -> Self {
+        self
+    }
+
+    // TODO: set_u64
+
+    fn set_i64(self, value: i64) {
+        self.api.finish_i64(value);
+    }
+    
+}
 
 pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
 where
@@ -14,7 +90,7 @@ where
 
 impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for T
 where
-    T: NestedEncode,
+    T: TopEncode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
@@ -32,21 +108,9 @@ where
                 api.finish_big_uint(cast_big_uint);
             },
 			_ => {
-                // the compiler is also smart enough to evaluate this if let at compile time
-                if let Some(res_i64) = self.top_encode_as_i64() {
-                    match res_i64 {
-                        Ok(encoded_i64) => {
-                            api.finish_i64(encoded_i64);
-                        },
-                        Err(encode_err_message) => {
-                            api.signal_error(encode_err_message.message_bytes());
-                        }
-                    }
-                } else {
-                    let res = self.using_top_encoded(|buf| api.finish_slice_u8(buf));
-                    if let Err(encode_err_message) = res {
-                        api.signal_error(encode_err_message.message_bytes());
-                    }
+                let res = self.top_encode(ApiOutput::new(api));
+                if let Err(encode_err_message) = res {
+                    api.signal_error(encode_err_message.message_bytes());
                 }
 			}
 		}

@@ -245,7 +245,7 @@ impl NestedEncode for RustBigUint {
 }
 
 impl TopEncode for RustBigUint {
-	fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
 		self.to_bytes_be().top_encode(output)
 	}
 }
