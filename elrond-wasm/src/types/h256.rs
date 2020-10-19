@@ -128,14 +128,14 @@ impl H256 {
 use elrond_codec::*;
 
 impl NestedEncode for H256 {
-    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
         Ok(())
     }
 }
 
 impl TopEncode for H256 {
-    fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
         output.set_slice_u8(&self.0[..]);
         Ok(())
     }

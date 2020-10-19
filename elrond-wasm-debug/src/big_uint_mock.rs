@@ -238,14 +238,14 @@ impl NestedEncode for RustBigUint {
         Ok(())
     }
     
-    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         let bytes = self.to_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
     }
 }
 
 impl TopEncode for RustBigUint {
-	fn top_encode<B: TopEncodeBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
 		self.to_bytes_be().top_encode(output)
 	}
 }

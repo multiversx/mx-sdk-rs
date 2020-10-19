@@ -1,7 +1,5 @@
 use crate::*;
 use crate::elrond_codec::*;
-// use crate::elrond_codec::num_conv::encode_number_to_output;
-// pub crate::top_ser_output::{TopEncodeOutput, TopEncodeBuffer};
 use core::iter::FromIterator;
 use core::marker::PhantomData;
 
@@ -34,7 +32,7 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint> NestedOutputBuffer for ApiOutput<'a, A, BigInt, BigUint>
+impl<'a, A, BigInt, BigUint> OutputBuffer for ApiOutput<'a, A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
@@ -46,18 +44,7 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint> TopEncodeBuffer for ApiOutput<'a, A, BigInt, BigUint>
-where
-    BigUint: BigUintApi + 'static,
-    BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
-{
-    fn save_buffer(self){
-        self.api.finish_slice_u8(self.buffer.as_slice());
-    }
-}
-
-impl<'a, A, BigInt, BigUint> TopEncodeOutput<Self> for ApiOutput<'a, A, BigInt, BigUint>
+impl<'a, A, BigInt, BigUint> TopEncodeOutput<'a, Vec<u8>> for ApiOutput<'a, A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
@@ -67,8 +54,13 @@ where
         self.api.finish_slice_u8(bytes);
     }
 
-    fn into_output_buffer(self) -> Self {
-        self
+    fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
+    where 'a: 'r {
+        &mut self.buffer
+    }
+
+    fn flush_buffer(self) {
+        self.api.finish_slice_u8(self.buffer.as_slice());
     }
 
     // TODO: set_u64
