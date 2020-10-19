@@ -23,7 +23,7 @@ use crate::transmute::*;
 /// 
 pub trait TopDecode: Sized {
     #[doc(hidden)]
-    const TOP_TYPE_INFO: TypeInfo = TypeInfo::Unknown;
+    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
     
     /// Attempt to deserialize the value from input.
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError>;
@@ -38,7 +38,7 @@ pub trait TopDecode: Sized {
 }
 
 impl TopDecode for () {
-    const TOP_TYPE_INFO: TypeInfo = TypeInfo::Unit;
+    const TYPE_INFO: TypeInfo = TypeInfo::Unit;
     
 	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
 		Ok(())
@@ -87,7 +87,7 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
 macro_rules! decode_num_unsigned {
     ($ty:ty, $bounds_ty:ty, $type_info:expr) => {
         impl TopDecode for $ty {
-            const TOP_TYPE_INFO: TypeInfo = $type_info;
+            const TYPE_INFO: TypeInfo = $type_info;
             
             fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
                 let arg_u64 = input.get_u64();
@@ -111,7 +111,7 @@ decode_num_unsigned!(u64, u64, TypeInfo::U64);
 macro_rules! decode_num_signed {
     ($ty:ty, $bounds_ty:ty, $type_info:expr) => {
         impl TopDecode for $ty {
-            const TOP_TYPE_INFO: TypeInfo = $type_info;
+            const TYPE_INFO: TypeInfo = $type_info;
             
             fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
                 let arg_i64 = input.get_i64();
@@ -134,7 +134,7 @@ decode_num_signed!(isize, i32, TypeInfo::ISIZE); // even if isize can be 64 bits
 decode_num_signed!(i64, i64, TypeInfo::I64);
 
 impl TopDecode for bool {
-    const TOP_TYPE_INFO: TypeInfo = TypeInfo::Bool;
+    const TYPE_INFO: TypeInfo = TypeInfo::Bool;
     
 	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
         match input.get_i64() {

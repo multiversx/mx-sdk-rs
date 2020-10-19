@@ -70,7 +70,7 @@ where
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
     // the compiler is smart enough to evaluate this match at compile time
-    match T::TOP_TYPE_INFO {
+    match T::TYPE_INFO {
         TypeInfo::BigInt => {
             let big_int_arg = api.get_argument_big_int(index);
             let cast_big_int: T = unsafe { core::mem::transmute_copy(&big_int_arg) };
