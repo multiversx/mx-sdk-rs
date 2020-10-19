@@ -15,6 +15,7 @@ members = [
   "examples/simple-erc20",
   "examples/crowdfunding-egld",
   "examples/crowdfunding-erc20",
+  "examples/lottery",
 
   "test-contracts/async",
   "test-contracts/async/async-alice",

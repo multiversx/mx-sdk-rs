@@ -1,0 +1,25 @@
+[package]
+name = "lottery"
+version = "0.0.1"
+authors = [ "you",]
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+wasm-output-mode = [ "elrond-wasm-node",]
+
+[dependencies.elrond-wasm]
+version = "0.7.1"
+
+[dependencies.elrond-wasm-derive]
+version = "0.7.1"
+
+[dependencies.elrond-wasm-node]
+version = "0.7.1"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.7.1"
+path = "../../elrond-wasm-debug"
