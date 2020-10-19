@@ -26,13 +26,20 @@ impl SimpleEnum {
     }
 }
 
-impl Encode for SimpleEnum {
+impl NestedEncode for SimpleEnum {
     fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
         Some(Ok(self.to_i64()))
     }
     
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.to_i64().dep_encode_to(dest)?;
+        Ok(())
+    }
+}
+
+impl TopEncode for SimpleEnum {
+    fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_i64(self.to_i64());
         Ok(())
     }
 }

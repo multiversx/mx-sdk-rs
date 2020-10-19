@@ -250,7 +250,7 @@ impl PartialOrd<u64> for ArwenBigUint {
 
 use elrond_wasm::elrond_codec::*;
 
-impl Encode for ArwenBigUint {
+impl NestedEncode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
@@ -259,11 +259,19 @@ impl Encode for ArwenBigUint {
         Ok(())
     }
     
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
         let bytes = self.to_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
     }
+}
+
+impl TopEncode for ArwenBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+    
+	fn top_encode<B: NestedOutputBuffer, O: TopEncodeOutput<B>>(&self, output: O) -> Result<(), EncodeError> {
+		self.to_bytes_be().top_encode(output)
+	}
 }
 
 impl NestedDecode for ArwenBigUint {

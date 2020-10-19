@@ -36,8 +36,8 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShrAssign, ShlAssign};
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractHookApi<BigInt, BigUint>: Sized
 where
-    BigInt: elrond_codec::Encode + 'static,
-    BigUint: elrond_codec::Encode + 'static,
+    BigInt: elrond_codec::NestedEncode + 'static,
+    BigUint: elrond_codec::NestedEncode + 'static,
 {
 
     fn get_sc_address(&self) -> Address;
@@ -207,7 +207,7 @@ pub trait BigUintApi:
     Ord +
     PartialEq<u64> +
     PartialOrd<u64> +
-    elrond_codec::Encode +
+    elrond_codec::NestedEncode +
     elrond_codec::NestedDecode +
     elrond_codec::TopDecode +
 {
@@ -259,7 +259,8 @@ pub trait BigIntApi<BigUint>:
         Ord +
         PartialEq<i64> +
         PartialOrd<i64> +
-        elrond_codec::Encode +
+        elrond_codec::NestedEncode +
+        elrond_codec::TopEncode +
         elrond_codec::NestedDecode +
         elrond_codec::TopDecode +
 {
@@ -302,7 +303,7 @@ macro_rules! imports {
         use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
         use elrond_wasm::{H256, Address};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};
-        use elrond_wasm::elrond_codec::{Encode, NestedDecode, TopDecode, DecodeError};
+        use elrond_wasm::elrond_codec::{NestedEncode, NestedDecode, TopDecode, DecodeError};
         use elrond_wasm::io::*;
         use elrond_wasm::non_zero_util::*;
         use elrond_wasm::err_msg;
@@ -341,8 +342,8 @@ macro_rules! sc_try {
 /// # use elrond_wasm::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: ContractHookApi<BigInt, BigUint>
 /// # where
-/// #     BigInt: elrond_codec::Encode + 'static,
-/// #     BigUint: elrond_codec::Encode + 'static,
+/// #     BigInt: elrond_codec::NestedEncode + 'static,
+/// #     BigUint: elrond_codec::NestedEncode + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
@@ -367,8 +368,8 @@ macro_rules! require {
 /// # use elrond_wasm::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: ContractHookApi<BigInt, BigUint>
 /// # where
-/// #     BigInt: elrond_codec::Encode + 'static,
-/// #     BigUint: elrond_codec::Encode + 'static,
+/// #     BigInt: elrond_codec::NestedEncode + 'static,
+/// #     BigUint: elrond_codec::NestedEncode + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     only_owner!(self, "Caller must be owner");

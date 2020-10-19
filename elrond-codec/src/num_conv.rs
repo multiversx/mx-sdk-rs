@@ -1,4 +1,4 @@
-use crate::output::Output;
+use crate::output::NestedOutputBuffer;
 
 
 /// Adds number to output buffer.
@@ -38,7 +38,7 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 	f(&result[0..result_size])
 }
 
-pub fn encode_number_to_output<O: Output>(output: &mut O, x: u64, size_in_bits: usize, signed: bool, mut compact: bool) {
+pub fn encode_number_to_output<O: NestedOutputBuffer>(output: &mut O, x: u64, size_in_bits: usize, signed: bool, mut compact: bool) {
 	let negative = 
 		compact && // only relevant when compact flag
 		signed &&  // only possible when signed flag

@@ -8,8 +8,8 @@ pub struct SerExample1 {
     pub another_byte: u8,
 }
 
-impl Encode for SerExample1 {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for SerExample1 {
+    fn dep_encode_to<O: NestedOutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.int.dep_encode_to(dest)?;
         self.seq.dep_encode_to(dest)?;
         self.another_byte.dep_encode_to(dest)?;

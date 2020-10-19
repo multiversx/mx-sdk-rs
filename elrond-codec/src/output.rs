@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 
 /// Trait that allows writing of data.
-pub trait Output {
+pub trait NestedOutputBuffer {
 	/// Write to the output.
 	fn write(&mut self, bytes: &[u8]);
 
@@ -11,7 +11,13 @@ pub trait Output {
 	}
 }
 
-impl Output for Vec<u8> {
+impl NestedOutputBuffer for Vec<u8> {
+	fn write(&mut self, bytes: &[u8]) {
+		self.extend_from_slice(bytes)
+	}
+}
+
+impl NestedOutputBuffer for &mut Vec<u8> {
 	fn write(&mut self, bytes: &[u8]) {
 		self.extend_from_slice(bytes)
 	}
