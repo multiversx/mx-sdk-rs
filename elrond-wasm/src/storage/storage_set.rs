@@ -1,11 +1,82 @@
 use crate::*;
 use elrond_codec::*;
+use core::marker::PhantomData;
 
-#[inline]
+fn storage_set_error<'a, A, BigInt, BigUint>(api: &'a A, encode_err: EncodeError) -> !
+where
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+{
+    // TODO: more verbose error messages?
+    api.signal_error(encode_err.message_bytes())
+}
+
+struct StorageSetOutput<'a, 'k, A, BigInt, BigUint>
+where
+    'a: 'k,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+{
+    api: &'a A,
+    key: &'k [u8],
+    buffer: Vec<u8>,
+    _phantom1: PhantomData<BigInt>,
+    _phantom2: PhantomData<BigUint>,
+}
+
+impl<'a, 'k, A, BigInt, BigUint> StorageSetOutput<'a, 'k, A, BigInt, BigUint>
+where
+    'a: 'k,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+{
+    #[inline]
+    fn new(api: &'a A, key: &'k [u8]) -> Self {
+        StorageSetOutput {
+            api,
+            key,
+            buffer: Vec::new(),
+            _phantom1: PhantomData,
+            _phantom2: PhantomData,
+        }
+    }
+}
+
+impl<'a, 'k, A, BigInt, BigUint> TopEncodeOutput<'a, Vec<u8>> for StorageSetOutput<'a, 'k, A, BigInt, BigUint>
+where
+    'a: 'k,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+{
+    fn set_slice_u8(self, bytes: &[u8]) {
+        self.api.storage_store(self.key, bytes)
+    }
+
+    fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
+    where 'a: 'r {
+        &mut self.buffer
+    }
+
+    fn flush_buffer(self) {
+        self.api.storage_store(self.key, self.buffer.as_slice());
+    }
+
+    // TODO: set_u64
+
+    fn set_i64(self, value: i64) {
+        self.api.storage_store_i64(self.key, value);
+    }
+}
+
+// #[inline]
 pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)
 where
     'a: 'k,
-    T: NestedEncode,
+    T: TopEncode,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
@@ -18,43 +89,10 @@ where
             let cast_big_uint: &BigUint = unsafe { &*(value as *const T as *const BigUint) };
             api.storage_store_big_uint(key, cast_big_uint);
         },
-        TypeInfo::U64 => {
-            let value_i64: i64 = unsafe { core::mem::transmute_copy(value) };
-            api.storage_store_i64(key, value_i64);
-        },
-        TypeInfo::U32 => {
-            // we have to be a bit careful with sign extension
-            let value_u32: u32 = unsafe { core::mem::transmute_copy(value) };
-            api.storage_store_i64(key, value_u32 as i64);
-        },
-        TypeInfo::USIZE => {
-            // we have to be a bit careful with sign extension
-            let value_usize: usize = unsafe { core::mem::transmute_copy(value) };
-            api.storage_store_i64(key, value_usize as i64);
-        },
-        TypeInfo::U8 => {
-            // we have to be a bit careful with sign extension
-            let value_u8: u8 = unsafe { core::mem::transmute_copy(value) };
-            api.storage_store_i64(key, value_u8 as i64);
-        },
         _ => {
-            // the compiler is also smart enough to evaluate this if let at compile time
-            if let Some(res_i64) = value.top_encode_as_i64() {
-                match res_i64 {
-                    Ok(encoded_i64) => {
-                        api.storage_store_i64(key, encoded_i64);
-                    },
-                    Err(encode_err_message) => {
-                        api.signal_error(encode_err_message.message_bytes());
-                    }
-                }
-            } else {
-                let res = value.using_top_encoded(|bytes| {
-                    api.storage_store(key, bytes);
-                });
-                if let Err(encode_err_message) = res {
-                    api.signal_error(encode_err_message.message_bytes());
-                }
+            match value.top_encode(StorageSetOutput::new(api, key)) {
+                Ok(v) => v,
+                Err(encode_err) => storage_set_error(api, encode_err),
             }
         }
     }
