@@ -42,6 +42,14 @@ pub fn dep_encode_slice_contents<T: NestedEncode, O: OutputBuffer>(slice: &[T], 
 	Ok(())
 }
 
+impl NestedEncode for () {
+    const TYPE_INFO: TypeInfo = TypeInfo::Unit;
+
+	fn dep_encode_to<O: OutputBuffer>(&self, _dest: &mut O) -> Result<(), EncodeError> {
+		Ok(())
+	}
+}
+
 impl<T: NestedEncode> NestedEncode for &[T] {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
@@ -326,6 +334,11 @@ mod tests {
     #[test]
     fn test_tuple() {
         ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
+	}
+	
+	#[test]
+    fn test_unit() {
+        ser_ok((), &[]);
     }
 
     #[test]
