@@ -85,6 +85,10 @@ where
     
     fn get_call_value_big_uint(&self) -> BigUint;
 
+    fn get_esdt_value_big_uint(&self) -> BigUint;
+
+    fn get_esdt_token_name(&self) -> Option<Vec<u8>>;
+
     fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
 
     fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
@@ -100,6 +104,14 @@ where
     fn get_block_round(&self) -> u64;
     
     fn get_block_epoch(&self) -> u64;
+
+    fn get_prev_block_timestamp(&self) -> u64;
+
+    fn get_prev_block_nonce(&self) -> u64;
+
+    fn get_prev_block_round(&self) -> u64;
+
+    fn get_prev_block_epoch(&self) -> u64;
 
     fn sha256(&self, data: &[u8]) -> H256;
 
