@@ -1,0 +1,59 @@
+{
+    "name": "buy ticket",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "start-limited-tickets-and-fixed-deadline-owner.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "buy-ticket",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:the_lottery_contract",
+                "value": "100",
+                "function": "buy_ticket",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "999,900",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {
+                        "''ticketPrice": "100",
+                        "''ticketsLeft": "1",
+                        "''deadline": "123,456",
+                        "''currentTicketNumber": "1",
+                        "''ticketHolder|0x00000000": "address:acc1"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}

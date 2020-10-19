@@ -1,0 +1,66 @@
+{
+    "name": "buy ticket after deadline",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy-ticket.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "123,567"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "buy-ticket-after-deadline",
+            "tx": {
+                "from": "address:acc2",
+                "to": "address:the_lottery_contract",
+                "value": "100",
+                "function": "buy_ticket",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Lottery entry period has ended! Awaiting winner announcement.",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "999,900",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {
+                        "''ticketPrice": "100",
+                        "''ticketsLeft": "1",
+                        "''deadline": "123,456",
+                        "''currentTicketNumber": "1",
+                        "''ticketHolder|0x00000000": "address:acc1"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}

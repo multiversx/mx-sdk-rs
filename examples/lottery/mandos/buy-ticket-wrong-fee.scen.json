@@ -1,0 +1,59 @@
+{
+    "name": "buy ticket wrong fee",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "start-limited-tickets-and-fixed-deadline-owner.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "buy-ticket",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:the_lottery_contract",
+                "value": "200",
+                "function": "buy_ticket",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Wrong ticket fee!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''ticketPrice": "100",
+                        "''ticketsLeft": "2",
+                        "''deadline": "123,456",
+                        "''currentTicketNumber": "0"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}
