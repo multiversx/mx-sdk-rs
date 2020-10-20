@@ -1,0 +1,61 @@
+{
+    "name": "start lottery for the second time",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "determine-winner-different-ticket-holders-winner-acc1.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "owner start limited tickets, fixed deadline. Again.",
+            "tx": {
+                "from": "address:my_address",
+                "to": "address:the_lottery_contract",
+                "value": "0",
+                "function": "start_limited_tickets_and_fixed_deadline",
+                "arguments": [
+                    "1000",
+                    "200",
+                    "123,456,789"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "4",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "1,000,100",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "999,900",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''ticketPrice": "1000",
+                        "''ticketsLeft": "200",
+                        "''deadline": "123,456,789"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}
