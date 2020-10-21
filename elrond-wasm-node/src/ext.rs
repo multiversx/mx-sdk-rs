@@ -68,6 +68,11 @@ extern {
     fn int64storageStore(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
     fn int64storageLoad(keyOffset: *const u8, keyLength: i32) -> i64;
 
+    fn uint64getArgument(id: i32) -> i64;
+    fn uint64finish(value: i64);
+    fn uint64storageStore(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
+    fn uint64storageLoad(keyOffset: *const u8, keyLength: i32) -> i64;
+
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 }
@@ -419,6 +424,11 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     #[inline]
     fn get_argument_i64(&self, arg_id: i32) -> i64 {
+        unsafe { int64getArgument(arg_id) }
+    }
+    
+    #[inline]
+    fn get_argument_u64(&self, arg_id: i32) -> u64 {
         unsafe { int64getArgument(arg_id) }
     }
     
