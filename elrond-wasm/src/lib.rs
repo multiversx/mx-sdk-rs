@@ -75,8 +75,12 @@ where
     fn storage_load_big_int(&self, key: &[u8]) -> BigInt;
 
     fn storage_store_i64(&self, key: &[u8], value: i64);
-    
+
+    fn storage_store_u64(&self, key: &[u8], value: u64);
+
     fn storage_load_i64(&self, key: &[u8]) -> i64;
+
+    fn storage_load_u64(&self, key: &[u8]) -> u64;
 
     #[inline]
     fn storage_load_cumulated_validator_reward(&self) -> BigUint {
@@ -164,6 +168,8 @@ pub trait ContractIOApi<BigInt, BigUint> {
         }
         elrond_codec::bytes_to_number(bytes.as_slice(), false)
     }
+    // unsigned
+    fn get_argument_u64(&self, arg_id: i32) -> u64;
     
     fn finish_slice_u8(&self, slice: &[u8]);
 
@@ -174,6 +180,8 @@ pub trait ContractIOApi<BigInt, BigUint> {
     fn finish_big_uint(&self, b: &BigUint);
 
     fn finish_i64(&self, value: i64);
+
+    fn finish_u64(&self, value: u64);
 
     fn signal_error(&self, message: &[u8]) -> !;
 
