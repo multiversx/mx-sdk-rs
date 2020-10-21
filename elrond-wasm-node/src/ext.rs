@@ -244,7 +244,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn storage_load_u64(&self, key: &[u8]) -> u64 {
         let bytes = self.storage_load_boxed_slice_u8(key);
         if bytes.len() > 8 {
-            ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
+            ext_error::signal_error(err_msg::STORAGE_VALUE_OUT_OF_RANGE);
         }
         elrond_wasm::elrond_codec::bytes_to_number(&bytes, false)
     }
@@ -262,7 +262,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     fn storage_load_i64(&self, key: &[u8]) -> i64 {
         let bytes = self.storage_load_boxed_slice_u8(key);
         if bytes.len() > 8 {
-            ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
+            ext_error::signal_error(err_msg::STORAGE_VALUE_OUT_OF_RANGE);
         }
         elrond_wasm::elrond_codec::bytes_to_number(&bytes, true) as i64
     }
