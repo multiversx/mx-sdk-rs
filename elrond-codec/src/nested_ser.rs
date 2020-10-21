@@ -53,7 +53,7 @@ impl NestedEncode for () {
 impl<T: NestedEncode> NestedEncode for &[T] {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
-		encode_number_to_output(dest, self.len() as u64, 32, false, false);
+		self.len().dep_encode_to(dest)?;
 		// actual data
 		dep_encode_slice_contents(self, dest)
 	}
@@ -99,7 +99,7 @@ macro_rules! encode_num_signed {
 		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
-			#[inline(never)]
+			#[inline]
             fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 				encode_number_to_output(dest, *self as u64, $size_in_bits, true, false);
 				Ok(())
@@ -113,7 +113,7 @@ macro_rules! encode_num_unsigned {
 		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
-			#[inline(never)]
+			#[inline]
             fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 				encode_number_to_output(dest, *self as u64, $size_in_bits, false, false);
 				Ok(())
@@ -146,11 +146,11 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
-				encode_number_to_output(dest, 1u64, 8, false, false);
+				dest.push_byte(1u8);
 				v.dep_encode_to(dest)
 			},
 			None => {
-				encode_number_to_output(dest, 0u64, 8, false, false);
+				dest.push_byte(0u8);
 				Ok(())
 			}
 		}

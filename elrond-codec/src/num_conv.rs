@@ -1,6 +1,5 @@
 use crate::nested_ser_output::OutputBuffer;
 
-
 /// Adds number to output buffer.
 /// No argument generics here, because we want the executable binary as small as possible.
 /// Smaller types need to be converted to u64 before using this function.
@@ -43,9 +42,16 @@ pub fn encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, size_in_
 		compact && // only relevant when compact flag
 		signed &&  // only possible when signed flag
 		x >> (size_in_bits - 1) & 1 == 1; // compute by checking first bit
+
+	if negative && x == u64::MAX {
+		// -1 is a special case
+		output.push_byte(0xffu8);
+		return;
+	}
 	
 	let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
 	let mut bit_offset = size_in_bits as isize;
+	let mut first_byte = true;
 	loop {
 		bit_offset -= 8;
 		if bit_offset < 0 {
@@ -59,6 +65,11 @@ pub fn encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, size_in_
 			// compact means ignoring irrelvant leading bytes
 			// that is 000... for positives and fff... for negatives
 			if byte != irrelevant_byte {
+				if first_byte && (byte >> 7 != negative as u8) {
+					// ensure leading byte (most significant bit actually) correctly indicates sign
+					output.push_byte(irrelevant_byte);
+					first_byte = false;
+				}
 				output.push_byte(byte);
 				compact = false;
 			}
@@ -81,7 +92,7 @@ pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
             // start with all bits set to 1, 
             // to ensure that if there are fewer bytes than the result type width,
             // the leading bits will be 1 instead of 0
-            0xffffffffffffffffu64 
+            u64::MAX 
         } else { 
             0u64 
         };

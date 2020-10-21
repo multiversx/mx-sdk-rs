@@ -292,7 +292,13 @@ mod tests {
         deser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
     }
 
-    
+    #[test]
+    fn test_top_numbers_decompacted_2() {
+        deser_ok(-1i32, &[255]);
+        deser_ok(-1i32, &[255, 255]);
+        deser_ok(-1i32, &[255, 255, 255, 255]);
+        deser_ok(-1i64, &[255, 255, 255, 255, 255, 255, 255, 255]);
+    }
 
     #[test]
     fn test_struct() {
