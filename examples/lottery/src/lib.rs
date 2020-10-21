@@ -4,66 +4,68 @@ imports!();
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
 pub trait Lottery {
+    
     #[init]
     fn init(&self) {
         
     }
 
-    fn start(&self, 
+    fn start(&self,
+        lottery_name: &Vec<u8>,
         ticket_price: BigUint, 
         total_tickets: u32, 
         deadline: u64) 
         -> SCResult<()> {
 
-        if self.get_caller() != self.get_owner_address() {
-            return sc_error!("Only owner may start the lottery!");
-        }
-        if self.status() != Status::Inactive {
+        if self.status(lottery_name.clone()) != Status::Inactive {
             return sc_error!("Lottery is already active!");
         }
         if ticket_price == 0 {
             return sc_error!("Ticket price must be higher than 0!");
         }
 
-        self.set_ticket_price(ticket_price);
-        self.set_tickets_left(total_tickets);
-        self.set_deadline(deadline);
+        self.set_ticket_price(lottery_name, ticket_price);
+        self.set_tickets_left(lottery_name, total_tickets);
+        self.set_deadline(lottery_name, deadline);
 
         Ok(())
     }
 
     #[endpoint]
     fn start_limited_tickets_and_fixed_deadline(&self,
+        lottery_name: Vec<u8>,
         ticket_price: BigUint, 
         total_tickets: u32, 
         deadline: u64) 
         -> SCResult<()> {
 
-        if total_tickets <= 0 {
+        if total_tickets == 0 {
             return sc_error!("Must have more than 0 tickets available!");
         }
         if deadline <= self.get_block_nonce() {
             return sc_error!("Deadline can't be in the past!");
         }
 
-        self.start(ticket_price, total_tickets, deadline)
+        self.start(&lottery_name, ticket_price, total_tickets, deadline)
     }
 
     #[endpoint]
     fn start_limited_tickets(&self, 
+        lottery_name: Vec<u8>,
         ticket_price: BigUint, 
         total_tickets: u32) 
         -> SCResult<()> {
         
-        if total_tickets <= 0 {
+        if total_tickets == 0 {
             return sc_error!("Must have more than 0 tickets available!");
         }
 
-        self.start(ticket_price, total_tickets, i64::MAX as u64)
+        self.start(&lottery_name, ticket_price, total_tickets, i64::MAX as u64)
     }
 
     #[endpoint]
     fn start_fixed_deadline(&self,
+        lottery_name: Vec<u8>,
         ticket_price: BigUint, 
         deadline: u64) 
         -> SCResult<()> {
@@ -72,29 +74,31 @@ pub trait Lottery {
             return sc_error!("Deadline can't be in the past!");
         }
 
-        self.start(ticket_price, u32::MAX, deadline)
+        self.start(&lottery_name, ticket_price, u32::MAX, deadline)
     }
 
     #[endpoint]
     #[payable]
-    fn buy_ticket(&self, #[payment] _payment : BigUint) -> SCResult<()> {
-        match self.status() {
+    fn buy_ticket(&self, lottery_name: Vec<u8>, #[payment] _payment: BigUint) -> SCResult<()> {
+        match self.status(lottery_name.clone()) {
             Status::Inactive => {
                 sc_error!("Lottery is currently inactive.")
             },
             Status::Running => {
-                let ticket_price = self.get_ticket_price();
+                let ticket_price = self.get_ticket_price(&lottery_name);
 
                 if _payment != ticket_price {
                     return sc_error!("Wrong ticket fee!");
                 }
 
-                let mut ticket_number = self.get_mut_current_ticket_number();
-                let mut tickets_left = self.get_mut_tickets_left();
+                let mut ticket_number = self.get_mut_current_ticket_number(&lottery_name);
+                let mut tickets_left = self.get_mut_tickets_left(&lottery_name);
+                let mut prize_pool = self.get_mut_prize_pool(&lottery_name);
 
-                self.set_ticket_holder(*ticket_number, &self.get_caller());
+                self.set_ticket_holder(&lottery_name, *ticket_number, &self.get_caller());
                 *ticket_number += 1;
                 *tickets_left -= 1;
+                *prize_pool += ticket_price;
 
                 Ok(())
             },
@@ -105,38 +109,39 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn determine_winner(&self) -> SCResult<()> {
-        if self.get_owner_address() != self.get_caller() {
-            return sc_error!("Only owner may call this function!");
+    fn determine_winner(&self, lottery_name: Vec<u8>) -> SCResult<()> {
+        match self.status(lottery_name.clone()) {
+            Status::Inactive => { 
+                sc_error!("Lottery is inactive!")
+            },
+            Status::Running => {
+                sc_error!("Lottery is still running!")
+            },
+            Status::Ended => {
+                let total_tickets = self.get_mut_current_ticket_number(&lottery_name);
+
+                if *total_tickets > 0 {
+                    let winning_ticket_id = self.random() % *total_tickets;
+                    let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
+
+                    self.send_tx(&winner_address, &self.get_sc_balance(), "You won the lottery! Congratulations!");
+                }
+
+                self.clear_storage(&lottery_name);
+
+                Ok(())
+            }
         }
-        if self.status() == Status::Inactive {
-            return sc_error!("Lottery is inactive!");
-        }
-        if self.status() == Status::Running {
-            return sc_error!("Lottery is still running!");
-        }
-
-        let total_tickets = self.get_mut_current_ticket_number();
-
-        if *total_tickets > 0 {
-            let winning_ticket_id = self.random() % *total_tickets;
-            let winner_address = self.get_ticket_holder(winning_ticket_id);
-
-            self.send_tx(&winner_address, &self.get_sc_balance(), "You won the lottery! Congratulations!");
-        }
-
-        self.clear_storage();
-
-        Ok(())
     }
 
     #[view]
-    fn status(&self) -> Status {
-        if self.get_ticket_price() == 0 {
+    fn status(&self, lottery_name: Vec<u8>) -> Status {
+        // Ticket_price 0 is invalid. Using the fact that memory is initialized to 0 by default.
+        if self.get_ticket_price(&lottery_name) == 0 {
             return Status::Inactive;
         }
-        if self.get_block_nonce() > self.get_deadline() || 
-            *self.get_mut_tickets_left() == 0 {
+        if self.get_block_nonce() > self.get_deadline(&lottery_name) || 
+            *self.get_mut_tickets_left(&lottery_name) == 0 {
             return Status::Ended;
         }
 
@@ -154,51 +159,62 @@ pub trait Lottery {
         return first_byte | second_byte | third_byte | fourth_byte;
     }
 
-    fn clear_storage(&self) {
-        self.storage_store("deadline".as_bytes(), &[0u8; 0]);
-        self.storage_store("ticketPrice".as_bytes(), &[0u8; 0]);
-        self.storage_store("ticketsLeft".as_bytes(), &[0u8; 0]);
+    fn clear_storage(&self, lottery_name: &Vec<u8>) {
+        let name_len_vec = &(lottery_name.len() as u32).to_be_bytes().to_vec();
+        let temp = [&name_len_vec[..], &lottery_name[..]].concat(); // "temporary value dropped" otherwise
+        let appended_name_in_key = temp.as_slice();
 
-        let last_ticket = self.get_mut_current_ticket_number();
+        self.storage_store(&["deadline".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["ticketPrice".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["ticketsLeft".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["prizePool".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+
+        let last_ticket = self.get_mut_current_ticket_number(lottery_name);
 
         for i in 0..*last_ticket {
-            let key = ["ticketHolder".as_bytes(), &i.to_be_bytes()].concat();
+            let key = ["ticketHolder".as_bytes(),
+                appended_name_in_key, &i.to_be_bytes()].concat();
+
             self.storage_store(key.as_slice(), &[0u8; 0]);
         }
 
-        self.storage_store("currentTicketNumber".as_bytes(), &[0u8; 0]);
+        self.storage_store(&["currentTicketNumber".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
     }
 
     #[storage_set("deadline")]
-    fn set_deadline(&self, deadline: u64);
+    fn set_deadline(&self, lottery_name: &[u8], deadline: u64);
 
     #[view]
     #[storage_get("deadline")]
-    fn get_deadline(&self) -> u64;
+    fn get_deadline(&self, lottery_name: &Vec<u8>) -> u64;
 
     #[storage_set("ticketPrice")]
-    fn set_ticket_price(&self, price: BigUint);
+    fn set_ticket_price(&self, lottery_name: &[u8], price: BigUint);
 
     #[view]
     #[storage_get("ticketPrice")]
-    fn get_ticket_price(&self) -> BigUint;
+    fn get_ticket_price(&self, lottery_name: &Vec<u8>) -> BigUint;
 
     #[view]
     #[storage_get_mut("ticketsLeft")]
-    fn get_mut_tickets_left(&self) -> mut_storage!(u32);
+    fn get_mut_tickets_left(&self, lottery_name: &Vec<u8>) -> mut_storage!(u32);
 
     #[storage_set("ticketsLeft")]
-    fn set_tickets_left(&self, tickets: u32);
+    fn set_tickets_left(&self, lottery_name: &[u8], tickets: u32);
 
     #[view]
     #[storage_get_mut("currentTicketNumber")]
-    fn get_mut_current_ticket_number(&self) -> mut_storage!(u32);
+    fn get_mut_current_ticket_number(&self, lottery_name: &Vec<u8>) -> mut_storage!(u32);
 
     #[storage_set("ticketHolder")]
-    fn set_ticket_holder(&self, ticket_id: u32, ticket_holder: &Address);
+    fn set_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32, ticket_holder: &Address);
 
     #[storage_get("ticketHolder")]
-    fn get_ticket_holder(&self, ticket_id: u32) -> Address;
+    fn get_ticket_holder(&self, lottery_name: &Vec<u8>, ticket_id: u32) -> Address;
+
+    #[view]
+    #[storage_get_mut("prizePool")]
+    fn get_mut_prize_pool(&self, lottery_name: &Vec<u8>) -> mut_storage!(BigUint);
 }
 
 use elrond_wasm::elrond_codec::*;

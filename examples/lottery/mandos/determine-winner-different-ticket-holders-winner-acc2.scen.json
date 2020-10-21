@@ -20,7 +20,9 @@
                 "to": "address:the_lottery_contract",
                 "value": "0",
                 "function": "determine_winner",
-                "arguments": [],
+                "arguments": [
+                    "str:lottery_name"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },

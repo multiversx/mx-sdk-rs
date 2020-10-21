@@ -13,7 +13,9 @@
                 "to": "address:the_lottery_contract",
                 "value": "100",
                 "function": "buy_ticket",
-                "arguments": [],
+                "arguments": [
+                    "str:lottery_name"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
@@ -46,12 +48,13 @@
                     "nonce": "0",
                     "balance": "200",
                     "storage": {
-                        "''ticketPrice": "100",
-                        "''ticketsLeft": "0",
-                        "''deadline": "123,456",
-                        "''currentTicketNumber": "2",
-                        "''ticketHolder|0x00000000": "address:acc1",
-                        "''ticketHolder|0x00000001": "address:acc2"
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "0",
+                        "''deadline|u32:12|''lottery_name": "123,456",
+                        "''currentTicketNumber|u32:12|''lottery_name": "2",
+                        "''prizePool|u32:12|''lottery_name": "200",
+                        "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
+                        "''ticketHolder|u32:12|''lottery_name|0x00000001": "address:acc2"
                     },
                     "code": "file:../output/lottery.wasm"
                 }

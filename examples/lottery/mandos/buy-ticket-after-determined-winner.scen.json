@@ -13,7 +13,9 @@
                 "to": "address:the_lottery_contract",
                 "value": "100",
                 "function": "buy_ticket",
-                "arguments": [],
+                "arguments": [
+                    "str:lottery_name"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },

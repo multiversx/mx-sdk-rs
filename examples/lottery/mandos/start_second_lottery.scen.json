@@ -1,28 +1,29 @@
 {
-    "name": "non-owner start with limited tickets",
+    "name": "start 2nd with limited tickets and fixed deadline",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "lottery-init.scen.json"
+            "path": "start-limited-tickets-and-fixed-deadline.scen.json"
         },
         {
             "step": "scCall",
-            "txId": "non-owner start limited tickets",
+            "txId": "start 2nd limited tickets, fixed deadline",
             "tx": {
                 "from": "address:acc1",
                 "to": "address:the_lottery_contract",
                 "value": "0",
-                "function": "start_limited_tickets",
+                "function": "start_limited_tickets_and_fixed_deadline",
                 "arguments": [
-                    "100",
-                    "2"
+                    "str:lottery_$$$$",
+                    "500",
+                    "5",
+                    "234,567"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "4",
-                "message": "str:Only owner may start the lottery!",
+                "status": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -31,7 +32,7 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "1",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "storage": {}
                 },
@@ -48,7 +49,14 @@
                 "address:the_lottery_contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "2",
+                        "''deadline|u32:12|''lottery_name": "123,456",
+                        "''ticketPrice|u32:12|''lottery_$$$$": "500",
+                        "''ticketsLeft|u32:12|''lottery_$$$$": "5",
+                        "''deadline|u32:12|''lottery_$$$$": "234,567"
+                    },
                     "code": "file:../output/lottery.wasm"
                 }
             }

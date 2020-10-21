@@ -1,21 +1,20 @@
 {
-    "name": "owner start with limited tickets",
+    "name": "buy ticket 2nd lottery",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "lottery-init.scen.json"
+            "path": "start_second_lottery.scen.json"
         },
         {
             "step": "scCall",
-            "txId": "owner start limited tickets",
+            "txId": "buy-ticket-2nd-lottery",
             "tx": {
-                "from": "address:my_address",
+                "from": "address:acc1",
                 "to": "address:the_lottery_contract",
-                "value": "0",
-                "function": "start_limited_tickets",
+                "value": "500",
+                "function": "buy_ticket",
                 "arguments": [
-                    "100",
-                    "2"
+                    "str:lottery_$$$$"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -35,8 +34,8 @@
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "0",
-                    "balance": "1,000,000",
+                    "nonce": "2",
+                    "balance": "999,500",
                     "storage": {}
                 },
                 "address:acc2": {
@@ -46,11 +45,17 @@
                 },
                 "address:the_lottery_contract": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "500",
                     "storage": {
-                        "''ticketPrice": "100",
-                        "''ticketsLeft": "2",
-                        "''deadline": "0x7fffffffffffffff"
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "2",
+                        "''deadline|u32:12|''lottery_name": "123,456",
+                        "''ticketPrice|u32:12|''lottery_$$$$": "500",
+                        "''ticketsLeft|u32:12|''lottery_$$$$": "4",
+                        "''deadline|u32:12|''lottery_$$$$": "234,567",
+                        "''currentTicketNumber|u32:12|''lottery_$$$$": "1",
+                        "''prizePool|u32:12|''lottery_$$$$": "500",
+                        "''ticketHolder|u32:12|''lottery_$$$$|0x00000000": "address:acc1"
                     },
                     "code": "file:../output/lottery.wasm"
                 }
