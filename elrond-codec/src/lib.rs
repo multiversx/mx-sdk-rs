@@ -25,7 +25,7 @@ pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 pub use crate::nested_de_input::Input;
 pub use crate::nested_ser_output::OutputBuffer;
-pub use crate::num_conv::{using_encoded_number, bytes_to_number};
+pub use crate::num_conv::{using_encoded_number, encode_number_to_output, bytes_to_number};
 
 /// !INTERNAL USE ONLY!
 ///

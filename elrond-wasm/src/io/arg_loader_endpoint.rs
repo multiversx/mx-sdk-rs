@@ -62,6 +62,7 @@ where
     }
 }
 
+#[inline]
 pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
 where
     T: TopDecode,

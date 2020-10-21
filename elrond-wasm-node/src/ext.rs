@@ -49,12 +49,10 @@ extern {
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
     fn getOriginalTxHash(resultOffset: *const u8);
 
-
+    // big int API
     fn bigIntNew(value: i64) -> i32;
-
     fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
     fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
-
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
@@ -63,16 +61,17 @@ extern {
     fn bigIntFinishUnsigned(bih: i32);
     fn bigIntFinishSigned(bih: i32);
 
-    fn int64getArgument(id: i32) -> i64;
-    fn int64finish(value: i64);
-    fn int64storageStore(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
-    fn int64storageLoad(keyOffset: *const u8, keyLength: i32) -> i64;
-
-    fn uint64getArgument(id: i32) -> i64;
-    fn uint64finish(value: i64);
-    fn uint64storageStore(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
-    fn uint64storageLoad(keyOffset: *const u8, keyLength: i32) -> i64;
-
+    // small int API
+    fn smallIntGetUnsignedArgument(id: i32) -> i64;
+    fn smallIntGetSignedArgument(id: i32) -> i64;
+    fn smallIntFinishUnsigned(value: i64);
+    fn smallIntFinishSigned(value: i64);
+    fn smallIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
+    fn smallIntStorageStoreSigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
+    fn smallIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32) -> i64;
+    fn smallIntStorageLoadSigned(keyOffset: *const u8, keyLength: i32) -> i64;
+    
+    // crypto API
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 }
@@ -114,7 +113,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
     
-    fn storage_store(&self, key: &[u8], value: &[u8]) {
+    fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         unsafe {
             storageStore(key.as_ref().as_ptr(), key.len() as i32, value.as_ptr(), value.len() as i32);
         }
@@ -200,18 +199,72 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
+    #[cfg(feature = "small-int-ei")]
+    #[inline]
+    fn storage_store_u64(&self, key: &[u8], value: u64) {
+        unsafe {
+            smallIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value as i64);
+        }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    #[inline]
+    fn storage_store_u64(&self, key: &[u8], value: u64) {
+        let mut buffer = Vec::<u8>::new();
+        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value, 64, false, true);
+        self.storage_store_slice_u8(key, &buffer[..]);
+    }
+
+    #[cfg(feature = "small-int-ei")]
     #[inline]
     fn storage_store_i64(&self, key: &[u8], value: i64) {
         unsafe {
-            int64storageStore(key.as_ref().as_ptr(), key.len() as i32, value);
+            smallIntStorageStoreSigned(key.as_ref().as_ptr(), key.len() as i32, value);
         }
     }
-    
+
+    #[cfg(not(feature = "small-int-ei"))]
+    #[inline]
+    fn storage_store_i64(&self, key: &[u8], value: i64) {
+        let mut buffer = Vec::<u8>::new();
+        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value as u64, 64, true, true);
+        self.storage_store_slice_u8(key, &buffer[..]);
+    }
+
+    #[cfg(feature = "small-int-ei")]
+    #[inline]
+    fn storage_load_u64(&self, key: &[u8]) -> u64 {
+        unsafe{
+            smallIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32) as u64
+        }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    #[inline(never)]
+    fn storage_load_u64(&self, key: &[u8]) -> u64 {
+        let bytes = self.storage_load_boxed_slice_u8(key);
+        if bytes.len() > 8 {
+            ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
+        }
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes, false)
+    }
+
+    #[cfg(feature = "small-int-ei")]
     #[inline]
     fn storage_load_i64(&self, key: &[u8]) -> i64 {
         unsafe{
-            int64storageLoad(key.as_ref().as_ptr(), key.len() as i32)
+            smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32)
         }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    #[inline(never)]
+    fn storage_load_i64(&self, key: &[u8]) -> i64 {
+        let bytes = self.storage_load_boxed_slice_u8(key);
+        if bytes.len() > 8 {
+            ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
+        }
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes, true) as i64
     }
 
     #[inline]
@@ -421,15 +474,35 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             ArwenBigInt {handle: result}
         }
     }
-
-    #[inline]
-    fn get_argument_i64(&self, arg_id: i32) -> i64 {
-        unsafe { int64getArgument(arg_id) }
-    }
     
+    #[cfg(feature = "small-int-ei")]
     #[inline]
     fn get_argument_u64(&self, arg_id: i32) -> u64 {
-        unsafe { int64getArgument(arg_id) }
+        unsafe { smallIntGetUnsignedArgument(arg_id) as u64 }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    fn get_argument_u64(&self, arg_id: i32) -> u64 {
+        let bytes = self.get_argument_boxed_slice_u8(arg_id);
+        if bytes.len() > 8 {
+            ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
+        }
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes, false)
+    }
+
+    #[cfg(feature = "small-int-ei")]
+    #[inline]
+    fn get_argument_i64(&self, arg_id: i32) -> i64 {
+        unsafe { smallIntGetSignedArgument(arg_id) }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    fn get_argument_i64(&self, arg_id: i32) -> i64 {
+        let bytes = self.get_argument_boxed_slice_u8(arg_id);
+        if bytes.len() > 8 {
+            ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
+        }
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes, true) as i64
     }
     
     #[inline]
@@ -460,9 +533,30 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
     
+    #[cfg(feature = "small-int-ei")]
+    #[inline]
+    fn finish_u64(&self, value: u64) {
+        unsafe { smallIntFinishUnsigned(value as i64); }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    fn finish_u64(&self, value: u64) {
+        let mut buffer = Vec::<u8>::new();
+        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value, 64, false, true);
+        self.finish_slice_u8(&buffer[..]);
+    }
+
+    #[cfg(feature = "small-int-ei")]
     #[inline]
     fn finish_i64(&self, value: i64) {
-        unsafe { int64finish(value); }
+        unsafe { smallIntFinishSigned(value); }
+    }
+
+    #[cfg(not(feature = "small-int-ei"))]
+    fn finish_i64(&self, value: i64) {
+        let mut buffer = Vec::<u8>::new();
+        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value as u64, 64, true, true);
+        self.finish_slice_u8(&buffer[..]);
     }
 
     #[inline]

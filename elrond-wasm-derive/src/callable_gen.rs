@@ -125,7 +125,7 @@ impl Callable {
                     let mut callback_data_ser = elrond_wasm::call_data::CallDataSerializer::new( & #cb_name_literal );
                 };
                 let callback_store = quote! {
-                    self.api.storage_store(&self.api.get_tx_hash().as_ref(), callback_data_ser.as_slice());
+                    self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), callback_data_ser.as_slice());
                 };
                 (callback_init, callback_store)
             } else {

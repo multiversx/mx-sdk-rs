@@ -120,7 +120,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
             elrond_wasm::check_no_more_args(&___arg_loader, &___err_handler);
 
             // cleanup
-            self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); 
+            self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), &[]); 
         }
     }
 }
