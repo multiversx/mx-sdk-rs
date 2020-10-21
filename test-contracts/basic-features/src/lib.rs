@@ -166,7 +166,17 @@ pub trait BasicFeatures {
     }
 
     #[endpoint]
+    fn echo_boxed_ser_example_1(&self, se: Box<SerExample1>) -> Box<SerExample1> {
+        se
+    }
+
+    #[endpoint]
     fn echo_ser_example_2(&self, se: SerExample2) -> SerExample2 {
+        se
+    }
+
+    #[endpoint]
+    fn echo_boxed_ser_example_2(&self, se: Box<SerExample2>) -> Box<SerExample2> {
         se
     }
 
@@ -205,6 +215,14 @@ pub trait BasicFeatures {
     #[endpoint]
     #[storage_set("usize")]
     fn store_usize(&self, i: usize);
+
+    #[endpoint]
+    #[storage_set("i32")]
+    fn store_i32(&self, i: i32);
+
+    #[endpoint]
+    #[storage_set("u64")]
+    fn store_u64(&self, i: u64);
 
     #[endpoint]
     #[storage_set("i64")]
@@ -274,6 +292,10 @@ pub trait BasicFeatures {
     #[endpoint]
     #[storage_get("big_int")]
     fn load_big_int(&self) -> BigInt;
+
+    #[endpoint]
+    #[storage_get("u64")]
+    fn load_u64(&self) -> u64;
 
     #[endpoint]
     #[storage_get("usize")]

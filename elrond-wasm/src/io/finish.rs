@@ -63,7 +63,9 @@ where
         self.api.finish_slice_u8(self.buffer.as_slice());
     }
 
-    // TODO: set_u64
+    fn set_u64(self, value: u64) {
+        self.api.finish_u64(value);
+    }
 
     fn set_i64(self, value: i64) {
         self.api.finish_i64(value);

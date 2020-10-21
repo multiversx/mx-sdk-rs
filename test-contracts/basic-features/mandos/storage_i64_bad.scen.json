@@ -1,0 +1,45 @@
+{
+    "name": "storage",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``i64": "0x008000000000000000"
+                    },
+                    "code": "file:../output/features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "load-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "load_i64",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:storage value out of range",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

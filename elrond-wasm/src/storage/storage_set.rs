@@ -53,7 +53,7 @@ where
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     fn set_slice_u8(self, bytes: &[u8]) {
-        self.api.storage_store(self.key, bytes)
+        self.api.storage_store_slice_u8(self.key, bytes)
     }
 
     fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
@@ -62,10 +62,12 @@ where
     }
 
     fn flush_buffer(self) {
-        self.api.storage_store(self.key, self.buffer.as_slice());
+        self.api.storage_store_slice_u8(self.key, self.buffer.as_slice());
     }
 
-    // TODO: set_u64
+    fn set_u64(self, value: u64) {
+        self.api.storage_store_u64(self.key, value);
+    }
 
     fn set_i64(self, value: i64) {
         self.api.storage_store_i64(self.key, value);

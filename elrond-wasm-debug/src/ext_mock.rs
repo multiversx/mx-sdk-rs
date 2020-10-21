@@ -228,7 +228,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.blockchain_info.contract_balance.clone().into()
     }
 
-    fn storage_store(&self, key: &[u8], value: &[u8]) {
+    fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         // TODO: extract magic strings somewhere
         if key.starts_with(&b"ELROND"[..]) {
             panic!(TxPanic{
@@ -257,7 +257,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
-        self.storage_store(key, &value[..].to_vec());
+        self.storage_store_slice_u8(key, &value[..].to_vec());
     }
     
     fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
@@ -271,7 +271,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store_big_uint(&self, key: &[u8], value: &RustBigUint) {
-        self.storage_store(key, &value.to_bytes_be());
+        self.storage_store_slice_u8(key, &value.to_bytes_be());
     }
 
     fn storage_load_big_uint(&self, key: &[u8]) -> RustBigUint {
@@ -281,7 +281,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn storage_store_big_int(&self, key: &[u8], value: &RustBigInt) {
-        self.storage_store(key, &value.to_signed_bytes_be());
+        self.storage_store_slice_u8(key, &value.to_signed_bytes_be());
     }
 
     fn storage_load_big_int(&self, key: &[u8]) -> RustBigInt {
@@ -294,9 +294,32 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.storage_store_big_int(key, &RustBigInt::from(value));
     }
 
+    fn storage_store_u64(&self, key: &[u8], value: u64) {
+        self.storage_store_big_uint(key, &RustBigUint::from(value));
+    }
+
     fn storage_load_i64(&self, key: &[u8]) -> i64 {
         let bi = self.storage_load_big_int(key);
-        bi.value().to_i64().unwrap_or_else(|| panic!("storage not i64"))
+        if let Some(v) = bi.0.to_i64() {
+            v
+        } else {
+            panic!(TxPanic{
+                status: 10,
+                message: b"storage value out of range".to_vec(),
+            })
+        }
+    }
+
+    fn storage_load_u64(&self, key: &[u8]) -> u64 {
+        let bu = self.storage_load_big_uint(key);
+        if let Some(v) = bu.0.to_u64() {
+            v
+        } else {
+            panic!(TxPanic{
+                status: 10,
+                message: b"storage value out of range".to_vec(),
+            })
+        }
     }
 
     #[inline]
@@ -451,6 +474,19 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
         }
     }
 
+    fn get_argument_u64(&self, arg_index: i32) -> u64 {
+        let bytes = self.get_argument_vec_u8(arg_index);
+        let bu = BigUint::from_bytes_be(&bytes);
+        if let Some(v) = bu.to_u64() {
+            v
+        } else {
+            panic!(TxPanic{
+                status: 10,
+                message: b"argument out of range".to_vec(),
+            })
+        }
+    }
+
     fn finish_slice_u8(&self, slice: &[u8]) {
         let mut v = vec![0u8; slice.len()];
         v.copy_from_slice(slice);
@@ -472,6 +508,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     
     fn finish_i64(&self, value: i64) {
         self.finish_big_int(&value.into());
+    }
+
+    fn finish_u64(&self, value: u64) {
+        self.finish_big_uint(&value.into());
     }
 
     fn signal_error(&self, message: &[u8]) -> ! {

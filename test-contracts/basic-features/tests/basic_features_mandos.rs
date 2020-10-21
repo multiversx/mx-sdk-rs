@@ -113,6 +113,11 @@ fn storage_i64() {
 }
 
 #[test]
+fn storage_i64_bad() {
+    parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());    
+}
+
+#[test]
 fn storage_map1() {
     parse_execute_mandos("mandos/storage_map1.scen.json", &contract_map());    
 }
@@ -143,8 +148,23 @@ fn storage_reserved() {
 }
 
 #[test]
+fn storage_u64() {
+    parse_execute_mandos("mandos/storage_u64.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_u64_bad() {
+    parse_execute_mandos("mandos/storage_u64_bad.scen.json", &contract_map());    
+}
+
+#[test]
 fn storage_usize() {
     parse_execute_mandos("mandos/storage_usize.scen.json", &contract_map());    
+}
+
+#[test]
+fn storage_usize_bad() {
+    parse_execute_mandos("mandos/storage_usize_bad.scen.json", &contract_map());    
 }
 
 #[test]

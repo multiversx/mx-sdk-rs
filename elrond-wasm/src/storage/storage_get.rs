@@ -68,6 +68,10 @@ where
         self.api.storage_load_boxed_slice_u8(self.key)
     }
 
+    fn get_u64(&mut self) -> u64 {
+        self.api.storage_load_u64(self.key)
+    }
+
     fn get_i64(&mut self) -> i64 {
         self.api.storage_load_i64(self.key)
     }

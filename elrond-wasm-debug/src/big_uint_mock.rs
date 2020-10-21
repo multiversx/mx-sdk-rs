@@ -22,19 +22,19 @@ impl RustBigUint {
 
 impl From<u64> for RustBigUint {
     fn from(item: u64) -> Self {
-        RustBigUint((item as i64).into())
+        RustBigUint(BigUint::from(item).into())
     }
 }
 
 impl From<u32> for RustBigUint {
     fn from(item: u32) -> Self {
-        RustBigUint((item as i32).into())
+        RustBigUint(BigUint::from(item).into())
     }
 }
 
 impl From<usize> for RustBigUint {
     fn from(item: usize) -> Self {
-        RustBigUint((item as i32).into())
+        RustBigUint(BigUint::from(item).into())
     }
 }
 
