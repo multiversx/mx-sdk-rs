@@ -252,7 +252,7 @@ mod tests {
     }
 
     #[test]
-    fn test_top_compacted_numbers() {
+    fn test_serialize_top_compacted_numbers() {
         // unsigned positive
         ser_ok(5u8, &[5]);
         ser_ok(5u16, &[5]);
@@ -273,6 +273,19 @@ mod tests {
 		ser_ok(-5isize, &[251]);
 		// non zero usize
         ser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
+	}
+	
+    #[test]
+    fn test_serialize_top_compacted_numbers_msb_ok() {
+		ser_ok(127i32, &[127]);
+		ser_ok(128i32, &[0, 128]);
+		ser_ok(255i32, &[0, 255]);
+		
+        ser_ok(-1i32, &[255]);
+		ser_ok(-128i32, &[128]);
+		ser_ok(-129i32, &[255, 127]);
+		ser_ok(-256i32, &[255, 0]);
+		ser_ok(-257i32, &[254, 255]);
     }
 
     #[test]
