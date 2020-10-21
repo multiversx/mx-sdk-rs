@@ -1,5 +1,5 @@
 {
-    "name": "owner start with limited tickets and fixed deadline",
+    "name": "start with limited tickets",
     "steps": [
         {
             "step": "externalSteps",
@@ -7,16 +7,16 @@
         },
         {
             "step": "scCall",
-            "txId": "owner start limited tickets, fixed deadline",
+            "txId": "start limited tickets",
             "tx": {
                 "from": "address:my_address",
                 "to": "address:the_lottery_contract",
                 "value": "0",
-                "function": "start_limited_tickets_and_fixed_deadline",
+                "function": "start_limited_tickets",
                 "arguments": [
+                    "str:lottery_name",
                     "100",
-                    "2",
-                    "123,456"
+                    "2"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -49,9 +49,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ticketPrice": "100",
-                        "''ticketsLeft": "2",
-                        "''deadline": "123,456"
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "2",
+                        "''deadline|u32:12|''lottery_name": "0x7fffffffffffffff"
                     },
                     "code": "file:../output/lottery.wasm"
                 }

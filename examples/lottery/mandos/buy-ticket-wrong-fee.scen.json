@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "externalSteps",
-            "path": "start-limited-tickets-and-fixed-deadline-owner.scen.json"
+            "path": "start-limited-tickets-and-fixed-deadline.scen.json"
         },
         {
             "step": "scCall",
@@ -13,7 +13,9 @@
                 "to": "address:the_lottery_contract",
                 "value": "200",
                 "function": "buy_ticket",
-                "arguments": [],
+                "arguments": [
+                    "str:lottery_name"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
@@ -46,10 +48,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ticketPrice": "100",
-                        "''ticketsLeft": "2",
-                        "''deadline": "123,456",
-                        "''currentTicketNumber": "0"
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "2",
+                        "''deadline|u32:12|''lottery_name": "123,456",
+                        "''currentTicketNumber|u32:12|''lottery_name": "0"
                     },
                     "code": "file:../output/lottery.wasm"
                 }

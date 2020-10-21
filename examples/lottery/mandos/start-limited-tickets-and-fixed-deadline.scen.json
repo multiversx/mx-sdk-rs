@@ -1,31 +1,29 @@
 {
-    "name": "non-owner try to determine winner",
+    "name": "start with limited tickets and fixed deadline",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "buy-ticket-another-account.scen.json"
-        },
-        {
-            "step": "setState",
-            "currentBlockInfo": {
-                "blockNonce": "123,567"
-            }
+            "path": "lottery-init.scen.json"
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-early",
+            "txId": "start limited tickets, fixed deadline",
             "tx": {
-                "from": "address:acc1",
+                "from": "address:my_address",
                 "to": "address:the_lottery_contract",
                 "value": "0",
-                "function": "determine_winner",
-                "arguments": [],
+                "function": "start_limited_tickets_and_fixed_deadline",
+                "arguments": [
+                    "str:lottery_name",
+                    "100",
+                    "2",
+                    "123,456"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "4",
-                "message": "str:Only owner may call this function!",
+                "status": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -39,25 +37,22 @@
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "2",
-                    "balance": "999,900",
+                    "nonce": "0",
+                    "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "1",
-                    "balance": "999,900",
+                    "nonce": "0",
+                    "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:the_lottery_contract": {
                     "nonce": "0",
-                    "balance": "200",
+                    "balance": "0",
                     "storage": {
-                        "''ticketPrice": "100",
-                        "''ticketsLeft": "0",
-                        "''deadline": "123,456",
-                        "''currentTicketNumber": "2",
-                        "''ticketHolder|0x00000000": "address:acc1",
-                        "''ticketHolder|0x00000001": "address:acc2"
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "2",
+                        "''deadline|u32:12|''lottery_name": "123,456"
                     },
                     "code": "file:../output/lottery.wasm"
                 }

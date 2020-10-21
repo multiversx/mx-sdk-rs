@@ -7,13 +7,14 @@
         },
         {
             "step": "scCall",
-            "txId": "owner start limited tickets, fixed deadline. Again.",
+            "txId": "start limited tickets, fixed deadline. Again.",
             "tx": {
                 "from": "address:my_address",
                 "to": "address:the_lottery_contract",
                 "value": "0",
                 "function": "start_limited_tickets_and_fixed_deadline",
                 "arguments": [
+                    "str:lottery_name",
                     "1000",
                     "200",
                     "123,456,789"
@@ -49,9 +50,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ticketPrice": "1000",
-                        "''ticketsLeft": "200",
-                        "''deadline": "123,456,789"
+                        "''ticketPrice|u32:12|''lottery_name": "1000",
+                        "''ticketsLeft|u32:12|''lottery_name": "200",
+                        "''deadline|u32:12|''lottery_name": "123,456,789"
                     },
                     "code": "file:../output/lottery.wasm"
                 }
