@@ -211,7 +211,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn storage_store_u64(&self, key: &[u8], value: u64) {
         let mut buffer = Vec::<u8>::new();
-        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value, 64, false, true);
+        elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value, false);
         self.storage_store_slice_u8(key, &buffer[..]);
     }
 
@@ -227,7 +227,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn storage_store_i64(&self, key: &[u8], value: i64) {
         let mut buffer = Vec::<u8>::new();
-        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value as u64, 64, true, true);
+        elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value as u64, true);
         self.storage_store_slice_u8(key, &buffer[..]);
     }
 
@@ -542,7 +542,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[cfg(not(feature = "small-int-ei"))]
     fn finish_u64(&self, value: u64) {
         let mut buffer = Vec::<u8>::new();
-        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value, 64, false, true);
+        elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value, false);
         self.finish_slice_u8(&buffer[..]);
     }
 
@@ -555,7 +555,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[cfg(not(feature = "small-int-ei"))]
     fn finish_i64(&self, value: i64) {
         let mut buffer = Vec::<u8>::new();
-        elrond_wasm::elrond_codec::encode_number_to_output(&mut buffer, value as u64, 64, true, true);
+        elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value as u64, true);
         self.finish_slice_u8(&buffer[..]);
     }
 

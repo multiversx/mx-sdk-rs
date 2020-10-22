@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
 use crate::nested_ser_output::OutputBuffer;
-use crate::num_conv::encode_number_to_output;
+use crate::num_conv::top_encode_number_to_output;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
 /// 
@@ -24,13 +24,13 @@ pub trait TopEncodeOutput<'o, B: OutputBuffer>: Sized {
 
     fn set_u64(mut self, value: u64) {
         let buffer = self.buffer_ref();
-        encode_number_to_output(buffer, value, 64, false, true);
+        top_encode_number_to_output(buffer, value, false);
         self.flush_buffer();
     }
 
     fn set_i64(mut self, value: i64) {
         let buffer = self.buffer_ref();
-        encode_number_to_output(buffer, value as u64, 64, true, true);
+        top_encode_number_to_output(buffer, value as u64, true);
         self.flush_buffer();
     }
 }
