@@ -1,5 +1,5 @@
 {
-    "name": "buy ticket wrong fee",
+    "name": "start 2nd with limited tickets and fixed deadline",
     "steps": [
         {
             "step": "externalSteps",
@@ -7,21 +7,26 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket",
+            "txId": "start 2nd limited tickets, fixed deadline",
             "tx": {
                 "from": "address:acc1",
                 "to": "address:the_lottery_contract",
-                "value": "200",
-                "function": "buy_ticket",
+                "value": "0",
+                "function": "start",
                 "arguments": [
-                    "str:lottery_name"
+                    "str:lottery_$$$$",
+                    "500",
+                    "0x01|u32:5",
+                    "0x01|u64:234,567",
+                    "0x",
+                    "0x",
+                    "0x"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "4",
-                "message": "str:Wrong ticket fee!",
+                "status": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -51,10 +56,15 @@
                         "''ticketPrice|u32:12|''lottery_name": "100",
                         "''ticketsLeft|u32:12|''lottery_name": "2",
                         "''deadline|u32:12|''lottery_name": "123,456",
-                        "''currentTicketNumber|u32:12|''lottery_name": "0",
                         "''maxEntriesPerUser|u32:12|''lottery_name": "0xffffffff",
                         "''prizeDistribution|u32:12|''lottery_name": "u8:100",
-                        "''whitelist|u32:12|''lottery_name": ""
+
+                        "''ticketPrice|u32:12|''lottery_$$$$": "500",
+                        "''ticketsLeft|u32:12|''lottery_$$$$": "5",
+                        "''deadline|u32:12|''lottery_$$$$": "234,567",
+                        "''maxEntriesPerUser|u32:12|''lottery_$$$$": "0xffffffff",
+                        "''prizeDistribution|u32:12|''lottery_$$$$": "u8:100",
+                        "''whitelist|u32:12|''lottery_$$$$": ""
                     },
                     "code": "file:../output/lottery.wasm"
                 }

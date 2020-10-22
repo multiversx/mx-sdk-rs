@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "externalSteps",
-            "path": "start_second_lottery.scen.json"
+            "path": "start-second-lottery.scen.json"
         },
         {
             "step": "scCall",
@@ -50,12 +50,20 @@
                         "''ticketPrice|u32:12|''lottery_name": "100",
                         "''ticketsLeft|u32:12|''lottery_name": "2",
                         "''deadline|u32:12|''lottery_name": "123,456",
+                        "''maxEntriesPerUser|u32:12|''lottery_name": "0xffffffff",
+                        "''prizeDistribution|u32:12|''lottery_name": "u8:100",
+                        "''whitelist|u32:12|''lottery_name": "",
+                        
                         "''ticketPrice|u32:12|''lottery_$$$$": "500",
                         "''ticketsLeft|u32:12|''lottery_$$$$": "4",
                         "''deadline|u32:12|''lottery_$$$$": "234,567",
                         "''currentTicketNumber|u32:12|''lottery_$$$$": "1",
                         "''prizePool|u32:12|''lottery_$$$$": "500",
-                        "''ticketHolder|u32:12|''lottery_$$$$|0x00000000": "address:acc1"
+                        "''ticketHolder|u32:12|''lottery_$$$$|0x00000000": "address:acc1",
+                        "''numberOfEntriesForUser|u32:12|''lottery_$$$$|address:acc1": "1",
+                        "''maxEntriesPerUser|u32:12|''lottery_$$$$": "0xffffffff",
+                        "''prizeDistribution|u32:12|''lottery_$$$$": "u8:100",
+                        "''whitelist|u32:12|''lottery_$$$$": ""
                     },
                     "code": "file:../output/lottery.wasm"
                 }

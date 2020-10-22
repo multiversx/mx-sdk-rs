@@ -15,5 +15,5 @@ fn contract_map() -> ContractMap<TxContext> {
 
 #[test]
 fn test_mandos() {
-    parse_execute_mandos("mandos/start-limited-tickets-and-fixed-deadline.scen.json", &contract_map());
+    parse_execute_mandos("mandos/start-with-no-options.scen.json", &contract_map());
 }

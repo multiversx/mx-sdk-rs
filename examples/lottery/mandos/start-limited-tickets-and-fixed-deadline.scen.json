@@ -17,7 +17,10 @@
                     "str:lottery_name",
                     "100",
                     "0x01|u32:2",
-                    "0x01|u64:123,456"
+                    "0x01|u64:123,456",
+                    "0x",
+                    "0x",
+                    "0x"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -52,7 +55,10 @@
                     "storage": {
                         "''ticketPrice|u32:12|''lottery_name": "100",
                         "''ticketsLeft|u32:12|''lottery_name": "2",
-                        "''deadline|u32:12|''lottery_name": "123,456"
+                        "''deadline|u32:12|''lottery_name": "123,456",
+                        "''maxEntriesPerUser|u32:12|''lottery_name": "0xffffffff",
+                        "''prizeDistribution|u32:12|''lottery_name": "u8:100",
+                        "''whitelist|u32:12|''lottery_name": ""
                     },
                     "code": "file:../output/lottery.wasm"
                 }
