@@ -39,7 +39,6 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 
 pub fn top_encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, signed: bool) {
 	let bytes_be: [u8; 8] = x.to_be_bytes();
-	let mut offset = 0usize;
 	if x == 0 {
 		// 0 is a special case
 		return;
@@ -56,11 +55,15 @@ pub fn top_encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, sign
 		bytes_be[0] > 0x7fu8; // most significant bit is 1
 	
 	let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
+	
+	let mut offset = 0usize;
 	while bytes_be[offset] == irrelevant_byte {
+		debug_assert!(offset < 7);
 		offset += 1;
 	}
 
 	if signed && bytes_be[offset] >> 7 != negative as u8 {
+		debug_assert!(offset > 0);
 		offset -= 1;
 	}
 
