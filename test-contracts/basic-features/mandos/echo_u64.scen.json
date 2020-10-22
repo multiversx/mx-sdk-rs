@@ -130,7 +130,7 @@
             },
             "expect": {
                 "out": [],
-                "status": "10",
+                "status": "*",
                 "message": "str:argument out of range",
                 "logs": [],
                 "gas": "*",
