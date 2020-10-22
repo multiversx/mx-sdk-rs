@@ -123,7 +123,7 @@ impl Status {
 }
 
 impl TopEncode for Status {
-    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.to_u8().top_encode(output)
     }
 }

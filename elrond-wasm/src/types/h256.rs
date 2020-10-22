@@ -135,7 +135,7 @@ impl NestedEncode for H256 {
 }
 
 impl TopEncode for H256 {
-    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_slice_u8(&self.0[..]);
         Ok(())
     }

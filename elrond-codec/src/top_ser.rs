@@ -13,7 +13,7 @@ pub trait TopEncode: Sized {
 	#[doc(hidden)]
 	const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError>;
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError>;
 }
 
 pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
@@ -25,14 +25,14 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> 
 impl TopEncode for () {
 	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		output.set_slice_u8(&[]);
 		Ok(())
 	}
 }
 
 impl<T: NestedEncode> TopEncode for &[T] {
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
 				// transmute to &[u8]
@@ -43,9 +43,10 @@ impl<T: NestedEncode> TopEncode for &[T] {
 			_ => {
 				// only using `dep_encode_slice_contents` for non-u8,
 				// because it always appends to the buffer,
-				// which is not necessary here
-				dep_encode_slice_contents(self, output.buffer_ref())?;
-				output.flush_buffer();
+				// which is not necessary above
+				let mut buffer = Vec::<u8>::new();
+				dep_encode_slice_contents(self, &mut buffer)?;
+				output.set_slice_u8(&buffer[..]);
 			}
 		}
 		Ok(())
@@ -54,13 +55,13 @@ impl<T: NestedEncode> TopEncode for &[T] {
 
 impl<T: TopEncode> TopEncode for &T {
 	#[inline]
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		(*self).top_encode(output)
 	}
 }
 
 impl TopEncode for &str {
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		output.set_slice_u8(self.as_bytes());
 		Ok(())
 	}
@@ -68,7 +69,7 @@ impl TopEncode for &str {
 
 impl<T: NestedEncode> TopEncode for Vec<T> {
 	#[inline]
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.as_slice().top_encode(output)
 	}
 }
@@ -78,7 +79,7 @@ macro_rules! encode_num_unsigned {
 		impl TopEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
-            fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 				output.set_u64(*self as u64);
 				Ok(())
 			}
@@ -98,7 +99,7 @@ macro_rules! encode_num_signed {
 			const TYPE_INFO: TypeInfo = $type_info;
 
 			// #[inline(never)]
-            fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 				output.set_i64(*self as i64);
 				Ok(())
 			}
@@ -115,7 +116,7 @@ encode_num_signed!{i8, 8, TypeInfo::I8}
 impl TopEncode for bool {
 	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		// only using signed because this one is implemented in Arwen, unsigned is not
 		// TODO: change to set_u64
 		output.set_i64(if *self { 1i64 } else { 0i64 } );
@@ -126,13 +127,13 @@ impl TopEncode for bool {
 impl<T: NestedEncode> TopEncode for Option<T> {
 	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
 	/// to allow disambiguation between e.g. Some(0) and None.
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
-				let buffer = output.buffer_ref();
+				let mut buffer = Vec::<u8>::new();
 				buffer.push_byte(1u8);
-				v.dep_encode_to(buffer)?;
-				output.flush_buffer();
+				v.dep_encode_to(&mut buffer)?;
+				output.set_slice_u8(&buffer[..]);
 			},
 			None => {
 				output.set_slice_u8(&[]);
@@ -144,14 +145,14 @@ impl<T: NestedEncode> TopEncode for Option<T> {
 
 impl<T: TopEncode> TopEncode for Box<T> {
 	#[inline(never)]
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.as_ref().top_encode(output)
 	}
 }
 
 impl<T: NestedEncode> TopEncode for Box<[T]> {
 	#[inline(never)]
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.as_ref().top_encode(output)
 	}
 }
@@ -163,12 +164,12 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
-					let buffer = output.buffer_ref();
+				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+					let mut buffer = Vec::<u8>::new();
 					$(
-                        self.$n.dep_encode_to(buffer)?;
+                        self.$n.dep_encode_to(&mut buffer)?;
                     )+
-					output.flush_buffer();
+					output.set_slice_u8(&buffer[..]);
 					Ok(())
 				}
             }
@@ -200,7 +201,7 @@ macro_rules! array_impls {
         $(
             impl<T: NestedEncode> TopEncode for [T; $n] {
 				#[inline(never)]
-				fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 					// the top encoded slice does not serialize its length, so just like the array
 					(&self[..]).top_encode(output)
 				}
@@ -230,7 +231,7 @@ array_impls!(
 
 impl TopEncode for NonZeroUsize {
 	#[inline(never)]
-	fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.get().top_encode(output)
 	}
 }
