@@ -12,7 +12,6 @@ pub trait AsyncCallArg: Sized {
 
 struct AsyncCallArgOutput<'c> {
     call_data_ser_ref: &'c mut CallDataSerializer,
-    buffer: Vec<u8>,
 }
 
 impl<'c> AsyncCallArgOutput<'c> {
@@ -20,23 +19,13 @@ impl<'c> AsyncCallArgOutput<'c> {
     fn new(call_data_ser_ref: &'c mut CallDataSerializer) -> Self {
         AsyncCallArgOutput {
             call_data_ser_ref,
-            buffer: Vec::new(),
         }
     }
 }
 
-impl<'c> TopEncodeOutput<'c, Vec<u8>> for AsyncCallArgOutput<'c> {
+impl<'c> TopEncodeOutput for AsyncCallArgOutput<'c> {
     fn set_slice_u8(self, bytes: &[u8]) {
         self.call_data_ser_ref.push_argument_bytes(bytes);
-    }
-
-    fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
-    where 'c: 'r {
-        &mut self.buffer
-    }
-
-    fn flush_buffer(self) {
-        self.call_data_ser_ref.push_argument_bytes(self.buffer.as_slice());
     }
 }
 

@@ -74,9 +74,8 @@ pub mod test_struct {
     }
 
     impl TopEncode for Test {
-        fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
-            self.dep_encode_to(output.buffer_ref())?;
-            output.flush_buffer();
+        fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+            output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
             Ok(())
         }
     }
@@ -130,9 +129,8 @@ pub mod test_struct {
     }
 
     impl TopEncode for E {
-        fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
-            self.dep_encode_to(output.buffer_ref())?;
-            output.flush_buffer();
+        fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+            output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
             Ok(())
         }
     }
@@ -166,7 +164,7 @@ pub mod test_struct {
     }
 
     impl TopEncode for WrappedArray {
-        fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+        fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
             output.set_slice_u8(&self.0[..]);
             Ok(())
         }

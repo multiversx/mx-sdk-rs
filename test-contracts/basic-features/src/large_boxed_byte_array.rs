@@ -14,7 +14,7 @@ impl NestedEncode for LargeBoxedByteArray {
 
 impl TopEncode for LargeBoxedByteArray {
     #[inline]
-    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.0.top_encode(output)
     }
 }

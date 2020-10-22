@@ -22,6 +22,13 @@ pub trait NestedEncode: Sized {
 
 }
 
+/// Convenience function for getting an object nested-encoded to a Vec<u8> directly.
+pub fn dep_encode_to_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
+	let mut bytes = Vec::<u8>::new();
+	obj.dep_encode_to(&mut bytes)?;
+	Ok(bytes)
+}
+
 /// Adds the concantenated encoded contents of a slice to an output buffer,
 /// without serializing the slice length.
 /// Byte slice is treated separately, via direct transmute.
@@ -247,8 +254,7 @@ mod tests {
     where
         V: NestedEncode + PartialEq + Debug + 'static,
     {
-		let mut bytes = Vec::<u8>::new();
-		element.dep_encode_to(&mut bytes).unwrap();
+		let bytes = dep_encode_to_vec(&element).unwrap();
 		assert_eq!(bytes.as_slice(), expected_bytes);
         
     }

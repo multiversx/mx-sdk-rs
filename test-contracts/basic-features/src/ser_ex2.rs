@@ -33,9 +33,8 @@ impl NestedEncode for SerExample2 {
 }
 
 impl TopEncode for SerExample2 {
-    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, mut output: O) -> Result<(), EncodeError> {
-        self.dep_encode_to(output.buffer_ref())?;
-        output.flush_buffer();
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
         Ok(())
     }
 }

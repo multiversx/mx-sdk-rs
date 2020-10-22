@@ -1,50 +1,34 @@
 use alloc::vec::Vec;
-use crate::nested_ser_output::OutputBuffer;
 use crate::num_conv::top_encode_number_to_output;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
-/// 
-/// It also models a buffer, where results can be accumulated,
+
 /// in principle from NestedEncode performed on nested items.
 /// 
-/// All methods (other than buffer_ref, which is just a reference to the underlying buffer)
-/// consume the object, so they can only be called once.
+/// All methods consume the object, so they can only be called once.
 /// 
 /// The trait is used in 3 scenarios:
 /// - SC results
 /// - `#[storage_set(...)]`
 /// - Serialize async call.
-pub trait TopEncodeOutput<'o, B: OutputBuffer>: Sized {
+pub trait TopEncodeOutput: Sized {
     fn set_slice_u8(self, bytes: &[u8]);
 
-    fn buffer_ref<'r>(&'r mut self) -> &'r mut B
-    where 'o: 'r;
-
-    fn flush_buffer(self);
-
-    fn set_u64(mut self, value: u64) {
-        let buffer = self.buffer_ref();
-        top_encode_number_to_output(buffer, value, false);
-        self.flush_buffer();
+    fn set_u64(self, value: u64) {
+        let mut buffer = Vec::<u8>::with_capacity(8);
+        top_encode_number_to_output(&mut buffer, value, false);
+        self.set_slice_u8(&buffer[..]);
     }
 
-    fn set_i64(mut self, value: i64) {
-        let buffer = self.buffer_ref();
-        top_encode_number_to_output(buffer, value as u64, true);
-        self.flush_buffer();
+    fn set_i64(self, value: i64) {
+        let mut buffer = Vec::<u8>::with_capacity(8);
+        top_encode_number_to_output(&mut buffer, value as u64, true);
+        self.set_slice_u8(&buffer[..]);
     }
 }
 
-impl<'o> TopEncodeOutput<'o, Vec<u8>> for &'o mut Vec<u8> {
+impl TopEncodeOutput for &mut Vec<u8> {
 	fn set_slice_u8(self, bytes: &[u8]) {
         self.extend_from_slice(bytes);
     }
-
-    fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
-    where 'o: 'r
-    {
-        self
-    }
-
-    fn flush_buffer(self) {}
 }

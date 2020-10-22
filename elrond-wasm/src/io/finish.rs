@@ -10,7 +10,6 @@ where
     A: ContractIOApi<BigInt, BigUint> + 'a 
 {
     api: &'a A,
-    buffer: Vec<u8>,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
@@ -25,26 +24,13 @@ where
     fn new(api: &'a A) -> Self {
         ApiOutput {
             api,
-            buffer: Vec::new(),
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
     }
 }
 
-impl<'a, A, BigInt, BigUint> OutputBuffer for ApiOutput<'a, A, BigInt, BigUint>
-where
-    BigUint: BigUintApi + 'static,
-    BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
-{
-    #[inline]
-    fn write(&mut self, bytes: &[u8]) {
-        self.buffer.extend_from_slice(bytes);
-    }
-}
-
-impl<'a, A, BigInt, BigUint> TopEncodeOutput<'a, Vec<u8>> for ApiOutput<'a, A, BigInt, BigUint>
+impl<'a, A, BigInt, BigUint> TopEncodeOutput for ApiOutput<'a, A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
@@ -52,15 +38,6 @@ where
 {
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.finish_slice_u8(bytes);
-    }
-
-    fn buffer_ref<'r>(&'r mut self) -> &'r mut Vec<u8>
-    where 'a: 'r {
-        &mut self.buffer
-    }
-
-    fn flush_buffer(self) {
-        self.api.finish_slice_u8(self.buffer.as_slice());
     }
 
     fn set_u64(self, value: u64) {

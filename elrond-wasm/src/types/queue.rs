@@ -92,7 +92,7 @@ impl<T: NestedEncode> NestedEncode for Queue<T> {
 }
 
 impl<T: NestedEncode> TopEncode for Queue<T> {
-    fn top_encode<'o, B: OutputBuffer, O: TopEncodeOutput<'o, B>>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.as_slice().top_encode(output)
     }
 }
