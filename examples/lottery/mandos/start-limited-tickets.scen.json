@@ -12,11 +12,12 @@
                 "from": "address:my_address",
                 "to": "address:the_lottery_contract",
                 "value": "0",
-                "function": "start_limited_tickets",
+                "function": "start",
                 "arguments": [
                     "str:lottery_name",
                     "100",
-                    "2"
+                    "0x01|u32:2",
+                    "0x"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
