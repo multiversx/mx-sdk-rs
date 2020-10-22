@@ -287,7 +287,9 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
             tx_id, want_str, have_str);
     }
     
-    assert_eq!(tx_expect.status.value, tx_result.result_status);
+    assert!(tx_expect.status.check(tx_result.result_status),
+        "bad tx status. Tx id: {}. Want: \"{}\". Have: \"{}\"",
+        tx_id, tx_expect.status, tx_result.result_status);
 }
 
 
