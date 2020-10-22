@@ -8,7 +8,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,567"
+                "blockTimestamp": "123,567"
             }
         },
         {
@@ -23,7 +23,10 @@
                     "str:lottery_name",
                     "100",
                     "0x01|u32:2",
-                    "0x01|u64:123,456"
+                    "0x01|u64:123,456",
+                    "0x",
+                    "0x",
+                    "0x"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"

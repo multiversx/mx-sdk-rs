@@ -54,7 +54,12 @@
                         "''currentTicketNumber|u32:12|''lottery_name": "2",
                         "''prizePool|u32:12|''lottery_name": "200",
                         "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
-                        "''ticketHolder|u32:12|''lottery_name|0x00000001": "address:acc2"
+                        "''ticketHolder|u32:12|''lottery_name|0x00000001": "address:acc2",
+                        "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc1": "1",
+                        "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc2": "1",
+                        "''maxEntriesPerUser|u32:12|''lottery_name": "0xffffffff",
+                        "''prizeDistribution|u32:12|''lottery_name": "u8:100",
+                        "''whitelist|u32:12|''lottery_name": ""
                     },
                     "code": "file:../output/lottery.wasm"
                 }

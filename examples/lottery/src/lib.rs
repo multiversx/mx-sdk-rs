@@ -2,26 +2,32 @@
 
 imports!();
 
+const PERCENTAGE_TOTAL: u16 = 100;
+
 #[elrond_wasm_derive::contract(LotteryImpl)]
 pub trait Lottery {
     
     #[init]
     fn init(&self) {
         
-    }
-
-    // TODO: ticket limit/user, whitelist, prize distribution
+    } // ADD STUFF TO LOGIC
 
     #[endpoint]
     fn start(&self,
-        lottery_name: &Vec<u8>,
+        lottery_name: Vec<u8>,
         ticket_price: BigUint, 
         total_tickets: Option<u32>, 
-        deadline: Option<u64>) 
+        deadline: Option<u64>,
+        max_entries_per_user: Option<u32>,
+        prize_distribution: Option<Vec<u8>>,
+        whitelist: Option<Vec<Address>>) 
         -> SCResult<()> {
            
         let tt = total_tickets.unwrap_or(u32::MAX);
         let d = deadline.unwrap_or(i64::MAX as u64);
+        let max = max_entries_per_user.unwrap_or(u32::MAX);
+        let pd = prize_distribution.unwrap_or([PERCENTAGE_TOTAL as u8].to_vec());
+        let wl = whitelist.unwrap_or(Vec::new());
 
         if self.status(lottery_name.clone()) != Status::Inactive {
             return sc_error!("Lottery is already active!");
@@ -32,13 +38,36 @@ pub trait Lottery {
         if tt == 0 {
             return sc_error!("Must have more than 0 tickets available!");
         }
-        if d <= self.get_block_nonce() {
+        if d <= self.get_block_timestamp() {
             return sc_error!("Deadline can't be in the past!");
         }
+        if max == 0 {
+            return sc_error!("Must have more than 0 max entries per user!");
+        }
+        {
+            let mut sum = 0u16; // u16 to protect against overflow
+
+            for i in 0..pd.len() {
+                sum += pd[i] as u16;
+
+                if sum > PERCENTAGE_TOTAL {
+                    return sc_error!("Prize distribution must add up to exactly 100(%)!");
+                }
+            }
+            
+            if sum != PERCENTAGE_TOTAL {
+                return sc_error!("Prize distribution must add up to exactly 100(%)!");
+            }
+        }
+
+        // TODO: Check to see if lottery is possible to complete
     
-        self.set_ticket_price(lottery_name, ticket_price);
-        self.set_tickets_left(lottery_name, tt);
-        self.set_deadline(lottery_name, d);
+        self.set_ticket_price(&lottery_name, ticket_price);
+        self.set_tickets_left(&lottery_name, tt);
+        self.set_deadline(&lottery_name, d);
+        self.set_max_entries_per_user(&lottery_name, max);
+        self.set_prize_distribution(&lottery_name, &pd);
+        self.set_whitelist(&lottery_name, &wl);
     
         Ok(())
     }
@@ -51,17 +80,32 @@ pub trait Lottery {
                 sc_error!("Lottery is currently inactive.")
             },
             Status::Running => {
+                let whitelist = self.get_whitelist(&lottery_name);
+                let caller = self.get_caller();
+
+                if !whitelist.is_empty() && !whitelist.contains(&caller) {
+                    return sc_error!("You are not allowed to participate in this lottery!");
+                }
+
                 let ticket_price = self.get_ticket_price(&lottery_name);
 
                 if _payment != ticket_price {
                     return sc_error!("Wrong ticket fee!");
                 }
 
+                let mut entries = self.get_number_of_entries_for_user(&lottery_name, &caller);
+                let max_entries = self.get_max_entries_per_user(&lottery_name);
+
+                if *entries == max_entries {
+                    return sc_error!("Ticket limit exceeded for this lottery!");
+                }
+
                 let mut ticket_number = self.get_mut_current_ticket_number(&lottery_name);
                 let mut tickets_left = self.get_mut_tickets_left(&lottery_name);
                 let mut prize_pool = self.get_mut_prize_pool(&lottery_name);
 
-                self.set_ticket_holder(&lottery_name, *ticket_number, &self.get_caller());
+                self.set_ticket_holder(&lottery_name, *ticket_number, &caller);
+                *entries += 1;
                 *ticket_number += 1;
                 *tickets_left -= 1;
                 *prize_pool += ticket_price;
@@ -87,10 +131,43 @@ pub trait Lottery {
                 let total_tickets = self.get_mut_current_ticket_number(&lottery_name);
 
                 if *total_tickets > 0 {
-                    let winning_ticket_id = self.random() % *total_tickets;
-                    let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
+                    let mut seed = self.get_block_nonce() + self.get_block_timestamp();
+                    let mut prev_winning_tickets: Vec<u32> = Vec::new();
+                    let mut prize_pool = self.get_mut_prize_pool(&lottery_name);
+                    let dist = self.get_prize_distribution(&lottery_name);
+                    
+                    // distribute to the first place last. Laws of probability say that order doesn't matter.
+                    // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
+                    // 1st place will get the spare money instead.
+                    for i in (0..dist.len()).rev() {
+                        let mut winning_ticket_id: u32;
 
-                    self.send_tx(&winner_address, &self.get_sc_balance(), "You won the lottery! Congratulations!");
+                        loop {
+                            // smallest change in input results in entirely different hash, creating "randomness"
+                            // +1 just to protect against infinite loop for id = 0
+                            winning_ticket_id = self.random(seed) % *total_tickets;
+                            seed += (winning_ticket_id as u64) + 1;
+
+                            if !prev_winning_tickets.contains(&winning_ticket_id) {
+                                let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
+                                let prize: BigUint;
+
+                                if i != 0 {
+                                    prize = BigUint::from(dist[i] as u32) * prize_pool.clone() / BigUint::from(100u32);
+                                }
+                                else {
+                                    prize = prize_pool.clone();
+                                }
+
+                                self.send_tx(&winner_address, &prize, "You won the lottery! Congratulations!");
+                                *prize_pool -= prize;
+                                
+                                prev_winning_tickets.push(winning_ticket_id);
+
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 self.clear_storage(&lottery_name);
@@ -106,7 +183,7 @@ pub trait Lottery {
         if self.get_ticket_price(&lottery_name) == 0 {
             return Status::Inactive;
         }
-        if self.get_block_nonce() > self.get_deadline(&lottery_name) || 
+        if self.get_block_timestamp() > self.get_deadline(&lottery_name) || 
             *self.get_mut_tickets_left(&lottery_name) == 0 {
             return Status::Ended;
         }
@@ -114,9 +191,8 @@ pub trait Lottery {
         return Status::Running;
     }
 
-    fn random(&self) -> u32 {
-        let current_timestamp = self.get_block_timestamp();
-        let hash_array = self.sha256(&current_timestamp.to_be_bytes());
+    fn random(&self, seed: u64) -> u32 {
+        let hash_array = self.sha256(&seed.to_be_bytes());
         let first_byte = (hash_array[28] as u32) << 24;
         let second_byte = (hash_array[29] as u32) << 16;
         let third_byte = (hash_array[30] as u32) << 8;
@@ -134,14 +210,21 @@ pub trait Lottery {
         self.storage_store(&["ticketPrice".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
         self.storage_store(&["ticketsLeft".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
         self.storage_store(&["prizePool".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["maxEntriesPerUser".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["prizeDistribution".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["whitelist".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
 
         let last_ticket = self.get_mut_current_ticket_number(lottery_name);
 
         for i in 0..*last_ticket {
-            let key = ["ticketHolder".as_bytes(),
+            let addr = self.get_ticket_holder(lottery_name, i);
+            let key_ticket_holder = ["ticketHolder".as_bytes(),
                 appended_name_in_key, &i.to_be_bytes()].concat();
+            let key_number_of_entries = ["numberOfEntriesForUser".as_bytes(),
+                appended_name_in_key, addr.as_bytes()].concat();
 
-            self.storage_store(&key, &[0u8; 0]);
+            self.storage_store(&key_ticket_holder, &[0u8; 0]);
+            self.storage_store(&key_number_of_entries, &[0u8; 0]);
         }
 
         self.storage_store(&["currentTicketNumber".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
@@ -181,6 +264,31 @@ pub trait Lottery {
     #[view]
     #[storage_get_mut("prizePool")]
     fn get_mut_prize_pool(&self, lottery_name: &Vec<u8>) -> mut_storage!(BigUint);
+
+    #[storage_set("maxEntriesPerUser")]
+    fn set_max_entries_per_user(&self, lottery_name: &[u8], max_entries: u32);
+
+    #[view]
+    #[storage_get("maxEntriesPerUser")]
+    fn get_max_entries_per_user(&self, lottery_name: &Vec<u8>) -> u32;
+
+    #[view]
+    #[storage_get_mut("numberOfEntriesForUser")]
+    fn get_number_of_entries_for_user(&self, lottery_name: &Vec<u8>, user: &Address) -> mut_storage!(u32);
+
+    #[storage_set("prizeDistribution")]
+    fn set_prize_distribution(&self, lottery_name: &[u8], dist: &[u8]);
+
+    #[view]
+    #[storage_get("prizeDistribution")]
+    fn get_prize_distribution(&self, lottery_name: &Vec<u8>) -> Vec<u8>;
+
+    #[storage_set("whitelist")]
+    fn set_whitelist(&self, lottery_name: &[u8], list: &[Address]);
+
+    #[view]
+    #[storage_get("whitelist")]
+    fn get_whitelist(&self, lottery_name: &Vec<u8>) -> Vec<Address>;
 }
 
 use elrond_wasm::elrond_codec::*;
