@@ -5,7 +5,6 @@ use core::num::NonZeroUsize;
 use crate::codec_err::EncodeError;
 use crate::TypeInfo;
 use crate::nested_ser_output::OutputBuffer;
-use crate::num_conv::encode_number_to_output;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///
@@ -68,11 +67,7 @@ impl<T: NestedEncode> NestedEncode for &T {
 
 impl NestedEncode for &str {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		// push size
-		encode_number_to_output(dest, self.len() as u64, 32, false, false);
-		// actual data
-		dest.write(self.as_bytes());
-		Ok(())
+		self.as_bytes().dep_encode_to(dest)
 	}
 }
 
@@ -83,39 +78,15 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 	}
 }
 
-/// Unlike the other number types, u8 doesn't need to pass through `encode_number_to_output`,
-/// can be added directly to buffer.
-impl NestedEncode for u8 {
-	const TYPE_INFO: TypeInfo = TypeInfo::U8;
-
-	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		dest.write(&[*self as u8][..]);
-		Ok(())
-	}
-}
-
-macro_rules! encode_num_signed {
-    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
-		impl NestedEncode for $num_type {
-			const TYPE_INFO: TypeInfo = $type_info;
-
-			#[inline]
-            fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-				encode_number_to_output(dest, *self as u64, $size_in_bits, true, false);
-				Ok(())
-			}
-		}
-    }
-}
-
+// The main unsigned types need to be reversed before serializing.
 macro_rules! encode_num_unsigned {
     ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
 		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
-			#[inline]
+			#[inline(never)]
             fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-				encode_number_to_output(dest, *self as u64, $size_in_bits, false, false);
+				dest.write(&self.to_be_bytes()[..]);
 				Ok(())
 			}
 		}
@@ -124,23 +95,39 @@ macro_rules! encode_num_unsigned {
 
 encode_num_unsigned!{u64, 64, TypeInfo::U64}
 encode_num_unsigned!{u32, 32, TypeInfo::U32}
-encode_num_unsigned!{usize, 32, TypeInfo::USIZE}
 encode_num_unsigned!{u16, 16, TypeInfo::U16}
 
-encode_num_signed!{i64, 64, TypeInfo::I64}
-encode_num_signed!{i32, 32, TypeInfo::I32}
-encode_num_signed!{isize, 32, TypeInfo::ISIZE}
-encode_num_signed!{i16, 16, TypeInfo::I16}
-encode_num_signed!{i8, 8, TypeInfo::I8}
-
-impl NestedEncode for bool {
-	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
+// No reversing needed for u8, because it is a single byte.
+impl NestedEncode for u8 {
+	const TYPE_INFO: TypeInfo = TypeInfo::U8;
 
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		dest.write(&[*self as u8][..]);
+		dest.push_byte(*self as u8);
 		Ok(())
 	}
 }
+
+// Derive the implementation of the other types by casting.
+macro_rules! encode_num_mimic {
+    ($num_type:ident, $mimic_type:ident, $type_info:expr) => {
+		impl NestedEncode for $num_type {
+			const TYPE_INFO: TypeInfo = $type_info;
+
+			#[inline]
+            fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				(*self as $mimic_type).dep_encode_to(dest)
+			}
+		}
+    }
+}
+
+encode_num_mimic!{usize, u32, TypeInfo::USIZE}
+encode_num_mimic!{i64, u64, TypeInfo::I64}
+encode_num_mimic!{i32, u32, TypeInfo::I32}
+encode_num_mimic!{isize, u32, TypeInfo::ISIZE}
+encode_num_mimic!{i16, u16, TypeInfo::I16}
+encode_num_mimic!{i8, u8, TypeInfo::I8}
+encode_num_mimic!{bool, u8, TypeInfo::Bool}
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
 	fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {

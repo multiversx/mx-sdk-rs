@@ -37,46 +37,34 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 	f(&result[0..result_size])
 }
 
-pub fn encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, size_in_bits: usize, signed: bool, mut compact: bool) {
-	let negative = 
-		compact && // only relevant when compact flag
-		signed &&  // only possible when signed flag
-		x >> (size_in_bits - 1) & 1 == 1; // compute by checking first bit
+pub fn top_encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, signed: bool) {
+	let bytes_be: [u8; 8] = x.to_be_bytes();
+	let mut offset = 0usize;
+	if x == 0 {
+		// 0 is a special case
+		return;
+	}
 
-	if negative && x == u64::MAX {
+	if signed && x == u64::MAX {
 		// -1 is a special case
 		output.push_byte(0xffu8);
 		return;
 	}
+
+	let negative = 
+		signed &&  // only possible when signed flag
+		bytes_be[0] > 0x7fu8; // most significant bit is 1
 	
 	let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
-	let mut bit_offset = size_in_bits as isize;
-	let mut first_byte = true;
-	loop {
-		bit_offset -= 8;
-		if bit_offset < 0 {
-			return;
-		}
-
-		// going byte by byte from most to least significant
-		let byte = (x >> (bit_offset as usize) & 0xffu64) as u8;
-		
-		if compact {
-			// compact means ignoring irrelvant leading bytes
-			// that is 000... for positives and fff... for negatives
-			if byte != irrelevant_byte {
-				if first_byte && (byte >> 7 != negative as u8) {
-					// ensure leading byte (most significant bit actually) correctly indicates sign
-					output.push_byte(irrelevant_byte);
-					first_byte = false;
-				}
-				output.push_byte(byte);
-				compact = false;
-			}
-		} else {
-			output.push_byte(byte);
-		}
+	while bytes_be[offset] == irrelevant_byte {
+		offset += 1;
 	}
+
+	if signed && bytes_be[offset] >> 7 != negative as u8 {
+		offset -= 1;
+	}
+
+	output.write(&bytes_be[offset .. ]);
 }
 
 /// Handles both signed and unsigned of any length.
