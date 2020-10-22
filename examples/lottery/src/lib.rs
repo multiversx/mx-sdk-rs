@@ -10,12 +10,18 @@ pub trait Lottery {
         
     }
 
+    // TODO: ticket limit/user, whitelist, prize distribution
+
+    #[endpoint]
     fn start(&self,
         lottery_name: &Vec<u8>,
         ticket_price: BigUint, 
-        total_tickets: u32, 
-        deadline: u64) 
+        total_tickets: Option<u32>, 
+        deadline: Option<u64>) 
         -> SCResult<()> {
+           
+        let tt = total_tickets.unwrap_or(u32::MAX);
+        let d = deadline.unwrap_or(i64::MAX as u64);
 
         if self.status(lottery_name.clone()) != Status::Inactive {
             return sc_error!("Lottery is already active!");
@@ -23,58 +29,18 @@ pub trait Lottery {
         if ticket_price == 0 {
             return sc_error!("Ticket price must be higher than 0!");
         }
-
+        if tt == 0 {
+            return sc_error!("Must have more than 0 tickets available!");
+        }
+        if d <= self.get_block_nonce() {
+            return sc_error!("Deadline can't be in the past!");
+        }
+    
         self.set_ticket_price(lottery_name, ticket_price);
-        self.set_tickets_left(lottery_name, total_tickets);
-        self.set_deadline(lottery_name, deadline);
-
+        self.set_tickets_left(lottery_name, tt);
+        self.set_deadline(lottery_name, d);
+    
         Ok(())
-    }
-
-    #[endpoint]
-    fn start_limited_tickets_and_fixed_deadline(&self,
-        lottery_name: Vec<u8>,
-        ticket_price: BigUint, 
-        total_tickets: u32, 
-        deadline: u64) 
-        -> SCResult<()> {
-
-        if total_tickets == 0 {
-            return sc_error!("Must have more than 0 tickets available!");
-        }
-        if deadline <= self.get_block_nonce() {
-            return sc_error!("Deadline can't be in the past!");
-        }
-
-        self.start(&lottery_name, ticket_price, total_tickets, deadline)
-    }
-
-    #[endpoint]
-    fn start_limited_tickets(&self, 
-        lottery_name: Vec<u8>,
-        ticket_price: BigUint, 
-        total_tickets: u32) 
-        -> SCResult<()> {
-        
-        if total_tickets == 0 {
-            return sc_error!("Must have more than 0 tickets available!");
-        }
-
-        self.start(&lottery_name, ticket_price, total_tickets, i64::MAX as u64)
-    }
-
-    #[endpoint]
-    fn start_fixed_deadline(&self,
-        lottery_name: Vec<u8>,
-        ticket_price: BigUint, 
-        deadline: u64) 
-        -> SCResult<()> {
-
-        if deadline <= self.get_block_nonce() {
-            return sc_error!("Deadline can't be in the past!");
-        }
-
-        self.start(&lottery_name, ticket_price, u32::MAX, deadline)
     }
 
     #[endpoint]
@@ -175,7 +141,7 @@ pub trait Lottery {
             let key = ["ticketHolder".as_bytes(),
                 appended_name_in_key, &i.to_be_bytes()].concat();
 
-            self.storage_store(key.as_slice(), &[0u8; 0]);
+            self.storage_store(&key, &[0u8; 0]);
         }
 
         self.storage_store(&["currentTicketNumber".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
