@@ -3,6 +3,7 @@
 imports!();
 
 const PERCENTAGE_TOTAL: u16 = 100;
+const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
 pub trait Lottery {
@@ -10,7 +11,7 @@ pub trait Lottery {
     #[init]
     fn init(&self) {
         
-    } // ADD STUFF TO LOGIC
+    }
 
     #[endpoint]
     fn start(&self,
@@ -22,9 +23,11 @@ pub trait Lottery {
         prize_distribution: Option<Vec<u8>>,
         whitelist: Option<Vec<Address>>) 
         -> SCResult<()> {
-           
+        
+        let timestamp = self.get_block_timestamp();
+        
         let tt = total_tickets.unwrap_or(u32::MAX);
-        let d = deadline.unwrap_or(i64::MAX as u64);
+        let d = deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
         let max = max_entries_per_user.unwrap_or(u32::MAX);
         let pd = prize_distribution.unwrap_or([PERCENTAGE_TOTAL as u8].to_vec());
         let wl = whitelist.unwrap_or(Vec::new());
@@ -38,8 +41,11 @@ pub trait Lottery {
         if tt == 0 {
             return sc_error!("Must have more than 0 tickets available!");
         }
-        if d <= self.get_block_timestamp() {
+        if d <= timestamp {
             return sc_error!("Deadline can't be in the past!");
+        }
+        if d > timestamp + THIRTY_DAYS_IN_SECONDS {
+            return sc_error!("Deadline can't be later than 30 days from now!");
         }
         if max == 0 {
             return sc_error!("Must have more than 0 max entries per user!");
@@ -59,8 +65,6 @@ pub trait Lottery {
                 return sc_error!("Prize distribution must add up to exactly 100(%)!");
             }
         }
-
-        // TODO: Check to see if lottery is possible to complete
     
         self.set_ticket_price(&lottery_name, ticket_price);
         self.set_tickets_left(&lottery_name, tt);
@@ -135,11 +139,23 @@ pub trait Lottery {
                     let mut prev_winning_tickets: Vec<u32> = Vec::new();
                     let mut prize_pool = self.get_mut_prize_pool(&lottery_name);
                     let dist = self.get_prize_distribution(&lottery_name);
+
+                    // if there are less tickets that the distributed prize pool,
+                    // the 1st place gets the leftover, maybe could split between the remaining
+                    // but this is a rare case anyway and it's not worth the overhead
+                    let for_loop_end: usize;
+
+                    if *total_tickets < dist.len() as u32 {
+                        for_loop_end = *total_tickets as usize;
+                    }
+                    else {
+                        for_loop_end = dist.len();
+                    }
                     
                     // distribute to the first place last. Laws of probability say that order doesn't matter.
                     // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
                     // 1st place will get the spare money instead.
-                    for i in (0..dist.len()).rev() {
+                    for i in (0..for_loop_end).rev() {
                         let mut winning_ticket_id: u32;
 
                         loop {
@@ -153,7 +169,7 @@ pub trait Lottery {
                                 let prize: BigUint;
 
                                 if i != 0 {
-                                    prize = BigUint::from(dist[i] as u32) * prize_pool.clone() / BigUint::from(100u32);
+                                    prize = BigUint::from(dist[i] as u32) * prize_pool.clone() / BigUint::from(PERCENTAGE_TOTAL as u32);
                                 }
                                 else {
                                     prize = prize_pool.clone();

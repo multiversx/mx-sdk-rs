@@ -1,0 +1,80 @@
+{
+    "name": "buy ticket when not on whitelist",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "start-with-all-options.scen.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "500,000,000",
+                    "storage": {}
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "buy-ticket-not-on-whitelist",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:the_lottery_contract",
+                "value": "100",
+                "function": "buy_ticket",
+                "arguments": [
+                    "str:lottery_name"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:You are not allowed to participate in this lottery!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "1",
+                    "balance": "500,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''ticketPrice|u32:12|''lottery_name": "100",
+                        "''ticketsLeft|u32:12|''lottery_name": "5",
+                        "''deadline|u32:12|''lottery_name": "123,456",
+                        "''currentTicketNumber|u32:12|''lottery_name": "0",
+                        "''prizePool|u32:12|''lottery_name": "0",
+                        "''maxEntriesPerUser|u32:12|''lottery_name": "1",
+                        "''prizeDistribution|u32:12|''lottery_name": "u8:75|u8:25",
+                        "''whitelist|u32:12|''lottery_name": "address:my_address|address:acc1|address:acc2"
+                    },
+                    "code": "file:../output/lottery.wasm"
+                }
+            }
+        }
+    ]
+}
