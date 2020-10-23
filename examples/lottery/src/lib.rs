@@ -267,7 +267,6 @@ pub trait Lottery {
     #[storage_set("ticketsLeft")]
     fn set_tickets_left(&self, lottery_name: &[u8], tickets: u32);
 
-    #[view]
     #[storage_get_mut("currentTicketNumber")]
     fn get_mut_current_ticket_number(&self, lottery_name: &Vec<u8>) -> mut_storage!(u32);
 
@@ -288,7 +287,6 @@ pub trait Lottery {
     #[storage_get("maxEntriesPerUser")]
     fn get_max_entries_per_user(&self, lottery_name: &Vec<u8>) -> u32;
 
-    #[view]
     #[storage_get_mut("numberOfEntriesForUser")]
     fn get_number_of_entries_for_user(&self, lottery_name: &Vec<u8>, user: &Address) -> mut_storage!(u32);
 
