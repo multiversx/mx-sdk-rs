@@ -1,32 +1,33 @@
 {
-    "name": "start lottery for the second time",
+    "name": "determine winner with split prize pool acc3 1st, acc4 2nd",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "determine-winner-different-ticket-holders-winner-acc1.scen.json"
+            "path": "buy-all-tickets-different-accounts.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "123456789",
+                "blockNonce": "987654321"
+            }
         },
         {
             "step": "scCall",
-            "txId": "start limited tickets, fixed deadline. Again.",
+            "txId": "determine-winner-with-split-prize-pool",
             "tx": {
-                "from": "address:my_address",
+                "from": "address:acc4",
                 "to": "address:the_lottery_contract",
                 "value": "0",
-                "function": "start",
+                "function": "determine_winner",
                 "arguments": [
-                    "str:lottery_name",
-                    "1000",
-                    "0x01|u32:200",
-                    "0x01|u64:12345678905",
-                    "0x",
-                    "0x",
-                    "0x"
+                    "str:lottery_name"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "",
+                "status": "0",
                 "gas": "*",
                 "refund": "*"
             }
@@ -35,13 +36,13 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "4",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc1": {
                     "nonce": "1",
-                    "balance": "1,000,100",
+                    "balance": "999,900",
                     "storage": {}
                 },
                 "address:acc2": {
@@ -49,16 +50,25 @@
                     "balance": "999,900",
                     "storage": {}
                 },
+                "address:acc3": {
+                    "nonce": "1",
+                    "balance": "1,000,275",
+                    "storage": {}
+                },
+                "address:acc4": {
+                    "nonce": "2",
+                    "balance": "1,000,025",
+                    "storage": {}
+                },
+                "address:acc5": {
+                    "nonce": "1",
+                    "balance": "999,900",
+                    "storage": {}
+                },
                 "address:the_lottery_contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "''ticketPrice|u32:12|''lottery_name": "1000",
-                        "''ticketsLeft|u32:12|''lottery_name": "200",
-                        "''deadline|u32:12|''lottery_name": "12345678905",
-                        "''maxEntriesPerUser|u32:12|''lottery_name": "0xffffffff",
-                        "''prizeDistribution|u32:12|''lottery_name": "u8:100"
-                    },
+                    "storage": {},
                     "code": "file:../output/lottery.wasm"
                 }
             }
