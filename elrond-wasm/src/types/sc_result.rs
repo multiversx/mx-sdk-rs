@@ -1,6 +1,6 @@
 use crate::*;
 use super::sc_error::SCError;
-use super::finish::EndpointResult;
+use crate::io::finish::EndpointResult;
 
 /// Default way to optionally return an error from a smart contract endpoint.
 #[must_use]
@@ -71,6 +71,4 @@ impl<T> SCResult<T> {
             SCResult::Err(_) => panic!("called `SCResult::unwrap()`"),
         }
     }
-
-
 }

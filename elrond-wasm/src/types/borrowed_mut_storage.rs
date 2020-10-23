@@ -112,3 +112,15 @@ where
         &mut self.value
     }
 }
+
+impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+where
+    BigInt: BigIntApi<BigUint> + 'static,
+    BigUint: BigUintApi + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
+    T: TopEncode + TopDecode + EndpointResult<'a, A, BigInt, BigUint>,
+{
+    fn finish(&self, api: &'a A) {
+        core::ops::Deref::deref(self).finish(api);
+    }
+}
