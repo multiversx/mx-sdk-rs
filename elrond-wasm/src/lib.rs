@@ -8,7 +8,7 @@ pub use alloc::string::String;
 
 pub use elrond_codec;
 
-mod types;
+pub mod types;
 pub mod io;
 mod proxy;
 pub mod storage;
@@ -18,8 +18,7 @@ pub mod non_zero_util;
 
 pub use types::*;
 pub use io::*;
-pub use storage::{storage_get, storage_set, BorrowedMutStorage};
-pub use io::SCResult;
+pub use storage::{storage_get, storage_set};
 pub use call_data::*;
 pub use proxy::OtherContractHandle;
 
@@ -312,6 +311,7 @@ macro_rules! contract_proxy {
 macro_rules! imports {
     () => {
         use elrond_wasm::{Box, Vec, String, Queue, VarArgs, BorrowedMutStorage};
+        use elrond_wasm::types::*;
         use elrond_wasm::{SCError, SCResult, SCResult::Ok, SCResult::Err};
         use elrond_wasm::{H256, Address};
         use elrond_wasm::{ContractHookApi, ContractIOApi, BigIntApi, BigUintApi, OtherContractHandle, AsyncCallResult, AsyncCallError};

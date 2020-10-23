@@ -3,6 +3,9 @@ use alloc::vec::Vec;
 use alloc::boxed::Box;
 use elrond_codec::EncodeError;
 
+/// Contains a smart contract execution error message.
+/// 
+/// Implemented as a simple boxed slice, for performance reasons.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SCError(Box<[u8]>);
 

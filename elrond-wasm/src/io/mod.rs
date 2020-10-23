@@ -5,8 +5,6 @@ pub mod arg_loader_cd;
 pub mod arg_loader_err;
 pub mod arg_serialize;
 pub mod finish;
-pub mod sc_error;
-pub mod sc_result;
 
 pub use arg_types::*;
 pub use arg_types_multi::*;
@@ -15,8 +13,6 @@ pub use arg_loader_cd::*;
 pub use arg_loader_err::*;
 pub use arg_serialize::*;
 pub use finish::*;
-pub use sc_error::*;
-pub use sc_result::*;
 
 #[cfg(test)]
 pub mod test_arg_load {
