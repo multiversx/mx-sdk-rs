@@ -25,8 +25,9 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> 
 impl TopEncode for () {
 	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
+	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		output.set_slice_u8(&[]);
+		output.set_unit();
 		Ok(())
 	}
 }

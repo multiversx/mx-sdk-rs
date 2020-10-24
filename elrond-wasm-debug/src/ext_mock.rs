@@ -505,6 +505,14 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
     fn finish_big_uint(&self, bu: &RustBigUint) {
         self.finish_slice_u8(bu.to_bytes_be().as_slice());
     }
+
+    fn finish_big_int_raw(&self, _handle: i32) {
+        panic!("cannot call finish_big_int_raw in debug mode");
+    }
+
+    fn finish_big_uint_raw(&self, _handle: i32) {
+        panic!("cannot call finish_big_uint_raw in debug mode");
+    }
     
     fn finish_i64(&self, value: i64) {
         self.finish_big_int(&value.into());

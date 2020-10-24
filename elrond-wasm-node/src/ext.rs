@@ -532,6 +532,20 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
             bigIntFinishUnsigned(b.handle);
         }
     }
+
+    #[inline]
+    fn finish_big_int_raw(&self, handle: i32) {
+        unsafe {
+            bigIntFinishSigned(handle);
+        }
+    }
+
+    #[inline]
+    fn finish_big_uint_raw(&self, handle: i32) {
+        unsafe {
+            bigIntFinishUnsigned(handle);
+        }
+    }
     
     #[cfg(feature = "small-int-ei")]
     #[inline]
