@@ -46,6 +46,21 @@ where
     fn set_i64(self, value: i64) {
         self.api.finish_i64(value);
     }
+
+    #[inline]
+    fn set_unit(self) {
+        // nothing: no result produced
+    }
+
+    #[inline]
+    fn set_big_int_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
+        self.api.finish_big_int_raw(handle);
+    }
+
+    #[inline]
+    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
+        self.api.finish_big_uint_raw(handle);
+    }
     
 }
 
@@ -67,23 +82,9 @@ where
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
 {
     fn finish(&self, api: &'a A) {
-        // the compiler is smart enough to evaluate this match at compile time
-        match T::TYPE_INFO {
-            TypeInfo::Unit => {},
-            TypeInfo::BigInt => {
-                let cast_big_int: &BigInt = unsafe { &*(self as *const T as *const BigInt) };
-                api.finish_big_int(cast_big_int);
-            },
-            TypeInfo::BigUint => {
-                let cast_big_uint: &BigUint = unsafe { &*(self as *const T as *const BigUint) };
-                api.finish_big_uint(cast_big_uint);
-            },
-			_ => {
-                let res = self.top_encode(ApiOutput::new(api));
-                if let Err(encode_err_message) = res {
-                    api.signal_error(encode_err_message.message_bytes());
-                }
-			}
-		}
+        let res = self.top_encode(ApiOutput::new(api));
+        if let Err(encode_err_message) = res {
+            api.signal_error(encode_err_message.message_bytes());
+        }
     }
 }

@@ -214,8 +214,10 @@ impl NestedEncode for ArwenBigInt {
 impl TopEncode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
     
+	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.to_signed_bytes_be().top_encode(output)
+        output.set_big_int_handle_or_bytes(self.handle, || self.to_signed_bytes_be());
+        Ok(())
 	}
 }
 
