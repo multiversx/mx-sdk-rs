@@ -21,14 +21,14 @@ default = [
 
 [dependencies]
 # modules
-elrond-wasm-module-features-wasm = { package = "elrond-wasm-module-features", version = "0.7.1", path = "../../modules/elrond-wasm-module-features", features = ["wasm-output-mode"], optional = true }
-elrond-wasm-module-features-default = { package = "elrond-wasm-module-features", version = "0.7.1", path = "../../modules/elrond-wasm-module-features", optional = true }
-elrond-wasm-module-pause-wasm = { package = "elrond-wasm-module-pause", version = "0.7.1", path = "../../modules/elrond-wasm-module-pause", features = ["wasm-output-mode"], optional = true }
-elrond-wasm-module-pause-default = { package = "elrond-wasm-module-pause", version = "0.7.1", path = "../../modules/elrond-wasm-module-pause", optional = true }
+elrond-wasm-module-features-wasm = { package = "elrond-wasm-module-features", version = "0.7.2", path = "../../modules/elrond-wasm-module-features", features = ["wasm-output-mode"], optional = true }
+elrond-wasm-module-features-default = { package = "elrond-wasm-module-features", version = "0.7.2", path = "../../modules/elrond-wasm-module-features", optional = true }
+elrond-wasm-module-pause-wasm = { package = "elrond-wasm-module-pause", version = "0.7.2", path = "../../modules/elrond-wasm-module-pause", features = ["wasm-output-mode"], optional = true }
+elrond-wasm-module-pause-default = { package = "elrond-wasm-module-pause", version = "0.7.2", path = "../../modules/elrond-wasm-module-pause", optional = true }
 
-elrond-wasm = { version = "0.7.1", path = "../../elrond-wasm" }
-elrond-wasm-derive = { version = "0.7.1", path = "../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.7.1", path = "../../elrond-wasm-node", optional = true }
+elrond-wasm = { version = "0.7.2", path = "../../elrond-wasm" }
+elrond-wasm-derive = { version = "0.7.2", path = "../../elrond-wasm-derive" }
+elrond-wasm-node = { version = "0.7.2", path = "../../elrond-wasm-node", optional = true }
 
 [dev-dependencies]
-elrond-wasm-debug = { version = "0.7.1", path = "../../elrond-wasm-debug" }
+elrond-wasm-debug = { version = "0.7.2", path = "../../elrond-wasm-debug" }
