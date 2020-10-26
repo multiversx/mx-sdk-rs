@@ -289,6 +289,7 @@ pub trait Lottery {
     #[storage_set("lotteryInfo")]
     fn set_lottery_info(&self, lottery_name: &[u8], lottery_info: &LotteryInfo<BigUint>);
 
+    #[view]
     #[storage_get_mut("lotteryInfo")]
     fn get_mut_lottery_info(&self, lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigUint>);
 
