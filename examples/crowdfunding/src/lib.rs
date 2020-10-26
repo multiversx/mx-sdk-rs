@@ -75,6 +75,11 @@ pub trait Crowdfunding {
         }
     }
 
+    #[view(currentFunds)]
+    fn current_funds(&self) -> SCResult<BigUint> {
+        Ok(self.get_sc_balance())
+    }
+
     #[endpoint]
     fn claim(&self) -> SCResult<()> {
         match self.status() {
