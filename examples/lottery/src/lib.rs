@@ -282,14 +282,14 @@ pub trait Lottery {
     #[storage_set("lotteryExists")]
     fn set_lottery_exists(&self, lottery_name: &[u8], exists: bool);
 
-    #[view]
+    #[view(lotteryExists)]
     #[storage_get("lotteryExists")]
     fn get_lottery_exists(&self, lottery_name: &Vec<u8>) -> bool;
 
     #[storage_set("lotteryInfo")]
     fn set_lottery_info(&self, lottery_name: &[u8], lottery_info: &LotteryInfo<BigUint>);
 
-    #[view]
+    #[view(lotteryInfo)]
     #[storage_get_mut("lotteryInfo")]
     fn get_mut_lottery_info(&self, lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigUint>);
 
