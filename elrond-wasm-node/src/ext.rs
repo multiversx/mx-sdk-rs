@@ -1,6 +1,6 @@
 
 
-use elrond_wasm::{H256, Address};
+use elrond_wasm::{H256, Address, Box};
 
 use crate::big_int::*;
 use crate::big_uint::*;
@@ -291,6 +291,15 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 
     #[inline]
+    fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+        unsafe {
+            let mut res = [0u8; 48];
+            getBlockRandomSeed(res.as_mut_ptr());
+            Box::new(res) 
+        }
+    }
+
+    #[inline]
     fn get_prev_block_timestamp(&self) -> u64 {
         unsafe{ getPrevBlockTimestamp() as u64 }
     }
@@ -308,6 +317,15 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_prev_block_epoch(&self) -> u64 {
         unsafe{ getPrevBlockEpoch() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+        unsafe {
+            let mut res = [0u8; 48];
+            getPrevBlockRandomSeed(res.as_mut_ptr());
+            Box::new(res) 
+        }
     }
 
     fn sha256(&self, data: &[u8]) -> [u8; 32] {

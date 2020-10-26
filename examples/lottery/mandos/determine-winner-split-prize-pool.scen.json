@@ -1,5 +1,5 @@
 {
-    "name": "determine winner with split prize pool acc3 1st, acc4 2nd",
+    "name": "determine winner with split prize pool acc5 1st, acc1 2nd",
     "steps": [
         {
             "step": "externalSteps",
@@ -42,7 +42,7 @@
                 },
                 "address:acc1": {
                     "nonce": "1",
-                    "balance": "999,900",
+                    "balance": "1,000,025",
                     "storage": {}
                 },
                 "address:acc2": {
@@ -52,17 +52,17 @@
                 },
                 "address:acc3": {
                     "nonce": "1",
-                    "balance": "1,000,275",
+                    "balance": "999,900",
                     "storage": {}
                 },
                 "address:acc4": {
                     "nonce": "2",
-                    "balance": "1,000,025",
+                    "balance": "999,900",
                     "storage": {}
                 },
                 "address:acc5": {
                     "nonce": "1",
-                    "balance": "999,900",
+                    "balance": "1,000,275",
                     "storage": {}
                 },
                 "address:the_lottery_contract": {

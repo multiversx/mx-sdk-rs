@@ -101,6 +101,8 @@ where
     
     fn get_block_epoch(&self) -> u64;
 
+    fn get_block_random_seed(&self) -> Box<[u8; 48]>;
+
     fn get_prev_block_timestamp(&self) -> u64;
 
     fn get_prev_block_nonce(&self) -> u64;
@@ -108,6 +110,8 @@ where
     fn get_prev_block_round(&self) -> u64;
 
     fn get_prev_block_epoch(&self) -> u64;
+
+    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
 
     fn sha256(&self, data: &[u8]) -> [u8; 32];
 

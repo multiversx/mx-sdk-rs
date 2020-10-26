@@ -53,18 +53,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ticketPrice|u32:12|''lottery_name": "100",
-                        "''ticketsLeft|u32:12|''lottery_name": "2",
-                        "''deadline|u32:12|''lottery_name": "123,456",
-                        "''maxEntriesPerUser|u32:12|''lottery_name": "0xffffffff",
-                        "''prizeDistribution|u32:12|''lottery_name": "u8:100",
-
-                        "''ticketPrice|u32:12|''lottery_$$$$": "500",
-                        "''ticketsLeft|u32:12|''lottery_$$$$": "5",
-                        "''deadline|u32:12|''lottery_$$$$": "234,567",
-                        "''maxEntriesPerUser|u32:12|''lottery_$$$$": "0xffffffff",
-                        "''prizeDistribution|u32:12|''lottery_$$$$": "u8:100",
-                        "''whitelist|u32:12|''lottery_$$$$": ""
+                        "''lotteryExists|u32:12|''lottery_name": "u8:1",
+                        "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:2|u64:123,456|0xffffffff|u32:1|u8:100|u32:0|u32:0|u32:0",
+                        "''lotteryExists|u32:12|''lottery_$$$$": "u8:1",
+                        "''lotteryInfo|u32:12|''lottery_$$$$": "u32:2|u16:500|u32:5|u64:234,567|0xffffffff|u32:1|u8:100|u32:0|u32:0|u32:0"
                     },
                     "code": "file:../output/lottery.wasm"
                 }
