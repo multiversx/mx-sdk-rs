@@ -83,6 +83,7 @@ impl Callable {
             let msig = m.generate_sig();
 
             let mut payment_count = 0;
+            let mut amount_snippet = quote! { BigUint::zero() };
             let arg_push_snippets: Vec<proc_macro2::TokenStream> = 
                 m.method_args
                     .iter()
@@ -101,7 +102,9 @@ impl Callable {
                                 // #[payment]
                                 payment_count += 1;
                                 let pat = &arg.pat;
-                                quote! { let amount = #pat; }
+                                amount_snippet = quote! { #pat };
+
+                                quote! {}
                             },
                             ArgMetadata::Multi(multi_attr) => {
                                 // #[multi(...)]
@@ -112,11 +115,9 @@ impl Callable {
                     })
                     .collect();
 
-            let amount_snippet = match payment_count {
-                0 => quote! { let amount = BigUint::zero(); },
-                1 => quote! {},
-                _ => panic!("Only one payment argument allowed in call proxy")
-            };
+            if payment_count > 1 {
+                panic!("Only one payment argument allowed in call proxy");
+            }
 
             let (callback_init, callback_store) = if let Some(callback_ident) = &m.callback {
                 let cb_name_str = &callback_ident.arg.to_string();
@@ -135,12 +136,11 @@ impl Callable {
             let m_name_literal = array_literal(m.name.to_string().as_bytes());
             let sig = quote! {
                 #msig {
-                    #amount_snippet
                     let mut call_data_ser = elrond_wasm::call_data::CallDataSerializer::new( & #m_name_literal );
                     #callback_init
                     #(#arg_push_snippets)*
                     #callback_store
-                    self.api.async_call(&self.address, &amount, call_data_ser.as_slice());
+                    self.api.async_call(&self.address, &#amount_snippet, call_data_ser.as_slice());
                 }
             };
             sig
