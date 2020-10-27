@@ -183,6 +183,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
+        fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+          self.api.get_block_random_seed()
+        }
+
+        #[inline]
         fn get_prev_block_timestamp(&self) -> u64 {
           self.api.get_prev_block_timestamp()
         }
@@ -200,6 +205,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         #[inline]
         fn get_prev_block_epoch(&self) -> u64 {
           self.api.get_prev_block_epoch()
+        }
+
+        #[inline]
+        fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+          self.api.get_prev_block_random_seed()
         }
 
         #[inline]

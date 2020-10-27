@@ -1,0 +1,26 @@
+[package]
+name = "lottery-wasm"
+version = "0.0.1"
+authors = [ "you",]
+edition = "2018"
+
+[lib]
+crate-type = [ "cdylib",]
+
+[workspace]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies.lottery]
+features = [ "wasm-output-mode",]
+default-features = false
+path = ".."
+
+[dependencies.elrond-wasm-output]
+version = "0.7.1"
+features = [ "wasm-output-mode",]
