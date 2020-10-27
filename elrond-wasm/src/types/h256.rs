@@ -150,11 +150,11 @@ impl NestedDecode for H256 {
 }
 
 impl TopDecode for H256 {
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        match Box::<[u8; 32]>::top_decode(input) {
-            Ok(array_box) => Ok(H256(array_box)),
-            Err(_) => Err(DecodeError::from(&b"bad H256 length"[..])),
-        }
+	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        Box::<[u8; 32]>::top_decode(input, |res| match res {
+            Ok(array_box) => f(Ok(H256(array_box))),
+            Err(_) => f(Err(DecodeError::from(&b"bad H256 length"[..]))),
+        })
     }
 }
 

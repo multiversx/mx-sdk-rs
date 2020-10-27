@@ -129,7 +129,10 @@ impl TopEncode for Status {
 }
 
 impl TopDecode for Status {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Status::from_u8(u8::top_decode(input)?)
+    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        u8::top_decode(input, |res| match res {
+            core::result::Result::Ok(num) => f(Status::from_u8(num)),
+            core::result::Result::Err(e) => f(core::result::Result::Err(e)),
+        })
     }
 }

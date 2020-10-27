@@ -85,10 +85,10 @@ where
             cast_big_uint
         },
         _ => {
-            match T::top_decode(ArgInput::new(api, index)) {
+            T::top_decode(ArgInput::new(api, index), |res| match res {
                 Ok(v) => v,
                 Err(de_err) => load_arg_error(api, arg_id, de_err),
-            }
+            })
         }
     }
 }
