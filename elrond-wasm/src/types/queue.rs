@@ -110,10 +110,13 @@ impl<T: NestedDecode> NestedDecode for Queue<T> {
 
 /// Deserializes like a Vec.
 impl<T: NestedDecode> TopDecode for Queue<T> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(Queue {
-            vec: Vec::<T>::top_decode(input)?,
-            start: 0,
+    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        Vec::<T>::top_decode(input, |res| match res {
+            Ok(vec) => f(Ok(Queue {
+                vec,
+                start: 0,
+            })),
+            Err(e) => f(Err(e)),
         })
     }
 }
