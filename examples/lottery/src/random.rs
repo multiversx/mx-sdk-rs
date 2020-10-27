@@ -28,10 +28,12 @@ impl Random {
         return first_byte | second_byte | third_byte | fourth_byte;
     }
 
-    // Fake shuffle. Just add numbers to one another, ignoring overflow.
+    // Fake shuffle. Just add numbers to one another, accounting for overflow overflow.
     fn shuffle(&mut self) {
         for i in 0..(self.data.len() - 1) {
-            self.data[i] += self.data[i + 1] + 1;
+            let res: u16 = (self.data[i] as u16) + (self.data[i+1] as u16) + 1;
+
+            self.data[i] = (res % (u8::MAX as u16 + 1)) as u8;
         }
     }
 }
