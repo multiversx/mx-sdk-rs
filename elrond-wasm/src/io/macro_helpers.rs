@@ -4,7 +4,7 @@ use elrond_codec::*;
 
 
 #[inline]
-pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
+pub fn load_single_arg<A, BigInt, BigUint, T>(api: A, index: i32, arg_id: ArgId) -> T 
 where
     T: TopDecode,
     BigUint: BigUintApi + 'static,
@@ -26,7 +26,7 @@ where
             cast_big_uint
         },
         _ => {
-            T::top_decode(ArgDecodeInput::new(api, index), |res| match res {
+            T::top_decode(ArgDecodeInput::new(api.clone(), index), |res| match res {
                 Ok(v) => v,
                 Err(de_err) => ApiSignalError::new(api).signal_arg_de_error(arg_id, de_err),
             })

@@ -5,13 +5,13 @@ use super::util::*;
 fn storage_store_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
     let pat = &arg.pat;
     quote! {
-        elrond_wasm::storage_set(&self.api, &key[..], & #pat);
+        elrond_wasm::storage_set(self.api.clone(), &key[..], & #pat);
     }
 }
 
 fn storage_load_snippet(_ty: &syn::Type) -> proc_macro2::TokenStream {
     quote! {
-        elrond_wasm::storage_get(&self.api, &key[..])
+        elrond_wasm::storage_get(self.api.clone(), &key[..])
     }
 }
 
@@ -84,7 +84,7 @@ pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::Toke
         quote! {
             #msig {
                 #key_snippet
-                BorrowedMutStorage::with_const_key(&self.api, key)
+                BorrowedMutStorage::with_const_key(self.api.clone(), key)
             }
         }
     } else {
@@ -92,7 +92,7 @@ pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::Toke
         quote! {
             #msig {
                 #key_snippet
-                BorrowedMutStorage::with_generated_key(&self.api, key)
+                BorrowedMutStorage::with_generated_key(self.api.clone(), key)
             }
         }
     }

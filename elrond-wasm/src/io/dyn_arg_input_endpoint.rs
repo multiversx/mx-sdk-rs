@@ -2,37 +2,38 @@ use crate::*;
 use core::marker::PhantomData;
 
 
-pub struct EndpointDynArgLoader<'a, A, BigInt, BigUint>
+pub struct EndpointDynArgLoader<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint>
 {
-    api: &'a A,
+    api: A,
     current_index: i32,
     num_arguments: i32,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, A, BigInt, BigUint> EndpointDynArgLoader<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> EndpointDynArgLoader<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint>
 {
-    pub fn new(api: &'a A) -> Self {
+    pub fn new(api: A) -> Self {
+        let num_arguments = api.get_num_arguments(); 
         EndpointDynArgLoader {
             api,
-            current_index : 0,
-            num_arguments: api.get_num_arguments(),
+            current_index: 0,
+            num_arguments,
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
     }
 }
 
-impl<'a, A, BigInt, BigUint> SignalError for EndpointDynArgLoader<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> SignalError for EndpointDynArgLoader<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
@@ -45,7 +46,7 @@ where
 }
 
 
-impl<'a, A, BigInt, BigUint> DynArgInput<ArgDecodeInput<'a, A, BigInt, BigUint>> for EndpointDynArgLoader<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> DynArgInput<ArgDecodeInput<A, BigInt, BigUint>> for EndpointDynArgLoader<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
@@ -57,11 +58,11 @@ where
     }
 
     // #[inline(never)]
-    fn next_arg_input(&mut self) -> ArgDecodeInput<'a, A, BigInt, BigUint> {
+    fn next_arg_input(&mut self) -> ArgDecodeInput<A, BigInt, BigUint> {
         if self.current_index >= self.num_arguments {
             self.signal_arg_wrong_number()
         } else {
-            let arg_input = ArgDecodeInput::new(self.api, self.current_index);
+            let arg_input = ArgDecodeInput::new(self.api.clone(), self.current_index);
             self.current_index += 1;
             arg_input
         }

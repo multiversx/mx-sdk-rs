@@ -46,24 +46,24 @@ pub trait SignalError {
     }
 }
 
-pub struct ApiSignalError<'a, A, BigInt, BigUint>
+pub struct ApiSignalError<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static 
 {
-    api: &'a A,
+    api: A,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, A, BigInt, BigUint> ApiSignalError<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> ApiSignalError<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static 
 {
-    pub fn new(api: &'a A) -> Self {
+    pub fn new(api: A) -> Self {
         ApiSignalError {
             api,
             _phantom1: PhantomData,
@@ -72,7 +72,7 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint> SignalError for ApiSignalError<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> SignalError for ApiSignalError<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,

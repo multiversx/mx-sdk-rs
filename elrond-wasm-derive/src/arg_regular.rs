@@ -13,12 +13,12 @@ pub fn generate_load_single_arg(arg: &MethodArg, arg_index_expr: &proc_macro2::T
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                & elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(&self.api, #arg_index_expr, #arg_name_expr)
+                & elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(self.api.clone(), #arg_index_expr, #arg_name_expr)
             }
         },
         _ => {
             quote! {
-                elrond_wasm::load_single_arg::<T, BigInt, BigUint, #arg_ty>(&self.api, #arg_index_expr, #arg_name_expr)
+                elrond_wasm::load_single_arg::<T, BigInt, BigUint, #arg_ty>(self.api.clone(), #arg_index_expr, #arg_name_expr)
             }
         },
     }

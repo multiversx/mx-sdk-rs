@@ -31,17 +31,17 @@ impl<T> FromIterator<T> for MultiResultVec<T> {
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for MultiResultVec<T>
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for MultiResultVec<T>
 where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
+    T: EndpointResult<A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     #[inline]
-    fn finish(&self, api: &'a A) {
+    fn finish(&self, api: A) {
         for elem in self.0.iter() {
-            elem.finish(api);
+            elem.finish(api.clone());
         }
     }
 }

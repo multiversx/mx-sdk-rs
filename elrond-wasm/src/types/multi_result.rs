@@ -5,17 +5,17 @@ macro_rules! multi_result_impls {
         $(
             pub struct $mr<$($name,)+>(pub ($($name,)+));
 
-            impl<'a, A, BigInt, BigUint, $($name),+> EndpointResult<'a, A, BigInt, BigUint> for $mr<$($name,)+>
+            impl<A, BigInt, BigUint, $($name),+> EndpointResult<A, BigInt, BigUint> for $mr<$($name,)+>
             where
-                $($name: EndpointResult<'a, A, BigInt, BigUint>,)+
+                $($name: EndpointResult<A, BigInt, BigUint>,)+
                 BigInt: BigIntApi<BigUint> + 'static,
                 BigUint: BigUintApi + 'static,
-                A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+                A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
             {
                 #[inline]
-				fn finish(&self, api: &'a A) {
+				fn finish(&self, api: A) {
                     $(
-                        (self.0).$n.finish(api);
+                        (self.0).$n.finish(api.clone());
                     )+
                 }
             }
