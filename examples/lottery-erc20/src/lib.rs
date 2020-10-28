@@ -127,7 +127,6 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    #[payable]
     fn buy_ticket(&self, lottery_name: Vec<u8>, token_amount: BigUint) -> SCResult<()> {
         match self.status(lottery_name.clone()) {
             Status::Inactive => {
@@ -184,7 +183,7 @@ pub trait Lottery {
     }
 
     fn update_after_buy_ticket(&self, lottery_name: &Vec<u8>, token_amount: BigUint) -> SCResult<()> {
-        let mut info = self.get_mut_lottery_info(&lottery_name);
+        let info = self.get_mut_lottery_info(&lottery_name);
         let caller = self.get_caller();
 
         if !info.whitelist.is_empty() && !info.whitelist.contains(&caller) {
@@ -201,8 +200,7 @@ pub trait Lottery {
         }
 
         // reserve the ticket, but don't update the other fields yet.
-        info.tickets_left -= 1;
-        info.queued_tickets += 1;
+        self.reserve_ticket(lottery_name);
 
         let erc20_address = self.get_erc20_contract_address();
         let lottery_contract_address = self.get_sc_address();
@@ -211,6 +209,13 @@ pub trait Lottery {
             token_amount, lottery_name.clone(), &caller);
 
         Ok(())
+    }
+
+    fn reserve_ticket(&self, lottery_name: &Vec<u8>) {
+        let mut info = self.get_mut_lottery_info(&lottery_name);
+
+        info.tickets_left -= 1;
+        info.queued_tickets += 1;
     }
 
     fn distribute_prizes(&self, lottery_name: &Vec<u8>) {
@@ -258,14 +263,14 @@ pub trait Lottery {
                             prize = info.prize_pool.clone();
                         }
 
+                        info.prize_pool -= prize.clone();
+
+                        prev_winning_tickets.push(winning_ticket_id);
+
                         let erc20_address = self.get_erc20_contract_address();
                         let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
         
-                        erc20_proxy.transfer( &winner_address, prize.clone());
-
-                        info.prize_pool -= prize;
-                        
-                        prev_winning_tickets.push(winning_ticket_id);
+                        erc20_proxy.transfer( &winner_address, prize);
 
                         break;
                     }
@@ -354,15 +359,15 @@ pub trait Lottery {
     fn set_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32, ticket_holder: &Address);
 
     #[storage_get("ticketHolder")]
-    fn get_ticket_holder(&self, lottery_name: &Vec<u8>, ticket_id: u32) -> Address;
+    fn get_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32) -> Address;
 
     #[storage_get_mut("numberOfEntriesForUser")]
-    fn get_mut_number_of_entries_for_user(&self, lottery_name: &Vec<u8>, user: &Address) -> mut_storage!(u32);
+    fn get_mut_number_of_entries_for_user(&self, lottery_name: &[u8], user: &Address) -> mut_storage!(u32);
 
     #[storage_set("erc20_contract_address")]
     fn set_erc20_contract_address(&self, address: &Address);
 
-    #[view]
+    #[view(erc20ContractAddress)]
     #[storage_get("erc20_contract_address")]
     fn get_erc20_contract_address(&self) -> Address;
 }

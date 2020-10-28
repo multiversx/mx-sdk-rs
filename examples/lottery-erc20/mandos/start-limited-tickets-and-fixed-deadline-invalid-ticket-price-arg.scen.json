@@ -53,8 +53,24 @@
                 "address:the_lottery_contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
-                    "code": "file:../output/lottery.wasm"
+                    "storage": {
+                        "''erc20_contract_address": "address:the_erc20_contract"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "address:the_erc20_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''balance|address:erc20_owner_address": "1,000,000,000",
+                        "''total_supply": "1,000,000,000"
+                    },
+                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                },
+                "address:erc20_owner_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
                 }
             }
         }
