@@ -1,5 +1,5 @@
 [package]
-name = "lottery-wasm"
+name = "lottery-erc20-wasm"
 version = "0.0.1"
 authors = [ "you",]
 edition = "2018"
@@ -16,7 +16,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.lottery]
+[dependencies.lottery-erc20]
 features = [ "wasm-output-mode",]
 default-features = false
 path = ".."

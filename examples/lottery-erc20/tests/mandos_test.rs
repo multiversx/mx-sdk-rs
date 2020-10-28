@@ -11,7 +11,7 @@ use elrond_wasm_debug::*;
 fn contract_map() -> ContractMap<TxContext> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
-        "file:../output/lottery.wasm",
+        "file:../output/lottery-erc20.wasm",
         Box::new(|context| Box::new(LotteryImpl::new(context))));
 
     contract_map.register_contract(
