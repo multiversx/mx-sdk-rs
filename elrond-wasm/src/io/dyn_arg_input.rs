@@ -27,7 +27,7 @@ pub trait DynArgInput<I: TopDecodeInput>: SignalError + Sized {
     /// If the loader is out of arguments, it will crash by itself with an appropriate error,
     /// without returning.
     /// Use if the next argument is optional, use `has_next` beforehand.
-    fn next_arg_input(&mut self) -> Option<I>;
+    fn next_arg_input(&mut self) -> I;
 
     /// Called after retrieving all arguments to validate that extra arguments were not provided.
     fn assert_no_more_args(&self) {

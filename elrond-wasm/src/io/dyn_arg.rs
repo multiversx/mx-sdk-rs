@@ -26,7 +26,7 @@ where
     D: DynArgInput<I>,
     T: TopDecode,
 {
-    #[inline]
+    // #[inline(never)]
     fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
         if let TypeInfo::Unit = T::TYPE_INFO {
             // unit type returns without loading anything
@@ -34,13 +34,10 @@ where
             return cast_unit;
         }
 
-        if let Some(arg_input) = loader.next_arg_input() {
-            T::top_decode(arg_input, |res| match res {
-                Ok(v) => v,
-                Err(de_err) => loader.signal_arg_de_error(arg_id, de_err),
-            })
-        } else {
-            loader.signal_arg_wrong_number()
-        }
+        let arg_input = loader.next_arg_input();
+        T::top_decode(arg_input, |res| match res {
+            Ok(v) => v,
+            Err(de_err) => loader.signal_arg_de_error(arg_id, de_err),
+        })
     }
 }

@@ -41,10 +41,10 @@ where
         self.deser.has_next()
     }
 
-    fn next_arg_input(&mut self) -> Option<Vec<u8>> {
+    fn next_arg_input(&mut self) -> Vec<u8> {
         match self.deser.next_argument() {
-            Ok(Some(arg_bytes)) => Some(arg_bytes),
-            Ok(None) => None,
+            Ok(Some(arg_bytes)) => arg_bytes,
+            Ok(None) => self.signal_arg_wrong_number(),
             Err(sc_err) => self.signal_error(sc_err.as_bytes())
         }
     }
