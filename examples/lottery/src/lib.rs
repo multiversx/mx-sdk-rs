@@ -297,8 +297,8 @@ pub trait Lottery {
     fn set_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32, ticket_holder: &Address);
 
     #[storage_get("ticketHolder")]
-    fn get_ticket_holder(&self, lottery_name: &Vec<u8>, ticket_id: u32) -> Address;
+    fn get_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32) -> Address;
 
     #[storage_get_mut("numberOfEntriesForUser")]
-    fn get_mut_number_of_entries_for_user(&self, lottery_name: &Vec<u8>, user: &Address) -> mut_storage!(u32);
+    fn get_mut_number_of_entries_for_user(&self, lottery_name: &[u8], user: &Address) -> mut_storage!(u32);
 }
