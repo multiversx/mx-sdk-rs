@@ -6,7 +6,7 @@ use core::marker::PhantomData;
 /// Allows objects to be deserialized directly from the API as arguments.
 /// 
 /// Of course the implementation provides shortcut deserialization computation paths directly from API:
-/// get_u64, get_i64, ...
+/// into_u64, into_i64, ...
 /// 
 /// This is a performance-critical struct.
 /// Since the wasm ContractIOApi is zero-size,
@@ -19,7 +19,6 @@ where
 {
     api: &'a A,
     arg_index: i32,
-    boxed_value: Box<[u8]>, // TODO: remove
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
@@ -35,7 +34,6 @@ where
         ArgDecodeInput {
             api,
             arg_index,
-            boxed_value: Box::new([]),
             _phantom1: PhantomData,
             _phantom2: PhantomData,
         }
@@ -52,20 +50,15 @@ where
         self.api.get_argument_len(self.arg_index)
     }
 
-    fn get_slice_u8(&mut self) -> &[u8] {
-        self.boxed_value = self.api.get_argument_boxed_slice_u8(self.arg_index);
-        &*self.boxed_value
-    }
-
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         self.api.get_argument_boxed_slice_u8(self.arg_index)
     }
 
-    fn get_u64(&mut self) -> u64 {
+    fn into_u64(self) -> u64 {
         self.api.get_argument_u64(self.arg_index)
     }
 
-    fn get_i64(&mut self) -> i64 {
+    fn into_i64(self) -> i64 {
         self.api.get_argument_i64(self.arg_index)
     }
 }
