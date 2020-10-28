@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
-use crate::io::{ArgId, ArgType, DynArgLoader};
-use super::SCError;
+use crate::io::{ArgId, DynArg, DynArgInput, DynArgMulti};
+use elrond_codec::TopDecodeInput;
 
 /// Structure that allows taking a variable number of arguments in a smart contract function.
 pub struct VarArgs<T>(pub Vec<T>);
@@ -58,17 +58,38 @@ impl<T> VarArgs<T> {
 
 }
 
-impl<T, D> ArgType<D> for VarArgs<T>
+impl<I, D, T> DynArg<I, D> for VarArgs<T>
 where
-    T: ArgType<D>,
-    D: DynArgLoader<()>,
+    I: TopDecodeInput,
+    D: DynArgInput<I>,
+    T: DynArg<I, D>,
 {
-    #[inline(never)]
-    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
+    // #[inline(never)]
+    fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
         let mut result_vec: Vec<T> = Vec::new();
-        while DynArgLoader::<()>::has_next(&*loader) {
-            result_vec.push(T::load(loader, arg_id)?);
+        while loader.has_next() {
+            result_vec.push(T::dyn_load(loader, arg_id));
         }
-        Ok(VarArgs(result_vec))
+        VarArgs(result_vec)
+    }
+}
+
+impl<I, D, T> DynArgMulti<I, D> for VarArgs<T>
+where
+    I: TopDecodeInput,
+    D: DynArgInput<I>,
+    T: DynArg<I, D>,
+{
+    fn dyn_load_multi(loader: &mut D, arg_id: ArgId, num: usize) -> Self {
+        let mut result_vec: Vec<T> = Vec::new();
+        let mut i = 0usize;
+        while loader.has_next() && i < num {
+            result_vec.push(T::dyn_load(loader, arg_id));
+            i += 1;
+        }
+        if i < num {
+            loader.signal_arg_wrong_number();
+        }
+        VarArgs(result_vec)
     }
 }

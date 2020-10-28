@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
-use crate::io::{ArgId, ArgType, DynArgLoader};
-use super::SCError;
+use crate::io::{ArgId, DynArg, DynArgInput};
+use elrond_codec::TopDecodeInput;
 
 pub struct AsyncCallError {
     pub err_code: i32,
@@ -12,22 +12,23 @@ pub enum AsyncCallResult<T> {
     Err(AsyncCallError)
 }
 
-impl<T, D> ArgType<D> for AsyncCallResult<T>
+impl<I, D, T> DynArg<I, D> for AsyncCallResult<T>
 where
-    T: ArgType<D>,
-    D: DynArgLoader<()> + DynArgLoader<i32> + DynArgLoader<Vec<u8>>,
+    I: TopDecodeInput,
+    D: DynArgInput<I>,
+    T: DynArg<I, D>,
 {
-    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
-        let err_code = i32::load(loader, arg_id)?;
+    fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+        let err_code = i32::dyn_load(loader, arg_id);
         if err_code == 0 {
-            let arg = T::load(loader, arg_id)?;
-            Ok(AsyncCallResult::Ok(arg))
+            let arg = T::dyn_load(loader, arg_id);
+            AsyncCallResult::Ok(arg)
         } else {
-            let err_msg = Vec::<u8>::load(loader, arg_id)?;
-            Ok(AsyncCallResult::Err(AsyncCallError {
+            let err_msg = Vec::<u8>::dyn_load(loader, arg_id);
+            AsyncCallResult::Err(AsyncCallError {
                 err_code,
                 err_msg,
-            }))
+            })
         }
     }
 }

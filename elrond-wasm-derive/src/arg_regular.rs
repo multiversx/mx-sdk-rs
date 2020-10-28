@@ -25,8 +25,7 @@ pub fn generate_load_single_arg(arg: &MethodArg, arg_index_expr: &proc_macro2::T
 }
 
 pub fn generate_load_dyn_arg(arg: &MethodArg,
-        loader_expr: &proc_macro2::TokenStream,
-        err_handler_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+        loader_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 
     let pat = &arg.pat;
     let arg_ty = &arg.ty;
@@ -38,12 +37,12 @@ pub fn generate_load_dyn_arg(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #err_handler_expr, #arg_name_literal);
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_literal);
             }
         },
         _ => {
             quote! {
-                let #pat: #arg_ty = elrond_wasm::load_dyn_arg(#loader_expr, #err_handler_expr, #arg_name_literal);
+                let #pat: #arg_ty = elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_literal);
             }
         },
     }
@@ -51,7 +50,6 @@ pub fn generate_load_dyn_arg(arg: &MethodArg,
 
 pub fn generate_load_dyn_multi_arg(arg: &MethodArg,
     loader_expr: &proc_macro2::TokenStream,
-    err_handler_expr: &proc_macro2::TokenStream,
     num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 
     let pat = &arg.pat;
@@ -64,12 +62,12 @@ pub fn generate_load_dyn_multi_arg(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                let #pat: & #referenced_type = &elrond_wasm::load_dyn_multi_arg(#loader_expr, #err_handler_expr, #arg_name_literal, #num_expr);
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_literal, #num_expr);
             }
         },
         _ => {
             quote! {
-                let #pat: #arg_ty = elrond_wasm::load_dyn_multi_arg(#loader_expr, #err_handler_expr, #arg_name_literal, #num_expr);
+                let #pat: #arg_ty = elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_literal, #num_expr);
             }
         },
     }
