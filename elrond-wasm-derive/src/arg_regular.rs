@@ -5,7 +5,7 @@ use super::util::*;
 
 pub fn generate_load_single_arg(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let arg_ty = &arg.ty;
-    let arg_name_literal = pat_literal(&arg.pat);
+    let arg_name_expr = arg_id_literal(&arg.pat);
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
             if type_reference.mutability.is_some() {
@@ -13,12 +13,12 @@ pub fn generate_load_single_arg(arg: &MethodArg, arg_index_expr: &proc_macro2::T
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                & elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(&self.api, #arg_index_expr, #arg_name_literal)
+                & elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(&self.api, #arg_index_expr, #arg_name_expr)
             }
         },
         _ => {
             quote! {
-                elrond_wasm::load_single_arg::<T, BigInt, BigUint, #arg_ty>(&self.api, #arg_index_expr, #arg_name_literal)
+                elrond_wasm::load_single_arg::<T, BigInt, BigUint, #arg_ty>(&self.api, #arg_index_expr, #arg_name_expr)
             }
         },
     }
@@ -29,7 +29,7 @@ pub fn generate_load_dyn_arg(arg: &MethodArg,
 
     let pat = &arg.pat;
     let arg_ty = &arg.ty;
-    let arg_name_literal = pat_literal(pat);
+    let arg_name_expr = arg_id_literal(pat);
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
             if type_reference.mutability.is_some() {
@@ -37,12 +37,12 @@ pub fn generate_load_dyn_arg(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_literal);
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_expr);
             }
         },
         _ => {
             quote! {
-                let #pat: #arg_ty = elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_literal);
+                let #pat: #arg_ty = elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_expr);
             }
         },
     }
@@ -54,7 +54,7 @@ pub fn generate_load_dyn_multi_arg(arg: &MethodArg,
 
     let pat = &arg.pat;
     let arg_ty = &arg.ty;
-    let arg_name_literal = pat_literal(pat);
+    let arg_name_expr = arg_id_literal(pat);
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
             if type_reference.mutability.is_some() {
@@ -62,12 +62,12 @@ pub fn generate_load_dyn_multi_arg(arg: &MethodArg,
             }
             let referenced_type = &*type_reference.elem;
             quote! {
-                let #pat: & #referenced_type = &elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_literal, #num_expr);
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_expr, #num_expr);
             }
         },
         _ => {
             quote! {
-                let #pat: #arg_ty = elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_literal, #num_expr);
+                let #pat: #arg_ty = elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_expr, #num_expr);
             }
         },
     }
