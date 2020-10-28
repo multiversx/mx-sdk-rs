@@ -1,5 +1,7 @@
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 use crate::num_conv::bytes_to_number;
+use crate::transmute::vec_into_boxed_slice;
 
 /// Trait that abstracts away an underlying API for a top-level object deserializer.
 /// The underlying API can provide pre-parsed i64/u64 or pre-bundled boxed slices.
@@ -47,6 +49,20 @@ impl TopDecodeInput for Box<[u8]> {
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         self
+    }
+}
+
+impl TopDecodeInput for Vec<u8> {
+    fn byte_len(&self) -> usize {
+        self.len()
+    }
+
+    fn get_slice_u8(&mut self) -> &[u8] {
+        &self[..]
+    }
+
+    fn into_boxed_slice_u8(self) -> Box<[u8]> {
+        vec_into_boxed_slice(self)
     }
 }
 

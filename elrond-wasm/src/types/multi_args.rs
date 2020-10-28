@@ -1,22 +1,23 @@
-use crate::io::{ArgId, ArgType, DynArgLoader};
-use super::SCError;
+use crate::io::{ArgId, DynArg, DynArgInput};
+use elrond_codec::TopDecodeInput;
 
 macro_rules! multi_arg_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
         $(
             pub struct $mr<$($name,)+>(pub ($($name,)+));
 
-            impl<$($name,)+ D> ArgType<D> for $mr<$($name,)+>
+            impl<I, D, $($name),+ > DynArg<I, D> for $mr<$($name,)+>
             where
-                $($name: ArgType<D>,)+
-                D: $(DynArgLoader<$name> + )+ Sized
+                I: TopDecodeInput,
+                D: DynArgInput<I>,
+                $($name: DynArg<I, D>,)+
             {
-                fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
-                    Ok($mr((
+                fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+                    $mr((
                         $(
-                            $name::load(loader, arg_id)?
+                            $name::dyn_load(loader, arg_id)
                         ),+
-                    )))
+                    ))
                 }
             }
 

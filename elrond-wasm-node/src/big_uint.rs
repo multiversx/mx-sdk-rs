@@ -281,6 +281,8 @@ impl NestedDecode for ArwenBigUint {
 }
 
 impl TopDecode for ArwenBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+    
 	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(mut input: I, f: F) -> R {
         f(Ok(ArwenBigUint::from_bytes_be(input.get_slice_u8())))
     }

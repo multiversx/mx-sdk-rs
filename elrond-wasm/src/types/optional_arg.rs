@@ -1,5 +1,5 @@
-use crate::io::{ArgId, ArgType, DynArgLoader};
-use super::SCError;
+use crate::io::{ArgId, DynArg, DynArgInput};
+use elrond_codec::TopDecodeInput;
 
 /// A smart contract argument that can be provided or not.
 /// If arguments stop before this argument, None will be returned.
@@ -26,16 +26,17 @@ impl<T> OptionalArg<T> {
     }
 }
 
-impl<T, D> ArgType<D> for OptionalArg<T>
+impl<I, D, T> DynArg<I, D> for OptionalArg<T>
 where
-    T: ArgType<D>,
-    D: DynArgLoader<()>,
+    I: TopDecodeInput,
+    D: DynArgInput<I>,
+    T: DynArg<I, D>,
 {
-    fn load(loader: &mut D, arg_id: ArgId) -> Result<Self, SCError> {
-        if DynArgLoader::<()>::has_next(&*loader) {
-            Ok(OptionalArg::Some(T::load(loader, arg_id)?))
+    fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+        if loader.has_next() {
+            OptionalArg::Some(T::dyn_load(loader, arg_id))
         } else {
-            Ok(OptionalArg::None)
+            OptionalArg::None
         }
     }
 }

@@ -51,8 +51,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
                                         match &arg.metadata {
                                             ArgMetadata::Single => {
                                                 generate_load_dyn_arg(arg,
-                                                    &quote! { &mut ___cb_arg_loader },
-                                                    &quote! { &___err_handler })
+                                                    &quote! { &mut ___cb_arg_loader })
                                             },
                                             ArgMetadata::Payment =>
                                                 panic!("payment args not allowed in callbacks"),
@@ -67,8 +66,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
                                         match &arg.metadata {
                                             ArgMetadata::Single | ArgMetadata::VarArgs => {
                                                 generate_load_dyn_arg(arg,
-                                                    &quote! { &mut ___arg_loader },
-                                                    &quote! { &___err_handler })
+                                                    &quote! { &mut ___arg_loader })
                                             },
                                             ArgMetadata::Payment =>
                                                 panic!("payment args not allowed in callbacks"),
@@ -88,10 +86,10 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
                         let match_arm = quote! {                     
                             #fn_name_literal =>
                             {
-                                let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer);
+                                let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer, ApiSignalError::new(&self.api));
                                 #(#arg_init_snippets)*
                                 #body_with_result ;
-                                elrond_wasm::check_no_more_args(&___cb_arg_loader, &___err_handler);
+                                ___cb_arg_loader.assert_no_more_args();
                             },
                         };
                         Some(match_arm)
@@ -108,8 +106,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
         quote! {
             let cb_data_raw = self.api.storage_load_vec_u8(&self.api.get_tx_hash().as_ref());
             let mut cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
-            let mut ___arg_loader = DynEndpointArgLoader::new(&self.api);
-            let ___err_handler = DynEndpointErrHandler::new(&self.api);
+            let mut ___arg_loader = EndpointDynArgLoader::new(&self.api);
 
             match cb_data_deserializer.get_func_name() {
                 [] => { return; }
@@ -117,7 +114,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
                 other => self.api.signal_error(err_msg::CALLBACK_BAD_FUNC)
             }
             
-            elrond_wasm::check_no_more_args(&___arg_loader, &___err_handler);
+            ___arg_loader.assert_no_more_args();
 
             // cleanup
             self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), &[]); 
