@@ -61,39 +61,37 @@ pub trait Lottery {
         opt_whitelist: Option<Vec<Address>>) 
         -> SCResult<()> {
 
-        if lottery_name.is_empty() {
-            return sc_error!("Name can't be empty!");
-        }
+        require!(!lottery_name.is_empty(),
+            "Name can't be empty!");
 
         let timestamp = self.get_block_timestamp();
         
         let total_tickets = opt_total_tickets.unwrap_or(u32::MAX);
-        let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
+        let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
         let max_entries_per_user = opt_max_entries_per_user.unwrap_or(u32::MAX);
-        let prize_distribution = opt_prize_distribution.unwrap_or([PERCENTAGE_TOTAL as u8].to_vec());
+        let prize_distribution = opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
         let whitelist = opt_whitelist.unwrap_or(Vec::new());
-
-        if self.status(lottery_name.clone()) != Status::Inactive {
-            return sc_error!("Lottery is already active!");
-        }
-        if ticket_price == 0 {
-            return sc_error!("Ticket price must be higher than 0!");
-        }
-        if total_tickets == 0 {
-            return sc_error!("Must have more than 0 tickets available!");
-        }
-        if deadline <= timestamp {
-            return sc_error!("Deadline can't be in the past!");
-        }
-        if deadline > timestamp + THIRTY_DAYS_IN_SECONDS {
-            return sc_error!("Deadline can't be later than 30 days from now!");
-        }
-        if max_entries_per_user == 0 {
-            return sc_error!("Must have more than 0 max entries per user!");
-        }
-        if self.sum_array(&prize_distribution) != PERCENTAGE_TOTAL {
-            return sc_error!("Prize distribution must add up to exactly 100(%)!");
-        }
+    
+        require!(self.status(lottery_name.clone()) == Status::Inactive,
+                "Lottery is already active!");
+    
+        require!(ticket_price > 0,
+                "Ticket price must be higher than 0!");
+    
+        require!(total_tickets > 0, 
+                "Must have more than 0 tickets available!");
+    
+        require!(deadline > timestamp,
+                "Deadline can't be in the past!");
+    
+        require!(deadline <= timestamp + THIRTY_DAYS_IN_SECONDS,
+                "Deadline can't be later than 30 days from now!");
+    
+        require!(max_entries_per_user > 0,
+                "Must have more than 0 max entries per user!");
+                
+        require!(self.sum_array(&prize_distribution) == PERCENTAGE_TOTAL,
+                "Prize distribution must add up to exactly 100(%)!");
 
         let info = LotteryInfo {
             ticket_price,
@@ -166,18 +164,16 @@ pub trait Lottery {
         let mut info = self.get_mut_lottery_info(&lottery_name);
         let caller = self.get_caller();
 
-        if !info.whitelist.is_empty() && !info.whitelist.contains(&caller) {
-            return sc_error!("You are not allowed to participate in this lottery!");
-        }
-        if payment != info.ticket_price {
-            return sc_error!("Wrong ticket fee!");
-        }
+        require!(info.whitelist.is_empty() || info.whitelist.contains(&caller),
+            "You are not allowed to participate in this lottery!");
+        
+        require!(payment == info.ticket_price,
+            "Wrong ticket fee!");
 
         let mut entries = self.get_mut_number_of_entries_for_user(&lottery_name, &caller);
 
-        if *entries == info.max_entries_per_user {
-            return sc_error!("Ticket limit exceeded for this lottery!");
-        }
+        require!(*entries < info.max_entries_per_user,
+            "Ticket limit exceeded for this lottery!");
 
         self.set_ticket_holder(&lottery_name, info.current_ticket_number, &caller);
         *entries += 1;
