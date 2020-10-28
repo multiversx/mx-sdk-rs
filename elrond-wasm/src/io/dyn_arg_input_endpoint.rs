@@ -51,18 +51,19 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
 {
-    #[inline]
+    // #[inline(never)]
     fn has_next(&self) -> bool {
         self.current_index < self.num_arguments
     }
 
-    fn next_arg_input(&mut self) -> Option<ArgDecodeInput<'a, A, BigInt, BigUint>> {
+    // #[inline(never)]
+    fn next_arg_input(&mut self) -> ArgDecodeInput<'a, A, BigInt, BigUint> {
         if self.current_index >= self.num_arguments {
-            None
+            self.signal_arg_wrong_number()
         } else {
             let arg_input = ArgDecodeInput::new(self.api, self.current_index);
             self.current_index += 1;
-            Some(arg_input)
+            arg_input
         }
     }
 }
