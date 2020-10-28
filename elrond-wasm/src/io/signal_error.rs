@@ -7,7 +7,26 @@ use core::marker::PhantomData;
 /// Generated automatically.
 /// Current version uses argument names,
 /// but in principle it could be changed to argument index to save some bytes from the wasm output.
-pub type ArgId = &'static [u8];
+#[derive(Clone, Copy)]
+pub struct ArgId(&'static [u8]);
+
+impl From<&'static [u8]> for ArgId {
+    #[inline]
+    fn from(static_bytes: &'static [u8]) -> Self {
+        ArgId(static_bytes)
+    }
+}
+
+impl ArgId {
+    fn as_bytes(&self) -> &'static [u8] {
+        self.0
+    }
+
+    #[inline]
+    pub fn empty() -> Self {
+        ArgId::from(&[][..])
+    }
+}
 
 pub trait SignalError {
     fn signal_error(&self, message: &[u8]) -> !;
@@ -15,7 +34,7 @@ pub trait SignalError {
     fn signal_arg_de_error(&self, arg_id: ArgId, de_err: DecodeError) -> ! {
         let mut decode_err_message: Vec<u8> = Vec::new();
         decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-        decode_err_message.extend_from_slice(arg_id);
+        decode_err_message.extend_from_slice(arg_id.as_bytes());
         decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
         decode_err_message.extend_from_slice(de_err.message_bytes());
         self.signal_error(decode_err_message.as_slice())
