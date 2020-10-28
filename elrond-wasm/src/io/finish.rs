@@ -2,25 +2,25 @@ use crate::*;
 use crate::elrond_codec::*;
 use core::marker::PhantomData;
 
-struct ApiOutput<'a, A, BigInt, BigUint>
+struct ApiOutput<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint> + 'static 
 {
-    api: &'a A,
+    api: A,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, A, BigInt, BigUint> ApiOutput<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> ApiOutput<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint> + 'static 
 {
     #[inline]
-    fn new(api: &'a A) -> Self {
+    fn new(api: A) -> Self {
         ApiOutput {
             api,
             _phantom1: PhantomData,
@@ -29,11 +29,11 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint> TopEncodeOutput for ApiOutput<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> TopEncodeOutput for ApiOutput<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint> + 'static 
 {
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.finish_slice_u8(bytes);
@@ -64,25 +64,25 @@ where
     
 }
 
-pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
+pub trait EndpointResult<A, BigInt, BigUint>: Sized
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static 
 {
-    fn finish(&self, api: &'a A);
+    fn finish(&self, api: A);
 }
 
 /// All serializable objects can be used as smart contract function result.
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for T
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for T
 where
     T: TopEncode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
-    fn finish(&self, api: &'a A) {
-        let res = self.top_encode(ApiOutput::new(api));
+    fn finish(&self, api: A) {
+        let res = self.top_encode(ApiOutput::new(api.clone()));
         if let Err(encode_err_message) = res {
             api.signal_error(encode_err_message.message_bytes());
         }

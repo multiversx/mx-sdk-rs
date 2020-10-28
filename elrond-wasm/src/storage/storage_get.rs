@@ -2,11 +2,11 @@ use crate::*;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
-fn storage_get_error<'a, A, BigInt, BigUint>(api: &'a A, de_err: DecodeError) -> !
+fn storage_get_error<A, BigInt, BigUint>(api: A, de_err: DecodeError) -> !
 where
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     let mut decode_err_message: Vec<u8> = Vec::new();
     decode_err_message.extend_from_slice(err_msg::STORAGE_DECODE_ERROR);
@@ -15,28 +15,26 @@ where
 }
 
 
-struct StorageGetInput<'a, 'k, A, BigInt, BigUint>
+struct StorageGetInput<'k, A, BigInt, BigUint>
 where
-    'a: 'k,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
-    api: &'a A,
+    api: A,
     key: &'k [u8],
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, 'k, A, BigInt, BigUint> StorageGetInput<'a, 'k, A, BigInt, BigUint>
+impl<'k, A, BigInt, BigUint> StorageGetInput<'k, A, BigInt, BigUint>
 where
-    'a: 'k,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     #[inline]
-    fn new(api: &'a A, key: &'k [u8]) -> Self {
+    fn new(api: A, key: &'k [u8]) -> Self {
         StorageGetInput {
             api,
             key,
@@ -46,12 +44,11 @@ where
     }
 }
 
-impl<'a, 'k, A, BigInt, BigUint> TopDecodeInput for StorageGetInput<'a, 'k, A, BigInt, BigUint>
+impl<'k, A, BigInt, BigUint> TopDecodeInput for StorageGetInput<'k, A, BigInt, BigUint>
 where
-    'a: 'k,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     fn byte_len(&self) -> usize {
         self.api.storage_load_len(self.key)
@@ -70,13 +67,12 @@ where
     }
 }
 
-pub fn storage_get<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8]) -> T
+pub fn storage_get<'k, A, BigInt, BigUint, T>(api: A, key: &'k [u8]) -> T
 where
-    'a: 'k,
     T: TopDecode,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
@@ -89,7 +85,7 @@ where
             cast_big_uint
         },
         _ => {
-            T::top_decode(StorageGetInput::new(api, key), |res| match res {
+            T::top_decode(StorageGetInput::new(api.clone(), key), |res| match res {
                 Ok(v) => v,
                 Err(de_err) => storage_get_error(api, de_err),
             })

@@ -11,26 +11,26 @@ use core::marker::PhantomData;
 /// This is a performance-critical struct.
 /// Since the wasm ContractIOApi is zero-size,
 /// it means that this structures translates to a single glorified i32 in wasm.
-pub struct ArgDecodeInput<'a, A, BigInt, BigUint>
+pub struct ArgDecodeInput<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint>
 {
-    api: &'a A,
+    api: A,
     arg_index: i32,
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, A, BigInt, BigUint> ArgDecodeInput<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> ArgDecodeInput<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint>
 {
     #[inline]
-    pub fn new(api: &'a A, arg_index: i32) -> Self {
+    pub fn new(api: A, arg_index: i32) -> Self {
         ArgDecodeInput {
             api,
             arg_index,
@@ -40,11 +40,11 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint> TopDecodeInput for ArgDecodeInput<'a, A, BigInt, BigUint>
+impl<A, BigInt, BigUint> TopDecodeInput for ArgDecodeInput<A, BigInt, BigUint>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractIOApi<BigInt, BigUint> + 'a 
+    A: ContractIOApi<BigInt, BigUint>
 {
     fn byte_len(&self) -> usize {
         self.api.get_argument_len(self.arg_index)

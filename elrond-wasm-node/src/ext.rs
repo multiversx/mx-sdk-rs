@@ -589,6 +589,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     }
 }
 
+/// Should be no-op. The API implementation is zero-sized.
 impl Clone for ArwenApiImpl {
     #[inline]
     fn clone(&self) -> Self {

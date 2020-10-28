@@ -399,7 +399,7 @@ impl Method {
             fn #call_method_ident (&self) {
                 #payable_snippet
 
-                let mut ___arg_loader = EndpointDynArgLoader::new(&self.api);
+                let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
 
                 #(#arg_init_snippets)*
 
