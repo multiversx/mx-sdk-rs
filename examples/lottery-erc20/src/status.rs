@@ -5,6 +5,7 @@ pub enum Status {
     Inactive,
     Running,
     Ended,
+    DistributingPrizes,
 }
 
 impl Status {
@@ -13,6 +14,7 @@ impl Status {
             Status::Inactive => 0,
             Status::Running => 1,
             Status::Ended => 2,
+            Status::DistributingPrizes => 3
         }
     }
 
@@ -21,6 +23,7 @@ impl Status {
             0 => core::result::Result::Ok(Status::Inactive),
             1 => core::result::Result::Ok(Status::Running),
             2 => core::result::Result::Ok(Status::Ended),
+            3 => core::result::Result::Ok(Status::DistributingPrizes),
             _ => core::result::Result::Err(DecodeError::InvalidValue),
         }
     }
