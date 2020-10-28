@@ -171,8 +171,8 @@ impl NestedDecode for RustBigInt {
 }
 
 impl TopDecode for RustBigInt {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(mut input: I, f: F) -> R {
-        f(Ok(RustBigInt::from_signed_bytes_be(input.get_slice_u8())))
+	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        f(Ok(RustBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())))
     }
 }
 
