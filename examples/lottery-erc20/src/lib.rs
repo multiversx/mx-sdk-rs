@@ -23,7 +23,11 @@ pub trait Erc20 {
         #[callback_arg] cb_lottery_name: Vec<u8>,
         #[callback_arg] cb_sender: &Address);
 
-    fn transfer(&self, to: &Address, amount: BigUint);
+    #[callback(distribute_prizes_callback)]
+    fn transfer(&self, 
+        to: &Address, 
+        amount: BigUint, 
+        #[callback_arg] cb_lottery_name: Vec<u8>);
 }
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
@@ -137,6 +141,9 @@ pub trait Lottery {
             },
             Status::Ended => {
                 sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
+            },
+            Status::DistributingPrizes => {
+                sc_error!("Prizes are currently being distributed. Can't buy tickets!")
             }
         }
     }
@@ -158,9 +165,11 @@ pub trait Lottery {
                 }
 
                 self.distribute_prizes(&lottery_name);
-                self.clear_storage(&lottery_name);
 
                 Ok(())
+            },
+            Status::DistributingPrizes => {
+                sc_error!("Prizes are currently being distributed!")
             }
         }
     }
@@ -171,6 +180,12 @@ pub trait Lottery {
 
         if !exists {
             return Status::Inactive;
+        }
+
+        let prev_winners = self.get_prev_winners(&lottery_name);
+
+        if prev_winners.len() > 0 {
+            return Status::DistributingPrizes;
         }
 
         let info = self.get_mut_lottery_info(&lottery_name);
@@ -218,63 +233,70 @@ pub trait Lottery {
         info.queued_tickets += 1;
     }
 
-    fn distribute_prizes(&self, lottery_name: &Vec<u8>) {
+    fn reduce_prize_pool(&self, lottery_name: &Vec<u8>, value: BigUint) {
         let mut info = self.get_mut_lottery_info(&lottery_name);
+        info.prize_pool -= value;
+    }
+
+    fn distribute_prizes(&self, lottery_name: &Vec<u8>) {
+        let info = self.get_mut_lottery_info(&lottery_name);
+
         let total_tickets = info.current_ticket_number;
+        let total_winning_tickets = info.prize_distribution.len();
+        let mut prev_winners = self.get_prev_winners(&lottery_name);
+        let prev_winners_count = prev_winners.len();
+        let winners_left = total_winning_tickets - prev_winners_count;
 
-        if info.current_ticket_number > 0 {
-            let mut prev_winning_tickets: Vec<u32> = Vec::new();
+        if winners_left == 0 {
+            self.clear_storage(&lottery_name);
 
-            let seed = self.get_block_random_seed();
-            let mut rand = Random::new(*seed);
+            return;
+        }
 
-            // if there are less tickets that the distributed prize pool,
-            // the 1st place gets the leftover, maybe could split between the remaining
-            // but this is a rare case anyway and it's not worth the overhead
-            let for_loop_end: usize;
+        let last_winning_ticket_index: usize;
 
-            if total_tickets < info.prize_distribution.len() as u32 {
-                for_loop_end = total_tickets as usize;
-            }
-            else {
-                for_loop_end = info.prize_distribution.len();
-            }
-            
-            // distribute to the first place last. Laws of probability say that order doesn't matter.
-            // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
-            // 1st place will get the spare money instead.
-            for i in (0..for_loop_end).rev() {
-                let mut winning_ticket_id: u32;
+        // less tickets purchased than total winning tickets
+        if total_tickets < total_winning_tickets as u32 {
+            last_winning_ticket_index = (total_tickets - 1) as usize;
+        }
+        else {
+            last_winning_ticket_index = info.prize_distribution.len() - 1;
+        }
 
-                loop {
-                    // smallest change in input results in entirely different hash, creating "randomness"
-                    // +1 just to protect against infinite loop for id = 0
-                    winning_ticket_id = rand.next() % total_tickets;
+        let current_winning_ticket_index = last_winning_ticket_index - prev_winners_count;
+        let winning_ticket_id = self.get_random_winning_ticket_id(&prev_winners, total_tickets);
 
-                    if !prev_winning_tickets.contains(&winning_ticket_id) {
-                        let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
-                        let prize: BigUint;
+        let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
+        let prize: BigUint;
 
-                        if i != 0 {
-                            prize = BigUint::from(info.prize_distribution[i] as u32) *
-                                info.prize_pool.clone() / BigUint::from(PERCENTAGE_TOTAL as u32);
-                        }
-                        else {
-                            prize = info.prize_pool.clone();
-                        }
+        if current_winning_ticket_index != 0 {
+            prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32) *
+                info.prize_pool.clone() / BigUint::from(PERCENTAGE_TOTAL as u32);
+        }
+        else {
+            prize = info.prize_pool.clone();
+        }
 
-                        info.prize_pool -= prize.clone();
+        self.reduce_prize_pool(lottery_name, prize.clone());
 
-                        prev_winning_tickets.push(winning_ticket_id);
+        prev_winners.push(winning_ticket_id);
+        self.set_prev_winners(lottery_name, &prev_winners);
 
-                        let erc20_address = self.get_erc20_contract_address();
-                        let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
-        
-                        erc20_proxy.transfer( &winner_address, prize);
+        let erc20_address = self.get_erc20_contract_address();
+        let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
+    
+        erc20_proxy.transfer( &winner_address, prize, lottery_name.clone());
+    }
 
-                        break;
-                    }
-                }
+    fn get_random_winning_ticket_id(&self, prev_winners: &Vec<u32>, total_tickets: u32) -> u32 {
+        let seed = self.get_block_random_seed();
+        let mut rand = Random::new(*seed);
+
+        loop {
+            let winner = rand.next() % total_tickets;
+
+            if !prev_winners.contains(&winner) {
+                return winner;
             }
         }
     }
@@ -299,6 +321,7 @@ pub trait Lottery {
 
         self.storage_store(&["lotteryExists".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
         self.storage_store(&["lotteryInfo".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store(&["previousWinners".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
     }
 
     fn sum_array(&self, array: &[u8]) -> u16 {
@@ -341,6 +364,20 @@ pub trait Lottery {
         info.queued_tickets -= 1;
     }
 
+    #[callback]
+    fn distribute_prizes_callback(&self, 
+        result: AsyncCallResult<()>,
+        #[callback_arg] cb_lottery_name: Vec<u8>) {
+        match result {
+            AsyncCallResult::Ok(()) => {
+                self.distribute_prizes(&cb_lottery_name);
+            },
+            AsyncCallResult::Err(_) => {
+                // nothing we can do if an error occurs in the erc20 contract
+            }
+        }
+    }
+
     #[storage_set("lotteryExists")]
     fn set_lottery_exists(&self, lottery_name: &[u8], exists: bool);
 
@@ -370,4 +407,12 @@ pub trait Lottery {
     #[view(erc20ContractAddress)]
     #[storage_get("erc20_contract_address")]
     fn get_erc20_contract_address(&self) -> Address;
+
+    // temporary storage between "determine_winner" proxy callbacks
+
+    #[storage_get("previousWinners")]
+    fn get_prev_winners(&self, lottery_name: &[u8]) -> Vec<u32>;
+
+    #[storage_set("previousWinners")]
+    fn set_prev_winners(&self, lottery_name: &[u8], prev_winners: &Vec<u32>);
 }
