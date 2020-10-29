@@ -1,7 +1,7 @@
 pub use crate::codec_err::DecodeError;
 
 /// Trait that allows reading of data into a slice.
-pub trait Input {
+pub trait NestedDecodeInput {
 	/// The remaining length of the input data.
     fn remaining_len(&mut self) -> usize;
     
@@ -26,7 +26,7 @@ pub trait Input {
 
 }
 
-impl<'a> Input for &'a [u8] {
+impl<'a> NestedDecodeInput for &'a [u8] {
 	fn remaining_len(&mut self) -> usize {
 		self.len()
     }

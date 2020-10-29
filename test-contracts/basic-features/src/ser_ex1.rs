@@ -29,13 +29,13 @@ impl TopEncode for SerExample1 {
 }
 
 impl NestedDecode for SerExample1 {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(SerExample1{
-            int: u16::dep_decode(input)?,
-            seq: Vec::<u8>::dep_decode(input)?,
-            another_byte: u8::dep_decode(input)?,
-            uint_32: u32::dep_decode(input)?,
-            uint_64: u64::dep_decode(input)?,
+            int: u16::dep_decode_to(input)?,
+            seq: Vec::<u8>::dep_decode_to(input)?,
+            another_byte: u8::dep_decode_to(input)?,
+            uint_32: u32::dep_decode_to(input)?,
+            uint_64: u64::dep_decode_to(input)?,
         })
     }
 }

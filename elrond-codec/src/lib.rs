@@ -23,7 +23,7 @@ pub use top_ser::{TopEncode, top_encode_to_vec};
 pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
-pub use crate::nested_de_input::Input;
+pub use crate::nested_de_input::NestedDecodeInput;
 pub use crate::nested_ser_output::OutputBuffer;
 pub use crate::num_conv::{using_encoded_number, top_encode_number_to_output, bytes_to_number};
 
@@ -81,11 +81,11 @@ pub mod test_struct {
     }
     
     impl NestedDecode for Test {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
             Ok(Test{
-                int: u16::dep_decode(input)?,
-                seq: Vec::<u8>::dep_decode(input)?,
-                another_byte: u8::dep_decode(input)?,
+                int: u16::dep_decode_to(input)?,
+                seq: Vec::<u8>::dep_decode_to(input)?,
+                another_byte: u8::dep_decode_to(input)?,
             })
         }
     }
@@ -136,12 +136,12 @@ pub mod test_struct {
     }
     
     impl NestedDecode for E {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-            match u32::dep_decode(input)? {
+        fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+            match u32::dep_decode_to(input)? {
                 0 => Ok(E::Unit),
-                1 => Ok(E::Newtype(u32::dep_decode(input)?)),
-                2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
-                3 => Ok(E::Struct{ a: u32::dep_decode(input)? }),
+                1 => Ok(E::Newtype(u32::dep_decode_to(input)?)),
+                2 => Ok(E::Tuple(u32::dep_decode_to(input)?, u32::dep_decode_to(input)?)),
+                3 => Ok(E::Struct{ a: u32::dep_decode_to(input)? }),
                 _ => Err(DecodeError::INVALID_VALUE),
             }
         }
@@ -171,7 +171,7 @@ pub mod test_struct {
     }
     
     impl NestedDecode for WrappedArray {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
             let mut arr = [0u8; 5];
             input.read_into(&mut arr)?;
             Ok(WrappedArray(arr))

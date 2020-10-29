@@ -40,12 +40,12 @@ impl TopEncode for SerExample2 {
 }
 
 impl NestedDecode for SerExample2 {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        match u32::dep_decode(input)? {
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        match u32::dep_decode_to(input)? {
             0 => Ok(SerExample2::Unit),
-            1 => Ok(SerExample2::Newtype(u32::dep_decode(input)?)),
-            2 => Ok(SerExample2::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
-            3 => Ok(SerExample2::Struct{ a: u32::dep_decode(input)? }),
+            1 => Ok(SerExample2::Newtype(u32::dep_decode_to(input)?)),
+            2 => Ok(SerExample2::Tuple(u32::dep_decode_to(input)?, u32::dep_decode_to(input)?)),
+            3 => Ok(SerExample2::Struct{ a: u32::dep_decode_to(input)? }),
             _ => Err(DecodeError::INVALID_VALUE),
         }
     }
