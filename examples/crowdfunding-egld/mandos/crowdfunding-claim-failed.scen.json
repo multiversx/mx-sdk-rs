@@ -138,6 +138,6 @@
             "code": "file:../output/crowdfunding.wasm"
           }
         }
-    }
+      }
     ]
   }
