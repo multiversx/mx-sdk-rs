@@ -1,0 +1,84 @@
+{
+    "name": "acc1 winner",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy-ticket-another-account.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "12345678900"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "determine-winner-different-ticket-holder-winner-acc1",
+            "tx": {
+                "from": "address:my_address",
+                "to": "address:the_lottery_contract",
+                "value": "0",
+                "function": "determine_winner",
+                "arguments": [
+                    "str:lottery_name"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "gas": "*",
+                "refund": "*",
+                "logs": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "3",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''erc20_contract_address": "address:the_erc20_contract"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "address:the_erc20_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''balance|address:erc20_owner_address": "997,000,000",
+                        "''balance|address:my_address": "1,000,000",
+                        "''balance|address:acc1": "1,000,100",
+                        "''balance|address:acc2": "999,900",
+                        "''balance|address:the_lottery_contract": "0",
+                        "''allowance|address:acc1|address:the_lottery_contract": "0",
+                        "''allowance|address:acc2|address:the_lottery_contract": "0",
+                        "''total_supply": "1,000,000,000"
+                    },
+                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                },
+                "address:erc20_owner_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}
