@@ -379,6 +379,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
         self.blockchain_info.current_block_info.block_epoch
     }
 
+    fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+        Box::new([0u8; 48])
+    }
+
     fn get_prev_block_timestamp(&self) -> u64 {
         self.blockchain_info.previous_block_info.block_timestamp
     }
@@ -393,6 +397,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     fn get_prev_block_epoch(&self) -> u64 {
         self.blockchain_info.previous_block_info.block_epoch
+    }
+
+    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+        Box::new([0u8; 48])
     }
     
     fn sha256(&self, data: &[u8]) -> H256 {

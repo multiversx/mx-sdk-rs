@@ -1,0 +1,24 @@
+{
+    "name": "set initial balance for accounts",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:the_erc20_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''balance|address:erc20_owner_address": "997,000,000",
+                        "''balance|address:my_address": "1,000,000",
+                        "''balance|address:acc1": "1,000,000",
+                        "''balance|address:acc2": "1,000,000",
+                        "''allowance|address:acc1|address:the_lottery_contract": "100",
+                        "''allowance|address:acc2|address:the_lottery_contract": "100",
+                        "''total_supply": "1,000,000,000"
+                    },
+                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                }
+            }
+        }
+    ]
+}

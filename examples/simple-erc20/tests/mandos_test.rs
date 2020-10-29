@@ -1,6 +1,7 @@
 
 extern crate simple_erc20;
 use simple_erc20::*;
+
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
