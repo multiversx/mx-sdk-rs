@@ -48,7 +48,7 @@
                     "balance": "200",
                     "storage": {
                         "''lotteryExists|u32:12|''lottery_name": "u8:1",
-                        "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:0|u64:123,456|0xffffffff|u32:1|u8:100|u32:0|u32:2|u32:1|u8:200",
+                        "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:0|u64:123,456|u32:800|u32:1|u8:100|u32:0|u32:2|u32:1|u8:200",
                         "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
                         "''ticketHolder|u32:12|''lottery_name|0x00000001": "address:acc1",
                         "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc1": "2"
