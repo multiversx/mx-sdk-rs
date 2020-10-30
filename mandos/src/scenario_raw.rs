@@ -155,8 +155,15 @@ pub struct TxCallRaw {
     pub from: ValueSubTree,
     pub to: ValueSubTree,
     pub value: ValueSubTree,
-    pub esdt_token_name: ValueSubTree,
-    pub esdt_value: ValueSubTree,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub esdt_token_name: Option<ValueSubTree>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub esdt_value: Option<ValueSubTree>,
+
     pub function: String,
 
     #[serde(default)]
@@ -171,6 +178,14 @@ pub struct TxCallRaw {
 pub struct TxDeployRaw {
     pub from: ValueSubTree,
     pub value: ValueSubTree,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub esdt_token_name: Option<ValueSubTree>,
+    
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub esdt_value: Option<ValueSubTree>,
 
     pub contract_code: ValueSubTree,
 
