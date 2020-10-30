@@ -88,7 +88,7 @@ pub trait Crowdfunding {
             Status::Successful => {
                 let caller = self.get_caller();
                 if &caller != &self.get_owner() {
-                    return sc_error!("only owner can claim succesful funding");
+                    return sc_error!("only owner can claim successful funding");
                 }
                 self.send_tx(&caller, &self.get_sc_balance(), "funding success");
                 Ok(())
