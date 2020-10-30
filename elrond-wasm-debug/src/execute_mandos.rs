@@ -87,7 +87,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                     from: tx.from.value.into(),
                     to: tx.to.value.into(),
                     call_value: tx.call_value.value.clone(),
-                    esdt_value: 0u32.into(),
+                    esdt_value: BigUint::from(0u32), // CHANGE!!!
                     esdt_token_name: None,
                     func_name: tx.function.as_bytes().to_vec(),
                     args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
