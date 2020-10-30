@@ -103,9 +103,9 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                             let async_input = async_call_tx_input(&async_data, &contract_address);
                             let (async_result, opt_more_async) = execute_sc_call(async_input, state, contract_map);
                             assert!(opt_more_async.is_none(), "nested asyncs currently not supported");
-                            tx_result = merge_results(tx_result, async_result);
+                            tx_result = merge_results(tx_result, async_result.clone());
 
-                            let callback_input = async_callback_tx_input(&async_data, &contract_address, &tx_result);
+                            let callback_input = async_callback_tx_input(&async_data, &contract_address, &async_result);
                             let (callback_result, opt_more_async) = execute_sc_call(callback_input, state, contract_map);
                             assert!(opt_more_async.is_none(), "successive asyncs currently not supported");
                             tx_result = merge_results(tx_result, callback_result);
