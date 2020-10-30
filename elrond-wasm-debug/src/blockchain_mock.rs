@@ -34,7 +34,7 @@ pub struct AccountData {
     pub nonce: u64,
     pub balance: BigUint,
     pub storage: HashMap<Vec<u8>, Vec<u8>>,
-    pub esdt: Option<HashMap<Vec<u8>, Vec<u8>>>,
+    pub esdt: Option<HashMap<Vec<u8>, BigUint>>,
     pub contract_path: Option<Vec<u8>>,
     pub contract_owner: Option<Address>,
 }
@@ -57,7 +57,7 @@ impl fmt::Display for AccountData {
 
         for key in &esdt_keys {
             let value = esdt_unwrapped.get(key).unwrap();
-            write!(&mut esdt_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
+            write!(&mut esdt_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.to_bytes_be())).unwrap();
         }
         
         write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ], esdt: [{} ] }}",
@@ -186,8 +186,8 @@ impl BlockchainMock {
         let sender_nonce_before_tx = sender.nonce - 1;
         let new_address = self.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
             .unwrap_or_else(|| panic!("Missing new address. Only explicit new deploy addresses supported"));
-        let mut esdt = HashMap::<Vec<u8>, Vec<u8>>::new();
-        esdt.insert(tx_input.esdt_token_name.clone().unwrap(), tx_input.esdt_value.to_bytes_be());
+        let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
+        esdt.insert(tx_input.esdt_token_name.clone().unwrap(), tx_input.esdt_value.clone());
 
         let old_value = self.accounts.insert(new_address.clone(), AccountData{
             address: new_address.clone(),
