@@ -37,6 +37,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                         nonce: account.nonce.value,
                         balance: account.balance.value.clone(),
                         storage: account.storage.iter().map(|(k, v)| (k.value.clone(), v.value.clone())).collect(),
+                        esdt: account.esdt.map(|tree| tree.iter().map(|(k, v)| (k.value.clone(), v.value.clone())).collect()),
                         contract_path: account.code.as_ref().map(|bytes_value| bytes_value.value.clone()),
                         contract_owner: None, // TODO: add contract owner in mandos
                     });
@@ -116,6 +117,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                                 nonce: 0,
                                 balance: async_data.call_value.clone(),
                                 storage: HashMap::new(),
+                                esdt: None,
                                 contract_path: None,
                                 contract_owner: None,
                             });

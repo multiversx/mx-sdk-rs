@@ -34,6 +34,7 @@ pub struct AccountData {
     pub nonce: u64,
     pub balance: BigUint,
     pub storage: HashMap<Vec<u8>, Vec<u8>>,
+    pub esdt: Option<HashMap<Vec<u8>, Vec<u8>>>,
     pub contract_path: Option<Vec<u8>>,
     pub contract_owner: Option<Address>,
 }
@@ -41,17 +42,29 @@ pub struct AccountData {
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut storage_buf = String::new();
-        let mut keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-        keys.sort();
-        for key in &keys {
+        let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+        storage_keys.sort();
+
+        for key in &storage_keys {
             let value = self.storage.get(key).unwrap();
             write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
         }
+
+        let mut esdt_buf = String::new();
+        let mut esdt_unwrapped = self.esdt.unwrap_or_default();
+        let mut esdt_keys: Vec<Vec<u8>> = esdt_unwrapped.iter().map(|(k, _)| k.clone()).collect();
+        esdt_keys.sort();
+
+        for key in &esdt_keys {
+            let value = esdt_unwrapped.get(key).unwrap();
+            write!(&mut esdt_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
+        }
         
-        write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
+        write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ], esdt: [{} ] }}",
             self.nonce, 
             self.balance,
-            storage_buf)
+            storage_buf,
+            esdt_buf)
     }
 }
 

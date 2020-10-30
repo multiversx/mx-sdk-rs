@@ -186,6 +186,8 @@ pub struct TxCall {
     pub from: AddressValue,
     pub to: AddressValue,
     pub call_value: BigUintValue,
+    pub esdt_value: Option<BigUintValue>,
+    pub esdt_token_name: Option<String>,
     pub function: String,
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
