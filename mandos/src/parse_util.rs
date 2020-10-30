@@ -7,7 +7,8 @@ use std::fs;
 use std::path::Path;
 
 pub fn parse_scenario_raw<P: AsRef<Path>>(path: P) -> ScenarioRaw {
-    let contents = fs::read_to_string(path).unwrap();
+    let contents = fs::read_to_string(path.as_ref().clone())
+        .unwrap_or_else(|e| panic!("not found: {} {:?}", e, path.as_ref()));
     serde_json::from_str(contents.as_str()).unwrap()
 }
 
