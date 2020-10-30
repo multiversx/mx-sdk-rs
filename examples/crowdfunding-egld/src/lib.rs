@@ -98,6 +98,7 @@ pub trait Crowdfunding {
                 let deposit = self.get_deposit(&caller);
                 if &deposit > &0 {
                     self.send_tx(&caller, &deposit, "reclaim failed funding");
+                    self.set_deposit(&caller, &BigUint::zero());
                 }
                 Ok(())
             },
