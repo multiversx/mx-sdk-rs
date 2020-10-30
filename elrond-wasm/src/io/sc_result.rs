@@ -71,6 +71,4 @@ impl<T> SCResult<T> {
             SCResult::Err(_) => panic!("called `SCResult::unwrap()`"),
         }
     }
-
-
 }
