@@ -20,7 +20,7 @@ pub trait NestedDecodeInput {
     }
 
     /// Read the exact number of bytes required to fill the given buffer.
-	fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError>;
+    fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError>;
     
     fn flush(&mut self) -> Result<&[u8], DecodeError>;
 
