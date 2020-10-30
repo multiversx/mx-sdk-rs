@@ -51,7 +51,7 @@ impl fmt::Display for AccountData {
         }
 
         let mut esdt_buf = String::new();
-        let mut esdt_unwrapped = self.esdt.unwrap_or_default();
+        let esdt_unwrapped = self.esdt.clone().unwrap_or_default();
         let mut esdt_keys: Vec<Vec<u8>> = esdt_unwrapped.iter().map(|(k, _)| k.clone()).collect();
         esdt_keys.sort();
 
@@ -186,12 +186,15 @@ impl BlockchainMock {
         let sender_nonce_before_tx = sender.nonce - 1;
         let new_address = self.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
             .unwrap_or_else(|| panic!("Missing new address. Only explicit new deploy addresses supported"));
+        let mut esdt = HashMap::<Vec<u8>, Vec<u8>>::new();
+        esdt.insert(tx_input.esdt_token_name.clone().unwrap(), tx_input.esdt_value.to_bytes_be());
 
         let old_value = self.accounts.insert(new_address.clone(), AccountData{
             address: new_address.clone(),
             nonce: 0,
             balance: tx_input.call_value.clone(),
             storage: new_storage,
+            esdt: Some(esdt),
             contract_path: Some(contract_path),
             contract_owner: Some(tx_input.from.clone()),
         });

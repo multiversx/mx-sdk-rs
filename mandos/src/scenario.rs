@@ -200,6 +200,8 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
             from: AddressValue::interpret_from(from.from, context),
             to: AddressValue::interpret_from(from.to, context),
             call_value: BigUintValue::interpret_from(from.value, context),
+            esdt_token_name: Some(from.esdt_token_name.to_string()),
+            esdt_value: Some(BigUintValue::interpret_from(from.esdt_value, context)),
             function: from.function,
             arguments: from.arguments.into_iter().map(|t| BytesValue::interpret_from(t, context)).collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit, context),
