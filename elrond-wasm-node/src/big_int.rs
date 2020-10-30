@@ -204,7 +204,7 @@ use elrond_wasm::elrond_codec::*;
 impl NestedEncode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
     
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
         let bytes = self.to_signed_bytes_be();
         bytes.as_slice().dep_encode_to(dest)

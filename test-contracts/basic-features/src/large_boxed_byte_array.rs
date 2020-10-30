@@ -7,7 +7,7 @@ pub struct LargeBoxedByteArray(Box<[u8; ARRAY_SIZE]>);
 
 impl NestedEncode for LargeBoxedByteArray {
     #[inline]
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.0.dep_encode_to(dest)
     }
 }

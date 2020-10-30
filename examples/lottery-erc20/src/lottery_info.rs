@@ -14,7 +14,7 @@ pub struct LotteryInfo<BigUint:BigUintApi> {
 }
 
 impl<BigUint:BigUintApi> NestedEncode for LotteryInfo<BigUint> {
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.ticket_price.dep_encode_to(dest)?;
         self.tickets_left.dep_encode_to(dest)?;
         self.deadline.dep_encode_to(dest)?;

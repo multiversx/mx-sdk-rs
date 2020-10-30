@@ -1,4 +1,4 @@
-use crate::nested_ser_output::OutputBuffer;
+use crate::nested_ser_output::NestedEncodeOutput;
 
 /// Adds number to output buffer.
 /// No argument generics here, because we want the executable binary as small as possible.
@@ -37,7 +37,7 @@ pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signe
 	f(&result[0..result_size])
 }
 
-pub fn top_encode_number_to_output<O: OutputBuffer>(output: &mut O, x: u64, signed: bool) {
+pub fn top_encode_number_to_output<O: NestedEncodeOutput>(output: &mut O, x: u64, signed: bool) {
 	let bytes_be: [u8; 8] = x.to_be_bytes();
 	if x == 0 {
 		// 0 is a special case

@@ -5,7 +5,7 @@ use core::num::NonZeroUsize;
 use crate::codec_err::EncodeError;
 use crate::nested_ser::{NestedEncode, dep_encode_slice_contents};
 use crate::TypeInfo;
-use crate::nested_ser_output::OutputBuffer;
+use crate::nested_ser_output::NestedEncodeOutput;
 use crate::top_ser_output::TopEncodeOutput;
 
 pub trait TopEncode: Sized {
