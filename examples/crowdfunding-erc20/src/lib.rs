@@ -191,19 +191,19 @@ impl Status {
             0 => core::result::Result::Ok(Status::FundingPeriod),
             1 => core::result::Result::Ok(Status::Successful),
             2 => core::result::Result::Ok(Status::Failed),
-            _ => core::result::Result::Err(DecodeError::InvalidValue),
+            _ => core::result::Result::Err(DecodeError::INVALID_VALUE),
         }
     }
 }
 
-impl Encode for Status {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        return self.to_u8().dep_encode_to(dest);
+impl TopEncode for Status {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.to_u8().top_encode(output)
 	}
 }
 
-impl Decode for Status {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        return Status::from_u8(u8::dep_decode(input)?);
+impl TopDecode for Status {
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Status::from_u8(u8::top_decode(input)?)
     }
 }

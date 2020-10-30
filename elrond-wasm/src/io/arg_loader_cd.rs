@@ -17,7 +17,7 @@ impl<'a> CallDataArgLoader<'a> {
 
 impl<'a, T> DynArgLoader<T> for CallDataArgLoader<'a>
 where
-    T: Decode,
+    T: TopDecode,
 {
     #[inline]
     fn has_next(&self) -> bool {
@@ -27,7 +27,7 @@ where
     fn next_arg(&mut self, arg_id: ArgId) -> Result<Option<T>, SCError> {
         match self.deser.next_argument() {
             Ok(Some(arg_bytes)) => {
-                match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
+                match T::top_decode(arg_bytes.as_slice()) {
                     Ok(v) => Ok(Some(v)),
                     Err(de_err) => {
                         let mut decode_err_message: Vec<u8> = Vec::new();
@@ -35,7 +35,7 @@ where
                         decode_err_message.extend_from_slice(arg_id);
                         decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
                         decode_err_message.extend_from_slice(de_err.message_bytes());
-                        Err(SCError::Dynamic(decode_err_message))
+                        Err(SCError::from(decode_err_message))
                     }
                 }
             },

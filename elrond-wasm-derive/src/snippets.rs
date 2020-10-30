@@ -73,13 +73,13 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn storage_store(&self, key: &[u8], value: &[u8]) {
-          self.api.storage_store(key, value);
+        fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
+          self.api.storage_store_slice_u8(key, value);
         }
 
         #[inline]
-        fn storage_load(&self, key: &[u8]) -> Vec<u8> {
-          self.api.storage_load(key)
+        fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
+          self.api.storage_load_vec_u8(key)
         }
 
         #[inline]
@@ -121,10 +121,20 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         fn storage_store_i64(&self, key: &[u8], value: i64) {
           self.api.storage_store_i64(key, value);
         }
+
+        #[inline]
+        fn storage_store_u64(&self, key: &[u8], value: u64) {
+          self.api.storage_store_u64(key, value);
+        }
         
         #[inline]
-        fn storage_load_i64(&self, key: &[u8]) -> Option<i64> {
+        fn storage_load_i64(&self, key: &[u8]) -> i64 {
           self.api.storage_load_i64(key)
+        }
+
+        #[inline]
+        fn storage_load_u64(&self, key: &[u8]) -> u64 {
+          self.api.storage_load_u64(key)
         }
         
         #[inline]
@@ -213,12 +223,12 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
         }
 
         #[inline]
-        fn sha256(&self, data: &[u8]) -> [u8; 32] {
+        fn sha256(&self, data: &[u8]) -> H256 {
           self.api.sha256(data)
         }
     
         #[inline]
-        fn keccak256(&self, data: &[u8]) -> [u8; 32] {
+        fn keccak256(&self, data: &[u8]) -> H256 {
           self.api.keccak256(data)
         }
       }

@@ -13,7 +13,8 @@ wasm-output-mode = ["elrond-wasm-node"]
 [dependencies]
 elrond-wasm = { version = "0.7.2", path = "../../elrond-wasm" }
 elrond-wasm-derive = { version = "0.7.2", path = "../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.7.2", path = "../../elrond-wasm-node", optional = true }
+# elrond-wasm-node = { version = "0.7.2", path = "../../elrond-wasm-node", optional = true } # <- no small int api used
+elrond-wasm-node = { version = "0.7.2", path = "../../elrond-wasm-node", optional = true, features = ["small-int-ei"] }
 
 [dev-dependencies]
 elrond-wasm-debug = { version = "0.7.2", path = "../../elrond-wasm-debug" }

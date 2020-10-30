@@ -12,6 +12,7 @@ pub const ARG_BAD_LENGTH: &[u8] = b"argument has wrong length";
 pub const ARG_BAD_LENGTH_32: &[u8] = b"argument has wrong length: 32 bytes expected";
 pub const ARG_DECODE_ERROR_1: &[u8] = b"argument decode error (";
 pub const ARG_DECODE_ERROR_2: &[u8] = b"): ";
+pub const STORAGE_VALUE_OUT_OF_RANGE: &[u8] = b"storage value out of range";
 pub const STORAGE_DECODE_ERROR: &[u8] = b"storage decode error: ";
 
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";

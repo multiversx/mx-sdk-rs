@@ -355,9 +355,7 @@ impl Method {
             #[inline]
             fn #call_method_ident (&self) {
                 #payable_snippet
-                if !self.api.check_num_arguments(#nr_args) {
-                    return;
-                }
+                self.api.check_num_arguments(#nr_args);
                 #(#arg_init_snippets)*
                 #body_with_result
             }

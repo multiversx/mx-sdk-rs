@@ -29,7 +29,7 @@ where
             i += 1
         }
         if i < num {
-            return Err(SCError::Static(err_msg::ARG_WRONG_NUMBER));
+            return Err(SCError::from(err_msg::ARG_WRONG_NUMBER));
         }
         Ok(VarArgs(result_vec))
     }

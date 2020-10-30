@@ -1,10 +1,71 @@
 use crate::*;
+use crate::arg_loader_err::load_arg_error;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
+struct ArgInput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    api: &'a A,
+    arg_index: i32,
+    boxed_value: Box<[u8]>,
+    _phantom1: PhantomData<BigInt>,
+    _phantom2: PhantomData<BigUint>,
+}
+
+impl<'a, A, BigInt, BigUint> ArgInput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    #[inline]
+    fn new(api: &'a A, arg_index: i32) -> Self {
+        ArgInput {
+            api,
+            arg_index,
+            boxed_value: Box::new([]),
+            _phantom1: PhantomData,
+            _phantom2: PhantomData,
+        }
+    }
+}
+
+impl<'a, A, BigInt, BigUint> TopDecodeInput for ArgInput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    fn byte_len(&self) -> usize {
+        self.api.get_argument_len(self.arg_index)
+    }
+
+    fn get_slice_u8(&mut self) -> &[u8] {
+        self.boxed_value = self.api.get_argument_boxed_slice_u8(self.arg_index);
+        &*self.boxed_value
+    }
+
+    fn into_boxed_slice_u8(self) -> Box<[u8]> {
+        self.api.get_argument_boxed_slice_u8(self.arg_index)
+    }
+
+    fn get_u64(&mut self) -> u64 {
+        self.api.get_argument_u64(self.arg_index)
+    }
+
+    fn get_i64(&mut self) -> i64 {
+        self.api.get_argument_i64(self.arg_index)
+    }
+}
+
+#[inline]
 pub fn load_single_arg<A, BigInt, BigUint, T>(api: &A, index: i32, arg_id: ArgId) -> T 
 where
-    T: Decode,
+    T: TopDecode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
@@ -24,32 +85,9 @@ where
             cast_big_uint
         },
         _ => {
-            // the compiler is also smart enough to evaluate this if let at compile time
-            if let Some(res_i64) = T::top_decode_from_i64(|| api.get_argument_i64(index)) {
-                match res_i64 {
-                    Ok(from_i64) => from_i64,
-                    Err(de_err) => {
-                        let mut decode_err_message: Vec<u8> = Vec::new();
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-                        decode_err_message.extend_from_slice(arg_id);
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-                        decode_err_message.extend_from_slice(de_err.message_bytes());
-                        api.signal_error(decode_err_message.as_slice())
-                    }
-                }
-            } else {
-                let arg_bytes = api.get_argument_vec(index);
-                match elrond_codec::decode_from_byte_slice(arg_bytes.as_slice()) {
-                    Ok(v) => v,
-                    Err(de_err) => {
-                        let mut decode_err_message: Vec<u8> = Vec::new();
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-                        decode_err_message.extend_from_slice(arg_id);
-                        decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-                        decode_err_message.extend_from_slice(de_err.message_bytes());
-                        api.signal_error(decode_err_message.as_slice())
-                    }
-                }
+            match T::top_decode(ArgInput::new(api, index)) {
+                Ok(v) => v,
+                Err(de_err) => load_arg_error(api, arg_id, de_err),
             }
         }
     }
@@ -87,7 +125,7 @@ where
 
 impl<'a, A, BigInt, BigUint, T> DynArgLoader<T> for DynEndpointArgLoader<'a, A, BigInt, BigUint>
 where
-    T: Decode,
+    T: TopDecode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractIOApi<BigInt, BigUint> + 'static
