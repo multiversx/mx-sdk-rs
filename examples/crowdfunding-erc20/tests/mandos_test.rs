@@ -35,10 +35,10 @@ fn fund_without_allowance() {
 
 #[test]
 fn fund_with_insufficient_allowance() {
-    parse_execute_mandos("mandos/fund_with_insufficient_allowance", &contract_map());
+    parse_execute_mandos("mandos/fund_with_insufficient_allowance.scen.json", &contract_map());
 }
 
 #[test]
 fn fund_with_sufficient_allowance() {
-    parse_execute_mandos("mandos/fund_with_sufficient_allowance", &contract_map());
+    parse_execute_mandos("mandos/fund_with_sufficient_allowance.scen.json", &contract_map());
 }
