@@ -101,10 +101,11 @@ fn determine_winner_same_ticket_holder() {
     parse_execute_mandos("mandos/determine-winner-same-ticket-holder.scen.json", &contract_map());
 }
 
-#[test]
-fn determine_winner_split_prize_pool() {
-    parse_execute_mandos("mandos/determine-winner-split-prize-pool.scen.json", &contract_map());
-}
+// TODO: uncomment after rust-mandos supports chaining async calls
+// #[test]
+// fn determine_winner_split_prize_pool() {
+//     parse_execute_mandos("mandos/determine-winner-split-prize-pool.scen.json", &contract_map());
+// }
 
 #[test]
 fn start_after_announced_winner() {
