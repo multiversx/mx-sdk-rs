@@ -13,8 +13,8 @@ pub struct LotteryInfo<BigUint:BigUintApi> {
     pub prize_pool: BigUint
 }
 
-impl<BigUint:BigUintApi> Encode for LotteryInfo<BigUint> {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl<BigUint:BigUintApi> NestedEncode for LotteryInfo<BigUint> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.ticket_price.dep_encode_to(dest)?;
         self.tickets_left.dep_encode_to(dest)?;
         self.deadline.dep_encode_to(dest)?;
@@ -28,7 +28,15 @@ impl<BigUint:BigUintApi> Encode for LotteryInfo<BigUint> {
     }
 }
 
-impl<BigUint:BigUintApi> Decode for LotteryInfo<BigUint> {
+impl<BigUint:BigUintApi> TopEncode for LotteryInfo<BigUint> {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
+        Result::Ok(())
+    }
+}
+
+
+impl<BigUint:BigUintApi> NestedDecode for LotteryInfo<BigUint> {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         core::result::Result::Ok(LotteryInfo {
             ticket_price: BigUint::dep_decode(input)?,
@@ -40,5 +48,11 @@ impl<BigUint:BigUintApi> Decode for LotteryInfo<BigUint> {
             current_ticket_number: u32::dep_decode(input)?,
             prize_pool: BigUint::dep_decode(input)?,
         })
+    }
+}
+
+impl<BigUint:BigUintApi> TopDecode for LotteryInfo<BigUint> {
+    fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        dep_decode_from_byte_slice(input.get_slice_u8())
     }
 }

@@ -3,9 +3,12 @@ use core::fmt::Debug;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+/// Type that holds 32 bytes of data.
+/// Data is kept on the heap to keep wasm size low and avoid copies.
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct H256(Box<[u8;32]>);
 
+/// Alias for H256, just to make smart contract code more readable.
 pub type Address = H256;
 
 impl From<[u8; 32]> for H256 {
@@ -75,16 +78,21 @@ impl AsRef<[u8]> for H256 {
 impl AsMut<[u8]> for H256 {
     #[inline]
     fn as_mut(&mut self) -> &mut [u8] {
-        self.as_bytes_mut()
+        self.0.as_mut()
     }
 }
 
 
 impl H256 {
     /// Returns a new zero-initialized fixed hash.
-    #[inline]
+    /// Allocates directly in heap.
+    /// Minimal resulting wasm code (14 bytes if not inlined).
     pub fn zero() -> H256 {
-        H256(Box::new([0u8; 32]))
+        use alloc::alloc::{alloc, Layout};
+        unsafe {
+            let ptr = alloc(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
+            H256(Box::from_raw(ptr))
+        }
     }
 
     /// Returns the size of this hash in bytes.
@@ -99,19 +107,6 @@ impl H256 {
         self.0.as_ref()
     }
 
-    /// Extracts a mutable byte slice containing the entire fixed hash.
-    #[inline]
-    pub fn as_bytes_mut(&mut self) -> &mut [u8] {
-        self.0.as_mut()
-        // &mut self.0
-    }
-
-    /// Extracts a reference to the byte array containing the entire fixed hash.
-    #[inline]
-    pub fn as_fixed_bytes(&self) -> &[u8; 32] {
-        &self.0
-    }
-
     #[inline]
     pub fn copy_to_array(&self, target: &mut [u8; 32]) {
         target.copy_from_slice(&self.0[..]);
@@ -121,22 +116,45 @@ impl H256 {
     pub fn to_vec(&self) -> Vec<u8> {
         self.0[..].to_vec()
     }
+
+    /// Returns an unsafe mutable pointer to the data on the heap.
+    /// Used by the API to populate data.
+    #[inline]
+    pub fn as_mut_ptr(&mut self) -> *mut u8 {
+        self.0.as_mut_ptr()
+    }
 }
 
 use elrond_codec::*;
 
-impl Encode for H256 {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for H256 {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
         Ok(())
     }
 }
 
-impl Decode for H256 {
+impl TopEncode for H256 {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_slice_u8(&self.0[..]);
+        Ok(())
+    }
+}
+
+impl NestedDecode for H256 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let mut arr = [0u8; 32];
-        input.read_into(&mut arr)?;
-        Ok(H256(Box::new(arr)))
+        let mut res = H256::zero();
+        input.read_into(res.as_mut())?;
+        Ok(res)
+    }
+}
+
+impl TopDecode for H256 {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        match Box::<[u8; 32]>::top_decode(input) {
+            Ok(array_box) => Ok(H256(array_box)),
+            Err(_) => Err(DecodeError::from(&b"bad H256 length"[..])),
+        }
     }
 }
 
@@ -167,7 +185,7 @@ mod esd_light_tests {
         let expected_bytes: &[u8] = &[4u8; 32*3];
 
         let tuple = (&addr, &&&addr, addr.clone());
-        let serialized_bytes = tuple.top_encode().unwrap();
+        let serialized_bytes = top_encode_to_vec(&tuple).unwrap();
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     }
 }

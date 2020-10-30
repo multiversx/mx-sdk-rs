@@ -8,38 +8,51 @@ pub enum SerExample2 {
     Struct { a: u32 },
 }
 
-impl Encode for SerExample2 {
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for SerExample2 {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         match self {
             SerExample2::Unit => {
-                using_encoded_number(0u64, 32, false, false, |buf| dest.write(buf));
+                0u32.dep_encode_to(dest)?;
             },
             SerExample2::Newtype(arg1) => {
-                using_encoded_number(1u64, 32, false, false, |buf| dest.write(buf));
-                using_encoded_number(*arg1 as u64, 32, false, false, |buf| dest.write(buf));
+                1u32.dep_encode_to(dest)?;
+                arg1.dep_encode_to(dest)?;
             },
             SerExample2::Tuple(arg1, arg2) => {
-                using_encoded_number(2u64, 32, false, false, |buf| dest.write(buf));
-                using_encoded_number(*arg1 as u64, 32, false, false, |buf| dest.write(buf));
-                using_encoded_number(*arg2 as u64, 32, false, false, |buf| dest.write(buf));
+                2u32.dep_encode_to(dest)?;
+                arg1.dep_encode_to(dest)?;
+                arg2.dep_encode_to(dest)?;
             },
             SerExample2::Struct { a } => {
-                using_encoded_number(3u64, 32, false, false, |buf| dest.write(buf));
-                using_encoded_number(*a as u64, 32, false, false, |buf| dest.write(buf));
+                3u32.dep_encode_to(dest)?;
+                a.dep_encode_to(dest)?;
             },
         }
         Ok(())
     }
 }
 
-impl Decode for SerExample2 {
+impl TopEncode for SerExample2 {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
+        Ok(())
+    }
+}
+
+impl NestedDecode for SerExample2 {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         match u32::dep_decode(input)? {
             0 => Ok(SerExample2::Unit),
             1 => Ok(SerExample2::Newtype(u32::dep_decode(input)?)),
             2 => Ok(SerExample2::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
             3 => Ok(SerExample2::Struct{ a: u32::dep_decode(input)? }),
-            _ => Err(DecodeError::InvalidValue),
+            _ => Err(DecodeError::INVALID_VALUE),
         }
+    }
+}
+
+impl TopDecode for SerExample2 {
+    fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        dep_decode_from_byte_slice(input.get_slice_u8())
     }
 }

@@ -250,34 +250,37 @@ impl PartialOrd<u64> for ArwenBigUint {
 
 use elrond_wasm::elrond_codec::*;
 
-impl Encode for ArwenBigUint {
+impl NestedEncode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-
-    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-        let bytes = self.to_bytes_be();
-        f(&bytes);
-        Ok(())
-    }
     
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
         let bytes = self.to_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
     }
 }
 
-impl Decode for ArwenBigUint {
+impl TopEncode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+    
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+		self.to_bytes_be().top_encode(output)
+	}
+}
 
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let bytes = input.flush()?;
-        Ok(ArwenBigUint::from_bytes_be(bytes))
-    }
+impl NestedDecode for ArwenBigUint {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(ArwenBigUint::from_bytes_be(bytes))
+    }
+}
+
+impl TopDecode for ArwenBigUint {
+	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        Ok(ArwenBigUint::from_bytes_be(input.get_slice_u8()))
     }
 }
 

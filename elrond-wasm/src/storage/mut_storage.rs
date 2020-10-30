@@ -26,10 +26,10 @@ impl BorrowedMutStorageKey {
 /// because only in such way can it be changed.
 pub struct BorrowedMutStorage<'a, A, BigInt, BigUint, T>
 where
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: TopEncode + TopDecode,
 {
     api: &'a A,
     key: BorrowedMutStorageKey,
@@ -41,10 +41,10 @@ where
 
 impl<'a, A, BigInt, BigUint, T> BorrowedMutStorage<'a, A, BigInt, BigUint, T>
 where
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: TopEncode + TopDecode,
 {
     pub fn with_const_key(api: &'a A, key: &'static [u8]) -> Self {
         let value: T = storage_get(api, key);
@@ -74,10 +74,10 @@ where
 
 impl<'a, A, BigInt, BigUint, T> Drop for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
 where
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: TopEncode + TopDecode,
 {
     fn drop(&mut self) {
         if self.dirty {
@@ -88,10 +88,10 @@ where
 
 impl<'a, A, BigInt, BigUint, T> Deref for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
 where
-    BigInt: Encode + 'static,
-    BigUint: Encode + 'static,
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: TopEncode + TopDecode,
 {
     type Target = T;
 
@@ -105,7 +105,7 @@ where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode,
+    T: TopEncode + TopDecode,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.dirty = true;

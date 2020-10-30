@@ -257,12 +257,12 @@ pub trait Lottery {
             let key_number_of_entries = ["numberOfEntriesForUser".as_bytes(),
                 appended_name_in_key, addr.as_bytes()].concat();
 
-            self.storage_store(&key_ticket_holder, &[0u8; 0]);
-            self.storage_store(&key_number_of_entries, &[0u8; 0]);
+            self.storage_store_slice_u8(&key_ticket_holder, &[0u8; 0]);
+            self.storage_store_slice_u8(&key_number_of_entries, &[0u8; 0]);
         }
 
-        self.storage_store(&["lotteryExists".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
-        self.storage_store(&["lotteryInfo".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store_slice_u8(&["lotteryExists".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+        self.storage_store_slice_u8(&["lotteryInfo".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
     }
 
     fn sum_array(&self, array: &[u8]) -> u16 {

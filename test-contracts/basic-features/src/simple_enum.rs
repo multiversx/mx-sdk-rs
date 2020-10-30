@@ -21,29 +21,33 @@ impl SimpleEnum {
             0 => Ok(SimpleEnum::Variant0),
             1 => Ok(SimpleEnum::Variant1),
             2 => Ok(SimpleEnum::Variant2),
-            _ => Err(DecodeError::InputOutOfRange),
+            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
         }
     }
 }
 
-impl Encode for SimpleEnum {
-    fn top_encode_as_i64(&self) -> Option<Result<i64, EncodeError>> {
-        Some(Ok(self.to_i64()))
-    }
-    
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncode for SimpleEnum {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.to_i64().dep_encode_to(dest)?;
         Ok(())
     }
 }
 
-impl Decode for SimpleEnum {
+impl TopEncode for SimpleEnum {
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_i64(self.to_i64());
+        Ok(())
+    }
+}
+
+impl NestedDecode for SimpleEnum {
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         SimpleEnum::from_i64(i64::dep_decode(input)?)
     }
+}
 
-    #[inline]
-    fn top_decode_from_i64<I: FnOnce() -> i64>(input: I) -> Option<Result<Self, DecodeError>> {
-        Some(SimpleEnum::from_i64(input()))
+impl TopDecode for SimpleEnum {
+    fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        dep_decode_from_byte_slice(input.get_slice_u8())
     }
 }

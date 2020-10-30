@@ -1,7 +1,54 @@
 use crate::*;
 use crate::elrond_codec::*;
 use core::iter::FromIterator;
+use core::marker::PhantomData;
 
+struct ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    api: &'a A,
+    _phantom1: PhantomData<BigInt>,
+    _phantom2: PhantomData<BigUint>,
+}
+
+impl<'a, A, BigInt, BigUint> ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    #[inline]
+    fn new(api: &'a A) -> Self {
+        ApiOutput {
+            api,
+            _phantom1: PhantomData,
+            _phantom2: PhantomData,
+        }
+    }
+}
+
+impl<'a, A, BigInt, BigUint> TopEncodeOutput for ApiOutput<'a, A, BigInt, BigUint>
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'a 
+{
+    fn set_slice_u8(self, bytes: &[u8]) {
+        self.api.finish_slice_u8(bytes);
+    }
+
+    fn set_u64(self, value: u64) {
+        self.api.finish_u64(value);
+    }
+
+    fn set_i64(self, value: i64) {
+        self.api.finish_i64(value);
+    }
+    
+}
 
 pub trait EndpointResult<'a, A, BigInt, BigUint>: Sized
 where
@@ -12,9 +59,10 @@ where
     fn finish(&self, api: &'a A);
 }
 
+/// All serializable objects can be used as smart contract function result.
 impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for T
 where
-    T: Encode,
+    T: TopEncode,
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
@@ -32,98 +80,13 @@ where
                 api.finish_big_uint(cast_big_uint);
             },
 			_ => {
-                // the compiler is also smart enough to evaluate this if let at compile time
-                if let Some(res_i64) = self.top_encode_as_i64() {
-                    match res_i64 {
-                        Ok(encoded_i64) => {
-                            api.finish_i64(encoded_i64);
-                        },
-                        Err(encode_err_message) => {
-                            api.signal_error(encode_err_message.message_bytes());
-                        }
-                    }
-                } else {
-                    let res = self.using_top_encoded(|buf| api.finish_slice_u8(buf));
-                    if let Err(encode_err_message) = res {
-                        api.signal_error(encode_err_message.message_bytes());
-                    }
+                let res = self.top_encode(ApiOutput::new(api));
+                if let Err(encode_err_message) = res {
+                    api.signal_error(encode_err_message.message_bytes());
                 }
 			}
 		}
     }
-}
-
-/// Default way to optionally return an error from a smart contract endpoint.
-#[must_use]
-#[derive(Debug, PartialEq, Eq)]
-pub enum SCResult<T> {
-    Ok(T),
-    Err(SCError),
-}
-
-impl<T> SCResult<T> {
-    #[inline]
-    pub fn is_ok(&self) -> bool {
-        if let SCResult::Ok(_) = self {
-            true
-        } else {
-            false
-        }
-    }
-
-    #[inline]
-    pub fn is_err(&self) -> bool {
-        !self.is_ok()
-    }
-
-    #[inline]
-    pub fn ok(self) -> Option<T> {
-        if let SCResult::Ok(t) = self {
-            Some(t)
-        } else {
-            None
-        }
-    }
-
-    #[inline]
-    pub fn err(self) -> Option<SCError> {
-        if let SCResult::Err(e) = self {
-            Some(e)
-        } else {
-            None
-        }
-    }
-}
-
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for SCResult<T>
-where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
-    BigInt: BigIntApi<BigUint> + 'static,
-    BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
-{
-    #[inline]
-    fn finish(&self, api: &'a A) {
-        match self {
-            SCResult::Ok(t) => {
-                t.finish(api);
-            },
-            SCResult::Err(e) => {
-                e.with_message_slice(|buf| api.signal_error(buf));
-            }
-        }
-    }
-}
-
-impl<T> SCResult<T> {
-    pub fn unwrap(self) -> T {
-        match self {
-            SCResult::Ok(t) => t,
-            SCResult::Err(_) => panic!("called `SCResult::unwrap()`"),
-        }
-    }
-
-
 }
 
 pub struct MultiResultVec<T>(pub Vec<T>);
@@ -252,7 +215,7 @@ where
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
-    T: Encode + Decode + EndpointResult<'a, A, BigInt, BigUint>,
+    T: TopEncode + TopDecode + EndpointResult<'a, A, BigInt, BigUint>,
 {
     fn finish(&self, api: &'a A) {
         core::ops::Deref::deref(self).finish(api);

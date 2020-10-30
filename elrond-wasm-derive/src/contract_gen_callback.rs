@@ -30,7 +30,7 @@ fn generate_callback_body_raw(raw_callback: &Method) -> proc_macro2::TokenStream
         let nr_args = self.api.get_num_arguments();
         let mut args: Vec<Vec<u8>> = Vec::with_capacity(nr_args as usize);
         for i in 0..nr_args {
-            args.push(self.api.get_argument_vec(i));
+            args.push(self.api.get_argument_vec_u8(i));
         }
         self.#fn_ident (args);
     }
@@ -106,7 +106,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
         }
     } else {
         quote! {
-            let cb_data_raw = self.api.storage_load(&self.api.get_tx_hash().as_ref());
+            let cb_data_raw = self.api.storage_load_vec_u8(&self.api.get_tx_hash().as_ref());
             let mut cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
             let mut ___arg_loader = DynEndpointArgLoader::new(&self.api);
             let ___err_handler = DynEndpointErrHandler::new(&self.api);
@@ -120,7 +120,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
             elrond_wasm::check_no_more_args(&___arg_loader, &___err_handler);
 
             // cleanup
-            self.api.storage_store(&self.api.get_tx_hash().as_ref(), &[]); 
+            self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), &[]); 
         }
     }
 }

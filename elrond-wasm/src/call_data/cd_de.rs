@@ -105,14 +105,14 @@ impl<'a> CallDataDeserializer<'a> {
             None => Ok(None),
             Some(arg_hex) => {
                 if arg_hex.len() % 2 != 0 {
-                    return Err(SCError::Static(err_msg::DESERIALIZATION_ODD_DIGITS));
+                    return Err(SCError::from(err_msg::DESERIALIZATION_ODD_DIGITS));
                 }
                 let res_len = arg_hex.len() / 2;
                 let mut res_vec = Vec::with_capacity(res_len);
                 for i in 0..res_len {
                     match hex_to_byte(arg_hex[2*i], arg_hex[2*i+1]) {
                         None => {
-                            return Err(SCError::Static(err_msg::DESERIALIZATION_INVALID_BYTE));
+                            return Err(SCError::from(err_msg::DESERIALIZATION_INVALID_BYTE));
                         },
                         Some(byte) => {
                             res_vec.push(byte);
@@ -236,7 +236,7 @@ mod tests {
         let input: &[u8] = b"func@123";
         let mut de = CallDataDeserializer::new(input);
         assert_eq!(de.get_func_name(), &b"func"[..]);
-        assert_eq!(de.next_argument(),  Err(SCError::Static(err_msg::DESERIALIZATION_ODD_DIGITS)));
+        assert_eq!(de.next_argument(),  Err(SCError::from(err_msg::DESERIALIZATION_ODD_DIGITS)));
         assert_eq!(de.next_argument(), Ok(None));
         assert_eq!(de.next_argument(), Ok(None));
     }

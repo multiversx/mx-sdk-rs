@@ -5,10 +5,12 @@
 
 imports!();
 
+mod large_boxed_byte_array;
 mod ser_ex1;
 mod ser_ex2;
 mod simple_enum;
 
+use large_boxed_byte_array::LargeBoxedByteArray;
 use ser_ex1::*;
 use ser_ex2::*;
 use simple_enum::*;
@@ -90,12 +92,22 @@ pub trait BasicFeatures {
     }
 
     #[endpoint]
+    fn echo_h256(&self, h: H256) -> H256 {
+        h
+    }
+
+    #[endpoint]
     fn echo_nothing(&self, #[var_args] nothing: ()) -> () {
         nothing
     }
 
     #[endpoint]
     fn echo_array_u8(&self, s: [u8; 5]) -> [u8; 5] {
+        s
+    }
+
+    #[endpoint]
+    fn echo_boxed_array_u8(&self, s: Box<[u8; 128]>) -> Box<[u8; 128]> {
         s
     }
 
@@ -139,12 +151,32 @@ pub trait BasicFeatures {
     fn echo_async_result_empty(&self, #[var_args] a: AsyncCallResult<()>) -> SCResult<()> {
         match a {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(msg) => Err(SCError::Dynamic(msg.err_msg)),
+            AsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
         }
     }
 
     #[endpoint]
+    fn echo_large_boxed_byte_array(&self, lbba: LargeBoxedByteArray) -> LargeBoxedByteArray {
+        lbba
+    }
+
+    #[endpoint]
     fn echo_ser_example_1(&self, se: SerExample1) -> SerExample1 {
+        se
+    }
+
+    #[endpoint]
+    fn echo_boxed_ser_example_1(&self, se: Box<SerExample1>) -> Box<SerExample1> {
+        se
+    }
+
+    #[endpoint]
+    fn echo_ser_example_2(&self, se: SerExample2) -> SerExample2 {
+        se
+    }
+
+    #[endpoint]
+    fn echo_boxed_ser_example_2(&self, se: Box<SerExample2>) -> Box<SerExample2> {
         se
     }
 
@@ -183,6 +215,14 @@ pub trait BasicFeatures {
     #[endpoint]
     #[storage_set("usize")]
     fn store_usize(&self, i: usize);
+
+    #[endpoint]
+    #[storage_set("i32")]
+    fn store_i32(&self, i: i32);
+
+    #[endpoint]
+    #[storage_set("u64")]
+    fn store_u64(&self, i: u64);
 
     #[endpoint]
     #[storage_set("i64")]
@@ -252,6 +292,10 @@ pub trait BasicFeatures {
     #[endpoint]
     #[storage_get("big_int")]
     fn load_big_int(&self) -> BigInt;
+
+    #[endpoint]
+    #[storage_get("u64")]
+    fn load_u64(&self) -> u64;
 
     #[endpoint]
     #[storage_get("usize")]
@@ -529,13 +573,13 @@ pub trait BasicFeatures {
     // CRYPTO FUNCTIONS
 
     #[endpoint(computeSha256)]
-    fn compute_sha256(&self, input: Vec<u8>) -> Vec<u8> {
-        self.sha256(&input).as_ref().into()
+    fn compute_sha256(&self, input: Vec<u8>) -> H256 {
+        self.sha256(&input)
     }
 
     #[endpoint(computeKeccak256)]
-    fn compute_keccak256(&self, input: Vec<u8>) -> Vec<u8> {
-        self.keccak256(&input).as_ref().into()
+    fn compute_keccak256(&self, input: Vec<u8>) -> H256 {
+        self.keccak256(&input)
     }
 
     // MACROS

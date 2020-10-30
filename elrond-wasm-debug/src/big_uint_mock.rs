@@ -22,19 +22,19 @@ impl RustBigUint {
 
 impl From<u64> for RustBigUint {
     fn from(item: u64) -> Self {
-        RustBigUint((item as i64).into())
+        RustBigUint(BigUint::from(item).into())
     }
 }
 
 impl From<u32> for RustBigUint {
     fn from(item: u32) -> Self {
-        RustBigUint((item as i32).into())
+        RustBigUint(BigUint::from(item).into())
     }
 }
 
 impl From<usize> for RustBigUint {
     fn from(item: usize) -> Self {
-        RustBigUint((item as i32).into())
+        RustBigUint(BigUint::from(item).into())
     }
 }
 
@@ -229,33 +229,34 @@ impl PartialOrd<u64> for RustBigUint {
 
 use elrond_wasm::elrond_codec::*;
 
-impl Encode for RustBigUint {
+impl NestedEncode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-
-    fn using_top_encoded<F: FnOnce(&[u8])>(&self, f: F) -> Result<(), EncodeError> {
-        let bytes = self.to_bytes_be();
-        f(&bytes);
-        Ok(())
-    }
     
-    fn dep_encode_to<O: Output>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
         let bytes = self.to_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
     }
 }
 
-impl Decode for RustBigUint {
+impl TopEncode for RustBigUint {
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+		self.to_bytes_be().top_encode(output)
+	}
+}
+
+impl NestedDecode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-    
-    fn top_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let bytes = input.flush()?;
-        Ok(RustBigUint::from_bytes_be(bytes))
-    }
 
     fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(RustBigUint::from_bytes_be(bytes))
+    }
+}
+
+impl TopDecode for RustBigUint {
+	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        Ok(RustBigUint::from_bytes_be(input.get_slice_u8()))
     }
 }
 
