@@ -1,0 +1,78 @@
+{
+    "name": "start with limited tickets and fixed deadline with invalid ticket price arg",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "lottery-init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "start limited tickets, fixed deadline, invalid ticket price arg",
+            "tx": {
+                "from": "address:my_address",
+                "to": "address:the_lottery_contract",
+                "value": "0",
+                "function": "start",
+                "arguments": [
+                    "str:lottery_name",
+                    "0",
+                    "0x01|u32:2",
+                    "0x01|u64:123,456",
+                    "0x",
+                    "0x",
+                    "0x"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Ticket price must be higher than 0!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:the_lottery_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''erc20_contract_address": "address:the_erc20_contract"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "address:the_erc20_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''balance|address:erc20_owner_address": "1,000,000,000",
+                        "''total_supply": "1,000,000,000"
+                    },
+                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                },
+                "address:erc20_owner_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

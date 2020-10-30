@@ -8,7 +8,6 @@ where
     BigUint: NestedEncode + 'static,
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
-    // TODO: more verbose error messages?
     api.signal_error(encode_err.message_bytes())
 }
 
