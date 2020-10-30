@@ -22,8 +22,6 @@ default-features = false
 [dependencies.elrond-wasm-output]
 version = "0.8.0"
 path = "../../../elrond-wasm-output"
-features = ["wasm-output-mode", "panic-message"]
-
-
+features = ["wasm-output-mode"]
 
 [workspace]

@@ -74,7 +74,7 @@ fn panic_fmt(panic_info: &core::panic::PanicInfo) -> ! {
 #[cfg(all(feature = "wasm-output-mode", not(feature = "panic-message")))]
 #[panic_handler]
 fn panic_fmt(_: &core::panic::PanicInfo) -> ! {
-    elrond_wasm_node::ext_error::signal_error(&b"panic occured"[..])
+    elrond_wasm_node::ext_error::signal_error(&b"panic occurred"[..])
 }
 
 #[cfg(feature = "wasm-output-mode")]
