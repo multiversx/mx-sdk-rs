@@ -84,7 +84,7 @@
             "gasPrice": "0"
         },
         "expect": {
-            "message": "str:only owner can claim successful funding",
+            "message": "str:only owner can claim succesful funding",
             "status": "4",
             "gas": "*",
             "refund": "*"
