@@ -12,6 +12,7 @@ use lottery_info::LotteryInfo;
 
 const PERCENTAGE_TOTAL: u16 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
+const MAX_TICKETS: u32 = 800;
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
 pub trait Lottery {
@@ -66,9 +67,9 @@ pub trait Lottery {
 
         let timestamp = self.get_block_timestamp();
         
-        let total_tickets = opt_total_tickets.unwrap_or(u32::MAX);
+        let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
         let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
-        let max_entries_per_user = opt_max_entries_per_user.unwrap_or(u32::MAX);
+        let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
         let prize_distribution = opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
         let whitelist = opt_whitelist.unwrap_or(Vec::new());
     
@@ -80,6 +81,9 @@ pub trait Lottery {
     
         require!(total_tickets > 0, 
                 "Must have more than 0 tickets available!");
+
+        require!(total_tickets <= MAX_TICKETS, 
+                "Only 800 or less total tickets per lottery are allowed!");
     
         require!(deadline > timestamp,
                 "Deadline can't be in the past!");
