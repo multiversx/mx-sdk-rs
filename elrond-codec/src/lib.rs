@@ -24,7 +24,7 @@ pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 pub use crate::nested_de_input::NestedDecodeInput;
-pub use crate::nested_ser_output::OutputBuffer;
+pub use crate::nested_ser_output::NestedEncodeOutput;
 pub use crate::num_conv::{using_encoded_number, top_encode_number_to_output, bytes_to_number};
 
 /// !INTERNAL USE ONLY!
@@ -65,7 +65,7 @@ pub mod test_struct {
 	}
 
 	impl NestedEncode for Test {
-		fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
 			self.int.dep_encode_to(dest)?;
 			self.seq.dep_encode_to(dest)?;
             self.another_byte.dep_encode_to(dest)?;
@@ -105,7 +105,7 @@ pub mod test_struct {
     }
 
     impl NestedEncode for E {
-		fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
             match self {
                 E::Unit => {
                     0u32.dep_encode_to(dest)?;
@@ -157,7 +157,7 @@ pub mod test_struct {
     pub struct WrappedArray(pub [u8; 5]);
 
     impl NestedEncode for WrappedArray {
-		fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
             dest.write(&self.0[..]);
             Ok(())
 		}

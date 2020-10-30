@@ -55,7 +55,7 @@ pub struct FeatureName<'a>(&'a [u8]);
 use elrond_wasm::elrond_codec::*;
 impl<'a> NestedEncode for FeatureName<'a> {
     #[inline]
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
         Result::Ok(())
     }

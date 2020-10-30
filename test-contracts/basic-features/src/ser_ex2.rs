@@ -9,7 +9,7 @@ pub enum SerExample2 {
 }
 
 impl NestedEncode for SerExample2 {
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         match self {
             SerExample2::Unit => {
                 0u32.dep_encode_to(dest)?;

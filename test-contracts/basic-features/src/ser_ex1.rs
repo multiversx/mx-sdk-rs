@@ -11,7 +11,7 @@ pub struct SerExample1 {
 }
 
 impl NestedEncode for SerExample1 {
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.int.dep_encode_to(dest)?;
         self.seq.dep_encode_to(dest)?;
         self.another_byte.dep_encode_to(dest)?;
