@@ -155,6 +155,8 @@ pub struct TxCallRaw {
     pub from: ValueSubTree,
     pub to: ValueSubTree,
     pub value: ValueSubTree,
+    pub esdt_token_name: ValueSubTree,
+    pub esdt_value: ValueSubTree,
     pub function: String,
 
     #[serde(default)]
