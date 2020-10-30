@@ -57,18 +57,24 @@ fn alloc_error_handler(_layout: alloc::alloc::Layout) -> ! {
 //     },
 // }
 
-#[cfg(feature = "wasm-output-mode")]
+#[cfg(all(feature = "wasm-output-mode", feature = "panic-message"))]
 #[panic_handler]
-fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
+fn panic_fmt(panic_info: &core::panic::PanicInfo) -> ! {
     use alloc::string::String;
     let panic_msg =
-        if let Some(s) = info.message() {
+        if let Some(s) = panic_info.message() {
             format!("panic occurred: {:?}", s)
         } else {
             String::from("unknown panic occurred")
         };
 
     elrond_wasm_node::ext_error::signal_error(panic_msg.as_bytes())
+}
+
+#[cfg(all(feature = "wasm-output-mode", not(feature = "panic-message")))]
+#[panic_handler]
+fn panic_fmt(_: &core::panic::PanicInfo) -> ! {
+    elrond_wasm_node::ext_error::signal_error(&b"panic occured"[..])
 }
 
 #[cfg(feature = "wasm-output-mode")]

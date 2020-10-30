@@ -14,8 +14,16 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies]
-basic-features = { path = "..", features=["wasm-output-mode"] }
-elrond-wasm-output = { version = "0.8.0", path = "../../../elrond-wasm-output", features=["wasm-output-mode"] }
+[dependencies.basic-features]
+path = ".."
+features = ["wasm-output-mode"]
+default-features = false
+
+[dependencies.elrond-wasm-output]
+version = "0.8.0"
+path = "../../../elrond-wasm-output"
+features = ["wasm-output-mode", "panic-message"]
+
+
 
 [workspace]
