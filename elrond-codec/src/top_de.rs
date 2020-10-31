@@ -26,17 +26,14 @@ pub trait TopDecode: Sized {
     const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
     
     /// Attempt to deserialize the value from input.
-    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R;
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError>;
     
     /// Allows types to provide optimized implementations for their boxed version.
     /// Especially designed for byte arrays that can be transmuted directly from the input sometimes.
     #[doc(hidden)]
     #[inline]
-    fn top_decode_boxed<I: TopDecodeInput, R, F: FnOnce(Result<Box<Self>, DecodeError>) -> R>(input: I, f: F) -> R {
-        Self::top_decode(input, |res| match res {
-            Ok(v) => f(Ok(Box::new(v))),
-            Err(e) => f(Err(e))
-        })
+    fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
+        Ok(Box::new(Self::top_decode(input)?))
     }
 }
 
@@ -58,52 +55,47 @@ where
 impl TopDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
     
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(_input: I, f: F) -> R {
-		f(Ok(()))
+	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
+		Ok(())
 	}
 }
 
 impl<T: TopDecode> TopDecode for Box<T> {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        T::top_decode_boxed(input, f)
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        T::top_decode_boxed(input)
     }
 }
 
 // Allowed to implement this because [T] cannot implement NestedDecode, being ?Sized.
 impl<T: NestedDecode> TopDecode for Box<[T]> {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
-            f(Ok(cast_bytes))
+            Ok(cast_bytes)
         } else {
-            Vec::<T>::top_decode(input, |res| match res {
-                Ok(vec) => f(Ok(vec_into_boxed_slice(vec))),
-                Err(e) => f(Err(e)),
-            })
+            let vec = Vec::<T>::top_decode(input)?;
+            Ok(vec_into_boxed_slice(vec))
         }
     }
 }
 
 impl<T: NestedDecode> TopDecode for Vec<T> {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let bytes_vec = boxed_slice_into_vec(bytes);
             let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
-            f(Ok(cast_vec))
+            Ok(cast_vec)
         } else {
             let bytes = input.into_boxed_slice_u8();
             // let mut slice = input.get_slice_u8();
             let mut_slice = &mut &*bytes;
             let mut result: Vec<T> = Vec::new();
             while !mut_slice.is_empty() {
-                match T::dep_decode(mut_slice) {
-                    Ok(t) => { result.push(t); }
-                    Err(e) => { return f(Err(e)); }
-                }
+                result.push(T::dep_decode(mut_slice)?);
             }
-            f(Ok(result))
+            Ok(result)
         }
     }
 }
@@ -113,13 +105,13 @@ macro_rules! decode_num_unsigned {
         impl TopDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
-            fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+            fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
                 let arg_u64 = input.into_u64();
                 let max = <$bounds_ty>::MAX as u64;
                 if arg_u64 > max {
-                    f(Err(DecodeError::INPUT_TOO_LONG))
+                    Err(DecodeError::INPUT_TOO_LONG)
                 } else {
-                    f(Ok(arg_u64 as $ty))
+                    Ok(arg_u64 as $ty)
                 }
             }
         }
@@ -137,14 +129,14 @@ macro_rules! decode_num_signed {
         impl TopDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
             
-            fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+            fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
                 let arg_i64 = input.into_i64();
                 let min = <$bounds_ty>::MIN as i64;
                 let max = <$bounds_ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {
-                    f(Err(DecodeError::INPUT_OUT_OF_RANGE))
+                    Err(DecodeError::INPUT_OUT_OF_RANGE)
                 } else {
-                    f(Ok(arg_i64 as $ty))
+                    Ok(arg_i64 as $ty)
                 }
             }
         }
@@ -160,26 +152,23 @@ decode_num_signed!(i64, i64, TypeInfo::I64);
 impl TopDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
     
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        match input.into_u64() {
-            0 => f(Ok(false)),
-            1 => f(Ok(true)),
-            _ => f(Err(DecodeError::INPUT_OUT_OF_RANGE)),
+	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        match input.into_i64() {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
         }
     }
 }
 
 impl<T: NestedDecode> TopDecode for Option<T> {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        let bytes = input.into_boxed_slice_u8();
+	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+        let bytes = input.get_slice_u8();
         if bytes.is_empty() {
-            f(Ok(None))
+            Ok(None)
         } else {
-            match dep_decode_from_byte_slice::<T>(&bytes[1..]) {
-                Ok(t) => f(Ok(Some(t))),
-                Err(e) => f(Err(e)),
-            }
-            
+            let item = dep_decode_from_byte_slice::<T>(&bytes[1..])?;
+            Ok(Some(item))
         }
     }
 }
@@ -191,8 +180,9 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedDecode,)+
             {
-                fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-                    top_decode_from_nested(input, f)
+                fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+                    let bytes = input.get_slice_u8();
+                    dep_decode_from_byte_slice(bytes)
 				}
             }
         )+
@@ -222,25 +212,22 @@ macro_rules! array_impls {
     ($($n: tt,)+) => {
         $(
             impl<T: NestedDecode> TopDecode for [T; $n] {
-                fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-                    top_decode_from_nested(input, f)
+                fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+                    dep_decode_from_byte_slice(input.get_slice_u8())
                 }
                 
-                fn top_decode_boxed<I: TopDecodeInput, R, F: FnOnce(Result<Box<Self>, DecodeError>) -> R>(input: I, f: F) -> R {
+                fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
                     if let TypeInfo::U8 = T::TYPE_INFO {
                         // transmute directly
                         let bs = input.into_boxed_slice_u8();
                         if bs.len() != $n {
-                            return f(Err(DecodeError::ARRAY_DECODE_ERROR));
+                            return Err(DecodeError::ARRAY_DECODE_ERROR);
                         }
                         let raw = Box::into_raw(bs);
                         let array_box = unsafe { Box::<[T; $n]>::from_raw(raw as *mut [T; $n]) };
-                        f(Ok(array_box))
+                        Ok(array_box)
                     } else {
-                        Self::top_decode(input, |res| match res {
-                            Ok(v) => f(Ok(Box::new(v))),
-                            Err(e) => f(Err(e))
-                        })
+                        Ok(Box::new(Self::top_decode(input)?))
                     }
                 }
             }
@@ -276,11 +263,8 @@ fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
 }
 
 impl TopDecode for NonZeroUsize {
-    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        usize::top_decode(input, |res| match res {
-            Ok(num) => f(decode_non_zero_usize(num)),
-            Err(e) => f(Err(e))
-        })
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        decode_non_zero_usize(usize::top_decode(input)?)
     }
 }
 
@@ -296,7 +280,7 @@ mod tests {
     where
         V: TopDecode + PartialEq + Debug + 'static,
     {
-        let deserialized: V = V::top_decode(bytes, |res| res.unwrap());
+        let deserialized: V = V::top_decode(bytes).unwrap();
         assert_eq!(deserialized, element);
     }
 
