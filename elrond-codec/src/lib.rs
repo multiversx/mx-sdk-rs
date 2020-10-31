@@ -91,8 +91,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for Test {
-        fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-            top_decode_from_nested(input, f)
+        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+            dep_decode_from_byte_slice(input.get_slice_u8())
         }
     }
 
@@ -148,8 +148,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for E {
-        fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-            top_decode_from_nested(input, f)
+        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+            dep_decode_from_byte_slice(input.get_slice_u8())
         }
     }
 
@@ -179,8 +179,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for WrappedArray {
-        fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-            top_decode_from_nested(input, f)
+        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
+            dep_decode_from_byte_slice(input.get_slice_u8())
         }
     }
 }
@@ -199,7 +199,7 @@ pub mod tests {
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
         let serialized_bytes = top_encode_to_vec(&element).unwrap();
-        let deserialized = V::top_decode(&serialized_bytes[..], |res| res.unwrap());
+        let deserialized = V::top_decode(&serialized_bytes[..]).unwrap();
         assert_eq!(deserialized, element);
     }
 
@@ -268,7 +268,7 @@ pub mod tests {
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize
-        let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..], |res| res.unwrap());
+        let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..]).unwrap();
         for i in 0..16384 {
             assert_eq!(deserialized[i], 7i32);
         }
