@@ -48,16 +48,11 @@ where
 {
     let bytes = input.into_boxed_slice_u8();
     let mut_slice = &mut &*bytes;
-    match D::dep_decode_to(mut_slice) {
-        Ok(result) => {
-            if mut_slice.is_empty() {
-                f(Ok(result))
-            } else {
-                f(Err(DecodeError::INPUT_TOO_LONG))
-            }
-        },
-        Err(e) => f(Err(e)),
+    let result = D::dep_decode(mut_slice);
+    if !mut_slice.is_empty() {
+        return f(Err(DecodeError::INPUT_TOO_LONG));
     }
+    f(result)
 }
 
 impl TopDecode for () {
@@ -103,7 +98,7 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
             let mut_slice = &mut &*bytes;
             let mut result: Vec<T> = Vec::new();
             while !mut_slice.is_empty() {
-                match T::dep_decode_to(mut_slice) {
+                match T::dep_decode(mut_slice) {
                     Ok(t) => { result.push(t); }
                     Err(e) => { return f(Err(e)); }
                 }

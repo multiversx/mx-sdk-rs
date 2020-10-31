@@ -163,8 +163,8 @@ impl TopEncode for RustBigInt {
 impl NestedDecode for RustBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode_to(input)?;
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
     }
