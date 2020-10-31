@@ -21,8 +21,8 @@ impl TopEncode for LargeBoxedByteArray {
 
 impl NestedDecode for LargeBoxedByteArray {
     #[inline]
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::dep_decode_to(input)?))
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::dep_decode(input)?))
     }
 }
 

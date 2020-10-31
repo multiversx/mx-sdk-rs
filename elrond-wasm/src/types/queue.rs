@@ -100,9 +100,9 @@ impl<T: NestedEncode> TopEncode for Queue<T> {
 /// Deserializes like a Vec.
 impl<T: NestedDecode> NestedDecode for Queue<T> {
     #[inline]
-	fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(Queue {
-            vec: Vec::<T>::dep_decode_to(input)?,
+            vec: Vec::<T>::dep_decode(input)?,
             start: 0,
         })
     }

@@ -41,8 +41,8 @@ impl TopEncode for SimpleEnum {
 }
 
 impl NestedDecode for SimpleEnum {
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        SimpleEnum::from_i64(i64::dep_decode_to(input)?)
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        SimpleEnum::from_i64(i64::dep_decode(input)?)
     }
 }
 
