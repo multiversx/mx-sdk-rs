@@ -85,10 +85,13 @@ where
             cast_big_uint
         },
         _ => {
-            match T::top_decode(StorageGetInput::new(api, key)) {
+            match T::top_decode(StorageGetInput::new(api.clone(), key)) {
                 Ok(v) => v,
                 Err(de_err) => storage_get_error(api, de_err),
             }
+            // T::top_decode_or_exit(
+            //     StorageGetInput::new(api.clone(), key),
+            //     &|de_err| storage_get_error(api.clone(), de_err))
         }
     }
 }

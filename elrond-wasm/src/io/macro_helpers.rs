@@ -26,10 +26,13 @@ where
             cast_big_uint
         },
         _ => {
-            match T::top_decode(ArgDecodeInput::new(api.clone(), index), |res| res) {
+            match T::top_decode(ArgDecodeInput::new(api.clone(), index)) {
                 Ok(v) => v,
                 Err(de_err) => ApiSignalError::new(api).signal_arg_de_error(arg_id, de_err),
             }
+            // T::top_decode_or_exit(
+            //     ArgDecodeInput::new(api.clone(), index),
+            //     &|de_err| ApiSignalError::new(api.clone()).signal_arg_de_error(arg_id, de_err))
         }
     }
 }

@@ -151,7 +151,7 @@ impl NestedDecode for H256 {
 
 impl TopDecode for H256 {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        match Box::<[u8; 32]>::top_decode(input) {
+        match <[u8; 32]>::top_decode_boxed(input) {
             Ok(array_box) => Ok(H256(array_box)),
             Err(_) => Err(DecodeError::from(&b"bad H256 length"[..])),
         }
