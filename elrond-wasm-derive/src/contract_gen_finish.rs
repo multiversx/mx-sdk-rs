@@ -6,7 +6,7 @@ pub fn generate_body_with_result(return_type: &syn::ReturnType, mbody: &proc_mac
         syn::ReturnType::Type(_, _) => {
             quote!{
                 let result = #mbody;
-                EndpointResult::<'_, T, BigInt, BigUint>::finish(&result, &self.api);
+                EndpointResult::<T, BigInt, BigUint>::finish(&result, self.api.clone());
             }
         },
     }

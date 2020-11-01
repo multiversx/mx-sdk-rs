@@ -377,15 +377,13 @@ impl Method {
                     match &arg.metadata {
                         ArgMetadata::Single | ArgMetadata::VarArgs => {
                             generate_load_dyn_arg(arg,
-                                &quote! { &mut ___arg_loader },
-                                &quote! { &___err_handler })
+                                &quote! { &mut ___arg_loader })
                         },
                         ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
                         ArgMetadata::Multi(multi_attr) => { // #[multi(...)]
                             let count_expr = &multi_attr.count_expr;
                             generate_load_dyn_multi_arg(arg,
                                 &quote! { &mut ___arg_loader },
-                                &quote! { &___err_handler },
                                 &quote! { #count_expr as usize })
                         }
                     }
@@ -401,12 +399,11 @@ impl Method {
             fn #call_method_ident (&self) {
                 #payable_snippet
 
-                let mut ___arg_loader = DynEndpointArgLoader::new(&self.api);
-                let ___err_handler = DynEndpointErrHandler::new(&self.api);
+                let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
 
                 #(#arg_init_snippets)*
 
-                elrond_wasm::check_no_more_args(&___arg_loader, &___err_handler);
+                ___arg_loader.assert_no_more_args();
 
                 #body_with_result
             }

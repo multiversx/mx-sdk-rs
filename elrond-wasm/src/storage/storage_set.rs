@@ -2,37 +2,35 @@ use crate::*;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
-fn storage_set_error<'a, A, BigInt, BigUint>(api: &'a A, encode_err: EncodeError) -> !
+fn storage_set_error<A, BigInt, BigUint>(api: A, encode_err: EncodeError) -> !
 where
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     api.signal_error(encode_err.message_bytes())
 }
 
-struct StorageSetOutput<'a, 'k, A, BigInt, BigUint>
+struct StorageSetOutput<'k, A, BigInt, BigUint>
 where
-    'a: 'k,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
-    api: &'a A,
+    api: A,
     key: &'k [u8],
     _phantom1: PhantomData<BigInt>,
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, 'k, A, BigInt, BigUint> StorageSetOutput<'a, 'k, A, BigInt, BigUint>
+impl<'k, A, BigInt, BigUint> StorageSetOutput<'k, A, BigInt, BigUint>
 where
-    'a: 'k,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>
 {
     #[inline]
-    fn new(api: &'a A, key: &'k [u8]) -> Self {
+    fn new(api: A, key: &'k [u8]) -> Self {
         StorageSetOutput {
             api,
             key,
@@ -42,12 +40,11 @@ where
     }
 }
 
-impl<'a, 'k, A, BigInt, BigUint> TopEncodeOutput for StorageSetOutput<'a, 'k, A, BigInt, BigUint>
+impl<'k, A, BigInt, BigUint> TopEncodeOutput for StorageSetOutput<'k, A, BigInt, BigUint>
 where
-    'a: 'k,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.storage_store_slice_u8(self.key, bytes)
@@ -63,13 +60,12 @@ where
 }
 
 // #[inline]
-pub fn storage_set<'a, 'k, A, BigInt, BigUint, T>(api: &'a A, key: &'k [u8], value: &T)
+pub fn storage_set<'k, A, BigInt, BigUint, T>(api: A, key: &'k [u8], value: &T)
 where
-    'a: 'k,
     T: TopEncode,
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     // the compiler is smart enough to evaluate this match at compile time
     match T::TYPE_INFO {
@@ -80,7 +76,7 @@ where
             api.storage_store_big_uint(key, cast_big_uint);
         },
         _ => {
-            match value.top_encode(StorageSetOutput::new(api, key)) {
+            match value.top_encode(StorageSetOutput::new(api.clone(), key)) {
                 Ok(v) => v,
                 Err(encode_err) => storage_set_error(api, encode_err),
             }

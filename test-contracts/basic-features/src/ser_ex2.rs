@@ -9,7 +9,7 @@ pub enum SerExample2 {
 }
 
 impl NestedEncode for SerExample2 {
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         match self {
             SerExample2::Unit => {
                 0u32.dep_encode_to(dest)?;
@@ -40,19 +40,19 @@ impl TopEncode for SerExample2 {
 }
 
 impl NestedDecode for SerExample2 {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        match u32::dep_decode(input)? {
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        match u32::dep_decode_to(input)? {
             0 => Ok(SerExample2::Unit),
-            1 => Ok(SerExample2::Newtype(u32::dep_decode(input)?)),
-            2 => Ok(SerExample2::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
-            3 => Ok(SerExample2::Struct{ a: u32::dep_decode(input)? }),
+            1 => Ok(SerExample2::Newtype(u32::dep_decode_to(input)?)),
+            2 => Ok(SerExample2::Tuple(u32::dep_decode_to(input)?, u32::dep_decode_to(input)?)),
+            3 => Ok(SerExample2::Struct{ a: u32::dep_decode_to(input)? }),
             _ => Err(DecodeError::INVALID_VALUE),
         }
     }
 }
 
 impl TopDecode for SerExample2 {
-    fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-        dep_decode_from_byte_slice(input.get_slice_u8())
+    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        top_decode_from_nested(input, f)
     }
 }

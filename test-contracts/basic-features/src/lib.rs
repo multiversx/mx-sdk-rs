@@ -139,6 +139,17 @@ pub trait BasicFeatures {
     }
 
     #[endpoint]
+    fn take_varags_u32(&self, #[var_args] m: VarArgs<u32>) -> usize {
+        let v = m.into_vec();
+        v.len()
+    }
+
+    #[endpoint]
+    fn echo_varags_big_uint(&self, #[var_args] m: VarArgs<BigUint>) -> MultiResultVec<BigUint> {
+        m.into_vec().into()
+    }
+
+    #[endpoint]
     fn echo_varags_tuples(&self, #[var_args] m: VarArgs<MultiArg2<isize, Vec<u8>>>) -> MultiResultVec<MultiResult2<isize, Vec<u8>>> {
         let mut result: Vec<MultiResult2<isize, Vec<u8>>> = Vec::new();
         for m_arg in m.into_vec().into_iter() {

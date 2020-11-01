@@ -10,6 +10,6 @@ where
     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
 
     // deserialize
-    let deserialized: V = V::top_decode(&serialized_bytes[..]).unwrap();
+    let deserialized: V = V::top_decode(&serialized_bytes[..], |res| res.unwrap());
     assert_eq!(deserialized, element);
 }

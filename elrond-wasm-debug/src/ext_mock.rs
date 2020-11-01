@@ -150,8 +150,8 @@ impl TxOutput {
 
 #[derive(Debug)]
 pub struct TxContext {
-    pub blockchain_info: BlockchainTxInfo,
-    pub tx_input: TxInput,
+    pub blockchain_info_box: Box<BlockchainTxInfo>,
+    pub tx_input_box: Box<TxInput>,
     pub tx_output_cell: Rc<RefCell<TxOutput>>,
 }
 
@@ -162,8 +162,8 @@ impl TxContext {
         tx_output: TxOutput) -> Self {
 
         TxContext {
-            blockchain_info,
-            tx_input,
+            blockchain_info_box: Box::new(blockchain_info),
+            tx_input_box: Box::new(tx_input),
             tx_output_cell: Rc::new(RefCell::new(tx_output)),
         }
     }
@@ -175,13 +175,13 @@ impl TxContext {
 
     pub fn dummy() -> Self {
         TxContext {
-            blockchain_info: BlockchainTxInfo {
+            blockchain_info_box: Box::new(BlockchainTxInfo {
                 previous_block_info: BlockInfo::new(),
                 current_block_info: BlockInfo::new(),
                 contract_balance: 0u32.into(),
                 contract_owner: None,
-            },
-            tx_input: TxInput{
+            }),
+            tx_input_box: Box::new(TxInput{
                 from: Address::zero(),
                 to: Address::zero(),
                 call_value: 0u32.into(),
@@ -192,7 +192,7 @@ impl TxContext {
                 gas_limit: 0,
                 gas_price: 0,
                 tx_hash: b"dummy...........................".into(),
-            },
+            }),
             tx_output_cell: Rc::new(RefCell::new(TxOutput::default())),
         }
     }
@@ -201,8 +201,8 @@ impl TxContext {
 impl Clone for TxContext {
     fn clone(&self) -> Self {
         TxContext{
-            blockchain_info: self.blockchain_info.clone(),
-            tx_input: self.tx_input.clone(),
+            blockchain_info_box: self.blockchain_info_box.clone(),
+            tx_input_box: self.tx_input_box.clone(),
             tx_output_cell: Rc::clone(&self.tx_output_cell),
         }
     }
@@ -210,22 +210,22 @@ impl Clone for TxContext {
 
 impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     fn get_sc_address(&self) -> Address {
-        self.tx_input.to.clone()
+        self.tx_input_box.to.clone()
     }
 
     fn get_owner_address(&self) -> Address {
-        self.blockchain_info.contract_owner.clone().unwrap_or_else(|| panic!("contract owner address not set"))
+        self.blockchain_info_box.contract_owner.clone().unwrap_or_else(|| panic!("contract owner address not set"))
     }
 
     fn get_caller(&self) -> Address {
-        self.tx_input.from.clone()
+        self.tx_input_box.from.clone()
     }
 
     fn get_balance(&self, address: &Address) -> RustBigUint {
         if address != &self.get_sc_address() {
             panic!("get balance not yet implemented for accounts other than the contract itself");
         }
-        self.blockchain_info.contract_balance.clone().into()
+        self.blockchain_info_box.contract_balance.clone().into()
     }
 
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
@@ -324,17 +324,17 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
     #[inline]
     fn get_call_value_big_uint(&self) -> RustBigUint {
-        self.tx_input.call_value.clone().into()
+        self.tx_input_box.call_value.clone().into()
     }
 
     #[inline]
     fn get_esdt_value_big_uint(&self) -> RustBigUint {
-        self.tx_input.esdt_value.clone().into()
+        self.tx_input_box.esdt_value.clone().into()
     }
 
     #[inline]
     fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
-        self.tx_input.esdt_token_name.clone()
+        self.tx_input_box.esdt_token_name.clone()
     }
 
     fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
@@ -356,27 +356,27 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_tx_hash(&self) -> H256 {
-        self.tx_input.tx_hash.clone()
+        self.tx_input_box.tx_hash.clone()
     }
 
     fn get_gas_left(&self) -> u64 {
-        self.tx_input.gas_limit
+        self.tx_input_box.gas_limit
     }
 
     fn get_block_timestamp(&self) -> u64 {
-        self.blockchain_info.current_block_info.block_timestamp
+        self.blockchain_info_box.current_block_info.block_timestamp
     }
 
     fn get_block_nonce(&self) -> u64 {
-        self.blockchain_info.current_block_info.block_nonce
+        self.blockchain_info_box.current_block_info.block_nonce
     }
 
     fn get_block_round(&self) -> u64 {
-        self.blockchain_info.current_block_info.block_round
+        self.blockchain_info_box.current_block_info.block_round
     }
 
     fn get_block_epoch(&self) -> u64 {
-        self.blockchain_info.current_block_info.block_epoch
+        self.blockchain_info_box.current_block_info.block_epoch
     }
 
     fn get_block_random_seed(&self) -> Box<[u8; 48]> {
@@ -384,19 +384,19 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
     }
 
     fn get_prev_block_timestamp(&self) -> u64 {
-        self.blockchain_info.previous_block_info.block_timestamp
+        self.blockchain_info_box.previous_block_info.block_timestamp
     }
 
     fn get_prev_block_nonce(&self) -> u64 {
-        self.blockchain_info.previous_block_info.block_nonce
+        self.blockchain_info_box.previous_block_info.block_nonce
     }
 
     fn get_prev_block_round(&self) -> u64 {
-        self.blockchain_info.previous_block_info.block_round
+        self.blockchain_info_box.previous_block_info.block_round
     }
 
     fn get_prev_block_epoch(&self) -> u64 {
-        self.blockchain_info.previous_block_info.block_epoch
+        self.blockchain_info_box.previous_block_info.block_epoch
     }
 
     fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
@@ -421,7 +421,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 
     fn get_num_arguments(&self) -> i32 {
-        self.tx_input.args.len() as i32
+        self.tx_input_box.args.len() as i32
     }
 
     fn check_not_payable(&self) {
@@ -441,10 +441,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 
     fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
         let arg_idx_usize = arg_index as usize;
-        if arg_idx_usize >= self.tx_input.args.len() {
+        if arg_idx_usize >= self.tx_input_box.args.len() {
             panic!("Tx arg index out of range");
         }
-        self.tx_input.args[arg_idx_usize].clone()
+        self.tx_input_box.args[arg_idx_usize].clone()
     }
 
     fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
@@ -512,6 +512,14 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 
     fn finish_big_uint(&self, bu: &RustBigUint) {
         self.finish_slice_u8(bu.to_bytes_be().as_slice());
+    }
+
+    fn finish_big_int_raw(&self, _handle: i32) {
+        panic!("cannot call finish_big_int_raw in debug mode");
+    }
+
+    fn finish_big_uint_raw(&self, _handle: i32) {
+        panic!("cannot call finish_big_uint_raw in debug mode");
     }
     
     fn finish_i64(&self, value: i64) {

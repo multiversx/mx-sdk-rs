@@ -11,7 +11,7 @@ pub struct SerExample1 {
 }
 
 impl NestedEncode for SerExample1 {
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.int.dep_encode_to(dest)?;
         self.seq.dep_encode_to(dest)?;
         self.another_byte.dep_encode_to(dest)?;
@@ -29,19 +29,19 @@ impl TopEncode for SerExample1 {
 }
 
 impl NestedDecode for SerExample1 {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(SerExample1{
-            int: u16::dep_decode(input)?,
-            seq: Vec::<u8>::dep_decode(input)?,
-            another_byte: u8::dep_decode(input)?,
-            uint_32: u32::dep_decode(input)?,
-            uint_64: u64::dep_decode(input)?,
+            int: u16::dep_decode_to(input)?,
+            seq: Vec::<u8>::dep_decode_to(input)?,
+            another_byte: u8::dep_decode_to(input)?,
+            uint_32: u32::dep_decode_to(input)?,
+            uint_64: u64::dep_decode_to(input)?,
         })
     }
 }
 
 impl TopDecode for SerExample1 {
-    fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-        dep_decode_from_byte_slice(input.get_slice_u8())
+    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        top_decode_from_nested(input, f)
     }
 }

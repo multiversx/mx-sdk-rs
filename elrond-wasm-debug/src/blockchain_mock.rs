@@ -209,7 +209,7 @@ pub fn execute_tx(
     contract_identifier: &Vec<u8>,
     contract_map: &ContractMap<TxContext>) -> TxOutput {
 
-    let func_name = tx_context.tx_input.func_name.clone();
+    let func_name = tx_context.tx_input_box.func_name.clone();
     let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         contract_inst.call(func_name.as_slice());

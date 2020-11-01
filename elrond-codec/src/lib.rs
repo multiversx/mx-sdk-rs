@@ -23,8 +23,8 @@ pub use top_ser::{TopEncode, top_encode_to_vec};
 pub use top_de_input::TopDecodeInput;
 pub use top_de::*;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
-pub use crate::nested_de_input::Input;
-pub use crate::nested_ser_output::OutputBuffer;
+pub use crate::nested_de_input::NestedDecodeInput;
+pub use crate::nested_ser_output::NestedEncodeOutput;
 pub use crate::num_conv::{using_encoded_number, top_encode_number_to_output, bytes_to_number};
 
 /// !INTERNAL USE ONLY!
@@ -65,7 +65,7 @@ pub mod test_struct {
 	}
 
 	impl NestedEncode for Test {
-		fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
 			self.int.dep_encode_to(dest)?;
 			self.seq.dep_encode_to(dest)?;
             self.another_byte.dep_encode_to(dest)?;
@@ -81,18 +81,18 @@ pub mod test_struct {
     }
     
     impl NestedDecode for Test {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
             Ok(Test{
-                int: u16::dep_decode(input)?,
-                seq: Vec::<u8>::dep_decode(input)?,
-                another_byte: u8::dep_decode(input)?,
+                int: u16::dep_decode_to(input)?,
+                seq: Vec::<u8>::dep_decode_to(input)?,
+                another_byte: u8::dep_decode_to(input)?,
             })
         }
     }
 
     impl TopDecode for Test {
-        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-            dep_decode_from_byte_slice(input.get_slice_u8())
+        fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+            top_decode_from_nested(input, f)
         }
     }
 
@@ -105,7 +105,7 @@ pub mod test_struct {
     }
 
     impl NestedEncode for E {
-		fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
             match self {
                 E::Unit => {
                     0u32.dep_encode_to(dest)?;
@@ -136,20 +136,20 @@ pub mod test_struct {
     }
     
     impl NestedDecode for E {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-            match u32::dep_decode(input)? {
+        fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+            match u32::dep_decode_to(input)? {
                 0 => Ok(E::Unit),
-                1 => Ok(E::Newtype(u32::dep_decode(input)?)),
-                2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
-                3 => Ok(E::Struct{ a: u32::dep_decode(input)? }),
+                1 => Ok(E::Newtype(u32::dep_decode_to(input)?)),
+                2 => Ok(E::Tuple(u32::dep_decode_to(input)?, u32::dep_decode_to(input)?)),
+                3 => Ok(E::Struct{ a: u32::dep_decode_to(input)? }),
                 _ => Err(DecodeError::INVALID_VALUE),
             }
         }
     }
 
     impl TopDecode for E {
-        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-            dep_decode_from_byte_slice(input.get_slice_u8())
+        fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+            top_decode_from_nested(input, f)
         }
     }
 
@@ -157,7 +157,7 @@ pub mod test_struct {
     pub struct WrappedArray(pub [u8; 5]);
 
     impl NestedEncode for WrappedArray {
-		fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
             dest.write(&self.0[..]);
             Ok(())
 		}
@@ -171,7 +171,7 @@ pub mod test_struct {
     }
     
     impl NestedDecode for WrappedArray {
-        fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+        fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
             let mut arr = [0u8; 5];
             input.read_into(&mut arr)?;
             Ok(WrappedArray(arr))
@@ -179,8 +179,8 @@ pub mod test_struct {
     }
 
     impl TopDecode for WrappedArray {
-        fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-            dep_decode_from_byte_slice(input.get_slice_u8())
+        fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+            top_decode_from_nested(input, f)
         }
     }
 }
@@ -199,7 +199,7 @@ pub mod tests {
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
         let serialized_bytes = top_encode_to_vec(&element).unwrap();
-        let deserialized = V::top_decode(&serialized_bytes[..]).unwrap();
+        let deserialized = V::top_decode(&serialized_bytes[..], |res| res.unwrap());
         assert_eq!(deserialized, element);
     }
 
@@ -268,7 +268,7 @@ pub mod tests {
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize
-        let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..]).unwrap();
+        let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..], |res| res.unwrap());
         for i in 0..16384 {
             assert_eq!(deserialized[i], 7i32);
         }
