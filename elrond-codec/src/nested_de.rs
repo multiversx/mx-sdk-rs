@@ -19,6 +19,16 @@ pub trait NestedDecode: Sized {
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError>;
+
+    /// Version of `top_decode` that exits quickly in case of error.
+    /// Its purpose is to create smaller implementations
+    /// in cases where the application is supposed to exit directly on decode error.
+    fn dep_decode_or_exit<I: NestedDecodeInput, X: Fn(DecodeError) -> !>(input: &mut I, exit: &X) -> Self {
+        match Self::dep_decode(input) {
+            Ok(v) => v,
+            Err(e) => exit(e)
+        }
+    }
 }
 
 /// Convenience method, to avoid having to specify type when calling `dep_decode`.
@@ -66,6 +76,25 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
                     result.push(T::dep_decode(input)?);
                 }
                 Ok(result)
+			}
+        }
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, X: Fn(DecodeError) -> !>(input: &mut I, exit: &X) -> Self {
+        let size = usize::dep_decode_or_exit(input, exit);
+        match T::TYPE_INFO {
+			TypeInfo::U8 => {
+                let bytes = input.read_slice(size).unwrap_or_else(|e| exit(e));
+                let bytes_copy = bytes.to_vec(); // copy is needed because result might outlive input
+                let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_copy) };
+                cast_vec
+			},
+			_ => {
+                let mut result: Vec<T> = Vec::with_capacity(size);
+				for _ in 0..size {
+                    result.push(T::dep_decode_or_exit(input, exit));
+                }
+                result
 			}
         }
     }

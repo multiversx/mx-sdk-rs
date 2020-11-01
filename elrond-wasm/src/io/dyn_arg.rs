@@ -35,9 +35,12 @@ where
         }
 
         let arg_input = loader.next_arg_input();
-        match T::top_decode(arg_input, |res| res) {
+        match T::top_decode(arg_input) {
             Ok(v) => v,
             Err(de_err) => loader.signal_arg_de_error(arg_id, de_err),
         }
+        // T::top_decode_or_exit(
+        //     arg_input,
+        //     &|de_err| loader.signal_arg_de_error(arg_id, de_err))
     }
 }

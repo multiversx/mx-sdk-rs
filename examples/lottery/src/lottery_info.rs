@@ -36,22 +36,22 @@ impl<BigUint:BigUintApi> TopEncode for LotteryInfo<BigUint> {
 
 
 impl<BigUint:BigUintApi> NestedDecode for LotteryInfo<BigUint> {
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(LotteryInfo {
-            ticket_price: BigUint::dep_decode_to(input)?,
-            tickets_left: u32::dep_decode_to(input)?,
-            deadline: u64::dep_decode_to(input)?,
-            max_entries_per_user: u32::dep_decode_to(input)?,
-            prize_distribution: Vec::<u8>::dep_decode_to(input)?,
-            whitelist: Vec::<Address>::dep_decode_to(input)?,
-            current_ticket_number: u32::dep_decode_to(input)?,
-            prize_pool: BigUint::dep_decode_to(input)?,
+            ticket_price: BigUint::dep_decode(input)?,
+            tickets_left: u32::dep_decode(input)?,
+            deadline: u64::dep_decode(input)?,
+            max_entries_per_user: u32::dep_decode(input)?,
+            prize_distribution: Vec::<u8>::dep_decode(input)?,
+            whitelist: Vec::<Address>::dep_decode(input)?,
+            current_ticket_number: u32::dep_decode(input)?,
+            prize_pool: BigUint::dep_decode(input)?,
         })
     }
 }
 
 impl<BigUint:BigUintApi> TopDecode for LotteryInfo<BigUint> {
-    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        top_decode_from_nested(input, f)
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        top_decode_from_nested(input)
     }
 }
