@@ -14,7 +14,14 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [features]
-wasm-output-mode = [] # crate functionality can be turned off, but just for running the framework tests
+# crate functionality can be turned off
+# is only turned off when running the framework tests
+wasm-output-mode = [] 
+
+# only provide panic messages if so configured
+# they add a lot of bloat to the final bytecode,
+# so only use them if you really need to learn about a certain panic occuring at some point
+panic-message = [] 
 
 [dependencies]
 elrond-wasm-node = { version = "0.8.0", path = "../elrond-wasm-node" }

@@ -131,15 +131,12 @@ impl TxOutput {
         }
     }
 
-    pub fn from_panic_string(panic_string: &str) -> Self {
-        let mut message = b"panic occurred: ".to_vec();
-        message.extend_from_slice(panic_string.as_bytes());
-
+    pub fn from_panic_string(_: &str) -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult {
                 result_status: 4,
-                result_message: message,
+                result_message: b"panic occurred".to_vec(),
                 result_values: Vec::new(),
             },
             send_balance_list: Vec::new(),
