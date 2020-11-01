@@ -7,7 +7,7 @@ pub struct LargeBoxedByteArray(Box<[u8; ARRAY_SIZE]>);
 
 impl NestedEncode for LargeBoxedByteArray {
     #[inline]
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.0.dep_encode_to(dest)
     }
 }
@@ -21,14 +21,14 @@ impl TopEncode for LargeBoxedByteArray {
 
 impl NestedDecode for LargeBoxedByteArray {
     #[inline]
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::dep_decode(input)?))
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::dep_decode_to(input)?))
     }
 }
 
 impl TopDecode for LargeBoxedByteArray {
     #[inline]
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::top_decode(input)?))
+    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        Box::<[u8; ARRAY_SIZE]>::top_decode(input, |res| f(res.map(|v| LargeBoxedByteArray(v))))
     }
 }

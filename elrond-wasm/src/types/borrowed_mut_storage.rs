@@ -24,14 +24,14 @@ impl BorrowedMutStorageKey {
 /// when the lifetime of the BorrowedMutStorage expires.
 /// Optimization: will only save back to storage if the value is referenced with deref_mut(),
 /// because only in such way can it be changed.
-pub struct BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+pub struct BorrowedMutStorage<A, BigInt, BigUint, T>
 where
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>+ 'static,
     T: TopEncode + TopDecode,
 {
-    api: &'a A,
+    api: A,
     key: BorrowedMutStorageKey,
     value: T,
     dirty: bool,
@@ -39,15 +39,15 @@ where
     _phantom2: PhantomData<BigUint>,
 }
 
-impl<'a, A, BigInt, BigUint, T> BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+impl<A, BigInt, BigUint, T> BorrowedMutStorage<A, BigInt, BigUint, T>
 where
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint>+ 'static,
     T: TopEncode + TopDecode,
 {
-    pub fn with_const_key(api: &'a A, key: &'static [u8]) -> Self {
-        let value: T = storage_get(api, key);
+    pub fn with_const_key(api: A, key: &'static [u8]) -> Self {
+        let value: T = storage_get(api.clone(), key);
         BorrowedMutStorage {
             api,
             key : BorrowedMutStorageKey::Const(key),
@@ -58,8 +58,8 @@ where
         }
     }
 
-    pub fn with_generated_key(api: &'a A, key: Vec<u8>) -> Self {
-        let value: T = storage_get(api, key.as_slice());
+    pub fn with_generated_key(api: A, key: Vec<u8>) -> Self {
+        let value: T = storage_get(api.clone(), key.as_slice());
         BorrowedMutStorage {
             api,
             key : BorrowedMutStorageKey::Generated(key),
@@ -72,25 +72,25 @@ where
 }
 
 
-impl<'a, A, BigInt, BigUint, T> Drop for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+impl<A, BigInt, BigUint, T> Drop for BorrowedMutStorage<A, BigInt, BigUint, T>
 where
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
     T: TopEncode + TopDecode,
 {
     fn drop(&mut self) {
         if self.dirty {
-            storage_set(self.api, self.key.as_bytes(), &self.value);
+            storage_set(self.api.clone(), self.key.as_bytes(), &self.value);
         }
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> Deref for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+impl<A, BigInt, BigUint, T> Deref for BorrowedMutStorage<A, BigInt, BigUint, T>
 where
     BigInt: NestedEncode + 'static,
     BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
     T: TopEncode + TopDecode,
 {
     type Target = T;
@@ -100,15 +100,27 @@ where
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> DerefMut for BorrowedMutStorage<'a, A, BigInt, BigUint, T>
+impl<A, BigInt, BigUint, T> DerefMut for BorrowedMutStorage<A, BigInt, BigUint, T>
 where
     BigUint: BigUintApi + 'static,
     BigInt: BigIntApi<BigUint> + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
     T: TopEncode + TopDecode,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.dirty = true;
         &mut self.value
+    }
+}
+
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for BorrowedMutStorage<A, BigInt, BigUint, T>
+where
+    BigInt: BigIntApi<BigUint> + 'static,
+    BigUint: BigUintApi + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+    T: TopEncode + TopDecode + EndpointResult<A, BigInt, BigUint>,
+{
+    fn finish(&self, api: A) {
+        core::ops::Deref::deref(self).finish(api);
     }
 }

@@ -204,7 +204,7 @@ use elrond_wasm::elrond_codec::*;
 impl NestedEncode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
     
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
         let bytes = self.to_signed_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
@@ -214,24 +214,28 @@ impl NestedEncode for ArwenBigInt {
 impl TopEncode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
     
+	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.to_signed_bytes_be().top_encode(output)
+        output.set_big_int_handle_or_bytes(self.handle, || self.to_signed_bytes_be());
+        Ok(())
 	}
 }
 
 impl NestedDecode for ArwenBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        let size = usize::dep_decode_to(input)?;
         let bytes = input.read_slice(size)?;
         Ok(ArwenBigInt::from_signed_bytes_be(bytes))
     }
 }
 
 impl TopDecode for ArwenBigInt {
-	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-        Ok(ArwenBigInt::from_signed_bytes_be(input.get_slice_u8()))
+    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
+    
+	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        f(Ok(ArwenBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())))
     }
 }
 

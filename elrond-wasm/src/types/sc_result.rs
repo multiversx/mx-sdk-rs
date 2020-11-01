@@ -1,6 +1,6 @@
 use crate::*;
 use super::sc_error::SCError;
-use super::finish::EndpointResult;
+use crate::io::finish::EndpointResult;
 
 /// Default way to optionally return an error from a smart contract endpoint.
 #[must_use]
@@ -44,15 +44,15 @@ impl<T> SCResult<T> {
     }
 }
 
-impl<'a, A, BigInt, BigUint, T> EndpointResult<'a, A, BigInt, BigUint> for SCResult<T>
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for SCResult<T>
 where
-    T: EndpointResult<'a, A, BigInt, BigUint>,
+    T: EndpointResult<A, BigInt, BigUint>,
     BigInt: BigIntApi<BigUint> + 'static,
     BigUint: BigUintApi + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'a
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     #[inline]
-    fn finish(&self, api: &'a A) {
+    fn finish(&self, api: A) {
         match self {
             SCResult::Ok(t) => {
                 t.finish(api);

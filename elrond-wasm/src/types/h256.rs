@@ -128,7 +128,7 @@ impl H256 {
 use elrond_codec::*;
 
 impl NestedEncode for H256 {
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
         Ok(())
     }
@@ -142,7 +142,7 @@ impl TopEncode for H256 {
 }
 
 impl NestedDecode for H256 {
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let mut res = H256::zero();
         input.read_into(res.as_mut())?;
         Ok(res)
@@ -150,11 +150,11 @@ impl NestedDecode for H256 {
 }
 
 impl TopDecode for H256 {
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        match Box::<[u8; 32]>::top_decode(input) {
-            Ok(array_box) => Ok(H256(array_box)),
-            Err(_) => Err(DecodeError::from(&b"bad H256 length"[..])),
-        }
+	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        Box::<[u8; 32]>::top_decode(input, |res| match res {
+            Ok(array_box) => f(Ok(H256(array_box))),
+            Err(_) => f(Err(DecodeError::from(&b"bad H256 length"[..]))),
+        })
     }
 }
 

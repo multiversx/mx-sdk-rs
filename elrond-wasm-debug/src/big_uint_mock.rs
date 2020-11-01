@@ -232,7 +232,7 @@ use elrond_wasm::elrond_codec::*;
 impl NestedEncode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
     
-    fn dep_encode_to<O: OutputBuffer>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         let bytes = self.to_bytes_be();
         bytes.as_slice().dep_encode_to(dest)
     }
@@ -247,16 +247,16 @@ impl TopEncode for RustBigUint {
 impl NestedDecode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
-    fn dep_decode<I: Input>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        let size = usize::dep_decode_to(input)?;
         let bytes = input.read_slice(size)?;
         Ok(RustBigUint::from_bytes_be(bytes))
     }
 }
 
 impl TopDecode for RustBigUint {
-	fn top_decode<I: TopDecodeInput>(mut input: I) -> Result<Self, DecodeError> {
-        Ok(RustBigUint::from_bytes_be(input.get_slice_u8()))
+	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
+        f(Ok(RustBigUint::from_bytes_be(&*input.into_boxed_slice_u8())))
     }
 }
 
