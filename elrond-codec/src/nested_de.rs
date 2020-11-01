@@ -23,10 +23,10 @@ pub trait NestedDecode: Sized {
     /// Version of `top_decode` that exits quickly in case of error.
     /// Its purpose is to create smaller implementations
     /// in cases where the application is supposed to exit directly on decode error.
-    fn dep_decode_or_exit<I: NestedDecodeInput, X: Fn(DecodeError) -> !>(input: &mut I, exit: &X) -> Self {
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
         match Self::dep_decode(input) {
             Ok(v) => v,
-            Err(e) => exit(e)
+            Err(e) => exit(c, e)
         }
     }
 }
@@ -80,11 +80,11 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         }
     }
 
-    fn dep_decode_or_exit<I: NestedDecodeInput, X: Fn(DecodeError) -> !>(input: &mut I, exit: &X) -> Self {
-        let size = usize::dep_decode_or_exit(input, exit);
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
         match T::TYPE_INFO {
 			TypeInfo::U8 => {
-                let bytes = input.read_slice(size).unwrap_or_else(|e| exit(e));
+                let bytes = input.read_slice(size).unwrap_or_else(|e| exit(c.clone(), e));
                 let bytes_copy = bytes.to_vec(); // copy is needed because result might outlive input
                 let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_copy) };
                 cast_vec
@@ -92,7 +92,7 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
 			_ => {
                 let mut result: Vec<T> = Vec::with_capacity(size);
 				for _ in 0..size {
-                    result.push(T::dep_decode_or_exit(input, exit));
+                    result.push(T::dep_decode_or_exit(input, c.clone(), exit));
                 }
                 result
 			}

@@ -31,10 +31,10 @@ pub trait TopDecode: Sized {
     /// Version of `top_decode` that exits quickly in case of error.
     /// Its purpose is to create smaller implementations
     /// in cases where the application is supposed to exit directly on decode error.
-    fn top_decode_or_exit<I: TopDecodeInput, X: Fn(DecodeError) -> !>(input: I, exit: &X) -> Self {
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
         match Self::top_decode(input) {
             Ok(v) => v,
-            Err(e) => exit(e)
+            Err(e) => exit(c, e)
         }
     }
     
@@ -61,17 +61,16 @@ where
     Ok(result)
 }
 
-pub fn top_decode_from_nested_or_exit<T, I, X>(input: I, exit: &X) -> T
+pub fn top_decode_from_nested_or_exit<T, I, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> T
 where
     I: TopDecodeInput,
     T: NestedDecode,
-    X: Fn(DecodeError) -> !,
 {
     let bytes = input.into_boxed_slice_u8();
     let mut_slice = &mut &*bytes;
-    let result = T::dep_decode_or_exit(mut_slice, exit);
+    let result = T::dep_decode_or_exit(mut_slice, c.clone(), exit);
     if !mut_slice.is_empty() {
-        exit(DecodeError::INPUT_TOO_LONG);
+        exit(c, DecodeError::INPUT_TOO_LONG);
     }
     result
 }
@@ -104,13 +103,13 @@ impl<T: NestedDecode> TopDecode for Box<[T]> {
     }
 
     /// Quick exit for any of the contained types
-    fn top_decode_or_exit<I: TopDecodeInput, X: Fn(DecodeError) -> !>(input: I, exit: &X) -> Self {
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
             cast_bytes
         } else {
-            let vec = Vec::<T>::top_decode_or_exit(input, exit);
+            let vec = Vec::<T>::top_decode_or_exit(input, c, exit);
             vec_into_boxed_slice(vec)
         }
     }
@@ -135,7 +134,8 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
     }
 
     /// Quick exit for any of the contained types
-    fn top_decode_or_exit<I: TopDecodeInput, X: Fn(DecodeError) -> !>(input: I, exit: &X) -> Self {
+    #[inline(never)]
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let bytes_vec = boxed_slice_into_vec(bytes);
@@ -146,7 +146,7 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
             let mut_slice = &mut &*bytes;
             let mut result: Vec<T> = Vec::new();
             while !mut_slice.is_empty() {
-                result.push(T::dep_decode_or_exit(mut_slice, exit));
+                result.push(T::dep_decode_or_exit(mut_slice, c.clone(), exit));
             }
             result
         }
@@ -237,8 +237,8 @@ macro_rules! tuple_impls {
                     top_decode_from_nested(input)
                 }
 
-                fn top_decode_or_exit<I: TopDecodeInput, X: Fn(DecodeError) -> !>(input: I, exit: &X) -> Self {
-                    top_decode_from_nested_or_exit(input, exit)
+                fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                    top_decode_from_nested_or_exit(input, c, exit)
                 }
             }
         )+
@@ -272,8 +272,8 @@ macro_rules! array_impls {
                     top_decode_from_nested(input)
                 }
 
-                fn top_decode_or_exit<I: TopDecodeInput, X: Fn(DecodeError) -> !>(input: I, exit: &X) -> Self {
-                    top_decode_from_nested_or_exit(input, exit)
+                fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                    top_decode_from_nested_or_exit(input, c, exit)
                 }
                 
                 fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
