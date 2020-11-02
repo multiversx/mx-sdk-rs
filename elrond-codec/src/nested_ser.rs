@@ -87,7 +87,7 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 
 // The main unsigned types need to be reversed before serializing.
 macro_rules! encode_num_unsigned {
-    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
+    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
 		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 
@@ -116,7 +116,7 @@ impl NestedEncode for u8 {
 
 // Derive the implementation of the other types by casting.
 macro_rules! encode_num_mimic {
-    ($num_type:ident, $mimic_type:ident, $type_info:expr) => {
+    ($num_type:ty, $mimic_type:ident, $type_info:expr) => {
 		impl NestedEncode for $num_type {
 			const TYPE_INFO: TypeInfo = $type_info;
 

@@ -8,12 +8,49 @@ use crate::TypeInfo;
 use crate::nested_ser_output::NestedEncodeOutput;
 use crate::top_ser_output::TopEncodeOutput;
 
+/// Most types will be encoded without any possibility of error.
+/// The trait is used to provide these implementations.
+/// This is currently not a substitute for implementing a proper TopEncode. 
+pub trait TopEncodeNoErr: Sized {
+	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O);
+}
+
 pub trait TopEncode: Sized {
 	// !INTERNAL USE ONLY!
 	#[doc(hidden)]
 	const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
+	/// Attempt to serialize the value to ouput.
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError>;
+
+	/// Version of `top_decode` that exits quickly in case of error.
+    /// Its purpose is to create smaller implementations
+    /// in cases where the application is supposed to exit directly on decode error.
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        match self.top_encode(output) {
+            Ok(v) => v,
+            Err(e) => exit(c, e)
+        }
+    }
+}
+
+macro_rules! top_encode_from_no_err {
+    ($type:ty, $type_info:expr) => {
+		impl TopEncode for $type {
+			const TYPE_INFO: TypeInfo = $type_info;
+		
+			#[inline]
+			fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+				self.top_encode_no_err(output);
+				Ok(())
+			}
+		
+			#[inline]
+			fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+				self.top_encode_no_err(output);
+			}
+		}
+    }
 }
 
 pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
@@ -22,15 +59,14 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> 
 	Ok(bytes)
 }
 
-impl TopEncode for () {
-	const TYPE_INFO: TypeInfo = TypeInfo::Unit;
-
+impl TopEncodeNoErr for () {
 	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
 		output.set_unit();
-		Ok(())
 	}
 }
+
+top_encode_from_no_err!{(), TypeInfo::Unit}
 
 impl<T: NestedEncode> TopEncode for &[T] {
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
@@ -76,15 +112,15 @@ impl<T: NestedEncode> TopEncode for Vec<T> {
 }
 
 macro_rules! encode_num_unsigned {
-    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
-		impl TopEncode for $num_type {
-			const TYPE_INFO: TypeInfo = $type_info;
-
-            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+		impl TopEncodeNoErr for $num_type {
+			#[inline]
+			fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
 				output.set_u64(*self as u64);
-				Ok(())
 			}
 		}
+
+		top_encode_from_no_err!{$num_type, $type_info}
     }
 }
 
@@ -95,16 +131,15 @@ encode_num_unsigned!{u16, 16, TypeInfo::U16}
 encode_num_unsigned!{u8, 8, TypeInfo::U8}
 
 macro_rules! encode_num_signed {
-    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
-		impl TopEncode for $num_type {
-			const TYPE_INFO: TypeInfo = $type_info;
-
-			// #[inline(never)]
-            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+		impl TopEncodeNoErr for $num_type {
+			#[inline]
+			fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
 				output.set_i64(*self as i64);
-				Ok(())
 			}
 		}
+
+		top_encode_from_no_err!{$num_type, $type_info}
     }
 }
 
@@ -114,16 +149,15 @@ encode_num_signed!{isize, 32, TypeInfo::ISIZE}
 encode_num_signed!{i16, 16, TypeInfo::I16}
 encode_num_signed!{i8, 8, TypeInfo::I8}
 
-impl TopEncode for bool {
-	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
-
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+impl TopEncodeNoErr for bool {
+	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
 		// only using signed because this one is implemented in Arwen, unsigned is not
 		// TODO: change to set_u64
 		output.set_i64(if *self { 1i64 } else { 0i64 } );
-		Ok(())
 	}
 }
+
+top_encode_from_no_err!{bool, TypeInfo::Bool}
 
 impl<T: NestedEncode> TopEncode for Option<T> {
 	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
