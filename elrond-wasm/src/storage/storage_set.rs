@@ -2,15 +2,6 @@ use crate::*;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
-fn storage_set_error<A, BigInt, BigUint>(api: A, encode_err: EncodeError) -> !
-where
-    BigInt: NestedEncode + 'static,
-    BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
-{
-    api.signal_error(encode_err.message_bytes())
-}
-
 struct StorageSetOutput<'k, A, BigInt, BigUint>
 where
     BigInt: NestedEncode + 'static,
@@ -76,10 +67,21 @@ where
             api.storage_store_big_uint(key, cast_big_uint);
         },
         _ => {
-            match value.top_encode(StorageSetOutput::new(api.clone(), key)) {
-                Ok(v) => v,
-                Err(encode_err) => storage_set_error(api, encode_err),
-            }
+            value.top_encode_or_exit(
+                StorageSetOutput::new(api.clone(), key),
+                api.clone(),
+                storage_set_exit
+            );
         }
     }
+}
+
+#[inline(always)]
+fn storage_set_exit<A, BigInt, BigUint>(api: A, encode_err: EncodeError) -> !
+where
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
+{
+    api.signal_error(encode_err.message_bytes())
 }
