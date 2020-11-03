@@ -86,8 +86,8 @@ impl<T> Queue<T> {
 /// Serializes identically to a Vec, entries before start index are ignored.
 impl<T: NestedEncode> NestedEncode for Queue<T> {
 	#[inline]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.as_slice().dep_encode_to(dest)
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.as_slice().dep_encode(dest)
 	}
 }
 

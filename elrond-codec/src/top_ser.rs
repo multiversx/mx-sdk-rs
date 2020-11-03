@@ -34,6 +34,28 @@ pub trait TopEncode: Sized {
     }
 }
 
+pub fn top_encode_from_nested<T, O>(obj: &T, output: O) -> Result<(), EncodeError>
+where
+    O: TopEncodeOutput,
+    T: NestedEncode,
+{
+	let mut bytes = Vec::<u8>::new();
+	obj.dep_encode(&mut bytes)?;
+	output.set_slice_u8(&bytes[..]);
+	Ok(())
+}
+
+pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(obj: &T, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !)
+where
+    O: TopEncodeOutput,
+	T: NestedEncode,
+	ExitCtx: Clone,
+{
+	let mut bytes = Vec::<u8>::new();
+	obj.dep_encode_or_exit(&mut bytes, c, exit);
+	output.set_slice_u8(&bytes[..]);
+}
+
 macro_rules! top_encode_from_no_err {
     ($type:ty, $type_info:expr) => {
 		impl TopEncode for $type {
@@ -58,6 +80,12 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> 
 	obj.top_encode(&mut bytes)?;
 	Ok(bytes)
 }
+
+// pub fn top_encode_to_vec_or_panic<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
+// 	let mut bytes = Vec::<u8>::new();
+// 	obj.top_encode(&mut bytes)?;
+// 	Ok(bytes)
+// }
 
 impl TopEncodeNoErr for () {
 	#[inline]
@@ -88,12 +116,37 @@ impl<T: NestedEncode> TopEncode for &[T] {
 		}
 		Ok(())
 	}
+
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		match T::TYPE_INFO {
+			TypeInfo::U8 => {
+				// transmute to &[u8]
+				// save directly, without passing through the buffer
+				let slice: &[u8] = unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
+				output.set_slice_u8(slice);
+			},
+			_ => {
+				// only using `dep_encode_slice_contents` for non-u8,
+				// because it always appends to the buffer,
+				// which is not necessary above
+				let mut buffer = Vec::<u8>::new();
+				for x in *self {
+					x.dep_encode_or_exit(&mut buffer, c.clone(), exit);
+				}
+				output.set_slice_u8(&buffer[..]);
+			}
+		}
+	}
 }
 
 impl<T: TopEncode> TopEncode for &T {
 	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		(*self).top_encode(output)
+	}
+
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		(*self).top_encode_or_exit(output, c, exit);
 	}
 }
 
@@ -102,12 +155,21 @@ impl TopEncode for &str {
 		output.set_slice_u8(self.as_bytes());
 		Ok(())
 	}
+
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		output.set_slice_u8(self.as_bytes());
+	}
 }
 
 impl<T: NestedEncode> TopEncode for Vec<T> {
 	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.as_slice().top_encode(output)
+	}
+
+	#[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_slice().top_encode_or_exit(output, c, exit);
 	}
 }
 
@@ -167,7 +229,7 @@ impl<T: NestedEncode> TopEncode for Option<T> {
 			Some(v) => {
 				let mut buffer = Vec::<u8>::new();
 				buffer.push_byte(1u8);
-				v.dep_encode_to(&mut buffer)?;
+				v.dep_encode(&mut buffer)?;
 				output.set_slice_u8(&buffer[..]);
 			},
 			None => {
@@ -202,7 +264,7 @@ macro_rules! tuple_impls {
 				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 					let mut buffer = Vec::<u8>::new();
 					$(
-                        self.$n.dep_encode_to(&mut buffer)?;
+                        self.$n.dep_encode(&mut buffer)?;
                     )+
 					output.set_slice_u8(&buffer[..]);
 					Ok(())

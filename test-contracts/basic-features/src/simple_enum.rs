@@ -27,8 +27,8 @@ impl SimpleEnum {
 }
 
 impl NestedEncode for SimpleEnum {
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.to_i64().dep_encode_to(dest)?;
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.to_i64().dep_encode(dest)?;
         Ok(())
     }
 }

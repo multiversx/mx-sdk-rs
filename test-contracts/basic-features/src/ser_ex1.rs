@@ -11,20 +11,25 @@ pub struct SerExample1 {
 }
 
 impl NestedEncode for SerExample1 {
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.int.dep_encode_to(dest)?;
-        self.seq.dep_encode_to(dest)?;
-        self.another_byte.dep_encode_to(dest)?;
-        self.uint_32.dep_encode_to(dest)?;
-        self.uint_64.dep_encode_to(dest)?;
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.int.dep_encode(dest)?;
+        self.seq.dep_encode(dest)?;
+        self.another_byte.dep_encode(dest)?;
+        self.uint_32.dep_encode(dest)?;
+        self.uint_64.dep_encode(dest)?;
         Ok(())
     }
 }
 
 impl TopEncode for SerExample1 {
+    #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
-        Ok(())
+        top_encode_from_nested(self, output)
+    }
+
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        top_encode_from_nested_or_exit(self, output, c, exit);
     }
 }
 
