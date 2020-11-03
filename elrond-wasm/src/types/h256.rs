@@ -132,6 +132,10 @@ impl NestedEncode for H256 {
         dest.write(&self.0[..]);
         Ok(())
     }
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		dest.write(&self.0[..]);
+	}
 }
 
 impl TopEncode for H256 {
@@ -139,6 +143,10 @@ impl TopEncode for H256 {
         output.set_slice_u8(&self.0[..]);
         Ok(())
     }
+
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		output.set_slice_u8(&self.0[..]);
+	}
 }
 
 impl NestedDecode for H256 {

@@ -201,6 +201,10 @@ impl Status {
 impl TopEncode for Status {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.to_u8().top_encode(output)
+    }
+    
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_u8().top_encode_or_exit(output, c, exit)
 	}
 }
 

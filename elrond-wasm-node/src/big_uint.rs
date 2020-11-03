@@ -255,9 +255,12 @@ impl NestedEncode for ArwenBigUint {
     
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
-        let bytes = self.to_bytes_be();
-        bytes.as_slice().dep_encode(dest)
+        self.to_bytes_be().as_slice().dep_encode(dest)
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_bytes_be().as_slice().dep_encode_or_exit(dest, c, exit);
+	}
 }
 
 impl TopEncode for ArwenBigUint {
@@ -267,6 +270,11 @@ impl TopEncode for ArwenBigUint {
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_big_uint_handle_or_bytes(self.handle, || self.to_bytes_be());
         Ok(())
+    }
+    
+    #[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		output.set_big_int_handle_or_bytes(self.handle, || self.to_bytes_be());
 	}
 }
 

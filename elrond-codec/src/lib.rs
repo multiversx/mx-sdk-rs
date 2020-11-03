@@ -71,7 +71,13 @@ pub mod test_struct {
 			self.seq.dep_encode(dest)?;
             self.another_byte.dep_encode(dest)?;
             Ok(())
-		}
+        }
+        
+        fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+            self.int.dep_encode_or_exit(dest, c.clone(), exit);
+			self.seq.dep_encode_or_exit(dest, c.clone(), exit);
+            self.another_byte.dep_encode_or_exit(dest, c.clone(), exit);
+        }
     }
 
     impl TopEncode for Test {
@@ -110,28 +116,40 @@ pub mod test_struct {
         Struct { a: u32 },
     }
 
-    impl NestedEncode for E {
-		fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    impl NestedEncodeNoErr for E {
+		fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
             match self {
                 E::Unit => {
-                    0u32.dep_encode(dest)?;
+                    0u32.dep_encode_no_err(dest);
                 },
                 E::Newtype(arg1) => {
-                    1u32.dep_encode(dest)?;
-                    arg1.dep_encode(dest)?;
+                    1u32.dep_encode_no_err(dest);
+                    arg1.dep_encode_no_err(dest);
                 },
                 E::Tuple(arg1, arg2) => {
-                    2u32.dep_encode(dest)?;
-                    arg1.dep_encode(dest)?;
-                    arg2.dep_encode(dest)?;
+                    2u32.dep_encode_no_err(dest);
+                    arg1.dep_encode_no_err(dest);
+                    arg2.dep_encode_no_err(dest);
                 },
                 E::Struct { a } => {
-                    3u32.dep_encode(dest)?;
-                    a.dep_encode(dest)?;
+                    3u32.dep_encode_no_err(dest);
+                    a.dep_encode_no_err(dest);
                 },
             }
+        }
+    }
+
+    impl NestedEncode for E {
+        #[inline]
+        fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+            self.dep_encode_no_err(dest);
             Ok(())
-		}
+        }
+    
+        #[inline]
+        fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+            self.dep_encode_no_err(dest);
+        }
     }
 
     impl TopEncode for E {
@@ -171,13 +189,21 @@ pub mod test_struct {
 		fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
             dest.write(&self.0[..]);
             Ok(())
-		}
+        }
+        
+        fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+            dest.write(&self.0[..]);
+        }
     }
 
     impl TopEncode for WrappedArray {
         fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
             output.set_slice_u8(&self.0[..]);
             Ok(())
+        }
+
+        fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+            output.set_slice_u8(&self.0[..]);
         }
     }
     

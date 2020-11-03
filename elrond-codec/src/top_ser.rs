@@ -145,6 +145,7 @@ impl<T: TopEncode> TopEncode for &T {
 		(*self).top_encode(output)
 	}
 
+	#[inline]
 	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
 		(*self).top_encode_or_exit(output, c, exit);
 	}
@@ -238,19 +239,45 @@ impl<T: NestedEncode> TopEncode for Option<T> {
 		}
 		Ok(())
 	}
+
+	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
+	/// to allow disambiguation between e.g. Some(0) and None.
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		match self {
+			Some(v) => {
+				let mut buffer = Vec::<u8>::new();
+				buffer.push_byte(1u8);
+				v.dep_encode_or_exit(&mut buffer, c, exit);
+				output.set_slice_u8(&buffer[..]);
+			},
+			None => {
+				output.set_slice_u8(&[]);
+			}
+		}
+	}
 }
 
 impl<T: TopEncode> TopEncode for Box<T> {
-	#[inline(never)]
+	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.as_ref().top_encode(output)
+	}
+
+	#[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_ref().top_encode_or_exit(output, c, exit);
 	}
 }
 
 impl<T: NestedEncode> TopEncode for Box<[T]> {
-	#[inline(never)]
+	#[inline]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.as_ref().top_encode(output)
+	}
+
+	#[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_ref().top_encode_or_exit(output, c, exit);
 	}
 }
 
@@ -268,6 +295,14 @@ macro_rules! tuple_impls {
                     )+
 					output.set_slice_u8(&buffer[..]);
 					Ok(())
+				}
+
+				fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+					let mut buffer = Vec::<u8>::new();
+					$(
+                        self.$n.dep_encode_or_exit(&mut buffer, c.clone(), exit);
+                    )+
+					output.set_slice_u8(&buffer[..]);
 				}
             }
         )+
@@ -297,10 +332,15 @@ macro_rules! array_impls {
     ($($n: tt,)+) => {
         $(
             impl<T: NestedEncode> TopEncode for [T; $n] {
-				#[inline(never)]
+				#[inline]
 				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 					// the top encoded slice does not serialize its length, so just like the array
 					(&self[..]).top_encode(output)
+				}
+
+				#[inline]
+				fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+					(&self[..]).top_encode_or_exit(output, c, exit);
 				}
             }
         )+
@@ -327,9 +367,12 @@ array_impls!(
 );
 
 impl TopEncode for NonZeroUsize {
-	#[inline(never)]
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.get().top_encode(output)
+	}
+
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.get().top_encode_or_exit(output, c, exit);
 	}
 }
 

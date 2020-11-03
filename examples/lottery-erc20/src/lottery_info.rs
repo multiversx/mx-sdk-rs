@@ -27,6 +27,18 @@ impl<BigUint:BigUintApi> NestedEncode for LotteryInfo<BigUint> {
 
         Ok(())
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        self.ticket_price.dep_encode_or_exit(dest, c.clone(), exit);
+        self.tickets_left.dep_encode_or_exit(dest, c.clone(), exit);
+        self.deadline.dep_encode_or_exit(dest, c.clone(), exit);
+        self.max_entries_per_user.dep_encode_or_exit(dest, c.clone(), exit);
+        self.prize_distribution.dep_encode_or_exit(dest, c.clone(), exit);
+        self.whitelist.dep_encode_or_exit(dest, c.clone(), exit);
+        self.current_ticket_number.dep_encode_or_exit(dest, c.clone(), exit);
+        self.prize_pool.dep_encode_or_exit(dest, c.clone(), exit);
+        self.queued_tickets.dep_encode_or_exit(dest, c.clone(), exit);
+    }
 }
 
 impl<BigUint:BigUintApi> TopEncode for LotteryInfo<BigUint> {

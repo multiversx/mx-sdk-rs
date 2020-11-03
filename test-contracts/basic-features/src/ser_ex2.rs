@@ -30,6 +30,27 @@ impl NestedEncode for SerExample2 {
         }
         Ok(())
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        match self {
+            SerExample2::Unit => {
+                0u32.dep_encode_or_exit(dest, c.clone(), exit);
+            },
+            SerExample2::Newtype(arg1) => {
+                1u32.dep_encode_or_exit(dest, c.clone(), exit);
+                arg1.dep_encode_or_exit(dest, c.clone(), exit);
+            },
+            SerExample2::Tuple(arg1, arg2) => {
+                2u32.dep_encode_or_exit(dest, c.clone(), exit);
+                arg1.dep_encode_or_exit(dest, c.clone(), exit);
+                arg2.dep_encode_or_exit(dest, c.clone(), exit);
+            },
+            SerExample2::Struct { a } => {
+                3u32.dep_encode_or_exit(dest, c.clone(), exit);
+                a.dep_encode_or_exit(dest, c.clone(), exit);
+            },
+        }
+    }
 }
 
 impl TopEncode for SerExample2 {

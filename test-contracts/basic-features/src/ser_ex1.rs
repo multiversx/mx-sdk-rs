@@ -19,6 +19,14 @@ impl NestedEncode for SerExample1 {
         self.uint_64.dep_encode(dest)?;
         Ok(())
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        self.int.dep_encode_or_exit(dest, c.clone(), exit);
+        self.seq.dep_encode_or_exit(dest, c.clone(), exit);
+        self.another_byte.dep_encode_or_exit(dest, c.clone(), exit);
+        self.uint_32.dep_encode_or_exit(dest, c.clone(), exit);
+        self.uint_64.dep_encode_or_exit(dest, c.clone(), exit);
+    }
 }
 
 impl TopEncode for SerExample1 {
