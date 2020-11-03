@@ -45,6 +45,12 @@ pub trait TopDecode: Sized {
     fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
         Ok(Box::new(Self::top_decode(input)?))
     }
+
+    #[doc(hidden)]
+    #[inline]
+    fn top_decode_boxed_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Box<Self> {
+        Box::new(Self::top_decode_or_exit(input, c, exit))
+    }
 }
 
 pub fn top_decode_from_nested<T, I>(input: I) -> Result<T, DecodeError>
@@ -78,14 +84,22 @@ where
 impl TopDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
     
-	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
+	fn top_decode<I: TopDecodeInput>(_: I) -> Result<Self, DecodeError> {
 		Ok(())
-	}
+    }
+    
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(_: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
+        ()
+    }
 }
 
 impl<T: TopDecode> TopDecode for Box<T> {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         T::top_decode_boxed(input)
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        T::top_decode_boxed_or_exit(input, c, exit)
     }
 }
 
@@ -133,9 +147,7 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
         }
     }
 
-    /// Quick exit for any of the contained types
-    #[inline(never)]
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let bytes_vec = boxed_slice_into_vec(bytes);
@@ -167,6 +179,16 @@ macro_rules! decode_num_unsigned {
                     Ok(arg_u64 as $ty)
                 }
             }
+
+            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                let arg_u64 = input.into_u64();
+                let max = <$bounds_ty>::MAX as u64;
+                if arg_u64 > max {
+                    exit(c, DecodeError::INPUT_TOO_LONG)
+                } else {
+                    arg_u64 as $ty
+                }
+            }
         }
     }
 }
@@ -192,6 +214,17 @@ macro_rules! decode_num_signed {
                     Ok(arg_i64 as $ty)
                 }
             }
+
+            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                let arg_i64 = input.into_i64();
+                let min = <$bounds_ty>::MIN as i64;
+                let max = <$bounds_ty>::MAX as i64;
+                if arg_i64 < min || arg_i64 > max {
+                    exit(c, DecodeError::INPUT_OUT_OF_RANGE)
+                } else {
+                    arg_i64 as $ty
+                }
+            }
         }
     }
 }
@@ -212,6 +245,14 @@ impl TopDecode for bool {
             _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
         }
     }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        match input.into_i64() {
+            0 => false,
+            1 => true,
+            _ => exit(c, DecodeError::INPUT_OUT_OF_RANGE),
+        }
+    }
 }
 
 impl<T: NestedDecode> TopDecode for Option<T> {
@@ -222,6 +263,16 @@ impl<T: NestedDecode> TopDecode for Option<T> {
         } else {
             let item = dep_decode_from_byte_slice::<T>(&bytes[1..])?;
             Ok(Some(item))
+        }
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let bytes = input.into_boxed_slice_u8();
+        if bytes.is_empty() {
+            None
+        } else {
+            let item = dep_decode_from_byte_slice_or_exit(&bytes[1..], c, exit);
+            Some(item)
         }
     }
 }
@@ -290,6 +341,21 @@ macro_rules! array_impls {
                         Ok(Box::new(Self::top_decode(input)?))
                     }
                 }
+
+                fn top_decode_boxed_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Box<Self> {
+                    if let TypeInfo::U8 = T::TYPE_INFO {
+                        // transmute directly
+                        let bs = input.into_boxed_slice_u8();
+                        if bs.len() != $n {
+                            exit(c, DecodeError::ARRAY_DECODE_ERROR);
+                        }
+                        let raw = Box::into_raw(bs);
+                        let array_box = unsafe { Box::<[T; $n]>::from_raw(raw as *mut [T; $n]) };
+                        array_box
+                    } else {
+                        Box::new(Self::top_decode_or_exit(input, c, exit))
+                    }
+                }
             }
         )+
     }
@@ -314,17 +380,21 @@ array_impls!(
 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
 );
 
-fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
-    if let Some(nz) = NonZeroUsize::new(num) {
-        Ok(nz)
-    } else {
-        Err(DecodeError::INVALID_VALUE)
-    }
-}
-
 impl TopDecode for NonZeroUsize {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        decode_non_zero_usize(usize::top_decode(input)?)
+        if let Some(nz) = NonZeroUsize::new(usize::top_decode(input)?) {
+            Ok(nz)
+        } else {
+            Err(DecodeError::INVALID_VALUE)
+        }
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        if let Some(nz) = NonZeroUsize::new(usize::top_decode_or_exit(input, c.clone(), exit)) {
+            nz
+        } else {
+            exit(c, DecodeError::INVALID_VALUE)
+        }
     }
 }
 

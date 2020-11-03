@@ -81,4 +81,8 @@ impl TopDecode for SerExample2 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         top_decode_from_nested(input)
     }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        top_decode_from_nested_or_exit(input, c, exit)
+    }
 }

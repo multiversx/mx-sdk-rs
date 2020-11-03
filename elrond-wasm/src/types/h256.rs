@@ -3,6 +3,8 @@ use core::fmt::Debug;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+const ERR_BAD_H256_LENGTH: &[u8] = b"bad H256 length";
+
 /// Type that holds 32 bytes of data.
 /// Data is kept on the heap to keep wasm size low and avoid copies.
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -161,8 +163,19 @@ impl TopDecode for H256 {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         match <[u8; 32]>::top_decode_boxed(input) {
             Ok(array_box) => Ok(H256(array_box)),
-            Err(_) => Err(DecodeError::from(&b"bad H256 length"[..])),
+            Err(_) => Err(DecodeError::from(ERR_BAD_H256_LENGTH)),
         }
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        // transmute directly
+        let bs = input.into_boxed_slice_u8();
+        if bs.len() != 32 {
+            exit(c, DecodeError::from(ERR_BAD_H256_LENGTH));
+        }
+        let raw = Box::into_raw(bs);
+        let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
+        H256(array_box)
     }
 }
 
