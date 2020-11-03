@@ -9,23 +9,23 @@ pub enum SerExample2 {
 }
 
 impl NestedEncode for SerExample2 {
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         match self {
             SerExample2::Unit => {
-                0u32.dep_encode_to(dest)?;
+                0u32.dep_encode(dest)?;
             },
             SerExample2::Newtype(arg1) => {
-                1u32.dep_encode_to(dest)?;
-                arg1.dep_encode_to(dest)?;
+                1u32.dep_encode(dest)?;
+                arg1.dep_encode(dest)?;
             },
             SerExample2::Tuple(arg1, arg2) => {
-                2u32.dep_encode_to(dest)?;
-                arg1.dep_encode_to(dest)?;
-                arg2.dep_encode_to(dest)?;
+                2u32.dep_encode(dest)?;
+                arg1.dep_encode(dest)?;
+                arg2.dep_encode(dest)?;
             },
             SerExample2::Struct { a } => {
-                3u32.dep_encode_to(dest)?;
-                a.dep_encode_to(dest)?;
+                3u32.dep_encode(dest)?;
+                a.dep_encode(dest)?;
             },
         }
         Ok(())
@@ -33,9 +33,14 @@ impl NestedEncode for SerExample2 {
 }
 
 impl TopEncode for SerExample2 {
+    #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
-        Ok(())
+        top_encode_from_nested(self, output)
+    }
+
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        top_encode_from_nested_or_exit(self, output, c, exit);
     }
 }
 

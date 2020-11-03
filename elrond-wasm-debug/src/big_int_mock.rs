@@ -148,9 +148,9 @@ use elrond_wasm::elrond_codec::*;
 impl NestedEncode for RustBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         let bytes = self.to_signed_bytes_be();
-        bytes.as_slice().dep_encode_to(dest)
+        bytes.as_slice().dep_encode(dest)
     }
 }
 

@@ -27,7 +27,7 @@ fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macr
         let key_appends: Vec<proc_macro2::TokenStream> = key_args.iter().map(|arg| {
             let arg_pat = &arg.pat;
             quote! {
-                if let Result::Err(encode_error) = #arg_pat.dep_encode_to(&mut key) {
+                if let Result::Err(encode_error) = #arg_pat.dep_encode(&mut key) {
                     self.api.signal_error(encode_error.message_bytes());
                 }
             }

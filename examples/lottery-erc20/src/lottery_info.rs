@@ -14,25 +14,30 @@ pub struct LotteryInfo<BigUint:BigUintApi> {
 }
 
 impl<BigUint:BigUintApi> NestedEncode for LotteryInfo<BigUint> {
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.ticket_price.dep_encode_to(dest)?;
-        self.tickets_left.dep_encode_to(dest)?;
-        self.deadline.dep_encode_to(dest)?;
-        self.max_entries_per_user.dep_encode_to(dest)?;
-        self.prize_distribution.dep_encode_to(dest)?;
-        self.whitelist.dep_encode_to(dest)?;
-        self.current_ticket_number.dep_encode_to(dest)?;
-        self.prize_pool.dep_encode_to(dest)?;
-        self.queued_tickets.dep_encode_to(dest)?;
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.ticket_price.dep_encode(dest)?;
+        self.tickets_left.dep_encode(dest)?;
+        self.deadline.dep_encode(dest)?;
+        self.max_entries_per_user.dep_encode(dest)?;
+        self.prize_distribution.dep_encode(dest)?;
+        self.whitelist.dep_encode(dest)?;
+        self.current_ticket_number.dep_encode(dest)?;
+        self.prize_pool.dep_encode(dest)?;
+        self.queued_tickets.dep_encode(dest)?;
 
         Ok(())
     }
 }
 
 impl<BigUint:BigUintApi> TopEncode for LotteryInfo<BigUint> {
+    #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_slice_u8(dep_encode_to_vec(self)?.as_slice());
-        Ok(())
+        top_encode_from_nested(self, output)
+    }
+
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        top_encode_from_nested_or_exit(self, output, c, exit);
     }
 }
 
