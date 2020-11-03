@@ -233,14 +233,21 @@ impl NestedEncode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
     
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        let bytes = self.to_bytes_be();
-        bytes.as_slice().dep_encode(dest)
+        self.to_bytes_be().as_slice().dep_encode(dest)
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_bytes_be().as_slice().dep_encode_or_exit(dest, c, exit);
+	}
 }
 
 impl TopEncode for RustBigUint {
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.to_bytes_be().top_encode(output)
+    }
+
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_bytes_be().top_encode_or_exit(output, c, exit)
 	}
 }
 

@@ -59,6 +59,11 @@ impl<'a> NestedEncode for FeatureName<'a> {
         dest.write(&self.0[..]);
         Result::Ok(())
     }
+
+    #[inline]
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+        dest.write(&self.0[..]);
+    }
 }
 
 /// Expands to a snippet that returns with error if a feature is not enabled.

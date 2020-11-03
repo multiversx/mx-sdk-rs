@@ -96,9 +96,15 @@ impl<T: NestedEncode> NestedEncode for Queue<T> {
 }
 
 impl<T: NestedEncode> TopEncode for Queue<T> {
+    #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.as_slice().top_encode(output)
     }
+
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_slice().top_encode_or_exit(output, c, exit)
+	}
 }
 
 /// Deserializes like a Vec.

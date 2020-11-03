@@ -31,6 +31,10 @@ impl NestedEncode for SimpleEnum {
         self.to_i64().dep_encode(dest)?;
         Ok(())
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        self.to_i64().dep_encode_or_exit(dest, c, exit);
+    }
 }
 
 impl TopEncode for SimpleEnum {
@@ -38,6 +42,10 @@ impl TopEncode for SimpleEnum {
         output.set_i64(self.to_i64());
         Ok(())
     }
+
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		output.set_i64(self.to_i64());
+	}
 }
 
 impl NestedDecode for SimpleEnum {

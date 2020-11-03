@@ -10,6 +10,11 @@ impl NestedEncode for LargeBoxedByteArray {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.0.dep_encode(dest)
     }
+
+    #[inline]
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.0.dep_encode_or_exit(dest, c, exit);
+	}
 }
 
 impl TopEncode for LargeBoxedByteArray {
@@ -17,6 +22,11 @@ impl TopEncode for LargeBoxedByteArray {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.0.top_encode(output)
     }
+
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.0.top_encode_or_exit(output, c, exit);
+	}
 }
 
 impl NestedDecode for LargeBoxedByteArray {
