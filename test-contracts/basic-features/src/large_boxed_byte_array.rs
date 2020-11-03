@@ -41,4 +41,9 @@ impl TopDecode for LargeBoxedByteArray {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::top_decode(input)?))
     }
+
+    #[inline]
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::top_decode_or_exit(input, c, exit))
+    }
 }

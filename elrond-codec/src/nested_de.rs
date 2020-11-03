@@ -44,6 +44,15 @@ pub fn dep_decode_from_byte_slice<D: NestedDecode>(input: &[u8]) -> Result<D, De
     result
 }
 
+pub fn dep_decode_from_byte_slice_or_exit<D: NestedDecode, ExitCtx: Clone>(input: &[u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> D {
+    let mut_slice = &mut &*input;
+    let result = D::dep_decode_or_exit(mut_slice, c.clone(), exit);
+    if !mut_slice.is_empty() {
+        exit(c, DecodeError::INPUT_TOO_LONG);
+    }
+    result
+}
+
 impl NestedDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
@@ -246,17 +255,21 @@ array_impls!(
 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
 );
 
-fn decode_non_zero_usize(num: usize) -> Result<NonZeroUsize, DecodeError> {
-    if let Some(nz) = NonZeroUsize::new(num) {
-        Ok(nz)
-    } else {
-        Err(DecodeError::INVALID_VALUE)
-    }
-}
-
 impl NestedDecode for NonZeroUsize {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        decode_non_zero_usize(usize::dep_decode(input)?)
+        if let Some(nz) = NonZeroUsize::new(usize::dep_decode(input)?) {
+            Ok(nz)
+        } else {
+            Err(DecodeError::INVALID_VALUE)
+        }
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_exit(input, c.clone(), exit)) {
+            nz
+        } else {
+            exit(c, DecodeError::INVALID_VALUE)
+        }
     }
 }
 

@@ -243,6 +243,10 @@ impl TopDecode for ArwenBigInt {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         Ok(ArwenBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8()))
     }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
+        ArwenBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())
+    }
 }
 
 impl BigIntApi<ArwenBigUint> for ArwenBigInt {

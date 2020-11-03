@@ -126,4 +126,11 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
             start: 0,
         })
     }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        Queue {
+            vec: Vec::<T>::top_decode_or_exit(input, c, exit),
+            start: 0,
+        }
+    }
 }

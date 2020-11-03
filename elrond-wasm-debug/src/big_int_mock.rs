@@ -181,6 +181,10 @@ impl TopDecode for RustBigInt {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         Ok(RustBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8()))
     }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
+        RustBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())
+    }
 }
 
 impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
