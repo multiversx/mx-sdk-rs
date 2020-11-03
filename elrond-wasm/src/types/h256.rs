@@ -157,6 +157,12 @@ impl NestedDecode for H256 {
         input.read_into(res.as_mut())?;
         Ok(res)
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let mut res = H256::zero();
+        input.read_into_or_exit(res.as_mut(), c, exit);
+        res
+    }
 }
 
 impl TopDecode for H256 {

@@ -34,6 +34,10 @@ impl NestedDecode for LargeBoxedByteArray {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::dep_decode(input)?))
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        LargeBoxedByteArray(Box::<[u8; ARRAY_SIZE]>::dep_decode_or_exit(input, c, exit))
+    }
 }
 
 impl TopDecode for LargeBoxedByteArray {

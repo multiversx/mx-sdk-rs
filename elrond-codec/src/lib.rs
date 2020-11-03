@@ -100,6 +100,14 @@ pub mod test_struct {
                 another_byte: u8::dep_decode(input)?,
             })
         }
+
+        fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+            Test{
+                int: u16::dep_decode_or_exit(input, c.clone(), exit),
+                seq: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
+                another_byte: u8::dep_decode_or_exit(input, c.clone(), exit),
+            }
+        }
     }
 
     impl TopDecode for Test {
@@ -178,6 +186,16 @@ pub mod test_struct {
                 _ => Err(DecodeError::INVALID_VALUE),
             }
         }
+
+        fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+            match u32::dep_decode_or_exit(input, c.clone(), exit) {
+                0 => E::Unit,
+                1 => E::Newtype(u32::dep_decode_or_exit(input, c.clone(), exit)),
+                2 => E::Tuple(u32::dep_decode_or_exit(input, c.clone(), exit), u32::dep_decode_or_exit(input, c.clone(), exit)),
+                3 => E::Struct{ a: u32::dep_decode_or_exit(input, c.clone(), exit) },
+                _ => exit(c.clone(), DecodeError::INVALID_VALUE),
+            }
+        }
     }
 
     impl TopDecode for E {
@@ -220,6 +238,12 @@ pub mod test_struct {
             let mut arr = [0u8; 5];
             input.read_into(&mut arr)?;
             Ok(WrappedArray(arr))
+        }
+
+        fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+            let mut arr = [0u8; 5];
+            input.read_into_or_exit(&mut arr, c, exit);
+            WrappedArray(arr)
         }
     }
 

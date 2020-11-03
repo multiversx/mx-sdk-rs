@@ -51,6 +51,16 @@ impl NestedDecode for SerExample1 {
             uint_64: u64::dep_decode(input)?,
         })
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        SerExample1{
+            int: u16::dep_decode_or_exit(input, c.clone(), exit),
+            seq: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
+            another_byte: u8::dep_decode_or_exit(input, c.clone(), exit),
+            uint_32: u32::dep_decode_or_exit(input, c.clone(), exit),
+            uint_64: u64::dep_decode_or_exit(input, c.clone(), exit),
+        }
+    }
 }
 
 impl TopDecode for SerExample1 {

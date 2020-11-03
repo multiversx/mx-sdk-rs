@@ -75,6 +75,16 @@ impl NestedDecode for SerExample2 {
             _ => Err(DecodeError::INVALID_VALUE),
         }
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        match u32::dep_decode_or_exit(input, c.clone(), exit) {
+            0 => SerExample2::Unit,
+            1 => SerExample2::Newtype(u32::dep_decode_or_exit(input, c.clone(), exit)),
+            2 => SerExample2::Tuple(u32::dep_decode_or_exit(input, c.clone(), exit), u32::dep_decode_or_exit(input, c.clone(), exit)),
+            3 => SerExample2::Struct{ a: u32::dep_decode_or_exit(input, c.clone(), exit) },
+            _ => exit(c, DecodeError::INVALID_VALUE),
+        }
+    }
 }
 
 impl TopDecode for SerExample2 {

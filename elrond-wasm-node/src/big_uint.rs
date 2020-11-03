@@ -286,6 +286,12 @@ impl NestedDecode for ArwenBigUint {
         let bytes = input.read_slice(size)?;
         Ok(ArwenBigUint::from_bytes_be(bytes))
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
+        let bytes = input.read_slice_or_exit(size, c, exit);
+        ArwenBigUint::from_bytes_be(bytes)
+    }
 }
 
 impl TopDecode for ArwenBigUint {

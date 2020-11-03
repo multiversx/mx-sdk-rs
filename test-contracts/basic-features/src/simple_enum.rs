@@ -52,6 +52,15 @@ impl NestedDecode for SimpleEnum {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         SimpleEnum::from_i64(i64::dep_decode(input)?)
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        match u32::dep_decode_or_exit(input, c.clone(), exit) {
+            0 => SimpleEnum::Variant0,
+            1 => SimpleEnum::Variant1,
+            2 => SimpleEnum::Variant2,
+            _ => exit(c, DecodeError::INVALID_VALUE),
+        }
+    }
 }
 
 impl TopDecode for SimpleEnum {
