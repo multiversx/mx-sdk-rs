@@ -64,6 +64,19 @@ impl<BigUint:BigUintApi> NestedDecode for LotteryInfo<BigUint> {
             prize_pool: BigUint::dep_decode(input)?,
         })
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        LotteryInfo {
+            ticket_price: BigUint::dep_decode_or_exit(input, c.clone(), exit),
+            tickets_left: u32::dep_decode_or_exit(input, c.clone(), exit),
+            deadline: u64::dep_decode_or_exit(input, c.clone(), exit),
+            max_entries_per_user: u32::dep_decode_or_exit(input, c.clone(), exit),
+            prize_distribution: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
+            whitelist: Vec::<Address>::dep_decode_or_exit(input, c.clone(), exit),
+            current_ticket_number: u32::dep_decode_or_exit(input, c.clone(), exit),
+            prize_pool: BigUint::dep_decode_or_exit(input, c.clone(), exit),
+        }
+    }
 }
 
 impl<BigUint:BigUintApi> TopDecode for LotteryInfo<BigUint> {

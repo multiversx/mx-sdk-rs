@@ -12,6 +12,8 @@ pub trait NestedDecodeInput {
 	/// Read the exact number of bytes required to fill the given buffer.
     fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError>;
 
+    fn read_into_or_exit<ExitCtx: Clone>(&mut self, into: &mut [u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !);
+
 	/// Read a single byte from the input.
 	fn read_byte(&mut self) -> Result<u8, DecodeError> {
 		let mut buf = [0u8];
@@ -19,10 +21,19 @@ pub trait NestedDecodeInput {
 		Ok(buf[0])
     }
 
+    /// Read a single byte from the input.
+	fn read_byte_or_exit<ExitCtx: Clone>(&mut self, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> u8 {
+		let mut buf = [0u8];
+		self.read_into_or_exit(&mut buf[..], c, exit);
+		buf[0]
+    }
+
     /// Read the exact number of bytes required to fill the given buffer.
     fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError>;
+
+    fn read_slice_or_exit<ExitCtx: Clone>(&mut self, length: usize, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> &[u8];
     
-    fn flush(&mut self) -> Result<&[u8], DecodeError>;
+    fn flush(&mut self) -> &[u8];
 
 }
 
@@ -41,6 +52,15 @@ impl<'a> NestedDecodeInput for &'a [u8] {
 		Ok(())
     }
 
+    fn read_into_or_exit<ExitCtx: Clone>(&mut self, into: &mut [u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) {
+        if into.len() > self.len() {
+			exit(c, DecodeError::INPUT_TOO_SHORT);
+		}
+		let len = into.len();
+		into.copy_from_slice(&self[..len]);
+		*self = &self[len..];
+    }
+
     fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError> {
         if length > self.len() {
             return Err(DecodeError::INPUT_TOO_SHORT);
@@ -50,10 +70,20 @@ impl<'a> NestedDecodeInput for &'a [u8] {
         *self = rest;
         Ok(result)
     }
+
+    fn read_slice_or_exit<ExitCtx: Clone>(&mut self, length: usize, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> &[u8] {
+        if length > self.len() {
+            exit(c, DecodeError::INPUT_TOO_SHORT);
+        }
+
+        let (result, rest) = self.split_at(length);
+        *self = rest;
+        result
+    }
     
-    fn flush(&mut self) -> Result<&[u8], DecodeError> {
+    fn flush(&mut self) -> &[u8] {
         let result = &self[..];
         *self = &[];
-        Ok(result)
+        result
     }
 }

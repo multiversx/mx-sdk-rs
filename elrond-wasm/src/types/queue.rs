@@ -116,6 +116,14 @@ impl<T: NestedDecode> NestedDecode for Queue<T> {
             start: 0,
         })
     }
+
+    #[inline]
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        Queue {
+            vec: Vec::<T>::dep_decode_or_exit(input, c, exit),
+            start: 0,
+        }
+    }
 }
 
 /// Deserializes like a Vec.

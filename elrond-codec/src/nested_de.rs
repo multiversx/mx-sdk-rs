@@ -58,7 +58,11 @@ impl NestedDecode for () {
 
 	fn dep_decode<I: NestedDecodeInput>(_: &mut I) -> Result<(), DecodeError> {
 		Ok(())
-	}
+    }
+    
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(_: &mut I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
+        ()
+    }
 }
 
 impl NestedDecode for u8 {
@@ -66,6 +70,10 @@ impl NestedDecode for u8 {
     
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         input.read_byte()
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        input.read_byte_or_exit(c, exit)
     }
 }
 
@@ -93,7 +101,7 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         let size = usize::dep_decode_or_exit(input, c.clone(), exit);
         match T::TYPE_INFO {
 			TypeInfo::U8 => {
-                let bytes = input.read_slice(size).unwrap_or_else(|e| exit(c.clone(), e));
+                let bytes = input.read_slice_or_exit(size, c, exit);
                 let bytes_copy = bytes.to_vec(); // copy is needed because result might outlive input
                 let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_copy) };
                 cast_vec
@@ -119,6 +127,12 @@ macro_rules! decode_num_unsigned {
                 let num = bytes_to_number(bytes, false) as $ty;
                 Ok(num)
             }
+
+            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
+                let num = bytes_to_number(bytes, false) as $ty;
+                num
+            }
         }
     }
 }
@@ -137,6 +151,12 @@ macro_rules! decode_num_signed {
                 let bytes = input.read_slice($num_bytes)?;
                 let num = bytes_to_number(bytes, true) as $ty;
                 Ok(num)
+            }
+
+            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
+                let num = bytes_to_number(bytes, true) as $ty;
+                num
             }
         }
     }
@@ -158,6 +178,14 @@ impl NestedDecode for bool {
             _ => Err(DecodeError::INVALID_VALUE),
         }
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        match input.read_byte_or_exit(c.clone(), exit) {
+            0 => false,
+            1 => true,
+            _ => exit(c, DecodeError::INVALID_VALUE),
+        }
+    }
 }
 
 impl<T: NestedDecode> NestedDecode for Option<T> {
@@ -168,11 +196,23 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 			_ => Err(DecodeError::INVALID_VALUE),
 		}
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        match input.read_byte_or_exit(c.clone(), exit) {
+            0 => None,
+            1 => Some(T::dep_decode_or_exit(input, c.clone(), exit)),
+            _ => exit(c, DecodeError::INVALID_VALUE),
+        }
+    }
 }
 
 impl<T: NestedDecode> NestedDecode for Box<T> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(Box::new(T::dep_decode(input)?))
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        Box::new(T::dep_decode_or_exit(input, c, exit))
     }
 }
 
@@ -184,12 +224,19 @@ macro_rules! tuple_impls {
                 $($name: NestedDecode,)+
             {
                 fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                    let tuple = (
+                    Ok((
                         $(
                             $name::dep_decode(input)?,
                         )+
-                    );
-                    Ok(tuple)
+                    ))
+                }
+
+                fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                    (
+                        $(
+                            $name::dep_decode_or_exit(input, c.clone(), exit),
+                        )+
+                    )
                 }
             }
         )+
@@ -230,7 +277,20 @@ macro_rules! array_impls {
 						Ok(a) => Ok(a),
 						Err(_) => Err(DecodeError::ARRAY_DECODE_ERROR),
 					}
-				}
+                }
+                
+                fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+                    let mut r = ArrayVec::new();
+					for _ in 0..$n {
+						r.push(T::dep_decode_or_exit(input, c.clone(), exit));
+					}
+					let i = r.into_inner();
+
+					match i {
+						Ok(a) => a,
+						Err(_) => exit(c, DecodeError::ARRAY_DECODE_ERROR),
+					}
+                }
             }
         )+
     }
