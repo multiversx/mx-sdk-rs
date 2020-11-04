@@ -11,9 +11,9 @@ path = "src/lib.rs"
 wasm-output-mode = ["elrond-wasm-node"]
 
 [dependencies]
-elrond-wasm = { version = "0.8.0", path = "../../../elrond-wasm" }
-elrond-wasm-derive = { version = "0.8.0", path = "../../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.8.0", path = "../../../elrond-wasm-node", optional = true }
+elrond-wasm = { version = "0.9.0", path = "../../../elrond-wasm" }
+elrond-wasm-derive = { version = "0.9.0", path = "../../../elrond-wasm-derive" }
+elrond-wasm-node = { version = "0.9.0", path = "../../../elrond-wasm-node", optional = true }
 
 [dev-dependencies]
-elrond-wasm-debug = { version = "0.8.0", path = "../../../elrond-wasm-debug" }
+elrond-wasm-debug = { version = "0.9.0", path = "../../../elrond-wasm-debug" }
