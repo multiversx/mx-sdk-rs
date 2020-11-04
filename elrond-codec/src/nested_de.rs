@@ -338,7 +338,8 @@ impl NestedDecode for NonZeroUsize {
 #[cfg(test)]
 mod tests {
     use super::*;
-	use super::super::test_struct::*;
+    use super::super::test_struct::*;
+    use crate::test_util::check_dep_decode;
     use core::fmt::Debug;
 
     fn deser_ok<V>(element: V, bytes: &[u8])
@@ -346,7 +347,7 @@ mod tests {
         V: NestedDecode + PartialEq + Debug + 'static,
     {
         let input = bytes.to_vec();
-        let deserialized: V = V::dep_decode(&mut &input[..]).unwrap();
+        let deserialized: V = check_dep_decode::<V>(&input[..]);
         assert_eq!(deserialized, element);
     }
 

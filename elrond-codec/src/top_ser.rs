@@ -81,12 +81,6 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> 
 	Ok(bytes)
 }
 
-// pub fn top_encode_to_vec_or_panic<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
-// 	let mut bytes = Vec::<u8>::new();
-// 	obj.top_encode(&mut bytes)?;
-// 	Ok(bytes)
-// }
-
 impl TopEncodeNoErr for () {
 	#[inline]
 	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
@@ -381,6 +375,7 @@ impl TopEncode for NonZeroUsize {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use crate::test_util::check_top_encode;
 	use super::super::test_struct::*;
     use core::fmt::Debug;
 
@@ -388,7 +383,7 @@ mod tests {
     where
         V: TopEncode + PartialEq + Debug + 'static,
     {
-		let bytes = top_encode_to_vec(&element).unwrap();
+		let bytes = check_top_encode(&element);
 		assert_eq!(bytes.as_slice(), expected_bytes);
     }
 

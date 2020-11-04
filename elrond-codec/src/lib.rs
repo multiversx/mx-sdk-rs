@@ -262,7 +262,7 @@ pub mod test_struct {
 pub mod tests {
     use super::*;
     use super::test_struct::*;
-    use crate::test_util::ser_deser_ok;
+    use crate::test_util::{ser_deser_ok, check_top_encode, check_top_decode};
     use core::fmt::Debug;
     use alloc::vec::Vec;
     use core::num::NonZeroUsize;
@@ -271,8 +271,8 @@ pub mod tests {
     where
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
-        let serialized_bytes = top_encode_to_vec(&element).unwrap();
-        let deserialized = V::top_decode(&serialized_bytes[..]).unwrap();
+        let serialized_bytes = check_top_encode(&element);
+        let deserialized: V = check_top_decode::<V>(&serialized_bytes[..]);
         assert_eq!(deserialized, element);
     }
 
@@ -337,7 +337,7 @@ pub mod tests {
         }
 
         // serialize
-        let serialized_bytes = top_encode_to_vec(&arr).unwrap();
+        let serialized_bytes = check_top_encode(&arr);
         assert_eq!(serialized_bytes, expected_bytes);
 
         // deserialize
