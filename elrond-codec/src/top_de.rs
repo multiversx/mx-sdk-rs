@@ -53,6 +53,7 @@ pub trait TopDecode: Sized {
     }
 }
 
+/// Top-decodes the result using the NestedDecode implementation.
 pub fn top_decode_from_nested<T, I>(input: I) -> Result<T, DecodeError>
 where
     I: TopDecodeInput,
@@ -67,6 +68,8 @@ where
     Ok(result)
 }
 
+/// Top-decodes the result using the NestedDecode implementation.
+/// Uses the fast-exit mechanism in case of error.
 pub fn top_decode_from_nested_or_exit<T, I, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> T
 where
     I: TopDecodeInput,
@@ -403,14 +406,15 @@ impl TopDecode for NonZeroUsize {
 #[cfg(test)]
 mod tests {
     use super::*;
-	use super::super::test_struct::*;
+    use super::super::test_struct::*;
+    use crate::test_util::check_top_decode;
     use core::fmt::Debug;
 
     fn deser_ok<V>(element: V, bytes: &[u8])
     where
         V: TopDecode + PartialEq + Debug + 'static,
     {
-        let deserialized: V = V::top_decode(bytes).unwrap();
+        let deserialized: V = check_top_decode::<V>(&bytes[..]);
         assert_eq!(deserialized, element);
     }
 

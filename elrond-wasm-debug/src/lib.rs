@@ -30,6 +30,7 @@ pub use std::collections::HashMap;
 mod elrond_codec_tests {
     use super::*;
     use elrond_wasm::elrond_codec::*;
+    use elrond_wasm::elrond_codec::test_util::{check_top_encode, check_top_decode};
     use core::fmt::Debug;
 
     pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
@@ -37,11 +38,11 @@ mod elrond_codec_tests {
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
         // serialize
-        let serialized_bytes = top_encode_to_vec(&element).unwrap();
+        let serialized_bytes = check_top_encode(&element);
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
 
         // deserialize
-        let deserialized: V = V::top_decode(&serialized_bytes[..]).unwrap();
+        let deserialized: V = check_top_decode::<V>(&serialized_bytes[..]);
         assert_eq!(deserialized, element);
     }
 

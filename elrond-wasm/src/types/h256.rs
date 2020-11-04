@@ -189,7 +189,7 @@ impl TopDecode for H256 {
 mod esd_light_tests {
     use super::*;
     use alloc::vec::Vec;
-    use elrond_codec::test_util::ser_deser_ok;
+    use elrond_codec::test_util::{ser_deser_ok, check_top_encode};
 
     #[test]
     fn test_address() {
@@ -212,7 +212,7 @@ mod esd_light_tests {
         let expected_bytes: &[u8] = &[4u8; 32*3];
 
         let tuple = (&addr, &&&addr, addr.clone());
-        let serialized_bytes = top_encode_to_vec(&tuple).unwrap();
+        let serialized_bytes = check_top_encode(&tuple);
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     }
 }

@@ -58,7 +58,7 @@ macro_rules! dep_encode_from_no_err {
 }
 
 /// Convenience function for getting an object nested-encoded to a Vec<u8> directly.
-pub fn dep_encode_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
+pub fn dep_encode_to_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
 	let mut bytes = Vec::<u8>::new();
 	obj.dep_encode(&mut bytes)?;
 	Ok(bytes)
@@ -353,6 +353,7 @@ impl NestedEncode for NonZeroUsize {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use crate::test_util::check_dep_encode;
 	use super::super::test_struct::*;
     use core::fmt::Debug;
 
@@ -360,8 +361,7 @@ mod tests {
     where
         V: NestedEncode + PartialEq + Debug + 'static,
     {
-		let bytes = dep_encode_vec(&element).unwrap();
-		// let bytes_or_exit = 
+		let bytes = check_dep_encode(&element);
 		assert_eq!(bytes.as_slice(), expected_bytes);
         
     }

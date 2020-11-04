@@ -12,6 +12,8 @@ pub trait NestedDecodeInput {
 	/// Read the exact number of bytes required to fill the given buffer.
     fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError>;
 
+    /// Read the exact number of bytes required to fill the given buffer.
+    /// Exit early if there are not enough bytes to fill the result.
     fn read_into_or_exit<ExitCtx: Clone>(&mut self, into: &mut [u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !);
 
 	/// Read a single byte from the input.
@@ -31,8 +33,11 @@ pub trait NestedDecodeInput {
     /// Read the exact number of bytes required to fill the given buffer.
     fn read_slice(&mut self, length: usize) -> Result<&[u8], DecodeError>;
 
+    /// Read the exact number of bytes required to fill the given buffer.
+    /// Exit directly if the input contains too few bytes.
     fn read_slice_or_exit<ExitCtx: Clone>(&mut self, length: usize, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> &[u8];
     
+    /// Clears the input buffer and returns all remaining bytes.
     fn flush(&mut self) -> &[u8];
 
 }
