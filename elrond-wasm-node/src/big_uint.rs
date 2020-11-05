@@ -253,11 +253,14 @@ use elrond_wasm::elrond_codec::*;
 impl NestedEncode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
     
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         // TODO: vector allocation can be avoided by writing directly to dest
-        let bytes = self.to_bytes_be();
-        bytes.as_slice().dep_encode_to(dest)
+        self.to_bytes_be().as_slice().dep_encode(dest)
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_bytes_be().as_slice().dep_encode_or_exit(dest, c, exit);
+	}
 }
 
 impl TopEncode for ArwenBigUint {
@@ -267,24 +270,37 @@ impl TopEncode for ArwenBigUint {
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_big_uint_handle_or_bytes(self.handle, || self.to_bytes_be());
         Ok(())
+    }
+    
+    #[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		output.set_big_uint_handle_or_bytes(self.handle, || self.to_bytes_be());
 	}
 }
 
 impl NestedDecode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode_to(input)?;
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(ArwenBigUint::from_bytes_be(bytes))
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
+        let bytes = input.read_slice_or_exit(size, c, exit);
+        ArwenBigUint::from_bytes_be(bytes)
     }
 }
 
 impl TopDecode for ArwenBigUint {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-    
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        f(Ok(ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8())))
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8()))
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
+        ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8())
     }
 }
 

@@ -2,19 +2,6 @@ use crate::*;
 use elrond_codec::*;
 use core::marker::PhantomData;
 
-fn storage_get_error<A, BigInt, BigUint>(api: A, de_err: DecodeError) -> !
-where
-    BigInt: NestedEncode + 'static,
-    BigUint: NestedEncode + 'static,
-    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
-{
-    let mut decode_err_message: Vec<u8> = Vec::new();
-    decode_err_message.extend_from_slice(err_msg::STORAGE_DECODE_ERROR);
-    decode_err_message.extend_from_slice(de_err.message_bytes());
-    api.signal_error(decode_err_message.as_slice())
-}
-
-
 struct StorageGetInput<'k, A, BigInt, BigUint>
 where
     BigInt: NestedEncode + 'static,
@@ -85,10 +72,23 @@ where
             cast_big_uint
         },
         _ => {
-            match T::top_decode(StorageGetInput::new(api.clone(), key), |res| res) {
-                Ok(v) => v,
-                Err(de_err) => storage_get_error(api, de_err),
-            }
+            T::top_decode_or_exit(
+                StorageGetInput::new(api.clone(), key),
+                api,
+                storage_get_exit)
         }
     }
+}
+
+#[inline(always)]
+fn storage_get_exit<A, BigInt, BigUint>(api: A, de_err: DecodeError) -> !
+where
+    BigInt: NestedEncode + 'static,
+    BigUint: NestedEncode + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
+{
+    let mut decode_err_message: Vec<u8> = Vec::new();
+    decode_err_message.extend_from_slice(err_msg::STORAGE_DECODE_ERROR);
+    decode_err_message.extend_from_slice(de_err.message_bytes());
+    api.signal_error(decode_err_message.as_slice())
 }

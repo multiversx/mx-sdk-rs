@@ -148,31 +148,48 @@ use elrond_wasm::elrond_codec::*;
 impl NestedEncode for RustBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        let bytes = self.to_signed_bytes_be();
-        bytes.as_slice().dep_encode_to(dest)
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.to_signed_bytes_be().as_slice().dep_encode(dest)
     }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_signed_bytes_be().as_slice().dep_encode_or_exit(dest, c, exit);
+	}
 }
 
 impl TopEncode for RustBigInt {
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.to_signed_bytes_be().top_encode(output)
+    }
+
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.to_signed_bytes_be().top_encode_or_exit(output, c, exit)
 	}
 }
 
 impl NestedDecode for RustBigInt {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode_to(input)?;
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        let size = usize::dep_decode(input)?;
         let bytes = input.read_slice(size)?;
         Ok(RustBigInt::from_signed_bytes_be(bytes))
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
+        let bytes = input.read_slice_or_exit(size, c, exit);
+        RustBigInt::from_signed_bytes_be(bytes)
     }
 }
 
 impl TopDecode for RustBigInt {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        f(Ok(RustBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())))
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(RustBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8()))
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
+        RustBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())
     }
 }
 

@@ -82,9 +82,20 @@ where
     A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
 {
     fn finish(&self, api: A) {
-        let res = self.top_encode(ApiOutput::new(api.clone()));
-        if let Err(encode_err_message) = res {
-            api.signal_error(encode_err_message.message_bytes());
-        }
+        self.top_encode_or_exit(
+            ApiOutput::new(api.clone()),
+            api.clone(),
+            finish_exit
+        );
     }
+}
+
+#[inline(always)]
+fn finish_exit<A, BigInt, BigUint>(api: A, en_err: EncodeError) -> !
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
+{
+    api.signal_error(en_err.message_bytes())
 }

@@ -86,37 +86,59 @@ impl<T> Queue<T> {
 /// Serializes identically to a Vec, entries before start index are ignored.
 impl<T: NestedEncode> NestedEncode for Queue<T> {
 	#[inline]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.as_slice().dep_encode_to(dest)
-	}
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.as_slice().dep_encode(dest)
+    }
+    
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        self.as_slice().dep_encode_or_exit(dest, c, exit);
+    }
 }
 
 impl<T: NestedEncode> TopEncode for Queue<T> {
+    #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.as_slice().top_encode(output)
     }
+
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_slice().top_encode_or_exit(output, c, exit)
+	}
 }
 
 /// Deserializes like a Vec.
 impl<T: NestedDecode> NestedDecode for Queue<T> {
     #[inline]
-	fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         Ok(Queue {
-            vec: Vec::<T>::dep_decode_to(input)?,
+            vec: Vec::<T>::dep_decode(input)?,
             start: 0,
         })
+    }
+
+    #[inline]
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        Queue {
+            vec: Vec::<T>::dep_decode_or_exit(input, c, exit),
+            start: 0,
+        }
     }
 }
 
 /// Deserializes like a Vec.
 impl<T: NestedDecode> TopDecode for Queue<T> {
-    fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        Vec::<T>::top_decode(input, |res| match res {
-            Ok(vec) => f(Ok(Queue {
-                vec,
-                start: 0,
-            })),
-            Err(e) => f(Err(e)),
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(Queue {
+            vec: Vec::<T>::top_decode(input)?,
+            start: 0,
         })
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        Queue {
+            vec: Vec::<T>::top_decode_or_exit(input, c, exit),
+            start: 0,
+        }
     }
 }

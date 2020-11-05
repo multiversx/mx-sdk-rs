@@ -6,9 +6,16 @@ use crate::codec_err::EncodeError;
 use crate::TypeInfo;
 use crate::nested_ser_output::NestedEncodeOutput;
 
+/// Most types will be encoded without any possibility of error.
+/// The trait is used to provide these implementations.
+/// This is currently not a substitute for implementing a proper TopEncode. 
+pub trait NestedEncodeNoErr: Sized {
+	fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O);
+}
+
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///
-/// Implementations should override `using_top_encoded` for value types and `dep_encode_to` and `size_hint` for allocating types.
+/// Implementations should override `using_top_encoded` for value types and `dep_encode` and `size_hint` for allocating types.
 /// Wrapper types should override all methods.
 pub trait NestedEncode: Sized {
 	// !INTERNAL USE ONLY!
@@ -18,14 +25,42 @@ pub trait NestedEncode: Sized {
 
 	/// NestedEncode to output, using the format of an object nested inside another structure.
 	/// Does not provide compact version.
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError>;
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError>;
 
+	/// Version of `top_decode` that exits quickly in case of error.
+    /// Its purpose is to create smaller implementations
+    /// in cases where the application is supposed to exit directly on decode error.
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+        match self.dep_encode(dest) {
+            Ok(v) => v,
+            Err(e) => exit(c, e)
+        }
+    }
+}
+
+macro_rules! dep_encode_from_no_err {
+    ($type:ty, $type_info:expr) => {
+		impl NestedEncode for $type {
+			const TYPE_INFO: TypeInfo = $type_info;
+		
+			#[inline]
+			fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				self.dep_encode_no_err(dest);
+				Ok(())
+			}
+		
+			#[inline]
+			fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+				self.dep_encode_no_err(dest);
+			}
+		}
+    }
 }
 
 /// Convenience function for getting an object nested-encoded to a Vec<u8> directly.
 pub fn dep_encode_to_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
 	let mut bytes = Vec::<u8>::new();
-	obj.dep_encode_to(&mut bytes)?;
+	obj.dep_encode(&mut bytes)?;
 	Ok(bytes)
 }
 
@@ -41,62 +76,100 @@ pub fn dep_encode_slice_contents<T: NestedEncode, O: NestedEncodeOutput>(slice: 
 		},
 		_ => {
 			for x in slice {
-				x.dep_encode_to(dest)?;
+				x.dep_encode(dest)?;
 			}
 		}
 	}
 	Ok(())
 }
 
-impl NestedEncode for () {
-    const TYPE_INFO: TypeInfo = TypeInfo::Unit;
-
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
-		Ok(())
+pub fn dep_encode_slice_contents_or_exit<T, O, ExitCtx>(slice: &[T], dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !)
+where
+	T: NestedEncode,
+	O: NestedEncodeOutput,
+	ExitCtx: Clone,
+{
+	match T::TYPE_INFO {
+		TypeInfo::U8 => {
+			// cast &[T] to &[u8]
+			let slice: &[u8] = unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
+			dest.write(slice);
+		},
+		_ => {
+			for x in slice {
+				x.dep_encode_or_exit(dest, c.clone(), exit);
+			}
+		}
 	}
 }
 
+impl NestedEncodeNoErr for () {
+	fn dep_encode_no_err<O: NestedEncodeOutput>(&self, _: &mut O) {
+	}
+}
+
+dep_encode_from_no_err!{(), TypeInfo::Unit}
+
 impl<T: NestedEncode> NestedEncode for &[T] {
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		// push size
-		self.len().dep_encode_to(dest)?;
+		self.len().dep_encode(dest)?;
 		// actual data
 		dep_encode_slice_contents(self, dest)
+	}
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		// push size
+		self.len().dep_encode_or_exit(dest, c.clone(), exit);
+		// actual data
+		dep_encode_slice_contents_or_exit(self, dest, c, exit);
 	}
 }
 
 impl<T: NestedEncode> NestedEncode for &T {
-	#[inline(never)]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		(*self).dep_encode_to(dest)
+	#[inline]
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		(*self).dep_encode(dest)
+	}
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		(*self).dep_encode_or_exit(dest, c, exit);
 	}
 }
 
 impl NestedEncode for &str {
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.as_bytes().dep_encode_to(dest)
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_bytes().dep_encode(dest)
+	}
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_bytes().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
 impl<T: NestedEncode> NestedEncode for Vec<T> {
-	#[inline(never)]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.as_slice().dep_encode_to(dest)
+	#[inline]
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_slice().dep_encode(dest)
+	}
+
+	#[inline]
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_slice().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
 // The main unsigned types need to be reversed before serializing.
 macro_rules! encode_num_unsigned {
-    ($num_type:ident, $size_in_bits:expr, $type_info:expr) => {
-		impl NestedEncode for $num_type {
-			const TYPE_INFO: TypeInfo = $type_info;
-
+    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+		impl NestedEncodeNoErr for $num_type {
 			#[inline(never)]
-            fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+            fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
 				dest.write(&self.to_be_bytes()[..]);
-				Ok(())
 			}
 		}
+
+		dep_encode_from_no_err!{$num_type, $type_info}
     }
 }
 
@@ -105,26 +178,25 @@ encode_num_unsigned!{u32, 32, TypeInfo::U32}
 encode_num_unsigned!{u16, 16, TypeInfo::U16}
 
 // No reversing needed for u8, because it is a single byte.
-impl NestedEncode for u8 {
-	const TYPE_INFO: TypeInfo = TypeInfo::U8;
-
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+impl NestedEncodeNoErr for u8 {
+	fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
 		dest.push_byte(*self as u8);
-		Ok(())
 	}
 }
 
+dep_encode_from_no_err!{u8, TypeInfo::U8}
+
 // Derive the implementation of the other types by casting.
 macro_rules! encode_num_mimic {
-    ($num_type:ident, $mimic_type:ident, $type_info:expr) => {
-		impl NestedEncode for $num_type {
-			const TYPE_INFO: TypeInfo = $type_info;
-
+    ($num_type:ty, $mimic_type:ident, $type_info:expr) => {
+		impl NestedEncodeNoErr for $num_type {
 			#[inline]
-            fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-				(*self as $mimic_type).dep_encode_to(dest)
+            fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
+				(*self as $mimic_type).dep_encode_no_err(dest)
 			}
 		}
+
+		dep_encode_from_no_err!{$num_type, $type_info}
     }
 }
 
@@ -137,11 +209,11 @@ encode_num_mimic!{i8, u8, TypeInfo::I8}
 encode_num_mimic!{bool, u8, TypeInfo::Bool}
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
 		match self {
 			Some(v) => {
 				dest.push_byte(1u8);
-				v.dep_encode_to(dest)
+				v.dep_encode(dest)
 			},
 			None => {
 				dest.push_byte(0u8);
@@ -149,19 +221,38 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
 			}
 		}
 	}
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		match self {
+			Some(v) => {
+				dest.push_byte(1u8);
+				v.dep_encode_or_exit(dest, c, exit);
+			},
+			None => {
+				dest.push_byte(0u8);
+			}
+		}
+	}
 }
 
 impl<T: NestedEncode> NestedEncode for Box<T> {
 	#[inline(never)]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.as_ref().dep_encode_to(dest)
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_ref().dep_encode(dest)
+	}
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_ref().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
 impl<T: NestedEncode> NestedEncode for Box<[T]> {
-	#[inline(never)]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.as_ref().dep_encode_to(dest)
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_ref().dep_encode(dest)
+	}
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.as_ref().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
@@ -172,12 +263,17 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				#[inline(never)]
-				fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
 					$(
-                        self.$n.dep_encode_to(dest)?;
+                        self.$n.dep_encode(dest)?;
                     )+
 					Ok(())
+				}
+
+				fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+					$(
+                        self.$n.dep_encode_or_exit(dest, c.clone(), exit);
+                    )+
 				}
             }
         )+
@@ -208,10 +304,15 @@ macro_rules! array_impls {
         $(
             impl<T: NestedEncode> NestedEncode for [T; $n] {
 				#[inline]
-				fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
 					dep_encode_slice_contents(&self[..], dest)
 				}
-            }
+
+				#[inline]
+				fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+					dep_encode_slice_contents_or_exit(&self[..], dest, c, exit);
+				}
+			}
         )+
     }
 }
@@ -236,9 +337,14 @@ array_impls!(
 );
 
 impl NestedEncode for NonZeroUsize {
-	#[inline(never)]
-	fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.get().dep_encode_to(dest)
+	#[inline]
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.get().dep_encode(dest)
+	}
+
+	#[inline]
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		self.get().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
@@ -247,6 +353,7 @@ impl NestedEncode for NonZeroUsize {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use crate::test_util::check_dep_encode;
 	use super::super::test_struct::*;
     use core::fmt::Debug;
 
@@ -254,7 +361,7 @@ mod tests {
     where
         V: NestedEncode + PartialEq + Debug + 'static,
     {
-		let bytes = dep_encode_to_vec(&element).unwrap();
+		let bytes = check_dep_encode(&element);
 		assert_eq!(bytes.as_slice(), expected_bytes);
         
     }
