@@ -163,6 +163,14 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
                 state.subtract_tx_payment(sender_address, &tx.value.value);
                 let recipient_address = &tx.to.value.into();
                 state.increase_balance(recipient_address, &tx.value.value);
+
+                if tx.esdt_token_name.is_some() && tx.esdt_value.is_some() {
+                    let esdt_token_name = tx.esdt_token_name.as_ref().unwrap().as_bytes();
+                    let esdt_value = &tx.esdt_value.as_ref().unwrap().value;
+
+                    state.substract_esdt_balance(sender_address, esdt_token_name, esdt_value);
+                    state.increase_esdt_balance(recipient_address, esdt_token_name, esdt_value);
+                }
             },
             Step::ValidatorReward {
                 tx_id,
@@ -380,8 +388,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                         actual_value);
                 }
 
-                let default_check_value = CheckValue::Equal(
-                    BigUintValue { original: ValueSubTree::default(), value: BigUint::from(0u32) });
+                let default_check_value = CheckValue::Equal(BigUintValue::default());
                 let default_hashmap = &HashMap::new();
 
                 for (actual_key, actual_value) in account.esdt.as_ref().unwrap_or(default_hashmap).iter() {
