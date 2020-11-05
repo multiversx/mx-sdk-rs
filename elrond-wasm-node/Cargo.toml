@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-node"
-version = "0.9.0"
+version = "0.9.1"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -17,4 +17,4 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 small-int-ei = []
 
 [dependencies]
-elrond-wasm = { version = "0.9.0", path = "../elrond-wasm" }
+elrond-wasm = { version = "0.9.1", path = "../elrond-wasm" }
