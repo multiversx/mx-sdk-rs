@@ -11,9 +11,9 @@ mod sc_error;
 mod sc_result;
 mod var_args;
 
-pub use async_call_result::{AsyncCallResult, AsyncCallError};
+pub use async_call_result::{AsyncCallError, AsyncCallResult};
 pub use borrowed_mut_storage::BorrowedMutStorage;
-pub use h256::{H256, Address};
+pub use h256::{Address, H256};
 pub use multi_args::*;
 pub use multi_result::*;
 pub use multi_result_vec::MultiResultVec;

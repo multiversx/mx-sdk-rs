@@ -1,41 +1,40 @@
-
 #[derive(Debug, PartialEq, Eq)]
 pub struct EncodeError(&'static [u8]);
 
 impl From<&'static [u8]> for EncodeError {
-    #[inline]
+	#[inline]
 	fn from(bytes: &'static [u8]) -> Self {
 		EncodeError(bytes)
 	}
 }
 
 impl EncodeError {
-    #[inline]
+	#[inline]
 	pub fn message_bytes(&self) -> &'static [u8] {
-        self.0
-    }
+		self.0
+	}
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct DecodeError(&'static [u8]);
 
 impl From<&'static [u8]> for DecodeError {
-    #[inline]
+	#[inline]
 	fn from(bytes: &'static [u8]) -> Self {
 		DecodeError(bytes)
 	}
 }
 
 impl DecodeError {
-    #[inline]
+	#[inline]
 	pub fn message_bytes(&self) -> &'static [u8] {
-        self.0
-    }
+		self.0
+	}
 
-    pub const INPUT_TOO_SHORT: DecodeError = DecodeError(b"input too short");
-    pub const INPUT_TOO_LONG: DecodeError = DecodeError(b"input too long");
-    pub const INPUT_OUT_OF_RANGE: DecodeError = DecodeError(b"input out of range");
-    pub const INVALID_VALUE: DecodeError = DecodeError(b"invalid value");
-    pub const UNSUPPORTED_OPERATION: DecodeError = DecodeError(b"unsupported operation");
-    pub const ARRAY_DECODE_ERROR: DecodeError = DecodeError(b"array decode error");
+	pub const INPUT_TOO_SHORT: DecodeError = DecodeError(b"input too short");
+	pub const INPUT_TOO_LONG: DecodeError = DecodeError(b"input too long");
+	pub const INPUT_OUT_OF_RANGE: DecodeError = DecodeError(b"input out of range");
+	pub const INVALID_VALUE: DecodeError = DecodeError(b"invalid value");
+	pub const UNSUPPORTED_OPERATION: DecodeError = DecodeError(b"unsupported operation");
+	pub const ARRAY_DECODE_ERROR: DecodeError = DecodeError(b"array decode error");
 }

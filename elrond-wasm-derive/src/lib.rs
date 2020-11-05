@@ -1,10 +1,7 @@
-
-
 #![allow(dead_code)]
 #![allow(stable_features)]
-
 // ensure we don't run out of macro stack
-#![recursion_limit="1024"]
+#![recursion_limit = "1024"]
 
 #[macro_use]
 extern crate syn;
@@ -29,39 +26,24 @@ mod contract_macro_main;
 mod contract_macro_module;
 mod function_selector;
 mod parse_attr;
+mod reserved;
 mod snippets;
 mod util;
-mod reserved;
 
 mod callable;
 mod callable_gen;
 
 #[proc_macro_attribute]
-pub fn contract(
-  args: proc_macro::TokenStream,
-  input: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-
-  contract_macro_main::process_contract(args, input)
-
+pub fn contract(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+	contract_macro_main::process_contract(args, input)
 }
 
 #[proc_macro_attribute]
-pub fn module(
-  args: proc_macro::TokenStream,
-  input: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-
-  contract_macro_module::process_module(args, input)
-
+pub fn module(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+	contract_macro_module::process_module(args, input)
 }
 
 #[proc_macro_attribute]
-pub fn callable(
-  args: proc_macro::TokenStream,
-  input: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-
-  callable::process_callable(args, input)
-
+pub fn callable(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+	callable::process_callable(args, input)
 }
