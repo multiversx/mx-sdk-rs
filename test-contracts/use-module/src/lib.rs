@@ -1,4 +1,3 @@
-
 #![no_std]
 
 mod internal_mod_a;
@@ -20,31 +19,29 @@ use elrond_wasm_module_pause_wasm::*;
 
 #[elrond_wasm_derive::contract(UseModuleImpl)]
 pub trait UseModule {
+	#[module(InteralModuleAImpl)]
+	fn internal_module_a(&self) -> InteralModuleAImpl<T, BigInt, BigUint>;
 
-    #[module(InteralModuleAImpl)]
-    fn internal_module_a(&self) -> InteralModuleAImpl<T, BigInt, BigUint>;
+	#[module(InteralModuleBImpl)]
+	fn internal_module_b(&self) -> InteralModuleBImpl<T, BigInt, BigUint>;
 
-    #[module(InteralModuleBImpl)]
-    fn internal_module_b(&self) -> InteralModuleBImpl<T, BigInt, BigUint>;
+	#[module(FeaturesModuleImpl)]
+	fn features_module(&self) -> FeaturesModuleImpl<T, BigInt, BigUint>;
 
-    #[module(FeaturesModuleImpl)]
-    fn features_module(&self) -> FeaturesModuleImpl<T, BigInt, BigUint>;
+	#[module(PauseModuleImpl)]
+	fn pause_module(&self) -> PauseModuleImpl<T, BigInt, BigUint>;
 
-    #[module(PauseModuleImpl)]
-    fn pause_module(&self) -> PauseModuleImpl<T, BigInt, BigUint>;
+	#[init]
+	fn init(&self) {}
 
-    #[init]
-    fn init(&self) {
-    }
+	#[endpoint(checkFeatureGuard)]
+	fn check_feature_guard(&self) -> SCResult<()> {
+		feature_guard!(self.features_module(), b"featureName", true);
+		Ok(())
+	}
 
-    #[endpoint(checkFeatureGuard)]
-    fn check_feature_guard(&self) -> SCResult<()> {
-        feature_guard!(self.features_module(), b"featureName", true);
-        Ok(())
-    }
-
-    #[endpoint(checkPause)]
-    fn check_pause(&self) -> SCResult<bool> {
-        Ok(self.pause_module().is_paused())
-    }
+	#[endpoint(checkPause)]
+	fn check_pause(&self) -> SCResult<bool> {
+		Ok(self.pause_module().is_paused())
+	}
 }

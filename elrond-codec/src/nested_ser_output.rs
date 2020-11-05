@@ -2,7 +2,7 @@ use alloc::vec::Vec;
 
 /// Trait that allows appending bytes.
 /// Used especially by the NestedEncode trait to output data.
-/// 
+///
 /// In principle it can be anything, but in practice
 /// we only keep 1 implementation, which is Vec<u8>.
 /// This is to avoid code duplication by monomorphization.
