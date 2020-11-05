@@ -33,7 +33,10 @@ impl InterpretableFrom<String> for AddressKey {
 		if bytes.len() == 32 {
 			value.copy_from_slice(&bytes[..]);
 		}
-		AddressKey { value, original: from }
+		AddressKey {
+			value,
+			original: from,
+		}
 	}
 }
 
@@ -56,7 +59,10 @@ impl InterpretableFrom<ValueSubTree> for AddressValue {
 		if bytes.len() == 32 {
 			value.copy_from_slice(&bytes[..]);
 		}
-		AddressValue { value, original: from }
+		AddressValue {
+			value,
+			original: from,
+		}
 	}
 }
 

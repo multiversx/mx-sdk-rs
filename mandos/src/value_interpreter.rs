@@ -133,7 +133,12 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
 		let mut result = vec![0xffu8; length];
 		let bi = BigInt::from_bytes_be(Sign::Minus, parse_unsigned(&s[1..]).as_slice());
 		let bytes = bi.to_signed_bytes_be();
-		assert!(bytes.len() <= length, "representation of {} does not fit in {} bytes", s, length);
+		assert!(
+			bytes.len() <= length,
+			"representation of {} does not fit in {} bytes",
+			s,
+			length
+		);
 		let offset = length - bytes.len();
 		if !bytes.is_empty() {
 			result[offset..].clone_from_slice(&bytes[..]);
@@ -151,7 +156,12 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
 
 fn parse_fixed_width_unsigned(s: &str, length: usize) -> Vec<u8> {
 	let parsed = parse_unsigned(s);
-	assert!(parsed.len() <= length, "representation of {} does not fit in {} bytes", s, length);
+	assert!(
+		parsed.len() <= length,
+		"representation of {} does not fit in {} bytes",
+		s,
+		length
+	);
 
 	let mut result = vec![0u8; length];
 	let offset = length - parsed.len();

@@ -30,7 +30,12 @@ pub trait NestedEncode: Sized {
 	/// Version of `top_decode` that exits quickly in case of error.
 	/// Its purpose is to create smaller implementations
 	/// in cases where the application is supposed to exit directly on decode error.
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		match self.dep_encode(dest) {
 			Ok(v) => v,
 			Err(e) => exit(c, e),
@@ -50,7 +55,12 @@ macro_rules! dep_encode_from_no_err {
 			}
 
 			#[inline]
-			fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+			fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+				&self,
+				dest: &mut O,
+				_: ExitCtx,
+				_: fn(ExitCtx, EncodeError) -> !,
+			) {
 				self.dep_encode_no_err(dest);
 			}
 		}
@@ -67,11 +77,15 @@ pub fn dep_encode_to_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeErro
 /// Adds the concantenated encoded contents of a slice to an output buffer,
 /// without serializing the slice length.
 /// Byte slice is treated separately, via direct transmute.
-pub fn dep_encode_slice_contents<T: NestedEncode, O: NestedEncodeOutput>(slice: &[T], dest: &mut O) -> Result<(), EncodeError> {
+pub fn dep_encode_slice_contents<T: NestedEncode, O: NestedEncodeOutput>(
+	slice: &[T],
+	dest: &mut O,
+) -> Result<(), EncodeError> {
 	match T::TYPE_INFO {
 		TypeInfo::U8 => {
 			// cast &[T] to &[u8]
-			let slice: &[u8] = unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
+			let slice: &[u8] =
+				unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
 			dest.write(slice);
 		},
 		_ => {
@@ -83,8 +97,12 @@ pub fn dep_encode_slice_contents<T: NestedEncode, O: NestedEncodeOutput>(slice: 
 	Ok(())
 }
 
-pub fn dep_encode_slice_contents_or_exit<T, O, ExitCtx>(slice: &[T], dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !)
-where
+pub fn dep_encode_slice_contents_or_exit<T, O, ExitCtx>(
+	slice: &[T],
+	dest: &mut O,
+	c: ExitCtx,
+	exit: fn(ExitCtx, EncodeError) -> !,
+) where
 	T: NestedEncode,
 	O: NestedEncodeOutput,
 	ExitCtx: Clone,
@@ -92,7 +110,8 @@ where
 	match T::TYPE_INFO {
 		TypeInfo::U8 => {
 			// cast &[T] to &[u8]
-			let slice: &[u8] = unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
+			let slice: &[u8] =
+				unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
 			dest.write(slice);
 		},
 		_ => {
@@ -117,7 +136,12 @@ impl<T: NestedEncode> NestedEncode for &[T] {
 		dep_encode_slice_contents(self, dest)
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		// push size
 		self.len().dep_encode_or_exit(dest, c.clone(), exit);
 		// actual data
@@ -131,7 +155,12 @@ impl<T: NestedEncode> NestedEncode for &T {
 		(*self).dep_encode(dest)
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		(*self).dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -141,7 +170,12 @@ impl NestedEncode for &str {
 		self.as_bytes().dep_encode(dest)
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_bytes().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -153,7 +187,12 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 	}
 
 	#[inline]
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_slice().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -221,7 +260,12 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
 		}
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		match self {
 			Some(v) => {
 				dest.push_byte(1u8);
@@ -240,7 +284,12 @@ impl<T: NestedEncode> NestedEncode for Box<T> {
 		self.as_ref().dep_encode(dest)
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_ref().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -250,7 +299,12 @@ impl<T: NestedEncode> NestedEncode for Box<[T]> {
 		self.as_ref().dep_encode(dest)
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_ref().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -343,7 +397,12 @@ impl NestedEncode for NonZeroUsize {
 	}
 
 	#[inline]
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.get().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -451,7 +510,10 @@ mod tests {
 		ser_ok(n, expected);
 
 		let t = E::Tuple(1, 2);
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+		let expected: &[u8] = &[
+			/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
+			2, /*)*/
+		];
 		ser_ok(t, expected);
 
 		let s = E::Struct { a: 1 };

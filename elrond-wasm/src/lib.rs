@@ -326,7 +326,10 @@ macro_rules! imports {
 		use elrond_wasm::non_zero_util::*;
 		use elrond_wasm::types::*;
 		use elrond_wasm::{Address, H256};
-		use elrond_wasm::{AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, OtherContractHandle};
+		use elrond_wasm::{
+			AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi, ContractIOApi,
+			OtherContractHandle,
+		};
 		use elrond_wasm::{BorrowedMutStorage, Box, Queue, String, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
 	};

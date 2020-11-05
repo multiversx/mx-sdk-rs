@@ -14,7 +14,12 @@ pub trait NestedDecodeInput {
 
 	/// Read the exact number of bytes required to fill the given buffer.
 	/// Exit early if there are not enough bytes to fill the result.
-	fn read_into_or_exit<ExitCtx: Clone>(&mut self, into: &mut [u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !);
+	fn read_into_or_exit<ExitCtx: Clone>(
+		&mut self,
+		into: &mut [u8],
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	);
 
 	/// Read a single byte from the input.
 	fn read_byte(&mut self) -> Result<u8, DecodeError> {
@@ -24,7 +29,11 @@ pub trait NestedDecodeInput {
 	}
 
 	/// Read a single byte from the input.
-	fn read_byte_or_exit<ExitCtx: Clone>(&mut self, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> u8 {
+	fn read_byte_or_exit<ExitCtx: Clone>(
+		&mut self,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> u8 {
 		let mut buf = [0u8];
 		self.read_into_or_exit(&mut buf[..], c, exit);
 		buf[0]
@@ -35,7 +44,12 @@ pub trait NestedDecodeInput {
 
 	/// Read the exact number of bytes required to fill the given buffer.
 	/// Exit directly if the input contains too few bytes.
-	fn read_slice_or_exit<ExitCtx: Clone>(&mut self, length: usize, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> &[u8];
+	fn read_slice_or_exit<ExitCtx: Clone>(
+		&mut self,
+		length: usize,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> &[u8];
 
 	/// Clears the input buffer and returns all remaining bytes.
 	fn flush(&mut self) -> &[u8];
@@ -56,7 +70,12 @@ impl<'a> NestedDecodeInput for &'a [u8] {
 		Ok(())
 	}
 
-	fn read_into_or_exit<ExitCtx: Clone>(&mut self, into: &mut [u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) {
+	fn read_into_or_exit<ExitCtx: Clone>(
+		&mut self,
+		into: &mut [u8],
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) {
 		if into.len() > self.len() {
 			exit(c, DecodeError::INPUT_TOO_SHORT);
 		}
@@ -75,7 +94,12 @@ impl<'a> NestedDecodeInput for &'a [u8] {
 		Ok(result)
 	}
 
-	fn read_slice_or_exit<ExitCtx: Clone>(&mut self, length: usize, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> &[u8] {
+	fn read_slice_or_exit<ExitCtx: Clone>(
+		&mut self,
+		length: usize,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> &[u8] {
 		if length > self.len() {
 			exit(c, DecodeError::INPUT_TOO_SHORT);
 		}

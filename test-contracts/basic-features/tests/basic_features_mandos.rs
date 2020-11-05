@@ -5,7 +5,10 @@ use elrond_wasm_debug::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
-	contract_map.register_contract("file:../output/features.wasm", Box::new(|context| Box::new(BasicFeaturesImpl::new(context))));
+	contract_map.register_contract(
+		"file:../output/features.wasm",
+		Box::new(|context| Box::new(BasicFeaturesImpl::new(context))),
+	);
 	contract_map
 }
 

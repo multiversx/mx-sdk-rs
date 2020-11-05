@@ -38,7 +38,11 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
 	}
 }
 
-pub fn async_callback_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address, async_result: &TxResult) -> TxInput {
+pub fn async_callback_tx_input(
+	async_data: &AsyncCallTxData,
+	contract_addr: &Address,
+	async_result: &TxResult,
+) -> TxInput {
 	let mut args: Vec<Vec<u8>> = Vec::new();
 	let serialized_bytes = top_encode_to_vec(&async_result.result_status).unwrap();
 	args.push(serialized_bytes);
@@ -63,7 +67,9 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, contract_addr: &Add
 
 pub fn merge_results(mut original: TxResult, new: TxResult) -> TxResult {
 	if original.result_status == 0 {
-		original.result_values.extend_from_slice(new.result_values.as_slice());
+		original
+			.result_values
+			.extend_from_slice(new.result_values.as_slice());
 		original
 	} else {
 		new

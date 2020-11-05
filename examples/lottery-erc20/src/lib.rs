@@ -16,7 +16,14 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 #[elrond_wasm_derive::callable(Erc20Proxy)]
 pub trait Erc20 {
 	#[callback(transfer_from_callback)]
-	fn transferFrom(&self, sender: &Address, recipient: &Address, amount: BigUint, #[callback_arg] cb_lottery_name: Vec<u8>, #[callback_arg] cb_sender: &Address);
+	fn transferFrom(
+		&self,
+		sender: &Address,
+		recipient: &Address,
+		amount: BigUint,
+		#[callback_arg] cb_lottery_name: Vec<u8>,
+		#[callback_arg] cb_sender: &Address,
+	);
 
 	#[callback(distribute_prizes_callback)]
 	fn transfer(&self, to: &Address, amount: BigUint, #[callback_arg] cb_lottery_name: Vec<u8>);
@@ -90,22 +97,38 @@ pub trait Lottery {
 		let total_tickets = opt_total_tickets.unwrap_or(u32::MAX);
 		let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
 		let max_entries_per_user = opt_max_entries_per_user.unwrap_or(u32::MAX);
-		let prize_distribution = opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
+		let prize_distribution =
+			opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
 		let whitelist = opt_whitelist.unwrap_or(Vec::new());
 
-		require!(self.status(lottery_name.clone()) == Status::Inactive, "Lottery is already active!");
+		require!(
+			self.status(lottery_name.clone()) == Status::Inactive,
+			"Lottery is already active!"
+		);
 
 		require!(ticket_price > 0, "Ticket price must be higher than 0!");
 
-		require!(total_tickets > 0, "Must have more than 0 tickets available!");
+		require!(
+			total_tickets > 0,
+			"Must have more than 0 tickets available!"
+		);
 
 		require!(deadline > timestamp, "Deadline can't be in the past!");
 
-		require!(deadline <= timestamp + THIRTY_DAYS_IN_SECONDS, "Deadline can't be later than 30 days from now!");
+		require!(
+			deadline <= timestamp + THIRTY_DAYS_IN_SECONDS,
+			"Deadline can't be later than 30 days from now!"
+		);
 
-		require!(max_entries_per_user > 0, "Must have more than 0 max entries per user!");
+		require!(
+			max_entries_per_user > 0,
+			"Must have more than 0 max entries per user!"
+		);
 
-		require!(self.sum_array(&prize_distribution) == PERCENTAGE_TOTAL, "Prize distribution must add up to exactly 100(%)!");
+		require!(
+			self.sum_array(&prize_distribution) == PERCENTAGE_TOTAL,
+			"Prize distribution must add up to exactly 100(%)!"
+		);
 
 		let info = LotteryInfo {
 			ticket_price,
@@ -130,8 +153,12 @@ pub trait Lottery {
 		match self.status(lottery_name.clone()) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
 			Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
-			Status::Ended => sc_error!("Lottery entry period has ended! Awaiting winner announcement."),
-			Status::DistributingPrizes => sc_error!("Prizes are currently being distributed. Can't buy tickets!"),
+			Status::Ended => {
+				sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
+			},
+			Status::DistributingPrizes => {
+				sc_error!("Prizes are currently being distributed. Can't buy tickets!")
+			},
 		}
 	}
 
@@ -144,7 +171,9 @@ pub trait Lottery {
 				let info = self.get_mut_lottery_info(&lottery_name);
 
 				if info.queued_tickets > 0 {
-					return sc_error!("There are still tickets being processed. Please try again later.");
+					return sc_error!(
+						"There are still tickets being processed. Please try again later."
+					);
 				}
 
 				self.distribute_prizes(&lottery_name);
@@ -178,17 +207,27 @@ pub trait Lottery {
 		return Status::Running;
 	}
 
-	fn update_after_buy_ticket(&self, lottery_name: &Vec<u8>, token_amount: BigUint) -> SCResult<()> {
+	fn update_after_buy_ticket(
+		&self,
+		lottery_name: &Vec<u8>,
+		token_amount: BigUint,
+	) -> SCResult<()> {
 		let info = self.get_mut_lottery_info(&lottery_name);
 		let caller = self.get_caller();
 
-		require!(info.whitelist.is_empty() || info.whitelist.contains(&caller), "You are not allowed to participate in this lottery!");
+		require!(
+			info.whitelist.is_empty() || info.whitelist.contains(&caller),
+			"You are not allowed to participate in this lottery!"
+		);
 
 		require!(token_amount == info.ticket_price, "Wrong ticket fee!");
 
 		let entries = self.get_mut_number_of_entries_for_user(&lottery_name, &caller);
 
-		require!(*entries < info.max_entries_per_user, "Ticket limit exceeded for this lottery!");
+		require!(
+			*entries < info.max_entries_per_user,
+			"Ticket limit exceeded for this lottery!"
+		);
 
 		// reserve the ticket, but don't update the other fields yet.
 		self.reserve_ticket(lottery_name);
@@ -196,7 +235,13 @@ pub trait Lottery {
 		let erc20_address = self.get_erc20_contract_address();
 		let lottery_contract_address = self.get_sc_address();
 		let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
-		erc20_proxy.transferFrom(&caller, &lottery_contract_address, token_amount, lottery_name.clone(), &caller);
+		erc20_proxy.transferFrom(
+			&caller,
+			&lottery_contract_address,
+			token_amount,
+			lottery_name.clone(),
+			&caller,
+		);
 
 		Ok(())
 	}
@@ -244,7 +289,9 @@ pub trait Lottery {
 		let prize: BigUint;
 
 		if current_winning_ticket_index != 0 {
-			prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32) * info.prize_pool.clone() / BigUint::from(PERCENTAGE_TOTAL as u32);
+			prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
+				* info.prize_pool.clone()
+				/ BigUint::from(PERCENTAGE_TOTAL as u32);
 		} else {
 			prize = info.prize_pool.clone();
 		}
@@ -282,16 +329,35 @@ pub trait Lottery {
 
 		for i in 0..info.current_ticket_number {
 			let addr = self.get_ticket_holder(lottery_name, i);
-			let key_ticket_holder = ["ticketHolder".as_bytes(), appended_name_in_key, &i.to_be_bytes()].concat();
-			let key_number_of_entries = ["numberOfEntriesForUser".as_bytes(), appended_name_in_key, addr.as_bytes()].concat();
+			let key_ticket_holder = [
+				"ticketHolder".as_bytes(),
+				appended_name_in_key,
+				&i.to_be_bytes(),
+			]
+			.concat();
+			let key_number_of_entries = [
+				"numberOfEntriesForUser".as_bytes(),
+				appended_name_in_key,
+				addr.as_bytes(),
+			]
+			.concat();
 
 			self.storage_store_slice_u8(&key_ticket_holder, &[0u8; 0]);
 			self.storage_store_slice_u8(&key_number_of_entries, &[0u8; 0]);
 		}
 
-		self.storage_store_slice_u8(&["lotteryExists".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
-		self.storage_store_slice_u8(&["lotteryInfo".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
-		self.storage_store_slice_u8(&["previousWinners".as_bytes(), appended_name_in_key].concat(), &[0u8; 0]);
+		self.storage_store_slice_u8(
+			&["lotteryExists".as_bytes(), appended_name_in_key].concat(),
+			&[0u8; 0],
+		);
+		self.storage_store_slice_u8(
+			&["lotteryInfo".as_bytes(), appended_name_in_key].concat(),
+			&[0u8; 0],
+		);
+		self.storage_store_slice_u8(
+			&["previousWinners".as_bytes(), appended_name_in_key].concat(),
+			&[0u8; 0],
+		);
 	}
 
 	fn sum_array(&self, array: &[u8]) -> u16 {
@@ -305,12 +371,18 @@ pub trait Lottery {
 	}
 
 	#[callback]
-	fn transfer_from_callback(&self, result: AsyncCallResult<()>, #[callback_arg] cb_lottery_name: Vec<u8>, #[callback_arg] cb_sender: Address) {
+	fn transfer_from_callback(
+		&self,
+		result: AsyncCallResult<()>,
+		#[callback_arg] cb_lottery_name: Vec<u8>,
+		#[callback_arg] cb_sender: Address,
+	) {
 		let mut info = self.get_mut_lottery_info(&cb_lottery_name);
 
 		match result {
 			AsyncCallResult::Ok(()) => {
-				let mut entries = self.get_mut_number_of_entries_for_user(&cb_lottery_name, &cb_sender);
+				let mut entries =
+					self.get_mut_number_of_entries_for_user(&cb_lottery_name, &cb_sender);
 
 				self.set_ticket_holder(&cb_lottery_name, info.current_ticket_number, &cb_sender);
 
@@ -330,7 +402,11 @@ pub trait Lottery {
 	}
 
 	#[callback]
-	fn distribute_prizes_callback(&self, result: AsyncCallResult<()>, #[callback_arg] cb_lottery_name: Vec<u8>) {
+	fn distribute_prizes_callback(
+		&self,
+		result: AsyncCallResult<()>,
+		#[callback_arg] cb_lottery_name: Vec<u8>,
+	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.distribute_prizes(&cb_lottery_name);
@@ -362,7 +438,11 @@ pub trait Lottery {
 	fn get_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32) -> Address;
 
 	#[storage_get_mut("numberOfEntriesForUser")]
-	fn get_mut_number_of_entries_for_user(&self, lottery_name: &[u8], user: &Address) -> mut_storage!(u32);
+	fn get_mut_number_of_entries_for_user(
+		&self,
+		lottery_name: &[u8],
+		user: &Address,
+	) -> mut_storage!(u32);
 
 	#[storage_set("erc20_contract_address")]
 	fn set_erc20_contract_address(&self, address: &Address);

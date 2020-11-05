@@ -71,7 +71,11 @@ where
 			core::mem::forget(big_uint_value); // otherwise the data gets deallocated twice
 			cast_big_uint
 		},
-		_ => T::top_decode_or_exit(StorageGetInput::new(api.clone(), key), api, storage_get_exit),
+		_ => T::top_decode_or_exit(
+			StorageGetInput::new(api.clone(), key),
+			api,
+			storage_get_exit,
+		),
 	}
 }
 

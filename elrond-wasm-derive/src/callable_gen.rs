@@ -48,7 +48,8 @@ pub struct Callable {
 
 impl Callable {
 	pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
-		let callable_impl_name = generate_callable_interface_impl_struct_name(&contract_trait.ident);
+		let callable_impl_name =
+			generate_callable_interface_impl_struct_name(&contract_trait.ident);
 		let contract_impl_name = extract_struct_name(args);
 
 		let methods: Vec<CallableMethod> = contract_trait
@@ -100,7 +101,9 @@ impl Callable {
 						};
 
 						match &arg.metadata {
-							ArgMetadata::Single | ArgMetadata::VarArgs => arg_serialize_push(arg, &arg_accumulator),
+							ArgMetadata::Single | ArgMetadata::VarArgs => {
+								arg_serialize_push(arg, &arg_accumulator)
+							},
 							ArgMetadata::Payment => {
 								// #[payment]
 								payment_count += 1;
@@ -112,7 +115,11 @@ impl Callable {
 							ArgMetadata::Multi(multi_attr) => {
 								// #[multi(...)]
 								let count_expr = &multi_attr.count_expr;
-								arg_serialize_push_multi(arg, &arg_accumulator, &quote! { #count_expr as usize })
+								arg_serialize_push_multi(
+									arg,
+									&arg_accumulator,
+									&quote! { #count_expr as usize },
+								)
 							},
 						}
 					})

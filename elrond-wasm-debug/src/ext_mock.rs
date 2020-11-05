@@ -74,8 +74,16 @@ pub struct TxResult {
 
 impl fmt::Display for TxResult {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let results_hex: Vec<String> = self.result_values.iter().map(|r| format!("0x{}", hex::encode(r))).collect();
-		write!(f, "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}", self.result_status, results_hex)
+		let results_hex: Vec<String> = self
+			.result_values
+			.iter()
+			.map(|r| format!("0x{}", hex::encode(r)))
+			.collect();
+		write!(
+			f,
+			"TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}",
+			self.result_status, results_hex
+		)
 	}
 }
 
@@ -207,7 +215,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	}
 
 	fn get_owner_address(&self) -> Address {
-		self.blockchain_info_box.contract_owner.clone().unwrap_or_else(|| panic!("contract owner address not set"))
+		self.blockchain_info_box
+			.contract_owner
+			.clone()
+			.unwrap_or_else(|| panic!("contract owner address not set"))
 	}
 
 	fn get_caller(&self) -> Address {
@@ -231,7 +242,9 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		}
 
 		let mut tx_output = self.tx_output_cell.borrow_mut();
-		tx_output.contract_storage.insert(key.to_vec(), value.to_vec());
+		tx_output
+			.contract_storage
+			.insert(key.to_vec(), value.to_vec());
 	}
 
 	fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
@@ -521,7 +534,10 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 	}
 
 	fn signal_error(&self, message: &[u8]) -> ! {
-		panic!(TxPanic { status: 4, message: message.to_vec() })
+		panic!(TxPanic {
+			status: 4,
+			message: message.to_vec()
+		})
 	}
 
 	fn write_log(&self, _topics: &[[u8; 32]], _data: &[u8]) {

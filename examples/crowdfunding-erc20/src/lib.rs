@@ -40,7 +40,13 @@ pub trait Crowdfunding {
 		let cf_contract_address = self.get_sc_address();
 
 		let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
-		erc20_proxy.transferFrom(&caller, &cf_contract_address, token_amount.clone(), &caller, token_amount.clone());
+		erc20_proxy.transferFrom(
+			&caller,
+			&cf_contract_address,
+			token_amount.clone(),
+			&caller,
+			token_amount.clone(),
+		);
 
 		Ok(())
 	}
@@ -93,7 +99,12 @@ pub trait Crowdfunding {
 	}
 
 	#[callback]
-	fn transfer_from_callback(&self, result: AsyncCallResult<()>, #[callback_arg] cb_sender: Address, #[callback_arg] cb_amount: BigUint) {
+	fn transfer_from_callback(
+		&self,
+		result: AsyncCallResult<()>,
+		#[callback_arg] cb_sender: Address,
+		#[callback_arg] cb_amount: BigUint,
+	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				// transaction started before deadline, ended after -> refund
@@ -193,7 +204,12 @@ impl TopEncode for Status {
 		self.to_u8().top_encode(output)
 	}
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.to_u8().top_encode_or_exit(output, c, exit)
 	}
 }
@@ -203,7 +219,11 @@ impl TopDecode for Status {
 		Status::from_u8(u8::top_decode(input)?)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match u8::top_decode_or_exit(input, c.clone(), exit) {
 			0 => Status::FundingPeriod,
 			1 => Status::Successful,

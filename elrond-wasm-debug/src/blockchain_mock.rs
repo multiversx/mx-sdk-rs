@@ -42,10 +42,20 @@ impl fmt::Display for AccountData {
 		keys.sort();
 		for key in &keys {
 			let value = self.storage.get(key).unwrap();
-			write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
+			write!(
+				&mut storage_buf,
+				"\n\t\t{} -> 0x{}",
+				key_hex(key.as_slice()),
+				hex::encode(value.as_slice())
+			)
+			.unwrap();
 		}
 
-		write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}", self.nonce, self.balance, storage_buf)
+		write!(
+			f,
+			"AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
+			self.nonce, self.balance, storage_buf
+		)
 	}
 }
 
@@ -92,17 +102,31 @@ impl BlockchainMock {
 	pub fn print_accounts(&self) {
 		let mut accounts_buf = String::new();
 		for (address, account) in &self.accounts {
-			write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
+			write!(
+				&mut accounts_buf,
+				"\n\t{} -> {}",
+				address_hex(address),
+				account
+			)
+			.unwrap();
 		}
 		println!("Accounts: {}", &accounts_buf);
 	}
 
-	pub fn put_new_address(&mut self, creator_address: Address, creator_nonce: u64, new_address: Address) {
-		self.new_addresses.insert((creator_address, creator_nonce), new_address);
+	pub fn put_new_address(
+		&mut self,
+		creator_address: Address,
+		creator_nonce: u64,
+		new_address: Address,
+	) {
+		self.new_addresses
+			.insert((creator_address, creator_nonce), new_address);
 	}
 
 	fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
-		self.new_addresses.get(&(creator_address, creator_nonce)).map(|addr_ref| addr_ref.clone())
+		self.new_addresses
+			.get(&(creator_address, creator_nonce))
+			.map(|addr_ref| addr_ref.clone())
 	}
 
 	pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {
@@ -118,20 +142,35 @@ impl BlockchainMock {
 	}
 
 	pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint) {
-		let sender_account = self.accounts.get_mut(address).unwrap_or_else(|| panic!("Sender account not found"));
-		assert!(&sender_account.balance >= call_value, "Not enough balance to send tx payment");
+		let sender_account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Sender account not found"));
+		assert!(
+			&sender_account.balance >= call_value,
+			"Not enough balance to send tx payment"
+		);
 		sender_account.balance -= call_value;
 	}
 
 	pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
-		let sender_account = self.accounts.get_mut(address).unwrap_or_else(|| panic!("Sender account not found"));
+		let sender_account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Sender account not found"));
 		let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
-		assert!(sender_account.balance >= gas_cost, "Not enough balance to pay gas upfront");
+		assert!(
+			sender_account.balance >= gas_cost,
+			"Not enough balance to pay gas upfront"
+		);
 		sender_account.balance -= &gas_cost;
 	}
 
 	pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
-		let account = self.accounts.get_mut(address).unwrap_or_else(|| panic!("Receiver account not found"));
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Receiver account not found"));
 		account.balance += amount;
 	}
 
@@ -143,16 +182,29 @@ impl BlockchainMock {
 	}
 
 	pub fn increase_nonce(&mut self, address: &Address) {
-		let account = self.accounts.get_mut(address).unwrap_or_else(|| panic!("Account not found"));
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Account not found"));
 		account.nonce += 1;
 	}
 
-	pub fn create_account_after_deploy(&mut self, tx_input: &TxInput, new_storage: HashMap<Vec<u8>, Vec<u8>>, contract_path: Vec<u8>) -> Address {
-		let sender = self.accounts.get(&tx_input.from).unwrap_or_else(|| panic!("Unknown deployer"));
+	pub fn create_account_after_deploy(
+		&mut self,
+		tx_input: &TxInput,
+		new_storage: HashMap<Vec<u8>, Vec<u8>>,
+		contract_path: Vec<u8>,
+	) -> Address {
+		let sender = self
+			.accounts
+			.get(&tx_input.from)
+			.unwrap_or_else(|| panic!("Unknown deployer"));
 		let sender_nonce_before_tx = sender.nonce - 1;
 		let new_address = self
 			.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
-			.unwrap_or_else(|| panic!("Missing new address. Only explicit new deploy addresses supported"));
+			.unwrap_or_else(|| {
+				panic!("Missing new address. Only explicit new deploy addresses supported")
+			});
 
 		let old_value = self.accounts.insert(
 			new_address.clone(),
@@ -173,19 +225,29 @@ impl BlockchainMock {
 	}
 
 	pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
-		let account = self.accounts.get_mut(address).unwrap_or_else(|| panic!("Account not found"));
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Account not found"));
 		account.balance += amount;
-		let mut storage_v_rew = if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY) {
-			BigUint::from_bytes_be(old_storage_value)
-		} else {
-			BigUint::zero()
-		};
+		let mut storage_v_rew =
+			if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY) {
+				BigUint::from_bytes_be(old_storage_value)
+			} else {
+				BigUint::zero()
+			};
 		storage_v_rew += amount;
-		account.storage.insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
+		account
+			.storage
+			.insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
 	}
 }
 
-pub fn execute_tx(tx_context: TxContext, contract_identifier: &Vec<u8>, contract_map: &ContractMap<TxContext>) -> TxOutput {
+pub fn execute_tx(
+	tx_context: TxContext,
+	contract_identifier: &Vec<u8>,
+	contract_map: &ContractMap<TxContext>,
+) -> TxOutput {
 	let func_name = tx_context.tx_input_box.func_name.clone();
 	let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
 	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {

@@ -5,7 +5,11 @@ use elrond_codec::*;
 pub trait AsyncCallArg: Sized {
 	fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError>;
 
-	fn push_async_arg_exact(&self, _serializer: &mut CallDataSerializer, _expected_len: usize) -> Result<(), SCError> {
+	fn push_async_arg_exact(
+		&self,
+		_serializer: &mut CallDataSerializer,
+		_expected_len: usize,
+	) -> Result<(), SCError> {
 		Err(SCError::from(&b"not supported"[..]))
 	}
 }
@@ -33,7 +37,8 @@ where
 {
 	#[inline]
 	fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
-		self.top_encode(AsyncCallArgOutput::new(serializer)).map_err(|err| SCError::from(err))
+		self.top_encode(AsyncCallArgOutput::new(serializer))
+			.map_err(|err| SCError::from(err))
 	}
 }
 
@@ -48,7 +53,11 @@ where
 		Ok(())
 	}
 
-	fn push_async_arg_exact(&self, serializer: &mut CallDataSerializer, expected_len: usize) -> Result<(), SCError> {
+	fn push_async_arg_exact(
+		&self,
+		serializer: &mut CallDataSerializer,
+		expected_len: usize,
+	) -> Result<(), SCError> {
 		if self.len() != expected_len {
 			return Err(SCError::from(err_msg::ARG_ASYNC_WRONG_NUMBER));
 		}

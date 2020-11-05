@@ -23,7 +23,11 @@ where
 			core::mem::forget(big_uint_arg); // otherwise the data gets deallocated twice
 			cast_big_uint
 		},
-		_ => T::top_decode_or_exit(ArgDecodeInput::new(api.clone(), index), (api, arg_id), load_single_arg_exit),
+		_ => T::top_decode_or_exit(
+			ArgDecodeInput::new(api.clone(), index),
+			(api, arg_id),
+			load_single_arg_exit,
+		),
 	}
 }
 

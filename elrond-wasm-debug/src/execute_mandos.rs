@@ -11,7 +11,11 @@ pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<
 	parse_execute_mandos_steps(path.as_ref(), &mut state, contract_map);
 }
 
-fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, contract_map: &ContractMap<TxContext>) {
+fn parse_execute_mandos_steps(
+	steps_path: &Path,
+	state: &mut BlockchainMock,
+	contract_map: &ContractMap<TxContext>,
+) {
 	let scenario = mandos::parse_scenario(steps_path);
 
 	for step in scenario.steps.iter() {
@@ -34,13 +38,24 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
 						address: address.value.into(),
 						nonce: account.nonce.value,
 						balance: account.balance.value.clone(),
-						storage: account.storage.iter().map(|(k, v)| (k.value.clone(), v.value.clone())).collect(),
-						contract_path: account.code.as_ref().map(|bytes_value| bytes_value.value.clone()),
+						storage: account
+							.storage
+							.iter()
+							.map(|(k, v)| (k.value.clone(), v.value.clone()))
+							.collect(),
+						contract_path: account
+							.code
+							.as_ref()
+							.map(|bytes_value| bytes_value.value.clone()),
 						contract_owner: None, // TODO: add contract owner in mandos
 					});
 				}
 				for new_address in new_addresses.iter() {
-					state.put_new_address(new_address.creator_address.value.into(), new_address.creator_nonce.value, new_address.new_address.value.into())
+					state.put_new_address(
+						new_address.creator_address.value.into(),
+						new_address.creator_nonce.value,
+						new_address.new_address.value.into(),
+					)
 				}
 				if let Some(block_info_obj) = previous_block_info {
 					if let Some(u64_value) = &block_info_obj.block_timestamp {
@@ -71,7 +86,12 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
 					}
 				}
 			},
-			Step::ScCall { tx_id, comment, tx, expect } => {
+			Step::ScCall {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => {
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),
@@ -79,25 +99,42 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
 					esdt_value: 0u32.into(),
 					esdt_token_name: None,
 					func_name: tx.function.as_bytes().to_vec(),
-					args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
+					args: tx
+						.arguments
+						.iter()
+						.map(|scen_arg| scen_arg.value.clone())
+						.collect(),
 					gas_limit: tx.gas_limit.value,
 					gas_price: tx.gas_price.value,
 					tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
 				};
 				state.increase_nonce(&tx_input.from);
-				let (mut tx_result, opt_async_data) = execute_sc_call(tx_input, state, contract_map);
+				let (mut tx_result, opt_async_data) =
+					execute_sc_call(tx_input, state, contract_map);
 				if tx_result.result_status == 0 {
 					if let Some(async_data) = opt_async_data {
 						let contract_address = tx.to.value.into();
 						if state.accounts.contains_key(&async_data.to) {
 							let async_input = async_call_tx_input(&async_data, &contract_address);
-							let (async_result, opt_more_async) = execute_sc_call(async_input, state, contract_map);
-							assert!(opt_more_async.is_none(), "nested asyncs currently not supported");
+							let (async_result, opt_more_async) =
+								execute_sc_call(async_input, state, contract_map);
+							assert!(
+								opt_more_async.is_none(),
+								"nested asyncs currently not supported"
+							);
 							tx_result = merge_results(tx_result, async_result.clone());
 
-							let callback_input = async_callback_tx_input(&async_data, &contract_address, &async_result);
-							let (callback_result, opt_more_async) = execute_sc_call(callback_input, state, contract_map);
-							assert!(opt_more_async.is_none(), "successive asyncs currently not supported");
+							let callback_input = async_callback_tx_input(
+								&async_data,
+								&contract_address,
+								&async_result,
+							);
+							let (callback_result, opt_more_async) =
+								execute_sc_call(callback_input, state, contract_map);
+							assert!(
+								opt_more_async.is_none(),
+								"successive asyncs currently not supported"
+							);
 							tx_result = merge_results(tx_result, callback_result);
 						} else {
 							state.subtract_tx_payment(&contract_address, &async_data.call_value);
@@ -117,7 +154,12 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
 				}
 			},
-			Step::ScDeploy { tx_id, comment, tx, expect } => {
+			Step::ScDeploy {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => {
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
 					to: H256::zero(),
@@ -125,13 +167,18 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
 					esdt_value: 0u32.into(),
 					esdt_token_name: None,
 					func_name: b"init".to_vec(),
-					args: tx.arguments.iter().map(|scen_arg| scen_arg.value.clone()).collect(),
+					args: tx
+						.arguments
+						.iter()
+						.map(|scen_arg| scen_arg.value.clone())
+						.collect(),
 					gas_limit: tx.gas_limit.value,
 					gas_price: tx.gas_price.value,
 					tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
 				};
 				state.increase_nonce(&tx_input.from);
-				let (tx_result, _) = execute_sc_create(tx_input, &tx.contract_code.value, state, contract_map);
+				let (tx_result, _) =
+					execute_sc_create(tx_input, &tx.contract_code.value, state, contract_map);
 				if let Some(tx_expect) = expect {
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
 				}
@@ -156,7 +203,11 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock, con
 	}
 }
 
-fn execute_sc_call(tx_input: TxInput, state: &mut BlockchainMock, contract_map: &ContractMap<TxContext>) -> (TxResult, Option<AsyncCallTxData>) {
+fn execute_sc_call(
+	tx_input: TxInput,
+	state: &mut BlockchainMock,
+	contract_map: &ContractMap<TxContext>,
+) -> (TxResult, Option<AsyncCallTxData>) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let call_value = tx_input.call_value.clone();
@@ -165,9 +216,15 @@ fn execute_sc_call(tx_input: TxInput, state: &mut BlockchainMock, contract_map: 
 	state.subtract_tx_payment(&from, &call_value);
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let contract_account = state.accounts.get_mut(&to).unwrap_or_else(|| panic!("Recipient account not found: {}", address_hex(&to)));
+	let contract_account = state
+		.accounts
+		.get_mut(&to)
+		.unwrap_or_else(|| panic!("Recipient account not found: {}", address_hex(&to)));
 
-	let contract_path = &contract_account.contract_path.clone().unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
+	let contract_path = &contract_account
+		.contract_path
+		.clone()
+		.unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
 
 	let tx_context = TxContext::new(
 		blockchain_info,
@@ -195,7 +252,12 @@ fn execute_sc_call(tx_input: TxInput, state: &mut BlockchainMock, contract_map: 
 	(tx_result, tx_output.async_call)
 }
 
-fn execute_sc_create(tx_input: TxInput, contract_path: &Vec<u8>, state: &mut BlockchainMock, contract_map: &ContractMap<TxContext>) -> (TxResult, Option<AsyncCallTxData>) {
+fn execute_sc_create(
+	tx_input: TxInput,
+	contract_path: &Vec<u8>,
+	state: &mut BlockchainMock,
+	contract_map: &ContractMap<TxContext>,
+) -> (TxResult, Option<AsyncCallTxData>) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let call_value = tx_input.call_value.clone();
@@ -208,7 +270,11 @@ fn execute_sc_create(tx_input: TxInput, contract_path: &Vec<u8>, state: &mut Blo
 	let tx_output = execute_tx(tx_context, contract_path, contract_map);
 
 	if tx_output.result.result_status == 0 {
-		let new_address = state.create_account_after_deploy(&tx_input, tx_output.contract_storage, contract_path.clone());
+		let new_address = state.create_account_after_deploy(
+			&tx_input,
+			tx_output.contract_storage,
+			contract_path.clone(),
+		);
 		state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
 	} else {
 		state.increase_balance(&from, &call_value);
@@ -240,7 +306,11 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 	if let Some(expected_message) = &tx_expect.message {
 		let want_str = std::str::from_utf8(expected_message.value.as_slice()).unwrap();
 		let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
-		assert_eq!(want_str, have_str, "bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"", tx_id, want_str, have_str);
+		assert_eq!(
+			want_str, have_str,
+			"bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"",
+			tx_id, want_str, have_str
+		);
 	}
 
 	assert!(
@@ -274,7 +344,10 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 			if let CheckStorage::Equal(eq) = &expected_account.storage {
 				let default_value = &Vec::new();
 				for (expected_key, expected_value) in eq.iter() {
-					let actual_value = account.storage.get(&expected_key.value).unwrap_or(default_value);
+					let actual_value = account
+						.storage
+						.get(&expected_key.value)
+						.unwrap_or(default_value);
 					assert!(
 						expected_value.check(actual_value),
 						"bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
@@ -287,7 +360,9 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 
 				let default_check_value = CheckValue::Equal(BytesValue::empty());
 				for (actual_key, actual_value) in account.storage.iter() {
-					let expected_value = eq.get(&actual_key.clone().into()).unwrap_or(&default_check_value);
+					let expected_value = eq
+						.get(&actual_key.clone().into())
+						.unwrap_or(&default_check_value);
 					assert!(
 						expected_value.check(actual_value),
 						"bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",

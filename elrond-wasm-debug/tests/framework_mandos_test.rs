@@ -9,7 +9,10 @@ fn contract_map() -> ContractMap<TxContext> {
 /// Checks that externalSteps work fine.
 #[test]
 fn external_steps() {
-	parse_execute_mandos("tests/mandos/external_steps/external_steps.scen.json", &contract_map());
+	parse_execute_mandos(
+		"tests/mandos/external_steps/external_steps.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]

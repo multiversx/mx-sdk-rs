@@ -46,7 +46,13 @@ impl Contract {
 	pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
 		self.methods
 			.iter()
-			.filter_map(|m| if m.metadata.endpoint_name().is_some() { Some(m.generate_sig()) } else { None })
+			.filter_map(|m| {
+				if m.metadata.endpoint_name().is_some() {
+					Some(m.generate_sig())
+				} else {
+					None
+				}
+			})
 			.collect()
 	}
 
@@ -76,7 +82,13 @@ impl Contract {
 	pub fn generate_call_methods(&self) -> Vec<proc_macro2::TokenStream> {
 		self.methods
 			.iter()
-			.filter_map(|m| if m.metadata.endpoint_name().is_some() { Some(m.generate_call_method()) } else { None })
+			.filter_map(|m| {
+				if m.metadata.endpoint_name().is_some() {
+					Some(m.generate_call_method())
+				} else {
+					None
+				}
+			})
 			.collect()
 	}
 
@@ -85,7 +97,11 @@ impl Contract {
 		self.methods
 			.iter()
 			.filter_map(|m| match m.metadata {
-				MethodMetadata::Event { .. } | MethodMetadata::StorageGetter { .. } | MethodMetadata::StorageSetter { .. } | MethodMetadata::StorageGetMut { .. } | MethodMetadata::Module { .. } => {
+				MethodMetadata::Event { .. }
+				| MethodMetadata::StorageGetter { .. }
+				| MethodMetadata::StorageSetter { .. }
+				| MethodMetadata::StorageGetMut { .. }
+				| MethodMetadata::Module { .. } => {
 					let sig = m.generate_sig();
 					Some(quote! { #sig ; })
 				},
@@ -99,11 +115,24 @@ impl Contract {
 		self.methods
 			.iter()
 			.filter_map(|m| match &m.metadata {
-				MethodMetadata::Event { identifier } => Some(generate_event_impl(&m, identifier.clone())),
-				MethodMetadata::StorageGetter { visibility: _, identifier } => Some(generate_getter_impl(&m, identifier.clone())),
-				MethodMetadata::StorageSetter { visibility: _, identifier } => Some(generate_setter_impl(&m, identifier.clone())),
-				MethodMetadata::StorageGetMut { visibility: _, identifier } => Some(generate_borrow_impl(&m, identifier.clone())),
-				MethodMetadata::Module { impl_path } => Some(generate_module_getter_impl(&m, &impl_path)),
+				MethodMetadata::Event { identifier } => {
+					Some(generate_event_impl(&m, identifier.clone()))
+				},
+				MethodMetadata::StorageGetter {
+					visibility: _,
+					identifier,
+				} => Some(generate_getter_impl(&m, identifier.clone())),
+				MethodMetadata::StorageSetter {
+					visibility: _,
+					identifier,
+				} => Some(generate_setter_impl(&m, identifier.clone())),
+				MethodMetadata::StorageGetMut {
+					visibility: _,
+					identifier,
+				} => Some(generate_borrow_impl(&m, identifier.clone())),
+				MethodMetadata::Module { impl_path } => {
+					Some(generate_module_getter_impl(&m, &impl_path))
+				},
 				_ => None,
 			})
 			.collect()
@@ -113,7 +142,9 @@ impl Contract {
 		self.methods
 			.iter()
 			.filter_map(|m| match &m.metadata {
-				MethodMetadata::Event { identifier } => Some(generate_event_impl(&m, identifier.clone())),
+				MethodMetadata::Event { identifier } => {
+					Some(generate_event_impl(&m, identifier.clone()))
+				},
 				_ => None,
 			})
 			.collect()

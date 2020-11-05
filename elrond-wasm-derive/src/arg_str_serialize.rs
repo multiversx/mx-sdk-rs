@@ -1,6 +1,9 @@
 use super::arg_def::*;
 
-pub fn arg_serialize_push(arg: &MethodArg, arg_accumulator: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn arg_serialize_push(
+	arg: &MethodArg,
+	arg_accumulator: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	let var_name = quote! { #pat };
 	let arg_ty = &arg.ty;
@@ -22,11 +25,18 @@ pub fn arg_serialize_push(arg: &MethodArg, arg_accumulator: &proc_macro2::TokenS
 				}
 			}
 		},
-		other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg),
+		other_arg => panic!(
+			"Unsupported argument type: {:?}, neither path nor reference",
+			other_arg
+		),
 	}
 }
 
-pub fn arg_serialize_push_multi(arg: &MethodArg, arg_accumulator: &proc_macro2::TokenStream, expected_count_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn arg_serialize_push_multi(
+	arg: &MethodArg,
+	arg_accumulator: &proc_macro2::TokenStream,
+	expected_count_expr: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	let var_name = quote! { #pat };
 	let arg_ty = &arg.ty;
@@ -48,6 +58,9 @@ pub fn arg_serialize_push_multi(arg: &MethodArg, arg_accumulator: &proc_macro2::
 				}
 			}
 		},
-		other_arg => panic!("Unsupported argument type: {:?}, neither path nor reference", other_arg),
+		other_arg => panic!(
+			"Unsupported argument type: {:?}, neither path nor reference",
+			other_arg
+		),
 	}
 }

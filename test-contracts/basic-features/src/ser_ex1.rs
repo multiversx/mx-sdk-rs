@@ -20,7 +20,12 @@ impl NestedEncode for SerExample1 {
 		Ok(())
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.int.dep_encode_or_exit(dest, c.clone(), exit);
 		self.seq.dep_encode_or_exit(dest, c.clone(), exit);
 		self.another_byte.dep_encode_or_exit(dest, c.clone(), exit);
@@ -36,7 +41,12 @@ impl TopEncode for SerExample1 {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		top_encode_from_nested_or_exit(self, output, c, exit);
 	}
 }
@@ -52,7 +62,11 @@ impl NestedDecode for SerExample1 {
 		})
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		SerExample1 {
 			int: u16::dep_decode_or_exit(input, c.clone(), exit),
 			seq: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
@@ -68,7 +82,11 @@ impl TopDecode for SerExample1 {
 		top_decode_from_nested(input)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		top_decode_from_nested_or_exit(input, c, exit)
 	}
 }

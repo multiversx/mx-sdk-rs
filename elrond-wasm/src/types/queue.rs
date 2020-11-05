@@ -14,7 +14,10 @@ pub struct Queue<T> {
 impl<T> Queue<T> {
 	#[inline]
 	pub fn new() -> Self {
-		Queue { vec: Vec::new(), start: 0 }
+		Queue {
+			vec: Vec::new(),
+			start: 0,
+		}
 	}
 }
 
@@ -85,7 +88,12 @@ impl<T: NestedEncode> NestedEncode for Queue<T> {
 		self.as_slice().dep_encode(dest)
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_slice().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -97,7 +105,12 @@ impl<T: NestedEncode> TopEncode for Queue<T> {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_slice().top_encode_or_exit(output, c, exit)
 	}
 }
@@ -113,7 +126,11 @@ impl<T: NestedDecode> NestedDecode for Queue<T> {
 	}
 
 	#[inline]
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		Queue {
 			vec: Vec::<T>::dep_decode_or_exit(input, c, exit),
 			start: 0,
@@ -130,7 +147,11 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
 		})
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		Queue {
 			vec: Vec::<T>::top_decode_or_exit(input, c, exit),
 			start: 0,

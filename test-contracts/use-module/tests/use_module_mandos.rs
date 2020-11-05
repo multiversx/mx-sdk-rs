@@ -5,7 +5,10 @@ use use_module::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
-	contract_map.register_contract("file:../output/use-module.wasm", Box::new(|context| Box::new(UseModuleImpl::new(context))));
+	contract_map.register_contract(
+		"file:../output/use-module.wasm",
+		Box::new(|context| Box::new(UseModuleImpl::new(context))),
+	);
 	contract_map
 }
 

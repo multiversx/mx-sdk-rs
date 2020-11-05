@@ -34,16 +34,25 @@ mod callable;
 mod callable_gen;
 
 #[proc_macro_attribute]
-pub fn contract(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn contract(
+	args: proc_macro::TokenStream,
+	input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
 	contract_macro_main::process_contract(args, input)
 }
 
 #[proc_macro_attribute]
-pub fn module(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn module(
+	args: proc_macro::TokenStream,
+	input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
 	contract_macro_module::process_module(args, input)
 }
 
 #[proc_macro_attribute]
-pub fn callable(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn callable(
+	args: proc_macro::TokenStream,
+	input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
 	callable::process_callable(args, input)
 }

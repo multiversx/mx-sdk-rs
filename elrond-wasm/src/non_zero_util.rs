@@ -30,7 +30,10 @@ impl NonZeroUsizeIterator {
 	/// The iterator will produce n numbers,
 	/// e.g. for 3 it will produce [1, 2, 3].
 	pub fn from_1_to_n(n: usize) -> Self {
-		NonZeroUsizeIterator { prev_num: 0, limit: n }
+		NonZeroUsizeIterator {
+			prev_num: 0,
+			limit: n,
+		}
 	}
 }
 

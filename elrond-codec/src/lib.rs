@@ -23,7 +23,9 @@ pub use nested_de::*;
 pub use nested_ser::*;
 pub use top_de::*;
 pub use top_de_input::TopDecodeInput;
-pub use top_ser::{top_encode_from_nested, top_encode_from_nested_or_exit, top_encode_to_vec, TopEncode};
+pub use top_ser::{
+	top_encode_from_nested, top_encode_from_nested_or_exit, top_encode_to_vec, TopEncode,
+};
 pub use top_ser_output::TopEncodeOutput;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 
@@ -72,7 +74,12 @@ pub mod test_struct {
 			Ok(())
 		}
 
-		fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+			&self,
+			dest: &mut O,
+			c: ExitCtx,
+			exit: fn(ExitCtx, EncodeError) -> !,
+		) {
 			self.int.dep_encode_or_exit(dest, c.clone(), exit);
 			self.seq.dep_encode_or_exit(dest, c.clone(), exit);
 			self.another_byte.dep_encode_or_exit(dest, c.clone(), exit);
@@ -86,7 +93,12 @@ pub mod test_struct {
 		}
 
 		#[inline]
-		fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+			&self,
+			output: O,
+			c: ExitCtx,
+			exit: fn(ExitCtx, EncodeError) -> !,
+		) {
 			top_encode_from_nested_or_exit(self, output, c, exit);
 		}
 	}
@@ -100,7 +112,11 @@ pub mod test_struct {
 			})
 		}
 
-		fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+		fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+			input: &mut I,
+			c: ExitCtx,
+			exit: fn(ExitCtx, DecodeError) -> !,
+		) -> Self {
 			Test {
 				int: u16::dep_decode_or_exit(input, c.clone(), exit),
 				seq: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
@@ -114,7 +130,11 @@ pub mod test_struct {
 			top_decode_from_nested(input)
 		}
 
-		fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+		fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+			input: I,
+			c: ExitCtx,
+			exit: fn(ExitCtx, DecodeError) -> !,
+		) -> Self {
 			top_decode_from_nested_or_exit(input, c, exit)
 		}
 	}
@@ -158,7 +178,12 @@ pub mod test_struct {
 		}
 
 		#[inline]
-		fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+			&self,
+			dest: &mut O,
+			_: ExitCtx,
+			_: fn(ExitCtx, EncodeError) -> !,
+		) {
 			self.dep_encode_no_err(dest);
 		}
 	}
@@ -170,7 +195,12 @@ pub mod test_struct {
 		}
 
 		#[inline]
-		fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+		fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+			&self,
+			output: O,
+			c: ExitCtx,
+			exit: fn(ExitCtx, EncodeError) -> !,
+		) {
 			top_encode_from_nested_or_exit(self, output, c, exit);
 		}
 	}
@@ -181,16 +211,25 @@ pub mod test_struct {
 				0 => Ok(E::Unit),
 				1 => Ok(E::Newtype(u32::dep_decode(input)?)),
 				2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
-				3 => Ok(E::Struct { a: u32::dep_decode(input)? }),
+				3 => Ok(E::Struct {
+					a: u32::dep_decode(input)?,
+				}),
 				_ => Err(DecodeError::INVALID_VALUE),
 			}
 		}
 
-		fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+		fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+			input: &mut I,
+			c: ExitCtx,
+			exit: fn(ExitCtx, DecodeError) -> !,
+		) -> Self {
 			match u32::dep_decode_or_exit(input, c.clone(), exit) {
 				0 => E::Unit,
 				1 => E::Newtype(u32::dep_decode_or_exit(input, c.clone(), exit)),
-				2 => E::Tuple(u32::dep_decode_or_exit(input, c.clone(), exit), u32::dep_decode_or_exit(input, c.clone(), exit)),
+				2 => E::Tuple(
+					u32::dep_decode_or_exit(input, c.clone(), exit),
+					u32::dep_decode_or_exit(input, c.clone(), exit),
+				),
 				3 => E::Struct {
 					a: u32::dep_decode_or_exit(input, c.clone(), exit),
 				},
@@ -204,7 +243,11 @@ pub mod test_struct {
 			top_decode_from_nested(input)
 		}
 
-		fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+		fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+			input: I,
+			c: ExitCtx,
+			exit: fn(ExitCtx, DecodeError) -> !,
+		) -> Self {
 			top_decode_from_nested_or_exit(input, c, exit)
 		}
 	}
@@ -218,7 +261,12 @@ pub mod test_struct {
 			Ok(())
 		}
 
-		fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+			&self,
+			dest: &mut O,
+			_: ExitCtx,
+			_: fn(ExitCtx, EncodeError) -> !,
+		) {
 			dest.write(&self.0[..]);
 		}
 	}
@@ -229,7 +277,12 @@ pub mod test_struct {
 			Ok(())
 		}
 
-		fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+			&self,
+			output: O,
+			_: ExitCtx,
+			_: fn(ExitCtx, EncodeError) -> !,
+		) {
 			output.set_slice_u8(&self.0[..]);
 		}
 	}
@@ -241,7 +294,11 @@ pub mod test_struct {
 			Ok(WrappedArray(arr))
 		}
 
-		fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+		fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+			input: &mut I,
+			c: ExitCtx,
+			exit: fn(ExitCtx, DecodeError) -> !,
+		) -> Self {
 			let mut arr = [0u8; 5];
 			input.read_into_or_exit(&mut arr, c, exit);
 			WrappedArray(arr)
@@ -253,7 +310,11 @@ pub mod test_struct {
 			top_decode_from_nested(input)
 		}
 
-		fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+		fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+			input: I,
+			c: ExitCtx,
+			exit: fn(ExitCtx, DecodeError) -> !,
+		) -> Self {
 			top_decode_from_nested_or_exit(input, c, exit)
 		}
 	}
@@ -351,7 +412,10 @@ pub mod tests {
 	#[test]
 	fn test_option_vec_i32() {
 		let some_v = Some([1i32, 2i32, 3i32].to_vec());
-		let expected: &[u8] = &[/*opt*/ 1, /*size*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
+		let expected: &[u8] = &[
+			/*opt*/ 1, /*size*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1, 0, 0, 0, 2, 0, 0,
+			0, 3,
+		];
 		ser_deser_ok(some_v, expected);
 
 		let none_v: Option<Vec<i32>> = None;

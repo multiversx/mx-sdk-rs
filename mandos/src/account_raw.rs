@@ -148,7 +148,9 @@ impl<'de> Visitor<'de> for CheckAccountRawOrNothingVisitor {
 	where
 		M: MapAccess<'de>,
 	{
-		Ok(CheckAccountRawOrNothing::Some(Deserialize::deserialize(de::value::MapAccessDeserializer::new(map))?))
+		Ok(CheckAccountRawOrNothing::Some(Deserialize::deserialize(
+			de::value::MapAccessDeserializer::new(map),
+		)?))
 	}
 }
 
@@ -211,7 +213,10 @@ impl<'de> Visitor<'de> for CheckAccountRawsVisitor {
 			}
 		}
 
-		Ok(CheckAccountsRaw { accounts, other_accounts_allowed })
+		Ok(CheckAccountsRaw {
+			accounts,
+			other_accounts_allowed,
+		})
 	}
 }
 

@@ -112,7 +112,8 @@ where
 	}
 }
 
-impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint>
+	for BorrowedMutStorage<A, BigInt, BigUint, T>
 where
 	BigInt: BigIntApi<BigUint> + 'static,
 	BigUint: BigUintApi + 'static,

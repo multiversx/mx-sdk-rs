@@ -59,7 +59,12 @@ pub trait SimpleErc20Token {
 	}
 
 	/// This method is private, deduplicates logic from transfer and transferFrom.
-	fn perform_transfer(&self, sender: Address, recipient: Address, amount: BigUint) -> SCResult<()> {
+	fn perform_transfer(
+		&self,
+		sender: Address,
+		recipient: Address,
+		amount: BigUint,
+	) -> SCResult<()> {
 		// check if enough funds & decrease sender balance
 		{
 			let mut sender_balance = self.get_mut_balance(&sender);

@@ -37,9 +37,15 @@ pub trait FeaturesModule {
 
 	#[endpoint(setFeatureFlag)]
 	fn set_feature_flag_endpoint(&self, feature_name: Vec<u8>, value: bool) -> SCResult<()> {
-		require!(self.get_caller() == self.get_owner_address(), "only owner allowed to change features");
+		require!(
+			self.get_caller() == self.get_owner_address(),
+			"only owner allowed to change features"
+		);
 
-		self.set_feature_flag(FeatureName(feature_name.as_slice()), if value { FEATURE_ON } else { FEATURE_OFF });
+		self.set_feature_flag(
+			FeatureName(feature_name.as_slice()),
+			if value { FEATURE_ON } else { FEATURE_OFF },
+		);
 		Ok(())
 	}
 }
@@ -55,7 +61,12 @@ impl<'a> NestedEncode for FeatureName<'a> {
 	}
 
 	#[inline]
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		_: ExitCtx,
+		_: fn(ExitCtx, EncodeError) -> !,
+	) {
 		dest.write(&self.0[..]);
 	}
 }

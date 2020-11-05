@@ -73,7 +73,10 @@ mod tests {
 		let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
 		cd.push_argument_bytes(arg_bytes);
 		cd.push_argument_bytes(arg_bytes);
-		assert_eq!(cd.as_slice(), &b"func@0123456789abcdef@0123456789abcdef"[..]);
+		assert_eq!(
+			cd.as_slice(),
+			&b"func@0123456789abcdef@0123456789abcdef"[..]
+		);
 	}
 
 	#[test]

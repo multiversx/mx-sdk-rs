@@ -31,7 +31,12 @@ impl NestedEncode for SerExample2 {
 		Ok(())
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		match self {
 			SerExample2::Unit => {
 				0u32.dep_encode_or_exit(dest, c.clone(), exit);
@@ -60,7 +65,12 @@ impl TopEncode for SerExample2 {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		top_encode_from_nested_or_exit(self, output, c, exit);
 	}
 }
@@ -70,17 +80,29 @@ impl NestedDecode for SerExample2 {
 		match u32::dep_decode(input)? {
 			0 => Ok(SerExample2::Unit),
 			1 => Ok(SerExample2::Newtype(u32::dep_decode(input)?)),
-			2 => Ok(SerExample2::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
-			3 => Ok(SerExample2::Struct { a: u32::dep_decode(input)? }),
+			2 => Ok(SerExample2::Tuple(
+				u32::dep_decode(input)?,
+				u32::dep_decode(input)?,
+			)),
+			3 => Ok(SerExample2::Struct {
+				a: u32::dep_decode(input)?,
+			}),
 			_ => Err(DecodeError::INVALID_VALUE),
 		}
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match u32::dep_decode_or_exit(input, c.clone(), exit) {
 			0 => SerExample2::Unit,
 			1 => SerExample2::Newtype(u32::dep_decode_or_exit(input, c.clone(), exit)),
-			2 => SerExample2::Tuple(u32::dep_decode_or_exit(input, c.clone(), exit), u32::dep_decode_or_exit(input, c.clone(), exit)),
+			2 => SerExample2::Tuple(
+				u32::dep_decode_or_exit(input, c.clone(), exit),
+				u32::dep_decode_or_exit(input, c.clone(), exit),
+			),
 			3 => SerExample2::Struct {
 				a: u32::dep_decode_or_exit(input, c.clone(), exit),
 			},
@@ -94,7 +116,11 @@ impl TopDecode for SerExample2 {
 		top_decode_from_nested(input)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		top_decode_from_nested_or_exit(input, c, exit)
 	}
 }
