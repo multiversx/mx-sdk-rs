@@ -1,10 +1,9 @@
-
 pub const NON_PAYABLE: &[u8] = b"attempted to transfer funds via a non-payable function";
 
 pub const ARG_WRONG_NUMBER: &[u8] = b"wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &[u8] = b"wrong number of arguments provided to async call";
 pub const ARG_ASYNC_RETURN_WRONG_NUMBER: &[u8] = b"wrong number of arguments returned by async call";
-pub const ARG_CALLBACK_TOO_FEW:  &[u8] = b"too few callback arguments provided";
+pub const ARG_CALLBACK_TOO_FEW: &[u8] = b"too few callback arguments provided";
 pub const ARG_CALLBACK_TOO_MANY: &[u8] = b"too many callback arguments provided";
 
 pub const ARG_OUT_OF_RANGE: &[u8] = b"argument out of range";
