@@ -181,11 +181,11 @@ pub struct TxDeployRaw {
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub esdt_token_name: Option<ValueSubTree>,
-    
+    pub esdt_value: Option<ValueSubTree>,
+
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub esdt_value: Option<ValueSubTree>,
+    pub esdt_token_name: Option<ValueSubTree>,
 
     pub contract_code: ValueSubTree,
 
@@ -202,6 +202,14 @@ pub struct TxTransferRaw {
     pub from: ValueSubTree,
     pub to: ValueSubTree,
     pub value: ValueSubTree,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub esdt_token_name: Option<ValueSubTree>,
+    
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub esdt_value: Option<ValueSubTree>,
 }
 
 #[derive(Serialize, Deserialize)]

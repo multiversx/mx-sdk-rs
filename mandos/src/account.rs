@@ -54,11 +54,37 @@ impl CheckStorage {
 }
 
 #[derive(Debug)]
+pub enum CheckEsdt {
+    Star,
+    Equal(BTreeMap<BytesKey, CheckValue<BigUintValue>>),
+}
+
+impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
+    fn interpret_from(from: CheckEsdtRaw, context: &InterpreterContext) -> Self {
+        match from {
+            CheckEsdtRaw::Star => CheckEsdt::Star,
+            CheckEsdtRaw::Equal(m) => CheckEsdt::Equal(
+                m.into_iter().map(|(k, v)| (
+                    BytesKey::interpret_from(k, context), 
+                    CheckValue::<BigUintValue>::interpret_from(v, context))).collect(),
+            )
+        }
+    }
+}
+
+impl CheckEsdt {
+    pub fn is_star(&self) -> bool {
+        matches!(self, CheckEsdt::Star)
+    }
+}
+
+#[derive(Debug)]
 pub struct CheckAccount {
     pub comment: Option<String>,
     pub nonce: CheckValue<U64Value>,
     pub balance: CheckValue<BigUintValue>,
     pub storage: CheckStorage,
+    pub esdt: Option<CheckEsdt>,
     pub code: Option<CheckValue<BytesValue>>,
     pub async_call_data: CheckValue<BytesValue>,
 }
@@ -70,6 +96,7 @@ impl InterpretableFrom<CheckAccountRaw> for CheckAccount {
             nonce: CheckValue::<U64Value>::interpret_from(from.nonce, context),
             balance: CheckValue::<BigUintValue>::interpret_from(from.balance, context),
             storage: CheckStorage::interpret_from(from.storage, context),
+            esdt: from.esdt.map(|e| CheckEsdt::interpret_from(e, context)),
             code: from.code.map(|c| CheckValue::<BytesValue>::interpret_from(c, context)),
             async_call_data: CheckValue::<BytesValue>::interpret_from(from.async_call_data, context),
         }

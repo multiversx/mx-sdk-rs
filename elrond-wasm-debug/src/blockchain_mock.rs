@@ -169,6 +169,45 @@ impl BlockchainMock {
         }
     }
 
+    pub fn substract_esdt_balance(&mut self, address: &Address, esdt_token_name: &[u8], value: &BigUint) {
+        let sender_account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Sender account not found"));
+        
+        let esdt =  sender_account.esdt.as_mut()
+            .unwrap_or_else(|| panic!("Account has no esdt tokens"));
+        
+        let esdt_balance = esdt.get_mut(esdt_token_name)
+            .unwrap_or_else(|| panic!("Account has no esdt tokens with that name"));
+
+        assert!(*esdt_balance >= *value, "Not enough esdt balance");
+        *esdt_balance -= value;
+    }
+
+    pub fn increase_esdt_balance(&mut self, address: &Address, esdt_token_name: &[u8], value: &BigUint) {
+        let account = self.accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Receiver account not found"));
+
+        if account.esdt.is_none() {
+            let mut new_esdt = HashMap::<Vec<u8>, BigUint>::new();
+            new_esdt.insert(esdt_token_name.to_vec(), value.clone());
+
+            account.esdt = Some(new_esdt);
+        }
+        else {
+            let esdt =  account.esdt.as_mut().unwrap();
+
+            if esdt.contains_key(esdt_token_name) {
+                let esdt_balance = esdt.get_mut(esdt_token_name).unwrap();
+                *esdt_balance += value;
+            }
+            else {
+                esdt.insert(esdt_token_name.to_vec(), value.clone());
+            }
+        }
+    }
+
     pub fn increase_nonce(&mut self, address: &Address) {
         let account = self.accounts
             .get_mut(address)
@@ -187,14 +226,20 @@ impl BlockchainMock {
         let new_address = self.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
             .unwrap_or_else(|| panic!("Missing new address. Only explicit new deploy addresses supported"));
         let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
-        esdt.insert(tx_input.esdt_token_name.clone().unwrap(), tx_input.esdt_value.clone());
+        let mut esdt_opt: Option<HashMap<Vec<u8>, BigUint>> = None;
+        
+        if tx_input.esdt_token_name.is_some()
+        {
+            esdt.insert(tx_input.esdt_token_name.clone().unwrap(), tx_input.esdt_value.clone());
+            esdt_opt = Some(esdt);
+        }
 
         let old_value = self.accounts.insert(new_address.clone(), AccountData{
             address: new_address.clone(),
             nonce: 0,
             balance: tx_input.call_value.clone(),
             storage: new_storage,
-            esdt: Some(esdt),
+            esdt: esdt_opt,
             contract_path: Some(contract_path),
             contract_owner: Some(tx_input.from.clone()),
         });

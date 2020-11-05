@@ -49,10 +49,12 @@ pub struct TxInput {
 
 impl fmt::Display for TxInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, from: 0x{}, to: 0x{}\n}}", 
+        write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_token_name: {:?}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
             String::from_utf8(self.func_name.clone()).unwrap(), 
             self.args, 
             self.call_value,
+            self.esdt_token_name,
+            self.esdt_value,
             address_hex(&self.from), 
             address_hex(&self.to))
     }

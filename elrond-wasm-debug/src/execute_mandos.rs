@@ -194,8 +194,16 @@ fn execute_sc_call(
     let call_value = tx_input.call_value.clone();
     let blockchain_info = state.create_tx_info(&to);
 
+    let esdt_token_name = tx_input.esdt_token_name.clone().unwrap_or_default();
+    let esdt_value = tx_input.esdt_value.clone();
+    let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+
     state.subtract_tx_payment(&from, &call_value);
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
+
+    if esdt_used {
+        state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+    }
     
     let contract_account = state.accounts
         .get_mut(&to)
@@ -224,8 +232,16 @@ fn execute_sc_call(
 
         state.increase_balance(&to, &call_value);
         state.send_balance(&to, tx_output.send_balance_list.as_slice());
+
+        if esdt_used {
+            state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+        }
     } else {
         state.increase_balance(&from, &call_value);
+
+        if esdt_used {
+            state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+        }
     }
 
     (tx_result, tx_output.async_call)
@@ -242,8 +258,16 @@ fn execute_sc_create(
     let call_value = tx_input.call_value.clone();
     let blockchain_info = state.create_tx_info(&to);
 
+    let esdt_token_name = tx_input.esdt_token_name.clone().unwrap_or_default();
+    let esdt_value = tx_input.esdt_value.clone();
+    let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+
     state.subtract_tx_payment(&from, &call_value);
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
+
+    if esdt_used {
+        state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+    }
 
     let tx_context = TxContext::new(
         blockchain_info,
@@ -259,6 +283,10 @@ fn execute_sc_create(
         state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
     } else {
         state.increase_balance(&from, &call_value);
+
+        if esdt_used {
+            state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+        }
     }
 
     (tx_output.result, tx_output.async_call)
@@ -332,6 +360,41 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                         verbose_hex(actual_key),
                         expected_value,
                         verbose_hex(actual_value));
+                }
+            }
+
+            if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
+                let default_value = &BigUint::from(0u32);
+                let default_hashmap = &HashMap::new();
+                let actual_esdt = account.esdt.as_ref().unwrap_or(default_hashmap);
+                for (expected_key, expected_value) in eq.iter() {
+                    let actual_value = actual_esdt
+                        .get(&expected_key.value)
+                        .unwrap_or(default_value);
+                    assert!(
+                        expected_value.check(actual_value),
+                        "bad esdt value value. Address: {}. Token Name: {}. Want: {}. Have: {}",
+                        expected_address,
+                        expected_key,
+                        expected_value,
+                        actual_value);
+                }
+
+                let default_check_value = CheckValue::Equal(
+                    BigUintValue { original: ValueSubTree::default(), value: BigUint::from(0u32) });
+                let default_hashmap = &HashMap::new();
+
+                for (actual_key, actual_value) in account.esdt.as_ref().unwrap_or(default_hashmap).iter() {
+                    let expected_value = eq
+                        .get(&actual_key.clone().into())
+                        .unwrap_or(&default_check_value);
+                    assert!(
+                        expected_value.check(actual_value),
+                        "bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
+                        expected_address,
+                        verbose_hex(actual_key),
+                        expected_value,
+                        actual_value);
                 }
             }
         } else {
