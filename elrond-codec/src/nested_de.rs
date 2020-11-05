@@ -61,7 +61,6 @@ impl NestedDecode for () {
     }
     
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(_: &mut I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
-        ()
     }
 }
 
