@@ -19,3 +19,4 @@ use-module = { path = "..", default-features = false, features=["wasm-output-mod
 elrond-wasm-output = { version = "0.9.0", path = "../../../elrond-wasm-output", default-features = false, features=["wasm-output-mode"] }
 
 [workspace]
+members = ["."]
