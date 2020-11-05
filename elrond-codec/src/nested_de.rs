@@ -23,7 +23,11 @@ pub trait NestedDecode: Sized {
 	/// Version of `top_decode` that exits quickly in case of error.
 	/// Its purpose is to create smaller implementations
 	/// in cases where the application is supposed to exit directly on decode error.
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match Self::dep_decode(input) {
 			Ok(v) => v,
 			Err(e) => exit(c, e),
@@ -44,7 +48,11 @@ pub fn dep_decode_from_byte_slice<D: NestedDecode>(input: &[u8]) -> Result<D, De
 	result
 }
 
-pub fn dep_decode_from_byte_slice_or_exit<D: NestedDecode, ExitCtx: Clone>(input: &[u8], c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> D {
+pub fn dep_decode_from_byte_slice_or_exit<D: NestedDecode, ExitCtx: Clone>(
+	input: &[u8],
+	c: ExitCtx,
+	exit: fn(ExitCtx, DecodeError) -> !,
+) -> D {
 	let mut_slice = &mut &*input;
 	let result = D::dep_decode_or_exit(mut_slice, c.clone(), exit);
 	if !mut_slice.is_empty() {
@@ -60,7 +68,12 @@ impl NestedDecode for () {
 		Ok(())
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(_: &mut I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {}
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		_: &mut I,
+		_: ExitCtx,
+		_: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+	}
 }
 
 impl NestedDecode for u8 {
@@ -70,7 +83,11 @@ impl NestedDecode for u8 {
 		input.read_byte()
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		input.read_byte_or_exit(c, exit)
 	}
 }
@@ -95,7 +112,11 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
 		}
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		let size = usize::dep_decode_or_exit(input, c.clone(), exit);
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
@@ -126,7 +147,11 @@ macro_rules! decode_num_unsigned {
 				Ok(num)
 			}
 
-			fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+			fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+				input: &mut I,
+				c: ExitCtx,
+				exit: fn(ExitCtx, DecodeError) -> !,
+			) -> Self {
 				let bytes = input.read_slice_or_exit($num_bytes, c, exit);
 				let num = bytes_to_number(bytes, false) as $ty;
 				num
@@ -151,7 +176,11 @@ macro_rules! decode_num_signed {
 				Ok(num)
 			}
 
-			fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+			fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+				input: &mut I,
+				c: ExitCtx,
+				exit: fn(ExitCtx, DecodeError) -> !,
+			) -> Self {
 				let bytes = input.read_slice_or_exit($num_bytes, c, exit);
 				let num = bytes_to_number(bytes, true) as $ty;
 				num
@@ -177,7 +206,11 @@ impl NestedDecode for bool {
 		}
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match input.read_byte_or_exit(c.clone(), exit) {
 			0 => false,
 			1 => true,
@@ -195,7 +228,11 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 		}
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match input.read_byte_or_exit(c.clone(), exit) {
 			0 => None,
 			1 => Some(T::dep_decode_or_exit(input, c.clone(), exit)),
@@ -209,7 +246,11 @@ impl<T: NestedDecode> NestedDecode for Box<T> {
 		Ok(Box::new(T::dep_decode(input)?))
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		Box::new(T::dep_decode_or_exit(input, c, exit))
 	}
 }
@@ -323,7 +364,11 @@ impl NestedDecode for NonZeroUsize {
 		}
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_exit(input, c.clone(), exit)) {
 			nz
 		} else {
@@ -395,7 +440,10 @@ mod tests {
 		deser_ok(n, expected);
 
 		let t = E::Tuple(1, 2);
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+		let expected: &[u8] = &[
+			/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
+			2, /*)*/
+		];
 		deser_ok(t, expected);
 
 		let s = E::Struct { a: 1 };

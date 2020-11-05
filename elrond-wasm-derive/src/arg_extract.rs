@@ -1,7 +1,11 @@
 use super::arg_def::*;
 use super::parse_attr::*;
 
-pub fn extract_method_args(m: &syn::TraitItemMethod, is_method_payable: bool, allow_callback_args: bool) -> Vec<MethodArg> {
+pub fn extract_method_args(
+	m: &syn::TraitItemMethod,
+	is_method_payable: bool,
+	allow_callback_args: bool,
+) -> Vec<MethodArg> {
 	let mut arg_index: isize = -1; // ignore the first argument, which is &self
 	let mut receiver_processed = false;
 	m.sig

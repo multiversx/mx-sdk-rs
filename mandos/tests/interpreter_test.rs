@@ -24,7 +24,10 @@ fn test_string() {
 	assert_eq!(b"'".to_vec(), interpret_string("'''", context));
 	assert_eq!(b"``".to_vec(), interpret_string("''``", context));
 
-	assert_eq!(b"abcdefg".to_vec(), interpret_string("str:abcdefg", context));
+	assert_eq!(
+		b"abcdefg".to_vec(),
+		interpret_string("str:abcdefg", context)
+	);
 	assert_eq!(EMPTY, interpret_string("str:", context));
 }
 
@@ -32,11 +35,26 @@ fn test_string() {
 fn test_address() {
 	let context = &InterpreterContext::default();
 
-	assert_eq!(b"________________________________".to_vec(), interpret_string("address:", context));
-	assert_eq!(b"a_______________________________".to_vec(), interpret_string("address:a", context));
-	assert_eq!(b"an_address______________________".to_vec(), interpret_string("address:an_address", context));
-	assert_eq!(b"12345678901234567890123456789012".to_vec(), interpret_string("address:12345678901234567890123456789012", context));
-	assert_eq!(b"12345678901234567890123456789012".to_vec(), interpret_string("address:123456789012345678901234567890123", context));
+	assert_eq!(
+		b"________________________________".to_vec(),
+		interpret_string("address:", context)
+	);
+	assert_eq!(
+		b"a_______________________________".to_vec(),
+		interpret_string("address:a", context)
+	);
+	assert_eq!(
+		b"an_address______________________".to_vec(),
+		interpret_string("address:an_address", context)
+	);
+	assert_eq!(
+		b"12345678901234567890123456789012".to_vec(),
+		interpret_string("address:12345678901234567890123456789012", context)
+	);
+	assert_eq!(
+		b"12345678901234567890123456789012".to_vec(),
+		interpret_string("address:123456789012345678901234567890123", context)
+	);
 }
 
 #[test]
@@ -48,7 +66,10 @@ fn test_unsigned_number() {
 	assert_eq!(vec![0x00], interpret_string("0x00", context));
 	assert_eq!(vec![0x00, 0x00], interpret_string("0x000", context));
 	assert_eq!(vec![0x00, 0x00], interpret_string("0x0000", context));
-	assert_eq!(vec![0x00, 0x00, 0xab], interpret_string("0x0000ab", context));
+	assert_eq!(
+		vec![0x00, 0x00, 0xab],
+		interpret_string("0x0000ab", context)
+	);
 	assert_eq!(EMPTY, interpret_string("0x", context));
 	assert_eq!(EMPTY, interpret_string("0", context));
 	assert_eq!(vec![12], interpret_string("12", context));
@@ -77,13 +98,25 @@ fn test_unsigned_fixed_width() {
 
 	assert_eq!(vec![0x00], interpret_string("u8:0", context));
 	assert_eq!(vec![0x00, 0x00], interpret_string("u16:0", context));
-	assert_eq!(vec![0x00, 0x00, 0x00, 0x00], interpret_string("u32:0", context));
-	assert_eq!(vec![0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], interpret_string("u64:0", context));
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x00],
+		interpret_string("u32:0", context)
+	);
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+		interpret_string("u64:0", context)
+	);
 	assert_eq!(vec![0x12, 0x34], interpret_string("u16:0x1234", context));
-	assert_eq!(vec![0x00, 0x00, 0x12, 0x34], interpret_string("u32:0x1234", context));
+	assert_eq!(
+		vec![0x00, 0x00, 0x12, 0x34],
+		interpret_string("u32:0x1234", context)
+	);
 	assert_eq!(vec![0x01, 0x00], interpret_string("u16:256", context));
 	assert_eq!(vec![0x01], interpret_string("u8:0b1", context));
-	assert_eq!(vec![0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05], interpret_string("u64:0b101", context));
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05],
+		interpret_string("u64:0b101", context)
+	);
 }
 
 #[test]
@@ -92,14 +125,29 @@ fn test_signed_fixed_width() {
 
 	assert_eq!(vec![0x00], interpret_string("i8:0", context));
 	assert_eq!(vec![0x00, 0x00], interpret_string("i16:0", context));
-	assert_eq!(vec![0x00, 0x00, 0x00, 0x00], interpret_string("i32:0", context));
-	assert_eq!(vec![0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], interpret_string("i64:0", context));
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x00],
+		interpret_string("i32:0", context)
+	);
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+		interpret_string("i64:0", context)
+	);
 
 	assert_eq!(vec![0xff], interpret_string("i8:-1", context));
 	assert_eq!(vec![0xff, 0xff], interpret_string("i16:-1", context));
-	assert_eq!(vec![0xff, 0xff, 0xff, 0xff], interpret_string("i32:-1", context));
-	assert_eq!(vec![0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff], interpret_string("i64:-1", context));
-	assert_eq!(vec![0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00], interpret_string("i64:-256", context));
+	assert_eq!(
+		vec![0xff, 0xff, 0xff, 0xff],
+		interpret_string("i32:-1", context)
+	);
+	assert_eq!(
+		vec![0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff],
+		interpret_string("i64:-1", context)
+	);
+	assert_eq!(
+		vec![0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00],
+		interpret_string("i64:-256", context)
+	);
 	assert_eq!(vec![0xfb], interpret_string("i8:-0b101", context));
 }
 

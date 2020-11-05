@@ -1,7 +1,10 @@
 use super::callable_gen::*;
 use super::*;
 
-pub fn process_callable(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn process_callable(
+	args: proc_macro::TokenStream,
+	input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
 	let args_input = parse_macro_input!(args as syn::AttributeArgs);
 	let proc_input = parse_macro_input!(input as syn::ItemTrait);
 

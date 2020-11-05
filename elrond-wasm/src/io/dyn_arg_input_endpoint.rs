@@ -44,7 +44,8 @@ where
 	}
 }
 
-impl<A, BigInt, BigUint> DynArgInput<ArgDecodeInput<A, BigInt, BigUint>> for EndpointDynArgLoader<A, BigInt, BigUint>
+impl<A, BigInt, BigUint> DynArgInput<ArgDecodeInput<A, BigInt, BigUint>>
+	for EndpointDynArgLoader<A, BigInt, BigUint>
 where
 	BigUint: BigUintApi + 'static,
 	BigInt: BigIntApi<BigUint> + 'static,

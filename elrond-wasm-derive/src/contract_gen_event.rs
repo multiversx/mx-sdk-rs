@@ -8,7 +8,9 @@ fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_m
 	match &arg.ty {
 		syn::Type::Reference(type_reference) => {
 			if type_reference.mutability.is_some() {
-				panic!("[Event topic] Mutable references not supported as contract method arguments");
+				panic!(
+					"[Event topic] Mutable references not supported as contract method arguments"
+				);
 			}
 			match &*type_reference.elem {
 				syn::Type::Path(type_path) => {
@@ -17,17 +19,28 @@ fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_m
 						"Address" | "H256" => quote! {
 							#pat.copy_to_array(&mut topics[#topic_index]);
 						},
-						"BigInt" => panic!("[Event data] BigInt argument type currently not supported"),
+						"BigInt" => {
+							panic!("[Event data] BigInt argument type currently not supported")
+						},
 						"BigUint" => quote! {
 							#pat.copy_to_array_big_endian_pad_right(&mut topics[#topic_index]);
 						},
-						other_stype_str => panic!("[Event topic] Unsupported reference argument type: {:?}", other_stype_str),
+						other_stype_str => panic!(
+							"[Event topic] Unsupported reference argument type: {:?}",
+							other_stype_str
+						),
 					}
 				},
-				_ => panic!("[Event topic] Unsupported reference argument type: {:?}", type_reference),
+				_ => panic!(
+					"[Event topic] Unsupported reference argument type: {:?}",
+					type_reference
+				),
 			}
 		},
-		other_arg => panic!("[Event topic] Unsupported argument type: {:?}, should be reference", other_arg),
+		other_arg => panic!(
+			"[Event topic] Unsupported argument type: {:?}, should be reference",
+			other_arg
+		),
 	}
 }
 

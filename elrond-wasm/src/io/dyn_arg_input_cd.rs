@@ -14,7 +14,10 @@ where
 	SE: SignalError,
 {
 	pub fn new(deser: CallDataDeserializer<'a>, signal_error: SE) -> Self {
-		CallDataArgLoader { deser, signal_error }
+		CallDataArgLoader {
+			deser,
+			signal_error,
+		}
 	}
 }
 

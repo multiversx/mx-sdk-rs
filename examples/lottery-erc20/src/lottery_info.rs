@@ -28,16 +28,25 @@ impl<BigUint: BigUintApi> NestedEncode for LotteryInfo<BigUint> {
 		Ok(())
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.ticket_price.dep_encode_or_exit(dest, c.clone(), exit);
 		self.tickets_left.dep_encode_or_exit(dest, c.clone(), exit);
 		self.deadline.dep_encode_or_exit(dest, c.clone(), exit);
-		self.max_entries_per_user.dep_encode_or_exit(dest, c.clone(), exit);
-		self.prize_distribution.dep_encode_or_exit(dest, c.clone(), exit);
+		self.max_entries_per_user
+			.dep_encode_or_exit(dest, c.clone(), exit);
+		self.prize_distribution
+			.dep_encode_or_exit(dest, c.clone(), exit);
 		self.whitelist.dep_encode_or_exit(dest, c.clone(), exit);
-		self.current_ticket_number.dep_encode_or_exit(dest, c.clone(), exit);
+		self.current_ticket_number
+			.dep_encode_or_exit(dest, c.clone(), exit);
 		self.prize_pool.dep_encode_or_exit(dest, c.clone(), exit);
-		self.queued_tickets.dep_encode_or_exit(dest, c.clone(), exit);
+		self.queued_tickets
+			.dep_encode_or_exit(dest, c.clone(), exit);
 	}
 }
 
@@ -48,7 +57,12 @@ impl<BigUint: BigUintApi> TopEncode for LotteryInfo<BigUint> {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		top_encode_from_nested_or_exit(self, output, c, exit);
 	}
 }
@@ -68,7 +82,11 @@ impl<BigUint: BigUintApi> NestedDecode for LotteryInfo<BigUint> {
 		})
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		LotteryInfo {
 			ticket_price: BigUint::dep_decode_or_exit(input, c.clone(), exit),
 			tickets_left: u32::dep_decode_or_exit(input, c.clone(), exit),
@@ -88,7 +106,11 @@ impl<BigUint: BigUintApi> TopDecode for LotteryInfo<BigUint> {
 		top_decode_from_nested(input)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		top_decode_from_nested_or_exit(input, c, exit)
 	}
 }

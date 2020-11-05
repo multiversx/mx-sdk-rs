@@ -26,7 +26,12 @@ pub trait TopEncode: Sized {
 	/// Version of `top_decode` that exits quickly in case of error.
 	/// Its purpose is to create smaller implementations
 	/// in cases where the application is supposed to exit directly on decode error.
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		match self.top_encode(output) {
 			Ok(v) => v,
 			Err(e) => exit(c, e),
@@ -45,8 +50,12 @@ where
 	Ok(())
 }
 
-pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(obj: &T, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !)
-where
+pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
+	obj: &T,
+	output: O,
+	c: ExitCtx,
+	exit: fn(ExitCtx, EncodeError) -> !,
+) where
 	O: TopEncodeOutput,
 	T: NestedEncode,
 	ExitCtx: Clone,
@@ -68,7 +77,12 @@ macro_rules! top_encode_from_no_err {
 			}
 
 			#[inline]
-			fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+			fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+				&self,
+				output: O,
+				_: ExitCtx,
+				_: fn(ExitCtx, EncodeError) -> !,
+			) {
 				self.top_encode_no_err(output);
 			}
 		}
@@ -96,7 +110,8 @@ impl<T: NestedEncode> TopEncode for &[T] {
 			TypeInfo::U8 => {
 				// transmute to &[u8]
 				// save directly, without passing through the buffer
-				let slice: &[u8] = unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
+				let slice: &[u8] =
+					unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
 				output.set_slice_u8(slice);
 			},
 			_ => {
@@ -111,12 +126,18 @@ impl<T: NestedEncode> TopEncode for &[T] {
 		Ok(())
 	}
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		match T::TYPE_INFO {
 			TypeInfo::U8 => {
 				// transmute to &[u8]
 				// save directly, without passing through the buffer
-				let slice: &[u8] = unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
+				let slice: &[u8] =
+					unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
 				output.set_slice_u8(slice);
 			},
 			_ => {
@@ -140,7 +161,12 @@ impl<T: TopEncode> TopEncode for &T {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		(*self).top_encode_or_exit(output, c, exit);
 	}
 }
@@ -151,7 +177,12 @@ impl TopEncode for &str {
 		Ok(())
 	}
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		_: ExitCtx,
+		_: fn(ExitCtx, EncodeError) -> !,
+	) {
 		output.set_slice_u8(self.as_bytes());
 	}
 }
@@ -163,7 +194,12 @@ impl<T: NestedEncode> TopEncode for Vec<T> {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_slice().top_encode_or_exit(output, c, exit);
 	}
 }
@@ -236,7 +272,12 @@ impl<T: NestedEncode> TopEncode for Option<T> {
 
 	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
 	/// to allow disambiguation between e.g. Some(0) and None.
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		match self {
 			Some(v) => {
 				let mut buffer = Vec::<u8>::new();
@@ -258,7 +299,12 @@ impl<T: TopEncode> TopEncode for Box<T> {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_ref().top_encode_or_exit(output, c, exit);
 	}
 }
@@ -270,7 +316,12 @@ impl<T: NestedEncode> TopEncode for Box<[T]> {
 	}
 
 	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.as_ref().top_encode_or_exit(output, c, exit);
 	}
 }
@@ -366,7 +417,12 @@ impl TopEncode for NonZeroUsize {
 		self.get().top_encode(output)
 	}
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.get().top_encode_or_exit(output, c, exit);
 	}
 }
@@ -487,7 +543,10 @@ mod tests {
 		ser_ok(n, expected);
 
 		let t = E::Tuple(1, 2);
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+		let expected: &[u8] = &[
+			/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
+			2, /*)*/
+		];
 		ser_ok(t, expected);
 
 		let s = E::Struct { a: 1 };

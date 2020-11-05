@@ -24,7 +24,10 @@ pub trait PauseModule {
 
 	#[endpoint(pause)]
 	fn pause_endpoint(&self) -> SCResult<()> {
-		require!(self.get_caller() == self.get_owner_address(), "only owner allowed to pause contract");
+		require!(
+			self.get_caller() == self.get_owner_address(),
+			"only owner allowed to pause contract"
+		);
 
 		self.set_paused(true);
 		// TODO: event
@@ -33,7 +36,10 @@ pub trait PauseModule {
 
 	#[endpoint(unpause)]
 	fn unpause_endpoint(&self) -> SCResult<()> {
-		require!(self.get_caller() == self.get_owner_address(), "only owner allowed to unpause contract");
+		require!(
+			self.get_caller() == self.get_owner_address(),
+			"only owner allowed to unpause contract"
+		);
 
 		self.set_paused(false);
 		// TODO: event

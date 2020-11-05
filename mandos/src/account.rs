@@ -19,7 +19,12 @@ impl InterpretableFrom<AccountRaw> for Account {
 			storage: from
 				.storage
 				.into_iter()
-				.map(|(k, v)| (BytesKey::interpret_from(k, context), BytesValue::interpret_from(v, context)))
+				.map(|(k, v)| {
+					(
+						BytesKey::interpret_from(k, context),
+						BytesValue::interpret_from(v, context),
+					)
+				})
 				.collect(),
 			code: from.code.map(|c| BytesValue::interpret_from(c, context)),
 		}
@@ -38,7 +43,12 @@ impl InterpretableFrom<CheckStorageRaw> for CheckStorage {
 			CheckStorageRaw::Star => CheckStorage::Star,
 			CheckStorageRaw::Equal(m) => CheckStorage::Equal(
 				m.into_iter()
-					.map(|(k, v)| (BytesKey::interpret_from(k, context), CheckValue::<BytesValue>::interpret_from(v, context)))
+					.map(|(k, v)| {
+						(
+							BytesKey::interpret_from(k, context),
+							CheckValue::<BytesValue>::interpret_from(v, context),
+						)
+					})
 					.collect(),
 			),
 		}
@@ -68,8 +78,13 @@ impl InterpretableFrom<CheckAccountRaw> for CheckAccount {
 			nonce: CheckValue::<U64Value>::interpret_from(from.nonce, context),
 			balance: CheckValue::<BigUintValue>::interpret_from(from.balance, context),
 			storage: CheckStorage::interpret_from(from.storage, context),
-			code: from.code.map(|c| CheckValue::<BytesValue>::interpret_from(c, context)),
-			async_call_data: CheckValue::<BytesValue>::interpret_from(from.async_call_data, context),
+			code: from
+				.code
+				.map(|c| CheckValue::<BytesValue>::interpret_from(c, context)),
+			async_call_data: CheckValue::<BytesValue>::interpret_from(
+				from.async_call_data,
+				context,
+			),
 		}
 	}
 }
@@ -87,7 +102,12 @@ impl InterpretableFrom<CheckAccountsRaw> for CheckAccounts {
 			accounts: from
 				.accounts
 				.into_iter()
-				.map(|(k, v)| (AddressKey::interpret_from(k, context), CheckAccount::interpret_from(v, context)))
+				.map(|(k, v)| {
+					(
+						AddressKey::interpret_from(k, context),
+						CheckAccount::interpret_from(v, context),
+					)
+				})
 				.collect(),
 		}
 	}

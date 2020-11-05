@@ -132,7 +132,10 @@ impl Ord for BytesKey {
 impl InterpretableFrom<String> for BytesKey {
 	fn interpret_from(from: String, context: &InterpreterContext) -> Self {
 		let bytes = interpret_string(&from, context);
-		BytesKey { value: bytes, original: from }
+		BytesKey {
+			value: bytes,
+			original: from,
+		}
 	}
 }
 

@@ -2,7 +2,10 @@ use super::contract_gen::*;
 use super::function_selector::*;
 use super::*;
 
-pub fn contract_implementation(contract: &Contract, is_contract_main: bool) -> proc_macro2::TokenStream {
+pub fn contract_implementation(
+	contract: &Contract,
+	is_contract_main: bool,
+) -> proc_macro2::TokenStream {
 	let contract_impl_ident = contract.contract_impl_name.clone();
 	let trait_name_ident = contract.trait_name.clone();
 	let method_impls = contract.extract_method_impls();

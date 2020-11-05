@@ -15,7 +15,11 @@ impl InterpretableFrom<ScenarioRaw> for Scenario {
 			name: from.name,
 			comment: from.comment,
 			check_gas: from.check_gas,
-			steps: from.steps.into_iter().map(|s| Step::interpret_from(s, context)).collect(),
+			steps: from
+				.steps
+				.into_iter()
+				.map(|s| Step::interpret_from(s, context))
+				.collect(),
 		}
 	}
 }
@@ -79,20 +83,43 @@ impl InterpretableFrom<StepRaw> for Step {
 				comment,
 				accounts: accounts
 					.into_iter()
-					.map(|(k, v)| (AddressKey::interpret_from(k, context), Account::interpret_from(v, context)))
+					.map(|(k, v)| {
+						(
+							AddressKey::interpret_from(k, context),
+							Account::interpret_from(v, context),
+						)
+					})
 					.collect(),
-				new_addresses: new_addresses.into_iter().map(|t| NewAddress::interpret_from(t, context)).collect(),
-				block_hashes: block_hashes.into_iter().map(|t| BytesValue::interpret_from(t, context)).collect(),
-				previous_block_info: previous_block_info.map(|v| BlockInfo::interpret_from(v, context)),
-				current_block_info: current_block_info.map(|v| BlockInfo::interpret_from(v, context)),
+				new_addresses: new_addresses
+					.into_iter()
+					.map(|t| NewAddress::interpret_from(t, context))
+					.collect(),
+				block_hashes: block_hashes
+					.into_iter()
+					.map(|t| BytesValue::interpret_from(t, context))
+					.collect(),
+				previous_block_info: previous_block_info
+					.map(|v| BlockInfo::interpret_from(v, context)),
+				current_block_info: current_block_info
+					.map(|v| BlockInfo::interpret_from(v, context)),
 			},
-			StepRaw::ScCall { tx_id, comment, tx, expect } => Step::ScCall {
+			StepRaw::ScCall {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => Step::ScCall {
 				tx_id,
 				comment,
 				tx: TxCall::interpret_from(tx, context),
 				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
 			},
-			StepRaw::ScDeploy { tx_id, comment, tx, expect } => Step::ScDeploy {
+			StepRaw::ScDeploy {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => Step::ScDeploy {
 				tx_id,
 				comment,
 				tx: TxDeploy::interpret_from(tx, context),
@@ -145,10 +172,18 @@ pub struct BlockInfo {
 impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
 	fn interpret_from(from: BlockInfoRaw, context: &InterpreterContext) -> Self {
 		BlockInfo {
-			block_timestamp: from.block_timestamp.map(|v| U64Value::interpret_from(v, context)),
-			block_nonce: from.block_nonce.map(|v| U64Value::interpret_from(v, context)),
-			block_round: from.block_round.map(|v| U64Value::interpret_from(v, context)),
-			block_epoch: from.block_epoch.map(|v| U64Value::interpret_from(v, context)),
+			block_timestamp: from
+				.block_timestamp
+				.map(|v| U64Value::interpret_from(v, context)),
+			block_nonce: from
+				.block_nonce
+				.map(|v| U64Value::interpret_from(v, context)),
+			block_round: from
+				.block_round
+				.map(|v| U64Value::interpret_from(v, context)),
+			block_epoch: from
+				.block_epoch
+				.map(|v| U64Value::interpret_from(v, context)),
 		}
 	}
 }
@@ -171,7 +206,11 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
 			to: AddressValue::interpret_from(from.to, context),
 			call_value: BigUintValue::interpret_from(from.value, context),
 			function: from.function,
-			arguments: from.arguments.into_iter().map(|t| BytesValue::interpret_from(t, context)).collect(),
+			arguments: from
+				.arguments
+				.into_iter()
+				.map(|t| BytesValue::interpret_from(t, context))
+				.collect(),
 			gas_limit: U64Value::interpret_from(from.gas_limit, context),
 			gas_price: U64Value::interpret_from(from.gas_price, context),
 		}
@@ -194,7 +233,11 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
 			from: AddressValue::interpret_from(from.from, context),
 			call_value: BigUintValue::interpret_from(from.value, context),
 			contract_code: BytesValue::interpret_from(from.contract_code, context),
-			arguments: from.arguments.into_iter().map(|t| BytesValue::interpret_from(t, context)).collect(),
+			arguments: from
+				.arguments
+				.into_iter()
+				.map(|t| BytesValue::interpret_from(t, context))
+				.collect(),
 			gas_limit: U64Value::interpret_from(from.gas_limit, context),
 			gas_price: U64Value::interpret_from(from.gas_price, context),
 		}
@@ -246,12 +289,20 @@ pub struct TxExpect {
 impl InterpretableFrom<TxExpectRaw> for TxExpect {
 	fn interpret_from(from: TxExpectRaw, context: &InterpreterContext) -> Self {
 		TxExpect {
-			out: from.out.into_iter().map(|t| CheckValue::<BytesValue>::interpret_from(t, context)).collect(),
+			out: from
+				.out
+				.into_iter()
+				.map(|t| CheckValue::<BytesValue>::interpret_from(t, context))
+				.collect(),
 			status: CheckValue::<U64Value>::interpret_from(from.status, context),
 			logs: CheckLogs::interpret_from(from.logs, context),
 			message: from.message.map(|v| BytesValue::interpret_from(v, context)),
-			gas: from.gas.map(|v| CheckValue::<U64Value>::interpret_from(v, context)),
-			refund: from.refund.map(|v| CheckValue::<U64Value>::interpret_from(v, context)),
+			gas: from
+				.gas
+				.map(|v| CheckValue::<U64Value>::interpret_from(v, context)),
+			refund: from
+				.refund
+				.map(|v| CheckValue::<U64Value>::interpret_from(v, context)),
 		}
 	}
 }

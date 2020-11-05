@@ -67,7 +67,11 @@ where
 			api.storage_store_big_uint(key, cast_big_uint);
 		},
 		_ => {
-			value.top_encode_or_exit(StorageSetOutput::new(api.clone(), key), api.clone(), storage_set_exit);
+			value.top_encode_or_exit(
+				StorageSetOutput::new(api.clone(), key),
+				api.clone(),
+				storage_set_exit,
+			);
 		},
 	}
 }

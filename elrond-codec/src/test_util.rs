@@ -19,7 +19,10 @@ pub fn dep_encode_to_vec_or_panic<T: NestedEncode>(obj: &T) -> Vec<u8> {
 }
 
 fn encode_panic_exit(_: (), en_err: EncodeError) -> ! {
-	panic!("encode panicked: {}", core::str::from_utf8(en_err.message_bytes()).unwrap())
+	panic!(
+		"encode panicked: {}",
+		core::str::from_utf8(en_err.message_bytes()).unwrap()
+	)
 }
 
 /// Calls both the fast exit and the regular top-encode,
@@ -55,7 +58,10 @@ pub fn dep_decode_from_byte_slice_or_panic<T: NestedDecode>(input: &[u8]) -> T {
 }
 
 fn decode_panic_exit(_: (), de_err: DecodeError) -> ! {
-	panic!("decode panicked: {}", core::str::from_utf8(de_err.message_bytes()).unwrap())
+	panic!(
+		"decode panicked: {}",
+		core::str::from_utf8(de_err.message_bytes()).unwrap()
+	)
 }
 
 /// Calls both the fast exit and the regular top-decode,

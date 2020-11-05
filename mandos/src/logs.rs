@@ -13,7 +13,11 @@ impl InterpretableFrom<CheckLogRaw> for CheckLog {
 		CheckLog {
 			address: BytesValue::interpret_from(from.address, context),
 			identifier: BytesValue::interpret_from(from.identifier, context),
-			topics: from.topics.into_iter().map(|t| BytesValue::interpret_from(t, context)).collect(),
+			topics: from
+				.topics
+				.into_iter()
+				.map(|t| BytesValue::interpret_from(t, context))
+				.collect(),
 			data: BytesValue::interpret_from(from.data, context),
 		}
 	}
@@ -36,7 +40,11 @@ impl InterpretableFrom<CheckLogsRaw> for CheckLogs {
 	fn interpret_from(from: CheckLogsRaw, context: &InterpreterContext) -> Self {
 		match from {
 			CheckLogsRaw::Star => CheckLogs::Star,
-			CheckLogsRaw::List(l) => CheckLogs::List(l.into_iter().map(|c| CheckLog::interpret_from(c, context)).collect()),
+			CheckLogsRaw::List(l) => CheckLogs::List(
+				l.into_iter()
+					.map(|c| CheckLog::interpret_from(c, context))
+					.collect(),
+			),
 			CheckLogsRaw::DefaultStar => CheckLogs::DefaultStar,
 		}
 	}

@@ -74,7 +74,12 @@ pub trait CryptoBubbles {
 	}
 
 	/// player joins game
-	fn _addPlayerToGameStateChange(&self, game_index: &BigUint, player: &Address, bet: &BigUint) -> SCResult<()> {
+	fn _addPlayerToGameStateChange(
+		&self,
+		game_index: &BigUint,
+		player: &Address,
+		bet: &BigUint,
+	) -> SCResult<()> {
 		let balance_key = self._player_balance_key(&player);
 		let mut balance = self.storage_load_big_uint(balance_key.as_bytes());
 		if bet > &balance {
@@ -101,7 +106,12 @@ pub trait CryptoBubbles {
 
 	// owner transfers prize into winner SC account
 	#[endpoint]
-	fn rewardWinner(&self, game_index: &BigUint, winner: &Address, prize: &BigUint) -> SCResult<()> {
+	fn rewardWinner(
+		&self,
+		game_index: &BigUint,
+		winner: &Address,
+		prize: &BigUint,
+	) -> SCResult<()> {
 		let caller = self.get_caller();
 		let owner: Address = self.storage_load_bytes32(OWNER_KEY).into();
 		if caller != owner {
@@ -120,7 +130,12 @@ pub trait CryptoBubbles {
 
 	// owner transfers prize into winner SC account, then transfers funds to player wallet
 	#[endpoint]
-	fn rewardAndSendToWallet(&self, game_index: &BigUint, winner: &Address, prize: &BigUint) -> SCResult<()> {
+	fn rewardAndSendToWallet(
+		&self,
+		game_index: &BigUint,
+		winner: &Address,
+		prize: &BigUint,
+	) -> SCResult<()> {
 		sc_try!(self.rewardWinner(game_index, winner, prize));
 		sc_try!(self._transferBackToPlayerWallet(winner, prize));
 		Ok(())

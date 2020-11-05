@@ -19,30 +19,50 @@ pub enum Visibility {
 
 #[derive(Clone, Debug)]
 pub enum MethodMetadata {
-	Regular { visibility: Visibility, payable: bool },
-	Event { identifier: Vec<u8> },
+	Regular {
+		visibility: Visibility,
+		payable: bool,
+	},
+	Event {
+		identifier: Vec<u8>,
+	},
 	Callback,
 	CallbackRaw,
-	StorageGetter { visibility: Visibility, identifier: String },
-	StorageSetter { visibility: Visibility, identifier: String },
-	StorageGetMut { visibility: Visibility, identifier: String },
-	Module { impl_path: proc_macro2::TokenTree },
+	StorageGetter {
+		visibility: Visibility,
+		identifier: String,
+	},
+	StorageSetter {
+		visibility: Visibility,
+		identifier: String,
+	},
+	StorageGetMut {
+		visibility: Visibility,
+		identifier: String,
+	},
+	Module {
+		impl_path: proc_macro2::TokenTree,
+	},
 }
 
 impl MethodMetadata {
 	pub fn endpoint_name(&self) -> Option<&syn::Ident> {
 		match self {
 			MethodMetadata::Regular {
-				visibility: Visibility::Endpoint(e), ..
+				visibility: Visibility::Endpoint(e),
+				..
 			}
 			| MethodMetadata::StorageGetter {
-				visibility: Visibility::Endpoint(e), ..
+				visibility: Visibility::Endpoint(e),
+				..
 			}
 			| MethodMetadata::StorageSetter {
-				visibility: Visibility::Endpoint(e), ..
+				visibility: Visibility::Endpoint(e),
+				..
 			}
 			| MethodMetadata::StorageGetMut {
-				visibility: Visibility::Endpoint(e), ..
+				visibility: Visibility::Endpoint(e),
+				..
 			} => Some(e),
 			_ => None,
 		}
@@ -50,7 +70,9 @@ impl MethodMetadata {
 
 	pub fn has_implementation(&self) -> bool {
 		match self {
-			MethodMetadata::Regular { .. } | MethodMetadata::Callback | MethodMetadata::CallbackRaw => true,
+			MethodMetadata::Regular { .. }
+			| MethodMetadata::Callback
+			| MethodMetadata::CallbackRaw => true,
 			_ => false,
 		}
 	}
@@ -159,7 +181,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		if m.default.is_some() {
 			panic!("Events cannot have an implementations provided in the trait.");
 		}
-		MethodMetadata::Event { identifier: event_attr.identifier }
+		MethodMetadata::Event {
+			identifier: event_attr.identifier,
+		}
 	} else if callback || callback_raw {
 		if payable {
 			panic!("Callback methods cannot be marked payable.");
@@ -236,19 +260,28 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		if m.default.is_some() {
 			panic!("Module declarations cannot have an implementations provided in the trait.");
 		}
-		MethodMetadata::Module { impl_path: module_attr.arg }
+		MethodMetadata::Module {
+			impl_path: module_attr.arg,
+		}
 	} else {
 		if m.default.is_none() {
 			panic!("Regular methods need an implementation.");
 		}
-		MethodMetadata::Regular { visibility, payable }
+		MethodMetadata::Regular {
+			visibility,
+			payable,
+		}
 	}
 }
 
 impl Method {
 	pub fn parse(m: &syn::TraitItemMethod) -> Method {
 		let metadata = extract_metadata(m);
-		let allow_callback_args = if let MethodMetadata::Callback = metadata { true } else { false };
+		let allow_callback_args = if let MethodMetadata::Callback = metadata {
+			true
+		} else {
+			false
+		};
 		let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
 		Method {
 			metadata,
@@ -288,7 +321,11 @@ impl Method {
 
 	pub fn generate_call_to_method(&self) -> proc_macro2::TokenStream {
 		let fn_ident = &self.name;
-		let arg_values: Vec<proc_macro2::TokenStream> = self.method_args.iter().map(|arg| generate_arg_call_name(arg)).collect();
+		let arg_values: Vec<proc_macro2::TokenStream> = self
+			.method_args
+			.iter()
+			.map(|arg| generate_arg_call_name(arg))
+			.collect();
 		quote! {
 			self.#fn_ident (#(#arg_values),*)
 		}
@@ -332,8 +369,12 @@ impl Method {
 						}
 					},
 					ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
-					ArgMetadata::Multi(_) => panic!("multi args not accepted in function generate_call_method_fixed_args"),
-					ArgMetadata::VarArgs => panic!("var_args not accepted in function generate_call_method_fixed_args"),
+					ArgMetadata::Multi(_) => panic!(
+						"multi args not accepted in function generate_call_method_fixed_args"
+					),
+					ArgMetadata::VarArgs => {
+						panic!("var_args not accepted in function generate_call_method_fixed_args")
+					},
 				}
 			})
 			.collect();
@@ -366,12 +407,18 @@ impl Method {
 				}
 
 				match &arg.metadata {
-					ArgMetadata::Single | ArgMetadata::VarArgs => generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader }),
+					ArgMetadata::Single | ArgMetadata::VarArgs => {
+						generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
+					},
 					ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
 					ArgMetadata::Multi(multi_attr) => {
 						// #[multi(...)]
 						let count_expr = &multi_attr.count_expr;
-						generate_load_dyn_multi_arg(arg, &quote! { &mut ___arg_loader }, &quote! { #count_expr as usize })
+						generate_load_dyn_multi_arg(
+							arg,
+							&quote! { &mut ___arg_loader },
+							&quote! { #count_expr as usize },
+						)
 					},
 				}
 			})

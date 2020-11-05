@@ -2,7 +2,10 @@ use super::contract_gen::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
-pub fn generate_function_selector_body(contract: &Contract, include_submodules: bool) -> proc_macro2::TokenStream {
+pub fn generate_function_selector_body(
+	contract: &Contract,
+	include_submodules: bool,
+) -> proc_macro2::TokenStream {
 	let match_arms: Vec<proc_macro2::TokenStream> = contract
 		.methods
 		.iter()

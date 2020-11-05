@@ -4,7 +4,13 @@ use crate::nested_ser_output::NestedEncodeOutput;
 /// No argument generics here, because we want the executable binary as small as possible.
 /// Smaller types need to be converted to u64 before using this function.
 /// TODO: there might be a quicker version of this using transmute + reverse bytes.
-pub fn using_encoded_number<F: FnOnce(&[u8])>(x: u64, size_in_bits: usize, signed: bool, mut compact: bool, f: F) {
+pub fn using_encoded_number<F: FnOnce(&[u8])>(
+	x: u64,
+	size_in_bits: usize,
+	signed: bool,
+	mut compact: bool,
+	f: F,
+) {
 	let mut result = [0u8; 8];
 	let mut result_size = 0usize;
 	let negative = compact && // only relevant when compact flag

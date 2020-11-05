@@ -58,7 +58,12 @@ pub trait Alice {
 		let calee_address: Address = self.storage_load_bytes32(CALEE_STORAGE_KEY).into();
 
 		let target_contract = contract_proxy!(self, &calee_address, MessageMe);
-		target_contract.messageMe(0x01, &BigUint::from(0x02u64), create_a_vec(), &SOME_ADDRESS.into());
+		target_contract.messageMe(
+			0x01,
+			&BigUint::from(0x02u64),
+			create_a_vec(),
+			&SOME_ADDRESS.into(),
+		);
 	}
 
 	#[endpoint]
@@ -66,7 +71,12 @@ pub trait Alice {
 		let calee_address: Address = self.storage_load_bytes32(&CALEE_STORAGE_KEY).into();
 
 		let target_contract = contract_proxy!(self, &calee_address, MessageMeWithCallback);
-		target_contract.messageMe(0x01, BigUint::from(0x02u64), create_a_vec(), SOME_ADDRESS.into());
+		target_contract.messageMe(
+			0x01,
+			BigUint::from(0x02u64),
+			create_a_vec(),
+			SOME_ADDRESS.into(),
+		);
 	}
 
 	#[callback]

@@ -1,7 +1,10 @@
 use super::arg_def::*;
 use super::util::*;
 
-pub fn generate_load_single_arg(arg: &MethodArg, arg_index_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn generate_load_single_arg(
+	arg: &MethodArg,
+	arg_index_expr: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
 	let arg_ty = &arg.ty;
 	let arg_name_expr = arg_id_literal(&arg.pat);
 	match &arg.ty {
@@ -22,7 +25,10 @@ pub fn generate_load_single_arg(arg: &MethodArg, arg_index_expr: &proc_macro2::T
 	}
 }
 
-pub fn generate_load_dyn_arg(arg: &MethodArg, loader_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn generate_load_dyn_arg(
+	arg: &MethodArg,
+	loader_expr: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	let arg_ty = &arg.ty;
 	let arg_name_expr = arg_id_literal(pat);
@@ -44,7 +50,11 @@ pub fn generate_load_dyn_arg(arg: &MethodArg, loader_expr: &proc_macro2::TokenSt
 	}
 }
 
-pub fn generate_load_dyn_multi_arg(arg: &MethodArg, loader_expr: &proc_macro2::TokenStream, num_expr: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn generate_load_dyn_multi_arg(
+	arg: &MethodArg,
+	loader_expr: &proc_macro2::TokenStream,
+	num_expr: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	let arg_ty = &arg.ty;
 	let arg_name_expr = arg_id_literal(pat);

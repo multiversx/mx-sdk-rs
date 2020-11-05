@@ -34,7 +34,12 @@ impl TopEncode for Status {
 		self.to_u8().top_encode(output)
 	}
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.to_u8().top_encode_or_exit(output, c, exit)
 	}
 }
@@ -44,7 +49,11 @@ impl TopDecode for Status {
 		Status::from_u8(u8::top_decode(input)?)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match u8::top_decode_or_exit(input, c.clone(), exit) {
 			0 => Status::Inactive,
 			1 => Status::Running,

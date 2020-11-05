@@ -7,7 +7,10 @@ pub struct Random {
 
 impl Random {
 	pub fn new(seed: [u8; SEED_SIZE]) -> Self {
-		Random { data: seed, current_index: 0 }
+		Random {
+			data: seed,
+			current_index: 0,
+		}
 	}
 
 	pub fn next(&mut self) -> u32 {

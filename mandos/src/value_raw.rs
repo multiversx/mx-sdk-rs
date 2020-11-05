@@ -119,7 +119,10 @@ pub enum CheckBytesValueRaw {
 
 impl CheckBytesValueRaw {
 	pub fn is_star(&self) -> bool {
-		matches!(self, CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar)
+		matches!(
+			self,
+			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar
+		)
 	}
 
 	pub fn is_default_star(&self) -> bool {
@@ -139,7 +142,9 @@ impl Serialize for CheckBytesValueRaw {
 		S: Serializer,
 	{
 		match self {
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar => serializer.serialize_str("*"),
+			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar => {
+				serializer.serialize_str("*")
+			},
 			CheckBytesValueRaw::Equal(bytes_value) => bytes_value.serialize(serializer),
 		}
 	}

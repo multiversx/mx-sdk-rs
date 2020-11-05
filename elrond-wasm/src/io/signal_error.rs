@@ -89,6 +89,9 @@ pub struct PanickingSignalError;
 
 impl SignalError for PanickingSignalError {
 	fn signal_error(&self, message: &[u8]) -> ! {
-		panic!("PanickingDynArgErrHandler panicked: {}", core::str::from_utf8(message).unwrap())
+		panic!(
+			"PanickingDynArgErrHandler panicked: {}",
+			core::str::from_utf8(message).unwrap()
+		)
 	}
 }

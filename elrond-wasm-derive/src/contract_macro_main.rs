@@ -2,7 +2,10 @@ use super::contract_gen::*;
 use super::contract_impl::*;
 use super::*;
 
-pub fn process_contract(args: proc_macro::TokenStream, input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn process_contract(
+	args: proc_macro::TokenStream,
+	input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
 	let args_input = parse_macro_input!(args as syn::AttributeArgs);
 	let proc_input = &parse_macro_input!(input as syn::ItemTrait);
 

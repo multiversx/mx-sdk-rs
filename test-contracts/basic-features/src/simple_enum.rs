@@ -32,7 +32,12 @@ impl NestedEncode for SimpleEnum {
 		Ok(())
 	}
 
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
 		self.to_i64().dep_encode_or_exit(dest, c, exit);
 	}
 }
@@ -43,7 +48,12 @@ impl TopEncode for SimpleEnum {
 		Ok(())
 	}
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		_: ExitCtx,
+		_: fn(ExitCtx, EncodeError) -> !,
+	) {
 		output.set_i64(self.to_i64());
 	}
 }
@@ -53,7 +63,11 @@ impl NestedDecode for SimpleEnum {
 		SimpleEnum::from_i64(i64::dep_decode(input)?)
 	}
 
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match u32::dep_decode_or_exit(input, c.clone(), exit) {
 			0 => SimpleEnum::Variant0,
 			1 => SimpleEnum::Variant1,
@@ -68,7 +82,11 @@ impl TopDecode for SimpleEnum {
 		top_decode_from_nested(input)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		top_decode_from_nested_or_exit(input, c, exit)
 	}
 }

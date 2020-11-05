@@ -31,7 +31,11 @@ pub trait TopDecode: Sized {
 	/// Version of `top_decode` that exits quickly in case of error.
 	/// Its purpose is to create smaller implementations
 	/// in cases where the application is supposed to exit directly on decode error.
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match Self::top_decode(input) {
 			Ok(v) => v,
 			Err(e) => exit(c, e),
@@ -48,7 +52,11 @@ pub trait TopDecode: Sized {
 
 	#[doc(hidden)]
 	#[inline]
-	fn top_decode_boxed_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Box<Self> {
+	fn top_decode_boxed_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Box<Self> {
 		Box::new(Self::top_decode_or_exit(input, c, exit))
 	}
 }
@@ -70,7 +78,11 @@ where
 
 /// Top-decodes the result using the NestedDecode implementation.
 /// Uses the fast-exit mechanism in case of error.
-pub fn top_decode_from_nested_or_exit<T, I, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> T
+pub fn top_decode_from_nested_or_exit<T, I, ExitCtx: Clone>(
+	input: I,
+	c: ExitCtx,
+	exit: fn(ExitCtx, DecodeError) -> !,
+) -> T
 where
 	I: TopDecodeInput,
 	T: NestedDecode,
@@ -91,7 +103,12 @@ impl TopDecode for () {
 		Ok(())
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(_: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {}
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		_: I,
+		_: ExitCtx,
+		_: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+	}
 }
 
 impl<T: TopDecode> TopDecode for Box<T> {
@@ -99,7 +116,11 @@ impl<T: TopDecode> TopDecode for Box<T> {
 		T::top_decode_boxed(input)
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		T::top_decode_boxed_or_exit(input, c, exit)
 	}
 }
@@ -118,7 +139,11 @@ impl<T: NestedDecode> TopDecode for Box<[T]> {
 	}
 
 	/// Quick exit for any of the contained types
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		if let TypeInfo::U8 = T::TYPE_INFO {
 			let bytes = input.into_boxed_slice_u8();
 			let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
@@ -148,7 +173,11 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
 		}
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		if let TypeInfo::U8 = T::TYPE_INFO {
 			let bytes = input.into_boxed_slice_u8();
 			let bytes_vec = boxed_slice_into_vec(bytes);
@@ -181,7 +210,11 @@ macro_rules! decode_num_unsigned {
 				}
 			}
 
-			fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+			fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+				input: I,
+				c: ExitCtx,
+				exit: fn(ExitCtx, DecodeError) -> !,
+			) -> Self {
 				let arg_u64 = input.into_u64();
 				let max = <$bounds_ty>::MAX as u64;
 				if arg_u64 > max {
@@ -216,7 +249,11 @@ macro_rules! decode_num_signed {
 				}
 			}
 
-			fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+			fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+				input: I,
+				c: ExitCtx,
+				exit: fn(ExitCtx, DecodeError) -> !,
+			) -> Self {
 				let arg_i64 = input.into_i64();
 				let min = <$bounds_ty>::MIN as i64;
 				let max = <$bounds_ty>::MAX as i64;
@@ -247,7 +284,11 @@ impl TopDecode for bool {
 		}
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		match input.into_i64() {
 			0 => false,
 			1 => true,
@@ -267,7 +308,11 @@ impl<T: NestedDecode> TopDecode for Option<T> {
 		}
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		let bytes = input.into_boxed_slice_u8();
 		if bytes.is_empty() {
 			None
@@ -391,7 +436,11 @@ impl TopDecode for NonZeroUsize {
 		}
 	}
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
 		if let Some(nz) = NonZeroUsize::new(usize::top_decode_or_exit(input, c.clone(), exit)) {
 			nz
 		} else {
@@ -470,7 +519,10 @@ mod tests {
 		deser_ok(n, expected);
 
 		let t = E::Tuple(1, 2);
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2 /*)*/];
+		let expected: &[u8] = &[
+			/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
+			2, /*)*/
+		];
 		deser_ok(t, expected);
 
 		let s = E::Struct { a: 1 };

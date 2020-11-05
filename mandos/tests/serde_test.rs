@@ -32,7 +32,9 @@ fn test_ser() {
 		name: None,
 		comment: Some("comment".to_string()),
 		check_gas: Some(false),
-		steps: vec![StepRaw::ExternalSteps { path: String::from("hello.txt") }],
+		steps: vec![StepRaw::ExternalSteps {
+			path: String::from("hello.txt"),
+		}],
 	};
 
 	let serialized = serde_json::to_string_pretty(&scen).unwrap();
