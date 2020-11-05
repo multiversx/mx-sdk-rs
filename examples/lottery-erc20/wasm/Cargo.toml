@@ -8,6 +8,7 @@ edition = "2018"
 crate-type = [ "cdylib",]
 
 [workspace]
+members = ["."]
 
 [profile.release]
 codegen-units = 1
