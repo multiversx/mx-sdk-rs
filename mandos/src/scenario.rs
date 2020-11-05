@@ -242,6 +242,8 @@ pub struct TxTransfer {
     pub from: AddressValue,
     pub to: AddressValue,
     pub value: BigUintValue,
+    pub esdt_value: Option<BigUintValue>,
+    pub esdt_token_name: Option<String>
 }
 
 impl InterpretableFrom<TxTransferRaw> for TxTransfer {
@@ -250,6 +252,8 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
             from: AddressValue::interpret_from(from.from, context),
             to: AddressValue::interpret_from(from.to, context),
             value: BigUintValue::interpret_from(from.value, context),
+            esdt_value: from.esdt_value.map(|val| BigUintValue::interpret_from(val, context)),
+            esdt_token_name: from.esdt_token_name.map(|name| name.to_string()),
         }
     }
 }
