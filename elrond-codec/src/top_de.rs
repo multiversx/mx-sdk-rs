@@ -92,7 +92,6 @@ impl TopDecode for () {
     }
     
     fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(_: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
-        ()
     }
 }
 
