@@ -3,6 +3,8 @@ use core::fmt::Debug;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+const ERR_BAD_H256_LENGTH: &[u8] = b"bad H256 length";
+
 /// Type that holds 32 bytes of data.
 /// Data is kept on the heap to keep wasm size low and avoid copies.
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -128,10 +130,14 @@ impl H256 {
 use elrond_codec::*;
 
 impl NestedEncode for H256 {
-    fn dep_encode_to<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.write(&self.0[..]);
         Ok(())
     }
+
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		dest.write(&self.0[..]);
+	}
 }
 
 impl TopEncode for H256 {
@@ -139,22 +145,43 @@ impl TopEncode for H256 {
         output.set_slice_u8(&self.0[..]);
         Ok(())
     }
+
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
+		output.set_slice_u8(&self.0[..]);
+	}
 }
 
 impl NestedDecode for H256 {
-    fn dep_decode_to<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let mut res = H256::zero();
         input.read_into(res.as_mut())?;
         Ok(res)
     }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        let mut res = H256::zero();
+        input.read_into_or_exit(res.as_mut(), c, exit);
+        res
+    }
 }
 
 impl TopDecode for H256 {
-	fn top_decode<I: TopDecodeInput, R, F: FnOnce(Result<Self, DecodeError>) -> R>(input: I, f: F) -> R {
-        Box::<[u8; 32]>::top_decode(input, |res| match res {
-            Ok(array_box) => f(Ok(H256(array_box))),
-            Err(_) => f(Err(DecodeError::from(&b"bad H256 length"[..]))),
-        })
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        match <[u8; 32]>::top_decode_boxed(input) {
+            Ok(array_box) => Ok(H256(array_box)),
+            Err(_) => Err(DecodeError::from(ERR_BAD_H256_LENGTH)),
+        }
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
+        // transmute directly
+        let bs = input.into_boxed_slice_u8();
+        if bs.len() != 32 {
+            exit(c, DecodeError::from(ERR_BAD_H256_LENGTH));
+        }
+        let raw = Box::into_raw(bs);
+        let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
+        H256(array_box)
     }
 }
 
@@ -162,7 +189,7 @@ impl TopDecode for H256 {
 mod esd_light_tests {
     use super::*;
     use alloc::vec::Vec;
-    use elrond_codec::test_util::ser_deser_ok;
+    use elrond_codec::test_util::{ser_deser_ok, check_top_encode};
 
     #[test]
     fn test_address() {
@@ -185,7 +212,7 @@ mod esd_light_tests {
         let expected_bytes: &[u8] = &[4u8; 32*3];
 
         let tuple = (&addr, &&&addr, addr.clone());
-        let serialized_bytes = top_encode_to_vec(&tuple).unwrap();
+        let serialized_bytes = check_top_encode(&tuple);
         assert_eq!(serialized_bytes.as_slice(), expected_bytes);
     }
 }

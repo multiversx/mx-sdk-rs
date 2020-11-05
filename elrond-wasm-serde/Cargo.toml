@@ -18,3 +18,4 @@ wee_alloc = "0.4"
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 
 [workspace]
+members = ["."]

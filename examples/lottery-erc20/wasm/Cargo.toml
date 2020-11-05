@@ -8,6 +8,7 @@ edition = "2018"
 crate-type = [ "cdylib",]
 
 [workspace]
+members = ["."]
 
 [profile.release]
 codegen-units = 1
@@ -22,5 +23,5 @@ default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.8.0"
+version = "0.9.1"
 features = [ "wasm-output-mode",]

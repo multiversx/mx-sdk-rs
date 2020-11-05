@@ -35,9 +35,19 @@ where
         }
 
         let arg_input = loader.next_arg_input();
-        match T::top_decode(arg_input, |res| res) {
-            Ok(v) => v,
-            Err(de_err) => loader.signal_arg_de_error(arg_id, de_err),
-        }
+        T::top_decode_or_exit(
+            arg_input,
+            &(&*loader, arg_id),
+            dyn_load_exit)
     }
+}
+
+#[inline(always)]
+fn dyn_load_exit<I, D>(ctx: &(&D, ArgId), de_err: DecodeError) -> !
+where
+    I: TopDecodeInput,
+    D: DynArgInput<I>,
+{
+    let (loader, arg_id) = ctx;
+    loader.signal_arg_de_error(*arg_id, de_err)
 }

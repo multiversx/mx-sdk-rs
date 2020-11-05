@@ -26,12 +26,23 @@ where
             cast_big_uint
         },
         _ => {
-            match T::top_decode(ArgDecodeInput::new(api.clone(), index), |res| res) {
-                Ok(v) => v,
-                Err(de_err) => ApiSignalError::new(api).signal_arg_de_error(arg_id, de_err),
-            }
+            T::top_decode_or_exit(
+                ArgDecodeInput::new(api.clone(), index),
+                (api, arg_id),
+                load_single_arg_exit)
         }
     }
+}
+
+#[inline(always)]
+fn load_single_arg_exit<A, BigInt, BigUint>(ctx: (A, ArgId), de_err: DecodeError) -> !
+where
+    BigUint: BigUintApi + 'static,
+    BigInt: BigIntApi<BigUint> + 'static,
+    A: ContractIOApi<BigInt, BigUint> + 'static
+{
+    let (api, arg_id) = ctx;
+    ApiSignalError::new(api).signal_arg_de_error(arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.
