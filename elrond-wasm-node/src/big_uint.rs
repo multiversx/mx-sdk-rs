@@ -274,7 +274,7 @@ impl TopEncode for ArwenBigUint {
     
     #[inline]
 	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, _: ExitCtx, _: fn(ExitCtx, EncodeError) -> !) {
-		output.set_big_int_handle_or_bytes(self.handle, || self.to_bytes_be());
+		output.set_big_uint_handle_or_bytes(self.handle, || self.to_bytes_be());
 	}
 }
 
