@@ -133,11 +133,6 @@ fn storage_map3() {
 }
 
 #[test]
-fn storage_opt_addr_err() {
-	parse_execute_mandos("mandos/storage_opt_addr_err.scen.json", &contract_map());
-}
-
-#[test]
 fn storage_opt_addr() {
 	parse_execute_mandos("mandos/storage_opt_addr.scen.json", &contract_map());
 }

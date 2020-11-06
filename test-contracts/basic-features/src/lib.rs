@@ -348,6 +348,10 @@ pub trait BasicFeatures {
 		self._get_opt_addr().into()
 	}
 
+	#[view]
+	#[storage_is_empty("opt_addr")]
+	fn is_empty_opt_addr(&self) -> bool;
+
 	#[endpoint]
 	#[storage_get("ser_1")]
 	fn load_ser_1(&self) -> SerExample1;
