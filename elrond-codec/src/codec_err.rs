@@ -1,48 +1,40 @@
-use alloc::vec::Vec;
-
 #[derive(Debug, PartialEq, Eq)]
-pub enum EncodeError {
-    UnsupportedOperation,
-    Static(&'static [u8]),
-    Dynamic(Vec<u8>),
+pub struct EncodeError(&'static [u8]);
+
+impl From<&'static [u8]> for EncodeError {
+	#[inline]
+	fn from(bytes: &'static [u8]) -> Self {
+		EncodeError(bytes)
+	}
 }
 
 impl EncodeError {
-    pub fn message_bytes(&self) -> &[u8] {
-        match self {
-            EncodeError::UnsupportedOperation => &b"unsupported operation"[..],
-            EncodeError::Static(msg) => msg,
-            EncodeError::Dynamic(msg) => msg.as_slice(),
-        }
-    }
+	#[inline]
+	pub fn message_bytes(&self) -> &'static [u8] {
+		self.0
+	}
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum DecodeError {
-    InputTooShort,
-    InputTooLong,
-    InputOutOfRange,
-    InvalidValue,
-    UnsupportedOperation,
-    ArrayDecodeErr,
-    Static(&'static [u8]),
-    Dynamic(Vec<u8>),
+pub struct DecodeError(&'static [u8]);
+
+impl From<&'static [u8]> for DecodeError {
+	#[inline]
+	fn from(bytes: &'static [u8]) -> Self {
+		DecodeError(bytes)
+	}
 }
 
 impl DecodeError {
-    pub fn message_bytes(&self) -> &[u8] {
-        match self {
-            DecodeError::InputTooShort => &b"input too short"[..],
-            DecodeError::InputTooLong => &b"input too long"[..],
-            DecodeError::InputOutOfRange => &b"input out of range"[..],
-            DecodeError::InvalidValue => &b"invalid value"[..],
-            DecodeError::UnsupportedOperation => &b"unsupported operation"[..],
-            DecodeError::ArrayDecodeErr => &b"array decode error"[..],
-            DecodeError::Static(msg) => msg,
-            DecodeError::Dynamic(msg) => msg.as_slice(),
-        }
-    }
+	#[inline]
+	pub fn message_bytes(&self) -> &'static [u8] {
+		self.0
+	}
+
+	pub const INPUT_TOO_SHORT: DecodeError = DecodeError(b"input too short");
+	pub const INPUT_TOO_LONG: DecodeError = DecodeError(b"input too long");
+	pub const INPUT_OUT_OF_RANGE: DecodeError = DecodeError(b"input out of range");
+	pub const INVALID_VALUE: DecodeError = DecodeError(b"invalid value");
+	pub const UNSUPPORTED_OPERATION: DecodeError = DecodeError(b"unsupported operation");
+	pub const ARRAY_DECODE_ERROR: DecodeError = DecodeError(b"array decode error");
 }
-
-
-
