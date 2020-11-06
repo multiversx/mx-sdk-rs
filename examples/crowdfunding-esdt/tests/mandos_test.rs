@@ -37,7 +37,7 @@ fn crowdfunding_claim_too_early() {
 }
 
 #[test]
-fn crowdfunding_fund() {
+fn crowdfunding_fund_ok() {
 	parse_execute_mandos("mandos/crowdfunding-fund.scen.json", &contract_map());
 }
 
