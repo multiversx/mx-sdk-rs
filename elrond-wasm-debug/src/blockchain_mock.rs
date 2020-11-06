@@ -27,42 +27,54 @@ use core::cell::RefCell;
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
 pub struct AccountData {
-    pub address: Address,
-    pub nonce: u64,
-    pub balance: BigUint,
-    pub storage: HashMap<Vec<u8>, Vec<u8>>,
-    pub esdt: Option<HashMap<Vec<u8>, BigUint>>,
-    pub contract_path: Option<Vec<u8>>,
-    pub contract_owner: Option<Address>,
+	pub address: Address,
+	pub nonce: u64,
+	pub balance: BigUint,
+	pub storage: HashMap<Vec<u8>, Vec<u8>>,
+	pub esdt: Option<HashMap<Vec<u8>, BigUint>>,
+	pub contract_path: Option<Vec<u8>>,
+	pub contract_owner: Option<Address>,
 }
 
 impl fmt::Display for AccountData {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut storage_buf = String::new();
-        let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-        storage_keys.sort();
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let mut storage_buf = String::new();
+		let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+		storage_keys.sort();
 
-        for key in &storage_keys {
-            let value = self.storage.get(key).unwrap();
-            write!(&mut storage_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.as_slice())).unwrap();
-        }
+		for key in &storage_keys {
+			let value = self.storage.get(key).unwrap();
+			write!(
+				&mut storage_buf,
+				"\n\t\t{} -> 0x{}",
+				key_hex(key.as_slice()),
+				hex::encode(value.as_slice())
+			)
+			.unwrap();
+		}
 
-        let mut esdt_buf = String::new();
-        let esdt_unwrapped = self.esdt.clone().unwrap_or_default();
-        let mut esdt_keys: Vec<Vec<u8>> = esdt_unwrapped.iter().map(|(k, _)| k.clone()).collect();
-        esdt_keys.sort();
+		let mut esdt_buf = String::new();
+		let esdt_unwrapped = self.esdt.clone().unwrap_or_default();
+		let mut esdt_keys: Vec<Vec<u8>> = esdt_unwrapped.iter().map(|(k, _)| k.clone()).collect();
+		esdt_keys.sort();
 
-        for key in &esdt_keys {
-            let value = esdt_unwrapped.get(key).unwrap();
-            write!(&mut esdt_buf, "\n\t\t{} -> 0x{}", key_hex(key.as_slice()), hex::encode(value.to_bytes_be())).unwrap();
-        }
-        
-        write!(f, "AccountData {{ nonce: {}, balance: {}, storage: [{} ], esdt: [{} ] }}",
-            self.nonce, 
-            self.balance,
-            storage_buf,
-            esdt_buf)
-    }
+		for key in &esdt_keys {
+			let value = esdt_unwrapped.get(key).unwrap();
+			write!(
+				&mut esdt_buf,
+				"\n\t\t{} -> 0x{}",
+				key_hex(key.as_slice()),
+				hex::encode(value.to_bytes_be())
+			)
+			.unwrap();
+		}
+
+		write!(
+			f,
+			"AccountData {{ nonce: {}, balance: {}, storage: [{} ], esdt: [{} ] }}",
+			self.nonce, self.balance, storage_buf, esdt_buf
+		)
+	}
 }
 
 #[derive(Clone, Debug)]
@@ -92,174 +104,224 @@ pub struct BlockchainMock {
 }
 
 impl BlockchainMock {
-    pub fn new() -> Self {
-        BlockchainMock {
-            accounts: HashMap::new(),
-            new_addresses: HashMap::new(),
-            previous_block_info: BlockInfo::new(),
-            current_block_info: BlockInfo::new(),
-        }
-    }
+	pub fn new() -> Self {
+		BlockchainMock {
+			accounts: HashMap::new(),
+			new_addresses: HashMap::new(),
+			previous_block_info: BlockInfo::new(),
+			current_block_info: BlockInfo::new(),
+		}
+	}
 
-    pub fn add_account(&mut self, acct: AccountData) {
-        self.accounts.insert(acct.address.clone(), acct);
-    }
+	pub fn add_account(&mut self, acct: AccountData) {
+		self.accounts.insert(acct.address.clone(), acct);
+	}
 
-    pub fn print_accounts(&self) {
-        let mut accounts_buf = String::new();
-        for (address, account) in &self.accounts {
-            write!(&mut accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
-        }
-        println!("Accounts: {}", &accounts_buf);
-    }
+	pub fn print_accounts(&self) {
+		let mut accounts_buf = String::new();
+		for (address, account) in &self.accounts {
+			write!(
+				&mut accounts_buf,
+				"\n\t{} -> {}",
+				address_hex(address),
+				account
+			)
+			.unwrap();
+		}
+		println!("Accounts: {}", &accounts_buf);
+	}
 
-    pub fn put_new_address(&mut self, creator_address: Address, creator_nonce: u64, new_address: Address) {
-        self.new_addresses.insert((creator_address, creator_nonce), new_address);
-    }
+	pub fn put_new_address(
+		&mut self,
+		creator_address: Address,
+		creator_nonce: u64,
+		new_address: Address,
+	) {
+		self.new_addresses
+			.insert((creator_address, creator_nonce), new_address);
+	}
 
-    fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
-        self.new_addresses
-            .get(&(creator_address, creator_nonce))
-            .map(|addr_ref| addr_ref.clone())
-    }
+	fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
+		self.new_addresses
+			.get(&(creator_address, creator_nonce))
+			.map(|addr_ref| addr_ref.clone())
+	}
 
-    pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {
-        if let Some(account) = self.accounts.get(&contract_address) {
-            if let Some(contract_path) = &account.contract_path {
-                contract_path.clone()
-            } else {
-                panic!("Recipient account is not a smart contract");
-            }
-        } else {
-            panic!("Account not found");
-        }
-    }
+	pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {
+		if let Some(account) = self.accounts.get(&contract_address) {
+			if let Some(contract_path) = &account.contract_path {
+				contract_path.clone()
+			} else {
+				panic!("Recipient account is not a smart contract");
+			}
+		} else {
+			panic!("Account not found");
+		}
+	}
 
-    pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint) {
-        let sender_account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
-        assert!(&sender_account.balance >= call_value, "Not enough balance to send tx payment");
-        sender_account.balance -= call_value;
-    }
+	pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint) {
+		let sender_account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Sender account not found"));
+		assert!(
+			&sender_account.balance >= call_value,
+			"Not enough balance to send tx payment"
+		);
+		sender_account.balance -= call_value;
+	}
 
-    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
-        let sender_account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
-        let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
-        assert!(sender_account.balance >= gas_cost, "Not enough balance to pay gas upfront");
-        sender_account.balance -= &gas_cost;
-    }
+	pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
+		let sender_account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Sender account not found"));
+		let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
+		assert!(
+			sender_account.balance >= gas_cost,
+			"Not enough balance to pay gas upfront"
+		);
+		sender_account.balance -= &gas_cost;
+	}
 
-    pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
-        let account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Receiver account not found"));
-        account.balance += amount;
-    }
+	pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Receiver account not found"));
+		account.balance += amount;
+	}
 
-    pub fn send_balance(&mut self, contract_address: &Address, send_balance_list: &[SendBalance]) {
-        for send_balance in send_balance_list {
-            self.subtract_tx_payment(contract_address, &send_balance.amount);
-            self.increase_balance(&send_balance.recipient, &send_balance.amount);
-        }
-    }
+	pub fn send_balance(&mut self, contract_address: &Address, send_balance_list: &[SendBalance]) {
+		for send_balance in send_balance_list {
+			self.subtract_tx_payment(contract_address, &send_balance.amount);
+			self.increase_balance(&send_balance.recipient, &send_balance.amount);
+		}
+	}
 
-    pub fn substract_esdt_balance(&mut self, address: &Address, esdt_token_name: &[u8], value: &BigUint) {
-        let sender_account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
-        
-        let esdt =  sender_account.esdt.as_mut()
-            .unwrap_or_else(|| panic!("Account has no esdt tokens"));
-        
-        let esdt_balance = esdt.get_mut(esdt_token_name)
-            .unwrap_or_else(|| panic!("Account has no esdt tokens with that name"));
+	pub fn substract_esdt_balance(
+		&mut self,
+		address: &Address,
+		esdt_token_name: &[u8],
+		value: &BigUint,
+	) {
+		let sender_account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Sender account not found"));
 
-        assert!(*esdt_balance >= *value, "Not enough esdt balance");
-        *esdt_balance -= value;
-    }
+		let esdt = sender_account
+			.esdt
+			.as_mut()
+			.unwrap_or_else(|| panic!("Account has no esdt tokens"));
 
-    pub fn increase_esdt_balance(&mut self, address: &Address, esdt_token_name: &[u8], value: &BigUint) {
-        let account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Receiver account not found"));
+		let esdt_balance = esdt
+			.get_mut(esdt_token_name)
+			.unwrap_or_else(|| panic!("Account has no esdt tokens with that name"));
 
-        if account.esdt.is_none() {
-            let mut new_esdt = HashMap::<Vec<u8>, BigUint>::new();
-            new_esdt.insert(esdt_token_name.to_vec(), value.clone());
+		assert!(*esdt_balance >= *value, "Not enough esdt balance");
+		*esdt_balance -= value;
+	}
 
-            account.esdt = Some(new_esdt);
-        }
-        else {
-            let esdt =  account.esdt.as_mut().unwrap();
+	pub fn increase_esdt_balance(
+		&mut self,
+		address: &Address,
+		esdt_token_name: &[u8],
+		value: &BigUint,
+	) {
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Receiver account not found"));
 
-            if esdt.contains_key(esdt_token_name) {
-                let esdt_balance = esdt.get_mut(esdt_token_name).unwrap();
-                *esdt_balance += value;
-            }
-            else {
-                esdt.insert(esdt_token_name.to_vec(), value.clone());
-            }
-        }
-    }
+		if account.esdt.is_none() {
+			let mut new_esdt = HashMap::<Vec<u8>, BigUint>::new();
+			new_esdt.insert(esdt_token_name.to_vec(), value.clone());
 
-    pub fn increase_nonce(&mut self, address: &Address) {
-        let account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Account not found"));
-        account.nonce += 1;
-    }
+			account.esdt = Some(new_esdt);
+		} else {
+			let esdt = account.esdt.as_mut().unwrap();
 
-    pub fn create_account_after_deploy(&mut self,
-        tx_input: &TxInput,
-        new_storage: HashMap<Vec<u8>, Vec<u8>>,
-        contract_path: Vec<u8>) -> Address {
+			if esdt.contains_key(esdt_token_name) {
+				let esdt_balance = esdt.get_mut(esdt_token_name).unwrap();
+				*esdt_balance += value;
+			} else {
+				esdt.insert(esdt_token_name.to_vec(), value.clone());
+			}
+		}
+	}
 
-        let sender = self.accounts.get(&tx_input.from)
-            .unwrap_or_else(|| panic!("Unknown deployer"));
-        let sender_nonce_before_tx = sender.nonce - 1;
-        let new_address = self.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
-            .unwrap_or_else(|| panic!("Missing new address. Only explicit new deploy addresses supported"));
-        let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
-        let mut esdt_opt: Option<HashMap<Vec<u8>, BigUint>> = None;
-        
-        if tx_input.esdt_token_name.is_some()
-        {
-            esdt.insert(tx_input.esdt_token_name.clone().unwrap(), tx_input.esdt_value.clone());
-            esdt_opt = Some(esdt);
-        }
+	pub fn increase_nonce(&mut self, address: &Address) {
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Account not found"));
+		account.nonce += 1;
+	}
 
-        let old_value = self.accounts.insert(new_address.clone(), AccountData{
-            address: new_address.clone(),
-            nonce: 0,
-            balance: tx_input.call_value.clone(),
-            storage: new_storage,
-            esdt: esdt_opt,
-            contract_path: Some(contract_path),
-            contract_owner: Some(tx_input.from.clone()),
-        });
-        if old_value.is_some() {
-            panic!("Account already exists at deploy address.");
-        }
+	pub fn create_account_after_deploy(
+		&mut self,
+		tx_input: &TxInput,
+		new_storage: HashMap<Vec<u8>, Vec<u8>>,
+		contract_path: Vec<u8>,
+	) -> Address {
+		let sender = self
+			.accounts
+			.get(&tx_input.from)
+			.unwrap_or_else(|| panic!("Unknown deployer"));
+		let sender_nonce_before_tx = sender.nonce - 1;
+		let new_address = self
+			.get_new_address(tx_input.from.clone(), sender_nonce_before_tx)
+			.unwrap_or_else(|| {
+				panic!("Missing new address. Only explicit new deploy addresses supported")
+			});
+		let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
+		let mut esdt_opt: Option<HashMap<Vec<u8>, BigUint>> = None;
 
-        new_address
-    }
+		if tx_input.esdt_token_name.is_some() {
+			esdt.insert(
+				tx_input.esdt_token_name.clone().unwrap(),
+				tx_input.esdt_value.clone(),
+			);
+			esdt_opt = Some(esdt);
+		}
 
-    pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
-        let account = self.accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Account not found"));
-        account.balance += amount;
-        let mut storage_v_rew = if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY){
-            BigUint::from_bytes_be(old_storage_value)
-        } else {
-            BigUint::zero()
-        };
-        storage_v_rew += amount;
-        account.storage.insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
-    }
+		let old_value = self.accounts.insert(
+			new_address.clone(),
+			AccountData {
+				address: new_address.clone(),
+				nonce: 0,
+				balance: tx_input.call_value.clone(),
+				storage: new_storage,
+				esdt: esdt_opt,
+				contract_path: Some(contract_path),
+				contract_owner: Some(tx_input.from.clone()),
+			},
+		);
+		if old_value.is_some() {
+			panic!("Account already exists at deploy address.");
+		}
+
+		new_address
+	}
+
+	pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Account not found"));
+		account.balance += amount;
+		let mut storage_v_rew =
+			if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY) {
+				BigUint::from_bytes_be(old_storage_value)
+			} else {
+				BigUint::zero()
+			};
+		storage_v_rew += amount;
+		account
+			.storage
+			.insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
+	}
 }
 
 pub fn execute_tx(

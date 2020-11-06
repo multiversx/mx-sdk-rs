@@ -72,9 +72,12 @@ impl fmt::Display for BigUintValue {
 }
 
 impl Default for BigUintValue {
-    fn default() -> Self {
-        BigUintValue { original: ValueSubTree::default(), value: BigUint::from(0u32) }
-    }
+	fn default() -> Self {
+		BigUintValue {
+			original: ValueSubTree::default(),
+			value: BigUint::from(0u32),
+		}
+	}
 }
 
 #[derive(Debug)]
