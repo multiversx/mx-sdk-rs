@@ -208,18 +208,25 @@ impl BlockchainMock {
 		let sender_account = self
 			.accounts
 			.get_mut(address)
-			.unwrap_or_else(|| panic!("Sender account not found"));
+			.unwrap_or_else(|| panic!("Sender account {} not found", 
+			address_hex(&address)));
 
 		let esdt = sender_account
 			.esdt
 			.as_mut()
-			.unwrap_or_else(|| panic!("Account has no esdt tokens"));
-
+			.unwrap_or_else(|| panic!("Account {} has no esdt tokens", 
+			address_hex(&address)));
+		
 		let esdt_balance = esdt
 			.get_mut(esdt_token_name)
-			.unwrap_or_else(|| panic!("Account has no esdt tokens with that name"));
+			.unwrap_or_else(|| panic!("Account {} has no esdt tokens with name {}", 
+			address_hex(&address),
+			String::from_utf8(esdt_token_name.to_vec()).unwrap()));
 
-		assert!(*esdt_balance >= *value, "Not enough esdt balance");
+		assert!(*esdt_balance >= *value, "Not enough esdt balance, have {}, need at least {}", 
+			esdt_balance,
+			value);
+
 		*esdt_balance -= value;
 	}
 
