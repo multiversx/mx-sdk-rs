@@ -213,9 +213,6 @@ fn execute_sc_call(
     let esdt_value = tx_input.esdt_value.clone();
     let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
 
-    state.subtract_tx_payment(&from, &call_value);
-    state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
-
     if esdt_used {
         state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
     }
@@ -278,9 +275,6 @@ fn execute_sc_create(
     let esdt_token_name = tx_input.esdt_token_name.clone().unwrap_or_default();
     let esdt_value = tx_input.esdt_value.clone();
     let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
-
-    state.subtract_tx_payment(&from, &call_value);
-    state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     if esdt_used {
         state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
