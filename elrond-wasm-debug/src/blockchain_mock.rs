@@ -1,18 +1,15 @@
-
-
-
-use elrond_wasm::{H256, Address};
+use elrond_wasm::{Address, H256};
 
 use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
 use crate::contract_map::*;
-use crate::ext_mock::*;
 use crate::display_util::*;
+use crate::ext_mock::*;
 
-use elrond_wasm::ContractHookApi;
-use elrond_wasm::CallableContract;
-use elrond_wasm::BigUintApi;
 use elrond_wasm::err_msg;
+use elrond_wasm::BigUintApi;
+use elrond_wasm::CallableContract;
+use elrond_wasm::ContractHookApi;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{cast::ToPrimitive, Zero};
@@ -24,8 +21,8 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Write;
 
-use core::cell::RefCell;
 use alloc::rc::Rc;
+use core::cell::RefCell;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
@@ -70,28 +67,28 @@ impl fmt::Display for AccountData {
 
 #[derive(Clone, Debug)]
 pub struct BlockInfo {
-    pub block_timestamp: u64,
-    pub block_nonce: u64,
-    pub block_round: u64,
-    pub block_epoch: u64,
+	pub block_timestamp: u64,
+	pub block_nonce: u64,
+	pub block_round: u64,
+	pub block_epoch: u64,
 }
 
 impl BlockInfo {
-    pub fn new() -> Self {
-        BlockInfo {
-            block_timestamp: 0,
-            block_nonce: 0,
-            block_round: 0,
-            block_epoch: 0,
-        }
-    }
+	pub fn new() -> Self {
+		BlockInfo {
+			block_timestamp: 0,
+			block_nonce: 0,
+			block_round: 0,
+			block_epoch: 0,
+		}
+	}
 }
 
 pub struct BlockchainMock {
-    pub accounts: HashMap<Address, AccountData>,
-    pub new_addresses: HashMap<(Address, u64), Address>,
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
+	pub accounts: HashMap<Address, AccountData>,
+	pub new_addresses: HashMap<(Address, u64), Address>,
+	pub previous_block_info: BlockInfo,
+	pub current_block_info: BlockInfo,
 }
 
 impl BlockchainMock {
@@ -266,33 +263,33 @@ impl BlockchainMock {
 }
 
 pub fn execute_tx(
-    tx_context: TxContext,
-    contract_identifier: &Vec<u8>,
-    contract_map: &ContractMap<TxContext>) -> TxOutput {
-
-    let func_name = tx_context.tx_input.func_name.clone();
-    let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        contract_inst.call(func_name.as_slice());
-        let context = contract_inst.into_api();
-        context.into_output()
-    }));
-    match result {
-        Ok(tx_result) => tx_result,
-        Err(panic_any) => panic_result(panic_any),
-    }
+	tx_context: TxContext,
+	contract_identifier: &Vec<u8>,
+	contract_map: &ContractMap<TxContext>,
+) -> TxOutput {
+	let func_name = tx_context.tx_input_box.func_name.clone();
+	let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
+	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+		contract_inst.call(func_name.as_slice());
+		let context = contract_inst.into_api();
+		context.into_output()
+	}));
+	match result {
+		Ok(tx_result) => tx_result,
+		Err(panic_any) => panic_result(panic_any),
+	}
 }
 
 fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
-    if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
-        return TxOutput::from_panic_obj(panic_obj);
-    }
+	if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
+		return TxOutput::from_panic_obj(panic_obj);
+	}
 
-    if let Some(panic_string) = panic_any.downcast_ref::<String>() {
-        return TxOutput::from_panic_string(panic_string.as_str());
-    }
+	if let Some(panic_string) = panic_any.downcast_ref::<String>() {
+		return TxOutput::from_panic_string(panic_string.as_str());
+	}
 
-    panic!("panic happened: unknown type.")
+	panic!("panic happened: unknown type.")
 }
 
 /// Some data to get copied for the tx.
@@ -300,28 +297,28 @@ fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutp
 /// but for now, copying some data is enough.
 #[derive(Clone, Debug)]
 pub struct BlockchainTxInfo {
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
-    pub contract_balance: BigUint,
-    pub contract_owner: Option<Address>
+	pub previous_block_info: BlockInfo,
+	pub current_block_info: BlockInfo,
+	pub contract_balance: BigUint,
+	pub contract_owner: Option<Address>,
 }
 
 impl BlockchainMock {
-    pub fn create_tx_info(&self, contract_address: &Address) -> BlockchainTxInfo {
-        if let Some(contract) = self.accounts.get(contract_address) {
-            BlockchainTxInfo {
-                previous_block_info: self.previous_block_info.clone(),
-                current_block_info: self.current_block_info.clone(),
-                contract_balance: contract.balance.clone(),
-                contract_owner: contract.contract_owner.clone(),
-            }
-        } else {
-            BlockchainTxInfo {
-                previous_block_info: self.previous_block_info.clone(),
-                current_block_info: self.current_block_info.clone(),
-                contract_balance: 0u32.into(),
-                contract_owner: None,
-            }
-        }
-    }
+	pub fn create_tx_info(&self, contract_address: &Address) -> BlockchainTxInfo {
+		if let Some(contract) = self.accounts.get(contract_address) {
+			BlockchainTxInfo {
+				previous_block_info: self.previous_block_info.clone(),
+				current_block_info: self.current_block_info.clone(),
+				contract_balance: contract.balance.clone(),
+				contract_owner: contract.contract_owner.clone(),
+			}
+		} else {
+			BlockchainTxInfo {
+				previous_block_info: self.previous_block_info.clone(),
+				current_block_info: self.current_block_info.clone(),
+				contract_balance: 0u32.into(),
+				contract_owner: None,
+			}
+		}
+	}
 }

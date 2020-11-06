@@ -35,7 +35,7 @@
             },
             "expect": {
                 "out": [],
-                "status": "10",
+                "status": "*",
                 "message": "str:failed transfer (insufficient funds)",
                 "logs": []
             }
