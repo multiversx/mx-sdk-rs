@@ -12,9 +12,18 @@ pub fn generate_load_single_arg(
 			if type_reference.mutability.is_some() {
 				panic!("Mutable references not supported as contract method arguments");
 			}
-			let referenced_type = &*type_reference.elem;
-			quote! {
-				& elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(self.api.clone(), #arg_index_expr, #arg_name_expr)
+			if let syn::Type::Slice(slice_type) = &*type_reference.elem {
+				// deserialize as boxed slice, so we have an owned object that we can reference
+				let slice_elem = &slice_type.elem;
+				quote! {
+					elrond_wasm::load_single_arg::<T, BigInt, BigUint, Box<[#slice_elem]>>(self.api.clone(), #arg_index_expr, #arg_name_expr)
+				}
+			} else {
+				// deserialize as owned object, so we can then have a reference to it
+				let referenced_type = &*type_reference.elem;
+				quote! {
+					elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(self.api.clone(), #arg_index_expr, #arg_name_expr)
+				}
 			}
 		},
 		_ => {
