@@ -135,8 +135,11 @@ fn parse_execute_mandos_steps(
 							);
 							tx_result = merge_results(tx_result, async_result.clone());
 
-							let callback_input =
-								async_callback_tx_input(&async_data, &contract_address, &async_result);
+							let callback_input = async_callback_tx_input(
+								&async_data,
+								&contract_address,
+								&async_result,
+							);
 							let (callback_result, opt_more_async) =
 								execute_sc_call(callback_input, state, contract_map);
 							assert!(
@@ -252,11 +255,11 @@ fn execute_sc_call(
 		.get_mut(&to)
 		.unwrap_or_else(|| panic!("Recipient account not found: {}", address_hex(&to)));
 
-    let contract_path = &contract_account
+	let contract_path = &contract_account
 		.contract_path
 		.clone()
-        .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
-    
+		.unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
+
 	let tx_context = TxContext::new(
 		blockchain_info,
 		tx_input,
@@ -266,8 +269,8 @@ fn execute_sc_call(
 			send_balance_list: Vec::new(),
 			async_call: None,
 		},
-    );
-    
+	);
+
 	let tx_output = execute_tx(tx_context, contract_path, contract_map);
 	let tx_result = tx_output.result;
 
