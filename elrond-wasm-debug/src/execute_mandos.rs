@@ -209,11 +209,6 @@ fn execute_sc_call(
 	state.subtract_tx_payment(&from, &call_value);
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let contract_account = state
-		.accounts
-		.get_mut(&to)
-		.unwrap_or_else(|| panic!("Recipient account not found: {}", address_hex(&to)));
-
     let esdt_token_name = tx_input.esdt_token_name.clone().unwrap_or_default();
     let esdt_value = tx_input.esdt_value.clone();
     let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
@@ -240,7 +235,8 @@ fn execute_sc_call(
 			send_balance_list: Vec::new(),
 			async_call: None,
 		},
-	);
+    );
+    let contract_path = contract_account.contract_path.as_ref().unwrap();
 	let tx_output = execute_tx(tx_context, contract_path, contract_map);
 	let tx_result = tx_output.result;
 
