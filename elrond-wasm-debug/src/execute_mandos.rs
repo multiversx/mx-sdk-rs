@@ -439,7 +439,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 						.unwrap_or(default_value);
 					assert!(
 						expected_value.check(actual_value),
-						"bad esdt value value. Address: {}. Token Name: {}. Want: {}. Have: {}",
+						"bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
 						expected_address,
 						expected_key,
 						expected_value,
