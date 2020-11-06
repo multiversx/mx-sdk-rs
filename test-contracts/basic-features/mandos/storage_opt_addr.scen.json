@@ -7,7 +7,9 @@
                 "address:features_contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "``opt_addr": ["1", "``____________address_too_long____________"]
+                    },
                     "code": "file:../output/features.wasm"
                 },
                 "address:an_account": {
@@ -16,6 +18,27 @@
                     "storage": {},
                     "code": ""
                 }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "load-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "load_opt_addr",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:storage decode error: input too long",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -76,6 +99,26 @@
         },
         {
             "step": "scCall",
+            "txId": "is-empty-false",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "is_empty_opt_addr",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "false" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
             "txId": "store-empty",
             "tx": {
                 "from": "address:an_account",
@@ -89,6 +132,26 @@
             },
             "expect": {
                 "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "is-empty-true",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "is_empty_opt_addr",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "true" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
