@@ -120,7 +120,7 @@ pub trait Crowdfunding {
 
 				let esdt_token_name = self.get_cf_esdt_token_name();
 				let esdt_balance = self.get_esdt_balance();
-				
+
 				self.set_esdt_balance(&BigUint::zero());
 				self.pay_esdt(&esdt_token_name, &esdt_balance, &caller);
 
@@ -146,16 +146,16 @@ pub trait Crowdfunding {
 	}
 
 	fn pay_esdt(&self, esdt_token_name: &Vec<u8>, amount: &BigUint, to: &Address) {
-        let mut data = Vec::<u8>::new();
+		let mut data = Vec::<u8>::new();
 
-        data.append(ESDT_TRANSFER_STRING.as_bytes().to_vec().as_mut());
-        data.push('@' as u8);
-        data.append(esdt_token_name.clone().as_mut());
-        data.push('@' as u8);
-        data.append(amount.to_bytes_be().as_mut());
+		data.append(ESDT_TRANSFER_STRING.as_bytes().to_vec().as_mut());
+		data.push('@' as u8);
+		data.append(esdt_token_name.clone().as_mut());
+		data.push('@' as u8);
+		data.append(amount.to_bytes_be().as_mut());
 
-        self.async_call(&to, &BigUint::zero(), &data);
-    }
+		self.async_call(&to, &BigUint::zero(), &data);
+	}
 }
 
 use elrond_wasm::elrond_codec::*;
