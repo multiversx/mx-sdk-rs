@@ -3,7 +3,7 @@
 
 imports!();
 
-const ESDT_TRANSFER_STRING: &str = "ESDTTransfer";
+const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Status {
@@ -145,14 +145,12 @@ pub trait Crowdfunding {
 		}
 	}
 
-	fn pay_esdt(&self, esdt_token_name: &Vec<u8>, amount: &BigUint, to: &Address) {
-		let mut data = Vec::<u8>::new();
-
-		data.append(ESDT_TRANSFER_STRING.as_bytes().to_vec().as_mut());
-		data.push('@' as u8);
-		data.append(esdt_token_name.clone().as_mut());
-		data.push('@' as u8);
-		data.append(amount.to_bytes_be().as_mut());
+	fn pay_esdt(&self, esdt_token_name: &[u8], amount: &BigUint, to: &Address) {
+		let mut data = ESDT_TRANSFER_STRING.to_vec();
+		data.push(b'@');
+		data.extend_from_slice(esdt_token_name);
+		data.push(b'@');
+		data.extend_from_slice(amount.to_bytes_be().as_slice());
 
 		self.async_call(&to, &BigUint::zero(), &data);
 	}
