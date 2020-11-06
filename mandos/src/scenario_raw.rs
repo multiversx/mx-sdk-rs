@@ -158,11 +158,11 @@ pub struct TxCallRaw {
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_token_name: Option<ValueSubTree>,
+	pub esdt_value: Option<ValueSubTree>,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_value: Option<ValueSubTree>,
+	pub esdt_token_name: Option<ValueSubTree>,
 
 	pub function: String,
 
@@ -205,11 +205,11 @@ pub struct TxTransferRaw {
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_token_name: Option<ValueSubTree>,
+	pub esdt_value: Option<ValueSubTree>,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_value: Option<ValueSubTree>,
+	pub esdt_token_name: Option<ValueSubTree>,
 }
 
 #[derive(Serialize, Deserialize)]
