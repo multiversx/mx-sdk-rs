@@ -1,4 +1,4 @@
-use elrond_wasm::{Address, H256};
+use elrond_wasm::{Address, BoxedBytes, H256};
 
 use crate::async_data::*;
 use crate::big_int_mock::*;
@@ -450,8 +450,8 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 		self.tx_input_box.args[arg_idx_usize].clone()
 	}
 
-	fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
-		self.get_argument_vec_u8(arg_index).into_boxed_slice()
+	fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
+		self.get_argument_vec_u8(arg_index).into()
 	}
 
 	fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {

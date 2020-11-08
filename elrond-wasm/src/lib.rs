@@ -56,8 +56,8 @@ where
 
 	fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8>;
 
-	fn storage_load_boxed_slice_u8(&self, key: &[u8]) -> Box<[u8]> {
-		self.storage_load_vec_u8(key).into_boxed_slice()
+	fn storage_load_boxed_bytes(&self, key: &[u8]) -> BoxedBytes {
+		self.storage_load_vec_u8(key).into()
 	}
 
 	fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]);
@@ -145,8 +145,8 @@ pub trait ContractIOApi<BigInt, BigUint>: Clone {
 
 	fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8>;
 
-	fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
-		self.get_argument_vec_u8(arg_index).into_boxed_slice()
+	fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
+		self.get_argument_vec_u8(arg_index).into()
 	}
 
 	fn get_argument_big_int(&self, arg_id: i32) -> BigInt;
