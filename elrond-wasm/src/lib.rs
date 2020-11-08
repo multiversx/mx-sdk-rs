@@ -149,12 +149,6 @@ pub trait ContractIOApi<BigInt, BigUint>: Clone {
 		self.get_argument_vec_u8(arg_index).into_boxed_slice()
 	}
 
-	fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32];
-
-	fn get_argument_address(&self, arg_index: i32) -> Address {
-		self.get_argument_bytes32(arg_index).into()
-	}
-
 	fn get_argument_big_int(&self, arg_id: i32) -> BigInt;
 
 	fn get_argument_big_uint(&self, arg_id: i32) -> BigUint;
@@ -164,8 +158,6 @@ pub trait ContractIOApi<BigInt, BigUint>: Clone {
 	fn get_argument_i64(&self, arg_id: i32) -> i64;
 
 	fn finish_slice_u8(&self, slice: &[u8]);
-
-	fn finish_bytes32(&self, bytes: &[u8; 32]);
 
 	fn finish_big_int(&self, b: &BigInt);
 

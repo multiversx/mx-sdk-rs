@@ -454,14 +454,6 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 		self.get_argument_vec_u8(arg_index).into_boxed_slice()
 	}
 
-	fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
-		let arg = self.get_argument_vec_u8(arg_index);
-		let mut res = [0u8; 32];
-		let offset = 32 - arg.len();
-		res[offset..].copy_from_slice(&arg[..]);
-		res
-	}
-
 	fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
 		let bytes = self.get_argument_vec_u8(arg_index);
 		RustBigInt::from_signed_bytes_be(&bytes)
@@ -503,10 +495,6 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 		v.copy_from_slice(slice);
 		let mut tx_output = self.tx_output_cell.borrow_mut();
 		tx_output.result.result_values.push(v)
-	}
-
-	fn finish_bytes32(&self, bytes: &[u8; 32]) {
-		self.finish_slice_u8(&*bytes);
 	}
 
 	fn finish_big_int(&self, bi: &RustBigInt) {
