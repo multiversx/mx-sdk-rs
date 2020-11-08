@@ -285,9 +285,9 @@ impl BlockchainMock {
 		let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
 		let mut esdt_opt: Option<HashMap<Vec<u8>, BigUint>> = None;
 
-		if tx_input.esdt_token_name.is_some() {
+		if !tx_input.esdt_token_name.is_empty() {
 			esdt.insert(
-				tx_input.esdt_token_name.clone().unwrap(),
+				tx_input.esdt_token_name.clone(),
 				tx_input.esdt_value.clone(),
 			);
 			esdt_opt = Some(esdt);

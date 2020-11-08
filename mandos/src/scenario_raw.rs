@@ -157,8 +157,8 @@ pub struct TxCallRaw {
 	pub value: ValueSubTree,
 
 	#[serde(default)]
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_value: Option<ValueSubTree>,
+	#[serde(skip_serializing_if = "ValueSubTree::is_empty_string")]
+	pub esdt_value: ValueSubTree,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
@@ -180,8 +180,8 @@ pub struct TxDeployRaw {
 	pub value: ValueSubTree,
 
 	#[serde(default)]
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_value: Option<ValueSubTree>,
+	#[serde(skip_serializing_if = "ValueSubTree::is_empty_string")]
+	pub esdt_value: ValueSubTree,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
@@ -204,8 +204,8 @@ pub struct TxTransferRaw {
 	pub value: ValueSubTree,
 
 	#[serde(default)]
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub esdt_value: Option<ValueSubTree>,
+	#[serde(skip_serializing_if = "ValueSubTree::is_empty_string")]
+	pub esdt_value: ValueSubTree,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]

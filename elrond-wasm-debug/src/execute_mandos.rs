@@ -101,14 +101,8 @@ fn parse_execute_mandos_steps(
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),
 					call_value: tx.call_value.value.clone(),
-					esdt_value: tx
-						.esdt_value
-						.as_ref()
-						.map_or(BigUint::from(0u32), |val| val.value.clone()),
-					esdt_token_name: tx
-						.esdt_token_name
-						.as_ref()
-						.map(|name| name.as_bytes().to_vec()),
+					esdt_value: tx.esdt_value.value.clone(),
+					esdt_token_name: tx.esdt_token_name.value.clone(),
 					func_name: tx.function.as_bytes().to_vec(),
 					args: tx
 						.arguments
@@ -176,14 +170,8 @@ fn parse_execute_mandos_steps(
 					from: tx.from.value.into(),
 					to: H256::zero(),
 					call_value: tx.call_value.value.clone(),
-					esdt_value: tx
-						.esdt_value
-						.as_ref()
-						.map_or(BigUint::from(0u32), |val| val.value.clone()),
-					esdt_token_name: tx
-						.esdt_token_name
-						.as_ref()
-						.map(|name| name.as_bytes().to_vec()),
+					esdt_value: tx.esdt_value.value.clone(),
+					esdt_token_name: tx.esdt_token_name.value.clone(),
 					func_name: b"init".to_vec(),
 					args: tx
 						.arguments
@@ -207,13 +195,16 @@ fn parse_execute_mandos_steps(
 				state.subtract_tx_payment(sender_address, &tx.value.value);
 				let recipient_address = &tx.to.value.into();
 				state.increase_balance(recipient_address, &tx.value.value);
+				let esdt_token_name = tx.esdt_token_name.value.clone();
+				let esdt_value = tx.esdt_value.value.clone();
 
-				if tx.esdt_token_name.is_some() && tx.esdt_value.is_some() {
-					let esdt_token_name = tx.esdt_token_name.as_ref().unwrap().as_bytes();
-					let esdt_value = &tx.esdt_value.as_ref().unwrap().value;
-
-					state.substract_esdt_balance(sender_address, esdt_token_name, esdt_value);
-					state.increase_esdt_balance(recipient_address, esdt_token_name, esdt_value);
+				if !esdt_token_name.is_empty() && esdt_value > 0u32.into() {
+					state.substract_esdt_balance(sender_address, &esdt_token_name[..], &esdt_value);
+					state.increase_esdt_balance(
+						recipient_address,
+						&esdt_token_name[..],
+						&esdt_value,
+					);
 				}
 			},
 			Step::ValidatorReward { tx_id, comment, tx } => {
@@ -242,7 +233,7 @@ fn execute_sc_call(
 	state.subtract_tx_payment(&from, &call_value);
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let esdt_token_name = tx_input.esdt_token_name.clone().unwrap_or_default();
+	let esdt_token_name = tx_input.esdt_token_name.clone();
 	let esdt_value = tx_input.esdt_value.clone();
 	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
 
@@ -309,7 +300,7 @@ fn execute_sc_create(
 	state.subtract_tx_payment(&from, &call_value);
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let esdt_token_name = tx_input.esdt_token_name.clone().unwrap_or_default();
+	let esdt_token_name = tx_input.esdt_token_name.clone();
 	let esdt_value = tx_input.esdt_value.clone();
 	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
 
