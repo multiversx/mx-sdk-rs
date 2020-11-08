@@ -18,6 +18,11 @@ fn block_info() {
 }
 
 #[test]
+fn boxed_bytes_zeros() {
+	parse_execute_mandos("mandos/boxed_bytes_zeros.scen.json", &contract_map());
+}
+
+#[test]
 fn count_ones() {
 	parse_execute_mandos("mandos/count_ones.scen.json", &contract_map());
 }

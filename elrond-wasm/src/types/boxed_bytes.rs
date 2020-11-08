@@ -1,4 +1,6 @@
+use alloc::alloc::{alloc, alloc_zeroed, Layout};
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 use elrond_codec::*;
 
 /// Simple wrapper around a boxed byte slice,
@@ -11,9 +13,35 @@ impl BoxedBytes {
 		BoxedBytes(Box::from([0u8; 0]))
 	}
 
+	pub fn zeros(len: usize) -> Self {
+		unsafe {
+			let layout = Layout::from_size_align(len, core::mem::align_of::<u8>()).unwrap();
+			let bytes_ptr = alloc_zeroed(layout);
+			let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(bytes_ptr, len));
+			BoxedBytes(bytes_box)
+		}
+	}
+
+	pub unsafe fn allocate(len: usize) -> Self {
+		let layout = Layout::from_size_align(len, core::mem::align_of::<u8>()).unwrap();
+		let bytes_ptr = alloc(layout);
+		let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(bytes_ptr, len));
+		BoxedBytes(bytes_box)
+	}
+
+	#[inline]
+	pub fn as_mut_ptr(&mut self) -> *mut u8 {
+		self.0.as_mut_ptr()
+	}
+
 	#[inline]
 	pub fn len(&self) -> usize {
 		self.0.len()
+	}
+
+	#[inline]
+	pub fn into_box(self) -> Box<[u8]> {
+		self.0
 	}
 }
 
@@ -28,6 +56,13 @@ impl<'a> From<&'a [u8]> for BoxedBytes {
 	#[inline]
 	fn from(byte_slice: &'a [u8]) -> Self {
 		BoxedBytes(Box::from(byte_slice))
+	}
+}
+
+impl From<Vec<u8>> for BoxedBytes {
+	#[inline]
+	fn from(v: Vec<u8>) -> Self {
+		BoxedBytes(v.into_boxed_slice())
 	}
 }
 

@@ -779,6 +779,13 @@ pub trait BasicFeatures {
 		h1 == h2
 	}
 
+	// BOXED BYTES
+
+	#[endpoint]
+	fn boxed_bytes_zeros(&self, len: usize) -> BoxedBytes {
+		BoxedBytes::zeros(len)
+	}
+
 	// NON ZERO EXTRA
 
 	#[view]

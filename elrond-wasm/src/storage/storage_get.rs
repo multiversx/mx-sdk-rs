@@ -42,7 +42,7 @@ where
 	}
 
 	fn into_boxed_slice_u8(self) -> Box<[u8]> {
-		self.api.storage_load_boxed_slice_u8(self.key)
+		self.api.storage_load_boxed_bytes(self.key).into_box()
 	}
 
 	fn into_u64(self) -> u64 {
