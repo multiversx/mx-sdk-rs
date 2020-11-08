@@ -322,7 +322,7 @@ macro_rules! imports {
 			AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi, ContractIOApi,
 			OtherContractHandle,
 		};
-		use elrond_wasm::{BorrowedMutStorage, Box, Queue, String, VarArgs, Vec};
+		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, String, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
 	};
 }

@@ -83,6 +83,11 @@ fn echo_vec_u8() {
 }
 
 #[test]
+fn echo_boxed_bytes() {
+	parse_execute_mandos("mandos/echo_boxed_bytes.scen.json", &contract_map());
+}
+
+#[test]
 fn panic() {
 	parse_execute_mandos("mandos/panic.scen.json", &contract_map());
 }

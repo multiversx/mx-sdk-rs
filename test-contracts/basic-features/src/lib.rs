@@ -109,6 +109,12 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
+	fn echo_boxed_bytes(&self, arg: BoxedBytes) -> MultiResult2<BoxedBytes, usize> {
+		let l = arg.len();
+		(arg, l).into()
+	}
+
+	#[endpoint]
 	fn echo_slice_u8<'s>(&self, slice: &'s [u8]) -> MultiResult2<&'s [u8], usize> {
 		let l = slice.len();
 		(slice, l).into()
