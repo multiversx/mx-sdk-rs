@@ -188,13 +188,24 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
 	}
 }
 
+fn interpret_esdt_token_name(
+	esdt_token_name: Option<ValueSubTree>,
+	context: &InterpreterContext,
+) -> BytesValue {
+	if let Some(esdt_token_name_raw) = esdt_token_name {
+		BytesValue::interpret_from(esdt_token_name_raw, context)
+	} else {
+		BytesValue::empty()
+	}
+}
+
 #[derive(Debug)]
 pub struct TxCall {
 	pub from: AddressValue,
 	pub to: AddressValue,
 	pub call_value: BigUintValue,
-	pub esdt_value: Option<BigUintValue>,
-	pub esdt_token_name: Option<String>,
+	pub esdt_value: BigUintValue,
+	pub esdt_token_name: BytesValue,
 	pub function: String,
 	pub arguments: Vec<BytesValue>,
 	pub gas_limit: U64Value,
@@ -207,10 +218,8 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
 			from: AddressValue::interpret_from(from.from, context),
 			to: AddressValue::interpret_from(from.to, context),
 			call_value: BigUintValue::interpret_from(from.value, context),
-			esdt_value: from
-				.esdt_value
-				.map(|val| BigUintValue::interpret_from(val, context)),
-			esdt_token_name: from.esdt_token_name.map(|name| name.to_string()),
+			esdt_value: BigUintValue::interpret_from(from.esdt_value, context),
+			esdt_token_name: interpret_esdt_token_name(from.esdt_token_name, context),
 			function: from.function,
 			arguments: from
 				.arguments
@@ -227,8 +236,8 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
 pub struct TxDeploy {
 	pub from: AddressValue,
 	pub call_value: BigUintValue,
-	pub esdt_value: Option<BigUintValue>,
-	pub esdt_token_name: Option<String>,
+	pub esdt_value: BigUintValue,
+	pub esdt_token_name: BytesValue,
 	pub contract_code: BytesValue,
 	pub arguments: Vec<BytesValue>,
 	pub gas_limit: U64Value,
@@ -240,10 +249,8 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
 		TxDeploy {
 			from: AddressValue::interpret_from(from.from, context),
 			call_value: BigUintValue::interpret_from(from.value, context),
-			esdt_value: from
-				.esdt_value
-				.map(|val| BigUintValue::interpret_from(val, context)),
-			esdt_token_name: from.esdt_token_name.map(|name| name.to_string()),
+			esdt_value: BigUintValue::interpret_from(from.esdt_value, context),
+			esdt_token_name: interpret_esdt_token_name(from.esdt_token_name, context),
 			contract_code: BytesValue::interpret_from(from.contract_code, context),
 			arguments: from
 				.arguments
@@ -261,8 +268,8 @@ pub struct TxTransfer {
 	pub from: AddressValue,
 	pub to: AddressValue,
 	pub value: BigUintValue,
-	pub esdt_value: Option<BigUintValue>,
-	pub esdt_token_name: Option<String>,
+	pub esdt_value: BigUintValue,
+	pub esdt_token_name: BytesValue,
 }
 
 impl InterpretableFrom<TxTransferRaw> for TxTransfer {
@@ -271,10 +278,8 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
 			from: AddressValue::interpret_from(from.from, context),
 			to: AddressValue::interpret_from(from.to, context),
 			value: BigUintValue::interpret_from(from.value, context),
-			esdt_value: from
-				.esdt_value
-				.map(|val| BigUintValue::interpret_from(val, context)),
-			esdt_token_name: from.esdt_token_name.map(|name| name.to_string()),
+			esdt_value: BigUintValue::interpret_from(from.esdt_value, context),
+			esdt_token_name: interpret_esdt_token_name(from.esdt_token_name, context),
 		}
 	}
 }

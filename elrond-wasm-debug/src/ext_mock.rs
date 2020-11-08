@@ -37,7 +37,7 @@ pub struct TxInput {
 	pub to: Address,
 	pub call_value: BigUint,
 	pub esdt_value: BigUint,
-	pub esdt_token_name: Option<Vec<u8>>,
+	pub esdt_token_name: Vec<u8>,
 	pub func_name: Vec<u8>,
 	pub args: Vec<Vec<u8>>,
 	pub gas_limit: u64,
@@ -186,7 +186,7 @@ impl TxContext {
 				to: Address::zero(),
 				call_value: 0u32.into(),
 				esdt_value: 0u32.into(),
-				esdt_token_name: None,
+				esdt_token_name: Vec::new(),
 				func_name: Vec::new(),
 				args: Vec::new(),
 				gas_limit: 0,
@@ -336,7 +336,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	}
 
 	#[inline]
-	fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+	fn get_esdt_token_name(&self) -> Vec<u8> {
 		self.tx_input_box.esdt_token_name.clone()
 	}
 

@@ -146,7 +146,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		}
 
 		#[inline]
-		fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+		fn get_esdt_token_name(&self) -> Vec<u8> {
 			self.api.get_esdt_token_name()
 		}
 

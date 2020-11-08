@@ -72,7 +72,7 @@ pub trait Crowdfunding {
 		}
 
 		let expected_token_name = self.get_cf_esdt_token_name();
-		let actual_token_name = self.get_esdt_token_name().unwrap_or_default();
+		let actual_token_name = self.get_esdt_token_name();
 
 		if expected_token_name != actual_token_name {
 			return sc_error!("wrong esdt token");
