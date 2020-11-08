@@ -1,5 +1,5 @@
 use elrond_wasm::elrond_codec::*;
-use elrond_wasm::Vec;
+use elrond_wasm::{BoxedBytes, Vec};
 
 /// Copied from elrond-wasm serialization tests.
 pub struct SerExample1 {
@@ -8,6 +8,7 @@ pub struct SerExample1 {
 	pub another_byte: u8,
 	pub uint_32: u32,
 	pub uint_64: u64,
+	pub boxed_bytes: BoxedBytes,
 }
 
 impl NestedEncode for SerExample1 {
@@ -17,6 +18,7 @@ impl NestedEncode for SerExample1 {
 		self.another_byte.dep_encode(dest)?;
 		self.uint_32.dep_encode(dest)?;
 		self.uint_64.dep_encode(dest)?;
+		self.boxed_bytes.dep_encode(dest)?;
 		Ok(())
 	}
 
@@ -31,6 +33,7 @@ impl NestedEncode for SerExample1 {
 		self.another_byte.dep_encode_or_exit(dest, c.clone(), exit);
 		self.uint_32.dep_encode_or_exit(dest, c.clone(), exit);
 		self.uint_64.dep_encode_or_exit(dest, c.clone(), exit);
+		self.boxed_bytes.dep_encode_or_exit(dest, c.clone(), exit);
 	}
 }
 
@@ -59,6 +62,7 @@ impl NestedDecode for SerExample1 {
 			another_byte: u8::dep_decode(input)?,
 			uint_32: u32::dep_decode(input)?,
 			uint_64: u64::dep_decode(input)?,
+			boxed_bytes: BoxedBytes::dep_decode(input)?,
 		})
 	}
 
@@ -73,6 +77,7 @@ impl NestedDecode for SerExample1 {
 			another_byte: u8::dep_decode_or_exit(input, c.clone(), exit),
 			uint_32: u32::dep_decode_or_exit(input, c.clone(), exit),
 			uint_64: u64::dep_decode_or_exit(input, c.clone(), exit),
+			boxed_bytes: BoxedBytes::dep_decode_or_exit(input, c.clone(), exit),
 		}
 	}
 }
