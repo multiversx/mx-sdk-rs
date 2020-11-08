@@ -41,8 +41,18 @@ impl BoxedBytes {
 	}
 
 	#[inline]
+	pub fn is_empty(&self) -> bool {
+		self.0.is_empty()
+	}
+
+	#[inline]
 	pub fn into_box(self) -> Box<[u8]> {
 		self.0
+	}
+
+	#[inline]
+	pub fn as_slice(&self) -> &[u8] {
+		&*self.0
 	}
 
 	/// Create new instance by concatenating several byte slices.
@@ -55,7 +65,7 @@ impl BoxedBytes {
 		}
 		unsafe {
 			let layout = Layout::from_size_align(total_len, core::mem::align_of::<u8>()).unwrap();
-			let bytes_ptr = alloc_zeroed(layout);
+			let bytes_ptr = alloc(layout);
 			let mut current_index = 0usize;
 			for slice in slices.iter() {
 				core::ptr::copy_nonoverlapping(
@@ -188,5 +198,10 @@ mod tests {
 	fn test_concat_empty_2() {
 		let bb = BoxedBytes::from_concat(&[]);
 		assert_eq!(bb, BoxedBytes::from(&b""[..]));
+	}
+
+	#[test]
+	fn test_is_empty() {
+		assert!(BoxedBytes::empty().is_empty());
 	}
 }
