@@ -766,6 +766,13 @@ pub trait BasicFeatures {
 		r
 	}
 
+	// MORE H256
+
+	#[endpoint]
+	fn compare_h256(&self, h1: H256, h2: H256) -> bool {
+		h1 == h2
+	}
+
 	// NON ZERO EXTRA
 
 	#[view]
