@@ -6,6 +6,7 @@ use elrond_codec::*;
 /// Simple wrapper around a boxed byte slice,
 /// but with a lot of optimized methods for manipulating it.
 /// The focus is on readucing code size rather improving speed.
+#[derive(Clone, PartialEq, Debug)]
 pub struct BoxedBytes(Box<[u8]>);
 
 impl BoxedBytes {
@@ -42,6 +43,31 @@ impl BoxedBytes {
 	#[inline]
 	pub fn into_box(self) -> Box<[u8]> {
 		self.0
+	}
+
+	/// Create new instance by concatenating several byte slices.
+	pub fn from_concat(slices: &[&[u8]]) -> Self {
+		let mut total_len = 0usize;
+		let mut index = slices.len();
+		while index > 0 {
+			index -= 1;
+			total_len += slices[index].len();
+		}
+		unsafe {
+			let layout = Layout::from_size_align(total_len, core::mem::align_of::<u8>()).unwrap();
+			let bytes_ptr = alloc_zeroed(layout);
+			let mut current_index = 0usize;
+			for slice in slices.iter() {
+				core::ptr::copy_nonoverlapping(
+					slice.as_ptr(),
+					bytes_ptr.offset(current_index as isize),
+					slice.len(),
+				);
+				current_index += slice.len();
+			}
+			let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(bytes_ptr, total_len));
+			BoxedBytes(bytes_box)
+		}
 	}
 }
 
@@ -131,5 +157,36 @@ impl TopDecode for BoxedBytes {
 		_: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
 		BoxedBytes(input.into_boxed_slice_u8())
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_concat_1() {
+		let bb = BoxedBytes::from_concat(&[&b"abc"[..], &b"def"[..]]);
+		assert_eq!(bb, BoxedBytes::from(&b"abcdef"[..]));
+	}
+
+	#[test]
+	fn test_concat_2() {
+		let bb = BoxedBytes::from_concat(&[&b"abc"[..], &b""[..], &b"def"[..]]);
+		assert_eq!(bb, BoxedBytes::from(&b"abcdef"[..]));
+	}
+
+	#[test]
+	fn test_concat_empty_1() {
+		let bb = BoxedBytes::from_concat(&[&b""[..], &b""[..], &b""[..]]);
+		assert_eq!(bb, BoxedBytes::from(&b""[..]));
+	}
+
+	#[test]
+	fn test_concat_empty_2() {
+		let bb = BoxedBytes::from_concat(&[]);
+		assert_eq!(bb, BoxedBytes::from(&b""[..]));
 	}
 }

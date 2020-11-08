@@ -396,15 +396,6 @@ pub trait BasicFeatures {
 		self.event_b(arg1, arg2, data);
 	}
 
-	// VEC OPERATIONS
-
-	#[view]
-	fn vec_concat_const(&self) -> Vec<u8> {
-		let mut result = b"part1".to_vec();
-		result.extend_from_slice(&[0u8; 100][..]);
-		result
-	}
-
 	// SEND TX
 
 	#[endpoint]
@@ -784,6 +775,20 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn boxed_bytes_zeros(&self, len: usize) -> BoxedBytes {
 		BoxedBytes::zeros(len)
+	}
+
+	#[endpoint]
+	fn boxed_bytes_concat_2(&self, slice1: &[u8], slice2: &[u8]) -> BoxedBytes {
+		BoxedBytes::from_concat(&[slice1, slice2][..])
+	}
+
+	// VEC OPERATIONS
+
+	#[view]
+	fn vec_concat_const(&self) -> Vec<u8> {
+		let mut result = b"part1".to_vec();
+		result.extend_from_slice(&[0u8; 100][..]);
+		result
 	}
 
 	// NON ZERO EXTRA
