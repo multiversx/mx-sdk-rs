@@ -16,7 +16,7 @@ panic = "abort"
 
 [dependencies]
 use-module = { path = "..", default-features = false, features=["wasm-output-mode"] }
-elrond-wasm-output = { version = "0.9.4", path = "../../../elrond-wasm-output", default-features = false, features=["wasm-output-mode"] }
+elrond-wasm-output = { version = "0.9.5", path = "../../../elrond-wasm-output", default-features = false, features=["wasm-output-mode"] }
 
 [workspace]
 members = ["."]
