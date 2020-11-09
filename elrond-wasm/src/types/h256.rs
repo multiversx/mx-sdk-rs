@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 
 const ERR_BAD_H256_LENGTH: &[u8] = b"bad H256 length";
+const ZERO_32: &[u8] = &[0u8; 32];
 
 /// Type that holds 32 bytes of data.
 /// Data is kept on the heap to keep wasm size low and avoid copies.
@@ -88,9 +89,9 @@ impl H256 {
 	/// Allocates directly in heap.
 	/// Minimal resulting wasm code (14 bytes if not inlined).
 	pub fn zero() -> H256 {
-		use alloc::alloc::{alloc, Layout};
+		use alloc::alloc::{alloc_zeroed, Layout};
 		unsafe {
-			let ptr = alloc(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
+			let ptr = alloc_zeroed(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
 			H256(Box::from_raw(ptr))
 		}
 	}
@@ -122,6 +123,10 @@ impl H256 {
 	#[inline]
 	pub fn as_mut_ptr(&mut self) -> *mut u8 {
 		self.0.as_mut_ptr()
+	}
+
+	pub fn is_zero(&self) -> bool {
+		self.as_bytes() == ZERO_32
 	}
 }
 
@@ -202,7 +207,7 @@ impl TopDecode for H256 {
 }
 
 #[cfg(test)]
-mod esd_light_tests {
+mod h256_tests {
 	use super::*;
 	use alloc::vec::Vec;
 	use elrond_codec::test_util::{check_top_encode, ser_deser_ok};
@@ -230,5 +235,17 @@ mod esd_light_tests {
 		let tuple = (&addr, &&&addr, addr.clone());
 		let serialized_bytes = check_top_encode(&tuple);
 		assert_eq!(serialized_bytes.as_slice(), expected_bytes);
+	}
+
+	#[test]
+	fn test_is_zero() {
+		assert!(H256::zero().is_zero());
+	}
+
+	#[test]
+	fn test_size_of() {
+		use core::mem::size_of;
+		assert_eq!(size_of::<H256>(), size_of::<usize>());
+		assert_eq!(size_of::<Option<H256>>(), size_of::<usize>());
 	}
 }
