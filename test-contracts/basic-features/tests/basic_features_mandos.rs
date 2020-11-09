@@ -73,6 +73,11 @@ fn echo_varargs_u32() {
 }
 
 #[test]
+fn echo_slice_u8() {
+	parse_execute_mandos("mandos/echo_slice_u8.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_vec_u8() {
 	parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());
 }
@@ -130,11 +135,6 @@ fn storage_map2() {
 #[test]
 fn storage_map3() {
 	parse_execute_mandos("mandos/storage_map3.scen.json", &contract_map());
-}
-
-#[test]
-fn storage_opt_addr_err() {
-	parse_execute_mandos("mandos/storage_opt_addr_err.scen.json", &contract_map());
 }
 
 #[test]

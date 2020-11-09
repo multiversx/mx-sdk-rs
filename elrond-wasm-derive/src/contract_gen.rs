@@ -101,6 +101,7 @@ impl Contract {
 				| MethodMetadata::StorageGetter { .. }
 				| MethodMetadata::StorageSetter { .. }
 				| MethodMetadata::StorageGetMut { .. }
+				| MethodMetadata::StorageIsEmpty { .. }
 				| MethodMetadata::Module { .. } => {
 					let sig = m.generate_sig();
 					Some(quote! { #sig ; })
@@ -130,6 +131,10 @@ impl Contract {
 					visibility: _,
 					identifier,
 				} => Some(generate_borrow_impl(&m, identifier.clone())),
+				MethodMetadata::StorageIsEmpty {
+					visibility: _,
+					identifier,
+				} => Some(generate_is_empty_impl(&m, identifier.clone())),
 				MethodMetadata::Module { impl_path } => {
 					Some(generate_module_getter_impl(&m, &impl_path))
 				},
