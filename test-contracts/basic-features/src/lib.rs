@@ -787,6 +787,11 @@ pub trait BasicFeatures {
 		BoxedBytes::from_concat(&[slice1, slice2][..])
 	}
 
+	#[endpoint]
+	fn boxed_bytes_split(&self, bb: BoxedBytes, at: usize) -> MultiResult2<BoxedBytes, BoxedBytes> {
+		bb.split(at).into()
+	}
+
 	// VEC OPERATIONS
 
 	#[view]
