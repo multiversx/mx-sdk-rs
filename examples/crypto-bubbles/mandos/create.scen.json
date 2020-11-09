@@ -4,7 +4,7 @@
         {
             "step": "setState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234": {
+                "address:creator_address": {
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
                     "storage": {},
@@ -13,9 +13,9 @@
             },
             "newAddresses": [
                 {
-                    "creatorAddress": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234",
+                    "creatorAddress": "address:creator_address",
                     "creatorNonce": "0",
-                    "newAddress": "0x0000000000000000000011111111a94f5374fce5edbc8e2a8697c15331001234"
+                    "newAddress": "address:contract_address"
                 }
             ]
         },
@@ -23,7 +23,7 @@
             "step": "scDeploy",
             "txId": "1",
             "tx": {
-                "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234",
+                "from": "address:creator_address",
                 "value": "0",
                 "contractCode": "file:../output/crypto-bubbles.wasm",
                 "arguments": [],
@@ -41,18 +41,16 @@
         {
             "step": "checkState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234": {
+                "address:creator_address": {
                     "nonce": "1",
                     "balance": "0xe8d4951000",
                     "storage": {},
                     "code": ""
                 },
-                "0x0000000000000000000011111111a94f5374fce5edbc8e2a8697c15331001234": {
+                "address:contract_address": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234"
-                    },
+                    "storage": {},
                     "code": "file:../output/crypto-bubbles.wasm"
                 }
             }
