@@ -15,7 +15,7 @@ fn contract_map() -> ContractMap<TxContext> {
 #[test]
 fn crowdfunding_claim_failed() {
 	parse_execute_mandos(
-		"mandos/crowdfunding-claim-failed.scen.json",
+		"/home/elrond/elrond-wasm-rs/examples/crowdfunding-esdt/mandos/crowdfunding-claim-failed.scen.json",
 		&contract_map(),
 	);
 }
@@ -39,7 +39,7 @@ fn crowdfunding_claim_too_early() {
 #[test]
 fn crowdfunding_fund_ok() {
 	parse_execute_mandos(
-		"/home/elrond/elrond-wasm-rs/examples/crowdfunding-esdt/mandos/crowdfunding-fund.scen.json",
+		"mandos/crowdfunding-fund.scen.json",
 		&contract_map(),
 	);
 }

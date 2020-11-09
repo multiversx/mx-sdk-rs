@@ -9,7 +9,7 @@ use num_traits::cast::ToPrimitive;
 
 use alloc::vec::Vec;
 
-const ESDT_TRANSFER_STRING: &str = "ESDTTransfer";
+const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 #[derive(Debug)]
 pub struct AsyncCallTxData {
@@ -26,7 +26,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
 	let mut esdt_token_name = Vec::<u8>::new();
 	let mut esdt_value = 0u32.into();
 
-	if func_name == ESDT_TRANSFER_STRING.as_bytes() {
+	if func_name == ESDT_TRANSFER_STRING {
 		esdt_token_name = de.next_argument().unwrap().unwrap();
 		esdt_value = BigUint::from_bytes_be(&de.next_argument().unwrap().unwrap());
 	}
