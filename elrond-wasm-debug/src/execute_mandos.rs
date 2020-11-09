@@ -420,6 +420,68 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 				}
 			}
 
+			match &expected_account.esdt {
+				Some(CheckEsdt::Equal(eq)) => {
+					let default_value = &BigUint::from(0u32);
+					let default_hashmap = &HashMap::new();
+					let actual_esdt = account.esdt.as_ref().unwrap_or(default_hashmap);
+					for (expected_key, expected_value) in eq.iter() {
+						let actual_value = actual_esdt
+							.get(&expected_key.value)
+							.unwrap_or(default_value);
+						assert!(
+							expected_value.check(actual_value),
+							"bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
+							expected_address,
+							expected_key,
+							expected_value,
+							actual_value
+						);
+					}
+	
+					let default_check_value = CheckValue::Equal(BigUintValue::default());
+	
+					for (actual_key, actual_value) in
+						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
+					{
+						let expected_value = eq
+							.get(&actual_key.clone().into())
+							.unwrap_or(&default_check_value);
+						assert!(
+							expected_value.check(actual_value),
+							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
+							expected_address,
+							verbose_hex(actual_key),
+							expected_value,
+							actual_value
+						);
+					}
+				}
+
+				Some(CheckEsdt::Star) => {
+					// nothing to be done for *
+				}
+
+				// we still have to check that the actual storage is empty
+				None => {
+					let default_check_value = CheckValue::Equal(BigUintValue::default());
+					let default_hashmap = &HashMap::new();
+	
+					for (actual_key, actual_value) in
+						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
+					{
+						assert!(
+							default_check_value.check(actual_value),
+							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
+							expected_address,
+							verbose_hex(actual_key),
+							default_check_value,
+							actual_value
+						);
+					}
+				}
+			}
+
 			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
 				let default_value = &BigUint::from(0u32);
 				let default_hashmap = &HashMap::new();
@@ -439,7 +501,6 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 				}
 
 				let default_check_value = CheckValue::Equal(BigUintValue::default());
-				let default_hashmap = &HashMap::new();
 
 				for (actual_key, actual_value) in
 					account.esdt.as_ref().unwrap_or(default_hashmap).iter()

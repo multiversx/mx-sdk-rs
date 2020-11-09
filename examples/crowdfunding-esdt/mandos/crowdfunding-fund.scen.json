@@ -65,6 +65,9 @@
               "''esdtBalance": "250,000,000,000",
               "''deposit|address:donor1": "250,000,000,000"
             },
+            "esdt": {
+              "''CrowdToken": "250,000,000,000"
+            },
             "code": "file:../output/crowdfunding-esdt.wasm"
           }
         }
