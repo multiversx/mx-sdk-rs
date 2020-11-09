@@ -6,6 +6,8 @@ use mandos::*;
 use num_bigint::BigUint;
 use std::path::Path;
 
+const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
+
 pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<TxContext>) {
 	let mut state = BlockchainMock::new();
 	parse_execute_mandos_steps(path.as_ref(), &mut state, contract_map);
@@ -121,6 +123,12 @@ fn parse_execute_mandos_steps(
 						let contract_address = tx.to.value.into();
 						if state.accounts.contains_key(&async_data.to) {
 							let async_input = async_call_tx_input(&async_data, &contract_address);
+
+							if async_input.func_name == ESDT_TRANSFER_STRING {
+								execute_esdt_async_call(async_input.clone(), state);
+								return;
+							}
+
 							let (async_result, opt_more_async) =
 								execute_sc_call(async_input, state, contract_map);
 							assert!(
@@ -218,6 +226,19 @@ fn parse_execute_mandos_steps(
 			},
 		}
 	}
+}
+
+fn execute_esdt_async_call(
+	tx_input: TxInput,
+	state: &mut BlockchainMock) {
+
+	let from = tx_input.from.clone();
+	let to = tx_input.to.clone();
+	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_value = tx_input.esdt_value.clone();
+
+	state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value);
+	state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
 }
 
 fn execute_sc_call(
