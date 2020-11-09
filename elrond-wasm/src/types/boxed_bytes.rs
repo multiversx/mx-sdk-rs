@@ -204,4 +204,11 @@ mod tests {
 	fn test_is_empty() {
 		assert!(BoxedBytes::empty().is_empty());
 	}
+
+	#[test]
+	fn test_size_of() {
+		use core::mem::size_of;
+		assert_eq!(size_of::<BoxedBytes>(), 2 * size_of::<usize>());
+		assert_eq!(size_of::<Option<BoxedBytes>>(), 2 * size_of::<usize>());
+	}
 }

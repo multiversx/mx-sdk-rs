@@ -770,6 +770,11 @@ pub trait BasicFeatures {
 		h1 == h2
 	}
 
+	#[endpoint]
+	fn h256_is_zero(&self, h: H256) -> bool {
+		h.is_zero()
+	}
+
 	// BOXED BYTES
 
 	#[endpoint]
