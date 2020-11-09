@@ -13,6 +13,7 @@ static ATTR_MULTI: &str = "multi";
 static ATTR_STORAGE_GET: &str = "storage_get";
 static ATTR_STORAGE_SET: &str = "storage_set";
 static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
+static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 static ATTR_MODULE: &str = "module";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
@@ -126,7 +127,7 @@ pub struct StorageGetAttribute {
 }
 
 impl StorageGetAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageGetAttribute> {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
 		match find_attr_one_string_arg(m, ATTR_STORAGE_GET) {
 			None => None,
 			Some(arg_str) => Some(StorageGetAttribute {
@@ -141,7 +142,7 @@ pub struct StorageSetAttribute {
 }
 
 impl StorageSetAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageSetAttribute> {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
 		match find_attr_one_string_arg(m, ATTR_STORAGE_SET) {
 			None => None,
 			Some(arg_str) => Some(StorageSetAttribute {
@@ -156,10 +157,25 @@ pub struct StorageGetMutAttribute {
 }
 
 impl StorageGetMutAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<StorageSetAttribute> {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
 		match find_attr_one_string_arg(m, ATTR_STORAGE_GET_MUT) {
 			None => None,
-			Some(arg_str) => Some(StorageSetAttribute {
+			Some(arg_str) => Some(StorageGetMutAttribute {
+				identifier: arg_str,
+			}),
+		}
+	}
+}
+
+pub struct StorageIsEmptyAttribute {
+	pub identifier: String,
+}
+
+impl StorageIsEmptyAttribute {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
+		match find_attr_one_string_arg(m, ATTR_STORAGE_IS_EMPTY) {
+			None => None,
+			Some(arg_str) => Some(StorageIsEmptyAttribute {
 				identifier: arg_str,
 			}),
 		}

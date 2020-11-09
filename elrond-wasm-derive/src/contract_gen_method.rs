@@ -40,6 +40,10 @@ pub enum MethodMetadata {
 		visibility: Visibility,
 		identifier: String,
 	},
+	StorageIsEmpty {
+		visibility: Visibility,
+		identifier: String,
+	},
 	Module {
 		impl_path: proc_macro2::TokenTree,
 	},
@@ -61,6 +65,10 @@ impl MethodMetadata {
 				..
 			}
 			| MethodMetadata::StorageGetMut {
+				visibility: Visibility::Endpoint(e),
+				..
+			}
+			| MethodMetadata::StorageIsEmpty {
 				visibility: Visibility::Endpoint(e),
 				..
 			} => Some(e),
@@ -154,6 +162,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let storage_get_opt = StorageGetAttribute::parse(m);
 	let storage_set_opt = StorageSetAttribute::parse(m);
 	let storage_get_mut_opt = StorageGetMutAttribute::parse(m);
+	let storage_is_empty_opt = StorageIsEmptyAttribute::parse(m);
 	let module_opt = ModuleAttribute::parse(m);
 
 	if let Some(event_attr) = event_opt {
@@ -256,6 +265,20 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			visibility,
 			identifier: storage_get_mut.identifier,
 		}
+	} else if let Some(storage_is_empty) = storage_is_empty_opt {
+		if payable {
+			panic!("Storage is empty cannot be marked payable.");
+		}
+		if m.default.is_some() {
+			panic!("Storage is empty cannot have an implementations provided in the trait.");
+		}
+		if module_opt.is_some() {
+			panic!("Storage is empty cannot be modules.");
+		}
+		MethodMetadata::StorageIsEmpty {
+			visibility,
+			identifier: storage_is_empty.identifier,
+		}
 	} else if let Some(module_attr) = module_opt {
 		if m.default.is_some() {
 			panic!("Module declarations cannot have an implementations provided in the trait.");
@@ -265,7 +288,10 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		}
 	} else {
 		if m.default.is_none() {
-			panic!("Regular methods need an implementation.");
+			panic!(
+				"Regular methods need an implementation: {}",
+				m.sig.ident.to_string()
+			);
 		}
 		MethodMetadata::Regular {
 			visibility,

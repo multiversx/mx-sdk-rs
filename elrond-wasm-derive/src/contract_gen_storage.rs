@@ -100,3 +100,14 @@ pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 		}
 	}
 }
+
+pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
+	let msig = m.generate_sig();
+	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
+	quote! {
+		#msig {
+			#key_snippet
+			self.api.storage_load_len(&key[..]) == 0
+		}
+	}
+}

@@ -109,8 +109,14 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiResult2<Vec<u8>, i64> {
-		let l = arg.len() as i64;
+	fn echo_slice_u8<'s>(&self, slice: &'s [u8]) -> MultiResult2<&'s [u8], usize> {
+		let l = slice.len();
+		(slice, l).into()
+	}
+
+	#[endpoint]
+	fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiResult2<Vec<u8>, usize> {
+		let l = arg.len();
 		(arg, l).into()
 	}
 
@@ -347,6 +353,10 @@ pub trait BasicFeatures {
 	fn load_opt_addr(&self) -> OptionalResult<Address> {
 		self._get_opt_addr().into()
 	}
+
+	#[view]
+	#[storage_is_empty("opt_addr")]
+	fn is_empty_opt_addr(&self) -> bool;
 
 	#[endpoint]
 	#[storage_get("ser_1")]
