@@ -3,6 +3,8 @@
 
 imports!();
 
+use elrond_wasm::CallDataSerializer;
+
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 #[derive(PartialEq, Clone, Copy)]
@@ -146,13 +148,11 @@ pub trait Crowdfunding {
 	}
 
 	fn pay_esdt(&self, esdt_token_name: &[u8], amount: &BigUint, to: &Address) {
-		let mut data = ESDT_TRANSFER_STRING.to_vec();
-		data.push(b'@');
-		data.extend_from_slice(esdt_token_name);
-		data.push(b'@');
-		data.extend_from_slice(amount.to_bytes_be().as_slice());
+		let mut serializer = CallDataSerializer::new(ESDT_TRANSFER_STRING);
+		serializer.push_argument_bytes(esdt_token_name);
+		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.async_call(&to, &BigUint::zero(), &data);
+		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
 	}
 }
 
