@@ -228,10 +228,7 @@ fn parse_execute_mandos_steps(
 	}
 }
 
-fn execute_esdt_async_call(
-	tx_input: TxInput,
-	state: &mut BlockchainMock) {
-
+fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let esdt_token_name = tx_input.esdt_token_name.clone();
@@ -459,9 +456,9 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 							actual_value
 						);
 					}
-	
+
 					let default_check_value = CheckValue::Equal(BigUintValue::default());
-	
+
 					for (actual_key, actual_value) in
 						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
 					{
@@ -477,17 +474,17 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 							actual_value
 						);
 					}
-				}
+				},
 
 				Some(CheckEsdt::Star) => {
 					// nothing to be done for *
-				}
+				},
 
 				// we still have to check that the actual storage is empty
 				None => {
 					let default_check_value = CheckValue::Equal(BigUintValue::default());
 					let default_hashmap = &HashMap::new();
-	
+
 					for (actual_key, actual_value) in
 						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
 					{
@@ -500,7 +497,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 							actual_value
 						);
 					}
-				}
+				},
 			}
 
 			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
