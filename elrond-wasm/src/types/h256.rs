@@ -51,6 +51,13 @@ impl<'a> From<&'a mut [u8; 32]> for H256 {
 	}
 }
 
+impl From<Box<[u8; 32]>> for H256 {
+	#[inline]
+	fn from(bytes: Box<[u8; 32]>) -> Self {
+		H256(bytes)
+	}
+}
+
 impl H256 {
 	pub fn from_slice(slice: &[u8]) -> Self {
 		let mut i = 0;
@@ -182,6 +189,24 @@ impl NestedDecode for H256 {
 	}
 }
 
+impl H256 {
+	// Transmutes directly from a (variable-sized) boxed byte slice.
+	// Will exit early if the input length is not 32.
+	// Designed to be used especially in deserializer implementations.
+	pub fn decode_from_boxed_bytes_or_exit<ExitCtx: Clone>(
+		input: Box::<[u8]>,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		if input.len() != 32 {
+			exit(c, DecodeError::from(ERR_BAD_H256_LENGTH));
+		}
+		let raw = Box::into_raw(input);
+		let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
+		H256(array_box)
+	}
+}
+
 impl TopDecode for H256 {
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
 		match <[u8; 32]>::top_decode_boxed(input) {
@@ -195,14 +220,7 @@ impl TopDecode for H256 {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		// transmute directly
-		let bs = input.into_boxed_slice_u8();
-		if bs.len() != 32 {
-			exit(c, DecodeError::from(ERR_BAD_H256_LENGTH));
-		}
-		let raw = Box::into_raw(bs);
-		let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
-		H256(array_box)
+		H256::decode_from_boxed_bytes_or_exit(input.into_boxed_slice_u8(), c, exit)
 	}
 }
 
