@@ -128,6 +128,13 @@ impl<'a> From<&'a [u8]> for BoxedBytes {
 	}
 }
 
+impl From<Box<[u8]>> for BoxedBytes {
+	#[inline]
+	fn from(b: Box<[u8]>) -> Self {
+		BoxedBytes(b)
+	}
+}
+
 impl From<Vec<u8>> for BoxedBytes {
 	#[inline]
 	fn from(v: Vec<u8>) -> Self {
