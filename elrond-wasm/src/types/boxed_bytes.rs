@@ -1,4 +1,4 @@
-use alloc::alloc::{alloc, alloc_zeroed, Layout};
+use alloc::alloc::{alloc, alloc_zeroed, realloc, Layout};
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use elrond_codec::*;
@@ -57,26 +57,59 @@ impl BoxedBytes {
 
 	/// Create new instance by concatenating several byte slices.
 	pub fn from_concat(slices: &[&[u8]]) -> Self {
-		let mut total_len = 0usize;
+		let mut result_len = 0usize;
 		let mut index = slices.len();
 		while index > 0 {
 			index -= 1;
-			total_len += slices[index].len();
+			result_len += slices[index].len();
 		}
 		unsafe {
-			let layout = Layout::from_size_align(total_len, core::mem::align_of::<u8>()).unwrap();
-			let bytes_ptr = alloc(layout);
+			let layout = Layout::from_size_align(result_len, core::mem::align_of::<u8>()).unwrap();
+			let result_ptr = alloc(layout);
 			let mut current_index = 0usize;
 			for slice in slices.iter() {
 				core::ptr::copy_nonoverlapping(
 					slice.as_ptr(),
-					bytes_ptr.offset(current_index as isize),
+					result_ptr.add(current_index),
 					slice.len(),
 				);
 				current_index += slice.len();
 			}
-			let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(bytes_ptr, total_len));
+			let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(result_ptr, result_len));
 			BoxedBytes(bytes_box)
+		}
+	}
+
+	/// Splits BoxedBytes into 2 others at designated position.
+	/// Returns the original and an empty BoxedBytes if position arugment out of range.
+	pub fn split(self, at: usize) -> (BoxedBytes, BoxedBytes) {
+		if at >= self.len() {
+			(self, BoxedBytes::empty())
+		} else {
+			let other_len = self.len() - at;
+			unsafe {
+				// breaking down the input into its components
+				let self_layout = Layout::from_size_align(self.len(), core::mem::align_of::<u8>()).unwrap();
+				let self_ptr = Box::into_raw(self.0) as *mut u8;
+
+				// the data for the second result needs to be copied somewhere else
+				let other_layout = Layout::from_size_align(other_len, core::mem::align_of::<u8>()).unwrap();
+				let other_ptr = alloc(other_layout);
+				core::ptr::copy_nonoverlapping(
+					self_ptr.add(at),
+					other_ptr,
+					other_len,
+				);
+
+				// truncating the memory for the first using a realloc
+				// got inspiration for this from the RawVec implementation
+				let realloc_ptr = realloc(self_ptr, self_layout, at);
+
+				// packaging the resulting parts nicely
+				let bytes_box_1 = Box::from_raw(core::slice::from_raw_parts_mut(realloc_ptr, at));
+				let bytes_box_2 = Box::from_raw(core::slice::from_raw_parts_mut(other_ptr, other_len));
+				(BoxedBytes(bytes_box_1), BoxedBytes(bytes_box_2))
+			}
 		}
 	}
 }
@@ -210,5 +243,30 @@ mod tests {
 		use core::mem::size_of;
 		assert_eq!(size_of::<BoxedBytes>(), 2 * size_of::<usize>());
 		assert_eq!(size_of::<Option<BoxedBytes>>(), 2 * size_of::<usize>());
+	}
+
+	#[test]
+	fn test_split_1() {
+		let (bb1, bb2) = BoxedBytes::from(&b"abcdef"[..]).split(3);
+		assert_eq!(bb1, BoxedBytes::from(&b"abc"[..]));
+		assert_eq!(bb2, BoxedBytes::from(&b"def"[..]));
+	}
+
+	#[test]
+	fn test_split_2() {
+		let (bb1, bb2) = BoxedBytes::from(&b"abcdef"[..]).split(0);
+		assert_eq!(bb1, BoxedBytes::from(&b""[..]));
+		assert_eq!(bb2, BoxedBytes::from(&b"abcdef"[..]));
+	}
+
+	#[test]
+	fn test_split_over() {
+		let (bb1, bb2) = BoxedBytes::from(&b"abcdef"[..]).split(6);
+		assert_eq!(bb1, BoxedBytes::from(&b"abcdef"[..]));
+		assert_eq!(bb2, BoxedBytes::from(&b""[..]));
+
+		let (bb1, bb2) = BoxedBytes::from(&b"abcdef"[..]).split(7);
+		assert_eq!(bb1, BoxedBytes::from(&b"abcdef"[..]));
+		assert_eq!(bb2, BoxedBytes::from(&b""[..]));
 	}
 }
