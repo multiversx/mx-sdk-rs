@@ -15,7 +15,7 @@ fn contract_map() -> ContractMap<TxContext> {
 #[test]
 fn crowdfunding_claim_failed() {
 	parse_execute_mandos(
-		"/home/elrond/elrond-wasm-rs/examples/crowdfunding-esdt/mandos/crowdfunding-claim-failed.scen.json",
+		"mandos/crowdfunding-claim-failed.scen.json",
 		&contract_map(),
 	);
 }
