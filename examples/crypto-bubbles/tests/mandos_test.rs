@@ -43,7 +43,7 @@ fn rewardwinner_last() {
 }
 
 #[test]
-fn rewardwinner() {
+fn rewardwinner_simple() {
 	parse_execute_mandos("mandos/rewardWinner.scen.json", &contract_map());
 }
 

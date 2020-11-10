@@ -18,6 +18,10 @@ pub struct AccountRaw {
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
+	pub esdt: Option<BTreeMap<String, ValueSubTree>>,
+
+	#[serde(default)]
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub code: Option<ValueSubTree>,
 }
 
@@ -96,6 +100,81 @@ impl<'de> Deserialize<'de> for CheckStorageRaw {
 	}
 }
 
+pub enum CheckEsdtRaw {
+	Star,
+	Equal(BTreeMap<String, ValueSubTree>),
+}
+
+impl CheckEsdtRaw {
+	pub fn is_star(&self) -> bool {
+		matches!(self, CheckEsdtRaw::Star)
+	}
+}
+
+impl Serialize for CheckEsdtRaw {
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: Serializer,
+	{
+		match self {
+			CheckEsdtRaw::Star => serializer.serialize_str("*"),
+			CheckEsdtRaw::Equal(m) => {
+				let mut map = serializer.serialize_map(Some(m.len()))?;
+				for (k, v) in m {
+					map.serialize_entry(k, v)?;
+				}
+				map.end()
+			},
+		}
+	}
+}
+
+struct CheckEsdtRawVisitor;
+
+impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
+	type Value = CheckEsdtRaw;
+
+	// Format a message stating what data this Visitor expects to receive.
+	fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+		formatter.write_str("serialized object JSON representation of esdt check")
+	}
+
+	fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+	where
+		E: de::Error,
+	{
+		if value == "*" {
+			Ok(CheckEsdtRaw::Star)
+		} else {
+			Err(de::Error::custom("only '*' allowed as esdt string value"))
+		}
+	}
+
+	fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
+	where
+		M: MapAccess<'de>,
+	{
+		let mut map = BTreeMap::<String, ValueSubTree>::new();
+
+		// While there are entries remaining in the input, add them
+		// into our map.
+		while let Some((key, value)) = access.next_entry()? {
+			map.insert(key, value);
+		}
+
+		Ok(CheckEsdtRaw::Equal(map))
+	}
+}
+
+impl<'de> Deserialize<'de> for CheckEsdtRaw {
+	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		deserializer.deserialize_any(CheckEsdtRawVisitor)
+	}
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckAccountRaw {
@@ -110,6 +189,10 @@ pub struct CheckAccountRaw {
 	#[serde(default)]
 	#[serde(skip_serializing_if = "ValueSubTree::is_empty_string")]
 	pub balance: ValueSubTree,
+
+	#[serde(default)]
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub esdt: Option<CheckEsdtRaw>,
 
 	pub storage: CheckStorageRaw,
 

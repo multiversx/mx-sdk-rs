@@ -6,6 +6,8 @@ use mandos::*;
 use num_bigint::BigUint;
 use std::path::Path;
 
+const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
+
 pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<TxContext>) {
 	let mut state = BlockchainMock::new();
 	parse_execute_mandos_steps(path.as_ref(), &mut state, contract_map);
@@ -43,6 +45,11 @@ fn parse_execute_mandos_steps(
 							.iter()
 							.map(|(k, v)| (k.value.clone(), v.value.clone()))
 							.collect(),
+						esdt: account.esdt.as_ref().map(|tree| {
+							tree.iter()
+								.map(|(k, v)| (k.value.clone(), v.value.clone()))
+								.collect()
+						}),
 						contract_path: account
 							.code
 							.as_ref()
@@ -96,8 +103,8 @@ fn parse_execute_mandos_steps(
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),
 					call_value: tx.call_value.value.clone(),
-					esdt_value: 0u32.into(),
-					esdt_token_name: None,
+					esdt_value: tx.esdt_value.value.clone(),
+					esdt_token_name: tx.esdt_token_name.value.clone(),
 					func_name: tx.function.as_bytes().to_vec(),
 					args: tx
 						.arguments
@@ -116,6 +123,12 @@ fn parse_execute_mandos_steps(
 						let contract_address = tx.to.value.into();
 						if state.accounts.contains_key(&async_data.to) {
 							let async_input = async_call_tx_input(&async_data, &contract_address);
+
+							if async_input.func_name == ESDT_TRANSFER_STRING {
+								execute_esdt_async_call(async_input.clone(), state);
+								return;
+							}
+
 							let (async_result, opt_more_async) =
 								execute_sc_call(async_input, state, contract_map);
 							assert!(
@@ -143,6 +156,7 @@ fn parse_execute_mandos_steps(
 								nonce: 0,
 								balance: async_data.call_value.clone(),
 								storage: HashMap::new(),
+								esdt: None,
 								contract_path: None,
 								contract_owner: None,
 							});
@@ -164,8 +178,8 @@ fn parse_execute_mandos_steps(
 					from: tx.from.value.into(),
 					to: H256::zero(),
 					call_value: tx.call_value.value.clone(),
-					esdt_value: 0u32.into(),
-					esdt_token_name: None,
+					esdt_value: tx.esdt_value.value.clone(),
+					esdt_token_name: tx.esdt_token_name.value.clone(),
 					func_name: b"init".to_vec(),
 					args: tx
 						.arguments
@@ -189,6 +203,17 @@ fn parse_execute_mandos_steps(
 				state.subtract_tx_payment(sender_address, &tx.value.value);
 				let recipient_address = &tx.to.value.into();
 				state.increase_balance(recipient_address, &tx.value.value);
+				let esdt_token_name = tx.esdt_token_name.value.clone();
+				let esdt_value = tx.esdt_value.value.clone();
+
+				if !esdt_token_name.is_empty() && esdt_value > 0u32.into() {
+					state.substract_esdt_balance(sender_address, &esdt_token_name[..], &esdt_value);
+					state.increase_esdt_balance(
+						recipient_address,
+						&esdt_token_name[..],
+						&esdt_value,
+					);
+				}
 			},
 			Step::ValidatorReward { tx_id, comment, tx } => {
 				state.increase_validator_reward(&tx.to.value.into(), &tx.value.value);
@@ -203,6 +228,16 @@ fn parse_execute_mandos_steps(
 	}
 }
 
+fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
+	let from = tx_input.from.clone();
+	let to = tx_input.to.clone();
+	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_value = tx_input.esdt_value.clone();
+
+	state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value);
+	state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+}
+
 fn execute_sc_call(
 	tx_input: TxInput,
 	state: &mut BlockchainMock,
@@ -215,6 +250,14 @@ fn execute_sc_call(
 
 	state.subtract_tx_payment(&from, &call_value);
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
+
+	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_value = tx_input.esdt_value.clone();
+	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+
+	if esdt_used {
+		state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+	}
 
 	let contract_account = state
 		.accounts
@@ -236,6 +279,7 @@ fn execute_sc_call(
 			async_call: None,
 		},
 	);
+
 	let tx_output = execute_tx(tx_context, contract_path, contract_map);
 	let tx_result = tx_output.result;
 
@@ -245,8 +289,16 @@ fn execute_sc_call(
 
 		state.increase_balance(&to, &call_value);
 		state.send_balance(&to, tx_output.send_balance_list.as_slice());
+
+		if esdt_used {
+			state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+		}
 	} else {
 		state.increase_balance(&from, &call_value);
+
+		if esdt_used {
+			state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+		}
 	}
 
 	(tx_result, tx_output.async_call)
@@ -266,6 +318,14 @@ fn execute_sc_create(
 	state.subtract_tx_payment(&from, &call_value);
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
+	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_value = tx_input.esdt_value.clone();
+	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+
+	if esdt_used {
+		state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+	}
+
 	let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
 	let tx_output = execute_tx(tx_context, contract_path, contract_map);
 
@@ -278,6 +338,10 @@ fn execute_sc_create(
 		state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
 	} else {
 		state.increase_balance(&from, &call_value);
+
+		if esdt_used {
+			state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+		}
 	}
 
 	(tx_output.result, tx_output.async_call)
@@ -370,6 +434,105 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 						verbose_hex(actual_key),
 						expected_value,
 						verbose_hex(actual_value)
+					);
+				}
+			}
+
+			match &expected_account.esdt {
+				Some(CheckEsdt::Equal(eq)) => {
+					let default_value = &BigUint::from(0u32);
+					let default_hashmap = &HashMap::new();
+					let actual_esdt = account.esdt.as_ref().unwrap_or(default_hashmap);
+					for (expected_key, expected_value) in eq.iter() {
+						let actual_value = actual_esdt
+							.get(&expected_key.value)
+							.unwrap_or(default_value);
+						assert!(
+							expected_value.check(actual_value),
+							"bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
+							expected_address,
+							expected_key,
+							expected_value,
+							actual_value
+						);
+					}
+
+					let default_check_value = CheckValue::Equal(BigUintValue::default());
+
+					for (actual_key, actual_value) in
+						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
+					{
+						let expected_value = eq
+							.get(&actual_key.clone().into())
+							.unwrap_or(&default_check_value);
+						assert!(
+							expected_value.check(actual_value),
+							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
+							expected_address,
+							verbose_hex(actual_key),
+							expected_value,
+							actual_value
+						);
+					}
+				},
+
+				Some(CheckEsdt::Star) => {
+					// nothing to be done for *
+				},
+
+				// we still have to check that the actual storage is empty
+				None => {
+					let default_check_value = CheckValue::Equal(BigUintValue::default());
+					let default_hashmap = &HashMap::new();
+
+					for (actual_key, actual_value) in
+						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
+					{
+						assert!(
+							default_check_value.check(actual_value),
+							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
+							expected_address,
+							verbose_hex(actual_key),
+							default_check_value,
+							actual_value
+						);
+					}
+				},
+			}
+
+			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
+				let default_value = &BigUint::from(0u32);
+				let default_hashmap = &HashMap::new();
+				let actual_esdt = account.esdt.as_ref().unwrap_or(default_hashmap);
+				for (expected_key, expected_value) in eq.iter() {
+					let actual_value = actual_esdt
+						.get(&expected_key.value)
+						.unwrap_or(default_value);
+					assert!(
+						expected_value.check(actual_value),
+						"bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
+						expected_address,
+						expected_key,
+						expected_value,
+						actual_value
+					);
+				}
+
+				let default_check_value = CheckValue::Equal(BigUintValue::default());
+
+				for (actual_key, actual_value) in
+					account.esdt.as_ref().unwrap_or(default_hashmap).iter()
+				{
+					let expected_value = eq
+						.get(&actual_key.clone().into())
+						.unwrap_or(&default_check_value);
+					assert!(
+						expected_value.check(actual_value),
+						"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
+						expected_address,
+						verbose_hex(actual_key),
+						expected_value,
+						actual_value
 					);
 				}
 			}
