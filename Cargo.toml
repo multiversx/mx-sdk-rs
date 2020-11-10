@@ -17,6 +17,7 @@ members = [
   "contracts/examples/crowdfunding-esdt",
   "contracts/examples/lottery",
   "contracts/examples/lottery-erc20",
+  "contracts/examples/lottery-esdt",
   
   "contracts/feature-tests/async",
   "contracts/feature-tests/async/async-alice",
