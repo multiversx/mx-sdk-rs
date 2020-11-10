@@ -34,7 +34,8 @@ impl<BigUint: BigUintApi> NestedEncode for LotteryInfo<BigUint> {
 		c: ExitCtx,
 		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
-		self.esdt_token_name.dep_encode_or_exit(dest, c.clone(), exit);
+		self.esdt_token_name
+			.dep_encode_or_exit(dest, c.clone(), exit);
 		self.ticket_price.dep_encode_or_exit(dest, c.clone(), exit);
 		self.tickets_left.dep_encode_or_exit(dest, c.clone(), exit);
 		self.deadline.dep_encode_or_exit(dest, c.clone(), exit);

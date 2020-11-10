@@ -86,7 +86,10 @@ pub trait Lottery {
 		opt_whitelist: Option<Vec<Address>>,
 	) -> SCResult<()> {
 		require!(!lottery_name.is_empty(), "Name can't be empty!");
-		require!(!esdt_token_name.is_empty(), "Esdt token name can't be empty!");
+		require!(
+			!esdt_token_name.is_empty(),
+			"Esdt token name can't be empty!"
+		);
 
 		let timestamp = self.get_block_timestamp();
 
@@ -200,8 +203,7 @@ pub trait Lottery {
 			"You are not allowed to participate in this lottery!"
 		);
 
-		require!(call_token_name == info.esdt_token_name, 
-			"Wrong esdt token!");
+		require!(call_token_name == info.esdt_token_name, "Wrong esdt token!");
 
 		require!(payment == info.ticket_price, "Wrong ticket fee!");
 
