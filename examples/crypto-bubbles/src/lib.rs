@@ -10,13 +10,8 @@ pub trait CryptoBubbles {
 	/// is called immediately after the contract is created
 	#[init]
 	fn init(&self) {
-
-	}
-
-	/// getter function: retrieves balance for an account
-	#[view(balanceOf)]
-	fn get_player_balance(&self, player: Address) -> BigUint {
-		self.storage_get_player_balance(&player)
+		let caller = self.get_caller();
+		self.set_owner(&caller);
 	}
 
 	/// player adds funds
@@ -25,9 +20,9 @@ pub trait CryptoBubbles {
 	fn add_funds(&self, #[payment] payment: BigUint) {
 		let caller = self.get_caller();
 
-		let mut balance = self.storage_get_player_balance(&caller);
+		let mut balance = self.get_player_balance(&caller);
 		balance += &payment;
-		self.storage_set_player_balance(&caller, &balance);
+		self.set_player_balance(&caller, &balance);
 
 		self.top_up_event(&caller, &payment);
 	}
@@ -40,13 +35,13 @@ pub trait CryptoBubbles {
 
 	/// server calls withdraw on behalf of the player
 	fn _transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
-		let mut balance = self.storage_get_player_balance(player);
+		let mut balance = self.get_player_balance(player);
 
 		require!(amount <= &balance,
 			"amount to withdraw must be less or equal to balance");
 
 		balance -= amount;
-		self.storage_set_player_balance(player, &balance);
+		self.set_player_balance(player, &balance);
 
 		self.send_tx(player, &amount, "crypto bubbles");
 
@@ -62,12 +57,12 @@ pub trait CryptoBubbles {
 		player: &Address,
 		bet: &BigUint,
 	) -> SCResult<()> {
-		let mut balance = self.storage_get_player_balance(player);
+		let mut balance = self.get_player_balance(player);
 		
 		require!(bet <= &balance, "insufficient funds to join game");
 
 		balance -= bet;
-		self.storage_set_player_balance(player, &balance);
+		self.set_player_balance(player, &balance);
 
 		self.player_joins_game_event(game_index, player, bet);
 
@@ -94,12 +89,12 @@ pub trait CryptoBubbles {
 		prize: &BigUint,
 	) -> SCResult<()> {
 		let caller = self.get_caller();
-		let owner: Address = self.get_owner_address();
+		let owner: Address = self.get_owner();
 		require!(caller == owner, "invalid sender: only contract owner can reward winner");
 
-		let mut balance = self.storage_get_player_balance(winner);
+		let mut balance = self.get_player_balance(winner);
 		balance += prize;
-		self.storage_set_player_balance(winner, &balance);
+		self.set_player_balance(winner, &balance);
 
 		self.reward_winner_event(game_index, &winner, &prize);
 
@@ -107,7 +102,7 @@ pub trait CryptoBubbles {
 	}
 
 	// owner transfers prize into winner SC account, then transfers funds to player wallet
-	#[endpoint(rewardAndSendToWaller)]
+	#[endpoint(rewardAndSendToWallet)]
 	fn reward_and_send_to_wallet(
 		&self,
 		game_index: &BigUint,
@@ -121,11 +116,18 @@ pub trait CryptoBubbles {
 
 	// Storage
 
+	#[view(balanceOf)]
 	#[storage_get("playerBalance")]
-	fn storage_get_player_balance(&self, player: &Address) -> BigUint;
+	fn get_player_balance(&self, player: &Address) -> BigUint;
 
 	#[storage_set("playerBalance")]
-	fn storage_set_player_balance(&self, player: &Address, balance: &BigUint);
+	fn set_player_balance(&self, player: &Address, balance: &BigUint);
+
+	#[storage_get("owner")]
+	fn get_owner(&self) -> Address;
+
+	#[storage_set("owner")]
+	fn set_owner(&self, owner: &Address);
 
 	// Events
 

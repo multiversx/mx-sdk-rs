@@ -2,10 +2,6 @@
     "name": "rewardWinner",
     "steps": [
         {
-            "step": "externalSteps",
-            "path": "create.scen.json"
-        },
-        {
             "step": "setState",
             "accounts": {
                 "address:creator_address": {
@@ -18,6 +14,7 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
+                        "''owner": "address:creator_address",
                         "''playerBalance|address:acc1": "0x100",
                         "''playerBalance|address:acc2": "0x100"
                     },
@@ -72,6 +69,7 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
+                        "''owner": "address:creator_address",
                         "''playerBalance|address:acc1": "0x300",
                         "''playerBalance|address:acc2": "0x100"
                     },
