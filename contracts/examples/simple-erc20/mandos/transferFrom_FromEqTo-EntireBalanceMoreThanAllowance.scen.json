@@ -1,0 +1,72 @@
+{
+    "name": "transferFrom_FromEqTo-EntireBalanceMoreThanAllowance",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "``account_1_____________________s1": {
+                    "nonce": "0",
+                    "balance": "0xe8d4a51000",
+                    "storage": {},
+                    "code": ""
+                },
+                "``busd__________________________s1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``allowance|``coin_holder_1_________________sx|``account_1_____________________s1": "0x270f",
+                        "``balance|``coin_holder_1_________________sx": "0x2710",
+                        "``total_supply": "0x2710"
+                    },
+                    "code": "file:../output/simple-erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "``account_1_____________________s1",
+                "to": "``busd__________________________s1",
+                "value": "0",
+                "function": "transferFrom",
+                "arguments": [
+                    "``coin_holder_1_________________sx",
+                    "``coin_holder_1_________________sx",
+                    "0x2710"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "0x04",
+                "message": "str:allowance exceeded",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "``account_1_____________________s1": {
+                    "nonce": "1",
+                    "balance": "0xe8d4951000",
+                    "storage": {},
+                    "code": ""
+                },
+                "``busd__________________________s1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``allowance|``coin_holder_1_________________sx|``account_1_____________________s1": "0x270f",
+                        "``balance|``coin_holder_1_________________sx": "0x2710",
+                        "``total_supply": "0x2710"
+                    },
+                    "code": "file:../output/simple-erc20.wasm"
+                }
+            }
+        }
+    ]
+}

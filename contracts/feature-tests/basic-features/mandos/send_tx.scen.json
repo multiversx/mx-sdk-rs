@@ -1,0 +1,44 @@
+{
+    "name": "eventA1",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {},
+                    "code": "file:../output/features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "send_tx_endpoint",
+                "arguments": [
+                    "address:an_account",
+                    "10000"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "*",
+                "message": "str:failed transfer (insufficient funds)",
+                "logs": []
+            }
+        }
+    ]
+}

@@ -5,25 +5,25 @@ members = [
   "elrond-wasm-derive",
   "mandos",
 
-  "modules/elrond-wasm-module-features",
-  "modules/elrond-wasm-module-pause",
+  "contracts/modules/elrond-wasm-module-features",
+  "contracts/modules/elrond-wasm-module-pause",
 
-  "examples/adder",
-  "examples/adder/debug",
-  "examples/crypto-bubbles",
-  "examples/factorial",
-  "examples/simple-erc20",
-  "examples/crowdfunding-egld",
-  "examples/crowdfunding-erc20",
-  "examples/crowdfunding-esdt",
-  "examples/lottery",
-  "examples/lottery-erc20",
-
-  "test-contracts/async",
-  "test-contracts/async/async-alice",
-  "test-contracts/async/async-bob",
-  "test-contracts/basic-features",
-  "test-contracts/use-module",
+  "contracts/examples/adder",
+  "contracts/examples/adder/debug",
+  "contracts/examples/crypto-bubbles",
+  "contracts/examples/factorial",
+  "contracts/examples/simple-erc20",
+  "contracts/examples/crowdfunding-egld",
+  "contracts/examples/crowdfunding-erc20",
+  "contracts/examples/crowdfunding-esdt",
+  "contracts/examples/lottery",
+  "contracts/examples/lottery-erc20",
+  
+  "contracts/test-contracts/async",
+  "contracts/test-contracts/async/async-alice",
+  "contracts/test-contracts/async/async-bob",
+  "contracts/test-contracts/basic-features",
+  "contracts/test-contracts/use-module",
 ]
 
 exclude = [

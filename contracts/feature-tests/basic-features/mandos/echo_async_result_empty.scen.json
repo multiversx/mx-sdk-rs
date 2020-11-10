@@ -1,0 +1,69 @@
+{
+    "name": "echo_async_result_empty",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {},
+                    "code": "file:../output/features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1-ok",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "echo_async_result_empty",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2-err",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "echo_async_result_empty",
+                "arguments": [
+                    "5",
+                    "''message"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:message",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+        
+    ]
+}

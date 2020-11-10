@@ -1,0 +1,22 @@
+[package]
+name = "async-alice-wasm"
+version = "0.2.0"
+authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies]
+async-alice = { path = "..", features=["wasm-output-mode"] }
+elrond-wasm-output = { version = "0.9.6", path = "../../../../../elrond-wasm-output", features=["wasm-output-mode"] }
+
+[workspace]
+members = ["."]
