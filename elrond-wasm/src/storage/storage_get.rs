@@ -42,7 +42,7 @@ where
 	}
 
 	fn into_boxed_slice_u8(self) -> Box<[u8]> {
-		self.api.storage_load_boxed_slice_u8(self.key)
+		self.api.storage_load_boxed_bytes(self.key).into_box()
 	}
 
 	fn into_u64(self) -> u64 {
@@ -86,8 +86,7 @@ where
 	BigUint: NestedEncode + 'static,
 	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
 {
-	let mut decode_err_message: Vec<u8> = Vec::new();
-	decode_err_message.extend_from_slice(err_msg::STORAGE_DECODE_ERROR);
-	decode_err_message.extend_from_slice(de_err.message_bytes());
+	let decode_err_message =
+		BoxedBytes::from_concat(&[err_msg::STORAGE_DECODE_ERROR, de_err.message_bytes()][..]);
 	api.signal_error(decode_err_message.as_slice())
 }

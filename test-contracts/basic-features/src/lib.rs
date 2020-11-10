@@ -109,6 +109,12 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
+	fn echo_boxed_bytes(&self, arg: BoxedBytes) -> MultiResult2<BoxedBytes, usize> {
+		let l = arg.len();
+		(arg, l).into()
+	}
+
+	#[endpoint]
 	fn echo_slice_u8<'s>(&self, slice: &'s [u8]) -> MultiResult2<&'s [u8], usize> {
 		let l = slice.len();
 		(slice, l).into()
@@ -388,15 +394,6 @@ pub trait BasicFeatures {
 	#[endpoint(logEventB)]
 	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
 		self.event_b(arg1, arg2, data);
-	}
-
-	// VEC OPERATIONS
-
-	#[view]
-	fn vec_concat_const(&self) -> Vec<u8> {
-		let mut result = b"part1".to_vec();
-		result.extend_from_slice(&[0u8; 100][..]);
-		result
 	}
 
 	// SEND TX
@@ -764,6 +761,44 @@ pub trait BasicFeatures {
 		let mut r = a.clone();
 		r <<= b;
 		r
+	}
+
+	// MORE H256
+
+	#[endpoint]
+	fn compare_h256(&self, h1: H256, h2: H256) -> bool {
+		h1 == h2
+	}
+
+	#[endpoint]
+	fn h256_is_zero(&self, h: H256) -> bool {
+		h.is_zero()
+	}
+
+	// BOXED BYTES
+
+	#[endpoint]
+	fn boxed_bytes_zeros(&self, len: usize) -> BoxedBytes {
+		BoxedBytes::zeros(len)
+	}
+
+	#[endpoint]
+	fn boxed_bytes_concat_2(&self, slice1: &[u8], slice2: &[u8]) -> BoxedBytes {
+		BoxedBytes::from_concat(&[slice1, slice2][..])
+	}
+
+	#[endpoint]
+	fn boxed_bytes_split(&self, bb: BoxedBytes, at: usize) -> MultiResult2<BoxedBytes, BoxedBytes> {
+		bb.split(at).into()
+	}
+
+	// VEC OPERATIONS
+
+	#[view]
+	fn vec_concat_const(&self) -> Vec<u8> {
+		let mut result = b"part1".to_vec();
+		result.extend_from_slice(&[0u8; 100][..]);
+		result
 	}
 
 	// NON ZERO EXTRA
