@@ -4,22 +4,22 @@
         {
             "step": "setState",
             "accounts": {
-                "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000": {
+                "address:creator_address": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000": {
+                "address:contract_address": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000",
-                        "0xecd0fbc0b830c25b4e7580a58b78b7bd365ffc62e1df61a3c6e937dc080f8258": "0x100"
+                        "''owner": "address:creator_address",
+                        "''playerBalance|address:acc1": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
-                "0xacc1000000000000000000000000000000000000000000000000000000000000": {
+                "address:acc1": {
                     "nonce": "0",
                     "balance": "0x200000",
                     "storage": {},
@@ -31,8 +31,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "0xacc1000000000000000000000000000000000000000000000000000000000000",
-                "to": "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000",
+                "from": "address:acc1",
+                "to": "address:contract_address",
                 "value": "0",
                 "function": "withdraw",
                 "arguments": [
@@ -53,22 +53,22 @@
         {
             "step": "checkState",
             "accounts": {
-                "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000": {
+                "address:creator_address": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000": {
+                "address:contract_address": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000",
-                        "0xecd0fbc0b830c25b4e7580a58b78b7bd365ffc62e1df61a3c6e937dc080f8258": "0x100"
+                        "''owner": "address:creator_address",
+                        "''playerBalance|address:acc1": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
-                "0xacc1000000000000000000000000000000000000000000000000000000000000": {
+                "address:acc1": {
                     "nonce": "1",
                     "balance": "0",
                     "storage": {},
