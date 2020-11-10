@@ -14,6 +14,7 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
+                        "''owner": "address:creator_address",
                         "''playerBalance|address:acc1": "0x311",
                         "''playerBalance|address:acc2": "0x422"
                     },
@@ -166,6 +167,7 @@
                     "nonce": "0",
                     "balance": "0x2450",
                     "storage": {
+                        "''owner": "address:creator_address",
                         "''playerBalance|address:acc1": "0x311",
                         "''playerBalance|address:acc2": "0x422"
                     },

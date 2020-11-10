@@ -13,7 +13,9 @@
                 "address:contract_address": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "''owner": "address:creator_address"
+                    },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
@@ -96,7 +98,9 @@
                 "address:contract_address": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "''owner": "address:creator_address"
+                    },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
