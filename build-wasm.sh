@@ -6,61 +6,61 @@
 
 export RUSTFLAGS=${RUSTFLAGS-'-C link-arg=-s'}
 
-cd examples/adder/wasm
+cd contracts/examples/adder/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/adder_wasm.wasm output/adder.wasm
-cd ../..
+cd ../../..
 
-cd examples/crypto-bubbles/wasm
+cd contracts/examples/crypto-bubbles/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/crypto_bubbles_wasm.wasm output/crypto-bubbles.wasm
-cd ../..
+cd ../../..
 
-cd examples/factorial/wasm
+cd contracts/examples/factorial/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/factorial_wasm.wasm output/factorial.wasm
-cd ../..
+cd ../../..
 
-cd examples/simple-erc20/wasm
+cd contracts/examples/simple-erc20/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/simple_erc20_wasm.wasm output/simple-erc20.wasm
-cd ../..
+cd ../../..
 
 
 ### TEST CONTRACTS ###
 
-cd test-contracts/basic-features/wasm
+cd contracts/test-contracts/basic-features/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/features.wasm
-cd ../..
+cd ../../..
 
-cd test-contracts/async/async-alice/wasm
+cd contracts/test-contracts/async/async-alice/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
-cd ../../..
+cd ../../../..
 
-cd test-contracts/async/async-bob/wasm
+cd contracts/test-contracts/async/async-bob/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.wasm
-cd ../../..
+cd ../../../..
 
-cd test-contracts/use-module/wasm
+cd contracts/test-contracts/use-module/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/use_module_wasm.wasm output/use_module.wasm
-cd ../..
+cd ../../..

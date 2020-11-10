@@ -1,0 +1,191 @@
+{
+    "name": "joinGame",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:creator_address": {
+                    "nonce": "0",
+                    "balance": "0x10000000",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:contract_address": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {
+                        "''owner": "address:creator_address",
+                        "''playerBalance|address:acc1": "0x311",
+                        "''playerBalance|address:acc2": "0x422"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0x20100200",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "0x20202150",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:contract_address",
+                "value": "0x200",
+                "function": "joinGame",
+                "arguments": [
+                    "0x12"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "address:acc1"
+                        ],
+                        "data": "0x0200"
+                    },
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "topics": [
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc1"
+                        ],
+                        "data": "0x200"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:acc2",
+                "to": "address:contract_address",
+                "value": "0x150",
+                "function": "joinGame",
+                "arguments": [
+                    "0x12"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "address:acc2"
+                        ],
+                        "data": "0x150"
+                    },
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "topics": [
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc2"
+                        ],
+                        "data": "0x150"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:acc2",
+                "to": "address:contract_address",
+                "value": "0x2000",
+                "function": "joinGame",
+                "arguments": [
+                    "0x12"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "address:acc2"
+                        ],
+                        "data": "0x2000"
+                    },
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "topics": [
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc2"
+                        ],
+                        "data": "0x2000"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:creator_address": {
+                    "nonce": "0",
+                    "balance": "0x10000000",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:contract_address": {
+                    "nonce": "0",
+                    "balance": "0x2450",
+                    "storage": {
+                        "''owner": "address:creator_address",
+                        "''playerBalance|address:acc1": "0x311",
+                        "''playerBalance|address:acc2": "0x422"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0x20000000",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:acc2": {
+                    "nonce": "2",
+                    "balance": "0x20000000",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

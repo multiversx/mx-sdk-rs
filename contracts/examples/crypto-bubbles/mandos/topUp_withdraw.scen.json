@@ -1,0 +1,116 @@
+{
+    "name": "topUp_withdraw",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:creator_address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:contract_address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''owner": "address:creator_address"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0x7200000",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:contract_address",
+                "value": "0x4000000",
+                "function": "topUp",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "topics": [
+                            "address:acc1"
+                        ],
+                        "data": "0x4000000"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:contract_address",
+                "value": "0",
+                "function": "withdraw",
+                "arguments": [
+                    "0x4000000"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "address:contract_address",
+                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000002",
+                        "topics": [
+                            "address:acc1"
+                        ],
+                        "data": "0x4000000"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:creator_address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:contract_address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''owner": "address:creator_address"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "2",
+                    "balance": "0x7000000",
+                    "storage": {},
+                    "code": "",
+                    "asyncCallData": "str:crypto bubbles"
+                }
+            }
+        }
+    ]
+}
