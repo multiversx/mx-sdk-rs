@@ -71,6 +71,15 @@ impl fmt::Display for BigUintValue {
 	}
 }
 
+impl Default for BigUintValue {
+	fn default() -> Self {
+		BigUintValue {
+			original: ValueSubTree::default(),
+			value: BigUint::from(0u32),
+		}
+	}
+}
+
 #[derive(Debug)]
 pub struct U64Value {
 	pub value: u64,

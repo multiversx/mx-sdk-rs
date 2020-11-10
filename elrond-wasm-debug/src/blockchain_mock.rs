@@ -31,6 +31,7 @@ pub struct AccountData {
 	pub nonce: u64,
 	pub balance: BigUint,
 	pub storage: HashMap<Vec<u8>, Vec<u8>>,
+	pub esdt: Option<HashMap<Vec<u8>, BigUint>>,
 	pub contract_path: Option<Vec<u8>>,
 	pub contract_owner: Option<Address>,
 }
@@ -38,9 +39,10 @@ pub struct AccountData {
 impl fmt::Display for AccountData {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let mut storage_buf = String::new();
-		let mut keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-		keys.sort();
-		for key in &keys {
+		let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+		storage_keys.sort();
+
+		for key in &storage_keys {
 			let value = self.storage.get(key).unwrap();
 			write!(
 				&mut storage_buf,
@@ -51,10 +53,26 @@ impl fmt::Display for AccountData {
 			.unwrap();
 		}
 
+		let mut esdt_buf = String::new();
+		let esdt_unwrapped = self.esdt.clone().unwrap_or_default();
+		let mut esdt_keys: Vec<Vec<u8>> = esdt_unwrapped.iter().map(|(k, _)| k.clone()).collect();
+		esdt_keys.sort();
+
+		for key in &esdt_keys {
+			let value = esdt_unwrapped.get(key).unwrap();
+			write!(
+				&mut esdt_buf,
+				"\n\t\t{} -> 0x{}",
+				key_hex(key.as_slice()),
+				hex::encode(value.to_bytes_be())
+			)
+			.unwrap();
+		}
+
 		write!(
 			f,
-			"AccountData {{ nonce: {}, balance: {}, storage: [{} ] }}",
-			self.nonce, self.balance, storage_buf
+			"AccountData {{ nonce: {}, balance: {}, storage: [{} ], esdt: [{} ] }}",
+			self.nonce, self.balance, storage_buf, esdt_buf
 		)
 	}
 }
@@ -181,6 +199,68 @@ impl BlockchainMock {
 		}
 	}
 
+	pub fn substract_esdt_balance(
+		&mut self,
+		address: &Address,
+		esdt_token_name: &[u8],
+		value: &BigUint,
+	) {
+		let sender_account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Sender account {} not found", address_hex(&address)));
+
+		let esdt = sender_account
+			.esdt
+			.as_mut()
+			.unwrap_or_else(|| panic!("Account {} has no esdt tokens", address_hex(&address)));
+
+		let esdt_balance = esdt.get_mut(esdt_token_name).unwrap_or_else(|| {
+			panic!(
+				"Account {} has no esdt tokens with name {}",
+				address_hex(&address),
+				String::from_utf8(esdt_token_name.to_vec()).unwrap()
+			)
+		});
+
+		assert!(
+			*esdt_balance >= *value,
+			"Not enough esdt balance, have {}, need at least {}",
+			esdt_balance,
+			value
+		);
+
+		*esdt_balance -= value;
+	}
+
+	pub fn increase_esdt_balance(
+		&mut self,
+		address: &Address,
+		esdt_token_name: &[u8],
+		value: &BigUint,
+	) {
+		let account = self
+			.accounts
+			.get_mut(address)
+			.unwrap_or_else(|| panic!("Receiver account not found"));
+
+		if account.esdt.is_none() {
+			let mut new_esdt = HashMap::<Vec<u8>, BigUint>::new();
+			new_esdt.insert(esdt_token_name.to_vec(), value.clone());
+
+			account.esdt = Some(new_esdt);
+		} else {
+			let esdt = account.esdt.as_mut().unwrap();
+
+			if esdt.contains_key(esdt_token_name) {
+				let esdt_balance = esdt.get_mut(esdt_token_name).unwrap();
+				*esdt_balance += value;
+			} else {
+				esdt.insert(esdt_token_name.to_vec(), value.clone());
+			}
+		}
+	}
+
 	pub fn increase_nonce(&mut self, address: &Address) {
 		let account = self
 			.accounts
@@ -205,6 +285,16 @@ impl BlockchainMock {
 			.unwrap_or_else(|| {
 				panic!("Missing new address. Only explicit new deploy addresses supported")
 			});
+		let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
+		let mut esdt_opt: Option<HashMap<Vec<u8>, BigUint>> = None;
+
+		if !tx_input.esdt_token_name.is_empty() {
+			esdt.insert(
+				tx_input.esdt_token_name.clone(),
+				tx_input.esdt_value.clone(),
+			);
+			esdt_opt = Some(esdt);
+		}
 
 		let old_value = self.accounts.insert(
 			new_address.clone(),
@@ -213,6 +303,7 @@ impl BlockchainMock {
 				nonce: 0,
 				balance: tx_input.call_value.clone(),
 				storage: new_storage,
+				esdt: esdt_opt,
 				contract_path: Some(contract_path),
 				contract_owner: Some(tx_input.from.clone()),
 			},

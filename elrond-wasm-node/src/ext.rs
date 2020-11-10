@@ -282,18 +282,13 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    #[inline]
-    fn get_esdt_token_name(&self) -> Option<Vec<u8>> {
+    fn get_esdt_token_name(&self) -> Vec<u8> {
+        // TODO: returning a boxed slice instead should marginally improve performance
         unsafe {
             let mut name = Vec::with_capacity(32);
             let name_len = getESDTTokenName(name.as_mut_ptr());
-            match name_len {
-                0 => None,
-                _ => {
-                    name.set_len(name_len as usize);
-                    Some(name)
-                }
-            }
+            name.set_len(name_len as usize);
+            name
         }
     }
 
