@@ -1,3 +1,4 @@
+use crate::BoxedBytes;
 use crate::*;
 use core::marker::PhantomData;
 use elrond_codec::DecodeError;
@@ -32,11 +33,14 @@ pub trait SignalError {
 	fn signal_error(&self, message: &[u8]) -> !;
 
 	fn signal_arg_de_error(&self, arg_id: ArgId, de_err: DecodeError) -> ! {
-		let mut decode_err_message: Vec<u8> = Vec::new();
-		decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_1);
-		decode_err_message.extend_from_slice(arg_id.as_bytes());
-		decode_err_message.extend_from_slice(err_msg::ARG_DECODE_ERROR_2);
-		decode_err_message.extend_from_slice(de_err.message_bytes());
+		let decode_err_message = BoxedBytes::from_concat(
+			&[
+				err_msg::ARG_DECODE_ERROR_1,
+				arg_id.as_bytes(),
+				err_msg::ARG_DECODE_ERROR_2,
+				de_err.message_bytes(),
+			][..],
+		);
 		self.signal_error(decode_err_message.as_slice())
 	}
 

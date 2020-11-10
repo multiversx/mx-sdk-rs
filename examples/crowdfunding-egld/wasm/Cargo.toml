@@ -16,7 +16,7 @@ panic = "abort"
 
 [dependencies]
 crowdfunding = { path = "..", features=["wasm-output-mode"]}
-elrond-wasm-output = { version = "0.9.2", path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
+elrond-wasm-output = { version = "0.9.6", path = "../../../elrond-wasm-output", features=["wasm-output-mode"]}
 
 [workspace]
 members = ["."]

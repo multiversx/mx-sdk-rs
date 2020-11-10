@@ -1,4 +1,4 @@
-use elrond_wasm::{H256, Address, Vec, Box};
+use elrond_wasm::{H256, Address, Vec, Box, BoxedBytes};
 
 use crate::big_int::*;
 use crate::big_uint::*;
@@ -78,27 +78,27 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_sc_address(&self) -> Address {
         unsafe {
-            let mut res = [0u8; 32];
+            let mut res = Address::zero();
             getSCAddress(res.as_mut_ptr());
-            res.into()
+            res
         }
     }
 
     #[inline]
     fn get_owner_address(&self) -> Address {
         unsafe {
-            let mut res = [0u8; 32];
+            let mut res = Address::zero();
             getOwnerAddress(res.as_mut_ptr());
-            res.into()
+            res
         }
     }
 
     #[inline]
     fn get_caller(&self) -> Address {
         unsafe {
-            let mut res = [0u8; 32];
+            let mut res = Address::zero();
             getCaller(res.as_mut_ptr());
-            res.into()
+            res
         }
     }
 
@@ -133,10 +133,10 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
        }
    }
 
-   fn storage_load_boxed_slice_u8(&self, key: &[u8]) -> Box<[u8]> {
+   fn storage_load_boxed_bytes(&self, key: &[u8]) -> BoxedBytes {
         let len = self.storage_load_len(key);
         unsafe {
-            let mut res = Box::<[u8]>::new_uninit_slice(len).assume_init();
+            let mut res = BoxedBytes::allocate(len);
             if len > 0 {
                 storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             }
@@ -239,11 +239,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[cfg(not(feature = "small-int-ei"))]
     #[inline(never)]
     fn storage_load_u64(&self, key: &[u8]) -> u64 {
-        let bytes = self.storage_load_boxed_slice_u8(key);
+        let bytes = self.storage_load_boxed_bytes(key);
         if bytes.len() > 8 {
             ext_error::signal_error(err_msg::STORAGE_VALUE_OUT_OF_RANGE);
         }
-        elrond_wasm::elrond_codec::bytes_to_number(&bytes, false)
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), false)
     }
 
     #[cfg(feature = "small-int-ei")]
@@ -257,11 +257,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[cfg(not(feature = "small-int-ei"))]
     #[inline(never)]
     fn storage_load_i64(&self, key: &[u8]) -> i64 {
-        let bytes = self.storage_load_boxed_slice_u8(key);
+        let bytes = self.storage_load_boxed_bytes(key);
         if bytes.len() > 8 {
             ext_error::signal_error(err_msg::STORAGE_VALUE_OUT_OF_RANGE);
         }
-        elrond_wasm::elrond_codec::bytes_to_number(&bytes, true) as i64
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), true) as i64
     }
 
     #[inline]
@@ -319,7 +319,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_tx_hash(&self) -> H256 {
         unsafe {
-            let mut res = [0u8; 32];
+            let mut res = H256::zero();
             getOriginalTxHash(res.as_mut_ptr());
             res.into()
         }
@@ -353,6 +353,7 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn get_block_random_seed(&self) -> Box<[u8; 48]> {
         unsafe {
+
             let mut res = [0u8; 48];
             getBlockRandomSeed(res.as_mut_ptr());
             Box::new(res) 
@@ -444,30 +445,17 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         res
     }
 
-    fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
+    fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
         let len = self.get_argument_len(arg_index);
         unsafe {
-            let mut res = Box::<[u8]>::new_uninit_slice(len).assume_init();
+            let mut res = BoxedBytes::allocate(len);
             if len > 0 {
                 getArgument(arg_index, res.as_mut_ptr());
             }
             res
         }
     }
-
-    #[inline]
-    fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32] {
-        unsafe {
-            let mut res = [0u8; 32];
-            let len = getArgument(arg_index, res.as_mut_ptr());
-            if len != 32 {
-                self.signal_error(err_msg::ARG_BAD_LENGTH_32);
-            }
-            res
-        }
-    }
     
-    #[inline]
     fn get_argument_big_uint(&self, arg_id: i32) -> ArwenBigUint {
         unsafe {
             let result = bigIntNew(0);
@@ -476,7 +464,6 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
 
-    #[inline]
     fn get_argument_big_int(&self, arg_id: i32) -> ArwenBigInt {
         unsafe {
             let result = bigIntNew(0);
@@ -493,11 +480,11 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     #[cfg(not(feature = "small-int-ei"))]
     fn get_argument_u64(&self, arg_id: i32) -> u64 {
-        let bytes = self.get_argument_boxed_slice_u8(arg_id);
+        let bytes = self.get_argument_boxed_bytes(arg_id);
         if bytes.len() > 8 {
             ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
         }
-        elrond_wasm::elrond_codec::bytes_to_number(&bytes, false)
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), false)
     }
 
     #[cfg(feature = "small-int-ei")]
@@ -508,24 +495,17 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
     #[cfg(not(feature = "small-int-ei"))]
     fn get_argument_i64(&self, arg_id: i32) -> i64 {
-        let bytes = self.get_argument_boxed_slice_u8(arg_id);
+        let bytes = self.get_argument_boxed_bytes(arg_id);
         if bytes.len() > 8 {
             ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
         }
-        elrond_wasm::elrond_codec::bytes_to_number(&bytes, true) as i64
+        elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), true) as i64
     }
     
     #[inline]
     fn finish_slice_u8(&self, slice: &[u8]) {
         unsafe {
             finish(slice.as_ptr(), slice.len() as i32);
-        }
-    }
-
-    #[inline]
-    fn finish_bytes32(&self, bytes: &[u8; 32]) {
-        unsafe {
-            finish(bytes.as_ptr(), 32i32);
         }
     }
 

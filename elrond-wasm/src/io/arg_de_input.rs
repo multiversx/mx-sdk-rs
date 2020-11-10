@@ -51,7 +51,7 @@ where
 	}
 
 	fn into_boxed_slice_u8(self) -> Box<[u8]> {
-		self.api.get_argument_boxed_slice_u8(self.arg_index)
+		self.api.get_argument_boxed_bytes(self.arg_index).into_box()
 	}
 
 	fn into_u64(self) -> u64 {

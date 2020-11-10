@@ -56,8 +56,8 @@ where
 
 	fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8>;
 
-	fn storage_load_boxed_slice_u8(&self, key: &[u8]) -> Box<[u8]> {
-		self.storage_load_vec_u8(key).into_boxed_slice()
+	fn storage_load_boxed_bytes(&self, key: &[u8]) -> BoxedBytes {
+		self.storage_load_vec_u8(key).into()
 	}
 
 	fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]);
@@ -145,14 +145,8 @@ pub trait ContractIOApi<BigInt, BigUint>: Clone {
 
 	fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8>;
 
-	fn get_argument_boxed_slice_u8(&self, arg_index: i32) -> Box<[u8]> {
-		self.get_argument_vec_u8(arg_index).into_boxed_slice()
-	}
-
-	fn get_argument_bytes32(&self, arg_index: i32) -> [u8; 32];
-
-	fn get_argument_address(&self, arg_index: i32) -> Address {
-		self.get_argument_bytes32(arg_index).into()
+	fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
+		self.get_argument_vec_u8(arg_index).into()
 	}
 
 	fn get_argument_big_int(&self, arg_id: i32) -> BigInt;
@@ -164,8 +158,6 @@ pub trait ContractIOApi<BigInt, BigUint>: Clone {
 	fn get_argument_i64(&self, arg_id: i32) -> i64;
 
 	fn finish_slice_u8(&self, slice: &[u8]);
-
-	fn finish_bytes32(&self, bytes: &[u8; 32]);
 
 	fn finish_big_int(&self, b: &BigInt);
 
@@ -330,7 +322,7 @@ macro_rules! imports {
 			AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi, ContractIOApi,
 			OtherContractHandle,
 		};
-		use elrond_wasm::{BorrowedMutStorage, Box, Queue, String, VarArgs, Vec};
+		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, String, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
 	};
 }

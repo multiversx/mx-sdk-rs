@@ -18,6 +18,11 @@ fn block_info() {
 }
 
 #[test]
+fn boxed_bytes_zeros() {
+	parse_execute_mandos("mandos/boxed_bytes_zeros.scen.json", &contract_map());
+}
+
+#[test]
 fn count_ones() {
 	parse_execute_mandos("mandos/count_ones.scen.json", &contract_map());
 }
@@ -80,6 +85,11 @@ fn echo_slice_u8() {
 #[test]
 fn echo_vec_u8() {
 	parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_boxed_bytes() {
+	parse_execute_mandos("mandos/echo_boxed_bytes.scen.json", &contract_map());
 }
 
 #[test]
