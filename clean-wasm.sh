@@ -2,30 +2,30 @@
 
 # cleans all wasm targets
 
-cd examples/adder/wasm
+cd contracts/examples/adder/wasm
 cargo clean
-cd ../../..
+cd ../../../..
 
-cd examples/crypto-bubbles/wasm
+cd contracts/examples/crypto-bubbles/wasm
 cargo clean
-cd ../../..
+cd ../../../..
 
-cd examples/factorial/wasm
+cd contracts/examples/factorial/wasm
 cargo clean
-cd ../../..
+cd ../../../..
 
-cd examples/simple-erc20/wasm
+cd contracts/examples/simple-erc20/wasm
 cargo clean
-cd ../../..
+cd ../../../..
 
-cd test-contracts/basic-features/wasm
+cd contracts/feature-tests/basic-features/wasm
 cargo clean
-cd ../../..
+cd ../../../..
 
-cd test-contracts/async-alice/wasm
+cd contracts/feature-tests/async/async-alice/wasm
 cargo clean
-cd ../../..
+cd ../../../../..
 
-cd test-contracts/async-bob/wasm
+cd contracts/feature-tests/async/async-bob/wasm
 cargo clean
-cd ../../..
+cd ../../../../..
