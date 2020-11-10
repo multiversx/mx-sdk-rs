@@ -93,7 +93,7 @@ fn buy_ticket_wrong_fee() {
 }
 
 #[test]
-fn buy_ticket() {
+fn buy_ticket_simple() {
 	parse_execute_mandos("mandos/buy-ticket.scen.json", &contract_map());
 }
 
@@ -118,6 +118,7 @@ fn determine_winner_same_ticket_holder() {
 	);
 }
 
+/* NOT SUPPORTED YET
 #[test]
 fn determine_winner_split_prize_pool() {
 	parse_execute_mandos(
@@ -125,6 +126,7 @@ fn determine_winner_split_prize_pool() {
 		&contract_map(),
 	);
 }
+*/
 
 #[test]
 fn lottery_init() {
@@ -185,7 +187,7 @@ fn start_limited_tickets_and_fixed_deadline_valid() {
 }
 
 #[test]
-fn start_limited_tickets() {
+fn start_limited_tickets_simple() {
 	parse_execute_mandos("mandos/start-limited-tickets.scen.json", &contract_map());
 }
 

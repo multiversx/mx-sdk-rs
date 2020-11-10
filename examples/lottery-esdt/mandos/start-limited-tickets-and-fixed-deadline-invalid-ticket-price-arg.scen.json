@@ -15,6 +15,7 @@
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
+                    "str:lottery_token",
                     "0",
                     "0x01|u32:2",
                     "0x01|u64:123,456",
