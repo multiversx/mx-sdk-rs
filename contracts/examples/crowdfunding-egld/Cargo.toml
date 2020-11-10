@@ -1,5 +1,5 @@
 [package]
-name = "crowdfunding"
+name = "crowdfunding-egld"
 version = "0.0.0"
 authors = ["dorin-iancu <dorin.iancu@elrond.com>"]
 edition = "2018"
@@ -10,10 +10,19 @@ path = "src/lib.rs"
 [features]
 wasm-output-mode = ["elrond-wasm-node"]
 
-[dependencies]
-elrond-wasm = { version = "0.9.6", path = "../../../elrond-wasm" }
-elrond-wasm-derive = { version = "0.9.6", path = "../../../elrond-wasm-derive" }
-elrond-wasm-node = { version = "0.9.6", path = "../../../elrond-wasm-node", optional = true }
+[dependencies.elrond-wasm]
+version = "0.9.6"
+path = "../../../elrond-wasm"
 
-[dev-dependencies]
-elrond-wasm-debug = { version = "0.9.6", path = "../../../elrond-wasm-debug" }
+[dependencies.elrond-wasm-derive]
+version = "0.9.6"
+path = "../../../elrond-wasm-derive"
+
+[dependencies.elrond-wasm-node]
+version = "0.9.6"
+path = "../../../elrond-wasm-node"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.9.6"
+path = "../../../elrond-wasm-debug"

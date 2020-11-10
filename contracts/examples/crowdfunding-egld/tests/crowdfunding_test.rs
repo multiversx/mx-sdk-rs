@@ -1,5 +1,5 @@
-extern crate crowdfunding;
-use crowdfunding::*;
+extern crate crowdfunding_egld;
+use crowdfunding_egld::*;
 use elrond_wasm_debug::*;
 
 #[test]
