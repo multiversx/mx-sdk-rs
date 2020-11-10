@@ -89,7 +89,7 @@ where
 
 	fn get_esdt_value_big_uint(&self) -> BigUint;
 
-	fn get_esdt_token_name(&self) -> Option<Vec<u8>>;
+	fn get_esdt_token_name(&self) -> Vec<u8>;
 
 	fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
 
