@@ -1,8 +1,10 @@
 # Abstract
 
-The lottery smart contract is designed to allow anyone to create their very own lottery, directly on the blockchain. Having said that, the purpose of this contract is just to have a bit of fun and show what’s possible on the current version of the Elrond blockchain. We do not endorse gambling and this should never really be used with high sums of eGLD.
+The lottery smart contract is designed to allow anyone to create their very own lottery, directly on the blockchain. Having said that, the purpose of this contract is just to have a bit of fun and show what’s possible on the current version of the Elrond blockchain. We do not endorse gambling. 
 
-Now that that’s out of the way, there’s not much else to say in this section. It’s just a lottery! You buy tickets and hope to win. The difference between this and the traditional lottery is that you don’t pick some numbers, you just buy a ticket and at the end, one (or more) of the tickets are declared the “winning tickets”.  
+This is the esdt version, which allows any arbitrary token to be used as currency.
+
+Now that that’s out of the way, there’s not much else to say in this section. It’s just a lottery! You buy tickets and hope to win. The difference between this and the traditional lottery is that you don’t pick some numbers, you just buy a ticket and at the end, one (more winning tickets not supported as of yet) of the tickets is declared the “winning ticket”.  
 
 # Available actions
 
@@ -16,6 +18,7 @@ Once the SC has been deployed, anyone can start a lottery, using the following f
 
 ```
 start(lottery_name: Vec<u8>,
+        esdt_token_name: Vec<u8>,
         ticket_price: BigUint, 
         opt_total_tickets: Option<u32>, 
         opt_deadline: Option<u64>,
@@ -34,14 +37,12 @@ The function requires the following arguments: (Note: Optional arguments still h
         Example: Option&lt;u32&gt; want to pass 4 as value, pass 0x0100000004)  
 
 - lottery_name: Each lottery has to have a unique, case-sensitive name, using ASCII characters only.
-- ticket_price: The price of the ticket in ERD wei (1 ERD/eGLD = 10^18 ERD wei). For example, 2000000000000000000 for 2 eGLD ticket price.
+- esdt_token_name: The name of the esdt token that will be used as currency for this lottery.
+- ticket_price: The price of the ticket, currency is the esdt token set above.
 - total_tickets (Optional): The total available tickets for the lottery. If they're sold out, the lottery can be ended. Default is "unlimited"
 - deadline (Optional): The deadline for the lottery, expressed as a timestamp. The default and the maximum is 30 days in the future.
 - max_entries_per_user (Optional): The max number of tickets each user can buy. The default is unlimited.
-- prize_distribution (Optional): An array of unsigned integer values that add up to exactly 100 (%). Example: [75, 15, 10]
-    [0] -> 1st ticket winner prize (75% of total pool)
-    [1] -> 2nd ticket winner prize (15% of total pool)
-    [2] -> 3rd ticket winner prize (10% of total pool)
+- prize_distribution (Optional): Not supported in the current version. In the future, you will be able to split the prize pool. Current version only supports one winner per lottery.
 - whitelist (Optional): If provided, only the addresses on the list can participate in this lottery.
 
 # Actions after lottery start
@@ -85,6 +86,7 @@ fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigU
 
 ```
 pub struct LotteryInfo<BigUint:BigUintApi> {
+    pub esdt_token_name: Vec<u8>
     pub ticket_price: BigUint,
     pub tickets_left: u32,
     pub deadline: u64,
@@ -99,7 +101,7 @@ pub struct LotteryInfo<BigUint:BigUintApi> {
 It basically contains the exact same fields as the arguments of the start function, plus an additional two fields:
 
 *current\_ticket\_number*: Could be called “tickets sold”, but this name makes more sense in the implementation.  
-*prize\_pool*: the accumulated eGLD up until now.
+*prize\_pool*: the accumulated esdt tokens up until now.
 
 ## 2) State-altering functions
 
@@ -108,10 +110,10 @@ Up until now, we’ve only looked at functions that allow you to get information
 Using the following function, you may buy a ticket for one of the available lotteries:
 
 ```
-fn buy_ticket(lottery_name: Vec<u8>, #[payment] payment: BigUint)
+fn buy_ticket(lottery_name: Vec<u8>)
 ```
 
-All you need to do is pass along the name of the lottery you wish to purchase the ticket for and deposit the appropriate sum of eGLD, corresponding to the ticket cost.
+All you need to do is pass along the name of the lottery you wish to purchase the ticket for and deposit the appropriate sum of the specific esdt tokens, corresponding to the ticket cost.
 
 Don’t know the ticket cost? Simply ask the lottery creator, or use the query function described in part 1.
 
