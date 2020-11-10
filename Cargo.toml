@@ -15,7 +15,7 @@ members = [
   "contracts/examples/crowdfunding-egld",
   "contracts/examples/crowdfunding-erc20",
   "contracts/examples/crowdfunding-esdt",
-  "contracts/examples/lottery",
+  "contracts/examples/lottery-egld",
   "contracts/examples/lottery-erc20",
   "contracts/examples/lottery-esdt",
   

@@ -1,5 +1,5 @@
-extern crate lottery;
-use lottery::*;
+extern crate lottery_egld;
+use lottery_egld::*;
 
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
