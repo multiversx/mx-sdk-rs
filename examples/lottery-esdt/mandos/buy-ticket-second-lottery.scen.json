@@ -6,12 +6,27 @@
             "path": "start-second-lottery.scen.json"
         },
         {
+            "step": "setState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {},
+                    "esdt": {
+                        "str:lottery_tok$$": "500"
+                    }
+                }
+            }
+        },
+        {
             "step": "scCall",
             "txId": "buy-ticket-2nd-lottery",
             "tx": {
                 "from": "address:acc1",
                 "to": "address:the_lottery_contract",
-                "value": "500",
+                "value": "0",
+                "esdtTokenName": "str:lottery_tok$$",
+                "esdtValue": "500",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_$$$$"
@@ -35,7 +50,7 @@
                 },
                 "address:acc1": {
                     "nonce": "2",
-                    "balance": "999,500",
+                    "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc2": {
@@ -45,15 +60,18 @@
                 },
                 "address:the_lottery_contract": {
                     "nonce": "0",
-                    "balance": "500",
+                    "balance": "0",
                     "storage": {
                         "''lotteryExists|u32:12|''lottery_name": "u8:1",
-                        "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:2|u64:123,456|u32:800|u32:1|u8:100|u32:0|u32:0|u32:0",
+                        "''lotteryInfo|u32:12|''lottery_name": "u32:13|str:lottery_token|u32:1|u8:100|u32:2|u64:123,456|u32:800|u32:1|u8:100|u32:0|u32:0|u32:0",
 
                         "''lotteryExists|u32:12|''lottery_$$$$": "u8:1",
-                        "''lotteryInfo|u32:12|''lottery_$$$$": "u32:2|u16:500|u32:4|u64:234,567|u32:800|u32:1|u8:100|u32:0|u32:1|u32:2|u16:500",
+                        "''lotteryInfo|u32:12|''lottery_$$$$": "u32:13|str:lottery_tok$$|u32:2|u16:500|u32:4|u64:234,567|u32:800|u32:1|u8:100|u32:0|u32:1|u32:2|u16:500",
                         "''ticketHolder|u32:12|''lottery_$$$$|0x00000000": "address:acc1",
                         "''numberOfEntriesForUser|u32:12|''lottery_$$$$|address:acc1": "1"
+                    },
+                    "esdt": {
+                        "str:lottery_tok$$": "500"
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

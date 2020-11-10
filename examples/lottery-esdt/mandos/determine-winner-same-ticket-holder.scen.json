@@ -43,7 +43,10 @@
                 "address:acc1": {
                     "nonce": "2",
                     "balance": "1,000,000",
-                    "storage": {}
+                    "storage": {},
+                    "esdt": {
+                        "str:lottery_token": "200"
+                    }
                 },
                 "address:acc2": {
                     "nonce": "0",
