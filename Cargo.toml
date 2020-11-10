@@ -5,8 +5,7 @@ members = [
   "elrond-wasm-derive",
   "mandos",
 
-  "contracts/modules/elrond-wasm-module-features",
-  "contracts/modules/elrond-wasm-module-pause",
+  "contracts/benchmarks/str-repeat",
 
   "contracts/examples/adder",
   "contracts/examples/adder/debug",
@@ -19,11 +18,14 @@ members = [
   "contracts/examples/lottery",
   "contracts/examples/lottery-erc20",
   
-  "contracts/test-contracts/async",
-  "contracts/test-contracts/async/async-alice",
-  "contracts/test-contracts/async/async-bob",
-  "contracts/test-contracts/basic-features",
-  "contracts/test-contracts/use-module",
+  "contracts/feature-tests/async",
+  "contracts/feature-tests/async/async-alice",
+  "contracts/feature-tests/async/async-bob",
+  "contracts/feature-tests/basic-features",
+  "contracts/feature-tests/use-module",
+
+  "contracts/modules/elrond-wasm-module-features",
+  "contracts/modules/elrond-wasm-module-pause",
 ]
 
 exclude = [
