@@ -37,8 +37,10 @@ pub trait CryptoBubbles {
 	fn _transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
 		let mut balance = self.get_player_balance(player);
 
-		require!(amount <= &balance,
-			"amount to withdraw must be less or equal to balance");
+		require!(
+			amount <= &balance,
+			"amount to withdraw must be less or equal to balance"
+		);
 
 		balance -= amount;
 		self.set_player_balance(player, &balance);
@@ -58,7 +60,7 @@ pub trait CryptoBubbles {
 		bet: &BigUint,
 	) -> SCResult<()> {
 		let mut balance = self.get_player_balance(player);
-		
+
 		require!(bet <= &balance, "insufficient funds to join game");
 
 		balance -= bet;
@@ -90,7 +92,10 @@ pub trait CryptoBubbles {
 	) -> SCResult<()> {
 		let caller = self.get_caller();
 		let owner: Address = self.get_owner();
-		require!(caller == owner, "invalid sender: only contract owner can reward winner");
+		require!(
+			caller == owner,
+			"invalid sender: only contract owner can reward winner"
+		);
 
 		let mut balance = self.get_player_balance(winner);
 		balance += prize;
