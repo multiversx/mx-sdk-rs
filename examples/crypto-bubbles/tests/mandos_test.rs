@@ -44,7 +44,7 @@ fn rewardwinner_last() {
 
 #[test]
 fn rewardwinner_simple() {
-	parse_execute_mandos("mandos/rewardWinner.scen.json", &contract_map());
+	parse_execute_mandos("/home/elrond/elrond-wasm-rs/examples/crypto-bubbles/mandos/rewardWinner.scen.json", &contract_map());
 }
 
 #[test]
