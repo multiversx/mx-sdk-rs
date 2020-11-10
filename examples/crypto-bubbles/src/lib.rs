@@ -2,50 +2,27 @@
 #![allow(non_snake_case)]
 #![allow(clippy::string_lit_as_bytes)]
 
-// TODO: modernize this contract and improve tests
-
 imports!();
-
-static OWNER_KEY: &[u8] = &[0u8; 32];
 
 #[elrond_wasm_derive::contract(CryptoBubblesImpl)]
 pub trait CryptoBubbles {
 	/// constructor function
 	/// is called immediately after the contract is created
-	/// will set the fixed global token supply and give all the supply to the creator
 	#[init]
 	fn init(&self) {
-		let sender = self.get_caller();
-		self.storage_store_bytes32(OWNER_KEY, &sender.into());
-	}
-
-	/// generates the balance key that maps balances with their owners
-	fn _player_balance_key(&self, address: &Address) -> H256 {
-		let mut raw_key: Vec<u8> = Vec::with_capacity(33);
-		raw_key.push(1u8); // "1" is for balance keys
-		raw_key.extend_from_slice(address.as_bytes()); // append the entire address
-		let key = self.keccak256(&raw_key); // this compresses the key down to 32 bytes
-		key.into()
-	}
-
-	/// getter function: retrieves balance for an account
-	#[view]
-	fn balanceOf(&self, subject: Address) -> BigUint {
-		let balance_key = self._player_balance_key(&subject);
-		let balance = self.storage_load_big_uint(balance_key.as_bytes());
-		balance
+		let caller = self.get_caller();
+		self.set_owner(&caller);
 	}
 
 	/// player adds funds
 	#[payable]
-	#[endpoint]
-	fn topUp(&self, #[payment] payment: BigUint) {
+	#[endpoint(topUp)]
+	fn add_funds(&self, #[payment] payment: BigUint) {
 		let caller = self.get_caller();
 
-		let balance_key = self._player_balance_key(&caller);
-		let mut balance = self.storage_load_big_uint(balance_key.as_bytes());
+		let mut balance = self.get_player_balance(&caller);
 		balance += &payment;
-		self.storage_store_big_uint(balance_key.as_bytes(), &balance);
+		self.set_player_balance(&caller, &balance);
 
 		self.top_up_event(&caller, &payment);
 	}
@@ -53,18 +30,20 @@ pub trait CryptoBubbles {
 	/// player withdraws funds
 	#[endpoint]
 	fn withdraw(&self, amount: &BigUint) -> SCResult<()> {
-		self._transferBackToPlayerWallet(&self.get_caller(), amount)
+		self._transfer_back_to_player_wallet(&self.get_caller(), amount)
 	}
 
 	/// server calls withdraw on behalf of the player
-	fn _transferBackToPlayerWallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
-		let balance_key = self._player_balance_key(&player);
-		let mut balance = self.storage_load_big_uint(balance_key.as_bytes());
-		if amount > &balance {
-			return sc_error!("amount to withdraw must be less or equal to balance");
-		}
+	fn _transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
+		let mut balance = self.get_player_balance(player);
+
+		require!(
+			amount <= &balance,
+			"amount to withdraw must be less or equal to balance"
+		);
+
 		balance -= amount;
-		self.storage_store_big_uint(balance_key.as_bytes(), &balance);
+		self.set_player_balance(player, &balance);
 
 		self.send_tx(player, &amount, "crypto bubbles");
 
@@ -74,19 +53,18 @@ pub trait CryptoBubbles {
 	}
 
 	/// player joins game
-	fn _addPlayerToGameStateChange(
+	fn _add_player_to_game_state_change(
 		&self,
 		game_index: &BigUint,
 		player: &Address,
 		bet: &BigUint,
 	) -> SCResult<()> {
-		let balance_key = self._player_balance_key(&player);
-		let mut balance = self.storage_load_big_uint(balance_key.as_bytes());
-		if bet > &balance {
-			return sc_error!("insufficient funds to join game");
-		}
+		let mut balance = self.get_player_balance(player);
+
+		require!(bet <= &balance, "insufficient funds to join game");
+
 		balance -= bet;
-		self.storage_store_big_uint(balance_key.as_bytes(), &balance);
+		self.set_player_balance(player, &balance);
 
 		self.player_joins_game_event(game_index, player, bet);
 
@@ -95,33 +73,33 @@ pub trait CryptoBubbles {
 
 	// player tops up + joins a game
 	#[payable]
-	#[endpoint]
-	fn joinGame(&self, game_index: BigUint) -> SCResult<()> {
+	#[endpoint(joinGame)]
+	fn join_game(&self, game_index: BigUint) -> SCResult<()> {
 		let player = self.get_caller();
 		let bet = self.get_call_value_big_uint();
 
-		self.topUp(self.get_call_value_big_uint());
-		self._addPlayerToGameStateChange(&game_index, &player, &bet)
+		self.add_funds(self.get_call_value_big_uint());
+		self._add_player_to_game_state_change(&game_index, &player, &bet)
 	}
 
 	// owner transfers prize into winner SC account
-	#[endpoint]
-	fn rewardWinner(
+	#[endpoint(rewardWinner)]
+	fn reward_winner(
 		&self,
 		game_index: &BigUint,
 		winner: &Address,
 		prize: &BigUint,
 	) -> SCResult<()> {
 		let caller = self.get_caller();
-		let owner: Address = self.storage_load_bytes32(OWNER_KEY).into();
-		if caller != owner {
-			return sc_error!("invalid sender: only contract owner can reward winner");
-		}
+		let owner: Address = self.get_owner();
+		require!(
+			caller == owner,
+			"invalid sender: only contract owner can reward winner"
+		);
 
-		let balance_key = self._player_balance_key(&winner);
-		let mut balance = self.storage_load_big_uint(balance_key.as_bytes());
+		let mut balance = self.get_player_balance(winner);
 		balance += prize;
-		self.storage_store_big_uint(balance_key.as_bytes(), &balance);
+		self.set_player_balance(winner, &balance);
 
 		self.reward_winner_event(game_index, &winner, &prize);
 
@@ -129,17 +107,34 @@ pub trait CryptoBubbles {
 	}
 
 	// owner transfers prize into winner SC account, then transfers funds to player wallet
-	#[endpoint]
-	fn rewardAndSendToWallet(
+	#[endpoint(rewardAndSendToWallet)]
+	fn reward_and_send_to_wallet(
 		&self,
 		game_index: &BigUint,
 		winner: &Address,
 		prize: &BigUint,
 	) -> SCResult<()> {
-		sc_try!(self.rewardWinner(game_index, winner, prize));
-		sc_try!(self._transferBackToPlayerWallet(winner, prize));
+		sc_try!(self.reward_winner(game_index, winner, prize));
+		sc_try!(self._transfer_back_to_player_wallet(winner, prize));
 		Ok(())
 	}
+
+	// Storage
+
+	#[view(balanceOf)]
+	#[storage_get("playerBalance")]
+	fn get_player_balance(&self, player: &Address) -> BigUint;
+
+	#[storage_set("playerBalance")]
+	fn set_player_balance(&self, player: &Address, balance: &BigUint);
+
+	#[storage_get("owner")]
+	fn get_owner(&self) -> Address;
+
+	#[storage_set("owner")]
+	fn set_owner(&self, owner: &Address);
+
+	// Events
 
 	#[event("0x1000000000000000000000000000000000000000000000000000000000000001")]
 	fn top_up_event(&self, player: &Address, amount: &BigUint);

@@ -4,27 +4,27 @@
         {
             "step": "setState",
             "accounts": {
-                "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000": {
+                "address:creator_address": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000": {
+                "address:contract_address": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000"
+                        "''owner": "address:creator_address"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
-                "0xacc1000000000000000000000000000000000000000000000000000000000000": {
+                "address:acc1": {
                     "nonce": "0",
                     "balance": "0x100800",
                     "storage": {},
                     "code": ""
                 },
-                "0xacc2000000000000000000000000000000000000000000000000000000000000": {
+                "address:acc2": {
                     "nonce": "0",
                     "balance": "0x100800",
                     "storage": {},
@@ -36,8 +36,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "0xacc1000000000000000000000000000000000000000000000000000000000000",
-                "to": "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000",
+                "from": "address:acc1",
+                "to": "address:contract_address",
                 "value": "0x100",
                 "function": "topUp",
                 "arguments": [],
@@ -49,10 +49,10 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000",
+                        "address": "address:contract_address",
                         "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
-                            "0xacc1000000000000000000000000000000000000000000000000000000000000"
+                            "address:acc1"
                         ],
                         "data": "0x0100"
                     }
@@ -65,8 +65,8 @@
             "step": "scCall",
             "txId": "2",
             "tx": {
-                "from": "0xacc2000000000000000000000000000000000000000000000000000000000000",
-                "to": "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000",
+                "from": "address:acc2",
+                "to": "address:contract_address",
                 "value": "0x100",
                 "function": "topUp",
                 "arguments": [],
@@ -78,10 +78,10 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000",
+                        "address": "address:contract_address",
                         "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
-                            "0xacc2000000000000000000000000000000000000000000000000000000000000"
+                            "address:acc2"
                         ],
                         "data": "0x0100"
                     }
@@ -93,29 +93,29 @@
         {
             "step": "checkState",
             "accounts": {
-                "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000": {
+                "address:creator_address": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "0x6a3ec0879ac70000000000000000000000000000000000000000000000000000": {
+                "address:contract_address": {
                     "nonce": "0",
                     "balance": "0x200",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x6a3e3a11e1000000000000000000000000000000000000000000000000000000",
-                        "0xecd0fbc0b830c25b4e7580a58b78b7bd365ffc62e1df61a3c6e937dc080f8258": "0x100",
-                        "0xde01ec8c240238f576e7126d8ddbfda535b64c6c22c150b2e08df20e226d9359": "0x100"
+                        "''owner": "address:creator_address",
+                        "''playerBalance|address:acc1": "0x100",
+                        "''playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
-                "0xacc1000000000000000000000000000000000000000000000000000000000000": {
+                "address:acc1": {
                     "nonce": "1",
                     "balance": "0x700",
                     "storage": {},
                     "code": ""
                 },
-                "0xacc2000000000000000000000000000000000000000000000000000000000000": {
+                "address:acc2": {
                     "nonce": "1",
                     "balance": "0x700",
                     "storage": {},
