@@ -26,6 +26,3 @@ optional = true
 [dev-dependencies.elrond-wasm-debug]
 version = "0.9.6"
 path = "../../../elrond-wasm-debug"
-
-[dependencies]
-crowdfunding = { path = "../crowdfunding-egld" }

@@ -1,5 +1,5 @@
 [package]
-name = "crowdfunding-wasm"
+name = "crowdfunding-egld-wasm"
 version = "0.2.0"
 authors = ["dorin-iancu <dorin.iancu@elrond.com>"]
 edition = "2018"
@@ -14,9 +14,15 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies]
-crowdfunding = { path = "..", features=["wasm-output-mode"]}
-elrond-wasm-output = { version = "0.9.6", path = "../../../../elrond-wasm-output", features=["wasm-output-mode"]}
+[dependencies.crowdfunding-egld]
+path = ".."
+features = ["wasm-output-mode"]
+default-features = false
+
+[dependencies.elrond-wasm-output]
+version = "0.9.6"
+path = "../../../../elrond-wasm-output"
+features = ["wasm-output-mode"]
 
 [workspace]
 members = ["."]

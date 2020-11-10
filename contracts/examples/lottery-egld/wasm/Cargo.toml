@@ -25,6 +25,3 @@ path = ".."
 version = "0.9.6"
 path = "../../../../elrond-wasm-output"
 features = [ "wasm-output-mode",]
-
-[workspace]
-members = ["."]
