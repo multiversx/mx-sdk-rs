@@ -1,6 +1,6 @@
 [package]
-name = "lottery"
-version = "0.0.1"
+name = "lottery-egld"
+version = "0.0.0"
 authors = [ "you",]
 edition = "2018"
 
