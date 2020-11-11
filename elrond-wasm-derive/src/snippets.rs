@@ -106,6 +106,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		}
 
 		#[inline]
+		fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
+		  self.api.storage_store_big_uint_raw(key, handle);
+		}
+
+		#[inline]
+		fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
+		  self.api.storage_load_big_uint_raw(key)
+		}
+
+		#[inline]
 		fn storage_store_big_int(&self, key: &[u8], value: &BigInt) {
 		  self.api.storage_store_big_int(key, value);
 		}

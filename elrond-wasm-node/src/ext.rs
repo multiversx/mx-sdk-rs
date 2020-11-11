@@ -172,11 +172,27 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
     #[inline]
     fn storage_load_big_uint(&self, key: &[u8]) -> ArwenBigUint {
         unsafe {
-            let result = bigIntNew(0);
-            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, result);
-            ArwenBigUint {handle: result}
+            let handle = bigIntNew(0);
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
+            ArwenBigUint {handle}
         }
     }
+
+    #[inline]
+    fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
+		unsafe {
+            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
+        }
+	}
+
+	#[inline]
+    fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
+		unsafe {
+            let handle = bigIntNew(0);
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
+            handle
+        }
+	}
 
     #[inline]
     fn storage_store_big_int(&self, key: &[u8], value: &ArwenBigInt) {
@@ -456,21 +472,31 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
         }
     }
     
+    #[inline]
     fn get_argument_big_uint(&self, arg_id: i32) -> ArwenBigUint {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntGetUnsignedArgument(arg_id, result);
-            ArwenBigUint {handle: result}
-        }
+        ArwenBigUint {handle: self.get_argument_big_uint_raw(arg_id)}
     }
 
+    #[inline]
     fn get_argument_big_int(&self, arg_id: i32) -> ArwenBigInt {
-        unsafe {
-            let result = bigIntNew(0);
-            bigIntGetSignedArgument(arg_id, result);
-            ArwenBigInt {handle: result}
-        }
+        ArwenBigInt {handle: self.get_argument_big_int_raw(arg_id)}
     }
+
+    fn get_argument_big_uint_raw(&self, arg_id: i32) -> i32 {
+		unsafe {
+            let handle = bigIntNew(0);
+            bigIntGetUnsignedArgument(arg_id, handle);
+            handle
+        }
+	}
+
+    fn get_argument_big_int_raw(&self, arg_id: i32) -> i32 {
+		unsafe {
+            let handle = bigIntNew(0);
+            bigIntGetSignedArgument(arg_id, handle);
+            handle
+        }
+	}
     
     #[cfg(feature = "small-int-ei")]
     #[inline]

@@ -61,4 +61,14 @@ where
 	fn into_i64(self) -> i64 {
 		self.api.get_argument_i64(self.arg_index)
 	}
+
+	#[inline]
+	fn try_get_big_uint_handle(&self) -> (bool, i32) {
+		(true, self.api.get_argument_big_uint_raw(self.arg_index))
+	}
+
+	#[inline]
+	fn try_get_big_int_handle(&self) -> (bool, i32) {
+		(true, self.api.get_argument_big_int_raw(self.arg_index))
+	}
 }

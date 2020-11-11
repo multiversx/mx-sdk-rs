@@ -296,13 +296,27 @@ impl NestedDecode for ArwenBigUint {
 
 impl TopDecode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-    
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8()))
+
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        // since can_use_handle is provided constantly,
+        // the compiler is smart enough to only ever expand one of the if branches
+        let (can_use_handle, handle) = input.try_get_big_uint_handle();
+        if can_use_handle {
+            Ok(ArwenBigUint{ handle })
+        } else {
+            Ok(ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8()))
+        }
     }
 
     fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, _: ExitCtx, _: fn(ExitCtx, DecodeError) -> !) -> Self {
-        ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8())
+        // since can_use_handle is provided constantly,
+        // the compiler is smart enough to only ever expand one of the if branches
+        let (can_use_handle, handle) = input.try_get_big_uint_handle();
+        if can_use_handle {
+            ArwenBigUint{ handle }
+        } else {
+            ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8())
+        }
     }
 }
 
