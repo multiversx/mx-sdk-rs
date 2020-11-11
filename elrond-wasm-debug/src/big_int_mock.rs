@@ -165,7 +165,7 @@ impl NestedEncode for RustBigInt {
 
 impl TopEncode for RustBigInt {
 	const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-	
+
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.to_signed_bytes_be().top_encode(output)
 	}

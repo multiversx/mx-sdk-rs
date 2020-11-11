@@ -245,7 +245,7 @@ impl NestedEncode for RustBigUint {
 
 impl TopEncode for RustBigUint {
 	const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-	
+
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
 		self.to_bytes_be().top_encode(output)
 	}
@@ -282,7 +282,7 @@ impl NestedDecode for RustBigUint {
 
 impl TopDecode for RustBigUint {
 	const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
-	
+
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
 		Ok(RustBigUint::from_bytes_be(&*input.into_boxed_slice_u8()))
 	}
