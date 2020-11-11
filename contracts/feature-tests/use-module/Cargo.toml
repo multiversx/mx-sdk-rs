@@ -1,0 +1,34 @@
+[package]
+name = "use-module"
+version = "0.0.0"
+authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+wasm-output-mode = [
+    "elrond-wasm-node",
+    "elrond-wasm-module-features-wasm",
+    "elrond-wasm-module-pause-wasm"
+]
+
+default = [
+    "elrond-wasm-module-features-default",
+    "elrond-wasm-module-pause-default"
+]
+
+[dependencies]
+# modules
+elrond-wasm-module-features-wasm = { package = "elrond-wasm-module-features", version = "0.9.6", path = "../../modules/elrond-wasm-module-features", features = ["wasm-output-mode"], optional = true }
+elrond-wasm-module-features-default = { package = "elrond-wasm-module-features", version = "0.9.6", path = "../../modules/elrond-wasm-module-features", optional = true }
+elrond-wasm-module-pause-wasm = { package = "elrond-wasm-module-pause", version = "0.9.6", path = "../../modules/elrond-wasm-module-pause", features = ["wasm-output-mode"], optional = true }
+elrond-wasm-module-pause-default = { package = "elrond-wasm-module-pause", version = "0.9.6", path = "../../modules/elrond-wasm-module-pause", optional = true }
+
+elrond-wasm = { version = "0.9.6", path = "../../../elrond-wasm" }
+elrond-wasm-derive = { version = "0.9.6", path = "../../../elrond-wasm-derive" }
+elrond-wasm-node = { version = "0.9.6", path = "../../../elrond-wasm-node", optional = true }
+
+[dev-dependencies]
+elrond-wasm-debug = { version = "0.9.6", path = "../../../elrond-wasm-debug" }

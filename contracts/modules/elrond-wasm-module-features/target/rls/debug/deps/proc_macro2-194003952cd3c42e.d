@@ -1,0 +1,11 @@
+/home/andreim/elrond/newsc/sc-delegation-rs/features-module/target/rls/debug/deps/proc_macro2-194003952cd3c42e.rmeta: /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/lib.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/parse.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/detection.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/fallback.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/wrapper.rs
+
+/home/andreim/elrond/newsc/sc-delegation-rs/features-module/target/rls/debug/deps/libproc_macro2-194003952cd3c42e.rlib: /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/lib.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/parse.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/detection.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/fallback.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/wrapper.rs
+
+/home/andreim/elrond/newsc/sc-delegation-rs/features-module/target/rls/debug/deps/proc_macro2-194003952cd3c42e.d: /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/lib.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/parse.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/detection.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/fallback.rs /home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/wrapper.rs
+
+/home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/lib.rs:
+/home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/parse.rs:
+/home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/detection.rs:
+/home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/fallback.rs:
+/home/andreim/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.19/src/wrapper.rs:
