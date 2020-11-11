@@ -194,7 +194,7 @@ impl H256 {
 	// Will exit early if the input length is not 32.
 	// Designed to be used especially in deserializer implementations.
 	pub fn decode_from_boxed_bytes_or_exit<ExitCtx: Clone>(
-		input: Box::<[u8]>,
+		input: Box<[u8]>,
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
