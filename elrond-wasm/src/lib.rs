@@ -68,6 +68,10 @@ where
 
 	fn storage_load_big_uint(&self, key: &[u8]) -> BigUint;
 
+	fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32);
+
+	fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32;
+
 	fn storage_store_big_int(&self, key: &[u8], value: &BigInt);
 
 	fn storage_load_big_int(&self, key: &[u8]) -> BigInt;
@@ -152,6 +156,10 @@ pub trait ContractIOApi<BigInt, BigUint>: Clone {
 	fn get_argument_big_int(&self, arg_id: i32) -> BigInt;
 
 	fn get_argument_big_uint(&self, arg_id: i32) -> BigUint;
+
+	fn get_argument_big_int_raw(&self, arg_id: i32) -> i32;
+
+	fn get_argument_big_uint_raw(&self, arg_id: i32) -> i32;
 
 	fn get_argument_u64(&self, arg_id: i32) -> u64;
 

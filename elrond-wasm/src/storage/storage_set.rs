@@ -48,6 +48,13 @@ where
 	fn set_i64(self, value: i64) {
 		self.api.storage_store_i64(self.key, value);
 	}
+
+	#[inline]
+	fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
+		self.api.storage_store_big_uint_raw(self.key, handle);
+	}
+
+	// TODO: there is currently no API hook for storage of signed big ints
 }
 
 // #[inline]
@@ -58,22 +65,11 @@ where
 	BigUint: NestedEncode + 'static,
 	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
 {
-	// the compiler is smart enough to evaluate this match at compile time
-	match T::TYPE_INFO {
-		TypeInfo::BigUint => {
-			// self must be of type BigUint
-			// performing a forceful cast
-			let cast_big_uint: &BigUint = unsafe { &*(value as *const T as *const BigUint) };
-			api.storage_store_big_uint(key, cast_big_uint);
-		},
-		_ => {
-			value.top_encode_or_exit(
-				StorageSetOutput::new(api.clone(), key),
-				api.clone(),
-				storage_set_exit,
-			);
-		},
-	}
+	value.top_encode_or_exit(
+		StorageSetOutput::new(api.clone(), key),
+		api.clone(),
+		storage_set_exit,
+	);
 }
 
 #[inline(always)]
