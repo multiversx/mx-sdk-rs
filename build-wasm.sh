@@ -4,63 +4,18 @@
 
 ### EXAMPLES ###
 
-export RUSTFLAGS=${RUSTFLAGS-'-C link-arg=-s'}
-
-cd examples/adder/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/adder_wasm.wasm output/adder.wasm
-cd ../..
-
-cd examples/crypto-bubbles/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/crypto_bubbles_wasm.wasm output/crypto-bubbles.wasm
-cd ../..
-
-cd examples/factorial/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/factorial_wasm.wasm output/factorial.wasm
-cd ../..
-
-cd examples/simple-erc20/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/simple_erc20_wasm.wasm output/simple-erc20.wasm
-cd ../..
-
-
-### TEST CONTRACTS ###
-
-cd test-contracts/basic-features/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/features.wasm
-cd ../..
-
-cd test-contracts/async/async-alice/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/async_alice_wasm.wasm output/alice.wasm
-cd ../../..
-
-cd test-contracts/async/async-bob/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/async_bob_wasm.wasm output/bob.wasm
-cd ../../..
-
-cd test-contracts/use-module/wasm
-cargo build --target=wasm32-unknown-unknown --release
-cd ..
-mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/use_module_wasm.wasm output/use_module.wasm
-cd ../..
+erdpy --verbose contract build "contracts/benchmarks/str-repeat"
+erdpy --verbose contract build "contracts/examples/adder"
+erdpy --verbose contract build "contracts/examples/crowdfunding-egld"
+erdpy --verbose contract build "contracts/examples/crowdfunding-erc20"
+erdpy --verbose contract build "contracts/examples/crowdfunding-esdt"
+erdpy --verbose contract build "contracts/examples/crypto-bubbles"
+erdpy --verbose contract build "contracts/examples/factorial"
+erdpy --verbose contract build "contracts/examples/lottery-egld"
+erdpy --verbose contract build "contracts/examples/lottery-erc20"
+erdpy --verbose contract build "contracts/examples/lottery-esdt"
+erdpy --verbose contract build "contracts/examples/simple-erc20"
+erdpy --verbose contract build "contracts/feature-tests/basic-features"
+erdpy --verbose contract build "contracts/feature-tests/async/async-alice"
+erdpy --verbose contract build "contracts/feature-tests/async/async-bob"
+erdpy --verbose contract build "contracts/feature-tests/use-module"
