@@ -65,13 +65,14 @@ pub trait NonFungibleTokens {
         let token_owner = self.get_token_owner(token_id);
 
         if caller == token_owner {
-            self.perform_transfer(token_id, to);
+            self.perform_transfer(token_id, &caller, to);
         }
         else {
-            let approved_address = self.get_approval(token_id);
+            let approved_address = self.get_approval(token_id)
+                .unwrap_or(Address::zero());
 
             if caller == approved_address {
-                self.perform_transfer(token_id, to);
+                self.perform_transfer(token_id, &caller, to);
             }
             else {
                 return sc_error!("Only the owner or the approved account may transfer the token!");
@@ -102,9 +103,15 @@ pub trait NonFungibleTokens {
         self.clear_storage_at_key(&["approval".as_bytes(), &token_id.to_be_bytes()]);
     }
 
-    fn perform_transfer(&self, token_id: u64, to: &Address) {
+    fn perform_transfer(&self, token_id: u64, from: &Address, to: &Address) {
+        let prev_owner_token_count = self.get_token_count(from);
+        let new_owner_token_count = self.get_token_count(to);
+
         // new ownership revokes approvals by previous owner
         self.perform_revoke_approval(token_id);
+
+        self.set_token_count(from, prev_owner_token_count - 1);
+        self.set_token_count(to, new_owner_token_count + 1);
         self.set_token_owner(token_id, to);
     }
 
@@ -151,7 +158,7 @@ pub trait NonFungibleTokens {
 
     #[view(approval)]
     #[storage_get("approval")]
-    fn get_approval(&self, token_id: u64) -> Address;
+    fn get_approval(&self, token_id: u64) -> Option<Address>;
 
     #[storage_set("approval")]
     fn set_approval(&self, token_id: u64, approved_address: &Address);
