@@ -293,10 +293,10 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			panic!("Storage clear cannot be marked payable.");
 		}
 		if m.default.is_some() {
-			panic!("Storage is empty cannot have an implementations provided in the trait.");
+			panic!("Storage clear cannot have an implementations provided in the trait.");
 		}
 		if module_opt.is_some() {
-			panic!("Storage is empty cannot be modules.");
+			panic!("Storage clear cannot be modules.");
 		}
 		MethodMetadata::StorageClear {
 			visibility,
