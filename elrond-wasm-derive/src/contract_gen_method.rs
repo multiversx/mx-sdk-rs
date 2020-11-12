@@ -44,6 +44,10 @@ pub enum MethodMetadata {
 		visibility: Visibility,
 		identifier: String,
 	},
+	StorageClear {
+		visibility: Visibility,
+		identifier: String,
+	},
 	Module {
 		impl_path: proc_macro2::TokenTree,
 	},
@@ -69,6 +73,10 @@ impl MethodMetadata {
 				..
 			}
 			| MethodMetadata::StorageIsEmpty {
+				visibility: Visibility::Endpoint(e),
+				..
+			}
+			| MethodMetadata::StorageClear {
 				visibility: Visibility::Endpoint(e),
 				..
 			} => Some(e),
@@ -163,6 +171,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let storage_set_opt = StorageSetAttribute::parse(m);
 	let storage_get_mut_opt = StorageGetMutAttribute::parse(m);
 	let storage_is_empty_opt = StorageIsEmptyAttribute::parse(m);
+	let storage_clear_opt = StorageClearAttribute::parse(m);
 	let module_opt = ModuleAttribute::parse(m);
 
 	if let Some(event_attr) = event_opt {
@@ -278,6 +287,20 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		MethodMetadata::StorageIsEmpty {
 			visibility,
 			identifier: storage_is_empty.identifier,
+		}
+	} else if let Some(storage_clear) = storage_clear_opt {
+		if payable {
+			panic!("Storage clear cannot be marked payable.");
+		}
+		if m.default.is_some() {
+			panic!("Storage is empty cannot have an implementations provided in the trait.");
+		}
+		if module_opt.is_some() {
+			panic!("Storage is empty cannot be modules.");
+		}
+		MethodMetadata::StorageClear {
+			visibility,
+			identifier: storage_clear.identifier,
 		}
 	} else if let Some(module_attr) = module_opt {
 		if m.default.is_some() {

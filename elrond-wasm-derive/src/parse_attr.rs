@@ -14,6 +14,7 @@ static ATTR_STORAGE_GET: &str = "storage_get";
 static ATTR_STORAGE_SET: &str = "storage_set";
 static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
 static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
+static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 static ATTR_MODULE: &str = "module";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
@@ -176,6 +177,21 @@ impl StorageIsEmptyAttribute {
 		match find_attr_one_string_arg(m, ATTR_STORAGE_IS_EMPTY) {
 			None => None,
 			Some(arg_str) => Some(StorageIsEmptyAttribute {
+				identifier: arg_str,
+			}),
+		}
+	}
+}
+
+pub struct StorageClearAttribute {
+	pub identifier: String,
+}
+
+impl StorageClearAttribute {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
+		match find_attr_one_string_arg(m, ATTR_STORAGE_CLEAR) {
+			None => None,
+			Some(arg_str) => Some(StorageClearAttribute {
 				identifier: arg_str,
 			}),
 		}
