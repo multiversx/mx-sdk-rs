@@ -89,17 +89,15 @@ impl BoxedBytes {
 			let other_len = self.len() - at;
 			unsafe {
 				// breaking down the input into its components
-				let self_layout = Layout::from_size_align(self.len(), core::mem::align_of::<u8>()).unwrap();
+				let self_layout =
+					Layout::from_size_align(self.len(), core::mem::align_of::<u8>()).unwrap();
 				let self_ptr = Box::into_raw(self.0) as *mut u8;
 
 				// the data for the second result needs to be copied somewhere else
-				let other_layout = Layout::from_size_align(other_len, core::mem::align_of::<u8>()).unwrap();
+				let other_layout =
+					Layout::from_size_align(other_len, core::mem::align_of::<u8>()).unwrap();
 				let other_ptr = alloc(other_layout);
-				core::ptr::copy_nonoverlapping(
-					self_ptr.add(at),
-					other_ptr,
-					other_len,
-				);
+				core::ptr::copy_nonoverlapping(self_ptr.add(at), other_ptr, other_len);
 
 				// truncating the memory for the first using a realloc
 				// got inspiration for this from the RawVec implementation
@@ -107,7 +105,8 @@ impl BoxedBytes {
 
 				// packaging the resulting parts nicely
 				let bytes_box_1 = Box::from_raw(core::slice::from_raw_parts_mut(realloc_ptr, at));
-				let bytes_box_2 = Box::from_raw(core::slice::from_raw_parts_mut(other_ptr, other_len));
+				let bytes_box_2 =
+					Box::from_raw(core::slice::from_raw_parts_mut(other_ptr, other_len));
 				(BoxedBytes(bytes_box_1), BoxedBytes(bytes_box_2))
 			}
 		}
