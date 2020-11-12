@@ -30,12 +30,9 @@ pub trait NonFungibleTokens {
     /// Only the owner of the token may call this function.
     #[endpoint]
     fn approve(&self, token_id: u64, approved_address: &Address) -> SCResult<()> {
-        let caller = self.get_caller();
-        let token_owner = self.get_token_owner(token_id);
-        let total_minted = self.get_total_minted();
-
-        require!(caller == token_owner, "Only the token owner can approve!");
-        require!(token_id < total_minted, "Token does not exist!");
+        require!(token_id < self.get_total_minted(), "Token does not exist!");
+        require!(self.get_caller() == self.get_token_owner(token_id),
+            "Only the token owner can approve!");
 
         self.set_approval(token_id, approved_address);
 
@@ -44,16 +41,15 @@ pub trait NonFungibleTokens {
 
     /// Revokes approval for the token.<br>  
     /// Only the owner of the token may call this function.
-    #[endpoint(revokeApproval)]
-    fn revoke_approval(&self, token_id: u64) -> SCResult<()> {
-        let caller = self.get_caller();
-        let token_owner = self.get_token_owner(token_id);
-        let total_minted = self.get_total_minted();
+    #[endpoint]
+    fn revoke(&self, token_id: u64) -> SCResult<()> {
+        require!(token_id < self.get_total_minted(), "Token does not exist!");
+        require!(self.get_caller() == self.get_token_owner(token_id),
+            "Only the token owner can revoke approval!");
 
-        require!(caller == token_owner, "Only the token owner can revoke approval!");
-        require!(token_id < total_minted, "Token does not exist!");
-
-        self.perform_revoke_approval(token_id);
+        if !self.approval_is_empty(token_id) {
+            self.perform_revoke_approval(token_id);
+        }
 
         Ok(())
     }
@@ -61,25 +57,27 @@ pub trait NonFungibleTokens {
     /// Transfer ownership of the token to a new account.
     #[endpoint]
     fn transfer(&self, token_id: u64, to: &Address) -> SCResult<()> {
+        require!(token_id < self.get_total_minted(), "Token does not exist!");
+
         let caller = self.get_caller();
         let token_owner = self.get_token_owner(token_id);
 
         if caller == token_owner {
-            self.perform_transfer(token_id, &caller, to);
+            self.perform_transfer(token_id, &token_owner, to);
+
+            return Ok(());
         }
-        else {
-            let approved_address = self.get_approval(token_id)
-                .unwrap_or(Address::zero());
+        else if !self.approval_is_empty(token_id) {
+            let approved_address = self.get_approval(token_id);
 
             if caller == approved_address {
-                self.perform_transfer(token_id, &caller, to);
-            }
-            else {
-                return sc_error!("Only the owner or the approved account may transfer the token!");
+                self.perform_transfer(token_id, &token_owner, to);
+
+                return Ok(());
             }
         }
 
-        Ok(())
+        sc_error!("Only the owner or the approved account may transfer the token!")
     }
 
     // private methods
@@ -156,9 +154,12 @@ pub trait NonFungibleTokens {
     #[storage_set("tokenCount")]
     fn set_token_count(&self, owner: &Address, token_count: u64);
 
+    #[storage_is_empty("approval")]
+    fn approval_is_empty(&self, token_id: u64) -> bool;
+
     #[view(approval)]
     #[storage_get("approval")]
-    fn get_approval(&self, token_id: u64) -> Option<Address>;
+    fn get_approval(&self, token_id: u64) -> Address;
 
     #[storage_set("approval")]
     fn set_approval(&self, token_id: u64, approved_address: &Address);
