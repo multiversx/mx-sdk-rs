@@ -15,10 +15,7 @@ fn contract_map() -> ContractMap<TxContext> {
 
 #[test]
 fn nft_init() {
-	parse_execute_mandos(
-		"mandos/nft-init.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/nft-init.scen.json", &contract_map());
 }
 
 #[test]
@@ -46,10 +43,7 @@ fn mint_more_tokens_caller_not_owner() {
 
 #[test]
 fn transfer_token_ok() {
-	parse_execute_mandos(
-		"mandos/nft-transfer-token-ok.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/nft-transfer-token-ok.scen.json", &contract_map());
 }
 
 #[test]
@@ -70,10 +64,7 @@ fn transfer_token_without_approval() {
 
 #[test]
 fn approve_ok() {
-	parse_execute_mandos(
-		"mandos/nft-approve-ok.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/nft-approve-ok.scen.json", &contract_map());
 }
 
 #[test]
@@ -94,26 +85,17 @@ fn approve_non_existent_token() {
 
 #[test]
 fn revoke_ok() {
-	parse_execute_mandos(
-		"mandos/nft-revoke-ok.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/nft-revoke-ok.scen.json", &contract_map());
 }
 
 #[test]
 fn revoke_non_approved() {
-	parse_execute_mandos(
-		"mandos/nft-revoke-non-approved.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/nft-revoke-non-approved.scen.json", &contract_map());
 }
 
 #[test]
 fn transfer_ok() {
-	parse_execute_mandos(
-		"mandos/nft-transfer-ok.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/nft-transfer-ok.scen.json", &contract_map());
 }
 
 #[test]
