@@ -55,15 +55,95 @@ fn transfer_token_ok() {
 #[test]
 fn transfer_token_steal() {
 	parse_execute_mandos(
-		"mandos/nft-transfer-token-not-owner-no-allowance-to-caller.scen.json",
+		"mandos/nft-transfer-token-not-owner-no-approval-to-caller.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn transfer_token_without_allowance() {
+fn transfer_token_without_approval() {
 	parse_execute_mandos(
-		"mandos/nft-transfer-token-not-owner-no-allowance-to-other.scen.json",
+		"mandos/nft-transfer-token-not-owner-no-approval-to-other.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn approve_ok() {
+	parse_execute_mandos(
+		"mandos/nft-approve-ok.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn approve_non_owned_token() {
+	parse_execute_mandos(
+		"mandos/nft-approve-non-owned-token.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn approve_non_existent_token() {
+	parse_execute_mandos(
+		"mandos/nft-approve-non-existent-token.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn revoke_ok() {
+	parse_execute_mandos(
+		"mandos/nft-revoke-ok.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn revoke_non_approved() {
+	parse_execute_mandos(
+		"mandos/nft-revoke-non-approved.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn transfer_ok() {
+	parse_execute_mandos(
+		"mandos/nft-transfer-ok.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn transfer_non_existent_token() {
+	parse_execute_mandos(
+		"mandos/nft-transfer-non-existent-token.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn transfer_non_owned_without_approval() {
+	parse_execute_mandos(
+		"mandos/nft-transfer-not-owned-not-approved-token.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn transfer_approved_token() {
+	parse_execute_mandos(
+		"mandos/nft-transfer-approved-token.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn transfer_after_revoked() {
+	parse_execute_mandos(
+		"mandos/nft-transfer-token-after-revoked.scen.json",
 		&contract_map(),
 	);
 }
