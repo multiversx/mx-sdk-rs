@@ -5,8 +5,7 @@ imports!();
 #[elrond_wasm_derive::contract(StrRepeatImpl)]
 pub trait StrRepeat {
 	#[init]
-	fn init(&self) {
-	}
+	fn init(&self) {}
 
 	#[endpoint]
 	fn repeat(&self, string: &[u8], num_repeats: usize) -> Vec<u8> {

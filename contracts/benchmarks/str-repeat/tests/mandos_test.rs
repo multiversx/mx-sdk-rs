@@ -1,7 +1,7 @@
 extern crate str_repeat;
-use str_repeat::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
+use str_repeat::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
