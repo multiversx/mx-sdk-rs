@@ -15,6 +15,12 @@ fn storage_load_snippet(_ty: &syn::Type) -> proc_macro2::TokenStream {
 	}
 }
 
+fn storage_clear_snippet() -> proc_macro2::TokenStream {
+	quote! {
+		elrond_wasm::storage_set(self.api.clone(), &key[..], &Vec::<u8>::new());
+	}
+}
+
 fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macro2::TokenStream {
 	let id_literal = array_literal(identifier.as_bytes());
 	if key_args.is_empty() {
@@ -108,6 +114,21 @@ pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::To
 		#msig {
 			#key_snippet
 			self.api.storage_load_len(&key[..]) == 0
+		}
+	}
+}
+
+pub fn generate_clear_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
+	let msig = m.generate_sig();
+	if m.return_type != syn::ReturnType::Default {
+		panic!("storage clear should not return anything");
+	}
+	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
+	let clear_snippet = storage_clear_snippet();
+	quote! {
+		#msig {
+			#key_snippet
+			#clear_snippet
 		}
 	}
 }

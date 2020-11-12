@@ -365,6 +365,14 @@ pub trait BasicFeatures {
 	fn is_empty_opt_addr(&self) -> bool;
 
 	#[endpoint]
+	#[storage_get("nr_to_clear")]
+	fn get_nr_to_clear(&self) -> u32;
+
+	#[endpoint]
+	#[storage_clear("nr_to_clear")]
+	fn clear_storage_value(&self);
+
+	#[endpoint]
 	#[storage_get("ser_1")]
 	fn load_ser_1(&self) -> SerExample1;
 
