@@ -1,0 +1,51 @@
+{
+    "name": "revoke approval",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "nft-approve-ok.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "revoke-ok",
+            "tx": {
+                "from": "address:contract_owner",
+                "to": "address:the_nft_contract",
+                "value": "0",
+                "function": "revoke",
+                "arguments": [
+                    "2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:contract_owner": {
+                    "nonce": "3",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:the_nft_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:owner": "address:contract_owner",
+                        "str:totalMinted": "3",
+                        "str:tokenCount|address:contract_owner": "3",
+                        "str:tokenOwner|u64:0": "address:contract_owner",
+                        "str:tokenOwner|u64:1": "address:contract_owner",
+                        "str:tokenOwner|u64:2": "address:contract_owner"
+                    }
+                }
+            }
+        }
+    ]
+}
