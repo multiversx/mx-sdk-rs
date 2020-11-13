@@ -1,11 +1,13 @@
 [package]
-name = "lottery-esdt-wasm"
-version = "0.0.1"
-authors = [ "dorin-iancu <dorin.iancu@elrond.com>",]
+name = "non-fungible-tokens-wasm"
+version = "0.0.0"
 edition = "2018"
 
 [lib]
 crate-type = [ "cdylib",]
+
+[workspace]
+members = ["."]
 
 [profile.release]
 codegen-units = 1
@@ -14,15 +16,12 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.lottery-esdt]
+[dependencies.non-fungible-tokens]
 features = [ "wasm-output-mode",]
 default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.9.7"
+version = "0.9.6"
 path = "../../../../elrond-wasm-output"
 features = [ "wasm-output-mode",]
-
-[workspace]
-members = ["."]

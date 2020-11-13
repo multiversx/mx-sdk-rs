@@ -1,6 +1,6 @@
 [package]
-name = "lottery-erc20"
-version = "0.0.1"
+name = "non-fungible-tokens"
+version = "0.0.0"
 authors = [ "dorin-iancu <dorin.iancu@elrond.com>",]
 edition = "2018"
 
@@ -11,21 +11,18 @@ path = "src/lib.rs"
 wasm-output-mode = [ "elrond-wasm-node",]
 
 [dependencies.elrond-wasm]
-version = "0.9.7"
+version = "0.9.6"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.9.7"
+version = "0.9.6"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.9.7"
+version = "0.9.6"
 path = "../../../elrond-wasm-node"
 optional = true
 
-[dependencies.simple-erc20]
-path = "../simple-erc20"
-
 [dev-dependencies.elrond-wasm-debug]
-version = "0.9.7"
+version = "0.9.6"
 path = "../../../elrond-wasm-debug"
