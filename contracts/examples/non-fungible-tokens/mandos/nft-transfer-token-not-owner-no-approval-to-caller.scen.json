@@ -1,0 +1,68 @@
+{
+    "name": "try to steal a token",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "nft-init.scen.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce" : "0",
+                    "balance": "0",
+                    "storage": {}
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "steal-token",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:the_nft_contract",
+                "value": "0",
+                "function": "transfer",
+                "arguments": [
+                    "1",
+                    "address:acc1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Only the owner or the approved account may transfer the token!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:contract_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce" : "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:the_nft_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:owner": "address:contract_owner",
+                        "str:totalMinted": "3",
+                        "str:tokenCount|address:contract_owner": "3",
+                        "str:tokenOwner|u64:0": "address:contract_owner",
+                        "str:tokenOwner|u64:1": "address:contract_owner",
+                        "str:tokenOwner|u64:2": "address:contract_owner"
+                    }
+                }
+            }
+        }
+    ]
+}

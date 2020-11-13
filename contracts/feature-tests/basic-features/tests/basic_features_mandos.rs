@@ -153,6 +153,11 @@ fn storage_opt_addr() {
 }
 
 #[test]
+fn storage_clear() {
+	parse_execute_mandos("mandos/storage_clear.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_reserved() {
 	parse_execute_mandos("mandos/storage_reserved.scen.json", &contract_map());
 }
