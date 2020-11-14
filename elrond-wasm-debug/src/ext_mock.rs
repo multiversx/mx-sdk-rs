@@ -283,6 +283,14 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		bi.into()
 	}
 
+	fn storage_store_big_uint_raw(&self, _key: &[u8], _handle: i32) {
+		panic!("cannot call storage_store_big_uint_raw in debug mode");
+	}
+
+	fn storage_load_big_uint_raw(&self, _key: &[u8]) -> i32 {
+		panic!("cannot call storage_load_big_uint_raw in debug mode");
+	}
+
 	fn storage_store_big_int(&self, key: &[u8], value: &RustBigInt) {
 		self.storage_store_slice_u8(key, &value.to_signed_bytes_be());
 	}
@@ -453,14 +461,22 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 		self.get_argument_vec_u8(arg_index).into()
 	}
 
+	fn get_argument_big_uint(&self, arg_index: i32) -> RustBigUint {
+		let bytes = self.get_argument_vec_u8(arg_index);
+		RustBigUint::from_bytes_be(&bytes[..])
+	}
+
 	fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
 		let bytes = self.get_argument_vec_u8(arg_index);
 		RustBigInt::from_signed_bytes_be(&bytes)
 	}
 
-	fn get_argument_big_uint(&self, arg_index: i32) -> RustBigUint {
-		let bytes = self.get_argument_vec_u8(arg_index);
-		RustBigUint::from_bytes_be(&bytes[..])
+	fn get_argument_big_uint_raw(&self, _arg_index: i32) -> i32 {
+		panic!("cannot call get_argument_big_uint_raw in debug mode");
+	}
+
+	fn get_argument_big_int_raw(&self, _arg_index: i32) -> i32 {
+		panic!("cannot call get_argument_big_int_raw in debug mode");
 	}
 
 	fn get_argument_i64(&self, arg_index: i32) -> i64 {
