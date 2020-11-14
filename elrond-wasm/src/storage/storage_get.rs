@@ -52,6 +52,12 @@ where
 	fn into_i64(self) -> i64 {
 		self.api.storage_load_i64(self.key)
 	}
+
+	fn try_get_big_uint_handle(&self) -> (bool, i32) {
+		(true, self.api.storage_load_big_uint_raw(self.key))
+	}
+
+	// TODO: there is currently no API hook for storage of signed big ints
 }
 
 pub fn storage_get<'k, A, BigInt, BigUint, T>(api: A, key: &'k [u8]) -> T
@@ -61,22 +67,11 @@ where
 	BigUint: NestedEncode + 'static,
 	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
 {
-	// the compiler is smart enough to evaluate this match at compile time
-	match T::TYPE_INFO {
-		TypeInfo::BigUint => {
-			// self must be of type BigUint
-			// performing a forceful cast
-			let big_uint_value = api.storage_load_big_uint(key);
-			let cast_big_uint: T = unsafe { core::mem::transmute_copy(&big_uint_value) };
-			core::mem::forget(big_uint_value); // otherwise the data gets deallocated twice
-			cast_big_uint
-		},
-		_ => T::top_decode_or_exit(
-			StorageGetInput::new(api.clone(), key),
-			api,
-			storage_get_exit,
-		),
-	}
+	T::top_decode_or_exit(
+		StorageGetInput::new(api.clone(), key),
+		api,
+		storage_get_exit,
+	)
 }
 
 #[inline(always)]
