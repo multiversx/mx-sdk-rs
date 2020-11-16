@@ -113,7 +113,7 @@ pub trait Multisig {
 		Ok(action_id)
 	}
 
-	#[endpoint(proposeAddBoardMemeber)]
+	#[endpoint(proposeAddBoardMember)]
 	fn propose_add_board_member(&self, board_member_address: Address) -> SCResult<usize> {
 		self.propose_action(Action::AddBoardMember(board_member_address))
 	}
@@ -225,6 +225,19 @@ pub trait Multisig {
 				self.set_board_size(self.get_board_size() + 1);
 			}
 		}
+	}
+
+	#[view(getActionSigners)]
+	fn get_action_signers(&self, action_id: usize) -> Vec<Address> {
+		self.get_action_signer_ids(action_id)
+			.iter()
+			.map(|signer_id| self.users_module().get_user_address(*signer_id))
+			.collect()
+	}
+
+	#[view(getActionSignerCount)]
+	fn get_action_signer_count(&self, action_id: usize) -> usize {
+		self.get_action_signer_ids(action_id).len()
 	}
 
 	#[endpoint(performAction)]
