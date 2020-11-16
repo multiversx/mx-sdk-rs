@@ -1,0 +1,141 @@
+{
+    "name": "adder",
+    "comment": "add then check",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:alice": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:bob": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:charlie": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:dan": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "address:multisig"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../output/multisig.wasm",
+                "arguments": [
+                    "2",
+                    "address:alice",
+                    "address:bob",
+                    "address:charlie"
+                ],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "getQuorum",
+            "tx": {
+                "from": "address:owner",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getQuorum",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "getBoardSize",
+            "tx": {
+                "from": "address:owner",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getBoardSize",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:multisig": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``num_users": "3",
+                        "``user_id|address:alice": "1",
+                        "``user_id|address:bob": "2",
+                        "``user_id|address:charlie": "3",
+                        "``user_address|u32:1": "address:alice",
+                        "``user_address|u32:2": "address:bob",
+                        "``user_address|u32:3": "address:charlie",
+                        "``user_role|u32:1": "2",
+                        "``user_role|u32:2": "2",
+                        "``user_role|u32:3": "2",
+                        "``board_size": "3",
+                        "``quorum": "2"
+                    },
+                    "code": "file:../output/multisig.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}
