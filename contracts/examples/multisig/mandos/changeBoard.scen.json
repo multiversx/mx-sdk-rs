@@ -11,11 +11,15 @@
         },
         {
             "step": "externalSteps",
-            "path": "steps/prop_add.steps.json"
+            "path": "steps/add_prop.steps.json"
         },
         {
             "step": "externalSteps",
-            "path": "steps/prop_bm.steps.json"
+            "path": "steps/add_bm.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/rem_alice.steps.json"
         }
     ]
 }
