@@ -10,7 +10,7 @@
                     "storage": {
                         "``opt_addr": ["1", "``____________address_too_long____________"]
                     },
-                    "code": "file:../output/features.wasm"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -72,7 +72,7 @@
                     "storage": {
                         "``opt_addr": "1|``____________address_____________"
                     },
-                    "code": "file:../output/features.wasm"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }
@@ -167,7 +167,7 @@
                     "storage": {
                         "``opt_addr": ""
                     },
-                    "code": "file:../output/features.wasm"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }
