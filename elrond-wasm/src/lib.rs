@@ -99,6 +99,15 @@ where
 
 	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
+	fn deploy_contract(
+		&self,
+		gas: u64,
+		amount: &BigUint,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Address;
+
 	fn get_tx_hash(&self) -> H256;
 
 	fn get_gas_left(&self) -> u64;

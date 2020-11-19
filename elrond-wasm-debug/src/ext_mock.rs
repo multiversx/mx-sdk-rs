@@ -1,4 +1,4 @@
-use elrond_wasm::{Address, BoxedBytes, H256};
+use elrond_wasm::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
 
 use crate::async_data::*;
 use crate::big_int_mock::*;
@@ -364,6 +364,17 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			call_data: data.to_vec(),
 			tx_hash: self.get_tx_hash(),
 		});
+	}
+
+	fn deploy_contract(
+		&self,
+		_gas: u64,
+		_amount: &RustBigUint,
+		_code: &BoxedBytes,
+		_code_metadata: CodeMetadata,
+		_arg_buffer: &ArgBuffer,
+	) -> Address {
+		panic!("deploy_contract not yet implemented")
 	}
 
 	fn get_tx_hash(&self) -> H256 {
