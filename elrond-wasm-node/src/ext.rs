@@ -1,4 +1,4 @@
-use elrond_wasm::{Address, Box, BoxedBytes, Vec, H256};
+use elrond_wasm::{Address, Box, BoxedBytes, Vec, H256, ArgBuffer, CodeMetadata};
 
 use crate::big_int::*;
 use crate::big_uint::*;
@@ -24,7 +24,12 @@ extern {
     fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
     fn transferValue(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
-    fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
+	fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
+	fn createContract(gas: u64,
+		valueOffset: *const u8,
+		codeOffset: *const u8, codeMetadataOffset: *const u8, length: i32,
+		resultOffset: *const u8,
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8) -> i32;
 
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
@@ -330,6 +335,25 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				data.len() as i32,
 			);
 		}
+	}
+
+	fn deploy_contract(&self, gas: u64, amount: &ArwenBigUint, code: &BoxedBytes, code_metadata: CodeMetadata, arg_buffer: &ArgBuffer) -> Address {
+		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+		let mut new_address = Address::zero();
+		unsafe {
+			let _ = createContract(
+				gas,
+				amount_bytes32.as_ptr(),
+				code.as_ptr(),
+				code_metadata.as_ptr(),
+				code.len() as i32,
+				new_address.as_mut_ptr(),
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+		new_address
 	}
 
 	#[inline]

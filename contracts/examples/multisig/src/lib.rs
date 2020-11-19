@@ -139,6 +139,34 @@ pub trait Multisig {
 		self.propose_action(Action::SendEgld(to, amount))
 	}
 
+	#[endpoint(proposeSCDeploy)]
+	fn propose_sc_deploy(
+		&self,
+		amount: BigUint,
+		code: BoxedBytes,
+		upgradeable: bool,
+		payable: bool,
+		readable: bool,
+		#[var_args] arguments: VarArgs<BoxedBytes>,
+	) -> SCResult<usize> {
+		let mut code_metadata = CodeMetadata::DEFAULT;
+		if upgradeable {
+			code_metadata |= CodeMetadata::UPGRADEABLE;
+		}
+		if payable {
+			code_metadata |= CodeMetadata::PAYABLE;
+		}
+		if readable {
+			code_metadata |= CodeMetadata::READABLE;
+		}
+		self.propose_action(Action::SCDeploy {
+			amount,
+			code,
+			code_metadata,
+			arguments: arguments.into_vec(),
+		})
+	}
+
 	#[view]
 	fn signed(&self, user: Address, action_id: usize) -> bool {
 		let user_id = self.users_module().get_user_id(&user);
@@ -285,6 +313,19 @@ pub trait Multisig {
 			},
 			Action::SendEgld(to, amount) => {
 				self.send_tx(&to, &amount, "");
+			},
+			Action::SCDeploy {
+				code,
+				code_metadata,
+				amount,
+				arguments,
+			} => {
+				let gas_left = self.get_gas_left();
+				let mut arg_buffer = ArgBuffer::new();
+				for arg in arguments {
+					arg_buffer.push_raw_arg(arg.as_slice());
+				}
+				let _ = self.deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer);
 			},
 		}
 

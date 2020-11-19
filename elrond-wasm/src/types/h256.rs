@@ -125,6 +125,12 @@ impl H256 {
 		self.0[..].to_vec()
 	}
 
+	/// Pointer to the data on the heap.
+	#[inline]
+	pub fn as_ptr(&mut self) -> *const u8 {
+		self.0.as_ptr()
+	}
+
 	/// Returns an unsafe mutable pointer to the data on the heap.
 	/// Used by the API to populate data.
 	#[inline]

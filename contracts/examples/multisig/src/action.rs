@@ -1,5 +1,5 @@
 use elrond_wasm::elrond_codec::*;
-use elrond_wasm::{Address, BigUintApi};
+use elrond_wasm::{Address, BigUintApi, BoxedBytes, CodeMetadata, Vec};
 
 pub enum Action<BigUint: BigUintApi> {
 	Nothing,
@@ -8,6 +8,12 @@ pub enum Action<BigUint: BigUintApi> {
 	RemoveUser(Address),
 	ChangeQuorum(usize),
 	SendEgld(Address, BigUint),
+	SCDeploy {
+		amount: BigUint,
+		code: BoxedBytes,
+		code_metadata: CodeMetadata,
+		arguments: Vec<BoxedBytes>,
+	},
 }
 
 impl<BigUint: BigUintApi> NestedEncode for Action<BigUint> {
@@ -23,28 +29,40 @@ impl<BigUint: BigUintApi> NestedEncode for Action<BigUint> {
 	) {
 		match self {
 			Action::Nothing => {
-				0u32.dep_encode_or_exit(dest, c.clone(), exit);
+				0u8.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::AddBoardMember(address) => {
-				1u32.dep_encode_or_exit(dest, c.clone(), exit);
+				1u8.dep_encode_or_exit(dest, c.clone(), exit);
 				address.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::AddProposer(address) => {
-				2u32.dep_encode_or_exit(dest, c.clone(), exit);
+				2u8.dep_encode_or_exit(dest, c.clone(), exit);
 				address.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::RemoveUser(address) => {
-				3u32.dep_encode_or_exit(dest, c.clone(), exit);
+				3u8.dep_encode_or_exit(dest, c.clone(), exit);
 				address.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::ChangeQuorum(new_quorum) => {
-				4u32.dep_encode_or_exit(dest, c.clone(), exit);
+				4u8.dep_encode_or_exit(dest, c.clone(), exit);
 				new_quorum.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::SendEgld(to, amount) => {
-				5u32.dep_encode_or_exit(dest, c.clone(), exit);
+				5u8.dep_encode_or_exit(dest, c.clone(), exit);
 				to.dep_encode_or_exit(dest, c.clone(), exit);
 				amount.dep_encode_or_exit(dest, c.clone(), exit);
+			},
+			Action::SCDeploy {
+				code,
+				code_metadata,
+				amount,
+				arguments,
+			} => {
+				6u8.dep_encode_or_exit(dest, c.clone(), exit);
+				amount.dep_encode_or_exit(dest, c.clone(), exit);
+				code.dep_encode_or_exit(dest, c.clone(), exit);
+				code_metadata.dep_encode_or_exit(dest, c.clone(), exit);
+				arguments.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 		}
 	}
@@ -81,7 +99,7 @@ impl<BigUint: BigUintApi> NestedDecode for Action<BigUint> {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		match u32::dep_decode_or_exit(input, c.clone(), exit) {
+		match u8::dep_decode_or_exit(input, c.clone(), exit) {
 			0 => Action::Nothing,
 			1 => Action::AddBoardMember(Address::dep_decode_or_exit(input, c.clone(), exit)),
 			2 => Action::AddProposer(Address::dep_decode_or_exit(input, c.clone(), exit)),
@@ -91,6 +109,12 @@ impl<BigUint: BigUintApi> NestedDecode for Action<BigUint> {
 				Address::dep_decode_or_exit(input, c.clone(), exit),
 				BigUint::dep_decode_or_exit(input, c.clone(), exit),
 			),
+			6 => Action::SCDeploy {
+				amount: BigUint::dep_decode_or_exit(input, c.clone(), exit),
+				code: BoxedBytes::dep_decode_or_exit(input, c.clone(), exit),
+				code_metadata: CodeMetadata::dep_decode_or_exit(input, c.clone(), exit),
+				arguments: Vec::<BoxedBytes>::dep_decode_or_exit(input, c.clone(), exit),
+			},
 			_ => exit(c, DecodeError::INVALID_VALUE),
 		}
 	}
