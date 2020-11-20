@@ -4,7 +4,7 @@ mod action;
 mod user_role;
 
 use action::Action;
-use elrond_wasm::CallDataSerializer;
+use elrond_wasm::HexCallDataSerializer;
 use user_role::UserRole;
 
 imports!();
@@ -353,7 +353,7 @@ pub trait Multisig {
 				function,
 				arguments,
 			} => {
-				let mut call_data = CallDataSerializer::new(function.as_slice());
+				let mut call_data = HexCallDataSerializer::new(function.as_slice());
 				for arg in arguments {
 					call_data.push_argument_bytes(arg.as_slice());
 				}
