@@ -149,6 +149,7 @@ impl From<Vec<u8>> for BoxedBytes {
 impl NestedEncode for BoxedBytes {
 	#[inline]
 	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.len().dep_encode(dest)?;
 		dest.write(self.as_ref());
 		Ok(())
 	}
@@ -157,9 +158,10 @@ impl NestedEncode for BoxedBytes {
 	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
 		&self,
 		dest: &mut O,
-		_: ExitCtx,
-		_: fn(ExitCtx, EncodeError) -> !,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
+		self.len().dep_encode_or_exit(dest, c, exit);
 		dest.write(self.as_ref());
 	}
 }
