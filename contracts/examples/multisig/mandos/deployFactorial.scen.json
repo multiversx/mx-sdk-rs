@@ -146,7 +146,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [ "address:factorial" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

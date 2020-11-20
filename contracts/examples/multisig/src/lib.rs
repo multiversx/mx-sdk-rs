@@ -269,7 +269,7 @@ pub trait Multisig {
 	}
 
 	#[endpoint(performAction)]
-	fn perform_action(&self, action_id: usize) -> SCResult<()> {
+	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -293,6 +293,7 @@ pub trait Multisig {
 		require!(valid_signers_count >= quorum, "quorum has not been reached");
 
 		let action = self.get_action_data(action_id);
+		let mut result = Vec::<BoxedBytes>::new();
 		match action {
 			Action::Nothing => {},
 			Action::AddBoardMember(board_member_address) => {
@@ -325,7 +326,9 @@ pub trait Multisig {
 				for arg in arguments {
 					arg_buffer.push_raw_arg(arg.as_slice());
 				}
-				let _ = self.deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer);
+				let new_address =
+					self.deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer);
+				result.push(new_address.into_boxed_bytes());
 			},
 		}
 
@@ -333,6 +336,6 @@ pub trait Multisig {
 		self.set_action_data(action_id, &Action::Nothing);
 		self.set_action_signer_ids(action_id, &[][..]);
 		self.set_pending_action_count(self.get_pending_action_count() - 1);
-		Ok(())
+		Ok(result.into())
 	}
 }
