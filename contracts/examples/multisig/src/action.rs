@@ -7,11 +7,20 @@ pub enum Action<BigUint: BigUintApi> {
 	AddProposer(Address),
 	RemoveUser(Address),
 	ChangeQuorum(usize),
-	SendEgld(Address, BigUint),
+	SendEgld {
+		to: Address,
+		amount: BigUint,
+	},
 	SCDeploy {
 		amount: BigUint,
 		code: BoxedBytes,
 		code_metadata: CodeMetadata,
+		arguments: Vec<BoxedBytes>,
+	},
+	SCCall {
+		to: Address,
+		amount: BigUint,
+		function: BoxedBytes,
 		arguments: Vec<BoxedBytes>,
 	},
 }
@@ -47,21 +56,33 @@ impl<BigUint: BigUintApi> NestedEncode for Action<BigUint> {
 				4u8.dep_encode_or_exit(dest, c.clone(), exit);
 				new_quorum.dep_encode_or_exit(dest, c.clone(), exit);
 			},
-			Action::SendEgld(to, amount) => {
+			Action::SendEgld { to, amount } => {
 				5u8.dep_encode_or_exit(dest, c.clone(), exit);
 				to.dep_encode_or_exit(dest, c.clone(), exit);
 				amount.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::SCDeploy {
+				amount,
 				code,
 				code_metadata,
-				amount,
 				arguments,
 			} => {
 				6u8.dep_encode_or_exit(dest, c.clone(), exit);
 				amount.dep_encode_or_exit(dest, c.clone(), exit);
 				code.dep_encode_or_exit(dest, c.clone(), exit);
 				code_metadata.dep_encode_or_exit(dest, c.clone(), exit);
+				arguments.dep_encode_or_exit(dest, c.clone(), exit);
+			},
+			Action::SCCall {
+				to,
+				amount,
+				function,
+				arguments,
+			} => {
+				7u8.dep_encode_or_exit(dest, c.clone(), exit);
+				to.dep_encode_or_exit(dest, c.clone(), exit);
+				amount.dep_encode_or_exit(dest, c.clone(), exit);
+				function.dep_encode_or_exit(dest, c.clone(), exit);
 				arguments.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 		}
@@ -105,14 +126,20 @@ impl<BigUint: BigUintApi> NestedDecode for Action<BigUint> {
 			2 => Action::AddProposer(Address::dep_decode_or_exit(input, c.clone(), exit)),
 			3 => Action::RemoveUser(Address::dep_decode_or_exit(input, c.clone(), exit)),
 			4 => Action::ChangeQuorum(usize::dep_decode_or_exit(input, c.clone(), exit)),
-			5 => Action::SendEgld(
-				Address::dep_decode_or_exit(input, c.clone(), exit),
-				BigUint::dep_decode_or_exit(input, c.clone(), exit),
-			),
+			5 => Action::SendEgld {
+				to: Address::dep_decode_or_exit(input, c.clone(), exit),
+				amount: BigUint::dep_decode_or_exit(input, c.clone(), exit),
+			},
 			6 => Action::SCDeploy {
 				amount: BigUint::dep_decode_or_exit(input, c.clone(), exit),
 				code: BoxedBytes::dep_decode_or_exit(input, c.clone(), exit),
 				code_metadata: CodeMetadata::dep_decode_or_exit(input, c.clone(), exit),
+				arguments: Vec::<BoxedBytes>::dep_decode_or_exit(input, c.clone(), exit),
+			},
+			7 => Action::SCCall {
+				to: Address::dep_decode_or_exit(input, c.clone(), exit),
+				amount: BigUint::dep_decode_or_exit(input, c.clone(), exit),
+				function: BoxedBytes::dep_decode_or_exit(input, c.clone(), exit),
 				arguments: Vec::<BoxedBytes>::dep_decode_or_exit(input, c.clone(), exit),
 			},
 			_ => exit(c, DecodeError::INVALID_VALUE),
