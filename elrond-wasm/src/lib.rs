@@ -8,15 +8,15 @@ pub use alloc::vec::Vec;
 
 pub use elrond_codec;
 
-pub mod call_data;
 pub mod err_msg;
+pub mod hex_call_data;
 pub mod io;
 pub mod non_zero_util;
 mod proxy;
 pub mod storage;
 pub mod types;
 
-pub use call_data::*;
+pub use hex_call_data::*;
 pub use io::*;
 pub use proxy::OtherContractHandle;
 pub use storage::{storage_get, storage_set};
