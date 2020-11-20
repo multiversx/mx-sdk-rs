@@ -332,6 +332,7 @@ pub trait Multisig {
 		// clean up storage
 		self.set_action_data(action_id, &Action::Nothing);
 		self.set_action_signer_ids(action_id, &[][..]);
+		self.set_pending_action_count(self.get_pending_action_count() - 1);
 		Ok(())
 	}
 }
