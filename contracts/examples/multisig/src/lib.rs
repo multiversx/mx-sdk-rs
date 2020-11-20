@@ -4,6 +4,7 @@ mod action;
 mod user_role;
 
 use action::Action;
+use elrond_wasm::CallDataSerializer;
 use user_role::UserRole;
 
 imports!();
@@ -136,7 +137,7 @@ pub trait Multisig {
 
 	#[endpoint(proposeSendEgld)]
 	fn propose_send_egld(&self, to: Address, amount: BigUint) -> SCResult<usize> {
-		self.propose_action(Action::SendEgld(to, amount))
+		self.propose_action(Action::SendEgld { to, amount })
 	}
 
 	#[endpoint(proposeSCDeploy)]
@@ -163,6 +164,22 @@ pub trait Multisig {
 			amount,
 			code,
 			code_metadata,
+			arguments: arguments.into_vec(),
+		})
+	}
+
+	#[endpoint(proposeSCCall)]
+	fn propose_sc_call(
+		&self,
+		to: Address,
+		amount: BigUint,
+		function: BoxedBytes,
+		#[var_args] arguments: VarArgs<BoxedBytes>,
+	) -> SCResult<usize> {
+		self.propose_action(Action::SCCall {
+			to,
+			amount,
+			function,
 			arguments: arguments.into_vec(),
 		})
 	}
@@ -312,13 +329,13 @@ pub trait Multisig {
 				);
 				self.set_quorum(new_quorum)
 			},
-			Action::SendEgld(to, amount) => {
+			Action::SendEgld { to, amount } => {
 				self.send_tx(&to, &amount, "");
 			},
 			Action::SCDeploy {
+				amount,
 				code,
 				code_metadata,
-				amount,
 				arguments,
 			} => {
 				let gas_left = self.get_gas_left();
@@ -329,6 +346,18 @@ pub trait Multisig {
 				let new_address =
 					self.deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer);
 				result.push(new_address.into_boxed_bytes());
+			},
+			Action::SCCall {
+				to,
+				amount,
+				function,
+				arguments,
+			} => {
+				let mut call_data = CallDataSerializer::new(function.as_slice());
+				for arg in arguments {
+					call_data.push_argument_bytes(arg.as_slice());
+				}
+				self.async_call(&to, &amount, call_data.as_slice());
 			},
 		}
 
