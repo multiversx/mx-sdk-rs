@@ -1,4 +1,4 @@
-use elrond_wasm::{Address, Box, BoxedBytes, Vec, H256, ArgBuffer, CodeMetadata};
+use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
 
 use crate::big_int::*;
 use crate::big_uint::*;
@@ -337,7 +337,14 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn deploy_contract(&self, gas: u64, amount: &ArwenBigUint, code: &BoxedBytes, code_metadata: CodeMetadata, arg_buffer: &ArgBuffer) -> Address {
+	fn deploy_contract(
+		&self,
+		gas: u64,
+		amount: &ArwenBigUint,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Address {
 		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 		let mut new_address = Address::zero();
 		unsafe {
