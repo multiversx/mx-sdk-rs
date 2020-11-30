@@ -37,7 +37,7 @@ impl Kitty {
         else {
             return cooldown;
         }
-    }
+	}
 }
 
 // The default Kitty, which is not a valid kitty. Used for Kitty with ID 0
