@@ -7,7 +7,11 @@ use kitty::{Kitty, KittyGenesType};
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
 pub trait KittyOwnership {
 	#[init]
-	fn init(&self, _gen_zero_kitties: u32) {
+	fn init(&self, gene_science_contract_address: &Address, auto_breed_fee: BigUint,
+			_gen_zero_kitties: u32) {
+
+		self.set_gene_science_contract_address(gene_science_contract_address);
+		self.set_auto_birth_fee(auto_breed_fee);
 		self._create_genesis_kitty();
 
 		// TBD: randomly create gen_zero_kitties
@@ -30,6 +34,7 @@ pub trait KittyOwnership {
 		self.get_kitty_owner(kitty_id)
 	}
 
+	#[endpoint]
 	fn approve(&self, to: &Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
@@ -42,6 +47,7 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
+	#[endpoint]
 	fn transfer(&self, to: &Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
@@ -56,6 +62,7 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
+	#[endpoint]
 	fn transfer_from(&self, from: &Address, to: &Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
@@ -93,7 +100,119 @@ pub trait KittyOwnership {
 		kitty_list
 	}
 
-	// endpoints - other
+	// endpoints - Kitty Breeding
+
+	#[endpoint(approveSiring)]
+	fn approve_siring(&self, kitty_id: u32, address: &Address) -> SCResult<()> {
+		require!(self.get_kitty_owner(kitty_id) == self.get_caller(), 
+			"You are not the owner of the kitty!");
+
+		self.set_sire_allowed_address(kitty_id, address);
+
+		Ok(())
+	}
+
+	#[endpoint(isReadyToBreed)]
+	fn is_ready_to_breed(&self, kitty_id: u32) -> SCResult<bool> {
+		require!(kitty_id != 0, "Invalid kitty id");
+
+		let kitty = self.get_kitty_by_id(kitty_id);
+
+		Ok(self._is_ready_to_breed(&kitty))
+	}
+
+	#[endpoint(isPregnant)]
+	fn is_pregnant(&self, kitty_id: u32) -> SCResult<bool> {
+		require!(kitty_id != 0, "Invalid kitty id");
+
+		let kitty = self.get_kitty_by_id(kitty_id);
+
+		Ok(kitty.siring_with_id != 0)
+	}
+
+	#[endpoint(canBreedWith)]
+	fn can_breed_with(&self, matron_id: u32, sire_id: u32) -> SCResult<bool> {
+		require!(matron_id != 0, "Invalid matron id!");
+		require!(sire_id != 0, "Invalid sire id!");
+
+		Ok(self._is_valid_mating_pair(matron_id, sire_id) && 
+			self._is_siring_permitted(matron_id, sire_id))
+	}
+
+	#[payable]
+	#[endpoint(breedWithAuto)]
+	fn breed_with_auto(&self, #[payment] payment: BigUint, matron_id: u32, sire_id: u32) 
+		-> SCResult<()> {
+
+		let auto_birth_fee = self.get_auto_birth_fee();
+		let caller = self.get_caller();
+
+		require!(payment == auto_birth_fee, "Wrong fee!");
+	
+		require!(caller == self.get_kitty_owner(matron_id), 
+			"You are not the owner of the kitty!");
+
+		require!(self._is_siring_permitted(matron_id, sire_id), 
+			"Siring not permitted!");
+
+		let matron = self.get_kitty_by_id(matron_id);
+		let sire = self.get_kitty_by_id(sire_id);
+
+		require!(self._is_ready_to_breed(&matron), 
+			"Matron not ready to breed!");
+
+		require!(self._is_ready_to_breed(&sire), 
+			"Sire not ready to breed!");
+
+		require!(self._is_valid_mating_pair(matron_id, sire_id), 
+			"Not a valid mating pair!");
+
+		self._breed(matron_id, sire_id);
+
+		Ok(())
+	}
+
+	#[endpoint(giveBirth)]
+	fn give_birth(&self, matron_id: u32) -> SCResult<u32> {
+		let total_kitties = self.get_total_kitties();
+
+		require!(matron_id < total_kitties, "Invalid matron ID!");
+
+		let mut matron = self.get_kitty_by_id(matron_id);
+
+		require!(self._is_ready_to_give_birth(&matron), 
+			"Matron not ready to give birth!");
+
+		let sire_id = matron.siring_with_id;
+		let sire = self.get_kitty_by_id(sire_id);
+		let new_kitty_generation: u16;
+
+		if matron.generation > sire.generation {
+			new_kitty_generation = matron.generation + 1;
+		}
+		else {
+			new_kitty_generation = sire.generation + 1;
+		}
+
+		// TBD
+		let new_kitty_genes: KittyGenesType = 0;
+
+		// new kitty goes to the owner of the matron
+		let new_kitty_owner = self.get_kitty_owner(matron_id);
+		let new_kitty_id = self._create_new_kitty(matron_id, sire_id, 
+			new_kitty_generation, new_kitty_genes, &new_kitty_owner);
+
+		// update matron kitty
+		matron.siring_with_id = 0;
+		self.set_kitty_at_id(matron_id, &matron);
+
+		// send auto birth fee to caller
+		let caller = self.get_caller();
+		let fee = self.get_auto_birth_fee();
+		self.send_tx(&caller, &fee, "Auto Birth Fee");
+
+		Ok(new_kitty_id)
+	}
 
 	// private
 
@@ -150,7 +269,95 @@ pub trait KittyOwnership {
 			genesis_kitty.generation, genesis_kitty.genes, &self.get_sc_address());
 	}
 
-	// storage
+	fn _trigger_cooldown(&self, kitty: &mut Kitty) {
+		let cooldown = kitty.get_next_cooldown_time();
+		kitty.cooldown_end = self.get_block_timestamp() + cooldown;
+	}
+
+	fn _breed(&self, matron_id: u32, sire_id: u32) {
+		let mut matron = self.get_kitty_by_id(matron_id);
+		let mut sire = self.get_kitty_by_id(sire_id);
+
+		// mark matron as pregnant
+		matron.siring_with_id = sire_id;
+
+		self._trigger_cooldown(&mut matron);
+		self._trigger_cooldown(&mut sire);
+
+		self.clear_sire_allowed_address(matron_id);
+		self.clear_sire_allowed_address(sire_id);
+
+		self.set_kitty_at_id(matron_id, &matron);
+		self.set_kitty_at_id(sire_id, &sire);
+	}
+
+	// private - Kitty checks. These should be in the Kitty struct,
+	// but unfortunately, they need access to the contract-only functions
+
+	fn _is_ready_to_breed(&self, kitty: &Kitty) -> bool {
+		kitty.siring_with_id == 0 && kitty.cooldown_end <= self.get_block_timestamp()
+	}
+
+	fn _is_siring_permitted(&self, matron_id: u32, sire_id: u32) -> bool {
+		let sire_owner = self.get_kitty_owner(sire_id);
+		let matron_owner = self.get_kitty_owner(matron_id);
+		let sire_approved_address = self.get_sire_allowed_address(sire_id);
+
+		sire_owner == matron_owner || matron_owner == sire_approved_address
+	}
+
+	fn _is_ready_to_give_birth(&self, matron: &Kitty) -> bool {
+		matron.siring_with_id != 0 && matron.cooldown_end <= self.get_block_timestamp()
+	}
+
+	fn _is_valid_mating_pair(&self, matron_id: u32, sire_id: u32) -> bool {
+		let matron = self.get_kitty_by_id(matron_id);
+		let sire = self.get_kitty_by_id(sire_id);
+
+		// can't breed with itself
+		if matron_id == sire_id {
+			return false;
+		}
+
+		// can't breed with their parents
+		if matron.matron_id == sire_id || matron.sire_id == sire_id {
+			return false;
+		}
+		if sire.matron_id == matron_id || sire.sire_id == matron_id {
+			return false;
+		}
+
+		// for gen zero kitties
+		if sire.matron_id == 0 || matron.matron_id == 0 {
+			return true;
+		}
+
+		// can't breed with full or half siblings
+		if sire.matron_id == matron.matron_id || sire.matron_id == matron.sire_id {
+			return false;
+		}
+		if sire.sire_id == matron.matron_id || sire.sire_id == matron.sire_id {
+			return false;
+		}
+
+		return true;
+	}
+
+	// storage - General
+
+	#[storage_get("geneScienceContractAddress")]
+	fn get_gene_science_contract_address(&self) -> Address;
+
+	#[storage_set("geneScienceContractAddress")]
+	fn set_gene_science_contract_address(&self, address: &Address);
+
+	#[storage_get("autoBirthFee")]
+	fn get_auto_birth_fee(&self) -> BigUint;
+
+	#[storage_set("autoBirthFee")]
+	fn set_auto_birth_fee(&self, fee: BigUint);
+
+	// storage - Kitties
 
 	#[storage_get("totalKitties")]
 	fn get_total_kitties(&self) ->u32;
