@@ -1,16 +1,21 @@
+#![no_std]
+
 use elrond_wasm::elrond_codec::*;
 
 const SECONDS_PER_MINUTE: u64 = 60;
 const MAX_COOLDOWN: u64 = 60 * 60 * 24 * 7; // 7 days
+const MAX_TIREDNESS: u16 = 20;
+
+pub type KittyGenesType = u64;
 
 pub struct Kitty {
     // 0-23 RGB fur color
     // 24-47 RGB eye color
     // 48-55 meow power - the higher the value, the louder the cat
     // 56-63 - reserved
-    pub genes: u64, 
+    pub genes: KittyGenesType, 
     pub birth_time: u64, // timestamp
-    pub cooldown_end: u64, // timestamp
+    pub cooldown_end: u64, // timestamp, used for pregnancy timer and siring cooldown
     pub matron_id: u32,
     pub sire_id: u32,
     pub siring_with_id: u32, // for pregnant cats, 0 otherwise
@@ -21,11 +26,11 @@ pub struct Kitty {
 impl Kitty {
     pub fn get_next_cooldown_time(&self) -> u64 {
 		let tiredness = self.nr_children + self.generation / 2;
-        if tiredness >= 64 {
+        if tiredness > MAX_TIREDNESS {
             return MAX_COOLDOWN;
         }
 
-        let cooldown = (1u64 << tiredness) * SECONDS_PER_MINUTE; // 2^(tiredness) minutes
+        let cooldown = SECONDS_PER_MINUTE << tiredness; // 2^(tiredness) minutes
         if cooldown > MAX_COOLDOWN {
             return MAX_COOLDOWN;
         }
@@ -33,6 +38,22 @@ impl Kitty {
             return cooldown;
         }
     }
+}
+
+// The default Kitty, which is not a valid kitty. Used for Kitty with ID 0
+impl Default for Kitty {
+	fn default() -> Kitty {
+		Kitty {
+			genes: KittyGenesType::default(),
+			birth_time: 0,
+			cooldown_end: u64::MAX,
+			matron_id: 0,
+			sire_id: 0,
+			siring_with_id: 0,
+			nr_children: 0,
+			generation: 0
+		}
+	}
 }
 
 impl NestedEncode for Kitty {
@@ -86,7 +107,7 @@ impl TopEncode for Kitty {
 impl NestedDecode for Kitty {
 	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
 		Ok(Kitty {
-            genes: u64::dep_decode(input)?,
+            genes: KittyGenesType::dep_decode(input)?,
             birth_time: u64::dep_decode(input)?,
             cooldown_end: u64::dep_decode(input)?,
             matron_id: u32::dep_decode(input)?,
@@ -103,7 +124,7 @@ impl NestedDecode for Kitty {
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
 		Kitty {
-            genes: u64::dep_decode_or_exit(input, c.clone(), exit),
+            genes: KittyGenesType::dep_decode_or_exit(input, c.clone(), exit),
             birth_time: u64::dep_decode_or_exit(input, c.clone(), exit),
             cooldown_end: u64::dep_decode_or_exit(input, c.clone(), exit),
             matron_id: u32::dep_decode_or_exit(input, c.clone(), exit),
