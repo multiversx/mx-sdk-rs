@@ -2,7 +2,7 @@
 
 imports!();
 
-use kitty::{Kitty, KittyGenesType};
+use kitty::{Kitty, KittyGenes};
 
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
 pub trait KittyOwnership {
@@ -196,7 +196,7 @@ pub trait KittyOwnership {
 		}
 
 		// TBD
-		let new_kitty_genes: KittyGenesType = 0;
+		let new_kitty_genes: KittyGenes = 0;
 
 		// new kitty goes to the owner of the matron
 		let new_kitty_owner = self.get_kitty_owner(matron_id);
@@ -239,7 +239,7 @@ pub trait KittyOwnership {
 	// checks should be done in the caller function
 	// returns the newly created kitten id
 	fn _create_new_kitty(&self, matron_id: u32, sire_id: u32, generation: u16, 
-		genes: KittyGenesType, owner: &Address) -> u32 {
+		genes: KittyGenes, owner: &Address) -> u32 {
 
 		let mut total_kitties = self.get_total_kitties();
 		let new_kitty_id = total_kitties;

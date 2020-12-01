@@ -6,14 +6,23 @@ const SECONDS_PER_MINUTE: u64 = 60;
 const MAX_COOLDOWN: u64 = 60 * 60 * 24 * 7; // 7 days
 const MAX_TIREDNESS: u16 = 20;
 
-pub type KittyGenesType = u64;
+// TO DO: fixing encoding/decoding
+
+// TO DO: move Color and KittyGenes to separate files each
+
+pub struct Color {
+	pub r: u8,
+	pub g: u8,
+	pub b: u8
+}
+pub struct KittyGenes {
+	pub fur_color: Color,
+	pub eye_color: Color,
+	pub meow_power: u8 // the higher the value, the louder the cat
+}
 
 pub struct Kitty {
-    // 0-23 RGB fur color
-    // 24-47 RGB eye color
-    // 48-55 meow power - the higher the value, the louder the cat
-    // 56-63 - reserved
-    pub genes: KittyGenesType, 
+    pub genes: KittyGenes, 
     pub birth_time: u64, // timestamp
     pub cooldown_end: u64, // timestamp, used for pregnancy timer and siring cooldown
     pub matron_id: u32,
@@ -21,6 +30,25 @@ pub struct Kitty {
     pub siring_with_id: u32, // for pregnant cats, 0 otherwise
     pub nr_children: u16, // cooldown period increases exponentially with every breeding/siring
     pub generation: u16 // max(sire_gen, matron_gen) + 1. Generation also influences cooldown.
+}
+
+impl Color {
+	// ratios are integers, 0 < ratio < 100, ratioFirst + ratioSecond = 100
+	// checks should be done in the caller
+	pub fn mix_with(&self, other_color: &Color, ratio_first: u8, ratio_second: u8) -> Color {
+		let mut result = Color::default();
+
+		result.r = ((self.r as u16 * ratio_first as u16 + 
+			other_color.r as u16 * ratio_second as u16) / 100) as u8;
+		
+		result.g = ((self.g as u16 * ratio_first as u16 + 
+			other_color.g as u16 * ratio_second as u16) / 100) as u8;
+
+		result.b = ((self.b as u16 * ratio_first as u16 + 
+			other_color.b as u16 * ratio_second as u16) / 100) as u8;
+
+		result
+	}
 }
 
 impl Kitty {
@@ -38,13 +66,47 @@ impl Kitty {
             return cooldown;
         }
 	}
+
+	pub fn get_fur_color(&self) -> Color {
+		self.genes.fur_color
+	}
+	
+	pub fn get_eye_color(&self) -> Color {
+		self.genes.eye_color
+	}
+
+	pub fn get_meow_power(&self) -> u8 {
+		self.genes.meow_power
+	}
+}
+
+// Default trait impl for the types
+
+impl Default for Color {
+	fn default() -> Self {
+		Color {
+			r: 0,
+			g: 0,
+			b: 0
+		}
+	}
+}
+
+impl Default for KittyGenes {
+	fn default() -> Self {
+		KittyGenes {
+			fur_color: Color::default(),
+			eye_color: Color::default(),
+			meow_power: 0
+		}
+	}
 }
 
 // The default Kitty, which is not a valid kitty. Used for Kitty with ID 0
 impl Default for Kitty {
-	fn default() -> Kitty {
+	fn default() -> Self {
 		Kitty {
-			genes: KittyGenesType::default(),
+			genes: KittyGenes::default(),
 			birth_time: 0,
 			cooldown_end: u64::MAX,
 			matron_id: 0,
@@ -107,7 +169,7 @@ impl TopEncode for Kitty {
 impl NestedDecode for Kitty {
 	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
 		Ok(Kitty {
-            genes: KittyGenesType::dep_decode(input)?,
+            genes: KittyGenes::dep_decode(input)?,
             birth_time: u64::dep_decode(input)?,
             cooldown_end: u64::dep_decode(input)?,
             matron_id: u32::dep_decode(input)?,
@@ -124,7 +186,7 @@ impl NestedDecode for Kitty {
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
 		Kitty {
-            genes: KittyGenesType::dep_decode_or_exit(input, c.clone(), exit),
+            genes: KittyGenes::dep_decode_or_exit(input, c.clone(), exit),
             birth_time: u64::dep_decode_or_exit(input, c.clone(), exit),
             cooldown_end: u64::dep_decode_or_exit(input, c.clone(), exit),
             matron_id: u32::dep_decode_or_exit(input, c.clone(), exit),
