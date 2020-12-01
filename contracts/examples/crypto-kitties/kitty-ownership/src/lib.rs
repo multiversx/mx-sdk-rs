@@ -7,11 +7,11 @@ use kitty::{Kitty, KittyGenesType};
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
 pub trait KittyOwnership {
 	#[init]
-	fn init(&self, gene_science_contract_address: &Address, auto_breed_fee: BigUint,
+	fn init(&self, gene_science_contract_address: &Address, auto_birth_fee: BigUint,
 			_gen_zero_kitties: u32) {
 
 		self.set_gene_science_contract_address(gene_science_contract_address);
-		self.set_auto_birth_fee(auto_breed_fee);
+		self.set_auto_birth_fee(auto_birth_fee);
 		self._create_genesis_kitty();
 
 		// TBD: randomly create gen_zero_kitties
@@ -114,7 +114,7 @@ pub trait KittyOwnership {
 
 	#[endpoint(isReadyToBreed)]
 	fn is_ready_to_breed(&self, kitty_id: u32) -> SCResult<bool> {
-		require!(kitty_id != 0, "Invalid kitty id");
+		require!(kitty_id != 0 && kitty_id < self.get_total_kitties(), "Invalid kitty id");
 
 		let kitty = self.get_kitty_by_id(kitty_id);
 
@@ -123,7 +123,7 @@ pub trait KittyOwnership {
 
 	#[endpoint(isPregnant)]
 	fn is_pregnant(&self, kitty_id: u32) -> SCResult<bool> {
-		require!(kitty_id != 0, "Invalid kitty id");
+		require!(kitty_id != 0 && kitty_id < self.get_total_kitties(), "Invalid kitty id");
 
 		let kitty = self.get_kitty_by_id(kitty_id);
 
@@ -132,8 +132,8 @@ pub trait KittyOwnership {
 
 	#[endpoint(canBreedWith)]
 	fn can_breed_with(&self, matron_id: u32, sire_id: u32) -> SCResult<bool> {
-		require!(matron_id != 0, "Invalid matron id!");
-		require!(sire_id != 0, "Invalid sire id!");
+		require!(matron_id != 0 && matron_id < self.get_total_kitties(), "Invalid matron id!");
+		require!(sire_id != 0 && sire_id < self.get_total_kitties(), "Invalid sire id!");
 
 		Ok(self._is_valid_mating_pair(matron_id, sire_id) && 
 			self._is_siring_permitted(matron_id, sire_id))
@@ -143,6 +143,9 @@ pub trait KittyOwnership {
 	#[endpoint(breedWithAuto)]
 	fn breed_with_auto(&self, #[payment] payment: BigUint, matron_id: u32, sire_id: u32) 
 		-> SCResult<()> {
+
+		require!(matron_id != 0 && matron_id < self.get_total_kitties(), "Invalid matron id!");
+		require!(sire_id != 0 && sire_id < self.get_total_kitties(), "Invalid sire id!");
 
 		let auto_birth_fee = self.get_auto_birth_fee();
 		let caller = self.get_caller();
@@ -174,9 +177,7 @@ pub trait KittyOwnership {
 
 	#[endpoint(giveBirth)]
 	fn give_birth(&self, matron_id: u32) -> SCResult<u32> {
-		let total_kitties = self.get_total_kitties();
-
-		require!(matron_id < total_kitties, "Invalid matron ID!");
+		require!(matron_id != 0 && matron_id < self.get_total_kitties(), "Invalid matron id!");
 
 		let mut matron = self.get_kitty_by_id(matron_id);
 
@@ -185,8 +186,8 @@ pub trait KittyOwnership {
 
 		let sire_id = matron.siring_with_id;
 		let sire = self.get_kitty_by_id(sire_id);
-		let new_kitty_generation: u16;
 
+		let new_kitty_generation: u16; // MAX generation(matron, sire) + 1
 		if matron.generation > sire.generation {
 			new_kitty_generation = matron.generation + 1;
 		}
