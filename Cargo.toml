@@ -20,6 +20,7 @@ members = [
   "contracts/examples/lottery-esdt",
   "contracts/examples/non-fungible-tokens",
   "contracts/examples/crypto-kitties/kitty-ownership",
+  "contracts/examples/crypto-kitties/kitty-genetic-alg",
   
   "contracts/feature-tests/async",
   "contracts/feature-tests/async/async-alice",
