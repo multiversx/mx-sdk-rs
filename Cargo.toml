@@ -4,7 +4,7 @@ members = [
   "elrond-wasm-debug",
   "elrond-wasm-derive",
   "mandos",
-  "elrond-codec/elrond-codec-derive",
+  "elrond-codec-derive",
 
   "contracts/benchmarks/str-repeat",
 
