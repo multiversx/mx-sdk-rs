@@ -125,8 +125,6 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
                 Ok(#name {
                     #(#fields: <#types>::dep_decode(input)?,)*
-
-                    prize_distribution: Vec::<u8>::dep_decode(input)?,
                 })
             }
         
