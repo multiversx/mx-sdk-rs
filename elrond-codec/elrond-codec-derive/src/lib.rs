@@ -36,15 +36,24 @@ fn extract_field_names(data: &syn::Data) -> Vec<syn::Ident> {
     match data {
         syn::Data::Struct(s) => {
             match &s.fields {
-                syn::Fields::Named(fields_named) => {
-                    fields_named.named.iter().map(|f| {
+                syn::Fields::Named(fields) => {
+                    fields.named.iter().map(|f| {
                         f.clone().ident.unwrap()
                     }).collect()
                 }
-                _ => panic!("only named fields supported at the moment")
+                _ => panic!("only named fields supported")
             }
         },
-        _ => panic!("only structs supported at the moment")
+        syn::Data::Enum(e) => {
+            e.variants.iter().map(|v| {
+                if v.fields.len() > 0 {
+                    panic!("only simple enums supported")
+                }
+
+                v.clone().ident
+            }).collect()
+        },
+        syn::Data::Union(_) => panic!("unions not supported")
     }
 }
 
@@ -52,15 +61,20 @@ fn extract_field_types(data: &syn::Data) -> Vec<syn::Type> {
     match data {
         syn::Data::Struct(s) => {
             match &s.fields {
-                syn::Fields::Named(fields_named) => {
-                    fields_named.named.iter().map(|f| {
+                syn::Fields::Named(fields) => {
+                    fields.named.iter().map(|f| {
                         f.ty.clone()
                     }).collect()
-                }
-                _ => panic!("only named fields supported at the moment")
+                },
+                syn::Fields::Unnamed(fields) => {
+                    fields.unnamed.iter().map(|f| {
+                        f.ty.clone()
+                    }).collect()
+                },
+                syn::Fields::Unit => panic!("unit not supported")
             }
         },
-        _ => panic!("only structs supported at the moment")
+        _ => panic!("only structs supported")
     }
 }
 
