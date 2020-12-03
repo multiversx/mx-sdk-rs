@@ -202,16 +202,6 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
         };
     }
     else {
-        let total_fields = match &ast.data {
-            syn::Data::Struct(s) => {
-                match &s.fields {
-                    syn::Fields::Unnamed(u) => u.unnamed.len(),
-                    _ => panic!("only structs with unnamed fields should reach here!")
-                }
-            },
-            _ => panic!("only structs should reach here!")
-        };
-
         gen = quote! {
             impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
                 fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
