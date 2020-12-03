@@ -90,9 +90,10 @@ fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
     let name = &ast.ident;
     let fields = extract_field_names(&ast.data);
+    let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 
     let gen = quote! {
-        impl NestedEncode for #name {
+        impl #impl_generics NestedEncode for #name #ty_generics #where_clause {
             fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
                 #(self.#fields.dep_encode(dest)?;)*
 
@@ -124,9 +125,10 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let fields = extract_field_names(&ast.data);
     let types = extract_field_types(&ast.data);
+    let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 
     let gen = quote! {
-        impl NestedDecode for #name {
+        impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
             fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
                 Ok(#name {
                     #(#fields: <#types>::dep_decode(input)?,)*
@@ -154,8 +156,10 @@ fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = match &ast.data {
         syn::Data::Struct(_) => {
+            let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+
             quote! {
-                impl TopEncode for #name {
+                impl #impl_generics TopEncode for #name #ty_generics #where_clause {
                     #[inline]
                     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
                         top_encode_from_nested(self, output)
@@ -213,8 +217,10 @@ fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = match &ast.data {
         syn::Data::Struct(_) => {
+            let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+
             quote! {
-                impl TopDecode for #name {
+                impl #impl_generics TopDecode for #name #ty_generics #where_clause {
                     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
                         top_decode_from_nested(input)
                     }

@@ -21,6 +21,18 @@ struct ComplexStruct {
     complex_struct_field: SimpleStruct
 }
 
+trait SimpleTrait {
+    fn simple_function(&self);
+}
+
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+struct StructWithGeneric<ST: SimpleTrait> 
+    where ST:NestedEncode+NestedDecode+TopEncode+TopDecode {
+
+    data: u64,
+    trait_stuff: ST,
+}
+
 /* not supported yet - tuple-style structs
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 struct TupleStruct(u8, u16, SimpleStruct, u32);
