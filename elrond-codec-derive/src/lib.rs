@@ -78,6 +78,8 @@ fn extract_field_types(data: &syn::Data) -> Vec<syn::Type> {
     }
 }
 
+// Nested
+
 fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let fields = extract_field_names(&ast.data);
@@ -97,31 +99,6 @@ fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
                 exit: fn(ExitCtx, EncodeError) -> !,
             ) {
                 #(self.#fields.dep_encode_or_exit(dest, c.clone(), exit);)*
-            }
-        }
-    };
-
-    gen.into()
-}
-
-fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
-    let name = &ast.ident;
-
-    let gen = quote! {
-        impl TopEncode for #name {
-            #[inline]
-            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-                top_encode_from_nested(self, output)
-            }
-        
-            #[inline]
-            fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-                &self,
-                output: O,
-                c: ExitCtx,
-                exit: fn(ExitCtx, EncodeError) -> !,
-            ) {
-                top_encode_from_nested_or_exit(self, output, c, exit);
             }
         }
     };
@@ -150,6 +127,33 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
                 #name {
                     #(#fields: <#types>::dep_decode_or_exit(input, c.clone(), exit),)*
                 }
+            }
+        }
+    };
+
+    gen.into()
+}
+
+// Top
+
+fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+
+    let gen = quote! {
+        impl TopEncode for #name {
+            #[inline]
+            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+                top_encode_from_nested(self, output)
+            }
+        
+            #[inline]
+            fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+                &self,
+                output: O,
+                c: ExitCtx,
+                exit: fn(ExitCtx, EncodeError) -> !,
+            ) {
+                top_encode_from_nested_or_exit(self, output, c, exit);
             }
         }
     };
