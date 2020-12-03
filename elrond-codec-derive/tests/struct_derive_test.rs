@@ -20,3 +20,8 @@ struct ComplexStruct {
     complex_boolean: bool,
     complex_struct_field: SimpleStruct
 }
+
+/* not supported yet - tuple-style structs
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+struct TupleStruct(u8, u16, SimpleStruct, u32);
+*/

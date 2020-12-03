@@ -16,3 +16,10 @@ enum DayOfWeek {
     Saturday,
     Sunday
 }
+
+/* not supported yet - complex enums
+#[derive(TopEncode, TopDecode)]
+enum ComplexEnum {
+    ComplexField(u8)
+}
+*/
