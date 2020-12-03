@@ -81,6 +81,13 @@ fn extract_field_types(data: &syn::Data) -> Vec<syn::Type> {
 // Nested
 
 fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
+    if let syn::Data::Struct(_) = &ast.data {
+           
+    }
+    else {
+        panic!("Only structs may implement nested encode!");
+    }
+
     let name = &ast.ident;
     let fields = extract_field_names(&ast.data);
 
@@ -107,6 +114,13 @@ fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 }
 
 fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
+    if let syn::Data::Struct(_) = &ast.data {
+           
+    }
+    else {
+        panic!("Only structs may implement nested decode!");
+    }
+
     let name = &ast.ident;
     let fields = extract_field_names(&ast.data);
     let types = extract_field_types(&ast.data);
@@ -138,24 +152,58 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
+    let gen = match &ast.data {
+        syn::Data::Struct(_) => {
+            quote! {
+                impl TopEncode for #name {
+                    #[inline]
+                    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+                        top_encode_from_nested(self, output)
+                    }
+                
+                    #[inline]
+                    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+                        &self,
+                        output: O,
+                        c: ExitCtx,
+                        exit: fn(ExitCtx, EncodeError) -> !,
+                    ) {
+                        top_encode_from_nested_or_exit(self, output, c, exit);
+                    }
+                }
+            }
+        },
+        syn::Data::Enum(_) => {
+            let idents = extract_field_names(&ast.data);
+            let index = 0..idents.len() as u8;
+            let name_repeated = std::iter::repeat(name);
 
-    let gen = quote! {
-        impl TopEncode for #name {
-            #[inline]
-            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-                top_encode_from_nested(self, output)
+            quote! {
+                impl #name {
+                    pub fn to_u8(&self) -> u8 {
+                        match self {
+                            #(#name_repeated::#idents => #index,)*
+                        }
+                    }
+                }
+
+                impl TopEncode for #name {
+                    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+                        self.to_u8().top_encode(output)
+                    }
+                
+                    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+                        &self,
+                        output: O,
+                        c: ExitCtx,
+                        exit: fn(ExitCtx, EncodeError) -> !,
+                    ) {
+                        self.to_u8().top_encode_or_exit(output, c, exit)
+                    }
+                }
             }
-        
-            #[inline]
-            fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-                &self,
-                output: O,
-                c: ExitCtx,
-                exit: fn(ExitCtx, EncodeError) -> !,
-            ) {
-                top_encode_from_nested_or_exit(self, output, c, exit);
-            }
-        }
+        },
+        syn::Data::Union(_) => panic!("Union not supported")
     };
 
     gen.into()
@@ -163,21 +211,60 @@ fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
+    let gen = match &ast.data {
+        syn::Data::Struct(_) => {
+            quote! {
+                impl TopDecode for #name {
+                    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+                        top_decode_from_nested(input)
+                    }
+                
+                    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+                        input: I,
+                        c: ExitCtx,
+                        exit: fn(ExitCtx, DecodeError) -> !,
+                    ) -> Self {
+                        top_decode_from_nested_or_exit(input, c, exit)
+                    }
+                }
+            }
+        },
+        syn::Data::Enum(_) => {
+            let idents = extract_field_names(&ast.data);
+            let index = 0..idents.len() as u8;
+            let index_again = index.clone();
+            let name_repeated = std::iter::repeat(name);
+            let name_repeated_again = name_repeated.clone();
 
-    let gen = quote! {
-        impl TopDecode for #name {
-            fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-                top_decode_from_nested(input)
+            quote! {
+                impl #name {
+                    pub fn from_u8(v: u8) -> Result<Self, DecodeError> {
+                        match v {
+                            #(#index => core::result::Result::Ok(#name_repeated::#idents),)*
+                            _ => core::result::Result::Err(DecodeError::INVALID_VALUE),
+                        }
+                    }
+                }
+
+                impl TopDecode for #name {
+                    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+                        #name::from_u8(u8::top_decode(input)?)
+                    }
+                
+                    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+                        input: I,
+                        c: ExitCtx,
+                        exit: fn(ExitCtx, DecodeError) -> !,
+                    ) -> Self {
+                        match u8::top_decode_or_exit(input, c.clone(), exit) {
+                            #(#index_again => #name_repeated_again::#idents,)*
+                            _ => exit(c, DecodeError::INVALID_VALUE),
+                        }
+                    }
+                }
             }
-        
-            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-                input: I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                top_decode_from_nested_or_exit(input, c, exit)
-            }
-        }
+        },
+        syn::Data::Union(_) => panic!("Union not supported")
     };
 
     gen.into()
