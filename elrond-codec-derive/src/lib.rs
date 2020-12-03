@@ -40,8 +40,9 @@ fn extract_field_names(data: &syn::Data) -> Vec<syn::Ident> {
                     fields.named.iter().map(|f| {
                         f.clone().ident.unwrap()
                     }).collect()
-                }
-                _ => panic!("only named fields supported")
+                },
+                syn::Fields::Unnamed(_) => Vec::new(),
+                syn::Fields::Unit => panic!("unit not supported")
             }
         },
         syn::Data::Enum(e) => {
@@ -57,7 +58,7 @@ fn extract_field_names(data: &syn::Data) -> Vec<syn::Ident> {
     }
 }
 
-fn extract_field_types(data: &syn::Data) -> Vec<syn::Type> {
+fn extract_struct_field_types(data: &syn::Data) -> Vec<syn::Type> {
     match data {
         syn::Data::Struct(s) => {
             match &s.fields {
@@ -78,6 +79,22 @@ fn extract_field_types(data: &syn::Data) -> Vec<syn::Type> {
     }
 }
 
+fn extract_enum_field_types(data: &syn::Data) -> Vec<Vec<syn::Type>> {
+    match data {
+        syn::Data::Enum(e) => {
+            e.variants.iter().map(|v| {
+                let mut field_types = Vec::new();
+                for field in &v.fields {
+                    field_types.push(field.ty.clone());
+                }
+
+                field_types
+            }).collect()
+        },
+        _ => panic!("only enums supported")
+    }
+}
+
 // Nested
 
 fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
@@ -89,27 +106,62 @@ fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
     }
 
     let name = &ast.ident;
-    let fields = extract_field_names(&ast.data);
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let fields = extract_field_names(&ast.data);
+    let gen;
 
-    let gen = quote! {
-        impl #impl_generics NestedEncode for #name #ty_generics #where_clause {
-            fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-                #(self.#fields.dep_encode(dest)?;)*
+    if fields.len() > 0 {
+        gen = quote! {
+            impl #impl_generics NestedEncode for #name #ty_generics #where_clause {
+                fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+                    #(self.#fields.dep_encode(dest)?;)*
 
-                Ok(())
+                    Ok(())
+                }
+
+                fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+                    &self,
+                    dest: &mut O,
+                    c: ExitCtx,
+                    exit: fn(ExitCtx, EncodeError) -> !,
+                ) {
+                    #(self.#fields.dep_encode_or_exit(dest, c.clone(), exit);)*
+                }
             }
+        };
+    }
+    else {
+        let total_fields = match &ast.data {
+            syn::Data::Struct(s) => {
+                match &s.fields {
+                    syn::Fields::Unnamed(u) => u.unnamed.len(),
+                    _ => panic!("only structs with unnamed fields should reach here!")
+                }
+            },
+            _ => panic!("only structs should reach here!")
+        };
+        let nameless_field_ident = (0..total_fields).map(syn::Index::from);
+        let nameless_field_ident_again = nameless_field_ident.clone();
 
-            fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-                &self,
-                dest: &mut O,
-                c: ExitCtx,
-                exit: fn(ExitCtx, EncodeError) -> !,
-            ) {
-                #(self.#fields.dep_encode_or_exit(dest, c.clone(), exit);)*
+        gen = quote! {
+            impl #impl_generics NestedEncode for #name #ty_generics #where_clause {
+                fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+                    #(self.#nameless_field_ident.dep_encode(dest)?;)*
+
+                    Ok(())
+                }
+
+                fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+                    &self,
+                    dest: &mut O,
+                    c: ExitCtx,
+                    exit: fn(ExitCtx, EncodeError) -> !,
+                ) {
+                    #(self.#nameless_field_ident_again.dep_encode_or_exit(dest, c.clone(), exit);)*
+                }
             }
-        }
-    };
+        };
+    }
 
     gen.into()
 }
@@ -123,29 +175,63 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
     }
 
     let name = &ast.ident;
-    let fields = extract_field_names(&ast.data);
-    let types = extract_field_types(&ast.data);
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-
-    let gen = quote! {
-        impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                Ok(#name {
-                    #(#fields: <#types>::dep_decode(input)?,)*
-                })
-            }
-        
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                #name {
-                    #(#fields: <#types>::dep_decode_or_exit(input, c.clone(), exit),)*
+    let fields = extract_field_names(&ast.data);
+    let types = extract_struct_field_types(&ast.data);
+    let gen;
+    
+    if fields.len() > 0 {
+        gen = quote! {
+            impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
+                fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+                    Ok(#name {
+                        #(#fields: <#types>::dep_decode(input)?,)*
+                    })
+                }
+            
+                fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+                    input: &mut I,
+                    c: ExitCtx,
+                    exit: fn(ExitCtx, DecodeError) -> !,
+                ) -> Self {
+                    #name {
+                        #(#fields: <#types>::dep_decode_or_exit(input, c.clone(), exit),)*
+                    }
                 }
             }
-        }
-    };
+        };
+    }
+    else {
+        let total_fields = match &ast.data {
+            syn::Data::Struct(s) => {
+                match &s.fields {
+                    syn::Fields::Unnamed(u) => u.unnamed.len(),
+                    _ => panic!("only structs with unnamed fields should reach here!")
+                }
+            },
+            _ => panic!("only structs should reach here!")
+        };
+
+        gen = quote! {
+            impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
+                fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+                    Ok(#name (
+                        #(<#types>::dep_decode(input)?),*
+                    ))
+                }
+            
+                fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+                    input: &mut I,
+                    c: ExitCtx,
+                    exit: fn(ExitCtx, DecodeError) -> !,
+                ) -> Self {
+                    #name (
+                        #(<#types>::dep_decode_or_exit(input, c.clone(), exit)),*
+                    )
+                }
+            }
+        };
+    }
 
     gen.into()
 }
