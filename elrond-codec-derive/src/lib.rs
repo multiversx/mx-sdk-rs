@@ -175,14 +175,14 @@ fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
         },
         syn::Data::Enum(_) => {
             let idents = extract_field_names(&ast.data);
-            let index = 0..idents.len() as u8;
+            let value = 0..idents.len() as u8;
             let name_repeated = std::iter::repeat(name);
 
             quote! {
                 impl #name {
                     pub fn to_u8(&self) -> u8 {
                         match self {
-                            #(#name_repeated::#idents => #index,)*
+                            #(#name_repeated::#idents => #value,)*
                         }
                     }
                 }
@@ -231,8 +231,8 @@ fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
         },
         syn::Data::Enum(_) => {
             let idents = extract_field_names(&ast.data);
-            let index = 0..idents.len() as u8;
-            let index_again = index.clone();
+            let value = 0..idents.len() as u8;
+            let value_again = value.clone();
             let name_repeated = std::iter::repeat(name);
             let name_repeated_again = name_repeated.clone();
 
@@ -240,7 +240,7 @@ fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
                 impl #name {
                     pub fn from_u8(v: u8) -> Result<Self, DecodeError> {
                         match v {
-                            #(#index => core::result::Result::Ok(#name_repeated::#idents),)*
+                            #(#value => core::result::Result::Ok(#name_repeated::#idents),)*
                             _ => core::result::Result::Err(DecodeError::INVALID_VALUE),
                         }
                     }
@@ -257,7 +257,7 @@ fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
                         exit: fn(ExitCtx, DecodeError) -> !,
                     ) -> Self {
                         match u8::top_decode_or_exit(input, c.clone(), exit) {
-                            #(#index_again => #name_repeated_again::#idents,)*
+                            #(#value_again => #name_repeated_again::#idents,)*
                             _ => exit(c, DecodeError::INVALID_VALUE),
                         }
                     }
