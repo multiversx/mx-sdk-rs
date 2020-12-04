@@ -6,7 +6,7 @@ use elrond_codec::*;
 // to test, run the following command in elrond-codec-derive folder:
 // cargo expand --test enum_derive_test > expanded.rs
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode)]
 enum DayOfWeek {
     Monday,
     Tuesday,
@@ -15,6 +15,13 @@ enum DayOfWeek {
     Friday,
     Saturday,
     Sunday
+}
+
+#[derive(NestedEncode)]
+enum Message {
+    Quit,
+    Today(DayOfWeek),
+    Write(Vec<u8>),
 }
 
 /* not supported yet - complex enums
