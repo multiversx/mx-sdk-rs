@@ -305,7 +305,7 @@ pub trait Multisig {
 			.count();
 		require!(valid_signers_count >= quorum, "quorum has not been reached");
 
-		self.perform_action_endpoint(action_id)
+		self.perform_action(action_id)
 	}
 
 	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
