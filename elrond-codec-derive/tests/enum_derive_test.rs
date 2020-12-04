@@ -17,7 +17,7 @@ enum DayOfWeek {
     Sunday
 }
 
-#[derive(NestedEncode)]
+#[derive(NestedEncode, NestedDecode)]
 enum Message {
     Quit,
     Today(DayOfWeek),
