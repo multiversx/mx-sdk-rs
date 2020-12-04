@@ -300,14 +300,14 @@ fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
                     });
                 }
                 else if type_list.len() == 1 {
-                    let var_type = &type_list[i];
+                    let var_type = &type_list[0];
 
                     enum_decode_snippets.push(quote! {
-                        #val => Some(#name::#ident(#var_type::dep_decode(input)?)),
+                        #val => Some(#name::#ident(<#var_type>::dep_decode(input)?)),
                     });
 
                     enum_decode_or_exit_snippets.push(quote! {
-                        #val => Some(#name::#ident(#var_type::dep_decode_or_exit(input, c.clone(), exit))),
+                        #val => Some(#name::#ident(<#var_type>::dep_decode_or_exit(input, c.clone(), exit))),
                     });
                 }
                 else {
