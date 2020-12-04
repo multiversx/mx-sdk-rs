@@ -41,19 +41,19 @@ fn hex_to_byte(digit1: u8, digit2: u8) -> Option<u8> {
 /// Arguments can be empty.
 /// Argument hex encodings must always have an even number of digits.
 ///
-/// CallDataDeserializer borrows its input and will allocate new Vecs for each output.
+/// HexCallDataDeserializer borrows its input and will allocate new Vecs for each output.
 ///
 /// Converting from bytes to specific argument types is not in scope. Use the `serializer` module for that.
 ///
-pub struct CallDataDeserializer<'a> {
+pub struct HexCallDataDeserializer<'a> {
 	source: &'a [u8],
 	index: usize,
 	func_name_output: &'a [u8],
 }
 
-impl<'a> CallDataDeserializer<'a> {
+impl<'a> HexCallDataDeserializer<'a> {
 	pub fn new(source: &'a [u8]) -> Self {
-		let mut de = CallDataDeserializer {
+		let mut de = HexCallDataDeserializer {
 			source,
 			index: 0,
 			func_name_output: &[],
@@ -136,7 +136,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_1() {
 		let input: &[u8] = b"func@1111@2222";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.get_func_name(), &b"func"[..]);
 		assert_eq!(de.next_argument_hex(), Some(&b"1111"[..]));
 		assert_eq!(de.next_argument(), Ok(Some([0x22, 0x22].to_vec())));
@@ -146,7 +146,7 @@ mod tests {
 
 	#[test]
 	fn test_next_raw_bytes_empty() {
-		let mut de = CallDataDeserializer::new(&[]);
+		let mut de = HexCallDataDeserializer::new(&[]);
 		assert_eq!(de.get_func_name(), &[][..]);
 		assert_eq!(de.next_argument(), Ok(None));
 	}
@@ -154,7 +154,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_only_func() {
 		let input: &[u8] = b"func";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 
 		assert_eq!(de.get_func_name(), &b"func"[..]);
 		assert_eq!(de.next_argument(), Ok(None));
@@ -164,7 +164,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_some_empty() {
 		let input: &[u8] = b"func@@2222";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
 		assert_eq!(de.next_argument(), Ok(Some([0x22, 0x22].to_vec())));
 		assert_eq!(de.next_argument(), Ok(None));
@@ -176,7 +176,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_ends_empty() {
 		let input: &[u8] = b"func@";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.get_func_name(), &b"func"[..]);
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
 		assert_eq!(de.next_argument(), Ok(None));
@@ -186,7 +186,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_many_empty() {
 		let input: &[u8] = b"func@@2222@@";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.get_func_name(), &b"func"[..]);
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
 		assert_eq!(de.next_argument(), Ok(Some([0x22, 0x22].to_vec())));
@@ -199,7 +199,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_all_empty() {
 		let input: &[u8] = b"@@@";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.get_func_name(), &[][..]);
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
@@ -211,7 +211,7 @@ mod tests {
 	#[test]
 	fn test_next_raw_bytes_all_empty_but_last() {
 		let input: &[u8] = b"@@@1234";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.get_func_name(), &[][..]);
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
 		assert_eq!(de.next_argument(), Ok(Some(Vec::new())));
@@ -223,7 +223,7 @@ mod tests {
 	#[test]
 	fn test_next_argument_large() {
 		let input: &[u8] = b"func@0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		let expected: [u8; 32] = [
 			0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab,
 			0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67,
@@ -238,7 +238,7 @@ mod tests {
 	#[test]
 	fn test_next_vec_odd() {
 		let input: &[u8] = b"func@123";
-		let mut de = CallDataDeserializer::new(input);
+		let mut de = HexCallDataDeserializer::new(input);
 		assert_eq!(de.get_func_name(), &b"func"[..]);
 		assert_eq!(
 			de.next_argument(),
@@ -247,84 +247,4 @@ mod tests {
 		assert_eq!(de.next_argument(), Ok(None));
 		assert_eq!(de.next_argument(), Ok(None));
 	}
-
-	// #[test]
-	// fn test_next_u64_1() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@5").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u64(), Some(0x05));
-	//     assert_eq!(de.next_u64(), None);
-	//     assert_eq!(de.next_u64(), None);
-	// }
-
-	// #[test]
-	// fn test_next_u64_2() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@05").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u64(), Some(0x05));
-	//     assert_eq!(de.next_u64(), None);
-	//     assert_eq!(de.next_u64(), None);
-	// }
-
-	// #[test]
-	// fn test_next_u64_3() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@e105").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u64(), Some(0xe105));
-	//     assert_eq!(de.next_u64(), None);
-	//     assert_eq!(de.next_u64(), None);
-	// }
-
-	// #[test]
-	// fn test_next_u64_4() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@1234567890abcdef").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u64(), Some(0x1234567890abcdef));
-	//     assert_eq!(de.next_u64(), None);
-	//     assert_eq!(de.next_u64(), None);
-	// }
-
-	// #[test]
-	// fn test_next_u64_too_long() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@010000000000000000").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u64(), Err(err_msg::DESERIALIZATION_ARG_OUT_OF_RANGE));
-	//     assert_eq!(de.next_u64(), None);
-	//     assert_eq!(de.next_u64(), None);
-	// }
-
-	// #[test]
-	// fn test_next_i64_1() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@ffffffffffffffff").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_i64(), Some(-1));
-	//     assert_eq!(de.next_i64(), None);
-	//     assert_eq!(de.next_i64(), None);
-	// }
-
-	// #[test]
-	// fn test_next_u32_1() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@e105").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u32(), Some(0xe105));
-	//     assert_eq!(de.next_u32(), None);
-	//     assert_eq!(de.next_u32(), None);
-	// }
-
-	// #[test]
-	// fn test_next_u32_too_long() {
-	//     let cd = CallDataSerializer::from_raw_data((&b"func@0100000000").to_vec());
-	//     let mut de = cd.deserializer();
-	//     assert_eq!(de.get_func_name(), &b"func"[..]);
-	//     assert_eq!(de.next_u32(), Err(err_msg::DESERIALIZATION_ARG_OUT_OF_RANGE));
-	//     assert_eq!(de.next_u32(), None);
-	//     assert_eq!(de.next_u32(), None);
-	// }
 }

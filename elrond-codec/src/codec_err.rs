@@ -13,6 +13,8 @@ impl EncodeError {
 	pub fn message_bytes(&self) -> &'static [u8] {
 		self.0
 	}
+
+	pub const UNSUPPORTED_OPERATION: EncodeError = EncodeError(b"unsupported operation");
 }
 
 #[derive(Debug, PartialEq, Eq)]

@@ -1,6 +1,8 @@
+mod arg_buffer;
 mod async_call_result;
 mod borrowed_mut_storage;
 mod boxed_bytes;
+mod code_metadata;
 mod h256;
 mod multi_args;
 mod multi_result;
@@ -12,9 +14,11 @@ mod sc_error;
 mod sc_result;
 mod var_args;
 
+pub use arg_buffer::ArgBuffer;
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
 pub use borrowed_mut_storage::BorrowedMutStorage;
 pub use boxed_bytes::BoxedBytes;
+pub use code_metadata::CodeMetadata;
 pub use h256::{Address, H256};
 pub use multi_args::*;
 pub use multi_result::*;

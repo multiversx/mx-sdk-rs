@@ -79,6 +79,13 @@ mkdir -p output
 cp wasm/target/wasm32-unknown-unknown/release/lottery_esdt_wasm.wasm output/lottery-esdt-dbg.wasm
 cd ../../..
 
+cd contracts/examples/multisig/wasm
+cargo build --target=wasm32-unknown-unknown --release
+cd ..
+mkdir -p output
+cp wasm/target/wasm32-unknown-unknown/release/multisig_wasm.wasm output/multisig-dbg.wasm
+cd ../../..
+
 cd contracts/examples/simple-erc20/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
@@ -93,7 +100,7 @@ cd contracts/feature-tests/basic-features/wasm
 cargo build --target=wasm32-unknown-unknown --release
 cd ..
 mkdir -p output
-cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/features-dbg.wasm
+cp wasm/target/wasm32-unknown-unknown/release/basic_features_wasm.wasm output/basic-features-dbg.wasm
 cd ../../..
 
 cd contracts/feature-tests/async/async-alice/wasm
