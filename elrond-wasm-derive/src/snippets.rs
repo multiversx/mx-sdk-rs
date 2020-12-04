@@ -171,6 +171,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		}
 
 		#[inline]
+		fn deploy_contract(&self, gas: u64, amount: &BigUint, code: &BoxedBytes, code_metadata: CodeMetadata, arg_buffer: &ArgBuffer) -> Address {
+			self.api.deploy_contract(gas, amount, code, code_metadata, arg_buffer)
+		}
+
+		#[inline]
 		fn get_tx_hash(&self) -> H256 {
 		  self.api.get_tx_hash()
 		}
