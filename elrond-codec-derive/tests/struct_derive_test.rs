@@ -7,18 +7,12 @@ use elrond_codec::*;
 // cargo expand --test struct_derive_test > expanded.rs
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-struct SimpleStruct {
-    x: u8,
-    y: u16,
-    z: Vec<u8>
-}
-
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-struct ComplexStruct {
-    complex_name: Vec<u8>,
-    complex_value: u64,
-    complex_boolean: bool,
-    complex_struct_field: SimpleStruct
+pub struct SerExample1 {
+	pub int: u16,
+	pub seq: Vec<u8>,
+	pub another_byte: u8,
+	pub uint_32: u32,
+	pub uint_64: u64,
 }
 
 trait SimpleTrait {
@@ -35,3 +29,16 @@ struct StructWithGeneric<ST: SimpleTrait>
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 struct TupleStruct(u8, u16, u32);
+
+#[test]
+fn ser_example_1_test() {
+    let ex = SerExample1 {
+        int: 0x42,
+        seq: vec![0x1, 0x2, 0x3, 0x4, 0x5],
+        another_byte: 0x6,
+        uint_32: 0x12345,
+        uint_64: 0x123456789,
+    };
+
+    // ???
+}
