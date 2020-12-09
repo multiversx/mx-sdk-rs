@@ -1,3 +1,4 @@
+use crate::BoxedBytes;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::fmt::Debug;
@@ -125,6 +126,12 @@ impl H256 {
 		self.0[..].to_vec()
 	}
 
+	/// Pointer to the data on the heap.
+	#[inline]
+	pub fn as_ptr(&mut self) -> *const u8 {
+		self.0.as_ptr()
+	}
+
 	/// Returns an unsafe mutable pointer to the data on the heap.
 	/// Used by the API to populate data.
 	#[inline]
@@ -132,8 +139,20 @@ impl H256 {
 		self.0.as_mut_ptr()
 	}
 
+	/// True if all 32 bytes of the hash are zero.
 	pub fn is_zero(&self) -> bool {
 		self.as_bytes() == ZERO_32
+	}
+
+	/// Transmutes self to an (in principle) variable length boxed bytes object.
+	/// Both BoxedBytes and H256 keep the data on the heap, so only the pointer to that data needs to be transmuted.
+	/// Does not reallocate or copy data, the data on the heap remains untouched.
+	pub fn into_boxed_bytes(self) -> BoxedBytes {
+		let raw = Box::into_raw(self.0) as *mut u8;
+		unsafe {
+			let bytes_box = Box::<[u8]>::from_raw(core::slice::from_raw_parts_mut(raw, 32));
+			bytes_box.into()
+		}
 	}
 }
 
@@ -265,5 +284,13 @@ mod h256_tests {
 		use core::mem::size_of;
 		assert_eq!(size_of::<H256>(), size_of::<usize>());
 		assert_eq!(size_of::<Option<H256>>(), size_of::<usize>());
+	}
+
+	#[test]
+	fn test_into_boxed_bytes() {
+		let array = b"32_bytes________________________";
+		let h256 = H256::from(array);
+		let bb = h256.into_boxed_bytes();
+		assert_eq!(bb.as_slice(), &array[..]);
 	}
 }

@@ -19,6 +19,7 @@ members = [
   "contracts/examples/lottery-egld",
   "contracts/examples/lottery-erc20",
   "contracts/examples/lottery-esdt",
+  "contracts/examples/multisig",
   "contracts/examples/non-fungible-tokens",
   
   "contracts/feature-tests/async",
@@ -29,6 +30,7 @@ members = [
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
+  "contracts/modules/elrond-wasm-module-users",
 ]
 
 exclude = [

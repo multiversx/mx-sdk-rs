@@ -8,15 +8,15 @@ pub use alloc::vec::Vec;
 
 pub use elrond_codec;
 
-pub mod call_data;
 pub mod err_msg;
+pub mod hex_call_data;
 pub mod io;
 pub mod non_zero_util;
 mod proxy;
 pub mod storage;
 pub mod types;
 
-pub use call_data::*;
+pub use hex_call_data::*;
 pub use io::*;
 pub use proxy::OtherContractHandle;
 pub use storage::{storage_get, storage_set};
@@ -98,6 +98,15 @@ where
 	fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
 
 	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
+
+	fn deploy_contract(
+		&self,
+		gas: u64,
+		amount: &BigUint,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Address;
 
 	fn get_tx_hash(&self) -> H256;
 
