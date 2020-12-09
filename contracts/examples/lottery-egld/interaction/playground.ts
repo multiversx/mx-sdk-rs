@@ -19,6 +19,7 @@ async function main() {
     let abiObject = JSON.parse(abiJson);
     let abi = new AbiRegistry();
     abi.extend(abiObject);
+    let namespace = abi.findNamespace("lottery-egld");
 
     await NetworkConfig.getDefault().sync(provider);
     await user.sync(provider);
@@ -72,7 +73,7 @@ async function main() {
         ]
     });
 
-    let values = codec.decodeFunctionOutput([queryResponse.firstResult().asBuffer], abi.namespaces[0].functions.find(e => e.name == "lotteryExists"));
+    let values = codec.decodeFunctionOutput(queryResponse.buffers(), namespace.findFunction("lotteryExists"));
     console.log("lotteryExists", values);
 
     // Query state
@@ -83,7 +84,7 @@ async function main() {
         ]
     });
 
-    values = codec.decodeFunctionOutput([queryResponse.firstResult().asBuffer], abi.namespaces[0].functions.find(e => e.name == "lotteryInfo"));
+    values = codec.decodeFunctionOutput(queryResponse.buffers(), namespace.findFunction("lotteryInfo"));
     console.log("lotteryInfo", values[0].valueOf());
 }
 
