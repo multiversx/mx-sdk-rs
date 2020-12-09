@@ -22,7 +22,6 @@ path = "../../../elrond-wasm-derive"
 version = "0.9.7"
 path = "../../../elrond-wasm-node"
 optional = true
-features = ["small-int-ei"]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.9.7"
