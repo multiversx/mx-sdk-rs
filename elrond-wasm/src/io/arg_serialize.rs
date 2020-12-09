@@ -1,13 +1,13 @@
-use crate::call_data::*;
+use crate::hex_call_data::*;
 use crate::*;
 use elrond_codec::*;
 
 pub trait AsyncCallArg: Sized {
-	fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError>;
+	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError>;
 
 	fn push_async_arg_exact(
 		&self,
-		_serializer: &mut CallDataSerializer,
+		_serializer: &mut HexCallDataSerializer,
 		_expected_len: usize,
 	) -> Result<(), SCError> {
 		Err(SCError::from(&b"not supported"[..]))
@@ -15,12 +15,12 @@ pub trait AsyncCallArg: Sized {
 }
 
 struct AsyncCallArgOutput<'c> {
-	call_data_ser_ref: &'c mut CallDataSerializer,
+	call_data_ser_ref: &'c mut HexCallDataSerializer,
 }
 
 impl<'c> AsyncCallArgOutput<'c> {
 	#[inline]
-	fn new(call_data_ser_ref: &'c mut CallDataSerializer) -> Self {
+	fn new(call_data_ser_ref: &'c mut HexCallDataSerializer) -> Self {
 		AsyncCallArgOutput { call_data_ser_ref }
 	}
 }
@@ -36,7 +36,7 @@ where
 	T: TopEncode,
 {
 	#[inline]
-	fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
+	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
 		self.top_encode(AsyncCallArgOutput::new(serializer))
 			.map_err(|err| SCError::from(err))
 	}
@@ -46,7 +46,7 @@ impl<T> AsyncCallArg for VarArgs<T>
 where
 	T: AsyncCallArg,
 {
-	fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
+	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
 		for elem in self.0.iter() {
 			elem.push_async_arg(serializer)?;
 		}
@@ -55,7 +55,7 @@ where
 
 	fn push_async_arg_exact(
 		&self,
-		serializer: &mut CallDataSerializer,
+		serializer: &mut HexCallDataSerializer,
 		expected_len: usize,
 	) -> Result<(), SCError> {
 		if self.len() != expected_len {
@@ -71,7 +71,7 @@ where
 	T: AsyncCallArg,
 {
 	#[inline]
-	fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
+	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
 		if let OptionalArg::Some(t) = self {
 			t.push_async_arg(serializer)?;
 		}
@@ -87,7 +87,7 @@ macro_rules! multi_result_impls {
                 $($name: AsyncCallArg,)+
             {
                 #[inline]
-                fn push_async_arg(&self, serializer: &mut CallDataSerializer) -> Result<(), SCError> {
+                fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
                     $(
                         (self.0).$n.push_async_arg(serializer)?;
                     )+

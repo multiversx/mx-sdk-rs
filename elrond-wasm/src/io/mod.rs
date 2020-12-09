@@ -25,7 +25,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_simple_args() {
 		let input: &[u8] = b"func@1111@2222";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let arg1: i32 = load_dyn_arg(&mut cd_loader, ArgId::empty());
 		assert_eq!(arg1, 0x1111i32);
@@ -39,7 +39,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_simple_vec_arg() {
 		let input: &[u8] = b"some_other_func@000000020000000300000006";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let arg1: Vec<usize> = load_dyn_arg(&mut cd_loader, ArgId::empty());
 		assert_eq!(arg1, [2usize, 3usize, 6usize].to_vec());
@@ -50,7 +50,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_var_args() {
 		let input: &[u8] = b"func@1111@2222";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let var_arg: VarArgs<i32> = load_dyn_arg(&mut cd_loader, ArgId::empty());
 		let arg_vec = var_arg.into_vec();
@@ -62,7 +62,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_multi_arg_2() {
 		let input: &[u8] = b"func@1111@2222";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let tuple_arg: MultiArg2<i32, i32> = load_dyn_arg(&mut cd_loader, ArgId::empty());
 		let tuple = tuple_arg.into_tuple();
@@ -73,7 +73,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_var_multi_arg_2() {
 		let input: &[u8] = b"func@1111@2222";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let tuple_arg: VarArgs<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
 		let tuple_vec = tuple_arg.into_vec();
@@ -87,7 +87,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_opt_multi_arg_2() {
 		let input: &[u8] = b"func@1111@2222";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let opt_tuple_arg: OptionalArg<MultiArg2<i32, i32>> =
 			load_dyn_arg(&mut cd_loader, ArgId::empty());
@@ -106,7 +106,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_async_call_result_ok() {
 		let input: &[u8] = b"func@@1111@2222";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let acr: AsyncCallResult<MultiArg2<i32, i32>> =
 			load_dyn_arg(&mut cd_loader, ArgId::empty());
@@ -125,7 +125,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_async_call_result_ok2() {
 		let input: &[u8] = b"func@00";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let acr: AsyncCallResult<VarArgs<MultiArg2<i32, i32>>> =
 			load_dyn_arg(&mut cd_loader, ArgId::empty());
@@ -142,7 +142,7 @@ pub mod test_arg_load {
 	#[test]
 	fn test_async_call_result_err() {
 		let input: &[u8] = b"func@0123@1111";
-		let de = CallDataDeserializer::new(input);
+		let de = HexCallDataDeserializer::new(input);
 		let mut cd_loader = CallDataArgLoader::new(de, PanickingSignalError);
 		let acr: AsyncCallResult<MultiArg2<i32, i32>> =
 			load_dyn_arg(&mut cd_loader, ArgId::empty());

@@ -1,0 +1,25 @@
+{
+    "name": "unjail nodes scenario",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/deploy.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/add_prop.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/add_bm.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/rem_alice.steps.json"
+        }
+    ]
+}
