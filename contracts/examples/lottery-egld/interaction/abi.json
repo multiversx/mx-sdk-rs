@@ -1,0 +1,172 @@
+{
+    "namespaces": [
+        {
+            "namespace": "lottery-egld",
+            "functions": [
+                {
+                    "name": "start",
+                    "input": [
+                        {
+                            "description": "lottery name",
+                            "type": [
+                                "Vector",
+                                "U8"
+                            ]
+                        },
+                        {
+                            "description": "ticket price",
+                            "type": [
+                                "BigUInt"
+                            ]
+                        },
+                        {
+                            "description": "total tickets",
+                            "type": [
+                                "Optional",
+                                "U32"
+                            ]
+                        },
+                        {
+                            "description": "deadline",
+                            "type": [
+                                "Optional",
+                                "U64"
+                            ]
+                        },
+                        {
+                            "description": "max entries per user",
+                            "type": [
+                                "Optional",
+                                "U32"
+                            ]
+                        },
+                        {
+                            "description": "prize distribution",
+                            "type": [
+                                "Optional",
+                                "Vector",
+                                "U8"
+                            ]
+                        },
+                        {
+                            "description": "whitelist",
+                            "type": [
+                                "Optional",
+                                "Vector",
+                                "Address"
+                            ]
+                        }
+                    ],
+                    "output": []
+                },
+                {
+                    "name": "lotteryInfo",
+                    "isPure": true,
+                    "input": [
+                        {
+                            "description": "lottery name",
+                            "type": [
+                                "Vector",
+                                "U8"
+                            ]
+                        }
+                    ],
+                    "output": [
+                        {
+                            "description": "lottery info",
+                            "type": [
+                                "lottery-info"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "lotteryExists",
+                    "isPure": true,
+                    "input": [
+                        {
+                            "description": "lottery name",
+                            "type": [
+                                "Vector",
+                                "U8"
+                            ]
+                        }
+                    ],
+                    "output": [
+                        {
+                            "description": "whether lottery exists",
+                            "type": [
+                                "Boolean"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "structures": [
+                {
+                    "name": "lottery-info",
+                    "fields": [
+                        {
+                            "name": "ticket_price",
+                            "description": "ticket price",
+                            "type": [
+                                "BigUInt"
+                            ]
+                        },
+                        {
+                            "name": "tickets_left",
+                            "description": "tickets left",
+                            "type": [
+                                "U32"
+                            ]
+                        },
+                        {
+                            "name": "deadline",
+                            "description": "deadline",
+                            "type": [
+                                "U64"
+                            ]
+                        },
+                        {
+                            "name": "max_entries_per_user",
+                            "description": "max entries per user",
+                            "type": [
+                                "U32"
+                            ]
+                        },
+                        {
+                            "name": "prize_distribution",
+                            "description": "prize distribution",
+                            "type": [
+                                "Vector",
+                                "U8"
+                            ]
+                        },
+                        {
+                            "name": "whitelist",
+                            "description": "whitelist",
+                            "type": [
+                                "Vector",
+                                "Address"
+                            ]
+                        },
+                        {
+                            "name": "current_ticket_number",
+                            "description": "current ticket number",
+                            "type": [
+                                "U32"
+                            ]
+                        },
+                        {
+                            "name": "prize_pool",
+                            "description": "prize pool",
+                            "type": [
+                                "BigUInt"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

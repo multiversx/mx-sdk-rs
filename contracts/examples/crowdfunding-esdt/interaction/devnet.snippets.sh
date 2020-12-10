@@ -1,19 +1,19 @@
 ALICE="${USERS}/alice.pem"
-ADDRESS=$(erdpy data load --key=address)
-DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction)
-DEPLOY_ARGUMENTS="12 4096"
+ADDRESS=$(erdpy data load --key=address-devnet)
+DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-devnet)
+DEPLOY_ARGUMENTS="12 4096 0xABBAABBA"
 DEPLOY_GAS="80000000"
 
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
-          --outfile="deploy.json" --send
+          --outfile="deploy-devnet.interaction.json" --send
 
-    TRANSACTION=$(erdpy data parse --file="deploy.json" --expression="data['result']['hash']")
-    ADDRESS=$(erdpy data parse --file="deploy.json" --expression="data['emitted_tx']['address']")
+    TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['hash']")
+    ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['address']")
 
-    erdpy data store --key=address --value=${ADDRESS}
-    erdpy data store --key=deployTransaction --value=${TRANSACTION}
+    erdpy data store --key=address-devnet --value=${ADDRESS}
+    erdpy data store --key=deployTransaction-devnet --value=${TRANSACTION}
 
     echo ""
     echo "Smart contract address: ${ADDRESS}"
@@ -22,12 +22,12 @@ deploy() {
 deploySimulate() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
-          --outfile="simulate.json" --simulate
+          --outfile="simulate-devnet.interaction.json" --simulate
 
-    TRANSACTION=$(erdpy data parse --file="simulate.json" --expression="data['result']['hash']")
-    ADDRESS=$(erdpy data parse --file="simulate.json" --expression="data['emitted_tx']['address']")
-    RETCODE=$(erdpy data parse --file="simulate.json" --expression="data['result']['returnCode']")
-    RETMSG=$(erdpy data parse --file="simulate.json" --expression="data['result']['returnMessage']")
+    TRANSACTION=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['hash']")
+    ADDRESS=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['emitted_tx']['address']")
+    RETCODE=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['returnCode']")
+    RETMSG=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['returnMessage']")
 
     echo ""
     echo "Simulated transaction: ${TRANSACTION}"
