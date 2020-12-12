@@ -8,6 +8,7 @@ members = [
   "contracts/benchmarks/str-repeat",
 
   "contracts/examples/adder",
+  "contracts/examples/adder/abi",
   "contracts/examples/adder/debug",
   "contracts/examples/crypto-bubbles",
   "contracts/examples/factorial",
@@ -26,6 +27,7 @@ members = [
   "contracts/feature-tests/async/async-bob",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/use-module",
+  "contracts/feature-tests/use-module/abi",
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
