@@ -9,6 +9,7 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
+mod abi_gen;
 mod arg_def;
 mod arg_extract;
 mod arg_regular;

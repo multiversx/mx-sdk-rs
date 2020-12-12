@@ -1,11 +1,15 @@
 [package]
-name = "adder-debug"
+name = "adder-abi"
 version = "0.2.0"
 authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
 edition = "2018"
 
 [dependencies.adder]
 path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.9.7"
+path = "../../../../elrond-wasm"
 
 [dependencies.elrond-wasm-debug]
 version = "0.9.7"

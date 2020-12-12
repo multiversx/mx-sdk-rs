@@ -96,6 +96,7 @@ impl MethodMetadata {
 
 #[derive(Clone, Debug)]
 pub struct Method {
+	pub docs: Vec<String>,
 	pub metadata: MethodMetadata,
 	pub name: syn::Ident,
 	pub generics: syn::Generics,
@@ -333,6 +334,7 @@ impl Method {
 		};
 		let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
 		Method {
+			docs: extract_doc(m.attrs.as_slice()),
 			metadata,
 			name: m.sig.ident.clone(),
 			generics: m.sig.generics.clone(),

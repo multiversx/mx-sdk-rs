@@ -8,6 +8,7 @@ pub use alloc::vec::Vec;
 
 pub use elrond_codec;
 
+pub mod abi;
 pub mod err_msg;
 pub mod hex_call_data;
 pub mod io;
@@ -306,6 +307,8 @@ pub trait BigIntApi<BigUint>:
 /// CallableContract is the means by which the debugger calls methods in the contract.
 pub trait CallableContract<A> {
 	fn call(&self, fn_name: &[u8]) -> bool;
+
+	fn abi(&self, include_modules: bool) -> abi::ContractAbi;
 
 	fn clone_contract(&self) -> Box<dyn CallableContract<A>>;
 
