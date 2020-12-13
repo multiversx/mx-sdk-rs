@@ -290,6 +290,7 @@ pub trait BigIntApi<BigUint>:
 	+ elrond_codec::TopEncode
 	+ elrond_codec::NestedDecode
 	+ elrond_codec::TopDecode
+	+ abi::TypeAbi
 {
 	fn zero() -> Self {
 		0i64.into()

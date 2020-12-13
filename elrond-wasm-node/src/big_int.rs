@@ -301,6 +301,12 @@ impl TopDecode for ArwenBigInt {
 	}
 }
 
+impl elrond_wasm::abi::TypeAbi for ArwenBigInt {
+	fn type_name() -> String {
+		String::from("BigInt")
+	}
+}
+
 impl BigIntApi<ArwenBigUint> for ArwenBigInt {
 	fn abs_uint(&self) -> ArwenBigUint {
 		unsafe {
