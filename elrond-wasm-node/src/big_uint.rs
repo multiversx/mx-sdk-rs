@@ -348,6 +348,12 @@ impl TopDecode for ArwenBigUint {
 	}
 }
 
+impl elrond_wasm::abi::TypeAbi for ArwenBigUint {
+	fn type_name() -> String {
+		String::from("BigUint")
+	}
+}
+
 impl BigUintApi for ArwenBigUint {
 	#[inline]
 	fn byte_length(&self) -> i32 {

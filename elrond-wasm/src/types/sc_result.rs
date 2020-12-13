@@ -1,4 +1,5 @@
 use super::sc_error::SCError;
+use crate::abi::{OutputAbi, TypeAbi, TypeDescription};
 use crate::io::finish::EndpointResult;
 use crate::*;
 
@@ -61,6 +62,20 @@ where
 				api.signal_error(e.as_bytes());
 			},
 		}
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for SCResult<T> {
+	fn type_name() -> String {
+		T::type_name()
+	}
+
+	fn output_abis() -> Vec<OutputAbi> {
+		T::output_abis()
+	}
+
+	fn type_description() -> Option<TypeDescription> {
+		T::type_description()
 	}
 }
 

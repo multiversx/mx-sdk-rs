@@ -1,3 +1,4 @@
+use crate::abi::{OutputAbi, TypeAbi, TypeDescription};
 use crate::*;
 use core::marker::PhantomData;
 use core::ops::Deref;
@@ -122,5 +123,25 @@ where
 {
 	fn finish(&self, api: A) {
 		core::ops::Deref::deref(self).finish(api);
+	}
+}
+
+impl<A, BigInt, BigUint, T> TypeAbi for BorrowedMutStorage<A, BigInt, BigUint, T>
+where
+	BigUint: BigUintApi + 'static,
+	BigInt: BigIntApi<BigUint> + 'static,
+	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	T: TopEncode + TopDecode + TypeAbi,
+{
+	fn type_name() -> String {
+		T::type_name()
+	}
+
+	fn output_abis() -> Vec<OutputAbi> {
+		T::output_abis()
+	}
+
+	fn type_description() -> Option<TypeDescription> {
+		T::type_description()
 	}
 }
