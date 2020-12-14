@@ -7,7 +7,7 @@ DEPLOY_GAS="80000000"
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
-          --outfile="deploy-devnet.interaction.json" --send
+          --outfile="deploy-devnet.interaction.json" --send || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['hash']")
     ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['address']")
@@ -22,7 +22,7 @@ deploy() {
 deploySimulate() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
-          --outfile="simulate-devnet.interaction.json" --simulate
+          --outfile="simulate-devnet.interaction.json" --simulate || return
 
     TRANSACTION=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['hash']")
     ADDRESS=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['emitted_tx']['address']")
