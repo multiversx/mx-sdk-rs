@@ -8,5 +8,5 @@ edition = "2018"
 path = ".."
 
 [dependencies.elrond-wasm-debug]
-version = "0.9.7"
+version = "0.9.8"
 path = "../../../../elrond-wasm-debug"
