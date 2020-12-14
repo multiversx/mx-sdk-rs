@@ -1,0 +1,150 @@
+[
+    {
+        "version": "1.0",
+        "name": "dns",
+        "docs": [],
+        "constructor": {
+            "description": "Only called at deploy",
+            "input": [
+                {
+                    "description": "registration cost",
+                    "type": "BigUint"
+                }
+            ],
+            "output": []
+        },
+        "endpoints": [
+            {
+                "name": "register",
+                "payableInTokens": [
+                    "eGLD"
+                ],
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "name to register, BoxedBytes in Rust",
+                        "type": "Vec<u8>"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "resolve",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "name, BoxedBytes in Rust",
+                        "type": "Vec<u8>"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "address, if it exists",
+                        "type": "Optional<Address>"
+                    }
+                ]
+            },
+            {
+                "name": "resolveFromHash",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "name hash",
+                        "type": "H256"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "address, if it exists",
+                        "type": "Optional<Address>"
+                    }
+                ]
+            },
+            {
+                "name": "claim",
+                "description": "owner can claim SC's balance",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [],
+                "output": []
+            },
+            {
+                "name": "getRegistrationCost",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "cost",
+                        "type": "BigUint"
+                    }
+                ]
+            },
+            {
+                "name": "getContractOwner",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "owner address",
+                        "type": "Address"
+                    }
+                ]
+            },
+            {
+                "name": "getOwnShardId",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "SC's shard id",
+                        "type": "u8"
+                    }
+                ]
+            },
+            {
+                "name": "nameHash",
+                "storageModifier": "pure",
+                "input": [
+                    {
+                        "description": "name",
+                        "type": "Vec<u8>"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "hash",
+                        "type": "H256"
+                    }
+                ]
+            },
+            {
+                "name": "nameShard",
+                "storageModifier": "pure",
+                "input": [
+                    {
+                        "description": "name",
+                        "type": "Vec<u8>"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "shard Id",
+                        "type": "u8"
+                    }
+                ]
+            },
+            {
+                "name": "validateName",
+                "description": "call returns SC error if not valid",
+                "storageModifier": "pure",
+                "input": [
+                    {
+                        "description": "name",
+                        "type": "Vec<u8>"
+                    }
+                ],
+                "output": []
+            }
+        ]
+    }
+]

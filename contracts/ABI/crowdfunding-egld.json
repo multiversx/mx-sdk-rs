@@ -1,0 +1,116 @@
+[
+    {
+        "version": "1.0",
+        "name": "crowdfunding-egld",
+        "docs": [
+            "Pls give me your eGLD.",
+            "It's for a noble cause, I swear."
+        ],
+        "constructor": {
+            "description": "Only called at deploy",
+            "input": [
+                {
+                    "description": "target",
+                    "type": "BigUint"
+                },
+                {
+                    "description": "deadline as unix timestamp",
+                    "type": "u64"
+                }
+            ],
+            "output": []
+        },
+        "endpoints": [
+            {
+                "name": "fund",
+                "payableInTokens": [
+                    "eGLD"
+                ],
+                "storageModifier": "readwrite",
+                "input": [],
+                "output": []
+            },
+            {
+                "name": "status",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "current status",
+                        "type": "Status"
+                    }
+                ]
+            },
+            {
+                "name": "currentFunds",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "current funds of the crowdfunder",
+                        "type": "BigUint"
+                    }
+                ]
+            },
+            {
+                "name": "claim",
+                "storageModifier": "readwrite",
+                "description": "owner claim all if success, funder claim its funds if failed",
+                "input": [],
+                "output": []
+            },
+            {
+                "name": "get_owner",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "the address of the owner of the SC",
+                        "type": "Address"
+                    }
+                ]
+            },
+            {
+                "name": "get_target",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "the target of the crowdfunder",
+                        "type": "BigUint"
+                    }
+                ]
+            },
+            {
+                "name": "get_deadline",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "the deadline of the crowdfunding, as a unix timestamp",
+                        "type": "u64"
+                    }
+                ]
+            }
+        ],
+        "enums": [
+            {
+                "name": "Status",
+                "values": [
+                    {
+                        "name": "FundingPeriod",
+                        "description": "still in funding period"
+                    },
+                    {
+                        "name": "Successful",
+                        "description": "ez money"
+                    },
+                    {
+                        "name": "Failed",
+                        "description": "catastrophic failure!"
+                    }
+                ]
+            }
+        ]
+    }
+]
