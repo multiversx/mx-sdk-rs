@@ -1,11 +1,11 @@
-use crate::call_data::*;
+use crate::hex_call_data::*;
 use crate::*;
 
 pub struct CallDataArgLoader<'a, SE>
 where
 	SE: SignalError,
 {
-	deser: CallDataDeserializer<'a>,
+	deser: HexCallDataDeserializer<'a>,
 	signal_error: SE,
 }
 
@@ -13,7 +13,7 @@ impl<'a, SE> CallDataArgLoader<'a, SE>
 where
 	SE: SignalError,
 {
-	pub fn new(deser: CallDataDeserializer<'a>, signal_error: SE) -> Self {
+	pub fn new(deser: HexCallDataDeserializer<'a>, signal_error: SE) -> Self {
 		CallDataArgLoader {
 			deser,
 			signal_error,

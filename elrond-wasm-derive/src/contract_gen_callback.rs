@@ -92,7 +92,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 	} else {
 		quote! {
 			let cb_data_raw = self.api.storage_load_vec_u8(&self.api.get_tx_hash().as_ref());
-			let mut cb_data_deserializer = elrond_wasm::call_data::CallDataDeserializer::new(cb_data_raw.as_slice());
+			let mut cb_data_deserializer = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(cb_data_raw.as_slice());
 			let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
 
 			match cb_data_deserializer.get_func_name() {

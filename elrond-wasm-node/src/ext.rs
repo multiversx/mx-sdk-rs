@@ -1,4 +1,4 @@
-use elrond_wasm::{Address, Box, BoxedBytes, Vec, H256};
+use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
 
 use crate::big_int::*;
 use crate::big_uint::*;
@@ -24,7 +24,12 @@ extern {
     fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
     fn transferValue(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
-    fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
+	fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
+	fn createContract(gas: u64,
+		valueOffset: *const u8,
+		codeOffset: *const u8, codeMetadataOffset: *const u8, length: i32,
+		resultOffset: *const u8,
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8) -> i32;
 
     fn getCaller(resultOffset: *mut u8);
     fn callValue(resultOffset: *const u8) -> i32;
@@ -216,7 +221,6 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn storage_store_u64(&self, key: &[u8], value: u64) {
 		unsafe {
@@ -224,15 +228,6 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[cfg(not(feature = "small-int-ei"))]
-	#[inline]
-	fn storage_store_u64(&self, key: &[u8], value: u64) {
-		let mut buffer = Vec::<u8>::new();
-		elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value, false);
-		self.storage_store_slice_u8(key, &buffer[..]);
-	}
-
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn storage_store_i64(&self, key: &[u8], value: i64) {
 		unsafe {
@@ -240,44 +235,14 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[cfg(not(feature = "small-int-ei"))]
-	#[inline]
-	fn storage_store_i64(&self, key: &[u8], value: i64) {
-		let mut buffer = Vec::<u8>::new();
-		elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value as u64, true);
-		self.storage_store_slice_u8(key, &buffer[..]);
-	}
-
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn storage_load_u64(&self, key: &[u8]) -> u64 {
 		unsafe { smallIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32) as u64 }
 	}
 
-	#[cfg(not(feature = "small-int-ei"))]
-	#[inline(never)]
-	fn storage_load_u64(&self, key: &[u8]) -> u64 {
-		let bytes = self.storage_load_boxed_bytes(key);
-		if bytes.len() > 8 {
-			ext_error::signal_error(err_msg::STORAGE_VALUE_OUT_OF_RANGE);
-		}
-		elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), false)
-	}
-
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn storage_load_i64(&self, key: &[u8]) -> i64 {
 		unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
-	}
-
-	#[cfg(not(feature = "small-int-ei"))]
-	#[inline(never)]
-	fn storage_load_i64(&self, key: &[u8]) -> i64 {
-		let bytes = self.storage_load_boxed_bytes(key);
-		if bytes.len() > 8 {
-			ext_error::signal_error(err_msg::STORAGE_VALUE_OUT_OF_RANGE);
-		}
-		elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), true) as i64
 	}
 
 	#[inline]
@@ -330,6 +295,32 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				data.len() as i32,
 			);
 		}
+	}
+
+	fn deploy_contract(
+		&self,
+		gas: u64,
+		amount: &ArwenBigUint,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Address {
+		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+		let mut new_address = Address::zero();
+		unsafe {
+			let _ = createContract(
+				gas,
+				amount_bytes32.as_ptr(),
+				code.as_ptr(),
+				code_metadata.as_ptr(),
+				code.len() as i32,
+				new_address.as_mut_ptr(),
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+		new_address
 	}
 
 	#[inline]
@@ -500,34 +491,14 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn get_argument_u64(&self, arg_id: i32) -> u64 {
 		unsafe { smallIntGetUnsignedArgument(arg_id) as u64 }
 	}
 
-	#[cfg(not(feature = "small-int-ei"))]
-	fn get_argument_u64(&self, arg_id: i32) -> u64 {
-		let bytes = self.get_argument_boxed_bytes(arg_id);
-		if bytes.len() > 8 {
-			ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
-		}
-		elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), false)
-	}
-
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn get_argument_i64(&self, arg_id: i32) -> i64 {
 		unsafe { smallIntGetSignedArgument(arg_id) }
-	}
-
-	#[cfg(not(feature = "small-int-ei"))]
-	fn get_argument_i64(&self, arg_id: i32) -> i64 {
-		let bytes = self.get_argument_boxed_bytes(arg_id);
-		if bytes.len() > 8 {
-			ext_error::signal_error(err_msg::ARG_OUT_OF_RANGE);
-		}
-		elrond_wasm::elrond_codec::bytes_to_number(&bytes.into_box(), true) as i64
 	}
 
 	#[inline]
@@ -565,7 +536,6 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn finish_u64(&self, value: u64) {
 		unsafe {
@@ -573,26 +543,11 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[cfg(not(feature = "small-int-ei"))]
-	fn finish_u64(&self, value: u64) {
-		let mut buffer = Vec::<u8>::new();
-		elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value, false);
-		self.finish_slice_u8(&buffer[..]);
-	}
-
-	#[cfg(feature = "small-int-ei")]
 	#[inline]
 	fn finish_i64(&self, value: i64) {
 		unsafe {
 			smallIntFinishSigned(value);
 		}
-	}
-
-	#[cfg(not(feature = "small-int-ei"))]
-	fn finish_i64(&self, value: i64) {
-		let mut buffer = Vec::<u8>::new();
-		elrond_wasm::elrond_codec::top_encode_number_to_output(&mut buffer, value as u64, true);
-		self.finish_slice_u8(&buffer[..]);
 	}
 
 	#[inline]

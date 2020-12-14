@@ -1,7 +1,7 @@
 use crate::display_util::*;
 use crate::ext_mock::*;
-use elrond_wasm::call_data::*;
 use elrond_wasm::elrond_codec::*;
+use elrond_wasm::hex_call_data::HexCallDataDeserializer;
 use elrond_wasm::{Address, H256};
 
 use num_bigint::{BigInt, BigUint};
@@ -20,7 +20,7 @@ pub struct AsyncCallTxData {
 }
 
 pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address) -> TxInput {
-	let mut de = CallDataDeserializer::new(async_data.call_data.as_slice());
+	let mut de = HexCallDataDeserializer::new(async_data.call_data.as_slice());
 	let func_name = de.get_func_name().to_vec();
 	let mut args: Vec<Vec<u8>> = Vec::new();
 	let mut esdt_token_name = Vec::<u8>::new();
