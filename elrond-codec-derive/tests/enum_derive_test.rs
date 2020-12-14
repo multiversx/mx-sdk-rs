@@ -1,7 +1,7 @@
 extern crate elrond_codec_derive;
 use elrond_codec_derive::*;
 
-use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
+use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode, check_top_decode};
 use elrond_codec::*;
 
 // to test, run the following command in elrond-codec-derive folder:
@@ -35,6 +35,10 @@ fn fieldless_enum_test() {
 	check_dep_encode_decode(DayOfWeek::Friday, &[4]);
 	check_dep_encode_decode(DayOfWeek::Saturday, &[5]);
 	check_dep_encode_decode(DayOfWeek::Sunday, &[6]);
+
+	// also allowed
+	assert_eq!(DayOfWeek::Monday, check_top_decode(&[0]));
+	assert_eq!(DayOfWeek::Monday, check_top_decode(&[0, 0]));
 }
 
 #[derive(PartialEq, Debug, NestedEncode, NestedDecode)]
