@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-node"
-version = "0.9.7"
+version = "0.9.8"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -13,5 +13,6 @@ description = "Elrond WebAssembly VM API wrapper"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
-[dependencies]
-elrond-wasm = { version = "0.9.7", path = "../elrond-wasm" }
+[dependencies.elrond-wasm]
+version = "0.9.8"
+path = "../elrond-wasm"
