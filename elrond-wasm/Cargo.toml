@@ -20,3 +20,4 @@ arrayvec = { version = "0.5.2", default-features = false, features = ["array-siz
 [dependencies.elrond-codec]
 version = "0.3.2"
 path = "../elrond-codec"
+features = ["derive"]
