@@ -2,6 +2,9 @@
 
 extern crate alloc;
 
+#[cfg(feature = "elrond-codec-derive")]
+pub use elrond_codec_derive::*;
+
 mod codec_err;
 mod nested_de;
 mod nested_de_input;
