@@ -1,14 +1,14 @@
 ALICE="${USERS}/alice.pem"
 ADDRESS=$(erdpy data load --key=address-testnet)
 DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-testnet)
-DEPLOY_ARGUMENTS="12 4096"
+DEPLOY_ARGUMENTS="12 42000000"
 DEPLOY_GAS="80000000"
 PROXY=https://testnet-api.elrond.com
 
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
-          --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=T
+          --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=T || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['hash']")
     ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['address']")
