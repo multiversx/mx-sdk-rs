@@ -8,7 +8,7 @@ PROXY=https://testnet-api.elrond.com
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
-          --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=T
+          --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=T || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['hash']")
     ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['address']")
