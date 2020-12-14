@@ -21,9 +21,6 @@ publish.sh
 
 tags
 
-# Coming soon
-elrond-codec-derive
-
 # Elrond IDE
 **/node_modules
 **/output/**

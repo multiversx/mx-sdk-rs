@@ -1,0 +1,22 @@
+[package]
+name = "elrond-codec-derive"
+version = "0.3.2"
+authors = ["dorin.iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+
+[lib]
+name = "elrond_codec_derive"
+proc-macro = true
+
+[features]
+default = ["syn/full", "syn/parsing", "syn/extra-traits"]
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = "1.0"
+hex = "0.4"
+
+[dev-dependencies.elrond-codec]
+version = "0.3.2"
+path = "../elrond-codec"
