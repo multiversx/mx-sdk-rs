@@ -1,0 +1,48 @@
+[package]
+name = "multisig"
+version = "0.0.0"
+authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+wasm-output-mode = [
+    "elrond-wasm-node",
+    "elrond-wasm-module-users-wasm",
+]
+
+default = [
+    "elrond-wasm-module-users-default"
+]
+
+[dependencies.elrond-wasm-module-users-wasm]
+package = "elrond-wasm-module-users"
+version = "0.9.8"
+path = "../../modules/elrond-wasm-module-users"
+features = ["wasm-output-mode"]
+optional = true
+
+[dependencies.elrond-wasm-module-users-default]
+package = "elrond-wasm-module-users"
+version = "0.9.8"
+path = "../../modules/elrond-wasm-module-users"
+optional = true
+
+[dependencies.elrond-wasm]
+version = "0.9.8"
+path = "../../../elrond-wasm"
+
+[dependencies.elrond-wasm-derive]
+version = "0.9.8"
+path = "../../../elrond-wasm-derive"
+
+[dependencies.elrond-wasm-node]
+version = "0.9.8"
+path = "../../../elrond-wasm-node"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.9.8"
+path = "../../../elrond-wasm-debug"

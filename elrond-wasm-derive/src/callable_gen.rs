@@ -133,7 +133,7 @@ impl Callable {
 					let cb_name_str = &callback_ident.arg.to_string();
 					let cb_name_literal = array_literal(cb_name_str.as_bytes());
 					let callback_init = quote! {
-						let mut callback_data_ser = elrond_wasm::call_data::CallDataSerializer::new( & #cb_name_literal );
+						let mut callback_data_ser = elrond_wasm::hex_call_data::HexCallDataSerializer::new( & #cb_name_literal );
 					};
 					let callback_store = quote! {
 						self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), callback_data_ser.as_slice());
@@ -146,7 +146,7 @@ impl Callable {
 				let m_name_literal = array_literal(m.name.to_string().as_bytes());
 				let sig = quote! {
 					#msig {
-						let mut call_data_ser = elrond_wasm::call_data::CallDataSerializer::new( & #m_name_literal );
+						let mut call_data_ser = elrond_wasm::hex_call_data::HexCallDataSerializer::new( & #m_name_literal );
 						#callback_init
 						#(#arg_push_snippets)*
 						#callback_store
