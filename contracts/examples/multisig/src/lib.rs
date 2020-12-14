@@ -70,7 +70,6 @@ pub trait Multisig {
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
-
 		self.set_quorum(quorum);
 
 		for (i, address) in board.iter().enumerate() {
@@ -100,11 +99,8 @@ pub trait Multisig {
 
 		let action_id = self.get_action_last_index() + 1;
 		self.set_action_last_index(action_id);
-
 		self.set_pending_action_count(self.get_pending_action_count() + 1);
-
 		self.set_action_data(action_id, &action);
-
 		if caller_role.can_sign() {
 			// also sign
 			// since the action is newly created, the caller can be the only signer
@@ -286,7 +282,7 @@ pub trait Multisig {
 	}
 
 	#[endpoint(performAction)]
-	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
+	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -309,6 +305,10 @@ pub trait Multisig {
 			.count();
 		require!(valid_signers_count >= quorum, "quorum has not been reached");
 
+		self.perform_action(action_id)
+	}
+
+	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let action = self.get_action_data(action_id);
 		let mut result = Vec::<BoxedBytes>::new();
 		match action {

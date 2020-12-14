@@ -13,9 +13,6 @@ description = "Elrond WebAssembly VM API wrapper"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
-[features]
-small-int-ei = []
-
 [dependencies.elrond-wasm]
 version = "0.9.8"
 path = "../elrond-wasm"
