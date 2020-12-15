@@ -1,7 +1,7 @@
 use super::arg_def::*;
-use super::util::*;
 use super::contract_gen::*;
 use super::contract_gen_method::*;
+use super::util::*;
 
 pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream {
 	let endpoint_snippets: Vec<proc_macro2::TokenStream> = contract

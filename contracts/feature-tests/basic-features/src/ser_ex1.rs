@@ -1,9 +1,8 @@
-use elrond_wasm::elrond_codec::*;
-// use elrond_wasm::elrond_codec_derive::*;
 use elrond_wasm::{BoxedBytes, Vec};
+derive_imports!();
 
 /// Copied from elrond-wasm serialization tests.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct SerExample1 {
 	pub int: u16,
 	pub seq: Vec<u8>,

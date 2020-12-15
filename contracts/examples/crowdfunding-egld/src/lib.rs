@@ -2,8 +2,9 @@
 #![allow(unused_attributes)]
 
 imports!();
+derive_imports!();
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, TypeAbi)]
 pub enum Status {
 	FundingPeriod,
 	Successful,

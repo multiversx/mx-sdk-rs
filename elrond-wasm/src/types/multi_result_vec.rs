@@ -1,4 +1,6 @@
+use crate::abi::TypeAbi;
 use crate::{BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, EndpointResult};
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
 
@@ -43,5 +45,14 @@ where
 		for elem in self.0.iter() {
 			elem.finish(api.clone());
 		}
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for MultiResultVec<T> {
+	fn type_name() -> String {
+		let mut repr = String::from("MultiResultVec<");
+		repr.push_str(T::type_name().as_str());
+		repr.push('>');
+		repr
 	}
 }

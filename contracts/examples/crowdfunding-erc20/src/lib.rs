@@ -172,8 +172,9 @@ pub trait Crowdfunding {
 }
 
 use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(TypeAbi, PartialEq, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
 	Successful,

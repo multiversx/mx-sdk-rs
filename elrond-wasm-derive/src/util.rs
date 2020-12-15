@@ -82,7 +82,8 @@ pub fn clear_all_type_lifetimes(ty: &mut syn::Type) {
 		},
 		syn::Type::Path(type_path) => {
 			type_path.path.segments.iter_mut().for_each(|path_segm| {
-				if let syn::PathArguments::AngleBracketed(angle_backeted) = &mut path_segm.arguments {
+				if let syn::PathArguments::AngleBracketed(angle_backeted) = &mut path_segm.arguments
+				{
 					angle_backeted.args.iter_mut().for_each(|gen_arg| {
 						if let syn::GenericArgument::Type(gen_ty) = &mut *gen_arg {
 							clear_all_type_lifetimes(gen_ty);
