@@ -1,4 +1,5 @@
 use super::arg_def::*;
+use super::util::*;
 use super::contract_gen::*;
 use super::contract_gen_method::*;
 
@@ -23,7 +24,8 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 						if let ArgMetadata::Payment = arg.metadata {
 							None
 						} else {
-							let arg_type = &arg.ty;
+							let mut arg_type = arg.ty.clone();
+							clear_all_type_lifetimes(&mut arg_type);
 							let arg_name = &arg.pat;
 							let arg_name_str = quote! { #arg_name }.to_string();
 							Some(quote! {
@@ -35,8 +37,12 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 
 				let output_snippet = match &m.return_type {
 					syn::ReturnType::Default => quote! {},
-					syn::ReturnType::Type(_, ty) => quote! {
-						endpoint.add_output::<#ty>();
+					syn::ReturnType::Type(_, ty) => {
+						let mut res_type = ty.clone();
+						clear_all_type_lifetimes(&mut res_type);
+						quote! {
+							endpoint.add_output::<#res_type>();
+						}
 					},
 				};
 
