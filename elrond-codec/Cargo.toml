@@ -13,6 +13,14 @@ description = "Lightweight binary serializer/deserializer, written especially fo
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
+[features]
+derive = ["elrond-codec-derive"]
+
+[dependencies.elrond-codec-derive]
+path = "../elrond-codec-derive"
+version = "0.3.2"
+optional = true
+
 [dependencies]
 wee_alloc = "0.4"
 arrayvec = { version = "0.5.1", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
