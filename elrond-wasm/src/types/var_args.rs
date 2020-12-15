@@ -1,4 +1,6 @@
+use crate::abi::TypeAbi;
 use crate::io::{ArgId, DynArg, DynArgInput, DynArgMulti};
+use alloc::string::String;
 use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
 
@@ -90,5 +92,14 @@ where
 			loader.signal_arg_wrong_number();
 		}
 		VarArgs(result_vec)
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for VarArgs<T> {
+	fn type_name() -> String {
+		let mut repr = String::from("VarArgs<");
+		repr.push_str(T::type_name().as_str());
+		repr.push('>');
+		repr
 	}
 }

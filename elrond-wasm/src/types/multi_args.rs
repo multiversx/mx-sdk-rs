@@ -1,4 +1,6 @@
+use crate::abi::TypeAbi;
 use crate::io::{ArgId, DynArg, DynArgInput};
+use alloc::string::String;
 use elrond_codec::TopDecodeInput;
 
 macro_rules! multi_arg_impls {
@@ -18,6 +20,21 @@ macro_rules! multi_arg_impls {
                             $name::dyn_load(loader, arg_id)
                         ),+
                     ))
+                }
+            }
+
+            impl<$($name),+ > TypeAbi for $mr<$($name,)+>
+            where
+                $($name: TypeAbi,)+
+            {
+                fn type_name() -> String {
+                    let mut repr = String::from("MultiArg<");
+                    $(
+                        repr.push_str($name::type_name().as_str());
+                        repr.push(',');
+                    )+
+                    repr.push('>');
+                    repr
                 }
             }
 

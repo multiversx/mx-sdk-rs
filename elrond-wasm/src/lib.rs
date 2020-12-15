@@ -237,6 +237,7 @@ pub trait BigUintApi:
 	+ elrond_codec::TopEncode
 	+ elrond_codec::NestedDecode
 	+ elrond_codec::TopDecode
+	+ abi::TypeAbi
 {
 	fn zero() -> Self {
 		0u64.into()
@@ -348,6 +349,16 @@ macro_rules! imports {
 	};
 }
 
+/// Imports required for deriving serialization and TypeAbi.
+#[macro_export]
+macro_rules! derive_imports {
+	() => {
+		use elrond_wasm::abi::TypeAbi;
+		use elrond_wasm::elrond_codec::*;
+		use elrond_wasm_derive::TypeAbi;
+	};
+}
+
 /// Compact way of returning a static error message.
 #[macro_export]
 macro_rules! sc_error {
@@ -364,8 +375,8 @@ macro_rules! sc_try {
 			elrond_wasm::SCResult::Ok(t) => t,
 			elrond_wasm::SCResult::Err(e) => {
 				return elrond_wasm::SCResult::Err(e);
-				},
-			}
+			},
+		}
 	};
 }
 
@@ -391,7 +402,7 @@ macro_rules! require {
 	($expression:expr, $error_msg:expr) => {
 		if (!($expression)) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -417,7 +428,7 @@ macro_rules! only_owner {
 	($trait_self: expr, $error_msg:expr) => {
 		if ($trait_self.get_caller() != $trait_self.get_owner_address()) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -434,9 +445,9 @@ macro_rules! mut_storage (
 macro_rules! non_zero_usize {
 	($input: expr, $error_msg:expr) => {
 		if let Some(nz) = NonZeroUsize::new($input) {
-				nz
+			nz
 		} else {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }

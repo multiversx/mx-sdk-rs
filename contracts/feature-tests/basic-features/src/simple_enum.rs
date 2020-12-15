@@ -1,6 +1,7 @@
-use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
 /// Copied from elrond-wasm serialization tests.
+#[derive(TypeAbi)]
 pub enum SimpleEnum {
 	Variant0,
 	Variant1,

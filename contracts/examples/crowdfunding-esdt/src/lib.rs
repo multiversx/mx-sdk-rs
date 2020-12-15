@@ -2,12 +2,13 @@
 #![allow(unused_attributes)]
 
 imports!();
+derive_imports!();
 
 use elrond_wasm::HexCallDataSerializer;
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(TypeAbi, PartialEq, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
 	Successful,
