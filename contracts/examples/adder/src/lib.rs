@@ -5,8 +5,8 @@ imports!();
 #[elrond_wasm_derive::contract(AdderImpl)]
 pub trait Adder {
 	#[view(getSum)]
-	#[storage_get_mut("sum")]
-	fn get_mut_sum(&self) -> mut_storage!(BigInt);
+	#[storage_get("sum")]
+	fn get_sum(&self) -> BigInt;
 
 	#[storage_set("sum")]
 	fn set_sum(&self, sum: &BigInt);
@@ -18,8 +18,10 @@ pub trait Adder {
 
 	#[endpoint]
 	fn add(&self, value: &BigInt) -> SCResult<()> {
-		let mut sum = self.get_mut_sum();
-		*sum += value;
+		let mut sum = self.get_sum();
+		sum += value;
+		self.set_sum(&sum);
+
 		Ok(())
 	}
 }
