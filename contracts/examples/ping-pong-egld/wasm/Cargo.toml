@@ -1,0 +1,25 @@
+[package]
+name = "ping-pong-wasm"
+version = "0.0.1"
+authors = [ "you",]
+edition = "2018"
+
+[lib]
+crate-type = [ "cdylib",]
+
+[workspace]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies.ping-pong]
+features = [ "wasm-output-mode",]
+path = ".."
+
+[dependencies.elrond-wasm-output]
+version = "0.9.8"
+features = [ "wasm-output-mode",]
