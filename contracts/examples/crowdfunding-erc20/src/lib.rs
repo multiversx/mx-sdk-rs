@@ -4,6 +4,15 @@
 
 imports!();
 
+use elrond_wasm::elrond_codec::*;
+
+#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
+pub enum Status {
+	FundingPeriod,
+	Successful,
+	Failed,
+}
+
 #[elrond_wasm_derive::callable(Erc20Proxy)]
 pub trait Erc20 {
 	#[rustfmt::skip]
@@ -20,12 +29,12 @@ pub trait Erc20 {
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
 pub trait Crowdfunding {
 	#[init]
-	fn init(&self, target: &BigUint, deadline: u64, erc20_contract_address: Address) {
+	fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: Address) {
 		let my_address: Address = self.get_caller();
 
 		self.set_owner(&my_address);
 		self.set_erc20_contract_address(&erc20_contract_address);
-		self.set_target(target);
+		self.set_target(&target);
 		self.set_deadline(deadline);
 	}
 
@@ -128,6 +137,8 @@ pub trait Crowdfunding {
 		}
 	}
 
+	// storage
+
 	#[storage_set("owner")]
 	fn set_owner(&self, address: &Address);
 
@@ -169,66 +180,4 @@ pub trait Crowdfunding {
 
 	#[storage_set("erc20_balance")]
 	fn set_total_balance(&self, balance: &BigUint);
-}
-
-use elrond_wasm::elrond_codec::*;
-
-#[derive(PartialEq, Clone, Copy)]
-pub enum Status {
-	FundingPeriod,
-	Successful,
-	Failed,
-}
-
-impl Status {
-	pub fn to_u8(&self) -> u8 {
-		match self {
-			Status::FundingPeriod => 0,
-			Status::Successful => 1,
-			Status::Failed => 2,
-		}
-	}
-
-	fn from_u8(v: u8) -> Result<Self, DecodeError> {
-		match v {
-			0 => core::result::Result::Ok(Status::FundingPeriod),
-			1 => core::result::Result::Ok(Status::Successful),
-			2 => core::result::Result::Ok(Status::Failed),
-			_ => core::result::Result::Err(DecodeError::INVALID_VALUE),
-		}
-	}
-}
-
-impl TopEncode for Status {
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.to_u8().top_encode(output)
-	}
-
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.to_u8().top_encode_or_exit(output, c, exit)
-	}
-}
-
-impl TopDecode for Status {
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-		Status::from_u8(u8::top_decode(input)?)
-	}
-
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		input: I,
-		c: ExitCtx,
-		exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		match u8::top_decode_or_exit(input, c.clone(), exit) {
-			0 => Status::FundingPeriod,
-			1 => Status::Successful,
-			2 => Status::Failed,
-			_ => exit(c, DecodeError::INVALID_VALUE),
-		}
-	}
 }

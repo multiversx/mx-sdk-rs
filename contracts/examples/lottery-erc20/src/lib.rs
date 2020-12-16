@@ -21,12 +21,12 @@ pub trait Erc20 {
 		sender: &Address,
 		recipient: &Address,
 		amount: BigUint,
-		#[callback_arg] cb_lottery_name: Vec<u8>,
+		#[callback_arg] cb_lottery_name: &BoxedBytes,
 		#[callback_arg] cb_sender: &Address,
 	);
 
 	#[callback(distribute_prizes_callback)]
-	fn transfer(&self, to: &Address, amount: BigUint, #[callback_arg] cb_lottery_name: Vec<u8>);
+	fn transfer(&self, to: &Address, amount: BigUint, #[callback_arg] cb_lottery_name: &BoxedBytes);
 }
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
@@ -39,7 +39,7 @@ pub trait Lottery {
 	#[endpoint]
 	fn start(
 		&self,
-		lottery_name: Vec<u8>,
+		lottery_name: BoxedBytes,
 		ticket_price: BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -61,7 +61,7 @@ pub trait Lottery {
 	#[endpoint(createLotteryPool)]
 	fn create_lottery_pool(
 		&self,
-		lottery_name: Vec<u8>,
+		lottery_name: BoxedBytes,
 		ticket_price: BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -82,7 +82,7 @@ pub trait Lottery {
 
 	fn start_lottery(
 		&self,
-		lottery_name: Vec<u8>,
+		lottery_name: BoxedBytes,
 		ticket_price: BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -102,7 +102,7 @@ pub trait Lottery {
 		let whitelist = opt_whitelist.unwrap_or(Vec::new());
 
 		require!(
-			self.status(lottery_name.clone()) == Status::Inactive,
+			self.status(&lottery_name) == Status::Inactive,
 			"Lottery is already active!"
 		);
 
@@ -142,17 +142,16 @@ pub trait Lottery {
 			queued_tickets: 0u32,
 		};
 
-		self.set_lottery_exists(&lottery_name, true);
 		self.set_lottery_info(&lottery_name, &info);
 
 		Ok(())
 	}
 
 	#[endpoint]
-	fn buy_ticket(&self, lottery_name: Vec<u8>, token_amount: BigUint) -> SCResult<()> {
-		match self.status(lottery_name.clone()) {
+	fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BigUint) -> SCResult<()> {
+		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
-			Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
+			Status::Running => self.update_after_buy_ticket(&lottery_name, &token_amount),
 			Status::Ended => {
 				sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
 			},
@@ -163,12 +162,12 @@ pub trait Lottery {
 	}
 
 	#[endpoint]
-	fn determine_winner(&self, lottery_name: Vec<u8>) -> SCResult<()> {
-		match self.status(lottery_name.clone()) {
+	fn determine_winner(&self, lottery_name: BoxedBytes) -> SCResult<()> {
+		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is inactive!"),
 			Status::Running => sc_error!("Lottery is still running!"),
 			Status::Ended => {
-				let info = self.get_mut_lottery_info(&lottery_name);
+				let info = self.get_lottery_info(&lottery_name);
 
 				if info.queued_tickets > 0 {
 					return sc_error!(
@@ -185,10 +184,8 @@ pub trait Lottery {
 	}
 
 	#[view]
-	fn status(&self, lottery_name: Vec<u8>) -> Status {
-		let exists = self.get_lottery_exists(&lottery_name);
-
-		if !exists {
+	fn status(&self, lottery_name: &BoxedBytes) -> Status {
+		if self.is_empty_lottery_info(lottery_name) {
 			return Status::Inactive;
 		}
 
@@ -198,7 +195,7 @@ pub trait Lottery {
 			return Status::DistributingPrizes;
 		}
 
-		let info = self.get_mut_lottery_info(&lottery_name);
+		let info = self.get_lottery_info(&lottery_name);
 
 		if self.get_block_timestamp() > info.deadline || info.tickets_left == 0 {
 			return Status::Ended;
@@ -209,10 +206,10 @@ pub trait Lottery {
 
 	fn update_after_buy_ticket(
 		&self,
-		lottery_name: &Vec<u8>,
-		token_amount: BigUint,
+		lottery_name: &BoxedBytes,
+		token_amount: &BigUint,
 	) -> SCResult<()> {
-		let info = self.get_mut_lottery_info(&lottery_name);
+		let info = self.get_lottery_info(&lottery_name);
 		let caller = self.get_caller();
 
 		require!(
@@ -220,12 +217,12 @@ pub trait Lottery {
 			"You are not allowed to participate in this lottery!"
 		);
 
-		require!(token_amount == info.ticket_price, "Wrong ticket fee!");
+		require!(token_amount == &info.ticket_price, "Wrong ticket fee!");
 
-		let entries = self.get_mut_number_of_entries_for_user(&lottery_name, &caller);
+		let entries = self.get_number_of_entries_for_user(&lottery_name, &caller);
 
 		require!(
-			*entries < info.max_entries_per_user,
+			entries < info.max_entries_per_user,
 			"Ticket limit exceeded for this lottery!"
 		);
 
@@ -238,28 +235,32 @@ pub trait Lottery {
 		erc20_proxy.transferFrom(
 			&caller,
 			&lottery_contract_address,
-			token_amount,
-			lottery_name.clone(),
+			token_amount.clone(),
+			lottery_name,
 			&caller,
 		);
 
 		Ok(())
 	}
 
-	fn reserve_ticket(&self, lottery_name: &Vec<u8>) {
-		let mut info = self.get_mut_lottery_info(&lottery_name);
+	fn reserve_ticket(&self, lottery_name: &BoxedBytes) {
+		let mut info = self.get_lottery_info(&lottery_name);
 
 		info.tickets_left -= 1;
 		info.queued_tickets += 1;
+
+		self.set_lottery_info(lottery_name, &info);
 	}
 
-	fn reduce_prize_pool(&self, lottery_name: &Vec<u8>, value: BigUint) {
-		let mut info = self.get_mut_lottery_info(&lottery_name);
+	fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: BigUint) {
+		let mut info = self.get_lottery_info(&lottery_name);
 		info.prize_pool -= value;
+
+		self.set_lottery_info(lottery_name, &info);
 	}
 
-	fn distribute_prizes(&self, lottery_name: &Vec<u8>) {
-		let info = self.get_mut_lottery_info(&lottery_name);
+	fn distribute_prizes(&self, lottery_name: &BoxedBytes) {
+		let info = self.get_lottery_info(&lottery_name);
 
 		let total_tickets = info.current_ticket_number;
 		let total_winning_tickets = info.prize_distribution.len();
@@ -268,7 +269,7 @@ pub trait Lottery {
 		let winners_left = total_winning_tickets - prev_winners_count;
 
 		if winners_left == 0 {
-			self.clear_storage(&lottery_name);
+			self.clear_storage(lottery_name);
 
 			return;
 		}
@@ -301,10 +302,11 @@ pub trait Lottery {
 		prev_winners.push(winning_ticket_id);
 		self.set_prev_winners(lottery_name, &prev_winners);
 
+		self.set_lottery_info(lottery_name, &info);
+
 		let erc20_address = self.get_erc20_contract_address();
 		let erc20_proxy = contract_proxy!(self, &erc20_address, Erc20);
-
-		erc20_proxy.transfer(&winner_address, prize, lottery_name.clone());
+		erc20_proxy.transfer(&winner_address, prize, lottery_name);
 	}
 
 	fn get_random_winning_ticket_id(&self, prev_winners: &Vec<u32>, total_tickets: u32) -> u32 {
@@ -320,44 +322,18 @@ pub trait Lottery {
 		}
 	}
 
-	fn clear_storage(&self, lottery_name: &Vec<u8>) {
-		let name_len_vec = &(lottery_name.len() as u32).to_be_bytes().to_vec();
-		let temp = [&name_len_vec[..], &lottery_name[..]].concat(); // "temporary value dropped" otherwise
-		let appended_name_in_key = temp.as_slice();
-
-		let info = self.get_mut_lottery_info(lottery_name);
+	fn clear_storage(&self, lottery_name: &BoxedBytes) {
+		let info = self.get_lottery_info(lottery_name);
 
 		for i in 0..info.current_ticket_number {
 			let addr = self.get_ticket_holder(lottery_name, i);
-			let key_ticket_holder = [
-				"ticketHolder".as_bytes(),
-				appended_name_in_key,
-				&i.to_be_bytes(),
-			]
-			.concat();
-			let key_number_of_entries = [
-				"numberOfEntriesForUser".as_bytes(),
-				appended_name_in_key,
-				addr.as_bytes(),
-			]
-			.concat();
 
-			self.storage_store_slice_u8(&key_ticket_holder, &[0u8; 0]);
-			self.storage_store_slice_u8(&key_number_of_entries, &[0u8; 0]);
+			self.clear_ticket_holder(lottery_name, i);
+			self.clear_number_of_entries_for_user(lottery_name, &addr);
 		}
 
-		self.storage_store_slice_u8(
-			&["lotteryExists".as_bytes(), appended_name_in_key].concat(),
-			&[0u8; 0],
-		);
-		self.storage_store_slice_u8(
-			&["lotteryInfo".as_bytes(), appended_name_in_key].concat(),
-			&[0u8; 0],
-		);
-		self.storage_store_slice_u8(
-			&["previousWinners".as_bytes(), appended_name_in_key].concat(),
-			&[0u8; 0],
-		);
+		self.clear_previous_winners(lottery_name);
+		self.clear_lottery_info(lottery_name);
 	}
 
 	fn sum_array(&self, array: &[u8]) -> u16 {
@@ -374,23 +350,24 @@ pub trait Lottery {
 	fn transfer_from_callback(
 		&self,
 		result: AsyncCallResult<()>,
-		#[callback_arg] cb_lottery_name: Vec<u8>,
+		#[callback_arg] cb_lottery_name: BoxedBytes,
 		#[callback_arg] cb_sender: Address,
 	) {
-		let mut info = self.get_mut_lottery_info(&cb_lottery_name);
+		let mut info = self.get_lottery_info(&cb_lottery_name);
 
 		match result {
 			AsyncCallResult::Ok(()) => {
-				let mut entries =
-					self.get_mut_number_of_entries_for_user(&cb_lottery_name, &cb_sender);
+				let mut entries = self.get_number_of_entries_for_user(&cb_lottery_name, &cb_sender);
 
 				self.set_ticket_holder(&cb_lottery_name, info.current_ticket_number, &cb_sender);
 
-				*entries += 1;
+				entries += 1;
 				info.current_ticket_number += 1;
 
 				let ticket_price = info.ticket_price.clone();
 				info.prize_pool += ticket_price;
+
+				self.set_number_of_entries_for_user(&cb_lottery_name, &cb_sender, entries);
 			},
 			AsyncCallResult::Err(_) => {
 				// payment error, return ticket to pool
@@ -399,13 +376,15 @@ pub trait Lottery {
 		}
 
 		info.queued_tickets -= 1;
+
+		self.set_lottery_info(&cb_lottery_name, &info);
 	}
 
 	#[callback]
 	fn distribute_prizes_callback(
 		&self,
 		result: AsyncCallResult<()>,
-		#[callback_arg] cb_lottery_name: Vec<u8>,
+		#[callback_arg] cb_lottery_name: BoxedBytes,
 	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
@@ -417,32 +396,51 @@ pub trait Lottery {
 		}
 	}
 
-	#[storage_set("lotteryExists")]
-	fn set_lottery_exists(&self, lottery_name: &[u8], exists: bool);
-
-	#[view(lotteryExists)]
-	#[storage_get("lotteryExists")]
-	fn get_lottery_exists(&self, lottery_name: &Vec<u8>) -> bool;
+	// storage
 
 	#[storage_set("lotteryInfo")]
-	fn set_lottery_info(&self, lottery_name: &[u8], lottery_info: &LotteryInfo<BigUint>);
+	fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<BigUint>);
 
 	#[view(lotteryInfo)]
-	#[storage_get_mut("lotteryInfo")]
-	fn get_mut_lottery_info(&self, lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigUint>);
+	#[storage_get("lotteryInfo")]
+	fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<BigUint>;
+
+	#[storage_is_empty("lotteryInfo")]
+	fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;
+
+	#[storage_clear("lotteryInfo")]
+	fn clear_lottery_info(&self, lottery_name: &BoxedBytes);
 
 	#[storage_set("ticketHolder")]
-	fn set_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32, ticket_holder: &Address);
+	fn set_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32, ticket_holder: &Address);
 
 	#[storage_get("ticketHolder")]
-	fn get_ticket_holder(&self, lottery_name: &[u8], ticket_id: u32) -> Address;
+	fn get_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32) -> Address;
 
-	#[storage_get_mut("numberOfEntriesForUser")]
-	fn get_mut_number_of_entries_for_user(
+	#[storage_clear("ticketHolder")]
+	fn clear_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32);
+
+	#[storage_set("numberOfEntriesForUser")]
+	fn set_number_of_entries_for_user(
 		&self,
-		lottery_name: &[u8],
+		lottery_name: &BoxedBytes,
 		user: &Address,
-	) -> mut_storage!(u32);
+		nr_entries: u32
+	);
+
+	#[storage_get("numberOfEntriesForUser")]
+	fn get_number_of_entries_for_user(
+		&self,
+		lottery_name: &BoxedBytes,
+		user: &Address,
+	) -> u32;
+
+	#[storage_clear("numberOfEntriesForUser")]
+	fn clear_number_of_entries_for_user(
+		&self, 
+		lottery_name: &BoxedBytes,
+		user: &Address
+	);
 
 	#[storage_set("erc20_contract_address")]
 	fn set_erc20_contract_address(&self, address: &Address);
@@ -454,8 +452,11 @@ pub trait Lottery {
 	// temporary storage between "determine_winner" proxy callbacks
 
 	#[storage_get("previousWinners")]
-	fn get_prev_winners(&self, lottery_name: &[u8]) -> Vec<u32>;
+	fn get_prev_winners(&self, lottery_name: &BoxedBytes) -> Vec<u32>;
 
 	#[storage_set("previousWinners")]
-	fn set_prev_winners(&self, lottery_name: &[u8], prev_winners: &Vec<u32>);
+	fn set_prev_winners(&self, lottery_name: &BoxedBytes, prev_winners: &[u32]);
+
+	#[storage_clear("previousWinners")]
+	fn clear_previous_winners(&self, lottery_name: &BoxedBytes);
 }
