@@ -22,11 +22,11 @@ pub trait SimpleErc20Token {
 	/// * `address` The address to query the the balance of
 	///
 	#[view(balanceOf)]
-	#[storage_get_mut("balance")]
-	fn get_mut_balance(&self, address: &Address) -> mut_storage!(BigUint);
+	#[storage_get("balance")]
+	fn get_token_balance(&self, address: &Address) -> BigUint;
 
 	#[storage_set("balance")]
-	fn set_balance(&self, address: &Address, balance: &BigUint);
+	fn set_token_balance(&self, address: &Address, balance: &BigUint);
 
 	/// The amount of tokens that an owner allowed to a spender.
 	///
@@ -36,8 +36,8 @@ pub trait SimpleErc20Token {
 	/// * `spender` The address that will spend the funds.
 	///
 	#[view(allowance)]
-	#[storage_get_mut("allowance")]
-	fn get_mut_allowance(&self, owner: &Address, spender: &Address) -> mut_storage!(BigUint);
+	#[storage_get("allowance")]
+	fn get_allowance(&self, owner: &Address, spender: &Address) -> BigUint;
 
 	#[storage_set("allowance")]
 	fn set_allowance(&self, owner: &Address, spender: &Address, allowance: &BigUint);
@@ -54,8 +54,9 @@ pub trait SimpleErc20Token {
 		self.set_total_supply(total_supply);
 
 		// deployer initially receives the total supply
-		let mut creator_balance = self.get_mut_balance(&creator);
-		*creator_balance += total_supply;
+		let mut creator_balance = self.get_token_balance(&creator);
+		creator_balance += total_supply;
+		self.set_token_balance(&creator, &creator_balance);
 	}
 
 	/// This method is private, deduplicates logic from transfer and transferFrom.
@@ -67,19 +68,20 @@ pub trait SimpleErc20Token {
 	) -> SCResult<()> {
 		// check if enough funds & decrease sender balance
 		{
-			let mut sender_balance = self.get_mut_balance(&sender);
-			if amount > *sender_balance {
+			let mut sender_balance = self.get_token_balance(&sender);
+			if amount > sender_balance {
 				return sc_error!("insufficient funds");
 			}
 
-			*sender_balance -= &amount; // saved automatically at the end of scope
+			sender_balance -= &amount;
+
+			self.set_token_balance(&sender, &sender_balance);
 		}
 
 		// increase recipient balance
-		{
-			let mut recipient_balance = self.get_mut_balance(&recipient);
-			*recipient_balance += &amount; // saved automatically at the end of scope
-		}
+		let mut recipient_balance = self.get_token_balance(&recipient);
+		recipient_balance += &amount; // saved automatically at the end of scope
+		self.set_token_balance(&recipient, &recipient_balance);
 
 		// log operation
 		self.transfer_event(&sender, &recipient, &amount);
@@ -114,15 +116,16 @@ pub trait SimpleErc20Token {
 		let caller = self.get_caller();
 
 		// load allowance
-		let mut allowance = self.get_mut_allowance(&sender, &caller);
+		let mut allowance = self.get_allowance(&sender, &caller);
 
 		// amount should not exceed allowance
-		if amount > *allowance {
+		if amount > allowance {
 			return sc_error!("allowance exceeded");
 		}
 
 		// update allowance
-		*allowance -= &amount; // saved automatically at the end of scope
+		allowance -= &amount; // saved automatically at the end of scope
+		self.set_allowance(&sender, &caller, &allowance);
 
 		// transfer
 		self.perform_transfer(sender, recipient, amount)
