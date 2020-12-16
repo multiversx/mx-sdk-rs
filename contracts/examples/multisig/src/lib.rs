@@ -76,6 +76,7 @@ pub trait Multisig {
 
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
+		require!(board.len() > 0, "board cannot be empty on init, no-one would be able to propose");
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
 		self.set_quorum(quorum);
 
