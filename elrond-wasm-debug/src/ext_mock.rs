@@ -447,7 +447,16 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 
 	fn check_not_payable(&self) {
 		if self.get_call_value_big_uint() > 0 {
-			self.signal_error(err_msg::NON_PAYABLE);
+			panic!(TxPanic {
+				status: 10,
+				message: err_msg::NON_PAYABLE_FUNC_EGLD.to_vec(),
+			});
+		}
+		if self.get_esdt_value_big_uint() > 0 {
+			panic!(TxPanic {
+				status: 10,
+				message: err_msg::NON_PAYABLE_FUNC_ESDT.to_vec(),
+			});
 		}
 	}
 
