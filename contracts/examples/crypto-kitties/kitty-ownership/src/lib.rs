@@ -2,15 +2,15 @@
 
 imports!();
 
-use kitty::{Kitty, KittyGenes};
+use kitty::{Kitty, kitty_genes::*};
 
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
 pub trait KittyOwnership {
 	#[init]
-	fn init(&self, gene_science_contract_address: &Address, auto_birth_fee: BigUint,
+	fn init(&self, gene_science_contract_address: Address, auto_birth_fee: BigUint,
 			_gen_zero_kitties: u32) {
 
-		self.set_gene_science_contract_address(gene_science_contract_address);
+		self.set_gene_science_contract_address(&gene_science_contract_address);
 		self.set_auto_birth_fee(auto_birth_fee);
 		self._create_genesis_kitty();
 
@@ -25,8 +25,8 @@ pub trait KittyOwnership {
 	}
 
 	#[endpoint(balanceOf)]
-	fn balance_of(&self, address: &Address) -> u32 {
-		self.get_nr_owned_kitties(address)
+	fn balance_of(&self, address: Address) -> u32 {
+		self.get_nr_owned_kitties(&address)
 	}
 
 	#[endpoint(ownerOf)]
@@ -35,55 +35,55 @@ pub trait KittyOwnership {
 	}
 
 	#[endpoint]
-	fn approve(&self, to: &Address, kitty_id: u32) -> SCResult<()> {
+	fn approve(&self, to: Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
 		require!(self.get_kitty_owner(kitty_id) == caller,
 			"You are not the owner of that kitty!");
 
-		self.set_approved_address(kitty_id, to);
-		self.approve_event(&caller, to, kitty_id);
+		self.set_approved_address(kitty_id, &to);
+		self.approve_event(&caller, &to, kitty_id);
 
 		Ok(())
 	}
 
 	#[endpoint]
-	fn transfer(&self, to: &Address, kitty_id: u32) -> SCResult<()> {
+	fn transfer(&self, to: Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
-		require!(to != &Address::zero(), "Can't transfer to default address 0x0!");
-		require!(to != &self.get_sc_address(), "Can't transfer to this contract!");
+		require!(to != Address::zero(), "Can't transfer to default address 0x0!");
+		require!(to != self.get_sc_address(), "Can't transfer to this contract!");
 
 		require!(self.get_kitty_owner(kitty_id) == caller, 
 			"You are not the owner of that kitty!");
 
-		self._transfer(&caller, to, kitty_id);
+		self._transfer(&caller, &to, kitty_id);
 
 		Ok(())
 	}
 
 	#[endpoint]
-	fn transfer_from(&self, from: &Address, to: &Address, kitty_id: u32) -> SCResult<()> {
+	fn transfer_from(&self, from: Address, to: Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
-		require!(to != &Address::zero(), "Can't transfer to default address 0x0!");
-		require!(to != &self.get_sc_address(), "Can't transfer to this contract!");
+		require!(to != Address::zero(), "Can't transfer to default address 0x0!");
+		require!(to != self.get_sc_address(), "Can't transfer to this contract!");
 
-		require!(&self.get_kitty_owner(kitty_id) == from,
+		require!(self.get_kitty_owner(kitty_id) == from,
 			"Address _from_ is not the owner!");
 
 		require!(self.get_kitty_owner(kitty_id) == caller ||
 			self.get_approved_address(kitty_id) == caller,
 			"You are not the owner of that kitty nor the approved address!");
 
-		self._transfer(from, to, kitty_id);
+		self._transfer(&from, &to, kitty_id);
 
 		Ok(())
 	}
 
 	#[endpoint(tokensOfOwner)]
-	fn tokens_of_owner(&self, address: &Address) -> Vec<u32> {
-		let nr_owned_kitties = self.get_nr_owned_kitties(address);
+	fn tokens_of_owner(&self, address: Address) -> Vec<u32> {
+		let nr_owned_kitties = self.get_nr_owned_kitties(&address);
 		let total_kitties = self.get_total_kitties();
 		let mut kitty_list = Vec::new();
 
@@ -92,7 +92,7 @@ pub trait KittyOwnership {
 				break;
 			}
 
-			if &self.get_kitty_owner(kitty_id) == address {
+			if self.get_kitty_owner(kitty_id) == address {
 				kitty_list.push(kitty_id);
 			}
 		}
@@ -103,11 +103,11 @@ pub trait KittyOwnership {
 	// endpoints - Kitty Breeding
 
 	#[endpoint(approveSiring)]
-	fn approve_siring(&self, kitty_id: u32, address: &Address) -> SCResult<()> {
+	fn approve_siring(&self, kitty_id: u32, address: Address) -> SCResult<()> {
 		require!(self.get_kitty_owner(kitty_id) == self.get_caller(), 
 			"You are not the owner of the kitty!");
 
-		self.set_sire_allowed_address(kitty_id, address);
+		self.set_sire_allowed_address(kitty_id, &address);
 
 		Ok(())
 	}
@@ -196,7 +196,7 @@ pub trait KittyOwnership {
 		}
 
 		// TBD
-		let new_kitty_genes: KittyGenes = 0;
+		let new_kitty_genes = KittyGenes::default();
 
 		// new kitty goes to the owner of the matron
 		let new_kitty_owner = self.get_kitty_owner(matron_id);
