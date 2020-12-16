@@ -1,6 +1,6 @@
 [package]
 name = "elrond-codec"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -12,6 +12,14 @@ documentation = "https://docs.elrond.com/"
 description = "Lightweight binary serializer/deserializer, written especially for Elrond smart contracts"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+
+[features]
+derive = ["elrond-codec-derive"]
+
+[dependencies.elrond-codec-derive]
+path = "../elrond-codec-derive"
+version = "0.3.2"
+optional = true
 
 [dependencies]
 wee_alloc = "0.4"
