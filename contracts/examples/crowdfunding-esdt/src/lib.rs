@@ -3,11 +3,12 @@
 
 imports!();
 
+use elrond_wasm::elrond_codec::*;
 use elrond_wasm::HexCallDataSerializer;
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
 	Successful,
@@ -16,55 +17,13 @@ pub enum Status {
 
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
 pub trait Crowdfunding {
-	#[storage_set("owner")]
-	fn set_owner(&self, address: &Address);
-
-	#[view]
-	#[storage_get("owner")]
-	fn get_owner(&self) -> Address;
-
-	#[storage_set("target")]
-	fn set_target(&self, target: &BigUint);
-
-	#[view]
-	#[storage_get("target")]
-	fn get_target(&self) -> BigUint;
-
-	#[storage_set("esdtBalance")]
-	fn set_esdt_balance(&self, esdt_balance: &BigUint);
-
-	#[view]
-	#[storage_get("esdtBalance")]
-	fn get_esdt_balance(&self) -> BigUint;
-
-	#[storage_set("deadline")]
-	fn set_deadline(&self, deadline: u64);
-
-	#[view]
-	#[storage_get("deadline")]
-	fn get_deadline(&self) -> u64;
-
-	#[storage_set("deposit")]
-	fn set_deposit(&self, donor: &Address, amount: &BigUint);
-
-	#[view]
-	#[storage_get("deposit")]
-	fn get_deposit(&self, donor: &Address) -> BigUint;
-
-	#[storage_set("esdtTokenName")]
-	fn set_cf_esdt_token_name(&self, esdt_token_name: &[u8]);
-
-	#[view]
-	#[storage_get("esdtTokenName")]
-	fn get_cf_esdt_token_name(&self) -> Vec<u8>;
-
 	#[init]
-	fn init(&self, target: &BigUint, deadline: u64, esdt_token_name: &Vec<u8>) {
+	fn init(&self, target: BigUint, deadline: u64, esdt_token_name: BoxedBytes) {
 		let my_address: Address = self.get_caller();
 		self.set_owner(&my_address);
-		self.set_target(target);
+		self.set_target(&target);
 		self.set_deadline(deadline);
-		self.set_cf_esdt_token_name(esdt_token_name);
+		self.set_cf_esdt_token_name(&esdt_token_name);
 	}
 
 	#[endpoint]
@@ -74,7 +33,7 @@ pub trait Crowdfunding {
 		}
 
 		let expected_token_name = self.get_cf_esdt_token_name();
-		let actual_token_name = self.get_esdt_token_name();
+		let actual_token_name = self.get_esdt_token_name_boxed();
 
 		if expected_token_name != actual_token_name {
 			return sc_error!("wrong esdt token");
@@ -147,66 +106,59 @@ pub trait Crowdfunding {
 		}
 	}
 
-	fn pay_esdt(&self, esdt_token_name: &[u8], amount: &BigUint, to: &Address) {
+	fn get_esdt_token_name_boxed(&self) -> BoxedBytes {
+		BoxedBytes::from(self.get_esdt_token_name())
+	}
+
+	fn pay_esdt(&self, esdt_token_name: &BoxedBytes, amount: &BigUint, to: &Address) {
 		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-		serializer.push_argument_bytes(esdt_token_name);
+		serializer.push_argument_bytes(esdt_token_name.as_slice());
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
 	}
-}
 
-use elrond_wasm::elrond_codec::*;
+	// storage
 
-impl Status {
-	pub fn to_u8(&self) -> u8 {
-		match self {
-			Status::FundingPeriod => 0,
-			Status::Successful => 1,
-			Status::Failed => 2,
-		}
-	}
+	#[storage_set("owner")]
+	fn set_owner(&self, address: &Address);
 
-	fn from_u8(v: u8) -> Result<Self, DecodeError> {
-		match v {
-			0 => core::result::Result::Ok(Status::FundingPeriod),
-			1 => core::result::Result::Ok(Status::Successful),
-			2 => core::result::Result::Ok(Status::Failed),
-			_ => core::result::Result::Err(DecodeError::INVALID_VALUE),
-		}
-	}
-}
+	#[view]
+	#[storage_get("owner")]
+	fn get_owner(&self) -> Address;
 
-impl TopEncode for Status {
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.to_u8().top_encode(output)
-	}
+	#[storage_set("target")]
+	fn set_target(&self, target: &BigUint);
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.to_u8().top_encode_or_exit(output, c, exit)
-	}
-}
+	#[view]
+	#[storage_get("target")]
+	fn get_target(&self) -> BigUint;
 
-impl TopDecode for Status {
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-		Status::from_u8(u8::top_decode(input)?)
-	}
+	#[storage_set("esdtBalance")]
+	fn set_esdt_balance(&self, esdt_balance: &BigUint);
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		input: I,
-		c: ExitCtx,
-		exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		match u8::top_decode_or_exit(input, c.clone(), exit) {
-			0 => Status::FundingPeriod,
-			1 => Status::Successful,
-			2 => Status::Failed,
-			_ => exit(c, DecodeError::INVALID_VALUE),
-		}
-	}
+	#[view]
+	#[storage_get("esdtBalance")]
+	fn get_esdt_balance(&self) -> BigUint;
+
+	#[storage_set("deadline")]
+	fn set_deadline(&self, deadline: u64);
+
+	#[view]
+	#[storage_get("deadline")]
+	fn get_deadline(&self) -> u64;
+
+	#[storage_set("deposit")]
+	fn set_deposit(&self, donor: &Address, amount: &BigUint);
+
+	#[view]
+	#[storage_get("deposit")]
+	fn get_deposit(&self, donor: &Address) -> BigUint;
+
+	#[storage_set("esdtTokenName")]
+	fn set_cf_esdt_token_name(&self, esdt_token_name: &BoxedBytes);
+
+	#[view]
+	#[storage_get("esdtTokenName")]
+	fn get_cf_esdt_token_name(&self) -> BoxedBytes;
 }

@@ -17,13 +17,13 @@ pub trait NonFungibleTokens {
 	/// Creates new tokens and sets their ownership to the specified account.
 	/// Only the contract owner may call this function.
 	#[endpoint]
-	fn mint(&self, count: u64, new_token_owner: &Address) -> SCResult<()> {
+	fn mint(&self, count: u64, new_token_owner: Address) -> SCResult<()> {
 		require!(
 			self.get_caller() == self.get_owner(),
 			"Only owner can mint new tokens!"
 		);
 
-		self.perform_mint(count, new_token_owner);
+		self.perform_mint(count, &new_token_owner);
 
 		Ok(())
 	}
@@ -31,14 +31,14 @@ pub trait NonFungibleTokens {
 	/// Approves an account to transfer the token on behalf of its owner.<br>
 	/// Only the owner of the token may call this function.
 	#[endpoint]
-	fn approve(&self, token_id: u64, approved_address: &Address) -> SCResult<()> {
+	fn approve(&self, token_id: u64, approved_address: Address) -> SCResult<()> {
 		require!(token_id < self.get_total_minted(), "Token does not exist!");
 		require!(
 			self.get_caller() == self.get_token_owner(token_id),
 			"Only the token owner can approve!"
 		);
 
-		self.set_approval(token_id, approved_address);
+		self.set_approval(token_id, &approved_address);
 
 		Ok(())
 	}
@@ -54,7 +54,7 @@ pub trait NonFungibleTokens {
 		);
 
 		if !self.approval_is_empty(token_id) {
-			self.perform_revoke_approval(token_id);
+			self.clear_approval(token_id);
 		}
 
 		Ok(())
@@ -62,21 +62,21 @@ pub trait NonFungibleTokens {
 
 	/// Transfer ownership of the token to a new account.
 	#[endpoint]
-	fn transfer(&self, token_id: u64, to: &Address) -> SCResult<()> {
+	fn transfer(&self, token_id: u64, to: Address) -> SCResult<()> {
 		require!(token_id < self.get_total_minted(), "Token does not exist!");
 
 		let caller = self.get_caller();
 		let token_owner = self.get_token_owner(token_id);
 
 		if caller == token_owner {
-			self.perform_transfer(token_id, &token_owner, to);
+			self.perform_transfer(token_id, &token_owner, &to);
 
 			return Ok(());
 		} else if !self.approval_is_empty(token_id) {
 			let approved_address = self.get_approval(token_id);
 
 			if caller == approved_address {
-				self.perform_transfer(token_id, &token_owner, to);
+				self.perform_transfer(token_id, &token_owner, &to);
 
 				return Ok(());
 			}
@@ -101,35 +101,19 @@ pub trait NonFungibleTokens {
 		self.set_token_count(new_token_owner, new_owner_current_total + count);
 	}
 
-	fn perform_revoke_approval(&self, token_id: u64) {
-		// clear at key "''approval|token_id"
-		self.clear_storage_at_key(&["approval".as_bytes(), &token_id.to_be_bytes()]);
-	}
-
 	fn perform_transfer(&self, token_id: u64, from: &Address, to: &Address) {
 		let prev_owner_token_count = self.get_token_count(from);
 		let new_owner_token_count = self.get_token_count(to);
 
 		// new ownership revokes approvals by previous owner
-		self.perform_revoke_approval(token_id);
+		self.clear_approval(token_id);
 
 		self.set_token_count(from, prev_owner_token_count - 1);
 		self.set_token_count(to, new_owner_token_count + 1);
 		self.set_token_owner(token_id, to);
 	}
 
-	// Storage
-
-	/// Constructs the final key from `key_parts` and clears the storage value addressed by it.  
-	fn clear_storage_at_key(&self, key_parts: &[&[u8]]) {
-		let mut final_key = Vec::new();
-
-		for key in key_parts {
-			final_key.extend_from_slice(key);
-		}
-
-		self.storage_store_slice_u8(&final_key, &Vec::new());
-	}
+	// storage
 
 	#[view(contractOwner)]
 	#[storage_get("owner")]
@@ -168,4 +152,7 @@ pub trait NonFungibleTokens {
 
 	#[storage_set("approval")]
 	fn set_approval(&self, token_id: u64, approved_address: &Address);
+
+	#[storage_clear("approval")]
+	fn clear_approval(&self, token_id: u64);
 }
