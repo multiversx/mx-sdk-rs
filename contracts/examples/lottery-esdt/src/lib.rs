@@ -10,7 +10,7 @@ use lottery_info::LotteryInfo;
 use random::Random;
 use status::Status;
 
-use elrond_wasm::CallDataSerializer;
+use elrond_wasm::HexCallDataSerializer;
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
@@ -315,7 +315,7 @@ pub trait Lottery {
 	}
 
 	fn pay_esdt(&self, esdt_token_name: &[u8], amount: &BigUint, to: &Address) {
-		let mut serializer = CallDataSerializer::new(ESDT_TRANSFER_STRING);
+		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
 		serializer.push_argument_bytes(esdt_token_name);
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
 

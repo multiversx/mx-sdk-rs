@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.9.7"
+version = "0.9.8"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
@@ -14,6 +14,10 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [dependencies]
-elrond-codec = { version = "0.3.1", path = "../elrond-codec" }
 wee_alloc = "0.4"
-arrayvec = { version = "0.5.1", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
+arrayvec = { version = "0.5.2", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
+
+[dependencies.elrond-codec]
+version = "0.3.2"
+path = "../elrond-codec"
+features = ["derive"]

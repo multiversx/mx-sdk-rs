@@ -4,6 +4,7 @@ members = [
   "elrond-wasm-debug",
   "elrond-wasm-derive",
   "mandos",
+  "elrond-codec-derive",
 
   "contracts/benchmarks/str-repeat",
 
@@ -18,6 +19,7 @@ members = [
   "contracts/examples/lottery-egld",
   "contracts/examples/lottery-erc20",
   "contracts/examples/lottery-esdt",
+  "contracts/examples/multisig",
   "contracts/examples/non-fungible-tokens",
   "contracts/examples/crypto-kitties/kitty-ownership",
   "contracts/examples/crypto-kitties/kitty-genetic-alg",
@@ -30,6 +32,7 @@ members = [
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
+  "contracts/modules/elrond-wasm-module-users",
 ]
 
 exclude = [
