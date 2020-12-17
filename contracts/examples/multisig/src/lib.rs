@@ -68,6 +68,9 @@ pub trait Multisig {
 	#[storage_set("action_data")]
 	fn set_action_data(&self, action_id: usize, action_data: &Action<BigUint>);
 
+	#[storage_is_empty("action_data")]
+	fn is_empty_action_data(&self, action_id: usize) -> bool;
+
 	#[storage_get("action_signer_ids")]
 	fn get_action_signer_ids(&self, action_id: usize) -> Vec<usize>;
 
@@ -211,6 +214,8 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
+		require!(!self.is_empty_action_data(action_id), "action does not exist");
+
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -227,6 +232,8 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
+		require!(!self.is_empty_action_data(action_id), "action does not exist");
+
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
