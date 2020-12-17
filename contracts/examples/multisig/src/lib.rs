@@ -308,7 +308,7 @@ pub trait Multisig {
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(
-			caller_role.can_propose(),
+			caller_role.can_perform_action(),
 			"only board members and proposers can perform actions"
 		);
 
