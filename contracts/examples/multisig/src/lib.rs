@@ -302,6 +302,24 @@ pub trait Multisig {
 		self.get_action_signer_ids(action_id).len()
 	}
 
+	/// It is possible for board members to lose their role.
+	/// They are not automatically removed from all actions when doing so,
+	/// therefore the contract needs to re-check every time when actions are performed.
+	/// This function is used to validate the signers before performing an action.
+	/// It also makes it easy to check before performing an action.
+	#[view(getActionValidSignerCount)]
+	fn get_action_valid_signer_count(&self, action_id: usize) -> usize {
+		let signer_ids = self.get_action_signer_ids(action_id);
+		signer_ids
+			.iter()
+			.filter(|signer_id| {
+				
+				let signer_role = self.get_user_id_to_role(**signer_id);
+				signer_role.can_sign()
+			})
+			.count()
+	}
+
 	#[endpoint(performAction)]
 	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let caller_address = self.get_caller();
@@ -313,17 +331,7 @@ pub trait Multisig {
 		);
 
 		let quorum = self.get_quorum();
-		let signer_ids = self.get_action_signer_ids(action_id);
-		let valid_signers_count = signer_ids
-			.iter()
-			.filter(|signer_id| {
-				// it is possible for signers to lose their role
-				// they are not automatically removed from all actions when doing so
-				// this the contract needs to re-check every time when actions are performed
-				let signer_role = self.get_user_id_to_role(**signer_id);
-				signer_role.can_sign()
-			})
-			.count();
+		let valid_signers_count = self.get_action_valid_signer_count(action_id);
 		require!(valid_signers_count >= quorum, "quorum has not been reached");
 
 		self.perform_action(action_id)
