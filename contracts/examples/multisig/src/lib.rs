@@ -320,6 +320,13 @@ pub trait Multisig {
 			.count()
 	}
 
+	#[view(quorumReached)]
+	fn quorum_reached(&self, action_id: usize) -> bool {
+		let quorum = self.get_quorum();
+		let valid_signers_count = self.get_action_valid_signer_count(action_id);
+		valid_signers_count >= quorum
+	}
+
 	#[endpoint(performAction)]
 	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let caller_address = self.get_caller();
@@ -329,10 +336,7 @@ pub trait Multisig {
 			caller_role.can_perform_action(),
 			"only board members and proposers can perform actions"
 		);
-
-		let quorum = self.get_quorum();
-		let valid_signers_count = self.get_action_valid_signer_count(action_id);
-		require!(valid_signers_count >= quorum, "quorum has not been reached");
+		require!(self.quorum_reached(action_id), "quorum has not been reached");
 
 		self.perform_action(action_id)
 	}
