@@ -1,0 +1,89 @@
+{
+    "comment": "check that action exists",
+    "steps": [
+        {
+            "step": "scCall",
+            "txId": "processed-action-id-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "sign",
+                "arguments": ["1"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:action does not exist",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "processed-action-id-unsign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "unsign",
+                "arguments": ["1"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:action does not exist",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "huge-action-id-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "sign",
+                "arguments": ["1000"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:action does not exist",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "huge-action-id-unsign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "unsign",
+                "arguments": ["1000"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:action does not exist",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

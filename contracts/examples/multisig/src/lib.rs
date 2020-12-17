@@ -40,6 +40,13 @@ pub trait Multisig {
 	#[storage_set("board_size")]
 	fn set_board_size(&self, board_size: usize);
 
+	#[view(getNumProposers)]
+	#[storage_get("num_proposers")]
+	fn get_num_proposers(&self) -> usize;
+
+	#[storage_set("num_proposers")]
+	fn set_num_proposers(&self, num_proposers: usize);
+
 	#[view(getActionLastIndex)]
 	#[storage_get("action_last_index")]
 	fn get_action_last_index(&self) -> usize;
@@ -61,6 +68,9 @@ pub trait Multisig {
 	#[storage_set("action_data")]
 	fn set_action_data(&self, action_id: usize, action_data: &Action<BigUint>);
 
+	#[storage_is_empty("action_data")]
+	fn is_empty_action_data(&self, action_id: usize) -> bool;
+
 	#[storage_get("action_signer_ids")]
 	fn get_action_signer_ids(&self, action_id: usize) -> Vec<usize>;
 
@@ -69,6 +79,7 @@ pub trait Multisig {
 
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
+		require!(board.len() > 0, "board cannot be empty on init, no-one would be able to propose");
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
 		self.set_quorum(quorum);
 
@@ -203,6 +214,8 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
+		require!(!self.is_empty_action_data(action_id), "action does not exist");
+
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -219,6 +232,8 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
+		require!(!self.is_empty_action_data(action_id), "action does not exist");
+
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -248,7 +263,7 @@ pub trait Multisig {
 	/// - remove user (board member / proposer)
 	/// - reactivate removed user
 	/// - convert between board member and proposer
-	/// Will keep the board size in sync.
+	/// Will keep the board size and proposer count in sync.
 	fn change_user_role(&self, user_address: Address, new_role: UserRole) {
 		let user_id = self.users_module().get_or_create_user(&user_address);
 		let old_role = if user_id == 0 {
@@ -257,6 +272,8 @@ pub trait Multisig {
 			self.get_user_id_to_role(user_id)
 		};
 		self.set_user_id_to_role(user_id, new_role);
+
+		// update board size
 		if old_role == UserRole::BoardMember {
 			if new_role != UserRole::BoardMember {
 				self.set_board_size(self.get_board_size() - 1);
@@ -264,6 +281,17 @@ pub trait Multisig {
 		} else {
 			if new_role == UserRole::BoardMember {
 				self.set_board_size(self.get_board_size() + 1);
+			}
+		}
+
+		// update num_proposers
+		if old_role == UserRole::Proposer {
+			if new_role != UserRole::Proposer {
+				self.set_num_proposers(self.get_num_proposers() - 1);
+			}
+		} else {
+			if new_role == UserRole::Proposer {
+				self.set_num_proposers(self.get_num_proposers() + 1);
 			}
 		}
 	}
@@ -287,7 +315,7 @@ pub trait Multisig {
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(
-			caller_role.can_propose(),
+			caller_role.can_perform_action(),
 			"only board members and proposers can perform actions"
 		);
 
@@ -321,6 +349,16 @@ pub trait Multisig {
 			},
 			Action::RemoveUser(user_address) => {
 				self.change_user_role(user_address, UserRole::None);
+				let board_size = self.get_board_size();
+				let num_proposers = self.get_num_proposers();
+				require!(
+					board_size + num_proposers > 0,
+					"cannot remove all board members and proposers"
+				);
+				require!(
+					self.get_quorum() <= board_size,
+					"quorum cannot exceed board size"
+				);
 			},
 			Action::ChangeQuorum(new_quorum) => {
 				require!(

@@ -152,7 +152,6 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''lotteryExists|u32:12|''lottery_name": "u8:1",
                         "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:0|u64:123,456|u32:1|u32:2|u8:75|u8:25|u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5|u32:5|u32:2|u16:500|u32:0",
                         "''erc20_contract_address": "address:the_erc20_contract",
                         "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
