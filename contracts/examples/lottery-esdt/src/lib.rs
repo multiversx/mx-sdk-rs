@@ -151,7 +151,9 @@ pub trait Lottery {
 	}
 
 	#[endpoint]
+	#[payable] // TODO: #[payable_esdt] syntax
 	fn buy_ticket(&self, lottery_name: BoxedBytes) -> SCResult<()> {
+		require!(self.get_call_value_big_uint() == 0, "EGLD payment not accepted");
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
 			Status::Running => self.update_after_buy_ticket(&lottery_name),
