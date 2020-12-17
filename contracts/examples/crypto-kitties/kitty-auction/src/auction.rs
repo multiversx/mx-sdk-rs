@@ -9,13 +9,13 @@ pub enum AuctionType {
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Auction<BigUint: BigUintApi> {
-    auction_type: AuctionType,
-    starting_price: BigUint,
-    ending_price: BigUint,
-    deadline: u64,
-    kitty_owner: Address,
-    current_bid: BigUint,
-    current_winner: Address
+    pub auction_type: AuctionType,
+    pub starting_price: BigUint,
+    pub ending_price: BigUint,
+    pub deadline: u64,
+    pub kitty_owner: Address,
+    pub current_bid: BigUint,
+    pub current_winner: Address
 }
 
 impl<BigUint: BigUintApi> Auction<BigUint> {
