@@ -51,6 +51,10 @@ impl Kitty {
 	pub fn get_meow_power(&self) -> u8 {
 		self.genes.meow_power
 	}
+
+	pub fn is_pregnant(&self) -> bool {
+		self.siring_with_id != 0
+	}
 }
 
 // The default Kitty, which is not a valid kitty. Used for Kitty with ID 0
