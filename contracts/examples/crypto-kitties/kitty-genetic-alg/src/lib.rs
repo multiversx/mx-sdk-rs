@@ -2,7 +2,7 @@
 
 imports!();
 
-use kitty::{Kitty, kitty_genes::*, color::*};
+use kitty::{Kitty, kitty_genes::*};
 use random::Random;
 
 #[elrond_wasm_derive::contract(KittyGeneticAlgImpl)]
