@@ -67,6 +67,7 @@
                         "``user_role|u32:4": "1",
                         "``user_role|u32:5": "2",
                         "``board_size": "4",
+                        "``num_proposers": "1",
                         "``quorum": "2",
                         "``action_last_index": "3",
                         "``pending_action_count": "1",
@@ -177,6 +178,7 @@
                         "``user_role|u32:4": "1",
                         "``user_role|u32:5": "2",
                         "``board_size": "4",
+                        "``num_proposers": "1",
                         "``quorum": "2",
                         "``action_last_index": "3"
                         

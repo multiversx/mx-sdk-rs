@@ -361,7 +361,7 @@ fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutp
 		return TxOutput::from_panic_string(panic_string.as_str());
 	}
 
-	panic!("panic happened: unknown type.")
+	TxOutput::from_panic_string("unknown panic")
 }
 
 /// Some data to get copied for the tx.
