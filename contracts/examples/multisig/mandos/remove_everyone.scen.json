@@ -1,0 +1,94 @@
+{
+    "name": "unjail nodes scenario",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../output/multisig.wasm",
+                "arguments": [
+                    "1",
+                    "address:alice"
+                ],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "rem-alice-prop",
+            "tx": {
+                "from": "address:alice",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "proposeRemoveUser",
+                "arguments": [
+                    "address:alice"
+                ],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["1"],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "rem-alice-sign-alice",
+            "tx": {
+                "from": "address:alice",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "sign",
+                "arguments": ["1"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "rem-alice--perform",
+            "tx": {
+                "from": "address:alice",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "performAction",
+                "arguments": ["1"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:cannot remove all board members and proposers",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
