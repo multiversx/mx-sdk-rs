@@ -343,6 +343,14 @@ pub trait Multisig {
 
 	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let action = self.get_action_data(action_id);
+
+		// clean up storage
+		// happens before actual execution, because the async_call kills contract execution,
+		// so cleanup cannot happen afterwards
+		self.set_action_data(action_id, &Action::Nothing);
+		self.set_action_signer_ids(action_id, &[][..]);
+		self.set_pending_action_count(self.get_pending_action_count() - 1);
+
 		let mut result = Vec::<BoxedBytes>::new();
 		match action {
 			Action::Nothing => {},
@@ -404,10 +412,6 @@ pub trait Multisig {
 			},
 		}
 
-		// clean up storage
-		self.set_action_data(action_id, &Action::Nothing);
-		self.set_action_signer_ids(action_id, &[][..]);
-		self.set_pending_action_count(self.get_pending_action_count() - 1);
 		Ok(result.into())
 	}
 }
