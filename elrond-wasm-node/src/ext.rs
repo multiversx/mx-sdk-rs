@@ -32,7 +32,7 @@ extern {
 		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8) -> i32;
 
 	fn getCaller(resultOffset: *mut u8);
-	fn nonPayableFuncCheck();
+	fn checkNoPayment();
     fn callValue(resultOffset: *const u8) -> i32;
     fn getESDTValue(resultOffset: *const u8) -> usize;
     fn getESDTTokenName(resultOffset: *const u8) -> usize;
@@ -422,7 +422,7 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 	fn check_not_payable(&self) {
 		unsafe {
-			nonPayableFuncCheck();
+			checkNoPayment();
 		}
 	}
 
