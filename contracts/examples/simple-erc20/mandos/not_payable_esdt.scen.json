@@ -1,5 +1,5 @@
 {
-    "name": "not_payable",
+    "name": "not_payable_esdt",
     "steps": [
         {
             "step": "setState",
@@ -27,7 +27,8 @@
             "tx": {
                 "from": "``account_1_____________________s1",
                 "to": "``busd__________________________s1",
-                "value": "0x01",
+                "esdtValue": "0x01",
+                "esdtTokenName": "str:ANY_TOKEN",
                 "function": "totalSupply",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -36,7 +37,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:function does not accept EGLD payment",
+                "message": "str:function does not accept ESDT payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -48,7 +49,8 @@
             "tx": {
                 "from": "``account_1_____________________s1",
                 "to": "``busd__________________________s1",
-                "value": "0x01",
+                "esdtValue": "0x01",
+                "esdtTokenName": "str:ANY_TOKEN",
                 "function": "balanceOf",
                 "arguments": [
                     "``account_1_____________________s1"
@@ -59,7 +61,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:function does not accept EGLD payment",
+                "message": "str:function does not accept ESDT payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -71,7 +73,8 @@
             "tx": {
                 "from": "``account_1_____________________s1",
                 "to": "``busd__________________________s1",
-                "value": "0x01",
+                "esdtValue": "0x01",
+                "esdtTokenName": "str:ANY_TOKEN",
                 "function": "allowance",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -83,7 +86,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:function does not accept EGLD payment",
+                "message": "str:function does not accept ESDT payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -95,7 +98,8 @@
             "tx": {
                 "from": "``account_1_____________________s1",
                 "to": "``busd__________________________s1",
-                "value": "0x01",
+                "esdtValue": "0x01",
+                "esdtTokenName": "str:ANY_TOKEN",
                 "function": "transfer",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -107,7 +111,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:function does not accept EGLD payment",
+                "message": "str:function does not accept ESDT payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -119,7 +123,8 @@
             "tx": {
                 "from": "``account_1_____________________s1",
                 "to": "``busd__________________________s1",
-                "value": "0x01",
+                "esdtValue": "0x01",
+                "esdtTokenName": "str:ANY_TOKEN",
                 "function": "approve",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -131,7 +136,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:function does not accept EGLD payment",
+                "message": "str:function does not accept ESDT payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -143,7 +148,8 @@
             "tx": {
                 "from": "``account_1_____________________s1",
                 "to": "``busd__________________________s1",
-                "value": "0x01",
+                "esdtValue": "0x01",
+                "esdtTokenName": "str:ANY_TOKEN",
                 "function": "transferFrom",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -156,7 +162,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:function does not accept EGLD payment",
+                "message": "str:function does not accept ESDT payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
