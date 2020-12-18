@@ -348,7 +348,7 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		self.tx_input_box.esdt_token_name.clone()
 	}
 
-	fn send_tx(&self, to: &Address, amount: &RustBigUint, _message: &str) {
+	fn send_tx(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		let mut tx_output = self.tx_output_cell.borrow_mut();
 		tx_output.send_balance_list.push(SendBalance {
 			recipient: to.clone(),
