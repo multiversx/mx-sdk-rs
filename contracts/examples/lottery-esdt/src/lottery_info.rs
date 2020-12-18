@@ -1,5 +1,5 @@
 use elrond_wasm::elrond_codec::*;
-use elrond_wasm::{Address, BoxedBytes, BigUintApi, Vec};
+use elrond_wasm::{Address, BigUintApi, BoxedBytes, Vec};
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct LotteryInfo<BigUint: BigUintApi> {
