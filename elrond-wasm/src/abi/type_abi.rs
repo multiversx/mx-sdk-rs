@@ -3,9 +3,20 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-pub enum TypeDescription {
-	Enum,
+pub struct TypeDescription {
+	pub docs: &'static [&'static str],
+	pub name: String,
+	pub contents: TypeContents,
+}
+
+pub enum TypeContents {
+	Enum(Vec<EnumVariantDescription>),
 	Struct,
+}
+
+pub struct EnumVariantDescription {
+	pub docs: &'static [&'static str],
+	pub name: &'static str,
 }
 
 pub trait TypeAbi {
