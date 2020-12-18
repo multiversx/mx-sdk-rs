@@ -174,7 +174,11 @@ pub trait Lottery {
 		return Status::Running;
 	}
 
-	fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes, payment: &BigUint) -> SCResult<()> {
+	fn update_after_buy_ticket(
+		&self,
+		lottery_name: &BoxedBytes,
+		payment: &BigUint,
+	) -> SCResult<()> {
 		let mut info = self.get_lottery_info(&lottery_name);
 		let caller = self.get_caller();
 
@@ -254,7 +258,7 @@ pub trait Lottery {
 						self.send_tx(
 							&winner_address,
 							&prize,
-							"You won the lottery! Congratulations!",
+							b"You won the lottery! Congratulations!",
 						);
 						info.prize_pool -= prize;
 
@@ -321,20 +325,12 @@ pub trait Lottery {
 		&self,
 		lottery_name: &BoxedBytes,
 		user: &Address,
-		nr_entries: u32
+		nr_entries: u32,
 	);
 
 	#[storage_get("numberOfEntriesForUser")]
-	fn get_number_of_entries_for_user(
-		&self,
-		lottery_name: &BoxedBytes,
-		user: &Address,
-	) -> u32;
+	fn get_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address) -> u32;
 
 	#[storage_clear("numberOfEntriesForUser")]
-	fn clear_number_of_entries_for_user(
-		&self, 
-		lottery_name: &BoxedBytes,
-		user: &Address
-	);
+	fn clear_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address);
 }

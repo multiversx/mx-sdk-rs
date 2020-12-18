@@ -273,14 +273,14 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn send_tx(&self, to: &Address, amount: &ArwenBigUint, message: &str) {
+	fn send_tx(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 		unsafe {
 			transferValue(
 				to.as_ref().as_ptr(),
 				amount_bytes32.as_ptr(),
-				message.as_ptr(),
-				message.len() as i32,
+				data.as_ptr(),
+				data.len() as i32,
 			);
 		}
 	}
