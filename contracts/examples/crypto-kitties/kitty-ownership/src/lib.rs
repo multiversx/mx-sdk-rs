@@ -8,9 +8,7 @@ use kitty::{Kitty, kitty_genes::*};
 pub trait GeneScience {
 	#[rustfmt::skip]
 	#[callback(generate_kitty_genes_callback)]
-	fn generateKittyGenes(&self, 
-		matron: Kitty, 
-		sire: Kitty,
+	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty,
 		#[callback_arg] matron_id: u32);
 }
 
@@ -127,7 +125,7 @@ pub trait KittyOwnership {
 	// multiple async-calls and callbacks
 
 	#[endpoint(allowAuctioning)]
-	fn allow_auctioning(&self, kitty_id: u32, by: Address) -> SCResult<()> {
+	fn allow_auctioning(&self, by: Address, kitty_id: u32) -> SCResult<()> {
 		let kitty_auction_addr = self.get_kitty_auction_contract_address();
 
 		require!(self.get_caller() == kitty_auction_addr, 
@@ -148,7 +146,7 @@ pub trait KittyOwnership {
 	// endpoints - Kitty Breeding
 
 	#[endpoint(approveSiring)]
-	fn approve_siring(&self, kitty_id: u32, address: Address) -> SCResult<()> {
+	fn approve_siring(&self, address: Address, kitty_id: u32) -> SCResult<()> {
 		require!(self.get_kitty_owner(kitty_id) == self.get_caller(), 
 			"You are not the owner of the kitty!");
 
@@ -242,8 +240,7 @@ pub trait KittyOwnership {
 	// callbacks
 
 	#[callback]
-	fn generate_kitty_genes_callback(
-		&self,
+	fn generate_kitty_genes_callback(&self,
 		result: AsyncCallResult<KittyGenes>,
 		#[callback_arg] matron_id: u32
 	) {
