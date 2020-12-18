@@ -25,14 +25,18 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 				.collect();
 			let type_docs = extract_doc(ast.attrs.as_slice());
 			quote! {
-				fn type_description() -> elrond_wasm::abi::TypeDescription {
+				fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
 					let mut variant_descriptions = elrond_wasm::Vec::new();
 					#(#enum_variant_snippets)*
-					elrond_wasm::abi::TypeDescription {
-						docs: &[ #(#type_docs),* ],
-						name: Self::type_name(),
-						contents: elrond_wasm::abi::TypeContents::Enum(variant_descriptions),
-					}
+					let type_name = Self::type_name();
+					accumulator.insert(
+						type_name.clone(),
+						elrond_wasm::abi::TypeDescription {
+							docs: &[ #(#type_docs),* ],
+							name: type_name,
+							contents: elrond_wasm::abi::TypeContents::Enum(variant_descriptions),
+						},
+					);
 				}
 			}
 		},

@@ -1,4 +1,4 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescription};
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::*;
 use core::marker::PhantomData;
 use core::ops::Deref;
@@ -141,7 +141,7 @@ where
 		T::output_abis()
 	}
 
-	fn type_description() -> TypeDescription {
-		T::type_description()
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator)
 	}
 }

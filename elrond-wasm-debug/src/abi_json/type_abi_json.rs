@@ -28,16 +28,19 @@ impl From<&TypeDescription> for TypeDescriptionJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
 			content_type: match &abi.contents {
-					TypeContents::NotSpecified => "not_specified",
-					TypeContents::Enum(_) => "enum",
-					TypeContents::Struct => "struct",
-			}.to_string(),
+				TypeContents::NotSpecified => "not_specified",
+				TypeContents::Enum(_) => "enum",
+				TypeContents::Struct => "struct",
+			}
+			.to_string(),
 			enum_variants: Vec::new(),
 		};
 		match &abi.contents {
 			TypeContents::Enum(variants) => {
 				for variant in variants {
-					type_desc_json.enum_variants.push(EnumVariantDescriptionJson::from(variant));
+					type_desc_json
+						.enum_variants
+						.push(EnumVariantDescriptionJson::from(variant));
 				}
 			},
 			_ => {},

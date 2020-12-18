@@ -1,5 +1,5 @@
 use super::sc_error::SCError;
-use crate::abi::{OutputAbi, TypeAbi, TypeDescription};
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::io::finish::EndpointResult;
 use crate::*;
 
@@ -74,8 +74,8 @@ impl<T: TypeAbi> TypeAbi for SCResult<T> {
 		T::output_abis()
 	}
 
-	fn type_description() -> TypeDescription {
-		T::type_description()
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
 	}
 }
 

@@ -20,7 +20,7 @@ impl From<&InputAbi> for InputAbiJson {
 	fn from(abi: &InputAbi) -> Self {
 		InputAbiJson {
 			arg_name: abi.arg_name.to_string(),
-			type_name: abi.type_description.name.clone(),
+			type_name: abi.type_name.clone(),
 		}
 	}
 }
@@ -34,7 +34,7 @@ pub struct OutputAbiJson {
 impl From<&OutputAbi> for OutputAbiJson {
 	fn from(abi: &OutputAbi) -> Self {
 		OutputAbiJson {
-			type_name: abi.type_description.name.clone(),
+			type_name: abi.type_name.clone(),
 		}
 	}
 }
