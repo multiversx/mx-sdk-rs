@@ -116,13 +116,18 @@ pub trait KittyAuction {
 		require!(self.get_block_timestamp() >= auction.deadline || 
 			auction.current_bid == auction.ending_price, "auction has not ended yet!");
 
-		match auction.auction_type {
-			AuctionType::Selling => {
-				self._transfer_to(auction.current_winner, kitty_id);
-			},
-			AuctionType::Siring => {
-				self._approve_siring(auction.current_winner, kitty_id);
+		if auction.current_winner != Address::zero() {
+			match auction.auction_type {
+				AuctionType::Selling => {
+					self._transfer_to(auction.current_winner, kitty_id);
+				},
+				AuctionType::Siring => {
+					self._approve_siring(auction.current_winner, kitty_id);
+				}
 			}
+		}
+		else { // no bids were made
+			self.clear_auction(kitty_id);
 		}
 
 		Ok(())
@@ -161,10 +166,14 @@ pub trait KittyAuction {
 	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
+				let auction = self.get_auction(cb_kitty_id);
 				self.clear_auction(cb_kitty_id);
+
+				// send winning bid money to kitty owner
+				self.send_tx(&auction.kitty_owner, &auction.current_bid, "sold kitty");
 			}
 			AsyncCallResult::Err(_) => {
-				// this can only fail if the kitty_genes contract address is invalid
+				// this can only fail if the kitty_ownership contract address is invalid
 				// nothing to revert in case of error
 			}
 		}
@@ -183,9 +192,10 @@ pub trait KittyAuction {
 				self._transfer_to(auction.kitty_owner, cb_kitty_id);
 
 				// auction data will be cleared in the transfer callback
+				// winning bid money will be sent as well
 			}
 			AsyncCallResult::Err(_) => {
-				// this can only fail if the kitty_genes contract address is invalid
+				// this can only fail if the kitty_ownership contract address is invalid
 				// nothing to revert in case of error
 			}
 		}
