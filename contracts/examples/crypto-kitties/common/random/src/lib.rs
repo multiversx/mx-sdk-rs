@@ -7,6 +7,14 @@ pub struct Random {
 	current_index: usize,
 }
 
+// usually, types should create their own `random` instance,
+// but because standalone types can't create a random seed 
+// (due to no access to blockhain functions),
+// the method will use a provided `random` instance
+pub trait Randomizeable {
+	fn get_random(random: &mut Random) -> Self;
+}
+
 impl Random {
 	pub fn new(seed: [u8; SEED_SIZE]) -> Self {
 		Random {

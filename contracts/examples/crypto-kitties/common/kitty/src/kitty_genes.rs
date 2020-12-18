@@ -1,8 +1,9 @@
 use elrond_wasm::elrond_codec::*;
 
 use super::color::*;
+use random::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
 pub struct KittyGenes {
 	pub fur_color: Color,
 	pub eye_color: Color,
@@ -17,4 +18,14 @@ impl Default for KittyGenes {
 			meow_power: 0
 		}
 	}
+}
+
+impl Randomizeable for KittyGenes {
+    fn get_random(random: &mut Random) -> Self {
+        KittyGenes {
+			fur_color: Color::get_random(random),
+			eye_color: Color::get_random(random),
+			meow_power: random.next_u8()
+		}
+    }
 }

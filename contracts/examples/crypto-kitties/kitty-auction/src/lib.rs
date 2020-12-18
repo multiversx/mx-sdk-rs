@@ -35,6 +35,18 @@ pub trait KittyAuction {
 		self.set_kitty_ownership_contract_address(&kitty_ownership_contract_address);
 	}
 
+	// endpoints - owner-only
+
+	#[endpoint(setKittyOwnershipContractAddress)]
+	fn set_kitty_ownership_contract_address_endpoint(&self, address: Address) -> SCResult<()> {
+		require!(self.get_caller() == self.get_owner_address(), 
+			"Only owner may call this function!");
+
+		self.set_kitty_ownership_contract_address(&address);
+
+		Ok(())
+	}
+
 	// endpoints
 
 	#[endpoint(isUpForAuction)]

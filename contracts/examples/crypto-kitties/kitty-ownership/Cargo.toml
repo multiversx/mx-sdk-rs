@@ -14,6 +14,10 @@ wasm-output-mode = [ "elrond-wasm-node",]
 version = "0.0.0"
 path = "../common/kitty"
 
+[dependencies.random]
+version = "0.0.0"
+path = "../common/random"
+
 [dependencies.elrond-wasm]
 version = "0.9.6"
 path = "../../../../elrond-wasm"

@@ -1,4 +1,7 @@
 use elrond_wasm::elrond_codec::*;
+
+use random::*;
+
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
 pub struct Color {
 	pub r: u8,
@@ -33,4 +36,14 @@ impl Default for Color {
 			b: 0
 		}
 	}
+}
+
+impl Randomizeable for Color {
+    fn get_random(random: &mut Random) -> Self {
+		Color {
+			r: random.next_u8(),
+			g: random.next_u8(),
+			b: random.next_u8()
+		}
+    }
 }
