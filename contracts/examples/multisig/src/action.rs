@@ -10,6 +10,7 @@ pub enum Action<BigUint: BigUintApi> {
 	SendEgld {
 		to: Address,
 		amount: BigUint,
+		data: BoxedBytes,
 	},
 	SCDeploy {
 		amount: BigUint,
@@ -56,10 +57,11 @@ impl<BigUint: BigUintApi> NestedEncode for Action<BigUint> {
 				4u8.dep_encode_or_exit(dest, c.clone(), exit);
 				new_quorum.dep_encode_or_exit(dest, c.clone(), exit);
 			},
-			Action::SendEgld { to, amount } => {
+			Action::SendEgld { to, amount, data } => {
 				5u8.dep_encode_or_exit(dest, c.clone(), exit);
 				to.dep_encode_or_exit(dest, c.clone(), exit);
 				amount.dep_encode_or_exit(dest, c.clone(), exit);
+				data.dep_encode_or_exit(dest, c.clone(), exit);
 			},
 			Action::SCDeploy {
 				amount,
@@ -129,6 +131,7 @@ impl<BigUint: BigUintApi> NestedDecode for Action<BigUint> {
 			5 => Action::SendEgld {
 				to: Address::dep_decode_or_exit(input, c.clone(), exit),
 				amount: BigUint::dep_decode_or_exit(input, c.clone(), exit),
+				data: BoxedBytes::dep_decode_or_exit(input, c.clone(), exit),
 			},
 			6 => Action::SCDeploy {
 				amount: BigUint::dep_decode_or_exit(input, c.clone(), exit),

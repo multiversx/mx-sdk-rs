@@ -407,8 +407,17 @@ pub trait BasicFeatures {
 	// SEND TX
 
 	#[endpoint]
-	fn send_tx_endpoint(&self, to: &Address, amount: &BigUint) {
-		self.send_tx(to, amount, "");
+	fn send_tx_endpoint(
+		&self,
+		to: &Address,
+		amount: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send_tx(to, amount, data);
 	}
 
 	// BLOCK INFO
