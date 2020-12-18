@@ -95,7 +95,7 @@ where
 
 	fn get_esdt_token_name(&self) -> Vec<u8>;
 
-	fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
+	fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
 	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
@@ -360,8 +360,8 @@ macro_rules! sc_try {
 			elrond_wasm::SCResult::Ok(t) => t,
 			elrond_wasm::SCResult::Err(e) => {
 				return elrond_wasm::SCResult::Err(e);
-				},
-			}
+			},
+		}
 	};
 }
 
@@ -387,7 +387,7 @@ macro_rules! require {
 	($expression:expr, $error_msg:expr) => {
 		if (!($expression)) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -413,7 +413,7 @@ macro_rules! only_owner {
 	($trait_self: expr, $error_msg:expr) => {
 		if ($trait_self.get_caller() != $trait_self.get_owner_address()) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -430,9 +430,9 @@ macro_rules! mut_storage (
 macro_rules! non_zero_usize {
 	($input: expr, $error_msg:expr) => {
 		if let Some(nz) = NonZeroUsize::new($input) {
-				nz
+			nz
 		} else {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }

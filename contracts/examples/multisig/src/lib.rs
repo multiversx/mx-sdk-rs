@@ -79,7 +79,10 @@ pub trait Multisig {
 
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
-		require!(board.len() > 0, "board cannot be empty on init, no-one would be able to propose");
+		require!(
+			board.len() > 0,
+			"board cannot be empty on init, no-one would be able to propose"
+		);
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
 		self.set_quorum(quorum);
 
@@ -143,8 +146,17 @@ pub trait Multisig {
 	}
 
 	#[endpoint(proposeSendEgld)]
-	fn propose_send_egld(&self, to: Address, amount: BigUint) -> SCResult<usize> {
-		self.propose_action(Action::SendEgld { to, amount })
+	fn propose_send_egld(
+		&self,
+		to: Address,
+		amount: BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) -> SCResult<usize> {
+		let data = match opt_data {
+			OptionalArg::Some(data) => data,
+			OptionalArg::None => BoxedBytes::empty(),
+		};
+		self.propose_action(Action::SendEgld { to, amount, data })
 	}
 
 	#[endpoint(proposeSCDeploy)]
@@ -214,7 +226,10 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
-		require!(!self.is_empty_action_data(action_id), "action does not exist");
+		require!(
+			!self.is_empty_action_data(action_id),
+			"action does not exist"
+		);
 
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
@@ -232,7 +247,10 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
-		require!(!self.is_empty_action_data(action_id), "action does not exist");
+		require!(
+			!self.is_empty_action_data(action_id),
+			"action does not exist"
+		);
 
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
@@ -320,7 +338,6 @@ pub trait Multisig {
 		signer_ids
 			.iter()
 			.filter(|signer_id| {
-				
 				let signer_role = self.get_user_id_to_role(**signer_id);
 				signer_role.can_sign()
 			})
@@ -343,7 +360,10 @@ pub trait Multisig {
 			caller_role.can_perform_action(),
 			"only board members and proposers can perform actions"
 		);
-		require!(self.quorum_reached(action_id), "quorum has not been reached");
+		require!(
+			self.quorum_reached(action_id),
+			"quorum has not been reached"
+		);
 
 		self.perform_action(action_id)
 	}
@@ -387,8 +407,8 @@ pub trait Multisig {
 				);
 				self.set_quorum(new_quorum)
 			},
-			Action::SendEgld { to, amount } => {
-				self.send_tx(&to, &amount, "");
+			Action::SendEgld { to, amount, data } => {
+				self.send_tx(&to, &amount, data.as_slice());
 			},
 			Action::SCDeploy {
 				amount,

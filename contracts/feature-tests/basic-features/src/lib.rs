@@ -408,7 +408,7 @@ pub trait BasicFeatures {
 
 	#[endpoint]
 	fn send_tx_endpoint(&self, to: &Address, amount: &BigUint) {
-		self.send_tx(to, amount, "");
+		self.send_tx(to, amount, &[]);
 	}
 
 	// BLOCK INFO
