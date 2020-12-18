@@ -8,7 +8,7 @@ pub struct Random {
 }
 
 // usually, types should create their own `random` instance,
-// but because standalone types can't create a random seed 
+// but because standalone types can't create a random seed
 // (due to no access to blockhain functions),
 // the method will use a provided `random` instance
 pub trait Randomizeable {
@@ -34,7 +34,7 @@ impl Random {
 
 	pub fn next_u8(&mut self) -> u8 {
 		let val = self.data[self.current_index];
-		
+
 		self.current_index += 1;
 
 		if self.current_index == SEED_SIZE {
