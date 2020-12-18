@@ -9,15 +9,23 @@ use auction::*;
 pub trait KittyOwnership {
 	#[rustfmt::skip]
 	#[callback(allow_auctioning_callback)]
-	fn allowAuctioning(&self, 
-		kitty_id: u32, 
-		by: Address,
+	fn allowAuctioning(&self, by: Address, kitty_id: u32,
 		#[callback_arg] auction_type: AuctionType,
 		#[callback_arg] cb_kitty_id: u32,
 		#[callback_arg] starting_price: BigUint,
 		#[callback_arg] ending_price: BigUint,
 		#[callback_arg] deadline: u64,
 		#[callback_arg] kitty_owner: Address);
+
+	#[rustfmt::skip]
+	#[callback(transfer_callback)]
+	fn transfer(&self, to: Address, kitty_id: u32, 
+		#[callback_arg] cb_kitty_id: u32);
+
+	#[rustfmt::skip]
+	#[callback(approve_siring_callback)]
+	fn approveSiring(&self, address: Address, kitty_id: u32,
+		#[callback_arg] cb_kitty_id: u32);
 }
 
 #[elrond_wasm_derive::contract(KittyAuctionImpl)]
@@ -45,12 +53,25 @@ pub trait KittyAuction {
 		require!(deadline < self.get_block_timestamp(), 
 			"deadline can't be in the past!");
 
-		let caller = self.get_caller();
+		self._create_auction(AuctionType::Selling, kitty_id, 
+			starting_price, ending_price, deadline);
 
-		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
-		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
-		proxy.allowAuctioning(kitty_id, caller.clone(), AuctionType::Selling,
-			kitty_id, starting_price, ending_price, deadline, caller);
+		Ok(())
+	}
+
+	#[endpoint(createSiringAuction)]
+	fn create_siring_auction(&self, kitty_id: u32, 
+		starting_price: BigUint, ending_price: BigUint, deadline: u64) -> SCResult<()> {
+
+		require!(!self.is_up_for_auction(kitty_id), "kitty already auctioned!");
+		require!(starting_price > 0, "starting price must be higher than 0!");
+		require!(starting_price < ending_price, 
+			"starting price must be less than ending price!");
+		require!(deadline < self.get_block_timestamp(), 
+			"deadline can't be in the past!");
+
+		self._create_auction(AuctionType::Siring, kitty_id, 
+			starting_price, ending_price, deadline);
 
 		Ok(())
 	}
@@ -84,13 +105,33 @@ pub trait KittyAuction {
 		self.set_auction(kitty_id, &auction);
 
 		Ok(())
-	} // TO DO: bidding completion logic
+	}
+
+	#[endpoint(endAuction)]
+	fn end_auction(&self, kitty_id: u32) -> SCResult<()> {
+		require!(self.is_up_for_auction(kitty_id), "kitty is not up for auction!");
+
+		let auction = self.get_auction(kitty_id);
+
+		require!(self.get_block_timestamp() >= auction.deadline || 
+			auction.current_bid == auction.ending_price, "auction has not ended yet!");
+
+		match auction.auction_type {
+			AuctionType::Selling => {
+				self._transfer_to(auction.current_winner, kitty_id);
+			},
+			AuctionType::Siring => {
+				self._approve_siring(auction.current_winner, kitty_id);
+			}
+		}
+
+		Ok(())
+	}
 
 	// callbacks
 
 	#[callback]
-	fn allow_auctioning_callback(
-		&self,
+	fn allow_auctioning_callback(&self, 
 		result: AsyncCallResult<()>,
 		#[callback_arg] auction_type: AuctionType,
 		#[callback_arg] cb_kitty_id: u32,
@@ -111,6 +152,68 @@ pub trait KittyAuction {
 				// nothing to revert in case of error
 			}
 		}
+	}
+
+	#[callback]
+	fn transfer_callback(&self,
+		result: AsyncCallResult<()>,
+		#[callback_arg] cb_kitty_id: u32
+	) {
+		match result {
+			AsyncCallResult::Ok(()) => {
+				self.clear_auction(cb_kitty_id);
+			}
+			AsyncCallResult::Err(_) => {
+				// this can only fail if the kitty_genes contract address is invalid
+				// nothing to revert in case of error
+			}
+		}
+	}
+
+	#[callback]
+	fn approve_siring_callback(&self,
+		result: AsyncCallResult<()>,
+		#[callback_arg] cb_kitty_id: u32
+	) {
+		match result {
+			AsyncCallResult::Ok(()) => {
+				let auction = self.get_auction(cb_kitty_id);
+
+				// transfer kitty back to its owner
+				self._transfer_to(auction.kitty_owner, cb_kitty_id);
+
+				// auction data will be cleared in the transfer callback
+			}
+			AsyncCallResult::Err(_) => {
+				// this can only fail if the kitty_genes contract address is invalid
+				// nothing to revert in case of error
+			}
+		}
+	}
+
+	// private
+
+	fn _create_auction(&self, auction_type: AuctionType, kitty_id: u32, 
+		starting_price: BigUint, ending_price: BigUint, deadline: u64) {
+
+		let caller = self.get_caller();
+
+		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
+		proxy.allowAuctioning(caller.clone(), kitty_id, auction_type,
+			kitty_id, starting_price, ending_price, deadline, caller);
+	}
+
+	fn _transfer_to(&self, address: Address, kitty_id: u32) {
+		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
+		proxy.transfer(address, kitty_id, kitty_id);
+	}
+
+	fn _approve_siring(&self, address: Address, kitty_id: u32) {
+		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
+		proxy.approveSiring(address, kitty_id, kitty_id);
 	}
 
 	// storage
