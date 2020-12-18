@@ -33,12 +33,12 @@ pub trait Multisig {
 	#[storage_set("user_role")]
 	fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
 
-	#[view(getBoardSize)]
-	#[storage_get("board_size")]
-	fn get_board_size(&self) -> usize;
+	#[view(getNumBoardMembers)]
+	#[storage_get("num_board_members")]
+	fn get_num_board_members(&self) -> usize;
 
-	#[storage_set("board_size")]
-	fn set_board_size(&self, board_size: usize);
+	#[storage_set("num_board_members")]
+	fn set_num_board_members(&self, num_board_members: usize);
 
 	#[view(getNumProposers)]
 	#[storage_get("num_proposers")]
@@ -79,7 +79,10 @@ pub trait Multisig {
 
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
-		require!(board.len() > 0, "board cannot be empty on init, no-one would be able to propose");
+		require!(
+			board.len() > 0,
+			"board cannot be empty on init, no-one would be able to propose"
+		);
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
 		self.set_quorum(quorum);
 
@@ -90,7 +93,7 @@ pub trait Multisig {
 			self.set_user_id_to_role(user_id, UserRole::BoardMember);
 		}
 		self.users_module().set_num_users(board.len());
-		self.set_board_size(board.len());
+		self.set_num_board_members(board.len());
 
 		Ok(())
 	}
@@ -143,8 +146,17 @@ pub trait Multisig {
 	}
 
 	#[endpoint(proposeSendEgld)]
-	fn propose_send_egld(&self, to: Address, amount: BigUint) -> SCResult<usize> {
-		self.propose_action(Action::SendEgld { to, amount })
+	fn propose_send_egld(
+		&self,
+		to: Address,
+		amount: BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) -> SCResult<usize> {
+		let data = match opt_data {
+			OptionalArg::Some(data) => data,
+			OptionalArg::None => BoxedBytes::empty(),
+		};
+		self.propose_action(Action::SendEgld { to, amount, data })
 	}
 
 	#[endpoint(proposeSCDeploy)]
@@ -214,7 +226,10 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
-		require!(!self.is_empty_action_data(action_id), "action does not exist");
+		require!(
+			!self.is_empty_action_data(action_id),
+			"action does not exist"
+		);
 
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
@@ -232,7 +247,10 @@ pub trait Multisig {
 
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
-		require!(!self.is_empty_action_data(action_id), "action does not exist");
+		require!(
+			!self.is_empty_action_data(action_id),
+			"action does not exist"
+		);
 
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
@@ -276,11 +294,11 @@ pub trait Multisig {
 		// update board size
 		if old_role == UserRole::BoardMember {
 			if new_role != UserRole::BoardMember {
-				self.set_board_size(self.get_board_size() - 1);
+				self.set_num_board_members(self.get_num_board_members() - 1);
 			}
 		} else {
 			if new_role == UserRole::BoardMember {
-				self.set_board_size(self.get_board_size() + 1);
+				self.set_num_board_members(self.get_num_board_members() + 1);
 			}
 		}
 
@@ -309,6 +327,30 @@ pub trait Multisig {
 		self.get_action_signer_ids(action_id).len()
 	}
 
+	/// It is possible for board members to lose their role.
+	/// They are not automatically removed from all actions when doing so,
+	/// therefore the contract needs to re-check every time when actions are performed.
+	/// This function is used to validate the signers before performing an action.
+	/// It also makes it easy to check before performing an action.
+	#[view(getActionValidSignerCount)]
+	fn get_action_valid_signer_count(&self, action_id: usize) -> usize {
+		let signer_ids = self.get_action_signer_ids(action_id);
+		signer_ids
+			.iter()
+			.filter(|signer_id| {
+				let signer_role = self.get_user_id_to_role(**signer_id);
+				signer_role.can_sign()
+			})
+			.count()
+	}
+
+	#[view(quorumReached)]
+	fn quorum_reached(&self, action_id: usize) -> bool {
+		let quorum = self.get_quorum();
+		let valid_signers_count = self.get_action_valid_signer_count(action_id);
+		valid_signers_count >= quorum
+	}
+
 	#[endpoint(performAction)]
 	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let caller_address = self.get_caller();
@@ -318,26 +360,24 @@ pub trait Multisig {
 			caller_role.can_perform_action(),
 			"only board members and proposers can perform actions"
 		);
-
-		let quorum = self.get_quorum();
-		let signer_ids = self.get_action_signer_ids(action_id);
-		let valid_signers_count = signer_ids
-			.iter()
-			.filter(|signer_id| {
-				// it is possible for signers to lose their role
-				// they are not automatically removed from all actions when doing so
-				// this the contract needs to re-check every time when actions are performed
-				let signer_role = self.get_user_id_to_role(**signer_id);
-				signer_role.can_sign()
-			})
-			.count();
-		require!(valid_signers_count >= quorum, "quorum has not been reached");
+		require!(
+			self.quorum_reached(action_id),
+			"quorum has not been reached"
+		);
 
 		self.perform_action(action_id)
 	}
 
 	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let action = self.get_action_data(action_id);
+
+		// clean up storage
+		// happens before actual execution, because the async_call kills contract execution,
+		// so cleanup cannot happen afterwards
+		self.set_action_data(action_id, &Action::Nothing);
+		self.set_action_signer_ids(action_id, &[][..]);
+		self.set_pending_action_count(self.get_pending_action_count() - 1);
+
 		let mut result = Vec::<BoxedBytes>::new();
 		match action {
 			Action::Nothing => {},
@@ -349,26 +389,26 @@ pub trait Multisig {
 			},
 			Action::RemoveUser(user_address) => {
 				self.change_user_role(user_address, UserRole::None);
-				let board_size = self.get_board_size();
+				let num_board_members = self.get_num_board_members();
 				let num_proposers = self.get_num_proposers();
 				require!(
-					board_size + num_proposers > 0,
+					num_board_members + num_proposers > 0,
 					"cannot remove all board members and proposers"
 				);
 				require!(
-					self.get_quorum() <= board_size,
+					self.get_quorum() <= num_board_members,
 					"quorum cannot exceed board size"
 				);
 			},
 			Action::ChangeQuorum(new_quorum) => {
 				require!(
-					new_quorum <= self.get_board_size(),
+					new_quorum <= self.get_num_board_members(),
 					"quorum cannot exceed board size"
 				);
 				self.set_quorum(new_quorum)
 			},
-			Action::SendEgld { to, amount } => {
-				self.send_tx(&to, &amount, "");
+			Action::SendEgld { to, amount, data } => {
+				self.send_tx(&to, &amount, data.as_slice());
 			},
 			Action::SCDeploy {
 				amount,
@@ -399,10 +439,6 @@ pub trait Multisig {
 			},
 		}
 
-		// clean up storage
-		self.set_action_data(action_id, &Action::Nothing);
-		self.set_action_signer_ids(action_id, &[][..]);
-		self.set_pending_action_count(self.get_pending_action_count() - 1);
 		Ok(result.into())
 	}
 }

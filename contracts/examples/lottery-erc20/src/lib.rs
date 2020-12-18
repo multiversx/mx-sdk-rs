@@ -425,22 +425,14 @@ pub trait Lottery {
 		&self,
 		lottery_name: &BoxedBytes,
 		user: &Address,
-		nr_entries: u32
+		nr_entries: u32,
 	);
 
 	#[storage_get("numberOfEntriesForUser")]
-	fn get_number_of_entries_for_user(
-		&self,
-		lottery_name: &BoxedBytes,
-		user: &Address,
-	) -> u32;
+	fn get_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address) -> u32;
 
 	#[storage_clear("numberOfEntriesForUser")]
-	fn clear_number_of_entries_for_user(
-		&self, 
-		lottery_name: &BoxedBytes,
-		user: &Address
-	);
+	fn clear_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address);
 
 	#[storage_set("erc20_contract_address")]
 	fn set_erc20_contract_address(&self, address: &Address);

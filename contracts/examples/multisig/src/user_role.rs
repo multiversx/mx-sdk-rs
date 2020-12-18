@@ -22,7 +22,7 @@ impl UserRole {
 
 	pub fn can_sign(&self) -> bool {
 		match *self {
-			UserRole::BoardMember  => true,
+			UserRole::BoardMember => true,
 			_ => false,
 		}
 	}

@@ -96,7 +96,7 @@ where
 
 	fn get_esdt_token_name(&self) -> Vec<u8>;
 
-	fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
+	fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
 	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
