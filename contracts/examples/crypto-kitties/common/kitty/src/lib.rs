@@ -25,6 +25,23 @@ pub struct Kitty {
 }
 
 impl Kitty {
+	pub fn new(genes: &KittyGenes, birth_time: u64, 
+		matron_id: u32, sire_id: u32, generation: u16) -> Self {
+		
+		Kitty {
+			genes: genes.clone(),
+			birth_time,
+			cooldown_end: 0,
+			matron_id,
+			sire_id,
+			siring_with_id: 0,
+			nr_children: 0,
+			generation
+		}
+	}
+}
+
+impl Kitty {
     pub fn get_next_cooldown_time(&self) -> u64 {
 		let tiredness = self.nr_children + self.generation / 2;
         if tiredness > MAX_TIREDNESS {

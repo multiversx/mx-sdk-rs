@@ -24,6 +24,7 @@ members = [
   "contracts/examples/crypto-kitties/kitty-ownership",
   "contracts/examples/crypto-kitties/kitty-genetic-alg",
   "contracts/examples/crypto-kitties/kitty-auction",
+  "contracts/examples/crypto-kitties/kitty-minting",
   
   "contracts/feature-tests/async",
   "contracts/feature-tests/async/async-alice",
