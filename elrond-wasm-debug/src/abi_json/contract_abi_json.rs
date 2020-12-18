@@ -26,20 +26,18 @@ impl From<&ContractAbi> for ContractAbiJson {
 			types: BTreeMap::new(),
 		};
 		for endpoint in &abi.endpoints {
-			contract_json.endpoints.push(EndpointAbiJson::from(endpoint));
-			for input in &endpoint.inputs {
-				if input.type_description.contents.is_specified() {
-					let type_desc_json = TypeDescriptionJson::from(&input.type_description);
-					contract_json.types.insert(input.type_description.name.clone(), type_desc_json);
-				}
+			contract_json
+				.endpoints
+				.push(EndpointAbiJson::from(endpoint));
+		}
+		for (type_name, type_description) in abi.type_descriptions.0.iter() {
+			if type_description.contents.is_specified() {
+				contract_json.types.insert(
+					type_name.clone(),
+					TypeDescriptionJson::from(type_description),
+				);
 			}
-			for output in &endpoint.outputs {
-				if output.type_description.contents.is_specified() {
-					let type_desc_json = TypeDescriptionJson::from(&output.type_description);
-					contract_json.types.insert(output.type_description.name.clone(), type_desc_json);
-				}
-			}
-		};
+		}
 		contract_json
 	}
 }

@@ -3,35 +3,6 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-#[derive(Clone, Debug)]
-pub struct TypeDescription {
-	pub docs: &'static [&'static str],
-	pub name: String,
-	pub contents: TypeContents,
-}
-
-#[derive(Clone, Debug)]
-pub enum TypeContents {
-	NotSpecified,
-	Enum(Vec<EnumVariantDescription>),
-	Struct,
-}
-
-impl TypeContents {
-	pub fn is_specified(&self) -> bool {
-		match *self {
-			TypeContents::NotSpecified => false,
-			_ => true,
-		}
-	}
-}
-
-#[derive(Clone, Debug)]
-pub struct EnumVariantDescription {
-	pub docs: &'static [&'static str],
-	pub name: &'static str,
-}
-
 pub trait TypeAbi {
 	fn type_name() -> String {
 		core::any::type_name::<Self>().into()
@@ -40,18 +11,26 @@ pub trait TypeAbi {
 	fn output_abis() -> Vec<OutputAbi> {
 		let mut result = Vec::with_capacity(1);
 		result.push(OutputAbi {
-			type_description: Self::type_description(),
+			type_name: Self::type_name(),
 			variable_num: false,
 		});
 		result
 	}
 
-	fn type_description() -> TypeDescription {
-		TypeDescription {
-			docs: &[],
-			name: Self::type_name(),
-			contents: TypeContents::NotSpecified,
-		}
+	/// A type can provide more than its own description.
+	/// For instance, a struct can also provide the descriptions of the type of its fields.
+	/// TypeAbi doesn't care for the exact accumulator type,
+	/// which is abstracted by the TypeDescriptionContainer trait.
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		let type_name = Self::type_name();
+		accumulator.insert(
+			type_name.clone(),
+			TypeDescription {
+				docs: &[],
+				name: Self::type_name(),
+				contents: TypeContents::NotSpecified,
+			},
+		);
 	}
 }
 
@@ -70,8 +49,8 @@ impl<T: TypeAbi> TypeAbi for &T {
 		T::output_abis()
 	}
 
-	fn type_description() -> TypeDescription {
-		T::type_description()
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
 	}
 }
 
@@ -84,15 +63,19 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
 		T::output_abis()
 	}
 
-	fn type_description() -> TypeDescription {
-		T::type_description()
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
 	}
 }
 
 impl<T: TypeAbi> TypeAbi for &[T] {
 	fn type_name() -> String {
+		let t_name = T::type_name();
+		if t_name == "u8" {
+			return "bytes".into();
+		}
 		let mut repr = String::from("List<");
-		repr.push_str(T::type_name().as_str());
+		repr.push_str(t_name.as_str());
 		repr.push('>');
 		repr
 	}
@@ -115,6 +98,9 @@ macro_rules! type_abi_name_only {
 		impl TypeAbi for $ty {
 			fn type_name() -> String {
 				String::from($name)
+			}
+
+			fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {
 			}
 		}
 	};
@@ -162,6 +148,12 @@ macro_rules! tuple_impls {
 					repr.push(')');
 					repr
 				}
+
+				fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+					$(
+						$name::provide_type_descriptions(accumulator);
+                    )+
+				}
             }
         )+
     }
@@ -197,6 +189,10 @@ macro_rules! array_impls {
 					repr.push_str(stringify!($n));
 					repr.push(']');
 					repr
+				}
+
+				fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+					T::provide_type_descriptions(accumulator);
 				}
 			}
         )+

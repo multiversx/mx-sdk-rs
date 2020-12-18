@@ -29,7 +29,8 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 							let arg_name = &arg.pat;
 							let arg_name_str = quote! { #arg_name }.to_string();
 							Some(quote! {
-								endpoint.add_input::<#arg_type>(#arg_name_str);
+								endpoint_abi.add_input::<#arg_type>(#arg_name_str);
+								contract_abi.add_type_descriptions::<#arg_type>();
 							})
 						}
 					})
@@ -41,13 +42,14 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 						let mut res_type = ty.clone();
 						clear_all_type_lifetimes(&mut res_type);
 						quote! {
-							endpoint.add_output::<#res_type>();
+							endpoint_abi.add_output::<#res_type>();
+							contract_abi.add_type_descriptions::<#res_type>();
 						}
 					},
 				};
 
 				Some(quote! {
-					let mut endpoint = elrond_wasm::abi::EndpointAbi{
+					let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
 						docs: &[ #(#endpoint_docs),* ],
 						name: #endpoint_name_str,
 						payable: #payable,
@@ -56,13 +58,13 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 					};
 					#(#input_snippets)*
 					#output_snippet
-					abi.endpoints.push(endpoint);
+					contract_abi.endpoints.push(endpoint_abi);
 				})
 			} else if let MethodMetadata::Module { .. } = &m.metadata {
 				let method_name = &m.name;
 				Some(quote! {
 					if include_modules {
-						abi.coalesce(self.#method_name().abi(false));
+						contract_abi.coalesce(self.#method_name().abi(false));
 					}
 				})
 			} else {
@@ -74,12 +76,13 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 	let contract_docs = &contract.docs;
 	let contract_name = &contract.trait_name.to_string();
 	quote! {
-		let mut abi = elrond_wasm::abi::ContractAbi{
+		let mut contract_abi = elrond_wasm::abi::ContractAbi{
 			docs: &[ #(#contract_docs),* ],
 			name: #contract_name,
 			endpoints: Vec::new(),
+			type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),
 		};
 		#(#endpoint_snippets)*
-		abi
+		contract_abi
 	}
 }
