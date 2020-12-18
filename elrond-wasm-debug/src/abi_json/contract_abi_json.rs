@@ -14,80 +14,33 @@ pub struct ContractAbiJson {
 	pub docs: Vec<String>,
 	pub name: String,
 	pub endpoints: Vec<EndpointAbiJson>,
+	pub types: BTreeMap<String, TypeDescriptionJson>,
 }
 
 impl From<&ContractAbi> for ContractAbiJson {
 	fn from(abi: &ContractAbi) -> Self {
-		ContractAbiJson {
+		let mut contract_json = ContractAbiJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
-			endpoints: abi
-				.endpoints
-				.iter()
-				.map(|e| EndpointAbiJson::from(e))
-				.collect(),
-		}
-	}
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct InputAbiJson {
-	#[serde(rename = "name")]
-	pub arg_name: String,
-	#[serde(rename = "type")]
-	pub type_name: String,
-}
-
-impl From<&InputAbi> for InputAbiJson {
-	fn from(abi: &InputAbi) -> Self {
-		InputAbiJson {
-			arg_name: abi.arg_name.to_string(),
-			type_name: abi.type_name.clone(),
-		}
-	}
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct OutputAbiJson {
-	#[serde(rename = "type")]
-	pub type_name: String,
-}
-
-impl From<&OutputAbi> for OutputAbiJson {
-	fn from(abi: &OutputAbi) -> Self {
-		OutputAbiJson {
-			type_name: abi.type_name.clone(),
-		}
-	}
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct EndpointAbiJson {
-	#[serde(skip_serializing_if = "Vec::is_empty")]
-	pub docs: Vec<String>,
-	pub name: String,
-	pub payable: bool,
-	pub inputs: Vec<InputAbiJson>,
-	pub outputs: Vec<OutputAbiJson>,
-}
-
-impl From<&EndpointAbi> for EndpointAbiJson {
-	fn from(abi: &EndpointAbi) -> Self {
-		EndpointAbiJson {
-			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
-			name: abi.name.to_string(),
-			payable: abi.payable,
-			inputs: abi
-				.inputs
-				.iter()
-				.map(|input| InputAbiJson::from(input))
-				.collect(),
-			outputs: abi
-				.outputs
-				.iter()
-				.map(|output| OutputAbiJson::from(output))
-				.collect(),
-		}
+			endpoints: Vec::new(),
+			types: BTreeMap::new(),
+		};
+		for endpoint in &abi.endpoints {
+			contract_json.endpoints.push(EndpointAbiJson::from(endpoint));
+			for input in &endpoint.inputs {
+				if input.type_description.contents.is_specified() {
+					let type_desc_json = TypeDescriptionJson::from(&input.type_description);
+					contract_json.types.insert(input.type_description.name.clone(), type_desc_json);
+				}
+			}
+			for output in &endpoint.outputs {
+				if output.type_description.contents.is_specified() {
+					let type_desc_json = TypeDescriptionJson::from(&output.type_description);
+					contract_json.types.insert(output.type_description.name.clone(), type_desc_json);
+				}
+			}
+		};
+		contract_json
 	}
 }
 

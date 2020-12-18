@@ -74,7 +74,7 @@ impl<T: TypeAbi> TypeAbi for SCResult<T> {
 		T::output_abis()
 	}
 
-	fn type_description() -> Option<TypeDescription> {
+	fn type_description() -> TypeDescription {
 		T::type_description()
 	}
 }
