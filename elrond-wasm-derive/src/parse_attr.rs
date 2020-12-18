@@ -95,8 +95,8 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
 					message_slice = &message_slice[1..];
 				}
 
-				// also unescape escaped double quotes
-				message_slice.replace("\\\"", "\"")
+				// also unescape escaped single and double quotes
+				message_slice.replace("\\\"", "\"").replace("\\'", "'")
 			} else {
 				panic!("malformed doc attribute");
 			}

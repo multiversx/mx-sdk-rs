@@ -3,17 +3,30 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+#[derive(Clone, Debug)]
 pub struct TypeDescription {
 	pub docs: &'static [&'static str],
 	pub name: String,
 	pub contents: TypeContents,
 }
 
+#[derive(Clone, Debug)]
 pub enum TypeContents {
+	NotSpecified,
 	Enum(Vec<EnumVariantDescription>),
 	Struct,
 }
 
+impl TypeContents {
+	pub fn is_specified(&self) -> bool {
+		match *self {
+			TypeContents::NotSpecified => false,
+			_ => true,
+		}
+	}
+}
+
+#[derive(Clone, Debug)]
 pub struct EnumVariantDescription {
 	pub docs: &'static [&'static str],
 	pub name: &'static str,
@@ -27,14 +40,18 @@ pub trait TypeAbi {
 	fn output_abis() -> Vec<OutputAbi> {
 		let mut result = Vec::with_capacity(1);
 		result.push(OutputAbi {
-			type_name: Self::type_name(),
+			type_description: Self::type_description(),
 			variable_num: false,
 		});
 		result
 	}
 
-	fn type_description() -> Option<TypeDescription> {
-		None
+	fn type_description() -> TypeDescription {
+		TypeDescription {
+			docs: &[],
+			name: Self::type_name(),
+			contents: TypeContents::NotSpecified,
+		}
 	}
 }
 
@@ -53,7 +70,7 @@ impl<T: TypeAbi> TypeAbi for &T {
 		T::output_abis()
 	}
 
-	fn type_description() -> Option<TypeDescription> {
+	fn type_description() -> TypeDescription {
 		T::type_description()
 	}
 }
@@ -67,7 +84,7 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
 		T::output_abis()
 	}
 
-	fn type_description() -> Option<TypeDescription> {
+	fn type_description() -> TypeDescription {
 		T::type_description()
 	}
 }
