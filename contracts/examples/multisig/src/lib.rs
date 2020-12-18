@@ -33,12 +33,12 @@ pub trait Multisig {
 	#[storage_set("user_role")]
 	fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
 
-	#[view(getBoardSize)]
-	#[storage_get("board_size")]
-	fn get_board_size(&self) -> usize;
+	#[view(getNumBoardMembers)]
+	#[storage_get("num_board_members")]
+	fn get_num_board_members(&self) -> usize;
 
-	#[storage_set("board_size")]
-	fn set_board_size(&self, board_size: usize);
+	#[storage_set("num_board_members")]
+	fn set_num_board_members(&self, num_board_members: usize);
 
 	#[view(getNumProposers)]
 	#[storage_get("num_proposers")]
@@ -90,7 +90,7 @@ pub trait Multisig {
 			self.set_user_id_to_role(user_id, UserRole::BoardMember);
 		}
 		self.users_module().set_num_users(board.len());
-		self.set_board_size(board.len());
+		self.set_num_board_members(board.len());
 
 		Ok(())
 	}
@@ -276,11 +276,11 @@ pub trait Multisig {
 		// update board size
 		if old_role == UserRole::BoardMember {
 			if new_role != UserRole::BoardMember {
-				self.set_board_size(self.get_board_size() - 1);
+				self.set_num_board_members(self.get_num_board_members() - 1);
 			}
 		} else {
 			if new_role == UserRole::BoardMember {
-				self.set_board_size(self.get_board_size() + 1);
+				self.set_num_board_members(self.get_num_board_members() + 1);
 			}
 		}
 
@@ -361,20 +361,20 @@ pub trait Multisig {
 			},
 			Action::RemoveUser(user_address) => {
 				self.change_user_role(user_address, UserRole::None);
-				let board_size = self.get_board_size();
+				let num_board_members = self.get_num_board_members();
 				let num_proposers = self.get_num_proposers();
 				require!(
-					board_size + num_proposers > 0,
+					num_board_members + num_proposers > 0,
 					"cannot remove all board members and proposers"
 				);
 				require!(
-					self.get_quorum() <= board_size,
+					self.get_quorum() <= num_board_members,
 					"quorum cannot exceed board size"
 				);
 			},
 			Action::ChangeQuorum(new_quorum) => {
 				require!(
-					new_quorum <= self.get_board_size(),
+					new_quorum <= self.get_num_board_members(),
 					"quorum cannot exceed board size"
 				);
 				self.set_quorum(new_quorum)
