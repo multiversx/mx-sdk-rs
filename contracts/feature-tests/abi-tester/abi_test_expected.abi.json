@@ -61,10 +61,49 @@
                 },
                 {
                     "name": "_var_args",
-                    "type": "VarArgs<MultiArg<i32,i32,>>"
+                    "type": "VarArgs<MultiArg<OnlyShowsUpAsNested4,i32,>>",
+                    "multi_arg": true
                 }
             ],
             "outputs": []
+        },
+        {
+            "name": "multi_result_vec",
+            "payable": false,
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "MultiResultVec<OnlyShowsUpAsNested5>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "optional_arg",
+            "payable": false,
+            "inputs": [
+                {
+                    "name": "_simple_arg",
+                    "type": "u32"
+                },
+                {
+                    "name": "_opt_args",
+                    "type": "OptionalArg<OnlyShowsUpAsNested6>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "optional_result",
+            "payable": false,
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OptionalResult<OnlyShowsUpAsNested7>",
+                    "multi_result": true
+                }
+            ]
         }
     ],
     "types": {
@@ -123,6 +162,54 @@
             ]
         },
         "OnlyShowsUpAsNested3": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested4": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested5": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested6": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested7": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
