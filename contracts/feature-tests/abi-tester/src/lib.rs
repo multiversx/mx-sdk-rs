@@ -6,6 +6,11 @@ mod abi_test_type;
 
 use abi_test_type::*;
 
+/// Contract whose sole purpose is to verify that
+/// the ABI generation framework works sa expected.
+/// 
+/// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
+/// including Rust docs.
 #[elrond_wasm_derive::contract(AbiTesterImpl)]
 pub trait AbiTester {
 	#[endpoint]
