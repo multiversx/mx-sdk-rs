@@ -100,8 +100,7 @@ macro_rules! type_abi_name_only {
 				String::from($name)
 			}
 
-			fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {
-			}
+			fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
 		}
 	};
 }

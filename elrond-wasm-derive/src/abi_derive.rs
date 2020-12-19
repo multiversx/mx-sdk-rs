@@ -3,10 +3,61 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn;
 
+fn struct_field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
+	let field_docs = extract_doc(field.attrs.as_slice());
+	let field_name_str = if let Some(ident) = &field.ident {
+		ident.to_string()
+	} else {
+		index.to_string()
+	};
+	let field_ty = &field.ty;
+	quote! {
+		field_descriptions.push(elrond_wasm::abi::StructFieldDescription {
+			docs: &[ #(#field_docs),* ],
+			name: #field_name_str,
+			field_type: <#field_ty>::type_name(),
+		});
+		<#field_ty>::provide_type_descriptions(accumulator);
+	}
+}
+
 pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
+	let type_docs = extract_doc(ast.attrs.as_slice());
 	let type_description_impl = match &ast.data {
-		syn::Data::Struct(_) => {
-			quote! {}
+		syn::Data::Struct(data_struct) => {
+			let struct_field_snippets: Vec<proc_macro2::TokenStream> = match &data_struct.fields {
+				syn::Fields::Named(fields_named) => fields_named
+					.named
+					.iter()
+					.enumerate()
+					.map(|(index, field)| struct_field_snippet(index, field))
+					.collect(),
+				syn::Fields::Unnamed(fields_unnamed) => fields_unnamed
+					.unnamed
+					.iter()
+					.enumerate()
+					.map(|(index, field)| struct_field_snippet(index, field))
+					.collect(),
+				syn::Fields::Unit => Vec::new(),
+			};
+
+			quote! {
+				fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+					let type_name = Self::type_name();
+					if !accumulator.contains_type(&type_name) {
+						let mut field_descriptions = elrond_wasm::Vec::new();
+						#(#struct_field_snippets)*
+						accumulator.insert(
+							type_name.clone(),
+							elrond_wasm::abi::TypeDescription {
+								docs: &[ #(#type_docs),* ],
+								name: type_name,
+								contents: elrond_wasm::abi::TypeContents::Struct(field_descriptions),
+							},
+						);
+					}
+				}
+			}
 		},
 		syn::Data::Enum(data_enum) => {
 			let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
@@ -23,20 +74,21 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 					}
 				})
 				.collect();
-			let type_docs = extract_doc(ast.attrs.as_slice());
 			quote! {
 				fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-					let mut variant_descriptions = elrond_wasm::Vec::new();
-					#(#enum_variant_snippets)*
 					let type_name = Self::type_name();
-					accumulator.insert(
-						type_name.clone(),
-						elrond_wasm::abi::TypeDescription {
-							docs: &[ #(#type_docs),* ],
-							name: type_name,
-							contents: elrond_wasm::abi::TypeContents::Enum(variant_descriptions),
-						},
-					);
+					if !accumulator.contains_type(&type_name) {
+						let mut variant_descriptions = elrond_wasm::Vec::new();
+						#(#enum_variant_snippets)*
+						accumulator.insert(
+							type_name.clone(),
+							elrond_wasm::abi::TypeDescription {
+								docs: &[ #(#type_docs),* ],
+								name: type_name,
+								contents: elrond_wasm::abi::TypeContents::Enum(variant_descriptions),
+							},
+						);
+					}
 				}
 			}
 		},
