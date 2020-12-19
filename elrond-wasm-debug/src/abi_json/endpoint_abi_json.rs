@@ -14,6 +14,9 @@ pub struct InputAbiJson {
 	pub arg_name: String,
 	#[serde(rename = "type")]
 	pub type_name: String,
+	/// Bool that is only serialized when true
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub multi_arg: Option<bool>,
 }
 
 impl From<&InputAbi> for InputAbiJson {
@@ -21,6 +24,7 @@ impl From<&InputAbi> for InputAbiJson {
 		InputAbiJson {
 			arg_name: abi.arg_name.to_string(),
 			type_name: abi.type_name.clone(),
+			multi_arg: if abi.multi_arg { Some(true) } else { None },
 		}
 	}
 }
@@ -29,12 +33,16 @@ impl From<&InputAbi> for InputAbiJson {
 pub struct OutputAbiJson {
 	#[serde(rename = "type")]
 	pub type_name: String,
+	/// Bool that is only serialized when true
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub multi_result: Option<bool>,
 }
 
 impl From<&OutputAbi> for OutputAbiJson {
 	fn from(abi: &OutputAbi) -> Self {
 		OutputAbiJson {
 			type_name: abi.type_name.clone(),
+			multi_result: if abi.multi_result { Some(true) } else { None },
 		}
 	}
 }

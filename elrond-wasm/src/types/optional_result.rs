@@ -1,4 +1,4 @@
-use crate::abi::TypeAbi;
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::{BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, EndpointResult};
 use alloc::string::String;
 
@@ -37,5 +37,13 @@ impl<T: TypeAbi> TypeAbi for OptionalResult<T> {
 		repr.push_str(T::type_name().as_str());
 		repr.push('>');
 		repr
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
+	}
+
+	fn is_multi_arg_or_result() -> bool {
+		true
 	}
 }

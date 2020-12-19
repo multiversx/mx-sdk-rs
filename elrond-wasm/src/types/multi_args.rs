@@ -1,4 +1,4 @@
-use crate::abi::TypeAbi;
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::io::{ArgId, DynArg, DynArgInput};
 use alloc::string::String;
 use elrond_codec::TopDecodeInput;
@@ -35,6 +35,16 @@ macro_rules! multi_arg_impls {
                     )+
                     repr.push('>');
                     repr
+                }
+
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+					$(
+						$name::provide_type_descriptions(accumulator);
+                    )+
+                }
+
+                fn is_multi_arg_or_result() -> bool {
+                    true
                 }
             }
 

@@ -24,6 +24,11 @@ pub trait TypeAbi {
 		);
 	}
 
+	#[doc(hidden)]
+	fn is_multi_arg_or_result() -> bool {
+		false
+	}
+
 	/// Method that provides output ABIs directly.
 	/// All types should return a single output, since Rust only allows for single method results
 	/// (even if it is a multi-output, live MultiResultVec),
@@ -35,7 +40,7 @@ pub trait TypeAbi {
 		let mut result = Vec::with_capacity(1);
 		result.push(OutputAbi {
 			type_name: Self::type_name(),
-			variable_num: false,
+			multi_result: Self::is_multi_arg_or_result(),
 		});
 		result
 	}

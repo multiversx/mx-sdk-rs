@@ -43,6 +43,10 @@ macro_rules! multi_result_impls {
                     )+
                 }
 
+                fn is_multi_arg_or_result() -> bool {
+                    true
+                }
+
                 fn output_abis() -> Vec<OutputAbi> {
                     let mut result = Vec::new();
                     $(

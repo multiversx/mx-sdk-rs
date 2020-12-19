@@ -6,13 +6,13 @@ use alloc::vec::Vec;
 pub struct InputAbi {
 	pub arg_name: &'static str,
 	pub type_name: String,
-	pub variable_num: bool,
+	pub multi_arg: bool,
 }
 
 #[derive(Clone, Debug)]
 pub struct OutputAbi {
 	pub type_name: String,
-	pub variable_num: bool,
+	pub multi_result: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -29,7 +29,7 @@ impl EndpointAbi {
 		self.inputs.push(InputAbi {
 			arg_name,
 			type_name: T::type_name(),
-			variable_num: false,
+			multi_arg: T::is_multi_arg_or_result(),
 		});
 	}
 

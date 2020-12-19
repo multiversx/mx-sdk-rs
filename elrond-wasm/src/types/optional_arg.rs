@@ -1,4 +1,4 @@
-use crate::abi::TypeAbi;
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::io::{ArgId, DynArg, DynArgInput};
 use alloc::string::String;
 use elrond_codec::TopDecodeInput;
@@ -49,5 +49,13 @@ impl<T: TypeAbi> TypeAbi for OptionalArg<T> {
 		repr.push_str(T::type_name().as_str());
 		repr.push('>');
 		repr
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
+	}
+
+	fn is_multi_arg_or_result() -> bool {
+		true
 	}
 }

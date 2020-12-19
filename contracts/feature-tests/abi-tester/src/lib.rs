@@ -30,5 +30,28 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
-	fn var_args(&self, _simple_arg: u32, #[var_args] _var_args: VarArgs<MultiArg2<i32, i32>>) {}
+	fn var_args(
+		&self,
+		_simple_arg: u32,
+		#[var_args] _var_args: VarArgs<MultiArg2<OnlyShowsUpAsNested4, i32>>,
+	) {
+	}
+
+	#[endpoint]
+	fn multi_result_vec(&self) -> MultiResultVec<OnlyShowsUpAsNested5> {
+		MultiResultVec::new()
+	}
+
+	#[endpoint]
+	fn optional_arg(
+		&self,
+		_simple_arg: u32,
+		#[var_args] _opt_args: OptionalArg<OnlyShowsUpAsNested6>,
+	) {
+	}
+
+	#[endpoint]
+	fn optional_result(&self) -> OptionalResult<OnlyShowsUpAsNested7> {
+		OptionalResult::None
+	}
 }
