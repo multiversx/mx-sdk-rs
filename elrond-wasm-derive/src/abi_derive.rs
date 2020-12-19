@@ -48,6 +48,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 				fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
 					let type_name = Self::type_name();
 					if !accumulator.contains_type(&type_name) {
+						accumulator.reserve_type_name(type_name.clone());
 						let mut field_descriptions = elrond_wasm::Vec::new();
 						#(#struct_field_snippets)*
 						accumulator.insert(
@@ -85,6 +86,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 				fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
 					let type_name = Self::type_name();
 					if !accumulator.contains_type(&type_name) {
+						accumulator.reserve_type_name(type_name.clone());
 						let mut variant_descriptions = elrond_wasm::Vec::new();
 						#(#enum_variant_snippets)*
 						accumulator.insert(
