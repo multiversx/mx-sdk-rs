@@ -1,4 +1,6 @@
 use core::ops::{BitOr, BitOrAssign};
+use alloc::string::String;
+use crate::abi::TypeAbi;
 use elrond_codec::*;
 
 /// Flags concerning smart contract creation and upgrade.
@@ -139,6 +141,12 @@ impl TopDecode for CodeMetadata {
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
 		top_decode_from_nested_or_exit(input, c, exit)
+	}
+}
+
+impl TypeAbi for CodeMetadata {
+	fn type_name() -> String {
+		"CodeMetadata".into()
 	}
 }
 
