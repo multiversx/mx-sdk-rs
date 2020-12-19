@@ -1,0 +1,16 @@
+[package]
+name = "abi-tester-abi"
+version = "0.0.0"
+authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
+edition = "2018"
+
+[dependencies.abi-tester]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.9.8"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.9.8"
+path = "../../../../elrond-wasm-debug"
