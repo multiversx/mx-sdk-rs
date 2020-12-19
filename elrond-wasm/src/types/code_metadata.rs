@@ -1,6 +1,6 @@
-use core::ops::{BitOr, BitOrAssign};
-use alloc::string::String;
 use crate::abi::TypeAbi;
+use alloc::string::String;
+use core::ops::{BitOr, BitOrAssign};
 use elrond_codec::*;
 
 /// Flags concerning smart contract creation and upgrade.
