@@ -1,10 +1,10 @@
 [package]
-name = "basic-features-abi"
+name = "factorial-abi"
 version = "0.0.0"
 authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
 edition = "2018"
 
-[dependencies.basic-features]
+[dependencies.factorial]
 path = ".."
 
 [dependencies.elrond-wasm]

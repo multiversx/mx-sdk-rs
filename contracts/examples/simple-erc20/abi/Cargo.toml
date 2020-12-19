@@ -1,10 +1,10 @@
 [package]
-name = "basic-features-abi"
+name = "simple-erc20-abi"
 version = "0.0.0"
 authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
 edition = "2018"
 
-[dependencies.basic-features]
+[dependencies.simple-erc20]
 path = ".."
 
 [dependencies.elrond-wasm]

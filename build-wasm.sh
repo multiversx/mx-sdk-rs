@@ -2,7 +2,7 @@
 
 # helper script for checking that all contracts and debug projects compile
 
-### EXAMPLES ###
+### BUILD ALL CONTRACTS ###
 
 erdpy --verbose contract build "contracts/benchmarks/str-repeat"
 erdpy --verbose contract build "contracts/examples/adder"
@@ -20,3 +20,19 @@ erdpy --verbose contract build "contracts/feature-tests/basic-features"
 erdpy --verbose contract build "contracts/feature-tests/async/async-alice"
 erdpy --verbose contract build "contracts/feature-tests/async/async-bob"
 erdpy --verbose contract build "contracts/feature-tests/use-module"
+
+### CREATE ALL ABIs ###
+
+./abi.sh "contracts/examples/adder"
+./abi.sh "contracts/examples/crowdfunding-egld"
+./abi.sh "contracts/examples/crowdfunding-erc20"
+./abi.sh "contracts/examples/crowdfunding-esdt"
+./abi.sh "contracts/examples/crypto-bubbles"
+./abi.sh "contracts/examples/factorial"
+./abi.sh "contracts/examples/lottery-egld"
+./abi.sh "contracts/examples/lottery-erc20"
+./abi.sh "contracts/examples/lottery-esdt"
+./abi.sh "contracts/examples/multisig"
+./abi.sh "contracts/examples/simple-erc20"
+./abi.sh "contracts/feature-tests/basic-features"
+./abi.sh "contracts/feature-tests/use-module"

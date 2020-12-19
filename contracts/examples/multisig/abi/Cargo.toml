@@ -1,10 +1,10 @@
 [package]
-name = "basic-features-abi"
+name = "multisig-abi"
 version = "0.0.0"
 authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
 edition = "2018"
 
-[dependencies.basic-features]
+[dependencies.multisig]
 path = ".."
 
 [dependencies.elrond-wasm]
