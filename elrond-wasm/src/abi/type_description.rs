@@ -12,7 +12,7 @@ pub struct TypeDescription {
 pub enum TypeContents {
 	NotSpecified,
 	Enum(Vec<EnumVariantDescription>),
-	Struct,
+	Struct(Vec<StructFieldDescription>),
 }
 
 impl TypeContents {
@@ -28,4 +28,11 @@ impl TypeContents {
 pub struct EnumVariantDescription {
 	pub docs: &'static [&'static str],
 	pub name: &'static str,
+}
+
+#[derive(Clone, Debug)]
+pub struct StructFieldDescription {
+	pub docs: &'static [&'static str],
+	pub name: &'static str,
+	pub field_type: String,
 }
