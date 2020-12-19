@@ -1,6 +1,7 @@
-use crate::abi::TypeAbi;
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::{BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, EndpointResult};
 use alloc::string::String;
+use alloc::vec::Vec;
 
 macro_rules! multi_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
@@ -34,6 +35,20 @@ macro_rules! multi_result_impls {
                     )+
                     repr.push('>');
                     repr
+                }
+
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+					$(
+						$name::provide_type_descriptions(accumulator);
+                    )+
+                }
+
+                fn output_abis() -> Vec<OutputAbi> {
+                    let mut result = Vec::new();
+                    $(
+                        result.append(&mut $name::output_abis());
+                    )+
+                    result
                 }
             }
 

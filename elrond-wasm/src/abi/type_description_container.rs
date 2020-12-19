@@ -7,6 +7,12 @@ pub trait TypeDescriptionContainer {
 
 	fn contains_type(&self, type_name: &str) -> bool;
 
+	// A placeholder gets inserted while computing field descriptions for a type,
+	// to avoid an infinite loop for recursive types (if the same type appears again lower in the tree).
+	fn reserve_type_name(&mut self, type_name: String) {
+		self.insert(type_name, TypeDescription::PLACEHOLDER);
+	}
+
 	fn insert(&mut self, type_name: String, type_description: TypeDescription);
 
 	fn insert_all(&mut self, other: &Self);

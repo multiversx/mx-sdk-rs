@@ -70,6 +70,10 @@ impl<T: TypeAbi> TypeAbi for SCResult<T> {
 		T::type_name()
 	}
 
+	/// Gives `SCResult<()>` the possibility to produce 0 output ABIs,
+	/// just like `()`.
+	/// It is also possible to have `SCResult<MultiResultX<...>>`,
+	/// so this gives the MultiResult to dissolve into its multiple output ABIs.
 	fn output_abis() -> Vec<OutputAbi> {
 		T::output_abis()
 	}

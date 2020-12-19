@@ -1,4 +1,4 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::*;
 use core::marker::PhantomData;
 use core::ops::Deref;
@@ -135,10 +135,6 @@ where
 {
 	fn type_name() -> String {
 		T::type_name()
-	}
-
-	fn output_abis() -> Vec<OutputAbi> {
-		T::output_abis()
 	}
 
 	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
