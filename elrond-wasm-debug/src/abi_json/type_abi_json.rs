@@ -82,6 +82,8 @@ pub struct EnumVariantDescriptionJson {
 	#[serde(skip_serializing_if = "Vec::is_empty")]
 	pub docs: Vec<String>,
 	pub name: String,
+	#[serde(skip_serializing_if = "Vec::is_empty")]
+	pub fields: Vec<StructFieldDescriptionJson>,
 }
 
 impl From<&EnumVariantDescription> for EnumVariantDescriptionJson {
@@ -89,6 +91,11 @@ impl From<&EnumVariantDescription> for EnumVariantDescriptionJson {
 		EnumVariantDescriptionJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
+			fields: abi
+				.fields
+				.iter()
+				.map(|field| StructFieldDescriptionJson::from(field))
+				.collect(),
 		}
 	}
 }

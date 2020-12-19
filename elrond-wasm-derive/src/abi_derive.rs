@@ -3,7 +3,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn;
 
-fn struct_field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
+fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
 	let field_docs = extract_doc(field.attrs.as_slice());
 	let field_name_str = if let Some(ident) = &field.ident {
 		ident.to_string()
@@ -21,26 +21,29 @@ fn struct_field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenS
 	}
 }
 
+fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+	match fields {
+		syn::Fields::Named(fields_named) => fields_named
+			.named
+			.iter()
+			.enumerate()
+			.map(|(index, field)| field_snippet(index, field))
+			.collect(),
+		syn::Fields::Unnamed(fields_unnamed) => fields_unnamed
+			.unnamed
+			.iter()
+			.enumerate()
+			.map(|(index, field)| field_snippet(index, field))
+			.collect(),
+		syn::Fields::Unit => Vec::new(),
+	}
+}
+
 pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 	let type_docs = extract_doc(ast.attrs.as_slice());
 	let type_description_impl = match &ast.data {
 		syn::Data::Struct(data_struct) => {
-			let struct_field_snippets: Vec<proc_macro2::TokenStream> = match &data_struct.fields {
-				syn::Fields::Named(fields_named) => fields_named
-					.named
-					.iter()
-					.enumerate()
-					.map(|(index, field)| struct_field_snippet(index, field))
-					.collect(),
-				syn::Fields::Unnamed(fields_unnamed) => fields_unnamed
-					.unnamed
-					.iter()
-					.enumerate()
-					.map(|(index, field)| struct_field_snippet(index, field))
-					.collect(),
-				syn::Fields::Unit => Vec::new(),
-			};
-
+			let struct_field_snippets = fields_snippets(&data_struct.fields);
 			quote! {
 				fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
 					let type_name = Self::type_name();
@@ -63,13 +66,17 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 			let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
 				.variants
 				.iter()
-				.map(|v| {
-					let variant_docs = extract_doc(v.attrs.as_slice());
-					let variant_name_str = v.ident.to_string();
+				.map(|variant| {
+					let variant_docs = extract_doc(variant.attrs.as_slice());
+					let variant_name_str = variant.ident.to_string();
+					let variant_field_snippets = fields_snippets(&variant.fields);
 					quote! {
+						let mut field_descriptions = elrond_wasm::Vec::new();
+						#(#variant_field_snippets)*
 						variant_descriptions.push(elrond_wasm::abi::EnumVariantDescription {
 							docs: &[ #(#variant_docs),* ],
-							name: #variant_name_str
+							name: #variant_name_str,
+							fields: field_descriptions,
 						});
 					}
 				})

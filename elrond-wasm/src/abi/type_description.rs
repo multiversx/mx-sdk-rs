@@ -28,6 +28,7 @@ impl TypeContents {
 pub struct EnumVariantDescription {
 	pub docs: &'static [&'static str],
 	pub name: &'static str,
+	pub fields: Vec<StructFieldDescription>,
 }
 
 #[derive(Clone, Debug)]
