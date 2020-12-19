@@ -1,5 +1,5 @@
-use simple_erc20::*;
 use elrond_wasm_debug::*;
+use simple_erc20::*;
 
 fn main() {
 	let contract = SimpleErc20TokenImpl::new(TxContext::dummy());
