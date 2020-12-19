@@ -1,0 +1,86 @@
+{
+    "name": "AbiTester",
+    "endpoints": [
+        {
+            "name": "echo_abi_test_type",
+            "payable": false,
+            "inputs": [
+                {
+                    "name": "att",
+                    "type": "AbiTestType"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "AbiTestType"
+                }
+            ]
+        },
+        {
+            "name": "multi_result_3",
+            "payable": false,
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "MultiResult<i32,[u8; 3],bytes,>"
+                }
+            ]
+        }
+    ],
+    "types": {
+        "AbiTestType": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "docs": [
+                        "This type should only appear here."
+                    ],
+                    "name": "nested",
+                    "type": "OnlyShowsUpAsNested1"
+                },
+                {
+                    "docs": [
+                        "Tests that recursive types will not send the ABI generator into an infinite loop."
+                    ],
+                    "name": "next",
+                    "type": "Option<AbiTestType>"
+                },
+                {
+                    "docs": [
+                        "Tests that tuples tell the ABI of their component types even if they appear nowhere else.",
+                        "Also, just like above, recursive types need to work even when nested into a tuple."
+                    ],
+                    "name": "tuple_madness",
+                    "type": "(OnlyShowsUpAsNested2,Option<AbiTestType>)"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested1": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested2": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        }
+    }
+}

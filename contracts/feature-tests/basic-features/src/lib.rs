@@ -4,13 +4,11 @@
 
 imports!();
 
-mod abi_test_type;
 mod large_boxed_byte_array;
 mod ser_ex1;
 mod ser_ex2;
 mod simple_enum;
 
-use abi_test_type::*;
 use large_boxed_byte_array::LargeBoxedByteArray;
 use ser_ex1::*;
 use ser_ex2::*;
@@ -225,11 +223,6 @@ pub trait BasicFeatures {
 	#[view]
 	fn finish_simple_enum_variant_1(&self) -> SimpleEnum {
 		SimpleEnum::Variant1
-	}
-
-	#[endpoint]
-	fn echo_abi_test_type(&self, att: AbiTestType) -> AbiTestType {
-		att
 	}
 
 	#[view]
