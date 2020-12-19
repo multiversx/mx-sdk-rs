@@ -1,5 +1,5 @@
-use lottery_esdt::*;
 use elrond_wasm_debug::*;
+use lottery_esdt::*;
 
 fn main() {
 	let contract = LotteryImpl::new(TxContext::dummy());

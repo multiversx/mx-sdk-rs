@@ -1,5 +1,5 @@
-use multisig::*;
 use elrond_wasm_debug::*;
+use multisig::*;
 
 fn main() {
 	let contract = MultisigImpl::new(TxContext::dummy());
