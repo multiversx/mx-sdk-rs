@@ -8,11 +8,11 @@ pub fn dep_decode_snippet(_index: usize, field: &syn::Field) -> proc_macro2::Tok
 	let ty = &field.ty;
 	if let Some(ident) = &field.ident {
 		quote! {
-			#ident: <#ty>::dep_decode(input)?
+			#ident: <#ty as elrond_codec::NestedDecode>::dep_decode(input)?
 		}
 	} else {
 		quote! {
-			<#ty>::dep_decode(input)?
+			<#ty as elrond_codec::NestedDecode>::dep_decode(input)?
 		}
 	}
 }
@@ -21,11 +21,11 @@ pub fn dep_decode_or_exit_snippet(_index: usize, field: &syn::Field) -> proc_mac
 	let ty = &field.ty;
 	if let Some(ident) = &field.ident {
 		quote! {
-			#ident: <#ty>::dep_decode_or_exit(input, c.clone(), exit)
+			#ident: <#ty as elrond_codec::NestedDecode>::dep_decode_or_exit(input, c.clone(), exit)
 		}
 	} else {
 		quote! {
-			<#ty>::dep_decode_or_exit(input, c.clone(), exit)
+			<#ty as elrond_codec::NestedDecode>::dep_decode_or_exit(input, c.clone(), exit)
 		}
 	}
 }
