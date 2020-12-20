@@ -3,109 +3,100 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn;
 
+fn dep_encode_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+	quote! {
+		#value.dep_encode(dest)?;
+	}
+}
+
+fn dep_encode_or_exit_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+	quote! {
+		#value.dep_encode_or_exit(dest, c.clone(), exit);
+	}
+}
+
 pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
-	let idents = extract_field_names(&ast.data);
 	let gen = match &ast.data {
-		syn::Data::Struct(_) => {
+		syn::Data::Struct(data_struct) => {
 			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-
-			if idents.len() > 0 {
-				quote! {
-					impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
-						fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
-							#(self.#idents.dep_encode(dest)?;)*
-
-							Ok(())
-						}
-
-						fn dep_encode_or_exit<O: elrond_codec::NestedEncodeOutput, ExitCtx: Clone>(
-							&self,
-							dest: &mut O,
-							c: ExitCtx,
-							exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
-						) {
-							#(self.#idents.dep_encode_or_exit(dest, c.clone(), exit);)*
-						}
+			let field_dep_encode_snippets = fields_snippets(&data_struct.fields, |index, field| {
+				dep_encode_snippet(&self_field_expr(index, field))
+			});
+			let field_dep_encode_or_exit_snippets =
+				fields_snippets(&data_struct.fields, |index, field| {
+					dep_encode_or_exit_snippet(&self_field_expr(index, field))
+				});
+			quote! {
+				impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
+					fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
+						#(#field_dep_encode_snippets)*
+						Result::Ok(())
 					}
-				}
-			} else {
-				let total_fields = match &ast.data {
-					syn::Data::Struct(s) => match &s.fields {
-						syn::Fields::Unnamed(u) => u.unnamed.len(),
-						_ => panic!("only structs with unnamed fields should reach here!"),
-					},
-					_ => panic!("only structs should reach here!"),
-				};
-				let nameless_field_ident = (0..total_fields).map(syn::Index::from);
-				let nameless_field_ident_again = nameless_field_ident.clone();
 
-				quote! {
-					impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
-						fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
-							#(self.#nameless_field_ident.dep_encode(dest)?;)*
-
-							Ok(())
-						}
-
-						fn dep_encode_or_exit<O: elrond_codec::NestedEncodeOutput, ExitCtx: Clone>(
-							&self,
-							dest: &mut O,
-							c: ExitCtx,
-							exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
-						) {
-							#(self.#nameless_field_ident_again.dep_encode_or_exit(dest, c.clone(), exit);)*
-						}
+					fn dep_encode_or_exit<O: elrond_codec::NestedEncodeOutput, ExitCtx: Clone>(
+						&self,
+						dest: &mut O,
+						c: ExitCtx,
+						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
+					) {
+						#(#field_dep_encode_or_exit_snippets)*
 					}
 				}
 			}
 		},
-		syn::Data::Enum(_) => {
-			let types = extract_enum_field_types(&ast.data);
-			let value: Vec<u8> = (0..idents.len() as u8).collect();
-			let mut enum_encode_snippets = Vec::new();
-			let mut enum_encode_or_exit_snippets = Vec::new();
-
-			for i in 0..types.len() {
-				let type_list = &types[i];
-				let ident = &idents[i];
-				let val = &value[i];
-
-				if type_list.is_empty() {
-					enum_encode_snippets.push(quote! {
-						#name::#ident => #val.dep_encode(dest)?,
-					});
-
-					enum_encode_or_exit_snippets.push(quote! {
-						#name::#ident => #val.dep_encode_or_exit(dest, c.clone(), exit),
-					});
-				} else if type_list.len() == 1 {
-					let local_var_ident =
-						syn::Ident::new("_var_enum_local_ident", proc_macro2::Span::call_site());
-
-					enum_encode_snippets.push(quote! {
-						#name::#ident(#local_var_ident) => {
-							#val.dep_encode(dest)?;
-							#local_var_ident.dep_encode(dest)?;
+		syn::Data::Enum(data_enum) => {
+			assert!(
+				data_enum.variants.len() < 256,
+				"enums with more than 256 variants not supported"
+			);
+			let variant_dep_encode_snippets: Vec<proc_macro2::TokenStream> = data_enum
+				.variants
+				.iter()
+				.enumerate()
+				.map(|(variant_index, variant)| {
+					let variant_index_u8 = variant_index as u8;
+					let variant_ident = &variant.ident;
+					let local_var_declarations = match_local_var_declarations(&variant.fields);
+					let variant_field_snippets =
+						fields_snippets(&variant.fields, |index, field| {
+							dep_encode_snippet(&local_variable_for_field(index, field))
+						});
+					quote! {
+						#name::#variant_ident #local_var_declarations => {
+							#variant_index_u8.dep_encode(dest)?;
+							#(#variant_field_snippets)*
 						},
-					});
+					}
+				})
+				.collect();
 
-					enum_encode_or_exit_snippets.push(quote! {
-						#name::#ident(#local_var_ident) => {
-							#val.dep_encode_or_exit(dest, c.clone(), exit);
-							#local_var_ident.dep_encode_or_exit(dest, c.clone(), exit);
+			let variant_dep_encode_or_exit_snippets: Vec<proc_macro2::TokenStream> = data_enum
+				.variants
+				.iter()
+				.enumerate()
+				.map(|(variant_index, variant)| {
+					let variant_index_u8 = variant_index as u8;
+					let variant_ident = &variant.ident;
+					let local_var_declarations = match_local_var_declarations(&variant.fields);
+					let variant_field_snippets =
+						fields_snippets(&variant.fields, |index, field| {
+							dep_encode_or_exit_snippet(&local_variable_for_field(index, field))
+						});
+					quote! {
+						#name::#variant_ident #local_var_declarations => {
+							#variant_index_u8.dep_encode_or_exit(dest, c.clone(), exit);
+							#(#variant_field_snippets)*
 						},
-					});
-				} else {
-					panic!("Only enums with one or less fields supported at the moment!");
-				}
-			}
+					}
+				})
+				.collect();
 
 			quote! {
 				impl NestedEncode for #name {
 					fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
 						match self {
-							#(#enum_encode_snippets)*
+							#(#variant_dep_encode_snippets)*
 						};
 						Ok(())
 					}
@@ -117,7 +108,7 @@ pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 					) {
 						match self {
-							#(#enum_encode_or_exit_snippets)*
+							#(#variant_dep_encode_or_exit_snippets)*
 						};
 					}
 				}
