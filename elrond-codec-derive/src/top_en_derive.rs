@@ -2,10 +2,13 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn;
 
-use crate::nested_en_derive::{dep_encode_snippet, dep_encode_or_exit_snippet};
+use crate::nested_en_derive::{dep_encode_or_exit_snippet, dep_encode_snippet};
 use crate::util::*;
 
-pub fn variant_top_encode_snippets(name: &syn::Ident, data_enum: &syn::DataEnum) -> Vec<proc_macro2::TokenStream> {
+pub fn variant_top_encode_snippets(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
 	data_enum
 		.variants
 		.iter()
@@ -41,7 +44,10 @@ pub fn variant_top_encode_snippets(name: &syn::Ident, data_enum: &syn::DataEnum)
 		.collect()
 }
 
-pub fn variant_top_encode_or_exit_snippets(name: &syn::Ident, data_enum: &syn::DataEnum) -> Vec<proc_macro2::TokenStream> {
+pub fn variant_top_encode_or_exit_snippets(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
 	data_enum
 		.variants
 		.iter()
