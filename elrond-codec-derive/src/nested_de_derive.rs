@@ -122,7 +122,7 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 				}
 			}
 		},
-		syn::Data::Union(_) => panic!("Union not supported!"),
+		syn::Data::Union(_) => panic!("Union not supported"),
 	};
 
 	gen.into()
