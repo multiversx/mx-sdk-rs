@@ -5,13 +5,13 @@ use syn;
 
 fn dep_encode_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 	quote! {
-		#value.dep_encode(dest)?;
+		elrond_codec::NestedEncode::dep_encode(&#value, dest)?;
 	}
 }
 
 fn dep_encode_or_exit_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 	quote! {
-		#value.dep_encode_or_exit(dest, c.clone(), exit);
+		elrond_codec::NestedEncode::dep_encode_or_exit(&#value, dest, c.clone(), exit);
 	}
 }
 
