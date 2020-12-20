@@ -57,7 +57,8 @@ pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 				.map(|(variant_index, variant)| {
 					let variant_index_u8 = variant_index as u8;
 					let variant_ident = &variant.ident;
-					let local_var_declarations = match_local_var_declarations(&variant.fields);
+					let local_var_declarations =
+						fields_decl_syntax(&variant.fields, local_variable_for_field);
 					let variant_field_snippets =
 						fields_snippets(&variant.fields, |index, field| {
 							dep_encode_snippet(&local_variable_for_field(index, field))
@@ -78,7 +79,8 @@ pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 				.map(|(variant_index, variant)| {
 					let variant_index_u8 = variant_index as u8;
 					let variant_ident = &variant.ident;
-					let local_var_declarations = match_local_var_declarations(&variant.fields);
+					let local_var_declarations =
+						fields_decl_syntax(&variant.fields, local_variable_for_field);
 					let variant_field_snippets =
 						fields_snippets(&variant.fields, |index, field| {
 							dep_encode_or_exit_snippet(&local_variable_for_field(index, field))

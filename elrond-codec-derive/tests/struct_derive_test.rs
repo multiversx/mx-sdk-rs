@@ -2,10 +2,10 @@ extern crate elrond_codec_derive;
 use elrond_codec_derive::*;
 
 use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
-use elrond_codec::*;
+// use elrond_codec::*;
 
 // to test, run the following command in elrond-codec-derive folder:
-// cargo expand --test struct_derive_test > expanded.rs
+// cargo expand --test struct_named_fields_test > expanded.rs
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
 pub struct Struct {
@@ -16,25 +16,8 @@ pub struct Struct {
 	pub uint_64: u64,
 }
 
-trait SimpleTrait {
-	fn simple_function(&self);
-}
-
-impl SimpleTrait for Struct {
-	fn simple_function(&self) {}
-}
-
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
-struct StructWithGeneric<ST: SimpleTrait>
-where
-	ST: NestedEncode + NestedDecode + TopEncode + TopDecode,
-{
-	data: u64,
-	trait_stuff: ST,
-}
-
 #[test]
-fn struct_derive_test() {
+fn struct_named_fields_test() {
 	let s = Struct {
 		int: 0x42,
 		seq: vec![0x1, 0x2, 0x3, 0x4, 0x5],
@@ -55,15 +38,4 @@ fn struct_derive_test() {
 
 	check_top_encode_decode(s.clone(), bytes_1);
 	check_dep_encode_decode(s.clone(), bytes_1);
-
-	let s_with_gen = StructWithGeneric {
-		data: 0xfedcab9876543210,
-		trait_stuff: s,
-	};
-
-	let mut bytes_2 = [0xfe, 0xdc, 0xab, 0x98, 0x76, 0x54, 0x32, 0x10].to_vec();
-	bytes_2.extend_from_slice(bytes_1);
-
-	check_top_encode_decode(s_with_gen.clone(), bytes_2.as_slice());
-	check_dep_encode_decode(s_with_gen, bytes_2.as_slice());
 }
