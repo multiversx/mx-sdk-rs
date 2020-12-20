@@ -11,17 +11,17 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 
 			quote! {
-				impl #impl_generics TopDecode for #name #ty_generics #where_clause {
-					fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-						top_decode_from_nested(input)
+				impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
+					fn top_decode<I: elrond_codec::TopDecodeInput>(input: I) -> Result<Self, elrond_codec::DecodeError> {
+						elrond_codec::top_decode_from_nested(input)
 					}
 
-					fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+					fn top_decode_or_exit<I: elrond_codec::TopDecodeInput, ExitCtx: Clone>(
 						input: I,
 						c: ExitCtx,
-						exit: fn(ExitCtx, DecodeError) -> !,
+						exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 					) -> Self {
-						top_decode_from_nested_or_exit(input, c, exit)
+						elrond_codec::top_decode_from_nested_or_exit(input, c, exit)
 					}
 				}
 			}
@@ -36,21 +36,21 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 				quote! {
 					impl TopDecode for #name {
-						fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+						fn top_decode<I: elrond_codec::TopDecodeInput>(input: I) -> Result<Self, elrond_codec::DecodeError> {
 							match u8::top_decode(input)? {
 								#(#value => core::result::Result::Ok(#name_repeated::#idents),)*
-								_ => core::result::Result::Err(DecodeError::INVALID_VALUE),
+								_ => core::result::Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 							}
 						}
 
-						fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+						fn top_decode_or_exit<I: elrond_codec::TopDecodeInput, ExitCtx: Clone>(
 							input: I,
 							c: ExitCtx,
-							exit: fn(ExitCtx, DecodeError) -> !,
+							exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 						) -> Self {
 							match u8::top_decode_or_exit(input, c.clone(), exit) {
 								#(#value_again => #name_repeated_again::#idents,)*
-								_ => exit(c, DecodeError::INVALID_VALUE),
+								_ => exit(c, elrond_codec::DecodeError::INVALID_VALUE),
 							}
 						}
 					}

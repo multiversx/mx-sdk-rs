@@ -18,17 +18,17 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 			if idents.len() > 0 {
 				quote! {
-					impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
-						fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+					impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
+						fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
 							Ok(#name {
 								#(#idents: <#types>::dep_decode(input)?,)*
 							})
 						}
 
-						fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+						fn dep_decode_or_exit<I: elrond_codec::NestedDecodeInput, ExitCtx: Clone>(
 							input: &mut I,
 							c: ExitCtx,
-							exit: fn(ExitCtx, DecodeError) -> !,
+							exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 						) -> Self {
 							#name {
 								#(#idents: <#types>::dep_decode_or_exit(input, c.clone(), exit),)*
@@ -39,16 +39,16 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 			} else {
 				quote! {
 					impl #impl_generics NestedDecode for #name #ty_generics #where_clause {
-						fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+						fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
 							Ok(#name (
 								#(<#types>::dep_decode(input)?),*
 							))
 						}
 
-						fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+						fn dep_decode_or_exit<I: elrond_codec::NestedDecodeInput, ExitCtx: Clone>(
 							input: &mut I,
 							c: ExitCtx,
-							exit: fn(ExitCtx, DecodeError) -> !,
+							exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 						) -> Self {
 							#name (
 								#(<#types>::dep_decode_or_exit(input, c.clone(), exit)),*
@@ -93,8 +93,8 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 			}
 
 			quote! {
-				impl NestedDecode for #name {
-					fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+				impl elrond_codec::NestedDecode for #name {
+					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
 						let return_value = match u8::dep_decode(input)? {
 							#(#enum_decode_snippets)*
 							_ => None
@@ -102,14 +102,14 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 						match return_value {
 							Some(r) => Ok(r),
-							None => Err(DecodeError::INVALID_VALUE)
+							None => Err(elrond_codec::DecodeError::INVALID_VALUE)
 						}
 					}
 
-					fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+					fn dep_decode_or_exit<I: elrond_codec::NestedDecodeInput, ExitCtx: Clone>(
 						input: &mut I,
 						c: ExitCtx,
-						exit: fn(ExitCtx, DecodeError) -> !,
+						exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 					) -> Self {
 						let return_value = match u8::dep_decode_or_exit(input, c.clone(), exit) {
 							#(#enum_decode_or_exit_snippets)*
@@ -118,7 +118,7 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 						match return_value {
 							Some(r) => r,
-							None => exit(c, DecodeError::INVALID_VALUE)
+							None => exit(c, elrond_codec::DecodeError::INVALID_VALUE)
 						}
 					}
 				}

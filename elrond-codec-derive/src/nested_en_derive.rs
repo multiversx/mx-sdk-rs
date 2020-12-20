@@ -12,18 +12,18 @@ pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 			if idents.len() > 0 {
 				quote! {
-					impl #impl_generics NestedEncode for #name #ty_generics #where_clause {
-						fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+					impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
+						fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
 							#(self.#idents.dep_encode(dest)?;)*
 
 							Ok(())
 						}
 
-						fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+						fn dep_encode_or_exit<O: elrond_codec::NestedEncodeOutput, ExitCtx: Clone>(
 							&self,
 							dest: &mut O,
 							c: ExitCtx,
-							exit: fn(ExitCtx, EncodeError) -> !,
+							exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 						) {
 							#(self.#idents.dep_encode_or_exit(dest, c.clone(), exit);)*
 						}
@@ -41,18 +41,18 @@ pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 				let nameless_field_ident_again = nameless_field_ident.clone();
 
 				quote! {
-					impl #impl_generics NestedEncode for #name #ty_generics #where_clause {
-						fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+					impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
+						fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
 							#(self.#nameless_field_ident.dep_encode(dest)?;)*
 
 							Ok(())
 						}
 
-						fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+						fn dep_encode_or_exit<O: elrond_codec::NestedEncodeOutput, ExitCtx: Clone>(
 							&self,
 							dest: &mut O,
 							c: ExitCtx,
-							exit: fn(ExitCtx, EncodeError) -> !,
+							exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 						) {
 							#(self.#nameless_field_ident_again.dep_encode_or_exit(dest, c.clone(), exit);)*
 						}
@@ -103,18 +103,18 @@ pub fn impl_nested_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 			quote! {
 				impl NestedEncode for #name {
-					fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+					fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
 						match self {
 							#(#enum_encode_snippets)*
 						};
 						Ok(())
 					}
 
-					fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+					fn dep_encode_or_exit<O: elrond_codec::NestedEncodeOutput, ExitCtx: Clone>(
 						&self,
 						dest: &mut O,
 						c: ExitCtx,
-						exit: fn(ExitCtx, EncodeError) -> !,
+						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 					) {
 						match self {
 							#(#enum_encode_or_exit_snippets)*
