@@ -11,20 +11,20 @@ pub fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 
 			quote! {
-				impl #impl_generics TopEncode for #name #ty_generics #where_clause {
+				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
 					#[inline]
-					fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-						top_encode_from_nested(self, output)
+					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> Result<(), elrond_codec::EncodeError> {
+						elrond_codec::top_encode_from_nested(self, output)
 					}
 
 					#[inline]
-					fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+					fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
 						&self,
 						output: O,
 						c: ExitCtx,
-						exit: fn(ExitCtx, EncodeError) -> !,
+						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 					) {
-						top_encode_from_nested_or_exit(self, output, c, exit);
+						elrond_codec::top_encode_from_nested_or_exit(self, output, c, exit);
 					}
 				}
 			}
@@ -38,18 +38,18 @@ pub fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 				quote! {
 					impl TopEncode for #name {
-						fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+						fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> Result<(), elrond_codec::EncodeError> {
 							//self.to_u8().top_encode(output)
 							match self {
 								#(#name_repeated::#idents => #value.top_encode(output),)*
 							}
 						}
 
-						fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+						fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
 							&self,
 							output: O,
 							c: ExitCtx,
-							exit: fn(ExitCtx, EncodeError) -> !,
+							exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 						) {
 							match self {
 								#(#name_repeated_again::#idents => #value.top_encode_or_exit(output, c, exit),)*
