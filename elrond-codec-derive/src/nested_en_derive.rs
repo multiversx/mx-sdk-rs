@@ -15,7 +15,10 @@ pub fn dep_encode_or_exit_snippet(value: &proc_macro2::TokenStream) -> proc_macr
 	}
 }
 
-fn variant_dep_encode_snippets(name: &syn::Ident, data_enum: &syn::DataEnum) -> Vec<proc_macro2::TokenStream> {
+fn variant_dep_encode_snippets(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
 	data_enum
 		.variants
 		.iter()
@@ -38,7 +41,10 @@ fn variant_dep_encode_snippets(name: &syn::Ident, data_enum: &syn::DataEnum) -> 
 		.collect()
 }
 
-fn variant_dep_encode_or_exit_snippets(name: &syn::Ident, data_enum: &syn::DataEnum) -> Vec<proc_macro2::TokenStream> {
+fn variant_dep_encode_or_exit_snippets(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
 	data_enum
 		.variants
 		.iter()
