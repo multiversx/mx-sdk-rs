@@ -17,17 +17,6 @@ pub fn extract_field_names(data: &syn::Data) -> Vec<syn::Ident> {
 	}
 }
 
-pub fn extract_struct_field_types(data: &syn::Data) -> Vec<syn::Type> {
-	match data {
-		syn::Data::Struct(s) => match &s.fields {
-			syn::Fields::Named(fields) => fields.named.iter().map(|f| f.ty.clone()).collect(),
-			syn::Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| f.ty.clone()).collect(),
-			syn::Fields::Unit => panic!("unit not supported"),
-		},
-		_ => panic!("only structs supported"),
-	}
-}
-
 pub fn extract_enum_field_types(data: &syn::Data) -> Vec<Vec<syn::Type>> {
 	match data {
 		syn::Data::Enum(e) => e
@@ -58,35 +47,15 @@ pub fn is_simple_enum(data: &syn::Data) -> bool {
 	return true;
 }
 
-pub fn fields_snippets<F>(fields: &syn::Fields, field_snippet: F) -> Vec<proc_macro2::TokenStream>
-where
-	F: Fn(usize, &syn::Field) -> proc_macro2::TokenStream,
-{
-	match fields {
-		syn::Fields::Named(fields_named) => fields_named
-			.named
-			.iter()
-			.enumerate()
-			.map(|(index, field)| field_snippet(index, field))
-			.collect(),
-		syn::Fields::Unnamed(fields_unnamed) => fields_unnamed
-			.unnamed
-			.iter()
-			.enumerate()
-			.map(|(index, field)| field_snippet(index, field))
-			.collect(),
-		syn::Fields::Unit => Vec::new(),
-	}
-}
-
 pub fn self_field_expr(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
 	if let Some(ident) = &field.ident {
 		quote! {
 			self.#ident
 		}
 	} else {
+		let index_lit = proc_macro2::Literal::usize_unsuffixed(index);
 		quote! {
-			self.#index
+			self.#index_lit
 		}
 	}
 }
@@ -105,14 +74,38 @@ pub fn local_variable_for_field(index: usize, field: &syn::Field) -> proc_macro2
 	}
 }
 
-pub fn match_local_var_declarations(fields: &syn::Fields) -> proc_macro2::TokenStream {
+pub fn fields_snippets<F>(fields: &syn::Fields, field_mapper: F) -> Vec<proc_macro2::TokenStream>
+where
+	F: Fn(usize, &syn::Field) -> proc_macro2::TokenStream,
+{
+	match fields {
+		syn::Fields::Named(fields_named) => fields_named
+			.named
+			.iter()
+			.enumerate()
+			.map(|(index, field)| field_mapper(index, field))
+			.collect(),
+		syn::Fields::Unnamed(fields_unnamed) => fields_unnamed
+			.unnamed
+			.iter()
+			.enumerate()
+			.map(|(index, field)| field_mapper(index, field))
+			.collect(),
+		syn::Fields::Unit => Vec::new(),
+	}
+}
+
+pub fn fields_decl_syntax<F>(fields: &syn::Fields, field_mapper: F) -> proc_macro2::TokenStream
+where
+	F: Fn(usize, &syn::Field) -> proc_macro2::TokenStream,
+{
 	match fields {
 		syn::Fields::Named(fields_named) => {
 			let local_variables: Vec<proc_macro2::TokenStream> = fields_named
 				.named
 				.iter()
 				.enumerate()
-				.map(|(index, field)| local_variable_for_field(index, field))
+				.map(|(index, field)| field_mapper(index, field))
 				.collect();
 			quote! {
 				{ #(#local_variables),* }
@@ -123,7 +116,7 @@ pub fn match_local_var_declarations(fields: &syn::Fields) -> proc_macro2::TokenS
 				.unnamed
 				.iter()
 				.enumerate()
-				.map(|(index, field)| local_variable_for_field(index, field))
+				.map(|(index, field)| field_mapper(index, field))
 				.collect();
 			quote! {
 				( #(#local_variables),* )
