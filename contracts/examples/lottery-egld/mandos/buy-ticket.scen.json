@@ -52,7 +52,7 @@
                         "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
                         "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc1": "1"
                     },
-                    "code": "file:../output/lottery.wasm"
+                    "code": "file:../output/lottery-egld.wasm"
                 }
             }
         }
