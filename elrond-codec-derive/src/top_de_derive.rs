@@ -50,32 +50,29 @@ fn zero_value_if_result_ok(
 	}
 	let first_variant = &data_enum.variants[0];
 	if first_variant.fields.is_empty() {
-		quote!{
+		quote! {
 			if top_input.byte_len() == 0 {
 				return Result::Ok(#name::#first_variant);
 			}
 		}
 	} else {
-		quote!{}
+		quote! {}
 	}
 }
 
-fn zero_value_if(
-	name: &syn::Ident,
-	data_enum: &syn::DataEnum,
-) -> proc_macro2::TokenStream {
+fn zero_value_if(name: &syn::Ident, data_enum: &syn::DataEnum) -> proc_macro2::TokenStream {
 	if data_enum.variants.is_empty() {
 		panic!("cannot deserialize enums without variants");
 	}
 	let first_variant = &data_enum.variants[0];
 	if first_variant.fields.is_empty() {
-		quote!{
+		quote! {
 			if top_input.byte_len() == 0 {
 				return #name::#first_variant;
 			}
 		}
 	} else {
-		quote!{}
+		quote! {}
 	}
 }
 
