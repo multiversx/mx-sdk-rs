@@ -64,7 +64,7 @@ fn parse_execute_mandos_steps(
 						new_address.new_address.value.into(),
 					)
 				}
-				if let Some(block_info_obj) = previous_block_info {
+				if let Some(block_info_obj) = &**previous_block_info {
 					if let Some(u64_value) = &block_info_obj.block_timestamp {
 						state.previous_block_info.block_timestamp = u64_value.value;
 					}
@@ -78,7 +78,7 @@ fn parse_execute_mandos_steps(
 						state.previous_block_info.block_round = u64_value.value;
 					}
 				}
-				if let Some(block_info_obj) = current_block_info {
+				if let Some(block_info_obj) = &**current_block_info {
 					if let Some(u64_value) = &block_info_obj.block_timestamp {
 						state.current_block_info.block_timestamp = u64_value.value;
 					}
@@ -536,10 +536,9 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 					);
 				}
 			}
-		} else {
-			if !accounts.other_accounts_allowed {
+		} else if !accounts.other_accounts_allowed {
 				panic!("Expected account not found");
-			}
+			
 		}
 	}
 }

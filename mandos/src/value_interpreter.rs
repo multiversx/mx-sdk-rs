@@ -62,13 +62,13 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 	}
 
 	for str_prefix in STR_PREFIXES.iter() {
-		if s.starts_with(str_prefix) {
-			return s[str_prefix.len()..].as_bytes().to_vec();
+		if let Some(stripped) = s.strip_prefix(str_prefix) {
+			return stripped.as_bytes().to_vec();
 		}
 	}
 
-	if s.starts_with(ADDR_PREFIX) {
-		return address(&s[ADDR_PREFIX.len()..]);
+	if let Some(stripped) = s.strip_prefix(ADDR_PREFIX) {
+		return address(stripped);
 	}
 
 	if s.starts_with(FILE_PREFIX) {
@@ -79,13 +79,13 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 		return fixed_width;
 	}
 
-	if s.starts_with('+') {
-		let bi = BigInt::from_bytes_be(Sign::Plus, parse_unsigned(&s[1..]).as_slice());
+	if let Some(stripped) = s.strip_prefix('+') {
+		let bi = BigInt::from_bytes_be(Sign::Plus, parse_unsigned(stripped).as_slice());
 		return big_int_to_bytes_be(&bi);
 	}
 
-	if s.starts_with('-') {
-		let bi = BigInt::from_bytes_be(Sign::Minus, parse_unsigned(&s[1..]).as_slice());
+	if let Some(stripped) = s.strip_prefix('-') {
+		let bi = BigInt::from_bytes_be(Sign::Minus, parse_unsigned(stripped).as_slice());
 		return big_int_to_bytes_be(&bi);
 	}
 
@@ -93,45 +93,45 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 }
 
 fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
-	if s.starts_with(U64_PREFIX) {
-		return Some(parse_fixed_width_unsigned(&s[U64_PREFIX.len()..], 8));
+	if let Some(stripped) = s.strip_prefix(U64_PREFIX) {
+		return Some(parse_fixed_width_unsigned(stripped, 8));
 	}
 
-	if s.starts_with(U32_PREFIX) {
-		return Some(parse_fixed_width_unsigned(&s[U32_PREFIX.len()..], 4));
+	if let Some(stripped) = s.strip_prefix(U32_PREFIX) {
+		return Some(parse_fixed_width_unsigned(stripped, 4));
 	}
 
-	if s.starts_with(U16_PREFIX) {
-		return Some(parse_fixed_width_unsigned(&s[U16_PREFIX.len()..], 2));
+	if let Some(stripped) = s.strip_prefix(U16_PREFIX) {
+		return Some(parse_fixed_width_unsigned(stripped, 2));
 	}
 
-	if s.starts_with(U8_PREFIX) {
-		return Some(parse_fixed_width_unsigned(&s[U8_PREFIX.len()..], 1));
+	if let Some(stripped) = s.strip_prefix(U8_PREFIX) {
+		return Some(parse_fixed_width_unsigned(stripped, 1));
 	}
 
-	if s.starts_with(I64_PREFIX) {
-		return Some(parse_fixed_width_signed(&s[I64_PREFIX.len()..], 8));
+	if let Some(stripped) = s.strip_prefix(I64_PREFIX) {
+		return Some(parse_fixed_width_signed(stripped, 8));
 	}
 
-	if s.starts_with(I32_PREFIX) {
-		return Some(parse_fixed_width_signed(&s[I32_PREFIX.len()..], 4));
+	if let Some(stripped) = s.strip_prefix(I32_PREFIX) {
+		return Some(parse_fixed_width_signed(stripped, 4));
 	}
 
-	if s.starts_with(I16_PREFIX) {
-		return Some(parse_fixed_width_signed(&s[I16_PREFIX.len()..], 2));
+	if let Some(stripped) = s.strip_prefix(I16_PREFIX) {
+		return Some(parse_fixed_width_signed(stripped, 2));
 	}
 
-	if s.starts_with(I8_PREFIX) {
-		return Some(parse_fixed_width_signed(&s[I8_PREFIX.len()..], 1));
+	if let Some(stripped) = s.strip_prefix(I8_PREFIX) {
+		return Some(parse_fixed_width_signed(stripped, 1));
 	}
 
 	None
 }
 
 fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
-	if s.starts_with('-') {
+	if let Some(stripped) = s.strip_prefix('-') {
 		let mut result = vec![0xffu8; length];
-		let bi = BigInt::from_bytes_be(Sign::Minus, parse_unsigned(&s[1..]).as_slice());
+		let bi = BigInt::from_bytes_be(Sign::Minus, parse_unsigned(stripped).as_slice());
 		let bytes = bi.to_signed_bytes_be();
 		assert!(
 			bytes.len() <= length,
@@ -145,7 +145,7 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
 		}
 		result
 	} else {
-		let s = if s.starts_with('+') { &s[1..] } else { s };
+		let s = if let Some(stripped) = s.strip_prefix('+') { stripped } else { s };
 		let result = parse_fixed_width_unsigned(s, length);
 		if !result.is_empty() && result[0] >> 7 == 1 {
 			panic!("representation of {} does not fit in {} bytes", s, length);

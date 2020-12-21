@@ -53,7 +53,7 @@ pub trait Crowdfunding {
 			&cf_contract_address,
 			token_amount.clone(),
 			&caller,
-			token_amount.clone(),
+			token_amount,
 		);
 
 		Ok(())
@@ -62,11 +62,11 @@ pub trait Crowdfunding {
 	#[view]
 	fn status(&self) -> Status {
 		if self.get_block_nonce() <= self.get_deadline() {
-			return Status::FundingPeriod;
+			Status::FundingPeriod
 		} else if self.get_sc_balance() >= self.get_target() {
-			return Status::Successful;
+			Status::Successful
 		} else {
-			return Status::Failed;
+			Status::Failed
 		}
 	}
 
@@ -76,7 +76,7 @@ pub trait Crowdfunding {
 			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
 			Status::Successful => {
 				let caller = self.get_caller();
-				if &caller != &self.get_owner() {
+				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
 

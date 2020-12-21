@@ -33,17 +33,17 @@ pub trait Crowdfunding {
 		deposit += payment;
 		self.set_deposit(&caller, &deposit);
 
-		return Ok(());
+		Ok(())
 	}
 
 	#[view]
 	fn status(&self) -> Status {
 		if self.get_block_nonce() <= self.get_deadline() {
-			return Status::FundingPeriod;
+			Status::FundingPeriod
 		} else if self.get_sc_balance() >= self.get_target() {
-			return Status::Successful;
+			Status::Successful
 		} else {
-			return Status::Failed;
+			Status::Failed
 		}
 	}
 
@@ -58,7 +58,7 @@ pub trait Crowdfunding {
 			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
 			Status::Successful => {
 				let caller = self.get_caller();
-				if &caller != &self.get_owner() {
+				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
 				self.send_tx(&caller, &self.get_sc_balance(), b"funding success");
@@ -67,7 +67,7 @@ pub trait Crowdfunding {
 			Status::Failed => {
 				let caller = self.get_caller();
 				let deposit = self.get_deposit(&caller);
-				if &deposit > &0 {
+				if deposit > 0 {
 					self.send_tx(&caller, &deposit, b"reclaim failed funding");
 					self.set_deposit(&caller, &BigUint::zero());
 				}

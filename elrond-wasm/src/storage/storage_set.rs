@@ -67,7 +67,7 @@ where
 {
 	value.top_encode_or_exit(
 		StorageSetOutput::new(api.clone(), key),
-		api.clone(),
+		api,
 		storage_set_exit,
 	);
 }

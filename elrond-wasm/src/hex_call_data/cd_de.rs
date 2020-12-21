@@ -4,10 +4,10 @@ use crate::types::SCError;
 use alloc::vec::Vec;
 
 fn hex_digit_to_half_byte(digit: u8) -> Option<u8> {
-	if digit >= b'0' && digit <= b'9' {
+	if (b'0'..=b'9').contains(&digit) {
 		return Some(digit - b'0');
 	}
-	if digit >= b'a' && digit <= b'f' {
+	if (b'a'..=b'f').contains(&digit) {
 		return Some(digit - b'a' + 0xau8);
 	}
 	None
