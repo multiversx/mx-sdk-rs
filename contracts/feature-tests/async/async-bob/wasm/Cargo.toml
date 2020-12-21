@@ -17,7 +17,7 @@ panic = "abort"
 
 [dependencies]
 async-bob = { path = "..", features=["wasm-output-mode"] }
-elrond-wasm-output = { version = "0.9.8", path = "../../../../../elrond-wasm-output", features=["wasm-output-mode"] }
+elrond-wasm-output = { version = "0.10.0", path = "../../../../../elrond-wasm-output", features=["wasm-output-mode"] }
 
 [workspace]
 members = ["."]
