@@ -2,7 +2,6 @@
 name = "elrond-wasm-module-features"
 version = "0.10.0"
 edition = "2018"
-publish = false
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
 license = "GPL-3.0-only"
