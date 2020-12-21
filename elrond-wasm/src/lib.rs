@@ -8,6 +8,7 @@ pub use alloc::vec::Vec;
 
 pub use elrond_codec;
 
+pub mod abi;
 pub mod err_msg;
 pub mod hex_call_data;
 pub mod io;
@@ -236,6 +237,7 @@ pub trait BigUintApi:
 	+ elrond_codec::TopEncode
 	+ elrond_codec::NestedDecode
 	+ elrond_codec::TopDecode
+	+ abi::TypeAbi
 {
 	fn zero() -> Self {
 		0u64.into()
@@ -289,6 +291,7 @@ pub trait BigIntApi<BigUint>:
 	+ elrond_codec::TopEncode
 	+ elrond_codec::NestedDecode
 	+ elrond_codec::TopDecode
+	+ abi::TypeAbi
 {
 	fn zero() -> Self {
 		0i64.into()
@@ -306,6 +309,8 @@ pub trait BigIntApi<BigUint>:
 /// CallableContract is the means by which the debugger calls methods in the contract.
 pub trait CallableContract<A> {
 	fn call(&self, fn_name: &[u8]) -> bool;
+
+	fn abi(&self, include_modules: bool) -> abi::ContractAbi;
 
 	fn clone_contract(&self) -> Box<dyn CallableContract<A>>;
 
@@ -341,6 +346,16 @@ macro_rules! imports {
 		};
 		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, String, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
+	};
+}
+
+/// Imports required for deriving serialization and TypeAbi.
+#[macro_export]
+macro_rules! derive_imports {
+	() => {
+		use elrond_wasm::abi::TypeAbi;
+		use elrond_wasm::elrond_codec::*;
+		use elrond_wasm_derive::TypeAbi;
 	};
 }
 

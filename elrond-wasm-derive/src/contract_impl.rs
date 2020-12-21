@@ -1,3 +1,4 @@
+use super::abi_gen;
 use super::contract_gen::*;
 use super::function_selector::*;
 use super::*;
@@ -19,6 +20,7 @@ pub fn contract_implementation(
 	let auto_impls = contract.generate_auto_impls();
 	let endpoints = contract.generate_endpoints();
 	let function_selector_body = generate_function_selector_body(&contract, is_contract_main);
+	let abi_body = abi_gen::generate_abi_method_body(&contract);
 	let callback_body = contract.generate_callback_body();
 	let api_where = snippets::api_where();
 
@@ -112,6 +114,10 @@ pub fn contract_implementation(
 	  {
 		fn call(&self, fn_name: &[u8]) -> bool {
 		  #function_selector_body
+		}
+
+		fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
+			#abi_body
 		}
 
 		fn clone_contract(&self) -> Box<dyn CallableContract<T>> {

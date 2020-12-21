@@ -1,6 +1,8 @@
 use elrond_wasm::elrond_codec::*;
 use elrond_wasm::{Address, BigUintApi, BoxedBytes, CodeMetadata, Vec};
+derive_imports!();
 
+#[derive(TypeAbi)]
 pub enum Action<BigUint: BigUintApi> {
 	Nothing,
 	AddBoardMember(Address),

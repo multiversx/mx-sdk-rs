@@ -1,6 +1,7 @@
-use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
 /// Copied from elrond-wasm serialization tests.
+#[derive(TypeAbi)]
 pub enum SerExample2 {
 	Unit,
 	Newtype(u32),
