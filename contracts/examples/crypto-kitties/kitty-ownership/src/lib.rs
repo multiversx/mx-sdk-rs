@@ -212,6 +212,16 @@ pub trait KittyOwnership {
 	// These are used by the other contracts so they don't have to nest
 	// multiple async-calls and callbacks
 
+	#[endpoint(getKittyById)]
+	fn get_kitty_by_id_endpoint(&self, kitty_id: u32) -> SCResult<Kitty> {
+		if self._is_valid_id(kitty_id) {
+			Ok(self.get_kitty_by_id(kitty_id))
+		}
+		else {
+			sc_error!("kitty does not exist!")
+		}
+	}
+
 	#[endpoint(allowAuctioning)]
 	fn allow_auctioning(&self, by: Address, kitty_id: u32) -> SCResult<()> {
 		let kitty_auction_addr = self.get_kitty_auction_contract_address();
