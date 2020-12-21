@@ -26,7 +26,7 @@ impl Random {
 			self.current_index = 0;
 		}
 
-		return first_byte | second_byte | third_byte | fourth_byte;
+		first_byte | second_byte | third_byte | fourth_byte
 	}
 
 	// Fake shuffle. Just add numbers to one another, accounting for overflow overflow.

@@ -15,7 +15,7 @@ pub trait TypeAbi {
 	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
 		let type_name = Self::type_name();
 		accumulator.insert(
-			type_name.clone(),
+			type_name,
 			TypeDescription {
 				docs: &[],
 				name: Self::type_name(),

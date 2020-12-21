@@ -81,7 +81,7 @@ where
 	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
 {
 	fn finish(&self, api: A) {
-		self.top_encode_or_exit(ApiOutput::new(api.clone()), api.clone(), finish_exit);
+		self.top_encode_or_exit(ApiOutput::new(api.clone()), api, finish_exit);
 	}
 }
 

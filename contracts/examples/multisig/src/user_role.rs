@@ -9,10 +9,7 @@ pub enum UserRole {
 
 impl UserRole {
 	pub fn can_propose(&self) -> bool {
-		match *self {
-			UserRole::BoardMember | UserRole::Proposer => true,
-			UserRole::None => false,
-		}
+		matches!(*self, UserRole::BoardMember | UserRole::Proposer)
 	}
 
 	pub fn can_perform_action(&self) -> bool {
@@ -20,9 +17,6 @@ impl UserRole {
 	}
 
 	pub fn can_sign(&self) -> bool {
-		match *self {
-			UserRole::BoardMember => true,
-			_ => false,
-		}
+		matches!(*self, UserRole::BoardMember)
 	}
 }

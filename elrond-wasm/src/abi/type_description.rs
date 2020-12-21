@@ -29,10 +29,7 @@ pub enum TypeContents {
 
 impl TypeContents {
 	pub fn is_specified(&self) -> bool {
-		match *self {
-			TypeContents::NotSpecified => false,
-			_ => true,
-		}
+		!matches!(*self, TypeContents::NotSpecified)
 	}
 }
 
