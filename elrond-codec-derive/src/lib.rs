@@ -12,7 +12,6 @@ use top_de_derive::impl_top_decode_macro;
 use top_en_derive::impl_top_encode_macro;
 
 use proc_macro::TokenStream;
-use syn;
 
 #[proc_macro_derive(NestedEncode)]
 pub fn nested_encode_derive(input: TokenStream) -> TokenStream {
