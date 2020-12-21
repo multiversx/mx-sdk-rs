@@ -52,17 +52,23 @@ pub struct EndpointAbiJson {
 	#[serde(skip_serializing_if = "Vec::is_empty")]
 	pub docs: Vec<String>,
 	pub name: String,
-	pub payable: bool,
+	#[serde(rename = "payableInTokens")]
+	#[serde(skip_serializing_if = "Vec::is_empty")]
+	pub payable_in_tokens: Vec<String>,
 	pub inputs: Vec<InputAbiJson>,
 	pub outputs: Vec<OutputAbiJson>,
 }
 
 impl From<&EndpointAbi> for EndpointAbiJson {
 	fn from(abi: &EndpointAbi) -> Self {
+		let mut payable_in_tokens = Vec::new();
+		if abi.payable {
+			payable_in_tokens.push("EGLD".to_string());
+		}
 		EndpointAbiJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
-			payable: abi.payable,
+			payable_in_tokens,
 			inputs: abi
 				.inputs
 				.iter()
