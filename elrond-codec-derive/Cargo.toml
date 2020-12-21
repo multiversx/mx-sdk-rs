@@ -1,8 +1,17 @@
 [package]
 name = "elrond-codec-derive"
-version = "0.3.2"
-authors = ["dorin.iancu <dorin.iancu@elrond.com>"]
+version = "0.4.0"
 edition = "2018"
+
+authors = ["dorin.iancu <dorin.iancu@elrond.com>", "Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://elrond.com/"
+documentation = "https://docs.elrond.com/"
+description = "Macro implementations of elrond-codec #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]"
+keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [lib]
 name = "elrond_codec_derive"
@@ -16,7 +25,3 @@ proc-macro2 = "1.0"
 quote = "1.0"
 syn = "1.0"
 hex = "0.4"
-
-[dev-dependencies.elrond-codec]
-version = "0.3.2"
-path = "../elrond-codec"
