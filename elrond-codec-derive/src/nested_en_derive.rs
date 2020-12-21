@@ -68,9 +68,9 @@ fn variant_dep_encode_or_exit_snippets(
 
 pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {
-			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 			let field_dep_encode_snippets = fields_snippets(&data_struct.fields, |index, field| {
 				dep_encode_snippet(&self_field_expr(index, field))
 			});
@@ -106,7 +106,7 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				variant_dep_encode_or_exit_snippets(&name, &data_enum);
 
 			quote! {
-				impl elrond_codec::NestedEncode for #name {
+				impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
 					fn dep_encode<O: elrond_codec::NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), elrond_codec::EncodeError> {
 						match self {
 							#(#variant_dep_encode_snippets)*

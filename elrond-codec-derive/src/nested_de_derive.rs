@@ -73,9 +73,9 @@ pub fn variant_dep_decode_or_exit_snippets(
 
 pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {
-			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 			let field_dep_decode_snippets =
 				fields_decl_syntax(&data_struct.fields, |index, field| {
 					dep_decode_snippet(index, field)
@@ -112,7 +112,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				variant_dep_decode_or_exit_snippets(&name, &data_enum);
 
 			quote! {
-				impl elrond_codec::NestedDecode for #name {
+				impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
 					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
 						match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
 							#(#variant_dep_decode_snippets)*

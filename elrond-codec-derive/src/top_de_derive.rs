@@ -77,9 +77,9 @@ fn zero_value_if(name: &syn::Ident, data_enum: &syn::DataEnum) -> proc_macro2::T
 
 pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {
-			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 			let field_dep_decode_snippets =
 				fields_decl_syntax(&data_struct.fields, |index, field| {
 					dep_decode_snippet(index, field)
@@ -126,7 +126,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				let top_decode_arms = fieldless_enum_match_arm_result_ok(&name, &data_enum);
 				let top_decode_or_exit_arms = fieldless_enum_match_arm(&name, &data_enum);
 				quote! {
-					impl elrond_codec::TopDecode for #name {
+					impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
 						fn top_decode<I: elrond_codec::TopDecodeInput>(input: I) -> Result<Self, elrond_codec::DecodeError> {
 							match <u8 as elrond_codec::TopDecode>::top_decode(input)? {
 								#(#top_decode_arms)*
@@ -154,7 +154,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				let zero_value_if = zero_value_if(&name, &data_enum);
 
 				quote! {
-					impl elrond_codec::TopDecode for #name {
+					impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
 						fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> Result<Self, elrond_codec::DecodeError> {
 							#zero_value_if_result_ok
 							let bytes = top_input.into_boxed_slice_u8();
