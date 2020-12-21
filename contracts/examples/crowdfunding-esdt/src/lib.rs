@@ -91,7 +91,7 @@ pub trait Crowdfunding {
 				let caller = self.get_caller();
 				let deposit = self.get_deposit(&caller);
 
-				if &deposit > &0 {
+				if deposit > 0 {
 					let esdt_token_name = self.get_cf_esdt_token_name();
 					let mut esdt_balance = self.get_esdt_balance();
 

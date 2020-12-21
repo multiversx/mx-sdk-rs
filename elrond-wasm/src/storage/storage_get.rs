@@ -60,7 +60,7 @@ where
 	// TODO: there is currently no API hook for storage of signed big ints
 }
 
-pub fn storage_get<'k, A, BigInt, BigUint, T>(api: A, key: &'k [u8]) -> T
+pub fn storage_get<A, BigInt, BigUint, T>(api: A, key: &[u8]) -> T
 where
 	T: TopDecode,
 	BigInt: NestedEncode + 'static,

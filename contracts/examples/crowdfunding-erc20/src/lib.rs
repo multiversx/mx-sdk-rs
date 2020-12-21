@@ -93,7 +93,7 @@ pub trait Crowdfunding {
 				let caller = self.get_caller();
 				let deposit = self.get_deposit(&caller);
 
-				if &deposit > &0 {
+				if deposit > 0 {
 					self.set_deposit(&caller, &BigUint::zero());
 
 					let erc20_address = self.get_erc20_contract_address();

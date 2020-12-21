@@ -377,10 +377,9 @@ impl Method {
 	}
 
 	pub fn has_variable_nr_args(&self) -> bool {
-		self.method_args.iter().any(|arg| matches!(&arg.metadata,
-			ArgMetadata::Multi(_) |
-			ArgMetadata::VarArgs )
-		)
+		self.method_args
+			.iter()
+			.any(|arg| matches!(&arg.metadata, ArgMetadata::Multi(_) | ArgMetadata::VarArgs))
 	}
 
 	pub fn generate_call_method(&self) -> proc_macro2::TokenStream {

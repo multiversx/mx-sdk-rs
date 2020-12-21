@@ -38,3 +38,9 @@ impl<A> ContractMap<A> {
 			.insert(path.as_bytes().to_vec(), new_contract_closure);
 	}
 }
+
+impl<A> Default for ContractMap<A> {
+	fn default() -> Self {
+		Self::new()
+	}
+}

@@ -537,8 +537,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 				}
 			}
 		} else if !accounts.other_accounts_allowed {
-				panic!("Expected account not found");
-			
+			panic!("Expected account not found");
 		}
 	}
 }

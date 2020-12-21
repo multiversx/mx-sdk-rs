@@ -145,7 +145,11 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
 		}
 		result
 	} else {
-		let s = if let Some(stripped) = s.strip_prefix('+') { stripped } else { s };
+		let s = if let Some(stripped) = s.strip_prefix('+') {
+			stripped
+		} else {
+			s
+		};
 		let result = parse_fixed_width_unsigned(s, length);
 		if !result.is_empty() && result[0] >> 7 == 1 {
 			panic!("representation of {} does not fit in {} bytes", s, length);
