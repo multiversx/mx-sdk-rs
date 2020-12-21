@@ -83,9 +83,9 @@ pub fn variant_top_encode_or_exit_snippets(
 
 pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {
-			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 			let field_dep_encode_snippets = fields_snippets(&data_struct.fields, |index, field| {
 				dep_encode_snippet(&self_field_expr(index, field))
 			});
@@ -127,7 +127,7 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				variant_top_encode_or_exit_snippets(&name, &data_enum);
 
 			quote! {
-				impl elrond_codec::TopEncode for #name {
+				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
 					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> Result<(), elrond_codec::EncodeError> {
 						match self {
 							#(#variant_top_encode_snippets)*
