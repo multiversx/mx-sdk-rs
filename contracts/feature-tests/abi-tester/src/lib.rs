@@ -61,6 +61,11 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
+	fn address_vs_h256(&self, address: Address, h256: H256) -> MultiResult2<Address, H256> {
+		(address, h256).into()
+	}
+
+	#[endpoint]
 	#[payable]
 	fn payable_egld(&self, #[payment] _payment: BigUint) {}
 }
