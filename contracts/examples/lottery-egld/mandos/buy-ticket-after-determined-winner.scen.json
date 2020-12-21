@@ -48,7 +48,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/lottery.wasm"
+                    "code": "file:../output/lottery-egld.wasm"
                 }
             }
         }
