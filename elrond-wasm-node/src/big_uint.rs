@@ -7,6 +7,7 @@ use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 
 use alloc::vec::Vec;
+use alloc::string::String;
 
 use elrond_wasm::err_msg;
 use elrond_wasm::BigUintApi;
@@ -345,6 +346,12 @@ impl TopDecode for ArwenBigUint {
 		} else {
 			ArwenBigUint::from_bytes_be(&*input.into_boxed_slice_u8())
 		}
+	}
+}
+
+impl elrond_wasm::abi::TypeAbi for ArwenBigUint {
+	fn type_name() -> String {
+		String::from("BigUint")
 	}
 }
 

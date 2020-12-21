@@ -1,10 +1,12 @@
 [package]
 name = "adder-debug"
 version = "0.2.0"
-authors = ["andrei-marinica <andrei_m_marinica@yahoo.com>"]
+authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 
-[dependencies]
-adder = { path = ".." }
-elrond-wasm = { version = "0.9.8", path = "../../../../elrond-wasm" }
-elrond-wasm-debug = { version = "0.9.8", path = "../../../../elrond-wasm-debug" }
+[dependencies.adder]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.9.8"
+path = "../../../../elrond-wasm-debug"

@@ -1,5 +1,7 @@
+use crate::abi::TypeAbi;
 use crate::BoxedBytes;
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::Debug;
 
@@ -240,6 +242,12 @@ impl TopDecode for H256 {
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
 		H256::decode_from_boxed_bytes_or_exit(input.into_boxed_slice_u8(), c, exit)
+	}
+}
+
+impl TypeAbi for H256 {
+	fn type_name() -> String {
+		"H256".into()
 	}
 }
 

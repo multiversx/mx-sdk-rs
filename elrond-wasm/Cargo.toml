@@ -16,6 +16,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 [dependencies]
 wee_alloc = "0.4"
 arrayvec = { version = "0.5.2", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
+hashbrown = "0.9.1"
 
 [dependencies.elrond-codec]
 version = "0.3.2"

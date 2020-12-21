@@ -296,6 +296,12 @@ impl TopDecode for RustBigUint {
 	}
 }
 
+impl elrond_wasm::abi::TypeAbi for RustBigUint {
+	fn type_name() -> String {
+		String::from("BigUint")
+	}
+}
+
 impl elrond_wasm::BigUintApi for RustBigUint {
 	fn byte_length(&self) -> i32 {
 		panic!("byte_length not yet implemented")

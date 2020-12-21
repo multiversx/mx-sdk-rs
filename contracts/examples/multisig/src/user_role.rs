@@ -1,6 +1,7 @@
 use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(TypeAbi, Clone, Copy, PartialEq)]
 pub enum UserRole {
 	None,
 	Proposer,

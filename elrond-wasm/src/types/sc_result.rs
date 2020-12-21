@@ -1,4 +1,5 @@
 use super::sc_error::SCError;
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::io::finish::EndpointResult;
 use crate::*;
 
@@ -61,6 +62,24 @@ where
 				api.signal_error(e.as_bytes());
 			},
 		}
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for SCResult<T> {
+	fn type_name() -> String {
+		T::type_name()
+	}
+
+	/// Gives `SCResult<()>` the possibility to produce 0 output ABIs,
+	/// just like `()`.
+	/// It is also possible to have `SCResult<MultiResultX<...>>`,
+	/// so this gives the MultiResult to dissolve into its multiple output ABIs.
+	fn output_abis() -> Vec<OutputAbi> {
+		T::output_abis()
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
 	}
 }
 

@@ -3,10 +3,9 @@
 #![allow(unused_variables)]
 
 imports!();
+derive_imports!();
 
-use elrond_wasm::elrond_codec::*;
-
-#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
+#[derive(TopEncode, TopDecode, PartialEq, TypeAbi, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
 	Successful,

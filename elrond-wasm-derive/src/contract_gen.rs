@@ -3,10 +3,12 @@ use super::contract_gen_event::*;
 use super::contract_gen_method::*;
 use super::contract_gen_module::*;
 use super::contract_gen_storage::*;
+use super::parse_attr::*;
 use super::snippets;
 use super::util::*;
 
 pub struct Contract {
+	pub docs: Vec<String>,
 	pub trait_name: proc_macro2::Ident,
 	pub contract_impl_name: syn::Path,
 	pub supertrait_paths: Vec<syn::Path>,
@@ -16,6 +18,8 @@ pub struct Contract {
 impl Contract {
 	pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
 		let contract_impl_name = extract_struct_name(args);
+
+		let docs = extract_doc(contract_trait.attrs.as_slice());
 
 		let supertrait_paths: Vec<syn::Path> = contract_trait
 			.supertraits
@@ -36,6 +40,7 @@ impl Contract {
 			.collect();
 
 		Contract {
+			docs,
 			trait_name: contract_trait.ident.clone(),
 			contract_impl_name,
 			supertrait_paths,
