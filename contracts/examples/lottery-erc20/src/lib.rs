@@ -191,7 +191,7 @@ pub trait Lottery {
 
 		let prev_winners = self.get_prev_winners(&lottery_name);
 
-		if prev_winners.len() > 0 {
+		if !prev_winners.is_empty() {
 			return Status::DistributingPrizes;
 		}
 
@@ -201,7 +201,7 @@ pub trait Lottery {
 			return Status::Ended;
 		}
 
-		return Status::Running;
+		Status::Running
 	}
 
 	fn update_after_buy_ticket(

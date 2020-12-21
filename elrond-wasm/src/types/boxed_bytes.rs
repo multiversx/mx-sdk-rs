@@ -25,6 +25,11 @@ impl BoxedBytes {
 		}
 	}
 
+	/// Allocates an uninitialized BoxedBytes to heap.
+	///
+	/// # Safety
+	///
+	/// Should only be called if the contents are initialized immediately afterwards, e.g. via a FFI call.
 	pub unsafe fn allocate(len: usize) -> Self {
 		let layout = Layout::from_size_align(len, core::mem::align_of::<u8>()).unwrap();
 		let bytes_ptr = alloc(layout);

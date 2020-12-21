@@ -80,7 +80,7 @@ pub trait Multisig {
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
 		require!(
-			board.len() > 0,
+			!board.is_empty(),
 			"board cannot be empty on init, no-one would be able to propose"
 		);
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
@@ -292,6 +292,7 @@ pub trait Multisig {
 		self.set_user_id_to_role(user_id, new_role);
 
 		// update board size
+		#[allow(clippy::collapsible_if)]
 		if old_role == UserRole::BoardMember {
 			if new_role != UserRole::BoardMember {
 				self.set_num_board_members(self.get_num_board_members() - 1);
@@ -303,6 +304,7 @@ pub trait Multisig {
 		}
 
 		// update num_proposers
+		#[allow(clippy::collapsible_if)]
 		if old_role == UserRole::Proposer {
 			if new_role != UserRole::Proposer {
 				self.set_num_proposers(self.get_num_proposers() - 1);
