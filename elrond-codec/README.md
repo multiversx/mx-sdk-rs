@@ -9,7 +9,7 @@ Designed to:
 
 Largely inspired by the Parity SCALE codec, but a completely different format and implementation.
 
-For more info about the serialization format, see [https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/].
+For more info about the serialization format, see [the developer reference](https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/).
 
 # no-std
 
