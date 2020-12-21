@@ -52,7 +52,7 @@ impl<T: InterpretableFrom<ValueSubTree>> Default for CheckValue<T> {
 impl<T: InterpretableFrom<ValueSubTree>> InterpretableFrom<ValueSubTree> for CheckValue<T> {
 	fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
 		if let ValueSubTree::Str(s) = &from {
-			if s == "" {
+			if s.is_empty() {
 				return CheckValue::DefaultStar;
 			} else if s == "*" {
 				return CheckValue::Star;

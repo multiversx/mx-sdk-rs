@@ -14,11 +14,7 @@ pub enum SCResult<T> {
 impl<T> SCResult<T> {
 	#[inline]
 	pub fn is_ok(&self) -> bool {
-		if let SCResult::Ok(_) = self {
-			true
-		} else {
-			false
-		}
+		matches!(self, SCResult::Ok(_))
 	}
 
 	#[inline]

@@ -126,7 +126,7 @@ impl NestedDecode for CodeMetadata {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		CodeMetadata(<[u8; 2]>::dep_decode_or_exit(input, c.clone(), exit))
+		CodeMetadata(<[u8; 2]>::dep_decode_or_exit(input, c, exit))
 	}
 }
 
