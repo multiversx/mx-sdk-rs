@@ -129,7 +129,7 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 				quote! {
 					impl elrond_codec::TopDecode for #name {
 						fn top_decode<I: elrond_codec::TopDecodeInput>(input: I) -> Result<Self, elrond_codec::DecodeError> {
-							match u8::top_decode(input)? {
+							match <u8 as elrond_codec::TopDecode>::top_decode(input)? {
 								#(#top_decode_arms)*
 								_ => Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 							}
@@ -140,7 +140,7 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 							c: ExitCtx,
 							exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 						) -> Self {
-							match u8::top_decode_or_exit(input, c.clone(), exit) {
+							match <u8 as elrond_codec::TopDecode>::top_decode_or_exit(input, c.clone(), exit) {
 								#(#top_decode_or_exit_arms)*
 								_ => exit(c, elrond_codec::DecodeError::INVALID_VALUE),
 							}
@@ -160,7 +160,7 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 							#zero_value_if_result_ok
 							let bytes = top_input.into_boxed_slice_u8();
 							let input = &mut &*bytes;
-							let result = match u8::dep_decode(input)? {
+							let result = match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
 								#(#variant_dep_decode_snippets)*
 								_ => Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 							};
@@ -178,7 +178,7 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 							#zero_value_if
 							let bytes = top_input.into_boxed_slice_u8();
 							let input = &mut &*bytes;
-							let result = match u8::dep_decode_or_exit(input, c.clone(), exit) {
+							let result = match <u8 as elrond_codec::NestedDecode>::dep_decode_or_exit(input, c.clone(), exit) {
 								#(#variant_dep_decode_or_exit_snippets)*
 								_ => exit(c, elrond_codec::DecodeError::INVALID_VALUE),
 							};
