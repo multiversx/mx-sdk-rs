@@ -15,9 +15,15 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies]
-use-module = { path = "..", default-features = false, features=["wasm-output-mode"] }
-elrond-wasm-output = { version = "0.10.0", path = "../../../../elrond-wasm-output", default-features = false, features=["wasm-output-mode"] }
+[dependencies.use-module]
+path = ".."
+default-features = false
+features=["wasm-output-mode"]
+
+[dependencies.elrond-wasm-output]
+version = "0.10.0"
+path = "../../../../elrond-wasm-output"
+features=["wasm-output-mode"]
 
 [workspace]
 members = ["."]
