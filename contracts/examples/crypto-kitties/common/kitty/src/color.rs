@@ -1,9 +1,9 @@
-
+use elrond_wasm::derive_imports;
 derive_imports!();
 
 use random::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, TypeAbi)]
 pub struct Color {
 	pub r: u8,
 	pub g: u8,
