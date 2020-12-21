@@ -115,7 +115,7 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 			quote! {
 				impl elrond_codec::NestedDecode for #name {
 					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
-						match u8::dep_decode(input)? {
+						match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
 							#(#variant_dep_decode_snippets)*
 							_ => Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 						}
@@ -126,7 +126,7 @@ pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 						c: ExitCtx,
 						exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 					) -> Self {
-						match u8::dep_decode_or_exit(input, c.clone(), exit) {
+						match <u8 as elrond_codec::NestedDecode>::dep_decode_or_exit(input, c.clone(), exit) {
 							#(#variant_dep_decode_or_exit_snippets)*
 							_ => exit(c, elrond_codec::DecodeError::INVALID_VALUE),
 						}
