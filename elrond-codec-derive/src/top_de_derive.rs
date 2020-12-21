@@ -41,6 +41,44 @@ fn fieldless_enum_match_arm(
 		.collect()
 }
 
+fn zero_value_if_result_ok(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> proc_macro2::TokenStream {
+	if data_enum.variants.is_empty() {
+		panic!("cannot deserialize enums without variants");
+	}
+	let first_variant = &data_enum.variants[0];
+	if first_variant.fields.is_empty() {
+		quote!{
+			if top_input.byte_len() == 0 {
+				return Result::Ok(#name::#first_variant);
+			}
+		}
+	} else {
+		quote!{}
+	}
+}
+
+fn zero_value_if(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> proc_macro2::TokenStream {
+	if data_enum.variants.is_empty() {
+		panic!("cannot deserialize enums without variants");
+	}
+	let first_variant = &data_enum.variants[0];
+	if first_variant.fields.is_empty() {
+		quote!{
+			if top_input.byte_len() == 0 {
+				return #name::#first_variant;
+			}
+		}
+	} else {
+		quote!{}
+	}
+}
+
 pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
 	let gen = match &ast.data {
@@ -116,10 +154,13 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 				let variant_dep_decode_snippets = variant_dep_decode_snippets(&name, &data_enum);
 				let variant_dep_decode_or_exit_snippets =
 					variant_dep_decode_or_exit_snippets(&name, &data_enum);
+				let zero_value_if_result_ok = zero_value_if_result_ok(&name, &data_enum);
+				let zero_value_if = zero_value_if(&name, &data_enum);
 
 				quote! {
 					impl elrond_codec::TopDecode for #name {
 						fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> Result<Self, elrond_codec::DecodeError> {
+							#zero_value_if_result_ok
 							let bytes = top_input.into_boxed_slice_u8();
 							let input = &mut &*bytes;
 							let result = match u8::dep_decode(input)? {
@@ -137,6 +178,7 @@ pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
 							c: ExitCtx,
 							exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 						) -> Self {
+							#zero_value_if
 							let bytes = top_input.into_boxed_slice_u8();
 							let input = &mut &*bytes;
 							let result = match u8::dep_decode_or_exit(input, c.clone(), exit) {
