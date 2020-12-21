@@ -5,6 +5,9 @@ extern crate alloc;
 #[cfg(feature = "elrond-codec-derive")]
 pub use elrond_codec_derive::*;
 
+/// Reexport needed by derive.
+pub use alloc::vec::Vec;
+
 mod codec_err;
 mod nested_de;
 mod nested_de_input;

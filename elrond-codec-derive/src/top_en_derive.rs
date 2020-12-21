@@ -31,7 +31,7 @@ pub fn variant_top_encode_snippets(
 				});
 				quote! {
 					#name::#variant_ident #local_var_declarations => {
-						let mut buffer = Vec::<u8>::new();
+						let mut buffer = elrond_codec::Vec::<u8>::new();
 						let dest = &mut buffer;
 						elrond_codec::NestedEncode::dep_encode(&#variant_index_u8, dest)?;
 						#(#variant_field_snippets)*
@@ -70,7 +70,7 @@ pub fn variant_top_encode_or_exit_snippets(
 				});
 				quote! {
 					#name::#variant_ident #local_var_declarations => {
-						let mut buffer = Vec::<u8>::new();
+						let mut buffer = elrond_codec::Vec::<u8>::new();
 						let dest = &mut buffer;
 						elrond_codec::NestedEncode::dep_encode_or_exit(&#variant_index_u8, dest, c.clone(), exit);
 						#(#variant_field_snippets)*
@@ -97,7 +97,7 @@ pub fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 			quote! {
 				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
 					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> Result<(), elrond_codec::EncodeError> {
-						let mut buffer = Vec::<u8>::new();
+						let mut buffer = elrond_codec::Vec::<u8>::new();
 						let dest = &mut buffer;
 						#(#field_dep_encode_snippets)*
 						output.set_slice_u8(&buffer[..]);
@@ -110,7 +110,7 @@ pub fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
 						c: ExitCtx,
 						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 					) {
-						let mut buffer = Vec::<u8>::new();
+						let mut buffer = elrond_codec::Vec::<u8>::new();
 						let dest = &mut buffer;
 						#(#field_dep_encode_or_exit_snippets)*
 						output.set_slice_u8(&buffer[..]);
