@@ -158,7 +158,7 @@ impl BlockchainMock {
 	fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
 		self.new_addresses
 			.get(&(creator_address, creator_nonce))
-			.map(|addr_ref| addr_ref.clone())
+			.cloned()
 	}
 
 	pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {

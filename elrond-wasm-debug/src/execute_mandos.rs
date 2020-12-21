@@ -125,7 +125,7 @@ fn parse_execute_mandos_steps(
 							let async_input = async_call_tx_input(&async_data, &contract_address);
 
 							if async_input.func_name == ESDT_TRANSFER_STRING {
-								execute_esdt_async_call(async_input.clone(), state);
+								execute_esdt_async_call(async_input, state);
 								return;
 							}
 
@@ -232,7 +232,7 @@ fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let esdt_token_name = tx_input.esdt_token_name.clone();
-	let esdt_value = tx_input.esdt_value.clone();
+	let esdt_value = tx_input.esdt_value;
 
 	state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value);
 	state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
