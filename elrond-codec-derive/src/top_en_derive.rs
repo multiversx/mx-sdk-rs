@@ -1,64 +1,150 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn;
 
+use crate::nested_en_derive::{dep_encode_or_exit_snippet, dep_encode_snippet};
 use crate::util::*;
 
-pub fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
-	let name = &ast.ident;
-	let gen = match &ast.data {
-		syn::Data::Struct(_) => {
-			let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+pub fn variant_top_encode_snippets(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
+	data_enum
+		.variants
+		.iter()
+		.enumerate()
+		.map(|(variant_index, variant)| {
+			let variant_index_u8 = variant_index as u8;
+			let variant_ident = &variant.ident;
+			if variant.fields.is_empty() {
+				// top-encode discriminant directly
+				quote! {
+					#name::#variant_ident =>
+						elrond_codec::TopEncode::top_encode(&#variant_index_u8, output),
+				}
+			} else {
+				// dep-encode to buffer first
+				let local_var_declarations =
+					fields_decl_syntax(&variant.fields, local_variable_for_field);
+				let variant_field_snippets = fields_snippets(&variant.fields, |index, field| {
+					dep_encode_snippet(&local_variable_for_field(index, field))
+				});
+				quote! {
+					#name::#variant_ident #local_var_declarations => {
+						let mut buffer = elrond_codec::Vec::<u8>::new();
+						let dest = &mut buffer;
+						elrond_codec::NestedEncode::dep_encode(&#variant_index_u8, dest)?;
+						#(#variant_field_snippets)*
+						output.set_slice_u8(&buffer[..]);
+						Result::Ok(())
+					},
+				}
+			}
+		})
+		.collect()
+}
 
+pub fn variant_top_encode_or_exit_snippets(
+	name: &syn::Ident,
+	data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
+	data_enum
+		.variants
+		.iter()
+		.enumerate()
+		.map(|(variant_index, variant)| {
+			let variant_index_u8 = variant_index as u8;
+			let variant_ident = &variant.ident;
+			if variant.fields.is_empty() {
+				// top-encode discriminant directly
+				quote! {
+					#name::#variant_ident =>
+						elrond_codec::TopEncode::top_encode_or_exit(&#variant_index_u8, output, c.clone(), exit),
+				}
+			} else {
+				// dep-encode to buffer first
+				let local_var_declarations =
+					fields_decl_syntax(&variant.fields, local_variable_for_field);
+				let variant_field_snippets = fields_snippets(&variant.fields, |index, field| {
+					dep_encode_or_exit_snippet(&local_variable_for_field(index, field))
+				});
+				quote! {
+					#name::#variant_ident #local_var_declarations => {
+						let mut buffer = elrond_codec::Vec::<u8>::new();
+						let dest = &mut buffer;
+						elrond_codec::NestedEncode::dep_encode_or_exit(&#variant_index_u8, dest, c.clone(), exit);
+						#(#variant_field_snippets)*
+						output.set_slice_u8(&buffer[..]);
+					},
+				}
+			}
+		})
+		.collect()
+}
+
+pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
+	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+	let gen = match &ast.data {
+		syn::Data::Struct(data_struct) => {
+			let field_dep_encode_snippets = fields_snippets(&data_struct.fields, |index, field| {
+				dep_encode_snippet(&self_field_expr(index, field))
+			});
+			let field_dep_encode_or_exit_snippets =
+				fields_snippets(&data_struct.fields, |index, field| {
+					dep_encode_or_exit_snippet(&self_field_expr(index, field))
+				});
 			quote! {
-				impl #impl_generics TopEncode for #name #ty_generics #where_clause {
-					#[inline]
-					fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-						top_encode_from_nested(self, output)
+				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
+					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> Result<(), elrond_codec::EncodeError> {
+						let mut buffer = elrond_codec::Vec::<u8>::new();
+						let dest = &mut buffer;
+						#(#field_dep_encode_snippets)*
+						output.set_slice_u8(&buffer[..]);
+						Result::Ok(())
 					}
 
-					#[inline]
-					fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+					fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
 						&self,
 						output: O,
 						c: ExitCtx,
-						exit: fn(ExitCtx, EncodeError) -> !,
+						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
 					) {
-						top_encode_from_nested_or_exit(self, output, c, exit);
+						let mut buffer = elrond_codec::Vec::<u8>::new();
+						let dest = &mut buffer;
+						#(#field_dep_encode_or_exit_snippets)*
+						output.set_slice_u8(&buffer[..]);
 					}
 				}
 			}
 		},
-		syn::Data::Enum(_) => {
-			if is_simple_enum(&ast.data) {
-				let idents = extract_field_names(&ast.data);
-				let value: Vec<u8> = (0..idents.len() as u8).collect();
-				let name_repeated = std::iter::repeat(name);
-				let name_repeated_again = name_repeated.clone();
+		syn::Data::Enum(data_enum) => {
+			assert!(
+				data_enum.variants.len() < 256,
+				"enums with more than 256 variants not supported"
+			);
+			let variant_top_encode_snippets = variant_top_encode_snippets(&name, &data_enum);
+			let variant_top_encode_or_exit_snippets =
+				variant_top_encode_or_exit_snippets(&name, &data_enum);
 
-				quote! {
-					impl TopEncode for #name {
-						fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-							//self.to_u8().top_encode(output)
-							match self {
-								#(#name_repeated::#idents => #value.top_encode(output),)*
-							}
+			quote! {
+				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
+					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> Result<(), elrond_codec::EncodeError> {
+						match self {
+							#(#variant_top_encode_snippets)*
 						}
+					}
 
-						fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-							&self,
-							output: O,
-							c: ExitCtx,
-							exit: fn(ExitCtx, EncodeError) -> !,
-						) {
-							match self {
-								#(#name_repeated_again::#idents => #value.top_encode_or_exit(output, c, exit),)*
-							}
+					fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
+						&self,
+						output: O,
+						c: ExitCtx,
+						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
+					) {
+						match self {
+							#(#variant_top_encode_or_exit_snippets)*
 						}
 					}
 				}
-			} else {
-				panic!("Only simple enums can have top encode!")
 			}
 		},
 		syn::Data::Union(_) => panic!("Union not supported"),

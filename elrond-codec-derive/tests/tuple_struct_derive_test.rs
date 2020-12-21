@@ -2,10 +2,13 @@ extern crate elrond_codec_derive;
 use elrond_codec_derive::*;
 
 use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
-use elrond_codec::*;
+// use elrond_codec::*;
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
 struct TupleStruct(u8, u16, u32);
+
+// to test, run the following command in elrond-codec-derive folder:
+// cargo expand --test tuple_struct_derive_test > expanded.rs
 
 #[test]
 fn tuple_struct_derive_test() {

@@ -1,7 +1,6 @@
 use super::parse_attr::extract_doc;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn;
 
 fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
 	let field_docs = extract_doc(field.attrs.as_slice());
