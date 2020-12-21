@@ -3,6 +3,7 @@ name = "simple-erc20"
 version = "0.0.0"
 authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
+publish = false
 
 [lib]
 path = "src/lib.rs"

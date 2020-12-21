@@ -3,6 +3,7 @@ name = "lottery-egld"
 version = "0.0.0"
 authors = [ "dorin-iancu <dorin.iancu@elrond.com>",]
 edition = "2018"
+publish = false
 
 [lib]
 path = "src/lib.rs"

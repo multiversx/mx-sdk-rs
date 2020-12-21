@@ -3,6 +3,7 @@ name = "lottery-esdt-abi"
 version = "0.0.0"
 authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
+publish = false
 
 [dependencies.lottery-esdt]
 path = ".."
