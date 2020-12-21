@@ -106,6 +106,27 @@
             ]
         },
         {
+            "name": "address_vs_h256",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "h256",
+                    "type": "H256"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                },
+                {
+                    "type": "H256"
+                }
+            ]
+        },
+        {
             "name": "payable_egld",
             "payableInTokens": [
                 "EGLD"
