@@ -1,8 +1,9 @@
 [package]
 name = "adder-wasm"
-version = "0.2.0"
+version = "0.0.0"
 authors = ["andrei-marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
+publish = false
 
 [lib]
 crate-type = ["cdylib"]
