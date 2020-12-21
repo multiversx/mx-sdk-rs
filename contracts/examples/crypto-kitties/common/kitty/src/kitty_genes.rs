@@ -1,4 +1,4 @@
-use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
 use super::color::*;
 use random::*;

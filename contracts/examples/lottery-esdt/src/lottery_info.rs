@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-use elrond_wasm::elrond_codec::*;
-=======
->>>>>>> master
 use elrond_wasm::{Address, BigUintApi, BoxedBytes, Vec};
 
 derive_imports!();
