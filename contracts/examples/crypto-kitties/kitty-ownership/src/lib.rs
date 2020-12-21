@@ -216,8 +216,7 @@ pub trait KittyOwnership {
 	fn get_kitty_by_id_endpoint(&self, kitty_id: u32) -> SCResult<Kitty> {
 		if self._is_valid_id(kitty_id) {
 			Ok(self.get_kitty_by_id(kitty_id))
-		}
-		else {
+		} else {
 			sc_error!("kitty does not exist!")
 		}
 	}
