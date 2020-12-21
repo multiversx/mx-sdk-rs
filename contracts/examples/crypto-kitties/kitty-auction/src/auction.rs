@@ -1,4 +1,5 @@
-use elrond_wasm::elrond_codec::*;
+derive_imports!();
+
 use elrond_wasm::{Address, BigUintApi};
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]

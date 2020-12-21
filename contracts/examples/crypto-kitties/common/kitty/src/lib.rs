@@ -1,6 +1,6 @@
 #![no_std]
 
-use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
 const SECONDS_PER_MINUTE: u64 = 60;
 const MAX_COOLDOWN: u64 = 60 * 60 * 24 * 7; // 7 days
