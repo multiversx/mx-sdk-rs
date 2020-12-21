@@ -2,13 +2,13 @@
 #![allow(unused_attributes)]
 
 imports!();
+derive_imports!();
 
-use elrond_wasm::elrond_codec::*;
 use elrond_wasm::HexCallDataSerializer;
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
-#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
+#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
 	Successful,
@@ -50,17 +50,17 @@ pub trait Crowdfunding {
 		self.set_deposit(&caller, &deposit);
 		self.set_esdt_balance(&balance);
 
-		return Ok(());
+		Ok(())
 	}
 
 	#[view]
 	fn status(&self) -> Status {
 		if self.get_block_nonce() <= self.get_deadline() {
-			return Status::FundingPeriod;
+			Status::FundingPeriod
 		} else if self.get_esdt_balance() >= self.get_target() {
-			return Status::Successful;
+			Status::Successful
 		} else {
-			return Status::Failed;
+			Status::Failed
 		}
 	}
 
@@ -75,7 +75,7 @@ pub trait Crowdfunding {
 			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
 			Status::Successful => {
 				let caller = self.get_caller();
-				if &caller != &self.get_owner() {
+				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
 
@@ -91,7 +91,7 @@ pub trait Crowdfunding {
 				let caller = self.get_caller();
 				let deposit = self.get_deposit(&caller);
 
-				if &deposit > &0 {
+				if deposit > 0 {
 					let esdt_token_name = self.get_cf_esdt_token_name();
 					let mut esdt_balance = self.get_esdt_balance();
 

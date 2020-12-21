@@ -58,7 +58,7 @@ where
 }
 
 // #[inline]
-pub fn storage_set<'k, A, BigInt, BigUint, T>(api: A, key: &'k [u8], value: &T)
+pub fn storage_set<A, BigInt, BigUint, T>(api: A, key: &[u8], value: &T)
 where
 	T: TopEncode,
 	BigInt: NestedEncode + 'static,
@@ -67,7 +67,7 @@ where
 {
 	value.top_encode_or_exit(
 		StorageSetOutput::new(api.clone(), key),
-		api.clone(),
+		api,
 		storage_set_exit,
 	);
 }
