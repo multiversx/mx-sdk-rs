@@ -235,7 +235,7 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 	) -> Self {
 		match input.read_byte_or_exit(c.clone(), exit) {
 			0 => None,
-			1 => Some(T::dep_decode_or_exit(input, c.clone(), exit)),
+			1 => Some(T::dep_decode_or_exit(input, c, exit)),
 			_ => exit(c, DecodeError::INVALID_VALUE),
 		}
 	}

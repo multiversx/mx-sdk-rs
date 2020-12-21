@@ -9,6 +9,8 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
+mod abi_derive;
+mod abi_gen;
 mod arg_def;
 mod arg_extract;
 mod arg_regular;
@@ -55,4 +57,11 @@ pub fn callable(
 	input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
 	callable::process_callable(args, input)
+}
+
+#[proc_macro_derive(TypeAbi)]
+pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+	let ast = syn::parse(input).unwrap();
+
+	abi_derive::type_abi_derive(&ast)
 }

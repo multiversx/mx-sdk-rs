@@ -5,8 +5,8 @@
             "step": "setState",
             "accounts": {
                 "address:features_contract": {
-                    "nonce": "0",
-                    "balance": "100",
+                    "nonce": "1000",
+                    "balance": "200",
                     "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "not-enough",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -37,6 +37,49 @@
                 "out": [],
                 "status": "*",
                 "message": "str:failed transfer (insufficient funds)",
+                "logs": []
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "without-message",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "send_tx_endpoint",
+                "arguments": [
+                    "address:an_account",
+                    "100"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": []
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "with-message",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "send_tx_endpoint",
+                "arguments": [
+                    "address:an_account",
+                    "100",
+                    "str:send tx message here"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
                 "logs": []
             }
         }

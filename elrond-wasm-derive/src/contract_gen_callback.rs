@@ -16,10 +16,7 @@ pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 fn find_raw_callback(methods: &[Method]) -> Option<Method> {
 	methods
 		.iter()
-		.find(|m| match m.metadata {
-			MethodMetadata::CallbackRaw => true,
-			_ => false,
-		})
+		.find(|m| matches!(m.metadata, MethodMetadata::CallbackRaw))
 		.cloned()
 }
 

@@ -5,6 +5,7 @@ use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 
 use alloc::vec::Vec;
+use alloc::string::String;
 
 use elrond_wasm::BigIntApi;
 use elrond_wasm::Sign;
@@ -298,6 +299,12 @@ impl TopDecode for ArwenBigInt {
 		} else {
 			ArwenBigInt::from_signed_bytes_be(&*input.into_boxed_slice_u8())
 		}
+	}
+}
+
+impl elrond_wasm::abi::TypeAbi for ArwenBigInt {
+	fn type_name() -> String {
+		String::from("BigInt")
 	}
 }
 

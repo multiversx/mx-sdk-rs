@@ -80,7 +80,11 @@ pub trait Multisig {
 	#[init]
 	fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
 		require!(
+<<<<<<< HEAD
 			board.len() > 0,
+=======
+			!board.is_empty(),
+>>>>>>> master
 			"board cannot be empty on init, no-one would be able to propose"
 		);
 		require!(quorum <= board.len(), "quorum cannot exceed board size");
@@ -146,8 +150,17 @@ pub trait Multisig {
 	}
 
 	#[endpoint(proposeSendEgld)]
-	fn propose_send_egld(&self, to: Address, amount: BigUint) -> SCResult<usize> {
-		self.propose_action(Action::SendEgld { to, amount })
+	fn propose_send_egld(
+		&self,
+		to: Address,
+		amount: BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) -> SCResult<usize> {
+		let data = match opt_data {
+			OptionalArg::Some(data) => data,
+			OptionalArg::None => BoxedBytes::empty(),
+		};
+		self.propose_action(Action::SendEgld { to, amount, data })
 	}
 
 	#[endpoint(proposeSCDeploy)]
@@ -283,6 +296,7 @@ pub trait Multisig {
 		self.set_user_id_to_role(user_id, new_role);
 
 		// update board size
+		#[allow(clippy::collapsible_if)]
 		if old_role == UserRole::BoardMember {
 			if new_role != UserRole::BoardMember {
 				self.set_num_board_members(self.get_num_board_members() - 1);
@@ -294,6 +308,7 @@ pub trait Multisig {
 		}
 
 		// update num_proposers
+		#[allow(clippy::collapsible_if)]
 		if old_role == UserRole::Proposer {
 			if new_role != UserRole::Proposer {
 				self.set_num_proposers(self.get_num_proposers() - 1);
@@ -398,8 +413,8 @@ pub trait Multisig {
 				);
 				self.set_quorum(new_quorum)
 			},
-			Action::SendEgld { to, amount } => {
-				self.send_tx(&to, &amount, "");
+			Action::SendEgld { to, amount, data } => {
+				self.send_tx(&to, &amount, data.as_slice());
 			},
 			Action::SCDeploy {
 				amount,

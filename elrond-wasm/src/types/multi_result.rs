@@ -1,4 +1,7 @@
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::{BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, EndpointResult};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 macro_rules! multi_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
@@ -17,6 +20,39 @@ macro_rules! multi_result_impls {
                     $(
                         (self.0).$n.finish(api.clone());
                     )+
+                }
+            }
+
+            impl<$($name),+ > TypeAbi for $mr<$($name,)+>
+            where
+                $($name: TypeAbi,)+
+            {
+                fn type_name() -> String {
+                    let mut repr = String::from("MultiResult<");
+                    $(
+                        repr.push_str($name::type_name().as_str());
+                        repr.push(',');
+                    )+
+                    repr.push('>');
+                    repr
+                }
+
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+					$(
+						$name::provide_type_descriptions(accumulator);
+                    )+
+                }
+
+                fn is_multi_arg_or_result() -> bool {
+                    true
+                }
+
+                fn output_abis() -> Vec<OutputAbi> {
+                    let mut result = Vec::new();
+                    $(
+                        result.append(&mut $name::output_abis());
+                    )+
+                    result
                 }
             }
 

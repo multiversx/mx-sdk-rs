@@ -36,6 +36,7 @@ where
 	T: TopEncode,
 {
 	#[inline]
+	#[allow(clippy::redundant_closure)]
 	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
 		self.top_encode(AsyncCallArgOutput::new(serializer))
 			.map_err(|err| SCError::from(err))

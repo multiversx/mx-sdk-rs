@@ -1,6 +1,6 @@
-use elrond_wasm::elrond_codec::*;
+derive_imports!();
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(TopEncode, TopDecode, TypeAbi, Clone, Copy, PartialEq)]
 pub enum UserRole {
 	None,
 	Proposer,
@@ -9,10 +9,7 @@ pub enum UserRole {
 
 impl UserRole {
 	pub fn can_propose(&self) -> bool {
-		match *self {
-			UserRole::BoardMember | UserRole::Proposer => true,
-			UserRole::None => false,
-		}
+		matches!(*self, UserRole::BoardMember | UserRole::Proposer)
 	}
 
 	pub fn can_perform_action(&self) -> bool {
@@ -20,6 +17,7 @@ impl UserRole {
 	}
 
 	pub fn can_sign(&self) -> bool {
+<<<<<<< HEAD
 		match *self {
 			UserRole::BoardMember => true,
 			_ => false,
@@ -64,5 +62,8 @@ impl TopDecode for UserRole {
 			2 => UserRole::BoardMember,
 			_ => exit(c, DecodeError::INVALID_VALUE),
 		}
+=======
+		matches!(*self, UserRole::BoardMember)
+>>>>>>> master
 	}
 }

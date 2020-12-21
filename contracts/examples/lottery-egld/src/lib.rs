@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(clippy::too_many_arguments)]
 
 imports!();
 
@@ -82,7 +83,7 @@ pub trait Lottery {
 		let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
 		let prize_distribution =
 			opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
-		let whitelist = opt_whitelist.unwrap_or(Vec::new());
+		let whitelist = opt_whitelist.unwrap_or_default();
 
 		require!(
 			self.status(&lottery_name) == Status::Inactive,
@@ -171,7 +172,7 @@ pub trait Lottery {
 			return Status::Ended;
 		}
 
-		return Status::Running;
+		Status::Running
 	}
 
 	fn update_after_buy_ticket(
@@ -258,7 +259,7 @@ pub trait Lottery {
 						self.send_tx(
 							&winner_address,
 							&prize,
-							"You won the lottery! Congratulations!",
+							b"You won the lottery! Congratulations!",
 						);
 						info.prize_pool -= prize;
 
@@ -289,11 +290,11 @@ pub trait Lottery {
 	fn sum_array(&self, array: &[u8]) -> u16 {
 		let mut sum = 0u16; // u16 to protect against overflow
 
-		for i in 0..array.len() {
-			sum += array[i] as u16;
+		for &item in array {
+			sum += item as u16;
 		}
 
-		return sum;
+		sum
 	}
 
 	// storage
