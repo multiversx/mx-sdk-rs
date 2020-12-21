@@ -3,7 +3,7 @@ name = "elrond-wasm-node"
 version = "0.10.0"
 edition = "2018"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
