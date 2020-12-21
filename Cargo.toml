@@ -30,12 +30,13 @@ members = [
   "contracts/examples/multisig",
   "contracts/examples/multisig/abi",
   "contracts/examples/non-fungible-tokens",
-  "contracts/examples/crypto-kitties/kitty-ownership",
-  "contracts/examples/crypto-kitties/kitty-genetic-alg",
-  "contracts/examples/crypto-kitties/kitty-auction",
   "contracts/examples/non-fungible-tokens/abi",
   "contracts/examples/simple-erc20",
   "contracts/examples/simple-erc20/abi",
+
+  "contracts/examples/crypto-kitties/kitty-ownership",
+  "contracts/examples/crypto-kitties/kitty-genetic-alg",
+  "contracts/examples/crypto-kitties/kitty-auction",
   
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/abi",
