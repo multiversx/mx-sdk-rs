@@ -5,7 +5,7 @@ use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use elrond_codec::*;
 
 // to test, run the following command in elrond-codec-derive folder:
-// cargo expand --test struct_derive_test > expanded.rs
+// cargo expand --test struct_with_generic_derive_test > expanded.rs
 
 trait SimpleTrait {
 	fn simple_function(&self);
