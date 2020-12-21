@@ -1,5 +1,6 @@
 #![no_std]
 
+use elrond_wasm::*;
 derive_imports!();
 
 const SECONDS_PER_MINUTE: u64 = 60;
@@ -12,7 +13,7 @@ pub mod kitty_genes;
 use color::*;
 use kitty_genes::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct Kitty {
 	pub genes: KittyGenes,
 	pub birth_time: u64,   // timestamp

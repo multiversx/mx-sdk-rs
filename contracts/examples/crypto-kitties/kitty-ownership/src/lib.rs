@@ -100,7 +100,7 @@ pub trait KittyOwnership {
 			"Only owner may call this function!"
 		);
 
-		self.send_tx(&caller, &self.get_sc_balance(), "claim");
+		self.send_tx(&caller, &self.get_sc_balance(), b"claim");
 
 		Ok(())
 	}
@@ -382,7 +382,7 @@ pub trait KittyOwnership {
 				// send auto birth fee to caller
 				let caller = self.get_caller();
 				let fee = self.get_auto_birth_fee();
-				self.send_tx(&caller, &fee, "Auto Birth Fee");
+				self.send_tx(&caller, &fee, b"auto birth fee");
 			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_genes contract address is invalid

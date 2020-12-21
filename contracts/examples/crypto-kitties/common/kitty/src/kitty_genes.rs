@@ -1,9 +1,10 @@
+use elrond_wasm::derive_imports;
 derive_imports!();
 
 use super::color::*;
 use random::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, TypeAbi)]
 pub struct KittyGenes {
 	pub fur_color: Color,
 	pub eye_color: Color,

@@ -156,7 +156,7 @@ pub trait KittyAuction {
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
-			self.send_tx(&auction.current_winner, &auction.current_bid, "bid refund");
+			self.send_tx(&auction.current_winner, &auction.current_bid, b"bid refund");
 		}
 
 		// update auction bid and winner
@@ -238,7 +238,7 @@ pub trait KittyAuction {
 				self.clear_auction(cb_kitty_id);
 
 				// send winning bid money to kitty owner
-				self.send_tx(&auction.kitty_owner, &auction.current_bid, "sold kitty");
+				self.send_tx(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
 			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_ownership contract address is invalid
