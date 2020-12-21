@@ -1,5 +1,4 @@
 use quote::quote;
-use syn;
 
 pub fn is_fieldless_enum(data_enum: &syn::DataEnum) -> bool {
 	data_enum

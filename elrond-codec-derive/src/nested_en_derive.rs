@@ -1,7 +1,6 @@
 use crate::util::*;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn;
 
 pub fn dep_encode_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 	quote! {
