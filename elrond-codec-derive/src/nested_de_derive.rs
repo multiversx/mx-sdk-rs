@@ -71,7 +71,7 @@ pub fn variant_dep_decode_or_exit_snippets(
 		.collect()
 }
 
-pub fn impl_nested_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
+pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {
