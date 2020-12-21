@@ -75,7 +75,7 @@ fn zero_value_if(name: &syn::Ident, data_enum: &syn::DataEnum) -> proc_macro2::T
 	}
 }
 
-pub fn impl_top_decode_macro(ast: &syn::DeriveInput) -> TokenStream {
+pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {

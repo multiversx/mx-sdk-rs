@@ -81,7 +81,7 @@ pub fn variant_top_encode_or_exit_snippets(
 		.collect()
 }
 
-pub fn impl_top_encode_macro(ast: &syn::DeriveInput) -> TokenStream {
+pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
 	let gen = match &ast.data {
 		syn::Data::Struct(data_struct) => {
