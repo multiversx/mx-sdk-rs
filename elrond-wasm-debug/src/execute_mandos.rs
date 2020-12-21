@@ -176,7 +176,7 @@ fn parse_execute_mandos_steps(
 			} => {
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
-					to: H256::zero(),
+					to: Address::zero(),
 					call_value: tx.call_value.value.clone(),
 					esdt_value: tx.esdt_value.value.clone(),
 					esdt_token_name: tx.esdt_token_name.value.clone(),
