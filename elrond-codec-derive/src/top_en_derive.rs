@@ -20,7 +20,7 @@ pub fn variant_top_encode_snippets(
 				// top-encode discriminant directly
 				quote! {
 					#name::#variant_ident =>
-						#variant_index_u8.top_encode(output),
+						elrond_codec::TopEncode::top_encode(&#variant_index_u8, output),
 				}
 			} else {
 				// dep-encode to buffer first
@@ -33,7 +33,7 @@ pub fn variant_top_encode_snippets(
 					#name::#variant_ident #local_var_declarations => {
 						let mut buffer = Vec::<u8>::new();
 						let dest = &mut buffer;
-						#variant_index_u8.dep_encode(dest)?;
+						elrond_codec::NestedEncode::dep_encode(&#variant_index_u8, dest)?;
 						#(#variant_field_snippets)*
 						output.set_slice_u8(&buffer[..]);
 						Result::Ok(())
@@ -59,7 +59,7 @@ pub fn variant_top_encode_or_exit_snippets(
 				// top-encode discriminant directly
 				quote! {
 					#name::#variant_ident =>
-						#variant_index_u8.top_encode_or_exit(output, c.clone(), exit),
+						elrond_codec::TopEncode::top_encode_or_exit(&#variant_index_u8, output, c.clone(), exit),
 				}
 			} else {
 				// dep-encode to buffer first
@@ -72,7 +72,7 @@ pub fn variant_top_encode_or_exit_snippets(
 					#name::#variant_ident #local_var_declarations => {
 						let mut buffer = Vec::<u8>::new();
 						let dest = &mut buffer;
-						#variant_index_u8.dep_encode_or_exit(dest, c.clone(), exit);
+						elrond_codec::NestedEncode::dep_encode_or_exit(&#variant_index_u8, dest, c.clone(), exit);
 						#(#variant_field_snippets)*
 						output.set_slice_u8(&buffer[..]);
 					},

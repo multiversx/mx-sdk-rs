@@ -33,7 +33,7 @@ fn variant_dep_encode_snippets(
 			});
 			quote! {
 				#name::#variant_ident #local_var_declarations => {
-					#variant_index_u8.dep_encode(dest)?;
+					elrond_codec::NestedEncode::dep_encode(&#variant_index_u8, dest)?;
 					#(#variant_field_snippets)*
 				},
 			}
@@ -59,7 +59,7 @@ fn variant_dep_encode_or_exit_snippets(
 			});
 			quote! {
 				#name::#variant_ident #local_var_declarations => {
-					#variant_index_u8.dep_encode_or_exit(dest, c.clone(), exit);
+					elrond_codec::NestedEncode::dep_encode_or_exit(&#variant_index_u8, dest, c.clone(), exit);
 					#(#variant_field_snippets)*
 				},
 			}
