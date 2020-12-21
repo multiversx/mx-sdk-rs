@@ -59,4 +59,8 @@ pub trait AbiTester {
 	fn optional_result(&self) -> OptionalResult<OnlyShowsUpAsNested7> {
 		OptionalResult::None
 	}
+
+	#[endpoint]
+	#[payable]
+	fn payable_egld(&self, #[payment] _payment: BigUint) {}
 }
