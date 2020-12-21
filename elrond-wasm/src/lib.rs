@@ -355,7 +355,9 @@ macro_rules! derive_imports {
 	() => {
 		use elrond_wasm::abi::TypeAbi;
 		use elrond_wasm::elrond_codec;
-		use elrond_wasm::elrond_codec::*;
+		use elrond_wasm::elrond_codec::elrond_codec_derive::{
+			NestedDecode, NestedEncode, TopDecode, TopEncode,
+		};
 		use elrond_wasm_derive::TypeAbi;
 	};
 }
