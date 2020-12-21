@@ -31,18 +31,18 @@ pub trait KittyOwnership {
 #[elrond_wasm_derive::contract(KittyAuctionImpl)]
 pub trait KittyAuction {
 	#[init]
-	fn init(&self, kitty_ownership_contract_address: Address) {
-		self.set_kitty_ownership_contract_address(&kitty_ownership_contract_address);
+	fn init(&self, #[var_args] opt_kitty_ownership_contract_address: OptionalArg<Address>) {
+		match opt_kitty_ownership_contract_address {
+			OptionalArg::Some(addr) => self.set_kitty_ownership_contract_address(&addr),
+			OptionalArg::None => {},
+		}
 	}
 
 	// endpoints - owner-only
 
 	#[endpoint(setKittyOwnershipContractAddress)]
 	fn set_kitty_ownership_contract_address_endpoint(&self, address: Address) -> SCResult<()> {
-		require!(
-			self.get_caller() == self.get_owner_address(),
-			"Only owner may call this function!"
-		);
+		only_owner!(self, "Only owner may call this function!");
 
 		self.set_kitty_ownership_contract_address(&address);
 
@@ -74,7 +74,7 @@ pub trait KittyAuction {
 			"starting price must be less than ending price!"
 		);
 		require!(
-			deadline < self.get_block_timestamp(),
+			deadline > self.get_block_timestamp(),
 			"deadline can't be in the past!"
 		);
 
@@ -107,7 +107,7 @@ pub trait KittyAuction {
 			"starting price must be less than ending price!"
 		);
 		require!(
-			deadline < self.get_block_timestamp(),
+			deadline > self.get_block_timestamp(),
 			"deadline can't be in the past!"
 		);
 
@@ -177,7 +177,7 @@ pub trait KittyAuction {
 		let auction = self.get_auction(kitty_id);
 
 		require!(
-			self.get_block_timestamp() >= auction.deadline
+			self.get_block_timestamp() > auction.deadline
 				|| auction.current_bid == auction.ending_price,
 			"auction has not ended yet!"
 		);
@@ -283,29 +283,35 @@ pub trait KittyAuction {
 		let caller = self.get_caller();
 
 		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
-		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
-		proxy.allowAuctioning(
-			caller.clone(),
-			kitty_id,
-			auction_type,
-			kitty_id,
-			starting_price,
-			ending_price,
-			deadline,
-			caller,
-		);
+		if kitty_ownership_contract_address != Address::zero() {
+			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
+			proxy.allowAuctioning(
+				caller.clone(),
+				kitty_id,
+				auction_type,
+				kitty_id,
+				starting_price,
+				ending_price,
+				deadline,
+				caller,
+			);
+		}
 	}
 
 	fn _transfer_to(&self, address: Address, kitty_id: u32) {
 		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
-		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
-		proxy.transfer(address, kitty_id, kitty_id);
+		if kitty_ownership_contract_address != Address::zero() {
+			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
+			proxy.transfer(address, kitty_id, kitty_id);
+		}
 	}
 
 	fn _approve_siring(&self, address: Address, kitty_id: u32) {
 		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
-		let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
-		proxy.approveSiring(address, kitty_id, kitty_id);
+		if kitty_ownership_contract_address != Address::zero() {
+			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
+			proxy.approveSiring(address, kitty_id, kitty_id);
+		}
 	}
 
 	// storage

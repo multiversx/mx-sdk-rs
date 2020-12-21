@@ -55,9 +55,9 @@ impl Kitty {
 
 		let cooldown = SECONDS_PER_MINUTE << tiredness; // 2^(tiredness) minutes
 		if cooldown > MAX_COOLDOWN {
-			return MAX_COOLDOWN;
+			MAX_COOLDOWN
 		} else {
-			return cooldown;
+			cooldown
 		}
 	}
 
