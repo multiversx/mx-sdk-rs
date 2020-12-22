@@ -18,7 +18,7 @@ pub trait PingPong {
 		max_funds: Option<BigUint>,
 	) {
 		self.set_fixed_sum(fixed_sum);
-		let computed_beginning = beginning.unwrap_or(self.get_block_nonce());
+		let computed_beginning = beginning.unwrap_or_else(|| self.get_block_nonce());
 		let deadline = computed_beginning + duration;
 		self.set_deadline(deadline);
 		self.set_beginning(computed_beginning);
@@ -38,22 +38,19 @@ pub trait PingPong {
 			"smart contract not active yet"
 		);
 
-		require!(
-			self.get_max_funds()
-				.map_or(true, |max_funds| &self.get_sc_balance() + payment
-					> max_funds),
-			"smart contract full"
-		);
+		if let Some(max_funds) = self.get_max_funds() {
+			require!(
+				&self.get_sc_balance() + payment > max_funds,
+				"smart contract full"
+			);
+		}
 
 		let caller = self.get_caller();
-		let user_status = self.get_user_status(&caller);
+		let user_id = self.get_or_create_user(&caller);
+		let user_status = self.get_user_status(user_id);
 		match user_status {
 			UserStatus::New => {
-				self.set_user_status(&caller, &UserStatus::Registered);
-				let new_index = self.get_size() + 1;
-				self.set_index(&caller, new_index);
-				self.set_address(new_index, &caller);
-				self.set_size(new_index);
+				self.set_user_status(user_id, &UserStatus::Registered);
 				Ok(())
 			},
 			UserStatus::Registered => {
@@ -65,20 +62,16 @@ pub trait PingPong {
 		}
 	}
 
-	fn pong_address(&self, caller: &Address) -> SCResult<()> {
-		require!(
-			self.get_block_nonce() >= self.get_deadline(),
-			"can't withdraw before deadline"
-		);
-
-		let user_status = self.get_user_status(&caller);
+	fn pong_by_user_id(&self, user_id: usize) -> SCResult<()> {
+		let user_status = self.get_user_status(user_id);
 		match user_status {
 			UserStatus::New => {
 				sc_error!("can't pong, never pinged")
 			},
 			UserStatus::Registered => {
-				self.set_user_status(&caller, &UserStatus::Withdrawn);
-				self.send_tx(&caller, &self.get_fixed_sum(), "pong");
+				self.set_user_status(user_id, &UserStatus::Withdrawn);
+				let user_address = self.get_user_address(user_id);
+				self.send_tx(&user_address, &self.get_fixed_sum(), "pong");
 				Ok(())
 			},
 			UserStatus::Withdrawn => {
@@ -89,8 +82,14 @@ pub trait PingPong {
 
 	#[endpoint]
 	fn pong(&self) -> SCResult<()> {
+		require!(
+			self.get_block_nonce() >= self.get_deadline(),
+			"can't withdraw before deadline"
+		);
+
 		let caller = self.get_caller();
-		self.pong_address(&caller)
+		let user_id = self.get_user_id(&caller);
+		self.pong_by_user_id(user_id)
 	}
 
 	#[endpoint]
@@ -100,10 +99,9 @@ pub trait PingPong {
 			"can't withdraw before deadline"
 		);
 
-		let size = self.get_size();
-		for i in 1..=size {
-			let address = self.get_address(i);
-			self.pong_address(&address).ok();
+		let num_users = self.get_num_users();
+		for user_id in 1..=num_users {
+			self.pong_by_user_id(user_id).ok();
 		}
 		Ok(())
 	}
@@ -139,30 +137,43 @@ pub trait PingPong {
 	fn get_max_funds(&self) -> Option<BigUint>;
 
 	#[storage_set("user_status")]
-	fn set_user_status(&self, user: &Address, user_status: &UserStatus);
+	fn set_user_status(&self, user_id: usize, user_status: &UserStatus);
 
 	#[view]
 	#[storage_get("user_status")]
-	fn get_user_status(&self, user: &Address) -> UserStatus;
+	fn get_user_status(&self, user_id: usize) -> UserStatus;
 
-	#[storage_set("index")]
-	fn set_index(&self, user: &Address, index: usize);
-
-	#[view]
-	#[storage_get("index")]
-	fn get_index(&self, user: &Address) -> usize;
-
-	#[storage_set("address")]
-	fn set_address(&self, index: usize, user: &Address);
+	#[storage_set("user_id")]
+	fn set_user_id(&self, user: &Address, user_id: usize);
 
 	#[view]
-	#[storage_get("address")]
-	fn get_address(&self, index: usize) -> Address;
+	#[storage_get("user_id")]
+	fn get_user_id(&self, user: &Address) -> usize;
 
-	#[storage_set("size")]
-	fn set_size(&self, size: usize);
+	#[storage_set("user_address")]
+	fn set_user_address(&self, user_id: usize, user_address: &Address);
 
 	#[view]
-	#[storage_get("size")]
-	fn get_size(&self) -> usize;
+	#[storage_get("user_address")]
+	fn get_user_address(&self, user_id: usize) -> Address;
+
+	#[storage_set("num_users")]
+	fn set_num_users(&self, size: usize);
+
+	#[view]
+	#[storage_get("num_users")]
+	fn get_num_users(&self) -> usize;
+
+	fn get_or_create_user(&self, address: &Address) -> usize {
+		let mut user_id = self.get_user_id(&address);
+		if user_id == 0 {
+			let mut num_users = self.get_num_users();
+			num_users += 1;
+			self.set_num_users(num_users);
+			user_id = num_users;
+			self.set_user_id(&address, user_id);
+			self.set_user_address(user_id, &address);
+		}
+		user_id
+	}
 }

@@ -1,14 +1,14 @@
 {
-    "name": "call ping a second time",
+    "name": "extracting the funds by calling pong after the deadline has passed",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "ping-pong-call-ping.scen.json"
+            "path": "ping-pong-init.scen.json"
         },
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,001"
+                "blockNonce": "123,781"
             }
         },
         {
@@ -16,15 +16,15 @@
             "tx": {
                 "from": "address:participant1",
                 "to": "address:the_ping_pong_contract",
-                "value": "500,000,000,000",
-                "function": "ping",
+                "value": "0",
+                "function": "pong",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
-                "message": "str:can only ping once",
+                "message": "str:can't pong, never pinged",
                 "gas": "*",
                 "refund": "*"
             }
@@ -38,8 +38,8 @@
                     "storage": {}
                 },
                 "address:participant1": {
-                    "nonce": "2",
-                    "balance": "1,300,000,000,000",
+                    "nonce": "*",
+                    "balance": "1,800,000,000,000",
                     "storage": {}
                 },
                 "address:participant2": {
@@ -49,15 +49,11 @@
                 },
                 "address:the_ping_pong_contract": {
                     "nonce": "0",
-                    "balance": "500,000,000,000",
+                    "balance": "0",
                     "storage": {
                         "''fixed_sum": "500,000,000,000",
                         "''beginning": "780",
-                        "''deadline": "123,780",
-                        "''user_id|address:participant1": "1",
-                        "''user_address|0x0000001": "address:participant1",
-                        "''user_status|0x0000001": "1",
-                        "''num_users": "1"
+                        "''deadline": "123,780"
                     },
                     "code": "file:../output/ping-pong.wasm"
                 }
