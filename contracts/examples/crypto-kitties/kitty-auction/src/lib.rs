@@ -51,7 +51,7 @@ pub trait KittyAuction {
 
 	// endpoints
 
-	#[endpoint(isUpForAuction)]
+	#[view(isUpForAuction)]
 	fn is_up_for_auction(&self, kitty_id: u32) -> bool {
 		!self.is_empty_auction(kitty_id)
 	}

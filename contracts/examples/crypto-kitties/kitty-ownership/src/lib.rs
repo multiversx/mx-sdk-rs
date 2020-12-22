@@ -104,19 +104,19 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
-	// endpoints - ERC721 required
+	// views/endpoints - ERC721 required
 
-	#[endpoint(totalSupply)]
+	#[view(totalSupply)]
 	fn total_supply(&self) -> u32 {
 		self.get_total_kitties() - 1 // not counting genesis Kitty
 	}
 
-	#[endpoint(balanceOf)]
+	#[view(balanceOf)]
 	fn balance_of(&self, address: Address) -> u32 {
 		self.get_nr_owned_kitties(&address)
 	}
 
-	#[endpoint(ownerOf)]
+	#[view(ownerOf)]
 	fn owner_of(&self, kitty_id: u32) -> Address {
 		self.get_kitty_owner(kitty_id)
 	}
@@ -187,7 +187,7 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
-	#[endpoint(tokensOfOwner)]
+	#[view(tokensOfOwner)]
 	fn tokens_of_owner(&self, address: Address) -> Vec<u32> {
 		let nr_owned_kitties = self.get_nr_owned_kitties(&address);
 		let total_kitties = self.get_total_kitties();
@@ -234,15 +234,42 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
-	// endpoints - Kitty Breeding
+	// views/endpoints - Kitty Breeding
 
-	#[endpoint(getKittyById)]
+	#[view(getKittyById)]
 	fn get_kitty_by_id_endpoint(&self, kitty_id: u32) -> SCResult<Kitty> {
 		if self._is_valid_id(kitty_id) {
 			Ok(self.get_kitty_by_id(kitty_id))
 		} else {
 			sc_error!("kitty does not exist!")
 		}
+	}
+
+	#[view(isReadyToBreed)]
+	fn is_ready_to_breed(&self, kitty_id: u32) -> SCResult<bool> {
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
+
+		let kitty = self.get_kitty_by_id(kitty_id);
+
+		Ok(self._is_ready_to_breed(&kitty))
+	}
+
+	#[view(isPregnant)]
+	fn is_pregnant(&self, kitty_id: u32) -> SCResult<bool> {
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
+
+		let kitty = self.get_kitty_by_id(kitty_id);
+
+		Ok(kitty.is_pregnant())
+	}
+
+	#[view(canBreedWith)]
+	fn can_breed_with(&self, matron_id: u32, sire_id: u32) -> SCResult<bool> {
+		require!(self._is_valid_id(matron_id), "Invalid matron id!");
+		require!(self._is_valid_id(sire_id), "Invalid sire id!");
+
+		Ok(self._is_valid_mating_pair(matron_id, sire_id)
+			&& self._is_siring_permitted(matron_id, sire_id))
 	}
 
 	#[endpoint(approveSiring)]
@@ -259,33 +286,6 @@ pub trait KittyOwnership {
 		self.set_sire_allowed_address(kitty_id, &address);
 
 		Ok(())
-	}
-
-	#[endpoint(isReadyToBreed)]
-	fn is_ready_to_breed(&self, kitty_id: u32) -> SCResult<bool> {
-		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
-
-		let kitty = self.get_kitty_by_id(kitty_id);
-
-		Ok(self._is_ready_to_breed(&kitty))
-	}
-
-	#[endpoint(isPregnant)]
-	fn is_pregnant(&self, kitty_id: u32) -> SCResult<bool> {
-		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
-
-		let kitty = self.get_kitty_by_id(kitty_id);
-
-		Ok(kitty.is_pregnant())
-	}
-
-	#[endpoint(canBreedWith)]
-	fn can_breed_with(&self, matron_id: u32, sire_id: u32) -> SCResult<bool> {
-		require!(self._is_valid_id(matron_id), "Invalid matron id!");
-		require!(self._is_valid_id(sire_id), "Invalid sire id!");
-
-		Ok(self._is_valid_mating_pair(matron_id, sire_id)
-			&& self._is_siring_permitted(matron_id, sire_id))
 	}
 
 	#[payable]
