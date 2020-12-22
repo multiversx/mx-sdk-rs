@@ -169,6 +169,7 @@ pub struct BlockInfo {
 	pub block_nonce: Option<U64Value>,
 	pub block_round: Option<U64Value>,
 	pub block_epoch: Option<U64Value>,
+	pub block_random_seed: Option<BytesValue>,
 }
 
 impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
@@ -186,6 +187,9 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
 			block_epoch: from
 				.block_epoch
 				.map(|v| U64Value::interpret_from(v, context)),
+			block_random_seed: from
+				.block_random_seed
+				.map(|v| BytesValue::interpret_from(v, context)),
 		}
 	}
 }

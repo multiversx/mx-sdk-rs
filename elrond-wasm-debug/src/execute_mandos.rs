@@ -77,6 +77,20 @@ fn parse_execute_mandos_steps(
 					if let Some(u64_value) = &block_info_obj.block_round {
 						state.previous_block_info.block_round = u64_value.value;
 					}
+					if let Some(bytes_value) = &block_info_obj.block_random_seed {
+						const SEED_LEN: usize = 48;
+						let val = &bytes_value.value;
+
+						let mut seed = [0u8; SEED_LEN];
+						let mut temp = Vec::with_capacity(SEED_LEN);
+						let zeroes_in_front = SEED_LEN - val.len();
+
+						temp.resize(zeroes_in_front, 0u8);
+						temp.extend_from_slice(val.as_slice());
+
+						seed.clone_from_slice(temp.as_slice());
+						state.previous_block_info.block_random_seed = Box::from(seed);
+					}
 				}
 				if let Some(block_info_obj) = &**current_block_info {
 					if let Some(u64_value) = &block_info_obj.block_timestamp {
@@ -90,6 +104,20 @@ fn parse_execute_mandos_steps(
 					}
 					if let Some(u64_value) = &block_info_obj.block_round {
 						state.current_block_info.block_round = u64_value.value;
+					}
+					if let Some(bytes_value) = &block_info_obj.block_random_seed {
+						const SEED_LEN: usize = 48;
+						let val = &bytes_value.value;
+
+						let mut seed = [0u8; SEED_LEN];
+						let mut temp = Vec::with_capacity(SEED_LEN);
+						let zeroes_in_front = SEED_LEN - val.len();
+
+						temp.resize(zeroes_in_front, 0u8);
+						temp.extend_from_slice(val.as_slice());
+
+						seed.clone_from_slice(temp.as_slice());
+						state.current_block_info.block_random_seed = Box::from(seed);
 					}
 				}
 			},

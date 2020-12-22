@@ -61,13 +61,15 @@
             "previousBlockInfo": {
                 "blockNonce": "222",
                 "blockRound": "333",
-                "blockEpoch": "444"
+                "blockEpoch": "444",
+                "blockRandomSeed": "u16:0|u32:0"
             },
             "currentBlockInfo": {
                 "blockTimestamp": "511",
                 "blockNonce": "522",
                 "blockRound": "533",
-                "blockEpoch": "544"
+                "blockEpoch": "544",
+                "blockRandomSeed": "u16:42|u32:12345"
             }
         },
         {

@@ -147,6 +147,10 @@ pub struct BlockInfoRaw {
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub block_epoch: Option<ValueSubTree>,
+
+	#[serde(default)]
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub block_random_seed: Option<ValueSubTree>,
 }
 
 #[derive(Serialize, Deserialize)]
