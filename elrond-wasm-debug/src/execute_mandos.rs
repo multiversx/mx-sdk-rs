@@ -84,13 +84,7 @@ fn parse_execute_mandos_steps(
 						assert!(val.len() <= SEED_LEN, "block random seed input value too long!");
 
 						let mut seed = [0u8; SEED_LEN];
-						let mut temp = Vec::with_capacity(SEED_LEN);
-						let zeroes_in_front = SEED_LEN - val.len();
-
-						temp.resize(zeroes_in_front, 0u8);
-						temp.extend_from_slice(val.as_slice());
-
-						seed.clone_from_slice(temp.as_slice());
+						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
 						state.previous_block_info.block_random_seed = Box::from(seed);
 					}
 				}
@@ -114,13 +108,7 @@ fn parse_execute_mandos_steps(
 						assert!(val.len() <= SEED_LEN, "block random seed input value too long!");
 
 						let mut seed = [0u8; SEED_LEN];
-						let mut temp = Vec::with_capacity(SEED_LEN);
-						let zeroes_in_front = SEED_LEN - val.len();
-
-						temp.resize(zeroes_in_front, 0u8);
-						temp.extend_from_slice(val.as_slice());
-
-						seed.clone_from_slice(temp.as_slice());
+						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
 						state.current_block_info.block_random_seed = Box::from(seed);
 					}
 				}
