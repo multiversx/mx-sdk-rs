@@ -277,7 +277,7 @@ impl TopDecode for bool {
 	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-		match input.into_i64() {
+		match input.into_u64() {
 			0 => Ok(false),
 			1 => Ok(true),
 			_ => Err(DecodeError::INPUT_OUT_OF_RANGE),
@@ -289,7 +289,7 @@ impl TopDecode for bool {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		match input.into_i64() {
+		match input.into_u64() {
 			0 => false,
 			1 => true,
 			_ => exit(c, DecodeError::INPUT_OUT_OF_RANGE),
