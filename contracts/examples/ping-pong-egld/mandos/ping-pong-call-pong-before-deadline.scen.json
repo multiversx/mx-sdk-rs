@@ -1,5 +1,5 @@
 {
-    "name": "call ping a second time",
+    "name": "trying withdraw the funds before the deadline has passed",
     "steps": [
         {
             "step": "externalSteps",
@@ -8,7 +8,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,001"
+                "blockNonce": "123,000"
             }
         },
         {
@@ -16,15 +16,15 @@
             "tx": {
                 "from": "address:participant1",
                 "to": "address:the_ping_pong_contract",
-                "value": "500,000,000,000",
-                "function": "ping",
+                "value": "0",
+                "function": "pong",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
-                "message": "str:can only ping once",
+                "message": "str:can't withdraw before deadline",
                 "gas": "*",
                 "refund": "*"
             }

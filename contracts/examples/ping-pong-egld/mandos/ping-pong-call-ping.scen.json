@@ -7,13 +7,6 @@
         },
         {
             "step": "setState",
-            "accounts": {
-                "address:participant1": {
-                    "nonce": "0",
-                    "balance": "1,800,000,000,000",
-                    "storage": {}
-                }
-            },
             "currentBlockInfo": {
                 "blockNonce": "781"
             }
@@ -48,6 +41,11 @@
                     "balance": "1,300,000,000,000",
                     "storage": {}
                 },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
+                    "storage": {}
+                },
                 "address:the_ping_pong_contract": {
                     "nonce": "0",
                     "balance": "500,000,000,000",
@@ -55,10 +53,10 @@
                         "''fixed_sum": "500,000,000,000",
                         "''beginning": "780",
                         "''deadline": "123,780",
-                        "''index|address:participant1": "1",
-                        "''address|0x0000001": "address:participant1",
-                        "''user_status|address:participant1": "1",
-                        "''size": "1"
+                        "''user_id|address:participant1": "1",
+                        "''user_address|0x0000001": "address:participant1",
+                        "''user_status|0x0000001": "1",
+                        "''num_users": "1"
                     },
                     "code": "file:../output/ping-pong.wasm"
                 }

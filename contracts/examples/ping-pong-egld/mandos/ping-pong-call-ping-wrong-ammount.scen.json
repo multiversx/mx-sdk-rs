@@ -6,16 +6,6 @@
             "path": "ping-pong-init.scen.json"
         },
         {
-            "step": "setState",
-            "accounts": {
-                "address:participant1": {
-                    "nonce": "0",
-                    "balance": "600,000,000,000",
-                    "storage": {}
-                }
-            }
-        },
-        {
             "step": "scCall",
             "tx": {
                 "from": "address:participant1",
@@ -42,8 +32,13 @@
                     "storage": {}
                 },
                 "address:participant1": {
-                    "nonce": "*",
-                    "balance": "600,000,000,000",
+                    "nonce": "1",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
                     "storage": {}
                 },
                 "address:the_ping_pong_contract": {

@@ -74,6 +74,14 @@ fn ping_pong_call_pong() {
 }
 
 #[test]
+fn ping_pong_call_pong_without_ping() {
+	parse_execute_mandos(
+		"mandos/ping-pong-call-pong-without-ping.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
 fn ping_pong_call_pong_twice() {
 	parse_execute_mandos(
 		"mandos/ping-pong-call-pong-twice.scen.json",
@@ -95,6 +103,14 @@ fn ping_pong_call_pong_before_deadline() {
 fn ping_pong_call_pong_all() {
 	parse_execute_mandos(
 		"mandos/ping-pong-call-pong-all.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn ping_pong_call_pong_all_after_pong() {
+	parse_execute_mandos(
+		"mandos/ping-pong-call-pong-all-after-pong.scen.json",
 		&contract_map(),
 	);
 }

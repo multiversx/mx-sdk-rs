@@ -1,21 +1,14 @@
 {
-    "name": "trying withdraw the funds before the deadline has passed",
+    "name": "call pong all in order to send the funds back to everyone after one user already got his funds back by calling pong himself",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "ping-pong-init.scen.json"
+            "path": "ping-pong-call-pong.scen.json"
         },
         {
             "step": "setState",
-            "accounts": {
-                "address:participant1": {
-                    "nonce": "0",
-                    "balance": "600,000,000,000",
-                    "storage": {}
-                }
-            },
             "currentBlockInfo": {
-                "blockNonce": "123,000"
+                "blockNonce": "123,781"
             }
         },
         {
@@ -24,14 +17,14 @@
                 "from": "address:participant1",
                 "to": "address:the_ping_pong_contract",
                 "value": "0",
-                "function": "pong",
+                "function": "pong_all",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "4",
-                "message": "str:can't withdraw before deadline",
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -45,8 +38,13 @@
                     "storage": {}
                 },
                 "address:participant1": {
-                    "nonce": "*",
-                    "balance": "600,000,000,000",
+                    "nonce": "3",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
                     "storage": {}
                 },
                 "address:the_ping_pong_contract": {
@@ -55,7 +53,11 @@
                     "storage": {
                         "''fixed_sum": "500,000,000,000",
                         "''beginning": "780",
-                        "''deadline": "123,780"
+                        "''deadline": "123,780",
+                        "''user_id|address:participant1": "1",
+                        "''user_address|0x0000001": "address:participant1",
+                        "''user_status|0x0000001": "2",
+                        "''num_users": "1"
                     },
                     "code": "file:../output/ping-pong.wasm"
                 }
