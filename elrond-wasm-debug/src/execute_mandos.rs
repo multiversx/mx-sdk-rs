@@ -81,6 +81,8 @@ fn parse_execute_mandos_steps(
 						const SEED_LEN: usize = 48;
 						let val = &bytes_value.value;
 
+						assert!(val.len() <= SEED_LEN, "block random seed input value too long!");
+
 						let mut seed = [0u8; SEED_LEN];
 						let mut temp = Vec::with_capacity(SEED_LEN);
 						let zeroes_in_front = SEED_LEN - val.len();
@@ -108,6 +110,8 @@ fn parse_execute_mandos_steps(
 					if let Some(bytes_value) = &block_info_obj.block_random_seed {
 						const SEED_LEN: usize = 48;
 						let val = &bytes_value.value;
+
+						assert!(val.len() <= SEED_LEN, "block random seed input value too long!");
 
 						let mut seed = [0u8; SEED_LEN];
 						let mut temp = Vec::with_capacity(SEED_LEN);
