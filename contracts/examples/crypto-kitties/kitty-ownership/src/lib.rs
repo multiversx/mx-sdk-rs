@@ -468,7 +468,7 @@ pub trait KittyOwnership {
 			genesis_kitty.sire_id,
 			genesis_kitty.generation,
 			&genesis_kitty.genes,
-			&self.get_sc_address(),
+			&Address::zero(),
 		);
 	}
 
