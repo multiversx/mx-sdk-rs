@@ -442,6 +442,11 @@ pub trait BasicFeatures {
 		self.get_block_epoch()
 	}
 
+	#[view(get_block_random_seed)]
+	fn get_block_random_seed_view(&self) -> Box<[u8;48]> {
+		self.get_block_random_seed()
+	}
+
 	#[view(get_prev_block_timestamp)]
 	fn get_prev_block_timestamp_view(&self) -> u64 {
 		self.get_prev_block_timestamp()
@@ -460,6 +465,11 @@ pub trait BasicFeatures {
 	#[view(get_prev_block_epoch)]
 	fn get_prev_block_epoch_view(&self) -> u64 {
 		self.get_prev_block_epoch()
+	}
+
+	#[view(get_prev_block_random_seed)]
+	fn get_prev_block_random_seed_view(&self) -> Box<[u8;48]> {
+		self.get_prev_block_random_seed()
 	}
 
 	// EVENTS
