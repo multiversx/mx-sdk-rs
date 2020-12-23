@@ -31,3 +31,70 @@ fn init() {
 fn create_and_auction_gen_zero_kitty() {
 	parse_execute_mandos("mandos/create_and_auction_gen_zero_kitty.scen.json", &contract_map());
 }
+
+#[test]
+fn bid_first() {
+	parse_execute_mandos("mandos/bid_first.scen.json", &contract_map());
+}
+
+#[test]
+fn bid_second_too_low() {
+	parse_execute_mandos("mandos/bid_second_too_low.scen.json", &contract_map());
+}
+
+#[test]
+fn bid_second_ok() {
+	parse_execute_mandos("mandos/bid_second_ok.scen.json", &contract_map());
+}
+
+#[test]
+fn bid_second_max() {
+	parse_execute_mandos("mandos/bid_second_max.scen.json", &contract_map());
+}
+
+#[test]
+fn end_auction_second_bid_ok_early() {
+	parse_execute_mandos("mandos/end_auction_second_bid_ok_early.scen.json", &contract_map());
+}
+
+#[test]
+fn end_auction_second_bid_ok_late() {
+	parse_execute_mandos("mandos/end_auction_second_bid_ok_late.scen.json", &contract_map());
+}
+
+#[test]
+fn end_auction_second_bid_max_early() {
+	parse_execute_mandos("mandos/end_auction_second_bid_max_early.scen.json", &contract_map());
+}
+
+#[test]
+fn create_sale_auction_ok() {
+	parse_execute_mandos("mandos/create_sale_auction_ok.scen.json", &contract_map());
+}
+
+#[test]
+fn create_sale_auction_not_owner() {
+	parse_execute_mandos("mandos/create_sale_auction_not_owner.scen.json", &contract_map());
+}
+
+#[test]
+fn create_siring_auction_ok() {
+	parse_execute_mandos("mandos/create_siring_auction_ok.scen.json", &contract_map());
+}
+
+#[test]
+fn create_siring_auction_not_owner() {
+	parse_execute_mandos("mandos/create_siring_auction_not_owner.scen.json", &contract_map());
+}
+
+#[test]
+fn bid_siring_auction() {
+	parse_execute_mandos("mandos/bid_siring_auction.scen.json", &contract_map());
+}
+
+/* TODO: uncomment once nested async calls are supported
+#[test]
+fn end_siring_auction() {
+	parse_execute_mandos("mandos/end_siring_auction-NOT-SUPPORTED.json", &contract_map());
+}
+*/
