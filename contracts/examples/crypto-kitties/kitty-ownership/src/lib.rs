@@ -219,7 +219,7 @@ pub trait KittyOwnership {
 		Ok(kitty_id)
 	}
 
-	// views/endpoints - Kitty Breeding
+	// views - Kitty Breeding
 
 	#[view(getKittyById)]
 	fn get_kitty_by_id_endpoint(&self, kitty_id: u32) -> SCResult<Kitty> {
@@ -256,6 +256,8 @@ pub trait KittyOwnership {
 		Ok(self._is_valid_mating_pair(matron_id, sire_id)
 			&& self._is_siring_permitted(matron_id, sire_id))
 	}
+
+	// endpoints - Kitty Breeding
 
 	#[endpoint(approveSiring)]
 	fn approve_siring(&self, address: Address, kitty_id: u32) -> SCResult<()> {

@@ -26,3 +26,13 @@ fn contract_map() -> ContractMap<TxContext> {
 fn init() {
 	parse_execute_mandos("mandos/init.scen.json", &contract_map());
 }
+
+#[test]
+fn setup_accounts() {
+	parse_execute_mandos("mandos/setup_accounts.scen.json", &contract_map());
+}
+
+#[test]
+fn query() {
+	parse_execute_mandos("mandos/query.scen.json", &contract_map());
+}
