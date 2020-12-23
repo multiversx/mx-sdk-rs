@@ -96,6 +96,13 @@ pub trait KittyAuction {
 		!self.is_empty_auction(kitty_id)
 	}
 
+	#[view(getAuctionStatus)]
+	fn get_auction_status(&self, kitty_id: u32) -> SCResult<Auction<BigUint>> {
+		require!(self.is_up_for_auction(kitty_id), "Kitty is not up for auction!");
+
+		Ok(self.get_auction(kitty_id))
+	}
+
 	// endpoints
 
 	#[endpoint(createSaleAuction)]

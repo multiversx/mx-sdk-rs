@@ -2,13 +2,13 @@ derive_imports!();
 
 use elrond_wasm::{Address, BigUintApi};
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub enum AuctionType {
 	Selling,
 	Siring,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<BigUint: BigUintApi> {
 	pub auction_type: AuctionType,
 	pub starting_price: BigUint,
