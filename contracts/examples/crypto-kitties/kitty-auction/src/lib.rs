@@ -265,6 +265,18 @@ pub trait KittyAuction {
 		}
 	}
 
+	fn _start_gen_zero_kitty_auction(&self, kitty_id: u32) {
+		let starting_price = self.get_gen_zero_kitty_starting_price();
+		let ending_price = self.get_gen_zero_kitty_ending_price();
+		let duration = self.get_gen_zero_kitty_auction_duration();
+		let deadline = self.get_block_timestamp() + duration;
+
+		let auction = Auction::new(AuctionType::Selling, 
+			&starting_price, &ending_price, deadline, &self.get_sc_address());
+		
+		self.set_auction(kitty_id, &auction);
+	}
+
 	fn _transfer_to(&self, address: Address, kitty_id: u32) {
 		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
 		if kitty_ownership_contract_address != Address::zero() {
@@ -356,15 +368,7 @@ pub trait KittyAuction {
 	fn create_gen_zero_kitty_callback(&self, result: AsyncCallResult<u32>) {
 		match result {
 			AsyncCallResult::Ok(kitty_id) => {
-				let starting_price = self.get_gen_zero_kitty_starting_price();
-				let ending_price = self.get_gen_zero_kitty_ending_price();
-				let duration = self.get_gen_zero_kitty_auction_duration();
-				let deadline = self.get_block_timestamp() + duration;
-
-				let auction = Auction::new(AuctionType::Selling, 
-					&starting_price, &ending_price, deadline, &self.get_sc_address());
-				
-				self.set_auction(kitty_id, &auction);
+				self._start_gen_zero_kitty_auction(kitty_id);
 			}
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_ownership contract address is invalid
