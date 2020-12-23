@@ -13,29 +13,16 @@ pub trait GeneScience {
 		#[callback_arg] matron_id: u32);
 }
 
-#[elrond_wasm_derive::callable(KittyAuctionProxy)]
-pub trait KittyAuction {
-	#[rustfmt::skip]
-	fn createSaleAuction(&self, kitty_id: u32,
-		starting_price: BigUint, ending_price: BigUint, deadline: u64);
-}
-
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
 pub trait KittyOwnership {
 	#[init]
 	fn init(
 		&self,
 		auto_birth_fee: BigUint,
-		gen_zero_kitty_starting_price: BigUint,
-		gen_zero_kitty_ending_price: BigUint,
-		gen_zero_kitty_auction_duration: u64,
 		#[var_args] opt_gene_science_contract_address: OptionalArg<Address>,
 		#[var_args] opt_kitty_auction_contract_address: OptionalArg<Address>,
 	) {
 		self.set_auto_birth_fee(auto_birth_fee);
-		self.set_gen_zero_kitty_starting_price(&gen_zero_kitty_starting_price);
-		self.set_gen_zero_kitty_ending_price(&gen_zero_kitty_ending_price);
-		self.set_gen_zero_kitty_auction_duration(gen_zero_kitty_auction_duration);
 
 		match opt_gene_science_contract_address {
 			OptionalArg::Some(addr) => self.set_gene_science_contract_address(&addr),
@@ -66,31 +53,6 @@ pub trait KittyOwnership {
 		only_owner!(self, "Only owner may call this function!");
 
 		self.set_kitty_auction_contract_address(&address);
-
-		Ok(())
-	}
-
-	// create gen zero kitty and auction it
-	#[endpoint(createGenZeroAndAuction)]
-	fn create_gen_zero_and_auction(&self) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
-
-		let mut random = Random::new(*self.get_block_random_seed());
-		let genes = KittyGenes::get_random(&mut random);
-		let kitty_id = self._create_new_gen_zero_kitty(&genes);
-
-		let starting_price = self.get_gen_zero_kitty_starting_price();
-		let ending_price = self.get_gen_zero_kitty_ending_price();
-		let duration = self.get_gen_zero_kitty_auction_duration();
-		let deadline = self.get_block_timestamp() + duration;
-
-		let kitty_auction_contract_address = self.get_kitty_auction_contract_address();
-		if kitty_auction_contract_address != Address::zero() {
-			let proxy = contract_proxy!(self, &kitty_auction_contract_address, KittyAuction);
-			proxy.createSaleAuction(kitty_id, starting_price, ending_price, deadline);
-		} else {
-			return sc_error!("kitty auction contract address not set!");
-		}
 
 		Ok(())
 	}
@@ -206,9 +168,7 @@ pub trait KittyOwnership {
 		kitty_list
 	}
 
-	// endpoints - helpers
-	// These are used by the other contracts so they don't have to nest
-	// multiple async-calls and callbacks
+	// endpoints - kitty-auction contract only
 
 	#[endpoint(allowAuctioning)]
 	fn allow_auctioning(&self, by: Address, kitty_id: u32) -> SCResult<()> {
@@ -232,6 +192,24 @@ pub trait KittyOwnership {
 		self._transfer(&by, &kitty_auction_addr, kitty_id);
 
 		Ok(())
+	}
+
+	// create gen zero kitty
+	// returns new kitty id
+	#[endpoint(createGenZeroKitty)]
+	fn create_gen_zero_kitty(&self) -> SCResult<u32> {
+		let kitty_auction_addr = self.get_kitty_auction_contract_address();
+
+		require!(
+			self.get_caller() == kitty_auction_addr,
+			"Only auction contract may call this function!"
+		);
+
+		let mut random = Random::new(*self.get_block_random_seed());
+		let genes = KittyGenes::get_random(&mut random);
+		let kitty_id = self._create_new_gen_zero_kitty(&genes);
+
+		Ok(kitty_id)
 	}
 
 	// views/endpoints - Kitty Breeding
@@ -355,53 +333,6 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
-	// callbacks
-
-	#[callback]
-	fn generate_kitty_genes_callback(
-		&self,
-		result: AsyncCallResult<KittyGenes>,
-		#[callback_arg] matron_id: u32,
-	) {
-		match result {
-			AsyncCallResult::Ok(genes) => {
-				let mut matron = self.get_kitty_by_id(matron_id);
-				let sire_id = matron.siring_with_id;
-				let sire = self.get_kitty_by_id(sire_id);
-
-				let new_kitty_generation: u16; // MAX(gen_matron, gen_sire) + 1
-				if matron.generation > sire.generation {
-					new_kitty_generation = matron.generation + 1;
-				} else {
-					new_kitty_generation = sire.generation + 1;
-				}
-
-				// new kitty goes to the owner of the matron
-				let new_kitty_owner = self.get_kitty_owner(matron_id);
-				let _new_kitty_id = self._create_new_kitty(
-					matron_id,
-					sire_id,
-					new_kitty_generation,
-					&genes,
-					&new_kitty_owner,
-				);
-
-				// update matron kitty
-				matron.siring_with_id = 0;
-				self.set_kitty_at_id(matron_id, &matron);
-
-				// send auto birth fee to caller
-				let caller = self.get_caller();
-				let fee = self.get_auto_birth_fee();
-				self.send_tx(&caller, &fee, b"auto birth fee");
-			},
-			AsyncCallResult::Err(_) => {
-				// this can only fail if the kitty_genes contract address is invalid
-				// in which case, the only thing we can do is call this again later
-			},
-		}
-	}
-
 	// private
 
 	fn _transfer(&self, from: &Address, to: &Address, kitty_id: u32) {
@@ -457,7 +388,7 @@ pub trait KittyOwnership {
 	}
 
 	fn _create_new_gen_zero_kitty(&self, genes: &KittyGenes) -> u32 {
-		self._create_new_kitty(0, 0, 0, genes, &self.get_sc_address())
+		self._create_new_kitty(0, 0, 0, genes, &self.get_kitty_auction_contract_address())
 	}
 
 	fn _create_genesis_kitty(&self) {
@@ -550,6 +481,53 @@ pub trait KittyOwnership {
 		return true;
 	}
 
+	// callbacks
+
+	#[callback]
+	fn generate_kitty_genes_callback(
+		&self,
+		result: AsyncCallResult<KittyGenes>,
+		#[callback_arg] matron_id: u32,
+	) {
+		match result {
+			AsyncCallResult::Ok(genes) => {
+				let mut matron = self.get_kitty_by_id(matron_id);
+				let sire_id = matron.siring_with_id;
+				let sire = self.get_kitty_by_id(sire_id);
+
+				let new_kitty_generation: u16; // MAX(gen_matron, gen_sire) + 1
+				if matron.generation > sire.generation {
+					new_kitty_generation = matron.generation + 1;
+				} else {
+					new_kitty_generation = sire.generation + 1;
+				}
+
+				// new kitty goes to the owner of the matron
+				let new_kitty_owner = self.get_kitty_owner(matron_id);
+				let _new_kitty_id = self._create_new_kitty(
+					matron_id,
+					sire_id,
+					new_kitty_generation,
+					&genes,
+					&new_kitty_owner,
+				);
+
+				// update matron kitty
+				matron.siring_with_id = 0;
+				self.set_kitty_at_id(matron_id, &matron);
+
+				// send auto birth fee to caller
+				let caller = self.get_caller();
+				let fee = self.get_auto_birth_fee();
+				self.send_tx(&caller, &fee, b"auto birth fee");
+			},
+			AsyncCallResult::Err(_) => {
+				// this can only fail if the kitty_genes contract address is invalid
+				// in which case, the only thing we can do is call this again later
+			},
+		}
+	}
+
 	// storage - General
 
 	#[storage_get("geneScienceContractAddress")]
@@ -569,26 +547,6 @@ pub trait KittyOwnership {
 
 	#[storage_set("autoBirthFee")]
 	fn set_auto_birth_fee(&self, fee: BigUint);
-
-	// storage - auction
-
-	#[storage_get("genZeroKittyStartingPrice")]
-	fn get_gen_zero_kitty_starting_price(&self) -> BigUint;
-
-	#[storage_set("genZeroKittyStartingPrice")]
-	fn set_gen_zero_kitty_starting_price(&self, price: &BigUint);
-
-	#[storage_get("genZeroKittyEndingPrice")]
-	fn get_gen_zero_kitty_ending_price(&self) -> BigUint;
-
-	#[storage_set("genZeroKittyEndingPrice")]
-	fn set_gen_zero_kitty_ending_price(&self, price: &BigUint);
-
-	#[storage_get("genZeroKittyAuctionDuration")]
-	fn get_gen_zero_kitty_auction_duration(&self) -> u64;
-
-	#[storage_set("genZeroKittyAuctionDuration")]
-	fn set_gen_zero_kitty_auction_duration(&self, duration: u64);
 
 	// storage - Kitties
 
