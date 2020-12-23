@@ -4,6 +4,9 @@
 
 imports!();
 
+// this is not part of the standard imports because we want to discourage its use
+use elrond_wasm::String;
+
 mod large_boxed_byte_array;
 mod ser_ex1;
 mod ser_ex2;
@@ -122,6 +125,12 @@ pub trait BasicFeatures {
 
 	#[endpoint]
 	fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiResult2<Vec<u8>, usize> {
+		let l = arg.len();
+		(arg, l).into()
+	}
+
+	#[endpoint]
+	fn echo_string(&self, arg: String) -> MultiResult2<String, usize> {
 		let l = arg.len();
 		(arg, l).into()
 	}

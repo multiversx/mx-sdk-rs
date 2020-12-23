@@ -83,6 +83,11 @@ fn echo_slice_u8() {
 }
 
 #[test]
+fn echo_string() {
+	parse_execute_mandos("mandos/echo_string.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_vec_u8() {
 	parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());
 }

@@ -1,4 +1,5 @@
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -194,6 +195,23 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
 		self.as_slice().dep_encode_or_exit(dest, c, exit);
+	}
+}
+
+impl NestedEncode for String {
+	#[inline]
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_bytes().dep_encode(dest)
+	}
+
+	#[inline]
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
+		self.as_bytes().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
