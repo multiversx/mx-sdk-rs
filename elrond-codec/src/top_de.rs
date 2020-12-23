@@ -1,4 +1,5 @@
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -191,6 +192,28 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
 				result.push(T::dep_decode_or_exit(mut_slice, c.clone(), exit));
 			}
 			result
+		}
+	}
+}
+
+impl TopDecode for String {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+		let raw = Vec::<u8>::top_decode(input)?;
+		match String::from_utf8(raw) {
+			Ok(s) => Ok(s),
+			Err(_) => Err(DecodeError::UTF8_DECODE_ERROR),
+		}
+	}
+
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		let raw = Vec::<u8>::top_decode_or_exit(input, c.clone(), exit);
+		match String::from_utf8(raw) {
+			Ok(s) => s,
+			Err(_) => exit(c, DecodeError::UTF8_DECODE_ERROR),
 		}
 	}
 }
