@@ -1,0 +1,169 @@
+{
+    "name": "test query functions",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "setup_accounts.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-total-supply",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "totalSupply",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["2"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-balance-of",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "balanceOf",
+                "arguments": ["address:acc1"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["1"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-owner-of",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "ownerOf",
+                "arguments": ["2"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["address:acc2"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-tokens-of-owner",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "tokensOfOwner",
+                "arguments": ["address:acc1"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["u32:1"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-get-kitty-by-id",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "getKittyById",
+                "arguments": ["1"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-is-ready-to-breed",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "isReadyToBreed",
+                "arguments": ["1"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["0x1"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-is-pregnant",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "isPregnant",
+                "arguments": ["1"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["0x"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-can-breed-with",
+            "tx": {
+                "from": "address:acc3",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "canBreedWith",
+                "arguments": ["1", "2"],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["0x"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
