@@ -1,5 +1,5 @@
 {
-    "name": "echo_string",
+    "name": "echo_str_box",
     "steps": [
         {
             "step": "setState",
@@ -25,7 +25,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "echo_string",
+                "function": "echo_str_box",
                 "arguments": [
                     "0x00"
                 ],
@@ -50,7 +50,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "echo_string",
+                "function": "echo_str_box",
                 "arguments": [
                     "str:a_string"
                 ],
@@ -75,7 +75,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "echo_string",
+                "function": "echo_str_box",
                 "arguments": [
                     "0x009f9296"
                 ],

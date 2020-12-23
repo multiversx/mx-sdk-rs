@@ -88,6 +88,16 @@ fn echo_string() {
 }
 
 #[test]
+fn echo_str() {
+	parse_execute_mandos("mandos/echo_str.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_str_box() {
+	parse_execute_mandos("mandos/echo_str_box.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_vec_u8() {
 	parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());
 }

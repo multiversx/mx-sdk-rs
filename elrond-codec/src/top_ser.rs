@@ -222,6 +222,23 @@ impl TopEncode for String {
 	}
 }
 
+impl TopEncode for Box<str> {
+	#[inline]
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+		self.as_ref().as_bytes().top_encode(output)
+	}
+
+	#[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
+		self.as_ref().as_bytes().top_encode_or_exit(output, c, exit);
+	}
+}
+
 macro_rules! encode_num_unsigned {
 	($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
 		impl TopEncodeNoErr for $num_type {
@@ -520,6 +537,14 @@ mod tests {
 	fn test_top_compacted_vec_u8() {
 		let some_vec = [1u8, 2u8, 3u8].to_vec();
 		ser_ok(some_vec, &[1u8, 2u8, 3u8]);
+	}
+
+	#[test]
+	fn test_top_encode_str() {
+		let s = "abc";
+		ser_ok(s, &[b'a', b'b', b'c']);
+		ser_ok(String::from(s), &[b'a', b'b', b'c']);
+		ser_ok(String::from(s).into_boxed_str(), &[b'a', b'b', b'c']);
 	}
 
 	#[test]
