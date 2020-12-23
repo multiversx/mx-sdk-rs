@@ -38,12 +38,12 @@ pub trait KittyOwnership {
 pub trait KittyAuction {
 	#[init]
 	fn init(
-		&self, 
+		&self,
 		gen_zero_kitty_starting_price: BigUint,
 		gen_zero_kitty_ending_price: BigUint,
 		gen_zero_kitty_auction_duration: u64,
-		#[var_args] opt_kitty_ownership_contract_address: OptionalArg<Address>) {
-
+		#[var_args] opt_kitty_ownership_contract_address: OptionalArg<Address>,
+	) {
 		self.set_gen_zero_kitty_starting_price(&gen_zero_kitty_starting_price);
 		self.set_gen_zero_kitty_ending_price(&gen_zero_kitty_ending_price);
 		self.set_gen_zero_kitty_auction_duration(gen_zero_kitty_auction_duration);
@@ -67,14 +67,24 @@ pub trait KittyAuction {
 
 	#[endpoint(createAndAuctionGenZeroKitty)]
 	fn create_and_auction_gen_zero_kitty(&self) -> SCResult<()> {
+		only_owner!(self, "Only owner may call this function!");
+
 		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
 		if kitty_ownership_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
 			proxy.createGenZeroKitty();
-		}
-		else {
+		} else {
 			return sc_error!("Kitty Ownership contract address not set!");
 		}
+
+		Ok(())
+	}
+
+	#[endpoint]
+	fn claim(&self) -> SCResult<()> {
+		only_owner!(self, "Only owner may call this function!");
+
+		self.send_tx(&self.get_caller(), &self.get_sc_balance(), b"claim");
 
 		Ok(())
 	}
@@ -96,7 +106,6 @@ pub trait KittyAuction {
 		ending_price: BigUint,
 		duration: u64,
 	) -> SCResult<()> {
-
 		let deadline = self.get_block_timestamp() + duration;
 
 		require!(
@@ -132,7 +141,6 @@ pub trait KittyAuction {
 		ending_price: BigUint,
 		duration: u64,
 	) -> SCResult<()> {
-
 		let deadline = self.get_block_timestamp() + duration;
 
 		require!(
@@ -271,9 +279,14 @@ pub trait KittyAuction {
 		let duration = self.get_gen_zero_kitty_auction_duration();
 		let deadline = self.get_block_timestamp() + duration;
 
-		let auction = Auction::new(AuctionType::Selling, 
-			&starting_price, &ending_price, deadline, &self.get_sc_address());
-		
+		let auction = Auction::new(
+			AuctionType::Selling,
+			&starting_price,
+			&ending_price,
+			deadline,
+			&self.get_sc_address(),
+		);
+
 		self.set_auction(kitty_id, &auction);
 	}
 
@@ -369,11 +382,11 @@ pub trait KittyAuction {
 		match result {
 			AsyncCallResult::Ok(kitty_id) => {
 				self._start_gen_zero_kitty_auction(kitty_id);
-			}
+			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_ownership contract address is invalid
 				// nothing to revert in case of error
-			}
+			},
 		}
 	}
 
