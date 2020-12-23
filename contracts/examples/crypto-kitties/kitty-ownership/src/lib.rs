@@ -180,8 +180,9 @@ pub trait KittyOwnership {
 		);
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
-			by == self.get_kitty_owner(kitty_id),
-			"_by_ is not the owner of that kitty!"
+			by == self.get_kitty_owner(kitty_id)
+				|| by == self.get_approved_address(kitty_id),
+			"_by_ is not the owner of that kitty nor the approved address!"
 		);
 		require!(
 			!self.get_kitty_by_id(kitty_id).is_pregnant(),
@@ -257,7 +258,7 @@ pub trait KittyOwnership {
 			"You are not the owner of the kitty!"
 		);
 		require!(
-			self.get_sire_allowed_address(kitty_id) == Address::zero(),
+			self._get_sire_allowed_address_or_default(kitty_id) == Address::zero(),
 			"Can't overwrite approved sire address!"
 		);
 
@@ -439,7 +440,7 @@ pub trait KittyOwnership {
 	fn _is_siring_permitted(&self, matron_id: u32, sire_id: u32) -> bool {
 		let sire_owner = self.get_kitty_owner(sire_id);
 		let matron_owner = self.get_kitty_owner(matron_id);
-		let sire_approved_address = self.get_sire_allowed_address(sire_id);
+		let sire_approved_address = self._get_sire_allowed_address_or_default(sire_id);
 
 		sire_owner == matron_owner || matron_owner == sire_approved_address
 	}
@@ -481,6 +482,15 @@ pub trait KittyOwnership {
 		return true;
 	}
 
+	fn _get_sire_allowed_address_or_default(&self, kitty_id: u32) -> Address {
+		if self.is_empty_sire_allowed_address(kitty_id) {
+			Address::zero()
+		}
+		else {
+			self.get_sire_allowed_address(kitty_id)
+		}
+	}
+ 
 	// callbacks
 
 	#[callback]
@@ -562,7 +572,6 @@ pub trait KittyOwnership {
 	#[storage_set("kitty")]
 	fn set_kitty_at_id(&self, kitty_id: u32, kitty: &Kitty);
 
-	#[view(getKittyOwner)]
 	#[storage_get("owner")]
 	fn get_kitty_owner(&self, kitty_id: u32) -> Address;
 
@@ -575,7 +584,6 @@ pub trait KittyOwnership {
 	#[storage_set("nrOwnedKitties")]
 	fn set_nr_owned_kitties(&self, address: &Address, nr_owned: u32);
 
-	#[view(getApprovedAddressForKitty)]
 	#[storage_get("approvedAddress")]
 	fn get_approved_address(&self, kitty_id: u32) -> Address;
 
@@ -585,7 +593,6 @@ pub trait KittyOwnership {
 	#[storage_clear("approvedAddress")]
 	fn clear_approved_address(&self, kitty_id: u32);
 
-	#[view(getSireAllowedAddressForKitty)]
 	#[storage_get("sireAllowedAddress")]
 	fn get_sire_allowed_address(&self, kitty_id: u32) -> Address;
 
@@ -594,6 +601,9 @@ pub trait KittyOwnership {
 
 	#[storage_clear("sireAllowedAddress")]
 	fn clear_sire_allowed_address(&self, kitty_id: u32);
+
+	#[storage_is_empty("sireAllowedAddress")]
+	fn is_empty_sire_allowed_address(&self, kitty_id: u32) -> bool;
 
 	// events
 
