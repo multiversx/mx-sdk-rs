@@ -111,6 +111,12 @@ impl TypeAbi for &str {
 	}
 }
 
+impl TypeAbi for Box<str> {
+	fn type_name() -> String {
+		String::type_name()
+	}
+}
+
 macro_rules! type_abi_name_only {
 	($ty:ty, $name:expr) => {
 		impl TypeAbi for $ty {

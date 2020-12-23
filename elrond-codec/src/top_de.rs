@@ -218,6 +218,20 @@ impl TopDecode for String {
 	}
 }
 
+impl TopDecode for Box<str> {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+		Ok(String::top_decode(input)?.into_boxed_str())
+	}
+
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		String::top_decode_or_exit(input, c, exit).into_boxed_str()
+	}
+}
+
 macro_rules! decode_num_unsigned {
 	($ty:ty, $bounds_ty:ty, $type_info:expr) => {
 		impl TopDecode for $ty {
@@ -519,6 +533,12 @@ mod tests {
 		deser_ok(-1i32, &[255, 255]);
 		deser_ok(-1i32, &[255, 255, 255, 255]);
 		deser_ok(-1i64, &[255, 255, 255, 255, 255, 255, 255, 255]);
+	}
+
+	#[test]
+	fn test_top_decode_str() {
+		deser_ok(String::from("abc"), &[b'a', b'b', b'c']);
+		deser_ok(String::from("abc").into_boxed_str(), &[b'a', b'b', b'c']);
 	}
 
 	#[test]

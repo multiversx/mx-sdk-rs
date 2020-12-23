@@ -130,9 +130,21 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn echo_string(&self, arg: String) -> MultiResult2<String, usize> {
-		let l = arg.len();
-		(arg, l).into()
+	fn echo_string(&self, s: String) -> MultiResult2<String, usize> {
+		let l = s.len();
+		(s, l).into()
+	}
+
+	#[endpoint]
+	fn echo_str<'s>(&self, s: &'s str) -> MultiResult2<&'s str, usize> {
+		let l = s.len();
+		(s, l).into()
+	}
+
+	#[endpoint]
+	fn echo_str_box(&self, s: Box<str>) -> MultiResult2<Box<str>, usize> {
+		let l = s.len();
+		(s, l).into()
 	}
 
 	#[endpoint]
