@@ -10,9 +10,6 @@
                     "storage": {}
                 }
             },
-            "blockInfo": {
-                "blockTimestamp": "0"
-            },
             "newAddresses": [
                 {
                     "creatorAddress": "address:my_address",
