@@ -8,8 +8,8 @@
         {
             "step": "setState",
             "comment": "generating 49 twice from seed, to get 50% ratio - see kitty genetic alg impl",
-            "blockInfo": {
-                "blockRandomSeed": "u8:49|u8:49|u32:0"
+            "currentBlockInfo": {
+                "blockRandomSeed": "u8:49|u8:49|u64:0|u64:0|u64:0|u64:0|u64:0|u32:0|u16:0"
             }
         },
         {

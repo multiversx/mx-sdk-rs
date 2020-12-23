@@ -34,7 +34,7 @@ pub trait KittyGeneticAlg {
 			100 - eye_color_percentage,
 		);
 
-		let kitty_meow_power = matron.get_meow_power() / 2 + matron.get_meow_power() / 2;
+		let kitty_meow_power = matron.get_meow_power() / 2 + sire.get_meow_power() / 2;
 
 		Ok(KittyGenes {
 			fur_color: kitty_fur_color,
