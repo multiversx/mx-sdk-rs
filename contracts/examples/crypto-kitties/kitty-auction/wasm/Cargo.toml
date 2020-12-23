@@ -16,12 +16,12 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.kitty-genetic-alg]
+[dependencies.kitty-auction]
 features = [ "wasm-output-mode",]
 default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.9.6"
+version = "0.10.0"
 path = "../../../../../elrond-wasm-output"
 features = [ "wasm-output-mode",]
