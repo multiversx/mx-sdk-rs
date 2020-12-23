@@ -62,14 +62,14 @@
                 "blockNonce": "222",
                 "blockRound": "333",
                 "blockEpoch": "444",
-                "blockRandomSeed": "u16:0|u32:0"
+                "blockRandomSeed": "u64:0|u64:0|u64:0|u64:0|u64:0|u64:0"
             },
             "currentBlockInfo": {
                 "blockTimestamp": "511",
                 "blockNonce": "522",
                 "blockRound": "533",
                 "blockEpoch": "544",
-                "blockRandomSeed": "u16:42|u32:12345"
+                "blockRandomSeed": "u64:0|u64:0|u64:42|u64:12345|u64:64|u64:7"
             }
         },
         {
