@@ -26,3 +26,8 @@ fn contract_map() -> ContractMap<TxContext> {
 fn init() {
 	parse_execute_mandos("mandos/init.scen.json", &contract_map());
 }
+
+#[test]
+fn create_and_auction_gen_zero_kitty() {
+	parse_execute_mandos("mandos/create_and_auction_gen_zero_kitty.scen.json", &contract_map());
+}

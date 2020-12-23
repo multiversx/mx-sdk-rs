@@ -352,7 +352,10 @@ pub trait KittyAuction {
 				self.clear_auction(cb_kitty_id);
 
 				// send winning bid money to kitty owner
-				self.send_tx(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
+				// condition needed for gen zero kitties, since this sc is their owner
+				if auction.kitty_owner != self.get_sc_address() {
+					self.send_tx(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
+				}
 			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_ownership contract address is invalid
