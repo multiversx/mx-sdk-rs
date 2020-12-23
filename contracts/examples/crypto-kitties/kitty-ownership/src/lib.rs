@@ -80,13 +80,19 @@ pub trait KittyOwnership {
 
 	#[view(ownerOf)]
 	fn owner_of(&self, kitty_id: u32) -> Address {
-		self.get_kitty_owner(kitty_id)
+		if self._is_valid_id(kitty_id) {
+			self.get_kitty_owner(kitty_id)
+		}
+		else {
+			Address::zero()
+		}
 	}
 
 	#[endpoint]
 	fn approve(&self, to: Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
 			self.get_kitty_owner(kitty_id) == caller,
 			"You are not the owner of that kitty!"
@@ -102,6 +108,7 @@ pub trait KittyOwnership {
 	fn transfer(&self, to: Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
 			to != Address::zero(),
 			"Can't transfer to default address 0x0!"
@@ -124,6 +131,7 @@ pub trait KittyOwnership {
 	fn transfer_from(&self, from: Address, to: Address, kitty_id: u32) -> SCResult<()> {
 		let caller = self.get_caller();
 
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
 			to != Address::zero(),
 			"Can't transfer to default address 0x0!"
@@ -132,12 +140,10 @@ pub trait KittyOwnership {
 			to != self.get_sc_address(),
 			"Can't transfer to this contract!"
 		);
-
 		require!(
 			self.get_kitty_owner(kitty_id) == from,
 			"Address _from_ is not the owner!"
 		);
-
 		require!(
 			self.get_kitty_owner(kitty_id) == caller
 				|| self.get_approved_address(kitty_id) == caller,
@@ -253,6 +259,7 @@ pub trait KittyOwnership {
 
 	#[endpoint(approveSiring)]
 	fn approve_siring(&self, address: Address, kitty_id: u32) -> SCResult<()> {
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
 			self.get_kitty_owner(kitty_id) == self.get_caller(),
 			"You are not the owner of the kitty!"
