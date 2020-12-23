@@ -21,6 +21,17 @@ pub fn generate_load_single_arg(
 			} else {
 				// deserialize as owned object, so we can then have a reference to it
 				let referenced_type = &*type_reference.elem;
+				if let syn::Type::Path(syn::TypePath { path, .. }) = referenced_type {
+					if let Some(ident) = path.get_ident() {
+						if ident.to_string() == "str" {
+							// TODO: generalize for all unsized types using Box
+							return quote! {
+								elrond_wasm::load_single_arg::<T, BigInt, BigUint, Box<str>>(self.api.clone(), #arg_index_expr, #arg_name_expr)
+							};
+						}
+					}
+				}
+
 				quote! {
 					elrond_wasm::load_single_arg::<T, BigInt, BigUint, #referenced_type>(self.api.clone(), #arg_index_expr, #arg_name_expr)
 				}

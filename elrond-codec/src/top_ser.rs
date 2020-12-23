@@ -1,4 +1,5 @@
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -24,7 +25,7 @@ pub trait TopEncode: Sized {
 	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError>;
 
 	/// Version of `top_decode` that exits quickly in case of error.
-	/// Its purpose is to create smaller implementations
+	/// Its purpose is to create smaller bytecode implementations
 	/// in cases where the application is supposed to exit directly on decode error.
 	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
 		&self,
@@ -201,6 +202,40 @@ impl<T: NestedEncode> TopEncode for Vec<T> {
 		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
 		self.as_slice().top_encode_or_exit(output, c, exit);
+	}
+}
+
+impl TopEncode for String {
+	#[inline]
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+		self.as_bytes().top_encode(output)
+	}
+
+	#[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
+		self.as_bytes().top_encode_or_exit(output, c, exit);
+	}
+}
+
+impl TopEncode for Box<str> {
+	#[inline]
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+		self.as_ref().as_bytes().top_encode(output)
+	}
+
+	#[inline]
+	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+		&self,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
+		self.as_ref().as_bytes().top_encode_or_exit(output, c, exit);
 	}
 }
 
@@ -502,6 +537,14 @@ mod tests {
 	fn test_top_compacted_vec_u8() {
 		let some_vec = [1u8, 2u8, 3u8].to_vec();
 		ser_ok(some_vec, &[1u8, 2u8, 3u8]);
+	}
+
+	#[test]
+	fn test_top_encode_str() {
+		let s = "abc";
+		ser_ok(s, &[b'a', b'b', b'c']);
+		ser_ok(String::from(s), &[b'a', b'b', b'c']);
+		ser_ok(String::from(s).into_boxed_str(), &[b'a', b'b', b'c']);
 	}
 
 	#[test]

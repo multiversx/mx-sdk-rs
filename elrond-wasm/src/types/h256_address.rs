@@ -25,6 +25,13 @@ impl From<Address> for H256 {
 	}
 }
 
+impl<'a> From<&'a Address> for &'a H256 {
+	#[inline]
+	fn from(address: &'a Address) -> Self {
+		&address.0
+	}
+}
+
 impl From<[u8; 32]> for Address {
 	#[inline]
 	fn from(arr: [u8; 32]) -> Self {
