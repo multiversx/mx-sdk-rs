@@ -40,6 +40,10 @@ pub enum MethodMetadata {
 		visibility: Visibility,
 		identifier: String,
 	},
+	StorageGetOrDefault {
+		visibility: Visibility,
+		identifier: String
+	},
 	StorageIsEmpty {
 		visibility: Visibility,
 		identifier: String,
@@ -69,6 +73,10 @@ impl MethodMetadata {
 				..
 			}
 			| MethodMetadata::StorageGetMut {
+				visibility: Visibility::Endpoint(e),
+				..
+			}
+			| MethodMetadata::StorageGetOrDefault {
 				visibility: Visibility::Endpoint(e),
 				..
 			}
@@ -169,6 +177,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let storage_get_opt = StorageGetAttribute::parse(m);
 	let storage_set_opt = StorageSetAttribute::parse(m);
 	let storage_get_mut_opt = StorageGetMutAttribute::parse(m);
+	let storage_get_or_default_opt = StorageGetOrDefaultAttribute::parse(m);
 	let storage_is_empty_opt = StorageIsEmptyAttribute::parse(m);
 	let storage_clear_opt = StorageClearAttribute::parse(m);
 	let module_opt = ModuleAttribute::parse(m);
@@ -191,6 +200,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		}
 		if storage_get_mut_opt.is_some() {
 			panic!("Events cannot be storage borrow getters.");
+		}
+		if storage_get_or_default_opt.is_some() {
+			panic!("Events cannot be storage getters.");
 		}
 		if module_opt.is_some() {
 			panic!("Events cannot be modules.");
@@ -216,6 +228,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		}
 		if storage_get_mut_opt.is_some() {
 			panic!("Callbacks cannot be storage borrow getters.");
+		}
+		if storage_get_or_default_opt.is_some() {
+			panic!("Callbacks cannot be storage getters.");
 		}
 		if module_opt.is_some() {
 			panic!("Callbacks cannot be modules.");
@@ -272,6 +287,20 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		MethodMetadata::StorageGetMut {
 			visibility,
 			identifier: storage_get_mut.identifier,
+		}
+	} else if let Some(storage_get_or_default) = storage_get_or_default_opt {
+		if payable {
+			panic!("Storage getters cannot be marked payable.");
+		}
+		if m.default.is_some() {
+			panic!("Storage getters cannot have an implementations provided in the trait.");
+		}
+		if module_opt.is_some() {
+			panic!("Storage getters cannot be modules.");
+		}
+		MethodMetadata::StorageGetOrDefault {
+			visibility,
+			identifier: storage_get_or_default.identifier,
 		}
 	} else if let Some(storage_is_empty) = storage_is_empty_opt {
 		if payable {

@@ -11,6 +11,12 @@ use core::fmt::Debug;
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct Address(H256);
 
+impl Default for Address {
+	fn default() -> Self {
+		Address::zero()
+	}
+}
+
 impl From<H256> for Address {
 	#[inline]
 	fn from(hash: H256) -> Self {

@@ -107,6 +107,28 @@ pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 	}
 }
 
+pub fn generate_getter_or_default_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
+	let msig = m.generate_sig();
+	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
+	match m.return_type.clone() {
+		syn::ReturnType::Default => panic!("getter should return some value"),
+		syn::ReturnType::Type(_, ty) => {
+			let load_snippet = storage_load_snippet(&ty);
+			quote! {
+				#msig {
+					#key_snippet
+					if self.api.storage_load_len(&key[..]) > 0 {
+						#load_snippet
+					}
+					else {
+						<#ty>::default()
+					}
+				}
+			}
+		},
+	}
+}
+
 pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
 	let msig = m.generate_sig();
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);

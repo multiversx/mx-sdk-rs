@@ -354,8 +354,16 @@ pub trait BasicFeatures {
 	fn load_u64(&self) -> u64;
 
 	#[endpoint]
+	#[storage_get_or_default("u64")]
+	fn load_u64_or_default(&self) -> u64;
+
+	#[endpoint]
 	#[storage_get("usize")]
 	fn load_usize(&self) -> usize;
+
+	#[endpoint]
+	#[storage_get_or_default("usize")]
+	fn load_usize_or_default(&self) -> usize;
 
 	#[endpoint]
 	#[storage_get("i64")]
@@ -366,12 +374,20 @@ pub trait BasicFeatures {
 	fn load_bool(&self) -> bool;
 
 	#[endpoint]
+	#[storage_get_or_default("bool")]
+	fn load_bool_or_default(&self) -> bool;
+
+	#[endpoint]
 	#[storage_get("vec_u8")]
 	fn load_vec_u8(&self) -> Vec<u8>;
 
 	#[endpoint]
 	#[storage_get("addr")]
 	fn load_addr(&self) -> Address;
+
+	#[endpoint]
+	#[storage_get_or_default("addr")]
+	fn load_addr_or_default(&self) -> Address;
 
 	#[storage_get("opt_addr")]
 	fn _get_opt_addr(&self) -> Option<Address>;

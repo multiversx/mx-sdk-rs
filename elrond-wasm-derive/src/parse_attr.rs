@@ -13,6 +13,7 @@ static ATTR_MULTI: &str = "multi";
 static ATTR_STORAGE_GET: &str = "storage_get";
 static ATTR_STORAGE_SET: &str = "storage_set";
 static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
+static ATTR_STORAGE_GET_OR_DEFAULT: &str = "storage_get_or_default";
 static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 static ATTR_MODULE: &str = "module";
@@ -212,6 +213,21 @@ impl StorageGetMutAttribute {
 		match find_attr_one_string_arg(m, ATTR_STORAGE_GET_MUT) {
 			None => None,
 			Some(arg_str) => Some(StorageGetMutAttribute {
+				identifier: arg_str,
+			}),
+		}
+	}
+}
+
+pub struct StorageGetOrDefaultAttribute {
+	pub identifier: String,
+}
+
+impl StorageGetOrDefaultAttribute {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
+		match find_attr_one_string_arg(m, ATTR_STORAGE_GET_OR_DEFAULT) {
+			None => None,
+			Some(arg_str) => Some(StorageGetOrDefaultAttribute {
 				identifier: arg_str,
 			}),
 		}

@@ -106,6 +106,7 @@ impl Contract {
 				| MethodMetadata::StorageGetter { .. }
 				| MethodMetadata::StorageSetter { .. }
 				| MethodMetadata::StorageGetMut { .. }
+				| MethodMetadata::StorageGetOrDefault { .. }
 				| MethodMetadata::StorageIsEmpty { .. }
 				| MethodMetadata::StorageClear { .. }
 				| MethodMetadata::Module { .. } => {
@@ -137,6 +138,10 @@ impl Contract {
 					visibility: _,
 					identifier,
 				} => Some(generate_borrow_impl(&m, identifier.clone())),
+				MethodMetadata::StorageGetOrDefault {
+					visibility: _,
+					identifier,
+				} => Some(generate_getter_or_default_impl(&m, identifier.clone())),
 				MethodMetadata::StorageIsEmpty {
 					visibility: _,
 					identifier,

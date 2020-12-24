@@ -13,6 +13,12 @@ const ZERO_32: &[u8] = &[0u8; 32];
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct H256(Box<[u8; 32]>);
 
+impl Default for H256 {
+	fn default() -> Self {
+		H256::zero()
+	}
+}
+
 impl From<[u8; 32]> for H256 {
 	/// Constructs a hash type from the given bytes array of fixed length.
 	///

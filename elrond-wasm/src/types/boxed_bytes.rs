@@ -125,6 +125,12 @@ impl BoxedBytes {
 	}
 }
 
+impl Default for BoxedBytes {
+	fn default() -> Self {
+		BoxedBytes::empty()
+	}
+}
+
 impl AsRef<[u8]> for BoxedBytes {
 	#[inline]
 	fn as_ref(&self) -> &[u8] {
