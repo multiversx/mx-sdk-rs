@@ -17,14 +17,19 @@ pub trait KittyOwnership {
 		#[callback_arg] deadline: u64,
 		#[callback_arg] kitty_owner: Address);
 
+	// not a mistake, same callback for transfer and approveSiringAndReturnKitty
+
 	#[rustfmt::skip]
 	#[callback(transfer_callback)]
 	fn transfer(&self, to: Address, kitty_id: u32,
 		#[callback_arg] cb_kitty_id: u32);
 
 	#[rustfmt::skip]
-	#[callback(approve_siring_callback)]
-	fn approveSiring(&self, address: Address, kitty_id: u32,
+	#[callback(transfer_callback)]
+	fn approveSiringAndReturnKitty(&self, 
+		approved_address: Address, 
+		kitty_owner: Address, 
+		kitty_id: u32,
 		#[callback_arg] cb_kitty_id: u32);
 
 	#[rustfmt::skip]
@@ -241,12 +246,14 @@ pub trait KittyAuction {
 					self._transfer_to(auction.current_winner, kitty_id);
 				},
 				AuctionType::Siring => {
-					self._approve_siring(auction.current_winner, kitty_id);
+					self._approve_siring_and_return_kitty(
+						auction.current_winner, auction.kitty_owner, 
+						kitty_id);
 				},
 			}
 		} else {
-			// no bids were made
-			self.clear_auction(kitty_id);
+			// return kitty to its owner
+			self._transfer_to(auction.kitty_owner, kitty_id);
 		}
 
 		Ok(())
@@ -305,11 +312,13 @@ pub trait KittyAuction {
 		}
 	}
 
-	fn _approve_siring(&self, address: Address, kitty_id: u32) {
+	fn _approve_siring_and_return_kitty(&self, approved_address: Address, 
+		kitty_owner: Address, kitty_id: u32) {
 		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
 		if kitty_ownership_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
-			proxy.approveSiring(address, kitty_id, kitty_id);
+			proxy.approveSiringAndReturnKitty(approved_address, kitty_owner, 
+				kitty_id, kitty_id);
 		}
 	}
 
@@ -353,7 +362,10 @@ pub trait KittyAuction {
 
 				// send winning bid money to kitty owner
 				// condition needed for gen zero kitties, since this sc is their owner
-				if auction.kitty_owner != self.get_sc_address() {
+				// and for when no bid was made
+				if auction.kitty_owner != self.get_sc_address()
+					&& auction.current_winner != Address::zero() {
+				
 					self.send_tx(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
 				}
 			},
