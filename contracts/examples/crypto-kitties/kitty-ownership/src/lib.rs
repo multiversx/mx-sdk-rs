@@ -146,7 +146,7 @@ pub trait KittyOwnership {
 		);
 		require!(
 			self.get_kitty_owner(kitty_id) == caller
-				|| self.get_approved_address(kitty_id) == caller,
+				|| self._get_approved_address_or_default(kitty_id) == caller,
 			"You are not the owner of that kitty nor the approved address!"
 		);
 
@@ -178,7 +178,7 @@ pub trait KittyOwnership {
 
 	#[endpoint(allowAuctioning)]
 	fn allow_auctioning(&self, by: Address, kitty_id: u32) -> SCResult<()> {
-		let kitty_auction_addr = self.get_kitty_auction_contract_address();
+		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
 			self.get_caller() == kitty_auction_addr,
@@ -187,7 +187,7 @@ pub trait KittyOwnership {
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
 			by == self.get_kitty_owner(kitty_id)
-				|| by == self.get_approved_address(kitty_id),
+				|| by == self._get_approved_address_or_default(kitty_id),
 			"_by_ is not the owner of that kitty nor the approved address!"
 		);
 		require!(
@@ -205,7 +205,7 @@ pub trait KittyOwnership {
 	fn approve_siring_and_return_kitty(&self, approved_address: Address, kitty_owner: Address,
 		kitty_id: u32) -> SCResult<()> {
 		
-		let kitty_auction_addr = self.get_kitty_auction_contract_address();
+		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
 			self.get_caller() == kitty_auction_addr,
@@ -214,7 +214,7 @@ pub trait KittyOwnership {
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
 			kitty_auction_addr == self.get_kitty_owner(kitty_id)
-				|| kitty_auction_addr == self.get_approved_address(kitty_id),
+				|| kitty_auction_addr == self._get_approved_address_or_default(kitty_id),
 			"_by_ is not the owner of that kitty nor the approved address!"
 		);
 
@@ -230,7 +230,7 @@ pub trait KittyOwnership {
 	// returns new kitty id
 	#[endpoint(createGenZeroKitty)]
 	fn create_gen_zero_kitty(&self) -> SCResult<u32> {
-		let kitty_auction_addr = self.get_kitty_auction_contract_address();
+		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
 			self.get_caller() == kitty_auction_addr,
@@ -357,7 +357,7 @@ pub trait KittyOwnership {
 		let sire_id = matron.siring_with_id;
 		let sire = self.get_kitty_by_id(sire_id);
 
-		let gene_science_contract_address = self.get_gene_science_contract_address();
+		let gene_science_contract_address = self._get_gene_science_contract_address_or_default();
 		if gene_science_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &gene_science_contract_address, GeneScience);
 			proxy.generateKittyGenes(matron, sire, matron_id);
@@ -516,6 +516,35 @@ pub trait KittyOwnership {
 		return true;
 	}
 
+	// getters
+
+	fn _get_gene_science_contract_address_or_default(&self) -> Address {
+		if self.is_empty_gene_science_contract_address() {
+			Address::zero()
+		}
+		else {
+			self.get_gene_science_contract_address()
+		}
+	}
+	
+	fn _get_kitty_auction_contract_address_or_default(&self) -> Address {
+		if self.is_empty_kitty_auction_contract_address() {
+			Address::zero()
+		}
+		else {
+			self.get_kitty_auction_contract_address()
+		}
+	}
+
+	fn _get_approved_address_or_default(&self, kitty_id: u32) -> Address {
+		if self.is_empty_approved_address(kitty_id) {
+			Address::zero()
+		}
+		else {
+			self.get_approved_address(kitty_id)
+		}
+	}
+
 	fn _get_sire_allowed_address_or_default(&self, kitty_id: u32) -> Address {
 		if self.is_empty_sire_allowed_address(kitty_id) {
 			Address::zero()
@@ -580,11 +609,17 @@ pub trait KittyOwnership {
 	#[storage_set("geneScienceContractAddress")]
 	fn set_gene_science_contract_address(&self, address: &Address);
 
+	#[storage_is_empty("geneScienceContractAddress")]
+	fn is_empty_gene_science_contract_address(&self) -> bool;
+
 	#[storage_get("kittyAuctionContractAddress")]
 	fn get_kitty_auction_contract_address(&self) -> Address;
 
 	#[storage_set("kittyAuctionContractAddress")]
 	fn set_kitty_auction_contract_address(&self, address: &Address);
+
+	#[storage_is_empty("kittyAuctionContractAddress")]
+	fn is_empty_kitty_auction_contract_address(&self) -> bool;
 
 	#[storage_get("autoBirthFee")]
 	fn get_auto_birth_fee(&self) -> BigUint;
@@ -626,6 +661,9 @@ pub trait KittyOwnership {
 
 	#[storage_clear("approvedAddress")]
 	fn clear_approved_address(&self, kitty_id: u32);
+
+	#[storage_is_empty("approvedAddress")]
+	fn is_empty_approved_address(&self, kitty_id: u32) -> bool;
 
 	#[storage_get("sireAllowedAddress")]
 	fn get_sire_allowed_address(&self, kitty_id: u32) -> Address;
