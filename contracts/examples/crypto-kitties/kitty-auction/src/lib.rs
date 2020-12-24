@@ -74,7 +74,7 @@ pub trait KittyAuction {
 	fn create_and_auction_gen_zero_kitty(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
-		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let kitty_ownership_contract_address = self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
 			proxy.createGenZeroKitty();
@@ -271,7 +271,7 @@ pub trait KittyAuction {
 	) {
 		let caller = self.get_caller();
 
-		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let kitty_ownership_contract_address = self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
 			proxy.allowAuctioning(
@@ -305,7 +305,7 @@ pub trait KittyAuction {
 	}
 
 	fn _transfer_to(&self, address: Address, kitty_id: u32) {
-		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let kitty_ownership_contract_address = self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
 			proxy.transfer(address, kitty_id, kitty_id);
@@ -314,11 +314,20 @@ pub trait KittyAuction {
 
 	fn _approve_siring_and_return_kitty(&self, approved_address: Address, 
 		kitty_owner: Address, kitty_id: u32) {
-		let kitty_ownership_contract_address = self.get_kitty_ownership_contract_address();
+		let kitty_ownership_contract_address = self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &kitty_ownership_contract_address, KittyOwnership);
 			proxy.approveSiringAndReturnKitty(approved_address, kitty_owner, 
 				kitty_id, kitty_id);
+		}
+	}
+
+	fn _get_kitty_ownership_contract_address_or_default(&self) -> Address {
+		if self.is_empty_kitty_ownership_contract_address() {
+			Address::zero()
+		}
+		else {
+			self.get_kitty_ownership_contract_address()
 		}
 	}
 
@@ -421,6 +430,9 @@ pub trait KittyAuction {
 
 	#[storage_set("kittyOwnershipContractAddress")]
 	fn set_kitty_ownership_contract_address(&self, address: &Address);
+
+	#[storage_is_empty("kittyOwnershipContractAddress")]
+	fn is_empty_kitty_ownership_contract_address(&self) -> bool;
 
 	// gen zero kitty
 
