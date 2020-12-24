@@ -36,3 +36,18 @@ fn setup_accounts() {
 fn query() {
 	parse_execute_mandos("mandos/query.scen.json", &contract_map());
 }
+
+#[test]
+fn approve_siring() {
+	parse_execute_mandos("mandos/approve_siring.scen.json", &contract_map());
+}
+
+#[test]
+fn breed_ok() {
+	parse_execute_mandos("mandos/breed_ok.scen.json", &contract_map());
+}
+
+#[test]
+fn give_birth() {
+	parse_execute_mandos("mandos/give_birth.scen.json", &contract_map());
+}

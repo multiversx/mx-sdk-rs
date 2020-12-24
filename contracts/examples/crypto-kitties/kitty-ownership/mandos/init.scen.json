@@ -80,7 +80,7 @@
                     "storage": {
                         "str:geneScienceContractAddress": "address:kitty_genetic_alg_contract_address",
                         "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
-                        "str:autoBirthFee": "10",
+                        "str:birthFee": "10",
                         "str:totalKitties": "1",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"
                     },

@@ -10,7 +10,8 @@ pub trait GeneScience {
 	#[rustfmt::skip]
 	#[callback(generate_kitty_genes_callback)]
 	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty,
-		#[callback_arg] matron_id: u32);
+		#[callback_arg] matron_id: u32, 
+		#[callback_arg] original_caller: Address);
 }
 
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
@@ -18,11 +19,11 @@ pub trait KittyOwnership {
 	#[init]
 	fn init(
 		&self,
-		auto_birth_fee: BigUint,
+		birth_fee: BigUint,
 		#[var_args] opt_gene_science_contract_address: OptionalArg<Address>,
 		#[var_args] opt_kitty_auction_contract_address: OptionalArg<Address>,
 	) {
-		self.set_auto_birth_fee(auto_birth_fee);
+		self.set_birth_fee(birth_fee);
 
 		match opt_gene_science_contract_address {
 			OptionalArg::Some(addr) => self.set_gene_science_contract_address(&addr),
@@ -302,8 +303,8 @@ pub trait KittyOwnership {
 	}
 
 	#[payable]
-	#[endpoint(breedWithAuto)]
-	fn breed_with_auto(
+	#[endpoint(breedWith)]
+	fn breed_with(
 		&self,
 		#[payment] payment: BigUint,
 		matron_id: u32,
@@ -312,7 +313,7 @@ pub trait KittyOwnership {
 		require!(self._is_valid_id(matron_id), "Invalid matron id!");
 		require!(self._is_valid_id(sire_id), "Invalid sire id!");
 
-		let auto_birth_fee = self.get_auto_birth_fee();
+		let auto_birth_fee = self.get_birth_fee();
 		let caller = self.get_caller();
 
 		require!(payment == auto_birth_fee, "Wrong fee!");
@@ -360,7 +361,7 @@ pub trait KittyOwnership {
 		let gene_science_contract_address = self._get_gene_science_contract_address_or_default();
 		if gene_science_contract_address != Address::zero() {
 			let proxy = contract_proxy!(self, &gene_science_contract_address, GeneScience);
-			proxy.generateKittyGenes(matron, sire, matron_id);
+			proxy.generateKittyGenes(matron, sire, matron_id, self.get_caller());
 		} else {
 			return sc_error!("Gene science contract address not set!");
 		}
@@ -561,12 +562,13 @@ pub trait KittyOwnership {
 		&self,
 		result: AsyncCallResult<KittyGenes>,
 		#[callback_arg] matron_id: u32,
+		#[callback_arg] original_caller: Address
 	) {
 		match result {
 			AsyncCallResult::Ok(genes) => {
 				let mut matron = self.get_kitty_by_id(matron_id);
 				let sire_id = matron.siring_with_id;
-				let sire = self.get_kitty_by_id(sire_id);
+				let mut sire = self.get_kitty_by_id(sire_id);
 
 				let new_kitty_generation: u16; // MAX(gen_matron, gen_sire) + 1
 				if matron.generation > sire.generation {
@@ -587,12 +589,16 @@ pub trait KittyOwnership {
 
 				// update matron kitty
 				matron.siring_with_id = 0;
+				matron.nr_children += 1;
 				self.set_kitty_at_id(matron_id, &matron);
 
-				// send auto birth fee to caller
-				let caller = self.get_caller();
-				let fee = self.get_auto_birth_fee();
-				self.send_tx(&caller, &fee, b"auto birth fee");
+				// update sire kitty
+				sire.nr_children += 1;
+				self.set_kitty_at_id(sire_id, &sire);
+
+				// send birth fee to caller
+				let fee = self.get_birth_fee();
+				self.send_tx(&original_caller, &fee, b"birth fee");
 			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_genes contract address is invalid
@@ -621,11 +627,11 @@ pub trait KittyOwnership {
 	#[storage_is_empty("kittyAuctionContractAddress")]
 	fn is_empty_kitty_auction_contract_address(&self) -> bool;
 
-	#[storage_get("autoBirthFee")]
-	fn get_auto_birth_fee(&self) -> BigUint;
+	#[storage_get("birthFee")]
+	fn get_birth_fee(&self) -> BigUint;
 
-	#[storage_set("autoBirthFee")]
-	fn set_auto_birth_fee(&self, fee: BigUint);
+	#[storage_set("birthFee")]
+	fn set_birth_fee(&self, fee: BigUint);
 
 	// storage - Kitties
 
