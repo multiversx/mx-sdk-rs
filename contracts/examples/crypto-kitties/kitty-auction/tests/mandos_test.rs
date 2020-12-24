@@ -92,9 +92,7 @@ fn bid_siring_auction() {
 	parse_execute_mandos("mandos/bid_siring_auction.scen.json", &contract_map());
 }
 
-/* TODO: uncomment once nested async calls are supported
 #[test]
 fn end_siring_auction() {
-	parse_execute_mandos("mandos/end_siring_auction-NOT-SUPPORTED.json", &contract_map());
+	parse_execute_mandos("mandos/end_siring_auction.scen.json", &contract_map());
 }
-*/

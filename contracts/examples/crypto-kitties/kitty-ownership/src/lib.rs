@@ -201,6 +201,31 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
+	#[endpoint(approveSiringAndReturnKitty)]
+	fn approve_siring_and_return_kitty(&self, approved_address: Address, kitty_owner: Address,
+		kitty_id: u32) -> SCResult<()> {
+		
+		let kitty_auction_addr = self.get_kitty_auction_contract_address();
+
+		require!(
+			self.get_caller() == kitty_auction_addr,
+			"Only auction contract may call this function!"
+		);
+		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
+		require!(
+			kitty_auction_addr == self.get_kitty_owner(kitty_id)
+				|| kitty_auction_addr == self.get_approved_address(kitty_id),
+			"_by_ is not the owner of that kitty nor the approved address!"
+		);
+
+		// return kitty to its original owner after siring auction is complete
+		self._transfer(&kitty_auction_addr, &kitty_owner, kitty_id);
+
+		self.set_sire_allowed_address(kitty_id, &approved_address);
+
+		Ok(())
+	}
+
 	// create gen zero kitty
 	// returns new kitty id
 	#[endpoint(createGenZeroKitty)]
