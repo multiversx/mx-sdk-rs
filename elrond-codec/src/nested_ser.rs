@@ -1,4 +1,5 @@
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -194,6 +195,40 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
 		self.as_slice().dep_encode_or_exit(dest, c, exit);
+	}
+}
+
+impl NestedEncode for String {
+	#[inline]
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_bytes().dep_encode(dest)
+	}
+
+	#[inline]
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
+		self.as_bytes().dep_encode_or_exit(dest, c, exit);
+	}
+}
+
+impl NestedEncode for Box<str> {
+	#[inline]
+	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+		self.as_ref().as_bytes().dep_encode(dest)
+	}
+
+	#[inline]
+	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+		&self,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
+	) {
+		self.as_ref().as_bytes().dep_encode_or_exit(dest, c, exit);
 	}
 }
 
@@ -469,6 +504,15 @@ mod tests {
 	fn test_dep_encode_vec_u8() {
 		let some_vec = [1u8, 2u8, 3u8].to_vec();
 		ser_ok(some_vec, &[0, 0, 0, 3, 1u8, 2u8, 3u8]);
+	}
+
+	#[test]
+	#[rustfmt::skip]
+	fn test_dep_encode_str() {
+		let s = "abc";
+		ser_ok(s, &[0, 0, 0, 3, b'a', b'b', b'c']);
+		ser_ok(String::from(s), &[0, 0, 0, 3, b'a', b'b', b'c']);
+		ser_ok(String::from(s).into_boxed_str(), &[0, 0, 0, 3, b'a', b'b', b'c']);
 	}
 
 	#[test]

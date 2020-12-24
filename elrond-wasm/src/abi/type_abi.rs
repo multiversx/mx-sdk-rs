@@ -99,6 +99,24 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
 	}
 }
 
+impl TypeAbi for String {
+	fn type_name() -> String {
+		"utf-8 string".into()
+	}
+}
+
+impl TypeAbi for &str {
+	fn type_name() -> String {
+		String::type_name()
+	}
+}
+
+impl TypeAbi for Box<str> {
+	fn type_name() -> String {
+		String::type_name()
+	}
+}
+
 macro_rules! type_abi_name_only {
 	($ty:ty, $name:expr) => {
 		impl TypeAbi for $ty {

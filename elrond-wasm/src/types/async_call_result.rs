@@ -5,7 +5,7 @@ use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
 
 pub struct AsyncCallError {
-	pub err_code: i32,
+	pub err_code: u32,
 	pub err_msg: Vec<u8>,
 }
 
@@ -21,7 +21,7 @@ where
 	T: DynArg<I, D>,
 {
 	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
-		let err_code = i32::dyn_load(loader, arg_id);
+		let err_code = u32::dyn_load(loader, arg_id);
 		if err_code == 0 {
 			let arg = T::dyn_load(loader, arg_id);
 			AsyncCallResult::Ok(arg)
