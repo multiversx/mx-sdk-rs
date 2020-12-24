@@ -1,36 +1,35 @@
 {
-    "name": "setup accounts and mock data",
+    "name": "approve siring",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "init.scen.json"
+            "path": "setup_accounts.scen.json"
         },
         {
-            "step": "setState",
-            "currentBlockInfo": {
-                "blockTimestamp": "100,000"
+            "step": "scCall",
+            "txId": "tx-approve-siring",
+            "tx": {
+                "from": "address:acc1",
+                "to": "address:kitty_ownership_contract_address",
+                "value": "0",
+                "function": "approveSiring",
+                "arguments": [
+                    "address:acc2",
+                    "1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
             },
+            "expect": {
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
             "accounts": {
-                "address:acc1": {
-                    "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
-                },
-                "address:acc2": {
-                    "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
-                },
-                "address:acc3": {
-                    "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
-                },
-                "address:my_address": {
-                    "nonce": "2",
-                    "balance": "1,000,000",
-                    "storage": {}
-                },
                 "address:kitty_ownership_contract_address": {
                     "nonce": "0",
                     "balance": "0",
@@ -48,7 +47,9 @@
                         "str:owner|u32:2": "address:acc2",
 
                         "str:nrOwnedKitties|address:acc1": "1",
-                        "str:nrOwnedKitties|address:acc2": "1"
+                        "str:nrOwnedKitties|address:acc2": "1",
+
+                        "str:sireAllowedAddress|u32:1": "address:acc2"
                     },
                     "code": "file:../output/kitty-ownership.wasm"
                 }
