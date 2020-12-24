@@ -96,3 +96,8 @@ fn bid_siring_auction() {
 fn end_siring_auction() {
 	parse_execute_mandos("mandos/end_siring_auction.scen.json", &contract_map());
 }
+
+#[test]
+fn end_auction_no_bids() {
+	parse_execute_mandos("/home/elrond/elrond-wasm-rs/contracts/examples/crypto-kitties/kitty-auction/mandos/end_auction_no_bids.scen.json", &contract_map());
+}
