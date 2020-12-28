@@ -44,7 +44,7 @@ pub fn variant_dep_decode_snippets(
 				dep_decode_snippet(index, field)
 			});
 			quote! {
-				#variant_index_u8 => Result::Ok( #name::#variant_ident #variant_field_snippets ),
+				#variant_index_u8 => core::result::Result::Ok( #name::#variant_ident #variant_field_snippets ),
 			}
 		})
 		.collect()
@@ -86,8 +86,8 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				});
 			quote! {
 				impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
-					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
-						Result::Ok(
+					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> core::result::Result<Self, elrond_codec::DecodeError> {
+						core::result::Result::Ok(
 							#name #field_dep_decode_snippets
 						)
 					}
@@ -113,10 +113,10 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
 			quote! {
 				impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
-					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> Result<Self, elrond_codec::DecodeError> {
+					fn dep_decode<I: elrond_codec::NestedDecodeInput>(input: &mut I) -> core::result::Result<Self, elrond_codec::DecodeError> {
 						match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
 							#(#variant_dep_decode_snippets)*
-							_ => Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
+							_ => core::result::Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 						}
 					}
 
