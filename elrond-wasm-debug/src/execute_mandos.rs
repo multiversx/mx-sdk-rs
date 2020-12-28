@@ -81,7 +81,10 @@ fn parse_execute_mandos_steps(
 						const SEED_LEN: usize = 48;
 						let val = &bytes_value.value;
 
-						assert!(val.len() <= SEED_LEN, "block random seed input value too long!");
+						assert!(
+							val.len() <= SEED_LEN,
+							"block random seed input value too long!"
+						);
 
 						let mut seed = [0u8; SEED_LEN];
 						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
@@ -105,7 +108,10 @@ fn parse_execute_mandos_steps(
 						const SEED_LEN: usize = 48;
 						let val = &bytes_value.value;
 
-						assert!(val.len() <= SEED_LEN, "block random seed input value too long!");
+						assert!(
+							val.len() <= SEED_LEN,
+							"block random seed input value too long!"
+						);
 
 						let mut seed = [0u8; SEED_LEN];
 						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());

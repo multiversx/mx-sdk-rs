@@ -24,3 +24,7 @@ optional = true
 [dependencies]
 wee_alloc = "0.4"
 arrayvec = { version = "0.5.2", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
+
+[dev-dependencies.elrond-codec-derive]
+path = "../elrond-codec-derive"
+version = "0.4.1"
