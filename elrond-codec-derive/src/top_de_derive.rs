@@ -16,7 +16,7 @@ fn fieldless_enum_match_arm_result_ok(
 			let variant_index_u8 = variant_index as u8;
 			let variant_ident = &variant.ident;
 			quote! {
-				#variant_index_u8 => Result::Ok( #name::#variant_ident ),
+				#variant_index_u8 => core::result::Result::Ok( #name::#variant_ident ),
 			}
 		})
 		.collect()
@@ -51,7 +51,7 @@ fn zero_value_if_result_ok(
 	if first_variant.fields.is_empty() {
 		quote! {
 			if top_input.byte_len() == 0 {
-				return Result::Ok(#name::#first_variant);
+				return core::result::Result::Ok(#name::#first_variant);
 			}
 		}
 	} else {
@@ -90,14 +90,14 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				});
 			quote! {
 				impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
-					fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> Result<Self, elrond_codec::DecodeError> {
+					fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> core::result::Result<Self, elrond_codec::DecodeError> {
 						let bytes = top_input.into_boxed_slice_u8();
 						let input = &mut &*bytes;
 						let result = #name #field_dep_decode_snippets ;
 						if !input.is_empty() {
-							return Result::Err(elrond_codec::DecodeError::INPUT_TOO_LONG);
+							return core::result::Result::Err(elrond_codec::DecodeError::INPUT_TOO_LONG);
 						}
-						Ok(result)
+						core::result::Result::Ok(result)
 					}
 
 					fn top_decode_or_exit<I: elrond_codec::TopDecodeInput, ExitCtx: Clone>(
@@ -127,10 +127,10 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				let top_decode_or_exit_arms = fieldless_enum_match_arm(&name, &data_enum);
 				quote! {
 					impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
-						fn top_decode<I: elrond_codec::TopDecodeInput>(input: I) -> Result<Self, elrond_codec::DecodeError> {
+						fn top_decode<I: elrond_codec::TopDecodeInput>(input: I) -> core::result::Result<Self, elrond_codec::DecodeError> {
 							match <u8 as elrond_codec::TopDecode>::top_decode(input)? {
 								#(#top_decode_arms)*
-								_ => Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
+								_ => core::result::Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 							}
 						}
 
@@ -155,16 +155,16 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
 				quote! {
 					impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
-						fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> Result<Self, elrond_codec::DecodeError> {
+						fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> core::result::Result<Self, elrond_codec::DecodeError> {
 							#zero_value_if_result_ok
 							let bytes = top_input.into_boxed_slice_u8();
 							let input = &mut &*bytes;
 							let result = match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
 								#(#variant_dep_decode_snippets)*
-								_ => Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
+								_ => core::result::Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
 							};
 							if !input.is_empty() {
-								return Result::Err(elrond_codec::DecodeError::INPUT_TOO_LONG);
+								return core::result::Result::Err(elrond_codec::DecodeError::INPUT_TOO_LONG);
 							}
 							result
 						}
