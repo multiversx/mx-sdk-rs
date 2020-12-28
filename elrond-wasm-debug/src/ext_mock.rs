@@ -402,7 +402,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	}
 
 	fn get_block_random_seed(&self) -> Box<[u8; 48]> {
-		self.blockchain_info_box.current_block_info.block_random_seed.clone()
+		self.blockchain_info_box
+			.current_block_info
+			.block_random_seed
+			.clone()
 	}
 
 	fn get_prev_block_timestamp(&self) -> u64 {
@@ -422,7 +425,10 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	}
 
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
-		self.blockchain_info_box.previous_block_info.block_random_seed.clone()
+		self.blockchain_info_box
+			.previous_block_info
+			.block_random_seed
+			.clone()
 	}
 
 	fn sha256(&self, data: &[u8]) -> H256 {

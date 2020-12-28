@@ -464,7 +464,7 @@ pub trait BasicFeatures {
 	}
 
 	#[view(get_block_random_seed)]
-	fn get_block_random_seed_view(&self) -> Box<[u8;48]> {
+	fn get_block_random_seed_view(&self) -> Box<[u8; 48]> {
 		self.get_block_random_seed()
 	}
 
@@ -489,7 +489,7 @@ pub trait BasicFeatures {
 	}
 
 	#[view(get_prev_block_random_seed)]
-	fn get_prev_block_random_seed_view(&self) -> Box<[u8;48]> {
+	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
 		self.get_prev_block_random_seed()
 	}
 
