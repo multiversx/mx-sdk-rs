@@ -83,7 +83,7 @@ pub struct BlockInfo {
 	pub block_nonce: u64,
 	pub block_round: u64,
 	pub block_epoch: u64,
-	pub block_random_seed: Box<[u8;48]>,
+	pub block_random_seed: Box<[u8; 48]>,
 }
 
 impl BlockInfo {
@@ -93,7 +93,7 @@ impl BlockInfo {
 			block_nonce: 0,
 			block_round: 0,
 			block_epoch: 0,
-			block_random_seed: Box::from([0u8;48]),
+			block_random_seed: Box::from([0u8; 48]),
 		}
 	}
 }

@@ -10,7 +10,6 @@ members = [
 
   "contracts/examples/adder",
   "contracts/examples/adder/abi",
-  "contracts/examples/adder/debug",
   "contracts/examples/crypto-bubbles",
   "contracts/examples/crypto-bubbles/abi",
   "contracts/examples/factorial",
