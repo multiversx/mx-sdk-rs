@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.10.1"
+version = "0.10.2"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -19,6 +19,6 @@ arrayvec = { version = "0.5.2", default-features = false, features = ["array-siz
 hashbrown = "0.9.1"
 
 [dependencies.elrond-codec]
-version = "0.4.1"
+version = "0.4.2"
 path = "../elrond-codec"
 features = ["derive"]
