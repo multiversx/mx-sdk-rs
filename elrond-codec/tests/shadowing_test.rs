@@ -4,7 +4,8 @@ extern crate elrond_codec_derive;
 use elrond_codec_derive::*;
 
 // This test doesn't run any code, the fact that it compiles is the actual testing.
-// It checks that defining other types with the same name as elrond-codec types does not break the derive macro generation.
+// It checks that the derive macro generation is immune to type shadowing,
+// i.e. any types that are in scope and happen to have the same name as elrond-codec types do not break the build.
 // The derive macro must generate fully qualified type names everywhere to avoid this hurdle.
 
 // All exported traits:
@@ -55,6 +56,9 @@ pub struct Struct {
 	pub uint_32: u32,
 	pub uint_64: u64,
 }
+
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+struct TupleStruct(u8, u16, u32);
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
 enum DayOfWeek {
