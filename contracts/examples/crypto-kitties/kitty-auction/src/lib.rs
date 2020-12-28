@@ -35,8 +35,6 @@ pub trait KittyOwnership {
 	#[rustfmt::skip]
 	#[callback(create_gen_zero_kitty_callback)]
 	fn createGenZeroKitty(&self);
-
-	// add create gen zero kitty endpoint
 }
 
 #[elrond_wasm_derive::contract(KittyAuctionImpl)]
@@ -106,6 +104,13 @@ pub trait KittyAuction {
 		require!(self.is_up_for_auction(kitty_id), "Kitty is not up for auction!");
 
 		Ok(self.get_auction(kitty_id))
+	}
+
+	#[view(getCurrentWinningBid)]
+	fn get_current_winning_bid(&self, kitty_id: u32) -> SCResult<BigUint> {
+		require!(self.is_up_for_auction(kitty_id), "Kitty is not up for auction!");
+
+		Ok(self.get_auction(kitty_id).current_bid)
 	}
 
 	// endpoints
