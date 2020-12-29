@@ -47,10 +47,16 @@ macro_rules! multi_result_impls {
                     true
                 }
 
-                fn output_abis() -> Vec<OutputAbi> {
+                fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
                     let mut result = Vec::new();
                     $(
-                        result.append(&mut $name::output_abis());
+                        if output_names.len() > $n {
+                            result.append(&mut $name::output_abis(&[output_names[$n]]));
+
+                        } else {
+                            result.append(&mut $name::output_abis(&[]));
+                        }
+
                     )+
                     result
                 }
