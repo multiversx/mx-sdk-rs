@@ -18,6 +18,7 @@
             ],
             "outputs": [
                 {
+                    "name": "single output",
                     "type": "AbiTestType"
                 }
             ]
@@ -27,12 +28,15 @@
             "inputs": [],
             "outputs": [
                 {
+                    "name": "multi-result-1",
                     "type": "i32"
                 },
                 {
+                    "name": "multi-result-2",
                     "type": "[u8; 3]"
                 },
                 {
+                    "name": "multi-result-3",
                     "type": "bytes"
                 }
             ]
@@ -42,9 +46,11 @@
             "inputs": [],
             "outputs": [
                 {
+                    "name": "multi-too-few-1",
                     "type": "i32"
                 },
                 {
+                    "name": "multi-too-few-2",
                     "type": "[u8; 3]"
                 },
                 {
