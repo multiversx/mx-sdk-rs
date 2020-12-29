@@ -99,6 +99,7 @@ pub struct Method {
 	pub name: syn::Ident,
 	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
+	pub output_names: Vec<String>,
 	pub return_type: syn::ReturnType,
 	pub body: Option<syn::Block>,
 }
@@ -327,12 +328,14 @@ impl Method {
 		let metadata = extract_metadata(m);
 		let allow_callback_args = matches!(metadata, MethodMetadata::Callback);
 		let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
+		let output_names = find_output_names(m);
 		Method {
 			docs: extract_doc(m.attrs.as_slice()),
 			metadata,
 			name: m.sig.ident.clone(),
 			generics: m.sig.generics.clone(),
 			method_args,
+			output_names,
 			return_type: m.sig.output.clone(),
 			body: m.default.clone(),
 		}
