@@ -627,6 +627,7 @@ pub trait KittyOwnership {
 	#[storage_is_empty("kittyAuctionContractAddress")]
 	fn is_empty_kitty_auction_contract_address(&self) -> bool;
 
+	#[view(birthFee)]
 	#[storage_get("birthFee")]
 	fn get_birth_fee(&self) -> BigUint;
 
