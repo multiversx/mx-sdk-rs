@@ -67,6 +67,7 @@ The init function requires no arguments and does nothing, so we'll skip it this 
 The contract has only one function:
 
 ```
+#[endpoint(generateKittyGenes)]
 fn generate_kitty_genes(matron: Kitty, sire: Kitty) -> SCResult<KittyGenes>
 ```
 
@@ -124,10 +125,12 @@ The last argument is the address of the `Kitty Ownership` contract, which can ei
 
 The following throw an error if the caller isn't the contract owner, so we will omit the `SCResult`.
 
+`#[endpoint(setKittyOwnershipContractAddress)]`  
 `fn set_kitty_ownership_contract_address_endpoint(address: Address)`
 
 This simply sets the `Kitty-Ownership` contract address.
 
+`#[endpoint(createAndAuctionGenZeroKitty)]`  
 `fn create_and_auction_gen_zero_kitty()`
 
 This function creates a new gen zero kitty (generating random genes) and puts it up for auction, using the parameters described above.
@@ -138,14 +141,17 @@ Owner claims funds.
 
 ## Views
 
+`#[view(isUpForAuction)]`  
 `fn is_up_for_auction(kitty_id: u32) -> bool`
 
 Returns `true` if the kitty is up for auction, `false` otherwise.
 
+`#[view(getAuctionStatus)]`  
 `fn get_auction_status(kitty_id: u32) -> SCResult<Auction>`
 
 Returns the relevant `Auction` struct (described above) if it exists, throws an error otherwise.
 
+`#[view(getCurrentWinningBid)]`  
 `fn get_current_winning_bid(kitty_id: u32) -> SCResult<BigUint>`
 
 Returns the current winning bid for a kitty's auction if it exists, throws an error otherwise. Cheaper version of `get_auction_status` is you're only interested in the winning bid.
@@ -153,6 +159,7 @@ Returns the current winning bid for a kitty's auction if it exists, throws an er
 ## Endpoints
 
 ```
+#[endpoint(createSaleAuction)]
 fn create_sale_auction(
 	kitty_id: u32,
 	starting_price: BigUint,
@@ -164,6 +171,7 @@ fn create_sale_auction(
 Puts the kitty up for a sale auction. Only the owner of the kitty may call this function,
 
 ```
+#[endpoint(createSiringAuction)]
 fn create_siring_auction(
 	kitty_id: u32,
 	starting_price: BigUint,
@@ -184,13 +192,14 @@ If this is the first bid in the auction, the rule changes to:
 
 If the bid is valid, the `current_bid` is sent back to the `current_winner`, `current_bid` is set to `payment`, and `current_winner` is set to the caller's address.
 
+`#[endpoint(endAuction)]`  
 `fn end_auction(kitty_id: u32) -> SCResult<()>`
 
 This function ends the auction for the kitty if one of the end conditions has been met:
 1) `deadline` has passed
 2) The `current_bid` is equal to `ending_price`
 
-Anyone may call this function, not only the one's involved in the auction.
+Anyone may call this function, not only the ones involved in the auction.
 
 If this was a selling auction, the `current_bid` is sent to the `kitty_owner` and the kitty's ownership is transfered to `current_winner`. Auction is then cleared from storage.
 
@@ -227,3 +236,70 @@ fn init(
 Each breeding will cost a fixed amount of eGLD. The birth operation can cost a lot of gas, depending on the implementation of the genetic algortihm, so whoever calls the give_birth method (will be discussed later) will get the deposited `birth_fee`.
 
 The next two arguments are the addresses of the other two contracts: the kitty-auction contract and the kitty-genetic-alg contract. These can either be set now or later by the owner, using the appropriate setter methods.
+
+## Views
+
+The following throw an error if the kitty does not exist.
+
+`#[view(getKittyById)]`  
+`fn get_kitty_by_id_endpoint(kitty_id: u32) -> SCResult<Kitty>`
+
+Gets a kitty by id.
+
+`#[view(isReadyToBreed)]`  
+`fn is_ready_to_breed(kitty_id: u32) -> SCResult<bool>`
+
+Checks if the kitty is ready to breed by checking if `siring_with_id` is 0 and cooldown period has passed.
+
+`#[view(isPregnant)]`  
+`fn is_pregnant(kitty_id: u32) -> SCResult<bool>`
+
+Checks if the kitty is pregnant by checking if `siring_with_id` is not 0.
+
+`#[view(canBreedWith)]`  
+`fn can_breed_with(matron_id: u32, sire_id: u32) -> SCResult<bool>`
+
+Checks if the matron can breed with the sire. Kitties can't breed with themselves, their parents, nor their siblings/half-siblings.
+
+#[view(birthFee)]
+fn get_birth_fee() -> BigUint;
+
+Gets the `birth_fee` set by the owner.
+
+## Endpoints
+
+`#[endpoint(approveSiring)]`  
+`fn approve_siring(&self, address: Address, kitty_id: u32) -> SCResult<()>`
+
+Approves an address to use the kitty as a sire. Only the owner of `kitty_id` may call this function, and it may not override an already existing approved address.
+
+```
+#[payable]
+#[endpoint(breedWith)]
+fn breed_with(
+	#[payment] payment: BigUint,
+	matron_id: u32,
+	sire_id: u32,
+) -> SCResult<()>
+```
+
+Breeds `matron_id` with `sire_id`. The `payment` must be equal to the `birth_fee` set by the contract owner. Only the owner of the `matron` may call this function, and the `sire` must either be owned the by the same account that owns the `matron` OR the caller must be the `sire_allowed_address` for the sire.
+
+If the call is successful, the `cooldown` period is triggered and the `sire_allowed_address` is reset for both kitties.
+
+`#[endpoint(giveBirth)]`  
+`fn give_birth(matron_id: u32) -> SCResult<()>`
+
+If the kitty is pregant and the gestation period has passed, a new kitty is created by the `Kitty Genetic Alg` contract and its ownership is given to the `matron`'s owner. Anyone may call this function.
+
+# General Flow
+
+Everything starts with the gen zero kitties randomly created and auctioned by the owner, using the `Kitty-Auction` contract. 
+
+Once there is a sufficient pool of kitties available, people can start breeding and creating more and more kitties, each with their own unique properties, by using the `Kitty-Ownership` contract, or they can sell their kitties by using the `Kitty-Auction` contract.
+
+The `Kitty-Genetic-Alg` contract is never meant to be called directly. People can still do it for fun if they want to see different combinations, but they must keep in mind that depending on its complexity, it can become quite gas-extensive to make such calls.
+
+# Conclusion
+
+Crpytokitties aims to show the power of NFTs by also making it easier to understand for people not familiar with the technology, and we hope this example gives birth to a whole lot of community-driven projects!
