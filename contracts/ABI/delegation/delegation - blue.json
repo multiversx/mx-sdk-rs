@@ -1,0 +1,142 @@
+{
+    "name": "delegation - blue",
+    "endpoints": [
+        {
+            "name": "getNumNodes",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "numNodes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getAllNodeStates",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "blsKeyNodeStatePair",
+                    "type": "MultiResultVec<MultiResult<string,bytes>",
+                    "multiresult": "true"
+                }
+            ]
+        },
+        {
+            "name": "getUserUnBondable",
+            "inputs": [
+                {
+                    "name": "delegatorAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "totalUnBondable",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getUserActiveStake",
+            "inputs": [
+                {
+                    "name": "delegatorAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "fundValue",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getUserUndelegatedList",
+            "inputs": [
+                {
+                    "name": "delegatorAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "fundValueRemainingNoncePairs",
+                    "type": "MultiResultVec<MultiResult<BigUint, BigUint>",
+                    "multiresult": "true"
+                }
+            ]
+        },
+        {
+            "name": "getUserUnStakedValue",
+            "inputs": [
+                {
+                    "name": "delegatorAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "totalUnStaked",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalActiveStake",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "totalActiveStake",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalUnStaked",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "totalUnStaked",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getNumUsers",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "numDelegators",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalCumulatedRewards",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "totalCumulatedRewards",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getClaimableRewards",
+            "inputs": [
+                {
+                    "name": "delegatorAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "unclaimedRewards",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    ]
+}

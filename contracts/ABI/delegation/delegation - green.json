@@ -1,0 +1,106 @@
+{
+    "name": "delegation - green",
+    "endpoints": [
+        {
+            "name": "setAutomaticActivation",
+            "inputs": [
+                {
+                    "name": "yesOrNo",
+                    "type": "string"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeServiceFee",
+            "inputs": [
+                {
+                    "name": "serviceFee",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "modifyTotalDelegationCap",
+            "inputs": [
+                {
+                    "name": "newDelegationCap",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "addNodes",
+            "inputs": [
+                {
+                    "name": "blsKeySignaturePair",
+                    "type": "VarArgs<MultiArg<bytes, bytes>>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "stakeNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "reStakeUnStakedNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unStakeNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unBondNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unJailNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        }
+    ]
+}
