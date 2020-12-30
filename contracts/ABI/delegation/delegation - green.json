@@ -6,7 +6,7 @@
             "inputs": [
                 {
                     "name": "yesOrNo",
-                    "type": "string"
+                    "type": "bytes"
                 }
             ],
             "outputs": []
@@ -16,7 +16,7 @@
             "inputs": [
                 {
                     "name": "serviceFee",
-                    "type": "BigUint"
+                    "type": "u64"
                 }
             ],
             "outputs": []
@@ -36,7 +36,7 @@
             "inputs": [
                 {
                     "name": "blsKeySignaturePair",
-                    "type": "VarArgs<MultiArg<bytes, bytes>>",
+                    "type": "VarArgs<MultiArg2<bytes, bytes>>",
                     "multi_arg": true
                 }
             ],

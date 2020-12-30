@@ -10,7 +10,7 @@
                 },
                 {
                     "name": "serviceFee",
-                    "type": "BigUint"
+                    "type": "u64"
                 }
             ],
             "outputs": []
@@ -33,7 +33,7 @@
                 },
                 {
                     "name": "serviceFee",
-                    "type": "BigUint"
+                    "type": "u64"
                 },
                 {
                     "name": "maxDelegationCap",
@@ -57,11 +57,11 @@
                 },
                 {
                     "name": "createdNonce",
-                    "type": "BigUint"
+                    "type": "u64"
                 },
                 {
                     "name": "unBondPeriod",
-                    "type": "BigUint"
+                    "type": "u64"
                 }
             ]
         }

@@ -7,7 +7,7 @@
             "outputs": [
                 {
                     "name": "numNodes",
-                    "type": "BigUint"
+                    "type": "u64"
                 }
             ]
         },
@@ -17,7 +17,7 @@
             "outputs": [
                 {
                     "name": "blsKeyNodeStatePair",
-                    "type": "MultiResultVec<MultiResult<string,bytes>",
+                    "type": "MultiResultVec<bytes>",
                     "multiresult": "true"
                 }
             ]
@@ -63,7 +63,7 @@
             "outputs": [
                 {
                     "name": "fundValueRemainingNoncePairs",
-                    "type": "MultiResultVec<MultiResult<BigUint, BigUint>",
+                    "type": "MultiResultVec<MultiResult2<BigUint, u64>",
                     "multiresult": "true"
                 }
             ]
@@ -109,7 +109,7 @@
             "outputs": [
                 {
                     "name": "numDelegators",
-                    "type": "BigUint"
+                    "type": "u64"
                 }
             ]
         },
