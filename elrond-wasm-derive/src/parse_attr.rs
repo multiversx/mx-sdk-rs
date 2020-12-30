@@ -1,4 +1,5 @@
 static ATTR_PAYABLE: &str = "payable";
+static ATTR_OUTPUT_NAME: &str = "output_name";
 static ATTR_PAYMENT: &str = "payment";
 static ATTR_VAR_ARGS: &str = "var_args";
 static ATTR_EVENT: &str = "event";
@@ -16,6 +17,10 @@ static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
 static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 static ATTR_MODULE: &str = "module";
+
+/// unlike the others, this is standard Rust,
+/// all doc comments get automatically transformed into "doc" attributes
+static ATTR_DOC: &str = "doc";
 
 fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
 	attrs.iter().any(|attr| {
@@ -54,6 +59,83 @@ pub fn is_callback_arg(pat: &syn::PatType) -> bool {
 	has_attribute(&pat.attrs, ATTR_CALLBACK_ARG)
 }
 
+/// Doc comments are actually syntactic sugar for doc attributes,
+/// so extracting doc comments means parsing "doc" attributes.
+pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
+	attrs
+		.iter()
+		.filter(|attr| {
+			if let Some(first_seg) = attr.path.segments.first() {
+				first_seg.ident == ATTR_DOC
+			} else {
+				false
+			}
+		})
+		.map(|attr| {
+			let mut tokens_iter = attr.clone().tokens.into_iter();
+
+			// checking punctuation, the first token is '='
+			if let Some(proc_macro2::TokenTree::Punct(punct)) = tokens_iter.next() {
+				assert_eq!(punct.as_char(), '=');
+			} else {
+				panic!("malformed doc attribute");
+			}
+
+			if let Some(proc_macro2::TokenTree::Literal(lit)) = tokens_iter.next() {
+				let lit_str = lit.to_string();
+				let mut message_slice = lit_str.as_str();
+
+				// the useful part of the message is between quotes
+				if !message_slice.starts_with('\"') || !message_slice.ends_with('\"') {
+					panic!("malformed doc attribute: string literal expected");
+				}
+				message_slice = &message_slice[1..message_slice.len() - 1];
+
+				// most doc comments start with a space, so remove that too
+				if message_slice.starts_with(' ') {
+					message_slice = &message_slice[1..];
+				}
+
+				// also unescape escaped single and double quotes
+				message_slice.replace("\\\"", "\"").replace("\\'", "'")
+			} else {
+				panic!("malformed doc attribute");
+			}
+		})
+		.collect()
+}
+
+fn attr_one_string_arg(attr: &syn::Attribute) -> String {
+	let result_str: String;
+	let mut iter = attr.clone().tokens.into_iter();
+	match iter.next() {
+		Some(proc_macro2::TokenTree::Group(group)) => {
+			if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
+				panic!("event paranthesis expected");
+			}
+			let mut iter2 = group.stream().into_iter();
+			match iter2.next() {
+				Some(proc_macro2::TokenTree::Literal(lit)) => {
+					let str_val = lit.to_string();
+					if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
+						panic!("string literal expected as attribute argument");
+					}
+					let substr = &str_val[1..str_val.len() - 1];
+					result_str = substr.to_string();
+				},
+				_ => panic!("literal expected as event identifier"),
+			}
+		},
+		_ => panic!("missing event identifier"),
+	}
+
+	if iter.next().is_some() {
+		panic!("event too many tokens in event attribute");
+	}
+
+	result_str
+}
+
 fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option<String> {
 	let event_attr = m.attrs.iter().find(|attr| {
 		if let Some(first_seg) = attr.path.segments.first() {
@@ -64,37 +146,22 @@ fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option
 	});
 	match event_attr {
 		None => None,
-		Some(attr) => {
-			let result_str: String;
-			let mut iter = attr.clone().tokens.into_iter();
-			match iter.next() {
-				Some(proc_macro2::TokenTree::Group(group)) => {
-					if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-						panic!("event paranthesis expected");
-					}
-					let mut iter2 = group.stream().into_iter();
-					match iter2.next() {
-						Some(proc_macro2::TokenTree::Literal(lit)) => {
-							let str_val = lit.to_string();
-							if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
-								panic!("string literal expected as attribute argument");
-							}
-							let substr = &str_val[1..str_val.len() - 1];
-							result_str = substr.to_string();
-						},
-						_ => panic!("literal expected as event identifier"),
-					}
-				},
-				_ => panic!("missing event identifier"),
-			}
-
-			if iter.next().is_some() {
-				panic!("event too many tokens in event attribute");
-			}
-
-			Some(result_str)
-		},
+		Some(attr) => Some(attr_one_string_arg(attr)),
 	}
+}
+
+pub fn find_output_names(m: &syn::TraitItemMethod) -> Vec<String> {
+	m.attrs
+		.iter()
+		.filter(|attr| {
+			if let Some(first_seg) = attr.path.segments.first() {
+				first_seg.ident == ATTR_OUTPUT_NAME
+			} else {
+				false
+			}
+		})
+		.map(attr_one_string_arg)
+		.collect()
 }
 
 pub struct EventAttribute {

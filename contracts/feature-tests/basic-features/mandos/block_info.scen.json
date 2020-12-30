@@ -22,13 +22,15 @@
                 "blockTimestamp": "506",
                 "blockNonce": "521",
                 "blockRound": "532",
-                "blockEpoch": "544"
+                "blockEpoch": "544",
+                "blockRandomSeed": "u64:0|u64:0|u64:0|u64:0|u64:0|u64:0"
             },
             "currentBlockInfo": {
                 "blockTimestamp": "511",
                 "blockNonce": "522",
                 "blockRound": "533",
-                "blockEpoch": "544"
+                "blockEpoch": "544",
+                "blockRandomSeed": "u64:42|u64:12345|u64:64|u64:7"
             }
         },
         {
@@ -111,6 +113,26 @@
                 "refund": "*"
             }
         },
+        {
+            "step": "scCall",
+            "txId": "get_prev_block_random_seed",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "get_prev_block_random_seed",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "u64:0|u64:0|u64:0|u64:0|u64:0|u64:0" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
 
         {
             "step": "scCall",
@@ -186,6 +208,27 @@
             },
             "expect": {
                 "out": [ "544" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get_block_random_seed",
+            "comment": "0-padding added in out-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "get_block_random_seed",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "u64:0|u64:0|u64:42|u64:12345|u64:64|u64:7" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

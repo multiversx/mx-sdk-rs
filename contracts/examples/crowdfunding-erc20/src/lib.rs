@@ -3,10 +3,9 @@
 #![allow(unused_variables)]
 
 imports!();
+derive_imports!();
 
-use elrond_wasm::elrond_codec::*;
-
-#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
+#[derive(TopEncode, TopDecode, PartialEq, TypeAbi, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
 	Successful,
@@ -54,7 +53,7 @@ pub trait Crowdfunding {
 			&cf_contract_address,
 			token_amount.clone(),
 			&caller,
-			token_amount.clone(),
+			token_amount,
 		);
 
 		Ok(())
@@ -63,11 +62,11 @@ pub trait Crowdfunding {
 	#[view]
 	fn status(&self) -> Status {
 		if self.get_block_nonce() <= self.get_deadline() {
-			return Status::FundingPeriod;
+			Status::FundingPeriod
 		} else if self.get_sc_balance() >= self.get_target() {
-			return Status::Successful;
+			Status::Successful
 		} else {
-			return Status::Failed;
+			Status::Failed
 		}
 	}
 
@@ -77,7 +76,7 @@ pub trait Crowdfunding {
 			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
 			Status::Successful => {
 				let caller = self.get_caller();
-				if &caller != &self.get_owner() {
+				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
 
@@ -94,7 +93,7 @@ pub trait Crowdfunding {
 				let caller = self.get_caller();
 				let deposit = self.get_deposit(&caller);
 
-				if &deposit > &0 {
+				if deposit > 0 {
 					self.set_deposit(&caller, &BigUint::zero());
 
 					let erc20_address = self.get_erc20_contract_address();

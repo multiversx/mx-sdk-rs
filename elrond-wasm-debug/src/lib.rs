@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+pub mod abi_json;
 mod async_data;
 mod big_int_mock;
 mod big_uint_mock;

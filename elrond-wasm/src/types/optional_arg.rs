@@ -1,4 +1,6 @@
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::io::{ArgId, DynArg, DynArgInput};
+use alloc::string::String;
 use elrond_codec::TopDecodeInput;
 
 /// A smart contract argument that can be provided or not.
@@ -38,5 +40,22 @@ where
 		} else {
 			OptionalArg::None
 		}
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for OptionalArg<T> {
+	fn type_name() -> String {
+		let mut repr = String::from("OptionalArg<");
+		repr.push_str(T::type_name().as_str());
+		repr.push('>');
+		repr
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
+	}
+
+	fn is_multi_arg_or_result() -> bool {
+		true
 	}
 }

@@ -21,7 +21,7 @@ use std::fmt::Write;
 
 use sha3::{Digest, Keccak256, Sha3_256};
 
-pub fn address_hex(address: &H256) -> alloc::string::String {
+pub fn address_hex(address: &Address) -> alloc::string::String {
 	alloc::format!("0x{}", hex::encode(address.as_bytes()))
 }
 

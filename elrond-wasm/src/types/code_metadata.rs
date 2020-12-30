@@ -1,3 +1,5 @@
+use crate::abi::TypeAbi;
+use alloc::string::String;
 use core::ops::{BitOr, BitOrAssign};
 use elrond_codec::*;
 
@@ -124,7 +126,7 @@ impl NestedDecode for CodeMetadata {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		CodeMetadata(<[u8; 2]>::dep_decode_or_exit(input, c.clone(), exit))
+		CodeMetadata(<[u8; 2]>::dep_decode_or_exit(input, c, exit))
 	}
 }
 
@@ -139,6 +141,12 @@ impl TopDecode for CodeMetadata {
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
 		top_decode_from_nested_or_exit(input, c, exit)
+	}
+}
+
+impl TypeAbi for CodeMetadata {
+	fn type_name() -> String {
+		"CodeMetadata".into()
 	}
 }
 

@@ -8,6 +8,7 @@ pub use alloc::vec::Vec;
 
 pub use elrond_codec;
 
+pub mod abi;
 pub mod err_msg;
 pub mod hex_call_data;
 pub mod io;
@@ -95,7 +96,7 @@ where
 
 	fn get_esdt_token_name(&self) -> Vec<u8>;
 
-	fn send_tx(&self, to: &Address, amount: &BigUint, message: &str);
+	fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
 	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
@@ -236,6 +237,7 @@ pub trait BigUintApi:
 	+ elrond_codec::TopEncode
 	+ elrond_codec::NestedDecode
 	+ elrond_codec::TopDecode
+	+ abi::TypeAbi
 {
 	fn zero() -> Self {
 		0u64.into()
@@ -289,6 +291,7 @@ pub trait BigIntApi<BigUint>:
 	+ elrond_codec::TopEncode
 	+ elrond_codec::NestedDecode
 	+ elrond_codec::TopDecode
+	+ abi::TypeAbi
 {
 	fn zero() -> Self {
 		0i64.into()
@@ -306,6 +309,8 @@ pub trait BigIntApi<BigUint>:
 /// CallableContract is the means by which the debugger calls methods in the contract.
 pub trait CallableContract<A> {
 	fn call(&self, fn_name: &[u8]) -> bool;
+
+	fn abi(&self, include_modules: bool) -> abi::ContractAbi;
 
 	fn clone_contract(&self) -> Box<dyn CallableContract<A>>;
 
@@ -339,8 +344,20 @@ macro_rules! imports {
 			AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi, ContractIOApi,
 			OtherContractHandle,
 		};
-		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, String, VarArgs, Vec};
+		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
+	};
+}
+
+/// Imports required for deriving serialization and TypeAbi.
+#[macro_export]
+macro_rules! derive_imports {
+	() => {
+		use elrond_wasm::elrond_codec;
+		use elrond_wasm::elrond_codec::elrond_codec_derive::{
+			NestedDecode, NestedEncode, TopDecode, TopEncode,
+		};
+		use elrond_wasm_derive::TypeAbi;
 	};
 }
 
@@ -360,8 +377,8 @@ macro_rules! sc_try {
 			elrond_wasm::SCResult::Ok(t) => t,
 			elrond_wasm::SCResult::Err(e) => {
 				return elrond_wasm::SCResult::Err(e);
-				},
-			}
+			},
+		}
 	};
 }
 
@@ -387,7 +404,7 @@ macro_rules! require {
 	($expression:expr, $error_msg:expr) => {
 		if (!($expression)) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -413,7 +430,7 @@ macro_rules! only_owner {
 	($trait_self: expr, $error_msg:expr) => {
 		if ($trait_self.get_caller() != $trait_self.get_owner_address()) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -430,9 +447,9 @@ macro_rules! mut_storage (
 macro_rules! non_zero_usize {
 	($input: expr, $error_msg:expr) => {
 		if let Some(nz) = NonZeroUsize::new($input) {
-				nz
+			nz
 		} else {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }

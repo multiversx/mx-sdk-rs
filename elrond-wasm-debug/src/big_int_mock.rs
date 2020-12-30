@@ -219,6 +219,12 @@ impl TopDecode for RustBigInt {
 	}
 }
 
+impl elrond_wasm::abi::TypeAbi for RustBigInt {
+	fn type_name() -> String {
+		String::from("BigInt")
+	}
+}
+
 impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
 	fn abs_uint(&self) -> RustBigUint {
 		RustBigUint(self.0.abs())

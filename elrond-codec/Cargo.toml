@@ -1,9 +1,9 @@
 [package]
 name = "elrond-codec"
-version = "0.3.2"
+version = "0.4.2"
 edition = "2018"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network<contact@elrond.com>"]
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
@@ -18,9 +18,13 @@ derive = ["elrond-codec-derive"]
 
 [dependencies.elrond-codec-derive]
 path = "../elrond-codec-derive"
-version = "0.3.2"
+version = "0.4.2"
 optional = true
 
 [dependencies]
 wee_alloc = "0.4"
-arrayvec = { version = "0.5.1", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
+arrayvec = { version = "0.5.2", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
+
+[dev-dependencies.elrond-codec-derive]
+path = "../elrond-codec-derive"
+version = "0.4.2"
