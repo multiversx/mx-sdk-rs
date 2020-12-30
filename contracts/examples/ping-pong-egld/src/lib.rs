@@ -71,7 +71,7 @@ pub trait PingPong {
 			UserStatus::Registered => {
 				self.set_user_status(user_id, &UserStatus::Withdrawn);
 				let user_address = self.get_user_address(user_id);
-				self.send_tx(&user_address, &self.get_fixed_sum(), "pong");
+				self.send_tx(&user_address, &self.get_fixed_sum(), b"pong");
 				Ok(())
 			},
 			UserStatus::Withdrawn => {
@@ -101,7 +101,7 @@ pub trait PingPong {
 
 		let num_users = self.get_num_users();
 		for user_id in 1..=num_users {
-			self.pong_by_user_id(user_id).ok();
+			let _ = self.pong_by_user_id(user_id);
 		}
 		Ok(())
 	}

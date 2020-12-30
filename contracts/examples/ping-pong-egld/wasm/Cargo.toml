@@ -1,8 +1,9 @@
 [package]
-name = "ping-pong-wasm"
+name = "ping-pong-egld-wasm"
 version = "0.0.1"
-authors = [ "you",]
+authors = [ "Bruda Claudiu-Marcel <claudiu725@yahoo.com>",]
 edition = "2018"
+publish = false
 
 [lib]
 crate-type = [ "cdylib",]
@@ -16,10 +17,10 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.ping-pong]
+[dependencies.ping-pong-egld]
 features = [ "wasm-output-mode",]
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.9.8"
+version = "0.10.3"
 features = [ "wasm-output-mode",]
