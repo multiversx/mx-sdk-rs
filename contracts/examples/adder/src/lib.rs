@@ -2,6 +2,8 @@
 
 imports!();
 
+/// One of the simplest smart contracts possible,
+/// it holds a single variable in storage, which anyone can increment.
 #[elrond_wasm_derive::contract(AdderImpl)]
 pub trait Adder {
 	#[view(getSum)]
@@ -16,6 +18,7 @@ pub trait Adder {
 		self.set_sum(initial_value);
 	}
 
+	/// Add desired amount to the storage variable.
 	#[endpoint]
 	fn add(&self, value: &BigInt) -> SCResult<()> {
 		let mut sum = self.get_sum();

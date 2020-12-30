@@ -83,6 +83,7 @@ pub struct BlockInfo {
 	pub block_nonce: u64,
 	pub block_round: u64,
 	pub block_epoch: u64,
+	pub block_random_seed: Box<[u8; 48]>,
 }
 
 impl BlockInfo {
@@ -92,7 +93,14 @@ impl BlockInfo {
 			block_nonce: 0,
 			block_round: 0,
 			block_epoch: 0,
+			block_random_seed: Box::from([0u8; 48]),
 		}
+	}
+}
+
+impl Default for BlockInfo {
+	fn default() -> Self {
+		Self::new()
 	}
 }
 
@@ -112,7 +120,15 @@ impl BlockchainMock {
 			current_block_info: BlockInfo::new(),
 		}
 	}
+}
 
+impl Default for BlockchainMock {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
+impl BlockchainMock {
 	pub fn add_account(&mut self, acct: AccountData) {
 		self.accounts.insert(acct.address.clone(), acct);
 	}
@@ -144,7 +160,7 @@ impl BlockchainMock {
 	fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
 		self.new_addresses
 			.get(&(creator_address, creator_nonce))
-			.map(|addr_ref| addr_ref.clone())
+			.cloned()
 	}
 
 	pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {

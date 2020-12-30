@@ -4,6 +4,9 @@
 
 imports!();
 
+// this is not part of the standard imports because we want to discourage its use
+use elrond_wasm::String;
+
 mod large_boxed_byte_array;
 mod ser_ex1;
 mod ser_ex2;
@@ -124,6 +127,24 @@ pub trait BasicFeatures {
 	fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiResult2<Vec<u8>, usize> {
 		let l = arg.len();
 		(arg, l).into()
+	}
+
+	#[endpoint]
+	fn echo_string(&self, s: String) -> MultiResult2<String, usize> {
+		let l = s.len();
+		(s, l).into()
+	}
+
+	#[endpoint]
+	fn echo_str<'s>(&self, s: &'s str) -> MultiResult2<&'s str, usize> {
+		let l = s.len();
+		(s, l).into()
+	}
+
+	#[endpoint]
+	fn echo_str_box(&self, s: Box<str>) -> MultiResult2<Box<str>, usize> {
+		let l = s.len();
+		(s, l).into()
 	}
 
 	#[endpoint]
@@ -407,8 +428,17 @@ pub trait BasicFeatures {
 	// SEND TX
 
 	#[endpoint]
-	fn send_tx_endpoint(&self, to: &Address, amount: &BigUint) {
-		self.send_tx(to, amount, "");
+	fn send_tx_endpoint(
+		&self,
+		to: &Address,
+		amount: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send_tx(to, amount, data);
 	}
 
 	// BLOCK INFO
@@ -433,6 +463,11 @@ pub trait BasicFeatures {
 		self.get_block_epoch()
 	}
 
+	#[view(get_block_random_seed)]
+	fn get_block_random_seed_view(&self) -> Box<[u8; 48]> {
+		self.get_block_random_seed()
+	}
+
 	#[view(get_prev_block_timestamp)]
 	fn get_prev_block_timestamp_view(&self) -> u64 {
 		self.get_prev_block_timestamp()
@@ -451,6 +486,11 @@ pub trait BasicFeatures {
 	#[view(get_prev_block_epoch)]
 	fn get_prev_block_epoch_view(&self) -> u64 {
 		self.get_prev_block_epoch()
+	}
+
+	#[view(get_prev_block_random_seed)]
+	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
+		self.get_prev_block_random_seed()
 	}
 
 	// EVENTS

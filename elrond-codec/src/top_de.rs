@@ -1,4 +1,5 @@
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -195,6 +196,42 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
 	}
 }
 
+impl TopDecode for String {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+		let raw = Vec::<u8>::top_decode(input)?;
+		match String::from_utf8(raw) {
+			Ok(s) => Ok(s),
+			Err(_) => Err(DecodeError::UTF8_DECODE_ERROR),
+		}
+	}
+
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		let raw = Vec::<u8>::top_decode_or_exit(input, c.clone(), exit);
+		match String::from_utf8(raw) {
+			Ok(s) => s,
+			Err(_) => exit(c, DecodeError::UTF8_DECODE_ERROR),
+		}
+	}
+}
+
+impl TopDecode for Box<str> {
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+		Ok(String::top_decode(input)?.into_boxed_str())
+	}
+
+	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		String::top_decode_or_exit(input, c, exit).into_boxed_str()
+	}
+}
+
 macro_rules! decode_num_unsigned {
 	($ty:ty, $bounds_ty:ty, $type_info:expr) => {
 		impl TopDecode for $ty {
@@ -277,7 +314,7 @@ impl TopDecode for bool {
 	const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-		match input.into_i64() {
+		match input.into_u64() {
 			0 => Ok(false),
 			1 => Ok(true),
 			_ => Err(DecodeError::INPUT_OUT_OF_RANGE),
@@ -289,7 +326,7 @@ impl TopDecode for bool {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		match input.into_i64() {
+		match input.into_u64() {
 			0 => false,
 			1 => true,
 			_ => exit(c, DecodeError::INPUT_OUT_OF_RANGE),
@@ -496,6 +533,12 @@ mod tests {
 		deser_ok(-1i32, &[255, 255]);
 		deser_ok(-1i32, &[255, 255, 255, 255]);
 		deser_ok(-1i64, &[255, 255, 255, 255, 255, 255, 255, 255]);
+	}
+
+	#[test]
+	fn test_top_decode_str() {
+		deser_ok(String::from("abc"), &[b'a', b'b', b'c']);
+		deser_ok(String::from("abc").into_boxed_str(), &[b'a', b'b', b'c']);
 	}
 
 	#[test]

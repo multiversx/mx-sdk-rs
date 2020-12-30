@@ -161,8 +161,8 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		}
 
 		#[inline]
-		fn send_tx(&self, to: &Address, amount: &BigUint, message: &str) {
-		  self.api.send_tx(to, amount, message);
+		fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]) {
+		  self.api.send_tx(to, amount, data);
 		}
 
 		#[inline]

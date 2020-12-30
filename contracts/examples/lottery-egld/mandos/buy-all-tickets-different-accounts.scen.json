@@ -154,7 +154,7 @@
                         "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc4": "1",
                         "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc5": "1"
                     },
-                    "code": "file:../output/lottery.wasm"
+                    "code": "file:../output/lottery-egld.wasm"
                 }
             }
         }

@@ -17,6 +17,10 @@ use elrond_wasm_module_pause_default::*;
 #[cfg(feature = "elrond-wasm-module-pause-wasm")]
 use elrond_wasm_module_pause_wasm::*;
 
+/// Contract that tests that using modules works correctly.
+/// Also provides testing for the most common modules:
+/// - FeaturesModule
+/// - PauseModule
 #[elrond_wasm_derive::contract(UseModuleImpl)]
 pub trait UseModule {
 	#[module(InteralModuleAImpl)]
@@ -34,6 +38,8 @@ pub trait UseModule {
 	#[init]
 	fn init(&self) {}
 
+	/// Validates that the "featureName" feature is on.
+	/// Uses the `feature_guard!` macro.
 	#[endpoint(checkFeatureGuard)]
 	fn check_feature_guard(&self) -> SCResult<()> {
 		feature_guard!(self.features_module(), b"featureName", true);

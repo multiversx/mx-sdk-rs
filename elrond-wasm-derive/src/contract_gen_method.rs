@@ -85,21 +85,21 @@ impl MethodMetadata {
 	}
 
 	pub fn has_implementation(&self) -> bool {
-		match self {
-			MethodMetadata::Regular { .. }
-			| MethodMetadata::Callback
-			| MethodMetadata::CallbackRaw => true,
-			_ => false,
-		}
+		matches!(
+			self,
+			MethodMetadata::Regular { .. } | MethodMetadata::Callback | MethodMetadata::CallbackRaw
+		)
 	}
 }
 
 #[derive(Clone, Debug)]
 pub struct Method {
+	pub docs: Vec<String>,
 	pub metadata: MethodMetadata,
 	pub name: syn::Ident,
 	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
+	pub output_names: Vec<String>,
 	pub return_type: syn::ReturnType,
 	pub body: Option<syn::Block>,
 }
@@ -326,17 +326,16 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 impl Method {
 	pub fn parse(m: &syn::TraitItemMethod) -> Method {
 		let metadata = extract_metadata(m);
-		let allow_callback_args = if let MethodMetadata::Callback = metadata {
-			true
-		} else {
-			false
-		};
+		let allow_callback_args = matches!(metadata, MethodMetadata::Callback);
 		let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
+		let output_names = find_output_names(m);
 		Method {
+			docs: extract_doc(m.attrs.as_slice()),
 			metadata,
 			name: m.sig.ident.clone(),
 			generics: m.sig.generics.clone(),
 			method_args,
+			output_names,
 			return_type: m.sig.output.clone(),
 			body: m.default.clone(),
 		}
@@ -381,11 +380,9 @@ impl Method {
 	}
 
 	pub fn has_variable_nr_args(&self) -> bool {
-		self.method_args.iter().any(|arg| match &arg.metadata {
-			ArgMetadata::Multi(_) => true,
-			ArgMetadata::VarArgs => true,
-			_ => false,
-		})
+		self.method_args
+			.iter()
+			.any(|arg| matches!(&arg.metadata, ArgMetadata::Multi(_) | ArgMetadata::VarArgs))
 	}
 
 	pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
