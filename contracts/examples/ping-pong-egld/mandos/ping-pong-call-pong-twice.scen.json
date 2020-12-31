@@ -1,0 +1,61 @@
+{
+    "name": "try withdraw the funds again by calling pong a second time",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "ping-pong-call-pong.scen.json"
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:participant1",
+                "to": "address:the_ping_pong_contract",
+                "value": "0",
+                "function": "pong",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:already withdrawn",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:participant1": {
+                    "nonce": "3",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
+                    "storage": {}
+                },
+                "address:the_ping_pong_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''fixed_sum": "500,000,000,000",
+                        "''beginning": "780",
+                        "''deadline": "123,780",
+                        "''user_id|address:participant1": "1",
+                        "''user_address|0x0000001": "address:participant1",
+                        "''user_status|0x0000001": "2",
+                        "''num_users": "1"
+                    },
+                    "code": "file:../output/ping-pong.wasm"
+                }
+            }
+        }
+    ]
+}
