@@ -49,7 +49,7 @@
                         "''beginning": "780",
                         "''deadline": "123,780"
                     },
-                    "code": "file:../output/ping-pong.wasm"
+                    "code": "file:../output/ping-pong-egld.wasm"
                 }
             }
         }
