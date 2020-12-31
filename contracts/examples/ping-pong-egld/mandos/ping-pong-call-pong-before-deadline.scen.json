@@ -59,7 +59,7 @@
                         "''user_status|0x0000001": "1",
                         "''num_users": "1"
                     },
-                    "code": "file:../output/ping-pong.wasm"
+                    "code": "file:../output/ping-pong-egld.wasm"
                 }
             }
         }
