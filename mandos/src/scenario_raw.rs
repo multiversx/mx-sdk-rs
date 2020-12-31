@@ -56,6 +56,7 @@ pub enum StepRaw {
 
 	#[serde(rename_all = "camelCase")]
 	ScCall {
+		#[serde(default)]
 		tx_id: String,
 
 		#[serde(default)]
@@ -71,6 +72,7 @@ pub enum StepRaw {
 
 	#[serde(rename_all = "camelCase")]
 	ScDeploy {
+		#[serde(default)]
 		tx_id: String,
 
 		#[serde(default)]
@@ -86,6 +88,7 @@ pub enum StepRaw {
 
 	#[serde(rename_all = "camelCase")]
 	Transfer {
+		#[serde(default)]
 		tx_id: String,
 
 		#[serde(default)]
@@ -97,6 +100,7 @@ pub enum StepRaw {
 
 	#[serde(rename_all = "camelCase")]
 	ValidatorReward {
+		#[serde(default)]
 		tx_id: String,
 
 		#[serde(default)]

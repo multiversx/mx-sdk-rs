@@ -33,7 +33,7 @@
         "txId": "deploy",
         "tx": {
           "from": "address:my_address",
-          "contractCode": "file:../output/ping-pong.wasm",
+          "contractCode": "file:../output/ping-pong-egld.wasm",
           "value": "0",
           "arguments": [
               "500,000,000,000",
@@ -76,7 +76,7 @@
               "''beginning": "780",
               "''deadline": "123,780"
             },
-            "code": "file:../output/ping-pong.wasm"
+            "code": "file:../output/ping-pong-egld.wasm"
           }
         }
       }
