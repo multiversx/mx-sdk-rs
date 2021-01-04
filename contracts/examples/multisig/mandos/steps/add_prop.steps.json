@@ -193,6 +193,28 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "getAllProposers",
+            "tx": {
+                "from": "address:paul",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getAllProposers",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "address:paul"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }
