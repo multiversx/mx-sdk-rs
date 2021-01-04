@@ -1,0 +1,84 @@
+{
+    "name": "ping-pong deployment test",
+    "steps": [
+      {
+        "step": "setState",
+        "accounts": {
+          "address:my_address": {
+            "nonce": "0",
+            "balance": "1,000,000",
+            "storage": {}
+          },
+          "address:participant1": {
+            "nonce": "0",
+            "balance": "1,800,000,000,000",
+            "storage": {}
+          },
+          "address:participant2": {
+            "nonce": "0",
+            "balance": "2,500,000,000,000",
+            "storage": {}
+          }
+        },
+        "newAddresses": [
+          {
+            "creatorAddress": "address:my_address",
+            "creatorNonce": "0",
+            "newAddress": "address:the_ping_pong_contract"
+          }
+        ]
+      },
+      {
+        "step": "scDeploy",
+        "txId": "deploy",
+        "tx": {
+          "from": "address:my_address",
+          "contractCode": "file:../output/ping-pong-egld.wasm",
+          "value": "0",
+          "arguments": [
+              "500,000,000,000",
+              "123,000",
+              "1|u64:780",
+              ""
+          ],
+          "gasLimit": "1,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+          "status": "0",
+          "gas": "*",
+          "refund": "*"
+        }
+      },
+      {
+        "step": "checkState",
+        "accounts": {
+          "address:my_address": {
+            "nonce": "1",
+            "balance": "1,000,000",
+            "storage": {}
+          },
+          "address:participant1": {
+            "nonce": "0",
+            "balance": "1,800,000,000,000",
+            "storage": {}
+          },
+          "address:participant2": {
+            "nonce": "0",
+            "balance": "2,500,000,000,000",
+            "storage": {}
+          },
+          "address:the_ping_pong_contract": {
+            "nonce": "0",
+            "balance": "0",
+            "storage": {
+              "''fixed_sum": "500,000,000,000",
+              "''beginning": "780",
+              "''deadline": "123,780"
+            },
+            "code": "file:../output/ping-pong-egld.wasm"
+          }
+        }
+      }
+    ]
+}
