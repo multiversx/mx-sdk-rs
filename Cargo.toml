@@ -44,6 +44,9 @@ members = [
   "contracts/feature-tests/basic-features/abi",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/abi",
+  "contracts/feature-tests/esdt-contract-pair",
+  "contracts/feature-tests/esdt-contract-pair/first-contract",
+  "contracts/feature-tests/esdt-contract-pair/second-contract",
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
