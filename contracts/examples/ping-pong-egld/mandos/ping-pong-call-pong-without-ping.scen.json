@@ -1,0 +1,63 @@
+{
+    "name": "extracting the funds by calling pong after the deadline has passed",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "ping-pong-init.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "123,781"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:participant1",
+                "to": "address:the_ping_pong_contract",
+                "value": "0",
+                "function": "pong",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:can't pong, never pinged",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:participant1": {
+                    "nonce": "*",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
+                    "storage": {}
+                },
+                "address:the_ping_pong_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "''fixed_sum": "500,000,000,000",
+                        "''beginning": "780",
+                        "''deadline": "123,780"
+                    },
+                    "code": "file:../output/ping-pong-egld.wasm"
+                }
+            }
+        }
+    ]
+}
