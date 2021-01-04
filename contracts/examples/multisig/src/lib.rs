@@ -224,6 +224,27 @@ pub trait Multisig {
 		}
 	}
 
+	#[view(getAllBoardMembers)]
+	fn get_all_board_members(&self) -> MultiResultVec<Address> {
+		self.get_all_users_with_role(UserRole::BoardMember)
+	}
+
+	#[view(getAllProposers)]
+	fn get_all_proposers(&self) -> MultiResultVec<Address> {
+		self.get_all_users_with_role(UserRole::Proposer)
+	}
+
+	fn get_all_users_with_role(&self, role: UserRole) -> MultiResultVec<Address> {
+		let mut result = Vec::new();
+		let num_users = self.users_module().get_num_users();
+		for user_id in 1..=num_users {
+			if self.get_user_id_to_role(user_id) == role {
+				result.push(self.users_module().get_user_address(user_id));
+			}
+		}
+		result.into()
+	}
+
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
 		require!(

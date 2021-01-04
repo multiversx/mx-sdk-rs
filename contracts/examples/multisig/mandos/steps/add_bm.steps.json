@@ -212,6 +212,31 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "getAllBoardMembers",
+            "tx": {
+                "from": "address:paul",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getAllBoardMembers",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "address:alice",
+                    "address:bob",
+                    "address:charlie",
+                    "address:dan"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }
