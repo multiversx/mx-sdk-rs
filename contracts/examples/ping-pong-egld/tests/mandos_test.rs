@@ -1,8 +1,7 @@
-
 extern crate ping_pong_egld;
-use ping_pong_egld::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
+use ping_pong_egld::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
@@ -15,20 +14,14 @@ fn contract_map() -> ContractMap<TxContext> {
 
 #[test]
 fn ping_pong_init() {
-	parse_execute_mandos(
-        "mandos/ping-pong-init.scen.json",
-        &contract_map()
-    );
+	parse_execute_mandos("mandos/ping-pong-init.scen.json", &contract_map());
 }
 
 // ping tests
 
 #[test]
 fn ping_pong_call_ping() {
-	parse_execute_mandos(
-        "mandos/ping-pong-call-ping.scen.json",
-        &contract_map()
-    );
+	parse_execute_mandos("mandos/ping-pong-call-ping.scen.json", &contract_map());
 }
 
 #[test]
@@ -67,10 +60,7 @@ fn ping_pong_call_ping_second_user() {
 
 #[test]
 fn ping_pong_call_pong() {
-	parse_execute_mandos(
-		"mandos/ping-pong-call-pong.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/ping-pong-call-pong.scen.json", &contract_map());
 }
 
 #[test]
@@ -101,10 +91,7 @@ fn ping_pong_call_pong_before_deadline() {
 
 #[test]
 fn ping_pong_call_pong_all() {
-	parse_execute_mandos(
-		"mandos/ping-pong-call-pong-all.scen.json",
-		&contract_map(),
-	);
+	parse_execute_mandos("mandos/ping-pong-call-pong-all.scen.json", &contract_map());
 }
 
 #[test]
