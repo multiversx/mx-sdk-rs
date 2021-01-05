@@ -26,3 +26,32 @@ pub enum Action<BigUint: BigUintApi> {
 		arguments: Vec<BoxedBytes>,
 	},
 }
+
+impl<BigUint: BigUintApi> Action<BigUint> {
+	/// Only pending actions are kept in storage,
+	/// both executed and discarded actions are removed (converted to `Nothing`).
+	/// So this is equivalent to `action != Action::Nothing`.
+	pub fn is_pending(&self) -> bool {
+		!matches!(*self, Action::Nothing)
+	}
+}
+
+/// Not used internally, just to retrieve results via endpoint. 
+#[derive(TopEncode, TypeAbi)]
+pub struct ActionFullInfo<BigUint: BigUintApi> {
+	pub action_id: usize,
+	pub action_data: Action<BigUint>,
+	pub signers: Vec<Address>,
+}
+
+#[cfg(test)]
+mod test {
+	use super::Action;
+	use elrond_wasm_debug::RustBigUint;
+
+	#[test]
+	fn test_is_pending() {
+		assert!(!Action::<RustBigUint>::Nothing.is_pending());
+		assert!(Action::<RustBigUint>::ChangeQuorum(5).is_pending());
+	}
+}
