@@ -444,6 +444,20 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		let hash: [u8; 32] = hasher.result().into();
 		hash.into()
 	}
+
+	// TODO: Remove underscores when implementing
+
+	fn verify_bls(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+		panic!("Not implemented yet!")
+	}
+
+	fn verify_ed25519(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+		panic!("Not implemented yet!")
+	}
+
+	fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+		panic!("Not implemented yet!")
+	}
 }
 
 impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
