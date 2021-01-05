@@ -36,6 +36,14 @@ impl<BigUint: BigUintApi> Action<BigUint> {
 	}
 }
 
+/// Not used internally, just to retrieve results via endpoint. 
+#[derive(TopEncode, TypeAbi)]
+pub struct ActionFullInfo<BigUint: BigUintApi> {
+	pub action_id: usize,
+	pub action_data: Action<BigUint>,
+	pub signers: Vec<Address>,
+}
+
 #[cfg(test)]
 mod test {
 	use super::Action;
