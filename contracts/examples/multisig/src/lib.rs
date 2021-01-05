@@ -63,13 +63,6 @@ pub trait Multisig {
 	#[storage_set("action_last_index")]
 	fn set_action_last_index(&self, action_last_index: usize);
 
-	#[view(getPendingActionCount)]
-	#[storage_get("pending_action_count")]
-	fn get_pending_action_count(&self) -> usize;
-
-	#[storage_set("pending_action_count")]
-	fn set_pending_action_count(&self, pending_action_count: usize);
-
 	/// Serialized action data of an action with index.
 	#[view(getActionData)]
 	#[storage_get("action_data")]
@@ -126,7 +119,6 @@ pub trait Multisig {
 
 		let action_id = self.get_action_last_index() + 1;
 		self.set_action_last_index(action_id);
-		self.set_pending_action_count(self.get_pending_action_count() + 1);
 		self.set_action_data(action_id, &action);
 		if caller_role.can_sign() {
 			// also sign
@@ -513,7 +505,6 @@ pub trait Multisig {
 	fn clear_action(&self, action_id: usize) {
 		self.set_action_data(action_id, &Action::Nothing);
 		self.set_action_signer_ids(action_id, &[][..]);
-		self.set_pending_action_count(self.get_pending_action_count() - 1);
 	}
 
 	/// Clears storage pertaining to an action that is no longer supposed to be executed.
