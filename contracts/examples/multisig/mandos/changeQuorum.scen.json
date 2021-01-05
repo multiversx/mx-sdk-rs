@@ -58,13 +58,19 @@
                 "from": "address:bob",
                 "to": "address:multisig",
                 "value": "0",
-                "function": "getPendingActionData",
+                "function": "getPendingActionFullInfo",
                 "arguments": [],
                 "gasLimit": "100,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "u8:4|u32:3"],
+                "out": [
+                    [
+                        "u32:1",
+                        "u8:4|u32:3",
+                        "u32:2|address:alice|address:bob"
+                    ]
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -120,7 +126,7 @@
                 "from": "address:bob",
                 "to": "address:multisig",
                 "value": "0",
-                "function": "getPendingActionData",
+                "function": "getPendingActionFullInfo",
                 "arguments": [],
                 "gasLimit": "100,000",
                 "gasPrice": "0"
