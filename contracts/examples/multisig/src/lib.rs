@@ -135,7 +135,7 @@ pub trait Multisig {
 	fn get_pending_action_data(&self) -> MultiResultVec<Action<BigUint>> {
 		let mut result = Vec::new();
 		let action_last_index = self.get_action_last_index();
-		for action_id in 1..=action_last_index{
+		for action_id in 1..=action_last_index {
 			let action = self.get_action_data(action_id);
 			if action.is_pending() {
 				result.push(action);
