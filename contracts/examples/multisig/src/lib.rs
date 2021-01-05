@@ -124,6 +124,21 @@ pub trait Multisig {
 		Ok(action_id)
 	}
 
+	/// Iterates through all actions and retrieves those that are still pending.
+	/// Only retrieves the serialized action data, not the signers.
+	#[view(getPendingActionData)]
+	fn get_pending_action_data(&self) -> MultiResultVec<Action<BigUint>> {
+		let mut result = Vec::new();
+		let action_last_index = self.get_action_last_index();
+		for action_id in 1..=action_last_index{
+			let action = self.get_action_data(action_id);
+			if action.is_pending() {
+				result.push(action);
+			}
+		}
+		result.into()
+	}
+
 	#[endpoint(proposeAddBoardMember)]
 	fn propose_add_board_member(&self, board_member_address: Address) -> SCResult<usize> {
 		self.propose_action(Action::AddBoardMember(board_member_address))
