@@ -448,15 +448,15 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	// TODO: Remove underscores when implementing
 
 	fn verify_bls(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-		panic!("Not implemented yet!")
+		panic!("verify_bls not implemented yet!")
 	}
 
 	fn verify_ed25519(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-		panic!("Not implemented yet!")
+		panic!("verify_ed25519 not implemented yet!")
 	}
 
 	fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-		panic!("Not implemented yet!")
+		panic!("verify_secp256k1 not implemented yet!")
 	}
 }
 
