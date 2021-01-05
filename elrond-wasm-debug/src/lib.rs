@@ -2,6 +2,7 @@
 #![allow(unused_imports)]
 
 pub mod abi_json;
+pub mod api;
 mod async_data;
 mod big_int_mock;
 mod big_uint_mock;

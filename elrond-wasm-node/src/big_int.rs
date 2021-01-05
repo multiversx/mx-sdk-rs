@@ -4,8 +4,8 @@ use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 use elrond_wasm::BigIntApi;
 use elrond_wasm::Sign;

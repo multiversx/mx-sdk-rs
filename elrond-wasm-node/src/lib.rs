@@ -2,6 +2,7 @@
 #![feature(new_uninit)]
 #![allow(dead_code)] // TODO: remove
 
+pub mod api;
 mod big_int;
 mod big_uint;
 mod ext;
