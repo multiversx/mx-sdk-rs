@@ -16,6 +16,10 @@ impl UserRole {
 		self.can_propose()
 	}
 
+	pub fn can_discard_action(&self) -> bool {
+		self.can_propose()
+	}
+
 	pub fn can_sign(&self) -> bool {
 		matches!(*self, UserRole::BoardMember)
 	}

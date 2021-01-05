@@ -287,11 +287,6 @@ pub trait Multisig {
 			// it is ok to call swap_remove, which is O(1)
 			signer_ids.swap_remove(signer_pos);
 			self.set_action_signer_ids(action_id, signer_ids.as_slice());
-
-			if signer_ids.is_empty() {
-				// last signer withdrew the signature, time to clean up
-				self.set_action_data(action_id, &Action::Nothing);
-			}
 		}
 
 		Ok(())
@@ -397,9 +392,7 @@ pub trait Multisig {
 		// clean up storage
 		// happens before actual execution, because the async_call kills contract execution,
 		// so cleanup cannot happen afterwards
-		self.set_action_data(action_id, &Action::Nothing);
-		self.set_action_signer_ids(action_id, &[][..]);
-		self.set_pending_action_count(self.get_pending_action_count() - 1);
+		self.clear_action(action_id);
 
 		let mut result = Vec::<BoxedBytes>::new();
 		match action {
@@ -463,5 +456,32 @@ pub trait Multisig {
 		}
 
 		Ok(result.into())
+	}
+
+	fn clear_action(&self, action_id: usize) {
+		self.set_action_data(action_id, &Action::Nothing);
+		self.set_action_signer_ids(action_id, &[][..]);
+		self.set_pending_action_count(self.get_pending_action_count() - 1);
+	}
+
+	/// Clears storage pertaining to an action that is no longer supposed to be executed.
+	/// Any signatures that the action received must first be removed, via `unsign`.
+	/// Otherwise the endpoint would be prone to abuse.
+	#[endpoint(discardAction)]
+	fn discard_action(&self, action_id: usize) -> SCResult<()> {
+		let caller_address = self.get_caller();
+		let caller_id = self.users_module().get_user_id(&caller_address);
+		let caller_role = self.get_user_id_to_role(caller_id);
+		require!(
+			caller_role.can_discard_action(),
+			"only board members and proposers can discard actions"
+		);
+		require!(
+			self.get_action_valid_signer_count(action_id) == 0,
+			"cannot discard action with valid signatures"
+		);
+
+		self.clear_action(action_id);
+		Ok(())
 	}
 }
