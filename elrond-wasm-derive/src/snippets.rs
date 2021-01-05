@@ -244,6 +244,21 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		fn keccak256(&self, data: &[u8]) -> H256 {
 		  self.api.keccak256(data)
 		}
+
+		#[inline]
+		fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+			self.api.verify_bls(key, message, signature)
+		}
+
+		#[inline]
+		fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+			self.api.verify_ed25519(key, message, signature)
+		}
+
+		#[inline]
+		fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+			self.api.verify_secp256k1(key, message, signature)
+		}
 	  }
 	}
 }
