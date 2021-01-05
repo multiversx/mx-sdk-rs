@@ -3,7 +3,7 @@
 mod action;
 mod user_role;
 
-use action::Action;
+use action::{Action, ActionFullInfo};
 use elrond_wasm::HexCallDataSerializer;
 use user_role::UserRole;
 
@@ -130,15 +130,22 @@ pub trait Multisig {
 	}
 
 	/// Iterates through all actions and retrieves those that are still pending.
-	/// Only retrieves the serialized action data, not the signers.
-	#[view(getPendingActionData)]
-	fn get_pending_action_data(&self) -> MultiResultVec<Action<BigUint>> {
+	/// Serialized full action data:
+	/// - the action id
+	/// - the serialized action data
+	/// - (number of signers followed by) list of signer addresses.
+	#[view(getPendingActionFullInfo)]
+	fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<BigUint>> {
 		let mut result = Vec::new();
 		let action_last_index = self.get_action_last_index();
 		for action_id in 1..=action_last_index {
-			let action = self.get_action_data(action_id);
-			if action.is_pending() {
-				result.push(action);
+			let action_data = self.get_action_data(action_id);
+			if action_data.is_pending() {
+				result.push(ActionFullInfo{
+					action_id,
+					action_data,
+					signers: self.get_action_signers(action_id),
+				});
 			}
 		}
 		result.into()
