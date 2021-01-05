@@ -14,11 +14,15 @@ use elrond_wasm_module_users_default::*;
 #[cfg(feature = "elrond-wasm-module-users-wasm")]
 use elrond_wasm_module_users_wasm::*;
 
+/// Multi-signature smart contract implementation.
+/// Acts like a wallet that needs multiple signers for any action performed.
+/// See the readme file for more detailed documentation.
 #[elrond_wasm_derive::contract(MultisigImpl)]
 pub trait Multisig {
 	#[module(UsersModuleImpl)]
 	fn users_module(&self) -> UsersModuleImpl<T, BigInt, BigUint>;
 
+	/// Minimum number of signatures needed to perform any action.
 	#[view(getQuorum)]
 	#[storage_get("quorum")]
 	fn get_quorum(&self) -> usize;
@@ -26,13 +30,14 @@ pub trait Multisig {
 	#[storage_set("quorum")]
 	fn set_quorum(&self, quorum: usize);
 
-	#[view(getUserRole)]
 	#[storage_get("user_role")]
 	fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
 
 	#[storage_set("user_role")]
 	fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
 
+	/// Denormalized board member count.
+	/// It is kept in sync with the user list by the contract.
 	#[view(getNumBoardMembers)]
 	#[storage_get("num_board_members")]
 	fn get_num_board_members(&self) -> usize;
@@ -40,6 +45,8 @@ pub trait Multisig {
 	#[storage_set("num_board_members")]
 	fn set_num_board_members(&self, num_board_members: usize);
 
+	/// Denormalized proposer count.
+	/// It is kept in sync with the user list by the contract.
 	#[view(getNumProposers)]
 	#[storage_get("num_proposers")]
 	fn get_num_proposers(&self) -> usize;
@@ -47,6 +54,8 @@ pub trait Multisig {
 	#[storage_set("num_proposers")]
 	fn set_num_proposers(&self, num_proposers: usize);
 
+	/// The index of the last proposed action.
+	/// 0 means that no action was ever proposed yet.
 	#[view(getActionLastIndex)]
 	#[storage_get("action_last_index")]
 	fn get_action_last_index(&self) -> usize;
@@ -61,6 +70,7 @@ pub trait Multisig {
 	#[storage_set("pending_action_count")]
 	fn set_pending_action_count(&self, pending_action_count: usize);
 
+	/// Serialized action data of an action with index.
 	#[view(getActionData)]
 	#[storage_get("action_data")]
 	fn get_action_data(&self, action_id: usize) -> Action<BigUint>;
@@ -68,6 +78,8 @@ pub trait Multisig {
 	#[storage_set("action_data")]
 	fn set_action_data(&self, action_id: usize, action_data: &Action<BigUint>);
 
+	/// Equivalent to `!self.get_action_data(action_id).is_pending()`,
+	/// but more efficient because it does not need to deserialize the data.
 	#[storage_is_empty("action_data")]
 	fn is_empty_action_data(&self, action_id: usize) -> bool;
 
@@ -98,6 +110,7 @@ pub trait Multisig {
 		Ok(())
 	}
 
+	/// Allows the contract to receive funds even if it is marked as unpayable in the protocol.
 	#[payable]
 	#[endpoint]
 	fn deposit(&self) {}
@@ -139,11 +152,15 @@ pub trait Multisig {
 		result.into()
 	}
 
+	/// Initiates board member addition process.
+	/// Can also be used to promote a proposer to board member.
 	#[endpoint(proposeAddBoardMember)]
 	fn propose_add_board_member(&self, board_member_address: Address) -> SCResult<usize> {
 		self.propose_action(Action::AddBoardMember(board_member_address))
 	}
 
+	/// Initiates proposer addition process..
+	/// Can also be used to demote a board member to proposer.
 	#[endpoint(proposeAddProposer)]
 	fn propose_add_proposer(&self, proposer_address: Address) -> SCResult<usize> {
 		self.propose_action(Action::AddProposer(proposer_address))
@@ -202,6 +219,8 @@ pub trait Multisig {
 		})
 	}
 
+	/// To be used not only for smart contract calls,
+	/// but also for ESDT calls or any protocol built-in function.
 	#[endpoint(proposeSCCall)]
 	fn propose_sc_call(
 		&self,
@@ -218,6 +237,8 @@ pub trait Multisig {
 		})
 	}
 
+	/// Returns `true` (`1`) if the user has signed the action.
+	/// Does not check whether or not the user is still a board member and the signature valid.
 	#[view]
 	fn signed(&self, user: Address, action_id: usize) -> bool {
 		let user_id = self.users_module().get_user_id(&user);
@@ -229,6 +250,10 @@ pub trait Multisig {
 		}
 	}
 
+	/// Indicates user rights.
+	/// `0` = no rights,
+	/// `1` = can propose, but not sign,
+	/// `2` = can propose and sign.
 	#[view(userRole)]
 	fn user_role(&self, user: Address) -> UserRole {
 		let user_id = self.users_module().get_user_id(&user);
@@ -239,11 +264,13 @@ pub trait Multisig {
 		}
 	}
 
+	/// Lists all users that can sign actions.
 	#[view(getAllBoardMembers)]
 	fn get_all_board_members(&self) -> MultiResultVec<Address> {
 		self.get_all_users_with_role(UserRole::BoardMember)
 	}
 
+	/// Lists all proposers that are not board members.
 	#[view(getAllProposers)]
 	fn get_all_proposers(&self) -> MultiResultVec<Address> {
 		self.get_all_users_with_role(UserRole::Proposer)
@@ -260,6 +287,7 @@ pub trait Multisig {
 		result.into()
 	}
 
+	/// Used by board members to sign actions.
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
 		require!(
@@ -281,6 +309,8 @@ pub trait Multisig {
 		Ok(())
 	}
 
+	/// Board members can withdraw their signatures if they no longer desire for the action to be executed.
+	/// Actions that are left with no valid signatures can be then deleted to free up storage.
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
 		require!(
@@ -347,6 +377,9 @@ pub trait Multisig {
 		}
 	}
 
+	/// Gets addresses of all users who signed an action.
+	/// Does not check if those users are still board members or not,
+	/// so the result may contain invalid signers.
 	#[view(getActionSigners)]
 	fn get_action_signers(&self, action_id: usize) -> Vec<Address> {
 		self.get_action_signer_ids(action_id)
@@ -355,6 +388,8 @@ pub trait Multisig {
 			.collect()
 	}
 
+	/// Gets addresses of all users who signed an action and are still board members.
+	/// All these signatures are currently valid.
 	#[view(getActionSignerCount)]
 	fn get_action_signer_count(&self, action_id: usize) -> usize {
 		self.get_action_signer_ids(action_id).len()
@@ -377,6 +412,7 @@ pub trait Multisig {
 			.count()
 	}
 
+	/// Returns `true` (`1`) if `getActionValidSignerCount >= getQuorum`.
 	#[view(quorumReached)]
 	fn quorum_reached(&self, action_id: usize) -> bool {
 		let quorum = self.get_quorum();
@@ -384,6 +420,7 @@ pub trait Multisig {
 		valid_signers_count >= quorum
 	}
 
+	/// Proposers and board members use this to launch signed actions.
 	#[endpoint(performAction)]
 	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
 		let caller_address = self.get_caller();
@@ -481,7 +518,7 @@ pub trait Multisig {
 
 	/// Clears storage pertaining to an action that is no longer supposed to be executed.
 	/// Any signatures that the action received must first be removed, via `unsign`.
-	/// Otherwise the endpoint would be prone to abuse.
+	/// Otherwise this endpoint would be prone to abuse.
 	#[endpoint(discardAction)]
 	fn discard_action(&self, action_id: usize) -> SCResult<()> {
 		let caller_address = self.get_caller();
