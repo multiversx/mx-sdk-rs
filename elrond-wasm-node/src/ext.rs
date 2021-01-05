@@ -418,25 +418,35 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 	fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 		unsafe {
-			verifyBLS(key.as_ptr(), 
-				message.as_ptr(), message.len() as i32, 
-				signature.as_ptr()) == 0
+			verifyBLS(
+				key.as_ptr(),
+				message.as_ptr(),
+				message.len() as i32,
+				signature.as_ptr(),
+			) == 0
 		}
 	}
 
 	fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 		unsafe {
-			verifyEd25519(key.as_ptr(),
-				message.as_ptr(), message.len() as i32,
-				signature.as_ptr()) == 0
+			verifyEd25519(
+				key.as_ptr(),
+				message.as_ptr(),
+				message.len() as i32,
+				signature.as_ptr(),
+			) == 0
 		}
 	}
 
 	fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 		unsafe {
-			verifySecp256k1(key.as_ptr(), key.len() as i32, 
-			message.as_ptr(), message.len() as i32,
-			signature.as_ptr()) == 0
+			verifySecp256k1(
+				key.as_ptr(),
+				key.len() as i32,
+				message.as_ptr(),
+				message.len() as i32,
+				signature.as_ptr(),
+			) == 0
 		}
 	}
 }

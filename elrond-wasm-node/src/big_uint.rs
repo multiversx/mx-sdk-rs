@@ -6,8 +6,8 @@ use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 use elrond_wasm::err_msg;
 use elrond_wasm::BigUintApi;
