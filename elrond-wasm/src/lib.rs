@@ -9,6 +9,7 @@ pub use alloc::vec::Vec;
 pub use elrond_codec;
 
 pub mod abi;
+pub mod api;
 pub mod err_msg;
 pub mod hex_call_data;
 pub mod io;
