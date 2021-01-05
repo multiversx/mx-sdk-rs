@@ -26,3 +26,12 @@ pub enum Action<BigUint: BigUintApi> {
 		arguments: Vec<BoxedBytes>,
 	},
 }
+
+impl<BigUint: BigUintApi> Action<BigUint> {
+	/// Only pending actions are kept in storage,
+	/// both executed and discarded actions are removed (converted to `Nothing`).
+	/// So this is equivalent to `action != Action::Nothing`.
+	pub fn is_pending(&self) -> bool {
+		matches!(*self, Action::Nothing)
+	}
+}
