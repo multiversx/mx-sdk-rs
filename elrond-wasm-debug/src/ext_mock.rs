@@ -431,6 +431,23 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			.clone()
 	}
 
+	// TODO: Remove underscores when implementing
+
+	fn execute_on_dest_context(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
+		_function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("execute_on_dest_context not implemented yet!");
+	}
+
+	fn execute_on_dest_context_by_caller(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
+		_function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("execute_on_dest_context_by_caller not implemented yet!");
+	}
+
+	fn execute_on_same_context(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
+		_function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("execute_on_same_context not implemented yet!");
+	}
+
 	fn sha256(&self, data: &[u8]) -> H256 {
 		let mut hasher = Sha3_256::new();
 		hasher.input(data);
@@ -443,6 +460,20 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		hasher.input(data);
 		let hash: [u8; 32] = hasher.result().into();
 		hash.into()
+	}
+
+	// TODO: Remove underscores when implementing
+
+	fn verify_bls(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+		panic!("verify_bls not implemented yet!")
+	}
+
+	fn verify_ed25519(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+		panic!("verify_ed25519 not implemented yet!")
+	}
+
+	fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+		panic!("verify_secp256k1 not implemented yet!")
 	}
 }
 

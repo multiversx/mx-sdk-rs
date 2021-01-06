@@ -236,6 +236,21 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		}
 
 		#[inline]
+		fn execute_on_dest_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+			self.api.execute_on_dest_context(gas, address, value, function, arg_buffer);
+		}
+
+		#[inline]
+		fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+			self.api.execute_on_dest_context_by_caller(gas, address, value, function, arg_buffer);
+		}
+
+		#[inline]
+		fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+			self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
+		}
+
+		#[inline]
 		fn sha256(&self, data: &[u8]) -> H256 {
 		  self.api.sha256(data)
 		}
@@ -243,6 +258,21 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		#[inline]
 		fn keccak256(&self, data: &[u8]) -> H256 {
 		  self.api.keccak256(data)
+		}
+
+		#[inline]
+		fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+			self.api.verify_bls(key, message, signature)
+		}
+
+		#[inline]
+		fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+			self.api.verify_ed25519(key, message, signature)
+		}
+
+		#[inline]
+		fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+			self.api.verify_secp256k1(key, message, signature)
 		}
 	  }
 	}
