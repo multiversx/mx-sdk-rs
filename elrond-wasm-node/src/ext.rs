@@ -408,42 +408,72 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn execute_on_dest_context(gas: u64, address: &Address, value: &BigUint,
-		function: &[u8], arg_buffer: &ArgBuffer) {
-
+	fn execute_on_dest_context(
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
 		unsafe {
 			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 
-			executeOnDestContext(gas, address.as_ptr(), value_bytes32.as_ptr(),
-				function.as_ptr(), function.len(),
-				arg_buffer.num_args(), arg_buffer.arg_lengths_bytes_ptr(),
-				arg_buffer.arg_data_ptr());
+			executeOnDestContext(
+				gas,
+				address.as_ptr(),
+				value_bytes32.as_ptr(),
+				function.as_ptr(),
+				function.len(),
+				arg_buffer.num_args(),
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
 		}
 	}
 
-	fn execute_on_dest_context_by_caller(gas: u64, address: &Address, value: &BigUint,
-		function: &[u8], arg_buffer: &ArgBuffer) {
-
+	fn execute_on_dest_context_by_caller(
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
 		unsafe {
 			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 
-			executeOnDestContextByCaller(gas, address.as_ptr(), value_bytes32.as_ptr(),
-				function.as_ptr(), function.len(),
-				arg_buffer.num_args(), arg_buffer.arg_lengths_bytes_ptr(),
-				arg_buffer.arg_data_ptr());
+			executeOnDestContextByCaller(
+				gas,
+				address.as_ptr(),
+				value_bytes32.as_ptr(),
+				function.as_ptr(),
+				function.len(),
+				arg_buffer.num_args(),
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
 		}
 	}
 
-	fn execute_on_same_context(gas: u64, address: &Address, value: &BigUint,
-		function: &[u8], arg_buffer: &ArgBuffer) {
-
+	fn execute_on_same_context(
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
 		unsafe {
 			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 
-			executeOnSameContext(gas, address.as_ptr(), value_bytes32.as_ptr(),
-				function.as_ptr(), function.len(),
-				arg_buffer.num_args(), arg_buffer.arg_lengths_bytes_ptr(),
-				arg_buffer.arg_data_ptr());
+			executeOnSameContext(
+				gas,
+				address.as_ptr(),
+				value_bytes32.as_ptr(),
+				function.as_ptr(),
+				function.len(),
+				arg_buffer.num_args(),
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
 		}
 	}
 
