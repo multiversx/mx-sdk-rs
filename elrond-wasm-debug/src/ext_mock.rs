@@ -431,6 +431,23 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			.clone()
 	}
 
+	// TODO: Remove underscores when implementing
+
+	fn execute_on_dest_context(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
+		_function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("execute_on_dest_context not implemented yet!");
+	}
+
+	fn execute_on_dest_context_by_caller(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
+		_function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("execute_on_dest_context_by_caller not implemented yet!");
+	}
+
+	fn execute_on_same_context(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
+		_function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("execute_on_same_context not implemented yet!");
+	}
+
 	fn sha256(&self, data: &[u8]) -> H256 {
 		let mut hasher = Sha3_256::new();
 		hasher.input(data);

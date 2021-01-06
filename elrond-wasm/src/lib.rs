@@ -133,6 +133,12 @@ where
 
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
 
+	fn execute_on_dest_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer);
+
+	fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer);
+
+	fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer);
+
 	fn sha256(&self, data: &[u8]) -> H256;
 
 	fn keccak256(&self, data: &[u8]) -> H256;
