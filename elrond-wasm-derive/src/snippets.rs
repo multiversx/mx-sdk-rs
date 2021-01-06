@@ -236,6 +236,21 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		}
 
 		#[inline]
+		fn execute_on_dest_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+			self.api.execute_on_dest_context(gas, address, value, function, arg_buffer);
+		}
+
+		#[inline]
+		fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+			self.api.execute_on_dest_context_by_caller(gas, address, value, function, arg_buffer);
+		}
+
+		#[inline]
+		fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+			self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
+		}
+
+		#[inline]
 		fn sha256(&self, data: &[u8]) -> H256 {
 		  self.api.sha256(data)
 		}

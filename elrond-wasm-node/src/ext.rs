@@ -50,7 +50,17 @@ extern {
     fn getPrevBlockRound() -> i64;
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
-    fn getOriginalTxHash(resultOffset: *const u8);
+	fn getOriginalTxHash(resultOffset: *const u8);
+	
+	fn executeOnDestContext(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
+		functionOffset: *const u8, functionLength: i32, 
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
+	fn executeOnDestContextByCaller(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
+		functionOffset: *const u8, functionLength: i32, 
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
+	fn executeOnSameContext(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
+		functionOffset: *const u8, functionLength: i32, 
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
 
     // big int API
     fn bigIntNew(value: i64) -> i32;
@@ -395,6 +405,45 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			let mut res = [0u8; 48];
 			getPrevBlockRandomSeed(res.as_mut_ptr());
 			Box::new(res)
+		}
+	}
+
+	fn execute_on_dest_context(gas: u64, address: &Address, value: &BigUint,
+		function: &[u8], arg_buffer: &ArgBuffer) {
+
+		unsafe {
+			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+
+			executeOnDestContext(gas, address.as_ptr(), value_bytes32.as_ptr(),
+				function.as_ptr(), function.len(),
+				arg_buffer.num_args(), arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr());
+		}
+	}
+
+	fn execute_on_dest_context_by_caller(gas: u64, address: &Address, value: &BigUint,
+		function: &[u8], arg_buffer: &ArgBuffer) {
+
+		unsafe {
+			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+
+			executeOnDestContextByCaller(gas, address.as_ptr(), value_bytes32.as_ptr(),
+				function.as_ptr(), function.len(),
+				arg_buffer.num_args(), arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr());
+		}
+	}
+
+	fn execute_on_same_context(gas: u64, address: &Address, value: &BigUint,
+		function: &[u8], arg_buffer: &ArgBuffer) {
+
+		unsafe {
+			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+
+			executeOnSameContext(gas, address.as_ptr(), value_bytes32.as_ptr(),
+				function.as_ptr(), function.len(),
+				arg_buffer.num_args(), arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr());
 		}
 	}
 
