@@ -409,9 +409,10 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	}
 
 	fn execute_on_dest_context(
+		&self,
 		gas: u64,
 		address: &Address,
-		value: &BigUint,
+		value: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) {
@@ -420,11 +421,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 			executeOnDestContext(
 				gas,
-				address.as_ptr(),
+				address.as_ref().as_ptr(),
 				value_bytes32.as_ptr(),
 				function.as_ptr(),
-				function.len(),
-				arg_buffer.num_args(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
 			);
@@ -432,9 +433,10 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	}
 
 	fn execute_on_dest_context_by_caller(
+		&self,
 		gas: u64,
 		address: &Address,
-		value: &BigUint,
+		value: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) {
@@ -443,11 +445,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 			executeOnDestContextByCaller(
 				gas,
-				address.as_ptr(),
+				address.as_ref().as_ptr(),
 				value_bytes32.as_ptr(),
 				function.as_ptr(),
-				function.len(),
-				arg_buffer.num_args(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
 			);
@@ -455,9 +457,10 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	}
 
 	fn execute_on_same_context(
+		&self,
 		gas: u64,
 		address: &Address,
-		value: &BigUint,
+		value: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) {
@@ -466,11 +469,11 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 			executeOnSameContext(
 				gas,
-				address.as_ptr(),
+				address.as_ref().as_ptr(),
 				value_bytes32.as_ptr(),
 				function.as_ptr(),
-				function.len(),
-				arg_buffer.num_args(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
 			);
