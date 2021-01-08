@@ -18,7 +18,7 @@ mod proxy;
 pub mod storage;
 pub mod types;
 
-use api::{ErrorApi, StorageReadApi, StorageWriteApi};
+use api::{ErrorApi, StorageReadApi, StorageWriteApi, CryptoApi};
 pub use hex_call_data::*;
 pub use io::*;
 pub use proxy::OtherContractHandle;
@@ -37,7 +37,7 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractHookApi<BigInt, BigUint>:
-	Sized + StorageReadApi + StorageWriteApi + ErrorApi
+	Sized + StorageReadApi + StorageWriteApi + ErrorApi + CryptoApi
 // pub trait ContractHookApi<BigInt, BigUint, StorageRead, StorageWrite, Crypto>: Sized
 where
 	BigInt: elrond_codec::NestedEncode + 'static,
@@ -108,16 +108,6 @@ where
 	fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer);
 
 	fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer);
-
-	fn sha256(&self, data: &[u8]) -> H256;
-
-	fn keccak256(&self, data: &[u8]) -> H256;
-
-	fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool;
-
-	fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool;
-
-	fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool;
 
 	// fn storage_read_raw_api(&self) -> StorageRead;
 
