@@ -878,6 +878,23 @@ pub trait BasicFeatures {
 		self.keccak256(&input)
 	}
 
+	// Not called, they currently just panic with "Not implemented yet!"
+
+	#[endpoint]
+	fn verify_bls_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		self.verify_bls(key, message, signature)
+	}
+
+	#[endpoint]
+	fn verify_ed25519_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		self.verify_ed25519(key, message, signature)
+	}
+
+	#[endpoint]
+	fn verify_secp256k1_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		self.verify_secp256k1(key, message, signature)
+	}
+
 	// MACROS
 
 	#[view]

@@ -51,7 +51,17 @@ extern {
     fn getPrevBlockRound() -> i64;
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
-    fn getOriginalTxHash(resultOffset: *const u8);
+	fn getOriginalTxHash(resultOffset: *const u8);
+	
+	fn executeOnDestContext(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
+		functionOffset: *const u8, functionLength: i32, 
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
+	fn executeOnDestContextByCaller(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
+		functionOffset: *const u8, functionLength: i32, 
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
+	fn executeOnSameContext(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
+		functionOffset: *const u8, functionLength: i32, 
+		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
 
     // big int API
     fn bigIntNew(value: i64) -> i32;
@@ -77,7 +87,10 @@ extern {
     
     // crypto API
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
-    fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+	fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+	fn verifyBLS(keyOffset: *const u8, messageOffset: *const u8, messageLength: i32, sigOffset: *const u8) -> i32;
+	fn verifyEd25519(keyOffset: *const u8, messageOffset: *const u8, messageLength: i32, sigOffset: *const u8) -> i32;
+	fn verifySecp256k1(keyOffset: *const u8, keyLength: i32, messageOffset: *const u8, messageLength: i32, sigOffset: *const u8) -> i32;
 }
 
 pub struct ArwenApiImpl {}
@@ -268,6 +281,78 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
+	fn execute_on_dest_context(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &ArwenBigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
+		unsafe {
+			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+
+			executeOnDestContext(
+				gas,
+				address.as_ref().as_ptr(),
+				value_bytes32.as_ptr(),
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+	}
+
+	fn execute_on_dest_context_by_caller(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &ArwenBigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
+		unsafe {
+			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+
+			executeOnDestContextByCaller(
+				gas,
+				address.as_ref().as_ptr(),
+				value_bytes32.as_ptr(),
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+	}
+
+	fn execute_on_same_context(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &ArwenBigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
+		unsafe {
+			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
+
+			executeOnSameContext(
+				gas,
+				address.as_ref().as_ptr(),
+				value_bytes32.as_ptr(),
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+	}
+
 	fn sha256(&self, data: &[u8]) -> H256 {
 		unsafe {
 			let mut res = H256::zero();
@@ -281,6 +366,42 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			let mut res = H256::zero();
 			keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
 			res
+		}
+	}
+
+	// the verify functions return 0 if valid signature, -1 if invalid
+
+	fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		unsafe {
+			verifyBLS(
+				key.as_ptr(),
+				message.as_ptr(),
+				message.len() as i32,
+				signature.as_ptr(),
+			) == 0
+		}
+	}
+
+	fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		unsafe {
+			verifyEd25519(
+				key.as_ptr(),
+				message.as_ptr(),
+				message.len() as i32,
+				signature.as_ptr(),
+			) == 0
+		}
+	}
+
+	fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		unsafe {
+			verifySecp256k1(
+				key.as_ptr(),
+				key.len() as i32,
+				message.as_ptr(),
+				message.len() as i32,
+				signature.as_ptr(),
+			) == 0
 		}
 	}
 }
