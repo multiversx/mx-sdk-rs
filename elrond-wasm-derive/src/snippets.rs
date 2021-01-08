@@ -54,15 +54,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 	quote! {
 		impl <T, BigInt, BigUint> elrond_wasm::api::ErrorApi for #contract_struct<T, BigInt, BigUint>
 		#api_where
-		  {
+		{
 			#[inline]
 			fn signal_error(&self, message: &[u8]) -> ! {
 				self.api.signal_error(message)
 			}
 		}
+
 		impl <T, BigInt, BigUint> elrond_wasm::api::StorageWriteApi for #contract_struct<T, BigInt, BigUint>
 		#api_where
-		  {
+		{
 			#[inline]
 			fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
 				self.api.storage_store_slice_u8(key, value);
@@ -232,6 +233,25 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			}
 
 			#[inline]
+			fn execute_on_dest_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+				self.api.execute_on_dest_context(gas, address, value, function, arg_buffer);
+			}
+
+			#[inline]
+			fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+				self.api.execute_on_dest_context_by_caller(gas, address, value, function, arg_buffer);
+			}
+
+			#[inline]
+			fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
+				self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
+			}
+		}
+
+		impl <T, BigInt, BigUint> elrond_wasm::api::CryptoApi for #contract_struct<T, BigInt, BigUint>
+		#api_where
+		{
+			#[inline]
 			fn sha256(&self, data: &[u8]) -> H256 {
 				self.api.sha256(data)
 			}
@@ -256,20 +276,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 				self.api.verify_secp256k1(key, message, signature)
 			}
 
-			#[inline]
-			fn execute_on_dest_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
-				self.api.execute_on_dest_context(gas, address, value, function, arg_buffer);
-			}
-
-			#[inline]
-			fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
-				self.api.execute_on_dest_context_by_caller(gas, address, value, function, arg_buffer);
-			}
-
-			#[inline]
-			fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
-				self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
-			}
 		}
 	}
 }
