@@ -67,6 +67,102 @@
             }
         },
         {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "verify_bls_signature",
+                "arguments": [
+                    "0xb5823f6e564251cc03ce7bad3da83e72576e92795d3500bba1acb30ec9a94dce87bb8aa794d67b2d61d15c33f28f6c0c23ba1dfcbf21e8f8b46286ff871afabac925303ddcaddce6254fcff6d3155797db40b3d3b5865e8fc0bd770b3d79b381",
+                    "0x6d65737361676520746f206265207369676e6564",
+                    "0xaf32a2ddf341c08d1eb7232f05dc34e4454155e676b58c40fddf9a036562ac2c01533d2d557cb49d73aa9d7a89744696"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": ["0x01"],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "verify_ed25519_signature",
+                "arguments": [
+                    "0xf2445fdaca6607728fa06e0610062c3468cad6d54f19549916ef577f69c7eb86",
+                    "0x6d65737361676520746f207369676e",
+                    "0xf34eb80f5ef94e0928f42f26b4a14799d52a8f687eb644d6be73a8db3ae85de059002d369be28c8c188b179dcf6286fd009d540953ea932f70aead52d6aa7d09"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": ["0x01"],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "5 - compressed key",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "verify_secp256k1_signature",
+                "arguments": [
+                    "0x02a673638cb9587cb68ea08dbef685c6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5",
+                    "0x6d65737361676520746f207369676e",
+                    "0x3045022100fab29dbcb623e7e96f44665f312b89ffdb9e4d2e2f53353236fbbcf57b2f49bf02203d6f9c63df8be43121042970a549a2d3baeca093fd37b726ddcc0924638409f5"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": ["0x01"],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "6 - uncompressed key",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "verify_secp256k1_signature",
+                "arguments": [
+                    "0x04a673638cb9587cb68ea08dbef685c6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5ca1d22fe57c6103dbaac10cf15d15c0791cab8bb9a04f800e4d215276cb3e008",
+                    "0x6d65737361676520746f207369676e",
+                    "0x3045022100fab29dbcb623e7e96f44665f312b89ffdb9e4d2e2f53353236fbbcf57b2f49bf02203d6f9c63df8be43121042970a549a2d3baeca093fd37b726ddcc0924638409f5"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": ["0x01"],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "accounts": {
                 "address:features_contract": {
@@ -76,7 +172,7 @@
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
-                    "nonce": "2",
+                    "nonce": "6",
                     "balance": "0x100abc",
                     "storage": {},
                     "code": ""
