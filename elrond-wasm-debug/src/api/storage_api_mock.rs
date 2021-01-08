@@ -71,10 +71,18 @@ impl StorageWriteApi for TxContext {
 	}
 
 	fn storage_store_u64(&self, key: &[u8], value: u64) {
-		self.storage_store_slice_u8(key, &BigUint::from(value).to_bytes_be());
+		if value == 0 {
+			self.storage_store_slice_u8(key, &[]);
+		} else {
+			self.storage_store_slice_u8(key, &BigUint::from(value).to_bytes_be());
+		}
 	}
 
 	fn storage_store_i64(&self, key: &[u8], value: i64) {
-		self.storage_store_slice_u8(key, &BigInt::from(value).to_signed_bytes_be());
+		if value == 0 {
+			self.storage_store_slice_u8(key, &[]);
+		} else {
+			self.storage_store_slice_u8(key, &BigInt::from(value).to_signed_bytes_be());
+		}
 	}
 }

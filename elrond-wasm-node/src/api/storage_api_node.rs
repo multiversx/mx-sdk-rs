@@ -1,6 +1,7 @@
 use alloc::vec::Vec;
 use elrond_wasm::api::{StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::BoxedBytes;
+use crate::ArwenApiImpl;
 
 #[rustfmt::skip]
 extern {
@@ -21,9 +22,7 @@ extern {
     fn smallIntStorageLoadSigned(keyOffset: *const u8, keyLength: i32) -> i64;
 }
 
-pub struct NodeStorageReadApi;
-
-impl StorageReadApi for NodeStorageReadApi {
+impl StorageReadApi for ArwenApiImpl {
 	#[inline]
 	fn storage_load_len(&self, key: &[u8]) -> usize {
 		unsafe { storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize }
@@ -70,9 +69,7 @@ impl StorageReadApi for NodeStorageReadApi {
 	}
 }
 
-pub struct NodeStorageWriteApi;
-
-impl StorageWriteApi for NodeStorageWriteApi {
+impl StorageWriteApi for ArwenApiImpl {
 	fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
 		unsafe {
 			storageStore(

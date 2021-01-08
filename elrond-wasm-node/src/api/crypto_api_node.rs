@@ -1,4 +1,6 @@
-use crate::types::H256;
+use elrond_wasm::types::H256;
+use crate::ArwenApiImpl;
+use elrond_wasm::api::CryptoApi;
 
 #[rustfmt::skip]
 extern {
@@ -6,9 +8,7 @@ extern {
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 }
 
-pub struct NodeCryptoApi;
-
-impl CryptoApi for NodeCryptoApi {
+impl CryptoApi for ArwenApiImpl {
 	fn sha256(&self, data: &[u8]) -> H256 {
 		unsafe {
 			let mut res = H256::zero();
