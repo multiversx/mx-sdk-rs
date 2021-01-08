@@ -1,41 +1,29 @@
+use crate::api::{ErrorApi, StorageReadApi};
 use crate::*;
-use core::marker::PhantomData;
+// use core::marker::PhantomData;
 use elrond_codec::*;
 
-struct StorageGetInput<'k, A, BigInt, BigUint>
+struct StorageGetInput<'k, SRA>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	SRA: StorageReadApi + ErrorApi + 'static,
 {
-	api: A,
+	api: SRA,
 	key: &'k [u8],
-	_phantom1: PhantomData<BigInt>,
-	_phantom2: PhantomData<BigUint>,
 }
 
-impl<'k, A, BigInt, BigUint> StorageGetInput<'k, A, BigInt, BigUint>
+impl<'k, SRA> StorageGetInput<'k, SRA>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	SRA: StorageReadApi + ErrorApi + 'static,
 {
 	#[inline]
-	fn new(api: A, key: &'k [u8]) -> Self {
-		StorageGetInput {
-			api,
-			key,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
-		}
+	fn new(api: SRA, key: &'k [u8]) -> Self {
+		StorageGetInput { api, key }
 	}
 }
 
-impl<'k, A, BigInt, BigUint> TopDecodeInput for StorageGetInput<'k, A, BigInt, BigUint>
+impl<'k, SRA> TopDecodeInput for StorageGetInput<'k, SRA>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	SRA: StorageReadApi + ErrorApi + 'static,
 {
 	fn byte_len(&self) -> usize {
 		self.api.storage_load_len(self.key)
@@ -60,12 +48,10 @@ where
 	// TODO: there is currently no API hook for storage of signed big ints
 }
 
-pub fn storage_get<A, BigInt, BigUint, T>(api: A, key: &[u8]) -> T
+pub fn storage_get<SRA, T>(api: SRA, key: &[u8]) -> T
 where
 	T: TopDecode,
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	SRA: StorageReadApi + ErrorApi + Clone + 'static,
 {
 	T::top_decode_or_exit(
 		StorageGetInput::new(api.clone(), key),
@@ -75,11 +61,9 @@ where
 }
 
 #[inline(always)]
-fn storage_get_exit<A, BigInt, BigUint>(api: A, de_err: DecodeError) -> !
+fn storage_get_exit<SRA>(api: SRA, de_err: DecodeError) -> !
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	SRA: StorageReadApi + ErrorApi + 'static,
 {
 	let decode_err_message =
 		BoxedBytes::from_concat(&[err_msg::STORAGE_DECODE_ERROR, de_err.message_bytes()][..]);

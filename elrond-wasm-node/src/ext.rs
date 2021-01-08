@@ -2,7 +2,8 @@ use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
 
 use crate::big_int::*;
 use crate::big_uint::*;
-use crate::ext_error;
+// use crate::ext_error;
+use elrond_wasm::api::*;
 use elrond_wasm::err_msg;
 use elrond_wasm::BigUintApi;
 use elrond_wasm::ContractHookApi;
@@ -116,134 +117,6 @@ impl elrond_wasm::ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
-		unsafe {
-			storageStore(
-				key.as_ref().as_ptr(),
-				key.len() as i32,
-				value.as_ptr(),
-				value.len() as i32,
-			);
-		}
-	}
-
-	#[inline]
-	fn storage_load_len(&self, key: &[u8]) -> usize {
-		unsafe { storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize }
-	}
-
-	fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
-		unsafe {
-			let value_len = self.storage_load_len(key);
-			let mut res = Vec::with_capacity(value_len);
-			storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
-			res.set_len(value_len);
-			res
-		}
-	}
-
-	fn storage_load_boxed_bytes(&self, key: &[u8]) -> BoxedBytes {
-		let len = self.storage_load_len(key);
-		unsafe {
-			let mut res = BoxedBytes::allocate(len);
-			if len > 0 {
-				storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
-			}
-			res
-		}
-	}
-
-	#[inline]
-	fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
-		unsafe {
-			storageStore(key.as_ref().as_ptr(), key.len() as i32, value.as_ptr(), 32);
-		}
-	}
-
-	fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
-		unsafe {
-			let mut res = [0u8; 32];
-			let len = storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
-			if len != 32 {
-				ext_error::signal_error(err_msg::STORAGE_NOT_32_BYTES);
-			}
-			res
-		}
-	}
-
-	#[inline]
-	fn storage_store_big_uint(&self, key: &[u8], value: &ArwenBigUint) {
-		unsafe {
-			bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value.handle);
-		}
-	}
-
-	#[inline]
-	fn storage_load_big_uint(&self, key: &[u8]) -> ArwenBigUint {
-		unsafe {
-			let handle = bigIntNew(0);
-			bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
-			ArwenBigUint { handle }
-		}
-	}
-
-	#[inline]
-	fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
-		unsafe {
-			bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
-		}
-	}
-
-	#[inline]
-	fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
-		unsafe {
-			let handle = bigIntNew(0);
-			bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
-			handle
-		}
-	}
-
-	#[inline]
-	fn storage_store_big_int(&self, key: &[u8], value: &ArwenBigInt) {
-		unsafe {
-			// TODO: convert to 2's complement
-			bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value.handle);
-		}
-	}
-
-	#[inline]
-	fn storage_load_big_int(&self, key: &[u8]) -> ArwenBigInt {
-		unsafe {
-			let result = bigIntNew(0);
-			// TODO: convert from 2's complement
-			bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, result);
-			ArwenBigInt { handle: result }
-		}
-	}
-
-	#[inline]
-	fn storage_store_u64(&self, key: &[u8], value: u64) {
-		unsafe {
-			smallIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value as i64);
-		}
-	}
-
-	#[inline]
-	fn storage_store_i64(&self, key: &[u8], value: i64) {
-		unsafe {
-			smallIntStorageStoreSigned(key.as_ref().as_ptr(), key.len() as i32, value);
-		}
-	}
-
-	#[inline]
-	fn storage_load_u64(&self, key: &[u8]) -> u64 {
-		unsafe { smallIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32) as u64 }
-	}
-
-	#[inline]
-	fn storage_load_i64(&self, key: &[u8]) -> i64 {
-		unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
-	}
 
 	#[inline]
 	fn get_call_value_big_uint(&self) -> ArwenBigUint {
@@ -550,10 +423,10 @@ impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	#[inline]
-	fn signal_error(&self, message: &[u8]) -> ! {
-		ext_error::signal_error(message)
-	}
+	// #[inline]
+	// fn signal_error(&self, message: &[u8]) -> ! {
+	// 	ext_error::signal_error(message)
+	// }
 
 	fn write_log(&self, topics: &[[u8; 32]], data: &[u8]) {
 		let mut topics_raw = [0u8; TOPIC_LENGTH * 10]; // hopefully we never have more than 10 topics

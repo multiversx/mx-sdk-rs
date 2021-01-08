@@ -6,6 +6,7 @@ use crate::big_uint_mock::*;
 use crate::blockchain_mock::*;
 use crate::display_util::*;
 
+use elrond_wasm::api::ErrorApi;
 use elrond_wasm::err_msg;
 use elrond_wasm::ContractHookApi;
 use elrond_wasm::{BigIntApi, BigUintApi};
@@ -231,108 +232,6 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		self.blockchain_info_box.contract_balance.clone().into()
 	}
 
-	fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
-		// TODO: extract magic strings somewhere
-		if key.starts_with(&b"ELROND"[..]) {
-			panic!(TxPanic {
-				status: 10,
-				message: b"cannot write to storage under Elrond reserved key".to_vec(),
-			});
-		}
-
-		let mut tx_output = self.tx_output_cell.borrow_mut();
-		tx_output
-			.contract_storage
-			.insert(key.to_vec(), value.to_vec());
-	}
-
-	fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
-		let tx_output = self.tx_output_cell.borrow();
-		match tx_output.contract_storage.get(&key.to_vec()) {
-			None => Vec::with_capacity(0),
-			Some(value) => value.clone(),
-		}
-	}
-
-	#[inline]
-	fn storage_load_len(&self, key: &[u8]) -> usize {
-		self.storage_load_vec_u8(key).len()
-	}
-
-	fn storage_store_bytes32(&self, key: &[u8], value: &[u8; 32]) {
-		self.storage_store_slice_u8(key, &value[..].to_vec());
-	}
-
-	fn storage_load_bytes32(&self, key: &[u8]) -> [u8; 32] {
-		let value = self.storage_load_vec_u8(key);
-		let mut res = [0u8; 32];
-		let offset = 32 - value.len();
-		if !value.is_empty() {
-			res[offset..].clone_from_slice(&value[..]);
-		}
-		res
-	}
-
-	fn storage_store_big_uint(&self, key: &[u8], value: &RustBigUint) {
-		self.storage_store_slice_u8(key, &value.to_bytes_be());
-	}
-
-	fn storage_load_big_uint(&self, key: &[u8]) -> RustBigUint {
-		let value = self.storage_load_vec_u8(key);
-		let bi = BigInt::from_bytes_be(num_bigint::Sign::Plus, value.as_slice());
-		bi.into()
-	}
-
-	fn storage_store_big_uint_raw(&self, _key: &[u8], _handle: i32) {
-		panic!("cannot call storage_store_big_uint_raw in debug mode");
-	}
-
-	fn storage_load_big_uint_raw(&self, _key: &[u8]) -> i32 {
-		panic!("cannot call storage_load_big_uint_raw in debug mode");
-	}
-
-	fn storage_store_big_int(&self, key: &[u8], value: &RustBigInt) {
-		self.storage_store_slice_u8(key, &value.to_signed_bytes_be());
-	}
-
-	fn storage_load_big_int(&self, key: &[u8]) -> RustBigInt {
-		let value = self.storage_load_vec_u8(key);
-		let bi = BigInt::from_signed_bytes_be(value.as_slice());
-		bi.into()
-	}
-
-	fn storage_store_i64(&self, key: &[u8], value: i64) {
-		self.storage_store_big_int(key, &RustBigInt::from(value));
-	}
-
-	fn storage_store_u64(&self, key: &[u8], value: u64) {
-		self.storage_store_big_uint(key, &RustBigUint::from(value));
-	}
-
-	fn storage_load_i64(&self, key: &[u8]) -> i64 {
-		let bi = self.storage_load_big_int(key);
-		if let Some(v) = bi.0.to_i64() {
-			v
-		} else {
-			panic!(TxPanic {
-				status: 10,
-				message: b"storage value out of range".to_vec(),
-			})
-		}
-	}
-
-	fn storage_load_u64(&self, key: &[u8]) -> u64 {
-		let bu = self.storage_load_big_uint(key);
-		if let Some(v) = bu.0.to_u64() {
-			v
-		} else {
-			panic!(TxPanic {
-				status: 10,
-				message: b"storage value out of range".to_vec(),
-			})
-		}
-	}
-
 	#[inline]
 	fn get_call_value_big_uint(&self) -> RustBigUint {
 		self.tx_input_box.call_value.clone().into()
@@ -553,12 +452,12 @@ impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
 		self.finish_big_uint(&value.into());
 	}
 
-	fn signal_error(&self, message: &[u8]) -> ! {
-		panic!(TxPanic {
-			status: 4,
-			message: message.to_vec()
-		})
-	}
+	// fn signal_error(&self, message: &[u8]) -> ! {
+	// 	panic!(TxPanic {
+	// 		status: 4,
+	// 		message: message.to_vec()
+	// 	})
+	// }
 
 	fn write_log(&self, _topics: &[[u8; 32]], _data: &[u8]) {
 		// does nothing yet
