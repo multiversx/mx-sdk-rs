@@ -37,7 +37,10 @@ fn simple_transfer_half() {
 
 #[test]
 fn simple_transfer_full_wrong_token() {
-	parse_execute_mandos("mandos/simple_transfer_full_wrong_token.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/simple_transfer_full_wrong_token.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]

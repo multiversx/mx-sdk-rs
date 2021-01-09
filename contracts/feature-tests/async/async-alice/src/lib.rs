@@ -3,9 +3,10 @@
 
 imports!();
 
-static CALEE_STORAGE_KEY: &[u8] = &[0u8; 32];
-static CALLBACK_INFO_KEY: &[u8] = &[0x77u8; 32];
-static SOME_ADDRESS: [u8; 32] = [0xfeu8; 32];
+use hex_literal::hex;
+
+static HARDCODED_ADDRESS: [u8; 32] =
+	hex!("fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe");
 
 #[elrond_wasm_derive::callable(PayMeProxy)]
 pub trait PayMe {
@@ -30,52 +31,61 @@ pub trait MessageMeWithCallback {
 
 #[elrond_wasm_derive::contract(AliceImpl)]
 pub trait Alice {
+	#[storage_get("other_contract")]
+	fn get_other_contract(&self) -> Address;
+
+	#[storage_set("other_contract")]
+	fn set_other_contract(&self, other_contract: &Address);
+
+	#[storage_set("callback_info")]
+	fn set_callback_info(&self, callback_info: i64);
+
 	#[init]
-	fn init(&self, calee_address: Address) {
-		self.storage_store_bytes32(CALEE_STORAGE_KEY, &calee_address.into());
+	fn init(&self, calee_address: &Address) {
+		self.set_other_contract(calee_address);
 	}
 
 	#[payable]
 	#[endpoint]
 	fn forwardToOtherContract(&self, #[payment] payment: BigUint) {
-		let calee_address: Address = self.storage_load_bytes32(CALEE_STORAGE_KEY).into();
+		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &calee_address, PayMe);
+		let target_contract = contract_proxy!(self, &other_contract, PayMe);
 		target_contract.payMe(payment, 0x56);
 	}
 
 	#[payable]
 	#[endpoint]
 	fn forwardToOtherContractWithCallback(&self, #[payment] payment: BigUint) {
-		let calee_address: Address = self.storage_load_bytes32(CALEE_STORAGE_KEY).into();
+		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &calee_address, PayMe);
+		let target_contract = contract_proxy!(self, &other_contract, PayMe);
 		target_contract.payMeWithResult(payment, 0x56);
 	}
 
 	#[endpoint]
 	fn messageOtherContract(&self) {
-		let calee_address: Address = self.storage_load_bytes32(CALEE_STORAGE_KEY).into();
+		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &calee_address, MessageMe);
+		let target_contract = contract_proxy!(self, &other_contract, MessageMe);
 		target_contract.messageMe(
 			0x01,
 			&BigUint::from(0x02u64),
 			create_a_vec(),
-			&SOME_ADDRESS.into(),
+			&HARDCODED_ADDRESS.into(),
 		);
 	}
 
 	#[endpoint]
 	fn messageOtherContractWithCallback(&self) {
-		let calee_address: Address = self.storage_load_bytes32(&CALEE_STORAGE_KEY).into();
+		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &calee_address, MessageMeWithCallback);
+		let target_contract = contract_proxy!(self, &other_contract, MessageMeWithCallback);
 		target_contract.messageMe(
 			0x01,
 			BigUint::from(0x02u64),
 			create_a_vec(),
-			SOME_ADDRESS.into(),
+			HARDCODED_ADDRESS.into(),
 		);
 	}
 
@@ -83,7 +93,7 @@ pub trait Alice {
 	fn payCallback(&self, call_result: AsyncCallResult<i64>) {
 		match call_result {
 			AsyncCallResult::Ok(cb_arg) => {
-				self.storage_store_i64(&CALLBACK_INFO_KEY, cb_arg);
+				self.set_callback_info(cb_arg);
 			},
 			AsyncCallResult::Err(_) => {},
 		}
@@ -91,7 +101,7 @@ pub trait Alice {
 
 	#[callback]
 	fn messageCallback(&self, _call_result: AsyncCallResult<()>) {
-		self.storage_store_i64(&CALLBACK_INFO_KEY, 0x5555);
+		self.set_callback_info(0x5555);
 	}
 }
 

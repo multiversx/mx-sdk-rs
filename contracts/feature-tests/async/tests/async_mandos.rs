@@ -9,12 +9,12 @@ use elrond_wasm_debug::*;
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
-		"file:../async-alice/output/alice.wasm",
+		"file:../async-alice/output/async-alice.wasm",
 		Box::new(|context| Box::new(AliceImpl::new(context))),
 	);
 
 	contract_map.register_contract(
-		"file:../async-bob/output/bob.wasm",
+		"file:../async-bob/output/async-bob.wasm",
 		Box::new(|context| Box::new(BobImpl::new(context))),
 	);
 	contract_map

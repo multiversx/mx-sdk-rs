@@ -38,9 +38,9 @@ members = [
   
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/abi",
-  # "contracts/feature-tests/async",
-  # "contracts/feature-tests/async/async-alice",
-  # "contracts/feature-tests/async/async-bob",
+  "contracts/feature-tests/async",
+  "contracts/feature-tests/async/async-alice",
+  "contracts/feature-tests/async/async-bob",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/abi",
   "contracts/feature-tests/use-module",

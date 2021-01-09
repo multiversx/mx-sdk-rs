@@ -4,19 +4,19 @@
         {
             "step": "setState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                "address:a_user": {
                     "nonce": "0",
                     "balance": "0x10000000000000e8d4a51000",
                     "storage": {},
                     "code": ""
                 },
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                "address:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5555"
+                        "``other_contract": "address:bob"
                     },
-                    "code": "file:../async-alice/output/alice.wasm"
+                    "code": "file:../async-alice/output/async-alice.wasm"
                 }
             }
         },
@@ -24,8 +24,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234",
-                "to": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234",
+                "from": "address:a_user",
+                "to": "address:alice",
                 "value": "0",
                 "function": "messageOtherContract",
                 "arguments": [],
@@ -43,21 +43,21 @@
         {
             "step": "checkState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                "address:a_user": {
                     "nonce": "1",
                     "balance": "0xfffffffffff00e8d4a51000",
                     "storage": {},
                     "code": ""
                 },
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                "address:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5555"
+                        "``other_contract": "address:bob"
                     },
-                    "code": "file:../async-alice/output/alice.wasm"
+                    "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5555": {
+                "address:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
