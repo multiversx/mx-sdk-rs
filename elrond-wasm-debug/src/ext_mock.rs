@@ -365,5 +365,3 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		panic!("execute_on_same_context not implemented yet!");
 	}
 }
-
-impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {}

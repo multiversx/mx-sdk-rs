@@ -41,9 +41,12 @@ pub fn api_where() -> proc_macro2::TokenStream {
 	quote! {
 	  #bi_where
 		T: elrond_wasm::ContractHookApi<BigInt, BigUint>
-		 + elrond_wasm::ContractIOApi<BigInt, BigUint>
+		 + elrond_wasm::api::ErrorApi
+		 + elrond_wasm::api::EndpointArgumentApi
+		 + elrond_wasm::api::EndpointFinishApi
 		 + elrond_wasm::api::StorageReadApi
 		 + elrond_wasm::api::StorageWriteApi
+		 + elrond_wasm::api::LogApi
 		 + Clone
 		 + 'static,
 	}
