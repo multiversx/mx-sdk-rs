@@ -1,7 +1,7 @@
+use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::BoxedBytes;
-use crate::ArwenApiImpl;
 
 #[rustfmt::skip]
 extern {

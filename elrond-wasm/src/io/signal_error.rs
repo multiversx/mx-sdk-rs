@@ -1,6 +1,6 @@
+use crate::api::ErrorApi;
+use crate::err_msg;
 use crate::BoxedBytes;
-use crate::*;
-use core::marker::PhantomData;
 use elrond_codec::DecodeError;
 
 /// Some info to display in endpoint argument deserialization error messages,
@@ -50,37 +50,25 @@ pub trait SignalError {
 	}
 }
 
-pub struct ApiSignalError<A, BigInt, BigUint>
+pub struct ApiSignalError<EA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	EA: ErrorApi + 'static,
 {
-	api: A,
-	_phantom1: PhantomData<BigInt>,
-	_phantom2: PhantomData<BigUint>,
+	api: EA,
 }
 
-impl<A, BigInt, BigUint> ApiSignalError<A, BigInt, BigUint>
+impl<EA> ApiSignalError<EA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	EA: ErrorApi + 'static,
 {
-	pub fn new(api: A) -> Self {
-		ApiSignalError {
-			api,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
-		}
+	pub fn new(api: EA) -> Self {
+		ApiSignalError { api }
 	}
 }
 
-impl<A, BigInt, BigUint> SignalError for ApiSignalError<A, BigInt, BigUint>
+impl<EA> SignalError for ApiSignalError<EA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	EA: ErrorApi + 'static,
 {
 	fn signal_error(&self, message: &[u8]) -> ! {
 		self.api.signal_error(message)

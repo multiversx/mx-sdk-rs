@@ -1,5 +1,5 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
-use crate::{BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, EndpointResult};
+use crate::{api::EndpointFinishApi, EndpointResult};
 use alloc::string::String;
 
 pub enum OptionalResult<T> {
@@ -16,15 +16,13 @@ impl<T> From<Option<T>> for OptionalResult<T> {
 	}
 }
 
-impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for OptionalResult<T>
+impl<FA, T> EndpointResult<FA> for OptionalResult<T>
 where
-	T: EndpointResult<A, BigInt, BigUint>,
-	BigInt: BigIntApi<BigUint> + 'static,
-	BigUint: BigUintApi + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + Clone + 'static,
+	T: EndpointResult<FA>,
 {
 	#[inline]
-	fn finish(&self, api: A) {
+	fn finish(&self, api: FA) {
 		if let OptionalResult::Some(t) = self {
 			t.finish(api);
 		}

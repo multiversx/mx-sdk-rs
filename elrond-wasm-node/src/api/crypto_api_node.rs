@@ -1,6 +1,6 @@
-use elrond_wasm::types::H256;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CryptoApi;
+use elrond_wasm::types::H256;
 
 #[rustfmt::skip]
 extern {

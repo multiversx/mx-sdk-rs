@@ -1,5 +1,5 @@
-use crate::*;
-use core::marker::PhantomData;
+use crate::api::EndpointArgumentApi;
+use crate::Box;
 use elrond_codec::TopDecodeInput;
 
 /// Adapter from the API to the TopDecodeInput trait.
@@ -9,42 +9,29 @@ use elrond_codec::TopDecodeInput;
 /// into_u64, into_i64, ...
 ///
 /// This is a performance-critical struct.
-/// Since the wasm ContractIOApi is zero-size,
+/// Since the wasm EndpointArgumentApi (ArwenApiImpl) is zero-size,
 /// it means that this structures translates to a single glorified i32 in wasm.
-pub struct ArgDecodeInput<A, BigInt, BigUint>
+pub struct ArgDecodeInput<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint>,
+	AA: EndpointArgumentApi + 'static,
 {
-	api: A,
+	api: AA,
 	arg_index: i32,
-	_phantom1: PhantomData<BigInt>,
-	_phantom2: PhantomData<BigUint>,
 }
 
-impl<A, BigInt, BigUint> ArgDecodeInput<A, BigInt, BigUint>
+impl<AA> ArgDecodeInput<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint>,
+	AA: EndpointArgumentApi + 'static,
 {
 	#[inline]
-	pub fn new(api: A, arg_index: i32) -> Self {
-		ArgDecodeInput {
-			api,
-			arg_index,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
-		}
+	pub fn new(api: AA, arg_index: i32) -> Self {
+		ArgDecodeInput { api, arg_index }
 	}
 }
 
-impl<A, BigInt, BigUint> TopDecodeInput for ArgDecodeInput<A, BigInt, BigUint>
+impl<AA> TopDecodeInput for ArgDecodeInput<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint>,
+	AA: EndpointArgumentApi + 'static,
 {
 	fn byte_len(&self) -> usize {
 		self.api.get_argument_len(self.arg_index)

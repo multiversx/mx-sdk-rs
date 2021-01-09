@@ -28,7 +28,6 @@ extern "C" {
 	fn bigIntCmp(x: i32, y: i32) -> i32;
 	fn bigIntSign(x: i32) -> i32;
 
-	fn bigIntNot(dest: i32, x: i32);
 	fn bigIntAnd(dest: i32, x: i32, y: i32);
 	fn bigIntOr(dest: i32, x: i32, y: i32);
 	fn bigIntXor(dest: i32, x: i32, y: i32);

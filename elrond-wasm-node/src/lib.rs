@@ -1,6 +1,5 @@
 #![no_std]
 #![feature(new_uninit)]
-#![allow(dead_code)] // TODO: remove
 
 pub mod api;
 mod big_int;
