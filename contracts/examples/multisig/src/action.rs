@@ -36,7 +36,7 @@ impl<BigUint: BigUintApi> Action<BigUint> {
 	}
 }
 
-/// Not used internally, just to retrieve results via endpoint. 
+/// Not used internally, just to retrieve results via endpoint.
 #[derive(TopEncode, TypeAbi)]
 pub struct ActionFullInfo<BigUint: BigUintApi> {
 	pub action_id: usize,
