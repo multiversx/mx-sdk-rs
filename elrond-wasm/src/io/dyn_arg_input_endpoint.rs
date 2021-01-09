@@ -1,42 +1,32 @@
-use crate::*;
-use core::marker::PhantomData;
+use crate::api::{EndpointArgumentApi, ErrorApi};
+use crate::{ArgDecodeInput, DynArgInput, SignalError};
 
-pub struct EndpointDynArgLoader<A, BigInt, BigUint>
+pub struct EndpointDynArgLoader<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint>,
+	AA: EndpointArgumentApi + 'static,
 {
-	api: A,
+	api: AA,
 	current_index: i32,
 	num_arguments: i32,
-	_phantom1: PhantomData<BigInt>,
-	_phantom2: PhantomData<BigUint>,
 }
 
-impl<A, BigInt, BigUint> EndpointDynArgLoader<A, BigInt, BigUint>
+impl<AA> EndpointDynArgLoader<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint>,
+	AA: EndpointArgumentApi + 'static,
 {
-	pub fn new(api: A) -> Self {
+	pub fn new(api: AA) -> Self {
 		let num_arguments = api.get_num_arguments();
 		EndpointDynArgLoader {
 			api,
 			current_index: 0,
 			num_arguments,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
 		}
 	}
 }
 
-impl<A, BigInt, BigUint> SignalError for EndpointDynArgLoader<A, BigInt, BigUint>
+impl<AA> SignalError for EndpointDynArgLoader<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	AA: EndpointArgumentApi + ErrorApi + 'static,
 {
 	#[inline]
 	fn signal_error(&self, message: &[u8]) -> ! {
@@ -44,18 +34,15 @@ where
 	}
 }
 
-impl<A, BigInt, BigUint> DynArgInput<ArgDecodeInput<A, BigInt, BigUint>>
-	for EndpointDynArgLoader<A, BigInt, BigUint>
+impl<AA> DynArgInput<ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	AA: EndpointArgumentApi + Clone + 'static,
 {
 	fn has_next(&self) -> bool {
 		self.current_index < self.num_arguments
 	}
 
-	fn next_arg_input(&mut self) -> ArgDecodeInput<A, BigInt, BigUint> {
+	fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
 		if self.current_index >= self.num_arguments {
 			self.signal_arg_wrong_number()
 		} else {

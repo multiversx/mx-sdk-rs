@@ -332,138 +332,38 @@ impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
 	// TODO: Remove underscores when implementing
 
-	fn execute_on_dest_context(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
-		_function: &[u8], _arg_buffer: &ArgBuffer) {
+	fn execute_on_dest_context(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
 		panic!("execute_on_dest_context not implemented yet!");
 	}
 
-	fn execute_on_dest_context_by_caller(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
-		_function: &[u8], _arg_buffer: &ArgBuffer) {
+	fn execute_on_dest_context_by_caller(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
 		panic!("execute_on_dest_context_by_caller not implemented yet!");
 	}
 
-	fn execute_on_same_context(&self, _gas: u64, _address: &Address, _value: &RustBigUint,
-		_function: &[u8], _arg_buffer: &ArgBuffer) {
+	fn execute_on_same_context(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
 		panic!("execute_on_same_context not implemented yet!");
 	}
 }
 
-impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {
-	fn get_num_arguments(&self) -> i32 {
-		self.tx_input_box.args.len() as i32
-	}
-
-	fn check_not_payable(&self) {
-		if self.get_call_value_big_uint() > 0 {
-			self.signal_error(err_msg::NON_PAYABLE);
-		}
-	}
-
-	fn get_argument_len(&self, arg_index: i32) -> usize {
-		let arg = self.get_argument_vec_u8(arg_index);
-		arg.len()
-	}
-
-	fn copy_argument_to_slice(&self, _arg_index: i32, _slice: &mut [u8]) {
-		panic!("copy_argument_to_slice not yet implemented")
-	}
-
-	fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
-		let arg_idx_usize = arg_index as usize;
-		if arg_idx_usize >= self.tx_input_box.args.len() {
-			panic!("Tx arg index out of range");
-		}
-		self.tx_input_box.args[arg_idx_usize].clone()
-	}
-
-	fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
-		self.get_argument_vec_u8(arg_index).into()
-	}
-
-	fn get_argument_big_uint(&self, arg_index: i32) -> RustBigUint {
-		let bytes = self.get_argument_vec_u8(arg_index);
-		RustBigUint::from_bytes_be(&bytes[..])
-	}
-
-	fn get_argument_big_int(&self, arg_index: i32) -> RustBigInt {
-		let bytes = self.get_argument_vec_u8(arg_index);
-		RustBigInt::from_signed_bytes_be(&bytes)
-	}
-
-	fn get_argument_big_uint_raw(&self, _arg_index: i32) -> i32 {
-		panic!("cannot call get_argument_big_uint_raw in debug mode");
-	}
-
-	fn get_argument_big_int_raw(&self, _arg_index: i32) -> i32 {
-		panic!("cannot call get_argument_big_int_raw in debug mode");
-	}
-
-	fn get_argument_i64(&self, arg_index: i32) -> i64 {
-		let bytes = self.get_argument_vec_u8(arg_index);
-		let bi = BigInt::from_signed_bytes_be(&bytes);
-		if let Some(v) = bi.to_i64() {
-			v
-		} else {
-			panic!(TxPanic {
-				status: 10,
-				message: b"argument out of range".to_vec(),
-			})
-		}
-	}
-
-	fn get_argument_u64(&self, arg_index: i32) -> u64 {
-		let bytes = self.get_argument_vec_u8(arg_index);
-		let bu = BigUint::from_bytes_be(&bytes);
-		if let Some(v) = bu.to_u64() {
-			v
-		} else {
-			panic!(TxPanic {
-				status: 10,
-				message: b"argument out of range".to_vec(),
-			})
-		}
-	}
-
-	fn finish_slice_u8(&self, slice: &[u8]) {
-		let mut v = vec![0u8; slice.len()];
-		v.copy_from_slice(slice);
-		let mut tx_output = self.tx_output_cell.borrow_mut();
-		tx_output.result.result_values.push(v)
-	}
-
-	fn finish_big_int(&self, bi: &RustBigInt) {
-		self.finish_slice_u8(bi.to_signed_bytes_be().as_slice());
-	}
-
-	fn finish_big_uint(&self, bu: &RustBigUint) {
-		self.finish_slice_u8(bu.to_bytes_be().as_slice());
-	}
-
-	fn finish_big_int_raw(&self, _handle: i32) {
-		panic!("cannot call finish_big_int_raw in debug mode");
-	}
-
-	fn finish_big_uint_raw(&self, _handle: i32) {
-		panic!("cannot call finish_big_uint_raw in debug mode");
-	}
-
-	fn finish_i64(&self, value: i64) {
-		self.finish_big_int(&value.into());
-	}
-
-	fn finish_u64(&self, value: u64) {
-		self.finish_big_uint(&value.into());
-	}
-
-	// fn signal_error(&self, message: &[u8]) -> ! {
-	// 	panic!(TxPanic {
-	// 		status: 4,
-	// 		message: message.to_vec()
-	// 	})
-	// }
-
-	fn write_log(&self, _topics: &[[u8; 32]], _data: &[u8]) {
-		// does nothing yet
-		// TODO: implement at some point
-	}
-}
+impl elrond_wasm::ContractIOApi<RustBigInt, RustBigUint> for TxContext {}
