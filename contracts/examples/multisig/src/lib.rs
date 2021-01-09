@@ -141,7 +141,7 @@ pub trait Multisig {
 		for action_id in 1..=action_last_index {
 			let action_data = self.get_action_data(action_id);
 			if action_data.is_pending() {
-				result.push(ActionFullInfo{
+				result.push(ActionFullInfo {
 					action_id,
 					action_data,
 					signers: self.get_action_signers(action_id),
