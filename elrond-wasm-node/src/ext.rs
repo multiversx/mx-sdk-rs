@@ -331,8 +331,6 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	}
 }
 
-impl elrond_wasm::ContractIOApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {}
-
 /// Should be no-op. The API implementation is zero-sized.
 impl Clone for ArwenApiImpl {
 	#[inline]

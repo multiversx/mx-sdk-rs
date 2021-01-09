@@ -18,10 +18,7 @@ mod proxy;
 pub mod storage;
 pub mod types;
 
-use api::{
-	CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi, LogApi, StorageReadApi,
-	StorageWriteApi,
-};
+use api::{CryptoApi, ErrorApi, StorageReadApi, StorageWriteApi};
 pub use hex_call_data::*;
 pub use io::*;
 pub use proxy::OtherContractHandle;
@@ -138,11 +135,6 @@ where
 	// fn storage_write_raw_api(&self) -> StorageWrite;
 
 	// fn crypto(&self) -> Crypto;
-}
-
-pub trait ContractIOApi<BigInt, BigUint>:
-	Clone + ErrorApi + EndpointArgumentApi + EndpointFinishApi + LogApi
-{
 }
 
 /// Definition of the BigUint type required by the API.
@@ -292,7 +284,7 @@ macro_rules! imports {
 		use elrond_wasm::types::*;
 		use elrond_wasm::{Address, H256};
 		use elrond_wasm::{
-			AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi, ContractIOApi,
+			AsyncCallError, AsyncCallResult, BigIntApi, BigUintApi, ContractHookApi,
 			OtherContractHandle,
 		};
 		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, VarArgs, Vec};
