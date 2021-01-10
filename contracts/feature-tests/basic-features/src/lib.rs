@@ -426,6 +426,21 @@ pub trait BasicFeatures {
 		my_single_value_mapper.save();
 	}
 
+	#[view]
+	#[storage_mapper("list_mapper")]
+	fn list_mapper(&self) -> ListMapper<Self::StorageRaw, u32>;
+
+	#[endpoint]
+	fn list_mapper_push(&self, item: u32) {
+		let mut list_mapper = self.list_mapper();
+		list_mapper.push(&item);
+	}
+
+	#[endpoint]
+	fn list_mapper_get(&self, index: usize) -> u32 {
+		self.list_mapper().get(index)
+	}
+
 	// EVENTS
 
 	#[endpoint(logEventA)]
