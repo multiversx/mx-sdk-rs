@@ -210,9 +210,9 @@ impl Clone for TxContext {
 }
 
 impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
-	type StorageRaw = Self;
+	type Storage = Self;
 
-	fn get_storage_raw(&self) -> Self::StorageRaw {
+	fn get_storage_raw(&self) -> Self::Storage {
 		self.clone()
 	}
 

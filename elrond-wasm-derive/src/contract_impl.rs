@@ -127,7 +127,7 @@ pub fn contract_implementation(
 	  impl <T, BigInt, BigUint> elrond_wasm::ContractWithAbi for #contract_impl_ident<T, BigInt, BigUint>
 	  #api_where
 	  {
-		type StorageRaw = T::StorageRaw;
+		type Storage = T::Storage;
 
 		fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
 			#abi_body
