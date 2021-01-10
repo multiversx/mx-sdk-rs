@@ -55,73 +55,6 @@ pub fn api_where() -> proc_macro2::TokenStream {
 pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::TokenStream {
 	let api_where = api_where();
 	quote! {
-		impl <T, BigInt, BigUint> elrond_wasm::api::ErrorApi for #contract_struct<T, BigInt, BigUint>
-		#api_where
-		{
-			#[inline]
-			fn signal_error(&self, message: &[u8]) -> ! {
-				self.api.signal_error(message)
-			}
-		}
-
-		impl <T, BigInt, BigUint> elrond_wasm::api::StorageWriteApi for #contract_struct<T, BigInt, BigUint>
-		#api_where
-		{
-			#[inline]
-			fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
-				self.api.storage_store_slice_u8(key, value);
-			}
-
-			#[inline]
-			fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
-				self.api.storage_store_big_uint_raw(key, handle);
-			}
-
-			#[inline]
-			fn storage_store_i64(&self, key: &[u8], value: i64) {
-				self.api.storage_store_i64(key, value);
-			}
-
-			#[inline]
-			fn storage_store_u64(&self, key: &[u8], value: u64) {
-				self.api.storage_store_u64(key, value);
-			}
-		}
-
-		impl <T, BigInt, BigUint> elrond_wasm::api::StorageReadApi for #contract_struct<T, BigInt, BigUint>
-		#api_where
-		  {
-
-
-			#[inline]
-			fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
-				self.api.storage_load_vec_u8(key)
-			}
-
-			#[inline]
-			fn storage_load_len(&self, key: &[u8]) -> usize {
-				self.api.storage_load_len(key)
-			}
-
-			#[inline]
-			fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
-				self.api.storage_load_big_uint_raw(key)
-			}
-
-
-
-			#[inline]
-			fn storage_load_i64(&self, key: &[u8]) -> i64 {
-				self.api.storage_load_i64(key)
-			}
-
-			#[inline]
-			fn storage_load_u64(&self, key: &[u8]) -> u64 {
-				self.api.storage_load_u64(key)
-			}
-
-		}
-
 		impl <T, BigInt, BigUint> elrond_wasm::ContractHookApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>
 		#api_where
 		{
@@ -134,17 +67,17 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 
 			#[inline]
 			fn get_sc_address(&self) -> Address {
-			self.api.get_sc_address()
+				self.api.get_sc_address()
 			}
 
 			#[inline]
 			fn get_owner_address(&self) -> Address {
-			self.api.get_owner_address()
+				self.api.get_owner_address()
 			}
 
 			#[inline]
 			fn get_caller(&self) -> Address {
-			self.api.get_caller()
+				self.api.get_caller()
 			}
 
 			#[inline]
@@ -154,7 +87,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 
 			#[inline]
 			fn get_call_value_big_uint(&self) -> BigUint {
-			self.api.get_call_value_big_uint()
+				self.api.get_call_value_big_uint()
 			}
 
 			#[inline]
@@ -169,12 +102,12 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 
 			#[inline]
 			fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]) {
-			self.api.send_tx(to, amount, data);
+				self.api.send_tx(to, amount, data);
 			}
 
 			#[inline]
 			fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]) {
-			self.api.async_call(to, amount, data);
+				self.api.async_call(to, amount, data);
 			}
 
 			#[inline]
@@ -285,7 +218,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 				self.api.verify_secp256k1(key, message, signature)
 			}
-
 		}
 	}
 }
