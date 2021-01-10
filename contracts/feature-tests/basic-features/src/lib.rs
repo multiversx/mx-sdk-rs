@@ -415,6 +415,7 @@ pub trait BasicFeatures {
 
 	// STORAGE MAPPERS
 
+	#[view]
 	#[storage_mapper("my_single_value_mapper")]
 	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::StorageRaw, BigInt>;
 
@@ -423,11 +424,6 @@ pub trait BasicFeatures {
 		let mut my_single_value_mapper = self.map_my_single_value_mapper();
 		my_single_value_mapper.value += amount;
 		my_single_value_mapper.save();
-	}
-
-	#[view]
-	fn get_my_single_value_mapper(&self) -> BigInt {
-		self.map_my_single_value_mapper().value
 	}
 
 	// EVENTS
