@@ -1,6 +1,5 @@
 use crate::api::{ErrorApi, StorageWriteApi};
 use crate::*;
-// use core::marker::PhantomData;
 use elrond_codec::*;
 
 struct StorageSetOutput<'k, SWA>

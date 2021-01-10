@@ -1,6 +1,5 @@
 use crate::api::{ErrorApi, StorageReadApi};
 use crate::*;
-// use core::marker::PhantomData;
 use elrond_codec::*;
 
 struct StorageGetInput<'k, SRA>

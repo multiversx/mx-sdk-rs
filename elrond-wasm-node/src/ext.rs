@@ -73,6 +73,12 @@ extern {
 
 pub struct ArwenApiImpl {}
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
+	type StorageRaw = Self;
+
+	fn get_storage_raw(&self) -> Self::StorageRaw {
+		self.clone()
+	}
+
 	#[inline]
 	fn get_sc_address(&self) -> Address {
 		unsafe {

@@ -210,6 +210,12 @@ impl Clone for TxContext {
 }
 
 impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
+	type StorageRaw = Self;
+
+	fn get_storage_raw(&self) -> Self::StorageRaw {
+		self.clone()
+	}
+
 	fn get_sc_address(&self) -> Address {
 		self.tx_input_box.to.clone()
 	}

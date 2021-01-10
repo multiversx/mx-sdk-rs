@@ -36,6 +36,10 @@ pub enum MethodMetadata {
 		visibility: Visibility,
 		identifier: String,
 	},
+	StorageMapper {
+		visibility: Visibility,
+		identifier: String,
+	},
 	StorageGetMut {
 		visibility: Visibility,
 		identifier: String,
@@ -65,6 +69,10 @@ impl MethodMetadata {
 				..
 			}
 			| MethodMetadata::StorageSetter {
+				visibility: Visibility::Endpoint(e),
+				..
+			}
+			| MethodMetadata::StorageMapper {
 				visibility: Visibility::Endpoint(e),
 				..
 			}
@@ -169,6 +177,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let event_opt = EventAttribute::parse(m);
 	let storage_get_opt = StorageGetAttribute::parse(m);
 	let storage_set_opt = StorageSetAttribute::parse(m);
+	let storage_mapper_opt = StorageMapperAttribute::parse(m);
 	let storage_get_mut_opt = StorageGetMutAttribute::parse(m);
 	let storage_is_empty_opt = StorageIsEmptyAttribute::parse(m);
 	let storage_clear_opt = StorageClearAttribute::parse(m);
@@ -189,6 +198,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		}
 		if storage_set_opt.is_some() {
 			panic!("Events cannot be storage setters.");
+		}
+		if storage_mapper_opt.is_some() {
+			panic!("Events cannot be storage mappers.");
 		}
 		if storage_get_mut_opt.is_some() {
 			panic!("Events cannot be storage borrow getters.");
@@ -214,6 +226,9 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		}
 		if storage_set_opt.is_some() {
 			panic!("Callbacks cannot be storage setters.");
+		}
+		if storage_mapper_opt.is_some() {
+			panic!("Callbacks cannot be storage mappers.");
 		}
 		if storage_get_mut_opt.is_some() {
 			panic!("Callbacks cannot be storage borrow getters.");
@@ -259,6 +274,20 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		MethodMetadata::StorageSetter {
 			visibility,
 			identifier: storage_set.identifier,
+		}
+	} else if let Some(storage_mapper) = storage_mapper_opt {
+		if payable {
+			panic!("Storage mappers cannot be marked payable.");
+		}
+		if m.default.is_some() {
+			panic!("Storage mappers cannot have an implementations provided in the trait.");
+		}
+		if module_opt.is_some() {
+			panic!("Storage mappers cannot be modules.");
+		}
+		MethodMetadata::StorageMapper {
+			visibility,
+			identifier: storage_mapper.identifier,
 		}
 	} else if let Some(storage_get_mut) = storage_get_mut_opt {
 		if payable {

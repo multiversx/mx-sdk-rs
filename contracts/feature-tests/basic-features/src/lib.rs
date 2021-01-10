@@ -413,6 +413,23 @@ pub trait BasicFeatures {
 	#[storage_get("map3")]
 	fn load_map3(&self, x: usize) -> bool;
 
+	// STORAGE MAPPERS
+
+	#[storage_mapper("my_single_value_mapper")]
+	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::StorageRaw, BigInt>;
+
+	#[endpoint]
+	fn my_single_value_mapper_increment(&self, amount: &BigInt) {
+		let mut my_single_value_mapper = self.map_my_single_value_mapper();
+		my_single_value_mapper.value += amount;
+		my_single_value_mapper.save();
+	}
+
+	#[view]
+	fn get_my_single_value_mapper(&self) -> BigInt {
+		self.map_my_single_value_mapper().value
+	}
+
 	// EVENTS
 
 	#[endpoint(logEventA)]
