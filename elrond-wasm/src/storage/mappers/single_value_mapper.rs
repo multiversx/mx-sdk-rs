@@ -4,7 +4,7 @@ use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::BoxedBytes;
-use elrond_codec::*;
+use elrond_codec::{TopDecode, TopEncode};
 
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
