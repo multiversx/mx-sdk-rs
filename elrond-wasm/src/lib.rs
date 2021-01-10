@@ -36,8 +36,7 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BigInt, BigUint>:
-	Sized + CryptoApi
+pub trait ContractHookApi<BigInt, BigUint>: Sized + CryptoApi
 where
 	BigInt: elrond_codec::NestedEncode + 'static,
 	BigUint: elrond_codec::NestedEncode + 'static,
@@ -260,11 +259,21 @@ pub trait BigIntApi<BigUint>:
 pub trait CallableContract<A> {
 	fn call(&self, fn_name: &[u8]) -> bool;
 
-	fn abi(&self, include_modules: bool) -> abi::ContractAbi;
-
 	fn clone_contract(&self) -> Box<dyn CallableContract<A>>;
 
 	fn into_api(self: Box<Self>) -> A;
+}
+
+/// ContractWithAbi is the means by which a contract can provide an ABI.
+pub trait ContractWithAbi {
+	/// The generated ABI generation code sometimes references the contract storage manager type,
+	/// e.g. with storage mappers.
+	type StorageRaw;
+
+	/// Generate a raw ABI object.
+	/// Contracts would not call this function, so it never ends up in the wasm bytecode.
+	/// It is, however, still no_std.
+	fn abi(&self, include_modules: bool) -> abi::ContractAbi;
 }
 
 /// Handy way of casting to a contract proxy trait.
