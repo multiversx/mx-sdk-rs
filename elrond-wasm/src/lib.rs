@@ -37,12 +37,19 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractHookApi<BigInt, BigUint>:
-	Sized + StorageReadApi + StorageWriteApi + ErrorApi + CryptoApi
-// pub trait ContractHookApi<BigInt, BigUint, StorageRead, StorageWrite, Crypto>: Sized
+	Sized + CryptoApi
 where
 	BigInt: elrond_codec::NestedEncode + 'static,
 	BigUint: elrond_codec::NestedEncode + 'static,
 {
+	/// Abstracts the lower-level storage functionality.
+	type StorageRaw: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+
+	/// Gateway into the lower-level storage functionality.
+	/// Storage related annotations make use of this.
+	/// Using it directly is not recommended.
+	fn get_storage_raw(&self) -> Self::StorageRaw;
+
 	fn get_sc_address(&self) -> Address;
 
 	fn get_owner_address(&self) -> Address;
@@ -281,6 +288,7 @@ macro_rules! imports {
 		use elrond_wasm::err_msg;
 		use elrond_wasm::io::*;
 		use elrond_wasm::non_zero_util::*;
+		use elrond_wasm::storage::mappers::*;
 		use elrond_wasm::types::*;
 		use elrond_wasm::{Address, H256};
 		use elrond_wasm::{
