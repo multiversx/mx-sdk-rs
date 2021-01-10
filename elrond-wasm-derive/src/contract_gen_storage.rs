@@ -74,7 +74,7 @@ pub fn generate_mapper_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 			quote! {
 				#msig {
 					#key_snippet
-					<#ty as elrond_wasm::storage::mappers::StorageMapper<Self::StorageRaw>>::new(
+					<#ty as elrond_wasm::storage::mappers::StorageMapper<Self::Storage>>::new(
 						self.get_storage_raw(),
 						elrond_wasm::types::BoxedBytes::from(key),
 					)

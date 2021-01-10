@@ -73,9 +73,9 @@ extern {
 
 pub struct ArwenApiImpl {}
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
-	type StorageRaw = Self;
+	type Storage = Self;
 
-	fn get_storage_raw(&self) -> Self::StorageRaw {
+	fn get_storage_raw(&self) -> Self::Storage {
 		self.clone()
 	}
 

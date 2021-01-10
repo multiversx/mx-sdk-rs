@@ -417,7 +417,7 @@ pub trait BasicFeatures {
 
 	#[view]
 	#[storage_mapper("my_single_value_mapper")]
-	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::StorageRaw, BigInt>;
+	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
 
 	#[endpoint]
 	fn my_single_value_mapper_increment(&self, amount: &BigInt) {
@@ -428,7 +428,7 @@ pub trait BasicFeatures {
 
 	#[view]
 	#[storage_mapper("list_mapper")]
-	fn list_mapper(&self) -> ListMapper<Self::StorageRaw, u32>;
+	fn list_mapper(&self) -> ListMapper<Self::Storage, u32>;
 
 	#[endpoint]
 	fn list_mapper_push(&self, item: u32) {

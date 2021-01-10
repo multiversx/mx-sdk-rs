@@ -42,12 +42,12 @@ where
 	BigUint: elrond_codec::NestedEncode + 'static,
 {
 	/// Abstracts the lower-level storage functionality.
-	type StorageRaw: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
 	/// Using it directly is not recommended.
-	fn get_storage_raw(&self) -> Self::StorageRaw;
+	fn get_storage_raw(&self) -> Self::Storage;
 
 	fn get_sc_address(&self) -> Address;
 
@@ -268,7 +268,7 @@ pub trait CallableContract<A> {
 pub trait ContractWithAbi {
 	/// The generated ABI generation code sometimes references the contract storage manager type,
 	/// e.g. with storage mappers.
-	type StorageRaw;
+	type Storage;
 
 	/// Generate a raw ABI object.
 	/// Contracts would not call this function, so it never ends up in the wasm bytecode.

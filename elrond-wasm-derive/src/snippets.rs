@@ -125,10 +125,10 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		impl <T, BigInt, BigUint> elrond_wasm::ContractHookApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>
 		#api_where
 		{
-			type StorageRaw = T::StorageRaw;
+			type Storage = T::Storage;
 
 			#[inline]
-			fn get_storage_raw(&self) -> Self::StorageRaw {
+			fn get_storage_raw(&self) -> Self::Storage {
 				self.api.get_storage_raw()
 			}
 
