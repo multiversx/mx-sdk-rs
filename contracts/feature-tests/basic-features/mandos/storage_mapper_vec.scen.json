@@ -25,7 +25,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper",
+                "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -45,7 +45,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_push",
+                "function": "vec_mapper_push",
                 "arguments": [ "123" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -65,7 +65,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper",
+                "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -85,7 +85,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_push",
+                "function": "vec_mapper_push",
                 "arguments": [ "111" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -105,7 +105,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper",
+                "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -125,9 +125,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper|u32:0": "2",
-                        "``list_mapper|u32:1": "123",
-                        "``list_mapper|u32:2": "111"
+                        "``vec_mapper|u32:0": "2",
+                        "``vec_mapper|u32:1": "123",
+                        "``vec_mapper|u32:2": "111"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -146,7 +146,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_get",
+                "function": "vec_mapper_get",
                 "arguments": [ "0" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -167,7 +167,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_get",
+                "function": "vec_mapper_get",
                 "arguments": [ "2" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -187,7 +187,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_get",
+                "function": "vec_mapper_get",
                 "arguments": [ "3" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
