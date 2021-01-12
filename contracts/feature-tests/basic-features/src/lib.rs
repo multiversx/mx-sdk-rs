@@ -427,18 +427,18 @@ pub trait BasicFeatures {
 	}
 
 	#[view]
-	#[storage_mapper("list_mapper")]
-	fn list_mapper(&self) -> ListMapper<Self::Storage, u32>;
+	#[storage_mapper("vec_mapper")]
+	fn vec_mapper(&self) -> VecMapper<Self::Storage, u32>;
 
 	#[endpoint]
-	fn list_mapper_push(&self, item: u32) {
-		let mut list_mapper = self.list_mapper();
-		list_mapper.push(&item);
+	fn vec_mapper_push(&self, item: u32) {
+		let mut vec_mapper = self.vec_mapper();
+		vec_mapper.push(&item);
 	}
 
 	#[endpoint]
-	fn list_mapper_get(&self, index: usize) -> u32 {
-		self.list_mapper().get(index)
+	fn vec_mapper_get(&self, index: usize) -> u32 {
+		self.vec_mapper().get(index)
 	}
 
 	// EVENTS

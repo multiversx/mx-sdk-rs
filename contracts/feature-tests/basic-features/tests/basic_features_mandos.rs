@@ -163,16 +163,16 @@ fn storage_map3() {
 }
 
 #[test]
-fn storage_mapper_list() {
-	parse_execute_mandos("mandos/storage_mapper_list.scen.json", &contract_map());
-}
-
-#[test]
 fn storage_mapper_single_value() {
 	parse_execute_mandos(
 		"mandos/storage_mapper_single_value.scen.json",
 		&contract_map(),
 	);
+}
+
+#[test]
+fn storage_mapper_vec() {
+	parse_execute_mandos("mandos/storage_mapper_vec.scen.json", &contract_map());
 }
 
 #[test]

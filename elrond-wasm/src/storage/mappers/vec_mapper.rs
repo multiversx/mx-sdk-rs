@@ -24,7 +24,7 @@ fn compute_key(prefix: &[u8], index: usize) -> BoxedBytes {
 /// Indexes start from 1, instead of 0. (We avoid 0-value indexes to prevent confusion between an uninitialized variable and zero.)
 /// It also stores the count separately, at what would be index 0.
 /// The count is always kept in sync automatically.
-pub struct ListMapper<SA, T>
+pub struct VecMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode + 'static,
@@ -35,7 +35,7 @@ where
 	_phantom: core::marker::PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for ListMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for VecMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
@@ -43,7 +43,7 @@ where
 	fn new(api: SA, main_key: BoxedBytes) -> Self {
 		let count_key = compute_key(main_key.as_slice(), COUNT_KEY_INDEX);
 		let count: usize = storage_get(api.clone(), count_key.as_slice());
-		ListMapper {
+		VecMapper {
 			api,
 			main_key,
 			count,
@@ -52,7 +52,7 @@ where
 	}
 }
 
-impl<SA, T> ListMapper<SA, T>
+impl<SA, T> VecMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
@@ -119,7 +119,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, FA, T> EndpointResult<FA> for ListMapper<SA, T>
+impl<SA, FA, T> EndpointResult<FA> for VecMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	FA: EndpointFinishApi + Clone + 'static,
@@ -132,7 +132,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for ListMapper<SA, T>
+impl<SA, T> TypeAbi for VecMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode + TypeAbi,
