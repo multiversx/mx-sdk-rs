@@ -22,43 +22,43 @@ default = [
 
 [dependencies.elrond-wasm-module-features-wasm]
 package = "elrond-wasm-module-features"
-version = "0.10.3"
+version = "0.10.4"
 path = "../../modules/elrond-wasm-module-features"
 features = ["wasm-output-mode"]
 optional = true
 
 [dependencies.elrond-wasm-module-features-default]
 package = "elrond-wasm-module-features"
-version = "0.10.3"
+version = "0.10.4"
 path = "../../modules/elrond-wasm-module-features"
 optional = true
 
 [dependencies.elrond-wasm-module-pause-wasm]
 package = "elrond-wasm-module-pause"
-version = "0.10.3"
+version = "0.10.4"
 path = "../../modules/elrond-wasm-module-pause"
 features = ["wasm-output-mode"]
 optional = true
 
 [dependencies.elrond-wasm-module-pause-default]
 package = "elrond-wasm-module-pause"
-version = "0.10.3"
+version = "0.10.4"
 path = "../../modules/elrond-wasm-module-pause"
 optional = true
 
 [dependencies.elrond-wasm]
-version = "0.10.3"
+version = "0.10.4"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.10.3"
+version = "0.10.4"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.10.3"
+version = "0.10.4"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.10.3"
+version = "0.10.4"
 path = "../../../elrond-wasm-debug"
