@@ -21,7 +21,7 @@ where
 	AA: EndpointArgumentApi + ErrorApi + 'static,
 {
 	let (api, arg_id) = ctx;
-	ApiSignalError::new(api).signal_arg_de_error(arg_id, de_err)
+	signal_arg_de_error(&api, arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.
