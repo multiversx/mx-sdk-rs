@@ -1,28 +1,14 @@
-use elrond_wasm::{Address, H256};
-
-use crate::big_int_mock::*;
-use crate::big_uint_mock::*;
 use crate::contract_map::*;
 use crate::display_util::*;
-use crate::ext_mock::*;
-
-use elrond_wasm::api::BigUintApi;
-use elrond_wasm::api::CallableContract;
-use elrond_wasm::api::ContractHookApi;
-use elrond_wasm::err_msg;
-
-use num_bigint::{BigInt, BigUint};
-use num_traits::{cast::ToPrimitive, Zero};
-
+use crate::tx_context::*;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-
+use elrond_wasm::types::Address;
+use num_bigint::BigUint;
+use num_traits::Zero;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Write;
-
-use alloc::rc::Rc;
-use core::cell::RefCell;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 

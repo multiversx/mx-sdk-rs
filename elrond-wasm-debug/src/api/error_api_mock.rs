@@ -1,5 +1,4 @@
 use crate::{TxContext, TxPanic};
-use alloc::vec::Vec;
 use elrond_wasm::api::ErrorApi;
 
 impl ErrorApi for TxContext {

@@ -1,5 +1,4 @@
-use crate::{TxContext, TxPanic};
-use alloc::vec::Vec;
+use crate::TxContext;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::H256;
 use sha3::{Digest, Keccak256, Sha3_256};

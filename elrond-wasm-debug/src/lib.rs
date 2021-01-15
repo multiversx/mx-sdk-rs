@@ -1,25 +1,18 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-
 pub mod abi_json;
 pub mod api;
 mod async_data;
-mod big_int_mock;
-mod big_uint_mock;
 mod blockchain_mock;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
-mod ext_mock;
+mod tx_context;
 
 pub use async_data::*;
-pub use big_int_mock::*;
-pub use big_uint_mock::*;
 pub use blockchain_mock::*;
 pub use contract_map::*;
 pub use display_util::*;
 pub use execute_mandos::*;
-pub use ext_mock::*;
+pub use tx_context::*;
 
 #[macro_use]
 extern crate alloc;
@@ -30,7 +23,7 @@ pub use std::collections::HashMap;
 
 #[cfg(test)]
 mod elrond_codec_tests {
-	use super::*;
+	use crate::api::{RustBigInt, RustBigUint};
 	use core::fmt::Debug;
 	use elrond_wasm::elrond_codec::test_util::{check_top_decode, check_top_encode};
 	use elrond_wasm::elrond_codec::*;
