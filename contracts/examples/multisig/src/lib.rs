@@ -93,7 +93,10 @@ pub trait Multisig {
 
 		for (i, address) in board.iter().enumerate() {
 			let user_id = i + 1;
-			require!(self.users_module().get_user_id(&address) == 0, "duplicate board member");
+			require!(
+				self.users_module().get_user_id(&address) == 0,
+				"duplicate board member"
+			);
 			self.users_module().set_user_id(&address, user_id);
 			self.users_module().set_user_address(user_id, &address);
 			self.set_user_id_to_role(user_id, UserRole::BoardMember);

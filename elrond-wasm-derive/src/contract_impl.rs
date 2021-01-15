@@ -108,14 +108,14 @@ pub fn contract_implementation(
 	};
 
 	let function_selector = quote! {
-	  impl <T, BigInt, BigUint> elrond_wasm::CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint>
+	  impl <T, BigInt, BigUint> elrond_wasm::api::CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint>
 	  #api_where
 	  {
 		fn call(&self, fn_name: &[u8]) -> bool {
 		  #function_selector_body
 		}
 
-		fn clone_contract(&self) -> Box<dyn elrond_wasm::CallableContract<T>> {
+		fn clone_contract(&self) -> Box<dyn elrond_wasm::api::CallableContract<T>> {
 		  Box::new(#contract_impl_ident::new(self.api.clone()))
 		}
 
@@ -124,7 +124,7 @@ pub fn contract_implementation(
 		}
 	  }
 
-	  impl <T, BigInt, BigUint> elrond_wasm::ContractWithAbi for #contract_impl_ident<T, BigInt, BigUint>
+	  impl <T, BigInt, BigUint> elrond_wasm::api::ContractWithAbi for #contract_impl_ident<T, BigInt, BigUint>
 	  #api_where
 	  {
 		type Storage = T::Storage;

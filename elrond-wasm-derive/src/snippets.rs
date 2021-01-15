@@ -40,7 +40,7 @@ pub fn api_where() -> proc_macro2::TokenStream {
 
 	quote! {
 	  #bi_where
-		T: elrond_wasm::ContractHookApi<BigInt, BigUint>
+		T: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 		 + elrond_wasm::api::ErrorApi
 		 + elrond_wasm::api::EndpointArgumentApi
 		 + elrond_wasm::api::EndpointFinishApi
@@ -55,7 +55,7 @@ pub fn api_where() -> proc_macro2::TokenStream {
 pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::TokenStream {
 	let api_where = api_where();
 	quote! {
-		impl <T, BigInt, BigUint> elrond_wasm::ContractHookApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>
+		impl <T, BigInt, BigUint> elrond_wasm::api::ContractHookApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>
 		#api_where
 		{
 			type Storage = T::Storage;

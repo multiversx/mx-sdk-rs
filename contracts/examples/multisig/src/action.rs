@@ -1,4 +1,5 @@
-use elrond_wasm::{Address, BigUintApi, BoxedBytes, CodeMetadata, Vec};
+use elrond_wasm::api::BigUintApi;
+use elrond_wasm::{Address, BoxedBytes, CodeMetadata, Vec};
 derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

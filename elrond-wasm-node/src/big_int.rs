@@ -7,8 +7,7 @@ use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use elrond_wasm::BigIntApi;
-use elrond_wasm::Sign;
+use elrond_wasm::api::{BigIntApi, Sign};
 
 extern "C" {
 	fn bigIntNew(value: i64) -> i32;

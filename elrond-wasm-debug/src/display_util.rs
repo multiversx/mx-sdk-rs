@@ -4,10 +4,10 @@ use crate::big_int_mock::*;
 use crate::big_uint_mock::*;
 use crate::contract_map::*;
 
+use elrond_wasm::api::BigUintApi;
+use elrond_wasm::api::CallableContract;
+use elrond_wasm::api::ContractHookApi;
 use elrond_wasm::err_msg;
-use elrond_wasm::BigUintApi;
-use elrond_wasm::CallableContract;
-use elrond_wasm::ContractHookApi;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::cast::ToPrimitive;

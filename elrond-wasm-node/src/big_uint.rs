@@ -9,8 +9,8 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 use alloc::string::String;
 use alloc::vec::Vec;
 
+use elrond_wasm::api::BigUintApi;
 use elrond_wasm::err_msg;
-use elrond_wasm::BigUintApi;
 
 extern "C" {
 	fn bigIntNew(value: i64) -> i32;
