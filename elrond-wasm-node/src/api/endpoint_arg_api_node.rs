@@ -1,10 +1,10 @@
 use crate::ext_error;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
+use elrond_wasm::api::ContractHookApi;
 use elrond_wasm::api::EndpointArgumentApi;
 use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
-use elrond_wasm::ContractHookApi;
 
 #[rustfmt::skip]
 extern {

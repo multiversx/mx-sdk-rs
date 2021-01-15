@@ -7,9 +7,8 @@ use crate::blockchain_mock::*;
 use crate::display_util::*;
 
 use elrond_wasm::api::ErrorApi;
+use elrond_wasm::api::{BigIntApi, BigUintApi, ContractHookApi};
 use elrond_wasm::err_msg;
-use elrond_wasm::ContractHookApi;
-use elrond_wasm::{BigIntApi, BigUintApi};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::cast::ToPrimitive;
@@ -209,7 +208,7 @@ impl Clone for TxContext {
 	}
 }
 
-impl elrond_wasm::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
+impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
 
 	fn get_storage_raw(&self) -> Self::Storage {

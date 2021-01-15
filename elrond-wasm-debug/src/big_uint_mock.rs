@@ -3,7 +3,7 @@ use core::ops::{Add, Div, Mul, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
-use elrond_wasm::BigUintApi;
+use elrond_wasm::api::BigUintApi;
 
 use core::cmp::Ordering;
 use num_bigint::{BigInt, BigUint, Sign};
@@ -302,7 +302,7 @@ impl elrond_wasm::abi::TypeAbi for RustBigUint {
 	}
 }
 
-impl elrond_wasm::BigUintApi for RustBigUint {
+impl elrond_wasm::api::BigUintApi for RustBigUint {
 	fn byte_length(&self) -> i32 {
 		panic!("byte_length not yet implemented")
 	}

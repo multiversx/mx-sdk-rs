@@ -1,4 +1,9 @@
-use super::*;
+use crate::api::{BigIntApi, BigUintApi, ContractHookApi};
+use crate::types::Address;
+use core::ops::{Add, Div, Mul, Rem, Sub};
+use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
+use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
+use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign};
 
 pub struct OtherContractHandle<T, BigInt, BigUint>
 where

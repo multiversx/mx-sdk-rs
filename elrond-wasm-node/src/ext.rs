@@ -2,8 +2,8 @@ use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
 
 use crate::big_int::*;
 use crate::big_uint::*;
-use elrond_wasm::BigUintApi;
-use elrond_wasm::ContractHookApi;
+use elrond_wasm::api::BigUintApi;
+use elrond_wasm::api::ContractHookApi;
 
 #[rustfmt::skip]
 extern {
