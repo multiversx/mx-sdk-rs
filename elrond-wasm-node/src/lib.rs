@@ -2,17 +2,23 @@
 #![feature(new_uninit)]
 
 pub mod api;
-mod big_int;
-mod big_uint;
-mod ext;
-pub mod ext_error;
-
-pub use big_int::*;
-pub use big_uint::*;
-pub use ext::*;
+pub mod error_hook;
 
 #[macro_use]
 extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::string::String;
 pub use alloc::vec::Vec;
+
+/// The reference to the API implementation based on Arwen hooks.
+/// It continas no data, can be embedded at no cost.
+/// Cloning it is a no-op.
+pub struct ArwenApiImpl {}
+
+/// Should be no-op. The API implementation is zero-sized.
+impl Clone for ArwenApiImpl {
+	#[inline]
+	fn clone(&self) -> Self {
+		ArwenApiImpl {}
+	}
+}

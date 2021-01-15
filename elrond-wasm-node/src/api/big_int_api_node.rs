@@ -1,4 +1,4 @@
-use crate::big_uint::*;
+use super::ArwenBigUint;
 
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Neg, Rem, Sub};

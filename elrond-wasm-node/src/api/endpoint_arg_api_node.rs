@@ -1,4 +1,4 @@
-use crate::ext_error;
+use crate::error_hook;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::ContractHookApi;
@@ -38,7 +38,7 @@ impl EndpointArgumentApi for ArwenApiImpl {
 
 	fn check_not_payable(&self) {
 		if self.get_call_value_big_uint() > 0 {
-			ext_error::signal_error(err_msg::NON_PAYABLE);
+			error_hook::signal_error(err_msg::NON_PAYABLE);
 		}
 	}
 
@@ -51,7 +51,7 @@ impl EndpointArgumentApi for ArwenApiImpl {
 		unsafe {
 			let byte_len = getArgument(arg_index, slice.as_mut_ptr()) as usize;
 			if byte_len != slice.len() {
-				ext_error::signal_error(err_msg::ARG_BAD_LENGTH);
+				error_hook::signal_error(err_msg::ARG_BAD_LENGTH);
 			}
 		}
 	}
