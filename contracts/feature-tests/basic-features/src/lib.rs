@@ -381,6 +381,11 @@ pub trait BasicFeatures {
 		self._get_opt_addr().into()
 	}
 
+	#[endpoint(storage_load_cumulated_validator_reward)]
+	fn storage_load_cumulated_validator_reward_endpoint(&self) -> BigUint {
+		self.storage_load_cumulated_validator_reward()
+	}
+
 	#[view]
 	#[storage_is_empty("opt_addr")]
 	fn is_empty_opt_addr(&self) -> bool;

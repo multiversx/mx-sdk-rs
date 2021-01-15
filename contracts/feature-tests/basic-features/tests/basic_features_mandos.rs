@@ -143,6 +143,14 @@ fn storage_i64() {
 }
 
 #[test]
+fn storage_load_cumulated_validator_reward() {
+	parse_execute_mandos(
+		"mandos/storage_load_cumulated_validator_reward.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
 fn storage_i64_bad() {
 	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
 }

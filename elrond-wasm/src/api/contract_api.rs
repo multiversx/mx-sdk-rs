@@ -1,4 +1,5 @@
 use super::{BigIntApi, BigUintApi, CryptoApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::storage;
 use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -11,8 +12,8 @@ use alloc::vec::Vec;
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractHookApi<BigInt, BigUint>: Sized + CryptoApi
 where
-	BigInt: elrond_codec::NestedEncode + 'static,
-	BigUint: elrond_codec::NestedEncode + 'static,
+	BigInt: BigIntApi<BigUint> + 'static,
+	BigUint: BigUintApi + 'static,
 {
 	/// Abstracts the lower-level storage functionality.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
@@ -34,10 +35,13 @@ where
 		self.get_balance(&self.get_sc_address())
 	}
 
-	// #[inline]
-	// fn storage_load_cumulated_validator_reward(&self) -> BigUint {
-	// 	self.storage_load_big_uint(storage::protected_keys::ELROND_REWARD_KEY)
-	// }
+	#[inline]
+	fn storage_load_cumulated_validator_reward(&self) -> BigUint {
+		storage::storage_get(
+			self.get_storage_raw(),
+			storage::protected_keys::ELROND_REWARD_KEY,
+		)
+	}
 
 	fn get_call_value_big_uint(&self) -> BigUint;
 
