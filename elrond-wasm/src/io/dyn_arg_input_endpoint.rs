@@ -1,5 +1,6 @@
 use crate::api::{EndpointArgumentApi, ErrorApi};
-use crate::{ArgDecodeInput, DynArgInput, SignalError};
+use crate::err_msg;
+use crate::{ArgDecodeInput, DynArgInput};
 
 pub struct EndpointDynArgLoader<AA>
 where
@@ -24,7 +25,7 @@ where
 	}
 }
 
-impl<AA> SignalError for EndpointDynArgLoader<AA>
+impl<AA> ErrorApi for EndpointDynArgLoader<AA>
 where
 	AA: EndpointArgumentApi + ErrorApi + 'static,
 {
@@ -44,7 +45,7 @@ where
 
 	fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
 		if self.current_index >= self.num_arguments {
-			self.signal_arg_wrong_number()
+			self.signal_error(err_msg::ARG_WRONG_NUMBER)
 		} else {
 			let arg_input = ArgDecodeInput::new(self.api.clone(), self.current_index);
 			self.current_index += 1;

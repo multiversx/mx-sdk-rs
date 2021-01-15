@@ -1,4 +1,5 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
+use crate::err_msg;
 use crate::io::{ArgId, DynArg, DynArgInput, DynArgMulti};
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -89,7 +90,7 @@ where
 			i += 1;
 		}
 		if i < num {
-			loader.signal_arg_wrong_number();
+			loader.signal_error(err_msg::ARG_WRONG_NUMBER);
 		}
 		VarArgs(result_vec)
 	}
