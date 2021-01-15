@@ -1,9 +1,8 @@
-use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
-
-use crate::big_int::*;
-use crate::big_uint::*;
+use super::{ArwenBigInt, ArwenBigUint};
+use crate::ArwenApiImpl;
 use elrond_wasm::api::BigUintApi;
 use elrond_wasm::api::ContractHookApi;
+use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
 
 #[rustfmt::skip]
 extern {
@@ -71,7 +70,6 @@ extern {
     fn bigIntGetESDTCallValue(dest: i32);
 }
 
-pub struct ArwenApiImpl {}
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	type Storage = Self;
 
@@ -334,13 +332,5 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.arg_data_ptr(),
 			);
 		}
-	}
-}
-
-/// Should be no-op. The API implementation is zero-sized.
-impl Clone for ArwenApiImpl {
-	#[inline]
-	fn clone(&self) -> Self {
-		ArwenApiImpl {}
 	}
 }

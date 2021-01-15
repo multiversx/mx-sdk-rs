@@ -1,4 +1,4 @@
-use crate::ext_error;
+use crate::error_hook;
 
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Rem, Sub};
@@ -96,7 +96,7 @@ impl Clone for ArwenBigUint {
 unsafe fn big_uint_safe_sub(dest: i32, x: i32, y: i32) {
 	bigIntSub(dest, x, y);
 	if bigIntSign(dest) < 0 {
-		ext_error::signal_error(err_msg::BIG_UINT_SUB_NEGATIVE)
+		error_hook::signal_error(err_msg::BIG_UINT_SUB_NEGATIVE)
 	}
 }
 
@@ -367,7 +367,7 @@ impl BigUintApi for ArwenBigUint {
 	fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
 		let byte_len = self.byte_length() as usize;
 		if byte_len > 32 {
-			ext_error::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE)
+			error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE)
 		}
 		self.copy_to_slice_big_endian(&mut target[32 - byte_len..]);
 	}

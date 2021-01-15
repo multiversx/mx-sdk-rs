@@ -18,10 +18,9 @@ pub fn process_contract(
 		#[cfg(feature = "wasm-output-mode")]
 		pub mod callback_endpoint {
 			use super::*;
-			use elrond_wasm_node::*;
 
-			fn new_arwen_instance() -> #contract_impl_ident<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
-				let api = ArwenApiImpl{};
+			fn new_arwen_instance() -> #contract_impl_ident<elrond_wasm_node::ArwenApiImpl, elrond_wasm_node::api::ArwenBigInt, elrond_wasm_node::api::ArwenBigUint> {
+				let api = elrond_wasm_node::ArwenApiImpl{};
 				#contract_impl_ident::new(api)
 			}
 
