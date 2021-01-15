@@ -48,7 +48,7 @@ pub struct ActionFullInfo<BigUint: BigUintApi> {
 #[cfg(test)]
 mod test {
 	use super::Action;
-	use elrond_wasm_debug::RustBigUint;
+	use elrond_wasm_debug::api::RustBigUint;
 
 	#[test]
 	fn test_is_pending() {

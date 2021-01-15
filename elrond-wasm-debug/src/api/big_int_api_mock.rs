@@ -1,4 +1,4 @@
-use crate::big_uint_mock::*;
+use super::big_uint_api_mock::RustBigUint;
 
 use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
