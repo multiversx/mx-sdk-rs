@@ -95,8 +95,8 @@ macro_rules! sc_try {
 /// # use elrond_wasm::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 /// # where
-/// #     BigInt: elrond_codec::NestedEncode + 'static,
-/// #     BigUint: elrond_codec::NestedEncode + 'static,
+/// # 	BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+/// # 	BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
@@ -121,8 +121,8 @@ macro_rules! require {
 /// # use elrond_wasm::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 /// # where
-/// #     BigInt: elrond_codec::NestedEncode + 'static,
-/// #     BigUint: elrond_codec::NestedEncode + 'static,
+/// # 	BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+/// # 	BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     only_owner!(self, "Caller must be owner");
