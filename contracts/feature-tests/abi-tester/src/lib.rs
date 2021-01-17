@@ -3,8 +3,12 @@
 imports!();
 
 mod abi_test_type;
+mod abi_enum;
+mod only_nested;
 
 use abi_test_type::*;
+use abi_enum::*;
+use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
 /// the ABI generation framework works sa expected.
@@ -19,6 +23,12 @@ pub trait AbiTester {
 	fn echo_abi_test_type(&self, att: AbiTestType) -> AbiTestType {
 		att
 	}
+
+	#[endpoint]
+	fn echo_enum(&self, e: AbiEnum) -> AbiEnum {
+		e
+	}
+
 
 	#[endpoint]
 	#[output_name("multi-result-1")]
