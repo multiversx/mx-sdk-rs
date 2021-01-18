@@ -38,6 +38,11 @@ pub trait PingPong {
 			"smart contract not active yet"
 		);
 
+		require!(
+			self.get_block_nonce() < self.get_deadline(),
+			"smart contract already ended"
+		);
+
 		if let Some(max_funds) = self.get_max_funds() {
 			require!(
 				&self.get_sc_balance() + payment > max_funds,
