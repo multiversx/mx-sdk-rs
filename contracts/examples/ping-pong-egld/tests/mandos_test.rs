@@ -49,6 +49,14 @@ fn ping_pong_call_ping_before_beginning() {
 }
 
 #[test]
+fn ping_pong_call_ping_after_deadline() {
+	parse_execute_mandos(
+		"mandos/ping-pong-call-ping-after-deadline.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
 fn ping_pong_call_ping_second_user() {
 	parse_execute_mandos(
 		"mandos/ping-pong-call-ping-second-user.scen.json",
