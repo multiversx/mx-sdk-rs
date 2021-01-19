@@ -4,70 +4,103 @@ use elrond_wasm::api::BigUintApi;
 use elrond_wasm::api::ContractHookApi;
 use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
 
-#[rustfmt::skip]
-extern {
-    fn getSCAddress(resultOffset: *mut u8);
+extern "C" {
+	fn getSCAddress(resultOffset: *mut u8);
 	fn getOwnerAddress(resultOffset: *mut u8);
 
 	/// Currently not used.
 	#[allow(dead_code)]
 	fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
-	
-    /// Currently not used.
-	#[allow(dead_code)]
-    fn getFunction(functionOffset: *const u8) -> i32;
 
-    fn transferValue(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32) -> i32;
-	fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
-	fn createContract(gas: u64,
+	/// Currently not used.
+	#[allow(dead_code)]
+	fn getFunction(functionOffset: *const u8) -> i32;
+
+	fn transferValue(
+		dstOffset: *const u8,
 		valueOffset: *const u8,
-		codeOffset: *const u8, codeMetadataOffset: *const u8, length: i32,
+		dataOffset: *const u8,
+		length: i32,
+	) -> i32;
+
+	fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
+
+	fn createContract(
+		gas: u64,
+		valueOffset: *const u8,
+		codeOffset: *const u8,
+		codeMetadataOffset: *const u8,
+		length: i32,
 		resultOffset: *const u8,
-		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8) -> i32;
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	) -> i32;
 
 	fn getCaller(resultOffset: *mut u8);
-	
-    /// Currently not used.
+
+	/// Currently not used.
 	#[allow(dead_code)]
 	fn callValue(resultOffset: *const u8) -> i32;
 
-    /// Currently not used.
+	/// Currently not used.
 	#[allow(dead_code)]
 	fn getESDTValue(resultOffset: *const u8) -> i32;
-	
-    fn getESDTTokenName(resultOffset: *const u8) -> i32;
 
-    fn getGasLeft() -> i64;
-    fn getBlockTimestamp() -> i64;
-    fn getBlockNonce() -> i64;
-    fn getBlockRound() -> i64;
-    fn getBlockEpoch() -> i64;
-    fn getBlockRandomSeed(resultOffset: *mut u8);
-    /// Currently not used.
+	fn getESDTTokenName(resultOffset: *const u8) -> i32;
+
+	fn getGasLeft() -> i64;
+	fn getBlockTimestamp() -> i64;
+	fn getBlockNonce() -> i64;
+	fn getBlockRound() -> i64;
+	fn getBlockEpoch() -> i64;
+	fn getBlockRandomSeed(resultOffset: *mut u8);
+	/// Currently not used.
 	#[allow(dead_code)]
 	fn getStateRootHash(resultOffset: *mut u8);
-    fn getPrevBlockTimestamp() -> i64;
-    fn getPrevBlockNonce() -> i64;
-    fn getPrevBlockRound() -> i64;
-    fn getPrevBlockEpoch() -> i64;
-    fn getPrevBlockRandomSeed(resultOffset: *const u8);
+	fn getPrevBlockTimestamp() -> i64;
+	fn getPrevBlockNonce() -> i64;
+	fn getPrevBlockRound() -> i64;
+	fn getPrevBlockEpoch() -> i64;
+	fn getPrevBlockRandomSeed(resultOffset: *const u8);
 	fn getOriginalTxHash(resultOffset: *const u8);
-	
-	fn executeOnDestContext(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
-		functionOffset: *const u8, functionLength: i32, 
-		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
-	fn executeOnDestContextByCaller(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
-		functionOffset: *const u8, functionLength: i32, 
-		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
-	fn executeOnSameContext(gas: u64, addressOffset: *const u8, valueOffset: *const u8, 
-		functionOffset: *const u8, functionLength: i32, 
-		numArguments: i32, argumentsLengthOffset: *const u8, dataOffset: *const u8);
 
-    // big int API
-    fn bigIntNew(value: i64) -> i32;
+	fn executeOnDestContext(
+		gas: u64,
+		addressOffset: *const u8,
+		valueOffset: *const u8,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	);
+	fn executeOnDestContextByCaller(
+		gas: u64,
+		addressOffset: *const u8,
+		valueOffset: *const u8,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	);
+	fn executeOnSameContext(
+		gas: u64,
+		addressOffset: *const u8,
+		valueOffset: *const u8,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	);
+
+	// big int API
+	fn bigIntNew(value: i64) -> i32;
 	fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
 	fn bigIntGetCallValue(dest: i32);
-    fn bigIntGetESDTCallValue(dest: i32);
+	fn bigIntGetESDTCallValue(dest: i32);
 }
 
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {

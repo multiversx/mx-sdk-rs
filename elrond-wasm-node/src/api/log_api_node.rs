@@ -1,9 +1,8 @@
 use crate::ArwenApiImpl;
 use elrond_wasm::api::LogApi;
 
-#[rustfmt::skip]
-extern {
-    fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
+extern "C" {
+	fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
 }
 
 const TOPIC_LENGTH: usize = 32;
