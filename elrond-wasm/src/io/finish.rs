@@ -1,39 +1,27 @@
-use crate::elrond_codec::*;
-use crate::*;
-use core::marker::PhantomData;
+use crate::api::{EndpointFinishApi, ErrorApi};
+use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
+use crate::Vec;
 
-struct ApiOutput<A, BigInt, BigUint>
+struct ApiOutputAdapter<FA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + 'static,
 {
-	api: A,
-	_phantom1: PhantomData<BigInt>,
-	_phantom2: PhantomData<BigUint>,
+	api: FA,
 }
 
-impl<A, BigInt, BigUint> ApiOutput<A, BigInt, BigUint>
+impl<FA> ApiOutputAdapter<FA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + 'static,
 {
 	#[inline]
-	fn new(api: A) -> Self {
-		ApiOutput {
-			api,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
-		}
+	fn new(api: FA) -> Self {
+		ApiOutputAdapter { api }
 	}
 }
 
-impl<A, BigInt, BigUint> TopEncodeOutput for ApiOutput<A, BigInt, BigUint>
+impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + 'static,
 {
 	fn set_slice_u8(self, bytes: &[u8]) {
 		self.api.finish_slice_u8(bytes);
@@ -63,34 +51,28 @@ where
 	}
 }
 
-pub trait EndpointResult<A, BigInt, BigUint>: Sized
+pub trait EndpointResult<FA>: Sized
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + 'static,
 {
-	fn finish(&self, api: A);
+	fn finish(&self, api: FA);
 }
 
 /// All serializable objects can be used as smart contract function result.
-impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for T
+impl<FA, T> EndpointResult<FA> for T
 where
+	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode,
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
 {
-	fn finish(&self, api: A) {
-		self.top_encode_or_exit(ApiOutput::new(api.clone()), api, finish_exit);
+	fn finish(&self, api: FA) {
+		self.top_encode_or_exit(ApiOutputAdapter::new(api.clone()), api, finish_exit);
 	}
 }
 
 #[inline(always)]
-fn finish_exit<A, BigInt, BigUint>(api: A, en_err: EncodeError) -> !
+fn finish_exit<FA>(api: FA, en_err: EncodeError) -> !
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + ErrorApi + 'static,
 {
 	api.signal_error(en_err.message_bytes())
 }

@@ -9,7 +9,7 @@ pub fn generate_body_with_result(
 		syn::ReturnType::Type(_, _) => {
 			quote! {
 				let result = #mbody;
-				EndpointResult::<T, BigInt, BigUint>::finish(&result, self.api.clone());
+				EndpointResult::<T>::finish(&result, self.api.clone());
 			}
 		},
 	}

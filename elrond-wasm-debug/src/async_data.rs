@@ -1,11 +1,9 @@
-use crate::display_util::*;
-use crate::ext_mock::*;
+use crate::tx_context::*;
 use elrond_wasm::elrond_codec::*;
 use elrond_wasm::hex_call_data::HexCallDataDeserializer;
 use elrond_wasm::{Address, H256};
 
-use num_bigint::{BigInt, BigUint};
-use num_traits::cast::ToPrimitive;
+use num_bigint::BigUint;
 
 use alloc::vec::Vec;
 

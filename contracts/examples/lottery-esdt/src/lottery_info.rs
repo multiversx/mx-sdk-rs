@@ -1,4 +1,5 @@
-use elrond_wasm::{Address, BigUintApi, BoxedBytes, Vec};
+use elrond_wasm::api::BigUintApi;
+use elrond_wasm::{Address, BoxedBytes, Vec};
 
 derive_imports!();
 

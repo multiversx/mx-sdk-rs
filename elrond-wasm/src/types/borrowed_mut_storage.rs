@@ -1,6 +1,6 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
+use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::*;
-use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ops::DerefMut;
 use elrond_codec::*;
@@ -25,26 +25,20 @@ impl BorrowedMutStorageKey {
 /// when the lifetime of the BorrowedMutStorage expires.
 /// Optimization: will only save back to storage if the value is referenced with deref_mut(),
 /// because only in such way can it be changed.
-pub struct BorrowedMutStorage<A, BigInt, BigUint, T>
+pub struct BorrowedMutStorage<A, T>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	api: A,
 	key: BorrowedMutStorageKey,
 	value: T,
 	dirty: bool,
-	_phantom1: PhantomData<BigInt>,
-	_phantom2: PhantomData<BigUint>,
 }
 
-impl<A, BigInt, BigUint, T> BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, T> BorrowedMutStorage<A, T>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	pub fn with_const_key(api: A, key: &'static [u8]) -> Self {
@@ -54,8 +48,6 @@ where
 			key: BorrowedMutStorageKey::Const(key),
 			value,
 			dirty: false,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
 		}
 	}
 
@@ -66,17 +58,13 @@ where
 			key: BorrowedMutStorageKey::Generated(key),
 			value,
 			dirty: false,
-			_phantom1: PhantomData,
-			_phantom2: PhantomData,
 		}
 	}
 }
 
-impl<A, BigInt, BigUint, T> Drop for BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, T> Drop for BorrowedMutStorage<A, T>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	fn drop(&mut self) {
@@ -86,11 +74,9 @@ where
 	}
 }
 
-impl<A, BigInt, BigUint, T> Deref for BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, T> Deref for BorrowedMutStorage<A, T>
 where
-	BigInt: NestedEncode + 'static,
-	BigUint: NestedEncode + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	type Target = T;
@@ -100,11 +86,9 @@ where
 	}
 }
 
-impl<A, BigInt, BigUint, T> DerefMut for BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, T> DerefMut for BorrowedMutStorage<A, T>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	fn deref_mut(&mut self) -> &mut Self::Target {
@@ -113,24 +97,19 @@ where
 	}
 }
 
-impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint>
-	for BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, T> EndpointResult<A> for BorrowedMutStorage<A, T>
 where
-	BigInt: BigIntApi<BigUint> + 'static,
-	BigUint: BigUintApi + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
-	T: TopEncode + TopDecode + EndpointResult<A, BigInt, BigUint>,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
+	T: TopEncode + TopDecode + EndpointResult<A>,
 {
 	fn finish(&self, api: A) {
 		core::ops::Deref::deref(self).finish(api);
 	}
 }
 
-impl<A, BigInt, BigUint, T> TypeAbi for BorrowedMutStorage<A, BigInt, BigUint, T>
+impl<A, T> TypeAbi for BorrowedMutStorage<A, T>
 where
-	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode + TypeAbi,
 {
 	fn type_name() -> String {

@@ -26,10 +26,13 @@ pub trait FirstContract {
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-		self.call_esdt_second_contract(&expected_token_name, &esdt_value, 
+		self.call_esdt_second_contract(
+			&expected_token_name,
+			&esdt_value,
 			&self.get_second_contract_address(),
 			SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
-			&[]);
+			&[],
+		);
 
 		Ok(())
 	}
@@ -43,10 +46,13 @@ pub trait FirstContract {
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-		self.call_esdt_second_contract(&expected_token_name, &(esdt_value / BigUint::from(2u32)), 
+		self.call_esdt_second_contract(
+			&expected_token_name,
+			&(esdt_value / BigUint::from(2u32)),
 			&self.get_second_contract_address(),
 			SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
-			&[]);
+			&[],
+		);
 
 		Ok(())
 	}
@@ -60,10 +66,13 @@ pub trait FirstContract {
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-		self.call_esdt_second_contract(&expected_token_name, &(esdt_value / BigUint::from(2u32)), 
+		self.call_esdt_second_contract(
+			&expected_token_name,
+			&(esdt_value / BigUint::from(2u32)),
 			&self.get_second_contract_address(),
 			SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
-			&[]);
+			&[],
+		);
 
 		Ok(())
 	}
@@ -72,9 +81,14 @@ pub trait FirstContract {
 		BoxedBytes::from(self.get_esdt_token_name())
 	}
 
-	fn call_esdt_second_contract(&self, esdt_token_name: &BoxedBytes, amount: &BigUint, 
-		to: &Address, func_name: &[u8], args: &[BoxedBytes]) {
-
+	fn call_esdt_second_contract(
+		&self,
+		esdt_token_name: &BoxedBytes,
+		amount: &BigUint,
+		to: &Address,
+		func_name: &[u8],
+		args: &[BoxedBytes],
+	) {
 		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
 		serializer.push_argument_bytes(esdt_token_name.as_slice());
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
