@@ -37,6 +37,7 @@ impl TypeContents {
 pub struct EnumVariantDescription {
 	pub docs: &'static [&'static str],
 	pub name: &'static str,
+	pub discriminant: usize,
 	pub fields: Vec<StructFieldDescription>,
 }
 
