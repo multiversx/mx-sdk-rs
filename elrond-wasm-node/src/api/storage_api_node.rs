@@ -4,22 +4,22 @@ use elrond_wasm::api::{StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::BoxedBytes;
 
 #[rustfmt::skip]
-extern {
+extern "C" {
 	// general
 	fn storageStore(keyOffset: *const u8, keyLength: i32, dataOffset: *const u8, dataLength: i32) -> i32;
-    fn storageLoadLength(keyOffset: *const u8, keyLength: i32) -> i32;
+	fn storageLoadLength(keyOffset: *const u8, keyLength: i32) -> i32;
 	fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
-	
+
 	// big int API
-    fn bigIntNew(value: i64) -> i32;
-    fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
-    fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
-    
+	fn bigIntNew(value: i64) -> i32;
+	fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
+	fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
+
 	// small int API
-    fn smallIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
-    fn smallIntStorageStoreSigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
-    fn smallIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32) -> i64;
-    fn smallIntStorageLoadSigned(keyOffset: *const u8, keyLength: i32) -> i64;
+	fn smallIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
+	fn smallIntStorageStoreSigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
+	fn smallIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32) -> i64;
+	fn smallIntStorageLoadSigned(keyOffset: *const u8, keyLength: i32) -> i64;
 }
 
 impl StorageReadApi for ArwenApiImpl {
