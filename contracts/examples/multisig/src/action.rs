@@ -1,4 +1,5 @@
-use elrond_wasm::{Address, BigUintApi, BoxedBytes, CodeMetadata, Vec};
+use elrond_wasm::api::BigUintApi;
+use elrond_wasm::{Address, BoxedBytes, CodeMetadata, Vec};
 derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
@@ -36,7 +37,7 @@ impl<BigUint: BigUintApi> Action<BigUint> {
 	}
 }
 
-/// Not used internally, just to retrieve results via endpoint. 
+/// Not used internally, just to retrieve results via endpoint.
 #[derive(TopEncode, TypeAbi)]
 pub struct ActionFullInfo<BigUint: BigUintApi> {
 	pub action_id: usize,
@@ -47,7 +48,7 @@ pub struct ActionFullInfo<BigUint: BigUintApi> {
 #[cfg(test)]
 mod test {
 	use super::Action;
-	use elrond_wasm_debug::RustBigUint;
+	use elrond_wasm_debug::api::RustBigUint;
 
 	#[test]
 	fn test_is_pending() {

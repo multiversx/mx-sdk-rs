@@ -2,25 +2,6 @@ use super::arg_def::*;
 use super::contract_gen_method::*;
 use super::util::*;
 
-fn storage_store_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
-	let pat = &arg.pat;
-	quote! {
-		elrond_wasm::storage_set(self.api.clone(), &key[..], & #pat);
-	}
-}
-
-fn storage_load_snippet(_ty: &syn::Type) -> proc_macro2::TokenStream {
-	quote! {
-		elrond_wasm::storage_get(self.api.clone(), &key[..])
-	}
-}
-
-fn storage_clear_snippet() -> proc_macro2::TokenStream {
-	quote! {
-		elrond_wasm::storage_set(self.api.clone(), &key[..], &Vec::<u8>::new());
-	}
-}
-
 fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macro2::TokenStream {
 	let id_literal = array_literal(identifier.as_bytes());
 	if key_args.is_empty() {
@@ -53,12 +34,11 @@ pub fn generate_getter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
 	match m.return_type.clone() {
 		syn::ReturnType::Default => panic!("getter should return some value"),
-		syn::ReturnType::Type(_, ty) => {
-			let load_snippet = storage_load_snippet(&ty);
+		syn::ReturnType::Type(_, _ty) => {
 			quote! {
 				#msig {
 					#key_snippet
-					#load_snippet
+					elrond_wasm::storage_get(self.get_storage_raw(), &key[..])
 				}
 			}
 		},
@@ -76,12 +56,31 @@ pub fn generate_setter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 	let key_args = &m.method_args[..m.method_args.len() - 1];
 	let key_snippet = generate_key_snippet(key_args, identifier);
 	let value_arg = &m.method_args[m.method_args.len() - 1];
-	let store_snippet = storage_store_snippet(value_arg);
+	let pat = &value_arg.pat;
 	quote! {
 		#msig {
 			#key_snippet
-			#store_snippet
+			elrond_wasm::storage_set(self.get_storage_raw(), &key[..], & #pat);
 		}
+	}
+}
+
+pub fn generate_mapper_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
+	let msig = m.generate_sig();
+	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
+	match m.return_type.clone() {
+		syn::ReturnType::Default => panic!("getter should return some value"),
+		syn::ReturnType::Type(_, ty) => {
+			quote! {
+				#msig {
+					#key_snippet
+					<#ty as elrond_wasm::storage::mappers::StorageMapper<Self::Storage>>::new(
+						self.get_storage_raw(),
+						elrond_wasm::types::BoxedBytes::from(key),
+					)
+				}
+			}
+		},
 	}
 }
 
@@ -101,7 +100,7 @@ pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 		quote! {
 			#msig {
 				#key_snippet
-				BorrowedMutStorage::with_generated_key(self.api.clone(), key)
+				BorrowedMutStorage::with_generated_key(self.get_storage_raw(), key)
 			}
 		}
 	}
@@ -113,7 +112,7 @@ pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::To
 	quote! {
 		#msig {
 			#key_snippet
-			self.api.storage_load_len(&key[..]) == 0
+			elrond_wasm::api::StorageReadApi::storage_load_len(&self.get_storage_raw(), &key[..]) == 0
 		}
 	}
 }
@@ -124,11 +123,10 @@ pub fn generate_clear_impl(m: &Method, identifier: String) -> proc_macro2::Token
 		panic!("storage clear should not return anything");
 	}
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
-	let clear_snippet = storage_clear_snippet();
 	quote! {
 		#msig {
 			#key_snippet
-			#clear_snippet
+			elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &key[..], &[]);
 		}
 	}
 }

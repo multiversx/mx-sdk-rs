@@ -381,6 +381,11 @@ pub trait BasicFeatures {
 		self._get_opt_addr().into()
 	}
 
+	#[endpoint(storage_load_cumulated_validator_reward)]
+	fn storage_load_cumulated_validator_reward_endpoint(&self) -> BigUint {
+		self.storage_load_cumulated_validator_reward()
+	}
+
 	#[view]
 	#[storage_is_empty("opt_addr")]
 	fn is_empty_opt_addr(&self) -> bool;
@@ -412,6 +417,34 @@ pub trait BasicFeatures {
 	#[endpoint]
 	#[storage_get("map3")]
 	fn load_map3(&self, x: usize) -> bool;
+
+	// STORAGE MAPPERS
+
+	#[view]
+	#[storage_mapper("my_single_value_mapper")]
+	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
+
+	#[endpoint]
+	fn my_single_value_mapper_increment(&self, amount: &BigInt) {
+		let mut my_single_value_mapper = self.map_my_single_value_mapper();
+		my_single_value_mapper.value += amount;
+		my_single_value_mapper.save();
+	}
+
+	#[view]
+	#[storage_mapper("vec_mapper")]
+	fn vec_mapper(&self) -> VecMapper<Self::Storage, u32>;
+
+	#[endpoint]
+	fn vec_mapper_push(&self, item: u32) {
+		let mut vec_mapper = self.vec_mapper();
+		vec_mapper.push(&item);
+	}
+
+	#[endpoint]
+	fn vec_mapper_get(&self, index: usize) -> u32 {
+		self.vec_mapper().get(index)
+	}
 
 	// EVENTS
 

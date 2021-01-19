@@ -14,7 +14,10 @@ fn contract_map() -> ContractMap<TxContext> {
 
 #[test]
 fn test_send_tx_repeat_without_data_mandos() {
-	parse_execute_mandos("mandos/send_tx_repeat_without_data.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/send_tx_repeat_without_data.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]

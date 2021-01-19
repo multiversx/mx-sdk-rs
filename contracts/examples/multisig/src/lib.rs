@@ -93,7 +93,10 @@ pub trait Multisig {
 
 		for (i, address) in board.iter().enumerate() {
 			let user_id = i + 1;
-			require!(self.users_module().get_user_id(&address) == 0, "duplicate board member");
+			require!(
+				self.users_module().get_user_id(&address) == 0,
+				"duplicate board member"
+			);
 			self.users_module().set_user_id(&address, user_id);
 			self.users_module().set_user_address(user_id, &address);
 			self.set_user_id_to_role(user_id, UserRole::BoardMember);
@@ -142,7 +145,7 @@ pub trait Multisig {
 		for action_id in 1..=action_last_index {
 			let action_data = self.get_action_data(action_id);
 			if action_data.is_pending() {
-				result.push(ActionFullInfo{
+				result.push(ActionFullInfo {
 					action_id,
 					action_data,
 					signers: self.get_action_signers(action_id),

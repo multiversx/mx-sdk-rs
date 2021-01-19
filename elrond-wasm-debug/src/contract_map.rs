@@ -1,6 +1,6 @@
 use super::*;
 
-use elrond_wasm::CallableContract;
+use elrond_wasm::api::CallableContract;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
