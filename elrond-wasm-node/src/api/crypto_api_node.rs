@@ -2,13 +2,28 @@ use crate::ArwenApiImpl;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::H256;
 
-#[rustfmt::skip]
-extern {
+extern "C" {
 	fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 	fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
-	fn verifyBLS(keyOffset: *const u8, messageOffset: *const u8, messageLength: i32, sigOffset: *const u8) -> i32;
-	fn verifyEd25519(keyOffset: *const u8, messageOffset: *const u8, messageLength: i32, sigOffset: *const u8) -> i32;
-	fn verifySecp256k1(keyOffset: *const u8, keyLength: i32, messageOffset: *const u8, messageLength: i32, sigOffset: *const u8) -> i32;
+	fn verifyBLS(
+		keyOffset: *const u8,
+		messageOffset: *const u8,
+		messageLength: i32,
+		sigOffset: *const u8,
+	) -> i32;
+	fn verifyEd25519(
+		keyOffset: *const u8,
+		messageOffset: *const u8,
+		messageLength: i32,
+		sigOffset: *const u8,
+	) -> i32;
+	fn verifySecp256k1(
+		keyOffset: *const u8,
+		keyLength: i32,
+		messageOffset: *const u8,
+		messageLength: i32,
+		sigOffset: *const u8,
+	) -> i32;
 }
 
 impl CryptoApi for ArwenApiImpl {
