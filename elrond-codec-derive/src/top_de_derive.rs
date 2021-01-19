@@ -40,39 +40,35 @@ fn fieldless_enum_match_arm(
 		.collect()
 }
 
-fn zero_value_if_result_ok(
-	name: &syn::Ident,
-	data_enum: &syn::DataEnum,
-) -> proc_macro2::TokenStream {
-	if data_enum.variants.is_empty() {
-		panic!("cannot deserialize enums without variants");
-	}
-	let first_variant = &data_enum.variants[0];
-	if first_variant.fields.is_empty() {
-		quote! {
-			if top_input.byte_len() == 0 {
-				return core::result::Result::Ok(#name::#first_variant);
-			}
+/// Generates a default-value deserializer snippet automatically.
+/// Currently only does so for enums whose first variant is fieldless.
+/// Also generates the snippet for `top_decode_or_exit`.
+/// Not called for TopDecodeOrDefault, since that one already provides an explicit default.
+fn auto_default(ast: &syn::DeriveInput) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
+	let name = &ast.ident;
+	if let syn::Data::Enum(data_enum) = &ast.data {
+		if data_enum.variants.is_empty() {
+			panic!("cannot deserialize enums without variants");
 		}
-	} else {
-		quote! {}
+		let first_variant = &data_enum.variants[0];
+		if first_variant.fields.is_empty() {
+			let first_variant_ident = &first_variant.ident;
+			let auto_default = quote! {
+				if top_input.byte_len() == 0 {
+					return core::result::Result::Ok(#name::#first_variant_ident);
+				}
+			};
+			let auto_default_or_exit = quote! {
+				if top_input.byte_len() == 0 {
+					return #name::#first_variant_ident;
+				}
+			};
+			return (auto_default, auto_default_or_exit);
+		}
 	}
-}
 
-fn zero_value_if(name: &syn::Ident, data_enum: &syn::DataEnum) -> proc_macro2::TokenStream {
-	if data_enum.variants.is_empty() {
-		panic!("cannot deserialize enums without variants");
-	}
-	let first_variant = &data_enum.variants[0];
-	if first_variant.fields.is_empty() {
-		quote! {
-			if top_input.byte_len() == 0 {
-				return #name::#first_variant;
-			}
-		}
-	} else {
-		quote! {}
-	}
+	// returns nothing by default
+	(quote! {}, quote! {})
 }
 
 /// Only returns the trait implementation method bodies, without the impl or method definitions.
@@ -138,11 +134,8 @@ fn top_decode_method_bodies(
 				let variant_dep_decode_snippets = variant_dep_decode_snippets(&name, &data_enum);
 				let variant_dep_decode_or_exit_snippets =
 					variant_dep_decode_or_exit_snippets(&name, &data_enum);
-				let zero_value_if_result_ok = zero_value_if_result_ok(&name, &data_enum);
-				let zero_value_if = zero_value_if(&name, &data_enum);
 
 				let top_decode_body = quote! {
-					#zero_value_if_result_ok
 					let bytes = top_input.into_boxed_slice_u8();
 					let input = &mut &*bytes;
 					let result = match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
@@ -155,7 +148,6 @@ fn top_decode_method_bodies(
 					result
 				};
 				let top_decode_or_exit_body = quote! {
-					#zero_value_if
 					let bytes = top_input.into_boxed_slice_u8();
 					let input = &mut &*bytes;
 					let result = match <u8 as elrond_codec::NestedDecode>::dep_decode_or_exit(input, c.clone(), exit) {
@@ -178,10 +170,12 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
 	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 	let (top_decode_body, top_decode_or_exit_body) = top_decode_method_bodies(ast);
+	let (auto_default, auto_default_or_exit) = auto_default(&ast);
 
 	let gen = quote! {
 		impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
 			fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> core::result::Result<Self, elrond_codec::DecodeError> {
+				#auto_default
 				#top_decode_body
 			}
 
@@ -190,6 +184,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				c: ExitCtx,
 				exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 			) -> Self {
+				#auto_default_or_exit
 				#top_decode_or_exit_body
 			}
 		}
