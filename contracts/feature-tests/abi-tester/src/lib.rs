@@ -2,12 +2,12 @@
 
 imports!();
 
-mod abi_test_type;
 mod abi_enum;
+mod abi_test_type;
 mod only_nested;
 
-use abi_test_type::*;
 use abi_enum::*;
+use abi_test_type::*;
 use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
@@ -28,7 +28,6 @@ pub trait AbiTester {
 	fn echo_enum(&self, e: AbiEnum) -> AbiEnum {
 		e
 	}
-
 
 	#[endpoint]
 	#[output_name("multi-result-1")]

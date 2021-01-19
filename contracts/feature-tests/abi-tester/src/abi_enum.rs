@@ -7,8 +7,5 @@ pub enum AbiEnum {
 	Nothing,
 	Something(i32),
 	SomethingMore(u8, OnlyShowsUpAsNested8),
-	SomeStruct{
-		a: u16,
-		b: OnlyShowsUpAsNested9
-	}
+	SomeStruct { a: u16, b: OnlyShowsUpAsNested9 },
 }

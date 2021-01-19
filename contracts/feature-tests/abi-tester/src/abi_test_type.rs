@@ -1,5 +1,5 @@
-use elrond_wasm::Box;
 use crate::only_nested::*;
+use elrond_wasm::Box;
 derive_imports!();
 
 /// Its only purpose is to test that the ABI generator works fine.
@@ -15,4 +15,3 @@ pub struct AbiTestType {
 	/// Also, just like above, recursive types need to work even when nested into a tuple.
 	pub tuple_madness: (OnlyShowsUpAsNested2, Option<Box<AbiTestType>>),
 }
-
