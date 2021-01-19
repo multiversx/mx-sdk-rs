@@ -24,7 +24,7 @@
             },
             "expect": {
                 "status": "4",
-                "message": "str:smart contract already ended",
+                "message": "str:deadline has passed",
                 "gas": "*",
                 "refund": "*"
             }

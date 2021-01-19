@@ -40,7 +40,7 @@ pub trait PingPong {
 
 		require!(
 			self.get_block_nonce() < self.get_deadline(),
-			"smart contract already ended"
+			"deadline has passed"
 		);
 
 		if let Some(max_funds) = self.get_max_funds() {
