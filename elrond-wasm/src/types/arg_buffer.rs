@@ -35,6 +35,12 @@ impl ArgBuffer {
 	}
 }
 
+impl Default for ArgBuffer {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
 impl TopEncodeOutput for &mut ArgBuffer {
 	fn set_slice_u8(self, bytes: &[u8]) {
 		self.arg_lengths.push(bytes.len());

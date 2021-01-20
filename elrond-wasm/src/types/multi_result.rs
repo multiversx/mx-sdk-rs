@@ -1,22 +1,62 @@
-use crate::{BigIntApi, BigUintApi, ContractHookApi, ContractIOApi, EndpointResult};
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
+use crate::{api::EndpointFinishApi, EndpointResult};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 macro_rules! multi_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
         $(
             pub struct $mr<$($name,)+>(pub ($($name,)+));
 
-            impl<A, BigInt, BigUint, $($name),+> EndpointResult<A, BigInt, BigUint> for $mr<$($name,)+>
+            impl<FA, $($name),+> EndpointResult<FA> for $mr<$($name,)+>
             where
-                $($name: EndpointResult<A, BigInt, BigUint>,)+
-                BigInt: BigIntApi<BigUint> + 'static,
-                BigUint: BigUintApi + 'static,
-                A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static
+                FA: EndpointFinishApi + Clone + 'static,
+                $($name: EndpointResult<FA>,)+
             {
                 #[inline]
-				fn finish(&self, api: A) {
+				fn finish(&self, api: FA) {
                     $(
                         (self.0).$n.finish(api.clone());
                     )+
+                }
+            }
+
+            impl<$($name),+ > TypeAbi for $mr<$($name,)+>
+            where
+                $($name: TypeAbi,)+
+            {
+                fn type_name() -> String {
+                    let mut repr = String::from("MultiResult<");
+                    $(
+                        repr.push_str($name::type_name().as_str());
+                        repr.push(',');
+                    )+
+                    repr.push('>');
+                    repr
+                }
+
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+					$(
+						$name::provide_type_descriptions(accumulator);
+                    )+
+                }
+
+                fn is_multi_arg_or_result() -> bool {
+                    true
+                }
+
+                fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+                    let mut result = Vec::new();
+                    $(
+                        if output_names.len() > $n {
+                            result.append(&mut $name::output_abis(&[output_names[$n]]));
+
+                        } else {
+                            result.append(&mut $name::output_abis(&[]));
+                        }
+
+                    )+
+                    result
                 }
             }
 

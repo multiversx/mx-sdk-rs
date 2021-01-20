@@ -35,7 +35,7 @@ extern crate alloc;
 #[cfg(feature = "wasm-output-mode")]
 #[alloc_error_handler]
 fn alloc_error_handler(_layout: alloc::alloc::Layout) -> ! {
-	elrond_wasm_node::ext_error::signal_error(&b"allocation error"[..])
+	elrond_wasm_node::error_hook::signal_error(&b"allocation error"[..])
 }
 
 // for future reference, the PanicInfo struct looks like this:
@@ -61,13 +61,13 @@ fn panic_fmt(panic_info: &core::panic::PanicInfo) -> ! {
 		String::from("unknown panic occurred")
 	};
 
-	elrond_wasm_node::ext_error::signal_error(panic_msg.as_bytes())
+	elrond_wasm_node::error_hook::signal_error(panic_msg.as_bytes())
 }
 
 #[cfg(all(feature = "wasm-output-mode", not(feature = "panic-message")))]
 #[panic_handler]
 fn panic_fmt(_: &core::panic::PanicInfo) -> ! {
-	elrond_wasm_node::ext_error::signal_error(&b"panic occurred"[..])
+	elrond_wasm_node::error_hook::signal_error(&b"panic occurred"[..])
 }
 
 #[cfg(feature = "wasm-output-mode")]

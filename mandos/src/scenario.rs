@@ -34,30 +34,30 @@ pub enum Step {
 		accounts: BTreeMap<AddressKey, Account>,
 		new_addresses: Vec<NewAddress>,
 		block_hashes: Vec<BytesValue>,
-		previous_block_info: Option<BlockInfo>,
-		current_block_info: Option<BlockInfo>,
+		previous_block_info: Box<Option<BlockInfo>>,
+		current_block_info: Box<Option<BlockInfo>>,
 	},
 	ScCall {
 		tx_id: String,
 		comment: Option<String>,
-		tx: TxCall,
+		tx: Box<TxCall>,
 		expect: Option<TxExpect>,
 	},
 	ScDeploy {
 		tx_id: String,
 		comment: Option<String>,
-		tx: TxDeploy,
+		tx: Box<TxDeploy>,
 		expect: Option<TxExpect>,
 	},
 	Transfer {
 		tx_id: String,
 		comment: Option<String>,
-		tx: TxTransfer,
+		tx: Box<TxTransfer>,
 	},
 	ValidatorReward {
 		tx_id: String,
 		comment: Option<String>,
-		tx: TxValidatorReward,
+		tx: Box<TxValidatorReward>,
 	},
 	CheckState {
 		comment: Option<String>,
@@ -98,10 +98,12 @@ impl InterpretableFrom<StepRaw> for Step {
 					.into_iter()
 					.map(|t| BytesValue::interpret_from(t, context))
 					.collect(),
-				previous_block_info: previous_block_info
-					.map(|v| BlockInfo::interpret_from(v, context)),
-				current_block_info: current_block_info
-					.map(|v| BlockInfo::interpret_from(v, context)),
+				previous_block_info: Box::new(
+					previous_block_info.map(|v| BlockInfo::interpret_from(v, context)),
+				),
+				current_block_info: Box::new(
+					current_block_info.map(|v| BlockInfo::interpret_from(v, context)),
+				),
 			},
 			StepRaw::ScCall {
 				tx_id,
@@ -111,7 +113,7 @@ impl InterpretableFrom<StepRaw> for Step {
 			} => Step::ScCall {
 				tx_id,
 				comment,
-				tx: TxCall::interpret_from(tx, context),
+				tx: Box::new(TxCall::interpret_from(tx, context)),
 				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
 			},
 			StepRaw::ScDeploy {
@@ -122,18 +124,18 @@ impl InterpretableFrom<StepRaw> for Step {
 			} => Step::ScDeploy {
 				tx_id,
 				comment,
-				tx: TxDeploy::interpret_from(tx, context),
+				tx: Box::new(TxDeploy::interpret_from(tx, context)),
 				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
 			},
 			StepRaw::Transfer { tx_id, comment, tx } => Step::Transfer {
 				tx_id,
 				comment,
-				tx: TxTransfer::interpret_from(tx, context),
+				tx: Box::new(TxTransfer::interpret_from(tx, context)),
 			},
 			StepRaw::ValidatorReward { tx_id, comment, tx } => Step::ValidatorReward {
 				tx_id,
 				comment,
-				tx: TxValidatorReward::interpret_from(tx, context),
+				tx: Box::new(TxValidatorReward::interpret_from(tx, context)),
 			},
 			StepRaw::CheckState { comment, accounts } => Step::CheckState {
 				comment,
@@ -167,6 +169,7 @@ pub struct BlockInfo {
 	pub block_nonce: Option<U64Value>,
 	pub block_round: Option<U64Value>,
 	pub block_epoch: Option<U64Value>,
+	pub block_random_seed: Option<BytesValue>,
 }
 
 impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
@@ -184,6 +187,9 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
 			block_epoch: from
 				.block_epoch
 				.map(|v| U64Value::interpret_from(v, context)),
+			block_random_seed: from
+				.block_random_seed
+				.map(|v| BytesValue::interpret_from(v, context)),
 		}
 	}
 }

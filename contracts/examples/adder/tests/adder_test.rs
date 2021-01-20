@@ -1,6 +1,7 @@
 extern crate adder;
 use adder::*;
-use elrond_wasm_debug::*;
+use elrond_wasm_debug::api::RustBigInt;
+use elrond_wasm_debug::TxContext;
 
 #[test]
 fn test_add() {

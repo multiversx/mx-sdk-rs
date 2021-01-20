@@ -1,6 +1,6 @@
 use super::*;
 
-use elrond_wasm::CallableContract;
+use elrond_wasm::api::CallableContract;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -36,5 +36,11 @@ impl<A> ContractMap<A> {
 	) {
 		self.factories
 			.insert(path.as_bytes().to_vec(), new_contract_closure);
+	}
+}
+
+impl<A> Default for ContractMap<A> {
+	fn default() -> Self {
+		Self::new()
 	}
 }

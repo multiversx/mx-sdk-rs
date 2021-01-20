@@ -1,8 +1,9 @@
 [package]
 name = "lottery-egld"
 version = "0.0.0"
-authors = [ "dorin-iancu <dorin.iancu@elrond.com>",]
+authors = [ "Dorin Iancu <dorin.iancu@elrond.com>",]
 edition = "2018"
+publish = false
 
 [lib]
 path = "src/lib.rs"
@@ -11,18 +12,18 @@ path = "src/lib.rs"
 wasm-output-mode = [ "elrond-wasm-node",]
 
 [dependencies.elrond-wasm]
-version = "0.9.8"
+version = "0.10.4"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.9.8"
+version = "0.10.4"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.9.8"
+version = "0.10.4"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.9.8"
+version = "0.10.4"
 path = "../../../elrond-wasm-debug"

@@ -1,4 +1,5 @@
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use arrayvec::ArrayVec;
 use core::num::NonZeroUsize;
@@ -136,6 +137,44 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
 	}
 }
 
+impl NestedDecode for String {
+	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+		let raw = Vec::<u8>::dep_decode(input)?;
+		match String::from_utf8(raw) {
+			Ok(s) => Ok(s),
+			Err(_) => Err(DecodeError::UTF8_DECODE_ERROR),
+		}
+	}
+
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		let raw = Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit);
+		match String::from_utf8(raw) {
+			Ok(s) => s,
+			Err(_) => exit(c, DecodeError::UTF8_DECODE_ERROR),
+		}
+	}
+}
+
+impl NestedDecode for Box<str> {
+	#[inline]
+	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+		Ok(String::dep_decode(input)?.into_boxed_str())
+	}
+
+	#[inline]
+	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		String::dep_decode_or_exit(input, c, exit).into_boxed_str()
+	}
+}
+
 macro_rules! decode_num_unsigned {
 	($ty:ty, $num_bytes:expr, $type_info:expr) => {
 		impl NestedDecode for $ty {
@@ -235,7 +274,7 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 	) -> Self {
 		match input.read_byte_or_exit(c.clone(), exit) {
 			0 => None,
-			1 => Some(T::dep_decode_or_exit(input, c.clone(), exit)),
+			1 => Some(T::dep_decode_or_exit(input, c, exit)),
 			_ => exit(c, DecodeError::INVALID_VALUE),
 		}
 	}
@@ -417,6 +456,13 @@ mod tests {
 		deser_ok(-5i64, &[255, 255, 255, 255, 255, 255, 255, 251]);
 		// non zero usize
 		deser_ok(NonZeroUsize::new(5).unwrap(), &[0, 0, 0, 5]);
+	}
+
+	#[test]
+	#[rustfmt::skip]
+	fn test_dep_decode_str() {
+		deser_ok(String::from("abc"), &[0, 0, 0, 3, b'a', b'b', b'c']);
+		deser_ok(String::from("abc").into_boxed_str(), &[0, 0, 0, 3, b'a', b'b', b'c']);
 	}
 
 	#[test]

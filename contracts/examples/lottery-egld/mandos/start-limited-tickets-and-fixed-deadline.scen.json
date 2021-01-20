@@ -55,7 +55,7 @@
                     "storage": {
                         "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:2|u64:123,456|u32:800|u32:1|u8:100|u32:0|u32:0|u32:0"
                     },
-                    "code": "file:../output/lottery.wasm"
+                    "code": "file:../output/lottery-egld.wasm"
                 }
             }
         }

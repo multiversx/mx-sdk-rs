@@ -1,5 +1,7 @@
 use super::sc_error::SCError;
-use crate::io::finish::EndpointResult;
+use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
+use crate::api::{EndpointFinishApi, ErrorApi};
+use crate::EndpointResult;
 use crate::*;
 
 /// Default way to optionally return an error from a smart contract endpoint.
@@ -13,11 +15,7 @@ pub enum SCResult<T> {
 impl<T> SCResult<T> {
 	#[inline]
 	pub fn is_ok(&self) -> bool {
-		if let SCResult::Ok(_) = self {
-			true
-		} else {
-			false
-		}
+		matches!(self, SCResult::Ok(_))
 	}
 
 	#[inline]
@@ -44,15 +42,13 @@ impl<T> SCResult<T> {
 	}
 }
 
-impl<A, BigInt, BigUint, T> EndpointResult<A, BigInt, BigUint> for SCResult<T>
+impl<FA, T> EndpointResult<FA> for SCResult<T>
 where
-	T: EndpointResult<A, BigInt, BigUint>,
-	BigInt: BigIntApi<BigUint> + 'static,
-	BigUint: BigUintApi + 'static,
-	A: ContractHookApi<BigInt, BigUint> + ContractIOApi<BigInt, BigUint> + 'static,
+	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
+	T: EndpointResult<FA>,
 {
 	#[inline]
-	fn finish(&self, api: A) {
+	fn finish(&self, api: FA) {
 		match self {
 			SCResult::Ok(t) => {
 				t.finish(api);
@@ -61,6 +57,24 @@ where
 				api.signal_error(e.as_bytes());
 			},
 		}
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for SCResult<T> {
+	fn type_name() -> String {
+		T::type_name()
+	}
+
+	/// Gives `SCResult<()>` the possibility to produce 0 output ABIs,
+	/// just like `()`.
+	/// It is also possible to have `SCResult<MultiResultX<...>>`,
+	/// so this gives the MultiResult to dissolve into its multiple output ABIs.
+	fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+		T::output_abis(output_names)
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
 	}
 }
 
