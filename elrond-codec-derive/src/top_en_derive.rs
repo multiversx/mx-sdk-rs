@@ -81,10 +81,12 @@ pub fn variant_top_encode_or_exit_snippets(
 		.collect()
 }
 
-pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
+/// Only returns the trait implementation method bodies, without the impl or method definitions.
+fn top_encode_method_bodies(
+	ast: &syn::DeriveInput,
+) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
 	let name = &ast.ident;
-	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-	let gen = match &ast.data {
+	match &ast.data {
 		syn::Data::Struct(data_struct) => {
 			let field_dep_encode_snippets = fields_snippets(&data_struct.fields, |index, field| {
 				dep_encode_snippet(&self_field_expr(index, field))
@@ -93,29 +95,20 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				fields_snippets(&data_struct.fields, |index, field| {
 					dep_encode_or_exit_snippet(&self_field_expr(index, field))
 				});
-			quote! {
-				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
-					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> core::result::Result<(), elrond_codec::EncodeError> {
-						let mut buffer = elrond_codec::Vec::<u8>::new();
-						let dest = &mut buffer;
-						#(#field_dep_encode_snippets)*
-						output.set_slice_u8(&buffer[..]);
-						core::result::Result::Ok(())
-					}
-
-					fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
-						&self,
-						output: O,
-						c: ExitCtx,
-						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
-					) {
-						let mut buffer = elrond_codec::Vec::<u8>::new();
-						let dest = &mut buffer;
-						#(#field_dep_encode_or_exit_snippets)*
-						output.set_slice_u8(&buffer[..]);
-					}
-				}
-			}
+			let top_encode_body = quote! {
+				let mut buffer = elrond_codec::Vec::<u8>::new();
+				let dest = &mut buffer;
+				#(#field_dep_encode_snippets)*
+				output.set_slice_u8(&buffer[..]);
+				core::result::Result::Ok(())
+			};
+			let top_encode_or_exit_body = quote! {
+				let mut buffer = elrond_codec::Vec::<u8>::new();
+				let dest = &mut buffer;
+				#(#field_dep_encode_or_exit_snippets)*
+				output.set_slice_u8(&buffer[..]);
+			};
+			(top_encode_body, top_encode_or_exit_body)
 		},
 		syn::Data::Enum(data_enum) => {
 			assert!(
@@ -126,29 +119,75 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 			let variant_top_encode_or_exit_snippets =
 				variant_top_encode_or_exit_snippets(&name, &data_enum);
 
-			quote! {
-				impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
-					fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> core::result::Result<(), elrond_codec::EncodeError> {
-						match self {
-							#(#variant_top_encode_snippets)*
-						}
-					}
-
-					fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
-						&self,
-						output: O,
-						c: ExitCtx,
-						exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
-					) {
-						match self {
-							#(#variant_top_encode_or_exit_snippets)*
-						}
-					}
+			let top_encode_body = quote! {
+				match self {
+					#(#variant_top_encode_snippets)*
 				}
-			}
+			};
+			let top_encode_or_exit_body = quote! {
+				match self {
+					#(#variant_top_encode_or_exit_snippets)*
+				}
+			};
+			(top_encode_body, top_encode_or_exit_body)
 		},
 		syn::Data::Union(_) => panic!("Union not supported"),
-	};
+	}
+}
 
+pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
+	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+	let (top_encode_body, top_encode_or_exit_body) = top_encode_method_bodies(ast);
+
+	let gen = quote! {
+		impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
+			fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> core::result::Result<(), elrond_codec::EncodeError> {
+				#top_encode_body
+			}
+
+			fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
+				&self,
+				output: O,
+				c: ExitCtx,
+				exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
+			) {
+				#top_encode_or_exit_body
+			}
+		}
+	};
+	gen.into()
+}
+
+pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
+	let name = &ast.ident;
+	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+	let (top_encode_body, top_encode_or_exit_body) = top_encode_method_bodies(ast);
+
+	let gen = quote! {
+		impl #impl_generics elrond_codec::TopEncode for #name #ty_generics #where_clause {
+			fn top_encode<O: elrond_codec::TopEncodeOutput>(&self, output: O) -> core::result::Result<(), elrond_codec::EncodeError> {
+				if elrond_codec::EncodeDefault::is_default(self) {
+					output.set_slice_u8(&[]);
+					Ok(())
+				} else {
+					#top_encode_body
+				}
+			}
+
+			fn top_encode_or_exit<O: elrond_codec::TopEncodeOutput, ExitCtx: Clone>(
+				&self,
+				output: O,
+				c: ExitCtx,
+				exit: fn(ExitCtx, elrond_codec::EncodeError) -> !,
+			) {
+				if elrond_codec::EncodeDefault::is_default(self) {
+					output.set_slice_u8(&[]);
+				} else {
+					#top_encode_or_exit_body
+				}
+			}
+		}
+	};
 	gen.into()
 }
