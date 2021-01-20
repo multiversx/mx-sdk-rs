@@ -1,5 +1,7 @@
+use crate::abi::TypeAbi;
 use crate::BoxedBytes;
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::Debug;
 
@@ -10,9 +12,6 @@ const ZERO_32: &[u8] = &[0u8; 32];
 /// Data is kept on the heap to keep wasm size low and avoid copies.
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct H256(Box<[u8; 32]>);
-
-/// Alias for H256, just to make smart contract code more readable.
-pub type Address = H256;
 
 impl From<[u8; 32]> for H256 {
 	/// Constructs a hash type from the given bytes array of fixed length.
@@ -96,7 +95,7 @@ impl H256 {
 	/// Returns a new zero-initialized fixed hash.
 	/// Allocates directly in heap.
 	/// Minimal resulting wasm code (14 bytes if not inlined).
-	pub fn zero() -> H256 {
+	pub fn zero() -> Self {
 		use alloc::alloc::{alloc_zeroed, Layout};
 		unsafe {
 			let ptr = alloc_zeroed(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
@@ -243,6 +242,12 @@ impl TopDecode for H256 {
 	}
 }
 
+impl TypeAbi for H256 {
+	fn type_name() -> String {
+		"H256".into()
+	}
+}
+
 #[cfg(test)]
 mod h256_tests {
 	use super::*;
@@ -250,14 +255,14 @@ mod h256_tests {
 	use elrond_codec::test_util::{check_top_encode, ser_deser_ok};
 
 	#[test]
-	fn test_address() {
-		let addr = Address::from([4u8; 32]);
+	fn test_h256_from_array() {
+		let addr = H256::from([4u8; 32]);
 		ser_deser_ok(addr, &[4u8; 32]);
 	}
 
 	#[test]
-	fn test_opt_address() {
-		let addr = Address::from([4u8; 32]);
+	fn test_opt_h256() {
+		let addr = H256::from([4u8; 32]);
 		let mut expected: Vec<u8> = Vec::new();
 		expected.push(1u8);
 		expected.extend_from_slice(&[4u8; 32]);
@@ -265,8 +270,8 @@ mod h256_tests {
 	}
 
 	#[test]
-	fn test_ser_address_ref() {
-		let addr = Address::from([4u8; 32]);
+	fn test_ser_h256_ref() {
+		let addr = H256::from([4u8; 32]);
 		let expected_bytes: &[u8] = &[4u8; 32 * 3];
 
 		let tuple = (&addr, &&&addr, addr.clone());

@@ -67,11 +67,10 @@
                         "``user_role|u32:3": "2",
                         "``user_role|u32:4": "1",
                         "``user_role|u32:5": "2",
-                        "``board_size": "4",
+                        "``num_board_members": "4",
                         "``num_proposers": "1",
                         "``quorum": "2",
                         "``action_last_index": "3",
-                        "``pending_action_count": "1",
                         "``action_data|u32:3": {
                             "discriminant": "0x06",
                             "amount": "u32:0",
@@ -253,6 +252,48 @@
             },
             "expect": {
                 "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "comment": "check that account data got cleaned up",
+            "txId": "check-cleanup-1",
+            "tx": {
+                "from": "address:paul",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getActionData",
+                "arguments": ["4"],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "comment": "check that account data got cleaned up",
+            "txId": "check-cleanup-2",
+            "tx": {
+                "from": "address:paul",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getActionSigners",
+                "arguments": ["4"],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

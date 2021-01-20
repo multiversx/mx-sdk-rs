@@ -20,6 +20,10 @@
         {
             "step": "externalSteps",
             "path": "steps/rem_alice.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/sign_unsign_bad_action.steps.json"
         }
     ]
 }

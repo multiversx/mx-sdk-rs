@@ -4,25 +4,25 @@
         {
             "step": "setState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                "address:a_user": {
                     "nonce": "0",
                     "balance": "0x10000000000000e8d4a51000",
                     "storage": {},
                     "code": ""
                 },
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                "address:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234"
+                        "``other_contract": "address:bob"
                     },
-                    "code": "file:../async-alice/output/alice.wasm"
+                    "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234": {
+                "address:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../async-bob/output/bob.wasm"
+                    "code": "file:../async-bob/output/async-bob.wasm"
                 }
             }
         },
@@ -30,8 +30,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234",
-                "to": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234",
+                "from": "address:a_user",
+                "to": "address:alice",
                 "value": "0x123400",
                 "function": "forwardToOtherContractWithCallback",
                 "arguments": [],
@@ -51,29 +51,29 @@
         {
             "step": "checkState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                "address:a_user": {
                     "nonce": "1",
                     "balance": "0xfffffffffff00e8d492dc00",
                     "storage": {},
                     "code": ""
                 },
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                "address:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234",
-                        "0x7777777777777777777777777777777777777777777777777777777777777777": "0x7777"
+                        "``other_contract": "address:bob",
+                        "``callback_info": "0x7777"
                     },
-                    "code": "file:../async-alice/output/alice.wasm"
+                    "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234": {
+                "address:bob": {
                     "nonce": "0",
                     "balance": "0x123400",
                     "storage": {
-                        "0x1111111111111111111111111111111111111111111111111111111111111111": "0x56",
-                        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff": "0x123400"
+                        "``pay_me_arg": "0x56",
+                        "``last_payment": "0x123400"
                     },
-                    "code": "file:../async-bob/output/bob.wasm"
+                    "code": "file:../async-bob/output/async-bob.wasm"
                 }
             }
         }

@@ -1,28 +1,14 @@
-use elrond_wasm::{Address, H256};
-
-use crate::big_int_mock::*;
-use crate::big_uint_mock::*;
 use crate::contract_map::*;
 use crate::display_util::*;
-use crate::ext_mock::*;
-
-use elrond_wasm::err_msg;
-use elrond_wasm::BigUintApi;
-use elrond_wasm::CallableContract;
-use elrond_wasm::ContractHookApi;
-
-use num_bigint::{BigInt, BigUint};
-use num_traits::{cast::ToPrimitive, Zero};
-
+use crate::tx_context::*;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-
+use elrond_wasm::types::Address;
+use num_bigint::BigUint;
+use num_traits::Zero;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Write;
-
-use alloc::rc::Rc;
-use core::cell::RefCell;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
@@ -83,6 +69,7 @@ pub struct BlockInfo {
 	pub block_nonce: u64,
 	pub block_round: u64,
 	pub block_epoch: u64,
+	pub block_random_seed: Box<[u8; 48]>,
 }
 
 impl BlockInfo {
@@ -92,7 +79,14 @@ impl BlockInfo {
 			block_nonce: 0,
 			block_round: 0,
 			block_epoch: 0,
+			block_random_seed: Box::from([0u8; 48]),
 		}
+	}
+}
+
+impl Default for BlockInfo {
+	fn default() -> Self {
+		Self::new()
 	}
 }
 
@@ -112,7 +106,15 @@ impl BlockchainMock {
 			current_block_info: BlockInfo::new(),
 		}
 	}
+}
 
+impl Default for BlockchainMock {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
+impl BlockchainMock {
 	pub fn add_account(&mut self, acct: AccountData) {
 		self.accounts.insert(acct.address.clone(), acct);
 	}
@@ -144,7 +146,7 @@ impl BlockchainMock {
 	fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
 		self.new_addresses
 			.get(&(creator_address, creator_nonce))
-			.map(|addr_ref| addr_ref.clone())
+			.cloned()
 	}
 
 	pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {

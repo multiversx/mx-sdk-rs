@@ -2,6 +2,7 @@
 name = "lottery-egld-wasm"
 version = "0.0.0"
 edition = "2018"
+publish = false
 
 [lib]
 crate-type = [ "cdylib",]
@@ -22,6 +23,6 @@ default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.9.8"
+version = "0.10.4"
 path = "../../../../elrond-wasm-output"
 features = [ "wasm-output-mode",]

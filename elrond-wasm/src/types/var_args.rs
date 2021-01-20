@@ -1,4 +1,7 @@
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
+use crate::err_msg;
 use crate::io::{ArgId, DynArg, DynArgInput, DynArgMulti};
+use alloc::string::String;
 use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
 
@@ -87,8 +90,25 @@ where
 			i += 1;
 		}
 		if i < num {
-			loader.signal_arg_wrong_number();
+			loader.signal_error(err_msg::ARG_WRONG_NUMBER);
 		}
 		VarArgs(result_vec)
+	}
+}
+
+impl<T: TypeAbi> TypeAbi for VarArgs<T> {
+	fn type_name() -> String {
+		let mut repr = String::from("VarArgs<");
+		repr.push_str(T::type_name().as_str());
+		repr.push('>');
+		repr
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
+	}
+
+	fn is_multi_arg_or_result() -> bool {
+		true
 	}
 }

@@ -64,7 +64,7 @@ fn parse_execute_mandos_steps(
 						new_address.new_address.value.into(),
 					)
 				}
-				if let Some(block_info_obj) = previous_block_info {
+				if let Some(block_info_obj) = &**previous_block_info {
 					if let Some(u64_value) = &block_info_obj.block_timestamp {
 						state.previous_block_info.block_timestamp = u64_value.value;
 					}
@@ -77,8 +77,21 @@ fn parse_execute_mandos_steps(
 					if let Some(u64_value) = &block_info_obj.block_round {
 						state.previous_block_info.block_round = u64_value.value;
 					}
+					if let Some(bytes_value) = &block_info_obj.block_random_seed {
+						const SEED_LEN: usize = 48;
+						let val = &bytes_value.value;
+
+						assert!(
+							val.len() <= SEED_LEN,
+							"block random seed input value too long!"
+						);
+
+						let mut seed = [0u8; SEED_LEN];
+						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
+						state.previous_block_info.block_random_seed = Box::from(seed);
+					}
 				}
-				if let Some(block_info_obj) = current_block_info {
+				if let Some(block_info_obj) = &**current_block_info {
 					if let Some(u64_value) = &block_info_obj.block_timestamp {
 						state.current_block_info.block_timestamp = u64_value.value;
 					}
@@ -90,6 +103,19 @@ fn parse_execute_mandos_steps(
 					}
 					if let Some(u64_value) = &block_info_obj.block_round {
 						state.current_block_info.block_round = u64_value.value;
+					}
+					if let Some(bytes_value) = &block_info_obj.block_random_seed {
+						const SEED_LEN: usize = 48;
+						let val = &bytes_value.value;
+
+						assert!(
+							val.len() <= SEED_LEN,
+							"block random seed input value too long!"
+						);
+
+						let mut seed = [0u8; SEED_LEN];
+						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
+						state.current_block_info.block_random_seed = Box::from(seed);
 					}
 				}
 			},
@@ -125,7 +151,7 @@ fn parse_execute_mandos_steps(
 							let async_input = async_call_tx_input(&async_data, &contract_address);
 
 							if async_input.func_name == ESDT_TRANSFER_STRING {
-								execute_esdt_async_call(async_input.clone(), state);
+								execute_esdt_async_call(async_input, state);
 								return;
 							}
 
@@ -176,7 +202,7 @@ fn parse_execute_mandos_steps(
 			} => {
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
-					to: H256::zero(),
+					to: Address::zero(),
 					call_value: tx.call_value.value.clone(),
 					esdt_value: tx.esdt_value.value.clone(),
 					esdt_token_name: tx.esdt_token_name.value.clone(),
@@ -232,7 +258,7 @@ fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let esdt_token_name = tx_input.esdt_token_name.clone();
-	let esdt_value = tx_input.esdt_value.clone();
+	let esdt_value = tx_input.esdt_value;
 
 	state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value);
 	state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
@@ -536,10 +562,8 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 					);
 				}
 			}
-		} else {
-			if !accounts.other_accounts_allowed {
-				panic!("Expected account not found");
-			}
+		} else if !accounts.other_accounts_allowed {
+			panic!("Expected account not found");
 		}
 	}
 }

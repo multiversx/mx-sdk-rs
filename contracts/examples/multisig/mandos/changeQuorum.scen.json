@@ -53,6 +53,32 @@
         },
         {
             "step": "scCall",
+            "txId": "pending-action-data",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getPendingActionFullInfo",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    [
+                        "u32:1",
+                        "u8:4|u32:3",
+                        "u32:2|address:alice|address:bob"
+                    ]
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
             "txId": "change-quorum-perform",
             "tx": {
                 "from": "address:alice",
@@ -87,6 +113,26 @@
                 "out": [
                     "3"
                 ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "pending-action-data-none",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "getPendingActionFullInfo",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
                 "status": "",
                 "logs": [],
                 "gas": "*",

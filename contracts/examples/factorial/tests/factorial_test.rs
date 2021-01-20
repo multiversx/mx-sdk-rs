@@ -1,5 +1,6 @@
 extern crate factorial;
-use elrond_wasm_debug::*;
+use elrond_wasm_debug::api::RustBigUint;
+use elrond_wasm_debug::TxContext;
 use factorial::*;
 
 #[test]

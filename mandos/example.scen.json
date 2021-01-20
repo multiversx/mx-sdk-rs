@@ -61,13 +61,15 @@
             "previousBlockInfo": {
                 "blockNonce": "222",
                 "blockRound": "333",
-                "blockEpoch": "444"
+                "blockEpoch": "444",
+                "blockRandomSeed": "0x42BA9AE77C08604DD7EB9D209488B88DD5A301D9C9F3D4A6B4B40E95AA6F4A1E20519698D3F774052F475B6877449CF3"
             },
             "currentBlockInfo": {
                 "blockTimestamp": "511",
                 "blockNonce": "522",
                 "blockRound": "533",
-                "blockEpoch": "544"
+                "blockEpoch": "544",
+                "blockRandomSeed": "0x567A4637C658910A21C2AED8638D8A1A543B065929CD6D0452F279A9CF72CE80F6A15F66A217E92045DED9E3DF9441FB"
             }
         },
         {

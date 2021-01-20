@@ -4,6 +4,9 @@
 
 imports!();
 
+// this is not part of the standard imports because we want to discourage its use
+use elrond_wasm::String;
+
 mod large_boxed_byte_array;
 mod ser_ex1;
 mod ser_ex2;
@@ -124,6 +127,24 @@ pub trait BasicFeatures {
 	fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiResult2<Vec<u8>, usize> {
 		let l = arg.len();
 		(arg, l).into()
+	}
+
+	#[endpoint]
+	fn echo_string(&self, s: String) -> MultiResult2<String, usize> {
+		let l = s.len();
+		(s, l).into()
+	}
+
+	#[endpoint]
+	fn echo_str<'s>(&self, s: &'s str) -> MultiResult2<&'s str, usize> {
+		let l = s.len();
+		(s, l).into()
+	}
+
+	#[endpoint]
+	fn echo_str_box(&self, s: Box<str>) -> MultiResult2<Box<str>, usize> {
+		let l = s.len();
+		(s, l).into()
 	}
 
 	#[endpoint]
@@ -360,6 +381,11 @@ pub trait BasicFeatures {
 		self._get_opt_addr().into()
 	}
 
+	#[endpoint(storage_load_cumulated_validator_reward)]
+	fn storage_load_cumulated_validator_reward_endpoint(&self) -> BigUint {
+		self.storage_load_cumulated_validator_reward()
+	}
+
 	#[view]
 	#[storage_is_empty("opt_addr")]
 	fn is_empty_opt_addr(&self) -> bool;
@@ -392,6 +418,34 @@ pub trait BasicFeatures {
 	#[storage_get("map3")]
 	fn load_map3(&self, x: usize) -> bool;
 
+	// STORAGE MAPPERS
+
+	#[view]
+	#[storage_mapper("my_single_value_mapper")]
+	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
+
+	#[endpoint]
+	fn my_single_value_mapper_increment(&self, amount: &BigInt) {
+		let mut my_single_value_mapper = self.map_my_single_value_mapper();
+		my_single_value_mapper.value += amount;
+		my_single_value_mapper.save();
+	}
+
+	#[view]
+	#[storage_mapper("vec_mapper")]
+	fn vec_mapper(&self) -> VecMapper<Self::Storage, u32>;
+
+	#[endpoint]
+	fn vec_mapper_push(&self, item: u32) {
+		let mut vec_mapper = self.vec_mapper();
+		vec_mapper.push(&item);
+	}
+
+	#[endpoint]
+	fn vec_mapper_get(&self, index: usize) -> u32 {
+		self.vec_mapper().get(index)
+	}
+
 	// EVENTS
 
 	#[endpoint(logEventA)]
@@ -407,8 +461,17 @@ pub trait BasicFeatures {
 	// SEND TX
 
 	#[endpoint]
-	fn send_tx_endpoint(&self, to: &Address, amount: &BigUint) {
-		self.send_tx(to, amount, "");
+	fn send_tx_endpoint(
+		&self,
+		to: &Address,
+		amount: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send_tx(to, amount, data);
 	}
 
 	// BLOCK INFO
@@ -433,6 +496,11 @@ pub trait BasicFeatures {
 		self.get_block_epoch()
 	}
 
+	#[view(get_block_random_seed)]
+	fn get_block_random_seed_view(&self) -> Box<[u8; 48]> {
+		self.get_block_random_seed()
+	}
+
 	#[view(get_prev_block_timestamp)]
 	fn get_prev_block_timestamp_view(&self) -> u64 {
 		self.get_prev_block_timestamp()
@@ -451,6 +519,11 @@ pub trait BasicFeatures {
 	#[view(get_prev_block_epoch)]
 	fn get_prev_block_epoch_view(&self) -> u64 {
 		self.get_prev_block_epoch()
+	}
+
+	#[view(get_prev_block_random_seed)]
+	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
+		self.get_prev_block_random_seed()
 	}
 
 	// EVENTS
@@ -836,6 +909,23 @@ pub trait BasicFeatures {
 	#[endpoint(computeKeccak256)]
 	fn compute_keccak256(&self, input: Vec<u8>) -> H256 {
 		self.keccak256(&input)
+	}
+
+	// Not called, they currently just panic with "Not implemented yet!"
+
+	#[endpoint]
+	fn verify_bls_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		self.verify_bls(key, message, signature)
+	}
+
+	#[endpoint]
+	fn verify_ed25519_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		self.verify_ed25519(key, message, signature)
+	}
+
+	#[endpoint]
+	fn verify_secp256k1_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+		self.verify_secp256k1(key, message, signature)
 	}
 
 	// MACROS

@@ -50,12 +50,12 @@
         },
         {
             "step": "scCall",
-            "txId": "getBoardSize",
+            "txId": "getNumBoardMembers",
             "tx": {
                 "from": "address:owner",
                 "to": "address:multisig",
                 "value": "0",
-                "function": "getBoardSize",
+                "function": "getNumBoardMembers",
                 "arguments": [],
                 "gasLimit": "100,000",
                 "gasPrice": "0"
@@ -87,7 +87,7 @@
                         "``user_role|u32:1": "2",
                         "``user_role|u32:2": "2",
                         "``user_role|u32:3": "2",
-                        "``board_size": "3",
+                        "``num_board_members": "3",
                         "``quorum": "2"
                     },
                     "code": "file:../../output/multisig.wasm"
