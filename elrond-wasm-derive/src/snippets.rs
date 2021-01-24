@@ -42,6 +42,7 @@ pub fn api_where() -> proc_macro2::TokenStream {
 	  #bi_where
 		T: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 		 + elrond_wasm::api::ErrorApi
+		 + elrond_wasm::api::CallValueApi<BigUint>
 		 + elrond_wasm::api::EndpointArgumentApi
 		 + elrond_wasm::api::EndpointFinishApi
 		 + elrond_wasm::api::StorageReadApi
@@ -83,21 +84,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn get_balance(&self, address: &Address) -> BigUint {
 			self.api.get_balance(address)
-			}
-
-			#[inline]
-			fn get_call_value_big_uint(&self) -> BigUint {
-				self.api.get_call_value_big_uint()
-			}
-
-			#[inline]
-			fn get_esdt_value_big_uint(&self) -> BigUint {
-				self.api.get_esdt_value_big_uint()
-			}
-
-			#[inline]
-			fn get_esdt_token_name(&self) -> Vec<u8> {
-				self.api.get_esdt_token_name()
 			}
 
 			#[inline]
@@ -188,6 +174,30 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
 				self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
+			}
+		}
+
+		impl <T, BigInt, BigUint> elrond_wasm::api::CallValueApi<BigUint> for #contract_struct<T, BigInt, BigUint>
+		#api_where
+		{
+			#[inline]
+			fn check_not_payable(&self) {
+				self.api.check_not_payable();
+			}
+
+			#[inline]
+			fn get_call_value_big_uint(&self) -> BigUint {
+				self.api.get_call_value_big_uint()
+			}
+
+			#[inline]
+			fn get_esdt_value_big_uint(&self) -> BigUint {
+				self.api.get_esdt_value_big_uint()
+			}
+
+			#[inline]
+			fn get_esdt_token_name(&self) -> BoxedBytes {
+				self.api.get_esdt_token_name()
 			}
 		}
 
