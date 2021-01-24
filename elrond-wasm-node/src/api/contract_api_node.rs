@@ -2,7 +2,7 @@ use super::{ArwenBigInt, ArwenBigUint};
 use crate::ArwenApiImpl;
 use elrond_wasm::api::BigUintApi;
 use elrond_wasm::api::ContractHookApi;
-use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, Vec, H256};
+use elrond_wasm::{Address, ArgBuffer, Box, BoxedBytes, CodeMetadata, H256};
 
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
@@ -38,16 +38,6 @@ extern "C" {
 	) -> i32;
 
 	fn getCaller(resultOffset: *mut u8);
-
-	/// Currently not used.
-	#[allow(dead_code)]
-	fn callValue(resultOffset: *const u8) -> i32;
-
-	/// Currently not used.
-	#[allow(dead_code)]
-	fn getESDTValue(resultOffset: *const u8) -> i32;
-
-	fn getESDTTokenName(resultOffset: *const u8) -> i32;
 
 	fn getGasLeft() -> i64;
 	fn getBlockTimestamp() -> i64;
@@ -99,8 +89,6 @@ extern "C" {
 	// big int API
 	fn bigIntNew(value: i64) -> i32;
 	fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
-	fn bigIntGetCallValue(dest: i32);
-	fn bigIntGetESDTCallValue(dest: i32);
 }
 
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
@@ -142,34 +130,6 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			let result = bigIntNew(0);
 			bigIntGetExternalBalance(address.as_ref().as_ptr(), result);
 			ArwenBigUint { handle: result }
-		}
-	}
-
-	#[inline]
-	fn get_call_value_big_uint(&self) -> ArwenBigUint {
-		unsafe {
-			let result = bigIntNew(0);
-			bigIntGetCallValue(result);
-			ArwenBigUint { handle: result }
-		}
-	}
-
-	#[inline]
-	fn get_esdt_value_big_uint(&self) -> ArwenBigUint {
-		unsafe {
-			let result = bigIntNew(0);
-			bigIntGetESDTCallValue(result);
-			ArwenBigUint { handle: result }
-		}
-	}
-
-	fn get_esdt_token_name(&self) -> Vec<u8> {
-		// TODO: returning a boxed slice instead should marginally improve performance
-		unsafe {
-			let mut name = Vec::with_capacity(32);
-			let name_len = getESDTTokenName(name.as_mut_ptr());
-			name.set_len(name_len as usize);
-			name
 		}
 	}
 

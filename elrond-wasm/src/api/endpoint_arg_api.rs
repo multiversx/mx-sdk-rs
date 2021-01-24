@@ -15,8 +15,6 @@ pub trait EndpointArgumentApi: ErrorApi {
 		}
 	}
 
-	fn check_not_payable(&self);
-
 	fn get_argument_len(&self, arg_index: i32) -> usize;
 
 	fn copy_argument_to_slice(&self, arg_index: i32, slice: &mut [u8]);
