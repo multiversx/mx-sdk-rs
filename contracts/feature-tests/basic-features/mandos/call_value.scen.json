@@ -1,0 +1,109 @@
+{
+    "name": "call value",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "storage": {},
+                    "esdt": {
+                        "str:TestToken": "1,000,000,000,000"
+                    },
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "check_call_value",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0", "0", "" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "5",
+                "function": "check_call_value",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "5", "0", "" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "esdtTokenName": "str:CrowdToken",
+                "esdtValue": "100",
+                "function": "check_call_value",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0", "100", "str:CrowdToken" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "esdtTokenName": "str:CrowdToken",
+                "esdtValue": "0",
+                "function": "check_call_value",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0", "0", "str:CrowdToken" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

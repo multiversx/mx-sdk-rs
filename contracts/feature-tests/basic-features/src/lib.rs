@@ -899,6 +899,19 @@ pub trait BasicFeatures {
 		Ok(nz)
 	}
 
+	// CALL VALUE
+
+	#[view]
+	#[payable]
+	fn check_call_value(&self) -> MultiResult3<BigUint, BigUint, BoxedBytes> {
+		(
+			self.get_call_value_big_uint(),
+			self.get_esdt_value_big_uint(),
+			self.get_esdt_token_name(),
+		)
+			.into()
+	}
+
 	// CRYPTO FUNCTIONS
 
 	#[endpoint(computeSha256)]
