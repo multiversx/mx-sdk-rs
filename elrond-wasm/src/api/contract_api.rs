@@ -1,8 +1,9 @@
-use super::{BigIntApi, BigUintApi, CryptoApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use super::{
+	BigIntApi, BigUintApi, CallValueApi, CryptoApi, ErrorApi, StorageReadApi, StorageWriteApi,
+};
 use crate::storage;
 use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
 use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -10,7 +11,7 @@ use alloc::vec::Vec;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BigInt, BigUint>: Sized + CryptoApi
+pub trait ContractHookApi<BigInt, BigUint>: Sized + CryptoApi + CallValueApi<BigUint>
 where
 	BigInt: BigIntApi<BigUint> + 'static,
 	BigUint: BigUintApi + 'static,
@@ -42,12 +43,6 @@ where
 			storage::protected_keys::ELROND_REWARD_KEY,
 		)
 	}
-
-	fn get_call_value_big_uint(&self) -> BigUint;
-
-	fn get_esdt_value_big_uint(&self) -> BigUint;
-
-	fn get_esdt_token_name(&self) -> Vec<u8>;
 
 	fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
