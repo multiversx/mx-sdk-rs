@@ -45,5 +45,5 @@ where
 	D: DynArgInput<I>,
 {
 	let (loader, arg_id) = ctx;
-	loader.signal_arg_de_error(*arg_id, de_err)
+	signal_arg_de_error(*loader, *arg_id, de_err)
 }

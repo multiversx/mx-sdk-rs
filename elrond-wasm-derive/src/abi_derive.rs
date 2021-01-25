@@ -66,7 +66,8 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 			let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
 				.variants
 				.iter()
-				.map(|variant| {
+				.enumerate()
+				.map(|(variant_index, variant)| {
 					let variant_docs = extract_doc(variant.attrs.as_slice());
 					let variant_name_str = variant.ident.to_string();
 					let variant_field_snippets = fields_snippets(&variant.fields);
@@ -75,6 +76,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 						#(#variant_field_snippets)*
 						variant_descriptions.push(elrond_wasm::abi::EnumVariantDescription {
 							docs: &[ #(#variant_docs),* ],
+							discriminant: #variant_index,
 							name: #variant_name_str,
 							fields: field_descriptions,
 						});

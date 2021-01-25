@@ -33,6 +33,7 @@ const RESERVED: &[&str] = &[
 	"getBlockTimestamp",
 	"executeOnSameContext",
 	"executeOnDestContext",
+	"executeOnDestContextByCaller",
 	"asyncCall",
 	"delegateExecution",
 	"createContract",
@@ -81,6 +82,9 @@ const RESERVED: &[&str] = &[
 	"bigIntGetExternalBalance",
 	"sha256",
 	"keccak256",
+	"verifyBLS",
+	"verifyEd25519",
+	"verifySecp256k1",
 ];
 
 pub fn is_reserved(fn_name: &str) -> bool {

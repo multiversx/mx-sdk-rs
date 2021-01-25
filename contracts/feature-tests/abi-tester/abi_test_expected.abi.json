@@ -18,7 +18,22 @@
             ],
             "outputs": [
                 {
+                    "name": "single output",
                     "type": "AbiTestType"
+                }
+            ]
+        },
+        {
+            "name": "echo_enum",
+            "inputs": [
+                {
+                    "name": "e",
+                    "type": "AbiEnum"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "AbiEnum"
                 }
             ]
         },
@@ -27,12 +42,15 @@
             "inputs": [],
             "outputs": [
                 {
+                    "name": "multi-result-1",
                     "type": "i32"
                 },
                 {
+                    "name": "multi-result-2",
                     "type": "[u8; 3]"
                 },
                 {
+                    "name": "multi-result-3",
                     "type": "bytes"
                 }
             ]
@@ -42,9 +60,11 @@
             "inputs": [],
             "outputs": [
                 {
+                    "name": "multi-too-few-1",
                     "type": "i32"
                 },
                 {
+                    "name": "multi-too-few-2",
                     "type": "[u8; 3]"
                 },
                 {
@@ -136,6 +156,56 @@
         }
     ],
     "types": {
+        "AbiEnum": {
+            "type": "enum",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "variants": [
+                {
+                    "name": "Nothing",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Something",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "i32"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomethingMore",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u8"
+                        },
+                        {
+                            "name": "1",
+                            "type": "OnlyShowsUpAsNested8"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomeStruct",
+                    "discriminant": 3,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u16"
+                        },
+                        {
+                            "name": "b",
+                            "type": "OnlyShowsUpAsNested9"
+                        }
+                    ]
+                }
+            ]
+        },
         "AbiTestType": {
             "type": "struct",
             "docs": [
@@ -239,6 +309,30 @@
             ]
         },
         "OnlyShowsUpAsNested7": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested8": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested9": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."

@@ -3,23 +3,34 @@
 
 imports!();
 
-static STORAGE_KEY_1: &[u8] = &[0x11u8; 32];
-static STORAGE_KEY_2: &[u8] = &[0x22u8; 32];
-static STORAGE_KEY_3: &[u8] = &[0x33u8; 32];
-static STORAGE_KEY_4: &[u8] = &[0x44u8; 32];
-static STORAGE_KEY_5: &[u8] = &[0x55u8; 32];
-static LAST_PAY_KEY: &[u8] = &[0xffu8; 32];
-
 #[elrond_wasm_derive::contract(BobImpl)]
 pub trait Bob {
+	#[storage_set("last_payment")]
+	fn set_last_payment(&self, last_payment: &BigUint);
+
+	#[storage_set("pay_me_arg")]
+	fn set_pay_me_arg(&self, arg: i64);
+
+	#[storage_set("message_me_1")]
+	fn set_message_me_1(&self, m1: i64);
+
+	#[storage_set("message_me_2")]
+	fn set_message_me_2(&self, s2: &BigUint);
+
+	#[storage_set("message_me_3")]
+	fn set_message_me_3(&self, s3: &BoxedBytes);
+
+	#[storage_set("message_me_4")]
+	fn set_message_me_4(&self, s4: &Address);
+
 	#[init]
 	fn init(&self) {}
 
 	#[payable]
 	#[endpoint]
 	fn payMe(&self, #[payment] payment: BigUint, arg1: i64) {
-		self.storage_store_big_uint(LAST_PAY_KEY, &payment);
-		self.storage_store_i64(STORAGE_KEY_1, arg1);
+		self.set_last_payment(&payment);
+		self.set_pay_me_arg(arg1);
 	}
 
 	#[payable]
@@ -30,10 +41,10 @@ pub trait Bob {
 	}
 
 	#[endpoint]
-	fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: Address) {
-		self.storage_store_i64(STORAGE_KEY_2, arg1);
-		self.storage_store_big_uint(STORAGE_KEY_3, arg2);
-		self.storage_store_slice_u8(STORAGE_KEY_4, &arg3);
-		self.storage_store_bytes32(STORAGE_KEY_5, &arg4.into());
+	fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: &BoxedBytes, arg4: &Address) {
+		self.set_message_me_1(arg1);
+		self.set_message_me_2(arg2);
+		self.set_message_me_3(arg3);
+		self.set_message_me_4(arg4);
 	}
 }

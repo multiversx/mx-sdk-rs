@@ -1,11 +1,11 @@
-use crate::big_uint_mock::*;
+use super::big_uint_api_mock::RustBigUint;
 
 use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use num_traits::sign::Signed;
 
 use alloc::vec::Vec;
-use elrond_wasm::BigIntApi;
+use elrond_wasm::api::BigIntApi;
 
 use core::cmp::Ordering;
 use num_bigint::{BigInt, Sign};
@@ -225,16 +225,16 @@ impl elrond_wasm::abi::TypeAbi for RustBigInt {
 	}
 }
 
-impl elrond_wasm::BigIntApi<RustBigUint> for RustBigInt {
+impl elrond_wasm::api::BigIntApi<RustBigUint> for RustBigInt {
 	fn abs_uint(&self) -> RustBigUint {
 		RustBigUint(self.0.abs())
 	}
 
-	fn sign(&self) -> elrond_wasm::Sign {
+	fn sign(&self) -> elrond_wasm::api::Sign {
 		match self.0.sign() {
-			num_bigint::Sign::Minus => elrond_wasm::Sign::NoSign,
-			num_bigint::Sign::NoSign => elrond_wasm::Sign::NoSign,
-			num_bigint::Sign::Plus => elrond_wasm::Sign::Plus,
+			num_bigint::Sign::Minus => elrond_wasm::api::Sign::NoSign,
+			num_bigint::Sign::NoSign => elrond_wasm::api::Sign::NoSign,
+			num_bigint::Sign::Plus => elrond_wasm::api::Sign::Plus,
 		}
 	}
 

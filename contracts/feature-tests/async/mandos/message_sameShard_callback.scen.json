@@ -4,25 +4,25 @@
         {
             "step": "setState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                "address:a_user": {
                     "nonce": "0",
                     "balance": "0x10000000000000e8d4a51000",
                     "storage": {},
                     "code": ""
                 },
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                "address:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234"
+                        "``other_contract": "address:bob"
                     },
-                    "code": "file:../async-alice/output/alice.wasm"
+                    "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234": {
+                "address:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../async-bob/output/bob.wasm"
+                    "code": "file:../async-bob/output/async-bob.wasm"
                 }
             }
         },
@@ -30,8 +30,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234",
-                "to": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234",
+                "from": "address:a_user",
+                "to": "address:alice",
                 "value": "0",
                 "function": "messageOtherContractWithCallback",
                 "arguments": [],
@@ -49,31 +49,31 @@
         {
             "step": "checkState",
             "accounts": {
-                "0xa94f5374fce5edbc8e2a8697c15331677e6ebffefefefefefefefefefefe1234": {
+                "address:a_user": {
                     "nonce": "1",
                     "balance": "0xfffffffffff00e8d4a51000",
                     "storage": {},
                     "code": ""
                 },
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234": {
+                "address:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x0000000000000000000000000000000000000000000000000000000000000000": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234",
-                        "0x7777777777777777777777777777777777777777777777777777777777777777": "0x5555"
+                        "``other_contract": "address:bob",
+                        "``callback_info": "0x5555"
                     },
-                    "code": "file:../async-alice/output/alice.wasm"
+                    "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1234": {
+                "address:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "0x2222222222222222222222222222222222222222222222222222222222222222": "0x01",
-                        "0x3333333333333333333333333333333333333333333333333333333333333333": "0x02",
-                        "0x4444444444444444444444444444444444444444444444444444444444444444": "0x030303",
-                        "0x5555555555555555555555555555555555555555555555555555555555555555": "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe"
+                        "``message_me_1": "0x01",
+                        "``message_me_2": "0x02",
+                        "``message_me_3": "0x030303",
+                        "``message_me_4": "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe"
                     },
-                    "code": "file:../async-bob/output/bob.wasm"
+                    "code": "file:../async-bob/output/async-bob.wasm"
                 }
             }
         }

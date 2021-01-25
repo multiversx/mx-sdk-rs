@@ -1,12 +1,6 @@
 use alloc::vec::Vec;
 use elrond_wasm::abi::*;
-
-use super::*;
-use serde::de::{self, Deserializer, MapAccess, Visitor};
-use serde::ser::{SerializeMap, Serializer};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
-use std::fmt;
 
 #[derive(Serialize, Deserialize)]
 pub struct InputAbiJson {
@@ -31,6 +25,9 @@ impl From<&InputAbi> for InputAbiJson {
 
 #[derive(Serialize, Deserialize)]
 pub struct OutputAbiJson {
+	#[serde(rename = "name")]
+	#[serde(skip_serializing_if = "String::is_empty")]
+	pub output_name: String,
 	#[serde(rename = "type")]
 	pub type_name: String,
 	/// Bool that is only serialized when true
@@ -41,6 +38,7 @@ pub struct OutputAbiJson {
 impl From<&OutputAbi> for OutputAbiJson {
 	fn from(abi: &OutputAbi) -> Self {
 		OutputAbiJson {
+			output_name: abi.output_name.into(),
 			type_name: abi.type_name.clone(),
 			multi_result: if abi.multi_result { Some(true) } else { None },
 		}

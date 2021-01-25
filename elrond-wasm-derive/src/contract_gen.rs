@@ -105,6 +105,7 @@ impl Contract {
 				MethodMetadata::Event { .. }
 				| MethodMetadata::StorageGetter { .. }
 				| MethodMetadata::StorageSetter { .. }
+				| MethodMetadata::StorageMapper { .. }
 				| MethodMetadata::StorageGetMut { .. }
 				| MethodMetadata::StorageIsEmpty { .. }
 				| MethodMetadata::StorageClear { .. }
@@ -133,6 +134,10 @@ impl Contract {
 					visibility: _,
 					identifier,
 				} => Some(generate_setter_impl(&m, identifier.clone())),
+				MethodMetadata::StorageMapper {
+					visibility: _,
+					identifier,
+				} => Some(generate_mapper_impl(&m, identifier.clone())),
 				MethodMetadata::StorageGetMut {
 					visibility: _,
 					identifier,
