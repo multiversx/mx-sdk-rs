@@ -1,4 +1,5 @@
 static ATTR_PAYABLE: &str = "payable";
+static ATTR_OUTPUT_NAME: &str = "output_name";
 static ATTR_PAYMENT: &str = "payment";
 static ATTR_VAR_ARGS: &str = "var_args";
 static ATTR_EVENT: &str = "event";
@@ -12,6 +13,7 @@ static ATTR_CALLBACK_ARG: &str = "callback_arg";
 static ATTR_MULTI: &str = "multi";
 static ATTR_STORAGE_GET: &str = "storage_get";
 static ATTR_STORAGE_SET: &str = "storage_set";
+static ATTR_STORAGE_MAPPER: &str = "storage_mapper";
 static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
 static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 static ATTR_STORAGE_CLEAR: &str = "storage_clear";
@@ -104,6 +106,37 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
 		.collect()
 }
 
+fn attr_one_string_arg(attr: &syn::Attribute) -> String {
+	let result_str: String;
+	let mut iter = attr.clone().tokens.into_iter();
+	match iter.next() {
+		Some(proc_macro2::TokenTree::Group(group)) => {
+			if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
+				panic!("event paranthesis expected");
+			}
+			let mut iter2 = group.stream().into_iter();
+			match iter2.next() {
+				Some(proc_macro2::TokenTree::Literal(lit)) => {
+					let str_val = lit.to_string();
+					if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
+						panic!("string literal expected as attribute argument");
+					}
+					let substr = &str_val[1..str_val.len() - 1];
+					result_str = substr.to_string();
+				},
+				_ => panic!("literal expected as event identifier"),
+			}
+		},
+		_ => panic!("missing event identifier"),
+	}
+
+	if iter.next().is_some() {
+		panic!("event too many tokens in event attribute");
+	}
+
+	result_str
+}
+
 fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option<String> {
 	let event_attr = m.attrs.iter().find(|attr| {
 		if let Some(first_seg) = attr.path.segments.first() {
@@ -114,37 +147,22 @@ fn find_attr_one_string_arg(m: &syn::TraitItemMethod, attr_name: &str) -> Option
 	});
 	match event_attr {
 		None => None,
-		Some(attr) => {
-			let result_str: String;
-			let mut iter = attr.clone().tokens.into_iter();
-			match iter.next() {
-				Some(proc_macro2::TokenTree::Group(group)) => {
-					if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-						panic!("event paranthesis expected");
-					}
-					let mut iter2 = group.stream().into_iter();
-					match iter2.next() {
-						Some(proc_macro2::TokenTree::Literal(lit)) => {
-							let str_val = lit.to_string();
-							if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
-								panic!("string literal expected as attribute argument");
-							}
-							let substr = &str_val[1..str_val.len() - 1];
-							result_str = substr.to_string();
-						},
-						_ => panic!("literal expected as event identifier"),
-					}
-				},
-				_ => panic!("missing event identifier"),
-			}
-
-			if iter.next().is_some() {
-				panic!("event too many tokens in event attribute");
-			}
-
-			Some(result_str)
-		},
+		Some(attr) => Some(attr_one_string_arg(attr)),
 	}
+}
+
+pub fn find_output_names(m: &syn::TraitItemMethod) -> Vec<String> {
+	m.attrs
+		.iter()
+		.filter(|attr| {
+			if let Some(first_seg) = attr.path.segments.first() {
+				first_seg.ident == ATTR_OUTPUT_NAME
+			} else {
+				false
+			}
+		})
+		.map(attr_one_string_arg)
+		.collect()
 }
 
 pub struct EventAttribute {
@@ -197,6 +215,21 @@ impl StorageSetAttribute {
 		match find_attr_one_string_arg(m, ATTR_STORAGE_SET) {
 			None => None,
 			Some(arg_str) => Some(StorageSetAttribute {
+				identifier: arg_str,
+			}),
+		}
+	}
+}
+
+pub struct StorageMapperAttribute {
+	pub identifier: String,
+}
+
+impl StorageMapperAttribute {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
+		match find_attr_one_string_arg(m, ATTR_STORAGE_MAPPER) {
+			None => None,
+			Some(arg_str) => Some(StorageMapperAttribute {
 				identifier: arg_str,
 			}),
 		}

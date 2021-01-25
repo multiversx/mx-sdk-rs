@@ -18,18 +18,18 @@ path = "async-alice"
 path = "async-bob"
 
 [dependencies.elrond-wasm]
-version = "0.10.2"
+version = "0.10.4"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.10.2"
+version = "0.10.4"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.10.2"
+version = "0.10.4"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.10.2"
+version = "0.10.4"
 path = "../../../elrond-wasm-debug"

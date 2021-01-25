@@ -96,10 +96,9 @@ pub fn contract_implementation(
 		#[allow(non_snake_case)]
 		pub mod endpoints {
 		  use super::*;
-		  use elrond_wasm_node::*;
 
-		  fn new_arwen_instance() -> #contract_impl_ident<ArwenApiImpl, ArwenBigInt, ArwenBigUint> {
-			let api = ArwenApiImpl{};
+		  fn new_arwen_instance() -> #contract_impl_ident<elrond_wasm_node::ArwenApiImpl, elrond_wasm_node::api::ArwenBigInt, elrond_wasm_node::api::ArwenBigUint> {
+			let api = elrond_wasm_node::ArwenApiImpl{};
 			#contract_impl_ident::new(api)
 		  }
 
@@ -108,24 +107,29 @@ pub fn contract_implementation(
 	};
 
 	let function_selector = quote! {
-	  use elrond_wasm::CallableContract;
-	  impl <T, BigInt, BigUint> CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint>
+	  impl <T, BigInt, BigUint> elrond_wasm::api::CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint>
 	  #api_where
 	  {
 		fn call(&self, fn_name: &[u8]) -> bool {
 		  #function_selector_body
 		}
 
-		fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
-			#abi_body
-		}
-
-		fn clone_contract(&self) -> Box<dyn CallableContract<T>> {
+		fn clone_contract(&self) -> Box<dyn elrond_wasm::api::CallableContract<T>> {
 		  Box::new(#contract_impl_ident::new(self.api.clone()))
 		}
 
 		fn into_api(self: Box<Self>) -> T {
 		  self.api
+		}
+	  }
+
+	  impl <T, BigInt, BigUint> elrond_wasm::api::ContractWithAbi for #contract_impl_ident<T, BigInt, BigUint>
+	  #api_where
+	  {
+		type Storage = T::Storage;
+
+		fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
+			#abi_body
 		}
 	  }
 	};

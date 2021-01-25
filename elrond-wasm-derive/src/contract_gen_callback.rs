@@ -45,18 +45,33 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 							if arg.is_callback_arg {
 								// callback args, loaded from storage via the tx hash
 								match &arg.metadata {
-									ArgMetadata::Single => generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader }),
-									ArgMetadata::Payment => panic!("payment args not allowed in callbacks"),
-									ArgMetadata::Multi(_) => panic!("callback multi args not yet supported"),
-									ArgMetadata::VarArgs => panic!("callback var_args not yet supported"),
+									ArgMetadata::Single => generate_load_dyn_arg(
+										arg,
+										&quote! { &mut ___cb_arg_loader },
+									),
+									ArgMetadata::Payment => {
+										panic!("payment args not allowed in callbacks")
+									},
+									ArgMetadata::Multi(_) => {
+										panic!("callback multi args not yet supported")
+									},
+									ArgMetadata::VarArgs => {
+										panic!("callback var_args not yet supported")
+									},
 								}
 							} else {
 								// Should be an AsyncCallResult argument that wraps what comes from the async call.
 								// But in principle, one can express it it any way.
 								match &arg.metadata {
-									ArgMetadata::Single | ArgMetadata::VarArgs => generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader }),
-									ArgMetadata::Payment => panic!("payment args not allowed in callbacks"),
-									ArgMetadata::Multi(_) => panic!("multi args not allowed in callbacks"),
+									ArgMetadata::Single | ArgMetadata::VarArgs => {
+										generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
+									},
+									ArgMetadata::Payment => {
+										panic!("payment args not allowed in callbacks")
+									},
+									ArgMetadata::Multi(_) => {
+										panic!("multi args not allowed in callbacks")
+									},
 								}
 							}
 						})
@@ -71,7 +86,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 					let match_arm = quote! {
 						#fn_name_literal =>
 						{
-							let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer, ApiSignalError::new(self.api.clone()));
+							let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
 							#(#arg_init_snippets)*
 							#body_with_result ;
 							___cb_arg_loader.assert_no_more_args();

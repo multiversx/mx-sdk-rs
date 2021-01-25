@@ -1,12 +1,6 @@
 use alloc::vec::Vec;
 use elrond_wasm::abi::*;
-
-use super::*;
-use serde::de::{self, Deserializer, MapAccess, Visitor};
-use serde::ser::{SerializeMap, Serializer};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
-use std::fmt;
 
 #[derive(Serialize, Deserialize)]
 pub struct TypeDescriptionJson {
@@ -82,6 +76,7 @@ pub struct EnumVariantDescriptionJson {
 	#[serde(skip_serializing_if = "Vec::is_empty")]
 	pub docs: Vec<String>,
 	pub name: String,
+	pub discriminant: usize,
 	#[serde(skip_serializing_if = "Vec::is_empty")]
 	pub fields: Vec<StructFieldDescriptionJson>,
 }
@@ -91,6 +86,7 @@ impl From<&EnumVariantDescription> for EnumVariantDescriptionJson {
 		EnumVariantDescriptionJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
+			discriminant: abi.discriminant,
 			fields: abi
 				.fields
 				.iter()

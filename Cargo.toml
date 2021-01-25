@@ -7,6 +7,7 @@ members = [
   "elrond-codec-derive",
 
   "contracts/benchmarks/str-repeat",
+  "contracts/benchmarks/send-tx-repeat",
 
   "contracts/examples/adder",
   "contracts/examples/adder/abi",
@@ -30,6 +31,8 @@ members = [
   "contracts/examples/multisig/abi",
   "contracts/examples/non-fungible-tokens",
   "contracts/examples/non-fungible-tokens/abi",
+  "contracts/examples/ping-pong-egld",
+  "contracts/examples/ping-pong-egld/abi",
   "contracts/examples/simple-erc20",
   "contracts/examples/simple-erc20/abi",
 
@@ -46,6 +49,9 @@ members = [
   "contracts/feature-tests/basic-features/abi",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/abi",
+  "contracts/feature-tests/esdt-contract-pair",
+  "contracts/feature-tests/esdt-contract-pair/first-contract",
+  "contracts/feature-tests/esdt-contract-pair/second-contract",
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
