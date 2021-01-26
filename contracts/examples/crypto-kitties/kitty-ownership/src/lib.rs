@@ -238,7 +238,7 @@ pub trait KittyOwnership {
 			"Only auction contract may call this function!"
 		);
 
-		let mut random = Random::new(*self.get_block_random_seed());
+		let mut random = Random::new(*self.get_block_random_seed(), self.get_tx_hash().as_bytes());
 		let genes = KittyGenes::get_random(&mut random);
 		let kitty_id = self._create_new_gen_zero_kitty(&genes);
 

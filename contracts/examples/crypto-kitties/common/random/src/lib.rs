@@ -16,9 +16,17 @@ pub trait Randomizeable {
 }
 
 impl Random {
-	pub fn new(seed: [u8; SEED_SIZE]) -> Self {
+	/// block random seed + salt creates a stronger randomness source
+	pub fn new(seed: [u8; SEED_SIZE], salt: &[u8]) -> Self {
+		let mut rand_source = [0u8; SEED_SIZE];
+		let salt_len = salt.len();
+
+		for i in 0..SEED_SIZE {
+			rand_source[i] = (((seed[i] as u16) + (salt[i % salt_len] as u16)) % (u8::MAX as u16 + 1u16)) as u8;
+		}
+
 		Random {
-			data: seed,
+			data: rand_source,
 			current_index: 0,
 		}
 	}

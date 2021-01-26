@@ -9,13 +9,13 @@
             "step": "setState",
             "comment": "generating 49 twice from seed, to get 50% ratio - see kitty genetic alg impl",
             "currentBlockInfo": {
-                "blockRandomSeed": "u8:49|u8:49|u64:0|u64:0|u64:0|u64:0|u64:0|u32:0|u16:0"
+                "blockRandomSeed": "u8:189|u8:185|u64:0|u64:0|u64:0|u64:0|u64:0|u32:0|u16:0"
             }
         },
         {
             "step": "scCall",
             "txId": "tx-generate-kitty-genes",
-            "comment": "arguments are matron and sire serialized kitties",
+            "comment": "arguments are matron and sire serialized kitties.",
             "tx": {
                 "from": "address:my_address",
                 "to": "address:contract_address",
