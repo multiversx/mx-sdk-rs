@@ -1,0 +1,86 @@
+{
+    "name": "create sale auction ok",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "end_auction_second_bid_max_early.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "100,000"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-create-sale-auction-ok",
+            "tx": {
+                "from": "address:bidder2",
+                "to": "address:kitty_auction_contract_address",
+                "value": "0",
+                "function": "createSaleAuction",
+                "arguments": [
+                    "1",
+                    "1000",
+                    "5000",
+                    "100,000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "4",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:bidder1": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:bidder2": {
+                    "nonce": "3",
+                    "balance": "999,500",
+                    "storage": {}
+                },
+                "address:kitty_ownership_contract_address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:totalKitties": "2",
+                        "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
+                        "str:kitty|u32:1": "u8:1|u8:2|u8:3|u8:4|u8:5|u8:6|u8:7|u64:123456|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
+
+                        "str:nrOwnedKitties|address:kitty_auction_contract_address": "1",
+                        "str:owner|u32:1": "address:kitty_auction_contract_address"
+                    },
+                    "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
+                },
+                "address:kitty_auction_contract_address": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "storage": {
+                        "str:kittyOwnershipContractAddress": "address:kitty_ownership_contract_address",
+                        "str:genZeroKittyStartingPrice": "100",
+                        "str:genZeroKittyEndingPrice": "500",
+                        "str:genZeroKittyAuctionDuration": "100,000",
+
+                        "str:auction|u32:1": "u8:0|u32:2|u16:1000|u32:2|u16:5000|u64:200000|address:bidder2|u32:0|u64:0|u64:0|u64:0|u64:0"
+                    },
+                    "code": "file:../output/kitty-auction.wasm"
+                }
+            }
+        }
+    ]
+}
