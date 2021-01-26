@@ -42,14 +42,14 @@ pub(super) fn find_attr_one_string_arg(
 	m: &syn::TraitItemMethod,
 	attr_name: &str,
 ) -> Option<String> {
-	let event_attr = m.attrs.iter().find(|attr| {
+	let attribute = m.attrs.iter().find(|attr| {
 		if let Some(first_seg) = attr.path.segments.first() {
 			first_seg.ident == attr_name
 		} else {
 			false
 		}
 	});
-	match event_attr {
+	match attribute {
 		None => None,
 		Some(attr) => Some(attr_one_string_arg(attr)),
 	}

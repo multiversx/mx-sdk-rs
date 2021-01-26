@@ -12,7 +12,7 @@ const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &[u8] = b"rejectEsdtPayment";
 #[elrond_wasm_derive::contract(FirstContractImpl)]
 pub trait FirstContract {
 	#[init]
-	fn init(&self, esdt_token_name: BoxedBytes, second_contract_address: Address) {
+	fn init(&self, esdt_token_name: TokenIdentifier, second_contract_address: Address) {
 		self.set_contract_esdt_token_name(&esdt_token_name);
 		self.set_second_contract_address(&second_contract_address);
 	}
@@ -20,8 +20,8 @@ pub trait FirstContract {
 	#[endpoint(transferToSecondContractFull)]
 	fn transfer_to_second_contract_full(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.get_esdt_token_name_boxed();
-		let esdt_value = self.get_esdt_value_big_uint();
+		let actual_token_name = self.call_value().get_esdt_token_name();
+		let esdt_value = self.call_value().get_esdt_value_big_uint();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -40,8 +40,8 @@ pub trait FirstContract {
 	#[endpoint(transferToSecondContractHalf)]
 	fn transfer_to_second_contract_half(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.get_esdt_token_name_boxed();
-		let esdt_value = self.get_esdt_value_big_uint();
+		let actual_token_name = self.call_value().get_esdt_token_name();
+		let esdt_value = self.call_value().get_esdt_value_big_uint();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -60,8 +60,8 @@ pub trait FirstContract {
 	#[endpoint]
 	fn transfer_to_second_contract_rejected(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.get_esdt_token_name_boxed();
-		let esdt_value = self.get_esdt_value_big_uint();
+		let actual_token_name = self.call_value().get_esdt_token_name();
+		let esdt_value = self.call_value().get_esdt_value_big_uint();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -77,13 +77,9 @@ pub trait FirstContract {
 		Ok(())
 	}
 
-	fn get_esdt_token_name_boxed(&self) -> BoxedBytes {
-		BoxedBytes::from(self.get_esdt_token_name())
-	}
-
 	fn call_esdt_second_contract(
 		&self,
-		esdt_token_name: &BoxedBytes,
+		esdt_token_name: &TokenIdentifier,
 		amount: &BigUint,
 		to: &Address,
 		func_name: &[u8],
@@ -103,11 +99,11 @@ pub trait FirstContract {
 	// storage
 
 	#[storage_set("esdtTokenName")]
-	fn set_contract_esdt_token_name(&self, esdt_token_name: &BoxedBytes);
+	fn set_contract_esdt_token_name(&self, esdt_token_name: &TokenIdentifier);
 
 	#[view(getEsdtTokenName)]
 	#[storage_get("esdtTokenName")]
-	fn get_contract_esdt_token_name(&self) -> BoxedBytes;
+	fn get_contract_esdt_token_name(&self) -> TokenIdentifier;
 
 	#[storage_set("secondContractAddress")]
 	fn set_second_contract_address(&self, address: &Address);

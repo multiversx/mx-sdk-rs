@@ -15,12 +15,12 @@ pub struct CallableMethod {
 
 impl CallableMethod {
 	pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
-		let payable = is_payable(m);
+		let payable = process_payable(m);
 		let callback_opt = CallbackCallAttribute::parse(m);
-		let method_args = extract_method_args(m, payable, callback_opt.is_some());
+		let method_args = extract_method_args(m, /*payable*/ true, callback_opt.is_some());
 		CallableMethod {
 			name: m.sig.ident.clone(),
-			payable,
+			payable: payable.is_payable(),
 			callback: callback_opt,
 			method_args,
 		}

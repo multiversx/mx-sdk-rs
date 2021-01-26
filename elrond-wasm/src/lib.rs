@@ -41,7 +41,7 @@ macro_rules! imports {
 		use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 		use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 		use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
-		use elrond_wasm::api::{BigIntApi, BigUintApi, ContractHookApi};
+		use elrond_wasm::api::{BigIntApi, BigUintApi, CallValueApi, ContractHookApi};
 		use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
 		use elrond_wasm::err_msg;
 		use elrond_wasm::io::*;

@@ -93,8 +93,15 @@ extern "C" {
 
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	type Storage = Self;
+	type CallValue = Self;
 
+	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
+		self.clone()
+	}
+
+	#[inline]
+	fn call_value(&self) -> Self::CallValue {
 		self.clone()
 	}
 

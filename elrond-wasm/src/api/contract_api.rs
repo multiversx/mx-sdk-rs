@@ -11,7 +11,7 @@ use alloc::boxed::Box;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractHookApi<BigInt, BigUint>: Sized + CryptoApi + CallValueApi<BigUint>
+pub trait ContractHookApi<BigInt, BigUint>: Sized + CryptoApi
 where
 	BigInt: BigIntApi<BigUint> + 'static,
 	BigUint: BigUintApi + 'static,
@@ -19,10 +19,18 @@ where
 	/// Abstracts the lower-level storage functionality.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
+	/// Abstracts the call value handling at the beginning of a function call.
+	type CallValue: CallValueApi<BigUint> + ErrorApi + Clone + 'static;
+
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
 	/// Using it directly is not recommended.
 	fn get_storage_raw(&self) -> Self::Storage;
+
+	/// Gateway into the call value retrieval functionality.
+	/// The payment annotations should normally be the ones to handle this,
+	/// but the developer is also given direct access to the API.
+	fn call_value(&self) -> Self::CallValue;
 
 	fn get_sc_address(&self) -> Address;
 

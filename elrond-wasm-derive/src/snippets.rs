@@ -60,10 +60,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		#api_where
 		{
 			type Storage = T::Storage;
+			type CallValue = T::CallValue;
 
 			#[inline]
 			fn get_storage_raw(&self) -> Self::Storage {
 				self.api.get_storage_raw()
+			}
+
+			#[inline]
+			fn call_value(&self) -> Self::CallValue {
+				self.api.call_value()
 			}
 
 			#[inline]
@@ -174,30 +180,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
 				self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
-			}
-		}
-
-		impl <T, BigInt, BigUint> elrond_wasm::api::CallValueApi<BigUint> for #contract_struct<T, BigInt, BigUint>
-		#api_where
-		{
-			#[inline]
-			fn check_not_payable(&self) {
-				self.api.check_not_payable();
-			}
-
-			#[inline]
-			fn get_call_value_big_uint(&self) -> BigUint {
-				self.api.get_call_value_big_uint()
-			}
-
-			#[inline]
-			fn get_esdt_value_big_uint(&self) -> BigUint {
-				self.api.get_esdt_value_big_uint()
-			}
-
-			#[inline]
-			fn get_esdt_token_name(&self) -> BoxedBytes {
-				self.api.get_esdt_token_name()
 			}
 		}
 

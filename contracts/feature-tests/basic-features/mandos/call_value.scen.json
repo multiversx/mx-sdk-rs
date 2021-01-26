@@ -34,7 +34,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "0", "" ],
+                "out": [ "0", "0", "str:EGLD", "0", "str:EGLD" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -54,7 +54,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "5", "0", "" ],
+                "out": [ "5", "0", "str:EGLD", "5", "str:EGLD" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -76,7 +76,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "100", "str:CrowdToken" ],
+                "out": [ "0", "100", "str:CrowdToken", "100", "str:CrowdToken" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -98,7 +98,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "0", "str:CrowdToken" ],
+                "out": [ "0", "0", "str:CrowdToken", "0", "str:CrowdToken" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

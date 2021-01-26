@@ -18,7 +18,7 @@ pub enum Status {
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
 pub trait Crowdfunding {
 	#[init]
-	fn init(&self, target: BigUint, deadline: u64, esdt_token_name: BoxedBytes) {
+	fn init(&self, target: BigUint, deadline: u64, esdt_token_name: TokenIdentifier) {
 		let my_address: Address = self.get_caller();
 		self.set_owner(&my_address);
 		self.set_target(&target);
@@ -32,16 +32,19 @@ pub trait Crowdfunding {
 		if self.get_block_nonce() > self.get_deadline() {
 			return sc_error!("cannot fund after deadline");
 		}
-		require!(self.get_call_value_big_uint() == 0, "EGLD payment not accepted");
+		require!(
+			self.call_value().get_call_value_big_uint() == 0,
+			"EGLD payment not accepted"
+		);
 
 		let expected_token_name = self.get_cf_esdt_token_name();
-		let actual_token_name = self.get_esdt_token_name_boxed();
+		let actual_token_name = self.call_value().get_esdt_token_name();
 
 		if expected_token_name != actual_token_name {
 			return sc_error!("wrong esdt token");
 		}
 
-		let payment = self.get_esdt_value_big_uint();
+		let payment = self.call_value().get_esdt_value_big_uint();
 		let caller = self.get_caller();
 		let mut deposit = self.get_deposit(&caller);
 		let mut balance = self.get_esdt_balance();
@@ -108,11 +111,7 @@ pub trait Crowdfunding {
 		}
 	}
 
-	fn get_esdt_token_name_boxed(&self) -> BoxedBytes {
-		BoxedBytes::from(self.get_esdt_token_name())
-	}
-
-	fn pay_esdt(&self, esdt_token_name: &BoxedBytes, amount: &BigUint, to: &Address) {
+	fn pay_esdt(&self, esdt_token_name: &TokenIdentifier, amount: &BigUint, to: &Address) {
 		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
 		serializer.push_argument_bytes(esdt_token_name.as_slice());
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
@@ -158,9 +157,9 @@ pub trait Crowdfunding {
 	fn get_deposit(&self, donor: &Address) -> BigUint;
 
 	#[storage_set("esdtTokenName")]
-	fn set_cf_esdt_token_name(&self, esdt_token_name: &BoxedBytes);
+	fn set_cf_esdt_token_name(&self, esdt_token_name: &TokenIdentifier);
 
 	#[view]
 	#[storage_get("esdtTokenName")]
-	fn get_cf_esdt_token_name(&self) -> BoxedBytes;
+	fn get_cf_esdt_token_name(&self) -> TokenIdentifier;
 }
