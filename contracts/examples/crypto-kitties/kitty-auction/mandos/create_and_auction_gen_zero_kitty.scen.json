@@ -9,12 +9,12 @@
             "step": "setState",
             "currentBlockInfo": {
                 "blockTimestamp": "123,456",
-                "blockRandomSeed": "0x010203040506070000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+                "blockRandomSeed": "0xd1d2d3d4d5d6d70000000000000000000000000000000000000000000000000000000000000000000000000000000000"
             }
         },
         {
             "step": "scCall",
-            "txId": "tx-createAndAuctionGenZeroKitty",
+            "txId": "0000000tx-createAndAuctionGenZeroKitty",
             "tx": {
                 "from": "address:my_address",
                 "to": "address:kitty_auction_contract_address",
