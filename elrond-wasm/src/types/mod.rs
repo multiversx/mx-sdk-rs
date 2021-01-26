@@ -13,6 +13,7 @@ mod optional_result;
 mod queue;
 mod sc_error;
 mod sc_result;
+mod token_identifier;
 mod var_args;
 
 pub use arg_buffer::ArgBuffer;
@@ -30,4 +31,5 @@ pub use optional_result::OptionalResult;
 pub use queue::Queue;
 pub use sc_error::SCError;
 pub use sc_result::SCResult;
+pub use token_identifier::TokenIdentifier;
 pub use var_args::VarArgs;
