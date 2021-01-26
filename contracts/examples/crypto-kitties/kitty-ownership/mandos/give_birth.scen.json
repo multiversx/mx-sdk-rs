@@ -9,7 +9,7 @@
             "step": "setState",
             "currentBlockInfo": {
                 "blockTimestamp": "150,000",
-                "blockRandomSeed": "u8:49|u8:49|u64:0|u64:0|u64:0|u64:0|u64:0|u32:0|u16:0"
+                "blockRandomSeed": "u8:189|u8:185|u64:0|u64:0|u64:0|u64:0|u64:0|u32:0|u16:0"
             }
         },
         {
