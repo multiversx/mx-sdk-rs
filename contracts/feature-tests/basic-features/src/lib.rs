@@ -902,12 +902,17 @@ pub trait BasicFeatures {
 	// CALL VALUE
 
 	#[view]
-	#[payable]
-	fn check_call_value(&self) -> MultiResult3<BigUint, BigUint, BoxedBytes> {
+	#[payable("*")]
+	fn check_call_value(
+		&self,
+	) -> MultiResult5<BigUint, BigUint, TokenIdentifier, BigUint, TokenIdentifier> {
+		let (pair_call_value, pair_token_name) = self.call_value().get_call_value_token_name();
 		(
-			self.get_call_value_big_uint(),
-			self.get_esdt_value_big_uint(),
-			self.get_esdt_token_name(),
+			self.call_value().get_call_value_big_uint(),
+			self.call_value().get_esdt_value_big_uint(),
+			self.call_value().get_esdt_token_name(),
+			pair_call_value,
+			pair_token_name,
 		)
 			.into()
 	}

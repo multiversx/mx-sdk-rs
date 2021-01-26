@@ -1,11 +1,11 @@
 use elrond_wasm::api::BigUintApi;
-use elrond_wasm::{Address, BoxedBytes, Vec};
+use elrond_wasm::{Address, TokenIdentifier, Vec};
 
 derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct LotteryInfo<BigUint: BigUintApi> {
-	pub esdt_token_name: BoxedBytes,
+	pub esdt_token_name: TokenIdentifier,
 	pub ticket_price: BigUint,
 	pub tickets_left: u32,
 	pub deadline: u64,

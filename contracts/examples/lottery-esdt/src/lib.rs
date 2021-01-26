@@ -28,7 +28,7 @@ pub trait Lottery {
 	fn start(
 		&self,
 		lottery_name: BoxedBytes,
-		esdt_token_name: BoxedBytes,
+		esdt_token_name: TokenIdentifier,
 		ticket_price: BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -52,7 +52,7 @@ pub trait Lottery {
 	fn create_lottery_pool(
 		&self,
 		lottery_name: BoxedBytes,
-		esdt_token_name: BoxedBytes,
+		esdt_token_name: TokenIdentifier,
 		ticket_price: BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -75,7 +75,7 @@ pub trait Lottery {
 	fn start_lottery(
 		&self,
 		lottery_name: BoxedBytes,
-		esdt_token_name: BoxedBytes,
+		esdt_token_name: TokenIdentifier,
 		ticket_price: BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -88,7 +88,7 @@ pub trait Lottery {
 	) -> SCResult<()> {
 		require!(!lottery_name.is_empty(), "Name can't be empty!");
 		require!(
-			!esdt_token_name.is_empty(),
+			!esdt_token_name.is_egld(),
 			"Esdt token name can't be empty!"
 		);
 
@@ -154,7 +154,10 @@ pub trait Lottery {
 	#[endpoint]
 	#[payable] // TODO: #[payable_esdt] syntax
 	fn buy_ticket(&self, lottery_name: BoxedBytes) -> SCResult<()> {
-		require!(self.get_call_value_big_uint() == 0, "EGLD payment not accepted");
+		require!(
+			self.call_value().get_call_value_big_uint() == 0,
+			"EGLD payment not accepted"
+		);
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
 			Status::Running => self.update_after_buy_ticket(&lottery_name),
@@ -195,8 +198,8 @@ pub trait Lottery {
 	fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes) -> SCResult<()> {
 		let mut info = self.get_lottery_info(&lottery_name);
 		let caller = self.get_caller();
-		let call_token_name = self.get_esdt_token_name_boxed();
-		let payment = self.get_esdt_value_big_uint();
+		let call_token_name = self.call_value().get_esdt_token_name();
+		let payment = self.call_value().get_esdt_value_big_uint();
 
 		require!(
 			info.whitelist.is_empty() || info.whitelist.contains(&caller),
@@ -296,16 +299,12 @@ pub trait Lottery {
 		self.clear_lottery_info(lottery_name);
 	}
 
-	fn pay_esdt(&self, esdt_token_name: &BoxedBytes, amount: &BigUint, to: &Address) {
+	fn pay_esdt(&self, esdt_token_name: &TokenIdentifier, amount: &BigUint, to: &Address) {
 		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
 		serializer.push_argument_bytes(esdt_token_name.as_slice());
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
-	}
-
-	fn get_esdt_token_name_boxed(&self) -> BoxedBytes {
-		BoxedBytes::from(self.get_esdt_token_name())
 	}
 
 	fn sum_array(&self, array: &[u8]) -> u16 {

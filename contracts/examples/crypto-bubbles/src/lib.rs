@@ -76,9 +76,9 @@ pub trait CryptoBubbles {
 	#[endpoint(joinGame)]
 	fn join_game(&self, game_index: BigUint) -> SCResult<()> {
 		let player = self.get_caller();
-		let bet = self.get_call_value_big_uint();
+		let bet = self.call_value().get_call_value_big_uint();
 
-		self.add_funds(self.get_call_value_big_uint());
+		self.add_funds(self.call_value().get_call_value_big_uint());
 		self._add_player_to_game_state_change(&game_index, &player, &bet)
 	}
 

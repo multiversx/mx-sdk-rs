@@ -4,23 +4,33 @@ use super::arg_def::*;
 use super::contract_gen_method::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-	let not_payable_snippet = quote! {
-		self.api.check_not_payable();
+	let mpm = match &m.metadata {
+		MethodMetadata::Regular { payable, .. } => payable.clone(),
+		MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
+		MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
+		MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,
+		MethodMetadata::StorageIsEmpty { .. } => MethodPayableMetadata::NotPayable,
+		MethodMetadata::StorageClear { .. } => MethodPayableMetadata::NotPayable,
+		_ => MethodPayableMetadata::NoMetadata,
 	};
-	match &m.metadata {
-		MethodMetadata::Regular { payable, .. } => {
-			if *payable {
-				quote! {}
-			} else {
-				not_payable_snippet
+	payable_snippet_for_metadata(mpm)
+}
+
+fn payable_snippet_for_metadata(mpm: MethodPayableMetadata) -> proc_macro2::TokenStream {
+	match mpm {
+		MethodPayableMetadata::NoMetadata => quote! {},
+		MethodPayableMetadata::NotPayable => quote! {
+			self.call_value().check_not_payable();
+		},
+		MethodPayableMetadata::Egld => quote! {
+			let _ = self.call_value().require_egld();
+		},
+		MethodPayableMetadata::SingleEsdtToken(token_name) => {
+			quote! {
+				let _ = self.call_value().require_esdt(b#token_name);
 			}
 		},
-		MethodMetadata::StorageGetter { .. } => not_payable_snippet,
-		MethodMetadata::StorageSetter { .. } => not_payable_snippet,
-		MethodMetadata::StorageGetMut { .. } => not_payable_snippet,
-		MethodMetadata::StorageIsEmpty { .. } => not_payable_snippet,
-		MethodMetadata::StorageClear { .. } => not_payable_snippet,
-		_ => quote! {},
+		MethodPayableMetadata::AnyToken => quote! {},
 	}
 }
 

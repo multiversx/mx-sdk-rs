@@ -11,8 +11,8 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 			if let Some(endpoint_name) = m.metadata.endpoint_name() {
 				let endpoint_docs = &m.docs;
 				let endpoint_name_str = endpoint_name.to_string();
-				let payable = if let MethodMetadata::Regular { payable, .. } = m.metadata {
-					payable
+				let payable = if let MethodMetadata::Regular { payable, .. } = &m.metadata {
+					payable.is_payable()
 				} else {
 					false
 				};

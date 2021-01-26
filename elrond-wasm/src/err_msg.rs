@@ -1,5 +1,7 @@
 pub const NON_PAYABLE_FUNC_EGLD: &[u8] = b"function does not accept EGLD payment";
 pub const NON_PAYABLE_FUNC_ESDT: &[u8] = b"function does not accept ESDT payment";
+pub const BAD_ESDT_TOKEN_PROVIDED: &[u8] = b"bad ESDT call value token provided";
+pub const BAD_TOKEN_PROVIDED: &[u8] = b"bad call value token provided";
 
 pub const ARG_WRONG_NUMBER: &[u8] = b"wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &[u8] = b"wrong number of arguments provided to async call";

@@ -6,8 +6,14 @@ use elrond_wasm::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
+	type CallValue = Self;
 
 	fn get_storage_raw(&self) -> Self::Storage {
+		self.clone()
+	}
+
+	#[inline]
+	fn call_value(&self) -> Self::CallValue {
 		self.clone()
 	}
 

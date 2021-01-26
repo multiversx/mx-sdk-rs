@@ -2,7 +2,7 @@ use super::big_uint_api_mock::*;
 use crate::{TxContext, TxPanic};
 use elrond_wasm::api::CallValueApi;
 use elrond_wasm::err_msg;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::types::TokenIdentifier;
 
 impl CallValueApi<RustBigUint> for TxContext {
 	fn check_not_payable(&self) {
@@ -31,7 +31,7 @@ impl CallValueApi<RustBigUint> for TxContext {
 	}
 
 	#[inline]
-	fn get_esdt_token_name(&self) -> BoxedBytes {
-		self.tx_input_box.esdt_token_name.clone().into()
+	fn get_esdt_token_name(&self) -> TokenIdentifier {
+		TokenIdentifier::from(self.tx_input_box.esdt_token_name.as_slice())
 	}
 }
