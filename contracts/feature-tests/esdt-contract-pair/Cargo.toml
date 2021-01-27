@@ -18,18 +18,18 @@ path = "first-contract"
 path = "second-contract"
 
 [dependencies.elrond-wasm]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm-debug"

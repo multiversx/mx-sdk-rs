@@ -1,0 +1,39 @@
+{
+    "name": "generate kitty genes test",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "setState",
+            "comment": "generating 49 twice from seed, to get 50% ratio - see kitty genetic alg impl",
+            "currentBlockInfo": {
+                "blockRandomSeed": "u8:189|u8:185|u64:0|u64:0|u64:0|u64:0|u64:0|u32:0|u16:0"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "tx-generate-kitty-genes",
+            "comment": "arguments are matron and sire serialized kitties.",
+            "tx": {
+                "from": "address:my_address",
+                "to": "address:contract_address",
+                "value": "0",
+                "function": "generateKittyGenes",
+                "arguments": [
+                    "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
+                    "u8:255|u8:255|u8:255|u8:255|u8:255|u8:255|u8:255|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["u8:127|u8:127|u8:127|u8:127|u8:127|u8:127|u8:127"],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -63,7 +63,29 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "2-err-no-message",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "echo_async_result_empty",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
         }
-        
     ]
 }
