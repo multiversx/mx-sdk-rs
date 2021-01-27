@@ -29,7 +29,10 @@ fn init() {
 
 #[test]
 fn create_and_auction_gen_zero_kitty() {
-	parse_execute_mandos("mandos/create_and_auction_gen_zero_kitty.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_and_auction_gen_zero_kitty.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
@@ -54,17 +57,26 @@ fn bid_second_max() {
 
 #[test]
 fn end_auction_second_bid_ok_early() {
-	parse_execute_mandos("mandos/end_auction_second_bid_ok_early.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/end_auction_second_bid_ok_early.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn end_auction_second_bid_ok_late() {
-	parse_execute_mandos("mandos/end_auction_second_bid_ok_late.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/end_auction_second_bid_ok_late.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn end_auction_second_bid_max_early() {
-	parse_execute_mandos("mandos/end_auction_second_bid_max_early.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/end_auction_second_bid_max_early.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
@@ -74,7 +86,10 @@ fn create_sale_auction_ok() {
 
 #[test]
 fn create_sale_auction_not_owner() {
-	parse_execute_mandos("mandos/create_sale_auction_not_owner.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_sale_auction_not_owner.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
@@ -84,7 +99,10 @@ fn create_siring_auction_ok() {
 
 #[test]
 fn create_siring_auction_not_owner() {
-	parse_execute_mandos("mandos/create_siring_auction_not_owner.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_siring_auction_not_owner.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
