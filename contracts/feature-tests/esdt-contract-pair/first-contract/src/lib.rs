@@ -20,8 +20,8 @@ pub trait FirstContract {
 	#[endpoint(transferToSecondContractFull)]
 	fn transfer_to_second_contract_full(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().get_esdt_token_name();
-		let esdt_value = self.call_value().get_esdt_value_big_uint();
+		let actual_token_name = self.call_value().token();
+		let esdt_value = self.call_value().esdt_value();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -40,8 +40,8 @@ pub trait FirstContract {
 	#[endpoint(transferToSecondContractHalf)]
 	fn transfer_to_second_contract_half(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().get_esdt_token_name();
-		let esdt_value = self.call_value().get_esdt_value_big_uint();
+		let actual_token_name = self.call_value().token();
+		let esdt_value = self.call_value().esdt_value();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -60,8 +60,8 @@ pub trait FirstContract {
 	#[endpoint]
 	fn transfer_to_second_contract_rejected(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().get_esdt_token_name();
-		let esdt_value = self.call_value().get_esdt_value_big_uint();
+		let actual_token_name = self.call_value().token();
+		let esdt_value = self.call_value().esdt_value();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");

@@ -27,7 +27,7 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn get_call_value_big_uint(&self) -> ArwenBigUint {
+	fn egld_value(&self) -> ArwenBigUint {
 		unsafe {
 			let result = bigIntNew(0);
 			bigIntGetCallValue(result);
@@ -35,7 +35,7 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn get_esdt_value_big_uint(&self) -> ArwenBigUint {
+	fn esdt_value(&self) -> ArwenBigUint {
 		unsafe {
 			let result = bigIntNew(0);
 			bigIntGetESDTCallValue(result);
@@ -43,7 +43,7 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn get_esdt_token_name(&self) -> TokenIdentifier {
+	fn token(&self) -> TokenIdentifier {
 		unsafe {
 			let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_NAME_LENGTH];
 			let name_len = getESDTTokenName(name_buffer.as_mut_ptr());

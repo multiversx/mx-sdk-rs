@@ -6,13 +6,13 @@ use elrond_wasm::types::TokenIdentifier;
 
 impl CallValueApi<RustBigUint> for TxContext {
 	fn check_not_payable(&self) {
-		if self.get_call_value_big_uint() > 0 {
+		if self.egld_value() > 0 {
 			panic!(TxPanic {
 				status: 10,
 				message: err_msg::NON_PAYABLE_FUNC_EGLD.to_vec(),
 			});
 		}
-		if self.get_esdt_value_big_uint() > 0 {
+		if self.esdt_value() > 0 {
 			panic!(TxPanic {
 				status: 10,
 				message: err_msg::NON_PAYABLE_FUNC_ESDT.to_vec(),
@@ -21,17 +21,17 @@ impl CallValueApi<RustBigUint> for TxContext {
 	}
 
 	#[inline]
-	fn get_call_value_big_uint(&self) -> RustBigUint {
+	fn egld_value(&self) -> RustBigUint {
 		self.tx_input_box.call_value.clone().into()
 	}
 
 	#[inline]
-	fn get_esdt_value_big_uint(&self) -> RustBigUint {
+	fn esdt_value(&self) -> RustBigUint {
 		self.tx_input_box.esdt_value.clone().into()
 	}
 
 	#[inline]
-	fn get_esdt_token_name(&self) -> TokenIdentifier {
+	fn token(&self) -> TokenIdentifier {
 		TokenIdentifier::from(self.tx_input_box.esdt_token_name.as_slice())
 	}
 }
