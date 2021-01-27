@@ -10,7 +10,7 @@ pub trait GeneScience {
 	#[rustfmt::skip]
 	#[callback(generate_kitty_genes_callback)]
 	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty,
-		#[callback_arg] matron_id: u32, 
+		#[callback_arg] matron_id: u32,
 		#[callback_arg] original_caller: Address);
 }
 
@@ -83,8 +83,7 @@ pub trait KittyOwnership {
 	fn owner_of(&self, kitty_id: u32) -> Address {
 		if self._is_valid_id(kitty_id) {
 			self.get_kitty_owner(kitty_id)
-		}
-		else {
+		} else {
 			Address::zero()
 		}
 	}
@@ -203,9 +202,12 @@ pub trait KittyOwnership {
 	}
 
 	#[endpoint(approveSiringAndReturnKitty)]
-	fn approve_siring_and_return_kitty(&self, approved_address: Address, kitty_owner: Address,
-		kitty_id: u32) -> SCResult<()> {
-		
+	fn approve_siring_and_return_kitty(
+		&self,
+		approved_address: Address,
+		kitty_owner: Address,
+		kitty_id: u32,
+	) -> SCResult<()> {
 		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
@@ -522,17 +524,15 @@ pub trait KittyOwnership {
 	fn _get_gene_science_contract_address_or_default(&self) -> Address {
 		if self.is_empty_gene_science_contract_address() {
 			Address::zero()
-		}
-		else {
+		} else {
 			self.get_gene_science_contract_address()
 		}
 	}
-	
+
 	fn _get_kitty_auction_contract_address_or_default(&self) -> Address {
 		if self.is_empty_kitty_auction_contract_address() {
 			Address::zero()
-		}
-		else {
+		} else {
 			self.get_kitty_auction_contract_address()
 		}
 	}
@@ -540,8 +540,7 @@ pub trait KittyOwnership {
 	fn _get_approved_address_or_default(&self, kitty_id: u32) -> Address {
 		if self.is_empty_approved_address(kitty_id) {
 			Address::zero()
-		}
-		else {
+		} else {
 			self.get_approved_address(kitty_id)
 		}
 	}
@@ -549,12 +548,11 @@ pub trait KittyOwnership {
 	fn _get_sire_allowed_address_or_default(&self, kitty_id: u32) -> Address {
 		if self.is_empty_sire_allowed_address(kitty_id) {
 			Address::zero()
-		}
-		else {
+		} else {
 			self.get_sire_allowed_address(kitty_id)
 		}
 	}
- 
+
 	// callbacks
 
 	#[callback]
@@ -562,7 +560,7 @@ pub trait KittyOwnership {
 		&self,
 		result: AsyncCallResult<KittyGenes>,
 		#[callback_arg] matron_id: u32,
-		#[callback_arg] original_caller: Address
+		#[callback_arg] original_caller: Address,
 	) {
 		match result {
 			AsyncCallResult::Ok(genes) => {

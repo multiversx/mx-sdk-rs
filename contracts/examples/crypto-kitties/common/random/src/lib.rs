@@ -22,7 +22,8 @@ impl Random {
 		let salt_len = salt.len();
 
 		for i in 0..SEED_SIZE {
-			rand_source[i] = (((seed[i] as u16) + (salt[i % salt_len] as u16)) % (u8::MAX as u16 + 1u16)) as u8;
+			rand_source[i] =
+				(((seed[i] as u16) + (salt[i % salt_len] as u16)) % (u8::MAX as u16 + 1u16)) as u8;
 		}
 
 		Random {
