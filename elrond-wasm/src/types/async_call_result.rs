@@ -6,7 +6,7 @@ use elrond_codec::TopDecodeInput;
 
 pub struct AsyncCallError {
 	pub err_code: u32,
-	pub err_msg: Vec<u8>,
+	pub err_msg: Vec<u8>, // TODO: convert to BoxedBytes
 }
 
 pub enum AsyncCallResult<T> {
@@ -26,7 +26,14 @@ where
 			let arg = T::dyn_load(loader, arg_id);
 			AsyncCallResult::Ok(arg)
 		} else {
-			let err_msg = Vec::<u8>::dyn_load(loader, arg_id);
+			let err_msg = if loader.has_next() {
+				Vec::<u8>::dyn_load(loader, arg_id)
+			} else {
+				// temporary fix, until a problem involving missing error messages in the protocol gets fixed
+				// can be removed after the protocol is patched
+				// error messages should not normally be missing
+				Vec::<u8>::new()
+			};
 			AsyncCallResult::Err(AsyncCallError { err_code, err_msg })
 		}
 	}
