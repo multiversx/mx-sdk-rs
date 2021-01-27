@@ -1,36 +1,89 @@
-// use super::util::*;
+use super::util::*;
 // use super::parse_attr::*;
 use super::arg_def::*;
 use super::contract_gen_method::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-	let mpm = match &m.metadata {
-		MethodMetadata::Regular { payable, .. } => payable.clone(),
-		MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
-		MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
-		MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,
-		MethodMetadata::StorageIsEmpty { .. } => MethodPayableMetadata::NotPayable,
-		MethodMetadata::StorageClear { .. } => MethodPayableMetadata::NotPayable,
-		_ => MethodPayableMetadata::NoMetadata,
-	};
-	payable_snippet_for_metadata(mpm)
+	payable_snippet_for_metadata(m.metadata.payable_metadata(), &m.payment_arg, &m.token_arg)
 }
 
-fn payable_snippet_for_metadata(mpm: MethodPayableMetadata) -> proc_macro2::TokenStream {
+fn payable_snippet_for_metadata(
+	mpm: MethodPayableMetadata,
+	payment_arg: &Option<MethodArg>,
+	token_arg: &Option<MethodArg>,
+) -> proc_macro2::TokenStream {
 	match mpm {
 		MethodPayableMetadata::NoMetadata => quote! {},
-		MethodPayableMetadata::NotPayable => quote! {
-			self.call_value().check_not_payable();
-		},
-		MethodPayableMetadata::Egld => quote! {
-			let _ = self.call_value().require_egld();
-		},
-		MethodPayableMetadata::SingleEsdtToken(token_name) => {
+		MethodPayableMetadata::NotPayable => {
+			let payment_init = if let Some(arg) = payment_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = BigUint::zero();
+				}
+			} else {
+				quote! {}
+			};
+			let token_init = if let Some(arg) = token_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = TokenIdentifier::egld();
+				}
+			} else {
+				quote! {}
+			};
 			quote! {
-				let _ = self.call_value().require_esdt(b#token_name);
+				self.call_value().check_not_payable();
+				#payment_init
+				#token_init
 			}
 		},
-		MethodPayableMetadata::AnyToken => quote! {},
+		MethodPayableMetadata::Egld => {
+			let payment_var_name = var_name_or_underscore(payment_arg);
+			let token_init = if let Some(arg) = token_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = TokenIdentifier::egld();
+				}
+			} else {
+				quote! {}
+			};
+			quote! {
+				let #payment_var_name = self.call_value().require_egld();
+				#token_init
+			}
+		},
+		MethodPayableMetadata::SingleEsdtToken(token_name) => {
+			let token_literal = byte_slice_literal(token_name.as_bytes());
+			let payment_var_name = var_name_or_underscore(payment_arg);
+			let token_init = if let Some(arg) = token_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = TokenIdentifier::from(#token_literal);
+				}
+			} else {
+				quote! {}
+			};
+			quote! {
+				let #payment_var_name = self.call_value().require_esdt(#token_literal);
+				#token_init
+			}
+		},
+		MethodPayableMetadata::AnyToken => {
+			let payment_var_name = var_name_or_underscore(payment_arg);
+			let token_var_name = var_name_or_underscore(token_arg);
+			quote! {
+				let (#payment_var_name, #token_var_name) = self.call_value().get_call_value_token_name();
+			}
+		},
+	}
+}
+
+fn var_name_or_underscore(opt_arg: &Option<MethodArg>) -> proc_macro2::TokenStream {
+	if let Some(arg) = opt_arg {
+		let pat = &arg.pat;
+		quote! { #pat }
+	} else {
+		quote! { _ }
 	}
 }
 

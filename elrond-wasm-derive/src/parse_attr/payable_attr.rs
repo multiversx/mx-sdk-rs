@@ -7,6 +7,10 @@ pub fn is_payment(pat: &syn::PatType) -> bool {
 	has_attribute(&pat.attrs, ATTR_PAYMENT)
 }
 
+pub fn is_payment_token(pat: &syn::PatType) -> bool {
+	has_attribute(&pat.attrs, ATTR_PAYMENT_TOKEN)
+}
+
 pub struct PayableAttribute {
 	pub identifier: Option<String>,
 }

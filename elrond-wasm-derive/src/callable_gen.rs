@@ -17,7 +17,7 @@ impl CallableMethod {
 	pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
 		let payable = process_payable(m);
 		let callback_opt = CallbackCallAttribute::parse(m);
-		let method_args = extract_method_args(m, /*payable*/ true, callback_opt.is_some());
+		let method_args = extract_method_args(m, callback_opt.is_some());
 		CallableMethod {
 			name: m.sig.ident.clone(),
 			payable: payable.is_payable(),
@@ -112,6 +112,7 @@ impl Callable {
 
 								quote! {}
 							},
+							ArgMetadata::PaymentToken => panic!("callable payment token not yet supported"),
 							ArgMetadata::Multi(multi_attr) => {
 								// #[multi(...)]
 								let count_expr = &multi_attr.count_expr;

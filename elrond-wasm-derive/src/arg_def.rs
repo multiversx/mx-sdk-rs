@@ -12,6 +12,7 @@ pub struct MethodArg {
 #[derive(Clone, Debug)]
 pub enum ArgMetadata {
 	Payment,
+	PaymentToken,
 	Single,
 	Multi(MultiAttribute),
 	VarArgs,
