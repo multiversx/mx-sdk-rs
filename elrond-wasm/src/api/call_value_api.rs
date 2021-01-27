@@ -2,48 +2,57 @@ use super::{BigUintApi, ErrorApi};
 use crate::err_msg;
 use crate::types::TokenIdentifier;
 
-pub const EGLD_TOKEN_NAME: &[u8] = b"eGLD";
-
 pub trait CallValueApi<BigUint>: ErrorApi + Sized
 where
 	BigUint: BigUintApi + 'static,
 {
 	fn check_not_payable(&self);
 
-	fn get_call_value_big_uint(&self) -> BigUint;
+	/// Retrieves the EGLD call value from the VM.
+	/// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
+	fn egld_value(&self) -> BigUint;
 
-	fn get_esdt_value_big_uint(&self) -> BigUint;
+	/// Retrieves the ESDT call value from the VM.
+	/// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
+	fn esdt_value(&self) -> BigUint;
 
-	fn get_esdt_token_name(&self) -> TokenIdentifier;
+	/// Returns the call value token identifier of the current call.
+	/// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
+	///
+	/// A note on implementation: even though the underlying api returns an empty name for EGLD,
+	/// but the EGLD TokenIdentifier is serialized as `EGLD`.
+	fn token(&self) -> TokenIdentifier;
 
+	/// Will return the EGLD call value,
+	/// but also fail with an error if ESDT is sent.
+	/// Especially used in the auto-generated call value processing.
 	fn require_egld(&self) -> BigUint {
-		if !self.get_esdt_token_name().is_egld() {
+		if !self.token().is_egld() {
 			self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
 		}
-		self.get_call_value_big_uint()
+		self.egld_value()
 	}
 
-	fn require_esdt(&self, token_identifier: &[u8]) -> BigUint {
-		if self.get_esdt_token_name() != token_identifier {
+	/// Will return the ESDT call value,
+	/// but also fail with an error if EGLD or the wrong ESDT token is sent.
+	/// Especially used in the auto-generated call value processing.
+	fn require_esdt(&self, token: &[u8]) -> BigUint {
+		if self.token() != token {
 			self.signal_error(err_msg::BAD_ESDT_TOKEN_PROVIDED);
 		}
-		self.get_esdt_value_big_uint()
+		self.esdt_value()
 	}
 
-	fn require_token(&self, token_identifier: &[u8]) -> BigUint {
-		if token_identifier == EGLD_TOKEN_NAME {
-			self.require_egld()
+	/// Returns both the call value (either EGLD or ESDT) and the token identifier.
+	/// Especially used in the `#[payable("*")] auto-generated snippets.
+	/// The method might seem redundant, but there is such a hook in Arwen
+	/// that might be used in this scenario in the future.
+	fn payment_token_pair(&self) -> (BigUint, TokenIdentifier) {
+		let token = self.token();
+		if token.is_egld() {
+			(self.egld_value(), token)
 		} else {
-			self.require_esdt(token_identifier)
-		}
-	}
-
-	fn get_call_value_token_name(&self) -> (BigUint, TokenIdentifier) {
-		let token_identifier = self.get_esdt_token_name();
-		if token_identifier.is_egld() {
-			(self.get_call_value_big_uint(), token_identifier)
-		} else {
-			(self.get_esdt_value_big_uint(), token_identifier)
+			(self.esdt_value(), token)
 		}
 	}
 }

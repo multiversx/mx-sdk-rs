@@ -33,18 +33,18 @@ pub trait Crowdfunding {
 			return sc_error!("cannot fund after deadline");
 		}
 		require!(
-			self.call_value().get_call_value_big_uint() == 0,
+			self.call_value().egld_value() == 0,
 			"EGLD payment not accepted"
 		);
 
 		let expected_token_name = self.get_cf_esdt_token_name();
-		let actual_token_name = self.call_value().get_esdt_token_name();
+		let actual_token_name = self.call_value().token();
 
 		if expected_token_name != actual_token_name {
 			return sc_error!("wrong esdt token");
 		}
 
-		let payment = self.call_value().get_esdt_value_big_uint();
+		let payment = self.call_value().esdt_value();
 		let caller = self.get_caller();
 		let mut deposit = self.get_deposit(&caller);
 		let mut balance = self.get_esdt_balance();

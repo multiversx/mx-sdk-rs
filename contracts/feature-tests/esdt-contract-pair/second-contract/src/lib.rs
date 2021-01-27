@@ -13,7 +13,7 @@ pub trait SecondContract {
 	#[endpoint(acceptEsdtPayment)]
 	fn accept_esdt_payment(&self) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().get_esdt_token_name();
+		let actual_token_name = self.call_value().token();
 
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
 

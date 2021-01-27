@@ -2,7 +2,7 @@
 #![allow(clippy::string_lit_as_bytes)]
 #![allow(clippy::redundant_clone)]
 
-imports!();
+elrond_wasm::imports!();
 
 // this is not part of the standard imports because we want to discourage its use
 use elrond_wasm::String;
@@ -906,11 +906,11 @@ pub trait BasicFeatures {
 	fn check_call_value(
 		&self,
 	) -> MultiResult5<BigUint, BigUint, TokenIdentifier, BigUint, TokenIdentifier> {
-		let (pair_call_value, pair_token_name) = self.call_value().get_call_value_token_name();
+		let (pair_call_value, pair_token_name) = self.call_value().payment_token_pair();
 		(
-			self.call_value().get_call_value_big_uint(),
-			self.call_value().get_esdt_value_big_uint(),
-			self.call_value().get_esdt_token_name(),
+			self.call_value().egld_value(),
+			self.call_value().esdt_value(),
+			self.call_value().token(),
 			pair_call_value,
 			pair_token_name,
 		)
@@ -919,51 +919,122 @@ pub trait BasicFeatures {
 
 	#[endpoint]
 	#[payable("*")]
-	fn payable_any_1(&self, #[payment] payment: BigUint, #[payment_token] token: TokenIdentifier) {}
+	fn payable_any_1(
+		&self,
+		#[payment] payment: BigUint,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("*")]
-	fn payable_any_2(&self, #[payment] payment: BigUint) {}
+	fn payable_any_2(&self, #[payment] payment: BigUint) -> MultiResult2<BigUint, TokenIdentifier> {
+		let token = self.call_value().token();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("*")]
-	fn payable_any_3(&self, #[payment_token] token: TokenIdentifier) {}
+	fn payable_any_3(
+		&self,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		let (payment, _) = self.call_value().payment_token_pair();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("*")]
-	fn payable_any_4(&self) {}
+	fn payable_any_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+		self.call_value().payment_token_pair().into()
+	}
 
 	#[endpoint]
 	#[payable]
-	fn payable_egld_0(&self, #[payment] payment: BigUint, #[payment_token] token: TokenIdentifier) {}
+	fn payable_egld_0(
+		&self,
+		#[payment] payment: BigUint,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn payable_egld_1(&self, #[payment_token] token: TokenIdentifier) {}
+	fn payable_egld_1(
+		&self,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		let payment = self.call_value().egld_value();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn payable_egld_2(&self, #[payment] payment: BigUint) {}
+	fn payable_egld_2(
+		&self,
+		#[payment] payment: BigUint,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		let token = self.call_value().token();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn payable_egld_3(&self, #[payment_token] token: TokenIdentifier) {}
+	fn payable_egld_3(
+		&self,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		let payment = self.call_value().egld_value();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn payable_egld_4(&self) {}
+	fn payable_egld_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+		let payment = self.call_value().egld_value();
+		let token = self.call_value().token();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("MYTOKEN")]
-	fn payable_mytoken_1(&self, #[payment] payment: BigUint, #[payment_token] token: TokenIdentifier) {}
+	fn payable_mytoken_1(
+		&self,
+		#[payment] payment: BigUint,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("MYTOKEN")]
-	fn payable_mytoken_2(&self, #[payment] payment: BigUint) {}
+	fn payable_mytoken_2(
+		&self,
+		#[payment] payment: BigUint,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		let token = self.call_value().token();
+		(payment, token).into()
+	}
 
 	#[endpoint]
 	#[payable("MYTOKEN")]
-	fn payable_mytoken_3(&self, #[payment_token] token: TokenIdentifier) {}
+	fn payable_mytoken_3(
+		&self,
+		#[payment_token] token: TokenIdentifier,
+	) -> MultiResult2<BigUint, TokenIdentifier> {
+		let payment = self.call_value().esdt_value();
+		(payment, token).into()
+	}
+
+	#[endpoint]
+	#[payable("MYTOKEN")]
+	fn payable_mytoken_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+		let payment = self.call_value().esdt_value();
+		let token = self.call_value().token();
+		(payment, token).into()
+	}
 
 	// CRYPTO FUNCTIONS
 

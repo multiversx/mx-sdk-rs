@@ -72,7 +72,7 @@ fn payable_snippet_for_metadata(
 			let payment_var_name = var_name_or_underscore(payment_arg);
 			let token_var_name = var_name_or_underscore(token_arg);
 			quote! {
-				let (#payment_var_name, #token_var_name) = self.call_value().get_call_value_token_name();
+				let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
 			}
 		},
 	}
@@ -119,7 +119,7 @@ fn generate_payment_snippet_for_arg_type(
 	let type_str = type_path_segment.ident.to_string();
 	match type_str.as_str() {
 		"BigUint" => quote! {
-			let #pat = self.api.get_call_value_big_uint();
+			let #pat = self.api.egld_value();
 		},
 		other_stype_str => panic!(
 			"Arguments annotated with #[payment] must be of type BigUint. Found: {}",

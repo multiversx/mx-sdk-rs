@@ -155,7 +155,7 @@ pub trait Lottery {
 	#[payable] // TODO: #[payable_esdt] syntax
 	fn buy_ticket(&self, lottery_name: BoxedBytes) -> SCResult<()> {
 		require!(
-			self.call_value().get_call_value_big_uint() == 0,
+			self.call_value().egld_value() == 0,
 			"EGLD payment not accepted"
 		);
 		match self.status(&lottery_name) {
@@ -198,8 +198,8 @@ pub trait Lottery {
 	fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes) -> SCResult<()> {
 		let mut info = self.get_lottery_info(&lottery_name);
 		let caller = self.get_caller();
-		let call_token_name = self.call_value().get_esdt_token_name();
-		let payment = self.call_value().get_esdt_value_big_uint();
+		let call_token_name = self.call_value().token();
+		let payment = self.call_value().esdt_value();
 
 		require!(
 			info.whitelist.is_empty() || info.whitelist.contains(&caller),
