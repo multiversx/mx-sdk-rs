@@ -52,6 +52,9 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 									ArgMetadata::Payment => {
 										panic!("payment args not allowed in callbacks")
 									},
+									ArgMetadata::PaymentToken => {
+										panic!("payment token args not allowed in callbacks")
+									},
 									ArgMetadata::Multi(_) => {
 										panic!("callback multi args not yet supported")
 									},
@@ -68,6 +71,9 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 									},
 									ArgMetadata::Payment => {
 										panic!("payment args not allowed in callbacks")
+									},
+									ArgMetadata::PaymentToken => {
+										panic!("payment token args not allowed in callbacks")
 									},
 									ArgMetadata::Multi(_) => {
 										panic!("multi args not allowed in callbacks")

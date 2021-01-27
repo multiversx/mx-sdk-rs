@@ -917,6 +917,54 @@ pub trait BasicFeatures {
 			.into()
 	}
 
+	#[endpoint]
+	#[payable("*")]
+	fn payable_any_1(&self, #[payment] payment: BigUint, #[payment_token] token: TokenIdentifier) {}
+
+	#[endpoint]
+	#[payable("*")]
+	fn payable_any_2(&self, #[payment] payment: BigUint) {}
+
+	#[endpoint]
+	#[payable("*")]
+	fn payable_any_3(&self, #[payment_token] token: TokenIdentifier) {}
+
+	#[endpoint]
+	#[payable("*")]
+	fn payable_any_4(&self) {}
+
+	#[endpoint]
+	#[payable]
+	fn payable_egld_0(&self, #[payment] payment: BigUint, #[payment_token] token: TokenIdentifier) {}
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn payable_egld_1(&self, #[payment_token] token: TokenIdentifier) {}
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn payable_egld_2(&self, #[payment] payment: BigUint) {}
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn payable_egld_3(&self, #[payment_token] token: TokenIdentifier) {}
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn payable_egld_4(&self) {}
+
+	#[endpoint]
+	#[payable("MYTOKEN")]
+	fn payable_mytoken_1(&self, #[payment] payment: BigUint, #[payment_token] token: TokenIdentifier) {}
+
+	#[endpoint]
+	#[payable("MYTOKEN")]
+	fn payable_mytoken_2(&self, #[payment] payment: BigUint) {}
+
+	#[endpoint]
+	#[payable("MYTOKEN")]
+	fn payable_mytoken_3(&self, #[payment_token] token: TokenIdentifier) {}
+
 	// CRYPTO FUNCTIONS
 
 	#[endpoint(computeSha256)]

@@ -132,6 +132,18 @@ impl MethodMetadata {
 			MethodMetadata::Regular { .. } | MethodMetadata::Callback | MethodMetadata::CallbackRaw
 		)
 	}
+
+	pub fn payable_metadata(&self) -> MethodPayableMetadata {
+		match self {
+			MethodMetadata::Regular { payable, .. } => payable.clone(),
+			MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageIsEmpty { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageClear { .. } => MethodPayableMetadata::NotPayable,
+			_ => MethodPayableMetadata::NoMetadata,
+		}
+	}
 }
 
 #[derive(Clone, Debug)]
@@ -141,6 +153,8 @@ pub struct Method {
 	pub name: syn::Ident,
 	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
+	pub payment_arg: Option<MethodArg>,
+	pub token_arg: Option<MethodArg>,
 	pub output_names: Vec<String>,
 	pub return_type: syn::ReturnType,
 	pub body: Option<syn::Block>,
@@ -389,11 +403,9 @@ impl Method {
 	pub fn parse(m: &syn::TraitItemMethod) -> Method {
 		let metadata = extract_metadata(m);
 		let allow_callback_args = matches!(metadata, MethodMetadata::Callback);
-		let method_args = extract_method_args(
-			m,
-			/*metadata.payable.is_payable(m)*/ true,
-			allow_callback_args,
-		);
+		let method_args = extract_method_args(m, allow_callback_args);
+		let payment_arg = extract_payment(metadata.payable_metadata(), &method_args[..]);
+		let token_arg = extract_payment_token(metadata.payable_metadata(), &method_args[..]);
 		let output_names = find_output_names(m);
 		Method {
 			docs: extract_doc(m.attrs.as_slice()),
@@ -401,6 +413,8 @@ impl Method {
 			name: m.sig.ident.clone(),
 			generics: m.sig.generics.clone(),
 			method_args,
+			payment_arg,
+			token_arg,
 			output_names,
 			return_type: m.sig.output.clone(),
 			body: m.default.clone(),
@@ -480,7 +494,7 @@ impl Method {
 							let #pat = #arg_get;
 						}
 					},
-					ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
+					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 					ArgMetadata::Multi(_) => panic!(
 						"multi args not accepted in function generate_call_method_fixed_args"
 					),
@@ -522,7 +536,7 @@ impl Method {
 					ArgMetadata::Single | ArgMetadata::VarArgs => {
 						generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
 					},
-					ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
+					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 					ArgMetadata::Multi(multi_attr) => {
 						// #[multi(...)]
 						let count_expr = &multi_attr.count_expr;
