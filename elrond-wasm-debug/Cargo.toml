@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-debug"
-version = "0.10.4"
+version = "0.10.5"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -22,7 +22,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
 [dependencies.elrond-wasm]
-version = "0.10.4"
+version = "0.10.5"
 path = "../elrond-wasm"
 
 [dependencies.mandos]

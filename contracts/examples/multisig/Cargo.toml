@@ -20,30 +20,30 @@ default = [
 
 [dependencies.elrond-wasm-module-users-wasm]
 package = "elrond-wasm-module-users"
-version = "0.10.4"
+version = "0.10.5"
 path = "../../modules/elrond-wasm-module-users"
 features = ["wasm-output-mode"]
 optional = true
 
 [dependencies.elrond-wasm-module-users-default]
 package = "elrond-wasm-module-users"
-version = "0.10.4"
+version = "0.10.5"
 path = "../../modules/elrond-wasm-module-users"
 optional = true
 
 [dependencies.elrond-wasm]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.10.4"
+version = "0.10.5"
 path = "../../../elrond-wasm-debug"
