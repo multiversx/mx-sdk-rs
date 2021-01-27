@@ -431,6 +431,8 @@ pub trait BasicFeatures {
 		my_single_value_mapper.save();
 	}
 
+	// VecMapper
+
 	#[view]
 	#[storage_mapper("vec_mapper")]
 	fn vec_mapper(&self) -> VecMapper<Self::Storage, u32>;
@@ -444,6 +446,32 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn vec_mapper_get(&self, index: usize) -> u32 {
 		self.vec_mapper().get(index)
+	}
+
+	// LinkedListMapper
+
+	#[view]
+	#[storage_mapper("list_mapper")]
+	fn list_mapper(&self) -> LinkedListMapper<Self::Storage, u32>;
+
+	#[endpoint]
+	fn list_mapper_push_back(&self, item: u32) {
+		let mut list_mapper = self.list_mapper();
+		list_mapper.push_back(item);
+	}
+
+	#[endpoint]
+	fn list_mapper_pop_front(&self) {
+		let mut list_mapper = self.list_mapper();
+		list_mapper.pop_front();
+	}
+
+	#[endpoint]
+	fn list_mapper_front(&self) -> SCResult<u32> {
+		if let Some(front) = self.list_mapper().front() {
+			return Ok(front);
+		}
+		sc_error!("List empty!")
 	}
 
 	// EVENTS
