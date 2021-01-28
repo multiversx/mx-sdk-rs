@@ -14,8 +14,8 @@ const LEN_IDENTIFIER: &[u8] = b".len";
 const NEW_KEY_IDENTIFIER: &[u8] = b".new";
 const FRONT_IDENTIFIER: &[u8] = b".front";
 const BACK_IDENTIFIER: &[u8] = b".back";
-const NODE_IDENTIFIER: &[u8] = b"$";
-const VALUE_IDENTIFIER: &[u8] = b"*";
+const NODE_IDENTIFIER: &[u8] = b".node";
+const VALUE_IDENTIFIER: &[u8] = b".value";
 
 #[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
 pub struct Node {
