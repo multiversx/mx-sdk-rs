@@ -38,7 +38,7 @@ where
 	/// Especially used in the auto-generated call value processing.
 	fn require_esdt(&self, token: &[u8]) -> BigUint {
 		if self.token() != token {
-			self.signal_error(err_msg::BAD_ESDT_TOKEN_PROVIDED);
+			self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
 		}
 		self.esdt_value()
 	}

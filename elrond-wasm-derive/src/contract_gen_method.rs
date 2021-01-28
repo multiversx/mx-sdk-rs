@@ -49,6 +49,7 @@ pub fn process_payable(m: &syn::TraitItemMethod) -> MethodPayableMetadata {
 			match identifier.as_str() {
 				"EGLD" => MethodPayableMetadata::Egld,
 				"*" => MethodPayableMetadata::AnyToken,
+				"" => panic!("empty token name not allowed in #[payable] attribute"),
 				_ => MethodPayableMetadata::SingleEsdtToken(identifier),
 			}
 		} else {

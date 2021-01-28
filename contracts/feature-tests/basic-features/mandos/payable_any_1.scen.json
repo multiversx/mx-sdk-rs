@@ -1,5 +1,5 @@
 {
-    "name": "call value",
+    "name": "payable",
     "steps": [
         {
             "step": "setState",
@@ -15,7 +15,8 @@
                     "balance": "1,000,000,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:TestToken": "1,000,000,000,000"
+                        "str:BASIC-FEATURES-TOKEN": "1,000,000,000,000",
+                        "str:OTHER-TOKEN": "1,000,000,000,000"
                     },
                     "code": ""
                 }
@@ -23,18 +24,18 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "payable_any_1.1",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "check_call_value",
+                "function": "payable_any_1",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "0", "str:EGLD", "0", "str:EGLD" ],
+                "out": [ "0", "str:EGLD" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -43,18 +44,18 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "txId": "payable_any_1.2",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "5",
-                "function": "check_call_value",
+                "function": "payable_any_1",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "5", "0", "str:EGLD", "5", "str:EGLD" ],
+                "out": [ "5", "str:EGLD" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -63,20 +64,20 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "txId": "payable_any_1.3",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "esdtTokenName": "str:CrowdToken",
+                "esdtTokenName": "str:BASIC-FEATURES-TOKEN",
                 "esdtValue": "100",
-                "function": "check_call_value",
+                "function": "payable_any_1",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "100", "str:CrowdToken", "100", "str:CrowdToken" ],
+                "out": [ "100", "str:BASIC-FEATURES-TOKEN" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -85,20 +86,20 @@
         },
         {
             "step": "scCall",
-            "txId": "4",
+            "txId": "payable_any_1.4",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "esdtTokenName": "str:CrowdToken",
+                "esdtTokenName": "str:BASIC-FEATURES-TOKEN",
                 "esdtValue": "0",
-                "function": "check_call_value",
+                "function": "payable_any_1",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "0", "str:CrowdToken", "0", "str:CrowdToken" ],
+                "out": [ "0", "str:BASIC-FEATURES-TOKEN" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

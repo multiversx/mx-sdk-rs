@@ -1000,8 +1000,8 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	#[payable("MYTOKEN")]
-	fn payable_mytoken_1(
+	#[payable("BASIC-FEATURES-TOKEN")]
+	fn payable_token_1(
 		&self,
 		#[payment] payment: BigUint,
 		#[payment_token] token: TokenIdentifier,
@@ -1010,8 +1010,8 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	#[payable("MYTOKEN")]
-	fn payable_mytoken_2(
+	#[payable("BASIC-FEATURES-TOKEN")]
+	fn payable_token_2(
 		&self,
 		#[payment] payment: BigUint,
 	) -> MultiResult2<BigUint, TokenIdentifier> {
@@ -1020,8 +1020,8 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	#[payable("MYTOKEN")]
-	fn payable_mytoken_3(
+	#[payable("BASIC-FEATURES-TOKEN")]
+	fn payable_token_3(
 		&self,
 		#[payment_token] token: TokenIdentifier,
 	) -> MultiResult2<BigUint, TokenIdentifier> {
@@ -1030,8 +1030,8 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	#[payable("MYTOKEN")]
-	fn payable_mytoken_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+	#[payable("BASIC-FEATURES-TOKEN")]
+	fn payable_token_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
 		let payment = self.call_value().esdt_value();
 		let token = self.call_value().token();
 		(payment, token).into()

@@ -1,7 +1,7 @@
 use crate::abi::TypeAbi;
 use crate::io::{ArgId, DynArg, DynArgInput};
-use alloc::string::String;
 use crate::types::BoxedBytes;
+use alloc::string::String;
 use elrond_codec::TopDecodeInput;
 
 pub struct AsyncCallError {
