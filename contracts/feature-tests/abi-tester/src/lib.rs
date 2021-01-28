@@ -8,6 +8,7 @@ mod only_nested;
 
 use abi_enum::*;
 use abi_test_type::*;
+use elrond_wasm::TokenIdentifier;
 use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
@@ -83,6 +84,25 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
-	#[payable]
-	fn payable_egld(&self, #[payment] _payment: BigUint) {}
+	#[payable("EGLD")]
+	fn payable_egld(&self, #[payment] _payment: BigUint, #[payment_token] _token: TokenIdentifier) {
+	}
+
+	#[endpoint]
+	#[payable("TOKEN-FOR-ABI")]
+	fn payable_some_token(
+		&self,
+		#[payment] _payment: BigUint,
+		#[payment_token] _token: TokenIdentifier,
+	) {
+	}
+
+	#[endpoint]
+	#[payable("*")]
+	fn payable_any_token(
+		&self,
+		#[payment] _payment: BigUint,
+		#[payment_token] _token: TokenIdentifier,
+	) {
+	}
 }

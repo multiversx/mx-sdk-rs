@@ -59,14 +59,14 @@ pub struct EndpointAbiJson {
 
 impl From<&EndpointAbi> for EndpointAbiJson {
 	fn from(abi: &EndpointAbi) -> Self {
-		let mut payable_in_tokens = Vec::new();
-		if abi.payable {
-			payable_in_tokens.push("EGLD".to_string());
-		}
 		EndpointAbiJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
-			payable_in_tokens,
+			payable_in_tokens: abi
+				.payable_in_tokens
+				.iter()
+				.map(|d| d.to_string())
+				.collect(),
 			inputs: abi
 				.inputs
 				.iter()

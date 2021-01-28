@@ -31,6 +31,15 @@ impl MethodPayableMetadata {
 	pub fn is_payable(&self) -> bool {
 		!matches!(self, MethodPayableMetadata::NotPayable)
 	}
+
+	pub fn abi_strings(&self) -> Vec<String> {
+		match self {
+			MethodPayableMetadata::NoMetadata | MethodPayableMetadata::NotPayable => Vec::new(),
+			MethodPayableMetadata::Egld => vec!["EGLD".to_string()],
+			MethodPayableMetadata::SingleEsdtToken(s) => vec![s.clone()],
+			MethodPayableMetadata::AnyToken => vec!["*".to_string()],
+		}
+	}
 }
 
 pub fn process_payable(m: &syn::TraitItemMethod) -> MethodPayableMetadata {
