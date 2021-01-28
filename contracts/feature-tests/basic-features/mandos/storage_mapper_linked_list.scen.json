@@ -40,7 +40,7 @@
         },
         {
             "step": "scCall",
-            "txId": "increment-1",
+            "txId": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -86,7 +86,7 @@
         },
         {
             "step": "scCall",
-            "txId": "after-1",
+            "txId": "check-list-after-first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -108,7 +108,7 @@
         },
         {
             "step": "scCall",
-            "txId": "increment-2",
+            "txId": "second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -130,7 +130,7 @@
         },
         {
             "step": "scCall",
-            "txId": "after-2",
+            "txId": "check-list-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -179,6 +179,7 @@
         },
         {
             "step": "scCall",
+            "txId": "check-front-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -200,6 +201,7 @@
         },
         {
             "step": "scCall",
+            "txId": "first-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -218,7 +220,32 @@
             }
         },
         {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``list_mapper$|u32:2": "u32:0|u32:0",
+                        "``list_mapper*|u32:2": "111",
+                        "``list_mapper.back": "2",
+                        "``list_mapper.front": "2",
+                        "``list_mapper.len": "1",
+                        "``list_mapper.new": "2"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
             "step": "scCall",
+            "txId": "second-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
@@ -237,7 +264,30 @@
             }
         },
         {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``list_mapper.back": "0",
+                        "``list_mapper.front": "0",
+                        "``list_mapper.len": "0",
+                        "``list_mapper.new": "2"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
             "step": "scCall",
+            "txId": "check-front-after-second-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
