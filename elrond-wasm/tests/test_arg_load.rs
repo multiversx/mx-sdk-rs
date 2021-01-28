@@ -128,7 +128,7 @@ fn test_async_call_result_err() {
 		},
 		AsyncCallResult::Err(async_call_error) => {
 			assert_eq!(async_call_error.err_code, 0x0123);
-			assert_eq!(async_call_error.err_msg, [0x11u8, 0x11u8].to_vec());
+			assert_eq!(async_call_error.err_msg.as_slice(), &[0x11u8, 0x11u8][..]);
 		},
 	}
 }
