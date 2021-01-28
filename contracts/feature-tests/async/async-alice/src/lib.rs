@@ -10,10 +10,10 @@ static HARDCODED_ADDRESS: [u8; 32] =
 
 #[elrond_wasm_derive::callable(PayMeProxy)]
 pub trait PayMe {
-	#[payable]
+	#[payable("EGLD")]
 	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64);
 
-	#[payable]
+	#[payable("EGLD")]
 	#[callback(payCallback)]
 	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64);
 }
