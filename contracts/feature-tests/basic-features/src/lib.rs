@@ -950,6 +950,7 @@ pub trait BasicFeatures {
 		self.call_value().payment_token_pair().into()
 	}
 
+	/// Will issue a warning, but this is ok, this is the test.
 	#[endpoint]
 	#[payable]
 	fn payable_egld_0(

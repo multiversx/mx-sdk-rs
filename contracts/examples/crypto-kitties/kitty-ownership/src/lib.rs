@@ -304,7 +304,7 @@ pub trait KittyOwnership {
 		Ok(())
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint(breedWith)]
 	fn breed_with(
 		&self,

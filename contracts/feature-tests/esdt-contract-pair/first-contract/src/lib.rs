@@ -17,11 +17,14 @@ pub trait FirstContract {
 		self.set_second_contract_address(&second_contract_address);
 	}
 
+	#[payable("*")]
 	#[endpoint(transferToSecondContractFull)]
-	fn transfer_to_second_contract_full(&self) -> SCResult<()> {
+	fn transfer_to_second_contract_full(
+		&self,
+		#[payment] esdt_value: BigUint,
+		#[payment_token] actual_token_name: TokenIdentifier,
+	) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().token();
-		let esdt_value = self.call_value().esdt_value();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -37,11 +40,14 @@ pub trait FirstContract {
 		Ok(())
 	}
 
+	#[payable("*")]
 	#[endpoint(transferToSecondContractHalf)]
-	fn transfer_to_second_contract_half(&self) -> SCResult<()> {
+	fn transfer_to_second_contract_half(
+		&self,
+		#[payment] esdt_value: BigUint,
+		#[payment_token] actual_token_name: TokenIdentifier,
+	) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().token();
-		let esdt_value = self.call_value().esdt_value();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
@@ -57,11 +63,14 @@ pub trait FirstContract {
 		Ok(())
 	}
 
+	#[payable("*")]
 	#[endpoint]
-	fn transfer_to_second_contract_rejected(&self) -> SCResult<()> {
+	fn transfer_to_second_contract_rejected(
+		&self,
+		#[payment] esdt_value: BigUint,
+		#[payment_token] actual_token_name: TokenIdentifier,
+	) -> SCResult<()> {
 		let expected_token_name = self.get_contract_esdt_token_name();
-		let actual_token_name = self.call_value().token();
-		let esdt_value = self.call_value().esdt_value();
 
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");

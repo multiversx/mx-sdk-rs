@@ -192,7 +192,7 @@ pub trait KittyAuction {
 		Ok(())
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn bid(&self, kitty_id: u32, #[payment] payment: BigUint) -> SCResult<()> {
 		require!(

@@ -11,7 +11,7 @@ use lottery_info::LotteryInfo;
 use random::Random;
 use status::Status;
 
-use elrond_wasm::HexCallDataSerializer;
+use elrond_wasm::{HexCallDataSerializer, TokenIdentifier};
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
@@ -152,15 +152,16 @@ pub trait Lottery {
 	}
 
 	#[endpoint]
-	#[payable] // TODO: #[payable_esdt] syntax
-	fn buy_ticket(&self, lottery_name: BoxedBytes) -> SCResult<()> {
-		require!(
-			self.call_value().egld_value() == 0,
-			"EGLD payment not accepted"
-		);
+	#[payable("*")]
+	fn buy_ticket(
+		&self,
+		lottery_name: BoxedBytes,
+		#[payment] payment: BigUint,
+		#[payment_token] token: TokenIdentifier,
+	) -> SCResult<()> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
-			Status::Running => self.update_after_buy_ticket(&lottery_name),
+			Status::Running => self.update_after_buy_ticket(&lottery_name, payment, token),
 			Status::Ended => {
 				sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
 			},
@@ -195,18 +196,21 @@ pub trait Lottery {
 		Status::Running
 	}
 
-	fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes) -> SCResult<()> {
+	fn update_after_buy_ticket(
+		&self,
+		lottery_name: &BoxedBytes,
+		payment: BigUint,
+		token: TokenIdentifier,
+	) -> SCResult<()> {
 		let mut info = self.get_lottery_info(&lottery_name);
 		let caller = self.get_caller();
-		let call_token_name = self.call_value().token();
-		let payment = self.call_value().esdt_value();
 
 		require!(
 			info.whitelist.is_empty() || info.whitelist.contains(&caller),
 			"You are not allowed to participate in this lottery!"
 		);
 
-		require!(call_token_name == info.esdt_token_name, "Wrong esdt token!");
+		require!(token == info.esdt_token_name, "Wrong esdt token!");
 
 		require!(payment == info.ticket_price, "Wrong ticket fee!");
 

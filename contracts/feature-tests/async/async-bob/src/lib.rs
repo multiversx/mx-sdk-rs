@@ -26,14 +26,14 @@ pub trait Bob {
 	#[init]
 	fn init(&self) {}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn payMe(&self, #[payment] payment: BigUint, arg1: i64) {
 		self.set_last_payment(&payment);
 		self.set_pay_me_arg(arg1);
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn payMeWithResult(&self, #[payment] payment: BigUint, arg1: i64) -> i64 {
 		self.payMe(payment, arg1);

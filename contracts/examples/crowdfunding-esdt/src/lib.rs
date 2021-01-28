@@ -4,7 +4,7 @@
 imports!();
 derive_imports!();
 
-use elrond_wasm::HexCallDataSerializer;
+use elrond_wasm::{HexCallDataSerializer, TokenIdentifier};
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
@@ -27,24 +27,18 @@ pub trait Crowdfunding {
 	}
 
 	#[endpoint]
-	#[payable] // TODO: #[payable_esdt] syntax
-	fn fund(&self) -> SCResult<()> {
+	#[payable("*")]
+	fn fund(
+		&self,
+		#[payment] payment: BigUint,
+		#[payment_token] token: TokenIdentifier,
+	) -> SCResult<()> {
 		if self.get_block_nonce() > self.get_deadline() {
 			return sc_error!("cannot fund after deadline");
 		}
-		require!(
-			self.call_value().egld_value() == 0,
-			"EGLD payment not accepted"
-		);
 
-		let expected_token_name = self.get_cf_esdt_token_name();
-		let actual_token_name = self.call_value().token();
+		require!(token == self.get_cf_esdt_token_name(), "wrong esdt token");
 
-		if expected_token_name != actual_token_name {
-			return sc_error!("wrong esdt token");
-		}
-
-		let payment = self.call_value().esdt_value();
 		let caller = self.get_caller();
 		let mut deposit = self.get_deposit(&caller);
 		let mut balance = self.get_esdt_balance();

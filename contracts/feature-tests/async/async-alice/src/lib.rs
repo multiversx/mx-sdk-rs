@@ -45,7 +45,7 @@ pub trait Alice {
 		self.set_other_contract(calee_address);
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn forwardToOtherContract(&self, #[payment] payment: BigUint) {
 		let other_contract = self.get_other_contract();
@@ -54,7 +54,7 @@ pub trait Alice {
 		target_contract.payMe(payment, 0x56);
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn forwardToOtherContractWithCallback(&self, #[payment] payment: BigUint) {
 		let other_contract = self.get_other_contract();
