@@ -8,7 +8,7 @@ use elrond_codec::*;
 /// Simple wrapper around a boxed byte slice,
 /// but with a lot of optimized methods for manipulating it.
 /// The focus is on reducing code size rather improving speed.
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct BoxedBytes(Box<[u8]>);
 
 impl BoxedBytes {
