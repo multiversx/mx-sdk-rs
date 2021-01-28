@@ -7,7 +7,7 @@ pub trait SendTxRepeat {
 	#[init]
 	fn init(&self) {}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn repeat(
 		&self,

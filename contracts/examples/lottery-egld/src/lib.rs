@@ -136,7 +136,7 @@ pub trait Lottery {
 	}
 
 	#[endpoint]
-	#[payable]
+	#[payable("EGLD")]
 	fn buy_ticket(&self, lottery_name: BoxedBytes, #[payment] payment: BigUint) -> SCResult<()> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
