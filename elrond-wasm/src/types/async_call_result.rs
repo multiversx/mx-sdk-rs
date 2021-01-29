@@ -1,12 +1,12 @@
 use crate::abi::TypeAbi;
 use crate::io::{ArgId, DynArg, DynArgInput};
+use crate::types::BoxedBytes;
 use alloc::string::String;
-use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
 
 pub struct AsyncCallError {
 	pub err_code: u32,
-	pub err_msg: Vec<u8>, // TODO: convert to BoxedBytes
+	pub err_msg: BoxedBytes,
 }
 
 pub enum AsyncCallResult<T> {
@@ -27,12 +27,12 @@ where
 			AsyncCallResult::Ok(arg)
 		} else {
 			let err_msg = if loader.has_next() {
-				Vec::<u8>::dyn_load(loader, arg_id)
+				BoxedBytes::dyn_load(loader, arg_id)
 			} else {
 				// temporary fix, until a problem involving missing error messages in the protocol gets fixed
 				// can be removed after the protocol is patched
 				// error messages should not normally be missing
-				Vec::<u8>::new()
+				BoxedBytes::empty()
 			};
 			AsyncCallResult::Err(AsyncCallError { err_code, err_msg })
 		}

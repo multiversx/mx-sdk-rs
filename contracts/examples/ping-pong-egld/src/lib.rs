@@ -25,7 +25,7 @@ pub trait PingPong {
 		self.set_max_funds(max_funds);
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn ping(&self, #[payment] payment: &BigUint) -> SCResult<()> {
 		require!(

@@ -274,7 +274,7 @@ Gets the `birth_fee` set by the owner.
 Approves an address to use the kitty as a sire. Only the owner of `kitty_id` may call this function, and it may not override an already existing approved address.
 
 ```
-#[payable]
+#[payable("EGLD")]
 #[endpoint(breedWith)]
 fn breed_with(
 	#[payment] payment: BigUint,

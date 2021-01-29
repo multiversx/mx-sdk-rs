@@ -15,12 +15,16 @@ pub struct CallableMethod {
 
 impl CallableMethod {
 	pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
-		let payable = is_payable(m);
+		let payable = process_payable(m);
+		if let MethodPayableMetadata::SingleEsdtToken(_) | MethodPayableMetadata::AnyToken = payable {
+			panic!("payable methods in async call proxies currently only accept EGLD");
+		}
+
 		let callback_opt = CallbackCallAttribute::parse(m);
-		let method_args = extract_method_args(m, payable, callback_opt.is_some());
+		let method_args = extract_method_args(m, callback_opt.is_some());
 		CallableMethod {
 			name: m.sig.ident.clone(),
-			payable,
+			payable: payable.is_payable(),
 			callback: callback_opt,
 			method_args,
 		}
@@ -112,6 +116,7 @@ impl Callable {
 
 								quote! {}
 							},
+							ArgMetadata::PaymentToken => panic!("callable payment token not yet supported"),
 							ArgMetadata::Multi(multi_attr) => {
 								// #[multi(...)]
 								let count_expr = &multi_attr.count_expr;

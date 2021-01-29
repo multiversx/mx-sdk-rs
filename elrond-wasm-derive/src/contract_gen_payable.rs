@@ -1,26 +1,89 @@
-// use super::util::*;
+use super::util::*;
 // use super::parse_attr::*;
 use super::arg_def::*;
 use super::contract_gen_method::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-	let not_payable_snippet = quote! {
-		self.api.check_not_payable();
-	};
-	match &m.metadata {
-		MethodMetadata::Regular { payable, .. } => {
-			if *payable {
-				quote! {}
+	payable_snippet_for_metadata(m.metadata.payable_metadata(), &m.payment_arg, &m.token_arg)
+}
+
+fn payable_snippet_for_metadata(
+	mpm: MethodPayableMetadata,
+	payment_arg: &Option<MethodArg>,
+	token_arg: &Option<MethodArg>,
+) -> proc_macro2::TokenStream {
+	match mpm {
+		MethodPayableMetadata::NoMetadata => quote! {},
+		MethodPayableMetadata::NotPayable => {
+			let payment_init = if let Some(arg) = payment_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = BigUint::zero();
+				}
 			} else {
-				not_payable_snippet
+				quote! {}
+			};
+			let token_init = if let Some(arg) = token_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = TokenIdentifier::egld();
+				}
+			} else {
+				quote! {}
+			};
+			quote! {
+				self.call_value().check_not_payable();
+				#payment_init
+				#token_init
 			}
 		},
-		MethodMetadata::StorageGetter { .. } => not_payable_snippet,
-		MethodMetadata::StorageSetter { .. } => not_payable_snippet,
-		MethodMetadata::StorageGetMut { .. } => not_payable_snippet,
-		MethodMetadata::StorageIsEmpty { .. } => not_payable_snippet,
-		MethodMetadata::StorageClear { .. } => not_payable_snippet,
-		_ => quote! {},
+		MethodPayableMetadata::Egld => {
+			let payment_var_name = var_name_or_underscore(payment_arg);
+			let token_init = if let Some(arg) = token_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = TokenIdentifier::egld();
+				}
+			} else {
+				quote! {}
+			};
+			quote! {
+				let #payment_var_name = self.call_value().require_egld();
+				#token_init
+			}
+		},
+		MethodPayableMetadata::SingleEsdtToken(token_name) => {
+			let token_literal = byte_slice_literal(token_name.as_bytes());
+			let payment_var_name = var_name_or_underscore(payment_arg);
+			let token_init = if let Some(arg) = token_arg {
+				let pat = &arg.pat;
+				quote! {
+					let #pat = TokenIdentifier::from(#token_literal);
+				}
+			} else {
+				quote! {}
+			};
+			quote! {
+				let #payment_var_name = self.call_value().require_esdt(#token_literal);
+				#token_init
+			}
+		},
+		MethodPayableMetadata::AnyToken => {
+			let payment_var_name = var_name_or_underscore(payment_arg);
+			let token_var_name = var_name_or_underscore(token_arg);
+			quote! {
+				let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
+			}
+		},
+	}
+}
+
+fn var_name_or_underscore(opt_arg: &Option<MethodArg>) -> proc_macro2::TokenStream {
+	if let Some(arg) = opt_arg {
+		let pat = &arg.pat;
+		quote! { #pat }
+	} else {
+		quote! { _ }
 	}
 }
 
@@ -56,7 +119,7 @@ fn generate_payment_snippet_for_arg_type(
 	let type_str = type_path_segment.ident.to_string();
 	match type_str.as_str() {
 		"BigUint" => quote! {
-			let #pat = self.api.get_call_value_big_uint();
+			let #pat = self.api.egld_value();
 		},
 		other_stype_str => panic!(
 			"Arguments annotated with #[payment] must be of type BigUint. Found: {}",

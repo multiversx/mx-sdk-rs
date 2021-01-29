@@ -153,6 +153,22 @@
             ],
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "payable_some_token",
+            "payableInTokens": [
+                "TOKEN-FOR-ABI"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "payable_any_token",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
         }
     ],
     "types": {

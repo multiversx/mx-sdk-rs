@@ -11,17 +11,16 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 			if let Some(endpoint_name) = m.metadata.endpoint_name() {
 				let endpoint_docs = &m.docs;
 				let endpoint_name_str = endpoint_name.to_string();
-				let payable = if let MethodMetadata::Regular { payable, .. } = m.metadata {
-					payable
-				} else {
-					false
-				};
+				let payable_in_tokens = m.metadata.payable_metadata().abi_strings();
 
 				let input_snippets: Vec<proc_macro2::TokenStream> = m
 					.method_args
 					.iter()
 					.filter_map(|arg| {
-						if let ArgMetadata::Payment = arg.metadata {
+						if matches!(
+							arg.metadata,
+							ArgMetadata::Payment | ArgMetadata::PaymentToken
+						) {
 							None
 						} else {
 							let mut arg_type = arg.ty.clone();
@@ -53,7 +52,7 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 					let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
 						docs: &[ #(#endpoint_docs),* ],
 						name: #endpoint_name_str,
-						payable: #payable,
+						payable_in_tokens: &[ #(#payable_in_tokens),* ],
 						inputs: Vec::new(),
 						outputs: Vec::new(),
 					};

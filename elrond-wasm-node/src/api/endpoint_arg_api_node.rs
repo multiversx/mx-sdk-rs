@@ -1,7 +1,6 @@
 use crate::error_hook;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
-use elrond_wasm::api::ContractHookApi;
 use elrond_wasm::api::EndpointArgumentApi;
 use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
@@ -11,16 +10,10 @@ extern "C" {
 	fn getArgumentLength(id: i32) -> i32;
 	fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
 
-	// fn callValue(resultOffset: *const u8) -> i32;
-	// fn getESDTValue(resultOffset: *const u8) -> usize;
-	// fn getESDTTokenName(resultOffset: *const u8) -> usize;
-
 	// big int API
 	fn bigIntNew(value: i64) -> i32;
 	fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
 	fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
-	// fn bigIntGetCallValue(dest: i32);
-	// fn bigIntGetESDTCallValue(dest: i32);
 
 	// small int API
 	fn smallIntGetUnsignedArgument(id: i32) -> i64;
@@ -33,12 +26,6 @@ impl EndpointArgumentApi for ArwenApiImpl {
 	#[inline]
 	fn get_num_arguments(&self) -> i32 {
 		unsafe { getNumArguments() }
-	}
-
-	fn check_not_payable(&self) {
-		if self.get_call_value_big_uint() > 0 {
-			error_hook::signal_error(err_msg::NON_PAYABLE);
-		}
 	}
 
 	#[inline]
