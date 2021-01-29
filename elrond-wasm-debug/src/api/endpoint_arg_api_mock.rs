@@ -1,7 +1,6 @@
 use crate::{TxContext, TxPanic};
 use alloc::vec::Vec;
-use elrond_wasm::api::{ContractHookApi, EndpointArgumentApi, ErrorApi};
-use elrond_wasm::err_msg;
+use elrond_wasm::api::EndpointArgumentApi;
 use elrond_wasm::types::BoxedBytes;
 use num_bigint::{BigInt, BigUint};
 use num_traits::cast::ToPrimitive;
@@ -11,12 +10,6 @@ use num_traits::cast::ToPrimitive;
 impl EndpointArgumentApi for TxContext {
 	fn get_num_arguments(&self) -> i32 {
 		self.tx_input_box.args.len() as i32
-	}
-
-	fn check_not_payable(&self) {
-		if self.get_call_value_big_uint() > 0 {
-			self.signal_error(err_msg::NON_PAYABLE);
-		}
 	}
 
 	fn get_argument_len(&self, arg_index: i32) -> usize {

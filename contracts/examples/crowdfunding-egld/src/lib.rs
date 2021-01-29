@@ -21,7 +21,7 @@ pub trait Crowdfunding {
 		self.set_deadline(deadline);
 	}
 
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint]
 	fn fund(&self, #[payment] payment: BigUint) -> SCResult<()> {
 		if self.get_block_nonce() > self.get_deadline() {

@@ -35,8 +35,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
-                "message": "str:attempted to transfer funds via a non-payable function",
+                "status": "10",
+                "message": "str:function does not accept EGLD payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -58,8 +58,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
-                "message": "str:attempted to transfer funds via a non-payable function",
+                "status": "10",
+                "message": "str:function does not accept EGLD payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -82,8 +82,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
-                "message": "str:attempted to transfer funds via a non-payable function",
+                "status": "10",
+                "message": "str:function does not accept EGLD payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -106,8 +106,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
-                "message": "str:attempted to transfer funds via a non-payable function",
+                "status": "10",
+                "message": "str:function does not accept EGLD payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -130,8 +130,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
-                "message": "str:attempted to transfer funds via a non-payable function",
+                "status": "10",
+                "message": "str:function does not accept EGLD payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -155,8 +155,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
-                "message": "str:attempted to transfer funds via a non-payable function",
+                "status": "10",
+                "message": "str:function does not accept EGLD payment",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

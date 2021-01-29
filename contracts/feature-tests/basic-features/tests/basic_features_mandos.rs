@@ -38,6 +38,21 @@ fn echo_async_result_empty() {
 }
 
 #[test]
+fn echo_big_int() {
+	parse_execute_mandos("mandos/echo_big_int.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_big_uint() {
+	parse_execute_mandos("mandos/echo_big_uint.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_boxed_bytes() {
+	parse_execute_mandos("mandos/echo_boxed_bytes.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_i32() {
 	parse_execute_mandos("mandos/echo_i32.scen.json", &contract_map());
 }
@@ -55,6 +70,26 @@ fn echo_multi_i32() {
 #[test]
 fn echo_nothing() {
 	parse_execute_mandos("mandos/echo_nothing.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_slice_u8() {
+	parse_execute_mandos("mandos/echo_slice_u8.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_str_box() {
+	parse_execute_mandos("mandos/echo_str_box.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_string() {
+	parse_execute_mandos("mandos/echo_string.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_str() {
+	parse_execute_mandos("mandos/echo_str.scen.json", &contract_map());
 }
 
 #[test]
@@ -78,33 +113,23 @@ fn echo_varargs_u32() {
 }
 
 #[test]
-fn echo_slice_u8() {
-	parse_execute_mandos("mandos/echo_slice_u8.scen.json", &contract_map());
-}
-
-#[test]
-fn echo_string() {
-	parse_execute_mandos("mandos/echo_string.scen.json", &contract_map());
-}
-
-#[test]
-fn echo_str() {
-	parse_execute_mandos("mandos/echo_str.scen.json", &contract_map());
-}
-
-#[test]
-fn echo_str_box() {
-	parse_execute_mandos("mandos/echo_str_box.scen.json", &contract_map());
-}
-
-#[test]
 fn echo_vec_u8() {
 	parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_boxed_bytes() {
-	parse_execute_mandos("mandos/echo_boxed_bytes.scen.json", &contract_map());
+fn eventa1() {
+	parse_execute_mandos("mandos/eventA1.scen.json", &contract_map());
+}
+
+#[test]
+fn eventa2() {
+	parse_execute_mandos("mandos/eventA2.scen.json", &contract_map());
+}
+
+#[test]
+fn eventb1() {
+	parse_execute_mandos("mandos/eventB1.scen.json", &contract_map());
 }
 
 #[test]
@@ -113,9 +138,80 @@ fn panic() {
 }
 
 #[test]
+fn payable_any_1() {
+	parse_execute_mandos("mandos/payable_any_1.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_any_2() {
+	parse_execute_mandos("mandos/payable_any_2.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_any_3() {
+	parse_execute_mandos("mandos/payable_any_3.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_any_4() {
+	parse_execute_mandos("mandos/payable_any_4.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_egld_0() {
+	parse_execute_mandos("mandos/payable_egld_0.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_egld_1() {
+	parse_execute_mandos("mandos/payable_egld_1.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_egld_2() {
+	parse_execute_mandos("mandos/payable_egld_2.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_egld_3() {
+	parse_execute_mandos("mandos/payable_egld_3.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_egld_4() {
+	parse_execute_mandos("mandos/payable_egld_4.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_token_1() {
+	parse_execute_mandos("mandos/payable_token_1.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_token_2() {
+	parse_execute_mandos("mandos/payable_token_2.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_token_3() {
+	parse_execute_mandos("mandos/payable_token_3.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_token_4() {
+	parse_execute_mandos("mandos/payable_token_4.scen.json", &contract_map());
+}
+
+#[test]
 fn return_error() {
 	parse_execute_mandos("mandos/return_error.scen.json", &contract_map());
 }
+
+// TODO: fixing this test requires a mandos-rs fix
+// #[test]
+// fn send_tx() {
+//     parse_execute_mandos("mandos/send_tx.scen.json", &contract_map());
+// }
 
 #[test]
 fn storage_addr() {
@@ -138,6 +234,16 @@ fn storage_bool() {
 }
 
 #[test]
+fn storage_clear() {
+	parse_execute_mandos("mandos/storage_clear.scen.json", &contract_map());
+}
+
+#[test]
+fn storage_i64_bad() {
+	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_i64() {
 	parse_execute_mandos("mandos/storage_i64.scen.json", &contract_map());
 }
@@ -148,11 +254,6 @@ fn storage_load_cumulated_validator_reward() {
 		"mandos/storage_load_cumulated_validator_reward.scen.json",
 		&contract_map(),
 	);
-}
-
-#[test]
-fn storage_i64_bad() {
-	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
 }
 
 #[test]
@@ -189,18 +290,8 @@ fn storage_opt_addr() {
 }
 
 #[test]
-fn storage_clear() {
-	parse_execute_mandos("mandos/storage_clear.scen.json", &contract_map());
-}
-
-#[test]
 fn storage_reserved() {
 	parse_execute_mandos("mandos/storage_reserved.scen.json", &contract_map());
-}
-
-#[test]
-fn storage_u64() {
-	parse_execute_mandos("mandos/storage_u64.scen.json", &contract_map());
 }
 
 #[test]
@@ -209,13 +300,18 @@ fn storage_u64_bad() {
 }
 
 #[test]
-fn storage_usize() {
-	parse_execute_mandos("mandos/storage_usize.scen.json", &contract_map());
+fn storage_u64() {
+	parse_execute_mandos("mandos/storage_u64.scen.json", &contract_map());
 }
 
 #[test]
 fn storage_usize_bad() {
 	parse_execute_mandos("mandos/storage_usize_bad.scen.json", &contract_map());
+}
+
+#[test]
+fn storage_usize() {
+	parse_execute_mandos("mandos/storage_usize.scen.json", &contract_map());
 }
 
 #[test]

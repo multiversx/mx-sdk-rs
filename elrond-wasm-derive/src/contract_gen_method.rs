@@ -17,11 +17,55 @@ pub enum Visibility {
 	Private,
 }
 
+/// Contains metdata from the `#[payable]` attribute.
+#[derive(Clone, Debug)]
+pub enum MethodPayableMetadata {
+	NoMetadata,
+	NotPayable,
+	Egld,
+	SingleEsdtToken(String),
+	AnyToken,
+}
+
+impl MethodPayableMetadata {
+	pub fn is_payable(&self) -> bool {
+		!matches!(self, MethodPayableMetadata::NotPayable)
+	}
+
+	pub fn abi_strings(&self) -> Vec<String> {
+		match self {
+			MethodPayableMetadata::NoMetadata | MethodPayableMetadata::NotPayable => Vec::new(),
+			MethodPayableMetadata::Egld => vec!["EGLD".to_string()],
+			MethodPayableMetadata::SingleEsdtToken(s) => vec![s.clone()],
+			MethodPayableMetadata::AnyToken => vec!["*".to_string()],
+		}
+	}
+}
+
+pub fn process_payable(m: &syn::TraitItemMethod) -> MethodPayableMetadata {
+	let payable_attr_opt = PayableAttribute::parse(m);
+	if let Some(payable_attr) = payable_attr_opt {
+		if let Some(identifier) = payable_attr.identifier {
+			match identifier.as_str() {
+				"EGLD" => MethodPayableMetadata::Egld,
+				"*" => MethodPayableMetadata::AnyToken,
+				"" => panic!("empty token name not allowed in #[payable] attribute"),
+				_ => MethodPayableMetadata::SingleEsdtToken(identifier),
+			}
+		} else {
+			println!("Warning: usage of #[payable] without argument is deprecated. Replace with #[payable(\"EGLD\")]. Method name: {}", m.sig.ident.to_string());
+			MethodPayableMetadata::Egld
+		}
+	} else {
+		MethodPayableMetadata::NotPayable
+	}
+}
+
 #[derive(Clone, Debug)]
 pub enum MethodMetadata {
 	Regular {
 		visibility: Visibility,
-		payable: bool,
+		payable: MethodPayableMetadata,
 	},
 	Event {
 		identifier: Vec<u8>,
@@ -98,6 +142,18 @@ impl MethodMetadata {
 			MethodMetadata::Regular { .. } | MethodMetadata::Callback | MethodMetadata::CallbackRaw
 		)
 	}
+
+	pub fn payable_metadata(&self) -> MethodPayableMetadata {
+		match self {
+			MethodMetadata::Regular { payable, .. } => payable.clone(),
+			MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageIsEmpty { .. } => MethodPayableMetadata::NotPayable,
+			MethodMetadata::StorageClear { .. } => MethodPayableMetadata::NotPayable,
+			_ => MethodPayableMetadata::NoMetadata,
+		}
+	}
 }
 
 #[derive(Clone, Debug)]
@@ -107,6 +163,8 @@ pub struct Method {
 	pub name: syn::Ident,
 	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
+	pub payment_arg: Option<MethodArg>,
+	pub token_arg: Option<MethodArg>,
 	pub output_names: Vec<String>,
 	pub return_type: syn::ReturnType,
 	pub body: Option<syn::Block>,
@@ -169,9 +227,8 @@ fn process_visibility(m: &syn::TraitItemMethod) -> Visibility {
 }
 
 fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
-	let payable = is_payable(m);
-
 	let visibility = process_visibility(m);
+	let payable = process_payable(m);
 	let callback = is_callback_decl(m);
 	let callback_raw = is_callback_raw_decl(m);
 	let event_opt = EventAttribute::parse(m);
@@ -184,7 +241,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let module_opt = ModuleAttribute::parse(m);
 
 	if let Some(event_attr) = event_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Events cannot be payable.");
 		}
 		if let Visibility::Endpoint(_) = visibility {
@@ -215,7 +272,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			identifier: event_attr.identifier,
 		}
 	} else if callback || callback_raw {
-		if payable {
+		if payable.is_payable() {
 			panic!("Callback methods cannot be marked payable.");
 		}
 		if let Visibility::Endpoint(_) = visibility {
@@ -248,7 +305,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			MethodMetadata::Callback
 		}
 	} else if let Some(storage_get) = storage_get_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Storage getters cannot be marked payable.");
 		}
 		if m.default.is_some() {
@@ -262,7 +319,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			identifier: storage_get.identifier,
 		}
 	} else if let Some(storage_set) = storage_set_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Storage setters cannot be marked payable.");
 		}
 		if m.default.is_some() {
@@ -276,7 +333,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			identifier: storage_set.identifier,
 		}
 	} else if let Some(storage_mapper) = storage_mapper_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Storage mappers cannot be marked payable.");
 		}
 		if m.default.is_some() {
@@ -290,7 +347,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			identifier: storage_mapper.identifier,
 		}
 	} else if let Some(storage_get_mut) = storage_get_mut_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Storage mutable getters cannot be marked payable.");
 		}
 		if m.default.is_some() {
@@ -304,7 +361,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			identifier: storage_get_mut.identifier,
 		}
 	} else if let Some(storage_is_empty) = storage_is_empty_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Storage is empty cannot be marked payable.");
 		}
 		if m.default.is_some() {
@@ -318,7 +375,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 			identifier: storage_is_empty.identifier,
 		}
 	} else if let Some(storage_clear) = storage_clear_opt {
-		if payable {
+		if payable.is_payable() {
 			panic!("Storage clear cannot be marked payable.");
 		}
 		if m.default.is_some() {
@@ -347,7 +404,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 		}
 		MethodMetadata::Regular {
 			visibility,
-			payable,
+			payable: payable,
 		}
 	}
 }
@@ -356,7 +413,9 @@ impl Method {
 	pub fn parse(m: &syn::TraitItemMethod) -> Method {
 		let metadata = extract_metadata(m);
 		let allow_callback_args = matches!(metadata, MethodMetadata::Callback);
-		let method_args = extract_method_args(m, is_payable(m), allow_callback_args);
+		let method_args = extract_method_args(m, allow_callback_args);
+		let payment_arg = extract_payment(metadata.payable_metadata(), &method_args[..]);
+		let token_arg = extract_payment_token(metadata.payable_metadata(), &method_args[..]);
 		let output_names = find_output_names(m);
 		Method {
 			docs: extract_doc(m.attrs.as_slice()),
@@ -364,6 +423,8 @@ impl Method {
 			name: m.sig.ident.clone(),
 			generics: m.sig.generics.clone(),
 			method_args,
+			payment_arg,
+			token_arg,
 			output_names,
 			return_type: m.sig.output.clone(),
 			body: m.default.clone(),
@@ -443,7 +504,7 @@ impl Method {
 							let #pat = #arg_get;
 						}
 					},
-					ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
+					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 					ArgMetadata::Multi(_) => panic!(
 						"multi args not accepted in function generate_call_method_fixed_args"
 					),
@@ -485,7 +546,7 @@ impl Method {
 					ArgMetadata::Single | ArgMetadata::VarArgs => {
 						generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
 					},
-					ArgMetadata::Payment => generate_payment_snippet(arg), // #[payment]
+					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 					ArgMetadata::Multi(multi_attr) => {
 						// #[multi(...)]
 						let count_expr = &multi_attr.count_expr;

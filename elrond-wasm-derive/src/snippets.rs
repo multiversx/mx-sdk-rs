@@ -42,6 +42,7 @@ pub fn api_where() -> proc_macro2::TokenStream {
 	  #bi_where
 		T: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 		 + elrond_wasm::api::ErrorApi
+		 + elrond_wasm::api::CallValueApi<BigUint>
 		 + elrond_wasm::api::EndpointArgumentApi
 		 + elrond_wasm::api::EndpointFinishApi
 		 + elrond_wasm::api::StorageReadApi
@@ -59,10 +60,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		#api_where
 		{
 			type Storage = T::Storage;
+			type CallValue = T::CallValue;
 
 			#[inline]
 			fn get_storage_raw(&self) -> Self::Storage {
 				self.api.get_storage_raw()
+			}
+
+			#[inline]
+			fn call_value(&self) -> Self::CallValue {
+				self.api.call_value()
 			}
 
 			#[inline]
@@ -83,21 +90,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn get_balance(&self, address: &Address) -> BigUint {
 			self.api.get_balance(address)
-			}
-
-			#[inline]
-			fn get_call_value_big_uint(&self) -> BigUint {
-				self.api.get_call_value_big_uint()
-			}
-
-			#[inline]
-			fn get_esdt_value_big_uint(&self) -> BigUint {
-				self.api.get_esdt_value_big_uint()
-			}
-
-			#[inline]
-			fn get_esdt_token_name(&self) -> Vec<u8> {
-				self.api.get_esdt_token_name()
 			}
 
 			#[inline]

@@ -15,9 +15,9 @@ pub trait CryptoBubbles {
 	}
 
 	/// player adds funds
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint(topUp)]
-	fn add_funds(&self, #[payment] payment: BigUint) {
+	fn top_up(&self, #[payment] payment: BigUint) {
 		let caller = self.get_caller();
 
 		let mut balance = self.get_player_balance(&caller);
@@ -72,13 +72,11 @@ pub trait CryptoBubbles {
 	}
 
 	// player tops up + joins a game
-	#[payable]
+	#[payable("EGLD")]
 	#[endpoint(joinGame)]
-	fn join_game(&self, game_index: BigUint) -> SCResult<()> {
+	fn join_game(&self, game_index: BigUint, #[payment] bet: BigUint) -> SCResult<()> {
 		let player = self.get_caller();
-		let bet = self.get_call_value_big_uint();
-
-		self.add_funds(self.get_call_value_big_uint());
+		self.top_up(self.call_value().egld_value());
 		self._add_player_to_game_state_change(&game_index, &player, &bet)
 	}
 

@@ -2,13 +2,18 @@ use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::async_data::*;
 use crate::{SendBalance, TxContext};
-use alloc::vec::Vec;
 use elrond_wasm::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
+	type CallValue = Self;
 
 	fn get_storage_raw(&self) -> Self::Storage {
+		self.clone()
+	}
+
+	#[inline]
+	fn call_value(&self) -> Self::CallValue {
 		self.clone()
 	}
 
@@ -32,21 +37,6 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			panic!("get balance not yet implemented for accounts other than the contract itself");
 		}
 		self.blockchain_info_box.contract_balance.clone().into()
-	}
-
-	#[inline]
-	fn get_call_value_big_uint(&self) -> RustBigUint {
-		self.tx_input_box.call_value.clone().into()
-	}
-
-	#[inline]
-	fn get_esdt_value_big_uint(&self) -> RustBigUint {
-		self.tx_input_box.esdt_value.clone().into()
-	}
-
-	#[inline]
-	fn get_esdt_token_name(&self) -> Vec<u8> {
-		self.tx_input_box.esdt_token_name.clone()
 	}
 
 	fn send_tx(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
