@@ -88,8 +88,7 @@ where
 	}
 
 	fn get_front(&self) -> u32 {
-		let front = self.get_u32(FRONT_IDENTIFIER);
-		front
+		self.get_u32(FRONT_IDENTIFIER)
 	}
 
 	fn set_front(&self, index: u32) {
@@ -235,14 +234,14 @@ where
 	}
 
 	pub fn pop_back(&mut self) -> Option<T> {
-		self.remove_at_index(self.get_back())
+		self.remove_by_node_id(self.get_back())
 	}
 
 	pub fn pop_front(&mut self) -> Option<T> {
-		self.remove_at_index(self.get_front())
+		self.remove_by_node_id(self.get_front())
 	}
 
-	pub(crate) fn remove_at_index(&self, index: u32) -> Option<T> {
+	pub(crate) fn remove_by_node_id(&self, index: u32) -> Option<T> {
 		if index == NULL_ENTRY {
 			return None;
 		}
