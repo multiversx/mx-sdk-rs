@@ -28,6 +28,11 @@ fn count_ones() {
 }
 
 #[test]
+fn crypto_keccak256() {
+	parse_execute_mandos("mandos/crypto_keccak256.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_array_u8() {
 	parse_execute_mandos("mandos/echo_array_u8.scen.json", &contract_map());
 }
