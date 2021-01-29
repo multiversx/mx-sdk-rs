@@ -461,9 +461,9 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn list_mapper_pop_front(&self) {
+	fn list_mapper_pop_front(&self) -> Option<u32> {
 		let mut list_mapper = self.list_mapper();
-		list_mapper.pop_front();
+		list_mapper.pop_front()
 	}
 
 	#[endpoint]

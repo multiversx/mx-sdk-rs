@@ -212,7 +212,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "1|u32:123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -256,7 +258,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "1|u32:111"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
