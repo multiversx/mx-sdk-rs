@@ -143,7 +143,7 @@ fn parse_execute_mandos_steps(
 				};
 				state.increase_nonce(&tx_input.from);
 				let (mut tx_result, opt_async_data) =
-					execute_sc_call(tx_input, state, contract_map);
+					execute_sc_call(tx_input, state, contract_map).unwrap();
 				if tx_result.result_status == 0 {
 					if let Some(async_data) = opt_async_data {
 						let contract_address = tx.to.value.into();
@@ -156,7 +156,7 @@ fn parse_execute_mandos_steps(
 							}
 
 							let (async_result, opt_more_async) =
-								execute_sc_call(async_input, state, contract_map);
+								execute_sc_call(async_input, state, contract_map).unwrap();
 							assert!(
 								opt_more_async.is_none(),
 								"nested asyncs currently not supported"
@@ -169,14 +169,16 @@ fn parse_execute_mandos_steps(
 								&async_result,
 							);
 							let (callback_result, opt_more_async) =
-								execute_sc_call(callback_input, state, contract_map);
+								execute_sc_call(callback_input, state, contract_map).unwrap();
 							assert!(
 								opt_more_async.is_none(),
 								"successive asyncs currently not supported"
 							);
 							tx_result = merge_results(tx_result, callback_result);
 						} else {
-							state.subtract_tx_payment(&contract_address, &async_data.call_value);
+							state
+								.subtract_tx_payment(&contract_address, &async_data.call_value)
+								.unwrap();
 							state.add_account(AccountData {
 								address: async_data.to.clone(),
 								nonce: 0,
@@ -218,7 +220,8 @@ fn parse_execute_mandos_steps(
 				};
 				state.increase_nonce(&tx_input.from);
 				let (tx_result, _) =
-					execute_sc_create(tx_input, &tx.contract_code.value, state, contract_map);
+					execute_sc_create(tx_input, &tx.contract_code.value, state, contract_map)
+						.unwrap();
 				if let Some(tx_expect) = expect {
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
 				}
@@ -226,7 +229,9 @@ fn parse_execute_mandos_steps(
 			Step::Transfer { tx_id, comment, tx } => {
 				let sender_address = &tx.from.value.into();
 				state.increase_nonce(sender_address);
-				state.subtract_tx_payment(sender_address, &tx.value.value);
+				state
+					.subtract_tx_payment(sender_address, &tx.value.value)
+					.unwrap();
 				let recipient_address = &tx.to.value.into();
 				state.increase_balance(recipient_address, &tx.value.value);
 				let esdt_token_name = tx.esdt_token_name.value.clone();
@@ -268,13 +273,13 @@ fn execute_sc_call(
 	tx_input: TxInput,
 	state: &mut BlockchainMock,
 	contract_map: &ContractMap<TxContext>,
-) -> (TxResult, Option<AsyncCallTxData>) {
+) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let call_value = tx_input.call_value.clone();
 	let blockchain_info = state.create_tx_info(&to);
 
-	state.subtract_tx_payment(&from, &call_value);
+	state.subtract_tx_payment(&from, &call_value)?;
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
 	let esdt_token_name = tx_input.esdt_token_name.clone();
@@ -314,7 +319,7 @@ fn execute_sc_call(
 		let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
 
 		state.increase_balance(&to, &call_value);
-		state.send_balance(&to, tx_output.send_balance_list.as_slice());
+		state.send_balance(&to, tx_output.send_balance_list.as_slice())?;
 
 		if esdt_used {
 			state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
@@ -327,7 +332,7 @@ fn execute_sc_call(
 		}
 	}
 
-	(tx_result, tx_output.async_call)
+	Ok((tx_result, tx_output.async_call))
 }
 
 fn execute_sc_create(
@@ -335,13 +340,13 @@ fn execute_sc_create(
 	contract_path: &Vec<u8>,
 	state: &mut BlockchainMock,
 	contract_map: &ContractMap<TxContext>,
-) -> (TxResult, Option<AsyncCallTxData>) {
+) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let call_value = tx_input.call_value.clone();
 	let blockchain_info = state.create_tx_info(&to);
 
-	state.subtract_tx_payment(&from, &call_value);
+	state.subtract_tx_payment(&from, &call_value)?;
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
 	let esdt_token_name = tx_input.esdt_token_name.clone();
@@ -361,7 +366,7 @@ fn execute_sc_create(
 			tx_output.contract_storage,
 			contract_path.clone(),
 		);
-		state.send_balance(&new_address, tx_output.send_balance_list.as_slice());
+		state.send_balance(&new_address, tx_output.send_balance_list.as_slice())?;
 	} else {
 		state.increase_balance(&from, &call_value);
 
@@ -370,7 +375,7 @@ fn execute_sc_create(
 		}
 	}
 
-	(tx_output.result, tx_output.async_call)
+	Ok((tx_output.result, tx_output.async_call))
 }
 
 fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {

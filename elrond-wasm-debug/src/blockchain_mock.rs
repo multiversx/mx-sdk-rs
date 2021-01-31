@@ -1,3 +1,4 @@
+use super::mock_error::BlockchainMockError;
 use crate::contract_map::*;
 use crate::display_util::*;
 use crate::tx_context::*;
@@ -161,16 +162,20 @@ impl BlockchainMock {
 		}
 	}
 
-	pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint) {
+	pub fn subtract_tx_payment(
+		&mut self,
+		address: &Address,
+		call_value: &BigUint,
+	) -> Result<(), BlockchainMockError> {
 		let sender_account = self
 			.accounts
 			.get_mut(address)
 			.unwrap_or_else(|| panic!("Sender account not found"));
-		assert!(
-			&sender_account.balance >= call_value,
-			"Not enough balance to send tx payment"
-		);
+		if &sender_account.balance < call_value {
+			return Err("failed transfer (insufficient funds)".into());
+		}
 		sender_account.balance -= call_value;
+		Ok(())
 	}
 
 	pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
@@ -194,11 +199,16 @@ impl BlockchainMock {
 		account.balance += amount;
 	}
 
-	pub fn send_balance(&mut self, contract_address: &Address, send_balance_list: &[SendBalance]) {
+	pub fn send_balance(
+		&mut self,
+		contract_address: &Address,
+		send_balance_list: &[SendBalance],
+	) -> Result<(), BlockchainMockError> {
 		for send_balance in send_balance_list {
-			self.subtract_tx_payment(contract_address, &send_balance.amount);
+			self.subtract_tx_payment(contract_address, &send_balance.amount)?;
 			self.increase_balance(&send_balance.recipient, &send_balance.amount);
 		}
+		Ok(())
 	}
 
 	pub fn substract_esdt_balance(
