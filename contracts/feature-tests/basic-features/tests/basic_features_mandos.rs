@@ -208,8 +208,8 @@ fn return_error() {
 }
 
 #[test]
-fn send_tx() {
-    parse_execute_mandos("mandos/send_tx.scen.json", &contract_map());
+fn send_egld() {
+	parse_execute_mandos("mandos/send_egld.scen.json", &contract_map());
 }
 
 #[test]

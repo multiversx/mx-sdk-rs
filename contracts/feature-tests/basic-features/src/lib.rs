@@ -471,7 +471,7 @@ pub trait BasicFeatures {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send_tx(to, amount, data);
+		self.send().egld(to, amount, data);
 	}
 
 	// BLOCK INFO

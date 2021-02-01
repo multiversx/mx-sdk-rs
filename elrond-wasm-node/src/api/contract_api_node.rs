@@ -16,13 +16,6 @@ extern "C" {
 	#[allow(dead_code)]
 	fn getFunction(functionOffset: *const u8) -> i32;
 
-	fn transferValue(
-		dstOffset: *const u8,
-		valueOffset: *const u8,
-		dataOffset: *const u8,
-		length: i32,
-	) -> i32;
-
 	fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
 
 	fn createContract(
@@ -94,6 +87,7 @@ extern "C" {
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 	type Storage = Self;
 	type CallValue = Self;
+	type SendApi = Self;
 
 	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
@@ -102,6 +96,11 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 	#[inline]
 	fn call_value(&self) -> Self::CallValue {
+		self.clone()
+	}
+
+	#[inline]
+	fn send(&self) -> Self::SendApi {
 		self.clone()
 	}
 
@@ -137,18 +136,6 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			let result = bigIntNew(0);
 			bigIntGetExternalBalance(address.as_ref().as_ptr(), result);
 			ArwenBigUint { handle: result }
-		}
-	}
-
-	fn send_tx(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
-		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
-		unsafe {
-			transferValue(
-				to.as_ref().as_ptr(),
-				amount_bytes32.as_ptr(),
-				data.as_ptr(),
-				data.len() as i32,
-			);
 		}
 	}
 
