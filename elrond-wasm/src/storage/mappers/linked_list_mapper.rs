@@ -68,7 +68,7 @@ where
 		storage_get(self.api.clone(), self.build_name_key(name).as_slice())
 	}
 
-	fn set_u32(&self, name: &[u8], value: u32) {
+	fn set_u32(&mut self, name: &[u8], value: u32) {
 		storage_set(
 			self.api.clone(),
 			self.build_name_key(name).as_slice(),
@@ -80,12 +80,16 @@ where
 		self.get_u32(LEN_IDENTIFIER)
 	}
 
-	fn set_len(&self, len: u32) {
+	fn set_len(&mut self, len: u32) {
 		self.set_u32(LEN_IDENTIFIER, len);
 	}
 
-	fn generate_new_node_id(&self) -> u32 {
-		let new_key = self.get_u32(NEW_KEY_IDENTIFIER) + 1;
+	fn get_new_key(&self) -> u32 {
+		self.get_u32(NEW_KEY_IDENTIFIER)
+	}
+
+	fn generate_new_node_id(&mut self) -> u32 {
+		let new_key = self.get_new_key() + 1;
 		self.set_u32(NEW_KEY_IDENTIFIER, new_key);
 		new_key
 	}
@@ -94,7 +98,7 @@ where
 		self.get_u32(FRONT_IDENTIFIER)
 	}
 
-	fn set_front(&self, node_id: u32) {
+	fn set_front(&mut self, node_id: u32) {
 		self.set_u32(FRONT_IDENTIFIER, node_id);
 	}
 
@@ -102,7 +106,7 @@ where
 		self.get_u32(BACK_IDENTIFIER)
 	}
 
-	fn set_back(&self, node_id: u32) {
+	fn set_back(&mut self, node_id: u32) {
 		self.set_u32(BACK_IDENTIFIER, node_id);
 	}
 
@@ -114,7 +118,7 @@ where
 		)
 	}
 
-	fn set_node(&self, node_id: u32, item: Node) {
+	fn set_node(&mut self, node_id: u32, item: Node) {
 		storage_set(
 			self.api.clone(),
 			self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
@@ -123,7 +127,7 @@ where
 		);
 	}
 
-	fn clear_node(&self, node_id: u32) {
+	fn clear_node(&mut self, node_id: u32) {
 		storage_set(
 			self.api.clone(),
 			self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
@@ -147,7 +151,7 @@ where
 		Some(self.get_value(node_id))
 	}
 
-	fn set_value(&self, node_id: u32, value: &T) {
+	fn set_value(&mut self, node_id: u32, value: &T) {
 		storage_set(
 			self.api.clone(),
 			self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
@@ -156,7 +160,7 @@ where
 		)
 	}
 
-	fn clear_value(&self, node_id: u32) {
+	fn clear_value(&mut self, node_id: u32) {
 		storage_set(
 			self.api.clone(),
 			self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
@@ -277,7 +281,7 @@ where
 	/// Note: has undefined behavior if there's no node with the given node id in the list
 	///
 	/// This operation should compute in *O*(1) time.
-	pub(crate) fn remove_by_node_id(&self, node_id: u32) -> Option<T> {
+	pub(crate) fn remove_by_node_id(&mut self, node_id: u32) -> Option<T> {
 		if node_id == NULL_ENTRY {
 			return None;
 		}
@@ -385,5 +389,61 @@ where
 
 	fn is_multi_arg_or_result() -> bool {
 		true
+	}
+}
+
+#[cfg(test)]
+mod test {
+	use super::{BoxedBytes, LinkedListMapper, Vec};
+	use elrond_wasm_debug::TxContext;
+
+	fn create_list() -> LinkedListMapper<TxContext, u64> {
+		LinkedListMapper::new(TxContext::dummy(), BoxedBytes::from_concat(&[b"my_list"]))
+	}
+
+	struct Entry {
+		node_id: u32,
+		previous: u32,
+		next: u32,
+		value: u32,
+	}
+
+	struct ListState {
+		entries: Vec<Entry>,
+		front: u32,
+		back: u32,
+		new: u32,
+		len: u32,
+	}
+
+	fn extract_list_state(list: &LinkedListMapper<TxContext, u64>) -> ListState {
+		let mut state = ListState {
+			entries: Vec::new(),
+			front: list.get_front(),
+			back: list.get_back(),
+			new: list.get_new_key(),
+			len: list.get_len(),
+		};
+		let mut ids = Vec::new();
+		let mut node_id = list.get_front();
+		/*
+		while node_id != NULL_ENTRY {
+			ids.push_back(node_id);
+			node = list;
+			//...
+		}*/
+		state
+	}
+
+	fn check_list_nodes(list: &LinkedListMapper<TxContext, u64>, nodes: Vec<Entry>) {}
+
+	#[test]
+	fn test_list_internals() {
+		let mut list = create_list();
+		let range = 40..45;
+		range.for_each(|value| list.push_back(value));
+		let processed: Vec<u64> = list.iter().map(|val| val + 10).collect();
+		let expected: Vec<u64> = (50..55).collect();
+		assert_eq!(processed, expected);
 	}
 }
