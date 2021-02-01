@@ -61,6 +61,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		{
 			type Storage = T::Storage;
 			type CallValue = T::CallValue;
+			type SendApi = T::SendApi;
 
 			#[inline]
 			fn get_storage_raw(&self) -> Self::Storage {
@@ -70,6 +71,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn call_value(&self) -> Self::CallValue {
 				self.api.call_value()
+			}
+
+			#[inline]
+			fn send(&self) -> Self::SendApi {
+				self.api.send()
 			}
 
 			#[inline]
@@ -90,11 +96,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn get_balance(&self, address: &Address) -> BigUint {
 			self.api.get_balance(address)
-			}
-
-			#[inline]
-			fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]) {
-				self.api.send_tx(to, amount, data);
 			}
 
 			#[inline]

@@ -1,19 +1,26 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::async_data::*;
-use crate::{SendBalance, TxContext, TxPanic};
+use crate::TxContext;
 use elrond_wasm::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
 	type CallValue = Self;
+	type SendApi = Self;
 
+	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
 		self.clone()
 	}
 
 	#[inline]
 	fn call_value(&self) -> Self::CallValue {
+		self.clone()
+	}
+
+	#[inline]
+	fn send(&self) -> Self::SendApi {
 		self.clone()
 	}
 
@@ -37,22 +44,6 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			panic!("get balance not yet implemented for accounts other than the contract itself");
 		}
 		self.blockchain_info_box.contract_balance.clone().into()
-	}
-
-	fn send_tx(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
-		let own_balance = &self.blockchain_info_box.contract_balance;
-		if &amount.value() > own_balance {
-			panic!(TxPanic {
-				status: 10,
-				message: b"failed transfer (insufficient funds)".to_vec(),
-			});
-		}
-
-		let mut tx_output = self.tx_output_cell.borrow_mut();
-		tx_output.send_balance_list.push(SendBalance {
-			recipient: to.clone(),
-			amount: amount.value(),
-		})
 	}
 
 	fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {

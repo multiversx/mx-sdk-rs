@@ -45,7 +45,7 @@ pub trait CryptoBubbles {
 		balance -= amount;
 		self.set_player_balance(player, &balance);
 
-		self.send_tx(player, &amount, b"crypto bubbles");
+		self.send().egld(player, &amount, b"crypto bubbles");
 
 		self.withdraw_event(player, amount);
 

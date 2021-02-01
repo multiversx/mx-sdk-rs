@@ -1,5 +1,5 @@
 {
-    "name": "eventA1",
+    "name": "send_egld",
     "steps": [
         {
             "step": "setState",
