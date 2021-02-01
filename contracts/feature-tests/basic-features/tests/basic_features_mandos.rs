@@ -280,6 +280,14 @@ fn storage_mapper_single_value() {
 }
 
 #[test]
+fn storage_mapper_linked_list() {
+	parse_execute_mandos(
+		"mandos/storage_mapper_linked_list.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
 fn storage_mapper_vec() {
 	parse_execute_mandos("mandos/storage_mapper_vec.scen.json", &contract_map());
 }
