@@ -314,6 +314,77 @@ where
 	pub fn iter(&self) -> Iter<SA, T> {
 		Iter::new(self)
 	}
+
+	/// Runs several checks in order to verify that both forwards and backwards iteration
+	/// yields the same node entries and that the number of items in the list is correct.
+	/// Used for unit testing.
+	///
+	/// This operation should compute in *O*(n) time.
+	pub fn check_internal_consistency(&self) -> bool {
+		let len = self.get_len();
+		let mut front = self.get_front();
+		let mut back = self.get_back();
+		if len == 0 {
+			// if the list is empty, both ends should point to null entries
+			if front != NULL_ENTRY {
+				return false;
+			}
+			if back != NULL_ENTRY {
+				return false;
+			}
+			true
+		} else {
+			// if the list is non-empty, both ends should point to non-null entries
+			if front == NULL_ENTRY {
+				return false;
+			}
+			if back == NULL_ENTRY {
+				return false;
+			}
+
+			// the node before the first and the one after the last should both be null
+			if self.get_node(front).previous != NULL_ENTRY {
+				return false;
+			}
+			if self.get_node(back).next != NULL_ENTRY {
+				return false;
+			}
+
+			// iterate forwards
+			let mut forwards = Vec::new();
+			while front != NULL_ENTRY {
+				forwards.push(front);
+				front = self.get_node(front).next;
+			}
+			if forwards.len() != len as usize {
+				return false;
+			}
+
+			// iterate backwards
+			let mut backwards = Vec::new();
+			while back != NULL_ENTRY {
+				backwards.push(back);
+				back = self.get_node(back).previous;
+			}
+			if backwards.len() != len as usize {
+				return false;
+			}
+
+			// check that both iterations match element-wise
+			let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
+			if forwards != backwards_reversed {
+				return false;
+			}
+
+			// check that the node IDs are unique
+			forwards.sort();
+			forwards.dedup();
+			if forwards.len() != len as usize {
+				return false;
+			}
+			true
+		}
+	}
 }
 
 /// An iterator over the elements of a `LinkedListMapper`.
@@ -389,61 +460,5 @@ where
 
 	fn is_multi_arg_or_result() -> bool {
 		true
-	}
-}
-
-#[cfg(test)]
-mod test {
-	use super::{BoxedBytes, LinkedListMapper, Vec};
-	use elrond_wasm_debug::TxContext;
-
-	fn create_list() -> LinkedListMapper<TxContext, u64> {
-		LinkedListMapper::new(TxContext::dummy(), BoxedBytes::from_concat(&[b"my_list"]))
-	}
-
-	struct Entry {
-		node_id: u32,
-		previous: u32,
-		next: u32,
-		value: u32,
-	}
-
-	struct ListState {
-		entries: Vec<Entry>,
-		front: u32,
-		back: u32,
-		new: u32,
-		len: u32,
-	}
-
-	fn extract_list_state(list: &LinkedListMapper<TxContext, u64>) -> ListState {
-		let mut state = ListState {
-			entries: Vec::new(),
-			front: list.get_front(),
-			back: list.get_back(),
-			new: list.get_new_key(),
-			len: list.get_len(),
-		};
-		let mut ids = Vec::new();
-		let mut node_id = list.get_front();
-		/*
-		while node_id != NULL_ENTRY {
-			ids.push_back(node_id);
-			node = list;
-			//...
-		}*/
-		state
-	}
-
-	fn check_list_nodes(list: &LinkedListMapper<TxContext, u64>, nodes: Vec<Entry>) {}
-
-	#[test]
-	fn test_list_internals() {
-		let mut list = create_list();
-		let range = 40..45;
-		range.for_each(|value| list.push_back(value));
-		let processed: Vec<u64> = list.iter().map(|val| val + 10).collect();
-		let expected: Vec<u64> = (50..55).collect();
-		assert_eq!(processed, expected);
 	}
 }
