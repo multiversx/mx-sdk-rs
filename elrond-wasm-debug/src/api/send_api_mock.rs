@@ -23,7 +23,7 @@ impl TxContext {
 }
 
 impl SendApi<RustBigUint> for TxContext {
-	fn egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
+	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if &amount.value() > &self.get_available_balance() {
 			panic!(TxPanic {
 				status: 10,
@@ -36,5 +36,9 @@ impl SendApi<RustBigUint> for TxContext {
 			recipient: to.clone(),
 			amount: amount.value(),
 		})
+	}
+
+	fn direct_esdt_explicit_gas(&self, to: &Address, token: &[u8], amount: &RustBigUint, gas: u64, data: &[u8]) {
+		panic!()
 	}
 }

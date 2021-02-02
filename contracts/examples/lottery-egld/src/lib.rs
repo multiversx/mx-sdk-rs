@@ -256,7 +256,7 @@ pub trait Lottery {
 							prize = info.prize_pool.clone();
 						}
 
-						self.send().egld(
+						self.send().direct_egld(
 							&winner_address,
 							&prize,
 							b"You won the lottery! Congratulations!",

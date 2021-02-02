@@ -62,7 +62,7 @@ pub trait Crowdfunding {
 					return sc_error!("only owner can claim successful funding");
 				}
 				self.send()
-					.egld(&caller, &self.get_sc_balance(), b"funding success");
+					.direct_egld(&caller, &self.get_sc_balance(), b"funding success");
 				Ok(())
 			},
 			Status::Failed => {
@@ -70,7 +70,7 @@ pub trait Crowdfunding {
 				let deposit = self.get_deposit(&caller);
 				if deposit > 0 {
 					self.send()
-						.egld(&caller, &deposit, b"reclaim failed funding");
+						.direct_egld(&caller, &deposit, b"reclaim failed funding");
 					self.set_deposit(&caller, &BigUint::zero());
 				}
 				Ok(())
