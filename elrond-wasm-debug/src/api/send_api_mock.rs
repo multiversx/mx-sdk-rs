@@ -1,7 +1,8 @@
 use super::big_uint_api_mock::*;
+use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxPanic};
-use elrond_wasm::api::SendApi;
-use elrond_wasm::types::{Address, TokenIdentifier};
+use elrond_wasm::api::{ContractHookApi, SendApi};
+use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 use num_bigint::BigUint;
 
 impl TxContext {
@@ -38,7 +39,68 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn direct_esdt_explicit_gas(&self, to: &Address, token: &[u8], amount: &RustBigUint, gas: u64, data: &[u8]) {
+	fn direct_esdt_explicit_gas(
+		&self,
+		_to: &Address,
+		_token: &[u8],
+		_amount: &RustBigUint,
+		_gas: u64,
+		_data: &[u8],
+	) {
 		panic!()
+	}
+
+	fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
+		let mut tx_output = self.tx_output_cell.borrow_mut();
+		tx_output.async_call = Some(AsyncCallTxData {
+			to: to.clone(),
+			call_value: amount.value(),
+			call_data: data.to_vec(),
+			tx_hash: self.get_tx_hash(),
+		});
+	}
+
+	fn deploy_contract(
+		&self,
+		_gas: u64,
+		_amount: &RustBigUint,
+		_code: &BoxedBytes,
+		_code_metadata: CodeMetadata,
+		_arg_buffer: &ArgBuffer,
+	) -> Address {
+		panic!("deploy_contract not yet implemented")
+	}
+
+	fn execute_on_dest_context(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("execute_on_dest_context not implemented yet!");
+	}
+
+	fn execute_on_dest_context_by_caller(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("execute_on_dest_context_by_caller not implemented yet!");
+	}
+
+	fn execute_on_same_context(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("execute_on_same_context not implemented yet!");
 	}
 }

@@ -486,7 +486,8 @@ pub trait BasicFeatures {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send().direct_esdt(to, token_id.as_slice(), amount, data);
+		self.send()
+			.direct_esdt(to, token_id.as_slice(), amount, data);
 	}
 
 	// BLOCK INFO

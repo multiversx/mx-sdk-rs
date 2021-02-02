@@ -110,7 +110,7 @@ pub trait Crowdfunding {
 		serializer.push_argument_bytes(esdt_token_name.as_slice());
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
+		self.send().async_call(&to, &BigUint::zero(), serializer.as_slice());
 	}
 
 	// storage

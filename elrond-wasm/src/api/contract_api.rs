@@ -3,7 +3,7 @@ use super::{
 	StorageWriteApi,
 };
 use crate::storage;
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
+use crate::types::{Address, H256};
 use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
@@ -59,17 +59,6 @@ where
 		)
 	}
 
-	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
-
-	fn deploy_contract(
-		&self,
-		gas: u64,
-		amount: &BigUint,
-		code: &BoxedBytes,
-		code_metadata: CodeMetadata,
-		arg_buffer: &ArgBuffer,
-	) -> Address;
-
 	fn get_tx_hash(&self) -> H256;
 
 	fn get_gas_left(&self) -> u64;
@@ -93,31 +82,4 @@ where
 	fn get_prev_block_epoch(&self) -> u64;
 
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
-
-	fn execute_on_dest_context(
-		&self,
-		gas: u64,
-		address: &Address,
-		value: &BigUint,
-		function: &[u8],
-		arg_buffer: &ArgBuffer,
-	);
-
-	fn execute_on_dest_context_by_caller(
-		&self,
-		gas: u64,
-		address: &Address,
-		value: &BigUint,
-		function: &[u8],
-		arg_buffer: &ArgBuffer,
-	);
-
-	fn execute_on_same_context(
-		&self,
-		gas: u64,
-		address: &Address,
-		value: &BigUint,
-		function: &[u8],
-		arg_buffer: &ArgBuffer,
-	);
 }
