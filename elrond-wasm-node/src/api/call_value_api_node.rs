@@ -3,7 +3,7 @@ use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
 use elrond_wasm::types::{BoxedBytes, TokenIdentifier};
 
-const MAX_POSSIBLE_TOKEN_NAME_LENGTH: usize = 32;
+const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
 	fn checkNoPayment();
@@ -45,7 +45,7 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 
 	fn token(&self) -> TokenIdentifier {
 		unsafe {
-			let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_NAME_LENGTH];
+			let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
 			let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
 			if name_len == 0 {
 				TokenIdentifier::egld()
