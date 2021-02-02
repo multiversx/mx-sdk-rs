@@ -111,6 +111,10 @@ where
 	pub fn iter(&self) -> Iter<SA, T> {
 		self.linked_list_mapper.iter()
 	}
+
+	pub fn check_internal_consistency(&self) -> bool {
+		self.linked_list_mapper.check_internal_consistency()
+	}
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
