@@ -72,10 +72,7 @@
                         "``set_mapper.node|u32:1": "u32:0|u32:0",
                         "``set_mapper.value|u32:1": "123",
                         "``set_mapper.node_id|123": "1",
-                        "``set_mapper.back": "1",
-                        "``set_mapper.front": "1",
-                        "``set_mapper.len": "1",
-                        "``set_mapper.new": "1"
+                        "``set_mapper.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -169,10 +166,7 @@
                         "``set_mapper.value|u32:2": "111",
                         "``set_mapper.node_id|123": "1",
                         "``set_mapper.node_id|111": "2",
-                        "``set_mapper.back": "2",
-                        "``set_mapper.front": "1",
-                        "``set_mapper.len": "2",
-                        "``set_mapper.new": "2"
+                        "``set_mapper.info": "u32:2|u32:1|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -242,10 +236,7 @@
                         "``set_mapper.node|u32:2": "u32:0|u32:0",
                         "``set_mapper.value|u32:2": "111",
                         "``set_mapper.node_id|111": "2",
-                        "``set_mapper.back": "2",
-                        "``set_mapper.front": "2",
-                        "``set_mapper.len": "1",
-                        "``set_mapper.new": "2"
+                        "``set_mapper.info": "u32:1|u32:2|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -287,12 +278,7 @@
                 "address:features_contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "``set_mapper.back": "0",
-                        "``set_mapper.front": "0",
-                        "``set_mapper.len": "0",
-                        "``set_mapper.new": "2"
-                    },
+                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
