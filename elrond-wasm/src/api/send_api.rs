@@ -1,5 +1,5 @@
 use super::BigUintApi;
-use crate::types::{Address, TokenIdentifier};
+use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 
 pub const DIRECT_ESDT_DEFAULT_GAS: u64 = 500000;
 
@@ -30,4 +30,42 @@ where
 			self.direct_esdt(to, token.as_slice(), amount, data);
 		}
 	}
+
+	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
+
+	fn deploy_contract(
+		&self,
+		gas: u64,
+		amount: &BigUint,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Address;
+
+	fn execute_on_dest_context(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	);
+
+	fn execute_on_dest_context_by_caller(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	);
+
+	fn execute_on_same_context(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	);
 }

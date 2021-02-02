@@ -16,7 +16,8 @@ pub struct CallableMethod {
 impl CallableMethod {
 	pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
 		let payable = process_payable(m);
-		if let MethodPayableMetadata::SingleEsdtToken(_) | MethodPayableMetadata::AnyToken = payable {
+		if let MethodPayableMetadata::SingleEsdtToken(_) | MethodPayableMetadata::AnyToken = payable
+		{
 			panic!("payable methods in async call proxies currently only accept EGLD");
 		}
 
@@ -155,7 +156,7 @@ impl Callable {
 						#callback_init
 						#(#arg_push_snippets)*
 						#callback_store
-						self.api.async_call(&self.address, &#amount_snippet, call_data_ser.as_slice());
+						self.api.send().async_call(&self.address, &#amount_snippet, call_data_ser.as_slice());
 					}
 				};
 				sig
