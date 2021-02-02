@@ -72,7 +72,7 @@
                     "storage": {
                         "``map_mapper.node|u32:1": "u32:0|u32:0",
                         "``map_mapper.value|u32:1": "123",
-                        "``map_mapper.index|123": "1",
+                        "``map_mapper.node_id|123": "1",
                         "``map_mapper.mapped|123": "456",
                         "``map_mapper.back": "1",
                         "``map_mapper.front": "1",
@@ -91,19 +91,40 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-after-first-insert",
+            "txId": "check-map-keys-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "map_mapper",
+                "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "123",
+                    "123"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-map-values-after-first-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_mapper_values",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
                     "456"
                 ],
                 "status": "",
@@ -139,12 +160,12 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-after-second-insert",
+            "txId": "check-map-keys-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "map_mapper",
+                "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -152,8 +173,29 @@
             "expect": {
                 "out": [
                     "123",
+                    "111"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-map-values-after-second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_mapper_values",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
                     "456",
-                    "111",
                     "222"
                 ],
                 "status": "",
@@ -173,8 +215,8 @@
                         "``map_mapper.node|u32:2": "u32:1|u32:0",
                         "``map_mapper.value|u32:1": "123",
                         "``map_mapper.value|u32:2": "111",
-                        "``map_mapper.index|123": "1",
-                        "``map_mapper.index|111": "2",
+                        "``map_mapper.node_id|123": "1",
+                        "``map_mapper.node_id|111": "2",
                         "``map_mapper.mapped|123": "456",
                         "``map_mapper.mapped|111": "222",
                         "``map_mapper.back": "2",
@@ -249,7 +291,7 @@
                     "storage": {
                         "``map_mapper.node|u32:2": "u32:0|u32:0",
                         "``map_mapper.value|u32:2": "111",
-                        "``map_mapper.index|111": "2",
+                        "``map_mapper.node_id|111": "2",
                         "``map_mapper.mapped|111": "222",
                         "``map_mapper.back": "2",
                         "``map_mapper.front": "2",

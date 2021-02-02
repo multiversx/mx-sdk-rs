@@ -17,6 +17,7 @@ use ser_ex1::*;
 use ser_ex2::*;
 use simple_enum::*;
 
+use core::iter::FromIterator;
 use core::num::NonZeroUsize;
 
 #[elrond_wasm_derive::contract(BasicFeaturesImpl)]
@@ -502,6 +503,16 @@ pub trait BasicFeatures {
 
 	#[storage_mapper("map_mapper")]
 	fn map_mapper(&self) -> MapMapper<Self::Storage, u32, u32>;
+
+	#[view]
+	fn map_mapper_keys(&self) -> MultiResultVec<u32> {
+		MultiResultVec::from_iter(self.map_mapper().keys())
+	}
+
+	#[view]
+	fn map_mapper_values(&self) -> MultiResultVec<u32> {
+		MultiResultVec::from_iter(self.map_mapper().values())
+	}
 
 	#[endpoint]
 	fn map_mapper_insert(&self, item: u32, value: u32) -> Option<u32> {

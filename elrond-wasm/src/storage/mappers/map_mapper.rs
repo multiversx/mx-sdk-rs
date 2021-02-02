@@ -119,6 +119,10 @@ where
 		self.keys_set.iter()
 	}
 
+	pub fn values(&self) -> Values<SA, K, V> {
+		Values::new(self)
+	}
+
 	pub fn iter(&self) -> Iter<SA, K, V> {
 		Iter::new(self)
 	}
@@ -161,6 +165,48 @@ where
 		if let Some(key) = self.key_iter.next() {
 			let value = self.hash_map.get(&key).unwrap();
 			return Some((key, value));
+		}
+		None
+	}
+}
+
+pub struct Values<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + 'static,
+	V: TopEncode + TopDecode + 'static,
+{
+	key_iter: Keys<'a, SA, K>,
+	hash_map: &'a MapMapper<SA, K, V>,
+}
+
+impl<'a, SA, K, V> Values<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + 'static,
+	V: TopEncode + TopDecode + 'static,
+{
+	fn new(hash_map: &'a MapMapper<SA, K, V>) -> Values<'a, SA, K, V> {
+		Values {
+			key_iter: hash_map.keys(),
+			hash_map,
+		}
+	}
+}
+
+impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + 'static,
+	V: TopEncode + TopDecode + 'static,
+{
+	type Item = V;
+
+	#[inline]
+	fn next(&mut self) -> Option<V> {
+		if let Some(key) = self.key_iter.next() {
+			let value = self.hash_map.get(&key).unwrap();
+			return Some(value);
 		}
 		None
 	}
