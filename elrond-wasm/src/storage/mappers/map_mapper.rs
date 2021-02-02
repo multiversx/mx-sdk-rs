@@ -80,18 +80,22 @@ where
 		);
 	}
 
+	/// Returns `true` if the map contains no elements.
 	pub fn is_empty(&self) -> bool {
 		self.keys_set.is_empty()
 	}
 
+	/// Returns the number of elements in the map.
 	pub fn len(&self) -> usize {
 		self.keys_set.len()
 	}
 
+	/// Returns `true` if the map contains a value for the specified key.
 	pub fn contains_key(&self, k: &K) -> bool {
 		self.keys_set.contains(k)
 	}
 
+	/// Gets a reference to the value in the entry.
 	pub fn get(&self, k: &K) -> Option<V> {
 		if self.keys_set.contains(k) {
 			return Some(self.get_mapped_value(&k));
@@ -99,6 +103,7 @@ where
 		None
 	}
 
+	/// Sets the value of the entry, and returns the entry's old value.
 	pub fn insert(&mut self, k: K, v: V) -> Option<V> {
 		let old_value = self.get(&k);
 		self.set_mapped_value(&k, &v);
@@ -106,6 +111,7 @@ where
 		old_value
 	}
 
+	/// Takes the value out of the entry, and returns it.
 	pub fn remove(&mut self, k: &K) -> Option<V> {
 		if self.keys_set.remove(k) {
 			let value = self.get_mapped_value(k);
@@ -115,14 +121,20 @@ where
 		None
 	}
 
+	/// An iterator visiting all keys in arbitrary order.
+	/// The iterator element type is `&'a K`.
 	pub fn keys(&self) -> Keys<SA, K> {
 		self.keys_set.iter()
 	}
 
+	/// An iterator visiting all values in arbitrary order.
+	/// The iterator element type is `&'a V`.
 	pub fn values(&self) -> Values<SA, K, V> {
 		Values::new(self)
 	}
 
+	/// An iterator visiting all key-value pairs in arbitrary order.
+	/// The iterator element type is `(&'a K, &'a V)`.
 	pub fn iter(&self) -> Iter<SA, K, V> {
 		Iter::new(self)
 	}

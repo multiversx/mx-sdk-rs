@@ -77,18 +77,26 @@ where
 		);
 	}
 
+	/// Returns `true` if the set contains no elements.
 	pub fn is_empty(&self) -> bool {
 		self.linked_list_mapper.is_empty()
 	}
 
+	/// Returns the number of elements in the set.
 	pub fn len(&self) -> usize {
 		self.linked_list_mapper.len()
 	}
 
+	/// Returns `true` if the set contains a value.
 	pub fn contains(&self, value: &T) -> bool {
 		self.get_node_id(value) != NULL_ENTRY
 	}
 
+	/// Adds a value to the set.
+	///
+	/// If the set did not have this value present, `true` is returned.
+	///
+	/// If the set did have this value present, `false` is returned.
 	pub fn insert(&mut self, value: T) -> bool {
 		if self.contains(&value) {
 			return false;
@@ -98,6 +106,8 @@ where
 		true
 	}
 
+	/// Removes a value from the set. Returns whether the value was
+	/// present in the set.
 	pub fn remove(&mut self, value: &T) -> bool {
 		let node_id = self.get_node_id(value);
 		if node_id == NULL_ENTRY {
@@ -108,10 +118,13 @@ where
 		true
 	}
 
+	/// An iterator visiting all elements in arbitrary order.
+	/// The iterator element type is `&'a T`.
 	pub fn iter(&self) -> Iter<SA, T> {
 		self.linked_list_mapper.iter()
 	}
 
+	/// Checks the internal consistency of the collection. Used for unit tests.
 	pub fn check_internal_consistency(&self) -> bool {
 		self.linked_list_mapper.check_internal_consistency()
 	}
