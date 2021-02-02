@@ -21,7 +21,7 @@ pub trait SendTxRepeat {
 			OptionalArg::None => Vec::new(),
 		};
 		for _ in 0..times {
-			self.send().egld(&to, &amount, &data);
+			self.send().direct_egld(&to, &amount, &data);
 		}
 	}
 }

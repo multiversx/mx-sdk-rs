@@ -77,7 +77,7 @@ pub trait PingPong {
 				self.set_user_status(user_id, &UserStatus::Withdrawn);
 				if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
 					self.send()
-						.egld(&user_address, &self.get_fixed_sum(), b"pong");
+						.direct_egld(&user_address, &self.get_fixed_sum(), b"pong");
 					Ok(())
 				} else {
 					sc_error!("unknown user")

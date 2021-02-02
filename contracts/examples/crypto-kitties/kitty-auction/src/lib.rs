@@ -89,7 +89,7 @@ pub trait KittyAuction {
 		only_owner!(self, "Only owner may call this function!");
 
 		self.send()
-			.egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
+			.direct_egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
 
 		Ok(())
 	}
@@ -228,7 +228,7 @@ pub trait KittyAuction {
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
 			self.send()
-				.egld(&auction.current_winner, &auction.current_bid, b"bid refund");
+				.direct_egld(&auction.current_winner, &auction.current_bid, b"bid refund");
 		}
 
 		// update auction bid and winner
@@ -397,7 +397,7 @@ pub trait KittyAuction {
 					&& auction.current_winner != Address::zero()
 				{
 					self.send()
-						.egld(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
+						.direct_egld(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
 				}
 			},
 			AsyncCallResult::Err(_) => {

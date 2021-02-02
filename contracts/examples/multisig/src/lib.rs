@@ -479,7 +479,7 @@ pub trait Multisig {
 				self.set_quorum(new_quorum)
 			},
 			Action::SendEgld { to, amount, data } => {
-				self.send().egld(&to, &amount, data.as_slice());
+				self.send().direct_egld(&to, &amount, data.as_slice());
 			},
 			Action::SCDeploy {
 				amount,

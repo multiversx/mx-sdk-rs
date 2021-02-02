@@ -1,13 +1,16 @@
 {
-    "name": "send_egld",
+    "name": "send_esdt",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:features_contract": {
                     "nonce": "1000",
-                    "balance": "200",
+                    "balance": "0",
                     "storage": {},
+                    "esdt": {
+                        "str:BASIC-FEATURES-TOKEN": "1,000"
+                    },
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
@@ -25,9 +28,10 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "send_egld",
+                "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
+                    "str:BASIC-FEATURES-TOKEN",
                     "10000"
                 ],
                 "gasLimit": "0x100000",
@@ -47,9 +51,10 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "send_egld",
+                "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
+                    "str:BASIC-FEATURES-TOKEN",
                     "100"
                 ],
                 "gasLimit": "0x100000",
@@ -68,9 +73,10 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "send_egld",
+                "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
+                    "str:BASIC-FEATURES-TOKEN",
                     "100",
                     "str:send tx message here"
                 ],
