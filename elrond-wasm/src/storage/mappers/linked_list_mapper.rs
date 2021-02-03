@@ -13,7 +13,7 @@ use elrond_codec::{DecodeDefault, EncodeDefault, TopDecode, TopEncode};
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
-const NODE_IDENTIFIER: &[u8] = b".node";
+const NODE_IDENTIFIER: &[u8] = b".node_links";
 const VALUE_IDENTIFIER: &[u8] = b".value";
 
 #[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
