@@ -23,7 +23,6 @@ extern "C" {
 		messageOffset: *const u8,
 		messageLength: i32,
 		sigOffset: *const u8,
-		sigLength: i32,
 	) -> i32;
 }
 
@@ -76,7 +75,6 @@ impl CryptoApi for ArwenApiImpl {
 				message.as_ptr(),
 				message.len() as i32,
 				signature.as_ptr(),
-				signature.len() as i32,
 			) == 0
 		}
 	}
