@@ -25,7 +25,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper",
+                "function": "map_mapper",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -40,20 +40,23 @@
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "txId": "first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_push_back",
+                "function": "map_mapper_insert",
                 "arguments": [
-                    "123"
+                    "123",
+                    "456"
                 ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "0"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -67,9 +70,11 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper.node_links|u32:1": "u32:0|u32:0",
-                        "``list_mapper.value|u32:1": "123",
-                        "``list_mapper.info": "u32:1|u32:1|u32:1|u32:1"
+                        "``map_mapper.node_links|u32:1": "u32:0|u32:0",
+                        "``map_mapper.value|u32:1": "123",
+                        "``map_mapper.node_id|123": "1",
+                        "``map_mapper.mapped|123": "456",
+                        "``map_mapper.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -83,12 +88,12 @@
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-first-push-back",
+            "txId": "check-map-keys-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper",
+                "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -105,20 +110,20 @@
         },
         {
             "step": "scCall",
-            "txId": "second-push-back",
+            "txId": "check-map-values-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_push_back",
-                "arguments": [
-                    "111"
-                ],
+                "function": "map_mapper_values",
+                "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "456"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -127,12 +132,37 @@
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-second-push-back",
+            "txId": "second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper",
+                "function": "map_mapper_insert",
+                "arguments": [
+                    "111",
+                    "222"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-map-keys-after-second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -149,17 +179,44 @@
             }
         },
         {
+            "step": "scCall",
+            "txId": "check-map-values-after-second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_mapper_values",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "456",
+                    "222"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "accounts": {
                 "address:features_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``list_mapper.node_links|u32:2": "u32:1|u32:0",
-                        "``list_mapper.value|u32:1": "123",
-                        "``list_mapper.value|u32:2": "111",
-                        "``list_mapper.info": "u32:2|u32:1|u32:2|u32:2"
+                        "``map_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "``map_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "``map_mapper.value|u32:1": "123",
+                        "``map_mapper.value|u32:2": "111",
+                        "``map_mapper.node_id|123": "1",
+                        "``map_mapper.node_id|111": "2",
+                        "``map_mapper.mapped|123": "456",
+                        "``map_mapper.mapped|111": "222",
+                        "``map_mapper.info": "u32:2|u32:1|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -173,41 +230,45 @@
         },
         {
             "step": "scCall",
-            "txId": "check-front-after-second-push-back",
+            "txId": "check-contains-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_front",
-                "arguments": [],
+                "function": "map_mapper_contains_key",
+                "arguments": [
+                    "111"
+                ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-remove",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_mapper_remove",
+                "arguments": [
                     "123"
                 ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "first-pop-front",
-            "tx": {
-                "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_pop_front",
-                "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "1|u32:123"
+                    "1|u32:456"
                 ],
                 "status": "",
                 "logs": [],
@@ -222,9 +283,11 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper.node_links|u32:2": "u32:0|u32:0",
-                        "``list_mapper.value|u32:2": "111",
-                        "``list_mapper.info": "u32:1|u32:2|u32:2|u32:2"
+                        "``map_mapper.node_links|u32:2": "u32:0|u32:0",
+                        "``map_mapper.value|u32:2": "111",
+                        "``map_mapper.node_id|111": "2",
+                        "``map_mapper.mapped|111": "222",
+                        "``map_mapper.info": "u32:1|u32:2|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -238,19 +301,21 @@
         },
         {
             "step": "scCall",
-            "txId": "second-pop-front",
+            "txId": "second-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_pop_front",
-                "arguments": [],
+                "function": "map_mapper_remove",
+                "arguments": [
+                    "111"
+                ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "1|u32:111"
+                    "1|u32:222"
                 ],
                 "status": "",
                 "logs": [],
@@ -277,20 +342,23 @@
         },
         {
             "step": "scCall",
-            "txId": "check-front-after-second-pop-front",
+            "txId": "check-get-after-second-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "list_mapper_front",
-                "arguments": [],
+                "function": "map_mapper_get",
+                "arguments": [
+                    "123"
+                ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:List empty!",
+                "out": [
+                    "0"
+                ],
+                "status": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

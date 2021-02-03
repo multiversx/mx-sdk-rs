@@ -6,21 +6,52 @@ use crate::storage::{storage_get, storage_set};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
 use core::marker::PhantomData;
-use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
-use elrond_codec::{TopDecode, TopEncode};
+use elrond_codec::elrond_codec_derive::{
+	TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
+};
+use elrond_codec::{DecodeDefault, EncodeDefault, TopDecode, TopEncode};
 
 const NULL_ENTRY: u32 = 0;
-const LEN_IDENTIFIER: &[u8] = b".len";
-const NEW_KEY_IDENTIFIER: &[u8] = b".new";
-const FRONT_IDENTIFIER: &[u8] = b".front";
-const BACK_IDENTIFIER: &[u8] = b".back";
-const NODE_IDENTIFIER: &[u8] = b".node";
+const INFO_IDENTIFIER: &[u8] = b".info";
+const NODE_IDENTIFIER: &[u8] = b".node_links";
 const VALUE_IDENTIFIER: &[u8] = b".value";
 
 #[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
 pub struct Node {
 	pub previous: u32,
 	pub next: u32,
+}
+
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
+pub struct LinkedListMapperInfo {
+	pub len: u32,
+	pub front: u32,
+	pub back: u32,
+	pub new: u32,
+}
+
+impl EncodeDefault for LinkedListMapperInfo {
+	fn is_default(&self) -> bool {
+		self.len == 0
+	}
+}
+
+impl DecodeDefault for LinkedListMapperInfo {
+	fn default() -> Self {
+		Self {
+			len: 0,
+			front: 0,
+			back: 0,
+			new: 0,
+		}
+	}
+}
+
+impl LinkedListMapperInfo {
+	pub fn generate_new_node_id(&mut self) -> u32 {
+		self.new += 1;
+		self.new
+	}
 }
 
 /// A doubly-linked list with owned nodes.
@@ -64,50 +95,19 @@ where
 		BoxedBytes::from_concat(&[self.main_key.as_slice(), name])
 	}
 
-	fn get_u32(&self, name: &[u8]) -> u32 {
-		storage_get(self.api.clone(), self.build_name_key(name).as_slice())
+	fn get_info(&self) -> LinkedListMapperInfo {
+		storage_get(
+			self.api.clone(),
+			self.build_name_key(INFO_IDENTIFIER).as_slice(),
+		)
 	}
 
-	fn set_u32(&mut self, name: &[u8], value: u32) {
+	fn set_info(&mut self, value: LinkedListMapperInfo) {
 		storage_set(
 			self.api.clone(),
-			self.build_name_key(name).as_slice(),
+			self.build_name_key(INFO_IDENTIFIER).as_slice(),
 			&value,
 		);
-	}
-
-	fn get_len(&self) -> u32 {
-		self.get_u32(LEN_IDENTIFIER)
-	}
-
-	fn set_len(&mut self, len: u32) {
-		self.set_u32(LEN_IDENTIFIER, len);
-	}
-
-	fn get_new_key(&self) -> u32 {
-		self.get_u32(NEW_KEY_IDENTIFIER)
-	}
-
-	fn generate_new_node_id(&mut self) -> u32 {
-		let new_key = self.get_new_key() + 1;
-		self.set_u32(NEW_KEY_IDENTIFIER, new_key);
-		new_key
-	}
-
-	fn get_front(&self) -> u32 {
-		self.get_u32(FRONT_IDENTIFIER)
-	}
-
-	fn set_front(&mut self, node_id: u32) {
-		self.set_u32(FRONT_IDENTIFIER, node_id);
-	}
-
-	fn get_back(&self) -> u32 {
-		self.get_u32(BACK_IDENTIFIER)
-	}
-
-	fn set_back(&mut self, node_id: u32) {
-		self.set_u32(BACK_IDENTIFIER, node_id);
 	}
 
 	fn get_node(&self, node_id: u32) -> Node {
@@ -173,14 +173,14 @@ where
 	///
 	/// This operation should compute in *O*(1) time.
 	pub fn is_empty(&self) -> bool {
-		self.get_len() == 0
+		self.get_info().len == 0
 	}
 
 	/// Returns the length of the `LinkedList`.
 	///
 	/// This operation should compute in *O*(1) time.
 	pub fn len(&self) -> usize {
-		self.get_len() as usize
+		self.get_info().len as usize
 	}
 
 	/// Appends an element to the back of a list
@@ -188,13 +188,13 @@ where
 	///
 	/// This operation should compute in *O*(1) time.
 	pub(crate) fn push_back_node_id(&mut self, elt: &T) -> u32 {
-		let new_node_id = self.generate_new_node_id();
-		let len = self.get_len();
+		let mut info = self.get_info();
+		let new_node_id = info.generate_new_node_id();
 		let mut previous = NULL_ENTRY;
-		if len == 0 {
-			self.set_front(new_node_id);
+		if info.len == 0 {
+			info.front = new_node_id;
 		} else {
-			let back = self.get_back();
+			let back = info.back;
 			let mut back_node = self.get_node(back);
 			back_node.next = new_node_id;
 			previous = back;
@@ -207,9 +207,10 @@ where
 				next: NULL_ENTRY,
 			},
 		);
-		self.set_back(new_node_id);
+		info.back = new_node_id;
 		self.set_value(new_node_id, &elt);
-		self.set_len(len + 1);
+		info.len += 1;
+		self.set_info(info);
 		new_node_id
 	}
 
@@ -224,13 +225,13 @@ where
 	///
 	/// This operation should compute in *O*(1) time.
 	pub fn push_front(&mut self, elt: T) {
-		let new_node_id = self.generate_new_node_id();
-		let len = self.get_len();
+		let mut info = self.get_info();
+		let new_node_id = info.generate_new_node_id();
 		let mut next = NULL_ENTRY;
-		if len == 0 {
-			self.set_back(new_node_id);
+		if info.len == 0 {
+			info.back = new_node_id;
 		} else {
-			let front = self.get_front();
+			let front = info.front;
 			let mut front_node = self.get_node(front);
 			front_node.previous = new_node_id;
 			next = front;
@@ -243,21 +244,22 @@ where
 				next,
 			},
 		);
-		self.set_front(new_node_id);
+		info.front = new_node_id;
 		self.set_value(new_node_id, &elt);
-		self.set_len(len + 1);
+		info.len += 1;
+		self.set_info(info);
 	}
 
 	/// Provides a copy to the front element, or `None` if the list is
 	/// empty.
 	pub fn front(&self) -> Option<T> {
-		self.get_value_option(self.get_front())
+		self.get_value_option(self.get_info().front)
 	}
 
 	/// Provides a copy to the back element, or `None` if the list is
 	/// empty.
 	pub fn back(&self) -> Option<T> {
-		self.get_value_option(self.get_back())
+		self.get_value_option(self.get_info().back)
 	}
 
 	/// Removes the last element from a list and returns it, or `None` if
@@ -265,7 +267,7 @@ where
 	///
 	/// This operation should compute in *O*(1) time.
 	pub fn pop_back(&mut self) -> Option<T> {
-		self.remove_by_node_id(self.get_back())
+		self.remove_by_node_id(self.get_info().back)
 	}
 
 	/// Removes the first element and returns it, or `None` if the list is
@@ -273,7 +275,7 @@ where
 	///
 	/// This operation should compute in *O*(1) time.
 	pub fn pop_front(&mut self) -> Option<T> {
-		self.remove_by_node_id(self.get_front())
+		self.remove_by_node_id(self.get_info().front)
 	}
 
 	/// Removes element with the given node id and returns it, or `None` if the list is
@@ -287,8 +289,9 @@ where
 		}
 		let node = self.get_node(node_id);
 
+		let mut info = self.get_info();
 		if node.previous == NULL_ENTRY {
-			self.set_front(node.next);
+			info.front = node.next;
 		} else {
 			let mut previous = self.get_node(node.previous);
 			previous.next = node.next;
@@ -296,7 +299,7 @@ where
 		}
 
 		if node.next == NULL_ENTRY {
-			self.set_back(node.previous);
+			info.back = node.previous;
 		} else {
 			let mut next = self.get_node(node.next);
 			next.previous = node.previous;
@@ -306,7 +309,8 @@ where
 		self.clear_node(node_id);
 		let removed_value = self.get_value(node_id);
 		self.clear_value(node_id);
-		self.set_len(self.get_len() - 1);
+		info.len -= 1;
+		self.set_info(info);
 		Some(removed_value)
 	}
 
@@ -321,10 +325,10 @@ where
 	///
 	/// This operation should compute in *O*(n) time.
 	pub fn check_internal_consistency(&self) -> bool {
-		let len = self.get_len();
-		let mut front = self.get_front();
-		let mut back = self.get_back();
-		if len == 0 {
+		let info = self.get_info();
+		let mut front = info.front;
+		let mut back = info.back;
+		if info.len == 0 {
 			// if the list is empty, both ends should point to null entries
 			if front != NULL_ENTRY {
 				return false;
@@ -356,7 +360,7 @@ where
 				forwards.push(front);
 				front = self.get_node(front).next;
 			}
-			if forwards.len() != len as usize {
+			if forwards.len() != info.len as usize {
 				return false;
 			}
 
@@ -366,7 +370,7 @@ where
 				backwards.push(back);
 				back = self.get_node(back).previous;
 			}
-			if backwards.len() != len as usize {
+			if backwards.len() != info.len as usize {
 				return false;
 			}
 
@@ -379,7 +383,7 @@ where
 			// check that the node IDs are unique
 			forwards.sort();
 			forwards.dedup();
-			if forwards.len() != len as usize {
+			if forwards.len() != info.len as usize {
 				return false;
 			}
 			true
@@ -407,7 +411,7 @@ where
 {
 	fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
 		Iter {
-			node_id: linked_list.get_front(),
+			node_id: linked_list.get_info().front,
 			linked_list,
 		}
 	}

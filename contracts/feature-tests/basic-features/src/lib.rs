@@ -17,6 +17,7 @@ use ser_ex1::*;
 use ser_ex2::*;
 use simple_enum::*;
 
+use core::iter::FromIterator;
 use core::num::NonZeroUsize;
 
 #[elrond_wasm_derive::contract(BasicFeaturesImpl)]
@@ -472,6 +473,69 @@ pub trait BasicFeatures {
 			return Ok(front);
 		}
 		sc_error!("List empty!")
+	}
+
+	// SetMapper
+
+	#[view]
+	#[storage_mapper("set_mapper")]
+	fn set_mapper(&self) -> SetMapper<Self::Storage, u32>;
+
+	#[endpoint]
+	fn set_mapper_insert(&self, item: u32) -> bool {
+		let mut set_mapper = self.set_mapper();
+		set_mapper.insert(item)
+	}
+
+	#[endpoint]
+	fn set_mapper_contains(&self, item: u32) -> bool {
+		let set_mapper = self.set_mapper();
+		set_mapper.contains(&item)
+	}
+
+	#[endpoint]
+	fn set_mapper_remove(&self, item: u32) -> bool {
+		let mut set_mapper = self.set_mapper();
+		set_mapper.remove(&item)
+	}
+
+	// MapMapper
+
+	#[storage_mapper("map_mapper")]
+	fn map_mapper(&self) -> MapMapper<Self::Storage, u32, u32>;
+
+	#[view]
+	fn map_mapper_keys(&self) -> MultiResultVec<u32> {
+		MultiResultVec::from_iter(self.map_mapper().keys())
+	}
+
+	#[view]
+	fn map_mapper_values(&self) -> MultiResultVec<u32> {
+		MultiResultVec::from_iter(self.map_mapper().values())
+	}
+
+	#[endpoint]
+	fn map_mapper_insert(&self, item: u32, value: u32) -> Option<u32> {
+		let mut map_mapper = self.map_mapper();
+		map_mapper.insert(item, value)
+	}
+
+	#[endpoint]
+	fn map_mapper_contains_key(&self, item: u32) -> bool {
+		let map_mapper = self.map_mapper();
+		map_mapper.contains_key(&item)
+	}
+
+	#[endpoint]
+	fn map_mapper_get(&self, item: u32) -> Option<u32> {
+		let map_mapper = self.map_mapper();
+		map_mapper.get(&item)
+	}
+
+	#[endpoint]
+	fn map_mapper_remove(&self, item: u32) -> Option<u32> {
+		let mut map_mapper = self.map_mapper();
+		map_mapper.remove(&item)
 	}
 
 	// EVENTS
