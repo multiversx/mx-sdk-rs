@@ -304,6 +304,14 @@ fn storage_mapper_set() {
 
 #[test]
 fn storage_mapper_map() {
+	parse_execute_mandos(
+		"mandos/storage_mapper_map_storage.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn storage_mapper_map_storage() {
 	parse_execute_mandos("mandos/storage_mapper_map.scen.json", &contract_map());
 }
 

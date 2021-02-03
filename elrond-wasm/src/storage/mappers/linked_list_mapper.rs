@@ -1,4 +1,4 @@
-use super::StorageMapper;
+use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
@@ -79,6 +79,24 @@ where
 			main_key,
 			_phantom: PhantomData,
 		}
+	}
+}
+
+impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	T: TopEncode + TopDecode,
+{
+	fn clear(&mut self) {
+		let info = self.get_info();
+		let mut node_id = info.front;
+		while node_id != NULL_ENTRY {
+			let node = self.get_node(node_id);
+			self.clear_node(node_id);
+			self.clear_value(node_id);
+			node_id = node.next;
+		}
+		self.set_info(LinkedListMapperInfo::default());
 	}
 }
 

@@ -1,5 +1,5 @@
 use elrond_wasm::storage::mappers::SetMapper;
-use elrond_wasm::storage::mappers::StorageMapper;
+use elrond_wasm::storage::mappers::{StorageClearable, StorageMapper};
 use elrond_wasm::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
@@ -63,4 +63,18 @@ fn test_set_removal_from_middle() {
 	check_set(&set, vec![42]);
 	assert_eq!(set.remove(&42), true);
 	check_set(&set, vec![]);
+}
+
+#[test]
+fn test_set_clear() {
+	let mut set = create_set();
+	set.insert(42);
+	set.insert(43);
+	set.insert(44);
+	set.insert(45);
+	assert!(set.check_internal_consistency());
+	set.clear();
+	assert!(set.check_internal_consistency());
+	assert_eq!(set.len(), 0);
+	assert!(set.is_empty());
 }
