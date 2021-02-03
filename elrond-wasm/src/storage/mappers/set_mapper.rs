@@ -6,7 +6,7 @@ use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
-use elrond_codec::{TopDecode, TopEncode};
+use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
 
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
@@ -35,19 +35,13 @@ where
 	}
 }
 
-pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Vec<u8> {
-	let mut bytes = Vec::<u8>::new();
-	obj.top_encode(&mut bytes).unwrap();
-	bytes
-}
-
 impl<SA, T> SetMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	fn build_named_value_key(&self, name: &[u8], value: &T) -> BoxedBytes {
-		let bytes = top_encode_to_vec(&value);
+		let bytes = top_encode_to_vec(&value).unwrap();
 		BoxedBytes::from_concat(&[self.main_key.as_slice(), name, &bytes])
 	}
 

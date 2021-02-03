@@ -23,20 +23,20 @@ pub struct Node {
 }
 
 #[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
-pub struct Info {
+pub struct LinkedListMapperInfo {
 	pub len: u32,
 	pub front: u32,
 	pub back: u32,
 	pub new: u32,
 }
 
-impl EncodeDefault for Info {
+impl EncodeDefault for LinkedListMapperInfo {
 	fn is_default(&self) -> bool {
 		self.len == 0
 	}
 }
 
-impl DecodeDefault for Info {
+impl DecodeDefault for LinkedListMapperInfo {
 	fn default() -> Self {
 		Self {
 			len: 0,
@@ -47,7 +47,7 @@ impl DecodeDefault for Info {
 	}
 }
 
-impl Info {
+impl LinkedListMapperInfo {
 	pub fn generate_new_node_id(&mut self) -> u32 {
 		self.new += 1;
 		self.new
@@ -95,14 +95,14 @@ where
 		BoxedBytes::from_concat(&[self.main_key.as_slice(), name])
 	}
 
-	fn get_info(&self) -> Info {
+	fn get_info(&self) -> LinkedListMapperInfo {
 		storage_get(
 			self.api.clone(),
 			self.build_name_key(INFO_IDENTIFIER).as_slice(),
 		)
 	}
 
-	fn set_info(&mut self, value: Info) {
+	fn set_info(&mut self, value: LinkedListMapperInfo) {
 		storage_set(
 			self.api.clone(),
 			self.build_name_key(INFO_IDENTIFIER).as_slice(),

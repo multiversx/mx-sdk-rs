@@ -2,9 +2,8 @@ use super::{set_mapper, SetMapper, StorageMapper};
 use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::storage::{storage_get, storage_set};
 use crate::types::BoxedBytes;
-use alloc::vec::Vec;
 use core::marker::PhantomData;
-use elrond_codec::{TopDecode, TopEncode};
+use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
 
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
@@ -37,12 +36,6 @@ where
 	}
 }
 
-pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Vec<u8> {
-	let mut bytes = Vec::<u8>::new();
-	obj.top_encode(&mut bytes).unwrap();
-	bytes
-}
-
 impl<SA, K, V> MapMapper<SA, K, V>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
@@ -50,7 +43,7 @@ where
 	V: TopEncode + TopDecode,
 {
 	fn build_named_key(&self, name: &[u8], key: &K) -> BoxedBytes {
-		let bytes = top_encode_to_vec(&key);
+		let bytes = top_encode_to_vec(&key).unwrap();
 		BoxedBytes::from_concat(&[self.main_key.as_slice(), name, &bytes])
 	}
 
