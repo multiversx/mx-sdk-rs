@@ -298,6 +298,16 @@ fn storage_mapper_linked_list() {
 }
 
 #[test]
+fn storage_mapper_set() {
+	parse_execute_mandos("mandos/storage_mapper_set.scen.json", &contract_map());
+}
+
+#[test]
+fn storage_mapper_map() {
+	parse_execute_mandos("mandos/storage_mapper_map.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_mapper_vec() {
 	parse_execute_mandos("mandos/storage_mapper_vec.scen.json", &contract_map());
 }
