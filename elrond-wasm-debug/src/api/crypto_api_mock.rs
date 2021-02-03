@@ -1,20 +1,21 @@
 use crate::TxContext;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::H256;
-use sha3::{Digest, Keccak256, Sha3_256};
+use sha2::Sha256;
+use sha3::{Digest, Keccak256};
 
 impl CryptoApi for TxContext {
 	fn sha256(&self, data: &[u8]) -> H256 {
-		let mut hasher = Sha3_256::new();
-		hasher.input(data);
-		let hash: [u8; 32] = hasher.result().into();
+		let mut hasher = Sha256::new();
+		hasher.update(data);
+		let hash: [u8; 32] = hasher.finalize().into();
 		hash.into()
 	}
 
 	fn keccak256(&self, data: &[u8]) -> H256 {
 		let mut hasher = Keccak256::new();
-		hasher.input(data);
-		let hash: [u8; 32] = hasher.result().into();
+		hasher.update(data);
+		let hash: [u8; 32] = hasher.finalize().into();
 		hash.into()
 	}
 

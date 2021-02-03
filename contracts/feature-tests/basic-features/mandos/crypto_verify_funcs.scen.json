@@ -1,69 +1,22 @@
 {
     "name": "crypto",
+    "comment": "does not currently work with mandos-rs, because the crypto functions are not yet mocked",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:features_contract": {
                     "nonce": "0",
-                    "balance": "0x100",
+                    "balance": "0",
                     "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0x300abc",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 }
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "1",
-            "tx": {
-                "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "computeKeccak256",
-                "arguments": [
-                    "0x61"
-                ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
-            },
-            "expect": {
-                "out": [
-                    "0x3ac225168df54212a25c1c01fd35bebfea408fdac2e31ddd6f80a4bbf9a5f1cb"
-                ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "2",
-            "tx": {
-                "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "computeKeccak256",
-                "arguments": [
-                    "0x0102030405060708"
-                ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
-            },
-            "expect": {
-                "out": [
-                    "0xfec062278915ba5c3c3af6ebf470b5afc94fedadf39fe78eea427b9aa5df9692"
-                ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
             }
         },
         {
@@ -80,7 +33,7 @@
                     "0xaf32a2ddf341c08d1eb7232f05dc34e4454155e676b58c40fddf9a036562ac2c01533d2d557cb49d73aa9d7a89744696"
                 ],
                 "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasPrice": "0"
             },
             "expect": {
                 "out": ["0x01"],
@@ -104,7 +57,7 @@
                     "0xf34eb80f5ef94e0928f42f26b4a14799d52a8f687eb644d6be73a8db3ae85de059002d369be28c8c188b179dcf6286fd009d540953ea932f70aead52d6aa7d09"
                 ],
                 "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasPrice": "0"
             },
             "expect": {
                 "out": ["0x01"],
@@ -128,7 +81,7 @@
                     "0x3045022100fab29dbcb623e7e96f44665f312b89ffdb9e4d2e2f53353236fbbcf57b2f49bf02203d6f9c63df8be43121042970a549a2d3baeca093fd37b726ddcc0924638409f5"
                 ],
                 "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasPrice": "0"
             },
             "expect": {
                 "out": ["0x01"],
@@ -152,7 +105,7 @@
                     "0x3045022100fab29dbcb623e7e96f44665f312b89ffdb9e4d2e2f53353236fbbcf57b2f49bf02203d6f9c63df8be43121042970a549a2d3baeca093fd37b726ddcc0924638409f5"
                 ],
                 "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasPrice": "0"
             },
             "expect": {
                 "out": ["0x01"],
@@ -160,23 +113,6 @@
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
-            }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "address:features_contract": {
-                    "nonce": "0",
-                    "balance": "0x100",
-                    "storage": {},
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "address:an_account": {
-                    "nonce": "6",
-                    "balance": "0x100abc",
-                    "storage": {},
-                    "code": ""
-                }
             }
         }
     ]

@@ -8,9 +8,14 @@ use std::path::Path;
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
-pub fn parse_execute_mandos<P: AsRef<Path>>(path: P, contract_map: &ContractMap<TxContext>) {
+pub fn parse_execute_mandos<P: AsRef<Path>>(
+	relative_path: P,
+	contract_map: &ContractMap<TxContext>,
+) {
+	let mut absolute_path = std::env::current_dir().unwrap();
+	absolute_path.push(relative_path);
 	let mut state = BlockchainMock::new();
-	parse_execute_mandos_steps(path.as_ref(), &mut state, contract_map);
+	parse_execute_mandos_steps(absolute_path.as_ref(), &mut state, contract_map);
 }
 
 fn parse_execute_mandos_steps(
