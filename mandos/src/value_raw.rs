@@ -112,27 +112,24 @@ impl fmt::Display for ValueSubTree {
 }
 
 pub enum CheckBytesValueRaw {
-	DefaultStar,
+	DefaultValue,
 	Star,
 	Equal(ValueSubTree),
 }
 
 impl CheckBytesValueRaw {
 	pub fn is_star(&self) -> bool {
-		matches!(
-			self,
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar
-		)
+		matches!(self, CheckBytesValueRaw::Star)
 	}
 
-	pub fn is_default_star(&self) -> bool {
-		matches!(self, CheckBytesValueRaw::DefaultStar)
+	pub fn is_default(&self) -> bool {
+		matches!(self, CheckBytesValueRaw::DefaultValue)
 	}
 }
 
 impl Default for CheckBytesValueRaw {
 	fn default() -> Self {
-		CheckBytesValueRaw::DefaultStar
+		CheckBytesValueRaw::DefaultValue
 	}
 }
 
@@ -142,9 +139,8 @@ impl Serialize for CheckBytesValueRaw {
 		S: Serializer,
 	{
 		match self {
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar => {
-				serializer.serialize_str("*")
-			},
+			CheckBytesValueRaw::DefaultValue => serializer.serialize_str(""),
+			CheckBytesValueRaw::Star => serializer.serialize_str("*"),
 			CheckBytesValueRaw::Equal(bytes_value) => bytes_value.serialize(serializer),
 		}
 	}
@@ -201,7 +197,8 @@ impl<'de> Deserialize<'de> for CheckBytesValueRaw {
 impl fmt::Display for CheckBytesValueRaw {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		match self {
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar => write!(f, "*"),
+			CheckBytesValueRaw::DefaultValue => write!(f, ""),
+			CheckBytesValueRaw::Star => write!(f, "*"),
 			CheckBytesValueRaw::Equal(bytes_value) => bytes_value.fmt(f),
 		}
 	}

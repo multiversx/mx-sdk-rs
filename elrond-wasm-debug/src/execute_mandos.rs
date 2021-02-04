@@ -398,23 +398,26 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 		);
 	}
 
-	if let Some(expected_message) = &tx_expect.message {
-		let want_str = std::str::from_utf8(expected_message.value.as_slice()).unwrap();
-		let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
-		assert_eq!(
-			want_str, have_str,
-			"bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"",
-			tx_id, want_str, have_str
-		);
-	}
-
+	let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
 	assert!(
 		tx_expect.status.check(tx_result.result_status),
-		"bad tx status. Tx id: {}. Want: \"{}\". Have: \"{}\"",
+		"result code mismatch. Tx id: {}. Want: {}. Have: {}. Message: {}",
 		tx_id,
 		tx_expect.status,
-		tx_result.result_status
+		tx_result.result_status,
+		have_str,
 	);
+
+	if let Some(expected_message) = &tx_expect.message {
+		let want_str = std::str::from_utf8(expected_message.value.as_slice()).unwrap();
+		assert!(
+			want_str == have_str,
+			"result message mismatch. Tx id: {}. Want: {}. Have: {}.",
+			tx_id,
+			want_str,
+			have_str
+		);
+	}
 }
 
 fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {

@@ -27,7 +27,7 @@ impl InterpretableFrom<CheckLogRaw> for CheckLog {
 pub enum CheckLogs {
 	Star,
 	List(Vec<CheckLog>),
-	DefaultStar,
+	DefaultValue,
 }
 
 impl CheckLogs {
@@ -45,7 +45,7 @@ impl InterpretableFrom<CheckLogsRaw> for CheckLogs {
 					.map(|c| CheckLog::interpret_from(c, context))
 					.collect(),
 			),
-			CheckLogsRaw::DefaultStar => CheckLogs::DefaultStar,
+			CheckLogsRaw::DefaultValue => CheckLogs::DefaultValue,
 		}
 	}
 }
