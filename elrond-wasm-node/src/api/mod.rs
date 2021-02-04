@@ -9,6 +9,7 @@ mod error_api_node;
 mod log_api_node;
 mod send_api_node;
 mod storage_api_node;
+mod unsafe_buffer;
 
 pub use big_int_api_node::*;
 pub use big_uint_api_node::*;
