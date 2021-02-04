@@ -1,6 +1,6 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
-use elrond_wasm::api::{BigUintApi, SendApi};
+use elrond_wasm::api::SendApi;
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 
 extern "C" {
@@ -69,11 +69,11 @@ extern "C" {
 
 impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
-		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = transferValue(
 				to.as_ref().as_ptr(),
-				amount_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				data.as_ptr(),
 				data.len() as i32,
 			);
@@ -88,13 +88,13 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		data: &[u8],
 	) {
-		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = transferESDT(
 				to.as_ref().as_ptr(),
 				token.as_ptr(),
 				token.len() as i32,
-				amount_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				gas_limit as i64,
 				data.as_ptr(),
 				data.len() as i32,
@@ -103,11 +103,11 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	}
 
 	fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
-		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			asyncCall(
 				to.as_ref().as_ptr(),
-				amount_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				data.as_ptr(),
 				data.len() as i32,
 			);
@@ -122,12 +122,12 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
 	) -> Address {
-		let amount_bytes32 = amount.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
 		let mut new_address = Address::zero();
 		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = createContract(
 				gas,
-				amount_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				code.as_ptr(),
 				code_metadata.as_ptr(),
 				code.len() as i32,
@@ -144,17 +144,16 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		&self,
 		gas: u64,
 		address: &Address,
-		value: &ArwenBigUint,
+		amount: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) {
 		unsafe {
-			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
-
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			executeOnDestContext(
 				gas,
 				address.as_ref().as_ptr(),
-				value_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				function.as_ptr(),
 				function.len() as i32,
 				arg_buffer.num_args() as i32,
@@ -168,17 +167,16 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		&self,
 		gas: u64,
 		address: &Address,
-		value: &ArwenBigUint,
+		amount: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) {
 		unsafe {
-			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
-
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			executeOnDestContextByCaller(
 				gas,
 				address.as_ref().as_ptr(),
-				value_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				function.as_ptr(),
 				function.len() as i32,
 				arg_buffer.num_args() as i32,
@@ -192,17 +190,16 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		&self,
 		gas: u64,
 		address: &Address,
-		value: &ArwenBigUint,
+		amount: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) {
 		unsafe {
-			let value_bytes32 = value.to_bytes_be_pad_right(32).unwrap(); // TODO: unwrap panics, remove
-
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			executeOnSameContext(
 				gas,
 				address.as_ref().as_ptr(),
-				value_bytes32.as_ptr(),
+				amount_bytes32_ptr,
 				function.as_ptr(),
 				function.len() as i32,
 				arg_buffer.num_args() as i32,
