@@ -490,6 +490,25 @@ pub trait BasicFeatures {
 			.direct_esdt(to, token_id.as_slice(), amount, data);
 	}
 
+	#[endpoint]
+	fn send_esdt_twice(
+		&self,
+		to: &Address,
+		token_id: BoxedBytes,
+		amount_first_time: &BigUint,
+		amount_second_time: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send()
+			.direct_esdt(to, token_id.as_slice(), amount_first_time, data);
+		self.send()
+			.direct_esdt(to, token_id.as_slice(), amount_second_time, data);
+	}
+
 	// BLOCK INFO
 
 	#[view(get_block_timestamp)]
