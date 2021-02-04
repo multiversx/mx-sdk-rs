@@ -28,6 +28,16 @@ fn count_ones() {
 }
 
 #[test]
+fn crypto_keccak256() {
+	parse_execute_mandos("mandos/crypto_keccak256.scen.json", &contract_map());
+}
+
+#[test]
+fn crypto_sha256() {
+	parse_execute_mandos("mandos/crypto_sha256.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_array_u8() {
 	parse_execute_mandos("mandos/echo_array_u8.scen.json", &contract_map());
 }
@@ -276,6 +286,24 @@ fn storage_mapper_single_value() {
 		"mandos/storage_mapper_single_value.scen.json",
 		&contract_map(),
 	);
+}
+
+#[test]
+fn storage_mapper_linked_list() {
+	parse_execute_mandos(
+		"mandos/storage_mapper_linked_list.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
+fn storage_mapper_set() {
+	parse_execute_mandos("mandos/storage_mapper_set.scen.json", &contract_map());
+}
+
+#[test]
+fn storage_mapper_map() {
+	parse_execute_mandos("mandos/storage_mapper_map.scen.json", &contract_map());
 }
 
 #[test]
