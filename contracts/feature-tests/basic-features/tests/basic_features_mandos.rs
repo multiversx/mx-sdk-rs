@@ -213,6 +213,11 @@ fn payable_token_4() {
 }
 
 #[test]
+fn return_codes() {
+	parse_execute_mandos("mandos/return_codes.scen.json", &contract_map());
+}
+
+#[test]
 fn return_error() {
 	parse_execute_mandos("mandos/return_error.scen.json", &contract_map());
 }

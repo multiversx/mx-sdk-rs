@@ -344,7 +344,13 @@ pub fn execute_tx(
 	let func_name = tx_context.tx_input_box.func_name.clone();
 	let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
 	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-		contract_inst.call(func_name.as_slice());
+		let call_successful = contract_inst.call(func_name.as_slice());
+		if !call_successful {
+			panic!(TxPanic {
+				status: 1,
+				message: b"invalid function (not found)".to_vec(),
+			});
+		}
 		let context = contract_inst.into_api();
 		context.into_output()
 	}));
