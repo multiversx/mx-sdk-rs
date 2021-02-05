@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(non_snake_case)]
 
-imports!();
+elrond_wasm::imports!();
 
 use hex_literal::hex;
 

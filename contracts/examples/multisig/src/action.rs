@@ -1,6 +1,6 @@
 use elrond_wasm::api::BigUintApi;
 use elrond_wasm::{Address, BoxedBytes, CodeMetadata, Vec};
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub enum Action<BigUint: BigUintApi> {

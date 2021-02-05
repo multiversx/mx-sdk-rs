@@ -1,4 +1,4 @@
-imports!();
+elrond_wasm::imports!();
 
 use super::internal_mod_b::*;
 

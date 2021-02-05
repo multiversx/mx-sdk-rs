@@ -7,7 +7,7 @@ use action::{Action, ActionFullInfo};
 use elrond_wasm::HexCallDataSerializer;
 use user_role::UserRole;
 
-imports!();
+elrond_wasm::imports!();
 
 #[cfg(feature = "elrond-wasm-module-users-default")]
 use elrond_wasm_module_users_default::*;
