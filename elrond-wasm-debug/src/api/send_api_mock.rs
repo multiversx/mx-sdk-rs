@@ -2,21 +2,47 @@ use super::big_uint_api_mock::*;
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxPanic};
 use elrond_wasm::api::{ContractHookApi, SendApi};
-use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
+use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 use num_bigint::BigUint;
+use num_traits::Zero;
 
 impl TxContext {
-	fn get_available_balance(&self) -> BigUint {
+	fn get_available_egld_balance(&self) -> BigUint {
 		// start with the pre-existing balance
 		let mut available_balance = self.blockchain_info_box.contract_balance.clone();
 
-		// add amount received received
+		// add amount received
 		available_balance += &self.tx_input_box.call_value;
+
+		// already sent
+		let tx_output = self.tx_output_cell.borrow();
+		for send_balance in &tx_output.send_balance_list {
+			available_balance -= &send_balance.amount;
+		}
+
+		available_balance
+	}
+
+	fn get_available_esdt_balance(&self, token_name: &[u8]) -> BigUint {
+		// start with the pre-existing balance
+		let mut available_balance = self
+			.blockchain_info_box
+			.contract_esdt
+			.get(token_name)
+			.unwrap_or(&BigUint::zero())
+			.clone();
+
+		// add amount received (if the same token)
+		if self.tx_input_box.esdt_token_name == token_name {
+			available_balance += &self.tx_input_box.esdt_value;
+		}
 		let tx_output = self.tx_output_cell.borrow();
 
 		// already sent
 		for send_balance in &tx_output.send_balance_list {
-			available_balance -= &send_balance.amount;
+			if send_balance.token == token_name {
+				available_balance -= &send_balance.amount;
+			}
 		}
 
 		available_balance
@@ -25,7 +51,7 @@ impl TxContext {
 
 impl SendApi<RustBigUint> for TxContext {
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
-		if &amount.value() > &self.get_available_balance() {
+		if &amount.value() > &self.get_available_egld_balance() {
 			panic!(TxPanic {
 				status: 10,
 				message: b"failed transfer (insufficient funds)".to_vec(),
@@ -35,19 +61,32 @@ impl SendApi<RustBigUint> for TxContext {
 		let mut tx_output = self.tx_output_cell.borrow_mut();
 		tx_output.send_balance_list.push(SendBalance {
 			recipient: to.clone(),
+			token: TokenIdentifier::egld(),
 			amount: amount.value(),
 		})
 	}
 
 	fn direct_esdt_explicit_gas(
 		&self,
-		_to: &Address,
-		_token: &[u8],
-		_amount: &RustBigUint,
+		to: &Address,
+		token: &[u8],
+		amount: &RustBigUint,
 		_gas: u64,
 		_data: &[u8],
 	) {
-		panic!()
+		if &amount.value() > &self.get_available_esdt_balance(token) {
+			panic!(TxPanic {
+				status: 10,
+				message: b"insufficient funds".to_vec(),
+			});
+		}
+
+		let mut tx_output = self.tx_output_cell.borrow_mut();
+		tx_output.send_balance_list.push(SendBalance {
+			recipient: to.clone(),
+			token: TokenIdentifier::from(token),
+			amount: amount.value(),
+		})
 	}
 
 	fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {

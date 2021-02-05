@@ -223,6 +223,11 @@ fn send_egld() {
 }
 
 #[test]
+fn send_esdt() {
+	parse_execute_mandos("mandos/send_esdt.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_addr() {
 	parse_execute_mandos("mandos/storage_addr.scen.json", &contract_map());
 }
