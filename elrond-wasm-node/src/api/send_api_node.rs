@@ -80,7 +80,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn direct_esdt_explicit_gas(
+	fn direct_esdt_explicit_gas_limit(
 		&self,
 		to: &Address,
 		token: &[u8],
@@ -102,7 +102,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn async_call(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
+	fn async_call_raw(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			asyncCall(

@@ -66,7 +66,7 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn direct_esdt_explicit_gas(
+	fn direct_esdt_explicit_gas_limit(
 		&self,
 		to: &Address,
 		token: &[u8],
@@ -89,7 +89,7 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
+	fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
 		let mut tx_output = self.tx_output_cell.borrow_mut();
 		tx_output.async_call = Some(AsyncCallTxData {
 			to: to.clone(),
