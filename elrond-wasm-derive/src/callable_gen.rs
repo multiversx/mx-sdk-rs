@@ -156,7 +156,7 @@ impl Callable {
 						#callback_init
 						#(#arg_push_snippets)*
 						#callback_store
-						self.api.send().async_call(&self.address, &#amount_snippet, call_data_ser.as_slice());
+						self.api.send().async_call_raw(&self.address, &#amount_snippet, call_data_ser.as_slice());
 					}
 				};
 				sig

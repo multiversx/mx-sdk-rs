@@ -445,7 +445,7 @@ pub trait Multisig {
 		let action = self.get_action_data(action_id);
 
 		// clean up storage
-		// happens before actual execution, because the async_call kills contract execution,
+		// happens before actual execution, because the async_call_raw kills contract execution,
 		// so cleanup cannot happen afterwards
 		self.clear_action(action_id);
 
@@ -511,7 +511,8 @@ pub trait Multisig {
 				for arg in arguments {
 					call_data.push_argument_bytes(arg.as_slice());
 				}
-				self.send().async_call(&to, &amount, call_data.as_slice());
+				self.send()
+					.async_call_raw(&to, &amount, call_data.as_slice());
 			},
 		}
 
