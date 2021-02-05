@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-module-users"
-version = "0.10.5"
+version = "0.11.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -17,18 +17,18 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 wasm-output-mode = ["elrond-wasm-node"]
 
 [dependencies.elrond-wasm]
-version = "0.10.5"
+version = "0.11.0"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.10.5"
+version = "0.11.0"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.10.5"
+version = "0.11.0"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.10.5"
+version = "0.11.0"
 path = "../../../elrond-wasm-debug"
