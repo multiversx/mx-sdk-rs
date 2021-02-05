@@ -62,7 +62,8 @@ pub trait KittyOwnership {
 	fn claim(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
-		self.send_tx(&self.get_caller(), &self.get_sc_balance(), b"claim");
+		self.send()
+			.direct_egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
 
 		Ok(())
 	}
@@ -596,7 +597,8 @@ pub trait KittyOwnership {
 
 				// send birth fee to caller
 				let fee = self.get_birth_fee();
-				self.send_tx(&original_caller, &fee, b"birth fee");
+				self.send()
+					.direct_egld(&original_caller, &fee, b"birth fee");
 			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_genes contract address is invalid

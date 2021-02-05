@@ -1,14 +1,12 @@
 use super::big_uint_api_mock::RustBigUint;
-
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
-use num_traits::sign::Signed;
-
-use alloc::vec::Vec;
 use elrond_wasm::api::BigIntApi;
-
-use core::cmp::Ordering;
 use num_bigint::{BigInt, Sign};
+use num_traits::sign::Signed;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct RustBigInt(pub num_bigint::BigInt);
@@ -16,6 +14,12 @@ pub struct RustBigInt(pub num_bigint::BigInt);
 impl RustBigInt {
 	pub fn value(&self) -> &BigInt {
 		&self.0
+	}
+}
+
+impl fmt::Display for RustBigInt {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		self.value().fmt(f)
 	}
 }
 

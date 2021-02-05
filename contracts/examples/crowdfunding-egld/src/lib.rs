@@ -61,14 +61,16 @@ pub trait Crowdfunding {
 				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
-				self.send_tx(&caller, &self.get_sc_balance(), b"funding success");
+				self.send()
+					.direct_egld(&caller, &self.get_sc_balance(), b"funding success");
 				Ok(())
 			},
 			Status::Failed => {
 				let caller = self.get_caller();
 				let deposit = self.get_deposit(&caller);
 				if deposit > 0 {
-					self.send_tx(&caller, &deposit, b"reclaim failed funding");
+					self.send()
+						.direct_egld(&caller, &deposit, b"reclaim failed funding");
 					self.set_deposit(&caller, &BigUint::zero());
 				}
 				Ok(())
