@@ -41,20 +41,25 @@ fn parse_execute_mandos_steps(
 				current_block_info,
 			} => {
 				for (address, account) in accounts.iter() {
+					let storage = account
+						.storage
+						.iter()
+						.map(|(k, v)| (k.value.clone(), v.value.clone()))
+						.collect();
+					let esdt = if let Some(esdt_map) = &account.esdt {
+						esdt_map
+							.iter()
+							.map(|(k, v)| (k.value.clone(), v.value.clone()))
+							.collect()
+					} else {
+						HashMap::new()
+					};
 					state.add_account(AccountData {
 						address: address.value.into(),
 						nonce: account.nonce.value,
 						balance: account.balance.value.clone(),
-						storage: account
-							.storage
-							.iter()
-							.map(|(k, v)| (k.value.clone(), v.value.clone()))
-							.collect(),
-						esdt: account.esdt.as_ref().map(|tree| {
-							tree.iter()
-								.map(|(k, v)| (k.value.clone(), v.value.clone()))
-								.collect()
-						}),
+						storage,
+						esdt,
 						contract_path: account
 							.code
 							.as_ref()
@@ -189,7 +194,7 @@ fn parse_execute_mandos_steps(
 								nonce: 0,
 								balance: async_data.call_value.clone(),
 								storage: HashMap::new(),
-								esdt: None,
+								esdt: HashMap::new(),
 								contract_path: None,
 								contract_owner: None,
 							});
@@ -477,10 +482,9 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 			match &expected_account.esdt {
 				Some(CheckEsdt::Equal(eq)) => {
 					let default_value = &BigUint::from(0u32);
-					let default_hashmap = &HashMap::new();
-					let actual_esdt = account.esdt.as_ref().unwrap_or(default_hashmap);
 					for (expected_key, expected_value) in eq.iter() {
-						let actual_value = actual_esdt
+						let actual_value = account
+							.esdt
 							.get(&expected_key.value)
 							.unwrap_or(default_value);
 						assert!(
@@ -495,9 +499,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 
 					let default_check_value = CheckValue::Equal(BigUintValue::default());
 
-					for (actual_key, actual_value) in
-						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
-					{
+					for (actual_key, actual_value) in account.esdt.iter() {
 						let expected_value = eq
 							.get(&actual_key.clone().into())
 							.unwrap_or(&default_check_value);
@@ -519,11 +521,8 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 				// we still have to check that the actual storage is empty
 				None => {
 					let default_check_value = CheckValue::Equal(BigUintValue::default());
-					let default_hashmap = &HashMap::new();
 
-					for (actual_key, actual_value) in
-						account.esdt.as_ref().unwrap_or(default_hashmap).iter()
-					{
+					for (actual_key, actual_value) in account.esdt.iter() {
 						assert!(
 							default_check_value.check(actual_value),
 							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
@@ -538,10 +537,8 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 
 			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
 				let default_value = &BigUint::from(0u32);
-				let default_hashmap = &HashMap::new();
-				let actual_esdt = account.esdt.as_ref().unwrap_or(default_hashmap);
 				for (expected_key, expected_value) in eq.iter() {
-					let actual_value = actual_esdt
+					let actual_value = account.esdt
 						.get(&expected_key.value)
 						.unwrap_or(default_value);
 					assert!(
@@ -556,9 +553,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 
 				let default_check_value = CheckValue::Equal(BigUintValue::default());
 
-				for (actual_key, actual_value) in
-					account.esdt.as_ref().unwrap_or(default_hashmap).iter()
-				{
+				for (actual_key, actual_value) in account.esdt.iter() {
 					let expected_value = eq
 						.get(&actual_key.clone().into())
 						.unwrap_or(&default_check_value);
