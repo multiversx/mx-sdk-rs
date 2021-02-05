@@ -1,6 +1,6 @@
 #![no_std]
 
-imports!();
+elrond_wasm::imports!();
 
 mod abi_enum;
 mod abi_test_type;

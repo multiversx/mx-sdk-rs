@@ -1,5 +1,5 @@
 use crate::only_nested::*;
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 /// Its only purpose is to test that the ABI generator works fine.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

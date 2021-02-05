@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(non_snake_case)]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(BobImpl)]
 pub trait Bob {
