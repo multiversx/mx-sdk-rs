@@ -396,8 +396,11 @@ pub trait KittyAuction {
 				if auction.kitty_owner != self.get_sc_address()
 					&& auction.current_winner != Address::zero()
 				{
-					self.send()
-						.direct_egld(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
+					self.send().direct_egld(
+						&auction.kitty_owner,
+						&auction.current_bid,
+						b"sold kitty",
+					);
 				}
 			},
 			AsyncCallResult::Err(_) => {

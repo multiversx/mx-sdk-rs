@@ -597,7 +597,8 @@ pub trait KittyOwnership {
 
 				// send birth fee to caller
 				let fee = self.get_birth_fee();
-				self.send().direct_egld(&original_caller, &fee, b"birth fee");
+				self.send()
+					.direct_egld(&original_caller, &fee, b"birth fee");
 			},
 			AsyncCallResult::Err(_) => {
 				// this can only fail if the kitty_genes contract address is invalid
