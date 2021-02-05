@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.10.5"
+version = "0.11.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -24,5 +24,5 @@ path = "../elrond-codec"
 features = ["derive"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.10.4"
+version = "0.11.0"
 path = "../elrond-wasm-debug"
