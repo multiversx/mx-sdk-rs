@@ -205,8 +205,22 @@ impl BlockchainMock {
 		send_balance_list: &[SendBalance],
 	) -> Result<(), BlockchainMockError> {
 		for send_balance in send_balance_list {
-			self.subtract_tx_payment(contract_address, &send_balance.amount)?;
-			self.increase_balance(&send_balance.recipient, &send_balance.amount);
+			if send_balance.token.is_egld() {
+				self.subtract_tx_payment(contract_address, &send_balance.amount)?;
+				self.increase_balance(&send_balance.recipient, &send_balance.amount);
+			} else {
+				let esdt_token_name = send_balance.token.as_slice();
+				self.substract_esdt_balance(
+					contract_address,
+					esdt_token_name,
+					&send_balance.amount,
+				);
+				self.increase_esdt_balance(
+					&send_balance.recipient,
+					esdt_token_name,
+					&send_balance.amount,
+				);
+			}
 		}
 		Ok(())
 	}
@@ -370,6 +384,7 @@ pub struct BlockchainTxInfo {
 	pub previous_block_info: BlockInfo,
 	pub current_block_info: BlockInfo,
 	pub contract_balance: BigUint,
+	pub contract_esdt: HashMap<Vec<u8>, BigUint>,
 	pub contract_owner: Option<Address>,
 }
 
@@ -380,6 +395,7 @@ impl BlockchainMock {
 				previous_block_info: self.previous_block_info.clone(),
 				current_block_info: self.current_block_info.clone(),
 				contract_balance: contract.balance.clone(),
+				contract_esdt: contract.esdt.clone(),
 				contract_owner: contract.contract_owner.clone(),
 			}
 		} else {
@@ -387,6 +403,7 @@ impl BlockchainMock {
 				previous_block_info: self.previous_block_info.clone(),
 				current_block_info: self.current_block_info.clone(),
 				contract_balance: 0u32.into(),
+				contract_esdt: HashMap::new(),
 				contract_owner: None,
 			}
 		}

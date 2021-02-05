@@ -40,7 +40,7 @@
             "expect": {
                 "out": [],
                 "status": "*",
-                "message": "str:failed transfer (insufficient funds)",
+                "message": "str:insufficient funds",
                 "logs": []
             }
         },
@@ -87,6 +87,29 @@
                 "out": [],
                 "status": "",
                 "logs": []
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "1000",
+                    "balance": "0",
+                    "storage": {},
+                    "esdt": {
+                        "str:BASIC-FEATURES-TOKEN": "800"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "esdt": {
+                        "str:BASIC-FEATURES-TOKEN": "200"
+                    },
+                    "code": ""
+                }
             }
         }
     ]

@@ -82,6 +82,23 @@
                 "status": "",
                 "logs": []
             }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "1000",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "200",
+                    "storage": {},
+                    "code": ""
+                }
+            }
         }
     ]
 }

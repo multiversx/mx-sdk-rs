@@ -329,11 +329,11 @@ fn execute_sc_call(
 		let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
 
 		state.increase_balance(&to, &call_value);
-		state.send_balance(&to, tx_output.send_balance_list.as_slice())?;
-
 		if esdt_used {
 			state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
 		}
+
+		state.send_balance(&to, tx_output.send_balance_list.as_slice())?;
 	} else {
 		state.increase_balance(&from, &call_value);
 
@@ -538,7 +538,8 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
 				let default_value = &BigUint::from(0u32);
 				for (expected_key, expected_value) in eq.iter() {
-					let actual_value = account.esdt
+					let actual_value = account
+						.esdt
 						.get(&expected_key.value)
 						.unwrap_or(default_value);
 					assert!(
