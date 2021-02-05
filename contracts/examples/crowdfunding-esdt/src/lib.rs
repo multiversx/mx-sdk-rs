@@ -4,10 +4,6 @@
 imports!();
 derive_imports!();
 
-use elrond_wasm::{HexCallDataSerializer, TokenIdentifier};
-
-const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
-
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy)]
 pub enum Status {
 	FundingPeriod,
@@ -82,7 +78,8 @@ pub trait Crowdfunding {
 				let esdt_balance = self.get_esdt_balance();
 
 				self.set_esdt_balance(&BigUint::zero());
-				self.pay_esdt(&esdt_token_name, &esdt_balance, &caller);
+				self.send()
+					.direct(&caller, &esdt_token_name, &esdt_balance, &[]);
 
 				Ok(())
 			},
@@ -98,20 +95,11 @@ pub trait Crowdfunding {
 
 					self.set_esdt_balance(&esdt_balance);
 					self.set_deposit(&caller, &BigUint::zero());
-					self.pay_esdt(&esdt_token_name, &deposit, &caller);
+					self.send().direct(&caller, &esdt_token_name, &deposit, &[]);
 				}
 				Ok(())
 			},
 		}
-	}
-
-	fn pay_esdt(&self, esdt_token_name: &TokenIdentifier, amount: &BigUint, to: &Address) {
-		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-		serializer.push_argument_bytes(esdt_token_name.as_slice());
-		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-
-		self.send()
-			.async_call(&to, &BigUint::zero(), serializer.as_slice());
 	}
 
 	// storage
