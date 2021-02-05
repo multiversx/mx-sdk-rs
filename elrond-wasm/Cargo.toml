@@ -19,6 +19,6 @@ arrayvec = { version = "0.5.2", default-features = false, features = ["array-siz
 hashbrown = "0.9.1"
 
 [dependencies.elrond-codec]
-version = "0.4.2"
+version = "0.5.0"
 path = "../elrond-codec"
 features = ["derive"]
