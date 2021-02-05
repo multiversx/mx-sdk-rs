@@ -1,7 +1,7 @@
 use super::BigUintApi;
 use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 
-pub const DIRECT_ESDT_DEFAULT_GAS: u64 = 500000;
+const DIRECT_ESDT_GAS: u64 = 0;
 
 pub trait SendApi<BigUint>: Sized
 where
@@ -11,7 +11,7 @@ where
 
 	#[inline]
 	fn direct_esdt(&self, to: &Address, token: &[u8], amount: &BigUint, data: &[u8]) {
-		self.direct_esdt_explicit_gas(to, token, amount, DIRECT_ESDT_DEFAULT_GAS, data);
+		self.direct_esdt_explicit_gas(to, token, amount, DIRECT_ESDT_GAS, data);
 	}
 
 	fn direct_esdt_explicit_gas(
