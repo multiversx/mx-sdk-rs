@@ -22,7 +22,3 @@ hashbrown = "0.9.1"
 version = "0.4.2"
 path = "../elrond-codec"
 features = ["derive"]
-
-[dev-dependencies.elrond-wasm-debug]
-version = "0.11.0"
-path = "../elrond-wasm-debug"
