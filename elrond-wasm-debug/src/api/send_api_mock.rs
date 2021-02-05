@@ -1,6 +1,6 @@
 use super::big_uint_api_mock::*;
 use crate::async_data::AsyncCallTxData;
-use crate::{SendBalance, TxContext, TxPanic};
+use crate::{SendBalance, TxContext, TxPanic, TxOutput};
 use elrond_wasm::api::{ContractHookApi, SendApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 use num_bigint::BigUint;
@@ -66,7 +66,7 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn direct_esdt_explicit_gas(
+	fn direct_esdt_explicit_gas_limit(
 		&self,
 		to: &Address,
 		token: &[u8],
@@ -89,14 +89,16 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
-		let mut tx_output = self.tx_output_cell.borrow_mut();
+	fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) -> ! {
+		// the cell is no longer needed, since we end in a panic
+		let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
 		tx_output.async_call = Some(AsyncCallTxData {
 			to: to.clone(),
 			call_value: amount.value(),
 			call_data: data.to_vec(),
 			tx_hash: self.get_tx_hash(),
 		});
+		panic!(tx_output)
 	}
 
 	fn deploy_contract(

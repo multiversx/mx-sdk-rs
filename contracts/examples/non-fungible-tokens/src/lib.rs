@@ -1,6 +1,6 @@
 #![no_std]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(NonFungibleTokensImpl)]
 pub trait NonFungibleTokens {

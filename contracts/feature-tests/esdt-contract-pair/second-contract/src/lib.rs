@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(SecondContractImpl)]
 pub trait SecondContract {

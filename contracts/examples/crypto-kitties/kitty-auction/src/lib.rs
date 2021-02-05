@@ -1,6 +1,6 @@
 #![no_std]
 
-imports!();
+elrond_wasm::imports!();
 
 pub mod auction;
 use auction::*;

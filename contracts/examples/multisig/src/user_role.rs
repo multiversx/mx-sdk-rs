@@ -1,4 +1,4 @@
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi, Clone, Copy, PartialEq)]
 pub enum UserRole {

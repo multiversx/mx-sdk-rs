@@ -2,7 +2,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::string_lit_as_bytes)]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(CryptoBubblesImpl)]
 pub trait CryptoBubbles {
