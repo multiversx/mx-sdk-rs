@@ -5,7 +5,7 @@ pub use internal_mod_a::*;
 mod internal_mod_b;
 pub use internal_mod_b::*;
 
-imports!();
+elrond_wasm::imports!();
 
 #[cfg(feature = "elrond-wasm-module-features-default")]
 use elrond_wasm_module_features_default::*;

@@ -1,5 +1,4 @@
-use elrond_wasm::derive_imports;
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 use random::*;
 

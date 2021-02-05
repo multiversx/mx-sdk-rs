@@ -1,5 +1,5 @@
 use elrond_wasm::Box;
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 const ARRAY_SIZE: usize = 512;
 
