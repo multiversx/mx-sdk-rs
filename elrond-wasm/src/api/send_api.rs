@@ -48,7 +48,7 @@ where
 	///
 	/// The data is expected to be of the form `functionName@<arg1-hex>@<arg2-hex>@...`.
 	/// Use a `HexCallDataSerializer` to prepare this field.
-	fn async_call_raw(&self, to: &Address, amount: &BigUint, data: &[u8]);
+	fn async_call_raw(&self, to: &Address, amount: &BigUint, data: &[u8]) -> !;
 
 	/// Deploys a new contract in the same shard.
 	/// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.

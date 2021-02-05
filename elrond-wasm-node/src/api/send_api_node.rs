@@ -21,7 +21,12 @@ extern "C" {
 		dataLength: i32,
 	) -> i32;
 
-	fn asyncCall(dstOffset: *const u8, valueOffset: *const u8, dataOffset: *const u8, length: i32);
+	fn asyncCall(
+		dstOffset: *const u8,
+		valueOffset: *const u8,
+		dataOffset: *const u8,
+		length: i32,
+	) -> !;
 
 	fn createContract(
 		gas: u64,
@@ -102,7 +107,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn async_call_raw(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
+	fn async_call_raw(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) -> ! {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			asyncCall(
@@ -110,7 +115,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				amount_bytes32_ptr,
 				data.as_ptr(),
 				data.len() as i32,
-			);
+			)
 		}
 	}
 

@@ -359,12 +359,18 @@ pub fn execute_tx(
 		context.into_output()
 	}));
 	match result {
-		Ok(tx_result) => tx_result,
+		Ok(tx_output) => tx_output,
 		Err(panic_any) => panic_result(panic_any),
 	}
 }
 
 fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
+	if let Some(_) = panic_any.downcast_ref::<TxOutput>() {
+		// async calls panic with the tx output directly
+		// it is not a failure, simply a way to kill the execution
+		return *panic_any.downcast::<TxOutput>().unwrap();
+	}
+
 	if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
 		return TxOutput::from_panic_obj(panic_obj);
 	}
