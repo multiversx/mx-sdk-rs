@@ -479,7 +479,7 @@ pub trait Multisig {
 				self.set_quorum(new_quorum)
 			},
 			Action::SendEgld { to, amount, data } => {
-				self.send_tx(&to, &amount, data.as_slice());
+				self.send().direct_egld(&to, &amount, data.as_slice());
 			},
 			Action::SCDeploy {
 				amount,
@@ -492,8 +492,13 @@ pub trait Multisig {
 				for arg in arguments {
 					arg_buffer.push_raw_arg(arg.as_slice());
 				}
-				let new_address =
-					self.deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer);
+				let new_address = self.send().deploy_contract(
+					gas_left,
+					&amount,
+					&code,
+					code_metadata,
+					&arg_buffer,
+				);
 				result.push(new_address.into_boxed_bytes());
 			},
 			Action::SCCall {
@@ -506,7 +511,7 @@ pub trait Multisig {
 				for arg in arguments {
 					call_data.push_argument_bytes(arg.as_slice());
 				}
-				self.async_call(&to, &amount, call_data.as_slice());
+				self.send().async_call(&to, &amount, call_data.as_slice());
 			},
 		}
 

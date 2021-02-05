@@ -102,7 +102,8 @@ pub trait FirstContract {
 			serializer.push_argument_bytes(arg.as_slice());
 		}
 
-		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
+		self.send()
+			.async_call(&to, &BigUint::zero(), serializer.as_slice());
 	}
 
 	// storage

@@ -15,7 +15,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.str-repeat]
+[dependencies.send-tx-repeat]
 path = ".."
 features = ["wasm-output-mode"]
 default-features = false

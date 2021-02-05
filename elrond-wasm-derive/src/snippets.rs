@@ -61,6 +61,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 		{
 			type Storage = T::Storage;
 			type CallValue = T::CallValue;
+			type SendApi = T::SendApi;
 
 			#[inline]
 			fn get_storage_raw(&self) -> Self::Storage {
@@ -70,6 +71,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn call_value(&self) -> Self::CallValue {
 				self.api.call_value()
+			}
+
+			#[inline]
+			fn send(&self) -> Self::SendApi {
+				self.api.send()
 			}
 
 			#[inline]
@@ -89,22 +95,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 
 			#[inline]
 			fn get_balance(&self, address: &Address) -> BigUint {
-			self.api.get_balance(address)
-			}
-
-			#[inline]
-			fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]) {
-				self.api.send_tx(to, amount, data);
-			}
-
-			#[inline]
-			fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]) {
-				self.api.async_call(to, amount, data);
-			}
-
-			#[inline]
-			fn deploy_contract(&self, gas: u64, amount: &BigUint, code: &BoxedBytes, code_metadata: CodeMetadata, arg_buffer: &ArgBuffer) -> Address {
-				self.api.deploy_contract(gas, amount, code, code_metadata, arg_buffer)
+				self.api.get_balance(address)
 			}
 
 			#[inline]
@@ -165,21 +156,6 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			#[inline]
 			fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
 				self.api.get_prev_block_random_seed()
-			}
-
-			#[inline]
-			fn execute_on_dest_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
-				self.api.execute_on_dest_context(gas, address, value, function, arg_buffer);
-			}
-
-			#[inline]
-			fn execute_on_dest_context_by_caller(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
-				self.api.execute_on_dest_context_by_caller(gas, address, value, function, arg_buffer);
-			}
-
-			#[inline]
-			fn execute_on_same_context(&self, gas: u64, address: &Address, value: &BigUint, function: &[u8], arg_buffer: &ArgBuffer) {
-				self.api.execute_on_same_context(gas, address, value, function, arg_buffer);
 			}
 		}
 
