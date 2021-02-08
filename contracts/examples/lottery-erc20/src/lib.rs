@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::too_many_arguments)]
 
-imports!();
+elrond_wasm::imports!();
 
 mod lottery_info;
 mod random;

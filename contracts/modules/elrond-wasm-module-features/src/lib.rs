@@ -4,7 +4,7 @@
 #[macro_use]
 extern crate elrond_wasm;
 
-imports!();
+elrond_wasm::imports!();
 
 pub const FEATURE_NOT_SET: u8 = 0;
 pub const FEATURE_ON: u8 = 1;

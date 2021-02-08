@@ -2,8 +2,8 @@
 #![allow(unused_attributes)]
 #![allow(unused_variables)]
 
-imports!();
-derive_imports!();
+elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, PartialEq, TypeAbi, Clone, Copy)]
 pub enum Status {

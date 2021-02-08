@@ -1,4 +1,5 @@
 use crate::error_hook;
+use super::unsafe_buffer;
 
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Rem, Sub};
@@ -401,5 +402,19 @@ impl BigUintApi for ArwenBigUint {
 			bigIntSetUnsignedBytes(handle, bytes.as_ptr(), bytes.len() as i32);
 			ArwenBigUint { handle }
 		}
+	}
+}
+
+impl ArwenBigUint {
+	pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(&self, nr_bytes: usize) -> *const u8 {
+		let byte_len = bigIntUnsignedByteLength(self.handle) as usize;
+		if byte_len > nr_bytes {
+			error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE);
+		}
+		unsafe_buffer::clear_buffer();
+		if byte_len > 0 {
+			bigIntGetUnsignedBytes(self.handle, unsafe_buffer::buffer_ptr().offset((nr_bytes - byte_len) as isize));
+		}
+		unsafe_buffer::buffer_ptr()
 	}
 }

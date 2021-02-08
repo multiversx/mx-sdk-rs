@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-imports!();
+elrond_wasm::imports!();
 
 use elrond_wasm::HexCallDataSerializer;
 
@@ -102,7 +102,8 @@ pub trait FirstContract {
 			serializer.push_argument_bytes(arg.as_slice());
 		}
 
-		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
+		self.send()
+			.async_call_raw(&to, &BigUint::zero(), serializer.as_slice());
 	}
 
 	// storage

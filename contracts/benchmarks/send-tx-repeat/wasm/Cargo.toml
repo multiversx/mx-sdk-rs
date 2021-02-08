@@ -15,13 +15,13 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.str-repeat]
+[dependencies.send-tx-repeat]
 path = ".."
 features = ["wasm-output-mode"]
 default-features = false
 
 [dependencies.elrond-wasm-output]
-version = "0.10.5"
+version = "0.11.0"
 path = "../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 

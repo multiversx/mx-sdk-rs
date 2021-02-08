@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 use elrond_codec::TopEncodeOutput;
 
-/// Helper structure for providing arguments to all SC call functions other than async_call.
+/// Helper structure for providing arguments to all SC call functions other than async_call_raw.
 /// It keeps argument lengths separately from the argument data itself.
 /// Argument data is concatenated into a single byte buffer.
 pub struct ArgBuffer {
