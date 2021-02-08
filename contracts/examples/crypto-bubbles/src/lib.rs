@@ -2,7 +2,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::string_lit_as_bytes)]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(CryptoBubblesImpl)]
 pub trait CryptoBubbles {
@@ -45,7 +45,7 @@ pub trait CryptoBubbles {
 		balance -= amount;
 		self.set_player_balance(player, &balance);
 
-		self.send_tx(player, &amount, b"crypto bubbles");
+		self.send().direct_egld(player, &amount, b"crypto bubbles");
 
 		self.withdraw_event(player, amount);
 

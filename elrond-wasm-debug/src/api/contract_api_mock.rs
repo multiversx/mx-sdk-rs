@@ -1,19 +1,25 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
-use crate::async_data::*;
-use crate::{SendBalance, TxContext};
-use elrond_wasm::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
+use crate::TxContext;
+use elrond_wasm::{Address, H256};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
 	type CallValue = Self;
+	type SendApi = Self;
 
+	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
 		self.clone()
 	}
 
 	#[inline]
 	fn call_value(&self) -> Self::CallValue {
+		self.clone()
+	}
+
+	#[inline]
+	fn send(&self) -> Self::SendApi {
 		self.clone()
 	}
 
@@ -37,35 +43,6 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			panic!("get balance not yet implemented for accounts other than the contract itself");
 		}
 		self.blockchain_info_box.contract_balance.clone().into()
-	}
-
-	fn send_tx(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
-		let mut tx_output = self.tx_output_cell.borrow_mut();
-		tx_output.send_balance_list.push(SendBalance {
-			recipient: to.clone(),
-			amount: amount.value(),
-		})
-	}
-
-	fn async_call(&self, to: &Address, amount: &RustBigUint, data: &[u8]) {
-		let mut tx_output = self.tx_output_cell.borrow_mut();
-		tx_output.async_call = Some(AsyncCallTxData {
-			to: to.clone(),
-			call_value: amount.value(),
-			call_data: data.to_vec(),
-			tx_hash: self.get_tx_hash(),
-		});
-	}
-
-	fn deploy_contract(
-		&self,
-		_gas: u64,
-		_amount: &RustBigUint,
-		_code: &BoxedBytes,
-		_code_metadata: CodeMetadata,
-		_arg_buffer: &ArgBuffer,
-	) -> Address {
-		panic!("deploy_contract not yet implemented")
 	}
 
 	fn get_tx_hash(&self) -> H256 {
@@ -120,40 +97,5 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			.previous_block_info
 			.block_random_seed
 			.clone()
-	}
-
-	// TODO: Remove underscores when implementing
-
-	fn execute_on_dest_context(
-		&self,
-		_gas: u64,
-		_address: &Address,
-		_value: &RustBigUint,
-		_function: &[u8],
-		_arg_buffer: &ArgBuffer,
-	) {
-		panic!("execute_on_dest_context not implemented yet!");
-	}
-
-	fn execute_on_dest_context_by_caller(
-		&self,
-		_gas: u64,
-		_address: &Address,
-		_value: &RustBigUint,
-		_function: &[u8],
-		_arg_buffer: &ArgBuffer,
-	) {
-		panic!("execute_on_dest_context_by_caller not implemented yet!");
-	}
-
-	fn execute_on_same_context(
-		&self,
-		_gas: u64,
-		_address: &Address,
-		_value: &RustBigUint,
-		_function: &[u8],
-		_arg_buffer: &ArgBuffer,
-	) {
-		panic!("execute_on_same_context not implemented yet!");
 	}
 }

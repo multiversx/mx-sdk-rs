@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::string_lit_as_bytes)]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(SimpleErc20TokenImpl)]
 pub trait SimpleErc20Token {

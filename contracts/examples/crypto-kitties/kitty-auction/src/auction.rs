@@ -1,4 +1,4 @@
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 use elrond_wasm::{api::BigUintApi, Address};
 

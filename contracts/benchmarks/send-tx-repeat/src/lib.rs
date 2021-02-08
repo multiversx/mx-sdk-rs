@@ -1,6 +1,6 @@
 #![no_std]
 
-imports!();
+elrond_wasm::imports!();
 
 #[elrond_wasm_derive::contract(SendTxRepeatImpl)]
 pub trait SendTxRepeat {
@@ -21,7 +21,7 @@ pub trait SendTxRepeat {
 			OptionalArg::None => Vec::new(),
 		};
 		for _ in 0..times {
-			self.send_tx(&to, &amount, &data);
+			self.send().direct_egld(&to, &amount, &data);
 		}
 	}
 }

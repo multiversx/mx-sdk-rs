@@ -1,8 +1,9 @@
 use super::{
-	BigIntApi, BigUintApi, CallValueApi, CryptoApi, ErrorApi, StorageReadApi, StorageWriteApi,
+	BigIntApi, BigUintApi, CallValueApi, CryptoApi, ErrorApi, SendApi, StorageReadApi,
+	StorageWriteApi,
 };
 use crate::storage;
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, H256};
+use crate::types::{Address, H256};
 use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
@@ -22,6 +23,9 @@ where
 	/// Abstracts the call value handling at the beginning of a function call.
 	type CallValue: CallValueApi<BigUint> + ErrorApi + Clone + 'static;
 
+	/// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
+	type SendApi: SendApi<BigUint> + Clone + 'static;
+
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
 	/// Using it directly is not recommended.
@@ -31,6 +35,9 @@ where
 	/// The payment annotations should normally be the ones to handle this,
 	/// but the developer is also given direct access to the API.
 	fn call_value(&self) -> Self::CallValue;
+
+	/// Gateway to the functionality related to sending transactions from the current contract.
+	fn send(&self) -> Self::SendApi;
 
 	fn get_sc_address(&self) -> Address;
 
@@ -51,19 +58,6 @@ where
 			storage::protected_keys::ELROND_REWARD_KEY,
 		)
 	}
-
-	fn send_tx(&self, to: &Address, amount: &BigUint, data: &[u8]);
-
-	fn async_call(&self, to: &Address, amount: &BigUint, data: &[u8]);
-
-	fn deploy_contract(
-		&self,
-		gas: u64,
-		amount: &BigUint,
-		code: &BoxedBytes,
-		code_metadata: CodeMetadata,
-		arg_buffer: &ArgBuffer,
-	) -> Address;
 
 	fn get_tx_hash(&self) -> H256;
 
@@ -88,31 +82,4 @@ where
 	fn get_prev_block_epoch(&self) -> u64;
 
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
-
-	fn execute_on_dest_context(
-		&self,
-		gas: u64,
-		address: &Address,
-		value: &BigUint,
-		function: &[u8],
-		arg_buffer: &ArgBuffer,
-	);
-
-	fn execute_on_dest_context_by_caller(
-		&self,
-		gas: u64,
-		address: &Address,
-		value: &BigUint,
-		function: &[u8],
-		arg_buffer: &ArgBuffer,
-	);
-
-	fn execute_on_same_context(
-		&self,
-		gas: u64,
-		address: &Address,
-		value: &BigUint,
-		function: &[u8],
-		arg_buffer: &ArgBuffer,
-	);
 }

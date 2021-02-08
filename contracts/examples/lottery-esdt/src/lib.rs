@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::too_many_arguments)]
 
-imports!();
+elrond_wasm::imports!();
 
 mod lottery_info;
 mod random;
@@ -10,10 +10,6 @@ mod status;
 use lottery_info::LotteryInfo;
 use random::Random;
 use status::Status;
-
-use elrond_wasm::{HexCallDataSerializer, TokenIdentifier};
-
-const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 const PERCENTAGE_TOTAL: u16 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
@@ -281,7 +277,8 @@ pub trait Lottery {
 
 						self.set_lottery_info(lottery_name, &info);
 
-						self.pay_esdt(&info.esdt_token_name, &prize, &winner_address);
+						self.send()
+							.direct(&winner_address, &info.esdt_token_name, &prize, &[]);
 
 						break;
 					}
@@ -301,14 +298,6 @@ pub trait Lottery {
 		}
 
 		self.clear_lottery_info(lottery_name);
-	}
-
-	fn pay_esdt(&self, esdt_token_name: &TokenIdentifier, amount: &BigUint, to: &Address) {
-		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-		serializer.push_argument_bytes(esdt_token_name.as_slice());
-		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-
-		self.async_call(&to, &BigUint::zero(), serializer.as_slice());
 	}
 
 	fn sum_array(&self, array: &[u8]) -> u16 {

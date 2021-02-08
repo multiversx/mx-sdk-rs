@@ -1,6 +1,6 @@
 #![no_std]
 
-imports!();
+elrond_wasm::imports!();
 
 use kitty::{kitty_genes::*, Kitty};
 use random::Random;

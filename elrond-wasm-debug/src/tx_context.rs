@@ -4,7 +4,7 @@ use crate::display_util::*;
 use alloc::rc::Rc;
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use elrond_wasm::{Address, H256};
+use elrond_wasm::{Address, TokenIdentifier, H256};
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::fmt;
@@ -85,6 +85,7 @@ impl TxResult {
 #[derive(Debug)]
 pub struct SendBalance {
 	pub recipient: Address,
+	pub token: TokenIdentifier,
 	pub amount: BigUint,
 }
 
@@ -162,6 +163,7 @@ impl TxContext {
 				previous_block_info: BlockInfo::new(),
 				current_block_info: BlockInfo::new(),
 				contract_balance: 0u32.into(),
+				contract_esdt: HashMap::new(),
 				contract_owner: None,
 			}),
 			tx_input_box: Box::new(TxInput {

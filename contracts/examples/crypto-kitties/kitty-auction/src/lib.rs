@@ -1,6 +1,6 @@
 #![no_std]
 
-imports!();
+elrond_wasm::imports!();
 
 pub mod auction;
 use auction::*;
@@ -88,7 +88,8 @@ pub trait KittyAuction {
 	fn claim(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
-		self.send_tx(&self.get_caller(), &self.get_sc_balance(), b"claim");
+		self.send()
+			.direct_egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
 
 		Ok(())
 	}
@@ -226,7 +227,8 @@ pub trait KittyAuction {
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
-			self.send_tx(&auction.current_winner, &auction.current_bid, b"bid refund");
+			self.send()
+				.direct_egld(&auction.current_winner, &auction.current_bid, b"bid refund");
 		}
 
 		// update auction bid and winner
@@ -394,7 +396,11 @@ pub trait KittyAuction {
 				if auction.kitty_owner != self.get_sc_address()
 					&& auction.current_winner != Address::zero()
 				{
-					self.send_tx(&auction.kitty_owner, &auction.current_bid, b"sold kitty");
+					self.send().direct_egld(
+						&auction.kitty_owner,
+						&auction.current_bid,
+						b"sold kitty",
+					);
 				}
 			},
 			AsyncCallResult::Err(_) => {
