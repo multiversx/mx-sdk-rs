@@ -18,10 +18,17 @@ pub trait Vault {
 	}
 
 	#[payable("*")]
-	#[endpoint(storeFunds)]
-	fn store_funds(&self) {}
+	#[endpoint]
+	fn accept_funds(&self) {}
+	
+	#[payable("*")]
+	#[endpoint]
+	fn reject_funds(&self) -> SCResult<()> {
+		sc_error!("Rejected")
+	}
 
-	#[endpoint(retrieveFunds)]
+	#[payable("*")]
+	#[endpoint]
 	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) {
 		self.send().direct(&self.get_caller(), &token, &amount, &[]);
 	}
