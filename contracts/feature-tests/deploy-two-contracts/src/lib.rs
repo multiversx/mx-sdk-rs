@@ -52,19 +52,35 @@ pub trait DeployTwoContracts {
 	#[init]
 	fn init() {}
 
-	#[endpoint(deployFirst)]
-	fn deploy_first() -> Address {
-		self.send().deploy_contract(
-			self.get_gas_left(),
-			&BigUint::zero(),
-			&BoxedBytes::from(CONTRACT_CODE),
-			CodeMetadata::DEFAULT,
-			&ArgBuffer::new(),
-		)
+	#[endpoint(deployContract)]
+	fn deploy_contract(&self) -> SCResult<Address> {
+		let deployed_contract_address = self.deploy();
+		if deployed_contract_address.is_zero() {
+			return sc_error!("Deploy failed");
+		}
+
+		Ok(deployed_contract_address)
 	}
 
-	#[endpoint(deploySecond)]
-	fn deploy_second() -> Address {
+	#[endpoint(deployTwoContracts)]
+	fn deploy_two_contracts(&self) -> SCResult<(Address, Address)> {
+		let first_deployed_contract_address = self.deploy();
+		if first_deployed_contract_address.is_zero() {
+			return sc_error!("First deploy failed");
+		}
+
+		let second_deployed_contract_address = self.deploy();
+		if second_deployed_contract_address.is_zero() {
+			return sc_error!("Second deploy failed");
+		}
+
+		Ok((
+			first_deployed_contract_address,
+			second_deployed_contract_address
+		))
+	}
+
+	fn deploy(&self) -> Address {
 		self.send().deploy_contract(
 			self.get_gas_left(),
 			&BigUint::zero(),
