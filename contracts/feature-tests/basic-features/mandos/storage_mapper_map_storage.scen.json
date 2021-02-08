@@ -25,7 +25,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "map_storage_mapper",
+                "function": "map_storage_mapper_view",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
