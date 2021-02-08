@@ -634,7 +634,7 @@ pub trait BasicFeatures {
 	// SEND TX
 
 	#[endpoint]
-	fn send_tx_endpoint(
+	fn send_egld(
 		&self,
 		to: &Address,
 		amount: &BigUint,
@@ -644,7 +644,42 @@ pub trait BasicFeatures {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send_tx(to, amount, data);
+		self.send().direct_egld(to, amount, data);
+	}
+
+	#[endpoint]
+	fn send_esdt(
+		&self,
+		to: &Address,
+		token_id: BoxedBytes,
+		amount: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send()
+			.direct_esdt(to, token_id.as_slice(), amount, data);
+	}
+
+	#[endpoint]
+	fn send_esdt_twice(
+		&self,
+		to: &Address,
+		token_id: BoxedBytes,
+		amount_first_time: &BigUint,
+		amount_second_time: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send()
+			.direct_esdt(to, token_id.as_slice(), amount_first_time, data);
+		self.send()
+			.direct_esdt(to, token_id.as_slice(), amount_second_time, data);
 	}
 
 	// BLOCK INFO

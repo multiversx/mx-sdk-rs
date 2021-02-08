@@ -1,5 +1,5 @@
 use elrond_wasm::{BoxedBytes, Vec};
-derive_imports!();
+elrond_wasm::derive_imports!();
 
 /// Copied from elrond-wasm serialization tests.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

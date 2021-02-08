@@ -5,6 +5,7 @@ mod blockchain_mock;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
+mod mock_error;
 mod tx_context;
 
 pub use async_data::*;
@@ -12,6 +13,7 @@ pub use blockchain_mock::*;
 pub use contract_map::*;
 pub use display_util::*;
 pub use execute_mandos::*;
+pub use mock_error::*;
 pub use tx_context::*;
 
 #[macro_use]

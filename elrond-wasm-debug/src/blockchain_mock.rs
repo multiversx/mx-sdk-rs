@@ -1,3 +1,4 @@
+use super::mock_error::BlockchainMockError;
 use crate::contract_map::*;
 use crate::display_util::*;
 use crate::tx_context::*;
@@ -17,7 +18,7 @@ pub struct AccountData {
 	pub nonce: u64,
 	pub balance: BigUint,
 	pub storage: HashMap<Vec<u8>, Vec<u8>>,
-	pub esdt: Option<HashMap<Vec<u8>, BigUint>>,
+	pub esdt: HashMap<Vec<u8>, BigUint>,
 	pub contract_path: Option<Vec<u8>>,
 	pub contract_owner: Option<Address>,
 }
@@ -40,12 +41,12 @@ impl fmt::Display for AccountData {
 		}
 
 		let mut esdt_buf = String::new();
-		let esdt_unwrapped = self.esdt.clone().unwrap_or_default();
-		let mut esdt_keys: Vec<Vec<u8>> = esdt_unwrapped.iter().map(|(k, _)| k.clone()).collect();
+		let mut esdt_keys: Vec<Vec<u8>> =
+			self.esdt.clone().iter().map(|(k, _)| k.clone()).collect();
 		esdt_keys.sort();
 
 		for key in &esdt_keys {
-			let value = esdt_unwrapped.get(key).unwrap();
+			let value = self.esdt.get(key).unwrap();
 			write!(
 				&mut esdt_buf,
 				"\n\t\t{} -> 0x{}",
@@ -161,16 +162,20 @@ impl BlockchainMock {
 		}
 	}
 
-	pub fn subtract_tx_payment(&mut self, address: &Address, call_value: &BigUint) {
+	pub fn subtract_tx_payment(
+		&mut self,
+		address: &Address,
+		call_value: &BigUint,
+	) -> Result<(), BlockchainMockError> {
 		let sender_account = self
 			.accounts
 			.get_mut(address)
 			.unwrap_or_else(|| panic!("Sender account not found"));
-		assert!(
-			&sender_account.balance >= call_value,
-			"Not enough balance to send tx payment"
-		);
+		if &sender_account.balance < call_value {
+			return Err("failed transfer (insufficient funds)".into());
+		}
 		sender_account.balance -= call_value;
+		Ok(())
 	}
 
 	pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
@@ -194,11 +199,30 @@ impl BlockchainMock {
 		account.balance += amount;
 	}
 
-	pub fn send_balance(&mut self, contract_address: &Address, send_balance_list: &[SendBalance]) {
+	pub fn send_balance(
+		&mut self,
+		contract_address: &Address,
+		send_balance_list: &[SendBalance],
+	) -> Result<(), BlockchainMockError> {
 		for send_balance in send_balance_list {
-			self.subtract_tx_payment(contract_address, &send_balance.amount);
-			self.increase_balance(&send_balance.recipient, &send_balance.amount);
+			if send_balance.token.is_egld() {
+				self.subtract_tx_payment(contract_address, &send_balance.amount)?;
+				self.increase_balance(&send_balance.recipient, &send_balance.amount);
+			} else {
+				let esdt_token_name = send_balance.token.as_slice();
+				self.substract_esdt_balance(
+					contract_address,
+					esdt_token_name,
+					&send_balance.amount,
+				);
+				self.increase_esdt_balance(
+					&send_balance.recipient,
+					esdt_token_name,
+					&send_balance.amount,
+				);
+			}
 		}
+		Ok(())
 	}
 
 	pub fn substract_esdt_balance(
@@ -212,18 +236,16 @@ impl BlockchainMock {
 			.get_mut(address)
 			.unwrap_or_else(|| panic!("Sender account {} not found", address_hex(&address)));
 
-		let esdt = sender_account
+		let esdt_balance = sender_account
 			.esdt
-			.as_mut()
-			.unwrap_or_else(|| panic!("Account {} has no esdt tokens", address_hex(&address)));
-
-		let esdt_balance = esdt.get_mut(esdt_token_name).unwrap_or_else(|| {
-			panic!(
-				"Account {} has no esdt tokens with name {}",
-				address_hex(&address),
-				String::from_utf8(esdt_token_name.to_vec()).unwrap()
-			)
-		});
+			.get_mut(esdt_token_name)
+			.unwrap_or_else(|| {
+				panic!(
+					"Account {} has no esdt tokens with name {}",
+					address_hex(&address),
+					String::from_utf8(esdt_token_name.to_vec()).unwrap()
+				)
+			});
 
 		assert!(
 			*esdt_balance >= *value,
@@ -246,20 +268,11 @@ impl BlockchainMock {
 			.get_mut(address)
 			.unwrap_or_else(|| panic!("Receiver account not found"));
 
-		if account.esdt.is_none() {
-			let mut new_esdt = HashMap::<Vec<u8>, BigUint>::new();
-			new_esdt.insert(esdt_token_name.to_vec(), value.clone());
-
-			account.esdt = Some(new_esdt);
+		if account.esdt.contains_key(esdt_token_name) {
+			let esdt_balance = account.esdt.get_mut(esdt_token_name).unwrap();
+			*esdt_balance += value;
 		} else {
-			let esdt = account.esdt.as_mut().unwrap();
-
-			if esdt.contains_key(esdt_token_name) {
-				let esdt_balance = esdt.get_mut(esdt_token_name).unwrap();
-				*esdt_balance += value;
-			} else {
-				esdt.insert(esdt_token_name.to_vec(), value.clone());
-			}
+			account.esdt.insert(esdt_token_name.to_vec(), value.clone());
 		}
 	}
 
@@ -288,14 +301,11 @@ impl BlockchainMock {
 				panic!("Missing new address. Only explicit new deploy addresses supported")
 			});
 		let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
-		let mut esdt_opt: Option<HashMap<Vec<u8>, BigUint>> = None;
-
 		if !tx_input.esdt_token_name.is_empty() {
 			esdt.insert(
 				tx_input.esdt_token_name.clone(),
 				tx_input.esdt_value.clone(),
 			);
-			esdt_opt = Some(esdt);
 		}
 
 		let old_value = self.accounts.insert(
@@ -305,7 +315,7 @@ impl BlockchainMock {
 				nonce: 0,
 				balance: tx_input.call_value.clone(),
 				storage: new_storage,
-				esdt: esdt_opt,
+				esdt,
 				contract_path: Some(contract_path),
 				contract_owner: Some(tx_input.from.clone()),
 			},
@@ -344,17 +354,29 @@ pub fn execute_tx(
 	let func_name = tx_context.tx_input_box.func_name.clone();
 	let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
 	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-		contract_inst.call(func_name.as_slice());
+		let call_successful = contract_inst.call(func_name.as_slice());
+		if !call_successful {
+			panic!(TxPanic {
+				status: 1,
+				message: b"invalid function (not found)".to_vec(),
+			});
+		}
 		let context = contract_inst.into_api();
 		context.into_output()
 	}));
 	match result {
-		Ok(tx_result) => tx_result,
+		Ok(tx_output) => tx_output,
 		Err(panic_any) => panic_result(panic_any),
 	}
 }
 
 fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
+	if let Some(_) = panic_any.downcast_ref::<TxOutput>() {
+		// async calls panic with the tx output directly
+		// it is not a failure, simply a way to kill the execution
+		return *panic_any.downcast::<TxOutput>().unwrap();
+	}
+
 	if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
 		return TxOutput::from_panic_obj(panic_obj);
 	}
@@ -374,6 +396,7 @@ pub struct BlockchainTxInfo {
 	pub previous_block_info: BlockInfo,
 	pub current_block_info: BlockInfo,
 	pub contract_balance: BigUint,
+	pub contract_esdt: HashMap<Vec<u8>, BigUint>,
 	pub contract_owner: Option<Address>,
 }
 
@@ -384,6 +407,7 @@ impl BlockchainMock {
 				previous_block_info: self.previous_block_info.clone(),
 				current_block_info: self.current_block_info.clone(),
 				contract_balance: contract.balance.clone(),
+				contract_esdt: contract.esdt.clone(),
 				contract_owner: contract.contract_owner.clone(),
 			}
 		} else {
@@ -391,6 +415,7 @@ impl BlockchainMock {
 				previous_block_info: self.previous_block_info.clone(),
 				current_block_info: self.current_block_info.clone(),
 				contract_balance: 0u32.into(),
+				contract_esdt: HashMap::new(),
 				contract_owner: None,
 			}
 		}

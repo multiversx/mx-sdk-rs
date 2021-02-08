@@ -43,6 +43,15 @@ impl InterpretableFrom<ValueSubTree> for BytesValue {
 	}
 }
 
+impl Default for BytesValue {
+	fn default() -> Self {
+		Self {
+			value: Vec::new(),
+			original: ValueSubTree::Str(String::new()),
+		}
+	}
+}
+
 impl fmt::Display for BytesValue {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		self.original.fmt(f)
@@ -93,6 +102,15 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
 		U64Value {
 			value: bu.to_u64().unwrap(),
 			original: from,
+		}
+	}
+}
+
+impl Default for U64Value {
+	fn default() -> Self {
+		Self {
+			value: 0,
+			original: ValueSubTree::default(),
 		}
 	}
 }

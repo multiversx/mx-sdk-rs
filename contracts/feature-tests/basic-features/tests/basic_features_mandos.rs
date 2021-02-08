@@ -213,15 +213,24 @@ fn payable_token_4() {
 }
 
 #[test]
+fn return_codes() {
+	parse_execute_mandos("mandos/return_codes.scen.json", &contract_map());
+}
+
+#[test]
 fn return_error() {
 	parse_execute_mandos("mandos/return_error.scen.json", &contract_map());
 }
 
-// TODO: fixing this test requires a mandos-rs fix
-// #[test]
-// fn send_tx() {
-//     parse_execute_mandos("mandos/send_tx.scen.json", &contract_map());
-// }
+#[test]
+fn send_egld() {
+	parse_execute_mandos("mandos/send_egld.scen.json", &contract_map());
+}
+
+#[test]
+fn send_esdt() {
+	parse_execute_mandos("mandos/send_esdt.scen.json", &contract_map());
+}
 
 #[test]
 fn storage_addr() {

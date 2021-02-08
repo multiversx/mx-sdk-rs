@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::too_many_arguments)]
 
-imports!();
+elrond_wasm::imports!();
 
 mod lottery_info;
 mod random;
@@ -256,7 +256,7 @@ pub trait Lottery {
 							prize = info.prize_pool.clone();
 						}
 
-						self.send_tx(
+						self.send().direct_egld(
 							&winner_address,
 							&prize,
 							b"You won the lottery! Congratulations!",
