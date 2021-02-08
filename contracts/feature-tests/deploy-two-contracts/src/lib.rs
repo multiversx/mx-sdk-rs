@@ -73,4 +73,12 @@ pub trait DeployTwoContracts {
 			&ArgBuffer::new(),
 		)
 	}
+
+	#[endpoint(deployTwo)]
+	fn deploy_two() -> (Address, Address) {
+		let address_first = self.deploy_first();
+		let address_second = self.deploy_second();
+
+		(address_first, address_second)
+	}
 }
