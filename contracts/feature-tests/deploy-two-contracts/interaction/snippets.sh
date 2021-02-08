@@ -23,3 +23,7 @@ deployFirst() {
 deploySecond() {
     erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deploySecond" --send --proxy=${PROXY} --chain=T
 }
+
+deployTwo() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deployTwo" --send --proxy=${PROXY} --chain=T
+}
