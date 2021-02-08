@@ -45,6 +45,8 @@ members = [
   "contracts/feature-tests/async",
   "contracts/feature-tests/async/async-alice",
   "contracts/feature-tests/async/async-bob",
+  "contracts/feature-tests/async/forwarder-raw",
+  "contracts/feature-tests/async/vault",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/abi",
   "contracts/feature-tests/use-module",
@@ -61,5 +63,5 @@ members = [
 exclude = [
   "elrond-wasm-node",
   "elrond-wasm-output",
-  "tools",
+  "tools/test-gen",
 ]
