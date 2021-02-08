@@ -146,6 +146,7 @@ impl MethodMetadata {
 	pub fn payable_metadata(&self) -> MethodPayableMetadata {
 		match self {
 			MethodMetadata::Regular { payable, .. } => payable.clone(),
+			MethodMetadata::Callback | MethodMetadata::CallbackRaw => MethodPayableMetadata::AnyToken,
 			MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
 			MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
 			MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,

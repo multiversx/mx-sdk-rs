@@ -2,6 +2,7 @@ use super::arg_def::*;
 use super::arg_regular::*;
 use super::contract_gen_finish::*;
 use super::contract_gen_method::*;
+use super::contract_gen_payable::*;
 use super::util::*;
 
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
@@ -26,6 +27,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 		.filter_map(|m| {
 			match m.metadata {
 				MethodMetadata::Callback => {
+					let payable_snippet = generate_payable_snippet(m);
 					let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
 						.method_args
 						.iter()
@@ -57,12 +59,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 									ArgMetadata::Single | ArgMetadata::VarArgs => {
 										generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
 									},
-									ArgMetadata::Payment => {
-										panic!("payment args not allowed in callbacks")
-									},
-									ArgMetadata::PaymentToken => {
-										panic!("payment token args not allowed in callbacks")
-									},
+									ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 									ArgMetadata::Multi(_) => {
 										panic!("multi args not allowed in callbacks")
 									},
@@ -80,6 +77,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 					let match_arm = quote! {
 						#fn_name_literal =>
 						{
+							#payable_snippet
 							let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
 							#(#arg_init_snippets)*
 							#body_with_result ;
