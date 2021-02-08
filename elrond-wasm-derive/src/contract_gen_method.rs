@@ -476,14 +476,25 @@ impl Method {
 	}
 
 	pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
-		if self.has_variable_nr_args() {
-			self.generate_call_method_variable_nr_args()
-		} else {
-			self.generate_call_method_fixed_args()
+		let call_method_ident = generate_call_method_name(&self.name);
+		let call_method_body = self.generate_call_method_body();
+		quote! {
+			#[inline]
+			fn #call_method_ident (&self) {
+				#call_method_body
+			}
 		}
 	}
 
-	pub fn generate_call_method_fixed_args(&self) -> proc_macro2::TokenStream {
+	pub fn generate_call_method_body(&self) -> proc_macro2::TokenStream {
+		if self.has_variable_nr_args() {
+			self.generate_call_method_body_variable_nr_args()
+		} else {
+			self.generate_call_method_body_fixed_args()
+		}
+	}
+
+	pub fn generate_call_method_body_fixed_args(&self) -> proc_macro2::TokenStream {
 		let payable_snippet = generate_payable_snippet(self);
 
 		let mut arg_index = -1i32;
@@ -515,23 +526,19 @@ impl Method {
 			})
 			.collect();
 
-		let call_method_ident = generate_call_method_name(&self.name);
 		let call = self.generate_call_to_method();
 		let body_with_result = generate_body_with_result(&self.return_type, &call);
 		let nr_args = arg_index + 1;
 
 		quote! {
-			#[inline]
-			fn #call_method_ident (&self) {
-				#payable_snippet
-				self.api.check_num_arguments(#nr_args);
-				#(#arg_init_snippets)*
-				#body_with_result
-			}
+			#payable_snippet
+			self.api.check_num_arguments(#nr_args);
+			#(#arg_init_snippets)*
+			#body_with_result
 		}
 	}
 
-	fn generate_call_method_variable_nr_args(&self) -> proc_macro2::TokenStream {
+	fn generate_call_method_body_variable_nr_args(&self) -> proc_macro2::TokenStream {
 		let payable_snippet = generate_payable_snippet(self);
 
 		let arg_init_snippets: Vec<proc_macro2::TokenStream> = self
@@ -560,23 +567,19 @@ impl Method {
 			})
 			.collect();
 
-		let call_method_ident = generate_call_method_name(&self.name);
 		let call = self.generate_call_to_method();
 		let body_with_result = generate_body_with_result(&self.return_type, &call);
 
 		quote! {
-			#[inline]
-			fn #call_method_ident (&self) {
-				#payable_snippet
+			#payable_snippet
 
-				let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
+			let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
 
-				#(#arg_init_snippets)*
+			#(#arg_init_snippets)*
 
-				___arg_loader.assert_no_more_args();
+			___arg_loader.assert_no_more_args();
 
-				#body_with_result
-			}
+			#body_with_result
 		}
 	}
 }
