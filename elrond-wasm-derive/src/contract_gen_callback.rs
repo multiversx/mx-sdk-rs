@@ -7,7 +7,7 @@ use super::util::*;
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 	let raw_decl = find_raw_callback(methods);
 	if let Some(raw) = raw_decl {
-		generate_callback_body_raw(&raw)
+		raw.generate_call_method_body()
 	} else {
 		generate_callback_body_regular(methods)
 	}
@@ -18,18 +18,6 @@ fn find_raw_callback(methods: &[Method]) -> Option<Method> {
 		.iter()
 		.find(|m| matches!(m.metadata, MethodMetadata::CallbackRaw))
 		.cloned()
-}
-
-fn generate_callback_body_raw(raw_callback: &Method) -> proc_macro2::TokenStream {
-	let fn_ident = &raw_callback.name;
-	quote! {
-		let nr_args = self.api.get_num_arguments();
-		let mut args: Vec<Vec<u8>> = Vec::with_capacity(nr_args as usize);
-		for i in 0..nr_args {
-			args.push(self.api.get_argument_vec_u8(i));
-		}
-		self.#fn_ident (args);
-	}
 }
 
 fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStream {
