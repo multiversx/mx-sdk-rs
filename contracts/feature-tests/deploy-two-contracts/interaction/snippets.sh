@@ -16,14 +16,10 @@ deploy() {
     echo "Smart contract address: ${ADDRESS}"
 }
 
-deployFirst() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deployFirst" --send --proxy=${PROXY} --chain=T
+deployContract() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deployContract" --send --proxy=${PROXY} --chain=T
 }
 
-deploySecond() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deploySecond" --send --proxy=${PROXY} --chain=T
-}
-
-deployTwo() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deployTwo" --send --proxy=${PROXY} --chain=T
+deployTwoContracts() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deployTwoContracts" --send --proxy=${PROXY} --chain=T
 }
