@@ -3,7 +3,6 @@ use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::AsyncCallArg;
 use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 
-const DIRECT_ESDT_GAS_LIMIT: u64 = 0;
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
@@ -19,20 +18,20 @@ where
 	/// Used especially for sending ESDT to regular accounts.
 	///
 	/// Unlike sending ESDT via async call, this method can be called multiple times per transaction.
-	#[inline]
 	fn direct_esdt(&self, to: &Address, token: &[u8], amount: &BigUint, data: &[u8]) {
-		self.direct_esdt_explicit_gas_limit(to, token, amount, DIRECT_ESDT_GAS_LIMIT, data);
+		self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
 	}
 
 	/// Lower-level version of `direct_esdt`, in which the contract can specify a gas limit.
 	/// The gas limit should be 0 for regulat ESDT transfers.
-	fn direct_esdt_explicit_gas_limit(
+	fn direct_esdt_execute(
 		&self,
 		to: &Address,
 		token: &[u8],
 		amount: &BigUint,
 		gas_limit: u64,
-		data: &[u8],
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
 	);
 
 	/// Sends either EGLD or an ESDT token to the target address,

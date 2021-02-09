@@ -11,14 +11,17 @@ extern "C" {
 		dataLength: i32,
 	) -> i32;
 
-	fn transferESDT(
+	fn transferESDTExecute(
 		dstOffset: *const u8,
 		tokenIdOffset: *const u8,
 		tokenIdLen: i32,
 		valueOffset: *const u8,
 		gasLimit: i64,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-		dataLength: i32,
 	) -> i32;
 
 	fn asyncCall(
@@ -85,24 +88,48 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn direct_esdt_explicit_gas_limit(
+	/// Same as the implementation in the trait, but avoids creating a new ArgBuffer instance.
+	fn direct_esdt(&self, to: &Address, token: &[u8], amount: &ArwenBigUint, data: &[u8]) {
+		let function = data;
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			let _ = transferESDTExecute(
+				to.as_ref().as_ptr(),
+				token.as_ptr(),
+				token.len() as i32,
+				amount_bytes32_ptr,
+				0i64,
+				function.as_ptr(),
+				function.len() as i32,
+				0i32,
+				core::ptr::null(),
+				core::ptr::null(),
+			);
+		}
+	}
+
+	fn direct_esdt_execute(
 		&self,
 		to: &Address,
 		token: &[u8],
 		amount: &ArwenBigUint,
 		gas_limit: u64,
-		data: &[u8],
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			let _ = transferESDT(
+			let _ = transferESDTExecute(
 				to.as_ref().as_ptr(),
 				token.as_ptr(),
 				token.len() as i32,
 				amount_bytes32_ptr,
 				gas_limit as i64,
-				data.as_ptr(),
-				data.len() as i32,
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
 			);
 		}
 	}
