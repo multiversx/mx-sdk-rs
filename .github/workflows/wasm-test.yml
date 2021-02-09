@@ -14,13 +14,16 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - name: Install erdpy
+      - name: Install erdpy and arwentools
         run : |
           export PATH=$HOME/.local/bin:$PATH
           pip3 install erdpy
-      - name: Set erdpy arwentools dependency
-        run: erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
+          erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
       - name: Build the wasm contracts
-        run: ./build-wasm.sh
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          ./build-wasm.sh
       - name: Run the wasm mandos tests
-        run: mandos-test .
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          mandos-test .
