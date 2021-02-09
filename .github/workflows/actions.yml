@@ -1,4 +1,4 @@
-name: Rust tests
+name: Builds and tests
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   wasm_test:
+    name: Wasm tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,9 +27,10 @@ jobs:
           ./build-wasm.sh
       - name: Run the wasm mandos tests
         run: |
-          export PATH=$HOME/.local/bin:$PATH
+          export PATH=$HOME/.local/bin:$HOME/elrondsdk/arwentools:$PATH
           mandos-test .
   rust_test:
+    name: Rust tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
