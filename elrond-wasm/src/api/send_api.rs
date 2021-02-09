@@ -44,6 +44,29 @@ where
 		}
 	}
 
+	/// Performs a simple ESDT transfer, but via async call.
+	/// This is the preferred way to send ESDT.
+	fn direct_esdt_via_async_call(&self, to: &Address, esdt_token_name: &[u8], amount: &BigUint, data: &[u8]) -> ! {
+		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
+		serializer.push_argument_bytes(esdt_token_name);
+		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+		if !data.is_empty() {
+			serializer.push_argument_bytes(data);
+		}
+		self.async_call_raw(&to, &BigUint::zero(), serializer.as_slice())
+	}
+
+	/// Sends either EGLD or an ESDT token to the target address,
+	/// depending on what token identifier was specified.
+	/// In case of ESDT it performs an async call.
+	fn direct_via_async_call(&self, to: &Address, token: &TokenIdentifier, amount: &BigUint, data: &[u8]) {
+		if token.is_egld() {
+			self.direct_egld(to, amount, data);
+		} else {
+			self.direct_esdt_via_async_call(to, token.as_slice(), amount, data);
+		}
+	}
+
 	/// Sends an asynchronous call to another contract.
 	/// Calling this method immediately terminates tx execution.
 	/// Using it directly is generally discouraged.
