@@ -29,7 +29,6 @@ fn main() {
 		"echo_boxed_bytes",
 		"echo_i32",
 		"echo_i64",
-		"echo_multi_i32",
 		"echo_nothing",
 		"echo_slice_u8",
 		"echo_str_box",

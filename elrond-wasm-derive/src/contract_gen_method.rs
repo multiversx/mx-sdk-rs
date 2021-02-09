@@ -473,7 +473,7 @@ impl Method {
 	pub fn has_variable_nr_args(&self) -> bool {
 		self.method_args
 			.iter()
-			.any(|arg| matches!(&arg.metadata, ArgMetadata::Multi(_) | ArgMetadata::VarArgs))
+			.any(|arg| matches!(&arg.metadata, ArgMetadata::VarArgs))
 	}
 
 	pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
@@ -517,9 +517,6 @@ impl Method {
 						}
 					},
 					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-					ArgMetadata::Multi(_) => panic!(
-						"multi args not accepted in function generate_call_method_fixed_args"
-					),
 					ArgMetadata::VarArgs => {
 						panic!("var_args not accepted in function generate_call_method_fixed_args")
 					},
@@ -555,15 +552,6 @@ impl Method {
 						generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
 					},
 					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-					ArgMetadata::Multi(multi_attr) => {
-						// #[multi(...)]
-						let count_expr = &multi_attr.count_expr;
-						generate_load_dyn_multi_arg(
-							arg,
-							&quote! { &mut ___arg_loader },
-							&quote! { #count_expr as usize },
-						)
-					},
 				}
 			})
 			.collect();

@@ -74,15 +74,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, allow_callback_args: bool) 
 					panic!("Callback args not allowed here");
 				}
 
-				if let Some(multi_attr) = MultiAttribute::parse(&pat_typed) {
-					Some(MethodArg {
-						index: -1,
-						pat: pat.clone(),
-						ty: ty.clone(),
-						is_callback_arg,
-						metadata: ArgMetadata::Multi(multi_attr),
-					})
-				} else if is_var_args(&pat_typed) {
+				if is_var_args(&pat_typed) {
 					Some(MethodArg {
 						index: -1,
 						pat: pat.clone(),
