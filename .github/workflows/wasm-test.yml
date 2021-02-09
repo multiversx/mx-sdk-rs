@@ -15,9 +15,7 @@ jobs:
         with:
           toolchain: nightly
       - name: Install erdpy
-        uses: actions/checkout@v2
-        with:
-          repository: 'ElrondNetwork/arwen-wasm-vm'
+        run : pip3 install erdpy
       - name: Set erdpy arwentools dependency
         run: erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
       - name: Build the wasm contracts
