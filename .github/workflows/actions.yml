@@ -20,6 +20,7 @@ jobs:
           pip3 install erdpy
           mkdir $HOME/elrondsdk
           erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
+          erdpy deps install arwentools
       - name: Build the wasm contracts
         run: ./build-wasm.sh
       - name: Run the wasm mandos tests
