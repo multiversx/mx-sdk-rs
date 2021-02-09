@@ -8,12 +8,19 @@ on:
 
 jobs:
   build_and_test:
-    name: Run rust tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - run: ./build-wasm.sh
-      - run: mandos-test .
+      - name: Install erdpy
+        uses: actions/checkout@v2
+        with:
+          repository: 'ElrondNetwork/arwen-wasm-vm'
+      - name: Set erdpy arwentools dependency
+        run: erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
+      - name: Build the wasm contracts
+        run: ./build-wasm.sh
+      - name: Run the wasm mandos tests
+        run: mandos-test .
