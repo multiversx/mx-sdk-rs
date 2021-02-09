@@ -17,18 +17,13 @@ jobs:
           toolchain: nightly
       - name: Install erdpy and arwentools
         run : |
-          export PATH=$HOME/.local/bin:$PATH
           pip3 install erdpy
           mkdir $HOME/elrondsdk
           erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
       - name: Build the wasm contracts
-        run: |
-          export PATH=$HOME/.local/bin:$PATH
-          ./build-wasm.sh
+        run: ./build-wasm.sh
       - name: Run the wasm mandos tests
-        run: |
-          export PATH=$HOME/.local/bin:$HOME/elrondsdk/arwentools:$PATH
-          mandos-test .
+        run: mandos-test .
   rust_test:
     name: Rust tests
     runs-on: ubuntu-latest
