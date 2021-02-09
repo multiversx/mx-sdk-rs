@@ -1,5 +1,3 @@
-use super::parse_attr::*;
-
 #[derive(Clone, Debug)]
 pub struct MethodArg {
 	pub index: i32,
@@ -14,7 +12,6 @@ pub enum ArgMetadata {
 	Payment,
 	PaymentToken,
 	Single,
-	Multi(MultiAttribute),
 	VarArgs,
 }
 

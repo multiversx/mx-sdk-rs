@@ -118,15 +118,6 @@ impl Callable {
 								quote! {}
 							},
 							ArgMetadata::PaymentToken => panic!("callable payment token not yet supported"),
-							ArgMetadata::Multi(multi_attr) => {
-								// #[multi(...)]
-								let count_expr = &multi_attr.count_expr;
-								arg_serialize_push_multi(
-									arg,
-									&arg_accumulator,
-									&quote! { #count_expr as usize },
-								)
-							},
 						}
 					})
 					.collect();
