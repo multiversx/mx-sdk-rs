@@ -66,13 +66,14 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn direct_esdt_explicit_gas_limit(
+	fn direct_esdt_execute(
 		&self,
 		to: &Address,
 		token: &[u8],
 		amount: &RustBigUint,
 		_gas: u64,
-		_data: &[u8],
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
 	) {
 		if &amount.value() > &self.get_available_esdt_balance(token) {
 			panic!(TxPanic {
