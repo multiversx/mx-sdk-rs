@@ -24,12 +24,15 @@ pub trait Vault {
 	#[payable("*")]
 	#[endpoint]
 	fn reject_funds(&self) -> SCResult<()> {
-		sc_error!("Rejected")
+		sc_error!("reject_funds")
 	}
 
-	#[payable("*")]
 	#[endpoint]
-	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) {
-		self.send().direct(&self.get_caller(), &token, &amount, &[]);
+	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint, #[var_args] return_message: OptionalArg<BoxedBytes>) {
+		let data = match &return_message {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send().direct_via_async_call(&self.get_caller(), &token, &amount, data);
 	}
 }
