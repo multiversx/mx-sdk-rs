@@ -2,18 +2,11 @@
 
 # cleans all wasm targets
 
-erdpy --verbose contract clean "contracts/benchmarks/str-repeat"
-erdpy --verbose contract clean "contracts/examples/adder"
-erdpy --verbose contract clean "contracts/examples/crowdfunding-egld"
-erdpy --verbose contract clean "contracts/examples/crowdfunding-erc20"
-erdpy --verbose contract clean "contracts/examples/crowdfunding-esdt"
-erdpy --verbose contract clean "contracts/examples/crypto-bubbles"
-erdpy --verbose contract clean "contracts/examples/factorial"
-erdpy --verbose contract clean "contracts/examples/lottery-egld"
-erdpy --verbose contract clean "contracts/examples/lottery-erc20"
-erdpy --verbose contract clean "contracts/examples/multisig"
-erdpy --verbose contract clean "contracts/examples/simple-erc20"
-erdpy --verbose contract clean "contracts/feature-tests/basic-features"
-erdpy --verbose contract clean "contracts/feature-tests/async/async-alice"
-erdpy --verbose contract clean "contracts/feature-tests/async/async-bob"
-erdpy --verbose contract clean "contracts/feature-tests/use-module"
+set -e
+SMART_CONTRACT_JSONS=$(find . -name "elrond.json")
+for smart_contract_json in $SMART_CONTRACT_JSONS
+do
+    smart_contract_folder=$(dirname $smart_contract_json)
+    echo ""
+    (set -x; erdpy --verbose contract clean $smart_contract_folder)
+done
