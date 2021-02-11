@@ -6,12 +6,12 @@ elrond_wasm::derive_imports!();
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct AbiTestType {
 	/// This type should only appear here.
-	pub nested: OnlyShowsUpAsNested1,
+	pub nested: OnlyShowsUpAsNested01,
 
 	/// Tests that recursive types will not send the ABI generator into an infinite loop.
 	pub next: Option<Box<AbiTestType>>,
 
 	/// Tests that tuples tell the ABI of their component types even if they appear nowhere else.
 	/// Also, just like above, recursive types need to work even when nested into a tuple.
-	pub tuple_madness: (OnlyShowsUpAsNested2, Option<Box<AbiTestType>>),
+	pub tuple_madness: (OnlyShowsUpAsNested02, Option<Box<AbiTestType>>),
 }
