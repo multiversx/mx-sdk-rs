@@ -1,4 +1,4 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
+use crate::{TokenIdentifier, abi::{OutputAbi, TypeAbi, TypeDescriptionContainer}};
 use crate::api::{BigUintApi, ErrorApi, SendApi, ESDT_TRANSFER_STRING};
 use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::AsyncCallArg;
@@ -24,8 +24,8 @@ impl<BigUint: BigUintApi> AsyncCall<BigUint> {
 
 	pub fn with_esdt(
 		to: Address,
-		esdt_payment: &BigUint,
 		esdt_token_name: &[u8],
+		esdt_payment: &BigUint,
 		endpoint_name: &[u8],
 	) -> Self {
 		let mut hex_data = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
@@ -36,6 +36,19 @@ impl<BigUint: BigUintApi> AsyncCall<BigUint> {
 			to,
 			egld_payment: BigUint::zero(),
 			hex_data,
+		}
+	}
+
+	pub fn with_token_payment(
+		to: Address,
+		token: TokenIdentifier,
+		payment: BigUint,
+		endpoint_name: &[u8],
+	) -> Self {
+		if token.is_egld() {
+			Self::new(to, payment, endpoint_name)
+		} else {
+			Self::with_esdt(to, token.as_slice(), &payment, endpoint_name)
 		}
 	}
 
