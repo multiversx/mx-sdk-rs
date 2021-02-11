@@ -4,7 +4,6 @@ mod action;
 mod user_role;
 
 use action::{Action, ActionFullInfo};
-use elrond_wasm::HexCallDataSerializer;
 use user_role::UserRole;
 
 elrond_wasm::imports!();
@@ -425,7 +424,10 @@ pub trait Multisig {
 
 	/// Proposers and board members use this to launch signed actions.
 	#[endpoint(performAction)]
-	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
+	fn perform_action_endpoint(
+		&self,
+		action_id: usize,
+	) -> SCResult<Choice4<(), SendEgld<BigUint>, Address, AsyncCall<BigUint>>> {
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -441,22 +443,26 @@ pub trait Multisig {
 		self.perform_action(action_id)
 	}
 
-	fn perform_action(&self, action_id: usize) -> SCResult<MultiResultVec<BoxedBytes>> {
+	fn perform_action(
+		&self,
+		action_id: usize,
+	) -> SCResult<Choice4<(), SendEgld<BigUint>, Address, AsyncCall<BigUint>>> {
 		let action = self.get_action_data(action_id);
 
 		// clean up storage
-		// happens before actual execution, because the async_call_raw kills contract execution,
-		// so cleanup cannot happen afterwards
+		// happens before actual execution, because the match provides the return on each branch
+		// syntax aside, the async_call_raw kills contract execution so cleanup cannot happen afterwards
 		self.clear_action(action_id);
 
-		let mut result = Vec::<BoxedBytes>::new();
 		match action {
-			Action::Nothing => {},
+			Action::Nothing => Ok(Choice4::Variant0(())),
 			Action::AddBoardMember(board_member_address) => {
 				self.change_user_role(board_member_address, UserRole::BoardMember);
+				Ok(Choice4::Variant0(()))
 			},
 			Action::AddProposer(proposer_address) => {
 				self.change_user_role(proposer_address, UserRole::Proposer);
+				Ok(Choice4::Variant0(()))
 			},
 			Action::RemoveUser(user_address) => {
 				self.change_user_role(user_address, UserRole::None);
@@ -470,16 +476,19 @@ pub trait Multisig {
 					self.get_quorum() <= num_board_members,
 					"quorum cannot exceed board size"
 				);
+				Ok(Choice4::Variant0(()))
 			},
 			Action::ChangeQuorum(new_quorum) => {
 				require!(
 					new_quorum <= self.get_num_board_members(),
 					"quorum cannot exceed board size"
 				);
-				self.set_quorum(new_quorum)
+				self.set_quorum(new_quorum);
+				Ok(Choice4::Variant0(()))
 			},
 			Action::SendEgld { to, amount, data } => {
-				self.send().direct_egld(&to, &amount, data.as_slice());
+				// self.send().direct_egld(&to, &amount, data.as_slice());
+				Ok(Choice4::Variant1(SendEgld { to, amount, data }))
 			},
 			Action::SCDeploy {
 				amount,
@@ -499,7 +508,7 @@ pub trait Multisig {
 					code_metadata,
 					&arg_buffer,
 				);
-				result.push(new_address.into_boxed_bytes());
+				Ok(Choice4::Variant2(new_address))
 			},
 			Action::SCCall {
 				to,
@@ -507,16 +516,13 @@ pub trait Multisig {
 				function,
 				arguments,
 			} => {
-				let mut call_data = HexCallDataSerializer::new(function.as_slice());
+				let mut async_call_raw = AsyncCall::new(to, amount, function.as_slice());
 				for arg in arguments {
-					call_data.push_argument_bytes(arg.as_slice());
+					async_call_raw.push_argument_raw_bytes(arg.as_slice());
 				}
-				self.send()
-					.async_call_raw(&to, &amount, call_data.as_slice());
+				Ok(Choice4::Variant3(async_call_raw))
 			},
 		}
-
-		Ok(result.into())
 	}
 
 	fn clear_action(&self, action_id: usize) {
