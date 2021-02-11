@@ -22,7 +22,7 @@ macro_rules! imports {
 		use elrond_wasm::non_zero_util::*;
 		use elrond_wasm::storage::mappers::*;
 		use elrond_wasm::types::*;
-		use elrond_wasm::{AsyncCallError, AsyncCallResult, OtherContractHandle};
+		use elrond_wasm::{AsyncCallError, OtherContractHandle};
 		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
 	};

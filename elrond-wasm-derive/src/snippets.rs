@@ -43,6 +43,7 @@ pub fn api_where() -> proc_macro2::TokenStream {
 		T: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 		 + elrond_wasm::api::ErrorApi
 		 + elrond_wasm::api::CallValueApi<BigUint>
+		 + elrond_wasm::api::SendApi<BigUint>
 		 + elrond_wasm::api::EndpointArgumentApi
 		 + elrond_wasm::api::EndpointFinishApi
 		 + elrond_wasm::api::StorageReadApi
