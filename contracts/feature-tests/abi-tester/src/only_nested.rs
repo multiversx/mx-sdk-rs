@@ -53,9 +53,3 @@ pub struct OnlyShowsUpAsNested08 {
 pub struct OnlyShowsUpAsNested09 {
 	pub something: (),
 }
-
-/// Tests that the ABI generator also fetches types that only appear as fields.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested10 {
-	pub something: (),
-}
