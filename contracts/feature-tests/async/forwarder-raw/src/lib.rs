@@ -15,8 +15,13 @@ pub trait ForwarderRaw {
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: BigUint,
-	) {
-		self.send().direct(&to, &token, &payment, &[]);
+	) -> SendToken<BigUint> {
+		SendToken {
+			to,
+			token,
+			amount: payment,
+			data: BoxedBytes::empty(),
+		}
 	}
 
 	#[endpoint]
@@ -28,9 +33,13 @@ pub trait ForwarderRaw {
 		#[payment] payment: BigUint,
 		endpoint_name: BoxedBytes,
 		#[var_args] args: VarArgs<BoxedBytes>,
-	) {
-		self.send()
-			.async_call(&to, &token, &payment, endpoint_name.as_slice(), args);
+	) -> AsyncCall<BigUint> {
+		let mut async_call =
+			AsyncCall::with_token_payment(to, token, payment, endpoint_name.as_slice());
+		for arg in args.into_vec() {
+			async_call.push_argument_raw_bytes(arg.as_slice());
+		}
+		async_call
 	}
 
 	#[endpoint]
@@ -42,10 +51,9 @@ pub trait ForwarderRaw {
 		#[payment] payment: BigUint,
 		endpoint_name: BoxedBytes,
 		#[var_args] args: VarArgs<BoxedBytes>,
-	) {
+	) -> AsyncCall<BigUint> {
 		let half_payment = payment / 2u32.into();
-		self.send()
-			.async_call(&to, &token, &half_payment, endpoint_name.as_slice(), args);
+		self.forward_call(to, token, half_payment, endpoint_name, args)
 	}
 
 	#[view]

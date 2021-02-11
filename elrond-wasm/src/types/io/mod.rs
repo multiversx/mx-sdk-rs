@@ -1,4 +1,5 @@
 mod arg_buffer;
+mod async_call;
 mod async_call_result;
 mod choice;
 mod multi_args;
@@ -9,8 +10,9 @@ mod optional_result;
 mod sc_error;
 mod sc_result;
 mod send_egld;
+mod send_esdt;
+mod send_token;
 mod var_args;
-mod async_call;
 
 pub use arg_buffer::ArgBuffer;
 pub use async_call::AsyncCall;
@@ -24,4 +26,6 @@ pub use optional_result::OptionalResult;
 pub use sc_error::SCError;
 pub use sc_result::SCResult;
 pub use send_egld::SendEgld;
+pub use send_esdt::SendEsdt;
+pub use send_token::SendToken;
 pub use var_args::VarArgs;
