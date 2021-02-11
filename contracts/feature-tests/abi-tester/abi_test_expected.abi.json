@@ -169,16 +169,6 @@
             ],
             "inputs": [],
             "outputs": []
-        },
-        {
-            "name": "choice_result",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "Choice<(),SendEgld,Address,AsyncCall,OnlyShowsUpAsNested10,>",
-                    "multi_result": true
-                }
-            ]
         }
     ],
     "types": {
@@ -359,18 +349,6 @@
             ]
         },
         "OnlyShowsUpAsNested09": {
-            "type": "struct",
-            "docs": [
-                "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
-            ]
-        },
-        "OnlyShowsUpAsNested10": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."

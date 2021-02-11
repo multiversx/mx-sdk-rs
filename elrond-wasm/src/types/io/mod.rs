@@ -1,7 +1,6 @@
 mod arg_buffer;
 mod async_call;
 mod async_call_result;
-mod choice;
 mod multi_args;
 mod multi_result;
 mod multi_result_vec;
@@ -17,7 +16,6 @@ mod var_args;
 pub use arg_buffer::ArgBuffer;
 pub use async_call::AsyncCall;
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
-pub use choice::*;
 pub use multi_args::*;
 pub use multi_result::*;
 pub use multi_result_vec::MultiResultVec;

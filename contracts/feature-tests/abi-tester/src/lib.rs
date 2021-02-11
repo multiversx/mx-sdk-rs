@@ -105,11 +105,4 @@ pub trait AbiTester {
 		#[payment_token] _token: TokenIdentifier,
 	) {
 	}
-
-	#[endpoint]
-	fn choice_result(
-		&self,
-	) -> SCResult<Choice5<(), SendEgld<BigUint>, Address, AsyncCall<BigUint>, OnlyShowsUpAsNested10>> {
-		Ok(Choice5::Variant0(()))
-	}
 }

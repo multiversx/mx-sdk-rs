@@ -3,7 +3,7 @@
 mod action;
 mod user_role;
 
-use action::{Action, ActionFullInfo};
+use action::{Action, ActionFullInfo, PerformActionResult};
 use user_role::UserRole;
 
 elrond_wasm::imports!();
@@ -424,10 +424,7 @@ pub trait Multisig {
 
 	/// Proposers and board members use this to launch signed actions.
 	#[endpoint(performAction)]
-	fn perform_action_endpoint(
-		&self,
-		action_id: usize,
-	) -> SCResult<Choice4<(), SendEgld<BigUint>, Address, AsyncCall<BigUint>>> {
+	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<PerformActionResult<BigUint>> {
 		let caller_address = self.get_caller();
 		let caller_id = self.users_module().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -443,10 +440,7 @@ pub trait Multisig {
 		self.perform_action(action_id)
 	}
 
-	fn perform_action(
-		&self,
-		action_id: usize,
-	) -> SCResult<Choice4<(), SendEgld<BigUint>, Address, AsyncCall<BigUint>>> {
+	fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<BigUint>> {
 		let action = self.get_action_data(action_id);
 
 		// clean up storage
@@ -455,14 +449,14 @@ pub trait Multisig {
 		self.clear_action(action_id);
 
 		match action {
-			Action::Nothing => Ok(Choice4::Variant0(())),
+			Action::Nothing => Ok(PerformActionResult::Nothing),
 			Action::AddBoardMember(board_member_address) => {
 				self.change_user_role(board_member_address, UserRole::BoardMember);
-				Ok(Choice4::Variant0(()))
+				Ok(PerformActionResult::Nothing)
 			},
 			Action::AddProposer(proposer_address) => {
 				self.change_user_role(proposer_address, UserRole::Proposer);
-				Ok(Choice4::Variant0(()))
+				Ok(PerformActionResult::Nothing)
 			},
 			Action::RemoveUser(user_address) => {
 				self.change_user_role(user_address, UserRole::None);
@@ -476,7 +470,7 @@ pub trait Multisig {
 					self.get_quorum() <= num_board_members,
 					"quorum cannot exceed board size"
 				);
-				Ok(Choice4::Variant0(()))
+				Ok(PerformActionResult::Nothing)
 			},
 			Action::ChangeQuorum(new_quorum) => {
 				require!(
@@ -484,11 +478,10 @@ pub trait Multisig {
 					"quorum cannot exceed board size"
 				);
 				self.set_quorum(new_quorum);
-				Ok(Choice4::Variant0(()))
+				Ok(PerformActionResult::Nothing)
 			},
 			Action::SendEgld { to, amount, data } => {
-				// self.send().direct_egld(&to, &amount, data.as_slice());
-				Ok(Choice4::Variant1(SendEgld { to, amount, data }))
+				Ok(PerformActionResult::SendEgld(SendEgld { to, amount, data }))
 			},
 			Action::SCDeploy {
 				amount,
@@ -508,7 +501,7 @@ pub trait Multisig {
 					code_metadata,
 					&arg_buffer,
 				);
-				Ok(Choice4::Variant2(new_address))
+				Ok(PerformActionResult::DeployResult(new_address))
 			},
 			Action::SCCall {
 				to,
@@ -520,7 +513,7 @@ pub trait Multisig {
 				for arg in arguments {
 					async_call_raw.push_argument_raw_bytes(arg.as_slice());
 				}
-				Ok(Choice4::Variant3(async_call_raw))
+				Ok(PerformActionResult::AsyncCall(async_call_raw))
 			},
 		}
 	}
