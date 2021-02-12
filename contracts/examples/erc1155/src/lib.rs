@@ -88,8 +88,8 @@ pub trait Erc1155 {
 	}
 
 	#[endpoint(setApprovalForAll)]
-	fn set_approved_for_all(&self, operator: Address, approved: bool) -> SCResult<()> {
-		Ok(())
+	fn set_approved_for_all(&self, operator: Address, approved: bool) {
+		self.set_is_approved(&operator, &self.get_caller(), approved);
 	}
 
 	// views
@@ -100,19 +100,25 @@ pub trait Erc1155 {
 	}
 
 	#[view(balanceOf)]
-	fn balance_of(&self, owner: Address, id: BigUint) -> BigUint {
-		BigUint::zero()
+	fn balance_of(&self, owner: &Address, id: &BigUint) -> BigUint {
+		self.get_balance_mapper(&owner).get(&id).unwrap_or_else(|| BigUint::zero())
 	}
 
 	// returns balance for each (owner, id) pair
 	#[view(balanceOfBatch)]
 	fn balance_of_batch(&self, owners: &[Address], ids: &[BigUint]) -> Vec<BigUint> {
-		Vec::new()
+		let mut batch_balance = Vec::new();
+
+		for i in 0..owners.len() {
+			batch_balance.push(self.balance_of(&owners[i], &ids[i]));
+		}
+
+		batch_balance
 	}
 
 	#[view(isApprovedForAll)]
 	fn is_approval_for_all(&self, owner: Address, operator: Address) -> bool {
-		true
+		self.get_is_approved(&operator, &owner)
 	}
 
 	// private
