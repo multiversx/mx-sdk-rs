@@ -444,9 +444,14 @@ pub trait BasicFeatures {
 		vec_mapper.push(&item);
 	}
 
-	#[endpoint]
+	#[view]
 	fn vec_mapper_get(&self, index: usize) -> u32 {
 		self.vec_mapper().get(index)
+	}
+
+	#[view]
+	fn vec_mapper_len(&self) -> usize {
+		self.vec_mapper().len()
 	}
 
 	// LinkedListMapper
