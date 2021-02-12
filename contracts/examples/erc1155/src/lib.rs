@@ -64,7 +64,10 @@ pub trait Erc1155 {
 			"Caller is not approved to transfer tokens from address"
 		);
 		require!(to != Address::zero(), "Can't transfer to address zero");
-		require!(ids.len() == amounts.len(), "Id and amount lenghts do not match");
+		require!(
+			ids.len() == amounts.len(),
+			"Id and amount lenghts do not match"
+		);
 
 		for i in 0..ids.len() {
 			let balance = match self.get_balance_mapper(&from).get(&ids[i]) {
@@ -82,14 +85,44 @@ pub trait Erc1155 {
 
 		if self.is_smart_contract_address(&to) {
 			// TODO: async-call
-		}		
+		}
 
 		Ok(())
 	}
 
 	#[endpoint(setApprovalForAll)]
 	fn set_approved_for_all(&self, operator: Address, approved: bool) {
-		self.set_is_approved(&operator, &self.get_caller(), approved);
+		let caller = self.get_caller();
+
+		self.set_is_approved(&operator, &caller, approved);
+
+		// self.approval_for_all_event(&caller, &operator, approved);
+	}
+
+	// returns assigned id
+	#[endpoint(createNonFungible)]
+	fn create_non_fungible(&self, _uri: &[u8]) -> BigUint {
+		// non-fungible tokens have a starting supply of 1 and cannot be minted
+		let initial_supply = BigUint::from(1u32);
+		let id = self.create_token(&self.get_caller(), &initial_supply);
+
+		self.set_is_fungible(&id, false);
+
+		// self.uri_event(uri, &id);
+
+		id
+	}
+
+	// returns assigned id
+	#[endpoint(createFungible)]
+	fn create_fungible(&self, _uri: &[u8], initial_supply: BigUint) -> BigUint {
+		let id = self.create_token(&self.get_caller(), &initial_supply);
+
+		self.set_is_fungible(&id, true);
+
+		// self.uri_event(uri, &id);
+
+		id
 	}
 
 	// views
@@ -101,7 +134,9 @@ pub trait Erc1155 {
 
 	#[view(balanceOf)]
 	fn balance_of(&self, owner: &Address, id: &BigUint) -> BigUint {
-		self.get_balance_mapper(&owner).get(&id).unwrap_or_else(|| BigUint::zero())
+		self.get_balance_mapper(&owner)
+			.get(&id)
+			.unwrap_or_else(|| BigUint::zero())
 	}
 
 	// returns balance for each (owner, id) pair
@@ -142,10 +177,28 @@ pub trait Erc1155 {
 		to_balance_mapper.insert(id.clone(), to_balance);
 	}
 
-	fn perform_batch_transfer(&self, from: &Address, to: &Address, ids: &[BigUint], amounts: &[BigUint]) {
+	fn perform_batch_transfer(
+		&self,
+		from: &Address,
+		to: &Address,
+		ids: &[BigUint],
+		amounts: &[BigUint],
+	) {
 		for i in 0..ids.len() {
 			self.perform_transfer(from, to, &ids[i], &amounts[i]);
 		}
+	}
+
+	fn create_token(&self, creator: &Address, initial_supply: &BigUint) -> BigUint {
+		let id = self.get_last_valid_id() + BigUint::from(1u32);
+
+		self.get_balance_mapper(&creator)
+			.insert(id.clone(), initial_supply.clone());
+		self.set_token_creator(&id, &creator);
+
+		self.set_last_valid_id(&id);
+
+		id
 	}
 
 	// storage
@@ -154,11 +207,37 @@ pub trait Erc1155 {
 	#[storage_mapper("balanceOf")]
 	fn get_balance_mapper(&self, owner: &Address) -> MapMapper<Self::Storage, BigUint, BigUint>;
 
+	// token creator
+
+	#[storage_get("tokenCreator")]
+	fn get_token_creator(&self, id: &BigUint) -> Address;
+
+	#[storage_set("tokenCreator")]
+	fn set_token_creator(&self, id: &BigUint, creator: &Address);
+
+	// last valid id
+
+	#[storage_get("lastValidId")]
+	fn get_last_valid_id(&self) -> BigUint;
+
+	#[storage_set("lastValidId")]
+	fn set_last_valid_id(&self, last_valid_id: &BigUint);
+
+	// check if an operator is approved. Default is false.
+
 	#[storage_get("isApproved")]
 	fn get_is_approved(&self, operator: &Address, owner: &Address) -> bool;
 
 	#[storage_set("isApproved")]
 	fn set_is_approved(&self, operator: &Address, owner: &Address, is_approved: bool);
+
+	// check if a token is fungible. Non-fungible tokens cannot be minted. Default is false.
+
+	#[storage_get("isFungible")]
+	fn get_is_fungible(&self, id: &BigUint) -> bool;
+
+	#[storage_set("isFungible")]
+	fn set_is_fungible(&self, id: &BigUint, is_fungible: bool);
 
 	// Events
 
@@ -173,6 +252,6 @@ pub trait Erc1155 {
 	fn approval_for_all_event(&self, owner: &Address, operator: &Address, approved: bool);
 
 	#[event("0x0000000000000000000000000000000000000000000000000000000000000004")]
-	fn uri_event(&self, new_uri: &[u8], id: &BigUint); // maybe use &str
+	fn uri_event(&self, uri: &[u8], id: &BigUint); // maybe use &str
 	*/
 }
