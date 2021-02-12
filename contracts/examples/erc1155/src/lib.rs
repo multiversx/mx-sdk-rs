@@ -55,8 +55,35 @@ pub trait Erc1155 {
 		to: Address,
 		ids: &[BigUint],
 		amounts: &[BigUint],
-		data: &[u8],
+		_data: &[u8],
 	) -> SCResult<()> {
+		let caller = self.get_caller();
+
+		require!(
+			caller == from || self.get_is_approved(&caller, &from),
+			"Caller is not approved to transfer tokens from address"
+		);
+		require!(to != Address::zero(), "Can't transfer to address zero");
+		require!(ids.len() == amounts.len(), "Id and amount lenghts do not match");
+
+		for i in 0..ids.len() {
+			let balance = match self.get_balance_mapper(&from).get(&ids[i]) {
+				Some(b) => b,
+				None => return sc_error!("Address has no tokens of that type"),
+			};
+
+			require!(amounts[i] > 0, "Must transfer more than 0");
+			require!(amounts[i] <= balance, "Not enough balance for id");
+		}
+
+		self.perform_batch_transfer(&from, &to, ids, amounts);
+
+		// self.transfer_batch_event(&caller, &from, &to, ids, amounts);
+
+		if self.is_smart_contract_address(&to) {
+			// TODO: async-call
+		}		
+
 		Ok(())
 	}
 
@@ -107,6 +134,12 @@ pub trait Erc1155 {
 
 		from_balance_mapper.insert(id.clone(), from_balance);
 		to_balance_mapper.insert(id.clone(), to_balance);
+	}
+
+	fn perform_batch_transfer(&self, from: &Address, to: &Address, ids: &[BigUint], amounts: &[BigUint]) {
+		for i in 0..ids.len() {
+			self.perform_transfer(from, to, &ids[i], &amounts[i]);
+		}
 	}
 
 	// storage
