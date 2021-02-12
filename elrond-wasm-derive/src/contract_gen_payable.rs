@@ -53,7 +53,7 @@ fn payable_snippet_for_metadata(
 			}
 		},
 		MethodPayableMetadata::SingleEsdtToken(token_name) => {
-			let token_literal = byte_slice_literal(token_name.as_bytes());
+			let token_literal = byte_str_slice_literal(token_name.as_bytes());
 			let payment_var_name = var_name_or_underscore(payment_arg);
 			let token_init = if let Some(arg) = token_arg {
 				let pat = &arg.pat;
