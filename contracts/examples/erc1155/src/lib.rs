@@ -176,11 +176,10 @@ pub trait Erc1155 {
 
 		self.get_balance_mapper(&creator)
 			.insert(type_id.clone(), initial_supply.clone());
-
 		self.set_token_type_creator(&type_id, &creator);
-		self.set_last_valid_type_id(&type_id);
-
 		self.set_is_fungible(&type_id, false);
+
+		self.set_last_valid_type_id(&type_id);
 
 		// self.uri_event(uri, &id);
 
