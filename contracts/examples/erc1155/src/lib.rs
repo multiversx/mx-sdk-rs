@@ -254,8 +254,8 @@ pub trait Erc1155 {
 		values: &[BigUint],
 	) {
 		for i in 0..type_ids.len() {
-			//self.perform_transfer(from, to, &type_ids[i], &values[i]);
 			let type_id = &type_ids[i];
+			
 			if self.get_is_fungible(&type_id) == true {
 				let amount = &values[i];
 
@@ -263,7 +263,7 @@ pub trait Erc1155 {
 			}
 			else {
 				let token_id = &values[i];
-				
+
 				self.set_token_owner(type_id, token_id, &to);
 			}
 		}
