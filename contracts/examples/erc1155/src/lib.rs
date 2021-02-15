@@ -43,7 +43,6 @@ pub trait Erc1155 {
 
 			self.decrease_balance(&from, &type_id, &amount);
 			self.increase_balance(&to, &type_id, &amount);
-
 		} else {
 			let token_id = &value;
 
@@ -72,7 +71,7 @@ pub trait Erc1155 {
 		Ok(())
 	}
 
-	// value is amount for fungible, token_id for non-fungible
+	/// `value` is amount for fungible, token_id for non-fungible
 	#[endpoint(safeBatchTransferFrom)]
 	fn safe_batch_transfer_from(
 		&self,
@@ -183,6 +182,26 @@ pub trait Erc1155 {
 		}
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+
+		Ok(())
+	}
+
+	#[endpoint]
+	fn burn(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
+		require!(
+			self.get_is_fungible(&type_id) == true,
+			"Only fungible tokens can be burned"
+		);
+
+		let caller = self.get_caller();
+		let balance = self
+			.get_balance_mapper(&caller)
+			.get(&type_id)
+			.unwrap_or_else(|| BigUint::zero());
+
+		require!(balance >= amount, "Not enough tokens to burn");
+
+		self.decrease_balance(&caller, &type_id, &amount);
 
 		Ok(())
 	}
