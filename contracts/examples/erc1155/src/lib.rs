@@ -72,47 +72,6 @@ pub trait Erc1155 {
 		Ok(())
 	}
 
-	#[endpoint(safeTransferFromNonFungible)]
-	fn safe_transfer_from_non_fungible(
-		&self,
-		from: Address,
-		to: Address,
-		type_id: BigUint,
-		token_id: BigUint,
-		_data: &[u8],
-	) -> SCResult<()> {
-		let caller = self.get_caller();
-
-		require!(to != Address::zero(), "Can't transfer to address zero");
-		require!(
-			self.is_valid_token_id(&type_id, &token_id),
-			"Token type-id pair is not valid"
-		);
-		require!(self.get_is_fungible(&type_id) == false, "Token is fungible");
-		require!(
-			self.get_token_owner(&type_id, &token_id) == from,
-			"_from_ is not the owner of the token"
-		);
-		require!(
-			caller == from || self.get_is_approved(&caller, &from),
-			"Caller is not approved to transfer tokens from address"
-		);
-
-		let amount = BigUint::from(1u32);
-		self.decrease_balance(&from, &type_id, &amount);
-		self.increase_balance(&to, &type_id, &amount);
-
-		self.set_token_owner(&type_id, &token_id, &to);
-
-		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
-
-		if self.is_smart_contract_address(&to) {
-			// TODO: async-call
-		}
-
-		Ok(())
-	}
-
 	// value is amount for fungible, token_id for non-fungible
 	#[endpoint(safeBatchTransferFrom)]
 	fn safe_batch_transfer_from(
