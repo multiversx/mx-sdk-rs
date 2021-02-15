@@ -160,44 +160,24 @@ pub trait Erc1155 {
 	}
 
 	// returns assigned id
-	#[endpoint(createNonFungible)]
-	fn create_non_fungible(&self, _uri: &[u8], initial_supply: BigUint) -> BigUint {
+	#[endpoint(createToken)]
+	fn create_token(&self, _uri: &[u8], initial_supply: BigUint, is_fungible: bool) -> BigUint {
 		let big_uint_one = BigUint::from(1u32);
 
 		let creator = self.get_caller();
 		let type_id = self.get_last_valid_type_id() + big_uint_one.clone();
+
+		self.get_balance_mapper(&creator)
+			.insert(type_id.clone(), initial_supply.clone());
+		self.set_token_type_creator(&type_id, &creator);
+		self.set_is_fungible(&type_id, is_fungible);
 		
-		self.set_owner_for_range(&type_id, &big_uint_one, &initial_supply, &creator);
-
-		self.get_balance_mapper(&creator)
-			.insert(type_id.clone(), initial_supply.clone());
-		self.set_token_type_creator(&type_id, &creator);
-		self.set_is_fungible(&type_id, false);
+		if !is_fungible {
+			self.set_owner_for_range(&type_id, &big_uint_one, &initial_supply, &creator);
+			self.set_last_valid_token_id_for_type(&type_id, &initial_supply);
+		}
 
 		self.set_last_valid_type_id(&type_id);
-		self.set_last_valid_token_id_for_type(&type_id, &initial_supply);
-
-		// self.uri_event(uri, &id);
-
-		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
-
-		type_id
-	}
-
-	// returns assigned id
-	#[endpoint(createFungible)]
-	fn create_fungible(&self, _uri: &[u8], initial_supply: BigUint) -> BigUint {
-		let type_id = self.get_last_valid_type_id() + BigUint::from(1u32);
-		let creator = self.get_caller();
-
-		self.get_balance_mapper(&creator)
-			.insert(type_id.clone(), initial_supply.clone());
-		self.set_token_type_creator(&type_id, &creator);
-		self.set_is_fungible(&type_id, true);
-
-		self.set_last_valid_type_id(&type_id);
-
-		// self.uri_event(uri, &id);
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
 
