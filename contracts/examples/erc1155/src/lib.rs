@@ -166,13 +166,8 @@ pub trait Erc1155 {
 
 		let creator = self.get_caller();
 		let type_id = self.get_last_valid_type_id() + big_uint_one.clone();
-		let mut token_id = big_uint_one.clone();
-
-		while token_id < initial_supply {
-			self.set_token_owner(&type_id, &token_id, &creator);
-
-			token_id += &big_uint_one;
-		}
+		
+		self.set_owner_for_range(&type_id, &big_uint_one, &initial_supply, &creator);
 
 		self.get_balance_mapper(&creator)
 			.insert(type_id.clone(), initial_supply.clone());
@@ -180,8 +175,11 @@ pub trait Erc1155 {
 		self.set_is_fungible(&type_id, false);
 
 		self.set_last_valid_type_id(&type_id);
+		self.set_last_valid_token_id_for_type(&type_id, &initial_supply);
 
 		// self.uri_event(uri, &id);
+
+		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
 
 		type_id
 	}
@@ -201,7 +199,34 @@ pub trait Erc1155 {
 
 		// self.uri_event(uri, &id);
 
+		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+
 		type_id
+	}
+
+	#[endpoint]
+	fn mint(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
+		let creator = self.get_token_type_creator(&type_id);
+
+		require!(
+			self.get_caller() == creator,
+			"Only the token creator may mint more tokens"
+		);
+
+		self.increase_balance(&creator, &type_id, &amount);
+
+		if self.get_is_fungible(&type_id) == false {
+			let id_first = self.get_last_valid_token_id_for_type(&type_id);
+			let id_last = id_first.clone() + amount;
+
+			self.set_owner_for_range(&type_id, &id_first, &id_last, &creator);
+
+			self.set_last_valid_token_id_for_type(&type_id, &id_last);
+		}
+
+		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+
+		Ok(())
 	}
 
 	// views
@@ -295,6 +320,18 @@ pub trait Erc1155 {
 
 		balance -= amount;
 		balance_mapper.insert(type_id.clone(), balance);
+	}
+
+	/// Range is inclusive for both `start` and `end`
+	fn set_owner_for_range(&self, type_id: &BigUint, start: &BigUint, end: &BigUint, owner: &Address) {
+		let big_uint_one = BigUint::from(1u32);
+		let mut token_id = start.clone();
+
+		while &token_id <= end {
+			self.set_token_owner(&type_id, &token_id, &owner);
+
+			token_id += &big_uint_one;
+		}
 	}
 
 	// storage
