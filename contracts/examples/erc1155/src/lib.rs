@@ -12,37 +12,56 @@ pub trait Erc1155 {
 
 	// endpoints
 
-	#[endpoint(safeTransferFromFungible)]
-	fn safe_transfer_from_fungible(
+	/// `value` is amount for fungible, token_id for non-fungible
+	#[endpoint(safeTransferFrom)]
+	fn safe_transfer_from(
 		&self,
 		from: Address,
 		to: Address,
 		type_id: BigUint,
-		amount: BigUint,
+		value: BigUint,
 		_data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
 
 		require!(to != Address::zero(), "Can't transfer to address zero");
-		require!(amount > 0, "Must transfer more than 0");
 		require!(self.is_valid_type_id(&type_id), "Toke id is invalid");
-		require!(
-			self.get_is_fungible(&type_id) == true,
-			"Token is not fungible"
-		);
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
 			"Caller is not approved to transfer tokens from address"
 		);
 
-		let balance = match self.get_balance_mapper(&from).get(&type_id) {
-			Some(b) => b,
-			None => return sc_error!("Address has no tokens of that type"),
-		};
-		require!(amount <= balance, "Not enough balance for id");
+		if self.get_is_fungible(&type_id) == true {
+			let amount = &value;
 
-		self.decrease_balance(&from, &type_id, &amount);
-		self.increase_balance(&to, &type_id, &amount);
+			require!(amount > &0, "Must transfer more than 0");
+			let balance = match self.get_balance_mapper(&from).get(&type_id) {
+				Some(b) => b,
+				None => return sc_error!("Address has no tokens of that type"),
+			};
+			require!(amount <= &balance, "Not enough balance for id");
+
+			self.decrease_balance(&from, &type_id, &amount);
+			self.increase_balance(&to, &type_id, &amount);
+
+		} else {
+			let token_id = &value;
+
+			require!(
+				self.is_valid_token_id(&type_id, &token_id),
+				"Token type-id pair is not valid"
+			);
+			require!(
+				self.get_token_owner(&type_id, &token_id) == from,
+				"_from_ is not the owner of the token"
+			);
+
+			let amount = BigUint::from(1u32);
+			self.decrease_balance(&from, &type_id, &amount);
+			self.increase_balance(&to, &type_id, &amount);
+
+			self.set_token_owner(&type_id, token_id, &to);
+		}
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
 
@@ -171,7 +190,7 @@ pub trait Erc1155 {
 			.insert(type_id.clone(), initial_supply.clone());
 		self.set_token_type_creator(&type_id, &creator);
 		self.set_is_fungible(&type_id, is_fungible);
-		
+
 		if !is_fungible {
 			self.set_owner_for_range(&type_id, &big_uint_one, &initial_supply, &creator);
 			self.set_last_valid_token_id_for_type(&type_id, &initial_supply);
@@ -303,7 +322,13 @@ pub trait Erc1155 {
 	}
 
 	/// Range is inclusive for both `start` and `end`
-	fn set_owner_for_range(&self, type_id: &BigUint, start: &BigUint, end: &BigUint, owner: &Address) {
+	fn set_owner_for_range(
+		&self,
+		type_id: &BigUint,
+		start: &BigUint,
+		end: &BigUint,
+		owner: &Address,
+	) {
 		let big_uint_one = BigUint::from(1u32);
 		let mut token_id = start.clone();
 
