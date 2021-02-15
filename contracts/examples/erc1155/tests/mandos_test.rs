@@ -27,3 +27,13 @@ fn create_token_fungible_test() {
 fn create_token_non_fungible_test() {
 	parse_execute_mandos("mandos/create_token_non_fungible.scen.json", &contract_map());
 }
+
+#[test]
+fn create_two_fungible_same_creator_test() {
+	parse_execute_mandos("mandos/create_two_tokens_both_fungible_same_creator.scen.json", &contract_map());
+}
+
+#[test]
+fn create_two_fungible_different_creator_test() {
+    parse_execute_mandos("mandos/create_two_tokens_both_fungible_different_creator.scen.json", &contract_map());
+}

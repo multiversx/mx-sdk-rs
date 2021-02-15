@@ -60,9 +60,10 @@
                         "str:tokenTypeCreator|u32:1|u8:1": "address:creator",
                         "str:isFungible|u32:1|u8:1": "false",
                         "str:tokenTypeUri|u32:1|u8:1": "str:https://token-cdn-domain/{id}.json",
-                        "str:lastValidTypeId": "1",
                         "str:lastValidTokenIdForType|u32:1|u8:1": "5",
                         "str:balanceOf|address:creator|str:.mapped|u8:1": "5",
+
+                        "str:lastValidTypeId": "1",
 
                         "str:tokenOwner|u32:1|u8:1|u32:1|u8:1": "address:creator",
                         "str:tokenOwner|u32:1|u8:1|u32:1|u8:2": "address:creator",
