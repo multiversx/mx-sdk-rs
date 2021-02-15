@@ -14,30 +14,36 @@ pub trait Erc1155 {
 
 	// endpoints
 
-	#[endpoint(safeTransferFrom)]
-	fn safe_transfer_from(
+	#[endpoint(safeTransferFromFungible)]
+	fn safe_transfer_from_fungible(
 		&self,
 		from: Address,
 		to: Address,
-		id: BigUint,
+		type_id: BigUint,
 		amount: BigUint,
 		_data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
-		let balance = match self.get_balance_mapper(&from).get(&id) {
-			Some(b) => b,
-			None => return sc_error!("Address has no tokens of that type"),
-		};
-
+		
+		require!(to != Address::zero(), "Can't transfer to address zero");
+		require!(amount > 0, "Must transfer more than 0");
+		require!(self.is_valid_type_id(&type_id), "Toke id is invalid");
+		require!(
+			self.get_is_fungible(&type_id) == true,
+			"Token is not fungible"
+		);
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
 			"Caller is not approved to transfer tokens from address"
 		);
-		require!(to != Address::zero(), "Can't transfer to address zero");
-		require!(amount > 0, "Must transfer more than 0");
+
+		let balance = match self.get_balance_mapper(&from).get(&type_id) {
+			Some(b) => b,
+			None => return sc_error!("Address has no tokens of that type"),
+		};
 		require!(amount <= balance, "Not enough balance for id");
 
-		self.perform_transfer(&from, &to, &id, &amount);
+		self.perform_transfer_fungible(&from, &to, &type_id, &amount);
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
 
@@ -48,13 +54,48 @@ pub trait Erc1155 {
 		Ok(())
 	}
 
+	#[endpoint(safeTransferFromNonFungible)]
+	fn safe_transfer_from_non_fungible(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		token_id: BigUint,
+		_data: &[u8],
+	) -> SCResult<()> {
+		let caller = self.get_caller();
+		
+		require!(to != Address::zero(), "Can't transfer to address zero");
+		require!(self.is_valid_token_id(&type_id, &token_id), "Token type-id pair is not valid");
+		require!(
+			self.get_is_fungible(&type_id) == false,
+			"Token is fungible"
+		);
+		require!(self.get_token_owner(&type_id, &token_id) == from, "_from_ is not the owner of the token");
+		require!(
+			caller == from || self.get_is_approved(&caller, &from),
+			"Caller is not approved to transfer tokens from address"
+		);
+
+		self.set_token_owner(&type_id, &token_id, &to);
+
+		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+
+		if self.is_smart_contract_address(&to) {
+			// TODO: async-call
+		}
+
+		Ok(())
+	}
+
+	// value is amount for fungible, token_id for non-fungible
 	#[endpoint(safeBatchTransferFrom)]
 	fn safe_batch_transfer_from(
 		&self,
 		from: Address,
 		to: Address,
-		ids: &[BigUint],
-		amounts: &[BigUint],
+		type_ids: &[BigUint],
+		values: &[BigUint],
 		_data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
@@ -65,21 +106,32 @@ pub trait Erc1155 {
 		);
 		require!(to != Address::zero(), "Can't transfer to address zero");
 		require!(
-			ids.len() == amounts.len(),
-			"Id and amount lenghts do not match"
+			type_ids.len() == values.len(),
+			"Id and value lenghts do not match"
 		);
 
-		for i in 0..ids.len() {
-			let balance = match self.get_balance_mapper(&from).get(&ids[i]) {
-				Some(b) => b,
-				None => return sc_error!("Address has no tokens of that type"),
-			};
+		for i in 0..type_ids.len() {
+			let type_id = &type_ids[i];
 
-			require!(amounts[i] > 0, "Must transfer more than 0");
-			require!(amounts[i] <= balance, "Not enough balance for id");
+			if self.get_is_fungible(type_id) == true {
+				let amount = &values[i];
+
+				let balance = match self.get_balance_mapper(&from).get(type_id) {
+					Some(b) => b,
+					None => return sc_error!("Address has no tokens of that type"),
+				};
+
+				require!(amount > &0, "Must transfer more than 0");
+				require!(amount <= &balance, "Not enough balance for id");
+			}
+			else {
+				let token_id = &values[i];
+
+				require!(self.get_token_owner(&type_id, &token_id) == from, "_from_ is not the owner of the token");
+			}
 		}
 
-		self.perform_batch_transfer(&from, &to, ids, amounts);
+		self.perform_batch_transfer(&from, &to, type_ids, values);
 
 		// self.transfer_batch_event(&caller, &from, &to, ids, amounts);
 
@@ -101,28 +153,45 @@ pub trait Erc1155 {
 
 	// returns assigned id
 	#[endpoint(createNonFungible)]
-	fn create_non_fungible(&self, _uri: &[u8]) -> BigUint {
-		// non-fungible tokens have a starting supply of 1 and cannot be minted
-		let initial_supply = BigUint::from(1u32);
-		let id = self.create_token(&self.get_caller(), &initial_supply);
+	fn create_non_fungible(&self, _uri: &[u8], initial_supply: BigUint) -> BigUint {
+		let big_uint_one = BigUint::from(1u32);
 
-		self.set_is_fungible(&id, false);
+		let creator = self.get_caller();
+		let type_id = self.get_last_valid_type_id() + big_uint_one.clone();
+		let mut token_id = big_uint_one.clone();
+
+		while token_id < initial_supply {
+			self.set_token_owner(&type_id, &token_id, &creator);
+
+			token_id += &big_uint_one;
+		}
+
+		self.set_token_type_creator(&type_id, &creator);
+		self.set_last_valid_type_id(&type_id);
+
+		self.set_is_fungible(&type_id, false);
 
 		// self.uri_event(uri, &id);
 
-		id
+		type_id
 	}
 
 	// returns assigned id
 	#[endpoint(createFungible)]
 	fn create_fungible(&self, _uri: &[u8], initial_supply: BigUint) -> BigUint {
-		let id = self.create_token(&self.get_caller(), &initial_supply);
+		let type_id = self.get_last_valid_type_id() + BigUint::from(1u32);
+		let creator = self.get_caller();
 
-		self.set_is_fungible(&id, true);
+		self.get_balance_mapper(&creator)
+			.insert(type_id.clone(), initial_supply.clone());
+		self.set_token_type_creator(&type_id, &creator);
+		self.set_is_fungible(&type_id, true);
+
+		self.set_last_valid_type_id(&type_id);
 
 		// self.uri_event(uri, &id);
 
-		id
+		type_id
 	}
 
 	// views
@@ -163,65 +232,102 @@ pub trait Erc1155 {
 		false
 	}
 
-	fn perform_transfer(&self, from: &Address, to: &Address, id: &BigUint, amount: &BigUint) {
+	fn perform_transfer_fungible(&self, from: &Address, to: &Address, type_id: &BigUint, amount: &BigUint) {
 		let mut from_balance_mapper = self.get_balance_mapper(&from);
 		let mut to_balance_mapper = self.get_balance_mapper(&to);
 
-		let mut from_balance = from_balance_mapper.get(id).unwrap();
-		let mut to_balance = to_balance_mapper.get(id).unwrap_or_else(|| BigUint::zero());
+		let mut from_balance = from_balance_mapper.get(type_id).unwrap();
+		let mut to_balance = to_balance_mapper.get(type_id).unwrap_or_else(|| BigUint::zero());
 
 		from_balance -= amount;
 		to_balance += amount;
 
-		from_balance_mapper.insert(id.clone(), from_balance);
-		to_balance_mapper.insert(id.clone(), to_balance);
+		from_balance_mapper.insert(type_id.clone(), from_balance);
+		to_balance_mapper.insert(type_id.clone(), to_balance);
 	}
 
 	fn perform_batch_transfer(
 		&self,
 		from: &Address,
 		to: &Address,
-		ids: &[BigUint],
-		amounts: &[BigUint],
+		type_ids: &[BigUint],
+		values: &[BigUint],
 	) {
-		for i in 0..ids.len() {
-			self.perform_transfer(from, to, &ids[i], &amounts[i]);
+		for i in 0..type_ids.len() {
+			//self.perform_transfer(from, to, &type_ids[i], &values[i]);
+			let type_id = &type_ids[i];
+			if self.get_is_fungible(&type_id) == true {
+				let amount = &values[i];
+
+				self.perform_transfer_fungible(&from, &to, type_id, amount);
+			}
+			else {
+				let token_id = &values[i];
+				
+				self.set_token_owner(type_id, token_id, &to);
+			}
 		}
 	}
 
-	fn create_token(&self, creator: &Address, initial_supply: &BigUint) -> BigUint {
-		let id = self.get_last_valid_id() + BigUint::from(1u32);
+	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
+		type_id > &0 && type_id <= &self.get_last_valid_type_id()
+	}
 
-		self.get_balance_mapper(&creator)
-			.insert(id.clone(), initial_supply.clone());
-		self.set_token_creator(&id, &creator);
-
-		self.set_last_valid_id(&id);
-
-		id
+	fn is_valid_token_id(&self, type_id: &BigUint, token_id: &BigUint) -> bool {
+		self.is_valid_type_id(type_id)
+			&& token_id > &0
+			&& token_id <= &self.get_last_valid_token_id_for_type(type_id)
 	}
 
 	// storage
 
-	// map for address -> id -> amount
+	// map for address -> type_id -> amount
+	// for fungible
+
 	#[storage_mapper("balanceOf")]
 	fn get_balance_mapper(&self, owner: &Address) -> MapMapper<Self::Storage, BigUint, BigUint>;
 
+	// token owner
+	// for non-fungible
+
+	#[view(getTokenOwner)]
+	#[storage_get("tokenOwner")]
+	fn get_token_owner(&self, type_id: &BigUint, token_id: &BigUint) -> Address;
+
+	#[storage_set("tokenOwner")]
+	fn set_token_owner(&self, type_id: &BigUint, token_id: &BigUint, owner: &Address);
+
 	// token creator
 
-	#[storage_get("tokenCreator")]
-	fn get_token_creator(&self, id: &BigUint) -> Address;
+	#[view(getTokenTypeCreator)]
+	#[storage_get("tokenTypeCreator")]
+	fn get_token_type_creator(&self, type_id: &BigUint) -> Address;
 
-	#[storage_set("tokenCreator")]
-	fn set_token_creator(&self, id: &BigUint, creator: &Address);
+	#[storage_set("tokenTypeCreator")]
+	fn set_token_type_creator(&self, type_id: &BigUint, creator: &Address);
+
+	// check if a token is fungible
+
+	#[view(isFungible)]
+	#[storage_get("isFungible")]
+	fn get_is_fungible(&self, type_id: &BigUint) -> bool;
+
+	#[storage_set("isFungible")]
+	fn set_is_fungible(&self, type_id: &BigUint, is_fungible: bool);
 
 	// last valid id
 
-	#[storage_get("lastValidId")]
-	fn get_last_valid_id(&self) -> BigUint;
+	#[storage_get("lastValidTypeId")]
+	fn get_last_valid_type_id(&self) -> BigUint;
 
-	#[storage_set("lastValidId")]
-	fn set_last_valid_id(&self, last_valid_id: &BigUint);
+	#[storage_set("lastValidTypeId")]
+	fn set_last_valid_type_id(&self, last_valid_type_id: &BigUint);
+
+	#[storage_get("lastValidTokenIdForType")]
+	fn get_last_valid_token_id_for_type(&self, type_id: &BigUint) -> BigUint;
+
+	#[storage_set("lastValidTokenIdForType")]
+	fn set_last_valid_token_id_for_type(&self, type_id: &BigUint, last_valid_token_id: &BigUint);
 
 	// check if an operator is approved. Default is false.
 
@@ -230,14 +336,6 @@ pub trait Erc1155 {
 
 	#[storage_set("isApproved")]
 	fn set_is_approved(&self, operator: &Address, owner: &Address, is_approved: bool);
-
-	// check if a token is fungible. Non-fungible tokens cannot be minted. Default is false.
-
-	#[storage_get("isFungible")]
-	fn get_is_fungible(&self, id: &BigUint) -> bool;
-
-	#[storage_set("isFungible")]
-	fn set_is_fungible(&self, id: &BigUint, is_fungible: bool);
 
 	// Events
 
