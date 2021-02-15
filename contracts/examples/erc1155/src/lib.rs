@@ -138,7 +138,7 @@ pub trait Erc1155 {
 
 	// returns assigned id
 	#[endpoint(createToken)]
-	fn create_token(&self, _uri: &[u8], initial_supply: BigUint, is_fungible: bool) -> BigUint {
+	fn create_token(&self, uri: &[u8], initial_supply: BigUint, is_fungible: bool) -> BigUint {
 		let big_uint_one = BigUint::from(1u32);
 
 		let creator = self.get_caller();
@@ -155,8 +155,11 @@ pub trait Erc1155 {
 		}
 
 		self.set_last_valid_type_id(&type_id);
+		self.set_token_type_uri(&type_id, uri);
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+
+		// uri event
 
 		type_id
 	}
@@ -342,6 +345,15 @@ pub trait Erc1155 {
 
 	#[storage_set("tokenTypeCreator")]
 	fn set_token_type_creator(&self, type_id: &BigUint, creator: &Address);
+
+	// token type uri
+	
+	#[view(getTokenTypeUri)]
+	#[storage_get("tokenTypeUri")]
+	fn get_token_type_uri(&self, type_id: &BigUint) -> Vec<u8>;
+
+	#[storage_set("tokenTypeUri")]
+	fn set_token_type_uri(&self, type_id: &BigUint, uri: &[u8]);
 
 	// check if a token is fungible
 
