@@ -18,6 +18,8 @@ fn deploy_test() {
 	parse_execute_mandos("mandos/deploy.scen.json", &contract_map());
 }
 
+// Create token tests
+
 #[test]
 fn create_token_fungible_test() {
 	parse_execute_mandos("mandos/create_token_fungible.scen.json", &contract_map());
@@ -36,4 +38,14 @@ fn create_two_fungible_same_creator_test() {
 #[test]
 fn create_two_fungible_different_creator_test() {
     parse_execute_mandos("mandos/create_two_tokens_both_fungible_different_creator.scen.json", &contract_map());
+}
+
+#[test]
+fn create_two_non_fungible_same_creator_test() {
+	parse_execute_mandos("mandos/create_two_tokens_both_non_fungible_same_creator.scen.json", &contract_map());
+}
+
+#[test]
+fn create_one_fungible_one_non_fungible_test() {
+	parse_execute_mandos("mandos/create_one_fungible_one_non_fungible.scen.json", &contract_map());
 }
