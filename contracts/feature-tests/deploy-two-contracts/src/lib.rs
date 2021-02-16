@@ -54,7 +54,7 @@ pub trait DeployTwoContracts {
 
 	#[endpoint(deployContract)]
 	fn deploy_contract(&self) -> SCResult<Address> {
-		let deployed_contract_address = self.deploy();
+		let deployed_contract_address = self.deploy(&ArgBuffer::new());
 		if deployed_contract_address.is_zero() {
 			return sc_error!("Deploy failed");
 		}
@@ -64,12 +64,12 @@ pub trait DeployTwoContracts {
 
 	#[endpoint(deployTwoContracts)]
 	fn deploy_two_contracts(&self) -> SCResult<(Address, Address)> {
-		let first_deployed_contract_address = self.deploy();
+		let first_deployed_contract_address = self.deploy(&ArgBuffer::new());
 		if first_deployed_contract_address.is_zero() {
 			return sc_error!("First deploy failed");
 		}
 
-		let second_deployed_contract_address = self.deploy();
+		let second_deployed_contract_address = self.deploy(&ArgBuffer::new());
 		if second_deployed_contract_address.is_zero() {
 			return sc_error!("Second deploy failed");
 		}
@@ -80,13 +80,26 @@ pub trait DeployTwoContracts {
 		))
 	}
 
-	fn deploy(&self) -> Address {
+	#[endpoint(deployUnexpectedArgument)]
+	fn deploy_unexepected_argument(&self) -> SCResult<Address> {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_raw_arg(b"unexpected argument");
+
+		let deployed_contract_address = self.deploy(&arg_buffer);
+		if deployed_contract_address.is_zero() {
+			return sc_error!("Deploy failed")
+		}
+
+		Ok(deployed_contract_address)
+	}
+
+	fn deploy(&self, arg_buffer: &ArgBuffer) -> Address {
 		self.send().deploy_contract(
 			self.get_gas_left(),
 			&BigUint::zero(),
 			&BoxedBytes::from(CONTRACT_CODE),
 			CodeMetadata::DEFAULT,
-			&ArgBuffer::new(),
+			arg_buffer,
 		)
 	}
 }

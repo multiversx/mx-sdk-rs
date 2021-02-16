@@ -21,5 +21,9 @@ deployContract() {
 }
 
 deployTwoContracts() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=5000000 --function="deployTwoContracts" --send --proxy=${PROXY} --chain=T
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=7500000 --function="deployTwoContracts" --send --proxy=${PROXY} --chain=T
+}
+
+deployUnexpectedArgument() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --function="deployUnexpectedArgument" --send --proxy=${PROXY} --chain=T
 }
