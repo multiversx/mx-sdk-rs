@@ -53,6 +53,7 @@ members = [
   "contracts/feature-tests/esdt-contract-pair/first-contract",
   "contracts/feature-tests/esdt-contract-pair/second-contract",
   "contracts/feature-tests/deploy-two-contracts",
+  "contracts/feature-tests/transfer-esdt-hook",
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
