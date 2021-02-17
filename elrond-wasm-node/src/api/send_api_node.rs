@@ -1,6 +1,6 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
-use elrond_wasm::api::SendApi;
+use elrond_wasm::api::{ContractHookApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 
 extern "C" {
@@ -239,5 +239,15 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.arg_data_ptr(),
 			);
 		}
+	}
+
+	fn storage_store_tx_hash_key(&self, data: &[u8]) {
+		let tx_hash = self.get_tx_hash();
+		self.storage_store_slice_u8(tx_hash.as_bytes(), data);
+	}
+
+	fn storage_load_tx_hash_key(&self) -> BoxedBytes {
+		let tx_hash = self.get_tx_hash();
+		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
 }

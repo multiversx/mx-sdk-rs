@@ -5,6 +5,15 @@ use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
+pub trait CallbackContainer<BigUint>
+where
+	BigUint: BigUintApi + 'static,
+{
+	type SendApi: SendApi<BigUint> + Clone + 'static;
+
+	fn send_api(&self) -> Self::SendApi;
+}
+
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi<BigUint>: ErrorApi + Sized
 where
@@ -46,7 +55,13 @@ where
 
 	/// Performs a simple ESDT transfer, but via async call.
 	/// This is the preferred way to send ESDT.
-	fn direct_esdt_via_async_call(&self, to: &Address, esdt_token_name: &[u8], amount: &BigUint, data: &[u8]) -> ! {
+	fn direct_esdt_via_async_call(
+		&self,
+		to: &Address,
+		esdt_token_name: &[u8],
+		amount: &BigUint,
+		data: &[u8],
+	) -> ! {
 		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
 		serializer.push_argument_bytes(esdt_token_name);
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
@@ -59,7 +74,13 @@ where
 	/// Sends either EGLD or an ESDT token to the target address,
 	/// depending on what token identifier was specified.
 	/// In case of ESDT it performs an async call.
-	fn direct_via_async_call(&self, to: &Address, token: &TokenIdentifier, amount: &BigUint, data: &[u8]) {
+	fn direct_via_async_call(
+		&self,
+		to: &Address,
+		token: &TokenIdentifier,
+		amount: &BigUint,
+		data: &[u8],
+	) {
 		if token.is_egld() {
 			self.direct_egld(to, amount, data);
 		} else {
@@ -183,4 +204,10 @@ where
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	);
+
+	/// Used to store data between async call and callback.
+	fn storage_store_tx_hash_key(&self, data: &[u8]);
+
+	/// Used to store data between async call and callback.
+	fn storage_load_tx_hash_key(&self) -> BoxedBytes;
 }

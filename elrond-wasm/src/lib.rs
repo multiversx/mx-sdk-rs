@@ -15,7 +15,7 @@ pub mod hex_call_data;
 pub mod io;
 mod macros;
 pub mod non_zero_util;
-mod proxy;
+pub mod proxy;
 pub mod storage;
 pub mod types;
 

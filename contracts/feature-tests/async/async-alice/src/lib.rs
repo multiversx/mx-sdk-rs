@@ -11,22 +11,22 @@ static HARDCODED_ADDRESS: [u8; 32] =
 #[elrond_wasm_derive::callable(PayMeProxy)]
 pub trait PayMe {
 	#[payable("EGLD")]
-	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64);
+	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> AsyncCall<BigUint>;
 
 	#[payable("EGLD")]
 	#[callback(payCallback)]
-	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64);
+	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64) -> AsyncCall<BigUint>;
 }
 
 #[elrond_wasm_derive::callable(MessageMeProxy)]
 pub trait MessageMe {
-	fn messageMe(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &Address);
-}
-
-#[elrond_wasm_derive::callable(MessageMeProxy)]
-pub trait MessageMeWithCallback {
-	#[callback(messageCallback)]
-	fn messageMe(&self, arg1: i64, arg2: BigUint, arg3: Vec<u8>, arg4: Address);
+	fn messageMe(
+		&self,
+		arg1: i64,
+		arg2: &BigUint,
+		arg3: Vec<u8>,
+		arg4: &Address,
+	) -> AsyncCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(AliceImpl)]
@@ -47,50 +47,57 @@ pub trait Alice {
 
 	#[payable("EGLD")]
 	#[endpoint]
-	fn forwardToOtherContract(&self, #[payment] payment: BigUint) {
+	fn forwardToOtherContract(&self, #[payment] payment: BigUint) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &other_contract, PayMe);
-		target_contract.payMe(payment, 0x56);
+		// let target_contract = contract_proxy!(self, &other_contract, PayMe);
+		// target_contract.payMe(payment, 0x56);
+		contract_call!(self, other_contract, PayMeProxy)
+			.payMe(payment, 0x56)
 	}
 
 	#[payable("EGLD")]
 	#[endpoint]
-	fn forwardToOtherContractWithCallback(&self, #[payment] payment: BigUint) {
+	fn forwardToOtherContractWithCallback(
+		&self,
+		#[payment] payment: BigUint,
+	) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &other_contract, PayMe);
-		target_contract.payMeWithResult(payment, 0x56);
+		contract_call!(self, other_contract, PayMeProxy)
+			.payMeWithResult(payment, 0x56)
+			.with_callback(self.callbacks().payCallback())
 	}
 
 	#[endpoint]
-	fn messageOtherContract(&self) {
+	fn messageOtherContract(&self) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &other_contract, MessageMe);
-		target_contract.messageMe(
+		// let target_contract = contract_proxy!(self, &other_contract, MessageMe);
+		contract_call!(self, other_contract, MessageMeProxy).messageMe(
 			0x01,
 			&BigUint::from(0x02u64),
-			create_a_vec(),
+			[3u8; 3].to_vec(),
 			&HARDCODED_ADDRESS.into(),
-		);
+		)
 	}
 
 	#[endpoint]
-	fn messageOtherContractWithCallback(&self) {
+	fn messageOtherContractWithCallback(&self) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
 
-		let target_contract = contract_proxy!(self, &other_contract, MessageMeWithCallback);
-		target_contract.messageMe(
-			0x01,
-			BigUint::from(0x02u64),
-			create_a_vec(),
-			HARDCODED_ADDRESS.into(),
-		);
+		contract_call!(self, other_contract, MessageMeProxy)
+			.messageMe(
+				0x01,
+				&BigUint::from(0x02u64),
+				[3u8; 3].to_vec(),
+				&HARDCODED_ADDRESS.into(),
+			)
+			.with_callback(self.callbacks().message_callback())
 	}
 
 	#[callback]
-	fn payCallback(&self, call_result: AsyncCallResult<i64>) {
+	fn payCallback(&self, #[call_result] call_result: AsyncCallResult<i64>) {
 		match call_result {
 			AsyncCallResult::Ok(cb_arg) => {
 				self.set_callback_info(cb_arg);
@@ -100,15 +107,7 @@ pub trait Alice {
 	}
 
 	#[callback]
-	fn messageCallback(&self, _call_result: AsyncCallResult<()>) {
+	fn message_callback(&self, #[call_result] _call_result: AsyncCallResult<()>) {
 		self.set_callback_info(0x5555);
 	}
-}
-
-fn create_a_vec() -> Vec<u8> {
-	let mut res = Vec::with_capacity(3);
-	res.push(3);
-	res.push(3);
-	res.push(3);
-	res
 }

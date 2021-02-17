@@ -48,7 +48,7 @@ pub fn extract_payment_token(
 	payment_token_arg
 }
 
-pub fn extract_method_args(m: &syn::TraitItemMethod, allow_callback_args: bool) -> Vec<MethodArg> {
+pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 	let mut arg_index: isize = -1; // ignore the first argument, which is &self
 	let mut receiver_processed = false;
 	m.sig
@@ -69,40 +69,41 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, allow_callback_args: bool) 
 				let pat = &*pat_typed.pat;
 				let ty = &*pat_typed.ty;
 
-				let is_callback_arg = is_callback_arg(&pat_typed);
-				if is_callback_arg && !allow_callback_args {
-					panic!("Callback args not allowed here");
-				}
+				let is_callback_result_arg = is_callback_result_arg(&pat_typed);
 
 				if is_var_args(&pat_typed) {
 					Some(MethodArg {
 						index: -1,
 						pat: pat.clone(),
 						ty: ty.clone(),
-						is_callback_arg,
 						metadata: ArgMetadata::VarArgs,
 					})
 				} else if is_payment(&pat_typed) {
-					if is_callback_arg {
-						panic!("Payment arguments cannot be annotated with #[callback_arg].");
+					if is_callback_result_arg {
+						panic!("Payment arguments cannot be annotated with #[async_result].");
 					}
 					Some(MethodArg {
 						index: -1,
 						pat: pat.clone(),
 						ty: ty.clone(),
-						is_callback_arg: false,
 						metadata: ArgMetadata::Payment,
 					})
 				} else if is_payment_token(&pat_typed) {
-					if is_callback_arg {
-						panic!("Payment token arguments cannot be annotated with #[callback_arg].");
+					if is_callback_result_arg {
+						panic!("Payment arguments cannot be annotated with #[async_result].");
 					}
 					Some(MethodArg {
 						index: -1,
 						pat: pat.clone(),
 						ty: ty.clone(),
-						is_callback_arg: false,
 						metadata: ArgMetadata::PaymentToken,
+					})
+				} else if is_callback_result_arg {
+					Some(MethodArg {
+						index: -1,
+						pat: pat.clone(),
+						ty: ty.clone(),
+						metadata: ArgMetadata::AsyncCallResultArg,
 					})
 				} else {
 					arg_index += 1;
@@ -110,7 +111,6 @@ pub fn extract_method_args(m: &syn::TraitItemMethod, allow_callback_args: bool) 
 						index: arg_index as i32,
 						pat: pat.clone(),
 						ty: ty.clone(),
-						is_callback_arg,
 						metadata: ArgMetadata::Single,
 					})
 				}

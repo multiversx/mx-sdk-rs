@@ -212,4 +212,8 @@ impl Contract {
 	pub fn generate_callback_body(&self) -> proc_macro2::TokenStream {
 		generate_callback_body(&self.methods)
 	}
+
+	pub fn generate_callback_proxies(&self) -> proc_macro2::TokenStream {
+		generate_callback_proxies(&self.methods)
+	}
 }
