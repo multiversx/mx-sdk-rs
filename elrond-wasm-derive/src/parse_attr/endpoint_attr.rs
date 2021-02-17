@@ -17,8 +17,8 @@ pub fn is_var_args(pat: &syn::PatType) -> bool {
 	has_attribute(&pat.attrs, ATTR_VAR_ARGS)
 }
 
-pub fn is_callback_arg(pat: &syn::PatType) -> bool {
-	has_attribute(&pat.attrs, ATTR_CALLBACK_ARG)
+pub fn is_callback_result_arg(pat: &syn::PatType) -> bool {
+	has_attribute(&pat.attrs, ATTR_CALLBACK_CALL_RESULT)
 }
 
 #[derive(Clone, Debug)]
@@ -55,23 +55,6 @@ impl ViewAttribute {
 			}),
 			Some(None) => Some(ViewAttribute { view_name: None }),
 			_ => panic!("unexpected endpoint argument tokens"),
-		}
-	}
-}
-
-#[derive(Clone, Debug)]
-pub struct CallbackCallAttribute {
-	pub arg: syn::Ident,
-}
-
-impl CallbackCallAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<CallbackCallAttribute> {
-		match find_attr_with_one_opt_token_tree_arg(m, ATTR_CALLBACK_CALL) {
-			None => None,
-			Some(Some(proc_macro2::TokenTree::Ident(ident))) => {
-				Some(CallbackCallAttribute { arg: ident })
-			},
-			_ => panic!("single identifier expected as callback argument"),
 		}
 	}
 }

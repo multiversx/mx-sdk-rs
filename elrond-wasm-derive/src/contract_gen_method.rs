@@ -146,7 +146,9 @@ impl MethodMetadata {
 	pub fn payable_metadata(&self) -> MethodPayableMetadata {
 		match self {
 			MethodMetadata::Regular { payable, .. } => payable.clone(),
-			MethodMetadata::Callback | MethodMetadata::CallbackRaw => MethodPayableMetadata::AnyToken,
+			MethodMetadata::Callback | MethodMetadata::CallbackRaw => {
+				MethodPayableMetadata::AnyToken
+			},
 			MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
 			MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
 			MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,
@@ -413,8 +415,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 impl Method {
 	pub fn parse(m: &syn::TraitItemMethod) -> Method {
 		let metadata = extract_metadata(m);
-		let allow_callback_args = matches!(metadata, MethodMetadata::Callback);
-		let method_args = extract_method_args(m, allow_callback_args);
+		let method_args = extract_method_args(m);
 		let payment_arg = extract_payment(metadata.payable_metadata(), &method_args[..]);
 		let token_arg = extract_payment_token(metadata.payable_metadata(), &method_args[..]);
 		let output_names = find_output_names(m);
@@ -503,10 +504,6 @@ impl Method {
 			.method_args
 			.iter()
 			.map(|arg| {
-				if arg.is_callback_arg {
-					panic!("callback args not allowed in endpoints");
-				}
-
 				match &arg.metadata {
 					ArgMetadata::Single => {
 						arg_index += 1;
@@ -519,6 +516,9 @@ impl Method {
 					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 					ArgMetadata::VarArgs => {
 						panic!("var_args not accepted in function generate_call_method_fixed_args")
+					},
+					ArgMetadata::AsyncCallResultArg => {
+						panic!("async call result arg not allowed here")
 					},
 				}
 			})
@@ -542,17 +542,12 @@ impl Method {
 		let arg_init_snippets: Vec<proc_macro2::TokenStream> = self
 			.method_args
 			.iter()
-			.map(|arg| {
-				if arg.is_callback_arg {
-					panic!("callback args not allowed in public functions");
-				}
-
-				match &arg.metadata {
-					ArgMetadata::Single | ArgMetadata::VarArgs => {
-						generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
-					},
-					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-				}
+			.map(|arg| match &arg.metadata {
+				ArgMetadata::Single | ArgMetadata::VarArgs => {
+					generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
+				},
+				ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
+				ArgMetadata::AsyncCallResultArg => panic!("async call result arg npt allowed here"),
 			})
 			.collect();
 

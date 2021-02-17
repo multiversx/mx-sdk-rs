@@ -1,9 +1,9 @@
 /// Handy way of casting to a contract proxy trait.
 /// Would make more sense to be in elrond-wasm-derive, but Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
 #[macro_export]
-macro_rules! contract_proxy {
+macro_rules! contract_call {
 	($s:expr, $address:expr, $proxy_trait:ident) => {
-		$s.contract_proxy($address) as Box<dyn $proxy_trait<BigInt, BigUint>>
+		$proxy_trait::<Self::SendApi, BigInt, BigUint>::new($s.send(), $address)
 	};
 }
 
@@ -25,6 +25,7 @@ macro_rules! imports {
 		use elrond_wasm::{AsyncCallError, OtherContractHandle};
 		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
+		use elrond_wasm::proxy::ContractProxy;
 	};
 }
 
