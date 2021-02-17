@@ -96,3 +96,13 @@ fn mint_non_fungible_test() {
 fn mint_not_creator_test() {
 	parse_execute_mandos("mandos/mint_not_creator.scen.json", &contract_map());
 }
+
+#[test]
+fn burn_fungible_test() {
+	parse_execute_mandos("mandos/burn_fungible.scen.json", &contract_map());
+}
+
+#[test]
+fn burn_non_fungible_test() {
+	parse_execute_mandos("mandos/burn_non_fungible.scen.json", &contract_map());
+}
