@@ -66,3 +66,18 @@ fn transfer_fungible_not_enough_balance_test() {
 fn transfer_non_fungible_ok_test() {
 	parse_execute_mandos("mandos/transfer_non_fungible_ok.scen.json", &contract_map());
 }
+
+#[test]
+fn batch_transfer_fungible_test() {
+	parse_execute_mandos("mandos/batch_transfer_fungible.scen.json", &contract_map());
+}
+
+#[test]
+fn batch_transfer_non_fungible_test() {
+	parse_execute_mandos("mandos/batch_transfer_non_fungible.scen.json", &contract_map());
+}
+
+#[test]
+fn batch_transfer_both_types_test() {
+	parse_execute_mandos("mandos/batch_transfer_both_types.scen.json", &contract_map());
+}
