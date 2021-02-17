@@ -93,6 +93,8 @@ pub trait Erc1155 {
 			"Id and value lenghts do not match"
 		);
 
+		// storage edits are rolled back in case of SCError, 
+		// so the reverting is handled automatically if one of the transfers fails
 		for i in 0..type_ids.len() {
 			let type_id = &type_ids[i];
 
