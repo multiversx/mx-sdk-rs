@@ -49,3 +49,20 @@ fn create_two_non_fungible_same_creator_test() {
 fn create_one_fungible_one_non_fungible_test() {
 	parse_execute_mandos("mandos/create_one_fungible_one_non_fungible.scen.json", &contract_map());
 }
+
+// transfer tests
+
+#[test]
+fn transfer_fungible_ok_test() {
+	parse_execute_mandos("mandos/transfer_fungible_ok.scen.json", &contract_map());
+}
+
+#[test]
+fn transfer_fungible_not_enough_balance_test() {
+	parse_execute_mandos("mandos/transfer_fungible_not_enough_balance.scen.json", &contract_map());
+}
+
+#[test]
+fn transfer_non_fungible_ok_test() {
+	parse_execute_mandos("mandos/transfer_non_fungible_ok.scen.json", &contract_map());
+}
