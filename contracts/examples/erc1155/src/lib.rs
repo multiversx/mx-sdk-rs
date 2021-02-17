@@ -427,7 +427,7 @@ pub trait Erc1155 {
 			}
 		}
 
-		// emit event, single transfer if len() == 1, batch transfer otherwise
+		// for success => emit event, single transfer if len() == 1, batch transfer otherwise
 
 		self.clear_pending_transfer(&tx_hash);
 	}
