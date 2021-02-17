@@ -106,6 +106,9 @@ pub trait Erc1155 {
 
 				require!(amount > &0, "Must transfer more than 0");
 				require!(amount <= &balance, "Not enough balance for id");
+
+				self.decrease_balance(&from, &type_id, &amount);
+				self.increase_balance(&to, &type_id, &amount);
 			} else {
 				let token_id = &values[i];
 
@@ -113,10 +116,15 @@ pub trait Erc1155 {
 					self.get_token_owner(&type_id, &token_id) == from,
 					"_from_ is not the owner of the token"
 				);
+
+				let amount = BigUint::from(1u32);
+
+				self.decrease_balance(&from, &type_id, &amount);
+				self.increase_balance(&to, &type_id, &amount);
+
+				self.set_token_owner(&type_id, &token_id, &to);
 			}
 		}
-
-		self.perform_batch_transfer(&from, &to, type_ids, values);
 
 		// self.transfer_batch_event(&caller, &from, &to, ids, amounts);
 
@@ -247,33 +255,6 @@ pub trait Erc1155 {
 		false
 	}
 
-	fn perform_batch_transfer(
-		&self,
-		from: &Address,
-		to: &Address,
-		type_ids: &[BigUint],
-		values: &[BigUint],
-	) {
-		for i in 0..type_ids.len() {
-			let type_id = &type_ids[i];
-
-			if self.get_is_fungible(&type_id) == true {
-				let amount = &values[i];
-
-				self.decrease_balance(&from, &type_id, &amount);
-				self.increase_balance(&to, &type_id, &amount);
-			} else {
-				let token_id = &values[i];
-				let amount = BigUint::from(1u32);
-
-				self.decrease_balance(&from, &type_id, &amount);
-				self.increase_balance(&to, &type_id, &amount);
-
-				self.set_token_owner(&type_id, &token_id, &to);
-			}
-		}
-	}
-
 	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
 		type_id > &0 && type_id <= &self.get_last_valid_type_id()
 	}
@@ -347,7 +328,7 @@ pub trait Erc1155 {
 	fn set_token_type_creator(&self, type_id: &BigUint, creator: &Address);
 
 	// token type uri
-	
+
 	#[view(getTokenTypeUri)]
 	#[storage_get("tokenTypeUri")]
 	fn get_token_type_uri(&self, type_id: &BigUint) -> Vec<u8>;
