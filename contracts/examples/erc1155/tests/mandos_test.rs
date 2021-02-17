@@ -81,3 +81,18 @@ fn batch_transfer_non_fungible_test() {
 fn batch_transfer_both_types_test() {
 	parse_execute_mandos("mandos/batch_transfer_both_types.scen.json", &contract_map());
 }
+
+#[test]
+fn mint_fungible_test() {
+	parse_execute_mandos("mandos/mint_fungible.scen.json", &contract_map());
+}
+
+#[test]
+fn mint_non_fungible_test() {
+	parse_execute_mandos("mandos/mint_non_fungible.scen.json", &contract_map());
+}
+
+#[test]
+fn mint_not_creator_test() {
+	parse_execute_mandos("mandos/mint_not_creator.scen.json", &contract_map());
+}
