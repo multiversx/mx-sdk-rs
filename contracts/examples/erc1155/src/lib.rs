@@ -117,9 +117,7 @@ pub trait Erc1155 {
 
 		// storage edits are rolled back in case of SCError,
 		// so the reverting is handled automatically if one of the transfers fails
-		for i in 0..type_ids.len() {
-			let type_id = &type_ids[i];
-
+		for (i, type_id) in type_ids.iter().enumerate() {
 			if self.get_is_fungible(type_id) == true {
 				let amount = &values[i];
 
@@ -132,7 +130,7 @@ pub trait Erc1155 {
 				require!(amount <= &balance, "Not enough balance for id");
 
 				self.decrease_balance(&from, &type_id, &amount);
-				
+
 				if !is_receiver_smart_contract {
 					self.increase_balance(&to, &type_id, &amount);
 				}
@@ -150,8 +148,7 @@ pub trait Erc1155 {
 				if !is_receiver_smart_contract {
 					self.increase_balance(&to, &type_id, &amount);
 					self.set_token_owner(&type_id, &token_id, &to);
-				}
-				else {
+				} else {
 					self.set_token_owner(&type_id, &token_id, &Address::zero());
 				}
 			}
@@ -346,7 +343,7 @@ pub trait Erc1155 {
 		serializer.push_argument_bytes(&value.to_bytes_be());
 		serializer.push_argument_bytes(data);
 
-		self.set_transfer(
+		self.set_pending_transfer(
 			&self.get_tx_hash(),
 			&Transfer {
 				from,
@@ -380,7 +377,7 @@ pub trait Erc1155 {
 		serializer.push_argument_bytes(values_encoded.as_slice());
 		serializer.push_argument_bytes(data);
 
-		self.set_transfer(
+		self.set_pending_transfer(
 			&self.get_tx_hash(),
 			&Transfer {
 				from,
@@ -392,6 +389,47 @@ pub trait Erc1155 {
 
 		self.send()
 			.async_call_raw(&to, &BigUint::zero(), serializer.as_slice());
+	}
+
+	// callbacks
+
+	#[callback_raw]
+	fn callback_raw(&self, result: Vec<Vec<u8>>) {
+		let execution_success = result[0].len() == 0;
+		let is_transfer_accepted = if execution_success {
+			match u32::dep_decode(&mut result[1].as_slice()) {
+				core::result::Result::Ok(return_code) => return_code == ACCEPTED_TRANSFER_ANSWER,
+				core::result::Result::Err(_) => false,
+			}
+		} else {
+			false
+		};
+
+		let tx_hash = self.get_tx_hash();
+		let pending_transfer = self.get_pending_transfer(&tx_hash);
+
+		// in case of success, transfer to the intended address, otherwise, return tokens to original owner
+		let dest_address = if is_transfer_accepted {
+			&pending_transfer.to
+		} else {
+			&pending_transfer.from
+		};
+
+		for (i, type_id) in pending_transfer.type_ids.iter().enumerate() {
+			if self.get_is_fungible(type_id) {
+				let amount = &pending_transfer.values[i];
+				self.increase_balance(&dest_address, &type_id, &amount);
+			} else {
+				let token_id = &pending_transfer.values[i];
+				let amount = BigUint::from(1u32);
+				self.increase_balance(&dest_address, &type_id, &amount);
+				self.set_token_owner(&type_id, token_id, &dest_address);
+			}
+		}
+
+		// emit event, single transfer if len() == 1, batch transfer otherwise
+
+		self.clear_pending_transfer(&tx_hash);
 	}
 
 	// storage
@@ -462,11 +500,14 @@ pub trait Erc1155 {
 
 	// transfer data for callbacks, in case a revert is needed
 
-	#[storage_get("transfer")]
-	fn get_transfer(&self, tx_hash: &H256) -> Transfer<BigUint>;
+	#[storage_get("pendingTransfer")]
+	fn get_pending_transfer(&self, tx_hash: &H256) -> Transfer<BigUint>;
 
-	#[storage_set("transfer")]
-	fn set_transfer(&self, tx_hash: &H256, transfer: &Transfer<BigUint>);
+	#[storage_set("pendingTransfer")]
+	fn set_pending_transfer(&self, tx_hash: &H256, pending_transfer: &Transfer<BigUint>);
+
+	#[storage_clear("pendingTransfer")]
+	fn clear_pending_transfer(&self, tx_hash: &H256);
 
 	// Events
 
