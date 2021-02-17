@@ -1,9 +1,24 @@
 #![no_std]
 
+use elrond_wasm::HexCallDataSerializer;
+
 elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
 
 const INTERFACE_SIGNATURE_ERC165: u32 = 0x01ffc9a7;
 const INTERFACE_SIGNATURE_ERC1155: u32 = 0xd9b67a26;
+
+const ON_ERC_RECEIVED_ENDPOINT_NAME: &[u8] = b"onERC1155Received";
+const ON_ERC_BATCH_RECEIVED_ENDPOINT_NAME: &[u8] = b"onERC1155BatchReceived";
+const ACCEPTED_TRANSFER_ANSWER: u32 = 0xbc197c81;
+
+#[derive(TopEncode, TopDecode)]
+pub struct Transfer<BigUint: BigUintApi> {
+	pub from: Address,
+	pub to: Address,
+	pub type_ids: Vec<BigUint>,
+	pub values: Vec<BigUint>,
+}
 
 #[elrond_wasm_derive::contract(Erc1155Impl)]
 pub trait Erc1155 {
@@ -20,7 +35,7 @@ pub trait Erc1155 {
 		to: Address,
 		type_id: BigUint,
 		value: BigUint,
-		_data: &[u8],
+		data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
 
@@ -42,7 +57,12 @@ pub trait Erc1155 {
 			require!(amount <= &balance, "Not enough balance for id");
 
 			self.decrease_balance(&from, &type_id, &amount);
-			self.increase_balance(&to, &type_id, &amount);
+
+			if self.is_smart_contract_address(&to) {
+				self.peform_async_call_single_transfer(from, to, type_id, value, data);
+			} else {
+				self.increase_balance(&to, &type_id, &amount);
+			}
 		} else {
 			let token_id = &value;
 
@@ -57,16 +77,17 @@ pub trait Erc1155 {
 
 			let amount = BigUint::from(1u32);
 			self.decrease_balance(&from, &type_id, &amount);
-			self.increase_balance(&to, &type_id, &amount);
+			self.set_token_owner(&type_id, token_id, &Address::zero());
 
-			self.set_token_owner(&type_id, token_id, &to);
+			if self.is_smart_contract_address(&to) {
+				self.peform_async_call_single_transfer(from, to, type_id, value, data);
+			} else {
+				self.increase_balance(&to, &type_id, &amount);
+				self.set_token_owner(&type_id, token_id, &to);
+			}
 		}
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
-
-		if self.is_smart_contract_address(&to) {
-			// TODO: async-call
-		}
 
 		Ok(())
 	}
@@ -79,9 +100,10 @@ pub trait Erc1155 {
 		to: Address,
 		type_ids: &[BigUint],
 		values: &[BigUint],
-		_data: &[u8],
+		data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
+		let is_receiver_smart_contract = self.is_smart_contract_address(&to);
 
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
@@ -93,7 +115,7 @@ pub trait Erc1155 {
 			"Id and value lenghts do not match"
 		);
 
-		// storage edits are rolled back in case of SCError, 
+		// storage edits are rolled back in case of SCError,
 		// so the reverting is handled automatically if one of the transfers fails
 		for i in 0..type_ids.len() {
 			let type_id = &type_ids[i];
@@ -110,7 +132,10 @@ pub trait Erc1155 {
 				require!(amount <= &balance, "Not enough balance for id");
 
 				self.decrease_balance(&from, &type_id, &amount);
-				self.increase_balance(&to, &type_id, &amount);
+				
+				if !is_receiver_smart_contract {
+					self.increase_balance(&to, &type_id, &amount);
+				}
 			} else {
 				let token_id = &values[i];
 
@@ -120,19 +145,23 @@ pub trait Erc1155 {
 				);
 
 				let amount = BigUint::from(1u32);
-
 				self.decrease_balance(&from, &type_id, &amount);
-				self.increase_balance(&to, &type_id, &amount);
 
-				self.set_token_owner(&type_id, &token_id, &to);
+				if !is_receiver_smart_contract {
+					self.increase_balance(&to, &type_id, &amount);
+					self.set_token_owner(&type_id, &token_id, &to);
+				}
+				else {
+					self.set_token_owner(&type_id, &token_id, &Address::zero());
+				}
 			}
 		}
 
-		// self.transfer_batch_event(&caller, &from, &to, ids, amounts);
-
-		if self.is_smart_contract_address(&to) {
-			// TODO: async-call
+		if is_receiver_smart_contract {
+			self.peform_async_call_batch_transfer(from, to, type_ids, values, data);
 		}
+
+		// self.transfer_batch_event(&caller, &from, &to, ids, amounts);
 
 		Ok(())
 	}
@@ -298,9 +327,71 @@ pub trait Erc1155 {
 
 		while &token_id <= end {
 			self.set_token_owner(&type_id, &token_id, &owner);
-
 			token_id += &big_uint_one;
 		}
+	}
+
+	fn peform_async_call_single_transfer(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		value: BigUint,
+		data: &[u8],
+	) {
+		let mut serializer = HexCallDataSerializer::new(ON_ERC_RECEIVED_ENDPOINT_NAME);
+		serializer.push_argument_bytes(&self.get_caller().as_bytes());
+		serializer.push_argument_bytes(&from.as_bytes());
+		serializer.push_argument_bytes(&type_id.to_bytes_be());
+		serializer.push_argument_bytes(&value.to_bytes_be());
+		serializer.push_argument_bytes(data);
+
+		self.set_transfer(
+			&self.get_tx_hash(),
+			&Transfer {
+				from,
+				to: to.clone(),
+				type_ids: [type_id].to_vec(),
+				values: [value].to_vec(),
+			},
+		);
+
+		self.send()
+			.async_call_raw(&to, &BigUint::zero(), serializer.as_slice());
+	}
+
+	fn peform_async_call_batch_transfer(
+		&self,
+		from: Address,
+		to: Address,
+		type_ids: &[BigUint],
+		values: &[BigUint],
+		data: &[u8],
+	) {
+		let mut type_ids_encoded = Vec::new();
+		let mut values_encoded = Vec::new();
+		let _ = type_ids.dep_encode(&mut type_ids_encoded);
+		let _ = values.dep_encode(&mut values_encoded);
+
+		let mut serializer = HexCallDataSerializer::new(ON_ERC_BATCH_RECEIVED_ENDPOINT_NAME);
+		serializer.push_argument_bytes(&self.get_caller().as_bytes());
+		serializer.push_argument_bytes(&from.as_bytes());
+		serializer.push_argument_bytes(type_ids_encoded.as_slice());
+		serializer.push_argument_bytes(values_encoded.as_slice());
+		serializer.push_argument_bytes(data);
+
+		self.set_transfer(
+			&self.get_tx_hash(),
+			&Transfer {
+				from,
+				to: to.clone(),
+				type_ids: type_ids.to_vec(),
+				values: values.to_vec(),
+			},
+		);
+
+		self.send()
+			.async_call_raw(&to, &BigUint::zero(), serializer.as_slice());
 	}
 
 	// storage
@@ -368,6 +459,14 @@ pub trait Erc1155 {
 
 	#[storage_set("isApproved")]
 	fn set_is_approved(&self, operator: &Address, owner: &Address, is_approved: bool);
+
+	// transfer data for callbacks, in case a revert is needed
+
+	#[storage_get("transfer")]
+	fn get_transfer(&self, tx_hash: &H256) -> Transfer<BigUint>;
+
+	#[storage_set("transfer")]
+	fn set_transfer(&self, tx_hash: &H256, transfer: &Transfer<BigUint>);
 
 	// Events
 
