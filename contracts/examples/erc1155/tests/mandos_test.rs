@@ -1,6 +1,9 @@
 extern crate erc1155;
 use erc1155::*;
 
+extern crate erc1155_user_mock;
+use erc1155_user_mock::*;
+
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -10,6 +13,11 @@ fn contract_map() -> ContractMap<TxContext> {
 		"file:../output/erc1155.wasm",
 		Box::new(|context| Box::new(Erc1155Impl::new(context))),
 	);
+	contract_map.register_contract(
+		"file:../../erc1155-user-mock/output/erc1155-user-mock.wasm",
+		Box::new(|context| Box::new(Erc1155UserMockImpl::new(context))),
+	);
+
 	contract_map
 }
 
@@ -50,7 +58,7 @@ fn create_one_fungible_one_non_fungible_test() {
 	parse_execute_mandos("mandos/create_one_fungible_one_non_fungible.scen.json", &contract_map());
 }
 
-// transfer tests
+// transfer tests -  to account
 
 #[test]
 fn transfer_fungible_ok_test() {
@@ -82,6 +90,37 @@ fn batch_transfer_both_types_test() {
 	parse_execute_mandos("mandos/batch_transfer_both_types.scen.json", &contract_map());
 }
 
+// transfer tests -  to smart contract
+// TODO: Fix batch 
+// TODO: Uncomment once IsSmartContractAddress is added to framework
+
+ #[test]
+fn transfer_fungible_ok_to_sc_test() {
+	parse_execute_mandos("mandos/transfer_fungible_ok_to_sc.scen.json", &contract_map());
+}
+/* 
+#[test]
+fn transfer_non_fungible_ok_to_sc_test() {
+	parse_execute_mandos("mandos/transfer_non_fungible_ok_to_sc.scen.json", &contract_map());
+}
+
+#[test]
+fn batch_transfer_fungible_to_sc_test() {
+	parse_execute_mandos("mandos/batch_transfer_fungible_to_sc.scen.json", &contract_map());
+}
+*/
+#[test]
+fn batch_transfer_non_fungible_to_sc_test() {
+	parse_execute_mandos("mandos/batch_transfer_non_fungible_to_sc.scen.json", &contract_map());
+}
+/*
+#[test]
+fn batch_transfer_both_types_to_sc_test() {
+	parse_execute_mandos("mandos/batch_transfer_both_types_to_sc.scen.json", &contract_map());
+}*/
+
+// mint tests
+
 #[test]
 fn mint_fungible_test() {
 	parse_execute_mandos("mandos/mint_fungible.scen.json", &contract_map());
@@ -96,6 +135,8 @@ fn mint_non_fungible_test() {
 fn mint_not_creator_test() {
 	parse_execute_mandos("mandos/mint_not_creator.scen.json", &contract_map());
 }
+
+// burn tests
 
 #[test]
 fn burn_fungible_test() {

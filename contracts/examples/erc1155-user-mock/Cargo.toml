@@ -1,5 +1,5 @@
 [package]
-name = "erc1155"
+name = "erc1155-user-mock"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
 edition = "2018"
@@ -10,9 +10,6 @@ path = "src/lib.rs"
 
 [features]
 wasm-output-mode = ["elrond-wasm-node"]
-
-[dependencies.erc1155-user-mock]
-path="../erc1155-user-mock"
 
 [dependencies.elrond-wasm]
 version = "0.11.0"

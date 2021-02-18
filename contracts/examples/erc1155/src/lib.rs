@@ -280,7 +280,7 @@ pub trait Erc1155 {
 
 	// mock
 	fn is_smart_contract_address(&self, _address: &Address) -> bool {
-		false
+		true
 	}
 
 	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
