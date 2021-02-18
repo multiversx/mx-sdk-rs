@@ -10,17 +10,14 @@ pub trait Vault {
 	fn init(&self) {}
 
 	#[endpoint]
-	fn echo_arguments(
-		&self,
-		#[var_args] args: VarArgs<BoxedBytes>,
-	) -> MultiResultVec<BoxedBytes> {
+	fn echo_arguments(&self, #[var_args] args: VarArgs<BoxedBytes>) -> MultiResultVec<BoxedBytes> {
 		args.into_vec().into()
 	}
 
 	#[payable("*")]
 	#[endpoint]
 	fn accept_funds(&self) {}
-	
+
 	#[payable("*")]
 	#[endpoint]
 	fn reject_funds(&self) -> SCResult<()> {
@@ -28,11 +25,17 @@ pub trait Vault {
 	}
 
 	#[endpoint]
-	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint, #[var_args] return_message: OptionalArg<BoxedBytes>) {
+	fn retrieve_funds(
+		&self,
+		token: TokenIdentifier,
+		amount: BigUint,
+		#[var_args] return_message: OptionalArg<BoxedBytes>,
+	) {
 		let data = match &return_message {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send().direct_via_async_call(&self.get_caller(), &token, &amount, data);
+		self.send()
+			.direct_via_async_call(&self.get_caller(), &token, &amount, data);
 	}
 }

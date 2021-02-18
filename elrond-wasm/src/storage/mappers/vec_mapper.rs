@@ -121,7 +121,8 @@ where
 	/// Can easily consume a lot of gas.
 	pub fn clear(&mut self) {
 		for i in 1..=self.count {
-			self.api.storage_store_slice_u8(self.get_key(i).as_slice(), &[]);
+			self.api
+				.storage_store_slice_u8(self.get_key(i).as_slice(), &[]);
 		}
 		self.count = 0;
 		self.save_count();

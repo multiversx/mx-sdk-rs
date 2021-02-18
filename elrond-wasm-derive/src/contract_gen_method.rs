@@ -503,24 +503,22 @@ impl Method {
 		let arg_init_snippets: Vec<proc_macro2::TokenStream> = self
 			.method_args
 			.iter()
-			.map(|arg| {
-				match &arg.metadata {
-					ArgMetadata::Single => {
-						arg_index += 1;
-						let pat = &arg.pat;
-						let arg_get = generate_load_single_arg(arg, &quote! { #arg_index });
-						quote! {
-							let #pat = #arg_get;
-						}
-					},
-					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-					ArgMetadata::VarArgs => {
-						panic!("var_args not accepted in function generate_call_method_fixed_args")
-					},
-					ArgMetadata::AsyncCallResultArg => {
-						panic!("async call result arg not allowed here")
-					},
-				}
+			.map(|arg| match &arg.metadata {
+				ArgMetadata::Single => {
+					arg_index += 1;
+					let pat = &arg.pat;
+					let arg_get = generate_load_single_arg(arg, &quote! { #arg_index });
+					quote! {
+						let #pat = #arg_get;
+					}
+				},
+				ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
+				ArgMetadata::VarArgs => {
+					panic!("var_args not accepted in function generate_call_method_fixed_args")
+				},
+				ArgMetadata::AsyncCallResultArg => {
+					panic!("async call result arg not allowed here")
+				},
 			})
 			.collect();
 
