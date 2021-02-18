@@ -91,18 +91,18 @@ fn batch_transfer_both_types_test() {
 }
 
 // transfer tests -  to smart contract
-// TODO: Fix batch 
 // TODO: Uncomment once IsSmartContractAddress is added to framework
 
-#[test]
+/*#[test]
 fn transfer_fungible_ok_to_sc_test() {
 	parse_execute_mandos("mandos/transfer_fungible_ok_to_sc.scen.json", &contract_map());
 }
-/* 
+
 #[test]
 fn transfer_non_fungible_ok_to_sc_test() {
 	parse_execute_mandos("mandos/transfer_non_fungible_ok_to_sc.scen.json", &contract_map());
 }
+
 
 #[test]
 fn batch_transfer_fungible_to_sc_test() {
@@ -117,8 +117,8 @@ fn batch_transfer_non_fungible_to_sc_test() {
 #[test]
 fn batch_transfer_both_types_to_sc_test() {
 	parse_execute_mandos("mandos/batch_transfer_both_types_to_sc.scen.json", &contract_map());
-}*/
-
+}
+*/
 // mint tests
 
 #[test]

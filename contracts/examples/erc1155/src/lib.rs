@@ -1,5 +1,6 @@
 #![no_std]
 
+use elrond_codec::test_util::top_encode_to_vec_or_panic;
 use elrond_wasm::HexCallDataSerializer;
 
 elrond_wasm::imports!();
@@ -381,10 +382,8 @@ pub trait Erc1155 {
 		values: &[BigUint],
 		data: &[u8],
 	) {
-		let mut type_ids_encoded = Vec::new();
-		let mut values_encoded = Vec::new();
-		let _ = type_ids.dep_encode(&mut type_ids_encoded);
-		let _ = values.dep_encode(&mut values_encoded);
+		let type_ids_encoded = top_encode_to_vec_or_panic(&type_ids);
+		let values_encoded = top_encode_to_vec_or_panic(&values);
 
 		let mut serializer = HexCallDataSerializer::new(ON_ERC_BATCH_RECEIVED_ENDPOINT_NAME);
 		serializer.push_argument_bytes(&self.get_caller().as_bytes());
