@@ -5,15 +5,6 @@ use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
-pub trait CallbackContainer<BigUint>
-where
-	BigUint: BigUintApi + 'static,
-{
-	type SendApi: SendApi<BigUint> + Clone + 'static;
-
-	fn send_api(&self) -> Self::SendApi;
-}
-
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi<BigUint>: ErrorApi + Sized
 where
