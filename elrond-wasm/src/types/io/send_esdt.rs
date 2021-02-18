@@ -1,7 +1,7 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
-use crate::types::{Address, BoxedBytes};
 use crate::io::EndpointResult;
+use crate::types::{Address, BoxedBytes};
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -19,7 +19,12 @@ where
 {
 	#[inline]
 	fn finish(&self, api: FA) {
-		api.direct_esdt_via_async_call(&self.to, &self.token_name.as_slice(), &self.amount, self.data.as_slice());
+		api.direct_esdt_via_async_call(
+			&self.to,
+			&self.token_name.as_slice(),
+			&self.amount,
+			self.data.as_slice(),
+		);
 	}
 }
 
