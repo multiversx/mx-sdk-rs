@@ -48,12 +48,8 @@ pub trait Erc1155 {
 
 		if self.get_is_fungible(&type_id) == true {
 			let amount = &value;
-			let balance = self.balance_of(&from, &type_id);
 
-			require!(amount > &0, "Must transfer more than 0");
-			require!(amount <= &balance, "Not enough balance for id");
-
-			self.decrease_balance(&from, &type_id, &amount);
+			sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
 
 			if self.is_smart_contract_address(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
@@ -63,22 +59,12 @@ pub trait Erc1155 {
 		} else {
 			let token_id = &value;
 
-			require!(
-				self.is_valid_token_id(&type_id, &token_id),
-				"Token type-id pair is not valid"
-			);
-			require!(
-				self.get_token_owner(&type_id, &token_id) == from,
-				"_from_ is not the owner of the token"
-			);
-
-			let amount = BigUint::from(1u32);
-			self.decrease_balance(&from, &type_id, &amount);
-			self.set_token_owner(&type_id, token_id, &Address::zero());
+			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &token_id));
 
 			if self.is_smart_contract_address(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
 			} else {
+				let amount = BigUint::from(1u32);
 				self.increase_balance(&to, &type_id, &amount);
 				self.set_token_owner(&type_id, token_id, &to);
 			}
@@ -117,12 +103,8 @@ pub trait Erc1155 {
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.get_is_fungible(type_id) == true {
 				let amount = value;
-				let balance = self.balance_of(&from, &type_id);
 
-				require!(amount > &0, "Must transfer more than 0");
-				require!(amount <= &balance, "Not enough balance for id");
-
-				self.decrease_balance(&from, &type_id, &amount);
+				sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
 
 				if !is_receiver_smart_contract {
 					self.increase_balance(&to, &type_id, &amount);
@@ -130,15 +112,10 @@ pub trait Erc1155 {
 			} else {
 				let token_id = value;
 
-				require!(
-					self.get_token_owner(&type_id, &token_id) == from,
-					"_from_ is not the owner of the token"
-				);
-
-				let amount = BigUint::from(1u32);
-				self.decrease_balance(&from, &type_id, &amount);
+				sc_try!(self.try_reserve_non_fungible(&from, &type_id, &token_id));
 
 				if !is_receiver_smart_contract {
+					let amount = BigUint::from(1u32);
 					self.increase_balance(&to, &type_id, &amount);
 					self.set_token_owner(&type_id, &token_id, &to);
 				} else {
@@ -310,6 +287,44 @@ pub trait Erc1155 {
 	fn set_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
 		let mut balance_mapper = self.get_balance_mapper(owner);
 		balance_mapper.insert(type_id.clone(), amount.clone());
+	}
+
+	fn try_reserve_fungible(
+		&self,
+		owner: &Address,
+		type_id: &BigUint,
+		amount: &BigUint,
+	) -> SCResult<()> {
+		let balance = self.balance_of(&owner, &type_id);
+
+		require!(amount > &0, "Must transfer more than 0");
+		require!(amount <= &balance, "Not enough balance for id");
+
+		self.decrease_balance(&owner, &type_id, &amount);
+
+		Ok(())
+	}
+
+	fn try_reserve_non_fungible(
+		&self,
+		owner: &Address,
+		type_id: &BigUint,
+		token_id: &BigUint,
+	) -> SCResult<()> {
+		require!(
+			self.is_valid_token_id(&type_id, &token_id),
+			"Token type-id pair is not valid"
+		);
+		require!(
+			&self.get_token_owner(&type_id, &token_id) == owner,
+			"_from_ is not the owner of the token"
+		);
+
+		let amount = BigUint::from(1u32);
+		self.decrease_balance(&owner, &type_id, &amount);
+		self.set_token_owner(&type_id, token_id, &Address::zero());
+
+		Ok(())
 	}
 
 	/// Range is inclusive for both `start` and `end`
