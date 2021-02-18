@@ -40,8 +40,6 @@ pub fn contract_implementation(
 
 		#(#auto_impl_defs)*
 
-		fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
-
 		fn callback(&self);
 
 		fn callbacks(&self) -> CallbackProxies<T, BigInt, BigUint>;
@@ -75,11 +73,6 @@ pub fn contract_implementation(
 	  #api_where
 	  {
 		#(#auto_impls)*
-
-		fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
-		  let contract_proxy = OtherContractHandle::new(self.api.clone(), address);
-		  Box::new(contract_proxy)
-		}
 
 		fn callback(&self) {
 		  #callback_body
