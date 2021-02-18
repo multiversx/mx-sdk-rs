@@ -141,7 +141,7 @@ impl Callable {
 				let m_name_literal = ident_str_literal(&m.name);
 				let sig = quote! {
 					#msig {
-						let mut async_call = AsyncCall::<BigUint>::new(
+						let mut async_call = elrond_wasm::types::ContractCall::<BigUint>::new(
 							self.address,
 							#token_expr,
 							#payment_expr,

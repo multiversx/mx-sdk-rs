@@ -11,10 +11,10 @@ static HARDCODED_ADDRESS: [u8; 32] =
 #[elrond_wasm_derive::callable(PayMeProxy)]
 pub trait PayMe {
 	#[payable("EGLD")]
-	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> AsyncCall<BigUint>;
+	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> ContractCall<BigUint>;
 
 	#[payable("EGLD")]
-	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64) -> AsyncCall<BigUint>;
+	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64) -> ContractCall<BigUint>;
 }
 
 #[elrond_wasm_derive::callable(MessageMeProxy)]
@@ -25,7 +25,7 @@ pub trait MessageMe {
 		arg2: &BigUint,
 		arg3: Vec<u8>,
 		arg4: &Address,
-	) -> AsyncCall<BigUint>;
+	) -> ContractCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(AliceImpl)]
@@ -48,7 +48,9 @@ pub trait Alice {
 	#[endpoint]
 	fn forwardToOtherContract(&self, #[payment] payment: BigUint) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
-		contract_call!(self, other_contract, PayMeProxy).payMe(payment, 0x56)
+		contract_call!(self, other_contract, PayMeProxy)
+			.payMe(payment, 0x56)
+			.async_call()
 	}
 
 	#[payable("EGLD")]
@@ -61,6 +63,7 @@ pub trait Alice {
 
 		contract_call!(self, other_contract, PayMeProxy)
 			.payMeWithResult(payment, 0x56)
+			.async_call()
 			.with_callback(self.callbacks().payCallback())
 	}
 
@@ -68,12 +71,14 @@ pub trait Alice {
 	fn messageOtherContract(&self) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
 
-		contract_call!(self, other_contract, MessageMeProxy).messageMe(
-			0x01,
-			&BigUint::from(0x02u64),
-			[3u8; 3].to_vec(),
-			&HARDCODED_ADDRESS.into(),
-		)
+		contract_call!(self, other_contract, MessageMeProxy)
+			.messageMe(
+				0x01,
+				&BigUint::from(0x02u64),
+				[3u8; 3].to_vec(),
+				&HARDCODED_ADDRESS.into(),
+			)
+			.async_call()
 	}
 
 	#[endpoint]
@@ -87,6 +92,7 @@ pub trait Alice {
 				[3u8; 3].to_vec(),
 				&HARDCODED_ADDRESS.into(),
 			)
+			.async_call()
 			.with_callback(self.callbacks().message_callback())
 	}
 

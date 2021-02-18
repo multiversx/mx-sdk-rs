@@ -20,9 +20,9 @@ pub trait Erc20 {
 		sender: &Address,
 		recipient: &Address,
 		amount: &BigUint,
-	) -> AsyncCall<BigUint>;
+	) -> ContractCall<BigUint>;
 
-	fn transfer(&self, to: &Address, amount: &BigUint) -> AsyncCall<BigUint>;
+	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
@@ -49,6 +49,7 @@ pub trait Crowdfunding {
 
 		Ok(contract_call!(self, erc20_address, Erc20Proxy)
 			.transferFrom(&caller, &cf_contract_address, &token_amount)
+			.async_call()
 			.with_callback(
 				self.callbacks()
 					.transfer_from_callback(&caller, &token_amount),
@@ -81,7 +82,9 @@ pub trait Crowdfunding {
 
 				let erc20_address = self.get_erc20_contract_address();
 				Ok(OptionalResult::Some(
-					contract_call!(self, erc20_address, Erc20Proxy).transfer(&caller, &balance),
+					contract_call!(self, erc20_address, Erc20Proxy)
+						.transfer(&caller, &balance)
+						.async_call(),
 				))
 			},
 			Status::Failed => {
@@ -93,7 +96,9 @@ pub trait Crowdfunding {
 
 					let erc20_address = self.get_erc20_contract_address();
 					Ok(OptionalResult::Some(
-						contract_call!(self, erc20_address, Erc20Proxy).transfer(&caller, &deposit),
+						contract_call!(self, erc20_address, Erc20Proxy)
+							.transfer(&caller, &deposit)
+							.async_call(),
 					))
 				} else {
 					Ok(OptionalResult::None)
@@ -116,7 +121,8 @@ pub trait Crowdfunding {
 					let erc20_address = self.get_erc20_contract_address();
 					return OptionalResult::Some(
 						contract_call!(self, erc20_address, Erc20Proxy)
-							.transfer(&cb_sender, cb_amount),
+							.transfer(&cb_sender, cb_amount)
+							.async_call(),
 					);
 				}
 

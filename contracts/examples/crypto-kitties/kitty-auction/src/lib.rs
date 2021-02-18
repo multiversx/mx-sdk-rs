@@ -8,18 +8,18 @@ use auction::*;
 
 #[elrond_wasm_derive::callable(KittyOwnershipProxy)]
 pub trait KittyOwnership {
-	fn allowAuctioning(&self, by: Address, kitty_id: u32) -> AsyncCall<BigUint>;
+	fn allowAuctioning(&self, by: Address, kitty_id: u32) -> ContractCall<BigUint>;
 
-	fn transfer(&self, to: Address, kitty_id: u32) -> AsyncCall<BigUint>;
+	fn transfer(&self, to: Address, kitty_id: u32) -> ContractCall<BigUint>;
 
 	fn approveSiringAndReturnKitty(
 		&self,
 		approved_address: Address,
 		kitty_owner: Address,
 		kitty_id: u32,
-	) -> AsyncCall<BigUint>;
+	) -> ContractCall<BigUint>;
 
-	fn createGenZeroKitty(&self) -> AsyncCall<BigUint>;
+	fn createGenZeroKitty(&self) -> ContractCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(KittyAuctionImpl)]
@@ -63,6 +63,7 @@ pub trait KittyAuction {
 			Ok(
 				contract_call!(self, kitty_ownership_contract_address, KittyOwnershipProxy)
 					.createGenZeroKitty()
+					.async_call()
 					.with_callback(self.callbacks().create_gen_zero_kitty_callback()),
 			)
 		} else {
@@ -269,6 +270,7 @@ pub trait KittyAuction {
 			OptionalResult::Some(
 				contract_call!(self, kitty_ownership_contract_address, KittyOwnershipProxy)
 					.allowAuctioning(caller.clone(), kitty_id)
+					.async_call()
 					.with_callback(self.callbacks().allow_auctioning_callback(
 						auction_type,
 						kitty_id,
@@ -307,6 +309,7 @@ pub trait KittyAuction {
 			OptionalResult::Some(
 				contract_call!(self, kitty_ownership_contract_address, KittyOwnershipProxy)
 					.transfer(address, kitty_id)
+					.async_call()
 					.with_callback(self.callbacks().transfer_callback(kitty_id)),
 			)
 		} else {
@@ -327,6 +330,7 @@ pub trait KittyAuction {
 				contract_call!(self, kitty_ownership_contract_address, KittyOwnershipProxy)
 					.approveSiringAndReturnKitty(approved_address, kitty_owner, kitty_id)
 					// not a mistake, same callback for transfer and approveSiringAndReturnKitty
+					.async_call()
 					.with_callback(self.callbacks().transfer_callback(kitty_id)),
 			)
 		} else {
