@@ -509,12 +509,14 @@ pub trait Multisig {
 				function,
 				arguments,
 			} => {
-				let mut async_call_raw =
-					AsyncCall::new(to, TokenIdentifier::egld(), amount, function.as_slice());
+				let mut contract_call_raw =
+					ContractCall::new(to, TokenIdentifier::egld(), amount, function.as_slice());
 				for arg in arguments {
-					async_call_raw.push_argument_raw_bytes(arg.as_slice());
+					contract_call_raw.push_argument_raw_bytes(arg.as_slice());
 				}
-				Ok(PerformActionResult::AsyncCall(async_call_raw))
+				Ok(PerformActionResult::AsyncCall(
+					contract_call_raw.async_call(),
+				))
 			},
 		}
 	}

@@ -22,9 +22,9 @@ pub trait Erc20 {
 		sender: &Address,
 		recipient: &Address,
 		amount: &BigUint,
-	) -> AsyncCall<BigUint>;
+	) -> ContractCall<BigUint>;
 
-	fn transfer(&self, to: &Address, amount: &BigUint) -> AsyncCall<BigUint>;
+	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
@@ -236,6 +236,7 @@ pub trait Lottery {
 		let lottery_contract_address = self.get_sc_address();
 		Ok(contract_call!(self, erc20_address, Erc20Proxy)
 			.transferFrom(&caller, &lottery_contract_address, token_amount)
+			.async_call()
 			.with_callback(
 				self.callbacks()
 					.transfer_from_callback(lottery_name, &caller),
@@ -307,6 +308,7 @@ pub trait Lottery {
 		OptionalResult::Some(
 			contract_call!(self, erc20_address, Erc20Proxy)
 				.transfer(&winner_address, &prize)
+				.async_call()
 				.with_callback(self.callbacks().distribute_prizes_callback(lottery_name)),
 		)
 	}
