@@ -27,8 +27,8 @@ pub trait Erc1155UserMock {
 		&self,
 		_operator: Address,
 		_from: Address,
-		_type_ids: &[BigUint],
-		_values: &[BigUint],
+		_type_ids: Vec<BigUint>,
+		_values: Vec<BigUint>,
 		_data: &[u8],
 	) -> SCResult<u32> {
 

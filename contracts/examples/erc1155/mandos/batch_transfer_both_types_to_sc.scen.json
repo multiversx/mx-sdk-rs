@@ -56,6 +56,12 @@
                     "balance": "0",
                     "storage": {}
                 },
+                "address:user_mock_sc": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../erc1155-user-mock/output/erc1155-user-mock.wasm"
+                },
                 "address:contract_address": {
                     "nonce": "0",
                     "balance": "0",
