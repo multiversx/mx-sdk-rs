@@ -41,7 +41,7 @@ pub fn process_callable(
 			_phantom2: core::marker::PhantomData<BigUint>,
 		}
 
-		impl<SA, BigInt, BigUint> elrond_wasm::proxy::ContractProxy<SA, BigInt, BigUint> for #callable_impl_name<SA, BigInt, BigUint>
+		impl<SA, BigInt, BigUint> elrond_wasm::types::ContractProxy<SA, BigInt, BigUint> for #callable_impl_name<SA, BigInt, BigUint>
 		where
 			BigUint: BigUintApi + 'static,
 			BigInt: BigIntApi<BigUint> + 'static,

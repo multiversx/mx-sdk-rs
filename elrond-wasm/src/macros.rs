@@ -20,7 +20,6 @@ macro_rules! imports {
 		use elrond_wasm::err_msg;
 		use elrond_wasm::io::*;
 		use elrond_wasm::non_zero_util::*;
-		use elrond_wasm::proxy::ContractProxy;
 		use elrond_wasm::storage::mappers::*;
 		use elrond_wasm::types::*;
 		use elrond_wasm::AsyncCallError;
