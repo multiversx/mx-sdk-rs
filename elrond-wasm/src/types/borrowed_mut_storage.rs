@@ -27,7 +27,7 @@ impl BorrowedMutStorageKey {
 /// because only in such way can it be changed.
 pub struct BorrowedMutStorage<A, T>
 where
-	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
+	A: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	api: A,
@@ -38,7 +38,7 @@ where
 
 impl<A, T> BorrowedMutStorage<A, T>
 where
-	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
+	A: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	pub fn with_const_key(api: A, key: &'static [u8]) -> Self {
@@ -64,7 +64,7 @@ where
 
 impl<A, T> Drop for BorrowedMutStorage<A, T>
 where
-	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
+	A: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	fn drop(&mut self) {
@@ -76,7 +76,7 @@ where
 
 impl<A, T> Deref for BorrowedMutStorage<A, T>
 where
-	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
+	A: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	type Target = T;
@@ -88,7 +88,7 @@ where
 
 impl<A, T> DerefMut for BorrowedMutStorage<A, T>
 where
-	A: StorageReadApi + StorageWriteApi + EndpointFinishApi + ErrorApi + Clone + 'static,
+	A: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
 	fn deref_mut(&mut self) -> &mut Self::Target {

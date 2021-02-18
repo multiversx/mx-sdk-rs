@@ -299,6 +299,14 @@ fn storage_mapper_single_value() {
 }
 
 #[test]
+fn storage_mapper_getter_setter() {
+	parse_execute_mandos(
+		"mandos/storage_mapper_getter_setter.scen.json",
+		&contract_map(),
+	);
+}
+
+#[test]
 fn storage_mapper_linked_list() {
 	parse_execute_mandos(
 		"mandos/storage_mapper_linked_list.scen.json",

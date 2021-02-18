@@ -421,6 +421,8 @@ pub trait BasicFeatures {
 
 	// STORAGE MAPPERS
 
+	// SingleValueMapper
+
 	#[view]
 	#[storage_mapper("my_single_value_mapper")]
 	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
@@ -430,6 +432,25 @@ pub trait BasicFeatures {
 		let mut my_single_value_mapper = self.map_my_single_value_mapper();
 		my_single_value_mapper.value += amount;
 		my_single_value_mapper.save();
+	}
+
+	// GetterSetterMapper
+
+	#[view]
+	#[storage_mapper("my_getter_setter_mapper")]
+	fn my_getter_setter_mapper(&self) -> GetterSetterMapper<Self::Storage, BigInt>;
+
+	#[endpoint]
+	fn my_getter_setter_mapper_increment(&self, amount: &BigInt) {
+		let mapped_value = self.my_getter_setter_mapper();
+		self.my_getter_setter_mapper()
+			.set(&mapped_value.get() + amount);
+	}
+
+	#[endpoint]
+	fn my_getter_setter_mapper_increment_with_mutable(&self, amount: &BigInt) {
+		let mut mapped_value_mutable = self.my_getter_setter_mapper().get_mut();
+		*mapped_value_mutable += amount;
 	}
 
 	// VecMapper
