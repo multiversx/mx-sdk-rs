@@ -124,7 +124,9 @@ impl Callable {
 
 								quote! {}
 							},
-							ArgMetadata::AsyncCallResultArg => panic!("async call result arg not allowed in call proxy"),
+							ArgMetadata::AsyncCallResultArg => {
+								panic!("async call result arg not allowed in call proxy")
+							},
 						}
 					})
 					.collect();

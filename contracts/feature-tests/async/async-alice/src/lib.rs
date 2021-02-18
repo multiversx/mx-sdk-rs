@@ -14,7 +14,6 @@ pub trait PayMe {
 	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> AsyncCall<BigUint>;
 
 	#[payable("EGLD")]
-	#[callback(payCallback)]
 	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64) -> AsyncCall<BigUint>;
 }
 
@@ -49,11 +48,7 @@ pub trait Alice {
 	#[endpoint]
 	fn forwardToOtherContract(&self, #[payment] payment: BigUint) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
-
-		// let target_contract = contract_proxy!(self, &other_contract, PayMe);
-		// target_contract.payMe(payment, 0x56);
-		contract_call!(self, other_contract, PayMeProxy)
-			.payMe(payment, 0x56)
+		contract_call!(self, other_contract, PayMeProxy).payMe(payment, 0x56)
 	}
 
 	#[payable("EGLD")]
@@ -73,7 +68,6 @@ pub trait Alice {
 	fn messageOtherContract(&self) -> AsyncCall<BigUint> {
 		let other_contract = self.get_other_contract();
 
-		// let target_contract = contract_proxy!(self, &other_contract, MessageMe);
 		contract_call!(self, other_contract, MessageMeProxy).messageMe(
 			0x01,
 			&BigUint::from(0x02u64),

@@ -20,12 +20,12 @@ macro_rules! imports {
 		use elrond_wasm::err_msg;
 		use elrond_wasm::io::*;
 		use elrond_wasm::non_zero_util::*;
+		use elrond_wasm::proxy::ContractProxy;
 		use elrond_wasm::storage::mappers::*;
 		use elrond_wasm::types::*;
 		use elrond_wasm::{AsyncCallError, OtherContractHandle};
 		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, VarArgs, Vec};
 		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
-		use elrond_wasm::proxy::ContractProxy;
 	};
 }
 
@@ -57,8 +57,8 @@ macro_rules! sc_try {
 			elrond_wasm::SCResult::Ok(t) => t,
 			elrond_wasm::SCResult::Err(e) => {
 				return elrond_wasm::SCResult::Err(e);
-				},
-			}
+			},
+		}
 	};
 }
 
@@ -84,7 +84,7 @@ macro_rules! require {
 	($expression:expr, $error_msg:expr) => {
 		if (!($expression)) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -110,7 +110,7 @@ macro_rules! only_owner {
 	($trait_self: expr, $error_msg:expr) => {
 		if ($trait_self.get_caller() != $trait_self.get_owner_address()) {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }
 
@@ -127,9 +127,9 @@ macro_rules! mut_storage (
 macro_rules! non_zero_usize {
 	($input: expr, $error_msg:expr) => {
 		if let Some(nz) = NonZeroUsize::new($input) {
-				nz
+			nz
 		} else {
 			return sc_error!($error_msg);
-			}
+		}
 	};
 }

@@ -127,7 +127,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 					.method_args
 					.iter()
 					.map(|arg| {
-						let arg_accumulator = quote! { closure_data };
+						let arg_accumulator = quote! { &mut closure_data };
 
 						match &arg.metadata {
 							ArgMetadata::Single | ArgMetadata::VarArgs => {
