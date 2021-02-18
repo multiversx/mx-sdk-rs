@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(non_snake_case)]
 
 elrond_wasm::imports!();
 
@@ -7,11 +8,7 @@ use random::*;
 
 #[elrond_wasm_derive::callable(GeneScienceProxy)]
 pub trait GeneScience {
-	#[rustfmt::skip]
-	#[callback(generate_kitty_genes_callback)]
-	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty,
-		#[callback_arg] matron_id: u32,
-		#[callback_arg] original_caller: Address);
+	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty) -> AsyncCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]
@@ -348,7 +345,7 @@ pub trait KittyOwnership {
 	}
 
 	#[endpoint(giveBirth)]
-	fn give_birth(&self, matron_id: u32) -> SCResult<()> {
+	fn give_birth(&self, matron_id: u32) -> SCResult<AsyncCall<BigUint>> {
 		require!(self._is_valid_id(matron_id), "Invalid kitty id!");
 
 		let matron = self.get_kitty_by_id(matron_id);
@@ -363,13 +360,17 @@ pub trait KittyOwnership {
 
 		let gene_science_contract_address = self._get_gene_science_contract_address_or_default();
 		if gene_science_contract_address != Address::zero() {
-			let proxy = contract_proxy!(self, &gene_science_contract_address, GeneScience);
-			proxy.generateKittyGenes(matron, sire, matron_id, self.get_caller());
+			Ok(
+				contract_call!(self, gene_science_contract_address, GeneScienceProxy)
+					.generateKittyGenes(matron, sire)
+					.with_callback(
+						self.callbacks()
+							.generate_kitty_genes_callback(matron_id, self.get_caller()),
+					),
+			)
 		} else {
-			return sc_error!("Gene science contract address not set!");
+			sc_error!("Gene science contract address not set!")
 		}
-
-		Ok(())
 	}
 
 	// private
@@ -559,9 +560,9 @@ pub trait KittyOwnership {
 	#[callback]
 	fn generate_kitty_genes_callback(
 		&self,
-		result: AsyncCallResult<KittyGenes>,
-		#[callback_arg] matron_id: u32,
-		#[callback_arg] original_caller: Address,
+		#[call_result] result: AsyncCallResult<KittyGenes>,
+		matron_id: u32,
+		original_caller: Address,
 	) {
 		match result {
 			AsyncCallResult::Ok(genes) => {

@@ -1,4 +1,3 @@
-use crate::{CallbackCall, api::{BigUintApi, ErrorApi, SendApi, ESDT_TRANSFER_STRING}};
 use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::AsyncCallArg;
 use crate::io::EndpointResult;
@@ -7,9 +6,13 @@ use crate::{
 	abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
 	TokenIdentifier,
 };
+use crate::{
+	api::{BigUintApi, ErrorApi, SendApi, ESDT_TRANSFER_STRING},
+	CallbackCall,
+};
 use alloc::string::String;
 use alloc::vec::Vec;
-
+#[must_use]
 pub struct AsyncCall<BigUint: BigUintApi> {
 	to: Address,
 	egld_payment: BigUint,
@@ -18,11 +21,7 @@ pub struct AsyncCall<BigUint: BigUintApi> {
 }
 
 impl<BigUint: BigUintApi> AsyncCall<BigUint> {
-	pub fn new_egld(
-		to: Address,
-		egld_payment: BigUint,
-		endpoint_name: &[u8],
-	) -> Self {
+	pub fn new_egld(to: Address, egld_payment: BigUint, endpoint_name: &[u8]) -> Self {
 		AsyncCall {
 			to,
 			egld_payment,

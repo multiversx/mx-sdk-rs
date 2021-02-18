@@ -1,7 +1,7 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
-use crate::types::{Address, BoxedBytes, TokenIdentifier};
 use crate::io::EndpointResult;
+use crate::types::{Address, BoxedBytes, TokenIdentifier};
 use alloc::string::String;
 use alloc::vec::Vec;
 

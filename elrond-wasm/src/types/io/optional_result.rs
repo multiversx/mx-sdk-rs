@@ -2,6 +2,7 @@ use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::{api::EndpointFinishApi, EndpointResult};
 use alloc::string::String;
 
+#[must_use]
 pub enum OptionalResult<T> {
 	Some(T),
 	None,
