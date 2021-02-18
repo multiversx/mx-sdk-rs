@@ -40,7 +40,7 @@ pub trait Erc1155 {
 		let caller = self.get_caller();
 
 		require!(to != Address::zero(), "Can't transfer to address zero");
-		require!(self.is_valid_type_id(&type_id), "Toke id is invalid");
+		require!(self.is_valid_type_id(&type_id), "Token id is invalid");
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
 			"Caller is not approved to transfer tokens from address"
@@ -48,12 +48,9 @@ pub trait Erc1155 {
 
 		if self.get_is_fungible(&type_id) == true {
 			let amount = &value;
+			let balance = self.balance_of(&from, &type_id);
 
 			require!(amount > &0, "Must transfer more than 0");
-			let balance = match self.get_balance_mapper(&from).get(&type_id) {
-				Some(b) => b,
-				None => return sc_error!("Address has no tokens of that type"),
-			};
 			require!(amount <= &balance, "Not enough balance for id");
 
 			self.decrease_balance(&from, &type_id, &amount);
@@ -117,14 +114,10 @@ pub trait Erc1155 {
 
 		// storage edits are rolled back in case of SCError,
 		// so the reverting is handled automatically if one of the transfers fails
-		for (i, type_id) in type_ids.iter().enumerate() {
+		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.get_is_fungible(type_id) == true {
-				let amount = &values[i];
-
-				let balance = match self.get_balance_mapper(&from).get(type_id) {
-					Some(b) => b,
-					None => return sc_error!("Address has no tokens of that type"),
-				};
+				let amount = value;
+				let balance = self.balance_of(&from, &type_id);
 
 				require!(amount > &0, "Must transfer more than 0");
 				require!(amount <= &balance, "Not enough balance for id");
@@ -135,7 +128,7 @@ pub trait Erc1155 {
 					self.increase_balance(&to, &type_id, &amount);
 				}
 			} else {
-				let token_id = &values[i];
+				let token_id = value;
 
 				require!(
 					self.get_token_owner(&type_id, &token_id) == from,
@@ -180,8 +173,7 @@ pub trait Erc1155 {
 		let creator = self.get_caller();
 		let type_id = self.get_last_valid_type_id() + big_uint_one.clone();
 
-		self.get_balance_mapper(&creator)
-			.insert(type_id.clone(), initial_supply.clone());
+		self.set_balance(&creator, &type_id, &initial_supply);
 		self.set_token_type_creator(&type_id, &creator);
 		self.set_is_fungible(&type_id, is_fungible);
 
@@ -212,8 +204,9 @@ pub trait Erc1155 {
 		self.increase_balance(&creator, &type_id, &amount);
 
 		if self.get_is_fungible(&type_id) == false {
-			let id_first = self.get_last_valid_token_id_for_type(&type_id);
-			let id_last = id_first.clone() + amount;
+			let last_valid_id = self.get_last_valid_token_id_for_type(&type_id);
+			let id_first = last_valid_id.clone() + BigUint::from(1u32);
+			let id_last = last_valid_id + amount;
 
 			self.set_owner_for_range(&type_id, &id_first, &id_last, &creator);
 
@@ -233,10 +226,7 @@ pub trait Erc1155 {
 		);
 
 		let caller = self.get_caller();
-		let balance = self
-			.get_balance_mapper(&caller)
-			.get(&type_id)
-			.unwrap_or_else(|| BigUint::zero());
+		let balance = self.balance_of(&caller, &type_id);
 
 		require!(balance >= amount, "Not enough tokens to burn");
 
@@ -261,14 +251,18 @@ pub trait Erc1155 {
 
 	// returns balance for each (owner, id) pair
 	#[view(balanceOfBatch)]
-	fn balance_of_batch(&self, owners: &[Address], type_ids: &[BigUint]) -> Vec<BigUint> {
-		let mut batch_balance = Vec::new();
+	fn balance_of_batch(&self, owners: &[Address], type_ids: &[BigUint]) -> SCResult<Vec<BigUint>> {
+		require!(
+			owners.len() == type_ids.len(),
+			"Argument lengths do not match"
+		);
 
-		for i in 0..owners.len() {
-			batch_balance.push(self.balance_of(&owners[i], &type_ids[i]));
+		let mut batch_balance = Vec::new();
+		for (owner, type_id) in owners.iter().zip(type_ids.iter()) {
+			batch_balance.push(self.balance_of(&owner, &type_id));
 		}
 
-		batch_balance
+		Ok(batch_balance)
 	}
 
 	#[view(isApprovedForAll)]
@@ -280,7 +274,7 @@ pub trait Erc1155 {
 
 	// mock
 	fn is_smart_contract_address(&self, _address: &Address) -> bool {
-		true
+		false
 	}
 
 	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
@@ -305,10 +299,17 @@ pub trait Erc1155 {
 
 	fn decrease_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
 		let mut balance_mapper = self.get_balance_mapper(owner);
-		let mut balance = balance_mapper.get(type_id).unwrap();
+		let mut balance = balance_mapper
+			.get(type_id)
+			.unwrap_or_else(|| BigUint::zero());
 
 		balance -= amount;
 		balance_mapper.insert(type_id.clone(), balance);
+	}
+
+	fn set_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
+		let mut balance_mapper = self.get_balance_mapper(owner);
+		balance_mapper.insert(type_id.clone(), amount.clone());
 	}
 
 	/// Range is inclusive for both `start` and `end`
@@ -407,6 +408,8 @@ pub trait Erc1155 {
 
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
+		let type_ids = &pending_transfer.type_ids;
+		let values = &pending_transfer.values;
 
 		// in case of success, transfer to the intended address, otherwise, return tokens to original owner
 		let dest_address = if is_transfer_accepted {
@@ -415,12 +418,12 @@ pub trait Erc1155 {
 			&pending_transfer.from
 		};
 
-		for (i, type_id) in pending_transfer.type_ids.iter().enumerate() {
+		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.get_is_fungible(type_id) {
-				let amount = &pending_transfer.values[i];
+				let amount = value;
 				self.increase_balance(&dest_address, &type_id, &amount);
 			} else {
-				let token_id = &pending_transfer.values[i];
+				let token_id = value;
 				let amount = BigUint::from(1u32);
 				self.increase_balance(&dest_address, &type_id, &amount);
 				self.set_token_owner(&type_id, token_id, &dest_address);
