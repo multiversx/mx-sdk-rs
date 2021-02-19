@@ -134,7 +134,56 @@ pub trait Erc1155Marketplace {
 
 	// endpoints
 
-	
+	#[payable("EGLD")]
+	#[endpoint]
+	fn bid(
+		&self,
+		type_id: BigUint,
+		token_id: BigUint,
+		#[payment] payment: BigUint,
+	) -> SCResult<()> {
+		require!(
+			self.is_up_for_auction(&type_id, &token_id),
+			"Token is not up for auction"
+		);
+
+		let caller = self.get_caller();
+		let mut auction = self.get_auction_for_token(&type_id, &token_id);
+
+		require!(
+			auction.original_owner != caller,
+			"Can't bid on your own token"
+		);
+		require!(
+			self.get_block_timestamp() < auction.deadline,
+			"Auction ended already"
+		);
+		require!(
+			payment >= auction.min_bid,
+			"Bid must be higher than or equal to the min bid"
+		);
+		require!(
+			payment > auction.current_bid,
+			"Bid must be higher than the current winning bid"
+		);
+		require!(
+			payment <= auction.max_bid,
+			"Bid must be less than or equal to the max bid"
+		);
+
+		// refund losing bid
+		if auction.current_winner != Address::zero() {
+			self.send()
+				.direct_egld(&auction.current_winner, &auction.current_bid, b"bid refund");
+		}
+
+		// update auction bid and winner
+		auction.current_bid = payment;
+		auction.current_winner = caller;
+		self.set_auction_for_token(&type_id, &token_id, &auction);
+
+		Ok(())
+	}
 
 	// views
 
