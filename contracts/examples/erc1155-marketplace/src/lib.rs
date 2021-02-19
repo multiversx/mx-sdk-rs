@@ -106,7 +106,7 @@ pub trait Erc1155Marketplace {
 		for (type_id, token_id) in type_ids.iter().zip(token_ids.iter()) {
 			require!(
 				self.is_empty_auction_for_token(&type_id, &token_id),
-				"There is already an auction for that token"
+				"Duplicate entry or there is already an auction for one of the tokens"
 			);
 
 			self.set_auction_for_token(
