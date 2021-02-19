@@ -35,27 +35,42 @@ fn create_token_fungible_test() {
 
 #[test]
 fn create_token_non_fungible_test() {
-	parse_execute_mandos("mandos/create_token_non_fungible.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_token_non_fungible.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn create_two_fungible_same_creator_test() {
-	parse_execute_mandos("mandos/create_two_tokens_both_fungible_same_creator.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_two_tokens_both_fungible_same_creator.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn create_two_fungible_different_creator_test() {
-    parse_execute_mandos("mandos/create_two_tokens_both_fungible_different_creator.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_two_tokens_both_fungible_different_creator.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn create_two_non_fungible_same_creator_test() {
-	parse_execute_mandos("mandos/create_two_tokens_both_non_fungible_same_creator.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_two_tokens_both_non_fungible_same_creator.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn create_one_fungible_one_non_fungible_test() {
-	parse_execute_mandos("mandos/create_one_fungible_one_non_fungible.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/create_one_fungible_one_non_fungible.scen.json",
+		&contract_map(),
+	);
 }
 
 // transfer tests -  to account
@@ -67,7 +82,10 @@ fn transfer_fungible_ok_test() {
 
 #[test]
 fn transfer_fungible_not_enough_balance_test() {
-	parse_execute_mandos("mandos/transfer_fungible_not_enough_balance.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/transfer_fungible_not_enough_balance.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
@@ -82,12 +100,18 @@ fn batch_transfer_fungible_test() {
 
 #[test]
 fn batch_transfer_non_fungible_test() {
-	parse_execute_mandos("mandos/batch_transfer_non_fungible.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/batch_transfer_non_fungible.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
 fn batch_transfer_both_types_test() {
-	parse_execute_mandos("mandos/batch_transfer_both_types.scen.json", &contract_map());
+	parse_execute_mandos(
+		"mandos/batch_transfer_both_types.scen.json",
+		&contract_map(),
+	);
 }
 
 // transfer tests -  to smart contract

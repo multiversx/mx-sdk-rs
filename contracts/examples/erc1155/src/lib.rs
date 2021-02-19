@@ -149,7 +149,12 @@ pub trait Erc1155 {
 
 	// returns assigned id
 	#[endpoint(createToken)]
-	fn create_token(&self, uri: &BoxedBytes, initial_supply: BigUint, is_fungible: bool) -> BigUint {
+	fn create_token(
+		&self,
+		uri: &BoxedBytes,
+		initial_supply: BigUint,
+		is_fungible: bool,
+	) -> BigUint {
 		let big_uint_one = BigUint::from(1u32);
 
 		let creator = self.get_caller();
