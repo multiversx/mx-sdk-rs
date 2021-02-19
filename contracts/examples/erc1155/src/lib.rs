@@ -270,23 +270,15 @@ pub trait Erc1155 {
 	}
 
 	fn increase_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
-		let mut balance_mapper = self.get_balance_mapper(owner);
-		let mut balance = balance_mapper
-			.get(type_id)
-			.unwrap_or_else(|| BigUint::zero());
-
+		let mut balance = self.balance_of(owner, type_id);
 		balance += amount;
-		balance_mapper.insert(type_id.clone(), balance);
+		self.set_balance(owner, type_id, &balance);
 	}
 
 	fn decrease_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
-		let mut balance_mapper = self.get_balance_mapper(owner);
-		let mut balance = balance_mapper
-			.get(type_id)
-			.unwrap_or_else(|| BigUint::zero());
-
+		let mut balance = self.balance_of(owner, type_id);
 		balance -= amount;
-		balance_mapper.insert(type_id.clone(), balance);
+		self.set_balance(owner, type_id, &balance);
 	}
 
 	fn set_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
