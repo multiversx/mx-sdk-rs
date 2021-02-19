@@ -1,7 +1,7 @@
 #![no_std]
 
 use elrond_codec::test_util::top_encode_to_vec_or_panic;
-use elrond_wasm::HexCallDataSerializer;
+use elrond_wasm::{HexCallDataSerializer, MultiArg2};
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -47,7 +47,7 @@ pub trait Erc1155 {
 			"Caller is not approved to transfer tokens from address"
 		);
 
-		if self.get_is_fungible(&type_id) == true {
+		if self.is_fungible(&type_id) {
 			let amount = &value;
 
 			sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
@@ -95,6 +95,10 @@ pub trait Erc1155 {
 		);
 		require!(to != Address::zero(), "Can't transfer to address zero");
 		require!(
+			!type_ids.is_empty() && !values.is_empty(),
+			"No type_ids and/or values provided"
+		);
+		require!(
 			type_ids.len() == values.len(),
 			"Id and value lenghts do not match"
 		);
@@ -102,7 +106,7 @@ pub trait Erc1155 {
 		// storage edits are rolled back in case of SCError,
 		// so the reverting is handled automatically if one of the transfers fails
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
-			if self.get_is_fungible(type_id) == true {
+			if self.is_fungible(type_id) {
 				let amount = value;
 
 				sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
@@ -145,11 +149,11 @@ pub trait Erc1155 {
 
 	// returns assigned id
 	#[endpoint(createToken)]
-	fn create_token(&self, uri: &[u8], initial_supply: BigUint, is_fungible: bool) -> BigUint {
+	fn create_token(&self, uri: &BoxedBytes, initial_supply: BigUint, is_fungible: bool) -> BigUint {
 		let big_uint_one = BigUint::from(1u32);
 
 		let creator = self.get_caller();
-		let type_id = self.get_last_valid_type_id() + big_uint_one.clone();
+		let type_id = &self.get_last_valid_type_id() + &big_uint_one;
 
 		self.set_balance(&creator, &type_id, &initial_supply);
 		self.set_token_type_creator(&type_id, &creator);
@@ -181,9 +185,9 @@ pub trait Erc1155 {
 
 		self.increase_balance(&creator, &type_id, &amount);
 
-		if self.get_is_fungible(&type_id) == false {
+		if !self.is_fungible(&type_id) {
 			let last_valid_id = self.get_last_valid_token_id_for_type(&type_id);
-			let id_first = last_valid_id.clone() + BigUint::from(1u32);
+			let id_first = &last_valid_id + &BigUint::from(1u32);
 			let id_last = last_valid_id + amount;
 
 			self.set_owner_for_range(&type_id, &id_first, &id_last, &creator);
@@ -199,7 +203,7 @@ pub trait Erc1155 {
 	#[endpoint]
 	fn burn(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
 		require!(
-			self.get_is_fungible(&type_id) == true,
+			self.is_fungible(&type_id),
 			"Only fungible tokens can be burned"
 		);
 
@@ -229,18 +233,18 @@ pub trait Erc1155 {
 
 	// returns balance for each (owner, id) pair
 	#[view(balanceOfBatch)]
-	fn balance_of_batch(&self, owners: &[Address], type_ids: &[BigUint]) -> SCResult<Vec<BigUint>> {
-		require!(
-			owners.len() == type_ids.len(),
-			"Argument lengths do not match"
-		);
-
+	fn balance_of_batch(
+		&self,
+		#[var_args] owner_type_id_pairs: VarArgs<MultiArg2<Address, BigUint>>,
+	) -> MultiResultVec<BigUint> {
 		let mut batch_balance = Vec::new();
-		for (owner, type_id) in owners.iter().zip(type_ids.iter()) {
+		for multi_arg in owner_type_id_pairs.into_vec() {
+			let (owner, type_id) = multi_arg.into_tuple();
+
 			batch_balance.push(self.balance_of(&owner, &type_id));
 		}
 
-		Ok(batch_balance)
+		batch_balance.into()
 	}
 
 	#[view(isApprovedForAll)]
@@ -433,7 +437,7 @@ pub trait Erc1155 {
 		};
 
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
-			if self.get_is_fungible(type_id) {
+			if self.is_fungible(type_id) {
 				let amount = value;
 				self.increase_balance(&dest_address, &type_id, &amount);
 			} else {
@@ -479,16 +483,16 @@ pub trait Erc1155 {
 
 	#[view(getTokenTypeUri)]
 	#[storage_get("tokenTypeUri")]
-	fn get_token_type_uri(&self, type_id: &BigUint) -> Vec<u8>;
+	fn get_token_type_uri(&self, type_id: &BigUint) -> BoxedBytes;
 
 	#[storage_set("tokenTypeUri")]
-	fn set_token_type_uri(&self, type_id: &BigUint, uri: &[u8]);
+	fn set_token_type_uri(&self, type_id: &BigUint, uri: &BoxedBytes);
 
 	// check if a token is fungible
 
 	#[view(isFungible)]
 	#[storage_get("isFungible")]
-	fn get_is_fungible(&self, type_id: &BigUint) -> bool;
+	fn is_fungible(&self, type_id: &BigUint) -> bool;
 
 	#[storage_set("isFungible")]
 	fn set_is_fungible(&self, type_id: &BigUint, is_fungible: bool);
