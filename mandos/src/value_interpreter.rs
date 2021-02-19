@@ -10,6 +10,7 @@ const ADDR_PREFIX: &str = "address:";
 const FILE_PREFIX: &str = "file:";
 const KECCAK256_PREFIX: &str = "keccak256:";
 
+const BIGUNT_PREFIX: &str = "biguint:";
 const U64_PREFIX: &str = "u64:";
 const U32_PREFIX: &str = "u32:";
 const U16_PREFIX: &str = "u16:";
@@ -99,6 +100,10 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 }
 
 fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
+	if let Some(stripped) = s.strip_prefix(BIGUNT_PREFIX) {
+		return Some(parse_biguint(stripped));
+	}
+
 	if let Some(stripped) = s.strip_prefix(U64_PREFIX) {
 		return Some(parse_fixed_width_unsigned(stripped, 8));
 	}
@@ -162,6 +167,21 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
 		}
 		result
 	}
+}
+
+fn parse_biguint(s: &str) -> Vec<u8> {
+	let parsed = parse_unsigned(s);
+	let length = parsed.len();
+	assert!(
+		length <= (u32::max_value() as usize),
+		"representation of {} does not fit in {} bytes",
+		s,
+		length
+	);
+
+	let mut result = (length as u32).to_be_bytes().to_vec();
+	result.append(&mut parsed.to_vec());
+	result
 }
 
 fn parse_fixed_width_unsigned(s: &str, length: usize) -> Vec<u8> {
