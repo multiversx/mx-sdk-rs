@@ -10,6 +10,8 @@ const ACCEPTED_TRANSFER_ANSWER: u32 = 0xbc197c81;
 
 const TRANSFER_TOKEN_ENDPOINT_NAME: &[u8] = b"safeTransferFrom";
 
+const PERCENTAGE_TOTAL: u8 = 100;
+
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<BigUint: BigUintApi> {
 	pub min_bid: BigUint,
@@ -107,8 +109,11 @@ pub trait Erc1155Marketplace {
 	fn claim(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
+		let claimable_funds = self.get_claimable_funds();
+		self.set_claimable_funds(&BigUint::zero());
+		
 		self.send()
-			.direct_egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
+			.direct_egld(&self.get_caller(), &claimable_funds, b"claim");
 
 		Ok(())
 	}
@@ -117,7 +122,7 @@ pub trait Erc1155Marketplace {
 	fn set_percentage_cut_endpoint(&self, new_cut_percentage: u8) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 		require!(
-			new_cut_percentage > 0 && new_cut_percentage < 100,
+			new_cut_percentage > 0 && new_cut_percentage < PERCENTAGE_TOTAL,
 			"Invalid percentage value, should be between 0 and 100"
 		);
 
@@ -206,7 +211,18 @@ pub trait Erc1155Marketplace {
 		self.clear_auction_for_token(&type_id, &token_id);
 
 		if auction.current_winner != Address::zero() {
-			// send to winner
+			let percentage_cut = self.get_percentage_cut();
+			let cut_amount = self.calculate_cut_amount(&auction.current_bid, percentage_cut);
+			let amount_to_send = &auction.current_bid - &cut_amount;
+
+			let mut claimable_funds = self.get_claimable_funds();
+			claimable_funds += &cut_amount;
+			self.set_claimable_funds(&claimable_funds);
+
+			// send part of the bid to the original owner
+			self.send().direct_egld(&auction.original_owner, &amount_to_send, b"sold token");
+
+			// send token to winner
 			self.asnyc_transfer_token(&type_id, &token_id, &auction.current_winner);
 		} else {
 			// return to original owner
@@ -318,6 +334,10 @@ pub trait Erc1155Marketplace {
 		);
 	}
 
+	fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {
+		&(total_amount * &(cut_percentage as u32).into()) / &(PERCENTAGE_TOTAL as u32).into()
+	}
+
 	// storage
 
 	// token ownership contract, i.e. the erc1155 SC
@@ -336,6 +356,14 @@ pub trait Erc1155Marketplace {
 
 	#[storage_set("percentageCut")]
 	fn set_percentage_cut(&self, bid_cut_percentage: u8);
+
+	// claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
+
+	#[storage_get("claimableFunds")]
+	fn get_claimable_funds(&self) -> BigUint;
+
+	#[storage_set("claimableFunds")]
+	fn set_claimable_funds(&self, claimable_funds: &BigUint);
 
 	// auction properties for each token
 
