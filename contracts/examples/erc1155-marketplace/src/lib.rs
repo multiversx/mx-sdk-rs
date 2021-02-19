@@ -1,10 +1,14 @@
 #![no_std]
 #![allow(unused_attributes)]
 
+use elrond_wasm::HexCallDataSerializer;
+
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 const ACCEPTED_TRANSFER_ANSWER: u32 = 0xbc197c81;
+
+const TRANSFER_TOKEN_ENDPOINT_NAME: &[u8] = b"safeTransferFrom";
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<BigUint: BigUintApi> {
@@ -185,6 +189,33 @@ pub trait Erc1155Marketplace {
 		Ok(())
 	}
 
+	#[endpoint(endAuction)]
+	fn end_auction(&self, type_id: BigUint, token_id: BigUint) -> SCResult<()> {
+		require!(
+			self.is_up_for_auction(&type_id, &token_id),
+			"Token is not up for auction"
+		);
+
+		let auction = self.get_auction_for_token(&type_id, &token_id);
+
+		require!(
+			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
+			"auction has not ended yet!"
+		);
+
+		self.clear_auction_for_token(&type_id, &token_id);
+
+		if auction.current_winner != Address::zero() {
+			// send to winner
+			self.asnyc_transfer_token(&type_id, &token_id, &auction.current_winner);
+		} else {
+			// return to original owner
+			self.asnyc_transfer_token(&type_id, &token_id, &auction.original_owner);
+		}
+
+		Ok(())
+	}
+
 	// views
 
 	#[view(isUpForAuction)]
@@ -266,6 +297,25 @@ pub trait Erc1155Marketplace {
 		);
 
 		Ok(())
+	}
+
+	// TODO: Replace with Proxy in the next framework version
+	fn asnyc_transfer_token(&self, type_id: &BigUint, token_id: &BigUint, to: &Address) {
+		let sc_own_address = self.get_sc_address();
+		let token_ownership_contract_address = self.get_token_ownership_contract_address();
+		let mut serializer = HexCallDataSerializer::new(TRANSFER_TOKEN_ENDPOINT_NAME);
+
+		serializer.push_argument_bytes(sc_own_address.as_bytes()); // from
+		serializer.push_argument_bytes(to.as_bytes()); // to
+		serializer.push_argument_bytes(type_id.to_bytes_be().as_slice()); // type_id
+		serializer.push_argument_bytes(token_id.to_bytes_be().as_slice()); // value
+		serializer.push_argument_bytes(&[]); // data
+
+		self.send().async_call_raw(
+			&token_ownership_contract_address,
+			&BigUint::zero(),
+			serializer.as_slice(),
+		);
 	}
 
 	// storage
