@@ -1,8 +1,5 @@
-use crate::types::Address;
-use crate::{
-	api::{BigIntApi, BigUintApi, SendApi},
-	TokenIdentifier,
-};
+use crate::api::{BigIntApi, BigUintApi, SendApi};
+use crate::types::{Address, TokenIdentifier};
 
 pub trait ContractProxy<SA, BigInt, BigUint>
 where

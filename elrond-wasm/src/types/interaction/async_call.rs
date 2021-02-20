@@ -1,11 +1,8 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
+use crate::api::{BigUintApi, ErrorApi, SendApi};
 use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::EndpointResult;
-use crate::types::Address;
-use crate::{
-	api::{BigUintApi, ErrorApi, SendApi},
-	CallbackCall,
-};
+use crate::types::{Address, CallbackCall};
 use alloc::string::String;
 use alloc::vec::Vec;
 

@@ -1,6 +1,7 @@
 elrond_wasm::derive_imports!();
 
-use elrond_wasm::{api::BigUintApi, Address};
+use elrond_wasm::api::BigUintApi;
+use elrond_wasm::types::Address;
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub enum AuctionType {

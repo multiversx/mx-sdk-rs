@@ -22,9 +22,8 @@ macro_rules! imports {
 		use elrond_wasm::non_zero_util::*;
 		use elrond_wasm::storage::mappers::*;
 		use elrond_wasm::types::*;
-		use elrond_wasm::AsyncCallError;
-		use elrond_wasm::{BorrowedMutStorage, Box, BoxedBytes, Queue, VarArgs, Vec};
-		use elrond_wasm::{SCError, SCResult, SCResult::Err, SCResult::Ok};
+		use elrond_wasm::types::{SCResult::Err, SCResult::Ok};
+		use elrond_wasm::{Box, Vec};
 	};
 }
 
@@ -44,7 +43,7 @@ macro_rules! derive_imports {
 #[macro_export]
 macro_rules! sc_error {
 	($s:expr) => {
-		elrond_wasm::SCResult::Err(elrond_wasm::SCError::from($s.as_bytes()))
+		elrond_wasm::types::SCResult::Err(elrond_wasm::types::SCError::from($s.as_bytes()))
 	};
 }
 
@@ -53,9 +52,9 @@ macro_rules! sc_error {
 macro_rules! sc_try {
 	($s:expr) => {
 		match $s {
-			elrond_wasm::SCResult::Ok(t) => t,
-			elrond_wasm::SCResult::Err(e) => {
-				return elrond_wasm::SCResult::Err(e);
+			elrond_wasm::types::SCResult::Ok(t) => t,
+			elrond_wasm::types::SCResult::Err(e) => {
+				return elrond_wasm::types::SCResult::Err(e);
 			},
 		}
 	};
@@ -66,7 +65,8 @@ macro_rules! sc_try {
 /// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
 ///
 /// ```rust
-/// # use elrond_wasm::{*, SCResult::Ok};
+/// # use elrond_wasm::*;
+/// # use elrond_wasm::types::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 /// # where
 /// # 	BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
@@ -92,7 +92,8 @@ macro_rules! require {
 /// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
 ///
 /// ```rust
-/// # use elrond_wasm::{*, SCResult::Ok};
+/// # use elrond_wasm::*;
+/// # use elrond_wasm::types::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 /// # where
 /// # 	BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
