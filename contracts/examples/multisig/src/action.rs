@@ -23,8 +23,8 @@ pub enum Action<BigUint: BigUintApi> {
 	},
 	SCCall {
 		to: Address,
-		amount: BigUint,
-		function: BoxedBytes,
+		egld_payment: BigUint,
+		endpoint_name: BoxedBytes,
 		arguments: Vec<BoxedBytes>,
 	},
 }

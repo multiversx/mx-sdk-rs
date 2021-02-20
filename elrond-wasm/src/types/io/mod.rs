@@ -1,4 +1,3 @@
-mod arg_buffer;
 mod async_call_result;
 mod multi_args;
 mod multi_result;
@@ -9,7 +8,6 @@ mod sc_error;
 mod sc_result;
 mod var_args;
 
-pub use arg_buffer::ArgBuffer;
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
 pub use multi_args::*;
 pub use multi_result::*;

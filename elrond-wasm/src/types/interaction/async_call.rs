@@ -11,10 +11,10 @@ use alloc::vec::Vec;
 
 #[must_use]
 pub struct AsyncCall<BigUint: BigUintApi> {
-	pub(super) to: Address,
-	pub(super) egld_payment: BigUint,
-	pub(super) hex_data: HexCallDataSerializer,
-	pub(super) callback_data: HexCallDataSerializer,
+	pub(crate) to: Address,
+	pub(crate) egld_payment: BigUint,
+	pub(crate) hex_data: HexCallDataSerializer,
+	pub(crate) callback_data: HexCallDataSerializer,
 }
 
 impl<BigUint: BigUintApi> AsyncCall<BigUint> {

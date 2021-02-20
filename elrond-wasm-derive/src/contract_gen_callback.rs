@@ -127,7 +127,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 					.method_args
 					.iter()
 					.map(|arg| {
-						let arg_accumulator = quote! { &mut closure_data };
+						let arg_accumulator = quote! { &mut ___closure_arg_buffer___ };
 
 						match &arg.metadata {
 							ArgMetadata::Single | ArgMetadata::VarArgs => {
@@ -141,9 +141,9 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 					.collect();
 				let proxy_decl = quote! {
 					pub fn #method_name ( &self , #(#arg_decl),* ) -> elrond_wasm::types::CallbackCall{
-						let mut closure_data = elrond_wasm::hex_call_data::HexCallDataSerializer::new(#cb_name_literal);
+						let mut ___closure_arg_buffer___ = elrond_wasm::types::ArgBuffer::new();
 						#(#arg_push_snippets)*
-						elrond_wasm::types::CallbackCall::from_raw(closure_data)
+						elrond_wasm::types::CallbackCall::from_arg_buffer(#cb_name_literal, &___closure_arg_buffer___)
 					}
 
 				};
@@ -160,7 +160,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 		where
 			BigUint: elrond_wasm::api::BigUintApi + 'static,
 			BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
-			A: elrond_wasm::api::ErrorApi + 'static,
+			A: elrond_wasm::api::ErrorApi + Clone + 'static,
 		{
 			pub api: A,
 			_phantom1: core::marker::PhantomData<BigInt>,
@@ -171,7 +171,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 		where
 			BigUint: elrond_wasm::api::BigUintApi + 'static,
 			BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
-			A: elrond_wasm::api::ErrorApi + 'static,
+			A: elrond_wasm::api::ErrorApi + Clone + 'static,
 		{
 			pub fn new(api: A) -> Self {
 				CallbackProxies {

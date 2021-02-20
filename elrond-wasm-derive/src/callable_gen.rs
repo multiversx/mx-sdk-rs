@@ -104,7 +104,7 @@ impl Callable {
 					.method_args
 					.iter()
 					.map(|arg| {
-						let arg_accumulator = quote! { &mut async_call.hex_data };
+						let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
 
 						match &arg.metadata {
 							ArgMetadata::Single | ArgMetadata::VarArgs => {
@@ -141,13 +141,13 @@ impl Callable {
 				let m_name_literal = ident_str_literal(&m.name);
 				let sig = quote! {
 					#msig {
-						let mut async_call = elrond_wasm::types::ContractCall::<BigUint>::new(
+						let mut ___contract_call___ = elrond_wasm::types::ContractCall::<BigUint>::new(
 							self.address,
 							#token_expr,
 							#payment_expr,
-							#m_name_literal);
+							elrond_wasm::types::BoxedBytes::from(#m_name_literal));
 						#(#arg_push_snippets)*
-						async_call
+						___contract_call___
 					}
 				};
 				sig
