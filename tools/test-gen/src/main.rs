@@ -1,7 +1,6 @@
-// Just a quick and dirty way to auto-generate some mandos tests on the Rust side.
-// Will get converted to a proper tool at some point.
+use std::{env, fs};
 
-fn print_mandos_tests(names: &[&str]) {
+fn print_mandos_tests(names: Vec<String>) {
 	for name in names.iter() {
 		print!(
 			"
@@ -16,68 +15,42 @@ fn {}() {{
 	}
 }
 
+fn split_file_name(name: String, separator: &str) -> Vec<String> {
+	let splitted_name = name.split(separator);
+	let collection: Vec<&str> = splitted_name.collect();
+	let mut converted_collection: Vec<String> = Vec::new();
+
+	for item in collection {
+		converted_collection.push(String::from(item));
+	}
+
+	return converted_collection;
+}
+
+fn read_dirs(path: &str) -> Vec<String> {
+	let paths = fs::read_dir(path).unwrap();
+	let mut names: Vec<String> = Vec::new();
+
+	for dir in paths {
+		let dir_abs_path =
+			String::from(dir.unwrap().path().into_os_string().into_string().unwrap());
+		let mut splitted_files_name: Vec<String> = split_file_name(dir_abs_path, "/");
+		let files_name_with_extension = splitted_files_name.pop().unwrap();
+		splitted_files_name = split_file_name(files_name_with_extension, ".");
+		let files_names = String::from(splitted_files_name.first().unwrap());
+		names.push(files_names);
+	}
+
+	names
+}
+
+/// Example run:
+/// `cargo run ../../contracts/examples/crowdfunding-erc20/mandos`
 fn main() {
-	print_mandos_tests(&[
-		"block_info",
-		"boxed_bytes_zeros",
-		"count_ones",
-		"crypto",
-		"echo_array_u8",
-		"echo_async_result_empty",
-		"echo_big_int",
-		"echo_big_uint",
-		"echo_boxed_bytes",
-		"echo_i32",
-		"echo_i64",
-		"echo_nothing",
-		"echo_slice_u8",
-		"echo_str_box",
-		"echo_string",
-		"echo_str",
-		"echo_u64",
-		"echo_usize",
-		"echo_varags_tuples",
-		"echo_varargs_u32",
-		"echo_vec_u8",
-		"eventA1",
-		"eventA2",
-		"eventB1",
-		"out_of_gas",
-		"panic",
-		"payable_any_1",
-		"payable_any_2",
-		"payable_any_3",
-		"payable_any_4",
-		"payable_egld_0",
-		"payable_egld_1",
-		"payable_egld_2",
-		"payable_egld_3",
-		"payable_egld_4",
-		"payable_token_1",
-		"payable_token_2",
-		"payable_token_3",
-		"payable_token_4",
-		"return_error",
-		"send_tx",
-		"storage_addr",
-		"storage_big_int",
-		"storage_big_uint",
-		"storage_bool",
-		"storage_clear",
-		"storage_i64_bad",
-		"storage_i64",
-		"storage_load_cumulated_validator_reward",
-		"storage_map1",
-		"storage_map2",
-		"storage_map3",
-		"storage_mapper_single_value",
-		"storage_mapper_vec",
-		"storage_opt_addr",
-		"storage_reserved",
-		"storage_u64_bad",
-		"storage_u64",
-		"storage_usize_bad",
-		"storage_usize",
-		"storage_vec_u8",
-	]);
+	let args: Vec<String> = env::args().collect();
+	let files_path = &args[1];
+
+	let names = read_dirs(files_path);
+
+	print_mandos_tests(names);
 }
