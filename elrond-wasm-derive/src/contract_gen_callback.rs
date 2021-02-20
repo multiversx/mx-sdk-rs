@@ -36,14 +36,9 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 							match &arg.metadata {
 								ArgMetadata::Single | ArgMetadata::VarArgs => {
 									// callback args, loaded from storage via the tx hash
-									generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader })
+									generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader___ })
 								},
-								ArgMetadata::Payment => {
-									panic!("payment args not allowed in callbacks")
-								},
-								ArgMetadata::PaymentToken => {
-									panic!("payment token args not allowed in callbacks")
-								},
+								ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
 								ArgMetadata::AsyncCallResultArg => {
 									// Should be an AsyncCallResult argument that wraps what comes from the async call.
 									// But in principle, one can express it it any way.
@@ -63,10 +58,10 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 						#fn_name_literal =>
 						{
 							#payable_snippet
-							let mut ___cb_arg_loader = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
+							let mut ___cb_arg_loader___ = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
 							#(#arg_init_snippets)*
 							#body_with_result ;
-							___cb_arg_loader.assert_no_more_args();
+							___cb_arg_loader___.assert_no_more_args();
 						},
 					};
 					Some(match_arm)
@@ -102,14 +97,15 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 pub fn cb_proxy_arg_declarations(method_args: &[MethodArg]) -> Vec<proc_macro2::TokenStream> {
 	method_args
 		.iter()
-		.filter_map(|arg| {
-			if let ArgMetadata::AsyncCallResultArg = arg.metadata {
+		.filter_map(|arg| match arg.metadata {
+			ArgMetadata::AsyncCallResultArg | ArgMetadata::Payment | ArgMetadata::PaymentToken => {
 				None
-			} else {
+			},
+			_ => {
 				let pat = &arg.pat;
 				let ty = &arg.ty;
 				Some(quote! {#pat : #ty })
-			}
+			},
 		})
 		.collect()
 }

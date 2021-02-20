@@ -10,7 +10,7 @@ pub fn arg_serialize_push(
 	match arg_ty {
 		syn::Type::Path(_) => {
 			quote! {
-				elrond_wasm::io::serialize_contract_call_arg(&#var_name, #arg_accumulator, self.api.clone());
+				elrond_wasm::io::serialize_contract_call_arg(#var_name, #arg_accumulator, self.api.clone());
 			}
 		},
 		syn::Type::Reference(type_reference) => {

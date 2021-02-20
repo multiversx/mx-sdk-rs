@@ -8,7 +8,7 @@ use super::util::*;
 #[derive(Clone, Debug)]
 pub struct CallableMethod {
 	pub name: syn::Ident,
-	pub payable: bool,
+	pub payable: MethodPayableMetadata,
 	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
 	pub return_type: syn::ReturnType,
@@ -17,15 +17,10 @@ pub struct CallableMethod {
 impl CallableMethod {
 	pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
 		let payable = process_payable(m);
-		if let MethodPayableMetadata::SingleEsdtToken(_) | MethodPayableMetadata::AnyToken = payable
-		{
-			panic!("payable methods in async call proxies currently only accept EGLD");
-		}
-
 		let method_args = extract_method_args(m);
 		CallableMethod {
 			name: m.sig.ident.clone(),
-			payable: payable.is_payable(),
+			payable,
 			generics: m.sig.generics.clone(),
 			method_args,
 			return_type: m.sig.output.clone(),
