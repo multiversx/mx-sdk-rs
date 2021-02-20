@@ -23,7 +23,7 @@ where
 	}
 
 	/// Lower-level version of `direct_esdt`, in which the contract can specify a gas limit.
-	/// The gas limit should be 0 for regulat ESDT transfers.
+	/// The gas limit should be 0 for regular ESDT transfers.
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,
