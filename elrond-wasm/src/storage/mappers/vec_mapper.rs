@@ -107,6 +107,11 @@ where
 		}
 	}
 
+	/// Number of items managed by the mapper.
+	pub fn len(&self) -> usize {
+		self.count
+	}
+
 	/// Loads all items from storage and places them in a Vec.
 	/// Can easily consume a lot of gas.
 	pub fn load_as_vec(&self) -> Vec<T> {
