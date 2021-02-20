@@ -26,7 +26,7 @@ pub trait ForwarderRaw {
 
 	#[endpoint]
 	#[payable("*")]
-	fn forward_call(
+	fn forward_async_call(
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
@@ -43,7 +43,7 @@ pub trait ForwarderRaw {
 
 	#[endpoint]
 	#[payable("*")]
-	fn forward_call_half_payment(
+	fn forward_async_call_half_payment(
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
@@ -52,12 +52,12 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) -> AsyncCall<BigUint> {
 		let half_payment = payment / 2u32.into();
-		self.forward_call(to, token, half_payment, endpoint_name, args)
+		self.forward_async_call(to, token, half_payment, endpoint_name, args)
 	}
 
 	#[view]
-	#[storage_mapper("callback_raw_data")]
-	fn callback_raw_data(
+	#[storage_mapper("callback_data")]
+	fn callback_data(
 		&self,
 	) -> VecMapper<Self::Storage, (TokenIdentifier, BigUint, Vec<BoxedBytes>)>;
 
@@ -66,13 +66,13 @@ pub trait ForwarderRaw {
 		&self,
 		index: usize,
 	) -> MultiResult3<TokenIdentifier, BigUint, MultiResultVec<BoxedBytes>> {
-		let (token, payment, args) = self.callback_raw_data().get(index);
+		let (token, payment, args) = self.callback_data().get(index);
 		(token, payment, args.into()).into()
 	}
 
 	#[endpoint]
 	fn clear_callback_info(&self) {
-		self.callback_raw_data().clear();
+		self.callback_data().clear();
 	}
 
 	#[callback_raw]
@@ -82,7 +82,7 @@ pub trait ForwarderRaw {
 		#[payment] payment: BigUint,
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
-		self.callback_raw_data()
+		self.callback_data()
 			.push(&(token, payment, args.into_vec()));
 	}
 }

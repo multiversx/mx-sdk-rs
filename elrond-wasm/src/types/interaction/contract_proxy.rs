@@ -9,7 +9,5 @@ where
 {
 	fn new(send_api: SA, address: Address) -> Self;
 
-	fn token_transfer(self, token: TokenIdentifier, amount: BigUint) -> Self;
-
-	fn egld_transfer(self, amount: BigUint) -> Self;
+	fn with_token_transfer(self, token: TokenIdentifier, amount: BigUint) -> Self;
 }
