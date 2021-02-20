@@ -1,6 +1,6 @@
 use elrond_wasm::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
 use elrond_wasm::io::EndpointResult;
-use elrond_wasm::{Address, AsyncCall, BoxedBytes, CodeMetadata, SendEgld, Vec};
+use elrond_wasm::types::{Address, AsyncCall, BoxedBytes, CodeMetadata, SendEgld, Vec};
 elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

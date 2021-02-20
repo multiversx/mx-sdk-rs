@@ -1,6 +1,5 @@
 use crate::api::ErrorApi;
-use crate::types::ArgBuffer;
-use crate::*;
+use crate::types::*;
 use elrond_codec::{TopEncode, TopEncodeOutput};
 
 pub fn serialize_contract_call_arg<I, A>(arg: I, arg_buffer: &mut ArgBuffer, error_api: A)
