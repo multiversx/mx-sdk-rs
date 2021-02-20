@@ -1,7 +1,6 @@
 use super::{BigUintApi, ErrorApi};
 use crate::hex_call_data::HexCallDataSerializer;
-use crate::io::AsyncCallArg;
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
+use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier};
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
@@ -14,6 +13,16 @@ where
 	/// Used especially for sending EGLD to regular accounts.
 	fn direct_egld(&self, to: &Address, amount: &BigUint, data: &[u8]);
 
+	/// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
+	fn direct_egld_execute(
+		&self,
+		to: &Address,
+		amount: &BigUint,
+		gas_limit: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	);
+
 	/// Sends an ESDT token to a given address, directly.
 	/// Used especially for sending ESDT to regular accounts.
 	///
@@ -22,8 +31,7 @@ where
 		self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
 	}
 
-	/// Lower-level version of `direct_esdt`, in which the contract can specify a gas limit.
-	/// The gas limit should be 0 for regulat ESDT transfers.
+	/// Sends ESDT to an address and executes like an async call, but without callback.
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,
@@ -87,74 +95,15 @@ where
 	/// Use a `HexCallDataSerializer` to prepare this field.
 	fn async_call_raw(&self, to: &Address, amount: &BigUint, data: &[u8]) -> !;
 
-	/// Sends an asynchronous call to another contract.
-	/// Calling this method immediately terminates tx execution.
-	///
-	/// Even though it only accepts 1 argument, this is not restrictive, since the argument can be a MultiArg.
-	/// For instance, to pass 3 arguments, pass a `MultiArg3<Type1, Type2, Type3>`.
-	/// To pass a variable number of arguments, pass VarArgs.
-	fn async_call_egld<A: AsyncCallArg>(
-		&self,
-		to: &Address,
-		payment: &BigUint,
-		endpoint_name: &[u8],
-		arg: A,
-	) -> ! {
-		let mut serializer = HexCallDataSerializer::new(endpoint_name);
-		// TODO: fast exit is also required here
-		if let Err(serialization_err) = arg.push_async_arg(&mut serializer) {
-			self.signal_error(serialization_err.as_bytes());
-		}
-		self.async_call_raw(&to, &payment, serializer.as_slice())
-	}
-
-	/// Sends an asynchronous call to another contract, by first invoking `ESDTTransfer`.
-	/// This allows to first pass an ESDT token to the endpoint.
-	/// Cannot send EGLD using this method.
-	/// Calling this method immediately terminates tx execution.
-	///
-	/// Even though it only accepts 1 argument, this is not restrictive, since the argument can be a MultiArg.
-	/// For instance, to pass 3 arguments, pass a `MultiArg3<Type1, Type2, Type3>`.
-	/// To pass a variable number of arguments, pass VarArgs.
-	fn async_call_esdt<A: AsyncCallArg>(
-		&self,
-		to: &Address,
-		esdt_payment: &BigUint,
-		esdt_token_name: &[u8],
-		endpoint_name: &[u8],
-		arg: A,
-	) -> ! {
-		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-		serializer.push_argument_bytes(esdt_token_name);
-		serializer.push_argument_bytes(esdt_payment.to_bytes_be().as_slice());
-		serializer.push_argument_bytes(endpoint_name);
-		// TODO: fast exit is also required here
-		if let Err(serialization_err) = arg.push_async_arg(&mut serializer) {
-			self.signal_error(serialization_err.as_bytes());
-		}
-		self.async_call_raw(&to, &BigUint::zero(), serializer.as_slice())
-	}
-
 	/// Sends an asynchronous call to another contract, with either EGLD or ESDT value.
 	/// The `token` argument decides which one it will be.
 	/// Calling this method immediately terminates tx execution.
-	///
-	/// Even though it only accepts 1 argument, this is not restrictive, since the argument can be a MultiArg.
-	/// For instance, to pass 3 arguments, pass a `MultiArg3<Type1, Type2, Type3>`.
-	/// To pass a variable number of arguments, pass VarArgs.
-	fn async_call<A: AsyncCallArg>(
-		&self,
-		to: &Address,
-		token: &TokenIdentifier,
-		payment: &BigUint,
-		endpoint_name: &[u8],
-		arg: A,
-	) -> ! {
-		if token.is_egld() {
-			self.async_call_egld(to, payment, endpoint_name, arg)
-		} else {
-			self.async_call_esdt(to, payment, token.as_slice(), endpoint_name, arg);
-		}
+	fn async_call(&self, async_call: AsyncCall<BigUint>) -> ! {
+		self.async_call_raw(
+			&async_call.to,
+			&async_call.egld_payment,
+			async_call.hex_data.as_slice(),
+		)
 	}
 
 	/// Deploys a new contract in the same shard.

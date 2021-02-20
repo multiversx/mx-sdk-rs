@@ -34,7 +34,7 @@ pub trait ForwarderRaw {
 		endpoint_name: BoxedBytes,
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) -> AsyncCall<BigUint> {
-		let mut contract_call = ContractCall::new(to, token, payment, endpoint_name.as_slice());
+		let mut contract_call = ContractCall::new(to, token, payment, endpoint_name);
 		for arg in args.into_vec() {
 			contract_call.push_argument_raw_bytes(arg.as_slice());
 		}
