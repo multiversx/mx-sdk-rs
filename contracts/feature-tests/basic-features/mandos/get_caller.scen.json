@@ -1,6 +1,5 @@
 {
-    "name": "count ones",
-    "comment": "should fail if the processor doesn't support the `count ones` instruction",
+    "name": "get caller",
     "steps": [
         {
             "step": "setState",
@@ -41,13 +40,13 @@
         },
         {
             "step": "scQuery",
-            "txId": "get_caller",
+            "txId": "get_caller_query",
             "tx": {
                 "to": "address:features_contract",
-                "function": "get_prev_block_timestamp",
+                "function": "get_caller"
             },
             "expect": {
-                "out": [ "address:an_account" ],
+                "out": [ "address:features_contract" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
