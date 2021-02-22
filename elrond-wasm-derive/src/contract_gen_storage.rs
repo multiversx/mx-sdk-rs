@@ -3,11 +3,11 @@ use super::contract_gen_method::*;
 use super::util::*;
 
 fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macro2::TokenStream {
-	let id_literal = array_literal(identifier.as_bytes());
+	let id_literal = byte_str_literal(identifier.as_bytes());
 	if key_args.is_empty() {
 		// hardcode key
 		quote! {
-			let key: &'static [u8] = &#id_literal;
+			let key: &'static [u8] = #id_literal;
 		}
 	} else {
 		// build key from arguments

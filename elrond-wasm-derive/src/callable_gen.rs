@@ -2,15 +2,16 @@ use super::arg_def::*;
 use super::arg_extract::*;
 use super::arg_str_serialize::*;
 use super::contract_gen_method::*;
-use super::parse_attr::*;
+// use super::parse_attr::*;
 use super::util::*;
 
 #[derive(Clone, Debug)]
 pub struct CallableMethod {
 	pub name: syn::Ident,
 	pub payable: bool,
-	pub callback: Option<CallbackCallAttribute>,
+	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
+	pub return_type: syn::ReturnType,
 }
 
 impl CallableMethod {
@@ -21,24 +22,27 @@ impl CallableMethod {
 			panic!("payable methods in async call proxies currently only accept EGLD");
 		}
 
-		let callback_opt = CallbackCallAttribute::parse(m);
-		let method_args = extract_method_args(m, callback_opt.is_some());
+		let method_args = extract_method_args(m);
 		CallableMethod {
 			name: m.sig.ident.clone(),
 			payable: payable.is_payable(),
-			callback: callback_opt,
+			generics: m.sig.generics.clone(),
 			method_args,
+			return_type: m.sig.output.clone(),
 		}
 	}
 
-	// TODO: deduplicate
-	pub fn generate_sig(&self) -> proc_macro2::TokenStream {
+	pub fn generate_proxy_sig(&self) -> proc_macro2::TokenStream {
 		let method_name = &self.name;
+		let generics = &self.generics;
+		let generics_where = &self.generics.where_clause;
 		let arg_decl = arg_declarations(&self.method_args);
-		let result = quote! {
-			#[allow(non_snake_case)]
-			fn #method_name ( &self , #(#arg_decl),* ) -> ()
+		let ret_tok = match &self.return_type {
+			syn::ReturnType::Default => quote! {},
+			syn::ReturnType::Type(_, ty) => quote! { -> #ty },
 		};
+		let result =
+			quote! { fn #method_name #generics ( self , #(#arg_decl),* ) #ret_tok #generics_where };
 		result
 	}
 }
@@ -66,7 +70,6 @@ impl Callable {
 			})
 			.collect();
 
-		//let trait_methods = extract_methods(&contract_trait);
 		Callable {
 			trait_name: contract_trait.ident.clone(),
 			callable_impl_name,
@@ -81,7 +84,7 @@ impl Callable {
 		self.methods
 			.iter()
 			.map(|m| {
-				let sig = m.generate_sig();
+				let sig = m.generate_proxy_sig();
 				quote! { #sig ; }
 			})
 			.collect()
@@ -91,72 +94,60 @@ impl Callable {
 		self.methods
 			.iter()
 			.map(|m| {
-				let msig = m.generate_sig();
+				let msig = m.generate_proxy_sig();
 
 				let mut payment_count = 0;
-				let mut amount_snippet = quote! { BigUint::zero() };
+				let mut payment_expr = quote! { self.payment };
+				let mut token_count = 0;
+				let mut token_expr = quote! { self.token };
 				let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
 					.method_args
 					.iter()
 					.map(|arg| {
-						let arg_accumulator = if arg.is_callback_arg {
-							quote! { callback_data_ser }
-						} else {
-							quote! { call_data_ser }
-						};
+						let arg_accumulator = quote! { &mut async_call.hex_data };
 
 						match &arg.metadata {
 							ArgMetadata::Single | ArgMetadata::VarArgs => {
 								arg_serialize_push(arg, &arg_accumulator)
 							},
 							ArgMetadata::Payment => {
-								// #[payment]
 								payment_count += 1;
 								let pat = &arg.pat;
-								amount_snippet = quote! { #pat };
+								payment_expr = quote! { #pat };
 
 								quote! {}
 							},
-							ArgMetadata::PaymentToken => panic!("callable payment token not yet supported"),
-							ArgMetadata::Multi(multi_attr) => {
-								// #[multi(...)]
-								let count_expr = &multi_attr.count_expr;
-								arg_serialize_push_multi(
-									arg,
-									&arg_accumulator,
-									&quote! { #count_expr as usize },
-								)
+							ArgMetadata::PaymentToken => {
+								token_count += 1;
+								let pat = &arg.pat;
+								token_expr = quote! { #pat };
+
+								quote! {}
+							},
+							ArgMetadata::AsyncCallResultArg => {
+								panic!("async call result arg not allowed in call proxy")
 							},
 						}
 					})
 					.collect();
 
 				if payment_count > 1 {
-					panic!("Only one payment argument allowed in call proxy");
+					panic!("No more than one payment argument allowed in call proxy");
+				}
+				if token_count > 1 {
+					panic!("No more than one payment token argument allowed in call proxy");
 				}
 
-				let (callback_init, callback_store) = if let Some(callback_ident) = &m.callback {
-					let cb_name_str = &callback_ident.arg.to_string();
-					let cb_name_literal = array_literal(cb_name_str.as_bytes());
-					let callback_init = quote! {
-						let mut callback_data_ser = elrond_wasm::hex_call_data::HexCallDataSerializer::new( & #cb_name_literal );
-					};
-					let callback_store = quote! {
-						self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), callback_data_ser.as_slice());
-					};
-					(callback_init, callback_store)
-				} else {
-					(quote! {}, quote! {})
-				};
-
-				let m_name_literal = array_literal(m.name.to_string().as_bytes());
+				let m_name_literal = ident_str_literal(&m.name);
 				let sig = quote! {
 					#msig {
-						let mut call_data_ser = elrond_wasm::hex_call_data::HexCallDataSerializer::new( & #m_name_literal );
-						#callback_init
+						let mut async_call = elrond_wasm::types::ContractCall::<BigUint>::new(
+							self.address,
+							#token_expr,
+							#payment_expr,
+							#m_name_literal);
 						#(#arg_push_snippets)*
-						#callback_store
-						self.api.send().async_call_raw(&self.address, &#amount_snippet, call_data_ser.as_slice());
+						async_call
 					}
 				};
 				sig
