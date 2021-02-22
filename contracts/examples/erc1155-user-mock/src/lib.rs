@@ -2,8 +2,6 @@
 
 elrond_wasm::imports!();
 
-const ACCEPTED_TRANSFER_ANSWER: u32 = 0xbc197c81;
-
 #[elrond_wasm_derive::contract(Erc1155UserMockImpl)]
 pub trait Erc1155UserMock {
 	#[init]
@@ -17,9 +15,9 @@ pub trait Erc1155UserMock {
 		_type_id: BigUint,
 		_value: BigUint,
 		_data: &[u8],
-	) -> SCResult<u32> {
+	) -> SCResult<()> {
 
-		Ok(ACCEPTED_TRANSFER_ANSWER)
+		Ok(())
 	}
 
 	#[endpoint(onERC1155BatchReceived)]
@@ -30,8 +28,8 @@ pub trait Erc1155UserMock {
 		_type_ids: Vec<BigUint>,
 		_values: Vec<BigUint>,
 		_data: &[u8],
-	) -> SCResult<u32> {
+	) -> SCResult<()> {
 
-		Ok(ACCEPTED_TRANSFER_ANSWER)
+		Ok(())
 	}
 }
