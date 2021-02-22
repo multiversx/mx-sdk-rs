@@ -1,7 +1,7 @@
 use super::big_uint_api_mock::*;
 use crate::async_data::AsyncCallTxData;
-use crate::{SendBalance, TxContext, TxPanic, TxOutput};
-use elrond_wasm::api::{ContractHookApi, SendApi};
+use crate::{SendBalance, TxContext, TxOutput, TxPanic};
+use elrond_wasm::api::{ContractHookApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -66,13 +66,14 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
-	fn direct_esdt_explicit_gas_limit(
+	fn direct_esdt_execute(
 		&self,
 		to: &Address,
 		token: &[u8],
 		amount: &RustBigUint,
 		_gas: u64,
-		_data: &[u8],
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
 	) {
 		if &amount.value() > &self.get_available_esdt_balance(token) {
 			panic!(TxPanic {
@@ -143,5 +144,15 @@ impl SendApi<RustBigUint> for TxContext {
 		_arg_buffer: &ArgBuffer,
 	) {
 		panic!("execute_on_same_context not implemented yet!");
+	}
+
+	fn storage_store_tx_hash_key(&self, data: &[u8]) {
+		let tx_hash = self.get_tx_hash();
+		self.storage_store_slice_u8(tx_hash.as_bytes(), data);
+	}
+
+	fn storage_load_tx_hash_key(&self) -> BoxedBytes {
+		let tx_hash = self.get_tx_hash();
+		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
 }
