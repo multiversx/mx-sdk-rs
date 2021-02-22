@@ -10,7 +10,7 @@ pub fn arg_serialize_push(
 	match arg_ty {
 		syn::Type::Path(_) => {
 			quote! {
-				if let Result::Err(sc_err) = AsyncCallArg::push_async_arg(&#var_name, &mut #arg_accumulator) {
+				if let Result::Err(sc_err) = AsyncCallArg::push_async_arg(&#var_name, #arg_accumulator) {
 					self.api.signal_error(sc_err.as_bytes());
 				}
 			}
@@ -20,7 +20,7 @@ pub fn arg_serialize_push(
 				panic!("Mutable references not supported as contract method arguments");
 			}
 			quote! {
-				if let Result::Err(sc_err) = AsyncCallArg::push_async_arg(#var_name, &mut #arg_accumulator) {
+				if let Result::Err(sc_err) = AsyncCallArg::push_async_arg(#var_name, #arg_accumulator) {
 					self.api.signal_error(sc_err.as_bytes());
 				}
 			}

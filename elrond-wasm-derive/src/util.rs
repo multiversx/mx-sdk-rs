@@ -62,9 +62,23 @@ pub fn byte_slice_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
 	quote! { &#arr_lit[..] }
 }
 
+pub fn byte_str_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
+	let lit = proc_macro2::Literal::byte_string(bytes);
+	quote! { #lit }
+}
+
+pub fn byte_str_slice_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
+	let lit = byte_str_literal(bytes);
+	quote! { &#lit[..] }
+}
+
+pub fn ident_str_literal(ident: &syn::Ident) -> proc_macro2::TokenStream {
+	byte_str_slice_literal(ident.to_string().as_bytes())
+}
+
 pub fn pat_literal(pat: &syn::Pat) -> proc_macro2::TokenStream {
 	let pat_str = quote::ToTokens::to_token_stream(pat).to_string();
-	byte_slice_literal(pat_str.as_bytes())
+	byte_str_slice_literal(pat_str.as_bytes())
 }
 
 pub fn arg_id_literal(pat: &syn::Pat) -> proc_macro2::TokenStream {

@@ -149,30 +149,6 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn echo_multi_1(
-		&self,
-		_n: usize,
-		#[multi(_n)] m: VarArgs<i32>,
-		another_arg: u64,
-	) -> MultiResult2<MultiResultVec<i32>, u64> {
-		(m.into_vec().into(), another_arg).into()
-	}
-
-	#[endpoint]
-	fn echo_multi_vec_u8(
-		&self,
-		_n: usize,
-		#[multi(_n)] m: VarArgs<Vec<u8>>,
-	) -> MultiResultVec<Vec<u8>> {
-		m.into_vec().into()
-	}
-
-	#[endpoint]
-	fn echo_multi_h256(&self, _n: usize, #[multi(_n)] m: VarArgs<H256>) -> MultiResultVec<H256> {
-		m.into_vec().into()
-	}
-
-	#[endpoint]
 	fn echo_varags_u32(
 		&self,
 		#[var_args] m: VarArgs<u32>,
