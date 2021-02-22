@@ -73,11 +73,6 @@ fn echo_i64() {
 }
 
 #[test]
-fn echo_multi_i32() {
-	parse_execute_mandos("mandos/echo_multi_i32.scen.json", &contract_map());
-}
-
-#[test]
 fn echo_nothing() {
 	parse_execute_mandos("mandos/echo_nothing.scen.json", &contract_map());
 }

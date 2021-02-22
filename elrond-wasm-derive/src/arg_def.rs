@@ -1,11 +1,8 @@
-use super::parse_attr::*;
-
 #[derive(Clone, Debug)]
 pub struct MethodArg {
 	pub index: i32,
 	pub pat: syn::Pat,
 	pub ty: syn::Type,
-	pub is_callback_arg: bool,
 	pub metadata: ArgMetadata,
 }
 
@@ -14,8 +11,8 @@ pub enum ArgMetadata {
 	Payment,
 	PaymentToken,
 	Single,
-	Multi(MultiAttribute),
 	VarArgs,
+	AsyncCallResultArg,
 }
 
 pub fn generate_arg_call_name(arg: &MethodArg) -> proc_macro2::TokenStream {

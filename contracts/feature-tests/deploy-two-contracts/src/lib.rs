@@ -76,7 +76,7 @@ pub trait DeployTwoContracts {
 
 		Ok((
 			first_deployed_contract_address,
-			second_deployed_contract_address
+			second_deployed_contract_address,
 		))
 	}
 
