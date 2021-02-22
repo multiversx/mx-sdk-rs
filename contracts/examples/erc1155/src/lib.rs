@@ -6,12 +6,8 @@ use elrond_wasm::{HexCallDataSerializer, MultiArg2};
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const INTERFACE_SIGNATURE_ERC165: u32 = 0x01ffc9a7;
-const INTERFACE_SIGNATURE_ERC1155: u32 = 0xd9b67a26;
-
 const ON_ERC_RECEIVED_ENDPOINT_NAME: &[u8] = b"onERC1155Received";
 const ON_ERC_BATCH_RECEIVED_ENDPOINT_NAME: &[u8] = b"onERC1155BatchReceived";
-const ACCEPTED_TRANSFER_ANSWER: u32 = 0xbc197c81;
 
 #[derive(TopEncode, TopDecode)]
 pub struct Transfer<BigUint: BigUintApi> {
@@ -224,11 +220,6 @@ pub trait Erc1155 {
 
 	// views
 
-	#[view(supportsInterface)]
-	fn supports_interface(&self, interface_id: u32) -> bool {
-		interface_id == INTERFACE_SIGNATURE_ERC165 || interface_id == INTERFACE_SIGNATURE_ERC1155
-	}
-
 	#[view(balanceOf)]
 	fn balance_of(&self, owner: &Address, type_id: &BigUint) -> BigUint {
 		self.get_balance_mapper(&owner)
@@ -411,16 +402,8 @@ pub trait Erc1155 {
 
 	#[callback_raw]
 	fn callback_raw(&self, result: Vec<Vec<u8>>) {
-		let execution_success = result[0].len() == 0;
-		let is_transfer_accepted = if execution_success {
-			match u32::dep_decode(&mut result[1].as_slice()) {
-				core::result::Result::Ok(return_code) => return_code == ACCEPTED_TRANSFER_ANSWER,
-				core::result::Result::Err(_) => false,
-			}
-		} else {
-			false
-		};
-
+		let is_transfer_accepted = result[0].len() == 0;
+		
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
 		let type_ids = &pending_transfer.type_ids;
