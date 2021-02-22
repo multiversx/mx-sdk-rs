@@ -51,10 +51,7 @@ where
 	}
 }
 
-pub trait EndpointResult<FA>: Sized
-where
-	FA: EndpointFinishApi + 'static,
-{
+pub trait EndpointResult<FA>: Sized {
 	fn finish(&self, api: FA);
 }
 
