@@ -6,8 +6,6 @@ use elrond_wasm::HexCallDataSerializer;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const ACCEPTED_TRANSFER_ANSWER: u32 = 0xbc197c81;
-
 const TRANSFER_TOKEN_ENDPOINT_NAME: &[u8] = b"safeTransferFrom";
 
 const PERCENTAGE_TOTAL: u8 = 100;
@@ -49,7 +47,7 @@ pub trait Erc1155Marketplace {
 		type_id: BigUint,
 		token_id: BigUint,
 		args: AuctionArgument<BigUint>,
-	) -> SCResult<u32> {
+	) -> SCResult<()> {
 		require!(
 			self.get_caller() == self.get_token_ownership_contract_address(),
 			"Only the token ownership contract may call this function"
@@ -64,7 +62,7 @@ pub trait Erc1155Marketplace {
 			args.deadline
 		));
 
-		Ok(ACCEPTED_TRANSFER_ANSWER)
+		Ok(())
 	}
 
 	/// Same `AuctionArgument` is used for all tokens  
@@ -77,7 +75,7 @@ pub trait Erc1155Marketplace {
 		type_ids: Vec<BigUint>,
 		token_ids: Vec<BigUint>,
 		args: AuctionArgument<BigUint>,
-	) -> SCResult<u32> {
+	) -> SCResult<()> {
 		require!(
 			self.get_caller() == self.get_token_ownership_contract_address(),
 			"Only the token ownership contract may call this function"
@@ -100,7 +98,7 @@ pub trait Erc1155Marketplace {
 			));
 		}
 
-		Ok(ACCEPTED_TRANSFER_ANSWER)
+		Ok(())
 	}
 
 	// endpoints - owner-only
