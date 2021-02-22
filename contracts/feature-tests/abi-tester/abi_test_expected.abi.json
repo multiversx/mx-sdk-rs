@@ -71,7 +71,7 @@
                     "type": "bytes"
                 },
                 {
-                    "type": "OnlyShowsUpAsNested3"
+                    "type": "OnlyShowsUpAsNested03"
                 }
             ]
         },
@@ -84,7 +84,7 @@
                 },
                 {
                     "name": "_var_args",
-                    "type": "VarArgs<MultiArg<OnlyShowsUpAsNested4,i32,>>",
+                    "type": "VarArgs<MultiArg<OnlyShowsUpAsNested04,i32,>>",
                     "multi_arg": true
                 }
             ],
@@ -95,7 +95,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "MultiResultVec<OnlyShowsUpAsNested5>",
+                    "type": "MultiResultVec<OnlyShowsUpAsNested05>",
                     "multi_result": true
                 }
             ]
@@ -109,7 +109,7 @@
                 },
                 {
                     "name": "_opt_args",
-                    "type": "OptionalArg<OnlyShowsUpAsNested6>",
+                    "type": "OptionalArg<OnlyShowsUpAsNested06>",
                     "multi_arg": true
                 }
             ],
@@ -120,7 +120,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "OptionalResult<OnlyShowsUpAsNested7>",
+                    "type": "OptionalResult<OnlyShowsUpAsNested07>",
                     "multi_result": true
                 }
             ]
@@ -202,7 +202,7 @@
                         },
                         {
                             "name": "1",
-                            "type": "OnlyShowsUpAsNested8"
+                            "type": "OnlyShowsUpAsNested08"
                         }
                     ]
                 },
@@ -216,7 +216,7 @@
                         },
                         {
                             "name": "b",
-                            "type": "OnlyShowsUpAsNested9"
+                            "type": "OnlyShowsUpAsNested09"
                         }
                     ]
                 }
@@ -233,7 +233,7 @@
                         "This type should only appear here."
                     ],
                     "name": "nested",
-                    "type": "OnlyShowsUpAsNested1"
+                    "type": "OnlyShowsUpAsNested01"
                 },
                 {
                     "docs": [
@@ -248,11 +248,11 @@
                         "Also, just like above, recursive types need to work even when nested into a tuple."
                     ],
                     "name": "tuple_madness",
-                    "type": "(OnlyShowsUpAsNested2,Option<AbiTestType>)"
+                    "type": "(OnlyShowsUpAsNested02,Option<AbiTestType>)"
                 }
             ]
         },
-        "OnlyShowsUpAsNested1": {
+        "OnlyShowsUpAsNested01": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -264,7 +264,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested2": {
+        "OnlyShowsUpAsNested02": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -276,7 +276,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested3": {
+        "OnlyShowsUpAsNested03": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -288,7 +288,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested4": {
+        "OnlyShowsUpAsNested04": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -300,7 +300,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested5": {
+        "OnlyShowsUpAsNested05": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -312,7 +312,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested6": {
+        "OnlyShowsUpAsNested06": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -324,7 +324,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested7": {
+        "OnlyShowsUpAsNested07": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -336,7 +336,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested8": {
+        "OnlyShowsUpAsNested08": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -348,7 +348,7 @@
                 }
             ]
         },
-        "OnlyShowsUpAsNested9": {
+        "OnlyShowsUpAsNested09": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."

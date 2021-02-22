@@ -6,6 +6,6 @@ elrond_wasm::derive_imports!();
 pub enum AbiEnum {
 	Nothing,
 	Something(i32),
-	SomethingMore(u8, OnlyShowsUpAsNested8),
-	SomeStruct { a: u16, b: OnlyShowsUpAsNested9 },
+	SomethingMore(u8, OnlyShowsUpAsNested08),
+	SomeStruct { a: u16, b: OnlyShowsUpAsNested09 },
 }

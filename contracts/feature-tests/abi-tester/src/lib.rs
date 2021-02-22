@@ -42,12 +42,12 @@ pub trait AbiTester {
 	#[endpoint]
 	#[output_name("multi-too-few-1")]
 	#[output_name("multi-too-few-2")]
-	fn multi_result_4(&self) -> MultiResult4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested3> {
+	fn multi_result_4(&self) -> MultiResult4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03> {
 		(
 			1,
 			[2; 3],
 			BoxedBytes::empty(),
-			OnlyShowsUpAsNested3 { something: () },
+			OnlyShowsUpAsNested03 { something: () },
 		)
 			.into()
 	}
@@ -56,12 +56,12 @@ pub trait AbiTester {
 	fn var_args(
 		&self,
 		_simple_arg: u32,
-		#[var_args] _var_args: VarArgs<MultiArg2<OnlyShowsUpAsNested4, i32>>,
+		#[var_args] _var_args: VarArgs<MultiArg2<OnlyShowsUpAsNested04, i32>>,
 	) {
 	}
 
 	#[endpoint]
-	fn multi_result_vec(&self) -> MultiResultVec<OnlyShowsUpAsNested5> {
+	fn multi_result_vec(&self) -> MultiResultVec<OnlyShowsUpAsNested05> {
 		MultiResultVec::new()
 	}
 
@@ -69,12 +69,12 @@ pub trait AbiTester {
 	fn optional_arg(
 		&self,
 		_simple_arg: u32,
-		#[var_args] _opt_args: OptionalArg<OnlyShowsUpAsNested6>,
+		#[var_args] _opt_args: OptionalArg<OnlyShowsUpAsNested06>,
 	) {
 	}
 
 	#[endpoint]
-	fn optional_result(&self) -> OptionalResult<OnlyShowsUpAsNested7> {
+	fn optional_result(&self) -> OptionalResult<OnlyShowsUpAsNested07> {
 		OptionalResult::None
 	}
 

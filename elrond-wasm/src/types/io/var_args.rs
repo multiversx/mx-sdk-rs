@@ -1,6 +1,5 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
-use crate::err_msg;
-use crate::io::{ArgId, DynArg, DynArgInput, DynArgMulti};
+use crate::io::{ArgId, DynArg, DynArgInput};
 use alloc::string::String;
 use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
@@ -71,26 +70,6 @@ where
 		let mut result_vec: Vec<T> = Vec::new();
 		while loader.has_next() {
 			result_vec.push(T::dyn_load(loader, arg_id));
-		}
-		VarArgs(result_vec)
-	}
-}
-
-impl<I, D, T> DynArgMulti<I, D> for VarArgs<T>
-where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-	T: DynArg<I, D>,
-{
-	fn dyn_load_multi(loader: &mut D, arg_id: ArgId, num: usize) -> Self {
-		let mut result_vec: Vec<T> = Vec::new();
-		let mut i = 0usize;
-		while loader.has_next() && i < num {
-			result_vec.push(T::dyn_load(loader, arg_id));
-			i += 1;
-		}
-		if i < num {
-			loader.signal_error(err_msg::ARG_WRONG_NUMBER);
 		}
 		VarArgs(result_vec)
 	}

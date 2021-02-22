@@ -22,6 +22,7 @@ pub fn contract_implementation(
 	let function_selector_body = generate_function_selector_body(&contract, is_contract_main);
 	let abi_body = abi_gen::generate_abi_method_body(&contract);
 	let callback_body = contract.generate_callback_body();
+	let callback_proxies = contract.generate_callback_proxies();
 	let api_where = snippets::api_where();
 
 	let supertrait_impls = contract.generate_supertrait_impls();
@@ -39,9 +40,9 @@ pub fn contract_implementation(
 
 		#(#auto_impl_defs)*
 
-		fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>>;
-
 		fn callback(&self);
+
+		fn callbacks(&self) -> CallbackProxies<T, BigInt, BigUint>;
 	  }
 
 	  pub struct #contract_impl_ident<T, BigInt, BigUint>
@@ -73,13 +74,12 @@ pub fn contract_implementation(
 	  {
 		#(#auto_impls)*
 
-		fn contract_proxy(&self, address: &Address) -> Box<OtherContractHandle<T, BigInt, BigUint>> {
-		  let contract_proxy = OtherContractHandle::new(self.api.clone(), address);
-		  Box::new(contract_proxy)
-		}
-
 		fn callback(&self) {
 		  #callback_body
+		}
+
+		fn callbacks(&self) -> CallbackProxies<T, BigInt, BigUint> {
+			CallbackProxies::new(self.api.clone())
 		}
 	  }
 
@@ -88,6 +88,8 @@ pub fn contract_implementation(
 	  {
 		#(#call_methods)*
 	  }
+
+	  #callback_proxies
 
 	};
 
