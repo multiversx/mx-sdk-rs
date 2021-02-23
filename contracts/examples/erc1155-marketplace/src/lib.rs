@@ -113,10 +113,10 @@ pub trait Erc1155Marketplace {
 
 		let caller = self.get_caller();
 		let claimable_funds_mapper = self.get_claimable_funds_mapper();
-		for (esdt_token, amount) in claimable_funds_mapper.iter() {
-			self.send().direct(&caller, &esdt_token, &amount, b"claim");
+		for (token_identifier, amount) in claimable_funds_mapper.iter() {
+			self.send().direct(&caller, &token_identifier, &amount, b"claim");
 
-			self.clear_claimable_funds(&esdt_token);
+			self.clear_claimable_funds(&token_identifier);
 		}
 
 		Ok(())
@@ -356,16 +356,16 @@ pub trait Erc1155Marketplace {
 		&(total_amount * &(cut_percentage as u32).into()) / &(PERCENTAGE_TOTAL as u32).into()
 	}
 
-	fn add_claimable_funds(&self, esdt_token: &TokenIdentifier, amount: &BigUint) {
+	fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
 		let mut mapper = self.get_claimable_funds_mapper();
-		let mut total = mapper.get(esdt_token).unwrap_or_else(|| BigUint::zero());
+		let mut total = mapper.get(token_identifier).unwrap_or_else(|| BigUint::zero());
 		total += amount;
-		mapper.insert(esdt_token.clone(), total);
+		mapper.insert(token_identifier.clone(), total);
 	}
 
-	fn clear_claimable_funds(&self, esdt_token: &TokenIdentifier) {
+	fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
 		let mut mapper = self.get_claimable_funds_mapper();
-		mapper.insert(esdt_token.clone(), BigUint::zero());
+		mapper.insert(token_identifier.clone(), BigUint::zero());
 	}
 
 	// storage
