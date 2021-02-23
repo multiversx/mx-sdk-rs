@@ -1,7 +1,7 @@
 #![allow(unused_variables)] // for now
 
 use super::*;
-use elrond_wasm::*;
+use elrond_wasm::types::*;
 use mandos::*;
 use num_bigint::BigUint;
 use std::path::Path;

@@ -1,7 +1,7 @@
 use super::{ArwenBigInt, ArwenBigUint};
 use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractHookApi;
-use elrond_wasm::{Address, Box, H256};
+use elrond_wasm::types::{Address, Box, H256};
 
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);

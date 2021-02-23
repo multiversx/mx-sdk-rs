@@ -71,16 +71,6 @@ pub trait KittyAuction {
 		}
 	}
 
-	#[endpoint]
-	fn claim(&self) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
-
-		self.send()
-			.direct_egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
-
-		Ok(())
-	}
-
 	// views
 
 	#[view(isUpForAuction)]

@@ -8,7 +8,7 @@ use super::util::*;
 #[derive(Clone, Debug)]
 pub struct CallableMethod {
 	pub name: syn::Ident,
-	pub payable: bool,
+	pub payable: MethodPayableMetadata,
 	pub generics: syn::Generics,
 	pub method_args: Vec<MethodArg>,
 	pub return_type: syn::ReturnType,
@@ -17,15 +17,10 @@ pub struct CallableMethod {
 impl CallableMethod {
 	pub fn parse(m: &syn::TraitItemMethod) -> CallableMethod {
 		let payable = process_payable(m);
-		if let MethodPayableMetadata::SingleEsdtToken(_) | MethodPayableMetadata::AnyToken = payable
-		{
-			panic!("payable methods in async call proxies currently only accept EGLD");
-		}
-
 		let method_args = extract_method_args(m);
 		CallableMethod {
 			name: m.sig.ident.clone(),
-			payable: payable.is_payable(),
+			payable,
 			generics: m.sig.generics.clone(),
 			method_args,
 			return_type: m.sig.output.clone(),
@@ -104,7 +99,7 @@ impl Callable {
 					.method_args
 					.iter()
 					.map(|arg| {
-						let arg_accumulator = quote! { &mut async_call.hex_data };
+						let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
 
 						match &arg.metadata {
 							ArgMetadata::Single | ArgMetadata::VarArgs => {
@@ -141,13 +136,13 @@ impl Callable {
 				let m_name_literal = ident_str_literal(&m.name);
 				let sig = quote! {
 					#msig {
-						let mut async_call = elrond_wasm::types::ContractCall::<BigUint>::new(
+						let mut ___contract_call___ = elrond_wasm::types::ContractCall::<BigUint>::new(
 							self.address,
 							#token_expr,
 							#payment_expr,
-							#m_name_literal);
+							elrond_wasm::types::BoxedBytes::from(#m_name_literal));
 						#(#arg_push_snippets)*
-						async_call
+						___contract_call___
 					}
 				};
 				sig

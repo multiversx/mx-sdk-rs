@@ -227,14 +227,14 @@ pub trait Multisig {
 	fn propose_sc_call(
 		&self,
 		to: Address,
-		amount: BigUint,
-		function: BoxedBytes,
+		egld_payment: BigUint,
+		endpoint_name: BoxedBytes,
 		#[var_args] arguments: VarArgs<BoxedBytes>,
 	) -> SCResult<usize> {
 		self.propose_action(Action::SCCall {
 			to,
-			amount,
-			function,
+			egld_payment,
+			endpoint_name,
 			arguments: arguments.into_vec(),
 		})
 	}
@@ -492,7 +492,7 @@ pub trait Multisig {
 				let gas_left = self.get_gas_left();
 				let mut arg_buffer = ArgBuffer::new();
 				for arg in arguments {
-					arg_buffer.push_raw_arg(arg.as_slice());
+					arg_buffer.push_argument_bytes(arg.as_slice());
 				}
 				let new_address = self.send().deploy_contract(
 					gas_left,
@@ -505,12 +505,12 @@ pub trait Multisig {
 			},
 			Action::SCCall {
 				to,
-				amount,
-				function,
+				egld_payment,
+				endpoint_name,
 				arguments,
 			} => {
 				let mut contract_call_raw =
-					ContractCall::new(to, TokenIdentifier::egld(), amount, function.as_slice());
+					ContractCall::new(to, TokenIdentifier::egld(), egld_payment, endpoint_name);
 				for arg in arguments {
 					contract_call_raw.push_argument_raw_bytes(arg.as_slice());
 				}

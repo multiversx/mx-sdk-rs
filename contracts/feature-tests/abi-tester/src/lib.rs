@@ -8,7 +8,6 @@ mod only_nested;
 
 use abi_enum::*;
 use abi_test_type::*;
-use elrond_wasm::TokenIdentifier;
 use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
