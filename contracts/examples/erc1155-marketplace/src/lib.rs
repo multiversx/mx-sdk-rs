@@ -12,7 +12,7 @@ const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<BigUint: BigUintApi> {
-	pub esdt_token: TokenIdentifier,
+	pub token_identifier: TokenIdentifier,
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
 	pub deadline: u64,
@@ -23,7 +23,7 @@ pub struct Auction<BigUint: BigUintApi> {
 
 #[derive(TopDecode, TypeAbi)]
 pub struct AuctionArgument<BigUint: BigUintApi> {
-	pub esdt_token: TokenIdentifier,
+	pub token_identifier: TokenIdentifier,
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
 	pub deadline: u64,
@@ -47,7 +47,7 @@ pub trait Erc1155Marketplace {
 		_operator: Address,
 		from: Address,
 		type_id: BigUint,
-		token_id: BigUint,
+		nft_id: BigUint,
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
 		require!(
@@ -57,9 +57,9 @@ pub trait Erc1155Marketplace {
 
 		sc_try!(self.try_create_auction(
 			&type_id,
-			&token_id,
+			&nft_id,
 			&from,
-			&args.esdt_token,
+			&args.token_identifier,
 			&args.min_bid,
 			&args.max_bid,
 			args.deadline
@@ -76,7 +76,7 @@ pub trait Erc1155Marketplace {
 		_operator: Address,
 		from: Address,
 		type_ids: Vec<BigUint>,
-		token_ids: Vec<BigUint>,
+		nft_ids: Vec<BigUint>,
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
 		require!(
@@ -84,18 +84,18 @@ pub trait Erc1155Marketplace {
 			"Only the token ownership contract may call this function"
 		);
 		require!(
-			type_ids.len() == token_ids.len(),
-			"type_ids and token_ids lengths do not match"
+			type_ids.len() == nft_ids.len(),
+			"type_ids and nft_ids lengths do not match"
 		);
 
 		// Don't have to worry about checking if there are duplicates in the entries,
 		// an error here will revert all storage changes automatically
-		for (type_id, token_id) in type_ids.iter().zip(token_ids.iter()) {
+		for (type_id, nft_id) in type_ids.iter().zip(nft_ids.iter()) {
 			sc_try!(self.try_create_auction(
 				type_id,
-				token_id,
+				nft_id,
 				&from,
-				&args.esdt_token,
+				&args.token_identifier,
 				&args.min_bid,
 				&args.max_bid,
 				args.deadline
@@ -152,17 +152,17 @@ pub trait Erc1155Marketplace {
 	fn bid(
 		&self,
 		type_id: BigUint,
-		token_id: BigUint,
+		nft_id: BigUint,
 		#[payment_token] payment_token: TokenIdentifier,
 		#[payment] payment: BigUint,
 	) -> SCResult<()> {
 		require!(
-			self.is_up_for_auction(&type_id, &token_id),
+			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
 		);
 
 		let caller = self.get_caller();
-		let mut auction = self.get_auction_for_token(&type_id, &token_id);
+		let mut auction = self.get_auction_for_token(&type_id, &nft_id);
 
 		require!(
 			auction.original_owner != caller,
@@ -173,8 +173,8 @@ pub trait Erc1155Marketplace {
 			"Auction ended already"
 		);
 		require!(
-			payment_token == auction.esdt_token,
-			"Wrong ESDT token used as payment"
+			payment_token == auction.token_identifier,
+			"Wrong token used as payment"
 		);
 		require!(
 			payment >= auction.min_bid,
@@ -193,7 +193,7 @@ pub trait Erc1155Marketplace {
 		if auction.current_winner != Address::zero() {
 			self.send().direct(
 				&auction.current_winner,
-				&auction.esdt_token,
+				&auction.token_identifier,
 				&auction.current_bid,
 				b"bit refund",
 			);
@@ -202,47 +202,47 @@ pub trait Erc1155Marketplace {
 		// update auction bid and winner
 		auction.current_bid = payment;
 		auction.current_winner = caller;
-		self.set_auction_for_token(&type_id, &token_id, &auction);
+		self.set_auction_for_token(&type_id, &nft_id, &auction);
 
 		Ok(())
 	}
 
 	#[endpoint(endAuction)]
-	fn end_auction(&self, type_id: BigUint, token_id: BigUint) -> SCResult<()> {
+	fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<()> {
 		require!(
-			self.is_up_for_auction(&type_id, &token_id),
+			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
 		);
 
-		let auction = self.get_auction_for_token(&type_id, &token_id);
+		let auction = self.get_auction_for_token(&type_id, &nft_id);
 
 		require!(
 			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
 			"auction has not ended yet!"
 		);
 
-		self.clear_auction_for_token(&type_id, &token_id);
+		self.clear_auction_for_token(&type_id, &nft_id);
 
 		if auction.current_winner != Address::zero() {
 			let percentage_cut = self.get_percentage_cut();
 			let cut_amount = self.calculate_cut_amount(&auction.current_bid, percentage_cut);
 			let amount_to_send = &auction.current_bid - &cut_amount;
 
-			self.add_claimable_funds(&auction.esdt_token, &cut_amount);
+			self.add_claimable_funds(&auction.token_identifier, &cut_amount);
 
 			// send part of the bid to the original owner
 			self.send().direct(
 				&auction.original_owner,
-				&auction.esdt_token,
+				&auction.token_identifier,
 				&amount_to_send,
 				b"sold token",
 			);
 
 			// send token to winner
-			self.asnyc_transfer_token(&type_id, &token_id, &auction.current_winner);
+			self.asnyc_transfer_token(&type_id, &nft_id, &auction.current_winner);
 		} else {
 			// return to original owner
-			self.asnyc_transfer_token(&type_id, &token_id, &auction.original_owner);
+			self.asnyc_transfer_token(&type_id, &nft_id, &auction.original_owner);
 		}
 
 		Ok(())
@@ -251,43 +251,43 @@ pub trait Erc1155Marketplace {
 	// views
 
 	#[view(isUpForAuction)]
-	fn is_up_for_auction(&self, type_id: &BigUint, token_id: &BigUint) -> bool {
-		!self.is_empty_auction_for_token(type_id, token_id)
+	fn is_up_for_auction(&self, type_id: &BigUint, nft_id: &BigUint) -> bool {
+		!self.is_empty_auction_for_token(type_id, nft_id)
 	}
 
 	#[view(getAuctionStatus)]
 	fn get_auction_status(
 		&self,
 		type_id: BigUint,
-		token_id: BigUint,
+		nft_id: BigUint,
 	) -> SCResult<Auction<BigUint>> {
 		require!(
-			self.is_up_for_auction(&type_id, &token_id),
+			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
 		);
 
-		Ok(self.get_auction_for_token(&type_id, &token_id))
+		Ok(self.get_auction_for_token(&type_id, &nft_id))
 	}
 
 	#[view(getCurrentWinningBid)]
-	fn get_current_winning_bid(&self, type_id: BigUint, token_id: BigUint) -> SCResult<BigUint> {
+	fn get_current_winning_bid(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<BigUint> {
 		require!(
-			self.is_up_for_auction(&type_id, &token_id),
+			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
 		);
 
-		Ok(self.get_auction_for_token(&type_id, &token_id).current_bid)
+		Ok(self.get_auction_for_token(&type_id, &nft_id).current_bid)
 	}
 
 	#[view(getCurrentWinner)]
-	fn get_current_winner(&self, type_id: BigUint, token_id: BigUint) -> SCResult<Address> {
+	fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<Address> {
 		require!(
-			self.is_up_for_auction(&type_id, &token_id),
+			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
 		);
 
 		Ok(self
-			.get_auction_for_token(&type_id, &token_id)
+			.get_auction_for_token(&type_id, &nft_id)
 			.current_winner)
 	}
 
@@ -296,7 +296,7 @@ pub trait Erc1155Marketplace {
 	fn try_create_auction(
 		&self,
 		type_id: &BigUint,
-		token_id: &BigUint,
+		nft_id: &BigUint,
 		original_owner: &Address,
 		token: &TokenIdentifier,
 		min_bid: &BigUint,
@@ -304,7 +304,7 @@ pub trait Erc1155Marketplace {
 		deadline: u64,
 	) -> SCResult<()> {
 		require!(
-			!self.is_up_for_auction(&type_id, &token_id),
+			!self.is_up_for_auction(&type_id, &nft_id),
 			"There is already an auction for that token"
 		);
 		require!(
@@ -318,9 +318,9 @@ pub trait Erc1155Marketplace {
 
 		self.set_auction_for_token(
 			&type_id,
-			&token_id,
+			&nft_id,
 			&Auction {
-				esdt_token: token.clone(),
+				token_identifier: token.clone(),
 				min_bid: min_bid.clone(),
 				max_bid: max_bid.clone(),
 				deadline,
@@ -334,7 +334,7 @@ pub trait Erc1155Marketplace {
 	}
 
 	// TODO: Replace with Proxy in the next framework version
-	fn asnyc_transfer_token(&self, type_id: &BigUint, token_id: &BigUint, to: &Address) {
+	fn asnyc_transfer_token(&self, type_id: &BigUint, nft_id: &BigUint, to: &Address) {
 		let sc_own_address = self.get_sc_address();
 		let token_ownership_contract_address = self.get_token_ownership_contract_address();
 		let mut serializer = HexCallDataSerializer::new(TRANSFER_TOKEN_ENDPOINT_NAME);
@@ -342,7 +342,7 @@ pub trait Erc1155Marketplace {
 		serializer.push_argument_bytes(sc_own_address.as_bytes()); // from
 		serializer.push_argument_bytes(to.as_bytes()); // to
 		serializer.push_argument_bytes(type_id.to_bytes_be().as_slice()); // type_id
-		serializer.push_argument_bytes(token_id.to_bytes_be().as_slice()); // value
+		serializer.push_argument_bytes(nft_id.to_bytes_be().as_slice()); // value
 		serializer.push_argument_bytes(&[]); // data
 
 		self.send().async_call_raw(
@@ -395,19 +395,19 @@ pub trait Erc1155Marketplace {
 	// auction properties for each token
 
 	#[storage_get("auctionForToken")]
-	fn get_auction_for_token(&self, type_id: &BigUint, token_id: &BigUint) -> Auction<BigUint>;
+	fn get_auction_for_token(&self, type_id: &BigUint, nft_id: &BigUint) -> Auction<BigUint>;
 
 	#[storage_set("auctionForToken")]
 	fn set_auction_for_token(
 		&self,
 		type_id: &BigUint,
-		token_id: &BigUint,
+		nft_id: &BigUint,
 		auction: &Auction<BigUint>,
 	);
 
 	#[storage_is_empty("auctionForToken")]
-	fn is_empty_auction_for_token(&self, type_id: &BigUint, token_id: &BigUint) -> bool;
+	fn is_empty_auction_for_token(&self, type_id: &BigUint, nft_id: &BigUint) -> bool;
 
 	#[storage_clear("auctionForToken")]
-	fn clear_auction_for_token(&self, type_id: &BigUint, token_id: &BigUint);
+	fn clear_auction_for_token(&self, type_id: &BigUint, nft_id: &BigUint);
 }
