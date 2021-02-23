@@ -1,8 +1,5 @@
-use crate::types::Address;
-use crate::{
-	api::{BigIntApi, BigUintApi, SendApi},
-	TokenIdentifier,
-};
+use crate::api::{BigIntApi, BigUintApi, SendApi};
+use crate::types::{Address, TokenIdentifier};
 
 pub trait ContractProxy<SA, BigInt, BigUint>
 where
@@ -12,7 +9,5 @@ where
 {
 	fn new(send_api: SA, address: Address) -> Self;
 
-	fn token_transfer(self, token: TokenIdentifier, amount: BigUint) -> Self;
-
-	fn egld_transfer(self, amount: BigUint) -> Self;
+	fn with_token_transfer(self, token: TokenIdentifier, amount: BigUint) -> Self;
 }
