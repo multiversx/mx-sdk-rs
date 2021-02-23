@@ -58,14 +58,8 @@ pub fn process_callable(
 				}
 			}
 
-			fn token_transfer(mut self, token: TokenIdentifier, payment: BigUint) -> Self {
+			fn with_token_transfer(mut self, token: TokenIdentifier, payment: BigUint) -> Self {
 				self.token = token;
-				self.payment = payment;
-				self
-			}
-
-			fn egld_transfer(mut self, payment: BigUint) -> Self {
-				self.token = elrond_wasm::types::TokenIdentifier::egld();
 				self.payment = payment;
 				self
 			}

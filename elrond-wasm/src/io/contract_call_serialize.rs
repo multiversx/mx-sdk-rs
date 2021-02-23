@@ -1,78 +1,73 @@
-use crate::hex_call_data::*;
-use crate::*;
-use elrond_codec::*;
+use crate::api::ErrorApi;
+use crate::types::*;
+use elrond_codec::{TopEncode, TopEncodeOutput};
 
-pub trait AsyncCallArg: Sized {
-	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError>;
-
-	fn push_async_arg_exact(
-		&self,
-		_serializer: &mut HexCallDataSerializer,
-		_expected_len: usize,
-	) -> Result<(), SCError> {
-		Err(SCError::from(&b"not supported"[..]))
+pub fn serialize_contract_call_arg<I, A>(arg: I, arg_buffer: &mut ArgBuffer, error_api: A)
+where
+	I: ContractCallArg,
+	A: ErrorApi,
+{
+	// TODO: convert to fast exit
+	if let Result::Err(sc_err) = arg.push_async_arg(arg_buffer) {
+		error_api.signal_error(sc_err.as_bytes());
 	}
 }
 
-struct AsyncCallArgOutput<'c> {
-	call_data_ser_ref: &'c mut HexCallDataSerializer,
+/// Trait that specifies how arguments are serialized in contract calls.
+///
+/// TODO: unite with DynArg trait when reorganizing argument handling.
+pub trait ContractCallArg: Sized {
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError>;
 }
 
-impl<'c> AsyncCallArgOutput<'c> {
+/// Local adapter the connects the ArgBuffer to the TopEncode trait.
+struct ContractCallArgOutput<'s> {
+	arg_buffer: &'s mut ArgBuffer,
+}
+
+impl<'c> ContractCallArgOutput<'c> {
 	#[inline]
-	fn new(call_data_ser_ref: &'c mut HexCallDataSerializer) -> Self {
-		AsyncCallArgOutput { call_data_ser_ref }
+	fn new(arg_buffer: &'c mut ArgBuffer) -> Self {
+		ContractCallArgOutput { arg_buffer }
 	}
 }
 
-impl<'c> TopEncodeOutput for AsyncCallArgOutput<'c> {
+impl<'c> TopEncodeOutput for ContractCallArgOutput<'c> {
 	fn set_slice_u8(self, bytes: &[u8]) {
-		self.call_data_ser_ref.push_argument_bytes(bytes);
+		self.arg_buffer.push_argument_bytes(bytes);
 	}
 }
 
-impl<T> AsyncCallArg for T
+impl<T> ContractCallArg for T
 where
 	T: TopEncode,
 {
 	#[inline]
 	#[allow(clippy::redundant_closure)]
-	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
-		self.top_encode(AsyncCallArgOutput::new(serializer))
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+		self.top_encode(ContractCallArgOutput::new(serializer))
 			.map_err(|err| SCError::from(err))
 	}
 }
 
-impl<T> AsyncCallArg for VarArgs<T>
+impl<T> ContractCallArg for VarArgs<T>
 where
-	T: AsyncCallArg,
+	T: ContractCallArg,
 {
-	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
 		for elem in self.0.iter() {
 			elem.push_async_arg(serializer)?;
 		}
 		Ok(())
 	}
-
-	fn push_async_arg_exact(
-		&self,
-		serializer: &mut HexCallDataSerializer,
-		expected_len: usize,
-	) -> Result<(), SCError> {
-		if self.len() != expected_len {
-			return Err(SCError::from(err_msg::ARG_ASYNC_WRONG_NUMBER));
-		}
-		self.push_async_arg(serializer)?;
-		Ok(())
-	}
 }
 
-impl<T> AsyncCallArg for OptionalArg<T>
+impl<T> ContractCallArg for OptionalArg<T>
 where
-	T: AsyncCallArg,
+	T: ContractCallArg,
 {
 	#[inline]
-	fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
 		if let OptionalArg::Some(t) = self {
 			t.push_async_arg(serializer)?;
 		}
@@ -83,12 +78,12 @@ where
 macro_rules! multi_arg_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
         $(
-            impl<$($name),+> AsyncCallArg for $mr<$($name,)+>
+            impl<$($name),+> ContractCallArg for $mr<$($name,)+>
             where
-                $($name: AsyncCallArg,)+
+                $($name: ContractCallArg,)+
             {
                 #[inline]
-                fn push_async_arg(&self, serializer: &mut HexCallDataSerializer) -> Result<(), SCError> {
+                fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
                     $(
                         (self.0).$n.push_async_arg(serializer)?;
                     )+

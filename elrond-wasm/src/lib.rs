@@ -21,4 +21,3 @@ pub mod types;
 pub use hex_call_data::*;
 pub use io::*;
 pub use storage::{storage_get, storage_set};
-pub use types::*;
