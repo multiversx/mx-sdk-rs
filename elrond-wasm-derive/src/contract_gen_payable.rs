@@ -69,10 +69,14 @@ fn payable_snippet_for_metadata(
 			}
 		},
 		MethodPayableMetadata::AnyToken => {
-			let payment_var_name = var_name_or_underscore(payment_arg);
-			let token_var_name = var_name_or_underscore(token_arg);
-			quote! {
-				let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
+			if payment_arg.is_none() && token_arg.is_none() {
+				quote! {}
+			} else {
+				let payment_var_name = var_name_or_underscore(payment_arg);
+				let token_var_name = var_name_or_underscore(token_arg);
+				quote! {
+					let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
+				}
 			}
 		},
 	}

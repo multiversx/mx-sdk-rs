@@ -1,0 +1,57 @@
+{
+    "name": "get caller",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get_caller",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "get_caller",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "address:an_account" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "get_caller_query",
+            "tx": {
+                "to": "address:features_contract",
+                "function": "get_caller"
+            },
+            "expect": {
+                "out": [ "address:features_contract" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

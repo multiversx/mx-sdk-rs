@@ -17,7 +17,7 @@ impl ArgBuffer {
 		}
 	}
 
-	pub fn push_raw_arg(&mut self, arg_bytes: &[u8]) {
+	pub fn push_argument_bytes(&mut self, arg_bytes: &[u8]) {
 		self.arg_lengths.push(arg_bytes.len());
 		self.arg_data.extend_from_slice(arg_bytes);
 	}
@@ -32,6 +32,28 @@ impl ArgBuffer {
 
 	pub fn arg_data_ptr(&self) -> *const u8 {
 		self.arg_data.as_ptr()
+	}
+
+	/// Quick for-each using closures.
+	/// TODO: also write an Iterator at some point, but beware of wasm bloat.
+	pub fn for_each_arg<F: FnMut(&[u8])>(&self, mut f: F) {
+		let mut data_offset = 0;
+		for &arg_length in self.arg_lengths.iter() {
+			let next_data_offset = data_offset + arg_length;
+			f(&self.arg_data[data_offset..next_data_offset]);
+			data_offset = next_data_offset;
+		}
+	}
+
+	pub fn is_empty(&self) -> bool {
+		self.arg_lengths.is_empty()
+	}
+
+	/// Concatenates 2 ArgBuffer. Consumes both arguments in the process.
+	pub fn concat(mut self, mut other: ArgBuffer) -> Self {
+		self.arg_lengths.append(&mut other.arg_lengths);
+		self.arg_data.append(&mut other.arg_data);
+		self
 	}
 }
 
