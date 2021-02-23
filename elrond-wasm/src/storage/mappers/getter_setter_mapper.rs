@@ -3,8 +3,7 @@ use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
-use crate::types::BoxedBytes;
-use crate::BorrowedMutStorage;
+use crate::types::{BorrowedMutStorage, BoxedBytes};
 use core::marker::PhantomData;
 use elrond_codec::{TopDecode, TopEncode};
 
