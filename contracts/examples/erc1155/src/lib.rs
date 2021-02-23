@@ -1,7 +1,8 @@
 #![no_std]
 
 use elrond_codec::test_util::top_encode_to_vec_or_panic;
-use elrond_wasm::{HexCallDataSerializer, MultiArg2};
+use elrond_wasm::HexCallDataSerializer;
+use elrond_wasm::types::MultiArg2;
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -24,7 +25,7 @@ pub trait Erc1155 {
 
 	// endpoints
 
-	/// `value` is amount for fungible, token_id for non-fungible
+	/// `value` is amount for fungible, nft_id for non-fungible
 	#[endpoint(safeTransferFrom)]
 	fn safe_transfer_from(
 		&self,
@@ -54,16 +55,16 @@ pub trait Erc1155 {
 				self.increase_balance(&to, &type_id, &amount);
 			}
 		} else {
-			let token_id = &value;
+			let nft_id = &value;
 
-			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &token_id));
+			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
 
 			if self.is_smart_contract_address(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
 			} else {
 				let amount = BigUint::from(1u32);
 				self.increase_balance(&to, &type_id, &amount);
-				self.set_token_owner(&type_id, token_id, &to);
+				self.set_token_owner(&type_id, nft_id, &to);
 			}
 		}
 
@@ -72,7 +73,7 @@ pub trait Erc1155 {
 		Ok(())
 	}
 
-	/// `value` is amount for fungible, token_id for non-fungible
+	/// `value` is amount for fungible, nft_id for non-fungible
 	#[endpoint(safeBatchTransferFrom)]
 	fn safe_batch_transfer_from(
 		&self,
@@ -111,16 +112,16 @@ pub trait Erc1155 {
 					self.increase_balance(&to, &type_id, &amount);
 				}
 			} else {
-				let token_id = value;
+				let nft_id = value;
 
-				sc_try!(self.try_reserve_non_fungible(&from, &type_id, &token_id));
+				sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
 
 				if !is_receiver_smart_contract {
 					let amount = BigUint::from(1u32);
 					self.increase_balance(&to, &type_id, &amount);
-					self.set_token_owner(&type_id, &token_id, &to);
+					self.set_token_owner(&type_id, &nft_id, &to);
 				} else {
-					self.set_token_owner(&type_id, &token_id, &Address::zero());
+					self.set_token_owner(&type_id, &nft_id, &Address::zero());
 				}
 			}
 		}
@@ -162,7 +163,7 @@ pub trait Erc1155 {
 
 		if !is_fungible {
 			self.set_owner_for_range(&type_id, &big_uint_one, &initial_supply, &creator);
-			self.set_last_valid_token_id_for_type(&type_id, &initial_supply);
+			self.set_last_valid_nft_id_for_type(&type_id, &initial_supply);
 		}
 
 		self.set_last_valid_type_id(&type_id);
@@ -187,13 +188,13 @@ pub trait Erc1155 {
 		self.increase_balance(&creator, &type_id, &amount);
 
 		if !self.is_fungible(&type_id) {
-			let last_valid_id = self.get_last_valid_token_id_for_type(&type_id);
+			let last_valid_id = self.get_last_valid_nft_id_for_type(&type_id);
 			let id_first = &last_valid_id + &BigUint::from(1u32);
 			let id_last = last_valid_id + amount;
 
 			self.set_owner_for_range(&type_id, &id_first, &id_last, &creator);
 
-			self.set_last_valid_token_id_for_type(&type_id, &id_last);
+			self.set_last_valid_nft_id_for_type(&type_id, &id_last);
 		}
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
@@ -259,10 +260,10 @@ pub trait Erc1155 {
 		type_id > &0 && type_id <= &self.get_last_valid_type_id()
 	}
 
-	fn is_valid_token_id(&self, type_id: &BigUint, token_id: &BigUint) -> bool {
+	fn is_valid_nft_id(&self, type_id: &BigUint, nft_id: &BigUint) -> bool {
 		self.is_valid_type_id(type_id)
-			&& token_id > &0
-			&& token_id <= &self.get_last_valid_token_id_for_type(type_id)
+			&& nft_id > &0
+			&& nft_id <= &self.get_last_valid_nft_id_for_type(type_id)
 	}
 
 	fn increase_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
@@ -302,20 +303,20 @@ pub trait Erc1155 {
 		&self,
 		owner: &Address,
 		type_id: &BigUint,
-		token_id: &BigUint,
+		nft_id: &BigUint,
 	) -> SCResult<()> {
 		require!(
-			self.is_valid_token_id(&type_id, &token_id),
+			self.is_valid_nft_id(&type_id, &nft_id),
 			"Token type-id pair is not valid"
 		);
 		require!(
-			&self.get_token_owner(&type_id, &token_id) == owner,
+			&self.get_token_owner(&type_id, &nft_id) == owner,
 			"_from_ is not the owner of the token"
 		);
 
 		let amount = BigUint::from(1u32);
 		self.decrease_balance(&owner, &type_id, &amount);
-		self.set_token_owner(&type_id, token_id, &Address::zero());
+		self.set_token_owner(&type_id, nft_id, &Address::zero());
 
 		Ok(())
 	}
@@ -329,11 +330,11 @@ pub trait Erc1155 {
 		owner: &Address,
 	) {
 		let big_uint_one = BigUint::from(1u32);
-		let mut token_id = start.clone();
+		let mut nft_id = start.clone();
 
-		while &token_id <= end {
-			self.set_token_owner(&type_id, &token_id, &owner);
-			token_id += &big_uint_one;
+		while &nft_id <= end {
+			self.set_token_owner(&type_id, &nft_id, &owner);
+			nft_id += &big_uint_one;
 		}
 	}
 
@@ -421,10 +422,10 @@ pub trait Erc1155 {
 				let amount = value;
 				self.increase_balance(&dest_address, &type_id, &amount);
 			} else {
-				let token_id = value;
+				let nft_id = value;
 				let amount = BigUint::from(1u32);
 				self.increase_balance(&dest_address, &type_id, &amount);
-				self.set_token_owner(&type_id, token_id, &dest_address);
+				self.set_token_owner(&type_id, nft_id, &dest_address);
 			}
 		}
 
@@ -445,10 +446,10 @@ pub trait Erc1155 {
 
 	#[view(getTokenOwner)]
 	#[storage_get("tokenOwner")]
-	fn get_token_owner(&self, type_id: &BigUint, token_id: &BigUint) -> Address;
+	fn get_token_owner(&self, type_id: &BigUint, nft_id: &BigUint) -> Address;
 
 	#[storage_set("tokenOwner")]
-	fn set_token_owner(&self, type_id: &BigUint, token_id: &BigUint, owner: &Address);
+	fn set_token_owner(&self, type_id: &BigUint, nft_id: &BigUint, owner: &Address);
 
 	// token creator
 
@@ -486,10 +487,10 @@ pub trait Erc1155 {
 	fn set_last_valid_type_id(&self, last_valid_type_id: &BigUint);
 
 	#[storage_get("lastValidTokenIdForType")]
-	fn get_last_valid_token_id_for_type(&self, type_id: &BigUint) -> BigUint;
+	fn get_last_valid_nft_id_for_type(&self, type_id: &BigUint) -> BigUint;
 
 	#[storage_set("lastValidTokenIdForType")]
-	fn set_last_valid_token_id_for_type(&self, type_id: &BigUint, last_valid_token_id: &BigUint);
+	fn set_last_valid_nft_id_for_type(&self, type_id: &BigUint, last_valid_nft_id: &BigUint);
 
 	// check if an operator is approved. Default is false.
 
