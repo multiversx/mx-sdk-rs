@@ -1,7 +1,7 @@
 #![allow(unused_variables)] // for now
 
 use super::*;
-use elrond_wasm::*;
+use elrond_wasm::types::*;
 use mandos::*;
 use num_bigint::BigUint;
 use std::path::Path;
@@ -75,58 +75,10 @@ fn parse_execute_mandos_steps(
 					)
 				}
 				if let Some(block_info_obj) = &**previous_block_info {
-					if let Some(u64_value) = &block_info_obj.block_timestamp {
-						state.previous_block_info.block_timestamp = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_nonce {
-						state.previous_block_info.block_nonce = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_epoch {
-						state.previous_block_info.block_epoch = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_round {
-						state.previous_block_info.block_round = u64_value.value;
-					}
-					if let Some(bytes_value) = &block_info_obj.block_random_seed {
-						const SEED_LEN: usize = 48;
-						let val = &bytes_value.value;
-
-						assert!(
-							val.len() <= SEED_LEN,
-							"block random seed input value too long!"
-						);
-
-						let mut seed = [0u8; SEED_LEN];
-						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
-						state.previous_block_info.block_random_seed = Box::from(seed);
-					}
+					update_block_info(&mut state.previous_block_info, block_info_obj);
 				}
 				if let Some(block_info_obj) = &**current_block_info {
-					if let Some(u64_value) = &block_info_obj.block_timestamp {
-						state.current_block_info.block_timestamp = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_nonce {
-						state.current_block_info.block_nonce = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_epoch {
-						state.current_block_info.block_epoch = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_round {
-						state.current_block_info.block_round = u64_value.value;
-					}
-					if let Some(bytes_value) = &block_info_obj.block_random_seed {
-						const SEED_LEN: usize = 48;
-						let val = &bytes_value.value;
-
-						assert!(
-							val.len() <= SEED_LEN,
-							"block random seed input value too long!"
-						);
-
-						let mut seed = [0u8; SEED_LEN];
-						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
-						state.current_block_info.block_random_seed = Box::from(seed);
-					}
+					update_block_info(&mut state.current_block_info, block_info_obj);
 				}
 			},
 			Step::ScCall {
@@ -586,4 +538,32 @@ fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
 		result[..bytes.len()].copy_from_slice(bytes);
 	}
 	result.into()
+}
+
+fn update_block_info(block_info: &mut super::BlockInfo, mandos_block_info: &mandos::BlockInfo) {
+	if let Some(u64_value) = &mandos_block_info.block_timestamp {
+		block_info.block_timestamp = u64_value.value;
+	}
+	if let Some(u64_value) = &mandos_block_info.block_nonce {
+		block_info.block_nonce = u64_value.value;
+	}
+	if let Some(u64_value) = &mandos_block_info.block_epoch {
+		block_info.block_epoch = u64_value.value;
+	}
+	if let Some(u64_value) = &mandos_block_info.block_round {
+		block_info.block_round = u64_value.value;
+	}
+	if let Some(bytes_value) = &mandos_block_info.block_random_seed {
+		const SEED_LEN: usize = 48;
+		let val = &bytes_value.value;
+
+		assert!(
+			val.len() == SEED_LEN,
+			"block random seed input value must be exactly 48 bytes long"
+		);
+
+		let mut seed = [0u8; SEED_LEN];
+		&seed[..].copy_from_slice(val.as_slice());
+		block_info.block_random_seed = Box::from(seed);
+	}
 }

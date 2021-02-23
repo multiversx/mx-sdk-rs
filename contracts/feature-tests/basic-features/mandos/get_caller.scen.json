@@ -1,12 +1,12 @@
 {
-    "name": "echo_multi_i32",
+    "name": "get caller",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:features_contract": {
                     "nonce": "0",
-                    "balance": "0x100",
+                    "balance": "0",
                     "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -20,29 +20,18 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "get_caller",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "echo_multi_1",
-                "arguments": [
-                    "3",
-                    "0",
-                    "1",
-                    "-2",
-                    "100"
-                ],
-                "gasLimit": "1,000,000",
+                "function": "get_caller",
+                "arguments": [],
+                "gasLimit": "0x100000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "0",
-                    "1",
-                    "-2",
-                    "100"
-                ],
+                "out": [ "address:an_account" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -50,30 +39,19 @@
             }
         },
         {
-            "step": "scCall",
-            "txId": "2",
+            "step": "scQuery",
+            "txId": "get_caller_query",
             "tx": {
-                "from": "address:an_account",
                 "to": "address:features_contract",
-                "value": "0",
-                "function": "echo_multi_1",
-                "arguments": [
-                    "0",
-                    "100"
-                ],
-                "gasLimit": "1,000,000",
-                "gasPrice": "0"
+                "function": "get_caller"
             },
             "expect": {
-                "out": [
-                    "100"
-                ],
+                "out": [ "address:features_contract" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
         }
-        
     ]
 }

@@ -53,7 +53,7 @@ pub fn process_payable(m: &syn::TraitItemMethod) -> MethodPayableMetadata {
 				_ => MethodPayableMetadata::SingleEsdtToken(identifier),
 			}
 		} else {
-			println!("Warning: usage of #[payable] without argument is deprecated. Replace with #[payable(\"EGLD\")]. Method name: {}", m.sig.ident.to_string());
+			eprintln!("Warning: usage of #[payable] without argument is deprecated. Replace with #[payable(\"EGLD\")]. Method name: {}", m.sig.ident.to_string());
 			MethodPayableMetadata::Egld
 		}
 	} else {
@@ -146,6 +146,9 @@ impl MethodMetadata {
 	pub fn payable_metadata(&self) -> MethodPayableMetadata {
 		match self {
 			MethodMetadata::Regular { payable, .. } => payable.clone(),
+			MethodMetadata::Callback | MethodMetadata::CallbackRaw => {
+				MethodPayableMetadata::AnyToken
+			},
 			MethodMetadata::StorageGetter { .. } => MethodPayableMetadata::NotPayable,
 			MethodMetadata::StorageSetter { .. } => MethodPayableMetadata::NotPayable,
 			MethodMetadata::StorageGetMut { .. } => MethodPayableMetadata::NotPayable,
@@ -412,8 +415,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 impl Method {
 	pub fn parse(m: &syn::TraitItemMethod) -> Method {
 		let metadata = extract_metadata(m);
-		let allow_callback_args = matches!(metadata, MethodMetadata::Callback);
-		let method_args = extract_method_args(m, allow_callback_args);
+		let method_args = extract_method_args(m);
 		let payment_arg = extract_payment(metadata.payable_metadata(), &method_args[..]);
 		let token_arg = extract_payment_token(metadata.payable_metadata(), &method_args[..]);
 		let output_names = find_output_names(m);
@@ -472,111 +474,94 @@ impl Method {
 	pub fn has_variable_nr_args(&self) -> bool {
 		self.method_args
 			.iter()
-			.any(|arg| matches!(&arg.metadata, ArgMetadata::Multi(_) | ArgMetadata::VarArgs))
+			.any(|arg| matches!(&arg.metadata, ArgMetadata::VarArgs))
 	}
 
 	pub fn generate_call_method(&self) -> proc_macro2::TokenStream {
-		if self.has_variable_nr_args() {
-			self.generate_call_method_variable_nr_args()
-		} else {
-			self.generate_call_method_fixed_args()
+		let call_method_ident = generate_call_method_name(&self.name);
+		let call_method_body = self.generate_call_method_body();
+		quote! {
+			#[inline]
+			fn #call_method_ident (&self) {
+				#call_method_body
+			}
 		}
 	}
 
-	pub fn generate_call_method_fixed_args(&self) -> proc_macro2::TokenStream {
+	pub fn generate_call_method_body(&self) -> proc_macro2::TokenStream {
+		if self.has_variable_nr_args() {
+			self.generate_call_method_body_variable_nr_args()
+		} else {
+			self.generate_call_method_body_fixed_args()
+		}
+	}
+
+	pub fn generate_call_method_body_fixed_args(&self) -> proc_macro2::TokenStream {
 		let payable_snippet = generate_payable_snippet(self);
 
 		let mut arg_index = -1i32;
 		let arg_init_snippets: Vec<proc_macro2::TokenStream> = self
 			.method_args
 			.iter()
-			.map(|arg| {
-				if arg.is_callback_arg {
-					panic!("callback args not allowed in endpoints");
-				}
-
-				match &arg.metadata {
-					ArgMetadata::Single => {
-						arg_index += 1;
-						let pat = &arg.pat;
-						let arg_get = generate_load_single_arg(arg, &quote! { #arg_index });
-						quote! {
-							let #pat = #arg_get;
-						}
-					},
-					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-					ArgMetadata::Multi(_) => panic!(
-						"multi args not accepted in function generate_call_method_fixed_args"
-					),
-					ArgMetadata::VarArgs => {
-						panic!("var_args not accepted in function generate_call_method_fixed_args")
-					},
-				}
+			.map(|arg| match &arg.metadata {
+				ArgMetadata::Single => {
+					arg_index += 1;
+					let pat = &arg.pat;
+					let arg_get = generate_load_single_arg(arg, &quote! { #arg_index });
+					quote! {
+						let #pat = #arg_get;
+					}
+				},
+				ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
+				ArgMetadata::VarArgs => {
+					panic!("var_args not accepted in function generate_call_method_fixed_args")
+				},
+				ArgMetadata::AsyncCallResultArg => {
+					panic!("async call result arg not allowed here")
+				},
 			})
 			.collect();
 
-		let call_method_ident = generate_call_method_name(&self.name);
 		let call = self.generate_call_to_method();
 		let body_with_result = generate_body_with_result(&self.return_type, &call);
 		let nr_args = arg_index + 1;
 
 		quote! {
-			#[inline]
-			fn #call_method_ident (&self) {
-				#payable_snippet
-				self.api.check_num_arguments(#nr_args);
-				#(#arg_init_snippets)*
-				#body_with_result
-			}
+			#payable_snippet
+			self.api.check_num_arguments(#nr_args);
+			#(#arg_init_snippets)*
+			#body_with_result
 		}
 	}
 
-	fn generate_call_method_variable_nr_args(&self) -> proc_macro2::TokenStream {
+	fn generate_call_method_body_variable_nr_args(&self) -> proc_macro2::TokenStream {
 		let payable_snippet = generate_payable_snippet(self);
 
 		let arg_init_snippets: Vec<proc_macro2::TokenStream> = self
 			.method_args
 			.iter()
-			.map(|arg| {
-				if arg.is_callback_arg {
-					panic!("callback args not allowed in public functions");
-				}
-
-				match &arg.metadata {
-					ArgMetadata::Single | ArgMetadata::VarArgs => {
-						generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
-					},
-					ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-					ArgMetadata::Multi(multi_attr) => {
-						// #[multi(...)]
-						let count_expr = &multi_attr.count_expr;
-						generate_load_dyn_multi_arg(
-							arg,
-							&quote! { &mut ___arg_loader },
-							&quote! { #count_expr as usize },
-						)
-					},
-				}
+			.map(|arg| match &arg.metadata {
+				ArgMetadata::Single | ArgMetadata::VarArgs => {
+					generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
+				},
+				ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
+				ArgMetadata::AsyncCallResultArg => panic!("async call result arg npt allowed here"),
 			})
 			.collect();
 
-		let call_method_ident = generate_call_method_name(&self.name);
 		let call = self.generate_call_to_method();
 		let body_with_result = generate_body_with_result(&self.return_type, &call);
 
 		quote! {
-			#[inline]
-			fn #call_method_ident (&self) {
-				#payable_snippet
+			#payable_snippet
 
-				let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
+			let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
 
-				#(#arg_init_snippets)*
+			#(#arg_init_snippets)*
 
-				___arg_loader.assert_no_more_args();
+			___arg_loader.assert_no_more_args();
 
-				#body_with_result
-			}
+			#body_with_result
 		}
 	}
 }

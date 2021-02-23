@@ -1,6 +1,6 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
-use elrond_wasm::api::SendApi;
+use elrond_wasm::api::{ContractHookApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 
 extern "C" {
@@ -11,6 +11,17 @@ extern "C" {
 		dataLength: i32,
 	) -> i32;
 
+	fn transferValueExecute(
+		dstOffset: *const u8,
+		valueOffset: *const u8,
+		gasLimit: i64,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	) -> i32;
+
 	fn transferESDT(
 		dstOffset: *const u8,
 		tokenIdOffset: *const u8,
@@ -19,6 +30,19 @@ extern "C" {
 		gasLimit: i64,
 		dataOffset: *const u8,
 		dataLength: i32,
+	) -> i32;
+
+	fn transferESDTExecute(
+		dstOffset: *const u8,
+		tokenIdOffset: *const u8,
+		tokenIdLen: i32,
+		valueOffset: *const u8,
+		gasLimit: i64,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
 	) -> i32;
 
 	fn asyncCall(
@@ -85,14 +109,31 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn direct_esdt_explicit_gas_limit(
+	fn direct_egld_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
 		amount: &ArwenBigUint,
 		gas_limit: u64,
-		data: &[u8],
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
 	) {
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			let _ = transferValueExecute(
+				to.as_ref().as_ptr(),
+				amount_bytes32_ptr,
+				gas_limit as i64,
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+	}
+
+	/// Same as the implementation in the trait, but avoids creating a new ArgBuffer instance.
+	fn direct_esdt(&self, to: &Address, token: &[u8], amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = transferESDT(
@@ -100,9 +141,35 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				token.as_ptr(),
 				token.len() as i32,
 				amount_bytes32_ptr,
-				gas_limit as i64,
+				0i64,
 				data.as_ptr(),
 				data.len() as i32,
+			);
+		}
+	}
+
+	fn direct_esdt_execute(
+		&self,
+		to: &Address,
+		token: &[u8],
+		amount: &ArwenBigUint,
+		gas_limit: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			let _ = transferESDTExecute(
+				to.as_ref().as_ptr(),
+				token.as_ptr(),
+				token.len() as i32,
+				amount_bytes32_ptr,
+				gas_limit as i64,
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
 			);
 		}
 	}
@@ -212,5 +279,15 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.arg_data_ptr(),
 			);
 		}
+	}
+
+	fn storage_store_tx_hash_key(&self, data: &[u8]) {
+		let tx_hash = self.get_tx_hash();
+		self.storage_store_slice_u8(tx_hash.as_bytes(), data);
+	}
+
+	fn storage_load_tx_hash_key(&self) -> BoxedBytes {
+		let tx_hash = self.get_tx_hash();
+		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
 }

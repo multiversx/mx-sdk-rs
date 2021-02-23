@@ -1,5 +1,5 @@
 use elrond_wasm::api::BigUintApi;
-use elrond_wasm::{Address, Vec};
+use elrond_wasm::types::{Address, Vec};
 elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

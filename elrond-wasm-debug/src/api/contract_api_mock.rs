@@ -1,7 +1,7 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::TxContext;
-use elrond_wasm::{Address, H256};
+use elrond_wasm::types::{Address, H256};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;

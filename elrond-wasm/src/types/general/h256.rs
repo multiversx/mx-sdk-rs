@@ -1,5 +1,5 @@
 use crate::abi::TypeAbi;
-use crate::BoxedBytes;
+use crate::types::BoxedBytes;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;

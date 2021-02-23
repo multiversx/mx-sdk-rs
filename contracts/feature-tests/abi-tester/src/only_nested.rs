@@ -2,54 +2,54 @@ elrond_wasm::derive_imports!();
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested1 {
+pub struct OnlyShowsUpAsNested01 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested2 {
+pub struct OnlyShowsUpAsNested02 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested3 {
+pub struct OnlyShowsUpAsNested03 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested4 {
+pub struct OnlyShowsUpAsNested04 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested5 {
+pub struct OnlyShowsUpAsNested05 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested6 {
+pub struct OnlyShowsUpAsNested06 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested7 {
+pub struct OnlyShowsUpAsNested07 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested8 {
+pub struct OnlyShowsUpAsNested08 {
 	pub something: (),
 }
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct OnlyShowsUpAsNested9 {
+pub struct OnlyShowsUpAsNested09 {
 	pub something: (),
 }

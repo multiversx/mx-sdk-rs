@@ -53,7 +53,7 @@ fn payable_snippet_for_metadata(
 			}
 		},
 		MethodPayableMetadata::SingleEsdtToken(token_name) => {
-			let token_literal = byte_slice_literal(token_name.as_bytes());
+			let token_literal = byte_str_slice_literal(token_name.as_bytes());
 			let payment_var_name = var_name_or_underscore(payment_arg);
 			let token_init = if let Some(arg) = token_arg {
 				let pat = &arg.pat;
@@ -69,10 +69,14 @@ fn payable_snippet_for_metadata(
 			}
 		},
 		MethodPayableMetadata::AnyToken => {
-			let payment_var_name = var_name_or_underscore(payment_arg);
-			let token_var_name = var_name_or_underscore(token_arg);
-			quote! {
-				let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
+			if payment_arg.is_none() && token_arg.is_none() {
+				quote! {}
+			} else {
+				let payment_var_name = var_name_or_underscore(payment_arg);
+				let token_var_name = var_name_or_underscore(token_arg);
+				quote! {
+					let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
+				}
 			}
 		},
 	}
