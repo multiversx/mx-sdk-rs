@@ -1,4 +1,4 @@
-use elrond_wasm::{BoxedBytes, Vec};
+use elrond_wasm::types::{BoxedBytes, Vec};
 elrond_wasm::derive_imports!();
 
 /// Copied from elrond-wasm serialization tests.

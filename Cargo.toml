@@ -45,6 +45,7 @@ members = [
   "contracts/feature-tests/async",
   "contracts/feature-tests/async/async-alice",
   "contracts/feature-tests/async/async-bob",
+  "contracts/feature-tests/async/forwarder",
   "contracts/feature-tests/async/forwarder-raw",
   "contracts/feature-tests/async/vault",
   "contracts/feature-tests/basic-features",

@@ -1,5 +1,5 @@
 use elrond_wasm::api::BigUintApi;
-use elrond_wasm::{Address, TokenIdentifier, Vec};
+use elrond_wasm::types::{Address, TokenIdentifier, Vec};
 
 elrond_wasm::derive_imports!();
 
