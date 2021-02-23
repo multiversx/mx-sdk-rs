@@ -37,6 +37,10 @@ members = [
   "contracts/examples/simple-erc20/abi",
   "contracts/examples/erc1155-marketplace",
   "contracts/examples/erc1155-marketplace/abi",
+  "contracts/examples/erc1155",
+  "contracts/examples/erc1155/abi",
+  "contracts/examples/erc1155-user-mock",
+  "contracts/examples/erc1155-user-mock/abi",
 
   "contracts/examples/crypto-kitties/kitty-ownership",
   "contracts/examples/crypto-kitties/kitty-genetic-alg",
