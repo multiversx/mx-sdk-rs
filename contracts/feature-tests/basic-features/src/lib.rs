@@ -519,6 +519,17 @@ pub trait BasicFeatures {
 		map_mapper.remove(&item)
 	}
 
+	// BASIC API
+	#[endpoint(get_caller)]
+	fn get_caller_endpoint(&self) -> Address {
+		self.get_caller()
+	}
+
+	#[endpoint(get_gas_left)]
+	fn get_gas_left_endpoint(&self) -> u64 {
+		self.get_gas_left()
+	}
+
 	// EVENTS
 
 	#[endpoint(logEventA)]

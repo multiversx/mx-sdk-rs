@@ -66,6 +66,17 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
+	fn direct_egld_execute(
+		&self,
+		_to: &Address,
+		_amount: &RustBigUint,
+		_gas_limit: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("direct_egld_execute not yet implemented")
+	}
+
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,

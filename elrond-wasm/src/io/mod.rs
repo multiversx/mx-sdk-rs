@@ -1,6 +1,6 @@
 pub mod arg_de_input;
 pub mod arg_id;
-pub mod arg_serialize;
+pub mod contract_call_serialize;
 pub mod dyn_arg;
 pub mod dyn_arg_input;
 pub mod dyn_arg_input_cd;
@@ -11,7 +11,7 @@ pub mod signal_error;
 
 pub use arg_de_input::*;
 pub use arg_id::ArgId;
-pub use arg_serialize::*;
+pub use contract_call_serialize::*;
 pub use dyn_arg::*;
 pub use dyn_arg_input::*;
 pub use dyn_arg_input_cd::*;

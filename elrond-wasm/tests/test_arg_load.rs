@@ -1,4 +1,6 @@
-use elrond_wasm::{api::PanickingErrorApi, *};
+use elrond_wasm::api::PanickingErrorApi;
+use elrond_wasm::types::*;
+use elrond_wasm::*;
 
 #[test]
 fn test_simple_args() {
