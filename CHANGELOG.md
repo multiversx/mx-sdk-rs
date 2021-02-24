@@ -6,6 +6,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [elrond-wasm 0.12.0]
+- Reorganized ESDT and EGLD direct send api.
+- New async call syntax
+	- redesigned contract proxies
+	- contract calls are communicated via objects returned from endpoint methods
+	- callbacks now specified programmatically
+	- got rid of the `#[callback_arg]` annotation
+
 ## [elrond-wasm 0.11.0, elrond-codec 0.5.0, mandos 0.5.0] - 2021-02-05
 ### Refactor
 - Major refactoring of the contract API: split into smaller traits
