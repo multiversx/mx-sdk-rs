@@ -34,6 +34,14 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			.unwrap_or_else(|| panic!("contract owner address not set"))
 	}
 
+	fn get_shard_of_address(&self, _address: &Address) -> u32 {
+		panic!("get_shard_of_address not implemented")
+	}
+
+	fn is_smart_contract(&self, _address: &Address) -> bool {
+		panic!("is_smart_contract not implemented")
+	}
+
 	fn get_caller(&self) -> Address {
 		self.tx_input_box.from.clone()
 	}

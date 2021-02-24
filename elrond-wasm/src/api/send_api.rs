@@ -27,7 +27,13 @@ where
 	/// Used especially for sending ESDT to regular accounts.
 	///
 	/// Unlike sending ESDT via async call, this method can be called multiple times per transaction.
-	fn direct_esdt_via_transf_exec(&self, to: &Address, token: &[u8], amount: &BigUint, data: &[u8]) {
+	fn direct_esdt_via_transf_exec(
+		&self,
+		to: &Address,
+		token: &[u8],
+		amount: &BigUint,
+		data: &[u8],
+	) {
 		self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
 	}
 
