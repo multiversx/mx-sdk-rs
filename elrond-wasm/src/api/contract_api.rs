@@ -43,6 +43,10 @@ where
 
 	fn get_owner_address(&self) -> Address;
 
+	fn get_shard_of_address(&self, address: &Address) -> u32;
+
+	fn is_smart_contract(&self, address: &Address) -> bool;
+
 	fn get_caller(&self) -> Address;
 
 	fn get_balance(&self, address: &Address) -> BigUint;
