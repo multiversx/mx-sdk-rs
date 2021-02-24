@@ -114,7 +114,8 @@ pub trait Erc1155Marketplace {
 		let caller = self.get_caller();
 		let claimable_funds_mapper = self.get_claimable_funds_mapper();
 		for (token_identifier, amount) in claimable_funds_mapper.iter() {
-			self.send().direct(&caller, &token_identifier, &amount, b"claim");
+			self.send()
+				.direct(&caller, &token_identifier, &amount, b"claim");
 
 			self.clear_claimable_funds(&token_identifier);
 		}
@@ -176,6 +177,7 @@ pub trait Erc1155Marketplace {
 			payment_token == auction.token_identifier,
 			"Wrong token used as payment"
 		);
+		require!(auction.current_winner != caller, "Can't outbid yourself");
 		require!(
 			payment >= auction.min_bid,
 			"Bid must be higher than or equal to the min bid"
@@ -218,7 +220,7 @@ pub trait Erc1155Marketplace {
 
 		require!(
 			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
-			"auction has not ended yet!"
+			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
 		self.clear_auction_for_token(&type_id, &nft_id);
@@ -256,11 +258,7 @@ pub trait Erc1155Marketplace {
 	}
 
 	#[view(getAuctionStatus)]
-	fn get_auction_status(
-		&self,
-		type_id: BigUint,
-		nft_id: BigUint,
-	) -> SCResult<Auction<BigUint>> {
+	fn get_auction_status(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<Auction<BigUint>> {
 		require!(
 			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
@@ -286,9 +284,7 @@ pub trait Erc1155Marketplace {
 			"Token is not up for auction"
 		);
 
-		Ok(self
-			.get_auction_for_token(&type_id, &nft_id)
-			.current_winner)
+		Ok(self.get_auction_for_token(&type_id, &nft_id).current_winner)
 	}
 
 	// private
@@ -358,7 +354,9 @@ pub trait Erc1155Marketplace {
 
 	fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
 		let mut mapper = self.get_claimable_funds_mapper();
-		let mut total = mapper.get(token_identifier).unwrap_or_else(|| BigUint::zero());
+		let mut total = mapper
+			.get(token_identifier)
+			.unwrap_or_else(|| BigUint::zero());
 		total += amount;
 		mapper.insert(token_identifier.clone(), total);
 	}
