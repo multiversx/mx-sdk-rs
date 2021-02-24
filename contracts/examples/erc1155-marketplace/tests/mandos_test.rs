@@ -25,3 +25,8 @@ fn contract_map() -> ContractMap<TxContext> {
 fn auction_single_token_test() {
 	parse_execute_mandos("mandos/auction_single_token.scen.json", &contract_map());
 }
+
+#[test]
+fn auction_batch_test() {
+	parse_execute_mandos("mandos/auction_batch.scen.json", &contract_map());
+}

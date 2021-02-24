@@ -1,5 +1,5 @@
 {
-    "name": "auction a single token",
+    "name": "auction batch",
     "steps": [
         {
             "step": "externalSteps",
@@ -7,18 +7,18 @@
         },
         {
             "step": "scCall",
-            "txId": "auction-single-token",
+            "txId": "auction-batch",
             "comment": "last argument is an AuctionArgument: token: eGLD (serialized as empty string), min_bid: 100, max_bid: 500, deadline: 1000",
             "tx": {
                 "from": "address:creator",
                 "to": "address:ownership_contract",
                 "value": "0",
-                "function": "safeTransferFrom",
+                "function": "safeBatchTransferFrom",
                 "arguments": [
                     "address:creator",
                     "address:marketplace_contract",
-                    "1",
-                    "2",
+                    "u32:1|u8:1|u32:1|u8:1",
+                    "u32:1|u8:2|u32:1|u8:3",
                     "u32:4|str:EGLD|u32:1|u8:100|u32:2|u16:500|u64:1000"
                 ],
                 "gasLimit": "0x100000",
@@ -68,15 +68,14 @@
                         "str:isFungible|u32:1|u8:1": "false",
                         "str:tokenTypeUri|u32:1|u8:1": "str:https://token-cdn-domain/{id}.json",
                         "str:lastValidTokenIdForType|u32:1|u8:1": "5",
-                        "str:balanceOf|address:creator|str:.mapped|u8:1": "4",
-                        "str:balanceOf|address:marketplace_contract|str:.mapped|u8:1": "1",
-
+                        "str:balanceOf|address:creator|str:.mapped|u8:1": "3",
+                        "str:balanceOf|address:marketplace_contract|str:.mapped|u8:1": "2",
 
                         "str:lastValidTypeId": "1",
 
                         "str:tokenOwner|u32:1|u8:1|u32:1|u8:1": "address:creator",
                         "str:tokenOwner|u32:1|u8:1|u32:1|u8:2": "address:marketplace_contract",
-                        "str:tokenOwner|u32:1|u8:1|u32:1|u8:3": "address:creator",
+                        "str:tokenOwner|u32:1|u8:1|u32:1|u8:3": "address:marketplace_contract",
                         "str:tokenOwner|u32:1|u8:1|u32:1|u8:4": "address:creator",
                         "str:tokenOwner|u32:1|u8:1|u32:1|u8:5": "address:creator",
 
@@ -98,7 +97,8 @@
                     "storage": {
                         "str:tokenOwnershipContractAddress": "address:ownership_contract",
                         "str:percentageCut": "10",
-                        "str:auctionForToken|u32:1|u8:1|u32:1|u8:2": "u32:4|str:EGLD|u32:1|u8:100|u32:2|u16:500|u64:1000|address:creator|u32:0|u64:0|u64:0|u64:0|u64:0"
+                        "str:auctionForToken|u32:1|u8:1|u32:1|u8:2": "u32:4|str:EGLD|u32:1|u8:100|u32:2|u16:500|u64:1000|address:creator|u32:0|u64:0|u64:0|u64:0|u64:0",
+                        "str:auctionForToken|u32:1|u8:1|u32:1|u8:3": "u32:4|str:EGLD|u32:1|u8:100|u32:2|u16:500|u64:1000|address:creator|u32:0|u64:0|u64:0|u64:0|u64:0"
                     },
                     "code": "file:../output/erc1155-marketplace.wasm"
                 }
