@@ -571,7 +571,7 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
 	#[endpoint]
@@ -588,9 +588,9 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_first_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_second_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
 	}
 
 	// BLOCK INFO
