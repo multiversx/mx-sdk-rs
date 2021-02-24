@@ -36,6 +36,21 @@ pub trait ForwarderRaw {
 			.direct_esdt_via_transf_exec(&to, &token.as_slice(), &payment, &[]);
 	}
 
+	#[endpoint]
+	#[payable("*")]
+	fn forward_direct_esdt_via_transf_exec_twice(
+		&self,
+		to: Address,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: BigUint,
+	) {
+		let half_payment = payment / 2u32.into();
+		self.send()
+			.direct_esdt_via_transf_exec(&to, &token.as_slice(), &half_payment, &[]);
+		self.send()
+			.direct_esdt_via_transf_exec(&to, &token.as_slice(), &half_payment, &[]);
+	}
+
 	fn forward_contract_call(
 		&self,
 		to: Address,
@@ -121,6 +136,21 @@ pub trait ForwarderRaw {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
 			.transfer_execute()
 			.with_gas_limit(self.get_gas_left() / 2)
+	}
+
+	#[endpoint]
+	#[payable("*")]
+	fn forward_transf_exec_twice(
+		&self,
+		to: Address,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: BigUint,
+		endpoint_name: BoxedBytes,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) -> MultiResult2<TransferExecute<BigUint>, TransferExecute<BigUint>> {
+		let half_payment = payment / 2u32.into();
+		let call = self.forward_transf_exec(to, token, half_payment, endpoint_name, args);
+		(call.clone(), call).into()
 	}
 
 	#[view]

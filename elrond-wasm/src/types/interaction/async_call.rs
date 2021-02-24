@@ -7,6 +7,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
+#[derive(Clone)]
 pub struct AsyncCall<BigUint: BigUintApi> {
 	pub(crate) to: Address,
 	pub(crate) egld_payment: BigUint,

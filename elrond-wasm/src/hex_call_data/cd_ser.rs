@@ -28,6 +28,7 @@ fn byte_to_hex(byte: u8) -> (u8, u8) {
 ///
 /// Converting from whatever type the argument to bytes is not in scope. Use the `serializer` module for that.
 ///
+#[derive(Clone)]
 pub struct HexCallDataSerializer(Vec<u8>);
 
 impl HexCallDataSerializer {

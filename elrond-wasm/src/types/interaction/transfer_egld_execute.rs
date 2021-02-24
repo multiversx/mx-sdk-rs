@@ -6,6 +6,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
+#[derive(Clone)]
 pub struct TransferEgldExecute<BigUint: BigUintApi> {
 	pub(super) to: Address,
 	pub(super) egld_payment: BigUint,

@@ -5,6 +5,7 @@ use crate::types::{Address, BoxedBytes};
 use alloc::string::String;
 use alloc::vec::Vec;
 
+#[derive(Clone)]
 pub struct SendEsdt<BigUint: BigUintApi> {
 	pub to: Address,
 	pub token_name: BoxedBytes,

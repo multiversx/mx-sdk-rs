@@ -6,6 +6,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
+#[derive(Clone)]
 pub struct TransferExecute<BigUint: BigUintApi> {
 	pub(super) to: Address,
 	pub(super) token: TokenIdentifier,

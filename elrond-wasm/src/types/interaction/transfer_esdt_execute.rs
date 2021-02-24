@@ -6,6 +6,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
+#[derive(Clone)]
 pub struct TransferEsdtExecute<BigUint: BigUintApi> {
 	pub(super) to: Address,
 	pub(super) token_name: BoxedBytes,

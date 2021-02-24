@@ -5,6 +5,7 @@ use crate::types::{Address, BoxedBytes};
 use alloc::string::String;
 use alloc::vec::Vec;
 
+#[derive(Clone)]
 pub struct SendEgld<BigUint: BigUintApi> {
 	pub to: Address,
 	pub amount: BigUint,
