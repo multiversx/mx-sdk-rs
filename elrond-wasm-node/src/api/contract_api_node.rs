@@ -6,6 +6,8 @@ use elrond_wasm::types::{Address, Box, H256};
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
 	fn getOwnerAddress(resultOffset: *mut u8);
+	fn getShardOfAddress(address_ptr: *const u8) -> i32;
+	fn isSmartContract(address_ptr: *const u8) -> i32;
 
 	/// Currently not used.
 	#[allow(dead_code)]
@@ -74,6 +76,16 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			getOwnerAddress(res.as_mut_ptr());
 			res
 		}
+	}
+
+	#[inline]
+	fn get_shard_of_address(&self, address: &Address) -> u32 {
+		unsafe { getShardOfAddress(address.as_ref().as_ptr()) as u32 }
+	}
+
+	#[inline]
+	fn is_smart_contract(&self, address: &Address) -> bool {
+		unsafe { isSmartContract(address.as_ref().as_ptr()) > 0 }
 	}
 
 	#[inline]

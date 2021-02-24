@@ -22,16 +22,6 @@ extern "C" {
 		dataOffset: *const u8,
 	) -> i32;
 
-	fn transferESDT(
-		dstOffset: *const u8,
-		tokenIdOffset: *const u8,
-		tokenIdLen: i32,
-		valueOffset: *const u8,
-		gasLimit: i64,
-		dataOffset: *const u8,
-		dataLength: i32,
-	) -> i32;
-
 	fn transferESDTExecute(
 		dstOffset: *const u8,
 		tokenIdOffset: *const u8,
@@ -128,22 +118,6 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			);
-		}
-	}
-
-	/// Same as the implementation in the trait, but avoids creating a new ArgBuffer instance.
-	fn direct_esdt(&self, to: &Address, token: &[u8], amount: &ArwenBigUint, data: &[u8]) {
-		unsafe {
-			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			let _ = transferESDT(
-				to.as_ref().as_ptr(),
-				token.as_ptr(),
-				token.len() as i32,
-				amount_bytes32_ptr,
-				0i64,
-				data.as_ptr(),
-				data.len() as i32,
 			);
 		}
 	}

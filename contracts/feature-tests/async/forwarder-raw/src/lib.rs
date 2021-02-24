@@ -26,6 +26,33 @@ pub trait ForwarderRaw {
 
 	#[endpoint]
 	#[payable("*")]
+	fn forward_direct_esdt_via_transf_exec(
+		&self,
+		to: Address,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: BigUint,
+	) {
+		self.send()
+			.direct_esdt_via_transf_exec(&to, &token.as_slice(), &payment, &[]);
+	}
+
+	fn forward_contract_call(
+		&self,
+		to: Address,
+		token: TokenIdentifier,
+		payment: BigUint,
+		endpoint_name: BoxedBytes,
+		args: VarArgs<BoxedBytes>,
+	) -> ContractCall<BigUint> {
+		let mut contract_call = ContractCall::new(to, token, payment, endpoint_name);
+		for arg in args.into_vec() {
+			contract_call.push_argument_raw_bytes(arg.as_slice());
+		}
+		contract_call
+	}
+
+	#[endpoint]
+	#[payable("*")]
 	fn forward_async_call(
 		&self,
 		to: Address,
@@ -34,11 +61,8 @@ pub trait ForwarderRaw {
 		endpoint_name: BoxedBytes,
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) -> AsyncCall<BigUint> {
-		let mut contract_call = ContractCall::new(to, token, payment, endpoint_name);
-		for arg in args.into_vec() {
-			contract_call.push_argument_raw_bytes(arg.as_slice());
-		}
-		contract_call.async_call()
+		self.forward_contract_call(to, token, payment, endpoint_name, args)
+			.async_call()
 	}
 
 	#[endpoint]
@@ -53,6 +77,50 @@ pub trait ForwarderRaw {
 	) -> AsyncCall<BigUint> {
 		let half_payment = payment / 2u32.into();
 		self.forward_async_call(to, token, half_payment, endpoint_name, args)
+	}
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn forward_transf_exec_egld(
+		&self,
+		to: Address,
+		#[payment] payment: BigUint,
+		endpoint_name: BoxedBytes,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) -> TransferEgldExecute<BigUint> {
+		self.forward_contract_call(to, TokenIdentifier::egld(), payment, endpoint_name, args)
+			.transfer_egld_execute()
+			.with_gas_limit(self.get_gas_left() / 2)
+	}
+
+	#[endpoint]
+	#[payable("*")]
+	fn forward_transf_exec_esdt(
+		&self,
+		to: Address,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: BigUint,
+		endpoint_name: BoxedBytes,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) -> TransferEsdtExecute<BigUint> {
+		self.forward_contract_call(to, token, payment, endpoint_name, args)
+			.transfer_esdt_execute()
+			.with_gas_limit(self.get_gas_left() / 2)
+	}
+
+	#[endpoint]
+	#[payable("*")]
+	fn forward_transf_exec(
+		&self,
+		to: Address,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: BigUint,
+		endpoint_name: BoxedBytes,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) -> TransferExecute<BigUint> {
+		self.forward_contract_call(to, token, payment, endpoint_name, args)
+			.transfer_execute()
+			.with_gas_limit(self.get_gas_left() / 2)
 	}
 
 	#[view]
