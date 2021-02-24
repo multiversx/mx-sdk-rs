@@ -253,7 +253,7 @@ pub trait Erc1155 {
 
 	// mock
 	fn is_smart_contract_address(&self, _address: &Address) -> bool {
-		false
+		true
 	}
 
 	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
@@ -403,7 +403,7 @@ pub trait Erc1155 {
 
 	#[callback_raw]
 	fn callback_raw(&self, result: Vec<Vec<u8>>) {
-		let is_transfer_accepted = result[0].len() == 0;
+		let is_transfer_accepted = result.len() == 0 || result[0].len() == 0;
 		
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
