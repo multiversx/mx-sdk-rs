@@ -13,12 +13,10 @@ pub enum SCResult<T> {
 }
 
 impl<T> SCResult<T> {
-	#[inline]
 	pub fn is_ok(&self) -> bool {
 		matches!(self, SCResult::Ok(_))
 	}
 
-	#[inline]
 	pub fn is_err(&self) -> bool {
 		!self.is_ok()
 	}
