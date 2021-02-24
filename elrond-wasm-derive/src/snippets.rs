@@ -90,6 +90,16 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			}
 
 			#[inline]
+			fn get_shard_of_address(&self, address: &Address) -> u32 {
+				self.api.get_shard_of_address(address)
+			}
+
+			#[inline]
+			fn is_smart_contract(&self, address: &Address) -> bool {
+				self.api.is_smart_contract(address)
+			}
+
+			#[inline]
 			fn get_caller(&self) -> Address {
 				self.api.get_caller()
 			}
