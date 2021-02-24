@@ -397,8 +397,8 @@ pub trait Erc1155 {
 	// callbacks
 
 	#[callback_raw]
-	fn callback_raw(&self, result: Vec<Vec<u8>>) {
-		let is_transfer_accepted = result.len() == 0 || result[0].len() == 0;
+	fn callback_raw(&self, #[var_args] result: AsyncCallResult<VarArgs<BoxedBytes>>) {
+		let is_transfer_accepted = result.is_ok();
 		
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
