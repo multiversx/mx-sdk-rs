@@ -525,6 +525,16 @@ pub trait BasicFeatures {
 		self.get_caller()
 	}
 
+	#[endpoint(get_shard_of_address)]
+	fn get_shard_of_address_endpoint(&self, address: &Address) -> u32 {
+		self.get_shard_of_address(address)
+	}
+
+	#[endpoint(is_smart_contract)]
+	fn is_smart_contract_endpoint(&self, address: &Address) -> bool {
+		self.is_smart_contract(address)
+	}
+
 	#[endpoint(get_gas_left)]
 	fn get_gas_left_endpoint(&self) -> u64 {
 		self.get_gas_left()
@@ -571,7 +581,7 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
 	#[endpoint]
@@ -588,9 +598,9 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_first_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_second_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
 	}
 
 	// BLOCK INFO
