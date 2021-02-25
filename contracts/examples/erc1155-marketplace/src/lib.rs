@@ -136,6 +136,7 @@ pub trait Erc1155Marketplace {
 		Ok(())
 	}
 
+	#[endpoint(setTokenOwnershipContractAddress)]
 	fn set_token_ownership_contract_address_endpoint(&self, new_address: Address) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 		require!(!new_address.is_zero(), "Cannot set to zero address");
