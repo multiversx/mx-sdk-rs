@@ -153,6 +153,13 @@ impl From<Vec<u8>> for BoxedBytes {
 	}
 }
 
+/// This allows us to use a mutable BoxedBytes as top encode output.
+impl TopEncodeOutput for &mut BoxedBytes {
+	fn set_slice_u8(self, bytes: &[u8]) {
+		*self = BoxedBytes::from(bytes);
+	}
+}
+
 impl NestedEncode for BoxedBytes {
 	#[inline]
 	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
