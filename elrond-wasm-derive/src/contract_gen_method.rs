@@ -67,8 +67,11 @@ pub enum MethodMetadata {
 		visibility: Visibility,
 		payable: MethodPayableMetadata,
 	},
-	Event {
+	LegacyEvent {
 		identifier: Vec<u8>,
+	},
+	Event {
+		identifier: String,
 	},
 	Callback,
 	CallbackRaw,
@@ -234,6 +237,7 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let payable = process_payable(m);
 	let callback = is_callback_decl(m);
 	let callback_raw = is_callback_raw_decl(m);
+	let legacy_event_opt = LegacyEventAttribute::parse(m);
 	let event_opt = EventAttribute::parse(m);
 	let storage_get_opt = StorageGetAttribute::parse(m);
 	let storage_set_opt = StorageSetAttribute::parse(m);
@@ -243,7 +247,39 @@ fn extract_metadata(m: &syn::TraitItemMethod) -> MethodMetadata {
 	let storage_clear_opt = StorageClearAttribute::parse(m);
 	let module_opt = ModuleAttribute::parse(m);
 
-	if let Some(event_attr) = event_opt {
+	// TODO: this entire component requires extensive refactoring
+	if let Some(event_attr) = legacy_event_opt {
+		if payable.is_payable() {
+			panic!("Events cannot be payable.");
+		}
+		if let Visibility::Endpoint(_) = visibility {
+			panic!("Events cannot be endpoints.");
+		}
+		if callback || callback_raw {
+			panic!("Events cannot be callbacks.");
+		}
+		if storage_get_opt.is_some() {
+			panic!("Events cannot be storage getters.");
+		}
+		if storage_set_opt.is_some() {
+			panic!("Events cannot be storage setters.");
+		}
+		if storage_mapper_opt.is_some() {
+			panic!("Events cannot be storage mappers.");
+		}
+		if storage_get_mut_opt.is_some() {
+			panic!("Events cannot be storage borrow getters.");
+		}
+		if module_opt.is_some() {
+			panic!("Events cannot be modules.");
+		}
+		if m.default.is_some() {
+			panic!("Events cannot have an implementations provided in the trait.");
+		}
+		MethodMetadata::LegacyEvent {
+			identifier: event_attr.identifier,
+		}
+	} else if let Some(event_attr) = event_opt {
 		if payable.is_payable() {
 			panic!("Events cannot be payable.");
 		}

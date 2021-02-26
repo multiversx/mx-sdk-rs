@@ -4,6 +4,7 @@ pub struct MethodArg {
 	pub pat: syn::Pat,
 	pub ty: syn::Type,
 	pub metadata: ArgMetadata,
+	pub event_topic: bool, // TODO: reorganize arg metadata
 }
 
 #[derive(Clone, Debug)]
