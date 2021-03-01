@@ -552,6 +552,30 @@ pub trait BasicFeatures {
 		self.event_b(arg1, arg2, data);
 	}
 
+	#[event("event_a")]
+	fn event_a(&self, data: &BigUint);
+
+	#[event("event_b")]
+	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &BigUint);
+
+	// EVENTS (LEGACY)
+
+	#[endpoint(logLegacyEventA)]
+	fn log_legacy_event_a(&self, data: &BigUint) {
+		self.legacy_event_a(data);
+	}
+
+	#[endpoint(logLegacyEventB)]
+	fn log_legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
+		self.legacy_event_b(arg1, arg2, data);
+	}
+
+	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
+	fn legacy_event_a(&self, data: &BigUint);
+
+	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
+	fn legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
+
 	// SEND TX
 
 	#[endpoint]
@@ -654,14 +678,6 @@ pub trait BasicFeatures {
 	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
 		self.get_prev_block_random_seed()
 	}
-
-	// EVENTS
-
-	#[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
-	fn event_a(&self, data: &BigUint);
-
-	#[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
-	fn event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 
 	// BIG INT OPERATIONS
 

@@ -13,6 +13,7 @@ pub mod api;
 pub mod err_msg;
 pub mod hex_call_data;
 pub mod io;
+pub mod log_util;
 mod macros;
 pub mod non_zero_util;
 pub mod storage;
