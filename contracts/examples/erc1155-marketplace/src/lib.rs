@@ -50,10 +50,10 @@ pub trait Erc1155Marketplace {
 		nft_id: BigUint,
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
-		require!(
+		/*require!(
 			self.get_caller() == self.get_token_ownership_contract_address(),
 			"Only the token ownership contract may call this function"
-		);
+		);*/
 
 		sc_try!(self.try_create_auction(
 			&type_id,
@@ -105,9 +105,11 @@ pub trait Erc1155Marketplace {
 		Ok(())
 	}
 
+	/*
+
 	// endpoints - owner-only
 
-	#[endpoint]
+	/*#[endpoint]
 	fn claim(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
@@ -121,7 +123,7 @@ pub trait Erc1155Marketplace {
 		}
 
 		Ok(())
-	}
+	}*/
 
 	#[endpoint(setCutPercentage)]
 	fn set_percentage_cut_endpoint(&self, new_cut_percentage: u8) -> SCResult<()> {
@@ -194,9 +196,14 @@ pub trait Erc1155Marketplace {
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
-			self.send().direct(
+			/*self.send().direct(
 				&auction.current_winner,
 				&auction.token_identifier,
+				&auction.current_bid,
+				b"bit refund",
+			);*/
+			self.send().direct_egld(
+				&auction.current_winner,
 				&auction.current_bid,
 				b"bit refund",
 			);
@@ -234,9 +241,14 @@ pub trait Erc1155Marketplace {
 			self.add_claimable_funds(&auction.token_identifier, &cut_amount);
 
 			// send part of the bid to the original owner
-			self.send().direct(
+			/*self.send().direct(
 				&auction.original_owner,
 				&auction.token_identifier,
+				&amount_to_send,
+				b"sold token",
+			);*/
+			self.send().direct_egld(
+				&auction.original_owner,
 				&amount_to_send,
 				b"sold token",
 			);
@@ -288,7 +300,14 @@ pub trait Erc1155Marketplace {
 		Ok(self.get_auction_for_token(&type_id, &nft_id).current_winner)
 	}
 
+	*/
+
 	// private
+
+	#[view(isUpForAuction)]
+	fn is_up_for_auction(&self, type_id: &BigUint, nft_id: &BigUint) -> bool {
+		!self.is_empty_auction_for_token(type_id, nft_id)
+	}
 
 	fn try_create_auction(
 		&self,
@@ -300,7 +319,7 @@ pub trait Erc1155Marketplace {
 		max_bid: &BigUint,
 		deadline: u64,
 	) -> SCResult<()> {
-		require!(
+		/*require!(
 			!self.is_up_for_auction(&type_id, &nft_id),
 			"There is already an auction for that token"
 		);
@@ -311,7 +330,7 @@ pub trait Erc1155Marketplace {
 		require!(
 			deadline > self.get_block_timestamp(),
 			"Deadline can't be in the past"
-		);
+		);*/
 
 		self.set_auction_for_token(
 			&type_id,
@@ -329,6 +348,8 @@ pub trait Erc1155Marketplace {
 
 		Ok(())
 	}
+
+	/*
 
 	// TODO: Replace with Proxy in the next framework version
 	fn asnyc_transfer_token(&self, type_id: &BigUint, nft_id: &BigUint, to: &Address) {
@@ -366,6 +387,8 @@ pub trait Erc1155Marketplace {
 		let mut mapper = self.get_claimable_funds_mapper();
 		mapper.insert(token_identifier.clone(), BigUint::zero());
 	}
+
+	*/
 
 	// storage
 

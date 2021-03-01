@@ -17,6 +17,8 @@ pub trait Erc1155UserMock {
 		_data: &[u8],
 	) -> SCResult<()> {
 
+		self.set_test(42);
+
 		Ok(())
 	}
 
@@ -32,4 +34,10 @@ pub trait Erc1155UserMock {
 
 		Ok(())
 	}
+
+	#[storage_set("test")]
+	fn set_test(&self, val: u32);
+
+	#[storage_get("test")]
+	fn get_test(&self) -> u32;
 }
