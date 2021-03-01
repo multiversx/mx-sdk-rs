@@ -40,10 +40,10 @@ pub fn extract_methods(contract_trait: &syn::ItemTrait) -> Vec<syn::TraitItemMet
 				match msig.inputs[0] {
 					syn::FnArg::Receiver(ref selfref) => {
 						if selfref.mutability.is_some() {
-							panic!(bad_self_ref)
+							panic!("{}", bad_self_ref)
 						}
 					},
-					_ => panic!(bad_self_ref),
+					_ => panic!("{}", bad_self_ref),
 				}
 
 				Some(m.clone())

@@ -52,7 +52,7 @@ impl TxContext {
 impl SendApi<RustBigUint> for TxContext {
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if &amount.value() > &self.get_available_egld_balance() {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"failed transfer (insufficient funds)".to_vec(),
 			});
@@ -87,7 +87,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_arg_buffer: &ArgBuffer,
 	) {
 		if &amount.value() > &self.get_available_esdt_balance(token) {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"insufficient funds".to_vec(),
 			});
@@ -110,7 +110,7 @@ impl SendApi<RustBigUint> for TxContext {
 			call_data: data.to_vec(),
 			tx_hash: self.get_tx_hash(),
 		});
-		panic!(tx_output)
+		std::panic::panic_any(tx_output)
 	}
 
 	fn deploy_contract(
