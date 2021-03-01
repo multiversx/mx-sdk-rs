@@ -356,7 +356,7 @@ pub fn execute_tx(
 	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
 		let call_successful = contract_inst.call(func_name.as_slice());
 		if !call_successful {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 1,
 				message: b"invalid function (not found)".to_vec(),
 			});
