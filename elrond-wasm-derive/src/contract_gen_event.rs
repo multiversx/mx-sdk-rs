@@ -1,7 +1,55 @@
 use super::arg_def::*;
 use super::contract_gen_method::*;
-//use super::parse_attr::*;
 use super::util::*;
+use crate::arg_str_serialize::arg_serialize_push;
+
+pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2::TokenStream {
+	// let nr_args_no_self = m.method_args.len();
+	// if nr_args_no_self == 0 {
+	// 	panic!("events need at least 1 argument, for the data");
+	// }
+	let mut data_arg: Option<&MethodArg> = None;
+	let mut topic_args = Vec::<&MethodArg>::new();
+	for arg in &m.method_args {
+		if arg.event_topic {
+			topic_args.push(arg);
+		} else {
+			if data_arg.is_none() {
+				data_arg = Some(arg);
+			} else {
+				panic!("only 1 data argument allowed in event log");
+			}
+		}
+	}
+
+	let arg_accumulator = quote! { &mut ___topic_buffer___ };
+	let topic_push_snippets: Vec<proc_macro2::TokenStream> = topic_args
+		.iter()
+		.map(|arg| arg_serialize_push(arg, &arg_accumulator))
+		.collect();
+	let write_log_snippet = if let Some(data_arg) = data_arg {
+		let data_pat = &data_arg.pat;
+		quote! {
+			let ___data_bytes___ = elrond_wasm::log_util::serialize_log_data(#data_pat, self.api.clone());
+			self.api.write_event_log(&___topic_buffer___, ___data_bytes___.as_slice());
+		}
+	} else {
+		quote! {
+			self.api.write_event_log(&___topic_buffer___, &[]);
+		}
+	};
+
+	let msig = m.generate_sig();
+	let event_identifier_literal = byte_slice_literal(event_identifier.as_bytes());
+	quote! {
+		#msig {
+			let mut ___topic_buffer___ = elrond_wasm::types::ArgBuffer::new();
+			___topic_buffer___.push_argument_bytes(#event_identifier_literal);
+			#(#topic_push_snippets)*
+			#write_log_snippet
+		}
+	}
+}
 
 fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
@@ -44,7 +92,7 @@ fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_m
 	}
 }
 
-pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
+pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
 	let nr_args_no_self = m.method_args.len();
 	if nr_args_no_self == 0 {
 		panic!("events need at least 1 argument, for the data");
@@ -81,7 +129,7 @@ pub fn generate_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::
 			let mut topics = [[0u8; 32]; #nr_topics];
 			topics[0] = #event_id_literal;
 			#(#topic_conv_snippets)*
-			self.api.write_log(&topics[..], &data_vec.as_slice());
+			self.api.write_legacy_log(&topics[..], &data_vec.as_slice());
 		}
 	}
 }
