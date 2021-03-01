@@ -1,0 +1,56 @@
+{
+    "name": "async call raw with callback set storage test",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "async-call-raw-set-storage",
+            "tx": {
+                "from": "address:owner",
+                "to": "address:first_contract",
+                "value": "0",
+                "function": "callSecondContract",
+                "arguments": [
+                    "address:second_contract",
+                    "500"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["42"],
+                "message": "",
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "3",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:first_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:callbackValue": "42"
+                    }
+                },
+                "address:second_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:callArg": "500"
+                    }
+                }
+            }
+        }
+    ]
+}

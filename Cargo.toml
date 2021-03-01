@@ -60,6 +60,9 @@ members = [
   "contracts/feature-tests/esdt-contract-pair/first-contract",
   "contracts/feature-tests/esdt-contract-pair/second-contract",
   "contracts/feature-tests/deploy-two-contracts",
+  "contracts/feature-tests/async-call-raw-set-storage",
+  "contracts/feature-tests/async-call-raw-set-storage/first-contract-async",
+  "contracts/feature-tests/async-call-raw-set-storage/second-contract-async",
 
   "contracts/modules/elrond-wasm-module-features",
   "contracts/modules/elrond-wasm-module-pause",
