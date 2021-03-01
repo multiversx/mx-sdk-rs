@@ -5,6 +5,19 @@ There are several crates in this repo, this changelog will keep track of all of 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+- Events revamped:
+	- any event name of any length is accepted. The event name is now expressed as ASCII instead of hex
+	- topics can have any length
+	- topics and data are serialized using the elrond-codec instead of the old macro-based solution
+	- old events are still allowed for now via the `#[legacy_event("0x...")]` syntax; might be removed in the future
+
+## [elrond-wasm 0.12.0] - 2021-02-25
+- Reorganized ESDT and EGLD direct send api.
+- New async call syntax
+	- redesigned contract proxies
+	- contract calls are communicated via objects returned from endpoint methods
+	- callbacks now specified programmatically
+	- got rid of the `#[callback_arg]` annotation
 
 ## [elrond-wasm 0.11.0, elrond-codec 0.5.0, mandos 0.5.0] - 2021-02-05
 ### Refactor

@@ -102,7 +102,8 @@ impl Contract {
 		self.methods
 			.iter()
 			.filter_map(|m| match m.metadata {
-				MethodMetadata::Event { .. }
+				MethodMetadata::LegacyEvent { .. }
+				| MethodMetadata::Event { .. }
 				| MethodMetadata::StorageGetter { .. }
 				| MethodMetadata::StorageSetter { .. }
 				| MethodMetadata::StorageMapper { .. }
@@ -123,6 +124,9 @@ impl Contract {
 		self.methods
 			.iter()
 			.filter_map(|m| match &m.metadata {
+				MethodMetadata::LegacyEvent { identifier } => {
+					Some(generate_legacy_event_impl(&m, identifier.clone()))
+				},
 				MethodMetadata::Event { identifier } => {
 					Some(generate_event_impl(&m, identifier.clone()))
 				},
@@ -162,8 +166,8 @@ impl Contract {
 		self.methods
 			.iter()
 			.filter_map(|m| match &m.metadata {
-				MethodMetadata::Event { identifier } => {
-					Some(generate_event_impl(&m, identifier.clone()))
+				MethodMetadata::LegacyEvent { identifier } => {
+					Some(generate_legacy_event_impl(&m, identifier.clone()))
 				},
 				_ => None,
 			})

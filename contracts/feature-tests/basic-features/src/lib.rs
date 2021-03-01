@@ -627,6 +627,16 @@ pub trait BasicFeatures {
 		self.get_caller()
 	}
 
+	#[endpoint(get_shard_of_address)]
+	fn get_shard_of_address_endpoint(&self, address: &Address) -> u32 {
+		self.get_shard_of_address(address)
+	}
+
+	#[endpoint(is_smart_contract)]
+	fn is_smart_contract_endpoint(&self, address: &Address) -> bool {
+		self.is_smart_contract(address)
+	}
+
 	#[endpoint(get_gas_left)]
 	fn get_gas_left_endpoint(&self) -> u64 {
 		self.get_gas_left()
@@ -643,6 +653,30 @@ pub trait BasicFeatures {
 	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
 		self.event_b(arg1, arg2, data);
 	}
+
+	#[event("event_a")]
+	fn event_a(&self, data: &BigUint);
+
+	#[event("event_b")]
+	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &BigUint);
+
+	// EVENTS (LEGACY)
+
+	#[endpoint(logLegacyEventA)]
+	fn log_legacy_event_a(&self, data: &BigUint) {
+		self.legacy_event_a(data);
+	}
+
+	#[endpoint(logLegacyEventB)]
+	fn log_legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
+		self.legacy_event_b(arg1, arg2, data);
+	}
+
+	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
+	fn legacy_event_a(&self, data: &BigUint);
+
+	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
+	fn legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 
 	// SEND TX
 
@@ -673,7 +707,7 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
 	#[endpoint]
@@ -690,9 +724,9 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_first_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_second_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
 	}
 
 	// BLOCK INFO
@@ -746,14 +780,6 @@ pub trait BasicFeatures {
 	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
 		self.get_prev_block_random_seed()
 	}
-
-	// EVENTS
-
-	#[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
-	fn event_a(&self, data: &BigUint);
-
-	#[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
-	fn event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 
 	// BIG INT OPERATIONS
 

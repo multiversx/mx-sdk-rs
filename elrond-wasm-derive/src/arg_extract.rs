@@ -70,6 +70,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 				let ty = &*pat_typed.ty;
 
 				let is_callback_result_arg = is_callback_result_arg(&pat_typed);
+				let event_topic = is_event_topic(pat_typed);
 
 				if is_var_args(&pat_typed) {
 					Some(MethodArg {
@@ -77,6 +78,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 						pat: pat.clone(),
 						ty: ty.clone(),
 						metadata: ArgMetadata::VarArgs,
+						event_topic,
 					})
 				} else if is_payment(&pat_typed) {
 					if is_callback_result_arg {
@@ -87,6 +89,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 						pat: pat.clone(),
 						ty: ty.clone(),
 						metadata: ArgMetadata::Payment,
+						event_topic,
 					})
 				} else if is_payment_token(&pat_typed) {
 					if is_callback_result_arg {
@@ -97,6 +100,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 						pat: pat.clone(),
 						ty: ty.clone(),
 						metadata: ArgMetadata::PaymentToken,
+						event_topic,
 					})
 				} else if is_callback_result_arg {
 					Some(MethodArg {
@@ -104,6 +108,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 						pat: pat.clone(),
 						ty: ty.clone(),
 						metadata: ArgMetadata::AsyncCallResultArg,
+						event_topic,
 					})
 				} else {
 					arg_index += 1;
@@ -112,6 +117,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArg> {
 						pat: pat.clone(),
 						ty: ty.clone(),
 						metadata: ArgMetadata::Single,
+						event_topic,
 					})
 				}
 			},
