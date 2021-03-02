@@ -11,29 +11,33 @@ extern crate quote;
 
 mod abi_derive;
 mod abi_gen;
-mod arg_def;
-mod arg_extract;
+// mod arg_def;
+// mod arg_extract;
 mod arg_regular;
 mod arg_str_serialize;
 mod contract_gen;
 mod contract_gen_callback;
-mod contract_gen_event;
+// mod contract_gen_event;
 mod contract_gen_finish;
-mod contract_gen_method;
-mod contract_gen_module;
+// mod contract_gen_method;
+// mod contract_gen_module;
 mod contract_gen_payable;
-mod contract_gen_storage;
+// mod contract_gen_storage;
 mod contract_impl;
 mod contract_macro_main;
 mod contract_macro_module;
 mod function_selector;
-mod parse_attr;
+// mod parse_attr;
 mod reserved;
 mod snippets;
 mod util;
-
 mod callable;
 mod callable_gen;
+
+mod model;
+mod validate;
+mod parse;
+mod generate;
 
 #[proc_macro_attribute]
 pub fn contract(

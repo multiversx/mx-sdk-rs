@@ -84,28 +84,6 @@ pub fn generate_mapper_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 	}
 }
 
-pub fn generate_borrow_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
-	let msig = m.generate_sig();
-	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
-	if m.method_args.is_empty() {
-		// const key
-		quote! {
-			#msig {
-				#key_snippet
-				BorrowedMutStorage::with_const_key(self.api.clone(), key)
-			}
-		}
-	} else {
-		// generated key
-		quote! {
-			#msig {
-				#key_snippet
-				BorrowedMutStorage::with_generated_key(self.get_storage_raw(), key)
-			}
-		}
-	}
-}
-
 pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
 	let msig = m.generate_sig();
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
