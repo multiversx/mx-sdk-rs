@@ -37,6 +37,16 @@ where
 	pub fn save(&self) {
 		storage_set(self.api.clone(), self.key.as_slice(), &self.value);
 	}
+
+	/// Returns whether the storage managed by this is empty
+	pub fn is_empty(&self) -> bool {
+		self.api.storage_load_len(self.key.as_slice()) == 0
+	}
+
+	/// Clears the storage for this mapper
+	pub fn clear(&self) {
+		self.api.storage_store_slice_u8(self.key.as_slice(), &[]);
+	}
 }
 
 impl<SA, FA, T> EndpointResult<FA> for SingleValueMapper<SA, T>
