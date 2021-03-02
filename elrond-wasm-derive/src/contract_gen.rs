@@ -7,45 +7,9 @@ use super::parse_attr::*;
 use super::snippets;
 use super::util::*;
 
-pub struct Contract {
-	pub docs: Vec<String>,
-	pub trait_name: proc_macro2::Ident,
-	pub contract_impl_name: syn::Path,
-	pub supertrait_paths: Vec<syn::Path>,
-	pub methods: Vec<Method>,
-}
 
 impl Contract {
-	pub fn new(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> Self {
-		let contract_impl_name = extract_struct_name(args);
-
-		let docs = extract_doc(contract_trait.attrs.as_slice());
-
-		let supertrait_paths: Vec<syn::Path> = contract_trait
-			.supertraits
-			.iter()
-			.map(|supertrait| match supertrait {
-				syn::TypeParamBound::Trait(t) => t.path.clone(),
-				_ => panic!("Contract trait can only extend other traits."),
-			})
-			.collect();
-
-		let methods: Vec<Method> = contract_trait
-			.items
-			.iter()
-			.map(|itm| match itm {
-				syn::TraitItem::Method(m) => Method::parse(m),
-				_ => panic!("Only methods allowed in contract traits"),
-			})
-			.collect();
-
-		Contract {
-			docs,
-			trait_name: contract_trait.ident.clone(),
-			contract_impl_name,
-			supertrait_paths,
-			methods,
-		}
+	
 	}
 
 	pub fn extract_pub_method_sigs(&self) -> Vec<proc_macro2::TokenStream> {
@@ -107,7 +71,6 @@ impl Contract {
 				| MethodMetadata::StorageGetter { .. }
 				| MethodMetadata::StorageSetter { .. }
 				| MethodMetadata::StorageMapper { .. }
-				| MethodMetadata::StorageGetMut { .. }
 				| MethodMetadata::StorageIsEmpty { .. }
 				| MethodMetadata::StorageClear { .. }
 				| MethodMetadata::Module { .. } => {
@@ -142,10 +105,6 @@ impl Contract {
 					visibility: _,
 					identifier,
 				} => Some(generate_mapper_impl(&m, identifier.clone())),
-				MethodMetadata::StorageGetMut {
-					visibility: _,
-					identifier,
-				} => Some(generate_borrow_impl(&m, identifier.clone())),
 				MethodMetadata::StorageIsEmpty {
 					visibility: _,
 					identifier,
