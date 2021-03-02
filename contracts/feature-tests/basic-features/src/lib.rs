@@ -408,6 +408,16 @@ pub trait BasicFeatures {
 		my_single_value_mapper.save();
 	}
 
+	#[endpoint]
+	fn clear_single_value_mapper(&self) {
+		self.map_my_single_value_mapper().clear();
+	}
+
+	#[endpoint]
+	fn is_empty_single_value_mapper(&self) -> bool {
+		self.map_my_single_value_mapper().is_empty()
+	}
+
 	// VecMapper
 
 	#[view]
