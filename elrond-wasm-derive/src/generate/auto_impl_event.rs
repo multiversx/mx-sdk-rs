@@ -3,7 +3,7 @@ use super::method_gen;
 use super::util::*;
 use crate::model::{Method, MethodArgument};
 
-pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2::TokenStream {
+pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::TokenStream {
 	let mut data_arg: Option<&MethodArgument> = None;
 	let mut topic_args = Vec::<&MethodArgument>::new();
 	for arg in &m.method_args {
@@ -91,7 +91,7 @@ fn generate_topic_conversion_code(
 	}
 }
 
-pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
+pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_macro2::TokenStream {
 	let nr_args_no_self = m.method_args.len();
 	if nr_args_no_self == 0 {
 		panic!("events need at least 1 argument, for the data");
@@ -122,7 +122,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_m
 		})
 		.collect();
 	let msig = method_gen::generate_sig(&m);
-	let event_id_literal = array_literal(event_id_bytes.as_slice());
+	let event_id_literal = array_literal(event_id_bytes);
 	quote! {
 		#msig {
 			let mut topics = [[0u8; 32]; #nr_topics];

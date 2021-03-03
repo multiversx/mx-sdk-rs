@@ -22,15 +22,16 @@ pub fn generate_auto_impls(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
 }
 
 fn generate_auto_impl(m: &Method, auto_impl: &AutoImpl) -> proc_macro2::TokenStream {
-	// TODO: remove .clone()
 	match auto_impl {
-		AutoImpl::LegacyEvent { identifier } => generate_legacy_event_impl(&m, identifier.clone()),
-		AutoImpl::Event { identifier } => generate_event_impl(&m, identifier.clone()),
-		AutoImpl::StorageGetter { identifier } => generate_getter_impl(&m, identifier.clone()),
-		AutoImpl::StorageSetter { identifier } => generate_setter_impl(&m, identifier.clone()),
-		AutoImpl::StorageMapper { identifier } => generate_mapper_impl(&m, identifier.clone()),
-		AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(&m, identifier.clone()),
-		AutoImpl::StorageClear { identifier } => generate_clear_impl(&m, identifier.clone()),
+		AutoImpl::LegacyEvent { identifier } => {
+			generate_legacy_event_impl(&m, identifier.as_slice())
+		},
+		AutoImpl::Event { identifier } => generate_event_impl(&m, identifier),
+		AutoImpl::StorageGetter { identifier } => generate_getter_impl(&m, identifier),
+		AutoImpl::StorageSetter { identifier } => generate_setter_impl(&m, identifier),
+		AutoImpl::StorageMapper { identifier } => generate_mapper_impl(&m, identifier),
+		AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(&m, identifier),
+		AutoImpl::StorageClear { identifier } => generate_clear_impl(&m, identifier),
 		AutoImpl::Module { impl_path } => generate_module_getter_impl(&m, &impl_path),
 	}
 }
