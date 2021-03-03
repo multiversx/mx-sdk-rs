@@ -1,4 +1,4 @@
-use super::parse_attr::extract_doc;
+use super::parse::attributes::extract_doc;
 use proc_macro::TokenStream;
 use quote::quote;
 
