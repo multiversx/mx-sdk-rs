@@ -1,17 +1,13 @@
-use super::arg_def::*;
-use super::contract_gen_method::*;
+use super::arg_str_serialize::arg_serialize_push;
+use super::method_gen;
 use super::util::*;
-use crate::arg_str_serialize::arg_serialize_push;
+use crate::model::{Method, MethodArgument};
 
-pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2::TokenStream {
-	// let nr_args_no_self = m.method_args.len();
-	// if nr_args_no_self == 0 {
-	// 	panic!("events need at least 1 argument, for the data");
-	// }
-	let mut data_arg: Option<&MethodArg> = None;
-	let mut topic_args = Vec::<&MethodArg>::new();
+pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::TokenStream {
+	let mut data_arg: Option<&MethodArgument> = None;
+	let mut topic_args = Vec::<&MethodArgument>::new();
 	for arg in &m.method_args {
-		if arg.event_topic {
+		if arg.metadata.event_topic {
 			topic_args.push(arg);
 		} else {
 			if data_arg.is_none() {
@@ -39,7 +35,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2:
 		}
 	};
 
-	let msig = m.generate_sig();
+	let msig = method_gen::generate_sig(&m);
 	let event_identifier_literal = byte_slice_literal(event_identifier.as_bytes());
 	quote! {
 		#msig {
@@ -51,7 +47,10 @@ pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2:
 	}
 }
 
-fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_macro2::TokenStream {
+fn generate_topic_conversion_code(
+	topic_index: usize,
+	arg: &MethodArgument,
+) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	match &arg.ty {
 		syn::Type::Reference(type_reference) => {
@@ -92,7 +91,7 @@ fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArg) -> proc_m
 	}
 }
 
-pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_macro2::TokenStream {
+pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_macro2::TokenStream {
 	let nr_args_no_self = m.method_args.len();
 	if nr_args_no_self == 0 {
 		panic!("events need at least 1 argument, for the data");
@@ -122,8 +121,8 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: Vec<u8>) -> proc_m
 			result
 		})
 		.collect();
-	let msig = m.generate_sig();
-	let event_id_literal = array_literal(event_id_bytes.as_slice());
+	let msig = method_gen::generate_sig(&m);
+	let event_id_literal = array_literal(event_id_bytes);
 	quote! {
 		#msig {
 			let mut topics = [[0u8; 32]; #nr_topics];

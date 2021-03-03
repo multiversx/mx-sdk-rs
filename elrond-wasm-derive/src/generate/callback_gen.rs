@@ -1,15 +1,18 @@
-use super::arg_def::*;
-use super::arg_regular::*;
-use super::contract_gen_finish::*;
-use super::contract_gen_method::*;
-use super::contract_gen_payable::*;
-use super::util::*;
-use crate::arg_str_serialize::arg_serialize_push;
+use super::{
+	arg_regular::*,
+	arg_str_serialize::arg_serialize_push,
+	method_call_gen::{
+		generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
+	},
+	payable_gen::*,
+	util::*,
+};
+use crate::model::{ArgPaymentMetadata, Method, MethodArgument, PublicRole};
 
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 	let raw_decl = find_raw_callback(methods);
 	if let Some(raw) = raw_decl {
-		raw.generate_call_method_body()
+		generate_call_method_body(&raw)
 	} else {
 		generate_callback_body_regular(methods)
 	}
@@ -18,7 +21,7 @@ pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 fn find_raw_callback(methods: &[Method]) -> Option<Method> {
 	methods
 		.iter()
-		.find(|m| matches!(m.metadata, MethodMetadata::CallbackRaw))
+		.find(|m| matches!(m.public_role, PublicRole::CallbackRaw))
 		.cloned()
 }
 
@@ -26,47 +29,47 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 	let match_arms: Vec<proc_macro2::TokenStream> = methods
 		.iter()
 		.filter_map(|m| {
-			match m.metadata {
-				MethodMetadata::Callback => {
-					let payable_snippet = generate_payable_snippet(m);
-					let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
-						.method_args
-						.iter()
-						.map(|arg| {
-							match &arg.metadata {
-								ArgMetadata::Single | ArgMetadata::VarArgs => {
-									// callback args, loaded from storage via the tx hash
-									generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader___ })
-								},
-								ArgMetadata::Payment | ArgMetadata::PaymentToken => quote! {},
-								ArgMetadata::AsyncCallResultArg => {
-									// Should be an AsyncCallResult argument that wraps what comes from the async call.
-									// But in principle, one can express it it any way.
-									generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
-								},
-							}
-						})
-						.collect();
+			if matches!(m.public_role, PublicRole::Callback) {
+				let payable_snippet = generate_payable_snippet(m);
+				let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
+					.method_args
+					.iter()
+					.map(|arg| {
+						if matches!(
+							arg.metadata.payment,
+							ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
+						) {
+							quote! {}
+						} else if arg.metadata.callback_call_result {
+							// Should be an AsyncCallResult argument that wraps what comes from the async call.
+							// But in principle, one can express it it any way.
+							generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
+						} else {
+							// callback args, loaded from storage via the tx hash
+							generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader___ })
+						}
+					})
+					.collect();
 
-					let fn_ident = &m.name;
-					let fn_name_str = &fn_ident.to_string();
-					let fn_name_literal = array_literal(fn_name_str.as_bytes());
-					let call = m.generate_call_to_method();
-					let body_with_result = generate_body_with_result(&m.return_type, &call);
+				let fn_ident = &m.name;
+				let fn_name_str = &fn_ident.to_string();
+				let fn_name_literal = array_literal(fn_name_str.as_bytes());
+				let call = generate_call_to_method_expr(&m);
+				let body_with_result = generate_body_with_result(&m.return_type, &call);
 
-					let match_arm = quote! {
-						#fn_name_literal =>
-						{
-							#payable_snippet
-							let mut ___cb_arg_loader___ = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
-							#(#arg_init_snippets)*
-							#body_with_result ;
-							___cb_arg_loader___.assert_no_more_args();
-						},
-					};
-					Some(match_arm)
-				},
-				_ => None,
+				let match_arm = quote! {
+					#fn_name_literal =>
+					{
+						#payable_snippet
+						let mut ___cb_arg_loader___ = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
+						#(#arg_init_snippets)*
+						#body_with_result ;
+						___cb_arg_loader___.assert_no_more_args();
+					},
+				};
+				Some(match_arm)
+			} else {
+				None
 			}
 		})
 		.collect();
@@ -94,18 +97,22 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 }
 
 /// Excludes the `#[call_result]`.
-pub fn cb_proxy_arg_declarations(method_args: &[MethodArg]) -> Vec<proc_macro2::TokenStream> {
+pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::TokenStream> {
 	method_args
 		.iter()
-		.filter_map(|arg| match arg.metadata {
-			ArgMetadata::AsyncCallResultArg | ArgMetadata::Payment | ArgMetadata::PaymentToken => {
+		.filter_map(|arg| {
+			if matches!(
+				arg.metadata.payment,
+				ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
+			) {
 				None
-			},
-			_ => {
+			} else if arg.metadata.callback_call_result {
+				None
+			} else {
 				let pat = &arg.pat;
 				let ty = &arg.ty;
 				Some(quote! {#pat : #ty })
-			},
+			}
 		})
 		.collect()
 }
@@ -114,7 +121,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 	let proxy_methods: Vec<proc_macro2::TokenStream> = methods
 		.iter()
 		.filter_map(|m| {
-			if matches!(m.metadata, MethodMetadata::Callback) {
+			if matches!(m.public_role, PublicRole::Callback) {
 				let method_name = &m.name;
 				let arg_decl = cb_proxy_arg_declarations(&m.method_args);
 				let cb_name_literal = ident_str_literal(&method_name);
@@ -125,13 +132,14 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 					.map(|arg| {
 						let arg_accumulator = quote! { &mut ___closure_arg_buffer___ };
 
-						match &arg.metadata {
-							ArgMetadata::Single | ArgMetadata::VarArgs => {
+						if let ArgPaymentMetadata::NotPayment = arg.metadata.payment {
+							if arg.metadata.callback_call_result {
+								quote! {}
+							} else {
 								arg_serialize_push(arg, &arg_accumulator)
-							},
-							ArgMetadata::Payment
-							| ArgMetadata::PaymentToken
-							| ArgMetadata::AsyncCallResultArg => quote! {},
+							}
+						} else {
+							quote! {}
 						}
 					})
 					.collect();
