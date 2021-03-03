@@ -21,7 +21,7 @@ pub fn process_method_impl(m: &syn::TraitItemMethod) -> MethodImpl {
 fn assert_no_other_auto_impl(auto_impl: &Option<AutoImpl>) {
 	assert!(
 		auto_impl.is_none(),
-		"Only one auto-implementation can be specified at one time. Auto=implementations are: {}{}{}{}{}{}{}{}",
+		"Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}",
 		"`#[storage_get]`, ",
 		"`#[storage_set]`, ",
 		"`#[storage_mapper]`, ",

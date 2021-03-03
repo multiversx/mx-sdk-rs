@@ -1,5 +1,6 @@
 use super::Method;
 
+/// Models a contract or module trait.
 pub struct ContractTrait {
 	pub docs: Vec<String>,
 	pub trait_name: proc_macro2::Ident,

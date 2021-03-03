@@ -18,7 +18,7 @@ pub fn process_method(m: &syn::TraitItemMethod) -> Method {
 		public_role,
 		name: m.sig.ident.clone(),
 		generics: m.sig.generics.clone(),
-		remaining_attributes: Vec::new(), // TODO
+		remaining_attributes: Vec::new(), // TODO: keep unprocessed attributes (e.g. `#[inline]` here)
 		method_args,
 		output_names,
 		return_type: m.sig.output.clone(),

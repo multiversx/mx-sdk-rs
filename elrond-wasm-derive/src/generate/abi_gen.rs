@@ -1,5 +1,5 @@
-use crate::model::{ContractTrait, ArgPaymentMetadata, PublicRole};
 use super::util::*;
+use crate::model::{ArgPaymentMetadata, ContractTrait, PublicRole};
 
 pub fn generate_abi_method_body(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let endpoint_snippets: Vec<proc_macro2::TokenStream> = contract

@@ -1,14 +1,7 @@
+use super::attributes::*;
 use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
 
-use super::attributes::*;
-
-// use super::arg_def::*;
-// use super::parse_attr::*;
-// use super::contract_gen_method::*;
-
-
 pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
-	// let mut arg_index: isize = -1; // ignore the first argument, which is &self
 	let mut receiver_processed = false;
 	m.sig
 		.inputs
@@ -48,63 +41,13 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 					event_topic: is_event_topic(&pat_typed),
 				};
 				let arg = MethodArgument {
-					index: -1,
 					pat: pat.clone(),
 					ty: ty.clone(),
-				    remaining_attributes: Vec::new(),
+					remaining_attributes: Vec::new(),
 					metadata,
 				};
 
 				Some(arg)
-
-				// if  {
-				// 	Some(MethodArgument {
-				// 		index: -1,
-				// 		pat: pat.clone(),
-				// 		ty: ty.clone(),
-				// 		metadata: ArgMetadata::VarArgs,
-				// 		event_topic,
-				// 	})
-				// } else if  {
-				// 	if is_callback_result_arg {
-				// 		panic!("Payment arguments cannot be annotated with #[async_result].");
-				// 	}
-				// 	Some(MethodArgument {
-				// 		index: -1,
-				// 		pat: pat.clone(),
-				// 		ty: ty.clone(),
-				// 		metadata: ArgMetadata::Payment,
-				// 		event_topic,
-				// 	})
-				// } else if is_payment_token(&pat_typed) {
-				// 	if is_callback_result_arg {
-				// 		panic!("Payment arguments cannot be annotated with #[async_result].");
-				// 	}
-				// 	Some(MethodArgument {
-				// 		index: -1,
-				// 		pat: pat.clone(),
-				// 		ty: ty.clone(),
-				// 		metadata: ArgMetadata::PaymentToken,
-				// 		event_topic,
-				// 	})
-				// } else if is_callback_result_arg {
-				// 	Some(MethodArgument {
-				// 		index: -1,
-				// 		pat: pat.clone(),
-				// 		ty: ty.clone(),
-				// 		metadata: ArgMetadata::AsyncCallResultArg,
-				// 		event_topic,
-				// 	})
-				// } else {
-				// 	arg_index += 1;
-				// 	Some(MethodArgument {
-				// 		index: arg_index as i32,
-				// 		pat: pat.clone(),
-				// 		ty: ty.clone(),
-				// 		metadata: ArgMetadata::Single,
-				// 		event_topic,
-				// 	})
-				// }
 			},
 		})
 		.collect()

@@ -1,12 +1,14 @@
+/// Models any method argument from a contract, module or callable proxy trait.
+/// Contains processed data from argument annotations.
 #[derive(Clone, Debug)]
 pub struct MethodArgument {
-	pub index: i32,
 	pub pat: syn::Pat,
 	pub ty: syn::Type,
 	pub remaining_attributes: Vec<syn::Attribute>,
 	pub metadata: ArgMetadata,
 }
 
+/// Models any method argument from a contract, module or callable proxy trait.
 #[derive(Clone, Debug)]
 pub struct ArgMetadata {
 	pub payment: ArgPaymentMetadata,

@@ -1,17 +1,13 @@
-use crate::model::{ArgPaymentMetadata, Method, MethodArgument, PublicRole};
-
-// use super::arg_def::*;
 use super::{
 	arg_regular::*,
+	arg_str_serialize::arg_serialize_push,
 	method_call_gen::{
 		generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
 	},
+	payable_gen::*,
+	util::*,
 };
-// use super::contract_gen_finish::*;
-// use super::contract_gen_method::*;
-use super::arg_str_serialize::arg_serialize_push;
-use super::payable_gen::*;
-use super::util::*;
+use crate::model::{ArgPaymentMetadata, Method, MethodArgument, PublicRole};
 
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 	let raw_decl = find_raw_callback(methods);

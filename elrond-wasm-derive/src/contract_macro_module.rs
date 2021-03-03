@@ -1,5 +1,6 @@
 use super::contract_impl::contract_implementation;
 use crate::parse::parse_contract_trait;
+use crate::validate::validate_contract;
 
 pub fn process_module(
 	args: proc_macro::TokenStream,
@@ -9,6 +10,7 @@ pub fn process_module(
 	let proc_input = &parse_macro_input!(input as syn::ItemTrait);
 
 	let contract = parse_contract_trait(args_input, proc_input);
+	validate_contract(&contract);
 
 	let contract_impl = contract_implementation(&contract, false);
 

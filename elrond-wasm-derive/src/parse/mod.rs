@@ -6,8 +6,8 @@ mod contract_trait_parse;
 mod endpoint_parse;
 mod method_impl_parse;
 mod method_parse;
-mod payable_parse;
 mod parse_util;
+mod payable_parse;
 
 pub use argument_parse::*;
 pub use callable_trait_parse::*;

@@ -1,10 +1,7 @@
-use crate::model::{ArgPaymentMetadata, CallableMethod, CallableTrait};
-// use super::arg_def::*;
-// use super::arg_extract::*;
 use super::arg_str_serialize::*;
 use super::method_gen::*;
-// use super::parse_attr::*;
 use super::util::*;
+use crate::model::{ArgPaymentMetadata, CallableMethod, CallableTrait};
 
 pub fn generate_proxy_sig(callable_method: &CallableMethod) -> proc_macro2::TokenStream {
 	let method_name = &callable_method.name;
@@ -46,12 +43,6 @@ pub fn generate_method_impl(callable_trait: &CallableTrait) -> Vec<proc_macro2::
 				.method_args
 				.iter()
 				.map(|arg| {
-					// TODO: move to validation module
-					assert!(
-						!arg.metadata.callback_call_result,
-						"call result arg not allowed here"
-					);
-
 					let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
 
 					match &arg.metadata.payment {
