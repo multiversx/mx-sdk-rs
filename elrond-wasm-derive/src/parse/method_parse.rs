@@ -7,7 +7,7 @@ use super::{
 	process_public_role,
 };
 
-pub fn process_methos(m: &syn::TraitItemMethod) -> Method {
+pub fn process_method(m: &syn::TraitItemMethod) -> Method {
 	let public_role = process_public_role(m);
 	let method_args = extract_method_args(m);
 	let output_names = find_output_names(m);

@@ -1,6 +1,5 @@
-use super::contract_gen::*;
-use super::contract_impl::*;
-use super::*;
+use super::contract_impl::contract_implementation;
+use crate::parse::parse_contract_trait;
 
 pub fn process_module(
 	args: proc_macro::TokenStream,
@@ -9,7 +8,7 @@ pub fn process_module(
 	let args_input = parse_macro_input!(args as syn::AttributeArgs);
 	let proc_input = &parse_macro_input!(input as syn::ItemTrait);
 
-	let contract = Contract::new(args_input, proc_input);
+	let contract = parse_contract_trait(args_input, proc_input);
 
 	let contract_impl = contract_implementation(&contract, false);
 

@@ -50,11 +50,31 @@ impl Method {
 	}
 
 	pub fn is_payable(&self) -> bool {
-		match self.public_role {
+		match &self.public_role {
 			PublicRole::Init(init_metadata) => init_metadata.payable.is_payable(),
 			PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.is_payable(),
 			PublicRole::Callback | PublicRole::CallbackRaw => true,
 			PublicRole::Private => false,
 		}
+	}
+
+	pub fn payable_metadata(&self) -> MethodPayableMetadata {
+		match &self.public_role {
+			PublicRole::Init(init_metadata) => init_metadata.payable.clone(),
+			PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.clone(),
+			PublicRole::Callback | PublicRole::CallbackRaw => MethodPayableMetadata::AnyToken,
+			PublicRole::Private => MethodPayableMetadata::NotPayable,
+		}
+	}
+
+	pub fn has_variable_nr_args(&self) -> bool {
+		self.method_args.iter().any(|arg| arg.metadata.var_args)
+	}
+
+	pub fn is_module(&self) -> bool {
+		matches!(
+			self.implementation,
+			MethodImpl::Generated(AutoImpl::Module { .. })
+		)
 	}
 }

@@ -21,3 +21,9 @@ pub enum ArgPaymentMetadata {
 	Payment,
 	PaymentToken,
 }
+
+impl MethodArgument {
+	pub fn is_endpoint_arg(&self) -> bool {
+		matches!(self.metadata.payment, ArgPaymentMetadata::NotPayment)
+	}
+}

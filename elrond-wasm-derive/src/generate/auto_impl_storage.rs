@@ -1,8 +1,11 @@
-use super::arg_def::*;
-use super::contract_gen_method::*;
+use super::method_gen;
 use super::util::*;
+use crate::model::{Method, MethodArgument};
 
-fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macro2::TokenStream {
+fn generate_key_snippet(
+	key_args: &[MethodArgument],
+	identifier: String,
+) -> proc_macro2::TokenStream {
 	let id_literal = byte_str_literal(identifier.as_bytes());
 	if key_args.is_empty() {
 		// hardcode key
@@ -30,7 +33,7 @@ fn generate_key_snippet(key_args: &[MethodArg], identifier: String) -> proc_macr
 }
 
 pub fn generate_getter_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
-	let msig = m.generate_sig();
+	let msig = method_gen::generate_sig(&m);
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
 	match m.return_type.clone() {
 		syn::ReturnType::Default => panic!("getter should return some value"),
@@ -46,7 +49,7 @@ pub fn generate_getter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 }
 
 pub fn generate_setter_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
-	let msig = m.generate_sig();
+	let msig = method_gen::generate_sig(&m);
 	if m.method_args.is_empty() {
 		panic!("setter must have at least one argument, for the value");
 	}
@@ -66,7 +69,7 @@ pub fn generate_setter_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 }
 
 pub fn generate_mapper_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
-	let msig = m.generate_sig();
+	let msig = method_gen::generate_sig(&m);
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
 	match m.return_type.clone() {
 		syn::ReturnType::Default => panic!("getter should return some value"),
@@ -85,7 +88,7 @@ pub fn generate_mapper_impl(m: &Method, identifier: String) -> proc_macro2::Toke
 }
 
 pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
-	let msig = m.generate_sig();
+	let msig = method_gen::generate_sig(&m);
 	let key_snippet = generate_key_snippet(&m.method_args.as_slice(), identifier);
 	quote! {
 		#msig {
@@ -96,7 +99,7 @@ pub fn generate_is_empty_impl(m: &Method, identifier: String) -> proc_macro2::To
 }
 
 pub fn generate_clear_impl(m: &Method, identifier: String) -> proc_macro2::TokenStream {
-	let msig = m.generate_sig();
+	let msig = method_gen::generate_sig(&m);
 	if m.return_type != syn::ReturnType::Default {
 		panic!("storage clear should not return anything");
 	}

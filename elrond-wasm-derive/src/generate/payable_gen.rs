@@ -1,16 +1,15 @@
+use crate::model::{Method, MethodArgument, MethodPayableMetadata};
+
 use super::util::*;
-// use super::parse_attr::*;
-use super::arg_def::*;
-use super::contract_gen_method::*;
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-	payable_snippet_for_metadata(m.metadata.payable_metadata(), &m.payment_arg, &m.token_arg)
+	payable_snippet_for_metadata(m.payable_metadata(), &m.payment_arg(), &m.token_arg())
 }
 
 fn payable_snippet_for_metadata(
 	mpm: MethodPayableMetadata,
-	payment_arg: &Option<MethodArg>,
-	token_arg: &Option<MethodArg>,
+	payment_arg: &Option<MethodArgument>,
+	token_arg: &Option<MethodArgument>,
 ) -> proc_macro2::TokenStream {
 	match mpm {
 		MethodPayableMetadata::NoMetadata => quote! {},
@@ -82,7 +81,7 @@ fn payable_snippet_for_metadata(
 	}
 }
 
-fn var_name_or_underscore(opt_arg: &Option<MethodArg>) -> proc_macro2::TokenStream {
+fn var_name_or_underscore(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
 	if let Some(arg) = opt_arg {
 		let pat = &arg.pat;
 		quote! { #pat }
@@ -91,7 +90,7 @@ fn var_name_or_underscore(opt_arg: &Option<MethodArg>) -> proc_macro2::TokenStre
 	}
 }
 
-pub fn generate_payment_snippet(arg: &MethodArg) -> proc_macro2::TokenStream {
+pub fn generate_payment_snippet(arg: &MethodArgument) -> proc_macro2::TokenStream {
 	match &arg.ty {
 		syn::Type::Path(type_path) => {
 			let type_path_segment = type_path.path.segments.last().unwrap().clone();
