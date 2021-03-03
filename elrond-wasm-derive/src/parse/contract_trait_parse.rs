@@ -1,8 +1,7 @@
-use crate::model::{ContractTrait, Method};
-
 use super::attributes::extract_doc;
-use super::*;
+use super::method_parse::process_method;
 use super::parse_util::extract_struct_name;
+use crate::model::{ContractTrait, Method};
 
 pub fn parse_contract_trait(
 	args: syn::AttributeArgs,
@@ -38,5 +37,3 @@ pub fn parse_contract_trait(
 		methods,
 	}
 }
-
-

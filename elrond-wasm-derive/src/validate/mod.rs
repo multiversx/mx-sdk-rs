@@ -1,4 +1,4 @@
-mod validate_method;
 mod reserved;
+mod validate_method;
 
 pub use validate_method::*;

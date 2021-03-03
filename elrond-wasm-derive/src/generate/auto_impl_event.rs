@@ -1,17 +1,9 @@
-use crate::model::{Method, MethodArgument};
-// use super::arg_str_serialize::*;
-
-// use super::arg_def::*;
-// use super::contract_gen_method::*;
-use super::util::*;
 use super::arg_str_serialize::arg_serialize_push;
 use super::method_gen;
+use super::util::*;
+use crate::model::{Method, MethodArgument};
 
 pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2::TokenStream {
-	// let nr_args_no_self = m.method_args.len();
-	// if nr_args_no_self == 0 {
-	// 	panic!("events need at least 1 argument, for the data");
-	// }
 	let mut data_arg: Option<&MethodArgument> = None;
 	let mut topic_args = Vec::<&MethodArgument>::new();
 	for arg in &m.method_args {
@@ -55,7 +47,10 @@ pub fn generate_event_impl(m: &Method, event_identifier: String) -> proc_macro2:
 	}
 }
 
-fn generate_topic_conversion_code(topic_index: usize, arg: &MethodArgument) -> proc_macro2::TokenStream {
+fn generate_topic_conversion_code(
+	topic_index: usize,
+	arg: &MethodArgument,
+) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	match &arg.ty {
 		syn::Type::Reference(type_reference) => {

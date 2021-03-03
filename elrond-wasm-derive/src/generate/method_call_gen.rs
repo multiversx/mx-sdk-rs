@@ -47,10 +47,6 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
 				!arg.metadata.var_args,
 				"var_args not accepted in function generate_call_method_fixed_args"
 			);
-			assert!(
-				!arg.metadata.callback_call_result,
-				"call result arg not allowed here"
-			);
 
 			if arg.is_endpoint_arg() {
 				arg_index += 1;
@@ -84,11 +80,6 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
 		.method_args
 		.iter()
 		.map(|arg| {
-			assert!(
-				!arg.metadata.callback_call_result,
-				"call result arg not allowed here"
-			);
-
 			if arg.is_endpoint_arg() {
 				generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
 			} else {

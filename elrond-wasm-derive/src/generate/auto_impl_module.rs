@@ -1,9 +1,5 @@
-// use super::contract_gen_method::*;
-
-
-use crate::model::Method;
-
 use super::method_gen;
+use crate::model::Method;
 
 pub fn generate_module_getter_impl(
 	m: &Method,

@@ -1,7 +1,5 @@
-// use super::callable_gen::*;
-// use super::*;
-use crate::parse::parse_callable_trait;
 use crate::generate::callable_gen::{extract_pub_method_sigs, generate_method_impl};
+use crate::parse::parse_callable_trait;
 
 pub fn process_callable(
 	args: proc_macro::TokenStream,
@@ -11,6 +9,7 @@ pub fn process_callable(
 	let proc_input = parse_macro_input!(input as syn::ItemTrait);
 
 	let callable = parse_callable_trait(args_input, &proc_input);
+	// TODO: add validation
 
 	let method_sigs = extract_pub_method_sigs(&callable);
 	let trait_name = callable.trait_name.clone();

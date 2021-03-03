@@ -1,12 +1,13 @@
+use super::parse_util::*;
+use super::{extract_method_args, process_payable};
+use crate::generate::util::generate_callable_interface_impl_struct_name; // TODO: remove dependency
 use crate::model::{CallableMethod, CallableTrait};
 
-use super::{extract_method_args, process_payable};
-use super::parse_util::*;
-use crate::generate::util::generate_callable_interface_impl_struct_name; // TODO: remove dependnecy
-
-pub fn parse_callable_trait(args: syn::AttributeArgs, contract_trait: &syn::ItemTrait) -> CallableTrait {
-	let callable_impl_name =
-		generate_callable_interface_impl_struct_name(&contract_trait.ident);
+pub fn parse_callable_trait(
+	args: syn::AttributeArgs,
+	contract_trait: &syn::ItemTrait,
+) -> CallableTrait {
+	let callable_impl_name = generate_callable_interface_impl_struct_name(&contract_trait.ident);
 	let contract_impl_name = extract_struct_name(args);
 
 	let methods: Vec<CallableMethod> = contract_trait

@@ -14,6 +14,7 @@ pub struct EndpointMetadata {
 /// Method visibility from the point of view of the smart contract
 #[derive(Clone, Debug)]
 pub enum PublicRole {
+	/// The smart contract constructor. Ther ecan be only one.
 	Init(InitMetadata),
 
 	/// Means it gets a smart contract function generated for it

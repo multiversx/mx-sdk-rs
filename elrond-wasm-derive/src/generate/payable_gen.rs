@@ -1,6 +1,5 @@
-use crate::model::{Method, MethodArgument, MethodPayableMetadata};
-
 use super::util::*;
+use crate::model::{Method, MethodArgument, MethodPayableMetadata};
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
 	payable_snippet_for_metadata(m.payable_metadata(), &m.payment_arg(), &m.token_arg())

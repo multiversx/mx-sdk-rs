@@ -1,7 +1,5 @@
-use crate::model::MethodArgument;
-
-// use super::arg_def::*;
 use super::util::*;
+use crate::model::MethodArgument;
 
 pub fn generate_load_single_arg(
 	arg: &MethodArgument,

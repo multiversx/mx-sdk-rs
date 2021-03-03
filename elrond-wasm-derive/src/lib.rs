@@ -9,33 +9,15 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
-mod type_abi_derive;
-// mod arg_def;
-// mod arg_extract;
-// mod arg_regular;
-// mod arg_str_serialize;
-// mod contract_gen;
-// mod contract_gen_callback;
-// mod contract_gen_event;
-// mod contract_gen_finish;
-// mod contract_gen_method;
-// mod contract_gen_module;
-// mod payable_gen;
-// mod contract_gen_storage;
+mod callable;
 mod contract_impl;
 mod contract_macro_main;
 mod contract_macro_module;
-// mod function_selector;
-// mod parse_attr;
-// mod reserved;
-// mod snippets;
-mod callable;
-// mod callable_gen;
-
-mod model;
-mod validate;
-mod parse;
 mod generate;
+mod model;
+mod parse;
+mod type_abi_derive;
+mod validate;
 
 #[proc_macro_attribute]
 pub fn contract(

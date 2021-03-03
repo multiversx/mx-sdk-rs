@@ -1,5 +1,5 @@
-use crate::model::{ContractTrait, Method, PublicRole};
 use super::util::*;
+use crate::model::{ContractTrait, Method, PublicRole};
 
 fn function_selector_match_arm(m: &Method, endpoint_name: &str) -> proc_macro2::TokenStream {
 	let fn_ident = &m.name;
