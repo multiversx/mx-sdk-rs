@@ -45,7 +45,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "my_single_value_mapper_increment",
+                "function": "my_single_value_mapper_increment_1",
                 "arguments": [ "123" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
@@ -85,7 +85,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "my_single_value_mapper_increment",
+                "function": "my_single_value_mapper_increment_2",
                 "arguments": [ "111" ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0"
