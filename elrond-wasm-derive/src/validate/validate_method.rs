@@ -1,7 +1,8 @@
 use crate::{
 	model::{ArgPaymentMetadata, Method, PublicRole},
-	reserved,
+	
 };
+use super::reserved;
 
 const INIT_ENDPOINT_NAME: &str = "init";
 
@@ -12,7 +13,7 @@ pub fn validate_method(m: &Method) {
 }
 
 fn validate_method_name(m: &Method) {
-	if let PublicRole::Endpoint(endpoint_metadata) = m.public_role {
+	if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
 		let endpoint_name_str = endpoint_metadata.public_name.to_string();
 		if endpoint_name_str == INIT_ENDPOINT_NAME {
 			panic!("Cannot declare endpoint with name 'init'. Use #[init] instead.")
@@ -50,7 +51,7 @@ fn validate_payable_arg(m: &Method) {
 			);
 		}
 	}
-	if let PublicRole::Init(init_metadata) = m.public_role {
+	if let PublicRole::Init(init_metadata) = &m.public_role {
 		if !init_metadata.payable.no_esdt() {
 			panic!("only EGLD payments currently allowed in constructors");
 		}

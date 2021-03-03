@@ -8,7 +8,7 @@ use super::attributes::*;
 
 
 pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
-	let mut arg_index: isize = -1; // ignore the first argument, which is &self
+	// let mut arg_index: isize = -1; // ignore the first argument, which is &self
 	let mut receiver_processed = false;
 	m.sig
 		.inputs

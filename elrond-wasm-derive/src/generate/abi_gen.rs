@@ -1,25 +1,23 @@
-use super::arg_def::*;
-use super::contract_gen::*;
-use super::contract_gen_method::*;
+use crate::model::{ContractTrait, ArgPaymentMetadata, PublicRole};
 use super::util::*;
 
-pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream {
+pub fn generate_abi_method_body(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let endpoint_snippets: Vec<proc_macro2::TokenStream> = contract
 		.methods
 		.iter()
 		.filter_map(|m| {
-			if let Some(endpoint_name) = m.metadata.endpoint_name() {
+			if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
 				let endpoint_docs = &m.docs;
-				let endpoint_name_str = endpoint_name.to_string();
-				let payable_in_tokens = m.metadata.payable_metadata().abi_strings();
+				let endpoint_name_str = endpoint_metadata.public_name.to_string();
+				let payable_in_tokens = m.payable_metadata().abi_strings();
 
 				let input_snippets: Vec<proc_macro2::TokenStream> = m
 					.method_args
 					.iter()
 					.filter_map(|arg| {
 						if matches!(
-							arg.metadata,
-							ArgMetadata::Payment | ArgMetadata::PaymentToken
+							arg.metadata.payment,
+							ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
 						) {
 							None
 						} else {
@@ -60,7 +58,7 @@ pub fn generate_abi_method_body(contract: &Contract) -> proc_macro2::TokenStream
 					#output_snippet
 					contract_abi.endpoints.push(endpoint_abi);
 				})
-			} else if let MethodMetadata::Module { .. } = &m.metadata {
+			} else if m.is_module() {
 				let method_name = &m.name;
 				Some(quote! {
 					if include_modules {

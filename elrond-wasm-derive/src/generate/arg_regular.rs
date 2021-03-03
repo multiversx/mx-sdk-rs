@@ -1,8 +1,10 @@
-use super::arg_def::*;
+use crate::model::MethodArgument;
+
+// use super::arg_def::*;
 use super::util::*;
 
 pub fn generate_load_single_arg(
-	arg: &MethodArg,
+	arg: &MethodArgument,
 	arg_index_expr: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
 	let arg_ty = &arg.ty;
@@ -46,7 +48,7 @@ pub fn generate_load_single_arg(
 }
 
 pub fn generate_load_dyn_arg(
-	arg: &MethodArg,
+	arg: &MethodArgument,
 	loader_expr: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
@@ -71,7 +73,7 @@ pub fn generate_load_dyn_arg(
 }
 
 pub fn generate_load_dyn_multi_arg(
-	arg: &MethodArg,
+	arg: &MethodArgument,
 	loader_expr: &proc_macro2::TokenStream,
 	num_expr: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
