@@ -46,21 +46,6 @@ impl StorageMapperAttribute {
 	}
 }
 
-pub struct StorageGetMutAttribute {
-	pub identifier: String,
-}
-
-impl StorageGetMutAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_STORAGE_GET_MUT) {
-			None => None,
-			Some(arg_str) => Some(StorageGetMutAttribute {
-				identifier: arg_str,
-			}),
-		}
-	}
-}
-
 pub struct StorageIsEmptyAttribute {
 	pub identifier: String,
 }

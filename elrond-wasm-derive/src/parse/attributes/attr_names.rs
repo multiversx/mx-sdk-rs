@@ -16,7 +16,6 @@ pub(super) static ATTR_MULTI: &str = "multi";
 pub(super) static ATTR_STORAGE_GET: &str = "storage_get";
 pub(super) static ATTR_STORAGE_SET: &str = "storage_set";
 pub(super) static ATTR_STORAGE_MAPPER: &str = "storage_mapper";
-pub(super) static ATTR_STORAGE_GET_MUT: &str = "storage_get_mut";
 pub(super) static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 pub(super) static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 pub(super) static ATTR_MODULE: &str = "module";

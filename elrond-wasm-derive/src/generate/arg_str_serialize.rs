@@ -1,7 +1,7 @@
-use super::arg_def::*;
+use crate::model::MethodArgument;
 
 pub fn arg_serialize_push(
-	arg: &MethodArg,
+	arg: &MethodArgument,
 	arg_accumulator: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;

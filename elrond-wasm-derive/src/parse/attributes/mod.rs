@@ -7,7 +7,7 @@ mod payable_attr;
 mod storage_attr;
 mod util;
 
-pub use doc_attr::*;
+pub use doc_attr::{extract_doc, find_output_names};
 pub use endpoint_attr::*;
 pub use event_attr::*;
 pub use module_attr::*;
