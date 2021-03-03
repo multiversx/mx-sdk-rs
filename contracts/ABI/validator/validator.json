@@ -1,0 +1,327 @@
+{
+    "name": "validator (old auction)",
+    "endpoints": [
+        {
+            "name": "init",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "stake",
+            "comments": "arguments are too complex to model in ABI, so we use raw bytes. Arguments are: blsKey/Signature pairs, then optionally, rewardAddress and maxStakePerNode",
+            "payableInTokens": [
+                "eGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "maxNodesToRun",
+                    "type": "u64"
+                },
+                {
+                    "name": "blsKeySignaturePairsOptionalRewardAddressOptionalMaxStakePerNode",
+                    "type": "MultiResultVec<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        },
+        {
+            "name": "unStake",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        },
+        {
+            "name": "unStakeNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        },
+        {
+            "name": "unStakeTokens",
+            "inputs": [
+                {
+                    "name": "unStakeValue",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unBond",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        },
+        {
+            "name": "unBondNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        },
+        {
+            "name": "unBondTokens",
+            "inputs": [
+                {
+                    "name": "valueToUnBond",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "claim",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "get",
+            "inputs": [
+                {
+                    "name": "validatorAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "registrationData",
+                    "type": "ValidatorDataV2"
+                }
+            ]
+        },
+        {
+            "name": "setConfig",
+            "inputs": [
+                {
+                    "name": "minStakeValue",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "totalSupply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "minStep",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "nodePrice",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "unJailPrice",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeRewardAddress",
+            "inputs": [
+                {
+                    "name": "newAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unJail",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        },
+        {
+            "name": "getTotalStaked",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "totalStakedForCaller",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalStakedTopUpBlsKeys",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "topUp",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "totalStakeValue",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getBlsKeysStatus",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyStatusPair",
+                    "type": "MultiResultVec<MultiResult2<bytes, bytes>"
+                }
+            ]
+        },
+        {
+            "name": "cleanRegisteredData",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "pauseUnStakeUnBond",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unPauseStakeUnBond",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "getUnStakedTokensList",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "unStakedTokensRemainingPeriodToUnbondPair",
+                    "type": "MultiResultVec<MultiResult2<BigUint, u64>"
+                }
+            ]
+        },
+        {
+            "name": "reStakeUnStakedNodes",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyErrorCodePair",
+                    "type": "MultiResultVec<MultiResult2<bytes, u8>"
+                }
+            ]
+        }
+    ],
+    "types": {
+        "ValidatorDataV2": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "RegisterNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "Epoch",
+                    "type": "u32"
+                },
+                {
+                    "name": "RewardAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "TotalStakeValue",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "LockedStake",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "MaxStakePerNode",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "BlsPubKeys",
+                    "type": "List<bytes>"
+                },
+                {
+                    "name": "NumRegistered",
+                    "type": "u32"
+                },
+                {
+                    "name": "UnstakedInfo",
+                    "type": "UnstakedValue"
+                },
+                {
+                    "name": "TotalUnstaked",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "UnstakedValue": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "UnstakedNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "UnstakedValue",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
+}

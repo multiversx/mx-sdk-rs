@@ -1,0 +1,107 @@
+[
+    {
+        "version": "1.0",
+        "name": "crypto-bubbles",
+        "docs": [
+            "Crypto bubbles game.",
+            "It's fun!"
+        ],
+        "constructor": {
+            "description": "Only called at deploy",
+            "input": [],
+            "output": []
+        },
+        "endpoints": [
+            {
+                "name": "topUp",
+                "payableInTokens": [
+                    "eGLD"
+                ],
+                "storageModifier": "readwrite",
+                "input": [],
+                "output": []
+            },
+            {
+                "name": "withdraw",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "amount to withdraw",
+                        "type": "BigUint"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "joinGame",
+                "payableInTokens": [
+                    "eGLD"
+                ],
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "the index of the game to join",
+                        "type": "BigUint"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "rewardWinner",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "the index of the game",
+                        "type": "BigUint"
+                    },
+                    {
+                        "description": "the address of the winner",
+                        "type": "Address"
+                    },
+                    {
+                        "description": "prize amount",
+                        "type": "BigUint"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "rewardAndSendToWallet",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "the index of the game",
+                        "type": "BigUint"
+                    },
+                    {
+                        "description": "the address of the winner",
+                        "type": "Address"
+                    },
+                    {
+                        "description": "prize amount",
+                        "type": "BigUint"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "balanceOf",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "address of the account",
+                        "type": "Address"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "balance of the account",
+                        "type": "BigUint"
+                    }
+                ]
+            }
+        ]
+    }
+]

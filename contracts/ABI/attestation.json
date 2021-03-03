@@ -1,0 +1,223 @@
+[
+    {
+        "version": "1.0",
+        "name": "attestation",
+        "docs": [],
+        "constructor": {
+            "description": "Only called at deploy",
+            "input": [
+                {
+                    "description": "registration cost",
+                    "type": "BigUint"
+                },
+                {
+                    "description": "initial approved address",
+                    "type": "Address"
+                },
+                {
+                    "description": "max nonce diff - i.e. grace period",
+                    "type": "u64"
+                }
+            ],
+            "output": []
+        },
+        "endpoints": [
+            {
+                "name": "register",
+                "payableInTokens": [
+                    "eGLD"
+                ],
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "obfuscated data",
+                        "type": "H256"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "savePublicInfo",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "obfuscated data",
+                        "type": "H256"
+                    },
+                    {
+                        "description": "public info",
+                        "type": "H256"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "attest",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "obfuscated data",
+                        "type": "H256"
+                    },
+                    {
+                        "description": "private info",
+                        "type": "Vec<u8>"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "addAttestator",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "attestator address",
+                        "type": "Address"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "setRegisterCost",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "cost",
+                        "type": "BigUint"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "removedAttestator",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "attestator address",
+                        "type": "Address"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "claim",
+                "description": "owner claim SC funds",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [],
+                "output": []
+            },
+            {
+                "name": "getUserData",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "obfuscated data",
+                        "type": "H256"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "user data",
+                        "type": "User"
+                    }
+                ]
+            },
+            {
+                "name": "getPublicKey",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "obfuscated data",
+                        "type": "H256"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "public key",
+                        "type": "Address"
+                    }
+                ]
+            },
+            {
+                "name": "getRegistrationCost",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "cost",
+                        "type": "BigUint"
+                    }
+                ]
+            },
+            {
+                "name": "getMaxNonceDiff",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "max nonce diff",
+                        "type": "u64"
+                    }
+                ]
+            }
+        ],
+        "structures": [
+            {
+                "name": "User",
+                "fields": [
+                    {
+                        "name": "value_state",
+                        "type": "ValueState"
+                    },
+                    {
+                        "name": "public_info",
+                        "type": "H256"
+                    },
+                    {
+                        "name": "private_info",
+                        "type": "Vec<u8>"
+                    },
+                    {
+                        "name": "address",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "attester",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "nonce",
+                        "type": "u64"
+                    }
+                ]
+            }
+        ],
+        "enums": [
+            {
+                "name": "ValueState",
+                "values": [
+                    {
+                        "name": "None",
+                        "description": "does not exist"
+                    },
+                    {
+                        "name": "Requested",
+                        "description": "requested"
+                    },
+                    {
+                        "name": "Pending",
+                        "description": "pending"
+                    },
+                    {
+                        "name": "Approved",
+                        "description": "approved"
+                    }
+                ]
+            }
+        ]
+    }
+]

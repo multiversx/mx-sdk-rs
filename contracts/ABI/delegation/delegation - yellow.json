@@ -1,0 +1,33 @@
+{
+    "name": "delegation - yellow",
+    "endpoints": [
+        {
+            "name": "delegate",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "undelegate",
+            "inputs": [
+                {
+                    "name": "valueToUnDelegate",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "withdraw",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "claimRewards",
+            "inputs": [],
+            "outputs": []
+        }
+    ]
+}

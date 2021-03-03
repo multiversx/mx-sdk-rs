@@ -1,0 +1,375 @@
+{
+    "name": "staking",
+    "endpoints": [
+        {
+            "name": "init",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "stake",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "rewardAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "ownerAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "register",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "rewardAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "ownerAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unStake",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "rewardAddress",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unBond",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "get",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "stakingData",
+                    "type": "StakedDataV2_0"
+                }
+            ]
+        },
+        {
+            "name": "isStaked",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "slash",
+            "comment": "backwards compatibility",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "jail",
+            "inputs": [
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unJail",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeRewardAddress",
+            "inputs": [
+                {
+                    "name": "newRewardAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "blsKeys",
+                    "type": "VarArgs<bytes>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeValidatorKeys",
+            "inputs": [
+                {
+                    "name": "oldBlsKey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "newBlsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "switchJailedWithWaiting",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getQueueIndex",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "getQueueSize",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "size",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "getRewardAddress",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rewardAddress",
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getBLSKeyStatus",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "status",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "getRemainingUnBondPeriod",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "remainingPeriod",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getQueueRegisterNonceAndRewardAddress",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "rewardAddressNoncePair",
+                    "type": "MultiResultVec<MultiResult2<Address, u64>"
+                }
+            ]
+        },
+        {
+            "name": "updateConfigMinNodes",
+            "inputs": [
+                {
+                    "name": "newMinNodes",
+                    "type": "i64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setOwnersOnAddresses",
+            "inputs": [
+                {
+                    "name": "blsKeyOwnerAddressPair",
+                    "type": "VarArgs<MultiArg2<bytes, Address>>" 
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getOwner",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "ownerAddress",
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "updateConfigMaxNodes",
+            "inputs": [
+                {
+                    "name": "newMaxNodes",
+                    "type": "i64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "stakeNodesFromQueue",
+            "inputs": [
+                {
+                    "name": "numNodesToStake",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "blsKeyRewardAddressPair",
+                    "type": "MultiResultVec<MultiResult2<bytes, Address>"
+                }
+            ]
+        },
+        {
+            "name": "unStakeAtEndOfEpoch",
+            "inputs": [
+                {
+                    "name": "blsKey",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "types": {
+        "StakedDataV2_0": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "RegisterNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "StakedNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "Staked",
+                    "type": "bool"
+                },
+                {
+                    "name": "UnStakedNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "UnStakedEpoch",
+                    "type": "u32"
+                },
+                {
+                    "name": "RewardAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "StakeValue",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "JailedRound",
+                    "type": "u64"
+                },
+                {
+                    "name": "JailedNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "UnJailedNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "Jailed",
+                    "type": "bool"
+                },
+                {
+                    "name": "Waiting",
+                    "type": "bool"
+                },
+                {
+                    "name": "NumJailed",
+                    "type": "u32"
+                },
+                {
+                    "name": "SlashValue",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "OwnerAddress",
+                    "type": "Address"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,259 @@
+{
+    "name": "esdt",
+    "endpoints": [
+        {
+            "name": "init",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "issue",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "tickerName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "initialSupply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "numOfDecimals",
+                    "type": "u32"
+                },
+                {
+                    "name": "properties",
+                    "type": "VarArgs<MultiArg2<bytes, bool>>" 
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "burn",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "burnAmount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "mint",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "mintAmount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "mintedTokensOwner",
+                    "type": "OptionalArg<Address>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "freeze",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "addressToFreezeFor",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unFreeze",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "addressToUnFreezeFor",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "wipe",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "addressToWipeFor",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "pause",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unPause",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "claim",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "configChange",
+            "inputs": [
+                {
+                    "name": "ownerAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "baseIssuingCost",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "minTokenNameLength",
+                    "type": "u32"
+                },
+                {
+                    "name": "maxTokenNameLength",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "controlChanges",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "properties",
+                    "type": "VarArgs<MultiArg2<bytes, bool>>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "transferOwnership",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "newOwner",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getAllESDTTokens",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "esdtTokenNamesSeparated",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "getTokenProperties",
+            "comment": "Properties have the format: Name-value, ex: NumDecimals-5, IsPaused-true",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "esdtTokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "ownerAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "totalMinted",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "totalBurned",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "numDecimals",
+                    "type": "bytes"
+                },
+                {
+                    "name": "isPaused",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canUpgrade",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canMint",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canBurn",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canChangeOwner",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canPause",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canFreeze",
+                    "type": "bytes"
+                },
+                {
+                    "name": "canWipe",
+                    "type": "bytes"
+                }
+            ]
+        }
+    ]
+}

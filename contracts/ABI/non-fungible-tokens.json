@@ -1,0 +1,151 @@
+[
+    {
+        "version": "1.0",
+        "name": "non-fungible-tokens",
+        "docs": [
+            "NFT example"
+        ],
+        "constructor": {
+            "description": "Only called at deploy",
+            "input": [
+                {
+                    "description": "initial nr minted tokens",
+                    "type": "u64"
+                }
+            ],
+            "output": []
+        },
+        "endpoints": [
+            {
+                "name": "mint",
+                "isOwnerOnly": "true",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "nr tokens to mint",
+                        "type": "u64"
+                    },
+                    {
+                        "description": "owner of the created tokens",
+                        "type": "Address"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "approve",
+                "description": "Approves an account to transfer the token on behalf of its owner",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "token id",
+                        "type": "u64"
+                    },
+                    {
+                        "description": "approved address",
+                        "type": "Address"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "revoke",
+                "description": "revoke approval",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "token id",
+                        "type": "u64"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "transfer",
+                "description": "transfer token ownership",
+                "storageModifier": "readwrite",
+                "input": [
+                    {
+                        "description": "token id",
+                        "type": "u64"
+                    },
+                    {
+                        "description": "new owner address",
+                        "type": "Address"
+                    }
+                ],
+                "output": []
+            },
+            {
+                "name": "contractOwner",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "the address of the owner of the SC",
+                        "type": "Address"
+                    }
+                ]
+            },
+            {
+                "name": "totalMinted",
+                "storageModifier": "readonly",
+                "input": [],
+                "output": [
+                    {
+                        "description": "nr total minted tokens",
+                        "type": "u64"
+                    }
+                ]
+            },
+            {
+                "name": "tokenOwner",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "token id",
+                        "type": "u64"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "the address of the owner of token",
+                        "type": "Address"
+                    }
+                ]
+            },
+            {
+                "name": "tokenCount",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "address",
+                        "type": "Address"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "the total nr of tokens owned by the account",
+                        "type": "u64"
+                    }
+                ]
+            },
+            {
+                "name": "approval",
+                "storageModifier": "readonly",
+                "input": [
+                    {
+                        "description": "token id",
+                        "type": "u64"
+                    }
+                ],
+                "output": [
+                    {
+                        "description": "the approved address",
+                        "type": "Address"
+                    }
+                ]
+            }
+        ]
+    }
+]

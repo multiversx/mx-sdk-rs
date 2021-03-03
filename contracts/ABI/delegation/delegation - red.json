@@ -1,0 +1,69 @@
+{
+    "name": "delegation - red",
+    "endpoints": [
+        {
+            "name": "init",
+            "inputs": [
+                {
+                    "name": "totalDelegationCap",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "serviceFee",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "updateRewards",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "getContractConfig",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "ownerAddress",
+                    "type": "Address"
+                },
+                {
+                    "name": "serviceFee",
+                    "type": "u64"
+                },
+                {
+                    "name": "maxDelegationCap",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "initialOwnerFunds",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "automaticActivation",
+                    "type": "bytes"
+                },
+                {
+                    "name": "withDelegationCap",
+                    "type": "bytes"
+                },
+                {
+                    "name": "changeableServiceFee",
+                    "type": "bytes"
+                },
+                {
+                    "name": "createdNonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "unBondPeriod",
+                    "type": "u64"
+                }
+            ]
+        }
+    ]
+}
