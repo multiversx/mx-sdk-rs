@@ -36,6 +36,8 @@ pub trait EgldEsdtSwap {
 			"Wrong payment, should pay exactly 5 EGLD for ESDT token issue"
 		);
 
+		self.issue_started_event(token_ticker.as_slice(), &initial_supply);
+
 		Ok(ESDTSystemSmartContractProxy::new()
 			.issue(
 				ESDT_ISSUE_COST.into(),
@@ -64,11 +66,16 @@ pub trait EgldEsdtSwap {
 	) {
 		// callback is called with ESDTTransfer of the newly issued token, with the amount requested,
 		// so we can get the token identifier and amount from the call data
-		if result.is_ok() {
-			self.unused_wrapped_egld().set(&initial_supply);
-			self.wrapped_egld_token_id().set(&token_identifier);
+		match result {
+			AsyncCallResult::Ok(()) => {
+				self.issue_success_event(&token_identifier, &initial_supply);
+				self.unused_wrapped_egld().set(&initial_supply);
+				self.wrapped_egld_token_id().set(&token_identifier);
+			},
+			AsyncCallResult::Err(message) => {
+				self.issue_failure_event(message.err_msg.as_slice());
+			},
 		}
-		// nothing to do in case of error
 	}
 
 	#[endpoint(mintWrappedEgld)]
@@ -80,22 +87,28 @@ pub trait EgldEsdtSwap {
 			"Wrapped EGLD was not issued yet"
 		);
 
+		let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
+		let esdt_token_id = wrapped_egld_token_id.as_esdt_name();
+		self.mint_started_event(esdt_token_id, &amount);
+
 		Ok(ESDTSystemSmartContractProxy::new()
-			.mint(
-				self.wrapped_egld_token_id().get().as_esdt_name(),
-				&amount,
-			)
+			.mint(esdt_token_id, &amount)
 			.async_call()
 			.with_callback(self.callbacks().esdt_mint_callback(&amount)))
 	}
 
 	#[callback]
 	fn esdt_mint_callback(&self, amount: &BigUint, #[call_result] result: AsyncCallResult<()>) {
-		if result.is_ok() {
-			self.unused_wrapped_egld()
-				.update(|unused_wrapped_egld| *unused_wrapped_egld += amount);
+		match result {
+			AsyncCallResult::Ok(()) => {
+				self.mint_success_event();
+				self.unused_wrapped_egld()
+					.update(|unused_wrapped_egld| *unused_wrapped_egld += amount);
+			},
+			AsyncCallResult::Err(message) => {
+				self.mint_failure_event(message.err_msg.as_slice());
+			},
 		}
-		// nothing to do in case of error
 	}
 
 	// endpoints
@@ -117,12 +130,15 @@ pub trait EgldEsdtSwap {
 		unused_wrapped_egld -= &payment;
 		self.unused_wrapped_egld().set(&unused_wrapped_egld);
 
+		let caller = self.get_caller();
 		self.send().direct_esdt_via_transf_exec(
-			&self.get_caller(),
+			&caller,
 			self.wrapped_egld_token_id().get().as_slice(),
 			&payment,
 			b"wrapping",
 		);
+
+		self.wrap_egld_event(&caller, &payment);
 
 		Ok(())
 	}
@@ -158,8 +174,11 @@ pub trait EgldEsdtSwap {
 			.update(|unused_wrapped_egld| *unused_wrapped_egld += &wrapped_egld_payment);
 
 		// 1 wrapped EGLD = 1 EGLD, so we pay back the same amount
+		let caller = self.get_caller();
 		self.send()
-			.direct_egld(&self.get_caller(), &wrapped_egld_payment, b"unwrapping");
+			.direct_egld(&caller, &wrapped_egld_payment, b"unwrapping");
+
+		self.unwrap_egld_event(&caller, &wrapped_egld_payment);
 
 		Ok(())
 	}
@@ -178,4 +197,34 @@ pub trait EgldEsdtSwap {
 	#[view(getUnusedWrappedEgld)]
 	#[storage_mapper("unused_wrapped_egld")]
 	fn unused_wrapped_egld(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+
+	// events
+
+	#[event("issue-started")]
+	fn issue_started_event(&self, #[indexed] token_ticker: &[u8], initial_supply: &BigUint);
+
+	#[event("issue-success")]
+	fn issue_success_event(
+		&self,
+		#[indexed] token_identifier: &TokenIdentifier,
+		initial_supply: &BigUint,
+	);
+
+	#[event("issue-failure")]
+	fn issue_failure_event(&self, message: &[u8]);
+
+	#[event("mint-started")]
+	fn mint_started_event(&self, #[indexed] esdt_token_id: &[u8], amount: &BigUint);
+
+	#[event("mint-success")]
+	fn mint_success_event();
+
+	#[event("mint-failure")]
+	fn mint_failure_event(&self, message: &[u8]);
+
+	#[event("wrap-egld")]
+	fn wrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+
+	#[event("unwrap-egld")]
+	fn unwrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
 }

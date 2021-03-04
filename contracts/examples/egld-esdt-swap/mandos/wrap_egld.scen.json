@@ -38,6 +38,16 @@
             "expect": {
                 "status": "0",
                 "message": "",
+                "logs": [
+                    {
+                        "address": "address:contract",
+                        "identifier": "str:wrap-egld",
+                        "topics": [
+                            "address:user"
+                        ],
+                        "data": "500"
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
