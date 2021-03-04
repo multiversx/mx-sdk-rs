@@ -44,8 +44,8 @@
                         "str:WEGLD-abcdef": "1800"
                     },
                     "storage": {
-                        "str:wrappedEgldTokenIdentifier": "str:WEGLD-abcdef",
-                        "str:wrappedEgldRemaining": "1800"
+                        "str:wrapped_egld_token_id": "str:WEGLD-abcdef",
+                        "str:unused_wrapped_egld": "1800"
                     },
                     "code": "file:../output/egld-esdt-swap.wasm"
                 }
