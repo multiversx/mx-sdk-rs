@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 const ESDT_ISSUE_COST: u64 = 5000000000000000000; // 5 EGLD
-const EGLD_DECIMALS: u8 = 18;
+const EGLD_DECIMALS: usize = 18;
 
 /// Converts between EGLD and a wrapped EGLD ESDT token.
 ///	1 EGLD = 1 wrapped EGLD and is interchangeable at all times.
