@@ -41,6 +41,11 @@ impl TokenIdentifier {
 	}
 
 	#[inline]
+	pub fn as_esdt_name(&self) -> &[u8] {
+		self.0.as_slice()
+	}
+
+	#[inline]
 	pub fn as_name(&self) -> &[u8] {
 		if self.is_egld() {
 			TokenIdentifier::EGLD_REPRESENTATION
