@@ -5,11 +5,19 @@ There are several crates in this repo, this changelog will keep track of all of 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+
+
+## [elrond-wasm 0.13.0] - 2021-03-04
+### Main feature
 - Events revamped:
 	- any event name of any length is accepted. The event name is now expressed as ASCII instead of hex
 	- topics can have any length
 	- topics and data are serialized using the elrond-codec instead of the old macro-based solution
 	- old events are still allowed for now via the `#[legacy_event("0x...")]` syntax; might be removed in the future
+### Refactoring 
+- Major refactoring of elrond-wasm-derive. This doesn't change much of the functionality, though.
+### Minor features
+- SingleValueMapper redesigned for easier use. It no longer keeps the storage value cached.
 
 ## [elrond-wasm 0.12.0] - 2021-02-25
 - Reorganized ESDT and EGLD direct send api.
