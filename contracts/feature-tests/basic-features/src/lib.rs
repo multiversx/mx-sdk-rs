@@ -402,10 +402,26 @@ pub trait BasicFeatures {
 	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
 
 	#[endpoint]
-	fn my_single_value_mapper_increment(&self, amount: &BigInt) {
-		let mut my_single_value_mapper = self.map_my_single_value_mapper();
-		my_single_value_mapper.value += amount;
-		my_single_value_mapper.save();
+	fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
+		let my_single_value_mapper = self.map_my_single_value_mapper();
+		my_single_value_mapper.set(&(my_single_value_mapper.get() + amount));
+	}
+
+	/// Same as my_single_value_mapper_increment_1, but expressed more compactly.
+	#[endpoint]
+	fn my_single_value_mapper_increment_2(&self, amount: &BigInt) {
+		self.map_my_single_value_mapper()
+			.update(|value| *value += amount);
+	}
+
+	#[endpoint]
+	fn clear_single_value_mapper(&self) {
+		self.map_my_single_value_mapper().clear();
+	}
+
+	#[endpoint]
+	fn is_empty_single_value_mapper(&self) -> bool {
+		self.map_my_single_value_mapper().is_empty()
 	}
 
 	// VecMapper
