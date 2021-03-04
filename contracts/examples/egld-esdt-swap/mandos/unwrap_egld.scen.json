@@ -1,0 +1,55 @@
+{
+    "name": "unwrap egld",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "wrap_egld.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "unwrap-egld",
+            "tx": {
+                "from": "address:user",
+                "to": "address:contract",
+                "value": "0",
+                "esdtTokenName": "str:WEGLD-abcdef",
+                "esdtValue": "300",
+                "function": "unwrapEgld",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "2",
+                    "balance": "800",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "200"
+                    },
+                    "storage": {}
+                },
+                "address:contract": {
+                    "nonce": "0",
+                    "balance": "200",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "1800"
+                    },
+                    "storage": {
+                        "str:wrappedEgldTokenIdentifier": "str:WEGLD-abcdef",
+                        "str:wrappedEgldRemaining": "1800"
+                    },
+                    "code": "file:../output/egld-esdt-swap.wasm"
+                }
+            }
+        }
+    ]
+}

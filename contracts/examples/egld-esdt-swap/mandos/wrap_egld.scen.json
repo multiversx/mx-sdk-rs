@@ -1,0 +1,71 @@
+{
+    "name": "wrap egld",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "storage": {}
+                },
+                "address:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "2000"
+                    },
+                    "storage": {
+                        "str:wrappedEgldTokenIdentifier": "str:WEGLD-abcdef",
+                        "str:wrappedEgldRemaining": "2000"
+                    },
+                    "code": "file:../output/egld-esdt-swap.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "wrap-egld",
+            "tx": {
+                "from": "address:user",
+                "to": "address:contract",
+                "value": "500",
+                "function": "wrapEgld",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "1",
+                    "balance": "500",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "500"
+                    },
+                    "storage": {}
+                },
+                "address:contract": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "1500"
+                    },
+                    "storage": {
+                        "str:wrappedEgldTokenIdentifier": "str:WEGLD-abcdef",
+                        "str:wrappedEgldRemaining": "1500"
+                    },
+                    "code": "file:../output/egld-esdt-swap.wasm"
+                }
+            }
+        }
+    ]
+}

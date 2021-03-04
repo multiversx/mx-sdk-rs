@@ -5,13 +5,14 @@
 erdpy --verbose contract build "contracts/benchmarks/str-repeat" || return 1
 erdpy --verbose contract build "contracts/benchmarks/send-tx-repeat" || return 1
 erdpy --verbose contract build "contracts/examples/adder" || return 1
+erdpy --verbose contract build "contracts/examples/crowdfunding-egld" || return 1
+erdpy --verbose contract build "contracts/examples/crowdfunding-erc20" || return 1
+erdpy --verbose contract build "contracts/examples/crowdfunding-esdt" || return 1
 erdpy --verbose contract build "contracts/examples/crypto-bubbles" || return 1
 erdpy --verbose contract build "contracts/examples/crypto-kitties/kitty-ownership" || return 1
 erdpy --verbose contract build "contracts/examples/crypto-kitties/kitty-genetic-alg" || return 1
 erdpy --verbose contract build "contracts/examples/crypto-kitties/kitty-auction" || return 1
-erdpy --verbose contract build "contracts/examples/crowdfunding-egld" || return 1
-erdpy --verbose contract build "contracts/examples/crowdfunding-erc20" || return 1
-erdpy --verbose contract build "contracts/examples/crowdfunding-esdt" || return 1
+erdpy --verbose contract build "contracts/examples/egld-esdt-swap" || return 1
 erdpy --verbose contract build "contracts/examples/erc1155" || return 1
 erdpy --verbose contract build "contracts/examples/erc1155-user-mock" || return 1
 erdpy --verbose contract build "contracts/examples/factorial" || return 1
