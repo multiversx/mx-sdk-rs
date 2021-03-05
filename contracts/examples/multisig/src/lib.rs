@@ -456,6 +456,12 @@ pub trait Multisig {
 			},
 			Action::AddProposer(proposer_address) => {
 				self.change_user_role(proposer_address, UserRole::Proposer);
+
+				// validation required for the scenario when a board member becomes a proposer
+				require!(
+					self.get_quorum() <= self.get_num_board_members(),
+					"quorum cannot exceed board size"
+				);
 				Ok(PerformActionResult::Nothing)
 			},
 			Action::RemoveUser(user_address) => {
