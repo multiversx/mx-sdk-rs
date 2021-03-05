@@ -83,10 +83,10 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 	/// Produces a contract call to the ESDT system SC,
 	/// which causes it to issue a new ESDT token.
-	pub fn mint(&self, token_name: &[u8], amount: &BigUint) -> ContractCall<BigUint> {
+	pub fn mint(&self, token_identifier: &[u8], amount: &BigUint) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"mint");
 
-		contract_call.push_argument_raw_bytes(token_name);
+		contract_call.push_argument_raw_bytes(token_identifier);
 		contract_call.push_argument_raw_bytes(&amount.to_bytes_be());
 
 		contract_call
@@ -94,20 +94,20 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 	/// The manager of an ESDT token may choose to suspend all transactions of the token,
 	/// except minting, freezing/unfreezing and wiping.
-	pub fn pause(&self, token_name: &[u8]) -> ContractCall<BigUint> {
+	pub fn pause(&self, token_identifier: &[u8]) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"pause");
 
-		contract_call.push_argument_raw_bytes(token_name);
+		contract_call.push_argument_raw_bytes(token_identifier);
 
 		contract_call
 	}
 
 	/// The manager of an ESDT token may choose to suspend all transactions of the token,
 	/// except minting, freezing/unfreezing and wiping.
-	pub fn unpause(&self, token_name: &[u8]) -> ContractCall<BigUint> {
+	pub fn unpause(&self, token_identifier: &[u8]) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"unPause");
 
-		contract_call.push_argument_raw_bytes(token_name);
+		contract_call.push_argument_raw_bytes(token_identifier);
 
 		contract_call
 	}
@@ -115,20 +115,20 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 	/// The manager of an ESDT token may freeze the tokens held by a specific account.
 	/// As a consequence, no tokens may be transferred to or from the frozen account.
 	/// Freezing and unfreezing the tokens of an account are operations designed to help token managers to comply with regulations.
-	pub fn freeze(&self, token_name: &[u8], address: &Address) -> ContractCall<BigUint> {
+	pub fn freeze(&self, token_identifier: &[u8], address: &Address) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"freeze");
 
-		contract_call.push_argument_raw_bytes(token_name);
+		contract_call.push_argument_raw_bytes(token_identifier);
 		contract_call.push_argument_raw_bytes(address.as_bytes());
 
 		contract_call
 	}
 
 	/// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
-	pub fn unfreeze(&self, token_name: &[u8], address: &Address) -> ContractCall<BigUint> {
+	pub fn unfreeze(&self, token_identifier: &[u8], address: &Address) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"unFreeze");
 
-		contract_call.push_argument_raw_bytes(token_name);
+		contract_call.push_argument_raw_bytes(token_identifier);
 		contract_call.push_argument_raw_bytes(address.as_bytes());
 
 		contract_call
@@ -138,10 +138,10 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 	/// This operation is similar to burning the tokens, but the account must have been frozen beforehand,
 	/// and it must be done by the token manager.
 	/// Wiping the tokens of an account is an operation designed to help token managers to comply with regulations.
-	pub fn wipe(&self, token_name: &[u8], address: &Address) -> ContractCall<BigUint> {
+	pub fn wipe(&self, token_identifier: &[u8], address: &Address) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"wipe");
 
-		contract_call.push_argument_raw_bytes(token_name);
+		contract_call.push_argument_raw_bytes(token_identifier);
 		contract_call.push_argument_raw_bytes(address.as_bytes());
 
 		contract_call
