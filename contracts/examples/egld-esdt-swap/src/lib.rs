@@ -92,7 +92,7 @@ pub trait EgldEsdtSwap {
 		);
 
 		let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
-		let esdt_token_id = wrapped_egld_token_id.as_esdt_name();
+		let esdt_token_id = wrapped_egld_token_id.as_esdt_identifier();
 		let caller = self.get_caller();
 		self.mint_started_event(&caller, &amount);
 
@@ -103,7 +103,12 @@ pub trait EgldEsdtSwap {
 	}
 
 	#[callback]
-	fn esdt_mint_callback(&self, caller: &Address, amount: &BigUint, #[call_result] result: AsyncCallResult<()>) {
+	fn esdt_mint_callback(
+		&self,
+		caller: &Address,
+		amount: &BigUint,
+		#[call_result] result: AsyncCallResult<()>,
+	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.mint_success_event(caller);
@@ -138,7 +143,7 @@ pub trait EgldEsdtSwap {
 		let caller = self.get_caller();
 		self.send().direct_esdt_via_transf_exec(
 			&caller,
-			self.wrapped_egld_token_id().get().as_slice(),
+			self.wrapped_egld_token_id().get().as_esdt_identifier(),
 			&payment,
 			b"wrapping",
 		);
