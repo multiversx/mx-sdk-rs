@@ -3,8 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const ESDT_ISSUE_COST: u64 = 5000000000000000000; // 5 EGLD
-const EGLD_DECIMALS: usize = 18;
+const EGLD_NUM_DECIMALS: usize = 18;
 
 /// Converts between EGLD and a wrapped EGLD ESDT token.
 ///	1 EGLD = 1 wrapped EGLD and is interchangeable at all times.
@@ -23,7 +22,7 @@ pub trait EgldEsdtSwap {
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 		initial_supply: BigUint,
-		#[payment] payment: BigUint,
+		#[payment] issue_cost: BigUint,
 	) -> SCResult<AsyncCall<BigUint>> {
 		only_owner!(self, "only owner may call this function");
 
@@ -31,20 +30,16 @@ pub trait EgldEsdtSwap {
 			self.wrapped_egld_token_id().is_empty(),
 			"wrapped egld was already issued"
 		);
-		require!(
-			payment == BigUint::from(ESDT_ISSUE_COST),
-			"Wrong payment, should pay exactly 5 EGLD for ESDT token issue"
-		);
 
 		self.issue_started_event(token_ticker.as_slice(), &initial_supply);
 
 		Ok(ESDTSystemSmartContractProxy::new()
 			.issue(
-				ESDT_ISSUE_COST.into(),
+				issue_cost,
 				&token_display_name,
 				&token_ticker,
 				&initial_supply,
-				EGLD_DECIMALS,
+				EGLD_NUM_DECIMALS,
 				false,
 				false,
 				false,
