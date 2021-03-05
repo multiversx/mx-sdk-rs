@@ -44,7 +44,7 @@ pub trait EgldEsdtSwap {
 				false,
 				false,
 				true,
-				true,
+				false,
 				true,
 				true,
 			)
