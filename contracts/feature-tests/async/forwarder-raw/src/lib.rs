@@ -33,7 +33,7 @@ pub trait ForwarderRaw {
 		#[payment] payment: BigUint,
 	) {
 		self.send()
-			.direct_esdt_via_transf_exec(&to, &token.as_slice(), &payment, &[]);
+			.direct_esdt_via_transf_exec(&to, &token.as_esdt_identifier(), &payment, &[]);
 	}
 
 	fn forward_contract_call(

@@ -92,7 +92,7 @@ fn parse_execute_mandos_steps(
 					to: tx.to.value.into(),
 					call_value: tx.call_value.value.clone(),
 					esdt_value: tx.esdt_value.value.clone(),
-					esdt_token_name: tx.esdt_token_name.value.clone(),
+					esdt_token_identifier: tx.esdt_token_name.value.clone(),
 					func_name: tx.function.as_bytes().to_vec(),
 					args: tx
 						.arguments
@@ -169,7 +169,7 @@ fn parse_execute_mandos_steps(
 					to: Address::zero(),
 					call_value: tx.call_value.value.clone(),
 					esdt_value: tx.esdt_value.value.clone(),
-					esdt_token_name: tx.esdt_token_name.value.clone(),
+					esdt_token_identifier: tx.esdt_token_name.value.clone(),
 					func_name: b"init".to_vec(),
 					args: tx
 						.arguments
@@ -196,14 +196,14 @@ fn parse_execute_mandos_steps(
 					.unwrap();
 				let recipient_address = &tx.to.value.into();
 				state.increase_balance(recipient_address, &tx.value.value);
-				let esdt_token_name = tx.esdt_token_name.value.clone();
+				let esdt_token_identifier = tx.esdt_token_name.value.clone();
 				let esdt_value = tx.esdt_value.value.clone();
 
-				if !esdt_token_name.is_empty() && esdt_value > 0u32.into() {
-					state.substract_esdt_balance(sender_address, &esdt_token_name[..], &esdt_value);
+				if !esdt_token_identifier.is_empty() && esdt_value > 0u32.into() {
+					state.substract_esdt_balance(sender_address, &esdt_token_identifier[..], &esdt_value);
 					state.increase_esdt_balance(
 						recipient_address,
-						&esdt_token_name[..],
+						&esdt_token_identifier[..],
 						&esdt_value,
 					);
 				}
@@ -224,11 +224,11 @@ fn parse_execute_mandos_steps(
 fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
-	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
 	let esdt_value = tx_input.esdt_value;
 
-	state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value);
-	state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+	state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
+	state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
 }
 
 fn execute_sc_call(
@@ -244,12 +244,12 @@ fn execute_sc_call(
 	state.subtract_tx_payment(&from, &call_value)?;
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
 	let esdt_value = tx_input.esdt_value.clone();
-	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+	let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
 	if esdt_used {
-		state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+		state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
 	}
 
 	let contract_account = state
@@ -282,7 +282,7 @@ fn execute_sc_call(
 
 		state.increase_balance(&to, &call_value);
 		if esdt_used {
-			state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+			state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
 		}
 
 		state.send_balance(&to, tx_output.send_balance_list.as_slice())?;
@@ -290,7 +290,7 @@ fn execute_sc_call(
 		state.increase_balance(&from, &call_value);
 
 		if esdt_used {
-			state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+			state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
 		}
 	}
 
@@ -311,12 +311,12 @@ fn execute_sc_create(
 	state.subtract_tx_payment(&from, &call_value)?;
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
 	let esdt_value = tx_input.esdt_value.clone();
-	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+	let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
 	if esdt_used {
-		state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+		state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
 	}
 
 	let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
@@ -333,7 +333,7 @@ fn execute_sc_create(
 		state.increase_balance(&from, &call_value);
 
 		if esdt_used {
-			state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+			state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
 		}
 	}
 

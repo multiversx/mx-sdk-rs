@@ -50,7 +50,7 @@ const CONTRACT_CODE: &[u8] = &[
 #[elrond_wasm_derive::contract(DeployTwoContractsImpl)]
 pub trait DeployTwoContracts {
 	#[init]
-	fn init() {}
+	fn init(&self) {}
 
 	#[endpoint(deployContract)]
 	fn deploy_contract(&self) -> SCResult<Address> {

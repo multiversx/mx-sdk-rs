@@ -14,6 +14,18 @@ pub enum AsyncCallResult<T> {
 	Err(AsyncCallError),
 }
 
+impl<T> AsyncCallResult<T> {
+	#[inline]
+	pub fn is_ok(&self) -> bool {
+		matches!(self, AsyncCallResult::Ok(_))
+	}
+
+	#[inline]
+	pub fn is_err(&self) -> bool {
+		!self.is_ok()
+	}
+}
+
 impl<I, D, T> DynArg<I, D> for AsyncCallResult<T>
 where
 	I: TopDecodeInput,
