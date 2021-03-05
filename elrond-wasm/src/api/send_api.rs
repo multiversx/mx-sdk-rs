@@ -54,7 +54,7 @@ where
 		if token.is_egld() {
 			self.direct_egld(to, amount, data);
 		} else {
-			self.direct_esdt_via_transf_exec(to, token.as_slice(), amount, data);
+			self.direct_esdt_via_transf_exec(to, token.as_esdt_identifier(), amount, data);
 		}
 	}
 
@@ -89,7 +89,7 @@ where
 		if token.is_egld() {
 			self.direct_egld(to, amount, data);
 		} else {
-			self.direct_esdt_via_async_call(to, token.as_slice(), amount, data);
+			self.direct_esdt_via_async_call(to, token.as_esdt_identifier(), amount, data);
 		}
 	}
 

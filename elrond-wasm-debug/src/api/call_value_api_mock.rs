@@ -32,6 +32,6 @@ impl CallValueApi<RustBigUint> for TxContext {
 
 	#[inline]
 	fn token(&self) -> TokenIdentifier {
-		TokenIdentifier::from(self.tx_input_box.esdt_token_name.as_slice())
+		TokenIdentifier::from(self.tx_input_box.esdt_token_identifier.as_slice())
 	}
 }
