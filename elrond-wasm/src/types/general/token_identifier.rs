@@ -35,13 +35,16 @@ impl TokenIdentifier {
 		self.0
 	}
 
+	#[deprecated(
+		note = "Please use the as_esdt_identifier method instead, its name is more suggestive."
+	)]
 	#[inline]
 	pub fn as_slice(&self) -> &[u8] {
 		self.0.as_slice()
 	}
 
 	#[inline]
-	pub fn as_esdt_name(&self) -> &[u8] {
+	pub fn as_esdt_identifier(&self) -> &[u8] {
 		self.0.as_slice()
 	}
 
