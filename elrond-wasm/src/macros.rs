@@ -18,6 +18,7 @@ macro_rules! imports {
 		use elrond_wasm::api::{BigIntApi, BigUintApi, CallValueApi, ContractHookApi, SendApi};
 		use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
 		use elrond_wasm::err_msg;
+		use elrond_wasm::esdt::ESDTSystemSmartContractProxy;
 		use elrond_wasm::io::*;
 		use elrond_wasm::non_zero_util::*;
 		use elrond_wasm::storage::mappers::*;
