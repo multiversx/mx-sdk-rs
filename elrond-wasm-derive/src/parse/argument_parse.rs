@@ -2,6 +2,10 @@ use super::attributes::*;
 use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
 
 pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
+	if m.sig.inputs.is_empty() {
+		missing_self_panic(m);
+	}
+
 	let mut receiver_processed = false;
 	m.sig
 		.inputs
@@ -9,14 +13,14 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 		.filter_map(|arg| match arg {
 			syn::FnArg::Receiver(ref selfref) => {
 				if selfref.mutability.is_some() || receiver_processed {
-					panic!("Trait method must have `&self` as its first argument.");
+					missing_self_panic(m);
 				}
 				receiver_processed = true;
 				None
 			},
 			syn::FnArg::Typed(pat_typed) => {
 				if !receiver_processed {
-					panic!("Trait method must have `&self` as its first argument.");
+					missing_self_panic(m);
 				}
 				let pat = &*pat_typed.pat;
 				let ty = &*pat_typed.ty;
@@ -51,4 +55,11 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 			},
 		})
 		.collect()
+}
+
+fn missing_self_panic(m: &syn::TraitItemMethod) -> ! {
+	panic!(
+		"Trait method `{}` must have `&self` as its first argument.",
+		m.sig.ident.to_string()
+	)
 }
