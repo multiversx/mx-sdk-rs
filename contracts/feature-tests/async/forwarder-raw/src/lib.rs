@@ -151,12 +151,12 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		let args_vec = args.into_vec();
-		self.callback_raw_event(&token, &payment, args_vec.as_slice());
+		self.callback_raw_event(&token, &payment, args_vec.as_slice().to_vec());
 
 		self.callback_data()
 			.push(&(token, payment, args_vec));
 	}
 
 	#[event("callback_raw")]
-	fn callback_raw_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint, arguments: &[BoxedBytes]);
+	fn callback_raw_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint, arguments: Vec<BoxedBytes>);
 }
