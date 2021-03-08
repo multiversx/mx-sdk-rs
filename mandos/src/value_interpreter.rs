@@ -11,6 +11,7 @@ const FILE_PREFIX: &str = "file:";
 const KECCAK256_PREFIX: &str = "keccak256:";
 
 const BIGUNT_PREFIX: &str = "biguint:";
+const NESTED_PREFIX: &str = "nested:";
 const U64_PREFIX: &str = "u64:";
 const U32_PREFIX: &str = "u32:";
 const U16_PREFIX: &str = "u16:";
@@ -101,6 +102,10 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 
 fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
 	if let Some(stripped) = s.strip_prefix(BIGUNT_PREFIX) {
+		return Some(parse_biguint(stripped));
+	}
+
+	if let Some(stripped) = s.strip_prefix(NESTED_PREFIX) {
 		return Some(parse_biguint(stripped));
 	}
 
