@@ -22,5 +22,5 @@ features = [ "wasm-output-mode",]
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.11.0"
+version = "0.13.0"
 features = [ "wasm-output-mode",]

@@ -1,6 +1,6 @@
 use elrond_wasm::storage::mappers::SetMapper;
 use elrond_wasm::storage::mappers::StorageMapper;
-use elrond_wasm::BoxedBytes;
+use elrond_wasm::types::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
 fn create_set() -> SetMapper<TxContext, u64> {

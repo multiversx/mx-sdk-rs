@@ -1,5 +1,6 @@
-use elrond_wasm::api::BigUintApi;
-use elrond_wasm::{Address, BoxedBytes, CodeMetadata, Vec};
+use elrond_wasm::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
+use elrond_wasm::io::EndpointResult;
+use elrond_wasm::types::{Address, AsyncCall, BoxedBytes, CodeMetadata, SendEgld, Vec};
 elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
@@ -22,8 +23,8 @@ pub enum Action<BigUint: BigUintApi> {
 	},
 	SCCall {
 		to: Address,
-		amount: BigUint,
-		function: BoxedBytes,
+		egld_payment: BigUint,
+		endpoint_name: BoxedBytes,
 		arguments: Vec<BoxedBytes>,
 	},
 }
@@ -43,6 +44,29 @@ pub struct ActionFullInfo<BigUint: BigUintApi> {
 	pub action_id: usize,
 	pub action_data: Action<BigUint>,
 	pub signers: Vec<Address>,
+}
+
+#[derive(TypeAbi)]
+pub enum PerformActionResult<BigUint: BigUintApi> {
+	Nothing,
+	SendEgld(SendEgld<BigUint>),
+	DeployResult(Address),
+	AsyncCall(AsyncCall<BigUint>),
+}
+
+impl<FA, BigUint> EndpointResult<FA> for PerformActionResult<BigUint>
+where
+	BigUint: BigUintApi + 'static,
+	FA: EndpointFinishApi + ErrorApi + SendApi<BigUint> + Clone + 'static,
+{
+	fn finish(&self, api: FA) {
+		match self {
+			PerformActionResult::Nothing => (),
+			PerformActionResult::SendEgld(send_egld) => send_egld.finish(api),
+			PerformActionResult::DeployResult(address) => address.finish(api),
+			PerformActionResult::AsyncCall(async_call) => async_call.finish(api),
+		}
+	}
 }
 
 #[cfg(test)]
