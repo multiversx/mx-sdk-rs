@@ -1,7 +1,7 @@
 [package]
-name = "ping-pong-egld"
-version = "0.0.2"
-authors = [ "Bruda Claudiu-Marcel <claudiu725@yahoo.com>",]
+name = "recursive-caller"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
 
@@ -13,17 +13,17 @@ wasm-output-mode = ["elrond-wasm-node"]
 
 [dependencies.elrond-wasm]
 version = "0.13.0"
-path = "../../../elrond-wasm"
+path = "../../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
 version = "0.13.0"
-path = "../../../elrond-wasm-derive"
+path = "../../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
 version = "0.13.0"
-path = "../../../elrond-wasm-node"
+path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.13.0"
-path = "../../../elrond-wasm-debug"
+path = "../../../../elrond-wasm-debug"

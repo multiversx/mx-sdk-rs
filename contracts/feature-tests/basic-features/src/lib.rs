@@ -563,16 +563,16 @@ pub trait BasicFeatures {
 		self.event_a(data);
 	}
 
-	#[endpoint(logEventB)]
-	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
-		self.event_b(arg1, arg2, data);
-	}
-
 	#[event("event_a")]
 	fn event_a(&self, data: &BigUint);
 
+	#[endpoint(logEventB)]
+	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, #[var_args] data: VarArgs<BoxedBytes>) {
+		self.event_b(arg1, arg2, data.as_slice());
+	}
+
 	#[event("event_b")]
-	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &BigUint);
+	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &[BoxedBytes]);
 
 	// EVENTS (LEGACY)
 
