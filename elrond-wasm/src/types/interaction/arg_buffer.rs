@@ -34,6 +34,16 @@ impl ArgBuffer {
 		self.arg_data.as_ptr()
 	}
 
+	/// returns a clone of the raw arg data
+	pub fn arg_data(&self) -> Vec<u8> {
+		self.arg_data.clone()
+	}
+
+	/// returns a clone of the raw arg data lengths
+	pub fn arg_lengths(&self) -> Vec<usize> {
+		self.arg_lengths.clone()
+	}
+
 	/// Quick for-each using closures.
 	/// TODO: also write an Iterator at some point, but beware of wasm bloat.
 	pub fn for_each_arg<F: FnMut(&[u8])>(&self, mut f: F) {
