@@ -173,7 +173,7 @@ fn test_signed_fixed_width_panic_3() {
 }
 
 #[test]
-fn test_biguint() {
+fn test_biguint_nested() {
 	let context = &InterpreterContext::default();
 
 	assert_eq!(
@@ -187,5 +187,10 @@ fn test_biguint() {
 	assert_eq!(
 		vec![0x00, 0x00, 0x00, 0x02, 0x01, 0xFF],
 		interpret_string("biguint:0x01FF", context)
+	);
+
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05],
+		interpret_string("biguint:0x0102030405", context)
 	);
 }

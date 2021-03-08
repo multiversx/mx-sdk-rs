@@ -20,6 +20,7 @@ const I16_PREFIX: &str = "i16:";
 const I8_PREFIX: &str = "i8:";
 
 const BIGUINT_PREFIX: &str = "biguint:";
+const NESTED_PREFIX: &str = "nested:";
 
 pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Vec<u8> {
 	match vst {
@@ -134,6 +135,10 @@ fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
 	}
 
 	if let Some(stripped) = s.strip_prefix(BIGUINT_PREFIX) {
+		return Some(parse_biguint(stripped));
+	}
+
+	if let Some(stripped) = s.strip_prefix(NESTED_PREFIX) {
 		return Some(parse_biguint(stripped));
 	}
 
