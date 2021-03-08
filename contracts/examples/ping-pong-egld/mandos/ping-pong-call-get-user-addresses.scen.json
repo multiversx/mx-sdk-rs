@@ -1,0 +1,31 @@
+{
+    "name": "call get_user_addresses in order to check who registered",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "ping-pong-call-ping-second-user.scen.json"
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:participant1",
+                "to": "address:the_ping_pong_contract",
+                "value": "0",
+                "function": "get_user_addresses",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "out": [
+                    "address:participant1",
+                    "address:participant2"
+                ],
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
