@@ -15,14 +15,14 @@ pub trait PingPong {
 		fixed_sum: &BigUint,
 		duration: u64,
 		beginning: Option<u64>,
-		max_funds: Option<BigUint>,
+		#[var_args] max_funds: OptionalArg<BigUint>,
 	) {
 		self.set_fixed_sum(fixed_sum);
 		let computed_beginning = beginning.unwrap_or_else(|| self.get_block_timestamp());
 		let deadline = computed_beginning + duration;
 		self.set_deadline(deadline);
 		self.set_beginning(computed_beginning);
-		self.set_max_funds(max_funds);
+		self.set_max_funds(max_funds.into_option());
 	}
 
 	#[payable("EGLD")]
