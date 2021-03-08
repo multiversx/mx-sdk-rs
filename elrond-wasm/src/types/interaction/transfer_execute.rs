@@ -42,7 +42,7 @@ where
 		} else {
 			api.direct_esdt_execute(
 				&self.to,
-				self.token.as_slice(),
+				self.token.as_esdt_identifier(),
 				&self.amount,
 				self.gas_limit,
 				self.endpoint_name.as_slice(),
