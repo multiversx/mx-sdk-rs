@@ -19,6 +19,8 @@ const I32_PREFIX: &str = "i32:";
 const I16_PREFIX: &str = "i16:";
 const I8_PREFIX: &str = "i8:";
 
+const BIGUINT_PREFIX: &str = "biguint:";
+
 pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Vec<u8> {
 	match vst {
 		ValueSubTree::Str(s) => interpret_string(s, context),
@@ -131,6 +133,10 @@ fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
 		return Some(parse_fixed_width_signed(stripped, 1));
 	}
 
+	if let Some(stripped) = s.strip_prefix(BIGUINT_PREFIX) {
+		return Some(parse_biguint(stripped));
+	}
+
 	None
 }
 
@@ -179,6 +185,12 @@ fn parse_fixed_width_unsigned(s: &str, length: usize) -> Vec<u8> {
 		result[offset..].clone_from_slice(&parsed[..]);
 	}
 	result
+}
+
+fn parse_biguint(s: &str) -> Vec<u8> {
+	let parsed = parse_unsigned(s);
+	let encoded_length = (parsed.len() as u32).to_be_bytes();
+	[&encoded_length[..], &parsed[..]].concat()
 }
 
 fn parse_unsigned(s: &str) -> Vec<u8> {

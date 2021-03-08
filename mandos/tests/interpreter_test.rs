@@ -171,3 +171,21 @@ fn test_signed_fixed_width_panic_3() {
 	let context = &InterpreterContext::default();
 	interpret_string("i8:-255", context);
 }
+
+#[test]
+fn test_biguint() {
+	let context = &InterpreterContext::default();
+
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x00],
+		interpret_string("biguint:0", context)
+	);
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x01, 0x01],
+		interpret_string("biguint:1", context)
+	);
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x02, 0x01, 0xFF],
+		interpret_string("biguint:0x01FF", context)
+	);
+}
