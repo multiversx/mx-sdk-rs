@@ -34,7 +34,7 @@ pub trait Forwarder {
 
 	#[endpoint]
 	#[payable("*")]
-	fn deposit(
+	fn forward_async_call(
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
@@ -48,7 +48,7 @@ pub trait Forwarder {
 
 	#[endpoint]
 	#[payable("*")]
-	fn deposit_half_payment(
+	fn forward_async_call_half_payment(
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
@@ -87,6 +87,37 @@ pub trait Forwarder {
 			payment,
 			Vec::new(),
 		));
+	}
+
+	#[endpoint]
+	fn send_funds_twice(
+		&self,
+		to: &Address,
+		token_identifier: &TokenIdentifier,
+		amount: &BigUint,
+	) -> AsyncCall<BigUint> {
+		contract_call!(self, to.clone(), VaultProxy)
+			.with_token_transfer(token_identifier.clone(), amount.clone())
+			.accept_funds()
+			.async_call()
+			.with_callback(self.callbacks().send_funds_twice_callback(
+				to,
+				token_identifier,
+				amount,
+			))
+	}
+
+	#[callback]
+	fn send_funds_twice_callback(
+		&self,
+		to: &Address,
+		token_identifier: &TokenIdentifier,
+		amount: &BigUint,
+	) -> AsyncCall<BigUint> {
+		contract_call!(self, to.clone(), VaultProxy)
+			.with_token_transfer(token_identifier.clone(), amount.clone())
+			.accept_funds()
+			.async_call()
 	}
 
 	#[view]

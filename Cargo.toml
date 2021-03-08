@@ -52,6 +52,7 @@ members = [
   "contracts/feature-tests/async/async-bob",
   "contracts/feature-tests/async/forwarder",
   "contracts/feature-tests/async/forwarder-raw",
+  "contracts/feature-tests/async/recursive-caller",
   "contracts/feature-tests/async/vault",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/abi",

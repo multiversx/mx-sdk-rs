@@ -78,6 +78,11 @@ fn echo_nothing() {
 }
 
 #[test]
+fn echo_ser_ex_1() {
+	parse_execute_mandos("mandos/echo_ser_ex_1.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_slice_u8() {
 	parse_execute_mandos("mandos/echo_slice_u8.scen.json", &contract_map());
 }
