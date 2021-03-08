@@ -200,7 +200,11 @@ fn parse_execute_mandos_steps(
 				let esdt_value = tx.esdt_value.value.clone();
 
 				if !esdt_token_identifier.is_empty() && esdt_value > 0u32.into() {
-					state.substract_esdt_balance(sender_address, &esdt_token_identifier[..], &esdt_value);
+					state.substract_esdt_balance(
+						sender_address,
+						&esdt_token_identifier[..],
+						&esdt_value,
+					);
 					state.increase_esdt_balance(
 						recipient_address,
 						&esdt_token_identifier[..],
@@ -377,6 +381,36 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 		tx_expect.status,
 		tx_result.result_status
 	);
+
+	match &tx_expect.logs {
+		CheckLogs::Star => {},
+		CheckLogs::List(expected_logs) => {
+			assert!(
+				expected_logs.len() == tx_result.result_logs.len(),
+				"Log amounts do not match. Tx id: {}. Want: {}. Have: {}",
+				tx_id,
+				expected_logs.len(),
+				tx_result.result_logs.len()
+			);
+
+			for (expected_log, actual_log) in expected_logs.iter().zip(tx_result.result_logs.iter())
+			{
+				assert!(
+					actual_log.equals(&expected_log),
+					"Logs do not match. Tx id: {}. Want: \"{:?}\". Have: \"{:?}\"",
+					tx_id,
+					expected_log,
+					actual_log
+				);
+			}
+		},
+		CheckLogs::DefaultStar => assert!(
+			tx_result.result_logs.is_empty(),
+			"Log amounts do not match. Tx id: {}. Expected no logs, have: \"{:?}\"",
+			tx_id,
+			tx_result.result_logs
+		),
+	}
 }
 
 fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
