@@ -397,10 +397,16 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 			{
 				assert!(
 					actual_log.equals(&expected_log),
-					"Logs do not match. Tx id: {}. Want: \"{:?}\". Have: \"{:?}\"",
+					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
 					tx_id,
-					expected_log,
-					actual_log
+					verbose_hex(&expected_log.address.value),
+					vec_u8_to_string(&expected_log.identifier.value),
+					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
+					verbose_hex(&expected_log.data.value),
+					address_hex(&actual_log.address),
+					vec_u8_to_string(&actual_log.identifier),
+					actual_log.topics.iter().map(|topic| verbose_hex(&topic)).collect::<String>(),
+					verbose_hex(&actual_log.data),
 				);
 			}
 		},
