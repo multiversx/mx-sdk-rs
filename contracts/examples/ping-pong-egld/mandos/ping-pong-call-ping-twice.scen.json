@@ -18,7 +18,9 @@
                 "to": "address:the_ping_pong_contract",
                 "value": "500,000,000,000",
                 "function": "ping",
-                "arguments": [],
+                "arguments": [
+                    ""
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },

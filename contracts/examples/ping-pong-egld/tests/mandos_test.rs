@@ -109,3 +109,13 @@ fn ping_pong_call_pong_all_after_pong() {
 		&contract_map(),
 	);
 }
+
+// view
+
+#[test]
+fn ping_pong_call_get_user_addresses() {
+	parse_execute_mandos(
+		"mandos/ping-pong-call-get-user-addresses.scen.json",
+		&contract_map(),
+	);
+}
