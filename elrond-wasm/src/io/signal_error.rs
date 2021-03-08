@@ -1,7 +1,7 @@
 use super::ArgId;
 use crate::api::ErrorApi;
 use crate::err_msg;
-use crate::BoxedBytes;
+use crate::types::BoxedBytes;
 use elrond_codec::DecodeError;
 
 pub fn signal_arg_de_error<EA: ErrorApi>(api: &EA, arg_id: ArgId, de_err: DecodeError) -> ! {

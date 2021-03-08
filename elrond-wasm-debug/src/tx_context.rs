@@ -4,7 +4,7 @@ use crate::display_util::*;
 use alloc::rc::Rc;
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use elrond_wasm::{Address, TokenIdentifier, H256};
+use elrond_wasm::types::{Address, TokenIdentifier, H256};
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::fmt;
@@ -20,7 +20,7 @@ pub struct TxInput {
 	pub to: Address,
 	pub call_value: BigUint,
 	pub esdt_value: BigUint,
-	pub esdt_token_name: Vec<u8>,
+	pub esdt_token_identifier: Vec<u8>,
 	pub func_name: Vec<u8>,
 	pub args: Vec<Vec<u8>>,
 	pub gas_limit: u64,
@@ -30,11 +30,11 @@ pub struct TxInput {
 
 impl fmt::Display for TxInput {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_token_name: {:?}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
+		write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_token_identifier: {:?}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
             String::from_utf8(self.func_name.clone()).unwrap(),
             self.args,
             self.call_value,
-            self.esdt_token_name,
+            self.esdt_token_identifier,
             self.esdt_value,
             address_hex(&self.from),
             address_hex(&self.to))
@@ -171,7 +171,7 @@ impl TxContext {
 				to: Address::zero(),
 				call_value: 0u32.into(),
 				esdt_value: 0u32.into(),
-				esdt_token_name: Vec::new(),
+				esdt_token_identifier: Vec::new(),
 				func_name: Vec::new(),
 				args: Vec::new(),
 				gas_limit: 0,

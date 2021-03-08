@@ -73,11 +73,6 @@ fn echo_i64() {
 }
 
 #[test]
-fn echo_multi_i32() {
-	parse_execute_mandos("mandos/echo_multi_i32.scen.json", &contract_map());
-}
-
-#[test]
 fn echo_nothing() {
 	parse_execute_mandos("mandos/echo_nothing.scen.json", &contract_map());
 }
@@ -128,18 +123,13 @@ fn echo_vec_u8() {
 }
 
 #[test]
-fn eventa1() {
-	parse_execute_mandos("mandos/eventA1.scen.json", &contract_map());
+fn events() {
+	parse_execute_mandos("mandos/events.scen.json", &contract_map());
 }
 
 #[test]
-fn eventa2() {
-	parse_execute_mandos("mandos/eventA2.scen.json", &contract_map());
-}
-
-#[test]
-fn eventb1() {
-	parse_execute_mandos("mandos/eventB1.scen.json", &contract_map());
+fn events_legacy() {
+	parse_execute_mandos("mandos/events_legacy.scen.json", &contract_map());
 }
 
 #[test]

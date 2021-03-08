@@ -10,15 +10,6 @@ where
 	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self;
 }
 
-/// Used for loading arguments annotated with `#[multi(...)]`.
-pub trait DynArgMulti<I, D>: DynArg<I, D>
-where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-{
-	fn dyn_load_multi(loader: &mut D, arg_id: ArgId, num: usize) -> Self;
-}
-
 /// All top-deserializable types can be endpoint arguments.
 impl<I, D, T> DynArg<I, D> for T
 where
