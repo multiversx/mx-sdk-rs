@@ -27,7 +27,7 @@ pub trait PingPong {
 
 	#[payable("EGLD")]
 	#[endpoint]
-	fn ping(&self, #[payment] payment: &BigUint) -> SCResult<()> {
+	fn ping(&self, #[payment] payment: &BigUint, _data: BoxedBytes) -> SCResult<()> {
 		require!(
 			payment == &self.get_fixed_sum(),
 			"the payment must match the fixed sum"
@@ -113,6 +113,11 @@ pub trait PingPong {
 			let _ = self.pong_by_user_id(user_id);
 		}
 		Ok(())
+	}
+
+	#[view]
+	fn get_user_addresses(&self) -> MultiResultVec<Address> {
+		self.user_mapper().get_all_addresses().into()
 	}
 
 	// storage
