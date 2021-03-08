@@ -33,7 +33,7 @@ impl TxContext {
 			.clone();
 
 		// add amount received (if the same token)
-		if self.tx_input_box.esdt_token_name == token_name {
+		if self.tx_input_box.esdt_token_identifier == token_name {
 			available_balance += &self.tx_input_box.esdt_value;
 		}
 		let tx_output = self.tx_output_cell.borrow();
