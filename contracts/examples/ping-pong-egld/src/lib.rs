@@ -45,7 +45,7 @@ pub trait PingPong {
 
 		if let Some(max_funds) = self.get_max_funds() {
 			require!(
-				&self.get_sc_balance() + payment > max_funds,
+				&self.get_sc_balance() + payment <= max_funds,
 				"smart contract full"
 			);
 		}
@@ -118,6 +118,11 @@ pub trait PingPong {
 	#[view]
 	fn get_user_addresses(&self) -> MultiResultVec<Address> {
 		self.user_mapper().get_all_addresses().into()
+	}
+
+	#[view]
+	fn get_sc_balance_view(&self) -> BigUint {
+		self.get_sc_balance()
 	}
 
 	// storage
