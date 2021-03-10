@@ -1,5 +1,6 @@
 {
     "name": "echo_str",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -29,7 +30,7 @@
                 "arguments": [
                     "0x00"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -54,7 +55,7 @@
                 "arguments": [
                     "str:a_string"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -79,7 +80,7 @@
                 "arguments": [
                     "0x009f9296"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
