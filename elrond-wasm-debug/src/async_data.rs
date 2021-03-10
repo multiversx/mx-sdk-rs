@@ -1,7 +1,7 @@
 use crate::tx_context::*;
 use elrond_wasm::elrond_codec::*;
 use elrond_wasm::hex_call_data::HexCallDataDeserializer;
-use elrond_wasm::{Address, H256};
+use elrond_wasm::types::{Address, H256};
 
 use num_bigint::BigUint;
 
@@ -21,11 +21,11 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
 	let mut de = HexCallDataDeserializer::new(async_data.call_data.as_slice());
 	let func_name = de.get_func_name().to_vec();
 	let mut args: Vec<Vec<u8>> = Vec::new();
-	let mut esdt_token_name = Vec::<u8>::new();
+	let mut esdt_token_identifier = Vec::<u8>::new();
 	let mut esdt_value = 0u32.into();
 
 	if func_name == ESDT_TRANSFER_STRING {
-		esdt_token_name = de.next_argument().unwrap().unwrap();
+		esdt_token_identifier = de.next_argument().unwrap().unwrap();
 		esdt_value = BigUint::from_bytes_be(&de.next_argument().unwrap().unwrap());
 	}
 
@@ -37,7 +37,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
 		to: async_data.to.clone(),
 		call_value: async_data.call_value.clone(),
 		esdt_value,
-		esdt_token_name,
+		esdt_token_identifier,
 		func_name,
 		args,
 		gas_limit: 1000,
@@ -64,7 +64,7 @@ pub fn async_callback_tx_input(
 		to: contract_addr.clone(),
 		call_value: 0u32.into(),
 		esdt_value: 0u32.into(),
-		esdt_token_name: Vec::new(),
+		esdt_token_identifier: Vec::new(),
 		func_name: b"callBack".to_vec(),
 		args,
 		gas_limit: 1000,
