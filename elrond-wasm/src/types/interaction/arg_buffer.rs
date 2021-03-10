@@ -34,14 +34,14 @@ impl ArgBuffer {
 		self.arg_data.as_ptr()
 	}
 
-	/// returns a clone of the raw arg data
-	pub fn arg_data(&self) -> Vec<u8> {
-		self.arg_data.clone()
+	/// returns the raw arg data
+	pub fn arg_data(&self) -> &[u8] {
+		self.arg_data.as_slice()
 	}
 
-	/// returns a clone of the raw arg data lengths
-	pub fn arg_lengths(&self) -> Vec<usize> {
-		self.arg_lengths.clone()
+	/// returns the raw arg data lengths
+	pub fn arg_lengths(&self) -> &[usize] {
+		self.arg_lengths.as_slice()
 	}
 
 	/// Quick for-each using closures.

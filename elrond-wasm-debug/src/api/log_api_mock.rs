@@ -6,19 +6,19 @@ use elrond_wasm::{api::LogApi, types::ArgBuffer};
 /// The smart contract code doesn't have access to these methods directly.
 impl LogApi for TxContext {
 	fn write_event_log(&self, topics_buffer: &ArgBuffer, data: &[u8]) {
-		let arg_buffer_as_vec = topics_buffer.arg_data();
+		let arg_data_buffer = topics_buffer.arg_data();
 		let arg_data_lengths = topics_buffer.arg_lengths();
 
 		// identifier is the first arg data
 		let identifier_len = arg_data_lengths[0];
-		let identifier = arg_buffer_as_vec[0..identifier_len].to_vec();
+		let identifier = arg_data_buffer[0..identifier_len].to_vec();
 
 		let mut current_index = identifier_len;
 		let mut topics = Vec::new();
 
 		// we already processed the first data arg, so we skip it
 		for arg_len in arg_data_lengths[1..].iter() {
-			let topic = arg_buffer_as_vec[current_index..(current_index + arg_len)].to_vec();
+			let topic = arg_data_buffer[current_index..(current_index + arg_len)].to_vec();
 			topics.push(topic);
 
 			current_index += arg_len;
