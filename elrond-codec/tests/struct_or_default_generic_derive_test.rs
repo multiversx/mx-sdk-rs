@@ -50,7 +50,7 @@ fn struct_default() {
 		uint_64: 0,
 	};
 
-	check_top_encode_decode(s.clone(), &[]);
+	check_top_encode_decode(s, &[]);
 }
 
 #[test]
@@ -73,5 +73,5 @@ fn struct_or_default_not_default() {
 		/* uint_64 */ 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x67, 0x89,
 	];
 
-	check_top_encode_decode(s.clone(), bytes_1);
+	check_top_encode_decode(s, bytes_1);
 }
