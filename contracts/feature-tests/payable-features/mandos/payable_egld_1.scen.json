@@ -1,6 +1,5 @@
 {
     "name": "payable",
-    "comment": "deprecated endpoint, will be removed",
     "gasSchedule": "v2",
     "steps": [
         {
@@ -10,14 +9,14 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../output/payable-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "1,000,000,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "1,000,000,000,000",
+                        "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
                         "str:OTHER-TOKEN": "1,000,000,000,000"
                     },
                     "code": ""
@@ -26,12 +25,12 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_0.1",
+            "txId": "payable_egld_1.1",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "payable_egld_0",
+                "function": "payable_egld_1",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -46,12 +45,12 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_0.2",
+            "txId": "payable_egld_1.2",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "5",
-                "function": "payable_egld_0",
+                "function": "payable_egld_1",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -66,14 +65,14 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_0.3",
+            "txId": "payable_egld_1.3",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "esdtTokenName": "str:BASIC-FEATURES-TOKEN",
+                "esdtTokenName": "str:PAYABLE-FEATURES-TOKEN",
                 "esdtValue": "100",
-                "function": "payable_egld_0",
+                "function": "payable_egld_1",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -89,14 +88,14 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_0.4",
+            "txId": "payable_egld_1.4",
             "tx": {
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "esdtTokenName": "str:BASIC-FEATURES-TOKEN",
+                "esdtTokenName": "str:PAYABLE-FEATURES-TOKEN",
                 "esdtValue": "0",
-                "function": "payable_egld_0",
+                "function": "payable_egld_1",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
