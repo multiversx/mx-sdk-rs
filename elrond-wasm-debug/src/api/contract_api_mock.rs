@@ -1,7 +1,7 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::TxContext;
-use elrond_wasm::{Address, H256};
+use elrond_wasm::types::{Address, H256};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
@@ -32,6 +32,14 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			.contract_owner
 			.clone()
 			.unwrap_or_else(|| panic!("contract owner address not set"))
+	}
+
+	fn get_shard_of_address(&self, _address: &Address) -> u32 {
+		panic!("get_shard_of_address not implemented")
+	}
+
+	fn is_smart_contract(&self, _address: &Address) -> bool {
+		panic!("is_smart_contract not implemented")
 	}
 
 	fn get_caller(&self) -> Address {

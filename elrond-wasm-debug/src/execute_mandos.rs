@@ -1,7 +1,7 @@
 #![allow(unused_variables)] // for now
 
 use super::*;
-use elrond_wasm::*;
+use elrond_wasm::types::*;
 use mandos::*;
 use num_bigint::BigUint;
 use std::path::Path;
@@ -75,58 +75,10 @@ fn parse_execute_mandos_steps(
 					)
 				}
 				if let Some(block_info_obj) = &**previous_block_info {
-					if let Some(u64_value) = &block_info_obj.block_timestamp {
-						state.previous_block_info.block_timestamp = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_nonce {
-						state.previous_block_info.block_nonce = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_epoch {
-						state.previous_block_info.block_epoch = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_round {
-						state.previous_block_info.block_round = u64_value.value;
-					}
-					if let Some(bytes_value) = &block_info_obj.block_random_seed {
-						const SEED_LEN: usize = 48;
-						let val = &bytes_value.value;
-
-						assert!(
-							val.len() <= SEED_LEN,
-							"block random seed input value too long!"
-						);
-
-						let mut seed = [0u8; SEED_LEN];
-						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
-						state.previous_block_info.block_random_seed = Box::from(seed);
-					}
+					update_block_info(&mut state.previous_block_info, block_info_obj);
 				}
 				if let Some(block_info_obj) = &**current_block_info {
-					if let Some(u64_value) = &block_info_obj.block_timestamp {
-						state.current_block_info.block_timestamp = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_nonce {
-						state.current_block_info.block_nonce = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_epoch {
-						state.current_block_info.block_epoch = u64_value.value;
-					}
-					if let Some(u64_value) = &block_info_obj.block_round {
-						state.current_block_info.block_round = u64_value.value;
-					}
-					if let Some(bytes_value) = &block_info_obj.block_random_seed {
-						const SEED_LEN: usize = 48;
-						let val = &bytes_value.value;
-
-						assert!(
-							val.len() <= SEED_LEN,
-							"block random seed input value too long!"
-						);
-
-						let mut seed = [0u8; SEED_LEN];
-						&seed[SEED_LEN - val.len()..].copy_from_slice(val.as_slice());
-						state.current_block_info.block_random_seed = Box::from(seed);
-					}
+					update_block_info(&mut state.current_block_info, block_info_obj);
 				}
 			},
 			Step::ScCall {
@@ -140,7 +92,7 @@ fn parse_execute_mandos_steps(
 					to: tx.to.value.into(),
 					call_value: tx.call_value.value.clone(),
 					esdt_value: tx.esdt_value.value.clone(),
-					esdt_token_name: tx.esdt_token_name.value.clone(),
+					esdt_token_identifier: tx.esdt_token_name.value.clone(),
 					func_name: tx.function.as_bytes().to_vec(),
 					args: tx
 						.arguments
@@ -217,7 +169,7 @@ fn parse_execute_mandos_steps(
 					to: Address::zero(),
 					call_value: tx.call_value.value.clone(),
 					esdt_value: tx.esdt_value.value.clone(),
-					esdt_token_name: tx.esdt_token_name.value.clone(),
+					esdt_token_identifier: tx.esdt_token_name.value.clone(),
 					func_name: b"init".to_vec(),
 					args: tx
 						.arguments
@@ -244,14 +196,18 @@ fn parse_execute_mandos_steps(
 					.unwrap();
 				let recipient_address = &tx.to.value.into();
 				state.increase_balance(recipient_address, &tx.value.value);
-				let esdt_token_name = tx.esdt_token_name.value.clone();
+				let esdt_token_identifier = tx.esdt_token_name.value.clone();
 				let esdt_value = tx.esdt_value.value.clone();
 
-				if !esdt_token_name.is_empty() && esdt_value > 0u32.into() {
-					state.substract_esdt_balance(sender_address, &esdt_token_name[..], &esdt_value);
+				if !esdt_token_identifier.is_empty() && esdt_value > 0u32.into() {
+					state.substract_esdt_balance(
+						sender_address,
+						&esdt_token_identifier[..],
+						&esdt_value,
+					);
 					state.increase_esdt_balance(
 						recipient_address,
-						&esdt_token_name[..],
+						&esdt_token_identifier[..],
 						&esdt_value,
 					);
 				}
@@ -272,11 +228,11 @@ fn parse_execute_mandos_steps(
 fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
-	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
 	let esdt_value = tx_input.esdt_value;
 
-	state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value);
-	state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+	state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
+	state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
 }
 
 fn execute_sc_call(
@@ -292,12 +248,12 @@ fn execute_sc_call(
 	state.subtract_tx_payment(&from, &call_value)?;
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
 	let esdt_value = tx_input.esdt_value.clone();
-	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+	let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
 	if esdt_used {
-		state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+		state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
 	}
 
 	let contract_account = state
@@ -330,7 +286,7 @@ fn execute_sc_call(
 
 		state.increase_balance(&to, &call_value);
 		if esdt_used {
-			state.increase_esdt_balance(&to, &esdt_token_name, &esdt_value);
+			state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
 		}
 
 		state.send_balance(&to, tx_output.send_balance_list.as_slice())?;
@@ -338,7 +294,7 @@ fn execute_sc_call(
 		state.increase_balance(&from, &call_value);
 
 		if esdt_used {
-			state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+			state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
 		}
 	}
 
@@ -359,12 +315,12 @@ fn execute_sc_create(
 	state.subtract_tx_payment(&from, &call_value)?;
 	state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
-	let esdt_token_name = tx_input.esdt_token_name.clone();
+	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
 	let esdt_value = tx_input.esdt_value.clone();
-	let esdt_used = !esdt_token_name.is_empty() && esdt_value > 0u32.into();
+	let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
 	if esdt_used {
-		state.substract_esdt_balance(&from, &esdt_token_name, &esdt_value)
+		state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
 	}
 
 	let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
@@ -381,7 +337,7 @@ fn execute_sc_create(
 		state.increase_balance(&from, &call_value);
 
 		if esdt_used {
-			state.increase_esdt_balance(&from, &esdt_token_name, &esdt_value);
+			state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
 		}
 	}
 
@@ -427,6 +383,42 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 			want_str,
 			have_str
 		);
+	}
+
+	match &tx_expect.logs {
+		CheckLogs::Star => {},
+		CheckLogs::List(expected_logs) => {
+			assert!(
+				expected_logs.len() == tx_result.result_logs.len(),
+				"Log amounts do not match. Tx id: {}. Want: {}. Have: {}",
+				tx_id,
+				expected_logs.len(),
+				tx_result.result_logs.len()
+			);
+
+			for (expected_log, actual_log) in expected_logs.iter().zip(tx_result.result_logs.iter())
+			{
+				assert!(
+					actual_log.equals(&expected_log),
+					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
+					tx_id,
+					verbose_hex(&expected_log.address.value),
+					vec_u8_to_string(&expected_log.identifier.value),
+					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
+					verbose_hex(&expected_log.data.value),
+					address_hex(&actual_log.address),
+					vec_u8_to_string(&actual_log.identifier),
+					actual_log.topics.iter().map(|topic| verbose_hex(&topic)).collect::<String>(),
+					verbose_hex(&actual_log.data),
+				);
+			}
+		},
+		CheckLogs::DefaultValue => assert!(
+			tx_result.result_logs.is_empty(),
+			"Log amounts do not match. Tx id: {}. Expected no logs, have: \"{:?}\"",
+			tx_id,
+			tx_result.result_logs
+		),
 	}
 }
 
@@ -586,4 +578,32 @@ fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
 		result[..bytes.len()].copy_from_slice(bytes);
 	}
 	result.into()
+}
+
+fn update_block_info(block_info: &mut super::BlockInfo, mandos_block_info: &mandos::BlockInfo) {
+	if let Some(u64_value) = &mandos_block_info.block_timestamp {
+		block_info.block_timestamp = u64_value.value;
+	}
+	if let Some(u64_value) = &mandos_block_info.block_nonce {
+		block_info.block_nonce = u64_value.value;
+	}
+	if let Some(u64_value) = &mandos_block_info.block_epoch {
+		block_info.block_epoch = u64_value.value;
+	}
+	if let Some(u64_value) = &mandos_block_info.block_round {
+		block_info.block_round = u64_value.value;
+	}
+	if let Some(bytes_value) = &mandos_block_info.block_random_seed {
+		const SEED_LEN: usize = 48;
+		let val = &bytes_value.value;
+
+		assert!(
+			val.len() == SEED_LEN,
+			"block random seed input value must be exactly 48 bytes long"
+		);
+
+		let mut seed = [0u8; SEED_LEN];
+		&seed[..].copy_from_slice(val.as_slice());
+		block_info.block_random_seed = Box::from(seed);
+	}
 }

@@ -34,13 +34,3 @@ where
 {
 	T::dyn_load(loader, arg_id)
 }
-
-#[inline]
-pub fn load_dyn_multi_arg<I, D, T>(loader: &mut D, arg_id: ArgId, num: usize) -> T
-where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-	T: DynArgMulti<I, D>,
-{
-	T::dyn_load_multi(loader, arg_id, num)
-}

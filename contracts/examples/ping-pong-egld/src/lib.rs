@@ -18,7 +18,7 @@ pub trait PingPong {
 		max_funds: Option<BigUint>,
 	) {
 		self.set_fixed_sum(fixed_sum);
-		let computed_beginning = beginning.unwrap_or_else(|| self.get_block_nonce());
+		let computed_beginning = beginning.unwrap_or_else(|| self.get_block_timestamp());
 		let deadline = computed_beginning + duration;
 		self.set_deadline(deadline);
 		self.set_beginning(computed_beginning);
@@ -27,19 +27,19 @@ pub trait PingPong {
 
 	#[payable("EGLD")]
 	#[endpoint]
-	fn ping(&self, #[payment] payment: &BigUint) -> SCResult<()> {
+	fn ping(&self, #[payment] payment: &BigUint, _data: BoxedBytes) -> SCResult<()> {
 		require!(
 			payment == &self.get_fixed_sum(),
 			"the payment must match the fixed sum"
 		);
 
 		require!(
-			self.get_beginning() <= self.get_block_nonce(),
+			self.get_beginning() <= self.get_block_timestamp(),
 			"smart contract not active yet"
 		);
 
 		require!(
-			self.get_block_nonce() < self.get_deadline(),
+			self.get_block_timestamp() < self.get_deadline(),
 			"deadline has passed"
 		);
 
@@ -92,7 +92,7 @@ pub trait PingPong {
 	#[endpoint]
 	fn pong(&self) -> SCResult<()> {
 		require!(
-			self.get_block_nonce() >= self.get_deadline(),
+			self.get_block_timestamp() >= self.get_deadline(),
 			"can't withdraw before deadline"
 		);
 
@@ -104,7 +104,7 @@ pub trait PingPong {
 	#[endpoint]
 	fn pong_all(&self) -> SCResult<()> {
 		require!(
-			self.get_block_nonce() >= self.get_deadline(),
+			self.get_block_timestamp() >= self.get_deadline(),
 			"can't withdraw before deadline"
 		);
 
@@ -113,6 +113,11 @@ pub trait PingPong {
 			let _ = self.pong_by_user_id(user_id);
 		}
 		Ok(())
+	}
+
+	#[view]
+	fn get_user_addresses(&self) -> MultiResultVec<Address> {
+		self.user_mapper().get_all_addresses().into()
 	}
 
 	// storage

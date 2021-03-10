@@ -1,6 +1,6 @@
 extern crate basic_features;
 use basic_features::*;
-use elrond_wasm::*;
+use elrond_wasm::types::{SCError, SCResult};
 use elrond_wasm_debug::*;
 
 #[test]
