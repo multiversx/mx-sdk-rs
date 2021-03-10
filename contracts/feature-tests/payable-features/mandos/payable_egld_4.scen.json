@@ -9,14 +9,14 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../output/payable-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "1,000,000,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "1,000,000,000,000",
+                        "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
                         "str:OTHER-TOKEN": "1,000,000,000,000"
                     },
                     "code": ""
@@ -70,7 +70,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "esdtTokenName": "str:BASIC-FEATURES-TOKEN",
+                "esdtTokenName": "str:PAYABLE-FEATURES-TOKEN",
                 "esdtValue": "100",
                 "function": "payable_egld_4",
                 "arguments": [],
@@ -93,7 +93,7 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "esdtTokenName": "str:BASIC-FEATURES-TOKEN",
+                "esdtTokenName": "str:PAYABLE-FEATURES-TOKEN",
                 "esdtValue": "0",
                 "function": "payable_egld_4",
                 "arguments": [],
