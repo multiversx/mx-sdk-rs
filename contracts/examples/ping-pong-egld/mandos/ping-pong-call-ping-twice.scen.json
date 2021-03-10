@@ -1,5 +1,6 @@
 {
     "name": "call ping a second time",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -21,7 +22,7 @@
                 "arguments": [
                     ""
                 ],
-                "gasLimit": "100,000,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -53,8 +54,8 @@
                     "nonce": "0",
                     "balance": "500,000,000,000",
                     "storage": {
-                        "''fixed_sum": "500,000,000,000",
-                        "''beginning": "780",
+                        "''ping_amount": "500,000,000,000",
+                        "''activation_timestamp": "780",
                         "''deadline": "123,780",
                         "''user_address_to_id|address:participant1": "1",
                         "''user_id_to_address|0x0000001": "address:participant1",
