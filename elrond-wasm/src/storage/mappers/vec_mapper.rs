@@ -125,6 +125,11 @@ where
 		}
 	}
 
+	/// Number of items managed by the mapper.
+	pub fn len(&self) -> usize {
+		self.count
+	}
+
 	/// Loads all items from storage and places them in a Vec.
 	/// Can easily consume a lot of gas.
 	pub fn load_as_vec(&self) -> Vec<T> {
@@ -133,6 +138,17 @@ where
 			result.push(self.get(i));
 		}
 		result
+	}
+
+	/// Deletes all contents form storage and sets count to 0.
+	/// Can easily consume a lot of gas.
+	pub fn clear(&mut self) {
+		for i in 1..=self.count {
+			self.api
+				.storage_store_slice_u8(self.get_key(i).as_slice(), &[]);
+		}
+		self.count = 0;
+		self.save_count();
 	}
 }
 

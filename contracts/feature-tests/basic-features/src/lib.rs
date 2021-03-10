@@ -149,30 +149,6 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn echo_multi_1(
-		&self,
-		_n: usize,
-		#[multi(_n)] m: VarArgs<i32>,
-		another_arg: u64,
-	) -> MultiResult2<MultiResultVec<i32>, u64> {
-		(m.into_vec().into(), another_arg).into()
-	}
-
-	#[endpoint]
-	fn echo_multi_vec_u8(
-		&self,
-		_n: usize,
-		#[multi(_n)] m: VarArgs<Vec<u8>>,
-	) -> MultiResultVec<Vec<u8>> {
-		m.into_vec().into()
-	}
-
-	#[endpoint]
-	fn echo_multi_h256(&self, _n: usize, #[multi(_n)] m: VarArgs<H256>) -> MultiResultVec<H256> {
-		m.into_vec().into()
-	}
-
-	#[endpoint]
 	fn echo_varags_u32(
 		&self,
 		#[var_args] m: VarArgs<u32>,
@@ -426,10 +402,26 @@ pub trait BasicFeatures {
 	fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
 
 	#[endpoint]
-	fn my_single_value_mapper_increment(&self, amount: &BigInt) {
-		let mut my_single_value_mapper = self.map_my_single_value_mapper();
-		my_single_value_mapper.value += amount;
-		my_single_value_mapper.save();
+	fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
+		let my_single_value_mapper = self.map_my_single_value_mapper();
+		my_single_value_mapper.set(&(my_single_value_mapper.get() + amount));
+	}
+
+	/// Same as my_single_value_mapper_increment_1, but expressed more compactly.
+	#[endpoint]
+	fn my_single_value_mapper_increment_2(&self, amount: &BigInt) {
+		self.map_my_single_value_mapper()
+			.update(|value| *value += amount);
+	}
+
+	#[endpoint]
+	fn clear_single_value_mapper(&self) {
+		self.map_my_single_value_mapper().clear();
+	}
+
+	#[endpoint]
+	fn is_empty_single_value_mapper(&self) -> bool {
+		self.map_my_single_value_mapper().is_empty()
 	}
 
 	// VecMapper
@@ -444,9 +436,14 @@ pub trait BasicFeatures {
 		vec_mapper.push(&item);
 	}
 
-	#[endpoint]
+	#[view]
 	fn vec_mapper_get(&self, index: usize) -> u32 {
 		self.vec_mapper().get(index)
+	}
+
+	#[view]
+	fn vec_mapper_len(&self) -> usize {
+		self.vec_mapper().len()
 	}
 
 	// LinkedListMapper
@@ -619,6 +616,27 @@ pub trait BasicFeatures {
 		map_storage_mapper.clear();
 	}
 
+	// BASIC API
+	#[endpoint(get_caller)]
+	fn get_caller_endpoint(&self) -> Address {
+		self.get_caller()
+	}
+
+	#[endpoint(get_shard_of_address)]
+	fn get_shard_of_address_endpoint(&self, address: &Address) -> u32 {
+		self.get_shard_of_address(address)
+	}
+
+	#[endpoint(is_smart_contract)]
+	fn is_smart_contract_endpoint(&self, address: &Address) -> bool {
+		self.is_smart_contract(address)
+	}
+
+	#[endpoint(get_gas_left)]
+	fn get_gas_left_endpoint(&self) -> u64 {
+		self.get_gas_left()
+	}
+
 	// EVENTS
 
 	#[endpoint(logEventA)]
@@ -626,10 +644,34 @@ pub trait BasicFeatures {
 		self.event_a(data);
 	}
 
+	#[event("event_a")]
+	fn event_a(&self, data: &BigUint);
+
 	#[endpoint(logEventB)]
-	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
-		self.event_b(arg1, arg2, data);
+	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, #[var_args] data: VarArgs<BoxedBytes>) {
+		self.event_b(arg1, arg2, data.as_slice());
 	}
+
+	#[event("event_b")]
+	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &[BoxedBytes]);
+
+	// EVENTS (LEGACY)
+
+	#[endpoint(logLegacyEventA)]
+	fn log_legacy_event_a(&self, data: &BigUint) {
+		self.legacy_event_a(data);
+	}
+
+	#[endpoint(logLegacyEventB)]
+	fn log_legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
+		self.legacy_event_b(arg1, arg2, data);
+	}
+
+	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
+	fn legacy_event_a(&self, data: &BigUint);
+
+	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
+	fn legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 
 	// SEND TX
 
@@ -660,7 +702,7 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
 	#[endpoint]
@@ -677,9 +719,9 @@ pub trait BasicFeatures {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_first_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
 		self.send()
-			.direct_esdt(to, token_id.as_slice(), amount_second_time, data);
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
 	}
 
 	// BLOCK INFO
@@ -733,14 +775,6 @@ pub trait BasicFeatures {
 	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
 		self.get_prev_block_random_seed()
 	}
-
-	// EVENTS
-
-	#[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
-	fn event_a(&self, data: &BigUint);
-
-	#[event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
-	fn event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 
 	// BIG INT OPERATIONS
 

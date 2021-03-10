@@ -8,7 +8,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,000"
+                "blockTimestamp": "123,000"
             }
         },
         {

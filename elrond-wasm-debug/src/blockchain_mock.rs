@@ -209,15 +209,15 @@ impl BlockchainMock {
 				self.subtract_tx_payment(contract_address, &send_balance.amount)?;
 				self.increase_balance(&send_balance.recipient, &send_balance.amount);
 			} else {
-				let esdt_token_name = send_balance.token.as_slice();
+				let esdt_token_identifier = send_balance.token.as_esdt_identifier();
 				self.substract_esdt_balance(
 					contract_address,
-					esdt_token_name,
+					esdt_token_identifier,
 					&send_balance.amount,
 				);
 				self.increase_esdt_balance(
 					&send_balance.recipient,
-					esdt_token_name,
+					esdt_token_identifier,
 					&send_balance.amount,
 				);
 			}
@@ -228,7 +228,7 @@ impl BlockchainMock {
 	pub fn substract_esdt_balance(
 		&mut self,
 		address: &Address,
-		esdt_token_name: &[u8],
+		esdt_token_identifier: &[u8],
 		value: &BigUint,
 	) {
 		let sender_account = self
@@ -238,12 +238,12 @@ impl BlockchainMock {
 
 		let esdt_balance = sender_account
 			.esdt
-			.get_mut(esdt_token_name)
+			.get_mut(esdt_token_identifier)
 			.unwrap_or_else(|| {
 				panic!(
 					"Account {} has no esdt tokens with name {}",
 					address_hex(&address),
-					String::from_utf8(esdt_token_name.to_vec()).unwrap()
+					String::from_utf8(esdt_token_identifier.to_vec()).unwrap()
 				)
 			});
 
@@ -260,7 +260,7 @@ impl BlockchainMock {
 	pub fn increase_esdt_balance(
 		&mut self,
 		address: &Address,
-		esdt_token_name: &[u8],
+		esdt_token_identifier: &[u8],
 		value: &BigUint,
 	) {
 		let account = self
@@ -268,11 +268,11 @@ impl BlockchainMock {
 			.get_mut(address)
 			.unwrap_or_else(|| panic!("Receiver account not found"));
 
-		if account.esdt.contains_key(esdt_token_name) {
-			let esdt_balance = account.esdt.get_mut(esdt_token_name).unwrap();
+		if account.esdt.contains_key(esdt_token_identifier) {
+			let esdt_balance = account.esdt.get_mut(esdt_token_identifier).unwrap();
 			*esdt_balance += value;
 		} else {
-			account.esdt.insert(esdt_token_name.to_vec(), value.clone());
+			account.esdt.insert(esdt_token_identifier.to_vec(), value.clone());
 		}
 	}
 
@@ -301,9 +301,9 @@ impl BlockchainMock {
 				panic!("Missing new address. Only explicit new deploy addresses supported")
 			});
 		let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
-		if !tx_input.esdt_token_name.is_empty() {
+		if !tx_input.esdt_token_identifier.is_empty() {
 			esdt.insert(
-				tx_input.esdt_token_name.clone(),
+				tx_input.esdt_token_identifier.clone(),
 				tx_input.esdt_value.clone(),
 			);
 		}

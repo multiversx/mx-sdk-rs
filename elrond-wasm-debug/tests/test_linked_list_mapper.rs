@@ -1,6 +1,6 @@
 use elrond_wasm::storage::mappers::LinkedListMapper;
 use elrond_wasm::storage::mappers::{StorageClearable, StorageMapper};
-use elrond_wasm::BoxedBytes;
+use elrond_wasm::types::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
 fn create_list() -> LinkedListMapper<TxContext, u64> {
