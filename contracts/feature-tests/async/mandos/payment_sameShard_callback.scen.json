@@ -1,5 +1,6 @@
 {
     "name": "payment_sameShard_callback",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

@@ -22,14 +22,52 @@ pub trait Forwarder {
 	fn init(&self) {}
 
 	#[endpoint]
-	#[payable("*")]
-	fn direct_payment(
+	fn send_egld(
 		&self,
-		to: Address,
-		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
+		to: &Address,
+		amount: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
 	) {
-		self.send().direct(&to, &token, &payment, &[]);
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send().direct_egld(to, amount, data);
+	}
+
+	#[endpoint]
+	fn send_esdt(
+		&self,
+		to: &Address,
+		token_id: BoxedBytes,
+		amount: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send()
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
+	}
+
+	#[endpoint]
+	fn send_esdt_twice(
+		&self,
+		to: &Address,
+		token_id: BoxedBytes,
+		amount_first_time: &BigUint,
+		amount_second_time: &BigUint,
+		#[var_args] opt_data: OptionalArg<BoxedBytes>,
+	) {
+		let data = match &opt_data {
+			OptionalArg::Some(data) => data.as_slice(),
+			OptionalArg::None => &[],
+		};
+		self.send()
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
+		self.send()
+			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
 	}
 
 	#[endpoint]
@@ -100,11 +138,10 @@ pub trait Forwarder {
 			.with_token_transfer(token_identifier.clone(), amount.clone())
 			.accept_funds()
 			.async_call()
-			.with_callback(self.callbacks().send_funds_twice_callback(
-				to,
-				token_identifier,
-				amount,
-			))
+			.with_callback(
+				self.callbacks()
+					.send_funds_twice_callback(to, token_identifier, amount),
+			)
 	}
 
 	#[callback]
