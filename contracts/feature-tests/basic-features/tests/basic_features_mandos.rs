@@ -1,4 +1,3 @@
-extern crate basic_features;
 use basic_features::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
@@ -157,16 +156,6 @@ fn panic() {
 #[test]
 fn return_error() {
 	parse_execute_mandos("mandos/return_error.scen.json", &contract_map());
-}
-
-#[test]
-fn send_egld() {
-	parse_execute_mandos("mandos/send_egld.scen.json", &contract_map());
-}
-
-#[test]
-fn send_esdt() {
-	parse_execute_mandos("mandos/send_esdt.scen.json", &contract_map());
 }
 
 #[test]
