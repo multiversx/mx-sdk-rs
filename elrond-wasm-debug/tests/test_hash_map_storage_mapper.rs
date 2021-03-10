@@ -1,5 +1,5 @@
 use elrond_wasm::storage::mappers::{MapMapper, MapStorageMapper, StorageClearable, StorageMapper};
-use elrond_wasm::BoxedBytes;
+use elrond_wasm::types::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
 fn create_map_storage() -> MapStorageMapper<TxContext, u64, MapMapper<TxContext, u64, u64>> {
