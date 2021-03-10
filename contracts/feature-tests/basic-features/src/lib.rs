@@ -592,57 +592,6 @@ pub trait BasicFeatures {
 	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
 	fn legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 
-	// SEND TX
-
-	#[endpoint]
-	fn send_egld(
-		&self,
-		to: &Address,
-		amount: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send().direct_egld(to, amount, data);
-	}
-
-	#[endpoint]
-	fn send_esdt(
-		&self,
-		to: &Address,
-		token_id: BoxedBytes,
-		amount: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
-	}
-
-	#[endpoint]
-	fn send_esdt_twice(
-		&self,
-		to: &Address,
-		token_id: BoxedBytes,
-		amount_first_time: &BigUint,
-		amount_second_time: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
-	}
-
 	// BLOCK INFO
 
 	#[view(get_block_timestamp)]

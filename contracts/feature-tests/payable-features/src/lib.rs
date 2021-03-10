@@ -107,7 +107,7 @@ pub trait PayableFeatures {
 	}
 
 	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
+	#[payable("PAYABLE-FEATURES-TOKEN")]
 	fn payable_token_1(
 		&self,
 		#[payment] payment: BigUint,
@@ -117,7 +117,7 @@ pub trait PayableFeatures {
 	}
 
 	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
+	#[payable("PAYABLE-FEATURES-TOKEN")]
 	fn payable_token_2(
 		&self,
 		#[payment] payment: BigUint,
@@ -127,7 +127,7 @@ pub trait PayableFeatures {
 	}
 
 	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
+	#[payable("PAYABLE-FEATURES-TOKEN")]
 	fn payable_token_3(
 		&self,
 		#[payment_token] token: TokenIdentifier,
@@ -137,7 +137,7 @@ pub trait PayableFeatures {
 	}
 
 	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
+	#[payable("PAYABLE-FEATURES-TOKEN")]
 	fn payable_token_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
 		let payment = self.call_value().esdt_value();
 		let token = self.call_value().token();

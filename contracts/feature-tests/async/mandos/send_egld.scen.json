@@ -1,5 +1,5 @@
 {
-    "name": "send_esdt",
+    "name": "send_egld",
     "gasSchedule": "v2",
     "steps": [
         {
@@ -7,12 +7,9 @@
             "accounts": {
                 "address:features_contract": {
                     "nonce": "1000",
-                    "balance": "0",
+                    "balance": "200",
                     "storage": {},
-                    "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "1,000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -29,10 +26,9 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "send_esdt",
+                "function": "send_egld",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
                     "10000"
                 ],
                 "gasLimit": "50,000,000",
@@ -41,7 +37,7 @@
             "expect": {
                 "out": [],
                 "status": "*",
-                "message": "str:insufficient funds",
+                "message": "str:failed transfer (insufficient funds)",
                 "logs": []
             }
         },
@@ -52,10 +48,9 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "send_esdt",
+                "function": "send_egld",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
                     "100"
                 ],
                 "gasLimit": "50,000,000",
@@ -74,10 +69,9 @@
                 "from": "address:an_account",
                 "to": "address:features_contract",
                 "value": "0",
-                "function": "send_esdt",
+                "function": "send_egld",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
                     "100",
                     "str:send tx message here"
                 ],
@@ -97,18 +91,12 @@
                     "nonce": "1000",
                     "balance": "0",
                     "storage": {},
-                    "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "800"
-                    },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
-                    "balance": "0",
+                    "balance": "200",
                     "storage": {},
-                    "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "200"
-                    },
                     "code": ""
                 }
             }
