@@ -1,5 +1,6 @@
 {
     "name": "payable",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -31,7 +32,7 @@
                 "value": "0",
                 "function": "payable_egld_3",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -51,7 +52,7 @@
                 "value": "5",
                 "function": "payable_egld_3",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -73,7 +74,7 @@
                 "esdtValue": "100",
                 "function": "payable_egld_3",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -96,7 +97,7 @@
                 "esdtValue": "0",
                 "function": "payable_egld_3",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

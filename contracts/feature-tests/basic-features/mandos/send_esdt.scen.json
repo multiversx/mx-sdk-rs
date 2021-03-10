@@ -1,5 +1,6 @@
 {
     "name": "send_esdt",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -34,7 +35,7 @@
                     "str:BASIC-FEATURES-TOKEN",
                     "10000"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -57,7 +58,7 @@
                     "str:BASIC-FEATURES-TOKEN",
                     "100"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -80,7 +81,7 @@
                     "100",
                     "str:send tx message here"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
