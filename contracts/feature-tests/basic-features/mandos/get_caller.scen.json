@@ -1,5 +1,6 @@
 {
     "name": "get caller",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -27,7 +28,7 @@
                 "value": "0",
                 "function": "get_caller",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

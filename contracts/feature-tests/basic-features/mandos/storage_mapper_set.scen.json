@@ -1,5 +1,6 @@
 {
     "name": "storage",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -27,7 +28,7 @@
                 "value": "0",
                 "function": "set_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -49,7 +50,7 @@
                 "arguments": [
                     "123"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -93,7 +94,7 @@
                 "value": "0",
                 "function": "set_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -117,7 +118,7 @@
                 "arguments": [
                     "111"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -139,7 +140,7 @@
                 "value": "0",
                 "function": "set_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -189,7 +190,7 @@
                 "arguments": [
                     "111"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -213,7 +214,7 @@
                 "arguments": [
                     "123"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -259,7 +260,7 @@
                 "arguments": [
                     "111"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -298,7 +299,7 @@
                 "value": "0",
                 "function": "list_mapper_front",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
