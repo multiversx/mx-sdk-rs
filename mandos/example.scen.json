@@ -2,6 +2,7 @@
     "name": "example scenario file",
     "comment": "comments are nice",
     "checkGas": false,
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
