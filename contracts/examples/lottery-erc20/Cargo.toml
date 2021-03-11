@@ -24,8 +24,8 @@ version = "0.13.0"
 path = "../../../elrond-wasm-node"
 optional = true
 
-[dependencies.simple-erc20]
-path = "../simple-erc20"
+[dependencies.erc20]
+path = "../erc20"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.13.0"
