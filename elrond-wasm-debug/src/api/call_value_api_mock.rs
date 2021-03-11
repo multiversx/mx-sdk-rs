@@ -34,4 +34,10 @@ impl CallValueApi<RustBigUint> for TxContext {
 	fn token(&self) -> TokenIdentifier {
 		TokenIdentifier::from(self.tx_input_box.esdt_token_identifier.as_slice())
 	}
+
+	#[inline]
+	fn esdt_token_nonce(&self) -> u64 {
+		// TODO: Add ESDT nonce in tx_input_box
+		0u64
+	}
 }

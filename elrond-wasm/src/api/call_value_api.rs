@@ -23,6 +23,10 @@ where
 	/// but the EGLD TokenIdentifier is serialized as `EGLD`.
 	fn token(&self) -> TokenIdentifier;
 
+	/// Returns the nonce of the received ESDT token.
+	/// Will return 0 in case of EGLD or fungible ESDT transfer.
+	fn esdt_token_nonce(&self) -> u64;
+
 	/// Will return the EGLD call value,
 	/// but also fail with an error if ESDT is sent.
 	/// Especially used in the auto-generated call value processing.
