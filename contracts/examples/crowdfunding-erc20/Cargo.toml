@@ -11,8 +11,8 @@ path = "src/lib.rs"
 [features]
 wasm-output-mode = ["elrond-wasm-node"]
 
-[dependencies.simple-erc20]
-path = "../simple-erc20"
+[dependencies.erc20]
+path = "../erc20"
 
 [dependencies.elrond-wasm]
 version = "0.13.0"
