@@ -1,5 +1,6 @@
 {
     "name": "not_payable_esdt",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

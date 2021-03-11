@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_Exploratory-MultipleTransfersSucceed",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

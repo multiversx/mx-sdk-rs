@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_FromEqTo-EntireBalanceMoreThanAllowance",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

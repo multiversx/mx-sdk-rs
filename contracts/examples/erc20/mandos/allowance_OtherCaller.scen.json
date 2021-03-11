@@ -1,5 +1,6 @@
 {
     "name": "allowance_OtherCaller",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

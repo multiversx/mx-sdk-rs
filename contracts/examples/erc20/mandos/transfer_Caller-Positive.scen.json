@@ -1,5 +1,6 @@
 {
     "name": "transfer_Caller-Positive",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

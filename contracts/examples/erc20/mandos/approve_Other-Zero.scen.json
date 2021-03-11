@@ -1,5 +1,6 @@
 {
     "name": "approve_Other-Zero",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

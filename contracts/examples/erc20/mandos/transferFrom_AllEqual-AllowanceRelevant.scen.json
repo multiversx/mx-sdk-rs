@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_AllEqual-AllowanceRelevant",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

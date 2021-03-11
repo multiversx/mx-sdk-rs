@@ -1,5 +1,6 @@
 {
     "name": "transfer_Other-StillNoOverflow",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

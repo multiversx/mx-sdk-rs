@@ -1,5 +1,6 @@
 {
     "name": "transfer_Other-MoreThanBalance",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
