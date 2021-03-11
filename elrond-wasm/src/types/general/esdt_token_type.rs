@@ -2,6 +2,12 @@ use crate::abi::TypeAbi;
 use alloc::string::String;
 use elrond_codec::*;
 
+const ESDT_TYPE_INVALID: &'static [u8] = &[];
+const ESDT_TYPE_FUNGIBLE: &'static [u8] = b"FungibleESDT";
+const ESDT_TYPE_NON_FUNGIBLE: &'static [u8] = b"NonFungibleESDT";
+const ESDT_TYPE_SEMI_FUNGIBLE: &'static [u8] = b"SemiFungibleESDT";
+
+#[derive(Clone, PartialEq, Debug)]
 pub enum EsdtTokenType {
     Invalid,
     Fungible,
@@ -18,6 +24,15 @@ impl EsdtTokenType {
             Self::SemiFungible => 3
         }
     }
+
+    pub fn as_type_name(&self) -> &'static [u8] {
+        match self {
+            Self::Invalid => ESDT_TYPE_INVALID,
+            Self::Fungible => ESDT_TYPE_FUNGIBLE,
+            Self::NonFungible => ESDT_TYPE_NON_FUNGIBLE,
+            Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE
+        }
+    }
 }
 
 impl From<u8> for EsdtTokenType {
@@ -28,6 +43,24 @@ impl From<u8> for EsdtTokenType {
             2 => Self::NonFungible,
             3 => Self::SemiFungible,
             _ => Self::Invalid
+        }
+	}
+}
+
+impl<'a> From<&'a [u8]> for EsdtTokenType {
+	#[inline]
+	fn from(byte_slice: &'a [u8]) -> Self {
+		if byte_slice == ESDT_TYPE_FUNGIBLE {
+            Self::Fungible
+        }
+        else if byte_slice == ESDT_TYPE_NON_FUNGIBLE {
+            Self::NonFungible
+        }
+        else if byte_slice == ESDT_TYPE_SEMI_FUNGIBLE {
+            Self::SemiFungible
+        }
+        else {
+            Self::Invalid
         }
 	}
 }
