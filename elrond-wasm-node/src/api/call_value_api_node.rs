@@ -13,6 +13,7 @@ extern "C" {
 	fn bigIntGetCallValue(dest: i32);
 	fn bigIntGetESDTCallValue(dest: i32);
 	fn getESDTTokenName(resultOffset: *const u8) -> i32;
+	fn getESDTTokenNonce() -> u64;
 
 	/// TODO: decide if it is worth using or not
 	#[allow(dead_code)]
@@ -52,6 +53,12 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 			} else {
 				BoxedBytes::from(&name_buffer[..name_len as usize]).into()
 			}
+		}
+	}
+
+	fn esdt_token_nonce(&self) -> u64 {
+		unsafe {
+			getESDTTokenNonce()
 		}
 	}
 }
