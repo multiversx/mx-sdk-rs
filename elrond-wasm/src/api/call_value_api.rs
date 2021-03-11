@@ -1,6 +1,6 @@
 use super::{BigUintApi, ErrorApi};
 use crate::err_msg;
-use crate::types::TokenIdentifier;
+use crate::types::{EsdtTokenType, TokenIdentifier};
 
 pub trait CallValueApi<BigUint>: ErrorApi + Sized
 where
@@ -26,6 +26,10 @@ where
 	/// Returns the nonce of the received ESDT token.
 	/// Will return 0 in case of EGLD or fungible ESDT transfer.
 	fn esdt_token_nonce(&self) -> u64;
+
+	/// Returns the ESDT token type.
+	/// Will return "Fungible" for EGLD.
+	fn esdt_token_type(&self) -> EsdtTokenType;
 
 	/// Will return the EGLD call value,
 	/// but also fail with an error if ESDT is sent.
