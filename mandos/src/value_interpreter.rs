@@ -84,7 +84,7 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 		return keccak256(arg.as_slice());
 	}
 
-	if let Some(fixed_width) = try_parse_fixed_width(s) {
+	if let Some(fixed_width) = try_parse_fixed_width(s, context) {
 		return fixed_width;
 	}
 
@@ -101,7 +101,7 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 	parse_unsigned(s)
 }
 
-fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
+fn try_parse_fixed_width(s: &str, context: &InterpreterContext) -> Option<Vec<u8>> {
 	if let Some(stripped) = s.strip_prefix(U64_PREFIX) {
 		return Some(parse_fixed_width_unsigned(stripped, 8));
 	}
@@ -139,7 +139,7 @@ fn try_parse_fixed_width(s: &str) -> Option<Vec<u8>> {
 	}
 
 	if let Some(stripped) = s.strip_prefix(NESTED_PREFIX) {
-		return Some(parse_biguint(stripped));
+		return Some(parse_nested(stripped, context));
 	}
 
 	None
@@ -194,6 +194,12 @@ fn parse_fixed_width_unsigned(s: &str, length: usize) -> Vec<u8> {
 
 fn parse_biguint(s: &str) -> Vec<u8> {
 	let parsed = parse_unsigned(s);
+	let encoded_length = (parsed.len() as u32).to_be_bytes();
+	[&encoded_length[..], &parsed[..]].concat()
+}
+
+fn parse_nested(s: &str, context: &InterpreterContext) -> Vec<u8> {
+	let parsed = interpret_string(s, context);
 	let encoded_length = (parsed.len() as u32).to_be_bytes();
 	[&encoded_length[..], &parsed[..]].concat()
 }

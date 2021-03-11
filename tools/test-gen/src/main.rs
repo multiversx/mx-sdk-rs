@@ -41,6 +41,7 @@ fn read_dirs(path: &str) -> Vec<String> {
 		names.push(files_names);
 	}
 
+	names.sort();
 	names
 }
 

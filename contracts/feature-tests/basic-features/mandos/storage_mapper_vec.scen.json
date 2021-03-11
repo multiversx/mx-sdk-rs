@@ -1,5 +1,6 @@
 {
     "name": "storage",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -27,7 +28,7 @@
                 "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,7 +48,7 @@
                 "value": "0",
                 "function": "vec_mapper_push",
                 "arguments": [ "123" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -67,7 +68,7 @@
                 "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -87,7 +88,7 @@
                 "value": "0",
                 "function": "vec_mapper_push",
                 "arguments": [ "111" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -107,7 +108,7 @@
                 "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -127,7 +128,7 @@
                 "value": "0",
                 "function": "vec_mapper_len",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -168,7 +169,7 @@
                 "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [ "0" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -189,7 +190,7 @@
                 "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [ "2" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -209,7 +210,7 @@
                 "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [ "3" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

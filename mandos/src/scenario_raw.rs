@@ -16,6 +16,11 @@ pub struct ScenarioRaw {
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub check_gas: Option<bool>,
+
+	#[serde(default)]
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub gas_schedule: Option<String>,
+
 	pub steps: Vec<StepRaw>,
 }
 

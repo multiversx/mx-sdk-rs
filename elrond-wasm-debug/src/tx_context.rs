@@ -52,6 +52,7 @@ pub struct TxResult {
 	pub result_status: u64,
 	pub result_message: Vec<u8>,
 	pub result_values: Vec<Vec<u8>>,
+	pub result_logs: Vec<TxLog>,
 }
 
 impl fmt::Display for TxResult {
@@ -75,6 +76,7 @@ impl TxResult {
 			result_status: 0,
 			result_message: Vec::new(),
 			result_values: Vec::new(),
+			result_logs: Vec::new(),
 		}
 	}
 	pub fn print(&self) {
@@ -116,6 +118,7 @@ impl TxOutput {
 				result_status: panic_obj.status,
 				result_message: panic_obj.message.clone(),
 				result_values: Vec::new(),
+				result_logs: Vec::new(),
 			},
 			send_balance_list: Vec::new(),
 			async_call: None,
@@ -129,6 +132,7 @@ impl TxOutput {
 				result_status: 4,
 				result_message: b"panic occurred".to_vec(),
 				result_values: Vec::new(),
+				result_logs: Vec::new(),
 			},
 			send_balance_list: Vec::new(),
 			async_call: None,
@@ -189,6 +193,33 @@ impl Clone for TxContext {
 			blockchain_info_box: self.blockchain_info_box.clone(),
 			tx_input_box: self.tx_input_box.clone(),
 			tx_output_cell: Rc::clone(&self.tx_output_cell),
+		}
+	}
+}
+
+#[derive(Clone, Debug)]
+pub struct TxLog {
+	pub address: Address,
+	pub identifier: Vec<u8>,
+	pub topics: Vec<Vec<u8>>,
+	pub data: Vec<u8>,
+}
+
+impl TxLog {
+	pub fn equals(&self, check_log: &mandos::CheckLog) -> bool {
+		if self.address.to_vec() == check_log.address.value
+			&& self.identifier == check_log.identifier.value
+			&& self.data == check_log.data.value
+		{
+			for (topic, other_topic) in self.topics.iter().zip(check_log.topics.iter()) {
+				if topic != &other_topic.value {
+					return false;
+				}
+			}
+
+			true
+		} else {
+			false
 		}
 	}
 }
