@@ -166,4 +166,8 @@ impl SendApi<RustBigUint> for TxContext {
 		let tx_hash = self.get_tx_hash();
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
+
+	fn call_local_esdt_built_in_function(&self, _gas: u64, _function: &[u8], _arg_buffer: &ArgBuffer) {
+		panic!("call_local_esdt_built_in_function not implemented yet!");
+	}
 }
