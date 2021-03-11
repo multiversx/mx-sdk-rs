@@ -2,7 +2,7 @@ use hex_literal::hex;
 
 use crate::{
 	api::BigUintApi,
-	types::{Address, BoxedBytes, ContractCall, EsdtTokenType, TokenIdentifier},
+	types::{Address, BoxedBytes, ContractCall, EsdtLocalRole, TokenIdentifier},
 };
 
 /// Address of the system smart contract that manages ESDT.
@@ -143,6 +143,47 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 		contract_call.push_argument_raw_bytes(token_identifier);
 		contract_call.push_argument_raw_bytes(address.as_bytes());
+
+		contract_call
+	}
+
+	/// The metachain system SC will evaluate the arguments and call “ESDTSetRole@tokenId@listOfRoles” for the given address.
+	/// This will be actually a cross shard call.
+	/// This function as almost all in case of ESDT can be called only by the owner.
+	pub fn set_special_roles(
+		&self,
+		address: &Address,
+		token_identifier: &[u8],
+		roles: &[EsdtLocalRole],
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"setSpecialRole");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(address.as_bytes());
+		for role in roles {
+			if role != &EsdtLocalRole::None {
+				contract_call.push_argument_raw_bytes(role.as_role_name());
+			}
+		}
+
+		contract_call
+	}
+
+	pub fn unset_special_roles(
+		&self,
+		address: &Address,
+		token_identifier: &[u8],
+		roles: &[EsdtLocalRole],
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"unSetSpecialRole");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(address.as_bytes());
+		for role in roles {
+			if role != &EsdtLocalRole::None {
+				contract_call.push_argument_raw_bytes(role.as_role_name());
+			}
+		}
 
 		contract_call
 	}
