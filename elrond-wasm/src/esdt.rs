@@ -2,7 +2,7 @@ use hex_literal::hex;
 
 use crate::{
 	api::BigUintApi,
-	types::{Address, BoxedBytes, ContractCall, TokenIdentifier},
+	types::{Address, BoxedBytes, ContractCall, EsdtTokenType, TokenIdentifier},
 };
 
 /// Address of the system smart contract that manages ESDT.
