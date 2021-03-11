@@ -2,35 +2,35 @@ use crate::abi::TypeAbi;
 use alloc::string::String;
 use elrond_codec::*;
 
-const ESDT_TYPE_INVALID: &'static [u8] = &[];
 const ESDT_TYPE_FUNGIBLE: &'static [u8] = b"FungibleESDT";
 const ESDT_TYPE_NON_FUNGIBLE: &'static [u8] = b"NonFungibleESDT";
 const ESDT_TYPE_SEMI_FUNGIBLE: &'static [u8] = b"SemiFungibleESDT";
+const ESDT_TYPE_INVALID: &'static [u8] = &[];
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum EsdtTokenType {
-    Invalid,
     Fungible,
     NonFungible,
-    SemiFungible
+    SemiFungible,
+    Invalid,
 }
 
 impl EsdtTokenType {
     pub fn as_u8(&self) -> u8 {
         match self {
-            Self::Invalid => 0,
-            Self::Fungible => 1,
-            Self::NonFungible => 2,
-            Self::SemiFungible => 3
+            Self::Fungible => 0,
+            Self::NonFungible => 1,
+            Self::SemiFungible => 2,
+            Self::Invalid => 3,
         }
     }
 
     pub fn as_type_name(&self) -> &'static [u8] {
         match self {
-            Self::Invalid => ESDT_TYPE_INVALID,
             Self::Fungible => ESDT_TYPE_FUNGIBLE,
             Self::NonFungible => ESDT_TYPE_NON_FUNGIBLE,
-            Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE
+            Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE,
+            Self::Invalid => ESDT_TYPE_INVALID,
         }
     }
 }
@@ -39,9 +39,9 @@ impl From<u8> for EsdtTokenType {
 	#[inline]
 	fn from(value: u8) -> Self {
 		match value {
-            1 => Self::Fungible,
-            2 => Self::NonFungible,
-            3 => Self::SemiFungible,
+            0 => Self::Fungible,
+            1 => Self::NonFungible,
+            2 => Self::SemiFungible,
             _ => Self::Invalid
         }
 	}
