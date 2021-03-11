@@ -112,7 +112,23 @@ pub fn generate_body_with_result(
 		syn::ReturnType::Default => quote! {
 			#mbody;
 		},
-		syn::ReturnType::Type(_, _) => {
+		syn::ReturnType::Type(_, ty) => {
+			// Because of Rust's orphan rules, Result cannot be made to implement EndpointResult.
+			// To still allow developers to use it as an endpoint result,
+			// we set up a manual conversion via macro magic.
+			// We still let the EndpointResult trait to do the heavy lifting.
+			if let syn::Type::Path(type_path) = ty.as_ref() {
+				let type_path_segment = type_path.path.segments.last().unwrap();
+				let type_str = type_path_segment.ident.to_string();
+				if type_str == "Result" {
+					return quote! {
+						let result = elrond_wasm::types::SCResult::from_result(#mbody);
+						EndpointResult::<T>::finish(&result, self.api.clone());
+					};
+				}
+			}
+
+			// default implementation, using the EndpointResult trait
 			quote! {
 				let result = #mbody;
 				EndpointResult::<T>::finish(&result, self.api.clone());

@@ -40,6 +40,19 @@ impl<T> SCResult<T> {
 			None
 		}
 	}
+
+	/// Used to convert from a regular Rust result.
+	/// Any error type is accepted as long as it can be converted to a SCError
+	/// (`Vec<u8>`, `&[u8]`, `BoxedBytes`, `String`, `&str` are covered).
+	pub fn from_result<E>(r: core::result::Result<T, E>) -> Self
+	where
+		E: Into<SCError>,
+	{
+		match r {
+			Ok(t) => SCResult::Ok(t),
+			Err(e) => SCResult::Err(e.into()),
+		}
+	}
 }
 
 impl<FA, T> EndpointResult<FA> for SCResult<T>
