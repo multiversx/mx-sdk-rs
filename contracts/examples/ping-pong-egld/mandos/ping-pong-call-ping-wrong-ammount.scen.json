@@ -1,5 +1,6 @@
 {
     "name": "try to ping the wrong ammount of funds",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -13,7 +14,7 @@
                 "value": "450,000,000,000",
                 "function": "ping",
                 "arguments": [],
-                "gasLimit": "100,000,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -45,8 +46,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''fixed_sum": "500,000,000,000",
-                        "''beginning": "780",
+                        "''ping_amount": "500,000,000,000",
+                        "''activation_timestamp": "780",
                         "''deadline": "123,780"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"

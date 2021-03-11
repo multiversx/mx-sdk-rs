@@ -1,7 +1,6 @@
-extern crate async_alice;
 use async_alice::*;
-extern crate async_bob;
 use async_bob::*;
+use forwarder::*;
 
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
@@ -17,6 +16,12 @@ fn contract_map() -> ContractMap<TxContext> {
 		"file:../async-bob/output/async-bob.wasm",
 		Box::new(|context| Box::new(BobImpl::new(context))),
 	);
+
+	contract_map.register_contract(
+		"file:../forwarder/output/forwarder.wasm",
+		Box::new(|context| Box::new(ForwarderImpl::new(context))),
+	);
+
 	contract_map
 }
 
@@ -70,4 +75,14 @@ fn payment_sameshard_callback() {
 #[test]
 fn payment_sameshard() {
 	parse_execute_mandos("mandos/payment_sameShard.scen.json", &contract_map());
+}
+
+#[test]
+fn send_egld() {
+	parse_execute_mandos("mandos/send_egld.scen.json", &contract_map());
+}
+
+#[test]
+fn send_esdt() {
+	parse_execute_mandos("mandos/send_esdt.scen.json", &contract_map());
 }

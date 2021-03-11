@@ -1,5 +1,6 @@
 {
     "name": "storage",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -12,7 +13,7 @@
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "100000000000000000",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 }
@@ -30,8 +31,8 @@
                     "``__________address_1_____________",
                     "123"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [],
@@ -71,8 +72,8 @@
                 "arguments": [
                     "``__________address_1_____________"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [ "123" ],
@@ -94,8 +95,8 @@
                     "``__________address_1_____________",
                     "0"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [],
@@ -135,8 +136,8 @@
                 "arguments": [
                     "``__________address_1_____________"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [ "0" ],
