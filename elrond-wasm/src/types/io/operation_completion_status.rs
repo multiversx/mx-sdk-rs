@@ -9,14 +9,14 @@ use alloc::string::String;
 /// An endpoint that performs a longer operation can check from time to time if it is running low
 /// on gas and can decide to save its state and exit, so that it can continue the same operation later.
 pub enum OperationCompletionStatus {
-	Finished,
+	Completed,
 	InterruptedBeforeOutOfGas,
 }
 
 impl OperationCompletionStatus {
 	pub fn output_bytes(&self) -> &'static [u8] {
 		match self {
-			OperationCompletionStatus::Finished => b"finished",
+			OperationCompletionStatus::Completed => b"completed",
 			OperationCompletionStatus::InterruptedBeforeOutOfGas => b"interrupted",
 		}
 	}
