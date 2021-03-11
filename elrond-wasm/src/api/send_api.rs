@@ -48,6 +48,16 @@ where
 		arg_buffer: &ArgBuffer,
 	);
 
+	fn direct_esdt_nft_execute(&self,
+		to: &Address,
+		token: &[u8],
+		amount: &BigUint,
+		nonce: u64,
+		gas_limit: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	);
+
 	/// Sends either EGLD or an ESDT token to the target address,
 	/// depending on what token identifier was specified.
 	fn direct(&self, to: &Address, token: &TokenIdentifier, amount: &BigUint, data: &[u8]) {
