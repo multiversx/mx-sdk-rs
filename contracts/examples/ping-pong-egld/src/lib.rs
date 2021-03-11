@@ -7,6 +7,9 @@ mod user_status;
 
 use user_status::UserStatus;
 
+/// Derived empirically.
+const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
+
 #[elrond_wasm_derive::contract(PingPongImpl)]
 pub trait PingPong {
 	#[init]
@@ -104,17 +107,30 @@ pub trait PingPong {
 	}
 
 	#[endpoint(pongAll)]
-	fn pong_all(&self) -> SCResult<()> {
+	fn pong_all(&self) -> SCResult<OperationCompletionStatus> {
 		require!(
 			self.get_block_timestamp() >= self.deadline().get(),
 			"can't withdraw before deadline"
 		);
 
 		let num_users = self.user_mapper().get_user_count();
-		for user_id in 1..=num_users {
-			let _ = self.pong_by_user_id(user_id);
+		let mut pong_all_last_user = self.pong_all_last_user().get();
+		loop {
+			if pong_all_last_user >= num_users {
+				// clear field and reset to 0
+				pong_all_last_user = 0;
+				self.pong_all_last_user().set(&pong_all_last_user);
+				return Ok(OperationCompletionStatus::Finished);
+			}
+
+			if self.get_gas_left() < PONG_ALL_LOW_GAS_LIMIT {
+				self.pong_all_last_user().set(&pong_all_last_user);
+				return Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas);
+			}
+
+			pong_all_last_user += 1;
+			let _ = self.pong_by_user_id(pong_all_last_user);
 		}
-		Ok(())
 	}
 
 	#[view(getUserAddresses)]
@@ -147,5 +163,7 @@ pub trait PingPong {
 	#[storage_mapper("user_status")]
 	fn user_status(&self, user_id: usize) -> SingleValueMapper<Self::Storage, UserStatus>;
 
-
+	#[view(pongAllLastUser)]
+	#[storage_mapper("pong_all_last_user")]
+	fn pong_all_last_user(&self) -> SingleValueMapper<Self::Storage, usize>;
 }
