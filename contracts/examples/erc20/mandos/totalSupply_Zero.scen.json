@@ -1,5 +1,6 @@
 {
     "name": "totalSupply_Zero",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

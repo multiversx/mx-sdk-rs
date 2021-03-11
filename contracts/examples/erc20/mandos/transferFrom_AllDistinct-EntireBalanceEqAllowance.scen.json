@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_AllDistinct-EntireBalanceEqAllowance",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

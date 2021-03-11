@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_FromEqTo-NoOverflow",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

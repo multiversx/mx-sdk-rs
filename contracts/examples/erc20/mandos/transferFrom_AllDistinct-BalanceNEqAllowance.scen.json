@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_AllDistinct-BalanceNEqAllowance",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

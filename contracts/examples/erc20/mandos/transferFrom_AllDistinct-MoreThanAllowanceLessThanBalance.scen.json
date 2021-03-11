@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_AllDistinct-MoreThanAllowanceLessThanBalance",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

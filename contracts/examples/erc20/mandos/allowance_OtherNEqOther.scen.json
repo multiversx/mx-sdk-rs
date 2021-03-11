@@ -1,5 +1,6 @@
 {
     "name": "allowance_OtherNEqOther",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

@@ -1,5 +1,6 @@
 {
     "name": "balanceOf_Caller",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

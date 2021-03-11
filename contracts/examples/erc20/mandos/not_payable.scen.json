@@ -1,5 +1,6 @@
 {
     "name": "not_payable",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

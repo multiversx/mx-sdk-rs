@@ -1,5 +1,6 @@
 {
     "name": "transferFrom_CallerEqTo-BalanceNEqAllowance",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
