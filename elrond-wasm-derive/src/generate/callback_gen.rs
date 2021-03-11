@@ -26,6 +26,7 @@ fn find_raw_callback(methods: &[Method]) -> Option<Method> {
 }
 
 fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStream {
+	let mut has_call_result = false;
 	let match_arms: Vec<proc_macro2::TokenStream> = methods
 		.iter()
 		.filter_map(|m| {
@@ -41,12 +42,14 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 						) {
 							quote! {}
 						} else if arg.metadata.callback_call_result {
+							has_call_result = true;
+
 							// Should be an AsyncCallResult argument that wraps what comes from the async call.
 							// But in principle, one can express it it any way.
-							generate_load_dyn_arg(arg, &quote! { &mut ___arg_loader })
+							generate_load_dyn_arg(arg, &quote! { &mut ___call_result_loader___ })
 						} else {
 							// callback args, loaded from storage via the tx hash
-							generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader___ })
+							generate_load_dyn_arg(arg, &quote! { &mut ___cb_closure_loader___ })
 						}
 					})
 					.collect();
@@ -55,16 +58,24 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 				let fn_name_str = &fn_ident.to_string();
 				let fn_name_literal = array_literal(fn_name_str.as_bytes());
 				let call = generate_call_to_method_expr(&m);
+				let call_result_assert_no_more_args = if has_call_result {
+					quote! {
+						___call_result_loader___.assert_no_more_args();
+					}
+				} else {
+					quote! {}
+				};
 				let body_with_result = generate_body_with_result(&m.return_type, &call);
 
 				let match_arm = quote! {
 					#fn_name_literal =>
 					{
 						#payable_snippet
-						let mut ___cb_arg_loader___ = CallDataArgLoader::new(cb_data_deserializer, self.api.clone());
+						let mut ___cb_closure_loader___ = CallDataArgLoader::new(___cb_data_deserializer___, self.api.clone());
 						#(#arg_init_snippets)*
+						___cb_closure_loader___.assert_no_more_args();
+						#call_result_assert_no_more_args
 						#body_with_result ;
-						___cb_arg_loader___.assert_no_more_args();
 					},
 				};
 				Some(match_arm)
@@ -78,20 +89,17 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 		quote! {}
 	} else {
 		quote! {
-			let cb_data_raw = self.api.storage_load_vec_u8(&self.api.get_tx_hash().as_ref());
-			let mut cb_data_deserializer = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(cb_data_raw.as_slice());
-			let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
+			let ___tx_hash___ = self.api.get_tx_hash();
+			let ___cb_data_raw___ = self.api.storage_load_boxed_bytes(&___tx_hash___.as_bytes());
+			self.api.storage_store_slice_u8(&___tx_hash___.as_bytes(), &[]); // cleanup
+			let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
+			let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.api.clone());
 
-			match cb_data_deserializer.get_func_name() {
+			match ___cb_data_deserializer___.get_func_name() {
 				[] => { return; }
 				#(#match_arms)*
 				other => self.api.signal_error(err_msg::CALLBACK_BAD_FUNC)
 			}
-
-			___arg_loader.assert_no_more_args();
-
-			// cleanup
-			self.api.storage_store_slice_u8(&self.api.get_tx_hash().as_ref(), &[]);
 		}
 	}
 }

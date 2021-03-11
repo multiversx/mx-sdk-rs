@@ -62,7 +62,7 @@
                     "''allowance|address:erc20_owner_address|address:acc1": "400,000",
                     "''total_supply": "1,000,000,000"
                     },
-                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                    "code": "file:../../erc20/output/erc20.wasm"
                 },
                 "address:the_crowdfunding_contract": {
                     "nonce": "0",
