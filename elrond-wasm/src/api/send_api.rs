@@ -156,4 +156,40 @@ where
 
 	/// Used to store data between async call and callback.
 	fn storage_load_tx_hash_key(&self) -> BoxedBytes;
+
+	/// Allows synchronously calling a local function by name. Execution is resumed afterwards.
+	/// You should never have to call this function directly.
+	/// Use the other specific methods instead.
+	fn call_local_esdt_built_in_function(
+		&self,
+		gas: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer
+	);
+
+	/// Allows synchronous minting of ESDT tokens. Execution is resumed afterwards.
+	fn esdt_local_mint(&self, gas: u64, token_identifier: &TokenIdentifier, amount: &BigUint) {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
+
+		self.call_local_esdt_built_in_function(
+			gas,
+			b"ESDTLocalMint",
+			&arg_buffer,
+		);
+	}
+
+	/// Allows synchronous burning of ESDT tokens. Execution is resumed afterwards.
+	fn esdt_local_burn(&self, gas: u64, token_identifier: &TokenIdentifier, amount: &BigUint) {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
+
+		self.call_local_esdt_built_in_function(
+			gas,
+			b"ESDTLocalBurn",
+			&arg_buffer,
+		);
+	}
 }

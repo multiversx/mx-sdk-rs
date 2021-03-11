@@ -264,4 +264,17 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		let tx_hash = self.get_tx_hash();
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
+
+	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer) {
+		// account-level built-in function, so the destination address is the contract itself
+		let own_address = self.get_sc_address();
+
+		self.execute_on_dest_context(
+			gas,
+			&own_address,
+			&ArwenBigUint::from(0u32),
+			function,
+			&arg_buffer,
+		)
+	}
 }
