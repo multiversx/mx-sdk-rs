@@ -1,5 +1,6 @@
 {
     "name": "storage clear test",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -14,7 +15,7 @@
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "100000000000000000",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 }
@@ -29,7 +30,7 @@
                 "value": "0",
                 "function": "get_nr_to_clear",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -49,7 +50,7 @@
                 "value": "0",
                 "function": "clear_storage_value",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -70,7 +71,7 @@
                 },
                 "address:an_account": {
                     "nonce": "2",
-                    "balance": "100000000000000000",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 }

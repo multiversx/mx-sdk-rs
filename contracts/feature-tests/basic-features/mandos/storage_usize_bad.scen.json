@@ -1,5 +1,6 @@
 {
     "name": "storage",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -29,7 +30,7 @@
                 "value": "0",
                 "function": "load_usize",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

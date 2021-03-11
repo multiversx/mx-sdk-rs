@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -28,7 +29,7 @@
                 "arguments": [
                     "0"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -39,7 +40,7 @@
                         "address": "address:features_contract",
                         "identifier": "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a",
                         "topics": [],
-                        "data": "0x00000000000000000000000000000000000000000000000000000000000000"
+                        "data": "0"
                     }
                 ],
                 "gas": "*",
@@ -57,7 +58,7 @@
                 "arguments": [
                     "0x1234abc"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -68,7 +69,7 @@
                         "address": "address:features_contract",
                         "identifier": "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a",
                         "topics": [],
-                        "data": "0x000000000000000000000000000000000000000000000000000000001234abc"
+                        "data": "0x1234abc"
                     }
                 ],
                 "gas": "*",
@@ -88,7 +89,7 @@
                     "``arg2_an_address_______________s3",
                     "0x1234abc"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -102,7 +103,7 @@
                             "0x00000000000000000000000000000000000000000000000000000000000000a1",
                             "``arg2_an_address_______________s3"
                         ],
-                        "data": "0x000000000000000000000000000000000000000000000000000000001234abc"
+                        "data": "0x1234abc"
                     }
                 ],
                 "gas": "*",

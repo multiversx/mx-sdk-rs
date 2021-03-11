@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(clippy::string_lit_as_bytes)]
 #![allow(clippy::redundant_clone)]
+#![feature(never_type)]
 
 elrond_wasm::imports!();
 
@@ -563,16 +564,16 @@ pub trait BasicFeatures {
 		self.event_a(data);
 	}
 
-	#[endpoint(logEventB)]
-	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
-		self.event_b(arg1, arg2, data);
-	}
-
 	#[event("event_a")]
 	fn event_a(&self, data: &BigUint);
 
+	#[endpoint(logEventB)]
+	fn log_event_b(&self, arg1: &BigUint, arg2: &Address, #[var_args] data: VarArgs<BoxedBytes>) {
+		self.event_b(arg1, arg2, data.as_slice());
+	}
+
 	#[event("event_b")]
-	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &BigUint);
+	fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &[BoxedBytes]);
 
 	// EVENTS (LEGACY)
 
@@ -591,57 +592,6 @@ pub trait BasicFeatures {
 
 	#[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
 	fn legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
-
-	// SEND TX
-
-	#[endpoint]
-	fn send_egld(
-		&self,
-		to: &Address,
-		amount: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send().direct_egld(to, amount, data);
-	}
-
-	#[endpoint]
-	fn send_esdt(
-		&self,
-		to: &Address,
-		token_id: BoxedBytes,
-		amount: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
-	}
-
-	#[endpoint]
-	fn send_esdt_twice(
-		&self,
-		to: &Address,
-		token_id: BoxedBytes,
-		amount_first_time: &BigUint,
-		amount_second_time: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
-	}
 
 	// BLOCK INFO
 
@@ -1060,144 +1010,6 @@ pub trait BasicFeatures {
 		Ok(nz)
 	}
 
-	// CALL VALUE
-
-	#[view]
-	#[payable("*")]
-	fn check_call_value(
-		&self,
-	) -> MultiResult5<BigUint, BigUint, TokenIdentifier, BigUint, TokenIdentifier> {
-		let (pair_call_value, pair_token_name) = self.call_value().payment_token_pair();
-		(
-			self.call_value().egld_value(),
-			self.call_value().esdt_value(),
-			self.call_value().token(),
-			pair_call_value,
-			pair_token_name,
-		)
-			.into()
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn payable_any_1(
-		&self,
-		#[payment] payment: BigUint,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn payable_any_2(&self, #[payment] payment: BigUint) -> MultiResult2<BigUint, TokenIdentifier> {
-		let token = self.call_value().token();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn payable_any_3(
-		&self,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		let (payment, _) = self.call_value().payment_token_pair();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn payable_any_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
-		self.call_value().payment_token_pair().into()
-	}
-
-	/// Will issue a warning, but this is ok, this is the test.
-	#[endpoint]
-	#[payable]
-	fn payable_egld_0(
-		&self,
-		#[payment] payment: BigUint,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("EGLD")]
-	fn payable_egld_1(
-		&self,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		let payment = self.call_value().egld_value();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("EGLD")]
-	fn payable_egld_2(
-		&self,
-		#[payment] payment: BigUint,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		let token = self.call_value().token();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("EGLD")]
-	fn payable_egld_3(
-		&self,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		let payment = self.call_value().egld_value();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("EGLD")]
-	fn payable_egld_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
-		let payment = self.call_value().egld_value();
-		let token = self.call_value().token();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
-	fn payable_token_1(
-		&self,
-		#[payment] payment: BigUint,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
-	fn payable_token_2(
-		&self,
-		#[payment] payment: BigUint,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		let token = self.call_value().token();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
-	fn payable_token_3(
-		&self,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<BigUint, TokenIdentifier> {
-		let payment = self.call_value().esdt_value();
-		(payment, token).into()
-	}
-
-	#[endpoint]
-	#[payable("BASIC-FEATURES-TOKEN")]
-	fn payable_token_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
-		let payment = self.call_value().esdt_value();
-		let token = self.call_value().token();
-		(payment, token).into()
-	}
-
 	// CRYPTO FUNCTIONS
 
 	#[endpoint(computeSha256)]
@@ -1242,7 +1054,37 @@ pub trait BasicFeatures {
 	}
 
 	#[view]
-	fn return_error(&self) -> SCResult<()> {
-		sc_error!("return_error")
+	fn return_sc_error(&self) -> SCResult<()> {
+		sc_error!("return_sc_error")
+	}
+
+	#[view]
+	fn result_ok(&self) -> Result<(), !> {
+		Result::Ok(())
+	}
+
+	#[view]
+	fn result_err_from_bytes_1(&self, e: BoxedBytes) -> Result<(), BoxedBytes> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_bytes_2<'a>(&self, e: &'a [u8]) -> Result<(), &'a [u8]> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_bytes_3(&self, e: Vec<u8>) -> Result<(), Vec<u8>> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_string(&self, e: String) -> Result<(), String> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_str<'a>(&self, e: &'a str) -> Result<(), &'a str> {
+		Result::Err(e)
 	}
 }

@@ -16,11 +16,18 @@ pub trait Vault {
 
 	#[payable("*")]
 	#[endpoint]
-	fn accept_funds(&self) {}
+	fn accept_funds(&self, #[payment_token] token: TokenIdentifier, #[payment] payment: BigUint) {
+		self.accept_funds_event(&token, &payment);
+	}
 
 	#[payable("*")]
 	#[endpoint]
-	fn reject_funds(&self) -> SCResult<()> {
+	fn reject_funds(
+		&self,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: BigUint,
+	) -> SCResult<()> {
+		self.reject_funds_event(&token, &payment);
 		sc_error!("reject_funds")
 	}
 
@@ -31,6 +38,8 @@ pub trait Vault {
 		amount: BigUint,
 		#[var_args] return_message: OptionalArg<BoxedBytes>,
 	) {
+		self.retrieve_funds_event(&token, &amount);
+
 		let data = match &return_message {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
@@ -38,4 +47,13 @@ pub trait Vault {
 		self.send()
 			.direct_via_async_call(&self.get_caller(), &token, &amount, data);
 	}
+
+	#[event("accept_funds")]
+	fn accept_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint);
+
+	#[event("reject_funds")]
+	fn reject_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint);
+
+	#[event("retrieve_funds")]
+	fn retrieve_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] amount: &BigUint);
 }
