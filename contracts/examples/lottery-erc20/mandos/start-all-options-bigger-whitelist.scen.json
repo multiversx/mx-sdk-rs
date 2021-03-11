@@ -68,7 +68,7 @@
                         "''allowance|address:acc5|address:the_lottery_contract": "100",
                         "''total_supply": "1,000,000,000"
                     },
-                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                    "code": "file:../../erc20/output/erc20.wasm"
                 }
             }
         },
@@ -138,7 +138,7 @@
                         "''allowance|address:acc5|address:the_lottery_contract": "100",
                         "''total_supply": "1,000,000,000"
                     },
-                    "code": "file:../../simple-erc20/output/simple-erc20.wasm"
+                    "code": "file:../../erc20/output/erc20.wasm"
                 }
             }
         }
