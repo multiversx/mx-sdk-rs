@@ -1,5 +1,6 @@
 {
     "name": "storage",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -27,7 +28,7 @@
                 "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,7 +48,7 @@
                 "value": "0",
                 "function": "my_single_value_mapper_increment_1",
                 "arguments": [ "123" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -67,7 +68,7 @@
                 "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -87,7 +88,7 @@
                 "value": "0",
                 "function": "my_single_value_mapper_increment_2",
                 "arguments": [ "111" ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -107,7 +108,7 @@
                 "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -146,7 +147,7 @@
                 "value": "0",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -166,7 +167,7 @@
                 "value": "0",
                 "function": "clear_single_value_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -186,7 +187,7 @@
                 "value": "0",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

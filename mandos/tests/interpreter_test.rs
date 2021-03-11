@@ -193,4 +193,21 @@ fn test_biguint_nested() {
 		vec![0x00, 0x00, 0x00, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05],
 		interpret_string("biguint:0x0102030405", context)
 	);
+
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05],
+		interpret_string("nested:0x0102030405", context)
+	);
+
+	assert_eq!(
+		vec![0x00, 0x00, 0x00, 0x01, 0xFF],
+		interpret_string("nested:-1", context)
+	);
+}
+
+#[test]
+#[should_panic]
+fn test_biguint_nested_neg() {
+	let context = &InterpreterContext::default();
+	interpret_string("biguint:-1", context);
 }
