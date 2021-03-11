@@ -1,5 +1,5 @@
-extern crate simple_erc20;
-use simple_erc20::*;
+extern crate erc20;
+use erc20::*;
 
 extern crate lottery_erc20;
 use lottery_erc20::*;
@@ -15,7 +15,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	);
 
 	contract_map.register_contract(
-		"file:../../simple-erc20/output/simple-erc20.wasm",
+		"file:../../erc20/output/erc20.wasm",
 		Box::new(|context| Box::new(SimpleErc20TokenImpl::new(context))),
 	);
 
