@@ -34,6 +34,16 @@ impl ArgBuffer {
 		self.arg_data.as_ptr()
 	}
 
+	/// returns the raw arg data
+	pub fn arg_data(&self) -> &[u8] {
+		self.arg_data.as_slice()
+	}
+
+	/// returns the raw arg data lengths
+	pub fn arg_lengths(&self) -> &[usize] {
+		self.arg_lengths.as_slice()
+	}
+
 	/// Quick for-each using closures.
 	/// TODO: also write an Iterator at some point, but beware of wasm bloat.
 	pub fn for_each_arg<F: FnMut(&[u8])>(&self, mut f: F) {

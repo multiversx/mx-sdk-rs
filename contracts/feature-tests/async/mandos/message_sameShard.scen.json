@@ -1,5 +1,6 @@
 {
     "name": "message_sameShard",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

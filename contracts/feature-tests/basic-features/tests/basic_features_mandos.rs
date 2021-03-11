@@ -1,4 +1,3 @@
-extern crate basic_features;
 use basic_features::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
@@ -88,6 +87,11 @@ fn echo_slice_u8() {
 }
 
 #[test]
+fn echo_str() {
+	parse_execute_mandos("mandos/echo_str.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_str_box() {
 	parse_execute_mandos("mandos/echo_str_box.scen.json", &contract_map());
 }
@@ -95,11 +99,6 @@ fn echo_str_box() {
 #[test]
 fn echo_string() {
 	parse_execute_mandos("mandos/echo_string.scen.json", &contract_map());
-}
-
-#[test]
-fn echo_str() {
-	parse_execute_mandos("mandos/echo_str.scen.json", &contract_map());
 }
 
 #[test]
@@ -137,89 +136,26 @@ fn events_legacy() {
 	parse_execute_mandos("mandos/events_legacy.scen.json", &contract_map());
 }
 
+// TODO: fix, by first implementing scQuery
+// #[test]
+// fn get_caller() {
+// 	parse_execute_mandos("mandos/get_caller.scen.json", &contract_map());
+// }
+
+// TODO: fix, by first implementing scQuery
+// #[test]
+// fn is_smart_contract() {
+// 	parse_execute_mandos("mandos/is_smart_contract.scen.json", &contract_map());
+// }
+
 #[test]
 fn panic() {
 	parse_execute_mandos("mandos/panic.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_any_1() {
-	parse_execute_mandos("mandos/payable_any_1.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_any_2() {
-	parse_execute_mandos("mandos/payable_any_2.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_any_3() {
-	parse_execute_mandos("mandos/payable_any_3.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_any_4() {
-	parse_execute_mandos("mandos/payable_any_4.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_egld_0() {
-	parse_execute_mandos("mandos/payable_egld_0.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_egld_1() {
-	parse_execute_mandos("mandos/payable_egld_1.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_egld_2() {
-	parse_execute_mandos("mandos/payable_egld_2.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_egld_3() {
-	parse_execute_mandos("mandos/payable_egld_3.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_egld_4() {
-	parse_execute_mandos("mandos/payable_egld_4.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_token_1() {
-	parse_execute_mandos("mandos/payable_token_1.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_token_2() {
-	parse_execute_mandos("mandos/payable_token_2.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_token_3() {
-	parse_execute_mandos("mandos/payable_token_3.scen.json", &contract_map());
-}
-
-#[test]
-fn payable_token_4() {
-	parse_execute_mandos("mandos/payable_token_4.scen.json", &contract_map());
-}
-
-#[test]
 fn return_error() {
 	parse_execute_mandos("mandos/return_error.scen.json", &contract_map());
-}
-
-#[test]
-fn send_egld() {
-	parse_execute_mandos("mandos/send_egld.scen.json", &contract_map());
-}
-
-#[test]
-fn send_esdt() {
-	parse_execute_mandos("mandos/send_esdt.scen.json", &contract_map());
 }
 
 #[test]
@@ -248,13 +184,13 @@ fn storage_clear() {
 }
 
 #[test]
-fn storage_i64_bad() {
-	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
+fn storage_i64() {
+	parse_execute_mandos("mandos/storage_i64.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_i64() {
-	parse_execute_mandos("mandos/storage_i64.scen.json", &contract_map());
+fn storage_i64_bad() {
+	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
 }
 
 #[test]
@@ -281,14 +217,6 @@ fn storage_map3() {
 }
 
 #[test]
-fn storage_mapper_single_value() {
-	parse_execute_mandos(
-		"mandos/storage_mapper_single_value.scen.json",
-		&contract_map(),
-	);
-}
-
-#[test]
 fn storage_mapper_linked_list() {
 	parse_execute_mandos(
 		"mandos/storage_mapper_linked_list.scen.json",
@@ -297,13 +225,21 @@ fn storage_mapper_linked_list() {
 }
 
 #[test]
+fn storage_mapper_map() {
+	parse_execute_mandos("mandos/storage_mapper_map.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_mapper_set() {
 	parse_execute_mandos("mandos/storage_mapper_set.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_mapper_map() {
-	parse_execute_mandos("mandos/storage_mapper_map.scen.json", &contract_map());
+fn storage_mapper_single_value() {
+	parse_execute_mandos(
+		"mandos/storage_mapper_single_value.scen.json",
+		&contract_map(),
+	);
 }
 
 #[test]
@@ -322,23 +258,23 @@ fn storage_reserved() {
 }
 
 #[test]
-fn storage_u64_bad() {
-	parse_execute_mandos("mandos/storage_u64_bad.scen.json", &contract_map());
-}
-
-#[test]
 fn storage_u64() {
 	parse_execute_mandos("mandos/storage_u64.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_usize_bad() {
-	parse_execute_mandos("mandos/storage_usize_bad.scen.json", &contract_map());
+fn storage_u64_bad() {
+	parse_execute_mandos("mandos/storage_u64_bad.scen.json", &contract_map());
 }
 
 #[test]
 fn storage_usize() {
 	parse_execute_mandos("mandos/storage_usize.scen.json", &contract_map());
+}
+
+#[test]
+fn storage_usize_bad() {
+	parse_execute_mandos("mandos/storage_usize_bad.scen.json", &contract_map());
 }
 
 #[test]

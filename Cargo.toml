@@ -60,6 +60,8 @@ members = [
   "contracts/feature-tests/esdt-contract-pair/first-contract",
   "contracts/feature-tests/esdt-contract-pair/second-contract",
   "contracts/feature-tests/deploy-two-contracts",
+  "contracts/feature-tests/payable-features",
+  "contracts/feature-tests/payable-features/abi",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/abi",
 

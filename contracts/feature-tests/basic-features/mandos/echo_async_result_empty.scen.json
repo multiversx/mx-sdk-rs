@@ -1,12 +1,13 @@
 {
     "name": "echo_async_result_empty",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:features_contract": {
                     "nonce": "0",
-                    "balance": "0x100",
+                    "balance": "0",
                     "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -29,7 +30,7 @@
                 "arguments": [
                     "0"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -52,7 +53,7 @@
                     "5",
                     "''message"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -75,7 +76,7 @@
                 "arguments": [
                     "5"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

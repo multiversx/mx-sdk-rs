@@ -17,6 +17,9 @@ path = "async-alice"
 [dependencies.async-bob]
 path = "async-bob"
 
+[dependencies.forwarder]
+path = "forwarder"
+
 [dependencies.elrond-wasm]
 version = "0.13.0"
 path = "../../../elrond-wasm"
