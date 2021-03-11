@@ -120,7 +120,7 @@ pub trait PingPong {
 				// clear field and reset to 0
 				pong_all_last_user = 0;
 				self.pong_all_last_user().set(&pong_all_last_user);
-				return Ok(OperationCompletionStatus::Finished);
+				return Ok(OperationCompletionStatus::Completed);
 			}
 
 			if self.get_gas_left() < PONG_ALL_LOW_GAS_LIMIT {

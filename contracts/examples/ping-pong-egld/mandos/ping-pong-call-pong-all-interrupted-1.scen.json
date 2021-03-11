@@ -73,6 +73,7 @@
         },
         {
             "step": "externalSteps",
+            "comment": "regular pong all with enough gas should continue with no problem",
             "path": "ping-pong-call-pong-all.steps.json"
         }
     ]
