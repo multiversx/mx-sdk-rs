@@ -40,7 +40,7 @@ extern "C" {
 		tokenIdOffset: *const u8,
 		tokenIdLen: i32,
 		valueOffset: *const u8,
-		nonce: u64,
+		nonce: i64,
 		gasLimit: i64,
 		functionOffset: *const u8,
 		functionLength: i32,
