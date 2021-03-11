@@ -57,8 +57,6 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 	}
 
 	fn esdt_token_nonce(&self) -> u64 {
-		unsafe {
-			getESDTTokenNonce()
-		}
+		unsafe { getESDTTokenNonce() }
 	}
 }

@@ -101,6 +101,19 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
+	fn direct_esdt_nft_execute(
+		&self,
+		_to: &Address,
+		_token: &[u8],
+		_amount: &RustBigUint,
+		_nonce: u64,
+		_gas_limit: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("direct_esdt_nft_execute not implemented yet");
+	}
+
 	fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) -> ! {
 		// the cell is no longer needed, since we end in a panic
 		let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
@@ -167,7 +180,12 @@ impl SendApi<RustBigUint> for TxContext {
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
 
-	fn call_local_esdt_built_in_function(&self, _gas: u64, _function: &[u8], _arg_buffer: &ArgBuffer) {
+	fn call_local_esdt_built_in_function(
+		&self,
+		_gas: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
 		panic!("call_local_esdt_built_in_function not implemented yet!");
 	}
 }
