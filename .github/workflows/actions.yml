@@ -16,7 +16,6 @@ jobs:
         with:
           default: true
           toolchain: nightly
-          override: true
       - name: Install erdpy and arwentools
         run : |
           source .github/workflows/env

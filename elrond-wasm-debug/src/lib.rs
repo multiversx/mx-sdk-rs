@@ -1,5 +1,3 @@
-#![allow(non_fmt_panic)] // TODO: remove after CI tools are upgraded to Rust2021 and branch rust2021 merged
-
 pub mod abi_json;
 pub mod api;
 mod async_data;
