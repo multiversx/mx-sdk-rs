@@ -164,6 +164,21 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
 	}
 }
 
+impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
+	fn type_name() -> String {
+		T::type_name()
+	}
+
+	/// Similar to the SCResult implementation.
+	fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+		T::output_abis(output_names)
+	}
+
+	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+		T::provide_type_descriptions(accumulator);
+	}
+}
+
 macro_rules! tuple_impls {
     ($($len:expr => ($($n:tt $name:ident)+))+) => {
         $(
