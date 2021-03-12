@@ -202,7 +202,7 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
 		impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
 			fn top_decode<I: elrond_codec::TopDecodeInput>(top_input: I) -> core::result::Result<Self, elrond_codec::DecodeError> {
 				if top_input.byte_len() == 0 {
-					Ok(<#name as elrond_codec::DecodeDefault>::default())
+					Ok(<#name #ty_generics as elrond_codec::DecodeDefault>::default())
 				} else {
 					#top_decode_body
 				}
@@ -214,7 +214,7 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
 				exit: fn(ExitCtx, elrond_codec::DecodeError) -> !,
 			) -> Self {
 				if top_input.byte_len() == 0 {
-					<#name as elrond_codec::DecodeDefault>::default()
+					<#name #ty_generics as elrond_codec::DecodeDefault>::default()
 				} else {
 					#top_decode_or_exit_body
 				}

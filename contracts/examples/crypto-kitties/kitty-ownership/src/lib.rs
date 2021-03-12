@@ -688,9 +688,19 @@ pub trait KittyOwnership {
 
 	// events
 
-	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000001")]
-	fn transfer_event(&self, from: &Address, to: &Address, token_id: u32);
+	#[event("transfer")]
+	fn transfer_event(
+		&self,
+		#[indexed] from: &Address,
+		#[indexed] to: &Address,
+		#[indexed] token_id: u32,
+	);
 
-	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000002")]
-	fn approve_event(&self, owner: &Address, approved: &Address, token_id: u32);
+	#[event("approve")]
+	fn approve_event(
+		&self,
+		#[indexed] owner: &Address,
+		#[indexed] approved: &Address,
+		#[indexed] token_id: u32,
+	);
 }

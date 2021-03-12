@@ -1,4 +1,5 @@
 use crate::types::BoxedBytes;
+use alloc::string::String;
 use alloc::vec::Vec;
 use elrond_codec::EncodeError;
 
@@ -29,6 +30,16 @@ impl From<&str> for SCError {
 	}
 }
 
+impl From<String> for SCError {
+	#[inline]
+	fn from(s: String) -> Self {
+		// data copy is avoided:
+		// - String -> Vec<u8> via String::into_bytes is just a move 
+		// - Vec<u8> -> Box<[u8]> -> BoxedBytes is also just a move
+		SCError(BoxedBytes::from(s.into_bytes()))
+	}
+}
+
 impl From<&[u8]> for SCError {
 	#[inline]
 	fn from(byte_slice: &[u8]) -> Self {
@@ -47,5 +58,11 @@ impl From<EncodeError> for SCError {
 	#[inline]
 	fn from(err: EncodeError) -> Self {
 		SCError::from(err.message_bytes())
+	}
+}
+
+impl From<!> for SCError {
+	fn from(_: !) -> Self {
+		unreachable!()
 	}
 }

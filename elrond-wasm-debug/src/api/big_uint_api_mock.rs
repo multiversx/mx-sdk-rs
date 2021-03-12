@@ -91,7 +91,7 @@ binary_operator! {BitXor, bitxor}
 
 fn check_sub_result(result: &BigInt) {
 	if result.sign() == num_bigint::Sign::Minus {
-		panic!(b"Cannot subtract because result would be negative")
+		panic!("Cannot subtract because result would be negative")
 	}
 }
 
