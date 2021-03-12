@@ -49,6 +49,7 @@ pub trait EgldEsdtSwap {
 				false,
 				true,
 				true,
+				false
 			)
 			.async_call()
 			.with_callback(self.callbacks().esdt_issue_callback(&caller)))
