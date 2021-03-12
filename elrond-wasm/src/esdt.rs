@@ -147,6 +147,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		contract_call
 	}
 
+	/// This function can be called only if canSetSpecialRoles was set to true. 
 	/// The metachain system SC will evaluate the arguments and call “ESDTSetRole@tokenId@listOfRoles” for the given address.
 	/// This will be actually a cross shard call.
 	/// This function as almost all in case of ESDT can be called only by the owner.
@@ -169,6 +170,10 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		contract_call
 	}
 
+	/// This function can be called only if canSetSpecialRoles was set to true. 
+	/// The metachain system SC will evaluate the arguments and call “ESDTUnsetRole@tokenId@listOfRoles” for the given address. 
+	/// This will be actually a cross shard call. 
+	/// This function as almost all in case of ESDT can be called only by the owner.
 	pub fn unset_special_roles(
 		&self,
 		address: &Address,

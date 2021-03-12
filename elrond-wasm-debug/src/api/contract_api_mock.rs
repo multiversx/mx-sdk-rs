@@ -1,7 +1,10 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::TxContext;
-use elrond_wasm::types::{Address, H256};
+use elrond_wasm::{
+	api::BigUintApi,
+	types::{Address, H256},
+};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
@@ -110,5 +113,19 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	fn get_current_esdt_nft_nonce(&self, _address: &Address, _token: &[u8]) -> u64 {
 		// TODO: Implement
 		0u64
+	}
+
+	// TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
+	fn get_esdt_balance(&self, address: &Address, token: &[u8], _nonce: u64) -> RustBigUint {
+		if address != &self.get_sc_address() {
+			panic!(
+				"get_esdt_balance not yet implemented for accounts other than the contract itself"
+			);
+		}
+
+		match self.blockchain_info_box.contract_esdt.get(&token.to_vec()) {
+			Some(value) => value.clone().into(),
+			None => RustBigUint::zero(),
+		}
 	}
 }

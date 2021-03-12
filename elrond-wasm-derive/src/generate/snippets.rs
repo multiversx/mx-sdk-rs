@@ -173,6 +173,11 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64 {
 				self.api.get_current_esdt_nft_nonce(address, token)
 			}
+
+			#[inline]
+			fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint {
+				self.api.get_esdt_balance(address, token, nonce)
+			}
 		}
 
 		impl <T, BigInt, BigUint> elrond_wasm::api::CryptoApi for #contract_struct<T, BigInt, BigUint>
