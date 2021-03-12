@@ -28,7 +28,7 @@ impl StorageReadApi for TxContext {
 		if let Some(v) = bu.to_u64() {
 			v
 		} else {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"storage value out of range".to_vec(),
 			})
@@ -41,7 +41,7 @@ impl StorageReadApi for TxContext {
 		if let Some(v) = bi.to_i64() {
 			v
 		} else {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"storage value out of range".to_vec(),
 			})
@@ -53,7 +53,7 @@ impl StorageWriteApi for TxContext {
 	fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
 		// TODO: extract magic strings somewhere
 		if key.starts_with(&b"ELROND"[..]) {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"cannot write to storage under Elrond reserved key".to_vec(),
 			});

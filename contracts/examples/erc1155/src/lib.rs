@@ -514,10 +514,10 @@ pub trait Erc1155 {
 	// Events
 
 	/*
-	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000001")]
+	#[event("transfer")]
 	fn transfer_single_event(&self, operator: &Address, from: &Address, to: &Address, id: &BigUint, amount: &BigUint);
 
-	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000002")]
+	#[event("approve")]
 	fn transfer_batch_event(&self, operator: &Address, from: &Address, to: &Address, ids: &Vec<BigUint>, amounts: &Vec<BigUint>);
 
 	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000003")]
