@@ -7,6 +7,7 @@ const ESDT_TYPE_NON_FUNGIBLE: &'static [u8] = b"NonFungibleESDT";
 const ESDT_TYPE_SEMI_FUNGIBLE: &'static [u8] = b"SemiFungibleESDT";
 const ESDT_TYPE_INVALID: &'static [u8] = &[];
 
+// Note: In the current implementation, SemiFungible is never returned
 #[derive(Clone, PartialEq, Debug)]
 pub enum EsdtTokenType {
 	Fungible,

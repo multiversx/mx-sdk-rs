@@ -3,6 +3,8 @@ use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractHookApi;
 use elrond_wasm::types::{Address, Box, H256};
 
+const MAX_POSSIBLE_TOKEN_NAME_LENGTH: usize = 20;
+
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
 	fn getOwnerAddress(resultOffset: *mut u8);
@@ -52,6 +54,21 @@ extern "C" {
 		nonce: i64,
 		resultOffset: i32,
 	);
+	#[allow(dead_code)] // TODO
+	fn getESDTTokenData(
+		address_ptr: *const u8,
+		tokenIDOffset: *const u8,
+		tokenIDLen: i32,
+		nonce: i64,
+		valueOffset: *const u8,
+		propertiesOffset: *const u8,
+		hashOffset: *const u8,
+		nameOffset: *const u8,
+		attributesOffset: *const u8,
+		creatorOffset: *const u8,
+		royaltiesOffset: *const u8,
+		urisOffset: *const u8,
+	) -> i32;
 }
 
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
@@ -213,8 +230,34 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				nonce as i64,
 				result,
 			);
-			
+
 			ArwenBigUint { handle: result }
 		}
 	}
+
+	/*#[inline]
+	fn get_esdt_token_data(&self, address: &Address, token: &[u8], nonce: u64) -> EsdtTokenData<ArwenBigUint> {
+		unsafe {
+			let value = bigIntNew(0);
+			let mut properties = [0u8; 2]; // always 2 bytes
+			let mut hash = H256::new();
+			let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_NAME_LENGTH];
+
+
+			getESDTTokenData(
+				address.as_ref().as_ptr(),
+				token.as_ptr(),
+				token.len() as i32,
+				nonce as i64,
+				value,
+				properties.as_ptr(),
+				hash.as_mut_ptr(),
+				name_buffer.as_mut_ptr(),
+				attributesOffset: *const u8,
+				creatorOffset: *const u8,
+				royaltiesOffset: *const u8,
+				urisOffset: *const u8,
+			);
+		}
+	}*/
 }
