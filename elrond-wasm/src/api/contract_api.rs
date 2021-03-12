@@ -88,4 +88,6 @@ where
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
 
 	fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64;
+
+	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint;
 }

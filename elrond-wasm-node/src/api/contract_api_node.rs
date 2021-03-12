@@ -39,11 +39,19 @@ extern "C" {
 	fn bigIntNew(value: i64) -> i32;
 	fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
 
+	// ESDT
 	fn getCurrentESDTNFTNonce(
 		address_ptr: *const u8,
 		tokenIDOffset: *const u8,
 		tokenIDLen: i32,
 	) -> i64;
+	fn getESDTBalance(
+		address_ptr: *const u8,
+		tokenIDOffset: *const u8,
+		tokenIDLen: i32,
+		nonce: i64,
+		resultOffset: i32,
+	);
 }
 
 impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
@@ -191,6 +199,22 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				token.as_ptr(),
 				token.len() as i32,
 			) as u64
+		}
+	}
+
+	#[inline]
+	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> ArwenBigUint {
+		unsafe {
+			let result = bigIntNew(0);
+			getESDTBalance(
+				address.as_ref().as_ptr(),
+				token.as_ptr(),
+				token.len() as i32,
+				nonce as i64,
+				result,
+			);
+			
+			ArwenBigUint { handle: result }
 		}
 	}
 }
