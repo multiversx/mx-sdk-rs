@@ -106,4 +106,9 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			.block_random_seed
 			.clone()
 	}
+
+	fn get_current_esdt_nft_nonce(&self, _address: &Address, _token: &[u8]) -> u64 {
+		// TODO: Implement
+		0u64
+	}
 }
