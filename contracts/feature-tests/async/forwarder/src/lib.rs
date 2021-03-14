@@ -119,7 +119,7 @@ pub trait Forwarder {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: BigUint,
 	) {
-		self.callback_data().push(&(
+		let _ = self.callback_data().push(&(
 			BoxedBytes::from(&b"retrieve_funds_callback"[..]),
 			token,
 			payment,
