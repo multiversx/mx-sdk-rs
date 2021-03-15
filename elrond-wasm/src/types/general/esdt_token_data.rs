@@ -4,7 +4,6 @@ use elrond_codec::*;
 
 use super::{Address, BoxedBytes, EsdtTokenType, H256};
 
-// TODO
 pub struct EsdtTokenData<BigUint: BigUintApi> {
 	pub token_type: EsdtTokenType,
 	pub amount: BigUint,
@@ -13,7 +12,7 @@ pub struct EsdtTokenData<BigUint: BigUintApi> {
 	pub name: BoxedBytes,
 	pub attributes: BoxedBytes,
 	pub creator: Address,
-	pub royalties: u32,
+	pub royalties: BigUint,
 	pub uris: Vec<BoxedBytes>,
 }
 

@@ -3,8 +3,6 @@ use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractHookApi;
 use elrond_wasm::types::{Address, Box, H256};
 
-const MAX_POSSIBLE_TOKEN_NAME_LENGTH: usize = 20;
-
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
 	fn getOwnerAddress(resultOffset: *mut u8);
@@ -41,7 +39,7 @@ extern "C" {
 	fn bigIntNew(value: i64) -> i32;
 	fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
 
-	// ESDT
+	// ESDT NFT
 	fn getCurrentESDTNFTNonce(
 		address_ptr: *const u8,
 		tokenIDOffset: *const u8,
@@ -54,7 +52,6 @@ extern "C" {
 		nonce: i64,
 		resultOffset: i32,
 	);
-	#[allow(dead_code)] // TODO
 	fn getESDTTokenData(
 		address_ptr: *const u8,
 		tokenIDOffset: *const u8,
@@ -68,6 +65,26 @@ extern "C" {
 		creatorOffset: *const u8,
 		royaltiesOffset: *const u8,
 		urisOffset: *const u8,
+	) -> i32;
+
+	// helper functions for getESDTTokenData
+	fn getESDTNFTNameLength(
+		address_ptr: *const u8,
+		tokenIDOffset: *const u8,
+		tokenIDLen: i32,
+		nonce: i64,
+	) -> i32;
+	fn getESDTNFTAttributeLength(
+		address_ptr: *const u8,
+		tokenIDOffset: *const u8,
+		tokenIDLen: i32,
+		nonce: i64,
+	) -> i32;
+	fn getESDTNFTURILength(
+		address_ptr: *const u8,
+		tokenIDOffset: *const u8,
+		tokenIDLen: i32,
+		nonce: i64,
 	) -> i32;
 }
 
@@ -235,14 +252,44 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	/*#[inline]
-	fn get_esdt_token_data(&self, address: &Address, token: &[u8], nonce: u64) -> EsdtTokenData<ArwenBigUint> {
+	#[inline]
+	fn get_esdt_token_data(
+		&self,
+		address: &Address,
+		token: &[u8],
+		nonce: u64,
+	) -> EsdtTokenData<ArwenBigUint> {
 		unsafe {
 			let value = bigIntNew(0);
 			let mut properties = [0u8; 2]; // always 2 bytes
 			let mut hash = H256::new();
-			let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_NAME_LENGTH];
 
+			let name_len = getESDTNFTNameLength(
+				address.as_ref().as_ptr(),
+				token.as_ptr(),
+				token_len() as i32,
+			);
+			let mut name_buffer = [0u8; name_len];
+
+			let attr_len = getESDTNFTAttributeLength(
+				address.as_ref().as_ptr(),
+				token.as_ptr(),
+				token_len() as i32,
+			);
+			let mut attr_buffer = [0u8; attr_len];
+
+			// Current implementation of the underlying API only provides one URI
+			// In the future, this might be extended to multiple URIs per token,
+			// Hence the EsdtTokenData receives a Vec<BoxedBytes>
+			let uris_len = getESDTNFTURILength(
+				address.as_ref().as_ptr(),
+				token.as_ptr(),
+				token_len() as i32,
+			);
+			let mut uris_buffer = [0u8; uris_len];
+
+			let mut creator = Address::zero();
+			let royalties = bigIntNew(0);
 
 			getESDTTokenData(
 				address.as_ref().as_ptr(),
@@ -253,11 +300,38 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				properties.as_ptr(),
 				hash.as_mut_ptr(),
 				name_buffer.as_mut_ptr(),
-				attributesOffset: *const u8,
-				creatorOffset: *const u8,
-				royaltiesOffset: *const u8,
-				urisOffset: *const u8,
+				attr_buffer.as_mut_ptr(),
+				creator.as_mut_ptr(),
+				royalties,
+				uris_buffer.as_mut_ptr(),
 			);
+
+			// Fungible always have a nonce of 0, so we check nonce to figure out the type
+			let nonce = getCurrentESDTNFTNonce(
+				address.as_ref().as_ptr(),
+				token.as_ptr(),
+				token.len() as i32,
+			);
+			let token_type = if nonce == 0 {
+				EsdtTokenType::Fungible
+			} else {
+				EsdtTokenType::NonFungible
+			};
+
+			// Token is frozen is properties is not 0
+			let frozen = (properties[0] == 0 && properties[1] == 0);
+
+			EsdtTokenData {
+				token_type,
+				amount: ArwenBigUint { handle: value },
+				frozen,
+				hash,
+				name: BoxedBytes::from(&name_buffer[..]),
+				attributes: BoxedBytes::from(&attr_buffer[..]),
+				creator,
+				royalties: ArwenBigUint { handle: royalties },
+				uris: [BoxedBytes::from(&uris_buffer[..])].to_vec()
+			}
 		}
-	}*/
+	}
 }

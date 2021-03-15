@@ -1,10 +1,7 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::TxContext;
-use elrond_wasm::{
-	api::BigUintApi,
-	types::{Address, H256},
-};
+use elrond_wasm::{api::BigUintApi, types::{Address, EsdtTokenData, H256}};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
@@ -127,5 +124,14 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 			Some(value) => value.clone().into(),
 			None => RustBigUint::zero(),
 		}
+	}
+
+	fn get_esdt_token_data(
+		&self,
+		_address: &Address,
+		_token: &[u8],
+		_nonce: u64,
+	) -> EsdtTokenData<RustBigUint> {
+		panic!("get_esdt_token_data not yet implemented")
 	}
 }
