@@ -1,7 +1,7 @@
 use super::{ArwenBigInt, ArwenBigUint};
 use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractHookApi;
-use elrond_wasm::types::{Address, Box, H256};
+use elrond_wasm::types::{Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, H256};
 
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
@@ -57,13 +57,13 @@ extern "C" {
 		tokenIDOffset: *const u8,
 		tokenIDLen: i32,
 		nonce: i64,
-		valueOffset: *const u8,
+		valueOffset: i32,
 		propertiesOffset: *const u8,
 		hashOffset: *const u8,
 		nameOffset: *const u8,
 		attributesOffset: *const u8,
 		creatorOffset: *const u8,
-		royaltiesOffset: *const u8,
+		royaltiesOffset: i32,
 		urisOffset: *const u8,
 	) -> i32;
 
@@ -262,21 +262,23 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 		unsafe {
 			let value = bigIntNew(0);
 			let mut properties = [0u8; 2]; // always 2 bytes
-			let mut hash = H256::new();
+			let mut hash = H256::zero();
 
 			let name_len = getESDTNFTNameLength(
 				address.as_ref().as_ptr(),
 				token.as_ptr(),
-				token_len() as i32,
-			);
-			let mut name_buffer = [0u8; name_len];
+				token.len() as i32,
+				nonce as i64,
+			) as usize;
+			let mut name_buffer = BoxedBytes::allocate(name_len);
 
 			let attr_len = getESDTNFTAttributeLength(
 				address.as_ref().as_ptr(),
 				token.as_ptr(),
-				token_len() as i32,
-			);
-			let mut attr_buffer = [0u8; attr_len];
+				token.len() as i32,
+				nonce as i64,
+			) as usize;
+			let mut attr_buffer = BoxedBytes::allocate(attr_len);
 
 			// Current implementation of the underlying API only provides one URI
 			// In the future, this might be extended to multiple URIs per token,
@@ -284,9 +286,10 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			let uris_len = getESDTNFTURILength(
 				address.as_ref().as_ptr(),
 				token.as_ptr(),
-				token_len() as i32,
-			);
-			let mut uris_buffer = [0u8; uris_len];
+				token.len() as i32,
+				nonce as i64,
+			) as usize;
+			let mut uris_buffer = BoxedBytes::allocate(uris_len);
 
 			let mut creator = Address::zero();
 			let royalties = bigIntNew(0);
@@ -297,7 +300,7 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 				token.len() as i32,
 				nonce as i64,
 				value,
-				properties.as_ptr(),
+				properties.as_mut_ptr(),
 				hash.as_mut_ptr(),
 				name_buffer.as_mut_ptr(),
 				attr_buffer.as_mut_ptr(),
@@ -319,18 +322,18 @@ impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 			};
 
 			// Token is frozen is properties is not 0
-			let frozen = (properties[0] == 0 && properties[1] == 0);
+			let frozen = properties[0] == 0 && properties[1] == 0;
 
 			EsdtTokenData {
 				token_type,
 				amount: ArwenBigUint { handle: value },
 				frozen,
 				hash,
-				name: BoxedBytes::from(&name_buffer[..]),
-				attributes: BoxedBytes::from(&attr_buffer[..]),
+				name: name_buffer,
+				attributes: attr_buffer,
 				creator,
 				royalties: ArwenBigUint { handle: royalties },
-				uris: [BoxedBytes::from(&uris_buffer[..])].to_vec()
+				uris: [uris_buffer].to_vec(),
 			}
 		}
 	}
