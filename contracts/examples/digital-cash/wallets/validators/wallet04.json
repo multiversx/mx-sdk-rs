@@ -1,0 +1,22 @@
+{
+    "version": 4,
+    "id": "b1c4296f-a33d-4792-96cd-075f92ed2cb8",
+    "address": "0746514aea9fe70676a30fe7e44cda921b5c4319d78bde2aef307550ffac8ed7",
+    "bech32": "erd1qar9zjh2nlnsva4rpln7gnx6jgd4csce679au2h0xp64plav3mtslq9lrf",
+    "crypto": {
+        "ciphertext": "b60eb9bb23fc7c18c74e28cd4b6b365cc3892226d2c8e94ecb3c7c1dd357943c924decf8974de0c8e9b49793bfe574d1d4c59d78e3764c10f897866f49b25df8",
+        "cipherparams": {
+            "iv": "0f2d2a811ba731d43516aa494b20b3d5"
+        },
+        "cipher": "aes-128-ctr",
+        "kdf": "scrypt",
+        "kdfparams": {
+            "dklen": 32,
+            "salt": "9bca39213bf4fb20ddaf10c1f16c34febd89f5b7cf4681c8642136ba38c2c9f3",
+            "n": 4096,
+            "r": 8,
+            "p": 1
+        },
+        "mac": "d94d8642d4464ce513a02c12bbccb8df7b9b6926af04e72c461d515ad1566862"
+    }
+}
