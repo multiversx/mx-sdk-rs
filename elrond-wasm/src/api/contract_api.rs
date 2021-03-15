@@ -91,10 +91,10 @@ where
 
 	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint;
 
-	/*fn get_esdt_token_data(
+	fn get_esdt_token_data(
 		&self,
 		address: &Address,
 		token: &[u8],
 		nonce: u64,
-	) -> EsdtTokenData<BigUint>;*/
+	) -> EsdtTokenData<BigUint>;
 }
