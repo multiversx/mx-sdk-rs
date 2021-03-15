@@ -2,7 +2,7 @@ use hex_literal::hex;
 
 use crate::{
 	api::BigUintApi,
-	types::{Address, BoxedBytes, ContractCall, EsdtLocalRole, TokenIdentifier},
+	types::{Address, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, TokenIdentifier},
 };
 
 /// Address of the system smart contract that manages ESDT.
@@ -13,6 +13,10 @@ pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
 pub fn esdt_system_sc_address() -> Address {
 	Address::from(ESDT_SYSTEM_SC_ADDRESS_ARRAY)
 }
+
+const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
+const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
+const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueSemiFungible";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -29,8 +33,8 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 	}
 
 	/// Produces a contract call to the ESDT system SC,
-	/// which causes it to issue a new ESDT token.
-	pub fn issue(
+	/// which causes it to issue a new fungible ESDT token.
+	pub fn issue_fungible(
 		&self,
 		issue_cost: BigUint,
 		token_display_name: &BoxedBytes,
@@ -46,17 +50,127 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		can_upgrade: bool,
 		can_add_special_roles: bool,
 	) -> ContractCall<BigUint> {
+		self.issue(
+			issue_cost,
+			EsdtTokenType::Fungible,
+			token_display_name,
+			token_ticker,
+			initial_supply,
+			num_decimals,
+			can_freeze,
+			can_wipe,
+			can_pause,
+			can_mint,
+			can_burn,
+			can_change_owner,
+			can_upgrade,
+			can_add_special_roles,
+		)
+	}
+
+	/// Produces a contract call to the ESDT system SC,
+	/// which causes it to issue a new non-fungible ESDT token.
+	pub fn issue_non_fungible(
+		&self,
+		issue_cost: BigUint,
+		token_display_name: &BoxedBytes,
+		token_ticker: &BoxedBytes,
+		can_freeze: bool,
+		can_wipe: bool,
+		can_pause: bool,
+		can_change_owner: bool,
+		can_upgrade: bool,
+		can_add_special_roles: bool,
+	) -> ContractCall<BigUint> {
+		self.issue(
+			issue_cost,
+			EsdtTokenType::NonFungible,
+			token_display_name,
+			token_ticker,
+			&BigUint::zero(),
+			0,
+			can_freeze,
+			can_wipe,
+			can_pause,
+			true,
+			true,
+			can_change_owner,
+			can_upgrade,
+			can_add_special_roles,
+		)
+	}
+
+	/// Produces a contract call to the ESDT system SC,
+	/// which causes it to issue a new semi-fungible ESDT token.
+	pub fn issue_semi_fungible(
+		&self,
+		issue_cost: BigUint,
+		token_display_name: &BoxedBytes,
+		token_ticker: &BoxedBytes,
+		can_freeze: bool,
+		can_wipe: bool,
+		can_pause: bool,
+		can_change_owner: bool,
+		can_upgrade: bool,
+		can_add_special_roles: bool,
+	) -> ContractCall<BigUint> {
+		self.issue(
+			issue_cost,
+			EsdtTokenType::SemiFungible,
+			token_display_name,
+			token_ticker,
+			&BigUint::zero(),
+			0,
+			can_freeze,
+			can_wipe,
+			can_pause,
+			true,
+			true,
+			can_change_owner,
+			can_upgrade,
+			can_add_special_roles,
+		)
+	}
+
+	/// Deduplicates code from all the possible issue functions
+	fn issue(
+		&self,
+		issue_cost: BigUint,
+		token_type: EsdtTokenType,
+		token_display_name: &BoxedBytes,
+		token_ticker: &BoxedBytes,
+		initial_supply: &BigUint,
+		num_decimals: usize,
+		can_freeze: bool,
+		can_wipe: bool,
+		can_pause: bool,
+		can_mint: bool,
+		can_burn: bool,
+		can_change_owner: bool,
+		can_upgrade: bool,
+		can_add_special_roles: bool,
+	) -> ContractCall<BigUint> {
+		let endpoint_name = match token_type {
+			EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
+			EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
+			EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
+			EsdtTokenType::Invalid => &[],
+		};
+
 		let mut contract_call = ContractCall::new(
 			esdt_system_sc_address(),
 			TokenIdentifier::egld(),
 			issue_cost,
-			BoxedBytes::from(&b"issue"[..]),
+			BoxedBytes::from(endpoint_name),
 		);
 
 		contract_call.push_argument_raw_bytes(token_display_name.as_slice());
 		contract_call.push_argument_raw_bytes(token_ticker.as_slice());
-		contract_call.push_argument_raw_bytes(&initial_supply.to_bytes_be());
-		contract_call.push_argument_raw_bytes(&num_decimals.to_be_bytes());
+
+		if token_type == EsdtTokenType::Fungible {
+			contract_call.push_argument_raw_bytes(&initial_supply.to_bytes_be());
+			contract_call.push_argument_raw_bytes(&num_decimals.to_be_bytes());
+		}
 
 		set_token_property(&mut contract_call, &b"canFreeze"[..], can_freeze);
 		set_token_property(&mut contract_call, &b"canWipe"[..], can_wipe);

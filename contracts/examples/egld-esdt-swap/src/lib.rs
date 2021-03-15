@@ -36,7 +36,7 @@ pub trait EgldEsdtSwap {
 		self.issue_started_event(&caller, token_ticker.as_slice(), &initial_supply);
 
 		Ok(ESDTSystemSmartContractProxy::new()
-			.issue(
+			.issue_fungible(
 				issue_cost,
 				&token_display_name,
 				&token_ticker,
