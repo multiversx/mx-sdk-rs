@@ -195,6 +195,9 @@ where
 		self.call_local_esdt_built_in_function(gas, b"ESDTLocalBurn", &arg_buffer);
 	}
 
+	/// Creates a new NFT token of a certain type (determined by `token_identifier`).  
+	/// `attributes` can be any serializable custom struct.  
+	/// This is a built-in function, so the smart contract execution is resumed after.
 	fn esdt_nft_create<T: elrond_codec::TopEncode>(
 		&self,
 		gas: u64,
@@ -229,6 +232,8 @@ where
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTCreate", &arg_buffer);
 	}
 
+	/// Adds quantity for an Non-Fungible Token. (which makes it a Semi-Fungible Token by definition)  
+	/// This is a built-in function, so the smart contract execution is resumed after.
 	fn esdt_nft_add_quantity(
 		&self,
 		gas: u64,
@@ -242,5 +247,22 @@ where
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTAddQuantity", &arg_buffer);
+	}
+
+	/// The reverse operation of `esdt_nft_add_quantity`, this locally decreases 
+	/// This is a built-in function, so the smart contract execution is resumed after.
+	fn esdt_nft_burn(
+		&self,
+		gas: u64,
+		token_identifier: &TokenIdentifier,
+		nonce: u64,
+		amount: &BigUint,
+	) {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
+
+		self.call_local_esdt_built_in_function(gas, b"ESDTNFTBurn", &arg_buffer);
 	}
 }
