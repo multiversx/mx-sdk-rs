@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scDeploy",
-            "txId": "1",
+            "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
                 "value": "0",
@@ -15,7 +15,7 @@
                     "address:bob",
                     "address:charlie"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -35,7 +35,7 @@
                 "value": "0",
                 "function": "getQuorum",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -57,7 +57,7 @@
                 "value": "0",
                 "function": "getNumBoardMembers",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

@@ -1,5 +1,5 @@
 {
-    "name": "multisig",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -32,7 +32,7 @@
                     "false",
                     "false"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "200,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -71,11 +71,11 @@
                         "``quorum": "2",
                         "``action_data.len": "3",
                         "``action_data.item|u32:3": {
-                            "discriminant": "0x06",
-                            "amount": "u32:0",
-                            "code": "u32:772|file:../test-contracts/factorial.wasm",
-                            "code_metadata": "0x0000",
-                            "arguments": "u32:0"
+                            "1-discriminant": "0x06",
+                            "2-amount": "u32:0",
+                            "3-code": "nested:file:../test-contracts/factorial.wasm",
+                            "4-code_metadata": "0x0000",
+                            "5-arguments": "u32:0"
                         }
                     },
                     "code": "file:../output/multisig.wasm"
@@ -92,7 +92,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -112,7 +112,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -142,7 +142,7 @@
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

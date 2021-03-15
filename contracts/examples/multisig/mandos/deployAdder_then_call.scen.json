@@ -1,5 +1,5 @@
 {
-    "name": "multisig",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -33,7 +33,7 @@
                     "false",
                     "1234"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "200,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -72,11 +72,11 @@
                         "``quorum": "2",
                         "``action_data.len": "3",
                         "``action_data.item|u32:3": {
-                            "discriminant": "0x06",
-                            "amount": "u32:0",
-                            "code": "u32:3455|file:../test-contracts/adder.wasm",
-                            "code_metadata": "0x0000",
-                            "arguments": [
+                            "1-discriminant": "0x06",
+                            "2-amount": "u32:0",
+                            "3-code": "nested:file:../test-contracts/adder.wasm",
+                            "4-code_metadata": "0x0000",
+                            "5-arguments": [
                                 "u32:1",
                                 "u32:2|1234"
                             ]
@@ -96,7 +96,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -116,7 +116,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -146,7 +146,7 @@
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["3"],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -187,7 +187,7 @@
                     "str:add",
                     "1234"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -207,7 +207,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["4"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -227,7 +227,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["4"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -247,7 +247,7 @@
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["4"],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -268,7 +268,7 @@
                 "value": "0",
                 "function": "getActionData",
                 "arguments": ["4"],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -289,7 +289,7 @@
                 "value": "0",
                 "function": "getActionSigners",
                 "arguments": ["4"],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
