@@ -1,5 +1,5 @@
 [package]
-name = "factorial-abi"
+name = "digital-cash-abi"
 version = "0.0.0"
 authors = [""]
 edition = "2018"
