@@ -323,6 +323,21 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 		contract_call
 	}
+
+	pub fn transfer_nft_create_role(
+		&self,
+		token_identifier: &[u8],
+		old_creator: &Address,
+		new_creator: &Address,
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"transferNFTCreateRole");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(old_creator.as_bytes());
+		contract_call.push_argument_raw_bytes(new_creator.as_bytes());
+
+		contract_call
+	}
 }
 
 fn esdt_system_sc_call_no_args<BigUint: BigUintApi>(endpoint_name: &[u8]) -> ContractCall<BigUint> {
