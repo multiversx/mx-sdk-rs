@@ -1,0 +1,17 @@
+[package]
+name = "factorial-abi"
+version = "0.0.0"
+authors = [""]
+edition = "2018"
+publish = false
+
+[dependencies.factorial]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.12.0"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.12.0"
+path = "../../../../elrond-wasm-debug"
