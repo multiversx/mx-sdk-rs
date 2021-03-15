@@ -17,7 +17,9 @@ pub struct EsdtTokenData<BigUint: BigUintApi> {
 }
 
 impl<BigUint: BigUintApi> EsdtTokenData<BigUint> {
-	
+	pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
+		T::top_decode(self.attributes.clone().as_slice())
+	}
 }
 
 impl<BigUint: BigUintApi> NestedEncode for EsdtTokenData<BigUint> {
