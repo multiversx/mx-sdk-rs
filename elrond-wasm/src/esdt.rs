@@ -310,6 +310,19 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 		contract_call
 	}
+
+	pub fn transfer_ownership(
+		&self,
+		token_identifier: &[u8],
+		new_owner: &Address,
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"transferOwnership");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(new_owner.as_bytes());
+
+		contract_call
+	}
 }
 
 fn esdt_system_sc_call_no_args<BigUint: BigUintApi>(endpoint_name: &[u8]) -> ContractCall<BigUint> {
