@@ -10,7 +10,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["1"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -31,7 +31,7 @@
                 "value": "0",
                 "function": "unsign",
                 "arguments": ["1"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -52,7 +52,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["1000"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -73,7 +73,7 @@
                 "value": "0",
                 "function": "unsign",
                 "arguments": ["1000"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

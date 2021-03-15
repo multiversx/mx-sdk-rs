@@ -434,7 +434,7 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn vec_mapper_push(&self, item: u32) {
 		let mut vec_mapper = self.vec_mapper();
-		vec_mapper.push(&item);
+		let _ = vec_mapper.push(&item);
 	}
 
 	#[view]
