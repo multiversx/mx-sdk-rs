@@ -2,7 +2,9 @@ use elrond_codec::TopEncode;
 
 use super::{BigUintApi, ErrorApi};
 use crate::hex_call_data::HexCallDataSerializer;
-use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, H256, TokenIdentifier, Vec};
+use crate::types::{
+	Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec, H256,
+};
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
@@ -202,7 +204,7 @@ where
 		royalties: u32,
 		hash: &H256,
 		attributes: &T,
-		uris: &[BoxedBytes]
+		uris: &[BoxedBytes],
 	) {
 		let mut arg_buffer = ArgBuffer::new();
 		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
@@ -210,7 +212,7 @@ where
 		arg_buffer.push_argument_bytes(name.as_slice());
 		arg_buffer.push_argument_bytes(&royalties.to_be_bytes()[..]);
 		arg_buffer.push_argument_bytes(hash.as_bytes());
-		
+
 		let mut top_encoded_attributes = Vec::new();
 		let _ = attributes.top_encode(&mut top_encoded_attributes);
 		arg_buffer.push_argument_bytes(top_encoded_attributes.as_slice());
@@ -219,11 +221,26 @@ where
 		for uri in uris {
 			let uri_len_as_u32_be_bytes = &uri.len().to_be_bytes()[..];
 			top_encoded_uris.extend_from_slice(uri_len_as_u32_be_bytes);
-			
+
 			let _ = uri.top_encode(&mut top_encoded_uris);
 		}
 		arg_buffer.push_argument_bytes(top_encoded_uris.as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTCreate", &arg_buffer);
+	}
+
+	fn esdt_nft_add_quantity(
+		&self,
+		gas: u64,
+		token_identifier: &TokenIdentifier,
+		nonce: u64,
+		amount: &BigUint,
+	) {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
+
+		self.call_local_esdt_built_in_function(gas, b"ESDTNFTAddQuantity", &arg_buffer);
 	}
 }
