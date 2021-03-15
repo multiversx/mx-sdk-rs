@@ -5,7 +5,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
-
+- Improvements in storage mappers:
+	- VecMapper length is now lazy
+	- UserMapper more functionality
 
 ## [elrond-wasm 0.13.0] - 2021-03-04
 ### Main feature
