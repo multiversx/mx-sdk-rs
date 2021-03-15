@@ -7,6 +7,7 @@ use crate::types::{
 };
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
+pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi<BigUint>: ErrorApi + Sized
@@ -52,6 +53,7 @@ where
 		arg_buffer: &ArgBuffer,
 	);
 
+	/// Sends ESDT NFT to an address and executes like an async call, but without callback.
 	fn direct_esdt_nft_execute(
 		&self,
 		to: &Address,
@@ -178,18 +180,18 @@ where
 	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer);
 
 	/// Allows synchronous minting of ESDT tokens. Execution is resumed afterwards.
-	fn esdt_local_mint(&self, gas: u64, token_identifier: &TokenIdentifier, amount: &BigUint) {
+	fn esdt_local_mint(&self, gas: u64, token: &[u8], amount: &BigUint) {
 		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTLocalMint", &arg_buffer);
 	}
 
 	/// Allows synchronous burning of ESDT tokens. Execution is resumed afterwards.
-	fn esdt_local_burn(&self, gas: u64, token_identifier: &TokenIdentifier, amount: &BigUint) {
+	fn esdt_local_burn(&self, gas: u64, token: &[u8], amount: &BigUint) {
 		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTLocalBurn", &arg_buffer);
@@ -201,7 +203,7 @@ where
 	fn esdt_nft_create<T: elrond_codec::TopEncode>(
 		&self,
 		gas: u64,
-		token_identifier: &TokenIdentifier,
+		token: &[u8],
 		amount: &BigUint,
 		name: &BoxedBytes,
 		royalties: u32,
@@ -210,7 +212,7 @@ where
 		uris: &[BoxedBytes],
 	) {
 		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 		arg_buffer.push_argument_bytes(name.as_slice());
 		arg_buffer.push_argument_bytes(&royalties.to_be_bytes()[..]);
@@ -234,35 +236,58 @@ where
 
 	/// Adds quantity for an Non-Fungible Token. (which makes it a Semi-Fungible Token by definition)  
 	/// This is a built-in function, so the smart contract execution is resumed after.
-	fn esdt_nft_add_quantity(
-		&self,
-		gas: u64,
-		token_identifier: &TokenIdentifier,
-		nonce: u64,
-		amount: &BigUint,
-	) {
+	fn esdt_nft_add_quantity(&self, gas: u64, token: &[u8], nonce: u64, amount: &BigUint) {
 		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTAddQuantity", &arg_buffer);
 	}
 
-	/// The reverse operation of `esdt_nft_add_quantity`, this locally decreases 
+	/// The reverse operation of `esdt_nft_add_quantity`, this locally decreases
 	/// This is a built-in function, so the smart contract execution is resumed after.
-	fn esdt_nft_burn(
-		&self,
-		gas: u64,
-		token_identifier: &TokenIdentifier,
-		nonce: u64,
-		amount: &BigUint,
-	) {
+	fn esdt_nft_burn(&self, gas: u64, token: &[u8], nonce: u64, amount: &BigUint) {
 		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token_identifier.as_esdt_identifier());
+		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTBurn", &arg_buffer);
+	}
+
+	/// Performs a simple ESDT NFT transfer, but via async call.
+	/// This is the preferred way to send ESDT.
+	fn direct_esdt_nft_via_async_call(
+		&self,
+		to: &Address,
+		token: &[u8],
+		nonce: u64,
+		amount: &BigUint,
+		data: &[u8],
+	) {
+		let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
+		serializer.push_argument_bytes(token);
+		serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+		if !data.is_empty() {
+			serializer.push_argument_bytes(data);
+		}
+		self.async_call_raw(&to, &BigUint::zero(), serializer.as_slice())
+	}
+
+	/// Sends an ESDT NFT to a given address, directly.
+	/// Used especially for sending ESDT to regular accounts.
+	///
+	/// Unlike sending ESDT via async call, this method can be called multiple times per transaction.
+	fn direct_esdt_nft_via_transfer_exec(
+		&self,
+		to: &Address,
+		token: &[u8],
+		nonce: u64,
+		amount: &BigUint,
+		data: &[u8],
+	) {
+		self.direct_esdt_nft_execute(to, token, amount, nonce, 0, data, &ArgBuffer::new());
 	}
 }
