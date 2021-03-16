@@ -24,6 +24,10 @@ deploy() {
     echo "Smart contract address: ${ADDRESS}"
 }
 
+upgrade() {
+    erdpy --verbose contract upgrade ${ADDRESS} --project==${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=75000000 --send --outfile="upgrade.json" --proxy=${PROXY} --chain=${CHAIN_ID} || return
+}
+
 # SC calls
 
 issueFungibleToken() {
