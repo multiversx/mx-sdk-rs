@@ -222,15 +222,15 @@ where
 		let _ = attributes.top_encode(&mut top_encoded_attributes);
 		arg_buffer.push_argument_bytes(top_encoded_attributes.as_slice());
 
-		let mut top_encoded_uris = Vec::new();
+		// The API function has the last argument as variadic, 
+		// so we top-encode each and send as separate argument
 		for uri in uris {
-			let uri_len_as_u32_be_bytes = &uri.len().to_be_bytes()[..];
-			top_encoded_uris.extend_from_slice(uri_len_as_u32_be_bytes);
+			let mut top_encoded_uri = Vec::new();
+			let _ = uri.top_encode(&mut top_encoded_uri);
 
-			let _ = uri.top_encode(&mut top_encoded_uris);
+			arg_buffer.push_argument_bytes(top_encoded_uri.as_slice());
 		}
-		arg_buffer.push_argument_bytes(top_encoded_uris.as_slice());
-
+		
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTCreate", &arg_buffer);
 	}
 
