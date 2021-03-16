@@ -79,7 +79,7 @@ extern "C" {
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
-	
+
 	fn executeOnDestContextByCaller(
 		gas: u64,
 		addressOffset: *const u8,
@@ -90,7 +90,7 @@ extern "C" {
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
-	
+
 	fn executeOnSameContext(
 		gas: u64,
 		addressOffset: *const u8,
@@ -339,16 +339,8 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 }
 
 /// Retrieves already pushed results, via `finish`.
-unsafe fn get_return_data(return_index: i32) -> BoxedBytes {
-	let len = getReturnDataSize(return_index);
-	let mut res = BoxedBytes::allocate(len as usize);
-	if len > 0 {
-		let _ = getReturnData(return_index, res.as_mut_ptr());
-	}
-	res
-}
-
-/// Retrieves already pushed results, via `finish`.
+/// `from_index` is inclusive.
+/// `to_index` is exclusive.
 unsafe fn get_return_data_range(from_index: i32, to_index: i32) -> Vec<BoxedBytes> {
 	let num_results = to_index - from_index;
 	let mut result = Vec::with_capacity(num_results as usize);
@@ -358,4 +350,14 @@ unsafe fn get_return_data_range(from_index: i32, to_index: i32) -> Vec<BoxedByte
 		}
 	}
 	result
+}
+
+/// Retrieves already pushed individual result at given index, via `finish`.
+unsafe fn get_return_data(return_index: i32) -> BoxedBytes {
+	let len = getReturnDataSize(return_index);
+	let mut res = BoxedBytes::allocate(len as usize);
+	if len > 0 {
+		let _ = getReturnData(return_index, res.as_mut_ptr());
+	}
+	res
 }

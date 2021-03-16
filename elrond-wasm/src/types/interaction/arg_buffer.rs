@@ -1,6 +1,6 @@
+use crate::types::BoxedBytes;
 use alloc::vec::Vec;
 use elrond_codec::TopEncodeOutput;
-use crate::types::BoxedBytes;
 
 /// Helper structure for providing arguments to all SC call functions other than async_call_raw.
 /// It keeps argument lengths separately from the argument data itself.
@@ -70,11 +70,11 @@ impl ArgBuffer {
 
 impl From<&[BoxedBytes]> for ArgBuffer {
 	fn from(raw_args: &[BoxedBytes]) -> Self {
-		let mut result = ArgBuffer::new();
+		let mut arg_buffer = ArgBuffer::new();
 		for bytes in raw_args {
-			result.push_argument_bytes(bytes.as_slice());
+			arg_buffer.push_argument_bytes(bytes.as_slice());
 		}
-		result
+		arg_buffer
 	}
 }
 
