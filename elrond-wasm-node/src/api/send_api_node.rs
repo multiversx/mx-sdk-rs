@@ -77,7 +77,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 	fn executeOnDestContextByCaller(
 		gas: u64,
 		addressOffset: *const u8,
@@ -87,7 +87,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 	fn executeOnSameContext(
 		gas: u64,
 		addressOffset: *const u8,
@@ -97,7 +97,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 }
 
 impl SendApi<ArwenBigUint> for ArwenApiImpl {
@@ -237,7 +237,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			executeOnDestContext(
+			let _ = executeOnDestContext(
 				gas,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
@@ -260,7 +260,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			executeOnDestContextByCaller(
+			let _ = executeOnDestContextByCaller(
 				gas,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
@@ -283,7 +283,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			executeOnSameContext(
+			let _ = executeOnSameContext(
 				gas,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
