@@ -144,7 +144,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_value: &RustBigUint,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		panic!("execute_on_dest_context not implemented yet!");
 	}
 
@@ -155,7 +155,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_value: &RustBigUint,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		panic!("execute_on_dest_context_by_caller not implemented yet!");
 	}
 
