@@ -1,0 +1,17 @@
+[package]
+name = "local-esdt-and-nft-abi"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.local-esdt-and-nft]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.13.0"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.13.0"
+path = "../../../../elrond-wasm-debug"
