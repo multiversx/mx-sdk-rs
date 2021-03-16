@@ -13,26 +13,26 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
 	match iter.next() {
 		Some(proc_macro2::TokenTree::Group(group)) => {
 			if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-				panic!("event paranthesis expected");
+				panic!("annotation paranthesis expected (check events and storage)");
 			}
 			let mut iter2 = group.stream().into_iter();
 			match iter2.next() {
 				Some(proc_macro2::TokenTree::Literal(lit)) => {
 					let str_val = lit.to_string();
 					if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
-						panic!("string literal expected as attribute argument");
+						panic!("string literal expected as attribute argument (check events and storage)");
 					}
 					let substr = &str_val[1..str_val.len() - 1];
 					result_str = substr.to_string();
 				},
-				_ => panic!("literal expected as event identifier"),
+				_ => panic!("literal expected as annotation identifier (check events and storage)"),
 			}
 		},
-		_ => panic!("missing event identifier"),
+		_ => panic!("missing annotation identifier (check events and storage)"),
 	}
 
 	if iter.next().is_some() {
-		panic!("event too many tokens in event attribute");
+		panic!("too many tokens in attribute (check events and storage)");
 	}
 
 	result_str
