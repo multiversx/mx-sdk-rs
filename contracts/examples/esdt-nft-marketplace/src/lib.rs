@@ -130,6 +130,65 @@ pub trait EsdtNftMarketplace {
 		Ok(())
 	}
 
+	#[payable("*")]
+	#[endpoint]
+	fn bid(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+		require!(
+			self.is_up_for_auction(&nft_type, nft_nonce),
+			"Token is not up for auction"
+		);
+
+		let (payment_amount, payment_token) = self.call_value().payment_token_pair();
+		let payment_token_nonce = self.call_value().esdt_token_nonce();
+		let caller = self.get_caller();
+		let mut auction = self.auction_for_token(&nft_type, nft_nonce).get();
+
+		require!(
+			auction.original_owner != caller,
+			"Can't bid on your own token"
+		);
+		require!(
+			self.get_block_timestamp() < auction.deadline,
+			"Auction ended already"
+		);
+		require!(
+			payment_token == auction.payment_token
+				&& payment_token_nonce == auction.payment_token_nonce,
+			"Wrong token used as payment"
+		);
+		require!(auction.current_winner != caller, "Can't outbid yourself");
+		require!(
+			payment_amount >= auction.min_bid,
+			"Bid must be higher than or equal to the min bid"
+		);
+		require!(
+			payment_amount > auction.current_bid,
+			"Bid must be higher than the current winning bid"
+		);
+		require!(
+			payment_amount <= auction.max_bid,
+			"Bid must be less than or equal to the max bid"
+		);
+
+		// refund losing bid
+		if auction.current_winner != Address::zero() {
+			self.send().direct_esdt_nft_via_transfer_exec(
+				&auction.current_winner,
+				&auction.payment_token.as_esdt_identifier(),
+				auction.payment_token_nonce,
+				&auction.current_bid,
+				b"bid refund",
+			);
+		}
+
+		// update auction bid and winner
+		auction.current_bid = payment_amount;
+		auction.current_winner = caller;
+		self.auction_for_token(&nft_type, nft_nonce).set(&auction);
+
+		Ok(())
+	}
+
 	// views
 
 	#[view(isUpForAuction)]
