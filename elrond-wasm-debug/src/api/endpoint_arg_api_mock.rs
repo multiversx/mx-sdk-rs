@@ -47,7 +47,7 @@ impl EndpointArgumentApi for TxContext {
 		if let Some(v) = bi.to_i64() {
 			v
 		} else {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"argument out of range".to_vec(),
 			})
@@ -60,7 +60,7 @@ impl EndpointArgumentApi for TxContext {
 		if let Some(v) = bu.to_u64() {
 			v
 		} else {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"argument out of range".to_vec(),
 			})

@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(clippy::string_lit_as_bytes)]
 #![allow(clippy::redundant_clone)]
+#![feature(never_type)]
 
 elrond_wasm::imports!();
 
@@ -433,7 +434,7 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn vec_mapper_push(&self, item: u32) {
 		let mut vec_mapper = self.vec_mapper();
-		vec_mapper.push(&item);
+		let _ = vec_mapper.push(&item);
 	}
 
 	#[view]
@@ -1053,7 +1054,37 @@ pub trait BasicFeatures {
 	}
 
 	#[view]
-	fn return_error(&self) -> SCResult<()> {
-		sc_error!("return_error")
+	fn return_sc_error(&self) -> SCResult<()> {
+		sc_error!("return_sc_error")
+	}
+
+	#[view]
+	fn result_ok(&self) -> Result<(), !> {
+		Result::Ok(())
+	}
+
+	#[view]
+	fn result_err_from_bytes_1(&self, e: BoxedBytes) -> Result<(), BoxedBytes> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_bytes_2<'a>(&self, e: &'a [u8]) -> Result<(), &'a [u8]> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_bytes_3(&self, e: Vec<u8>) -> Result<(), Vec<u8>> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_string(&self, e: String) -> Result<(), String> {
+		Result::Err(e)
+	}
+
+	#[view]
+	fn result_err_from_str<'a>(&self, e: &'a str) -> Result<(), &'a str> {
+		Result::Err(e)
 	}
 }

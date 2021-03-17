@@ -7,7 +7,7 @@ extern "C" {
 
 	fn writeEventLog(
 		numTopics: i32,
-		topicLengthOffset: *const u8,
+		topicLengthsOffset: *const u8,
 		topicOffset: *const u8,
 		dataOffset: *const u8,
 		dataLength: i32,

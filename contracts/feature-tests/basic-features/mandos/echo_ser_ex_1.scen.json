@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -35,7 +36,7 @@
                         "5-boxed_bytes": ["u32:4", "0x0708090a"]
                     }
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -74,7 +75,7 @@
                         "2-another_byte": "u8:4"
                     }
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
