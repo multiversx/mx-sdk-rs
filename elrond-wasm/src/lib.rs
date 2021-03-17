@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(never_type)]
 
 // re-export basic heap types
 extern crate alloc;
@@ -11,6 +12,7 @@ pub use elrond_codec;
 pub mod abi;
 pub mod api;
 pub mod err_msg;
+pub mod esdt;
 pub mod hex_call_data;
 pub mod io;
 pub mod log_util;

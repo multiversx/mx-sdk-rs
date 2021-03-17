@@ -33,7 +33,7 @@ pub trait ForwarderRaw {
 		#[payment] payment: BigUint,
 	) {
 		self.send()
-			.direct_esdt_via_transf_exec(&to, &token.as_slice(), &payment, &[]);
+			.direct_esdt_via_transf_exec(&to, &token.as_esdt_identifier(), &payment, &[]);
 	}
 
 	fn forward_contract_call(
@@ -150,7 +150,13 @@ pub trait ForwarderRaw {
 		#[payment] payment: BigUint,
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
-		self.callback_data()
-			.push(&(token, payment, args.into_vec()));
+		let args_vec = args.into_vec();
+		self.callback_raw_event(&token, &payment, args_vec.as_slice().to_vec());
+
+		let _ = self.callback_data()
+			.push(&(token, payment, args_vec));
 	}
+
+	#[event("callback_raw")]
+	fn callback_raw_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint, arguments: Vec<BoxedBytes>);
 }

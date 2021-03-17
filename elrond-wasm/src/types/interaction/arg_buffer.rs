@@ -1,3 +1,4 @@
+use crate::types::BoxedBytes;
 use alloc::vec::Vec;
 use elrond_codec::TopEncodeOutput;
 
@@ -34,6 +35,16 @@ impl ArgBuffer {
 		self.arg_data.as_ptr()
 	}
 
+	/// returns the raw arg data
+	pub fn arg_data(&self) -> &[u8] {
+		self.arg_data.as_slice()
+	}
+
+	/// returns the raw arg data lengths
+	pub fn arg_lengths(&self) -> &[usize] {
+		self.arg_lengths.as_slice()
+	}
+
 	/// Quick for-each using closures.
 	/// TODO: also write an Iterator at some point, but beware of wasm bloat.
 	pub fn for_each_arg<F: FnMut(&[u8])>(&self, mut f: F) {
@@ -54,6 +65,16 @@ impl ArgBuffer {
 		self.arg_lengths.append(&mut other.arg_lengths);
 		self.arg_data.append(&mut other.arg_data);
 		self
+	}
+}
+
+impl From<&[BoxedBytes]> for ArgBuffer {
+	fn from(raw_args: &[BoxedBytes]) -> Self {
+		let mut arg_buffer = ArgBuffer::new();
+		for bytes in raw_args {
+			arg_buffer.push_argument_bytes(bytes.as_slice());
+		}
+		arg_buffer
 	}
 }
 

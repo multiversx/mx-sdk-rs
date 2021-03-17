@@ -33,7 +33,7 @@ impl TxContext {
 			.clone();
 
 		// add amount received (if the same token)
-		if self.tx_input_box.esdt_token_name == token_name {
+		if self.tx_input_box.esdt_token_identifier == token_name {
 			available_balance += &self.tx_input_box.esdt_value;
 		}
 		let tx_output = self.tx_output_cell.borrow();
@@ -52,7 +52,7 @@ impl TxContext {
 impl SendApi<RustBigUint> for TxContext {
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if &amount.value() > &self.get_available_egld_balance() {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"failed transfer (insufficient funds)".to_vec(),
 			});
@@ -87,7 +87,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_arg_buffer: &ArgBuffer,
 	) {
 		if &amount.value() > &self.get_available_esdt_balance(token) {
-			panic!(TxPanic {
+			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"insufficient funds".to_vec(),
 			});
@@ -101,6 +101,19 @@ impl SendApi<RustBigUint> for TxContext {
 		})
 	}
 
+	fn direct_esdt_nft_execute(
+		&self,
+		_to: &Address,
+		_token: &[u8],
+		_amount: &RustBigUint,
+		_nonce: u64,
+		_gas_limit: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("direct_esdt_nft_execute not implemented yet");
+	}
+
 	fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) -> ! {
 		// the cell is no longer needed, since we end in a panic
 		let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
@@ -110,7 +123,7 @@ impl SendApi<RustBigUint> for TxContext {
 			call_data: data.to_vec(),
 			tx_hash: self.get_tx_hash(),
 		});
-		panic!(tx_output)
+		std::panic::panic_any(tx_output)
 	}
 
 	fn deploy_contract(
@@ -131,7 +144,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_value: &RustBigUint,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		panic!("execute_on_dest_context not implemented yet!");
 	}
 
@@ -142,7 +155,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_value: &RustBigUint,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		panic!("execute_on_dest_context_by_caller not implemented yet!");
 	}
 
@@ -165,5 +178,14 @@ impl SendApi<RustBigUint> for TxContext {
 	fn storage_load_tx_hash_key(&self) -> BoxedBytes {
 		let tx_hash = self.get_tx_hash();
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
+	}
+
+	fn call_local_esdt_built_in_function(
+		&self,
+		_gas: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("call_local_esdt_built_in_function not implemented yet!");
 	}
 }

@@ -15,10 +15,12 @@ pub enum AsyncCallResult<T> {
 }
 
 impl<T> AsyncCallResult<T> {
+	#[inline]
 	pub fn is_ok(&self) -> bool {
 		matches!(self, AsyncCallResult::Ok(_))
 	}
 
+	#[inline]
 	pub fn is_err(&self) -> bool {
 		!self.is_ok()
 	}

@@ -4,6 +4,7 @@ use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::BoxedBytes;
+use core::marker::PhantomData;
 use elrond_codec::{TopDecode, TopEncode};
 
 /// Manages a single serializable item in storage.
@@ -14,7 +15,7 @@ where
 {
 	api: SA,
 	key: BoxedBytes,
-	pub value: T,
+	_phantom: core::marker::PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
@@ -23,8 +24,11 @@ where
 	T: TopEncode + TopDecode,
 {
 	fn new(api: SA, key: BoxedBytes) -> Self {
-		let value: T = storage_get(api.clone(), key.as_slice());
-		SingleValueMapper { api, key, value }
+		SingleValueMapper {
+			api,
+			key,
+			_phantom: PhantomData,
+		}
 	}
 }
 
@@ -33,9 +37,32 @@ where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
 	T: TopEncode + TopDecode,
 {
-	/// Saves current value from memory to storage.
-	pub fn save(&self) {
-		storage_set(self.api.clone(), self.key.as_slice(), &self.value);
+	/// Retrieves current value from storage.
+	pub fn get(&self) -> T {
+		storage_get(self.api.clone(), self.key.as_slice())
+	}
+
+	/// Saves argument to storage.
+	pub fn set(&self, new_value: &T) {
+		storage_set(self.api.clone(), self.key.as_slice(), new_value);
+	}
+
+	/// Returns whether the storage managed by this is empty
+	pub fn is_empty(&self) -> bool {
+		self.api.storage_load_len(self.key.as_slice()) == 0
+	}
+
+	/// Clears the storage for this mapper
+	pub fn clear(&self) {
+		self.api.storage_store_slice_u8(self.key.as_slice(), &[]);
+	}
+
+	/// Syntactic sugar, to more compactly express a get, update and set in one line.
+	/// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
+	pub fn update<F: FnOnce(&mut T)>(&self, f: F) {
+		let mut value = self.get();
+		f(&mut value);
+		self.set(&value);
 	}
 }
 
@@ -46,7 +73,7 @@ where
 	T: TopEncode + TopDecode + EndpointResult<FA>,
 {
 	fn finish(&self, api: FA) {
-		self.value.finish(api);
+		self.get().finish(api);
 	}
 }
 
