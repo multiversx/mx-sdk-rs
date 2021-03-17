@@ -4,17 +4,23 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+const NFT_AMOUNT: u32 = 1; // Token has to be unique to be considered NFT
 
 #[derive(TopEncode, TopDecode, NestedEncode, TypeAbi)]
 pub struct Auction<BigUint: BigUintApi> {
-	pub payment_token: TokenIdentifier,
-	pub payment_token_nonce: u64,
+	pub payment_token: EsdtToken,
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
 	pub deadline: u64,
 	pub original_owner: Address,
 	pub current_bid: BigUint,
 	pub current_winner: Address,
+}
+
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+pub struct EsdtToken {
+	pub token_type: TokenIdentifier,
+	pub nonce: u64,
 }
 
 #[elrond_wasm_derive::contract(EsdtNftMarketplaceImpl)]
@@ -26,40 +32,6 @@ pub trait EsdtNftMarketplace {
 	}
 
 	// endpoints - owner-only
-
-	#[endpoint]
-	fn claim(&self) -> SCResult<()> {
-		let caller = self.get_caller();
-		require!(
-			caller == self.get_owner_address(),
-			"Only owner may call this function"
-		);
-
-		let mut gas_left_before = self.get_gas_left();
-		let mut max_gas_cost = 0u64;
-
-		for (token_identifier, amount) in self.claimable_funds().iter() {
-			// reserve double to try and prevent edge case bugs
-			if gas_left_before < 2 * max_gas_cost {
-				break;
-			}
-
-			self.send()
-				.direct(&caller, &token_identifier, &amount, b"claim");
-
-			self.claimable_funds().remove(&token_identifier);
-
-			let gas_left_after = self.get_gas_left();
-			let operation_gas_cost = gas_left_before - gas_left_after;
-			if max_gas_cost < operation_gas_cost {
-				max_gas_cost = operation_gas_cost;
-			}
-
-			gas_left_before = self.get_gas_left();
-		}
-
-		Ok(())
-	}
 
 	#[endpoint(setCutPercentage)]
 	fn set_percentage_cut(&self, new_cut_percentage: u64) -> SCResult<()> {
@@ -96,8 +68,8 @@ pub trait EsdtNftMarketplace {
 			"Only Non-Fungible tokens can be auctioned"
 		);
 		require!(
-			self.call_value().esdt_value() == BigUint::from(1u64),
-			"Can only auction one token of a certain type at a time"
+			self.call_value().esdt_value() == BigUint::from(NFT_AMOUNT),
+			"Token is not an NFT"
 		);
 		require!(
 			!self.is_up_for_auction(&nft_type, nft_nonce),
@@ -117,8 +89,10 @@ pub trait EsdtNftMarketplace {
 			.unwrap_or_default();
 
 		self.auction_for_token(&nft_type, nft_nonce).set(&Auction {
-			payment_token: accepted_payment_token,
-			payment_token_nonce: accepted_payment_nft_nonce,
+			payment_token: EsdtToken {
+				token_type: accepted_payment_token,
+				nonce: accepted_payment_nft_nonce,
+			},
 			min_bid,
 			max_bid,
 			deadline,
@@ -132,7 +106,7 @@ pub trait EsdtNftMarketplace {
 
 	#[payable("*")]
 	#[endpoint]
-	fn bid(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+	fn bid(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
 		require!(
 			self.is_up_for_auction(&nft_type, nft_nonce),
 			"Token is not up for auction"
@@ -152,8 +126,8 @@ pub trait EsdtNftMarketplace {
 			"Auction ended already"
 		);
 		require!(
-			payment_token == auction.payment_token
-				&& payment_token_nonce == auction.payment_token_nonce,
+			payment_token == auction.payment_token.token_type
+				&& payment_token_nonce == auction.payment_token.nonce,
 			"Wrong token used as payment"
 		);
 		require!(auction.current_winner != caller, "Can't outbid yourself");
@@ -174,8 +148,8 @@ pub trait EsdtNftMarketplace {
 		if auction.current_winner != Address::zero() {
 			self.send().direct_esdt_nft_via_transfer_exec(
 				&auction.current_winner,
-				&auction.payment_token.as_esdt_identifier(),
-				auction.payment_token_nonce,
+				&auction.payment_token.token_type.as_esdt_identifier(),
+				auction.payment_token.nonce,
 				&auction.current_bid,
 				b"bid refund",
 			);
@@ -185,6 +159,98 @@ pub trait EsdtNftMarketplace {
 		auction.current_bid = payment_amount;
 		auction.current_winner = caller;
 		self.auction_for_token(&nft_type, nft_nonce).set(&auction);
+
+		Ok(())
+	}
+
+	#[endpoint(endAuction)]
+	fn end_auction(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+		require!(
+			self.is_up_for_auction(&nft_type, nft_nonce),
+			"Token is not up for auction"
+		);
+
+		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
+
+		require!(
+			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
+			"Auction deadline has not passed nor is the current bid equal to max bid"
+		);
+
+		self.auction_for_token(&nft_type, nft_nonce).clear();
+
+		if auction.current_winner != Address::zero() {
+			let nft_info = self.get_esdt_token_data(
+				&self.get_sc_address(),
+				nft_type.as_esdt_identifier(),
+				nft_nonce,
+			);
+
+			let percentage_cut = self.bid_cut_percentage().get();
+			let creator_royalties =
+				self.calculate_cut_amount(&auction.current_bid, &nft_info.royalties);
+
+			// don't take anything if bid_cut would make it so the seller gets nothing
+			let bid_cut_amount =
+				if &percentage_cut + &nft_info.royalties < BigUint::from(PERCENTAGE_TOTAL) {
+					self.calculate_cut_amount(&auction.current_bid, &percentage_cut)
+				} else {
+					BigUint::zero()
+				};
+
+			let seller_amount_to_send =
+				&auction.current_bid - &creator_royalties - bid_cut_amount.clone();
+
+			let token = auction.payment_token.token_type.as_esdt_identifier();
+			let nonce = auction.payment_token.nonce;
+
+			if bid_cut_amount > BigUint::zero() {
+				// send part as cut for contract owner
+				self.send().direct_esdt_nft_via_transfer_exec(
+					&self.get_owner_address(),
+					token,
+					nonce,
+					&bid_cut_amount,
+					b"bid cut for sold token",
+				);
+			}
+
+			// send part as royalties to creator
+			self.send().direct_esdt_nft_via_transfer_exec(
+				&nft_info.creator,
+				token,
+				nonce,
+				&creator_royalties,
+				b"royalties for sold token",
+			);
+
+			// send rest of the bid to original owner
+			self.send().direct_esdt_nft_via_transfer_exec(
+				&auction.original_owner,
+				token,
+				nonce,
+				&seller_amount_to_send,
+				b"sold token",
+			);
+
+			// send NFT to auction winner
+			self.send().direct_esdt_nft_via_transfer_exec(
+				&auction.current_winner,
+				nft_type.as_esdt_identifier(),
+				nft_nonce,
+				&BigUint::from(NFT_AMOUNT),
+				b"bought token at auction",
+			);
+		} else {
+			// return to original owner
+			self.send().direct_esdt_nft_via_transfer_exec(
+				&auction.original_owner,
+				nft_type.as_esdt_identifier(),
+				nft_nonce,
+				&BigUint::from(NFT_AMOUNT),
+				b"returned token",
+			);
+		}
 
 		Ok(())
 	}
@@ -201,11 +267,13 @@ pub trait EsdtNftMarketplace {
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> Option<(TokenIdentifier, u64)> {
+	) -> Option<EsdtToken> {
 		if self.is_up_for_auction(nft_type, nft_nonce) {
-			let auction = self.auction_for_token(nft_type, nft_nonce).get();
-
-			Some((auction.payment_token, auction.payment_token_nonce))
+			Some(
+				self.auction_for_token(nft_type, nft_nonce)
+					.get()
+					.payment_token,
+			)
 		} else {
 			None
 		}
@@ -291,13 +359,16 @@ pub trait EsdtNftMarketplace {
 		}
 	}
 
+	// private
+
+	fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: &BigUint) -> BigUint {
+		total_amount * cut_percentage / BigUint::from(PERCENTAGE_TOTAL)
+	}
+
 	// storage
 
 	#[storage_mapper("bidCutPerecentage")]
 	fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, BigUint>;
-
-	#[storage_mapper("claimableFunds")]
-	fn claimable_funds(&self) -> MapMapper<Self::Storage, TokenIdentifier, BigUint>;
 
 	#[storage_mapper("auctionForToken")]
 	fn auction_for_token(
