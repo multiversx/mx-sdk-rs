@@ -7,116 +7,98 @@ imports!();
 mod deposit_info;
 use deposit_info::DepositInfo;
 
-pub const SECONDS_PER_ROUND: u64 = 6; 
+pub const SECONDS_PER_ROUND: u64 = 6;
 
 #[elrond_wasm_derive::contract(DepositImpl)]
 pub trait Deposit {
-	
-	#[init]
-	fn init(&self) {
-		let my_address: Address = self.get_caller();
-		self.set_owner(&my_address);
-	}
+    #[init]
+    fn init(&self) {}
 
-	fn get_expiration_round(&self,valability: u64) -> u64{
-		let valability_rounds = valability / SECONDS_PER_ROUND;
-		
-		return self.get_block_round() + valability_rounds;
-	}
+    fn get_expiration_round(&self, valability: u64) -> u64 {
+        let valability_rounds = valability / SECONDS_PER_ROUND;
 
-	#[endpoint]
-	#[payable("*")]
-	fn fund(
-		&self, #[payment] payment: BigUint,
-		#[payment_token] token: TokenIdentifier,
-		address: Address,
-		valability: u64
-		) -> SCResult<()> {
+        return self.get_block_round() + valability_rounds;
+    }
 
-		require!(
-			 payment > 0,
-			 "amount must be greater than 0"
-		);
+    #[endpoint]
+    #[payable("*")]
+    fn fund(
+        &self,
+        #[payment] payment: BigUint,
+        #[payment_token] token: TokenIdentifier,
+        address: Address,
+        valability: u64,
+    ) -> SCResult<()> {
+        require!(payment > 0, "amount must be greater than 0");
+        require!(self.deposit(&address).is_empty(), "key already used");
 
-		let deposit  = &DepositInfo{
-			amount : payment,
-			depositor_address : self.get_caller(),
-			expiration : self.get_expiration_round(valability),
-			token_name : token
-		};
+        let deposit = &DepositInfo {
+            amount: payment,
+            depositor_address: self.get_caller(),
+            expiration_round: self.get_expiration_round(valability),
+            token_name: token,
+        };
 
-		self.set_deposit(&address,deposit);
+        self.deposit(&address).set(deposit);
 
-		Ok(())
-	}
+        Ok(())
+    }
 
+    #[endpoint]
+    fn withdraw(&self, address: Address) -> SCResult<()> {
+        let deposit = self.deposit(&address).get();
 
-	#[endpoint]
-	fn withdraw(&self, address: Address) -> SCResult<()> {
-		let deposit = self.get_deposit(&address);
+        require!(
+            deposit.expiration_round < self.get_block_round(),
+            "withdrawal has not been available yet"
+        );
 
-		require!(
-			 deposit.expiration < self.get_block_round(),
-			 "withdrawal has not been available yet"
-		);
+        self.send().direct(
+            &deposit.depositor_address,
+            &deposit.token_name,
+            &deposit.amount,
+            b"successful withdrawal",
+        );
+        self.deposit(&address).clear();
 
-		self.send().direct(
-				   &deposit.depositor_address,
-				   &deposit.token_name, &deposit.amount,
-				   b"successful withdrawal"
-				   );
-		self.clear_deposit_info(&address);
-			
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[endpoint]
-	fn claim(&self, address: Address, signature: &[u8]) -> SCResult<()> {
-		let deposit = self.get_deposit(&address);
-		let caller_address: Address = self.get_caller();
+    #[endpoint]
+    fn claim(&self, address: Address, signature: &[u8]) -> SCResult<()> {
+        let deposit = self.deposit(&address).get();
+        let caller_address: Address = self.get_caller();
 
-		require!(deposit.expiration >= self.get_block_round(),
-				"deposit expired"
-		);
-		require!(
-			 self.verify_ed25519(address.as_bytes(), caller_address.as_bytes(), signature),
-			 "invalid signature"
-		);
-		
-		self.send().direct(
-				   &self.get_caller(),
-				   &deposit.token_name,
-				   &deposit.amount,
-				   b"successful claim"
-				   );
-		self.clear_deposit_info(&address);	
-		
-		Ok(())
-	}
+        require!(
+            deposit.expiration_round >= self.get_block_round(),
+            "deposit expired"
+        );
+        require!(
+            self.verify_ed25519(address.as_bytes(), caller_address.as_bytes(), signature),
+            "invalid signature"
+        );
 
-	#[view(amount)]
-	fn get_amount(&self,address: Address) -> SCResult<BigUint>{
-		let data = self.get_deposit(&address);
+        self.send().direct(
+            &self.get_caller(),
+            &deposit.token_name,
+            &deposit.amount,
+            b"successful claim",
+        );
+        self.deposit(&address).clear();
 
-		Ok(data.amount)
-	}
+        Ok(())
+    }
 
-	//storage
-	#[storage_set("owner")]
-	fn set_owner(&self, address: &Address);
+    #[view(amount)]
+    fn get_amount(&self, address: Address) -> SCResult<BigUint> {
+        let data = self.deposit(&address).get();
 
-	#[view]
-	#[storage_get("owner")]
-	fn get_owner(&self) -> Address;
+        Ok(data.amount)
+    }
 
-	#[storage_set("deposit")]
-	fn set_deposit(&self, donor: &Address, deposit_info: &DepositInfo<BigUint>);
+    //storage
 
-	#[view]
-	#[storage_get("deposit")]
-	fn get_deposit(&self, donor: &Address) -> DepositInfo<BigUint>;
-
-	#[storage_clear("deposit")]
-	fn clear_deposit_info(&self, donor: &Address);
+    #[view]
+    #[storage_mapper("deposit")]
+    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, DepositInfo<BigUint>>;
 }
-

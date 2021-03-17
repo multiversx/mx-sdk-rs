@@ -1,8 +1,8 @@
 [package]
 name = "digital-cash"
-version = "0.0.1"
-authors = [ "you",]
-edition = "2018"
+version = "0.0.0"
+authors = [ "Valentin Craciun"]
+edition = "2021"
 publish = false
 
 [lib]
