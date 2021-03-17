@@ -5,11 +5,10 @@ elrond_wasm::derive_imports!();
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[derive(TopEncode, TopDecode, NestedEncode, TypeAbi)]
 pub struct Auction<BigUint: BigUintApi> {
 	pub payment_token: TokenIdentifier,
 	pub payment_token_nonce: u64,
-	pub creator_royalties_percentage: BigUint,
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
 	pub deadline: u64,
@@ -76,6 +75,163 @@ pub trait EsdtNftMarketplace {
 		Ok(())
 	}
 
+	// endpoints
+
+	// TODO: Add macro-generated token-payment arguments once they're all available
+	#[payable("*")]
+	#[endpoint(auctionToken)]
+	fn auction_token(
+		&self,
+		min_bid: BigUint,
+		max_bid: BigUint,
+		deadline: u64,
+		accepted_payment_token: TokenIdentifier,
+		#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,
+	) -> SCResult<()> {
+		let nft_type = self.call_value().token();
+		let nft_nonce = self.call_value().esdt_token_nonce();
+
+		require!(
+			self.call_value().esdt_token_type() == EsdtTokenType::NonFungible,
+			"Only Non-Fungible tokens can be auctioned"
+		);
+		require!(
+			self.call_value().esdt_value() == BigUint::from(1u64),
+			"Can only auction one token of a certain type at a time"
+		);
+		require!(
+			!self.is_up_for_auction(&nft_type, nft_nonce),
+			"There is already an auction for that token"
+		);
+		require!(
+			min_bid > 0 && min_bid <= max_bid,
+			"Min bid can't be 0 or higher than max bid"
+		);
+		require!(
+			deadline > self.get_block_timestamp(),
+			"Deadline can't be in the past"
+		);
+
+		let accepted_payment_nft_nonce = opt_accepted_payment_token_nonce
+			.into_option()
+			.unwrap_or_default();
+
+		self.auction_for_token(&nft_type, nft_nonce).set(&Auction {
+			payment_token: accepted_payment_token,
+			payment_token_nonce: accepted_payment_nft_nonce,
+			min_bid,
+			max_bid,
+			deadline,
+			original_owner: self.get_caller(),
+			current_bid: BigUint::zero(),
+			current_winner: Address::zero(),
+		});
+
+		Ok(())
+	}
+
+	// views
+
+	#[view(isUpForAuction)]
+	fn is_up_for_auction(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> bool {
+		self.auction_for_token(nft_type, nft_nonce).is_empty()
+	}
+
+	#[view(getPaymentTokenForAuctionedNft)]
+	fn get_payment_token_for_auctioned_nft(
+		&self,
+		nft_type: &TokenIdentifier,
+		nft_nonce: u64,
+	) -> Option<(TokenIdentifier, u64)> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			let auction = self.auction_for_token(nft_type, nft_nonce).get();
+
+			Some((auction.payment_token, auction.payment_token_nonce))
+		} else {
+			None
+		}
+	}
+
+	#[view(getMinMaxBid)]
+	fn get_min_max_bid(
+		&self,
+		nft_type: &TokenIdentifier,
+		nft_nonce: u64,
+	) -> Option<(BigUint, BigUint)> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			let auction = self.auction_for_token(nft_type, nft_nonce).get();
+
+			Some((auction.min_bid, auction.max_bid))
+		} else {
+			None
+		}
+	}
+
+	#[view(getDeadline)]
+	fn get_deadline(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> Option<u64> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			Some(self.auction_for_token(nft_type, nft_nonce).get().deadline)
+		} else {
+			None
+		}
+	}
+
+	#[view(getOriginalOwner)]
+	fn get_original_owner(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> Option<Address> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			Some(
+				self.auction_for_token(nft_type, nft_nonce)
+					.get()
+					.original_owner,
+			)
+		} else {
+			None
+		}
+	}
+
+	#[view(getCurrentWinningBid)]
+	fn get_current_winning_bid(
+		&self,
+		nft_type: &TokenIdentifier,
+		nft_nonce: u64,
+	) -> Option<BigUint> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			Some(
+				self.auction_for_token(nft_type, nft_nonce)
+					.get()
+					.current_bid,
+			)
+		} else {
+			None
+		}
+	}
+
+	#[view(getCurrentWinner)]
+	fn get_current_winner(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> Option<Address> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			Some(
+				self.auction_for_token(nft_type, nft_nonce)
+					.get()
+					.current_winner,
+			)
+		} else {
+			None
+		}
+	}
+
+	#[view(getFullAuctionData)]
+	fn get_full_auction_data(
+		&self,
+		nft_type: &TokenIdentifier,
+		nft_nonce: u64,
+	) -> Option<Auction<BigUint>> {
+		if self.is_up_for_auction(nft_type, nft_nonce) {
+			Some(self.auction_for_token(nft_type, nft_nonce).get())
+		} else {
+			None
+		}
+	}
+
 	// storage
 
 	#[storage_mapper("bidCutPerecentage")]
@@ -87,7 +243,7 @@ pub trait EsdtNftMarketplace {
 	#[storage_mapper("auctionForToken")]
 	fn auction_for_token(
 		&self,
-		token_type: TokenIdentifier,
-		token_nonce: u64,
+		nft_type: &TokenIdentifier,
+		nft_nonce: u64,
 	) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
 }
