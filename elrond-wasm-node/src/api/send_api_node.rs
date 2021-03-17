@@ -1,5 +1,6 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
+use alloc::vec::Vec;
 use elrond_wasm::api::{ContractHookApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 
@@ -78,6 +79,7 @@ extern "C" {
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
+
 	fn executeOnDestContextByCaller(
 		gas: u64,
 		addressOffset: *const u8,
@@ -88,6 +90,7 @@ extern "C" {
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
+
 	fn executeOnSameContext(
 		gas: u64,
 		addressOffset: *const u8,
@@ -98,6 +101,10 @@ extern "C" {
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
+
+	fn getNumReturnData() -> i32;
+	fn getReturnDataSize(result_index: i32) -> i32;
+	fn getReturnData(result_index: i32, dataOffset: *const u8) -> i32;
 }
 
 impl SendApi<ArwenBigUint> for ArwenApiImpl {
@@ -162,7 +169,8 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn direct_esdt_nft_execute(&self,
+	fn direct_esdt_nft_execute(
+		&self,
 		to: &Address,
 		token: &[u8],
 		amount: &ArwenBigUint,
@@ -234,8 +242,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		amount: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		unsafe {
+			let num_return_data_before = getNumReturnData();
+
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = executeOnDestContext(
 				gas,
@@ -247,6 +257,9 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
 			);
+
+			let num_return_data_after = getNumReturnData();
+			get_return_data_range(num_return_data_before, num_return_data_after)
 		}
 	}
 
@@ -257,8 +270,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		amount: &ArwenBigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		unsafe {
+			let num_return_data_before = getNumReturnData();
+
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = executeOnDestContextByCaller(
 				gas,
@@ -270,6 +285,9 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
 			);
+
+			let num_return_data_after = getNumReturnData();
+			get_return_data_range(num_return_data_before, num_return_data_after)
 		}
 	}
 
@@ -310,12 +328,36 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		// account-level built-in function, so the destination address is the contract itself
 		let own_address = self.get_sc_address();
 
-		self.execute_on_dest_context(
+		let _ = self.execute_on_dest_context(
 			gas,
 			&own_address,
 			&ArwenBigUint::from(0u32),
 			function,
 			&arg_buffer,
-		)
+		);
 	}
+}
+
+/// Retrieves already pushed results, via `finish`.
+/// `from_index` is inclusive.
+/// `to_index` is exclusive.
+unsafe fn get_return_data_range(from_index: i32, to_index: i32) -> Vec<BoxedBytes> {
+	let num_results = to_index - from_index;
+	let mut result = Vec::with_capacity(num_results as usize);
+	if num_results > 0 {
+		for index in from_index..to_index {
+			result.push(get_return_data(index));
+		}
+	}
+	result
+}
+
+/// Retrieves already pushed individual result at given index, via `finish`.
+unsafe fn get_return_data(return_index: i32) -> BoxedBytes {
+	let len = getReturnDataSize(return_index);
+	let mut res = BoxedBytes::allocate(len as usize);
+	if len > 0 {
+		let _ = getReturnData(return_index, res.as_mut_ptr());
+	}
+	res
 }
