@@ -1,0 +1,45 @@
+name: Builds and tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  wasm_test:
+    name: Wasm tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          toolchain: nightly
+      - name: Install erdpy and arwentools
+        run : |
+          source .github/workflows/env
+          pip3 install erdpy
+          mkdir $HOME/elrondsdk
+          erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
+          erdpy deps install arwentools
+      - name: Build the wasm contracts
+        run: |
+          source .github/workflows/env
+          ./build-wasm.sh
+      # # Running the mandos tests through Arwen is not yet stable enough
+      # - name: Run the wasm mandos tests
+      #   run: |
+      #     source .github/workflows/env
+      #     mandos-test .
+  rust_test:
+    name: Rust tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          toolchain: nightly
+      - name: Run rust tests
+        run: cargo test

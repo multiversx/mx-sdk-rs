@@ -1,6 +1,7 @@
 {
     "name": "count ones",
     "comment": "should fail if the processor doesn't support the `count ones` instruction",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "setState",
@@ -30,7 +31,7 @@
                 "arguments": [
                     "0b010110"
                 ],
-                "gasLimit": "0x100000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

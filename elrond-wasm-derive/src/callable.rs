@@ -1,5 +1,5 @@
-use super::callable_gen::*;
-use super::*;
+use crate::generate::callable_gen::{extract_pub_method_sigs, generate_method_impl};
+use crate::parse::parse_callable_trait;
 
 pub fn process_callable(
 	args: proc_macro::TokenStream,
@@ -8,14 +8,15 @@ pub fn process_callable(
 	let args_input = parse_macro_input!(args as syn::AttributeArgs);
 	let proc_input = parse_macro_input!(input as syn::ItemTrait);
 
-	let callable = Callable::new(args_input, &proc_input);
+	let callable = parse_callable_trait(args_input, &proc_input);
+	// TODO: add validation
 
-	let method_sigs = callable.extract_pub_method_sigs();
+	let method_sigs = extract_pub_method_sigs(&callable);
 	let trait_name = callable.trait_name.clone();
 	let callable_impl_name = callable.contract_impl_name.clone();
 	//let contract_impl_name = callable.contract_impl_name.clone();
 
-	let method_impls = callable.generate_method_impl();
+	let method_impls = generate_method_impl(&callable);
 
 	// this definition is common to release and debug mode
 	let main_definition = quote! {

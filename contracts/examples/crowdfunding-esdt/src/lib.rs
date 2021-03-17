@@ -37,13 +37,13 @@ pub trait Crowdfunding {
 
 		let caller = self.get_caller();
 		let mut deposit = self.get_deposit(&caller);
-		let mut balance = self.get_esdt_balance();
+		let mut balance = self.get_esdt_balance_storage();
 
 		deposit += payment.clone();
 		balance += payment;
 
 		self.set_deposit(&caller, &deposit);
-		self.set_esdt_balance(&balance);
+		self.set_esdt_balance_storage(&balance);
 
 		Ok(())
 	}
@@ -52,7 +52,7 @@ pub trait Crowdfunding {
 	fn status(&self) -> Status {
 		if self.get_block_nonce() <= self.get_deadline() {
 			Status::FundingPeriod
-		} else if self.get_esdt_balance() >= self.get_target() {
+		} else if self.get_esdt_balance_storage() >= self.get_target() {
 			Status::Successful
 		} else {
 			Status::Failed
@@ -61,7 +61,7 @@ pub trait Crowdfunding {
 
 	#[view(currentFunds)]
 	fn current_funds(&self) -> SCResult<BigUint> {
-		Ok(self.get_esdt_balance())
+		Ok(self.get_esdt_balance_storage())
 	}
 
 	#[endpoint]
@@ -75,9 +75,9 @@ pub trait Crowdfunding {
 				}
 
 				let esdt_token_name = self.get_cf_esdt_token_name();
-				let esdt_balance = self.get_esdt_balance();
+				let esdt_balance = self.get_esdt_balance_storage();
 
-				self.set_esdt_balance(&BigUint::zero());
+				self.set_esdt_balance_storage(&BigUint::zero());
 				self.send()
 					.direct(&caller, &esdt_token_name, &esdt_balance, &[]);
 
@@ -89,11 +89,11 @@ pub trait Crowdfunding {
 
 				if deposit > 0 {
 					let esdt_token_name = self.get_cf_esdt_token_name();
-					let mut esdt_balance = self.get_esdt_balance();
+					let mut esdt_balance = self.get_esdt_balance_storage();
 
 					esdt_balance -= deposit.clone();
 
-					self.set_esdt_balance(&esdt_balance);
+					self.set_esdt_balance_storage(&esdt_balance);
 					self.set_deposit(&caller, &BigUint::zero());
 					self.send().direct(&caller, &esdt_token_name, &deposit, &[]);
 				}
@@ -119,11 +119,11 @@ pub trait Crowdfunding {
 	fn get_target(&self) -> BigUint;
 
 	#[storage_set("esdtBalance")]
-	fn set_esdt_balance(&self, esdt_balance: &BigUint);
+	fn set_esdt_balance_storage(&self, esdt_balance: &BigUint);
 
 	#[view]
 	#[storage_get("esdtBalance")]
-	fn get_esdt_balance(&self) -> BigUint;
+	fn get_esdt_balance_storage(&self) -> BigUint;
 
 	#[storage_set("deadline")]
 	fn set_deadline(&self, deadline: u64);

@@ -46,7 +46,7 @@ impl<BigUint: BigUintApi> ContractCall<BigUint> {
 	fn convert_to_esdt_transfer_call(self) -> Self {
 		if !self.token.is_egld() {
 			let mut new_arg_buffer = ArgBuffer::new();
-			new_arg_buffer.push_argument_bytes(self.token.as_slice());
+			new_arg_buffer.push_argument_bytes(self.token.as_esdt_identifier());
 			new_arg_buffer.push_argument_bytes(self.payment.to_bytes_be().as_slice());
 			new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 

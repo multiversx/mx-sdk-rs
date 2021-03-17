@@ -1,5 +1,5 @@
 {
-    "name": "multisig",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -32,7 +32,7 @@
                     "false",
                     "false"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "200,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -50,17 +50,17 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``num_users": "5",
-                        "``user_id|address:alice": "1",
-                        "``user_id|address:bob": "2",
-                        "``user_id|address:charlie": "3",
-                        "``user_id|address:paul": "4",
-                        "``user_id|address:dan": "5",
-                        "``user_address|u32:1": "address:alice",
-                        "``user_address|u32:2": "address:bob",
-                        "``user_address|u32:3": "address:charlie",
-                        "``user_address|u32:4": "address:paul",
-                        "``user_address|u32:5": "address:dan",
+                        "``user_count": "5",
+                        "``user_address_to_id|address:alice": "1",
+                        "``user_address_to_id|address:bob": "2",
+                        "``user_address_to_id|address:charlie": "3",
+                        "``user_address_to_id|address:paul": "4",
+                        "``user_address_to_id|address:dan": "5",
+                        "``user_id_to_address|u32:1": "address:alice",
+                        "``user_id_to_address|u32:2": "address:bob",
+                        "``user_id_to_address|u32:3": "address:charlie",
+                        "``user_id_to_address|u32:4": "address:paul",
+                        "``user_id_to_address|u32:5": "address:dan",
                         "``user_role|u32:1": "2",
                         "``user_role|u32:2": "2",
                         "``user_role|u32:3": "2",
@@ -69,13 +69,13 @@
                         "``num_board_members": "4",
                         "``num_proposers": "1",
                         "``quorum": "2",
-                        "``action_last_index": "3",
-                        "``action_data|u32:3": {
-                            "discriminant": "0x06",
-                            "amount": "u32:0",
-                            "code": "u32:772|file:../test-contracts/factorial.wasm",
-                            "code_metadata": "0x0000",
-                            "arguments": "u32:0"
+                        "``action_data.len": "3",
+                        "``action_data.item|u32:3": {
+                            "1-discriminant": "0x06",
+                            "2-amount": "u32:0",
+                            "3-code": "nested:file:../test-contracts/factorial.wasm",
+                            "4-code_metadata": "0x0000",
+                            "5-arguments": "u32:0"
                         }
                     },
                     "code": "file:../output/multisig.wasm"
@@ -92,7 +92,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -112,7 +112,7 @@
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -142,7 +142,7 @@
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["3"],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -160,17 +160,17 @@
                     "nonce": "1",
                     "balance": "0",
                     "storage": {
-                        "``num_users": "5",
-                        "``user_id|address:alice": "1",
-                        "``user_id|address:bob": "2",
-                        "``user_id|address:charlie": "3",
-                        "``user_id|address:paul": "4",
-                        "``user_id|address:dan": "5",
-                        "``user_address|u32:1": "address:alice",
-                        "``user_address|u32:2": "address:bob",
-                        "``user_address|u32:3": "address:charlie",
-                        "``user_address|u32:4": "address:paul",
-                        "``user_address|u32:5": "address:dan",
+                        "``user_count": "5",
+                        "``user_address_to_id|address:alice": "1",
+                        "``user_address_to_id|address:bob": "2",
+                        "``user_address_to_id|address:charlie": "3",
+                        "``user_address_to_id|address:paul": "4",
+                        "``user_address_to_id|address:dan": "5",
+                        "``user_id_to_address|u32:1": "address:alice",
+                        "``user_id_to_address|u32:2": "address:bob",
+                        "``user_id_to_address|u32:3": "address:charlie",
+                        "``user_id_to_address|u32:4": "address:paul",
+                        "``user_id_to_address|u32:5": "address:dan",
                         "``user_role|u32:1": "2",
                         "``user_role|u32:2": "2",
                         "``user_role|u32:3": "2",
@@ -179,7 +179,7 @@
                         "``num_board_members": "4",
                         "``num_proposers": "1",
                         "``quorum": "2",
-                        "``action_last_index": "3"
+                        "``action_data.len": "3"
                         
                     },
                     "code": "file:../output/multisig.wasm"
