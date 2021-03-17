@@ -21,7 +21,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Minor features
 - SingleValueMapper redesigned for easier use. It no longer keeps the storage value cached.
 
-## [elrond-wasm 0.12.0] - 2021-02-25
+## [elrond-wasm 0.13.0] - 2021-02-25
 - Reorganized ESDT and EGLD direct send api.
 - New async call syntax
 	- redesigned contract proxies
