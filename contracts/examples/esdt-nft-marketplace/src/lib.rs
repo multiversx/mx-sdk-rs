@@ -9,6 +9,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 pub struct Auction<BigUint: BigUintApi> {
 	pub payment_token: TokenIdentifier,
 	pub payment_token_nonce: u64,
+	pub creator_royalties_percentage: BigUint,
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
 	pub deadline: u64,
@@ -21,7 +22,8 @@ pub struct Auction<BigUint: BigUintApi> {
 pub trait EsdtNftMarketplace {
 	#[init]
 	fn init(&self, bid_cut_percentage: u64) {
-		self.bid_cut_percentage().set(&bid_cut_percentage);
+		self.bid_cut_percentage()
+			.set(&BigUint::from(bid_cut_percentage));
 	}
 
 	// endpoints - owner-only
@@ -68,7 +70,8 @@ pub trait EsdtNftMarketplace {
 			"Invalid percentage value, should be between 0 and 10,000"
 		);
 
-		self.bid_cut_percentage().set(&new_cut_percentage);
+		self.bid_cut_percentage()
+			.set(&BigUint::from(new_cut_percentage));
 
 		Ok(())
 	}
@@ -76,7 +79,7 @@ pub trait EsdtNftMarketplace {
 	// storage
 
 	#[storage_mapper("bidCutPerecentage")]
-	fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, u64>;
+	fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
 	#[storage_mapper("claimableFunds")]
 	fn claimable_funds(&self) -> MapMapper<Self::Storage, TokenIdentifier, BigUint>;
