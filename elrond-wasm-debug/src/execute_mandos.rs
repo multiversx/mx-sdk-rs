@@ -413,12 +413,6 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 				);
 			}
 		},
-		CheckLogs::DefaultValue => assert!(
-			tx_result.result_logs.is_empty(),
-			"Log amounts do not match. Tx id: {}. Expected no logs, have: \"{:?}\"",
-			tx_id,
-			tx_result.result_logs
-		),
 	}
 }
 
