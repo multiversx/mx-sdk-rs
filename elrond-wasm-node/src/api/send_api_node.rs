@@ -35,6 +35,20 @@ extern "C" {
 		dataOffset: *const u8,
 	) -> i32;
 
+	fn transferESDTNFTExecute(
+		dstOffset: *const u8,
+		tokenIdOffset: *const u8,
+		tokenIdLen: i32,
+		valueOffset: *const u8,
+		nonce: i64,
+		gasLimit: i64,
+		functionOffset: *const u8,
+		functionLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	);
+
 	fn asyncCall(
 		dstOffset: *const u8,
 		valueOffset: *const u8,
@@ -63,7 +77,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 	fn executeOnDestContextByCaller(
 		gas: u64,
 		addressOffset: *const u8,
@@ -73,7 +87,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 	fn executeOnSameContext(
 		gas: u64,
 		addressOffset: *const u8,
@@ -83,7 +97,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 }
 
 impl SendApi<ArwenBigUint> for ArwenApiImpl {
@@ -148,6 +162,33 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
+	fn direct_esdt_nft_execute(&self,
+		to: &Address,
+		token: &[u8],
+		amount: &ArwenBigUint,
+		nonce: u64,
+		gas_limit: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) {
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			let _ = transferESDTNFTExecute(
+				to.as_ref().as_ptr(),
+				token.as_ptr(),
+				token.len() as i32,
+				amount_bytes32_ptr,
+				nonce as i64,
+				gas_limit as i64,
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+	}
+
 	fn async_call_raw(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) -> ! {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
@@ -196,7 +237,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			executeOnDestContext(
+			let _ = executeOnDestContext(
 				gas,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
@@ -219,7 +260,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			executeOnDestContextByCaller(
+			let _ = executeOnDestContextByCaller(
 				gas,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
@@ -242,7 +283,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			executeOnSameContext(
+			let _ = executeOnSameContext(
 				gas,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
@@ -263,5 +304,18 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 	fn storage_load_tx_hash_key(&self) -> BoxedBytes {
 		let tx_hash = self.get_tx_hash();
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
+	}
+
+	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer) {
+		// account-level built-in function, so the destination address is the contract itself
+		let own_address = self.get_sc_address();
+
+		self.execute_on_dest_context(
+			gas,
+			&own_address,
+			&ArwenBigUint::from(0u32),
+			function,
+			&arg_buffer,
+		)
 	}
 }

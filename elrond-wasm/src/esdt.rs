@@ -2,7 +2,7 @@ use hex_literal::hex;
 
 use crate::{
 	api::BigUintApi,
-	types::{Address, BoxedBytes, ContractCall, TokenIdentifier},
+	types::{Address, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, TokenIdentifier},
 };
 
 /// Address of the system smart contract that manages ESDT.
@@ -13,6 +13,10 @@ pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
 pub fn esdt_system_sc_address() -> Address {
 	Address::from(ESDT_SYSTEM_SC_ADDRESS_ARRAY)
 }
+
+const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
+const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
+const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueSemiFungible";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -29,8 +33,8 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 	}
 
 	/// Produces a contract call to the ESDT system SC,
-	/// which causes it to issue a new ESDT token.
-	pub fn issue(
+	/// which causes it to issue a new fungible ESDT token.
+	pub fn issue_fungible(
 		&self,
 		issue_cost: BigUint,
 		token_display_name: &BoxedBytes,
@@ -44,47 +48,162 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		can_burn: bool,
 		can_change_owner: bool,
 		can_upgrade: bool,
+		can_add_special_roles: bool,
 	) -> ContractCall<BigUint> {
+		self.issue(
+			issue_cost,
+			EsdtTokenType::Fungible,
+			token_display_name,
+			token_ticker,
+			initial_supply,
+			num_decimals,
+			can_freeze,
+			can_wipe,
+			can_pause,
+			can_mint,
+			can_burn,
+			can_change_owner,
+			can_upgrade,
+			can_add_special_roles,
+		)
+	}
+
+	/// Produces a contract call to the ESDT system SC,
+	/// which causes it to issue a new non-fungible ESDT token.
+	pub fn issue_non_fungible(
+		&self,
+		issue_cost: BigUint,
+		token_display_name: &BoxedBytes,
+		token_ticker: &BoxedBytes,
+		can_freeze: bool,
+		can_wipe: bool,
+		can_pause: bool,
+		can_change_owner: bool,
+		can_upgrade: bool,
+		can_add_special_roles: bool,
+	) -> ContractCall<BigUint> {
+		self.issue(
+			issue_cost,
+			EsdtTokenType::NonFungible,
+			token_display_name,
+			token_ticker,
+			&BigUint::zero(),
+			0,
+			can_freeze,
+			can_wipe,
+			can_pause,
+			false,
+			false,
+			can_change_owner,
+			can_upgrade,
+			can_add_special_roles,
+		)
+	}
+
+	/// Produces a contract call to the ESDT system SC,
+	/// which causes it to issue a new semi-fungible ESDT token.
+	pub fn issue_semi_fungible(
+		&self,
+		issue_cost: BigUint,
+		token_display_name: &BoxedBytes,
+		token_ticker: &BoxedBytes,
+		can_freeze: bool,
+		can_wipe: bool,
+		can_pause: bool,
+		can_change_owner: bool,
+		can_upgrade: bool,
+		can_add_special_roles: bool,
+	) -> ContractCall<BigUint> {
+		self.issue(
+			issue_cost,
+			EsdtTokenType::SemiFungible,
+			token_display_name,
+			token_ticker,
+			&BigUint::zero(),
+			0,
+			can_freeze,
+			can_wipe,
+			can_pause,
+			false,
+			false,
+			can_change_owner,
+			can_upgrade,
+			can_add_special_roles,
+		)
+	}
+
+	/// Deduplicates code from all the possible issue functions
+	fn issue(
+		&self,
+		issue_cost: BigUint,
+		token_type: EsdtTokenType,
+		token_display_name: &BoxedBytes,
+		token_ticker: &BoxedBytes,
+		initial_supply: &BigUint,
+		num_decimals: usize,
+		can_freeze: bool,
+		can_wipe: bool,
+		can_pause: bool,
+		can_mint: bool,
+		can_burn: bool,
+		can_change_owner: bool,
+		can_upgrade: bool,
+		can_add_special_roles: bool,
+	) -> ContractCall<BigUint> {
+		let endpoint_name = match token_type {
+			EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
+			EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
+			EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
+			EsdtTokenType::Invalid => &[],
+		};
+
 		let mut contract_call = ContractCall::new(
 			esdt_system_sc_address(),
 			TokenIdentifier::egld(),
 			issue_cost,
-			BoxedBytes::from(&b"issue"[..]),
+			BoxedBytes::from(endpoint_name),
 		);
 
 		contract_call.push_argument_raw_bytes(token_display_name.as_slice());
 		contract_call.push_argument_raw_bytes(token_ticker.as_slice());
-		contract_call.push_argument_raw_bytes(&initial_supply.to_bytes_be());
-		contract_call.push_argument_raw_bytes(&num_decimals.to_be_bytes());
 
-		contract_call.push_argument_raw_bytes(&b"canFreeze"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_freeze));
+		if token_type == EsdtTokenType::Fungible {
+			contract_call.push_argument_raw_bytes(&initial_supply.to_bytes_be());
+			contract_call.push_argument_raw_bytes(&num_decimals.to_be_bytes());
+		}
 
-		contract_call.push_argument_raw_bytes(&b"canWipe"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_wipe));
-
-		contract_call.push_argument_raw_bytes(&b"canPause"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_pause));
-
-		contract_call.push_argument_raw_bytes(&b"canMint"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_mint));
-
-		contract_call.push_argument_raw_bytes(&b"canBurn"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_burn));
-
-		contract_call.push_argument_raw_bytes(&b"canChangeOwner"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_change_owner));
-
-		contract_call.push_argument_raw_bytes(&b"canUpgrade"[..]);
-		contract_call.push_argument_raw_bytes(bool_name_bytes(can_upgrade));
+		set_token_property(&mut contract_call, &b"canFreeze"[..], can_freeze);
+		set_token_property(&mut contract_call, &b"canWipe"[..], can_wipe);
+		set_token_property(&mut contract_call, &b"canPause"[..], can_pause);
+		set_token_property(&mut contract_call, &b"canMint"[..], can_mint);
+		set_token_property(&mut contract_call, &b"canBurn"[..], can_burn);
+		set_token_property(&mut contract_call, &b"canChangeOwner"[..], can_change_owner);
+		set_token_property(&mut contract_call, &b"canUpgrade"[..], can_upgrade);
+		set_token_property(
+			&mut contract_call,
+			&b"canAddSpecialRoles"[..],
+			can_add_special_roles,
+		);
 
 		contract_call
 	}
 
 	/// Produces a contract call to the ESDT system SC,
-	/// which causes it to issue a new ESDT token.
+	/// which causes it to mint more fungible ESDT tokens.
+	/// It will fail if the SC is not the owner of the token.
 	pub fn mint(&self, token_identifier: &[u8], amount: &BigUint) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"mint");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(&amount.to_bytes_be());
+
+		contract_call
+	}
+
+	/// Produces a contract call to the ESDT system SC,
+	/// which causes it to burn fungible ESDT tokens owned by the SC.
+	pub fn burn(&self, token_identifier: &[u8], amount: &BigUint) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"ESDTBurn");
 
 		contract_call.push_argument_raw_bytes(token_identifier);
 		contract_call.push_argument_raw_bytes(&amount.to_bytes_be());
@@ -102,8 +221,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		contract_call
 	}
 
-	/// The manager of an ESDT token may choose to suspend all transactions of the token,
-	/// except minting, freezing/unfreezing and wiping.
+	/// The reverse operation of `pause`.
 	pub fn unpause(&self, token_identifier: &[u8]) -> ContractCall<BigUint> {
 		let mut contract_call = esdt_system_sc_call_no_args(b"unPause");
 
@@ -146,6 +264,80 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 		contract_call
 	}
+
+	/// This function can be called only if canSetSpecialRoles was set to true.
+	/// The metachain system SC will evaluate the arguments and call “ESDTSetRole@tokenId@listOfRoles” for the given address.
+	/// This will be actually a cross shard call.
+	/// This function as almost all in case of ESDT can be called only by the owner.
+	pub fn set_special_roles(
+		&self,
+		address: &Address,
+		token_identifier: &[u8],
+		roles: &[EsdtLocalRole],
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"setSpecialRole");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(address.as_bytes());
+		for role in roles {
+			if role != &EsdtLocalRole::None {
+				contract_call.push_argument_raw_bytes(role.as_role_name());
+			}
+		}
+
+		contract_call
+	}
+
+	/// This function can be called only if canSetSpecialRoles was set to true.
+	/// The metachain system SC will evaluate the arguments and call “ESDTUnsetRole@tokenId@listOfRoles” for the given address.
+	/// This will be actually a cross shard call.
+	/// This function as almost all in case of ESDT can be called only by the owner.
+	pub fn unset_special_roles(
+		&self,
+		address: &Address,
+		token_identifier: &[u8],
+		roles: &[EsdtLocalRole],
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"unSetSpecialRole");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(address.as_bytes());
+		for role in roles {
+			if role != &EsdtLocalRole::None {
+				contract_call.push_argument_raw_bytes(role.as_role_name());
+			}
+		}
+
+		contract_call
+	}
+
+	pub fn transfer_ownership(
+		&self,
+		token_identifier: &[u8],
+		new_owner: &Address,
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"transferOwnership");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(new_owner.as_bytes());
+
+		contract_call
+	}
+
+	pub fn transfer_nft_create_role(
+		&self,
+		token_identifier: &[u8],
+		old_creator: &Address,
+		new_creator: &Address,
+	) -> ContractCall<BigUint> {
+		let mut contract_call = esdt_system_sc_call_no_args(b"transferNFTCreateRole");
+
+		contract_call.push_argument_raw_bytes(token_identifier);
+		contract_call.push_argument_raw_bytes(old_creator.as_bytes());
+		contract_call.push_argument_raw_bytes(new_creator.as_bytes());
+
+		contract_call
+	}
 }
 
 fn esdt_system_sc_call_no_args<BigUint: BigUintApi>(endpoint_name: &[u8]) -> ContractCall<BigUint> {
@@ -166,4 +358,13 @@ fn bool_name_bytes(b: bool) -> &'static [u8] {
 	} else {
 		FALSE_BYTES
 	}
+}
+
+fn set_token_property<BigUint: BigUintApi>(
+	contract_call: &mut ContractCall<BigUint>,
+	name: &[u8],
+	value: bool,
+) {
+	contract_call.push_argument_raw_bytes(name);
+	contract_call.push_argument_raw_bytes(bool_name_bytes(value));
 }

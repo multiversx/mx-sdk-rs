@@ -1,0 +1,80 @@
+{
+    "comment": "initially, the gas is not enough to even perform a single pong",
+    "gasSchedule": "v2",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "ping-pong-call-ping-second-user.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "123,781"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "pong-all-interrupted-0/2",
+            "comment": "initially, the gas is only enough to perform 0 of 2 pongs",
+            "tx": {
+                "from": "address:participant1",
+                "to": "address:the_ping_pong_contract",
+                "value": "0",
+                "function": "pongAll",
+                "arguments": [],
+                "gasLimit": "7,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "str:interrupted" ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:participant1": {
+                    "nonce": "2",
+                    "balance": "1,300,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "1",
+                    "balance": "2,000,000,000,000",
+                    "storage": {}
+                },
+                "address:the_ping_pong_contract": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "storage": {
+                        "''ping_amount": "500,000,000,000",
+                        "''activation_timestamp": "780",
+                        "''deadline": "123,780",
+                        "''user_address_to_id|address:participant1": "1",
+                        "''user_id_to_address|0x0000001": "address:participant1",
+                        "''user_status|0x0000001": "1",
+                        "''user_address_to_id|address:participant2": "2",
+                        "''user_id_to_address|0x0000002": "address:participant2",
+                        "''user_status|0x0000002": "1",
+                        "''user_count": "2",
+                        "''pong_all_last_user": "0"
+                    },
+                    "code": "file:../output/ping-pong-egld.wasm"
+                }
+            }
+        },
+        {
+            "step": "externalSteps",
+            "comment": "regular pong all with enough gas should continue with no problem",
+            "path": "ping-pong-call-pong-all.steps.json"
+        }
+    ]
+}
