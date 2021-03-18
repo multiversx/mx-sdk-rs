@@ -13,12 +13,15 @@ use std::fmt::Write;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
+pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
+pub type AccountEsdt = HashMap<Vec<u8>, BigUint>;
+
 pub struct AccountData {
 	pub address: Address,
 	pub nonce: u64,
 	pub balance: BigUint,
-	pub storage: HashMap<Vec<u8>, Vec<u8>>,
-	pub esdt: HashMap<Vec<u8>, BigUint>,
+	pub storage: AccountStorage,
+	pub esdt: AccountEsdt,
 	pub contract_path: Option<Vec<u8>>,
 	pub contract_owner: Option<Address>,
 }
