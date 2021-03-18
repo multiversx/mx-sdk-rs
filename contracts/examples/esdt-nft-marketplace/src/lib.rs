@@ -146,12 +146,13 @@ pub trait EsdtNftMarketplace {
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
+			let data = self.data_or_empty_if_sc(&auction.current_winner, b"bid refund");
 			self.send().direct_esdt_nft_via_transfer_exec(
 				&auction.current_winner,
 				&auction.payment_token.token_type.as_esdt_identifier(),
 				auction.payment_token.nonce,
 				&auction.current_bid,
-				b"bid refund",
+				data,
 			);
 		}
 
@@ -206,12 +207,13 @@ pub trait EsdtNftMarketplace {
 
 			if bid_cut_amount > BigUint::zero() {
 				// send part as cut for contract owner
+				let owner = self.get_owner_address();
 				self.send().direct_esdt_nft_via_transfer_exec(
-					&self.get_owner_address(),
+					&owner,
 					token,
 					nonce,
 					&bid_cut_amount,
-					b"bid cut for sold token",
+					self.data_or_empty_if_sc(&owner, b"bid cut for sold token"),
 				);
 			}
 
@@ -221,7 +223,7 @@ pub trait EsdtNftMarketplace {
 				token,
 				nonce,
 				&creator_royalties,
-				b"royalties for sold token",
+				self.data_or_empty_if_sc(&nft_info.creator, b"royalties for sold token"),
 			);
 
 			// send rest of the bid to original owner
@@ -230,7 +232,7 @@ pub trait EsdtNftMarketplace {
 				token,
 				nonce,
 				&seller_amount_to_send,
-				b"sold token",
+				self.data_or_empty_if_sc(&auction.original_owner, b"sold token"),
 			);
 
 			// send NFT to auction winner
@@ -239,7 +241,7 @@ pub trait EsdtNftMarketplace {
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
 				&BigUint::from(NFT_AMOUNT),
-				b"bought token at auction",
+				self.data_or_empty_if_sc(&auction.current_winner, b"bought token at auction"),
 			);
 		} else {
 			// return to original owner
@@ -248,7 +250,7 @@ pub trait EsdtNftMarketplace {
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
 				&BigUint::from(NFT_AMOUNT),
-				b"returned token",
+				self.data_or_empty_if_sc(&auction.original_owner, b"returned token"),
 			);
 		}
 
@@ -363,6 +365,14 @@ pub trait EsdtNftMarketplace {
 
 	fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: &BigUint) -> BigUint {
 		total_amount * cut_percentage / BigUint::from(PERCENTAGE_TOTAL)
+	}
+
+	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
+		if self.is_smart_contract(dest) {
+			&[]
+		} else {
+			data
+		}
 	}
 
 	// storage
