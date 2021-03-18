@@ -154,6 +154,11 @@ fn panic() {
 }
 
 #[test]
+fn return_codes() {
+	parse_execute_mandos("mandos/return_codes.scen.json", &contract_map());
+}
+
+#[test]
 fn sc_result() {
 	parse_execute_mandos("mandos/sc_result.scen.json", &contract_map());
 }
