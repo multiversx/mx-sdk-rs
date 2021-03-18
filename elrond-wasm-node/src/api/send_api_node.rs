@@ -48,7 +48,7 @@ extern "C" {
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
-	);
+	) -> i32;
 
 	fn asyncCall(
 		dstOffset: *const u8,
