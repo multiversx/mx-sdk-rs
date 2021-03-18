@@ -1,12 +1,9 @@
 #![no_std]
 #![allow(unused_attributes)]
-
-use elrond_wasm::HexCallDataSerializer;
+#![allow(non_snake_case)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
-
-const TRANSFER_TOKEN_ENDPOINT_NAME: &[u8] = b"safeTransferFrom";
 
 const PERCENTAGE_TOTAL: u8 = 100;
 
@@ -27,6 +24,18 @@ pub struct AuctionArgument<BigUint: BigUintApi> {
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
 	pub deadline: u64,
+}
+
+#[elrond_wasm_derive::callable(Erc1155OwnershipContractProxy)]
+pub trait Erc1155OwnershipContract {
+	fn safeTransferFrom(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		value: BigUint,
+		data: &[u8],
+	) -> ContractCall<BigUint>;
 }
 
 #[elrond_wasm_derive::contract(Erc1155MarketplaceImpl)]
@@ -215,7 +224,7 @@ pub trait Erc1155Marketplace {
 	}
 
 	#[endpoint(endAuction)]
-	fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<()> {
+	fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall<BigUint>> {
 		require!(
 			self.is_up_for_auction(&type_id, &nft_id),
 			"Token is not up for auction"
@@ -246,13 +255,11 @@ pub trait Erc1155Marketplace {
 			);
 
 			// send token to winner
-			self.async_transfer_token(&type_id, &nft_id, &auction.current_winner);
+			Ok(self.async_transfer_token(type_id, nft_id, auction.current_winner))
 		} else {
 			// return to original owner
-			self.async_transfer_token(&type_id, &nft_id, &auction.original_owner);
+			Ok(self.async_transfer_token(type_id, nft_id, auction.original_owner))
 		}
-
-		Ok(())
 	}
 
 	// views
@@ -333,23 +340,22 @@ pub trait Erc1155Marketplace {
 		Ok(())
 	}
 
-	// TODO: Replace with Proxy in the next framework version
-	fn async_transfer_token(&self, type_id: &BigUint, nft_id: &BigUint, to: &Address) {
+	fn async_transfer_token(
+		&self,
+		type_id: BigUint,
+		nft_id: BigUint,
+		to: Address,
+	) -> AsyncCall<BigUint> {
 		let sc_own_address = self.get_sc_address();
 		let token_ownership_contract_address = self.token_ownership_contract_address().get();
-		let mut serializer = HexCallDataSerializer::new(TRANSFER_TOKEN_ENDPOINT_NAME);
 
-		serializer.push_argument_bytes(sc_own_address.as_bytes()); // from
-		serializer.push_argument_bytes(to.as_bytes()); // to
-		serializer.push_argument_bytes(type_id.to_bytes_be().as_slice()); // type_id
-		serializer.push_argument_bytes(nft_id.to_bytes_be().as_slice()); // value
-		serializer.push_argument_bytes(&[]); // data
-
-		self.send().async_call_raw(
-			&token_ownership_contract_address,
-			&BigUint::zero(),
-			serializer.as_slice(),
-		);
+		contract_call!(
+			self,
+			token_ownership_contract_address,
+			Erc1155OwnershipContractProxy
+		)
+		.safeTransferFrom(sc_own_address, to, type_id, nft_id, &[])
+		.async_call()
 	}
 
 	fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {
