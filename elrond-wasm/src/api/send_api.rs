@@ -206,7 +206,7 @@ where
 		token: &[u8],
 		amount: &BigUint,
 		name: &BoxedBytes,
-		royalties: u32,
+		royalties: &BigUint,
 		hash: &H256,
 		attributes: &T,
 		uris: &[BoxedBytes],
@@ -215,7 +215,7 @@ where
 		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 		arg_buffer.push_argument_bytes(name.as_slice());
-		arg_buffer.push_argument_bytes(&royalties.to_be_bytes()[..]);
+		arg_buffer.push_argument_bytes(&royalties.to_bytes_be().as_slice());
 		arg_buffer.push_argument_bytes(hash.as_bytes());
 
 		let mut top_encoded_attributes = Vec::new();
