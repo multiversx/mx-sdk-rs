@@ -9,7 +9,7 @@ TOKEN_DISPLAY_NAME=0x46756e6769626c65546f6b656e # "FungibleToken"
 TOKEN_TICKER=0x46554e47544f4b # "FUNGTOK"
 
 # Manually update after issue
-TOKEN_IDENTIFIER=0x46554e47544f4b2d623639646635
+TOKEN_IDENTIFIER=0x46554e47544f4b2d646361623636
 
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=100000000 --send --outfile="deploy-testnet.interaction.json" --proxy=${PROXY} --chain=${CHAIN_ID} || return
@@ -35,11 +35,11 @@ issueFungibleToken() {
 }
 
 localMint() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=60000000 --function="localMint" --arguments ${TOKEN_IDENTIFIER} 0x64 --send --proxy=${PROXY} --chain=${CHAIN_ID}
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=2500000 --function="localMint" --arguments ${TOKEN_IDENTIFIER} 0x64 --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 localBurn() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=60000000 --function="localBurn" --arguments ${TOKEN_IDENTIFIER} 0x64 --send --proxy=${PROXY} --chain=${CHAIN_ID}
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=2500000 --function="localBurn" --arguments ${TOKEN_IDENTIFIER} 0x64 --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 # 0x01 = localmint roles, 0x02 = localburn role
