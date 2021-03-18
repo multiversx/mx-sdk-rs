@@ -34,8 +34,9 @@ pub trait Erc1155Marketplace {
 	/// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
 	#[init]
 	fn init(&self, token_ownership_contract_address: Address, bid_cut_percentage: u8) {
-		self.set_token_ownership_contract_address(&token_ownership_contract_address);
-		self.set_percentage_cut(bid_cut_percentage);
+		self.token_ownership_contract_address()
+			.set(&token_ownership_contract_address);
+		self.percentage_cut().set(&bid_cut_percentage);
 	}
 
 	// endpoints - Token ownership contract only
@@ -51,7 +52,7 @@ pub trait Erc1155Marketplace {
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.get_token_ownership_contract_address(),
+			self.get_caller() == self.token_ownership_contract_address().get(),
 			"Only the token ownership contract may call this function"
 		);
 
@@ -80,7 +81,7 @@ pub trait Erc1155Marketplace {
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.get_token_ownership_contract_address(),
+			self.get_caller() == self.token_ownership_contract_address().get(),
 			"Only the token ownership contract may call this function"
 		);
 		require!(
@@ -131,7 +132,7 @@ pub trait Erc1155Marketplace {
 			"Invalid percentage value, should be between 0 and 100"
 		);
 
-		self.set_percentage_cut(new_cut_percentage);
+		self.percentage_cut().set(&new_cut_percentage);
 
 		Ok(())
 	}
@@ -140,9 +141,12 @@ pub trait Erc1155Marketplace {
 	fn set_token_ownership_contract_address_endpoint(&self, new_address: Address) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 		require!(!new_address.is_zero(), "Cannot set to zero address");
-		// TODO: Also check the address with IsSmartContractAddress() once it's added to the API
+		require!(
+			self.is_smart_contract(&new_address),
+			"The provided address is not a smart contract"
+		);
 
-		self.set_token_ownership_contract_address(&new_address);
+		self.token_ownership_contract_address().set(&new_address);
 
 		Ok(())
 	}
@@ -164,7 +168,7 @@ pub trait Erc1155Marketplace {
 		);
 
 		let caller = self.get_caller();
-		let mut auction = self.get_auction_for_token(&type_id, &nft_id);
+		let mut auction = self.auction_for_token(&type_id, &nft_id).get();
 
 		require!(
 			auction.original_owner != caller,
@@ -205,7 +209,7 @@ pub trait Erc1155Marketplace {
 		// update auction bid and winner
 		auction.current_bid = payment;
 		auction.current_winner = caller;
-		self.set_auction_for_token(&type_id, &nft_id, &auction);
+		self.auction_for_token(&type_id, &nft_id).set(&auction);
 
 		Ok(())
 	}
@@ -217,17 +221,17 @@ pub trait Erc1155Marketplace {
 			"Token is not up for auction"
 		);
 
-		let auction = self.get_auction_for_token(&type_id, &nft_id);
+		let auction = self.auction_for_token(&type_id, &nft_id).get();
 
 		require!(
 			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
-		self.clear_auction_for_token(&type_id, &nft_id);
+		self.auction_for_token(&type_id, &nft_id).clear();
 
 		if auction.current_winner != Address::zero() {
-			let percentage_cut = self.get_percentage_cut();
+			let percentage_cut = self.percentage_cut().get();
 			let cut_amount = self.calculate_cut_amount(&auction.current_bid, percentage_cut);
 			let amount_to_send = &auction.current_bid - &cut_amount;
 
@@ -242,10 +246,10 @@ pub trait Erc1155Marketplace {
 			);
 
 			// send token to winner
-			self.asnyc_transfer_token(&type_id, &nft_id, &auction.current_winner);
+			self.async_transfer_token(&type_id, &nft_id, &auction.current_winner);
 		} else {
 			// return to original owner
-			self.asnyc_transfer_token(&type_id, &nft_id, &auction.original_owner);
+			self.async_transfer_token(&type_id, &nft_id, &auction.original_owner);
 		}
 
 		Ok(())
@@ -255,7 +259,7 @@ pub trait Erc1155Marketplace {
 
 	#[view(isUpForAuction)]
 	fn is_up_for_auction(&self, type_id: &BigUint, nft_id: &BigUint) -> bool {
-		!self.is_empty_auction_for_token(type_id, nft_id)
+		!self.auction_for_token(type_id, nft_id).is_empty()
 	}
 
 	#[view(getAuctionStatus)]
@@ -265,7 +269,7 @@ pub trait Erc1155Marketplace {
 			"Token is not up for auction"
 		);
 
-		Ok(self.get_auction_for_token(&type_id, &nft_id))
+		Ok(self.auction_for_token(&type_id, &nft_id).get())
 	}
 
 	#[view(getCurrentWinningBid)]
@@ -275,7 +279,7 @@ pub trait Erc1155Marketplace {
 			"Token is not up for auction"
 		);
 
-		Ok(self.get_auction_for_token(&type_id, &nft_id).current_bid)
+		Ok(self.auction_for_token(&type_id, &nft_id).get().current_bid)
 	}
 
 	#[view(getCurrentWinner)]
@@ -285,7 +289,10 @@ pub trait Erc1155Marketplace {
 			"Token is not up for auction"
 		);
 
-		Ok(self.get_auction_for_token(&type_id, &nft_id).current_winner)
+		Ok(self
+			.auction_for_token(&type_id, &nft_id)
+			.get()
+			.current_winner)
 	}
 
 	// private
@@ -313,27 +320,23 @@ pub trait Erc1155Marketplace {
 			"Deadline can't be in the past"
 		);
 
-		self.set_auction_for_token(
-			&type_id,
-			&nft_id,
-			&Auction {
-				token_identifier: token.clone(),
-				min_bid: min_bid.clone(),
-				max_bid: max_bid.clone(),
-				deadline,
-				original_owner: original_owner.clone(),
-				current_bid: BigUint::zero(),
-				current_winner: Address::zero(),
-			},
-		);
+		self.auction_for_token(&type_id, &nft_id).set(&Auction {
+			token_identifier: token.clone(),
+			min_bid: min_bid.clone(),
+			max_bid: max_bid.clone(),
+			deadline,
+			original_owner: original_owner.clone(),
+			current_bid: BigUint::zero(),
+			current_winner: Address::zero(),
+		});
 
 		Ok(())
 	}
 
 	// TODO: Replace with Proxy in the next framework version
-	fn asnyc_transfer_token(&self, type_id: &BigUint, nft_id: &BigUint, to: &Address) {
+	fn async_transfer_token(&self, type_id: &BigUint, nft_id: &BigUint, to: &Address) {
 		let sc_own_address = self.get_sc_address();
-		let token_ownership_contract_address = self.get_token_ownership_contract_address();
+		let token_ownership_contract_address = self.token_ownership_contract_address().get();
 		let mut serializer = HexCallDataSerializer::new(TRANSFER_TOKEN_ENDPOINT_NAME);
 
 		serializer.push_argument_bytes(sc_own_address.as_bytes()); // from
@@ -371,20 +374,14 @@ pub trait Erc1155Marketplace {
 
 	// token ownership contract, i.e. the erc1155 SC
 
-	#[storage_get("tokenOwnershipContractAddress")]
-	fn get_token_ownership_contract_address(&self) -> Address;
-
-	#[storage_set("tokenOwnershipContractAddress")]
-	fn set_token_ownership_contract_address(&self, token_ownership_contract_address: &Address);
+	#[storage_mapper("tokenOwnershipContractAddress")]
+	fn token_ownership_contract_address(&self) -> SingleValueMapper<Self::Storage, Address>;
 
 	// percentage taken from winning bids
 
 	#[view(getPercentageCut)]
-	#[storage_get("percentageCut")]
-	fn get_percentage_cut(&self) -> u8;
-
-	#[storage_set("percentageCut")]
-	fn set_percentage_cut(&self, bid_cut_percentage: u8);
+	#[storage_mapper("percentageCut")]
+	fn percentage_cut(&self) -> SingleValueMapper<Self::Storage, u8>;
 
 	// claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
@@ -393,20 +390,10 @@ pub trait Erc1155Marketplace {
 
 	// auction properties for each token
 
-	#[storage_get("auctionForToken")]
-	fn get_auction_for_token(&self, type_id: &BigUint, nft_id: &BigUint) -> Auction<BigUint>;
-
-	#[storage_set("auctionForToken")]
-	fn set_auction_for_token(
+	#[storage_mapper("auctionForToken")]
+	fn auction_for_token(
 		&self,
 		type_id: &BigUint,
 		nft_id: &BigUint,
-		auction: &Auction<BigUint>,
-	);
-
-	#[storage_is_empty("auctionForToken")]
-	fn is_empty_auction_for_token(&self, type_id: &BigUint, nft_id: &BigUint) -> bool;
-
-	#[storage_clear("auctionForToken")]
-	fn clear_auction_for_token(&self, type_id: &BigUint, nft_id: &BigUint);
+	) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
 }
