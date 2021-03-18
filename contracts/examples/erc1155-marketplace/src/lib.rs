@@ -122,10 +122,12 @@ pub trait Erc1155Marketplace {
 		only_owner!(self, "Only owner may call this function!");
 
 		let caller = self.get_caller();
+		let data = self.data_or_empty_if_sc(&caller, b"claim");
+
 		let claimable_funds_mapper = self.get_claimable_funds_mapper();
 		for (token_identifier, amount) in claimable_funds_mapper.iter() {
 			self.send()
-				.direct(&caller, &token_identifier, &amount, b"claim");
+				.direct(&caller, &token_identifier, &amount, data);
 
 			self.clear_claimable_funds(&token_identifier);
 		}
@@ -207,11 +209,12 @@ pub trait Erc1155Marketplace {
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
+			let data = self.data_or_empty_if_sc(&caller, b"bid refund");
 			self.send().direct(
 				&auction.current_winner,
 				&auction.token_identifier,
 				&auction.current_bid,
-				b"bit refund",
+				data,
 			);
 		}
 
@@ -247,11 +250,12 @@ pub trait Erc1155Marketplace {
 			self.add_claimable_funds(&auction.token_identifier, &cut_amount);
 
 			// send part of the bid to the original owner
+			let data = self.data_or_empty_if_sc(&auction.original_owner, b"sold token");
 			self.send().direct(
 				&auction.original_owner,
 				&auction.token_identifier,
 				&amount_to_send,
-				b"sold token",
+				data,
 			);
 
 			// send token to winner
@@ -374,6 +378,14 @@ pub trait Erc1155Marketplace {
 	fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
 		let mut mapper = self.get_claimable_funds_mapper();
 		mapper.insert(token_identifier.clone(), BigUint::zero());
+	}
+
+	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
+		if self.is_smart_contract(dest) {
+			&[]
+		} else {
+			data
+		}
 	}
 
 	// storage
