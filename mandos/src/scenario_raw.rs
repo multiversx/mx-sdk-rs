@@ -2,6 +2,8 @@ use super::*;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+/// Mapped 1-on-1 with the JSON. No complex logic here, just a basic interface with the JSON.
+/// The conversion to `Scenario` adds all additional functionality.
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScenarioRaw {
@@ -236,23 +238,23 @@ pub struct TxValidatorRewardRaw {
 #[serde(rename_all = "camelCase")]
 pub struct TxExpectRaw {
 	#[serde(default)]
-	pub out: Vec<ValueSubTree>,
+	pub out: Vec<CheckBytesValueRaw>,
 
-	pub status: ValueSubTree,
+	pub status: CheckBytesValueRaw,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "CheckLogsRaw::is_default")]
 	pub logs: CheckLogsRaw,
 
 	#[serde(default)]
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub message: Option<ValueSubTree>,
+	#[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+	pub message: CheckBytesValueRaw,
 
 	#[serde(default)]
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub gas: Option<ValueSubTree>,
+	#[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+	pub gas: CheckBytesValueRaw,
 
 	#[serde(default)]
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub refund: Option<ValueSubTree>,
+	#[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+	pub refund: CheckBytesValueRaw,
 }

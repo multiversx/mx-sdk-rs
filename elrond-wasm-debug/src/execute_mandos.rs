@@ -374,16 +374,13 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 		have_str,
 	);
 
-	if let Some(expected_message) = &tx_expect.message {
-		let want_str = std::str::from_utf8(expected_message.value.as_slice()).unwrap();
-		assert!(
-			want_str == have_str,
-			"result message mismatch. Tx id: {}. Want: {}. Have: {}.",
-			tx_id,
-			want_str,
-			have_str
-		);
-	}
+	assert!(
+		tx_expect.message.check(&tx_result.result_message),
+		"result message mismatch. Tx id: {}. Want: {}. Have: {}.",
+		tx_id,
+		&tx_expect.message,
+		have_str,
+	);
 
 	match &tx_expect.logs {
 		CheckLogs::Star => {},
@@ -469,7 +466,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 			}
 
 			match &expected_account.esdt {
-				Some(CheckEsdt::Equal(eq)) => {
+				CheckEsdt::Equal(eq) => {
 					let default_value = &BigUint::from(0u32);
 					for (expected_key, expected_value) in eq.iter() {
 						let actual_value = account
@@ -502,29 +499,12 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 						);
 					}
 				},
-
-				Some(CheckEsdt::Star) => {
+				CheckEsdt::Star => {
 					// nothing to be done for *
-				},
-
-				// we still have to check that the actual storage is empty
-				None => {
-					let default_check_value = CheckValue::Equal(BigUintValue::default());
-
-					for (actual_key, actual_value) in account.esdt.iter() {
-						assert!(
-							default_check_value.check(actual_value),
-							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
-							expected_address,
-							verbose_hex(actual_key),
-							default_check_value,
-							actual_value
-						);
-					}
 				},
 			}
 
-			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
+			if let CheckEsdt::Equal(eq) = &expected_account.esdt {
 				let default_value = &BigUint::from(0u32);
 				for (expected_key, expected_value) in eq.iter() {
 					let actual_value = account
