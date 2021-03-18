@@ -175,8 +175,12 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		set_token_property(&mut contract_call, &b"canFreeze"[..], can_freeze);
 		set_token_property(&mut contract_call, &b"canWipe"[..], can_wipe);
 		set_token_property(&mut contract_call, &b"canPause"[..], can_pause);
-		set_token_property(&mut contract_call, &b"canMint"[..], can_mint);
-		set_token_property(&mut contract_call, &b"canBurn"[..], can_burn);
+
+		if token_type == EsdtTokenType::Fungible {
+			set_token_property(&mut contract_call, &b"canMint"[..], can_mint);
+			set_token_property(&mut contract_call, &b"canBurn"[..], can_burn);
+		}
+
 		set_token_property(&mut contract_call, &b"canChangeOwner"[..], can_change_owner);
 		set_token_property(&mut contract_call, &b"canUpgrade"[..], can_upgrade);
 		set_token_property(
