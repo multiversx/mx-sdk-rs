@@ -46,6 +46,8 @@ pub trait Deposit {
 
     #[endpoint]
     fn withdraw(&self, address: Address) -> SCResult<()> {
+        require!(!self.deposit(&address).is_empty(), "non-existent key");
+
         let deposit = self.deposit(&address).get();
 
         require!(
@@ -66,6 +68,8 @@ pub trait Deposit {
 
     #[endpoint]
     fn claim(&self, address: Address, signature: &[u8]) -> SCResult<()> {
+        require!(!self.deposit(&address).is_empty(), "non-existent key");
+
         let deposit = self.deposit(&address).get();
         let caller_address: Address = self.get_caller();
 
@@ -91,6 +95,8 @@ pub trait Deposit {
 
     #[view(amount)]
     fn get_amount(&self, address: Address) -> SCResult<BigUint> {
+        require!(!self.deposit(&address).is_empty(), "non-existent key");
+        
         let data = self.deposit(&address).get();
 
         Ok(data.amount)
