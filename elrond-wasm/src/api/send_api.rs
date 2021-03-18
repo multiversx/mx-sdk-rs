@@ -148,7 +148,7 @@ where
 		value: &BigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	);
+	) -> Vec<BoxedBytes>;
 
 	fn execute_on_dest_context_by_caller(
 		&self,
@@ -157,7 +157,7 @@ where
 		value: &BigUint,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	);
+	) -> Vec<BoxedBytes>;
 
 	fn execute_on_same_context(
 		&self,
@@ -215,14 +215,14 @@ where
 		arg_buffer.push_argument_bytes(token);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 		arg_buffer.push_argument_bytes(name.as_slice());
-		arg_buffer.push_argument_bytes(&royalties.to_bytes_be().as_slice());
+		arg_buffer.push_argument_bytes(royalties.to_bytes_be().as_slice());
 		arg_buffer.push_argument_bytes(hash.as_bytes());
 
 		let mut top_encoded_attributes = Vec::new();
 		let _ = attributes.top_encode(&mut top_encoded_attributes);
 		arg_buffer.push_argument_bytes(top_encoded_attributes.as_slice());
 
-		// The API function has the last argument as variadic, 
+		// The API function has the last argument as variadic,
 		// so we top-encode each and send as separate argument
 		for uri in uris {
 			let mut top_encoded_uri = Vec::new();
@@ -230,7 +230,7 @@ where
 
 			arg_buffer.push_argument_bytes(top_encoded_uri.as_slice());
 		}
-		
+
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTCreate", &arg_buffer);
 	}
 
