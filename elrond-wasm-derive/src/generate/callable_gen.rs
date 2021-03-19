@@ -75,7 +75,7 @@ pub fn generate_method_impl(callable_trait: &CallableTrait) -> Vec<proc_macro2::
 			let m_name_literal = ident_str_literal(&m.name);
 			let sig = quote! {
 				#msig {
-					let mut ___contract_call___ = elrond_wasm::types::ContractCall::<BigUint>::new(
+					let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 						self.address,
 						#token_expr,
 						#payment_expr,

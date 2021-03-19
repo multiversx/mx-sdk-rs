@@ -1,5 +1,5 @@
 [package]
-name = "forwarder-same-shard-raw-wasm"
+name = "panic-message-features-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -15,14 +15,15 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.forwarder-same-shard-raw]
+[dependencies.panic-message-features]
 path = ".."
-features=["wasm-output-mode"]
+features = ["wasm-output-mode"]
+default-features = false
 
 [dependencies.elrond-wasm-output]
 version = "0.13.0"
-path = "../../../../../elrond-wasm-output"
-features=["wasm-output-mode"]
+path = "../../../../elrond-wasm-output"
+features = ["wasm-output-mode", "panic-message"] # <- to get panic messages
 
 [workspace]
 members = ["."]
