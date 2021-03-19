@@ -55,6 +55,15 @@ where
 	T: ContractCallArg,
 {
 	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+		(&self).push_async_arg(serializer)
+	}
+}
+
+impl<T> ContractCallArg for &VarArgs<T>
+where
+	T: ContractCallArg,
+{
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
 		for elem in self.0.iter() {
 			elem.push_async_arg(serializer)?;
 		}
