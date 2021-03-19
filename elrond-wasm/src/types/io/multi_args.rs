@@ -8,13 +8,15 @@ macro_rules! multi_arg_impls {
         $(
             pub struct $mr<$($name,)+>(pub ($($name,)+));
 
-            impl<I, D, $($name),+ > DynArg<I, D> for $mr<$($name,)+>
+            impl<$($name),+ > DynArg for $mr<$($name,)+>
             where
-                I: TopDecodeInput,
-                D: DynArgInput<I>,
-                $($name: DynArg<I, D>,)+
+                $($name: DynArg,)+
             {
-                fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+                fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+                where
+                    I: TopDecodeInput,
+                    D: DynArgInput<I>,
+                {
                     $mr((
                         $(
                             $name::dyn_load(loader, arg_id)

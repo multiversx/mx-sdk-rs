@@ -1,5 +1,5 @@
-use payable_features::*;
 use elrond_wasm_debug::*;
+use payable_features::*;
 
 fn main() {
 	let contract = PayableFeaturesImpl::new(TxContext::dummy());
