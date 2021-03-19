@@ -1,4 +1,4 @@
-use super::{StorageMapper, StorageClearable};
+use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
@@ -54,15 +54,7 @@ where
 	T: TopEncode + TopDecode,
 {
 	fn clear(&mut self) {
-		for i in 1..=self.count {
-			storage_set(
-				self.api.clone(),
-				self.get_key(i).as_slice(),
-				&BoxedBytes::empty(),
-			);
-		}
-		self.count = 0;
-		self.save_count();
+		self.clear();
 	}
 }
 
@@ -80,11 +72,7 @@ where
 	}
 
 	fn save_count(&self, new_len: usize) {
-		storage_set(
-			self.api.clone(),
-			self.len_key().as_slice(),
-			&new_len,
-		);
+		storage_set(self.api.clone(), self.len_key().as_slice(), &new_len);
 	}
 
 	/// Number of items managed by the mapper.
