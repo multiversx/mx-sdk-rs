@@ -35,7 +35,7 @@ pub trait Erc1155OwnershipContract {
 		type_id: BigUint,
 		value: BigUint,
 		data: &[u8],
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(Erc1155MarketplaceImpl)]
