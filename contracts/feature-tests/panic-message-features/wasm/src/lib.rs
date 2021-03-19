@@ -1,5 +1,5 @@
 
 #![no_std]
 
-pub use forwarder_same_shard_raw::*;
+pub use panic_message_features::*;
 pub use elrond_wasm_output::*;

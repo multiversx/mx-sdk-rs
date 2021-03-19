@@ -34,7 +34,7 @@ impl From<String> for SCError {
 	#[inline]
 	fn from(s: String) -> Self {
 		// data copy is avoided:
-		// - String -> Vec<u8> via String::into_bytes is just a move 
+		// - String -> Vec<u8> via String::into_bytes is just a move
 		// - Vec<u8> -> Box<[u8]> -> BoxedBytes is also just a move
 		SCError(BoxedBytes::from(s.into_bytes()))
 	}
