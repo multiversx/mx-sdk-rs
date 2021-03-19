@@ -73,8 +73,9 @@ fn create_one_fungible_one_non_fungible_test() {
 	);
 }
 
-// transfer tests -  to account
+/* is_smart_contract not yet implemented - uncomment later
 
+// transfer tests -  to account
 #[test]
 fn transfer_fungible_ok_test() {
 	parse_execute_mandos("mandos/transfer_fungible_ok.scen.json", &contract_map());
@@ -142,6 +143,8 @@ fn batch_transfer_non_fungible_to_sc_test() {
 fn batch_transfer_both_types_to_sc_test() {
 	parse_execute_mandos("mandos/batch_transfer_both_types_to_sc.scen.json", &contract_map());
 }
+*/
+
 */
 // mint tests
 
