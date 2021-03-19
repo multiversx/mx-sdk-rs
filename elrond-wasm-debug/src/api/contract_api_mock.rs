@@ -43,6 +43,16 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 
 	fn is_smart_contract(&self, _address: &Address) -> bool {
 		panic!("is_smart_contract not implemented")
+
+		/*
+		Mock used when testing the marketplace contract
+
+		let mut addr_slice = [0u8; 32];
+		hex::decode_to_slice(b"6d61726b6574706c6163655f636f6e74726163745f5f5f5f5f5f5f5f5f5f5f5f", 
+			&mut addr_slice);
+
+		_address == &Address::from_slice(&addr_slice)
+		*/
 	}
 
 	fn get_caller(&self) -> Address {
