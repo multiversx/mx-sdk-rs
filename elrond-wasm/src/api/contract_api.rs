@@ -3,7 +3,7 @@ use super::{
 	StorageWriteApi,
 };
 use crate::storage;
-use crate::types::{Address, H256};
+use crate::types::{Address, EsdtTokenData, H256};
 use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
@@ -86,4 +86,15 @@ where
 	fn get_prev_block_epoch(&self) -> u64;
 
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
+
+	fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64;
+
+	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint;
+
+	fn get_esdt_token_data(
+		&self,
+		address: &Address,
+		token: &[u8],
+		nonce: u64,
+	) -> EsdtTokenData<BigUint>;
 }

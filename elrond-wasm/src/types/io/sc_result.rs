@@ -13,12 +13,10 @@ pub enum SCResult<T> {
 }
 
 impl<T> SCResult<T> {
-	#[inline]
 	pub fn is_ok(&self) -> bool {
 		matches!(self, SCResult::Ok(_))
 	}
 
-	#[inline]
 	pub fn is_err(&self) -> bool {
 		!self.is_ok()
 	}
@@ -38,6 +36,19 @@ impl<T> SCResult<T> {
 			Some(e)
 		} else {
 			None
+		}
+	}
+
+	/// Used to convert from a regular Rust result.
+	/// Any error type is accepted as long as it can be converted to a SCError
+	/// (`Vec<u8>`, `&[u8]`, `BoxedBytes`, `String`, `&str` are covered).
+	pub fn from_result<E>(r: core::result::Result<T, E>) -> Self
+	where
+		E: Into<SCError>,
+	{
+		match r {
+			Ok(t) => SCResult::Ok(t),
+			Err(e) => SCResult::Err(e.into()),
 		}
 	}
 }

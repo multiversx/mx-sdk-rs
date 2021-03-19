@@ -1,6 +1,6 @@
 {
-    "name": "adder",
     "comment": "add then check",
+    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -8,7 +8,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
                 "value": "0",
@@ -18,7 +18,7 @@
                     "address:alice",
                     "address:alice"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

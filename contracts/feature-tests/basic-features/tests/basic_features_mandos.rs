@@ -159,8 +159,8 @@ fn return_codes() {
 }
 
 #[test]
-fn return_error() {
-	parse_execute_mandos("mandos/return_error.scen.json", &contract_map());
+fn sc_result() {
+	parse_execute_mandos("mandos/sc_result.scen.json", &contract_map());
 }
 
 #[test]

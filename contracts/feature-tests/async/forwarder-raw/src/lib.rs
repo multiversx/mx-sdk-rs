@@ -153,7 +153,7 @@ pub trait ForwarderRaw {
 		let args_vec = args.into_vec();
 		self.callback_raw_event(&token, &payment, args_vec.as_slice().to_vec());
 
-		self.callback_data()
+		let _ = self.callback_data()
 			.push(&(token, payment, args_vec));
 	}
 

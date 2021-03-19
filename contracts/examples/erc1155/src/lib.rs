@@ -49,7 +49,7 @@ pub trait Erc1155 {
 
 			sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
 
-			if self.is_smart_contract_address(&to) {
+			if self.is_smart_contract(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
 			} else {
 				self.increase_balance(&to, &type_id, &amount);
@@ -59,7 +59,7 @@ pub trait Erc1155 {
 
 			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
 
-			if self.is_smart_contract_address(&to) {
+			if self.is_smart_contract(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
 			} else {
 				let amount = BigUint::from(1u32);
@@ -84,7 +84,7 @@ pub trait Erc1155 {
 		data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
-		let is_receiver_smart_contract = self.is_smart_contract_address(&to);
+		let is_receiver_smart_contract = self.is_smart_contract(&to);
 
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
@@ -251,11 +251,6 @@ pub trait Erc1155 {
 
 	// private
 
-	// mock
-	fn is_smart_contract_address(&self, _address: &Address) -> bool {
-		false
-	}
-
 	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
 		type_id > &0 && type_id <= &self.get_last_valid_type_id()
 	}
@@ -402,8 +397,8 @@ pub trait Erc1155 {
 	// callbacks
 
 	#[callback_raw]
-	fn callback_raw(&self, result: Vec<Vec<u8>>) {
-		let is_transfer_accepted = result[0].len() == 0;
+	fn callback_raw(&self, #[var_args] result: AsyncCallResult<VarArgs<BoxedBytes>>) {
+		let is_transfer_accepted = result.is_ok();
 		
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
@@ -514,10 +509,10 @@ pub trait Erc1155 {
 	// Events
 
 	/*
-	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000001")]
+	#[event("transfer")]
 	fn transfer_single_event(&self, operator: &Address, from: &Address, to: &Address, id: &BigUint, amount: &BigUint);
 
-	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000002")]
+	#[event("approve")]
 	fn transfer_batch_event(&self, operator: &Address, from: &Address, to: &Address, ids: &Vec<BigUint>, amounts: &Vec<BigUint>);
 
 	#[legacy_event("0x0000000000000000000000000000000000000000000000000000000000000003")]

@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scDeploy",
-            "txId": "1",
+            "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
                 "value": "0",
@@ -15,7 +15,7 @@
                     "address:bob",
                     "address:charlie"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -35,7 +35,7 @@
                 "value": "0",
                 "function": "getQuorum",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -57,7 +57,7 @@
                 "value": "0",
                 "function": "getNumBoardMembers",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -77,13 +77,13 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``num_users": "3",
-                        "``user_id|address:alice": "1",
-                        "``user_id|address:bob": "2",
-                        "``user_id|address:charlie": "3",
-                        "``user_address|u32:1": "address:alice",
-                        "``user_address|u32:2": "address:bob",
-                        "``user_address|u32:3": "address:charlie",
+                        "``user_count": "3",
+                        "``user_address_to_id|address:alice": "1",
+                        "``user_address_to_id|address:bob": "2",
+                        "``user_address_to_id|address:charlie": "3",
+                        "``user_id_to_address|u32:1": "address:alice",
+                        "``user_id_to_address|u32:2": "address:bob",
+                        "``user_id_to_address|u32:3": "address:charlie",
                         "``user_role|u32:1": "2",
                         "``user_role|u32:2": "2",
                         "``user_role|u32:3": "2",

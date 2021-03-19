@@ -1,3 +1,5 @@
+use crate::CheckBytesValueRaw;
+
 use super::context::*;
 use super::value::*;
 use super::value_raw::*;
@@ -27,46 +29,47 @@ impl Checkable<u64> for U64Value {
 }
 
 #[derive(Debug)]
-pub enum CheckValue<T> {
-	DefaultValue,
+pub enum CheckValue<T: Default> {
 	Star,
 	Equal(T),
 }
 
-impl<T: InterpretableFrom<ValueSubTree>> CheckValue<T> {
+impl<T> CheckValue<T>
+where
+	T: InterpretableFrom<ValueSubTree> + Default,
+{
 	pub fn is_star(&self) -> bool {
 		matches!(self, CheckValue::Star)
 	}
-
-	pub fn is_default(&self) -> bool {
-		matches!(self, CheckValue::DefaultValue)
-	}
 }
 
-impl<T: InterpretableFrom<ValueSubTree>> Default for CheckValue<T> {
+impl<T> Default for CheckValue<T>
+where
+	T: InterpretableFrom<ValueSubTree> + Default,
+{
 	fn default() -> Self {
-		CheckValue::DefaultValue
+		CheckValue::Equal(T::default())
 	}
 }
 
-impl<T: InterpretableFrom<ValueSubTree>> InterpretableFrom<ValueSubTree> for CheckValue<T> {
-	fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
-		if let ValueSubTree::Str(s) = &from {
-			if s.is_empty() {
-				return CheckValue::DefaultValue;
-			} else if s == "*" {
-				return CheckValue::Star;
-			}
+impl<T> InterpretableFrom<CheckBytesValueRaw> for CheckValue<T>
+where
+	T: InterpretableFrom<ValueSubTree> + Default,
+{
+	fn interpret_from(from: CheckBytesValueRaw, context: &InterpreterContext) -> Self {
+		match from {
+			CheckBytesValueRaw::Unspecified => CheckValue::Equal(T::default()),
+			CheckBytesValueRaw::Star => CheckValue::Star,
+			CheckBytesValueRaw::Equal(bytes_value) => {
+				CheckValue::Equal(T::interpret_from(bytes_value, context))
+			},
 		}
-
-		CheckValue::Equal(T::interpret_from(from, context))
 	}
 }
 
 impl<T: fmt::Display + Default> fmt::Display for CheckValue<T> {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		match self {
-			CheckValue::DefaultValue => T::default().fmt(f),
 			CheckValue::Star => write!(f, "*"),
 			CheckValue::Equal(eq_value) => eq_value.fmt(f),
 		}
@@ -79,7 +82,6 @@ where
 {
 	fn check(&self, value: V) -> bool {
 		match self {
-			CheckValue::DefaultValue => T::default().check(value),
 			CheckValue::Star => true,
 			CheckValue::Equal(eq) => eq.check(value),
 		}
