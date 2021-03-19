@@ -63,6 +63,8 @@ members = [
   "contracts/feature-tests/deploy-two-contracts",
   "contracts/feature-tests/local-esdt-and-nft",
   "contracts/feature-tests/local-esdt-and-nft/abi",
+  "contracts/feature-tests/nft-receiver",
+  "contracts/feature-tests/nft-receiver/abi",
   "contracts/feature-tests/payable-features",
   "contracts/feature-tests/payable-features/abi",
   "contracts/feature-tests/use-module",
