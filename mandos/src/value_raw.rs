@@ -50,7 +50,7 @@ impl Serialize for ValueSubTree {
 	}
 }
 
-struct ValueSubTreeVisitor;
+pub(crate) struct ValueSubTreeVisitor;
 
 impl<'de> Visitor<'de> for ValueSubTreeVisitor {
 	type Value = ValueSubTree;
@@ -108,101 +108,5 @@ impl<'de> Deserialize<'de> for ValueSubTree {
 impl fmt::Display for ValueSubTree {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{}", serde_json::to_string(self).unwrap())
-	}
-}
-
-pub enum CheckBytesValueRaw {
-	DefaultStar,
-	Star,
-	Equal(ValueSubTree),
-}
-
-impl CheckBytesValueRaw {
-	pub fn is_star(&self) -> bool {
-		matches!(
-			self,
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar
-		)
-	}
-
-	pub fn is_default_star(&self) -> bool {
-		matches!(self, CheckBytesValueRaw::DefaultStar)
-	}
-}
-
-impl Default for CheckBytesValueRaw {
-	fn default() -> Self {
-		CheckBytesValueRaw::DefaultStar
-	}
-}
-
-impl Serialize for CheckBytesValueRaw {
-	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-	where
-		S: Serializer,
-	{
-		match self {
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar => {
-				serializer.serialize_str("*")
-			},
-			CheckBytesValueRaw::Equal(bytes_value) => bytes_value.serialize(serializer),
-		}
-	}
-}
-
-struct CheckBytesValueRawVisitor;
-
-impl<'de> Visitor<'de> for CheckBytesValueRawVisitor {
-	type Value = CheckBytesValueRaw;
-
-	// Format a message stating what data this Visitor expects to receive.
-	fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-		formatter.write_str("serialized CheckBytesValueRaw")
-	}
-
-	fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-	where
-		E: de::Error,
-	{
-		if value == "*" {
-			Ok(CheckBytesValueRaw::Star)
-		} else {
-			let vst = ValueSubTreeVisitor.visit_str(value)?;
-			Ok(CheckBytesValueRaw::Equal(vst))
-		}
-	}
-
-	fn visit_seq<A>(self, seq: A) -> Result<Self::Value, A::Error>
-	where
-		A: SeqAccess<'de>,
-	{
-		let vst = ValueSubTreeVisitor.visit_seq(seq)?;
-		Ok(CheckBytesValueRaw::Equal(vst))
-	}
-
-	fn visit_map<M>(self, access: M) -> Result<Self::Value, M::Error>
-	where
-		M: MapAccess<'de>,
-	{
-		let vst = ValueSubTreeVisitor.visit_map(access)?;
-		Ok(CheckBytesValueRaw::Equal(vst))
-	}
-}
-
-impl<'de> Deserialize<'de> for CheckBytesValueRaw {
-	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-	where
-		D: Deserializer<'de>,
-	{
-		deserializer.deserialize_any(CheckBytesValueRawVisitor)
-	}
-}
-
-impl fmt::Display for CheckBytesValueRaw {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		match self {
-			CheckBytesValueRaw::Star | CheckBytesValueRaw::DefaultStar => write!(f, "*"),
-			CheckBytesValueRaw::Equal(bytes_value) => bytes_value.fmt(f),
-		}
 	}
 }
