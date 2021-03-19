@@ -9,7 +9,7 @@ TOKEN_DISPLAY_NAME=0x46756e6769626c65546f6b656e # "FungibleToken"
 TOKEN_TICKER=0x46554e47544f4b # "FUNGTOK"
 
 # Manually update after issue
-TOKEN_IDENTIFIER=0x46554e47544f4b2d646361623636
+TOKEN_IDENTIFIER=0x46554e47544f4b2d333331666134
 
 NFT_DISPLAY_NAME=0x4d794e6674 # "MyNft"
 NFT_TICKER=0x4d594e4654 # "MYNFT"
@@ -57,6 +57,10 @@ removeLocalRolesFungible() {
     erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=500000000 --function="unsetLocalRoles" --arguments 0x${ADDRESS_DECODED} ${TOKEN_IDENTIFIER} 0x01 0x02 --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
+setLocalMintBurnRaw() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=500000000 --function="setLocalMintBurnRaw" --arguments ${TOKEN_IDENTIFIER} --send --proxy=${PROXY} --chain=${CHAIN_ID}
+}
+
 # SC calls - NFT
 
 issueNft() {
@@ -64,7 +68,7 @@ issueNft() {
 }
 
 setNftLocalRoles() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=500000000 --function="setLocalRoles" --arguments 0x${ADDRESS_DECODED} ${NFT_IDENTIFIER} 0x03 0x04 0x05 --send --proxy=${PROXY} --chain=${CHAIN_ID}
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=500000000 --function="setLocalRoles" --arguments 0x${ADDRESS_DECODED} ${NFT_IDENTIFIER} 0x03 0x05 --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 # Arguments: token identifier, amount (1), name (VeryUniqueToken), royalties (1000, i.e. 10%), hash (sha256(VeryUniqueToken)), color (1,2,3), uri (www.nfts.com)

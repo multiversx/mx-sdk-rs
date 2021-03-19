@@ -148,6 +148,7 @@ pub trait LocalEsdtAndEsdtNft {
 		data: BoxedBytes,
 	) {
 		self.send().direct_esdt_nft_via_async_call(
+			&self.get_sc_address(),
 			&to,
 			token_identifier.as_esdt_identifier(),
 			nonce,
@@ -161,8 +162,8 @@ pub trait LocalEsdtAndEsdtNft {
 		&self,
 		to: Address,
 		token_identifier: TokenIdentifier,
-		amount: BigUint,
 		nonce: u64,
+		amount: BigUint,
 		function: BoxedBytes,
 		#[var_args] arguments: VarArgs<BoxedBytes>,
 	) {
@@ -174,12 +175,40 @@ pub trait LocalEsdtAndEsdtNft {
 		self.send().direct_esdt_nft_execute(
 			&to,
 			token_identifier.as_esdt_identifier(),
-			&amount,
 			nonce,
+			&amount,
 			self.get_gas_left(),
 			function.as_slice(),
 			&arg_buffer,
 		);
+	}
+
+	// Semi-Fungible
+
+	#[payable("EGLD")]
+	#[endpoint(sftIssue)]
+	fn sft_issue(
+		&self,
+		#[payment] issue_cost: BigUint,
+		token_display_name: BoxedBytes,
+		token_ticker: BoxedBytes,
+	) -> AsyncCall<BigUint> {
+		let caller = self.get_caller();
+
+		ESDTSystemSmartContractProxy::new()
+			.issue_semi_fungible(
+				issue_cost,
+				&token_display_name,
+				&token_ticker,
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+			)
+			.async_call()
+			.with_callback(self.callbacks().nft_issue_callback(&caller))
 	}
 
 	// common
