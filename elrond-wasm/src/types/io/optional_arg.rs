@@ -28,13 +28,15 @@ impl<T> OptionalArg<T> {
 	}
 }
 
-impl<I, D, T> DynArg<I, D> for OptionalArg<T>
+impl<T> DynArg for OptionalArg<T>
 where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-	T: DynArg<I, D>,
+	T: DynArg,
 {
-	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+	fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+	where
+		I: TopDecodeInput,
+		D: DynArgInput<I>,
+	{
 		if loader.has_next() {
 			OptionalArg::Some(T::dyn_load(loader, arg_id))
 		} else {
