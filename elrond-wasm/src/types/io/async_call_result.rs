@@ -26,13 +26,15 @@ impl<T> AsyncCallResult<T> {
 	}
 }
 
-impl<I, D, T> DynArg<I, D> for AsyncCallResult<T>
+impl<T> DynArg for AsyncCallResult<T>
 where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-	T: DynArg<I, D>,
+	T: DynArg,
 {
-	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+	fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+	where
+		I: TopDecodeInput,
+		D: DynArgInput<I>,
+	{
 		let err_code = u32::dyn_load(loader, arg_id);
 		if err_code == 0 {
 			let arg = T::dyn_load(loader, arg_id);

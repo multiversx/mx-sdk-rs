@@ -2,22 +2,23 @@ use crate::*;
 use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.
-pub trait DynArg<I, D>: Sized
-where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-{
-	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self;
+pub trait DynArg: Sized {
+	fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+	where
+		I: TopDecodeInput,
+		D: DynArgInput<I>;
 }
 
 /// All top-deserializable types can be endpoint arguments.
-impl<I, D, T> DynArg<I, D> for T
+impl<T> DynArg for T
 where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
 	T: TopDecode,
 {
-	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+	fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+	where
+		I: TopDecodeInput,
+		D: DynArgInput<I>,
+	{
 		if let TypeInfo::Unit = T::TYPE_INFO {
 			// unit type returns without loading anything
 			let cast_unit: T = unsafe { core::mem::transmute_copy(&()) };

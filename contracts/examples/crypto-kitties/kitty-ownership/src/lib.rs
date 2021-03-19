@@ -8,7 +8,7 @@ use random::*;
 
 #[elrond_wasm_derive::callable(GeneScienceProxy)]
 pub trait GeneScience {
-	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty) -> ContractCall<BigUint>;
+	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(KittyOwnershipImpl)]

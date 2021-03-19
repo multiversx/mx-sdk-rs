@@ -30,7 +30,7 @@ pub fn load_dyn_arg<I, D, T>(loader: &mut D, arg_id: ArgId) -> T
 where
 	I: TopDecodeInput,
 	D: DynArgInput<I>,
-	T: DynArg<I, D>,
+	T: DynArg,
 {
 	T::dyn_load(loader, arg_id)
 }
