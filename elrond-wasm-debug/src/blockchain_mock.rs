@@ -13,12 +13,15 @@ use std::fmt::Write;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
+pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
+pub type AccountEsdt = HashMap<Vec<u8>, BigUint>;
+
 pub struct AccountData {
 	pub address: Address,
 	pub nonce: u64,
 	pub balance: BigUint,
-	pub storage: HashMap<Vec<u8>, Vec<u8>>,
-	pub esdt: HashMap<Vec<u8>, BigUint>,
+	pub storage: AccountStorage,
+	pub esdt: AccountEsdt,
 	pub contract_path: Option<Vec<u8>>,
 	pub contract_owner: Option<Address>,
 }
@@ -354,7 +357,13 @@ pub fn execute_tx(
 	let func_name = tx_context.tx_input_box.func_name.clone();
 	let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
 	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-		contract_inst.call(func_name.as_slice());
+		let call_successful = contract_inst.call(func_name.as_slice());
+		if !call_successful {
+			std::panic::panic_any(TxPanic {
+				status: 1,
+				message: b"invalid function (not found)".to_vec(),
+			});
+		}
 		let context = contract_inst.into_api();
 		context.into_output()
 	}));
