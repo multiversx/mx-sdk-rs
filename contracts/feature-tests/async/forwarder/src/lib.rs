@@ -4,15 +4,18 @@ elrond_wasm::imports!();
 
 #[elrond_wasm_derive::callable(VaultProxy)]
 pub trait Vault {
-	fn echo_arguments(&self, args: VarArgs<BoxedBytes>) -> ContractCall<BigUint>;
+	fn echo_arguments(
+		&self,
+		args: VarArgs<BoxedBytes>,
+	) -> ContractCall<BigUint, VarArgs<BoxedBytes>>;
 
 	#[payable("*")]
-	fn accept_funds(&self) -> ContractCall<BigUint>;
+	fn accept_funds(&self) -> ContractCall<BigUint, ()>;
 
 	#[payable("*")]
-	fn reject_funds(&self) -> ContractCall<BigUint>;
+	fn reject_funds(&self) -> ContractCall<BigUint, ()>;
 
-	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) -> ContractCall<BigUint>;
+	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) -> ContractCall<BigUint, ()>;
 }
 
 /// Test contract for investigating async calls.
@@ -176,4 +179,19 @@ pub trait Forwarder {
 	fn clear_callback_data(&self) {
 		self.callback_data().clear();
 	}
+
+	#[endpoint]
+	#[payable("*")]
+	fn echo_arguments_sync(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
+		let half_gas = self.get_gas_left() / 2;
+
+		let result = contract_call!(self, to, VaultProxy)
+			.echo_arguments(args)
+			.execute_on_dest_context(half_gas, self.send());
+
+		self.execute_on_dest_context_result(result.as_slice());
+	}
+
+	#[event("execute_on_dest_context_result")]
+	fn execute_on_dest_context_result(&self, result: &[BoxedBytes]);
 }
