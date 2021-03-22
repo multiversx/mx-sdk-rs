@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(non_snake_case)]
+#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 

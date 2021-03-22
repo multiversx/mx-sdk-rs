@@ -24,12 +24,9 @@ impl PayableAttribute {
 				false
 			}
 		});
-		match payable_attr {
-			None => None,
-			Some(attr) => Some(PayableAttribute {
-				identifier: extract_token_identifier(attr),
-			}),
-		}
+		payable_attr.map(|attr| PayableAttribute {
+			identifier: extract_token_identifier(attr),
+		})
 	}
 }
 

@@ -7,12 +7,9 @@ pub struct StorageGetAttribute {
 
 impl StorageGetAttribute {
 	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_STORAGE_GET) {
-			None => None,
-			Some(arg_str) => Some(StorageGetAttribute {
-				identifier: arg_str,
-			}),
-		}
+		find_attr_one_string_arg(m, ATTR_STORAGE_GET).map(|arg_str| StorageGetAttribute {
+			identifier: arg_str,
+		})
 	}
 }
 
@@ -22,12 +19,9 @@ pub struct StorageSetAttribute {
 
 impl StorageSetAttribute {
 	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_STORAGE_SET) {
-			None => None,
-			Some(arg_str) => Some(StorageSetAttribute {
-				identifier: arg_str,
-			}),
-		}
+		find_attr_one_string_arg(m, ATTR_STORAGE_SET).map(|arg_str| StorageSetAttribute {
+			identifier: arg_str,
+		})
 	}
 }
 
@@ -37,12 +31,9 @@ pub struct StorageMapperAttribute {
 
 impl StorageMapperAttribute {
 	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_STORAGE_MAPPER) {
-			None => None,
-			Some(arg_str) => Some(StorageMapperAttribute {
-				identifier: arg_str,
-			}),
-		}
+		find_attr_one_string_arg(m, ATTR_STORAGE_MAPPER).map(|arg_str| StorageMapperAttribute {
+			identifier: arg_str,
+		})
 	}
 }
 
@@ -52,12 +43,9 @@ pub struct StorageIsEmptyAttribute {
 
 impl StorageIsEmptyAttribute {
 	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_STORAGE_IS_EMPTY) {
-			None => None,
-			Some(arg_str) => Some(StorageIsEmptyAttribute {
-				identifier: arg_str,
-			}),
-		}
+		find_attr_one_string_arg(m, ATTR_STORAGE_IS_EMPTY).map(|arg_str| StorageIsEmptyAttribute {
+			identifier: arg_str,
+		})
 	}
 }
 
@@ -67,11 +55,8 @@ pub struct StorageClearAttribute {
 
 impl StorageClearAttribute {
 	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_STORAGE_CLEAR) {
-			None => None,
-			Some(arg_str) => Some(StorageClearAttribute {
-				identifier: arg_str,
-			}),
-		}
+		find_attr_one_string_arg(m, ATTR_STORAGE_CLEAR).map(|arg_str| StorageClearAttribute {
+			identifier: arg_str,
+		})
 	}
 }

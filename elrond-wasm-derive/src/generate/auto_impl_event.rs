@@ -9,12 +9,10 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
 	for arg in &m.method_args {
 		if arg.metadata.event_topic {
 			topic_args.push(arg);
+		} else if data_arg.is_none() {
+			data_arg = Some(arg);
 		} else {
-			if data_arg.is_none() {
-				data_arg = Some(arg);
-			} else {
-				panic!("only 1 data argument allowed in event log");
-			}
+			panic!("only 1 data argument allowed in event log");
 		}
 	}
 

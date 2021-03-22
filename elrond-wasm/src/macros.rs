@@ -18,7 +18,7 @@ macro_rules! imports {
 		use elrond_wasm::api::{BigIntApi, BigUintApi, CallValueApi, ContractHookApi, SendApi};
 		use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
 		use elrond_wasm::err_msg;
-		use elrond_wasm::esdt::ESDTSystemSmartContractProxy;
+		use elrond_wasm::esdt::*;
 		use elrond_wasm::io::*;
 		use elrond_wasm::non_zero_util::*;
 		use elrond_wasm::storage::mappers::*;
@@ -71,8 +71,8 @@ macro_rules! sc_try {
 /// # use elrond_wasm::types::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 /// # where
-/// # 	BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
-/// # 	BigUint: elrond_wasm::api::BigUintApi + 'static,
+/// #   BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+/// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
@@ -98,8 +98,8 @@ macro_rules! require {
 /// # use elrond_wasm::types::{*, SCResult::Ok};
 /// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
 /// # where
-/// # 	BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
-/// # 	BigUint: elrond_wasm::api::BigUintApi + 'static,
+/// #   BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+/// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     only_owner!(self, "Caller must be owner");

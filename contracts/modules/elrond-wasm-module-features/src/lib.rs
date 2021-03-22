@@ -56,7 +56,7 @@ use elrond_wasm::elrond_codec::*;
 impl<'a> NestedEncode for FeatureName<'a> {
 	#[inline]
 	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		dest.write(&self.0[..]);
+		dest.write(self.0);
 		Result::Ok(())
 	}
 
@@ -67,7 +67,7 @@ impl<'a> NestedEncode for FeatureName<'a> {
 		_: ExitCtx,
 		_: fn(ExitCtx, EncodeError) -> !,
 	) {
-		dest.write(&self.0[..]);
+		dest.write(self.0);
 	}
 }
 

@@ -294,8 +294,8 @@ impl<'de> Visitor<'de> for CheckAccountRawsVisitor {
 		}
 
 		Ok(CheckAccountsRaw {
-			accounts,
 			other_accounts_allowed,
+			accounts,
 		})
 	}
 }

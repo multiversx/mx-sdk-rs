@@ -73,9 +73,7 @@ fn validate_callback_call_result_arg(m: &Method) {
 		if num_call_result > 1 {
 			panic!("only one `#[call_result]` argument allowed");
 		}
-	} else {
-		if num_call_result > 1 {
-			panic!("`#[call_result]` argument only allowed in `#[callback]` methods");
-		}
+	} else if num_call_result > 1 {
+		panic!("`#[call_result]` argument only allowed in `#[callback]` methods");
 	}
 }

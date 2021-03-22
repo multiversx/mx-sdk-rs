@@ -67,16 +67,8 @@ impl From<&EndpointAbi> for EndpointAbiJson {
 				.iter()
 				.map(|d| d.to_string())
 				.collect(),
-			inputs: abi
-				.inputs
-				.iter()
-				.map(|input| InputAbiJson::from(input))
-				.collect(),
-			outputs: abi
-				.outputs
-				.iter()
-				.map(|output| OutputAbiJson::from(output))
-				.collect(),
+			inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
+			outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
 		}
 	}
 }

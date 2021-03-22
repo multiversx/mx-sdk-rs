@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -35,15 +36,17 @@ pub trait LocalEsdtAndEsdtNft {
 				&token_display_name,
 				&token_ticker,
 				&initial_supply,
-				0,
-				true,
-				true,
-				true,
-				true,
-				true,
-				true,
-				true,
-				true,
+				FungibleTokenProperties {
+					num_decimals: 0,
+					can_freeze: true,
+					can_wipe: true,
+					can_pause: true,
+					can_mint: true,
+					can_burn: true,
+					can_change_owner: true,
+					can_upgrade: true,
+					can_add_special_roles: true,
+				},
 			)
 			.async_call()
 			.with_callback(self.callbacks().esdt_issue_callback(&caller))
@@ -84,12 +87,14 @@ pub trait LocalEsdtAndEsdtNft {
 				issue_cost,
 				&token_display_name,
 				&token_ticker,
-				true,
-				true,
-				true,
-				true,
-				true,
-				true,
+				NonFungibleTokenProperties {
+					can_freeze: true,
+					can_wipe: true,
+					can_pause: true,
+					can_change_owner: true,
+					can_upgrade: true,
+					can_add_special_roles: true,
+				},
 			)
 			.async_call()
 			.with_callback(self.callbacks().nft_issue_callback(&caller))
@@ -200,12 +205,14 @@ pub trait LocalEsdtAndEsdtNft {
 				issue_cost,
 				&token_display_name,
 				&token_ticker,
-				true,
-				true,
-				true,
-				true,
-				true,
-				true,
+				SemiFungibleTokenProperties {
+					can_freeze: true,
+					can_wipe: true,
+					can_pause: true,
+					can_change_owner: true,
+					can_upgrade: true,
+					can_add_special_roles: true,
+				},
 			)
 			.async_call()
 			.with_callback(self.callbacks().nft_issue_callback(&caller))

@@ -183,10 +183,8 @@ fn parse_execute_mandos_steps(
 
 				let (tx_result, opt_async_data) =
 					execute_sc_call(tx_input, state, contract_map).unwrap();
-				if tx_result.result_status == 0 {
-					if opt_async_data.is_some() {
-						panic!("Can't query a view function that performs an async call");
-					}
+				if tx_result.result_status == 0 && opt_async_data.is_some() {
+					panic!("Can't query a view function that performs an async call");
 				}
 				if let Some(tx_expect) = expect {
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
@@ -337,7 +335,7 @@ fn execute_sc_call(
 
 fn execute_sc_create(
 	tx_input: TxInput,
-	contract_path: &Vec<u8>,
+	contract_path: &[u8],
 	state: &mut BlockchainMock,
 	contract_map: &ContractMap<TxContext>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
@@ -364,7 +362,7 @@ fn execute_sc_create(
 		let new_address = state.create_account_after_deploy(
 			&tx_input,
 			tx_output.contract_storage,
-			contract_path.clone(),
+			contract_path.to_vec(),
 		);
 		state.send_balance(&new_address, tx_output.send_balance_list.as_slice())?;
 	} else {
@@ -434,11 +432,11 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
 					tx_id,
 					verbose_hex(&expected_log.address.value),
-					vec_u8_to_string(&expected_log.identifier.value),
+					bytes_to_string(&expected_log.identifier.value),
 					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
 					verbose_hex(&expected_log.data.value),
 					address_hex(&actual_log.address),
-					vec_u8_to_string(&actual_log.identifier),
+					bytes_to_string(&actual_log.identifier),
 					actual_log.topics.iter().map(|topic| verbose_hex(&topic)).collect::<String>(),
 					verbose_hex(&actual_log.data),
 				);
@@ -611,7 +609,7 @@ fn update_block_info(block_info: &mut super::BlockInfo, mandos_block_info: &mand
 		);
 
 		let mut seed = [0u8; SEED_LEN];
-		&seed[..].copy_from_slice(val.as_slice());
+		seed[..].copy_from_slice(val.as_slice());
 		block_info.block_random_seed = Box::from(seed);
 	}
 }
