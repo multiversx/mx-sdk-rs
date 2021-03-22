@@ -86,7 +86,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) {
-		if &amount.value() > &self.get_available_esdt_balance(token) {
+		if amount.value() > self.get_available_esdt_balance(token) {
 			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"insufficient funds".to_vec(),

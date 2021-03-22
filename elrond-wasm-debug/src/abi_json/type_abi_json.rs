@@ -90,7 +90,7 @@ impl From<&EnumVariantDescription> for EnumVariantDescriptionJson {
 			fields: abi
 				.fields
 				.iter()
-				.map(|field| StructFieldDescriptionJson::from(field))
+				.map(StructFieldDescriptionJson::from)
 				.collect(),
 		}
 	}

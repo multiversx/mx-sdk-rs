@@ -343,7 +343,7 @@ pub trait Multisig {
 		}
 
 		// update num_proposers
-		#[allow(clippy::collapsible_if)]
+		#[allow(clippy::collapsible_else_if)]
 		if old_role == UserRole::Proposer {
 			if new_role != UserRole::Proposer {
 				self.num_proposers().update(|value| *value -= 1);
