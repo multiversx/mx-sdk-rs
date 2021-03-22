@@ -183,10 +183,8 @@ fn parse_execute_mandos_steps(
 
 				let (tx_result, opt_async_data) =
 					execute_sc_call(tx_input, state, contract_map).unwrap();
-				if tx_result.result_status == 0 {
-					if opt_async_data.is_some() {
-						panic!("Can't query a view function that performs an async call");
-					}
+				if tx_result.result_status == 0 && opt_async_data.is_some() {
+					panic!("Can't query a view function that performs an async call");
 				}
 				if let Some(tx_expect) = expect {
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
@@ -611,7 +609,7 @@ fn update_block_info(block_info: &mut super::BlockInfo, mandos_block_info: &mand
 		);
 
 		let mut seed = [0u8; SEED_LEN];
-		&seed[..].copy_from_slice(val.as_slice());
+		seed[..].copy_from_slice(val.as_slice());
 		block_info.block_random_seed = Box::from(seed);
 	}
 }

@@ -31,7 +31,15 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 			_phantom: core::marker::PhantomData,
 		}
 	}
+}
 
+impl<BigUint: BigUintApi> Default for ESDTSystemSmartContractProxy<BigUint> {
+	fn default() -> Self {
+		ESDTSystemSmartContractProxy::new()
+	}
+}
+
+impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 	/// Produces a contract call to the ESDT system SC,
 	/// which causes it to issue a new fungible ESDT token.
 	pub fn issue_fungible(
