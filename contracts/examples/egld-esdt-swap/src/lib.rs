@@ -41,15 +41,17 @@ pub trait EgldEsdtSwap {
 				&token_display_name,
 				&token_ticker,
 				&initial_supply,
-				EGLD_NUM_DECIMALS,
-				false,
-				false,
-				false,
-				true,
-				false,
-				true,
-				true,
-				false,
+				FungibleTokenProperties {
+					num_decimals: EGLD_NUM_DECIMALS,
+					can_freeze: false,
+					can_wipe: false,
+					can_pause: false,
+					can_mint: true,
+					can_burn: false,
+					can_change_owner: true,
+					can_upgrade: true,
+					can_add_special_roles: false,
+				},
 			)
 			.async_call()
 			.with_callback(self.callbacks().esdt_issue_callback(&caller)))

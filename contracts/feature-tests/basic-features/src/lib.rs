@@ -18,7 +18,6 @@ use ser_ex1::*;
 use ser_ex2::*;
 use simple_enum::*;
 
-use core::iter::FromIterator;
 use core::num::NonZeroUsize;
 
 #[elrond_wasm_derive::contract(BasicFeaturesImpl)]
