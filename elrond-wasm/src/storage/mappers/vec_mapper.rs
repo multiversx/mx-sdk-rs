@@ -62,11 +62,7 @@ where
 	}
 
 	fn save_count(&self, new_len: usize) {
-		storage_set(
-			self.api.clone(),
-			self.len_key().as_slice(),
-			&new_len,
-		);
+		storage_set(self.api.clone(), self.len_key().as_slice(), &new_len);
 	}
 
 	/// Number of items managed by the mapper.

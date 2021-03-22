@@ -136,17 +136,18 @@ fn events_legacy() {
 	parse_execute_mandos("mandos/events_legacy.scen.json", &contract_map());
 }
 
-// TODO: fix, by first implementing scQuery
-// #[test]
-// fn get_caller() {
-// 	parse_execute_mandos("mandos/get_caller.scen.json", &contract_map());
-// }
+#[test]
+fn get_caller() {
+	parse_execute_mandos("mandos/get_caller.scen.json", &contract_map());
+}
 
-// TODO: fix, by first implementing scQuery
-// #[test]
-// fn is_smart_contract() {
-// 	parse_execute_mandos("mandos/is_smart_contract.scen.json", &contract_map());
-// }
+// TODO: Fix by implementing is_smart_contract mock
+/*
+#[test]
+fn is_smart_contract() {
+	parse_execute_mandos("mandos/is_smart_contract.scen.json", &contract_map());
+}
+*/
 
 #[test]
 fn panic() {

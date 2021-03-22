@@ -43,6 +43,12 @@ pub enum Step {
 		tx: Box<TxCall>,
 		expect: Option<TxExpect>,
 	},
+	ScQuery {
+		tx_id: String,
+		comment: Option<String>,
+		tx: Box<TxQuery>,
+		expect: Option<TxExpect>,
+	},
 	ScDeploy {
 		tx_id: String,
 		comment: Option<String>,
@@ -114,6 +120,17 @@ impl InterpretableFrom<StepRaw> for Step {
 				tx_id,
 				comment,
 				tx: Box::new(TxCall::interpret_from(tx, context)),
+				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
+			},
+			StepRaw::ScQuery {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => Step::ScQuery {
+				tx_id,
+				comment,
+				tx: Box::new(TxQuery::interpret_from(tx, context)),
 				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
 			},
 			StepRaw::ScDeploy {
@@ -234,6 +251,27 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
 				.collect(),
 			gas_limit: U64Value::interpret_from(from.gas_limit, context),
 			gas_price: U64Value::interpret_from(from.gas_price, context),
+		}
+	}
+}
+
+#[derive(Debug)]
+pub struct TxQuery {
+	pub to: AddressValue,
+	pub function: String,
+	pub arguments: Vec<BytesValue>,
+}
+
+impl InterpretableFrom<TxQueryRaw> for TxQuery {
+	fn interpret_from(from: TxQueryRaw, context: &InterpreterContext) -> Self {
+		TxQuery {
+			to: AddressValue::interpret_from(from.to, context),
+			function: from.function,
+			arguments: from
+				.arguments
+				.into_iter()
+				.map(|t| BytesValue::interpret_from(t, context))
+				.collect(),
 		}
 	}
 }

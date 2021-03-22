@@ -59,14 +59,16 @@ impl<T> VarArgs<T> {
 	}
 }
 
-impl<I, D, T> DynArg<I, D> for VarArgs<T>
+impl<T> DynArg for VarArgs<T>
 where
-	I: TopDecodeInput,
-	D: DynArgInput<I>,
-	T: DynArg<I, D>,
+	T: DynArg,
 {
 	// #[inline(never)]
-	fn dyn_load(loader: &mut D, arg_id: ArgId) -> Self {
+	fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+	where
+		I: TopDecodeInput,
+		D: DynArgInput<I>,
+	{
 		let mut result_vec: Vec<T> = Vec::new();
 		while loader.has_next() {
 			result_vec.push(T::dyn_load(loader, arg_id));
