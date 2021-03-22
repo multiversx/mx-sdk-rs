@@ -5,9 +5,24 @@ There are several crates in this repo, this changelog will keep track of all of 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+
+## [elrond-wasm 0.14.0, mandos 0.6.0, elrond-codec 0.5.1]
+- ESDT functionality:
+	- ESDT system smart contract proxy, though which it is possible to mint, burn, issue, freeze, pause, etc.
+	- Endpoints to handle NFTs. Also added NFT management in the  ESDT system smart contract proxy
+	- Get balance, get token data, local mint/burn
+- Contract calls:
+	- Low-level and high-level support for synchronous calls via `execute_on_dest_context`.
+	- Callback bug fix
 - Improvements in storage mappers:
 	- VecMapper length is now lazy
 	- UserMapper more functionality
+- Mandos
+	- `scQuery` step
+	- fixed defaults: unspecified fields now check the default value instead of being ignored
+	- check logs
+	- `nested:` and `biguint:` syntax
+- Upgraded to Rust2021.
 
 ## [elrond-wasm 0.13.0] - 2021-03-04
 ### Main feature
