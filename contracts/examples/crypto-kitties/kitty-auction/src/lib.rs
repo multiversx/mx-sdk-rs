@@ -8,18 +8,18 @@ use auction::*;
 
 #[elrond_wasm_derive::callable(KittyOwnershipProxy)]
 pub trait KittyOwnership {
-	fn allowAuctioning(&self, by: Address, kitty_id: u32) -> ContractCall<BigUint>;
+	fn allowAuctioning(&self, by: Address, kitty_id: u32) -> ContractCall<BigUint, ()>;
 
-	fn transfer(&self, to: Address, kitty_id: u32) -> ContractCall<BigUint>;
+	fn transfer(&self, to: Address, kitty_id: u32) -> ContractCall<BigUint, ()>;
 
 	fn approveSiringAndReturnKitty(
 		&self,
 		approved_address: Address,
 		kitty_owner: Address,
 		kitty_id: u32,
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 
-	fn createGenZeroKitty(&self) -> ContractCall<BigUint>;
+	fn createGenZeroKitty(&self) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(KittyAuctionImpl)]

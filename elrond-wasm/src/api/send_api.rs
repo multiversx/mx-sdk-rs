@@ -10,7 +10,7 @@ pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApi<BigUint>: ErrorApi + Sized
+pub trait SendApi<BigUint>: ErrorApi + Clone + Sized
 where
 	BigUint: BigUintApi + 'static,
 {
@@ -141,7 +141,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Address;
 
-	fn execute_on_dest_context(
+	fn execute_on_dest_context_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -150,7 +150,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes>;
 
-	fn execute_on_dest_context_by_caller(
+	fn execute_on_dest_context_by_caller_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -159,7 +159,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes>;
 
-	fn execute_on_same_context(
+	fn execute_on_same_context_raw(
 		&self,
 		gas: u64,
 		address: &Address,

@@ -95,7 +95,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 			attributes,
 			creator,
 			royalties,
-			uris
+			uris,
 		})
 	}
 
@@ -123,7 +123,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 			attributes,
 			creator,
 			royalties,
-			uris
+			uris,
 		}
 	}
 }

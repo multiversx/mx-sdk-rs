@@ -137,7 +137,7 @@ impl SendApi<RustBigUint> for TxContext {
 		panic!("deploy_contract not yet implemented")
 	}
 
-	fn execute_on_dest_context(
+	fn execute_on_dest_context_raw(
 		&self,
 		_gas: u64,
 		_address: &Address,
@@ -145,10 +145,10 @@ impl SendApi<RustBigUint> for TxContext {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes> {
-		panic!("execute_on_dest_context not implemented yet!");
+		panic!("execute_on_dest_context_raw not implemented yet!");
 	}
 
-	fn execute_on_dest_context_by_caller(
+	fn execute_on_dest_context_by_caller_raw(
 		&self,
 		_gas: u64,
 		_address: &Address,
@@ -156,10 +156,10 @@ impl SendApi<RustBigUint> for TxContext {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes> {
-		panic!("execute_on_dest_context_by_caller not implemented yet!");
+		panic!("execute_on_dest_context_by_caller_raw not implemented yet!");
 	}
 
-	fn execute_on_same_context(
+	fn execute_on_same_context_raw(
 		&self,
 		_gas: u64,
 		_address: &Address,
@@ -167,7 +167,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) {
-		panic!("execute_on_same_context not implemented yet!");
+		panic!("execute_on_same_context_raw not implemented yet!");
 	}
 
 	fn storage_store_tx_hash_key(&self, data: &[u8]) {
