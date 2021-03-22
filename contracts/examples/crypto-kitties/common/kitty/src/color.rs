@@ -13,21 +13,16 @@ impl Color {
 	// ratios are integers, 0 < ratio < 100, ratioFirst + ratioSecond = 100
 	// checks should be done in the caller
 	pub fn mix_with(&self, other_color: &Color, ratio_first: u8, ratio_second: u8) -> Color {
-		let mut result = Color::default();
-
-		result.r = ((self.r as u16 * ratio_first as u16
-			+ other_color.r as u16 * ratio_second as u16)
+		let r = ((self.r as u16 * ratio_first as u16 + other_color.r as u16 * ratio_second as u16)
 			/ 100) as u8;
 
-		result.g = ((self.g as u16 * ratio_first as u16
-			+ other_color.g as u16 * ratio_second as u16)
+		let g = ((self.g as u16 * ratio_first as u16 + other_color.g as u16 * ratio_second as u16)
 			/ 100) as u8;
 
-		result.b = ((self.b as u16 * ratio_first as u16
-			+ other_color.b as u16 * ratio_second as u16)
+		let b = ((self.b as u16 * ratio_first as u16 + other_color.b as u16 * ratio_second as u16)
 			/ 100) as u8;
 
-		result
+		Color { r, g, b }
 	}
 }
 

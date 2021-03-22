@@ -2,12 +2,12 @@ use crate::abi::TypeAbi;
 use alloc::string::String;
 use elrond_codec::*;
 
-const ESDT_ROLE_NONE: &'static [u8] = &[];
-const ESDT_ROLE_LOCAL_MINT: &'static [u8] = b"ESDTRoleLocalMint";
-const ESDT_ROLE_LOCAL_BURN: &'static [u8] = b"ESDTRoleLocalBurn";
-const ESDT_ROLE_NFT_CREATE: &'static [u8] = b"ESDTRoleNFTCreate";
-const ESDT_ROLE_NFT_ADD_QUANTITY: &'static [u8] = b"ESDTRoleNFTAddQuantity";
-const ESDT_ROLE_NFT_BURN: &'static [u8] = b"ESDTRoleNFTBurn";
+const ESDT_ROLE_NONE: &[u8] = &[];
+const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
+const ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
+const ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
+const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
+const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum EsdtLocalRole {

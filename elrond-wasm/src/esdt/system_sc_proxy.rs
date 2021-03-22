@@ -1,3 +1,4 @@
+use super::properties::*;
 use hex_literal::hex;
 
 use crate::{
@@ -31,7 +32,15 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 			_phantom: core::marker::PhantomData,
 		}
 	}
+}
 
+impl<BigUint: BigUintApi> Default for ESDTSystemSmartContractProxy<BigUint> {
+	fn default() -> Self {
+		ESDTSystemSmartContractProxy::new()
+	}
+}
+
+impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 	/// Produces a contract call to the ESDT system SC,
 	/// which causes it to issue a new fungible ESDT token.
 	pub fn issue_fungible(
@@ -40,15 +49,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		token_display_name: &BoxedBytes,
 		token_ticker: &BoxedBytes,
 		initial_supply: &BigUint,
-		num_decimals: usize,
-		can_freeze: bool,
-		can_wipe: bool,
-		can_pause: bool,
-		can_mint: bool,
-		can_burn: bool,
-		can_change_owner: bool,
-		can_upgrade: bool,
-		can_add_special_roles: bool,
+		properties: FungibleTokenProperties,
 	) -> ContractCall<BigUint, ()> {
 		self.issue(
 			issue_cost,
@@ -56,15 +57,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 			token_display_name,
 			token_ticker,
 			initial_supply,
-			num_decimals,
-			can_freeze,
-			can_wipe,
-			can_pause,
-			can_mint,
-			can_burn,
-			can_change_owner,
-			can_upgrade,
-			can_add_special_roles,
+			properties,
 		)
 	}
 
@@ -75,12 +68,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		issue_cost: BigUint,
 		token_display_name: &BoxedBytes,
 		token_ticker: &BoxedBytes,
-		can_freeze: bool,
-		can_wipe: bool,
-		can_pause: bool,
-		can_change_owner: bool,
-		can_upgrade: bool,
-		can_add_special_roles: bool,
+		properties: NonFungibleTokenProperties,
 	) -> ContractCall<BigUint, ()> {
 		self.issue(
 			issue_cost,
@@ -88,15 +76,17 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 			token_display_name,
 			token_ticker,
 			&BigUint::zero(),
-			0,
-			can_freeze,
-			can_wipe,
-			can_pause,
-			false,
-			false,
-			can_change_owner,
-			can_upgrade,
-			can_add_special_roles,
+			TokenProperties {
+				num_decimals: 0,
+				can_freeze: properties.can_freeze,
+				can_wipe: properties.can_wipe,
+				can_pause: properties.can_pause,
+				can_mint: false,
+				can_burn: false,
+				can_change_owner: properties.can_change_owner,
+				can_upgrade: properties.can_upgrade,
+				can_add_special_roles: properties.can_add_special_roles,
+			},
 		)
 	}
 
@@ -107,12 +97,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		issue_cost: BigUint,
 		token_display_name: &BoxedBytes,
 		token_ticker: &BoxedBytes,
-		can_freeze: bool,
-		can_wipe: bool,
-		can_pause: bool,
-		can_change_owner: bool,
-		can_upgrade: bool,
-		can_add_special_roles: bool,
+		properties: SemiFungibleTokenProperties,
 	) -> ContractCall<BigUint, ()> {
 		self.issue(
 			issue_cost,
@@ -120,15 +105,17 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 			token_display_name,
 			token_ticker,
 			&BigUint::zero(),
-			0,
-			can_freeze,
-			can_wipe,
-			can_pause,
-			false,
-			false,
-			can_change_owner,
-			can_upgrade,
-			can_add_special_roles,
+			TokenProperties {
+				num_decimals: 0,
+				can_freeze: properties.can_freeze,
+				can_wipe: properties.can_wipe,
+				can_pause: properties.can_pause,
+				can_mint: false,
+				can_burn: false,
+				can_change_owner: properties.can_change_owner,
+				can_upgrade: properties.can_upgrade,
+				can_add_special_roles: properties.can_add_special_roles,
+			},
 		)
 	}
 
@@ -140,15 +127,7 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 		token_display_name: &BoxedBytes,
 		token_ticker: &BoxedBytes,
 		initial_supply: &BigUint,
-		num_decimals: usize,
-		can_freeze: bool,
-		can_wipe: bool,
-		can_pause: bool,
-		can_mint: bool,
-		can_burn: bool,
-		can_change_owner: bool,
-		can_upgrade: bool,
-		can_add_special_roles: bool,
+		properties: TokenProperties,
 	) -> ContractCall<BigUint, ()> {
 		let endpoint_name = match token_type {
 			EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
@@ -169,24 +148,32 @@ impl<BigUint: BigUintApi> ESDTSystemSmartContractProxy<BigUint> {
 
 		if token_type == EsdtTokenType::Fungible {
 			contract_call.push_argument_raw_bytes(&initial_supply.to_bytes_be());
-			contract_call.push_argument_raw_bytes(&num_decimals.to_be_bytes());
+			contract_call.push_argument_raw_bytes(&properties.num_decimals.to_be_bytes());
 		}
 
-		set_token_property(&mut contract_call, &b"canFreeze"[..], can_freeze);
-		set_token_property(&mut contract_call, &b"canWipe"[..], can_wipe);
-		set_token_property(&mut contract_call, &b"canPause"[..], can_pause);
+		set_token_property(&mut contract_call, &b"canFreeze"[..], properties.can_freeze);
+		set_token_property(&mut contract_call, &b"canWipe"[..], properties.can_wipe);
+		set_token_property(&mut contract_call, &b"canPause"[..], properties.can_pause);
 
 		if token_type == EsdtTokenType::Fungible {
-			set_token_property(&mut contract_call, &b"canMint"[..], can_mint);
-			set_token_property(&mut contract_call, &b"canBurn"[..], can_burn);
+			set_token_property(&mut contract_call, &b"canMint"[..], properties.can_mint);
+			set_token_property(&mut contract_call, &b"canBurn"[..], properties.can_burn);
 		}
 
-		set_token_property(&mut contract_call, &b"canChangeOwner"[..], can_change_owner);
-		set_token_property(&mut contract_call, &b"canUpgrade"[..], can_upgrade);
+		set_token_property(
+			&mut contract_call,
+			&b"canChangeOwner"[..],
+			properties.can_change_owner,
+		);
+		set_token_property(
+			&mut contract_call,
+			&b"canUpgrade"[..],
+			properties.can_upgrade,
+		);
 		set_token_property(
 			&mut contract_call,
 			&b"canAddSpecialRoles"[..],
-			can_add_special_roles,
+			properties.can_add_special_roles,
 		);
 
 		contract_call

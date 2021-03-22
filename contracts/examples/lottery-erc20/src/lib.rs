@@ -313,7 +313,7 @@ pub trait Lottery {
 		)
 	}
 
-	fn get_random_winning_ticket_id(&self, prev_winners: &Vec<u32>, total_tickets: u32) -> u32 {
+	fn get_random_winning_ticket_id(&self, prev_winners: &[u32], total_tickets: u32) -> u32 {
 		let seed = self.get_block_random_seed();
 		let mut rand = Random::new(*seed);
 

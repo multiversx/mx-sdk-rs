@@ -225,7 +225,7 @@ pub trait Erc1155 {
 	fn balance_of(&self, owner: &Address, type_id: &BigUint) -> BigUint {
 		self.get_balance_mapper(&owner)
 			.get(&type_id)
-			.unwrap_or_else(|| BigUint::zero())
+			.unwrap_or_else(BigUint::zero)
 	}
 
 	// returns balance for each (owner, id) pair

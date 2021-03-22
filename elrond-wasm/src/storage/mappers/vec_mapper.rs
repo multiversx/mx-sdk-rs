@@ -70,6 +70,11 @@ where
 		storage_get(self.api.clone(), self.len_key().as_slice())
 	}
 
+	/// True if no items present in the mapper.
+	pub fn is_empty(&self) -> bool {
+		self.len() == 0
+	}
+
 	/// Add one item at the end of the list.
 	/// Returns the index of the newly inserted item, which is also equal to the new number of elements.
 	pub fn push(&mut self, item: &T) -> usize {
@@ -124,17 +129,17 @@ where
 	/// Checks whether or not there is anything in storage at index.
 	/// There are no restrictions on the index,
 	/// calling for an invalid index will simply return `true`.
-	pub fn is_empty_unchecked(&self, index: usize) -> bool {
+	pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
 		self.api.storage_load_len(self.item_key(index).as_slice()) == 0
 	}
 
 	/// Checks whether or not there is anything ins storage at index.
 	/// Index must be valid (1 <= index <= count).
-	pub fn is_empty(&self, index: usize) -> bool {
+	pub fn item_is_empty(&self, index: usize) -> bool {
 		if index == 0 || index > self.len() {
 			self.api.signal_error(&b"index out of range"[..]);
 		}
-		self.is_empty_unchecked(index)
+		self.item_is_empty_unchecked(index)
 	}
 
 	/// Get item at index from storage.

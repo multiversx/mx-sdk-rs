@@ -353,7 +353,7 @@ impl BlockchainMock {
 
 pub fn execute_tx(
 	tx_context: TxContext,
-	contract_identifier: &Vec<u8>,
+	contract_identifier: &[u8],
 	contract_map: &ContractMap<TxContext>,
 ) -> TxOutput {
 	let func_name = tx_context.tx_input_box.func_name.clone();
@@ -376,7 +376,7 @@ pub fn execute_tx(
 }
 
 fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
-	if let Some(_) = panic_any.downcast_ref::<TxOutput>() {
+	if panic_any.downcast_ref::<TxOutput>().is_some() {
 		// async calls panic with the tx output directly
 		// it is not a failure, simply a way to kill the execution
 		return *panic_any.downcast::<TxOutput>().unwrap();

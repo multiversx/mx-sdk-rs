@@ -44,7 +44,7 @@ where
 		// TODO: build this more elegantly from elrond-codec
 		BoxedBytes::from_concat(&[
 			self.main_key.as_slice(),
-			&ADDRESS_TO_ID_SUFFIX[..],
+			ADDRESS_TO_ID_SUFFIX,
 			address.as_bytes(),
 		])
 	}
@@ -68,7 +68,7 @@ where
 		let id_bytes = (id as u32).to_be_bytes();
 		BoxedBytes::from_concat(&[
 			self.main_key.as_slice(),
-			&ID_TO_ADDRESS_SUFFIX[..],
+			ID_TO_ADDRESS_SUFFIX,
 			&id_bytes[..],
 		])
 	}
@@ -112,7 +112,7 @@ where
 	}
 
 	fn get_user_count_key(&self) -> BoxedBytes {
-		BoxedBytes::from_concat(&[self.main_key.as_slice(), &COUNT_SUFFIX[..]])
+		BoxedBytes::from_concat(&[self.main_key.as_slice(), COUNT_SUFFIX])
 	}
 
 	/// Number of users.
