@@ -22,6 +22,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 	- fixed defaults: unspecified fields now check the default value instead of being ignored
 	- check logs
 	- `nested:` and `biguint:` syntax
+- `elrond-codec-derive` dix - `TopDecodeOrDefault` works with generics
 - Upgraded to Rust2021.
 
 ## [elrond-wasm 0.13.0] - 2021-03-04
