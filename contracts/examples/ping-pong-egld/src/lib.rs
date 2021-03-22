@@ -25,7 +25,6 @@ const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
 /// It can be continued anytime.
 #[elrond_wasm_derive::contract(PingPongImpl)]
 pub trait PingPong {
-
 	/// Necessary configuration when deploying:
 	/// `ping_amount` - the exact EGLD amounf that needs to be sent when `ping`-ing.
 	/// `duration_in_seconds` - how much time (in seconds) until contract expires.
@@ -52,7 +51,11 @@ pub trait PingPong {
 	/// Optional `_data` argument is ignored.
 	#[payable("EGLD")]
 	#[endpoint]
-	fn ping(&self, #[payment] payment: &BigUint, #[var_args] _data: OptionalArg<BoxedBytes>) -> SCResult<()> {
+	fn ping(
+		&self,
+		#[payment] payment: &BigUint,
+		#[var_args] _data: OptionalArg<BoxedBytes>,
+	) -> SCResult<()> {
 		require!(
 			payment == &self.ping_amount().get(),
 			"the payment must match the fixed sum"
