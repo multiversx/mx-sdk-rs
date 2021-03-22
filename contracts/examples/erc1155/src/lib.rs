@@ -1,8 +1,8 @@
 #![no_std]
 
 use elrond_codec::test_util::top_encode_to_vec_or_panic;
-use elrond_wasm::HexCallDataSerializer;
 use elrond_wasm::types::MultiArg2;
+use elrond_wasm::HexCallDataSerializer;
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -399,7 +399,7 @@ pub trait Erc1155 {
 	#[callback_raw]
 	fn callback_raw(&self, #[var_args] result: AsyncCallResult<VarArgs<BoxedBytes>>) {
 		let is_transfer_accepted = result.is_ok();
-		
+
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
 		let type_ids = &pending_transfer.type_ids;

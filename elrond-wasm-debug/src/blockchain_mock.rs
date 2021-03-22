@@ -275,7 +275,9 @@ impl BlockchainMock {
 			let esdt_balance = account.esdt.get_mut(esdt_token_identifier).unwrap();
 			*esdt_balance += value;
 		} else {
-			account.esdt.insert(esdt_token_identifier.to_vec(), value.clone());
+			account
+				.esdt
+				.insert(esdt_token_identifier.to_vec(), value.clone());
 		}
 	}
 
