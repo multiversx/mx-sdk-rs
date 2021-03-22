@@ -153,7 +153,7 @@ where
 			&self.arg_buffer,
 		);
 
-		let mut loader = BytesArgLoader::new(raw_result.as_slice(), api.clone());
+		let mut loader = BytesArgLoader::new(raw_result.as_slice(), api);
 		R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
 	}
 }

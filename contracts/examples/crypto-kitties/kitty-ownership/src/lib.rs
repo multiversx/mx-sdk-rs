@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(non_snake_case)]
+#![allow(clippy::suspicious_operation_groupings)]
 
 elrond_wasm::imports!();
 

@@ -353,7 +353,7 @@ impl BlockchainMock {
 
 pub fn execute_tx(
 	tx_context: TxContext,
-	contract_identifier: &Vec<u8>,
+	contract_identifier: &[u8],
 	contract_map: &ContractMap<TxContext>,
 ) -> TxOutput {
 	let func_name = tx_context.tx_input_box.func_name.clone();
