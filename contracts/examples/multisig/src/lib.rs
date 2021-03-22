@@ -269,7 +269,7 @@ pub trait Multisig {
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
 		require!(
-			!self.action_mapper().is_empty_unchecked(action_id),
+			!self.action_mapper().item_is_empty_unchecked(action_id),
 			"action does not exist"
 		);
 
@@ -292,7 +292,7 @@ pub trait Multisig {
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
 		require!(
-			!self.action_mapper().is_empty_unchecked(action_id),
+			!self.action_mapper().item_is_empty_unchecked(action_id),
 			"action does not exist"
 		);
 
@@ -331,7 +331,7 @@ pub trait Multisig {
 		self.set_user_id_to_role(user_id, new_role);
 
 		// update board size
-		#[allow(clippy::collapsible_if)]
+		#[allow(clippy::collapsible_else_if)]
 		if old_role == UserRole::BoardMember {
 			if new_role != UserRole::BoardMember {
 				self.num_board_members().update(|value| *value -= 1);
@@ -343,7 +343,7 @@ pub trait Multisig {
 		}
 
 		// update num_proposers
-		#[allow(clippy::collapsible_if)]
+		#[allow(clippy::collapsible_else_if)]
 		if old_role == UserRole::Proposer {
 			if new_role != UserRole::Proposer {
 				self.num_proposers().update(|value| *value -= 1);
@@ -492,8 +492,12 @@ pub trait Multisig {
 				endpoint_name,
 				arguments,
 			} => {
-				let mut contract_call_raw =
-					ContractCall::new(to, TokenIdentifier::egld(), egld_payment, endpoint_name);
+				let mut contract_call_raw = ContractCall::<BigUint, ()>::new(
+					to,
+					TokenIdentifier::egld(),
+					egld_payment,
+					endpoint_name,
+				);
 				for arg in arguments {
 					contract_call_raw.push_argument_raw_bytes(arg.as_slice());
 				}

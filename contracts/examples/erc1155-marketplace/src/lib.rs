@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(unused_attributes)]
 #![allow(non_snake_case)]
+#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -35,7 +36,7 @@ pub trait Erc1155OwnershipContract {
 		type_id: BigUint,
 		value: BigUint,
 		data: &[u8],
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(Erc1155MarketplaceImpl)]
@@ -368,9 +369,7 @@ pub trait Erc1155Marketplace {
 
 	fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
 		let mut mapper = self.get_claimable_funds_mapper();
-		let mut total = mapper
-			.get(token_identifier)
-			.unwrap_or_else(|| BigUint::zero());
+		let mut total = mapper.get(token_identifier).unwrap_or_else(BigUint::zero);
 		total += amount;
 		mapper.insert(token_identifier.clone(), total);
 	}

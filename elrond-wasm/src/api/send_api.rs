@@ -10,7 +10,8 @@ pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApi<BigUint>: ErrorApi + Sized
+#[allow(clippy::too_many_arguments)] // TODO: some arguments should be grouped though
+pub trait SendApi<BigUint>: ErrorApi + Clone + Sized
 where
 	BigUint: BigUintApi + 'static,
 {
@@ -58,8 +59,8 @@ where
 		&self,
 		to: &Address,
 		token: &[u8],
-		amount: &BigUint,
 		nonce: u64,
+		amount: &BigUint,
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
@@ -141,7 +142,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Address;
 
-	fn execute_on_dest_context(
+	fn execute_on_dest_context_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -150,7 +151,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes>;
 
-	fn execute_on_dest_context_by_caller(
+	fn execute_on_dest_context_by_caller_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -159,7 +160,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes>;
 
-	fn execute_on_same_context(
+	fn execute_on_same_context_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -258,8 +259,10 @@ where
 
 	/// Performs a simple ESDT NFT transfer, but via async call.
 	/// This is the preferred way to send ESDT.
+	/// Note: call is done to the SC itself, so `from` should be the SCs own address
 	fn direct_esdt_nft_via_async_call(
 		&self,
+		from: &Address,
 		to: &Address,
 		token: &[u8],
 		nonce: u64,
@@ -270,10 +273,11 @@ where
 		serializer.push_argument_bytes(token);
 		serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
 		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+		serializer.push_argument_bytes(to.as_bytes());
 		if !data.is_empty() {
 			serializer.push_argument_bytes(data);
 		}
-		self.async_call_raw(&to, &BigUint::zero(), serializer.as_slice())
+		self.async_call_raw(&from, &BigUint::zero(), serializer.as_slice());
 	}
 
 	/// Sends an ESDT NFT to a given address, directly.
@@ -288,6 +292,6 @@ where
 		amount: &BigUint,
 		data: &[u8],
 	) {
-		self.direct_esdt_nft_execute(to, token, amount, nonce, 0, data, &ArgBuffer::new());
+		self.direct_esdt_nft_execute(to, token, nonce, amount, 0, data, &ArgBuffer::new());
 	}
 }

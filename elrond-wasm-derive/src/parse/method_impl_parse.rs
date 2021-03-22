@@ -9,12 +9,10 @@ pub fn process_method_impl(m: &syn::TraitItemMethod) -> MethodImpl {
 			"method cannot have both an auto-implementation and a default implementation"
 		);
 		MethodImpl::Generated(auto_impl)
+	} else if let Some(body) = m.default.clone() {
+		MethodImpl::Explicit(body)
 	} else {
-		if let Some(body) = m.default.clone() {
-			MethodImpl::Explicit(body)
-		} else {
-			panic!("method without an auto-implementation need a default implementation")
-		}
+		panic!("method without an auto-implementation need a default implementation")
 	}
 }
 

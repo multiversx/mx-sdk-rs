@@ -11,10 +11,14 @@ static HARDCODED_ADDRESS: [u8; 32] =
 #[elrond_wasm_derive::callable(PayMeProxy)]
 pub trait PayMe {
 	#[payable("EGLD")]
-	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> ContractCall<BigUint>;
+	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> ContractCall<BigUint, ()>;
 
 	#[payable("EGLD")]
-	fn payMeWithResult(&self, #[payment] _payment: BigUint, _arg1: i64) -> ContractCall<BigUint>;
+	fn payMeWithResult(
+		&self,
+		#[payment] _payment: BigUint,
+		_arg1: i64,
+	) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::callable(MessageMeProxy)]
@@ -25,7 +29,7 @@ pub trait MessageMe {
 		arg2: &BigUint,
 		arg3: Vec<u8>,
 		arg4: &Address,
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(AliceImpl)]

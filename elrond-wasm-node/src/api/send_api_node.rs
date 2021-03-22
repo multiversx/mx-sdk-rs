@@ -173,8 +173,8 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		&self,
 		to: &Address,
 		token: &[u8],
-		amount: &ArwenBigUint,
 		nonce: u64,
+		amount: &ArwenBigUint,
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
@@ -235,7 +235,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		new_address
 	}
 
-	fn execute_on_dest_context(
+	fn execute_on_dest_context_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -263,7 +263,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn execute_on_dest_context_by_caller(
+	fn execute_on_dest_context_by_caller_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -291,7 +291,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		}
 	}
 
-	fn execute_on_same_context(
+	fn execute_on_same_context_raw(
 		&self,
 		gas: u64,
 		address: &Address,
@@ -328,7 +328,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		// account-level built-in function, so the destination address is the contract itself
 		let own_address = self.get_sc_address();
 
-		let _ = self.execute_on_dest_context(
+		let _ = self.execute_on_dest_context_raw(
 			gas,
 			&own_address,
 			&ArwenBigUint::from(0u32),

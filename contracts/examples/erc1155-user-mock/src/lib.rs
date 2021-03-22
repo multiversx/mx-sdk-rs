@@ -16,7 +16,6 @@ pub trait Erc1155UserMock {
 		_value: BigUint,
 		_data: &[u8],
 	) -> SCResult<()> {
-
 		Ok(())
 	}
 
@@ -29,7 +28,6 @@ pub trait Erc1155UserMock {
 		_values: Vec<BigUint>,
 		_data: &[u8],
 	) -> SCResult<()> {
-
 		Ok(())
 	}
 }

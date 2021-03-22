@@ -78,6 +78,22 @@ pub enum StepRaw {
 	},
 
 	#[serde(rename_all = "camelCase")]
+	ScQuery {
+		#[serde(default)]
+		tx_id: String,
+
+		#[serde(default)]
+		#[serde(skip_serializing_if = "Option::is_none")]
+		comment: Option<String>,
+
+		tx: TxQueryRaw,
+
+		#[serde(default)]
+		#[serde(skip_serializing_if = "Option::is_none")]
+		expect: Option<TxExpectRaw>,
+	},
+
+	#[serde(rename_all = "camelCase")]
 	ScDeploy {
 		#[serde(default)]
 		tx_id: String,
@@ -186,6 +202,16 @@ pub struct TxCallRaw {
 
 	pub gas_limit: ValueSubTree,
 	pub gas_price: ValueSubTree,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TxQueryRaw {
+	pub to: ValueSubTree,
+	pub function: String,
+
+	#[serde(default)]
+	pub arguments: Vec<ValueSubTree>,
 }
 
 #[derive(Serialize, Deserialize)]

@@ -14,6 +14,6 @@ pub fn verbose_hex(value: &[u8]) -> String {
 }
 
 /// returns it as hex formatted number if it's not valid utf8
-pub fn vec_u8_to_string(vec_u8: &Vec<u8>) -> String {
-	String::from_utf8(vec_u8.clone()).unwrap_or_else(|_| verbose_hex(vec_u8))
+pub fn bytes_to_string(bytes: &[u8]) -> String {
+	String::from_utf8(bytes.to_vec()).unwrap_or_else(|_| verbose_hex(bytes))
 }

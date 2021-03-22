@@ -1,7 +1,10 @@
 use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::TxContext;
-use elrond_wasm::{api::BigUintApi, types::{Address, EsdtTokenData, H256}};
+use elrond_wasm::{
+	api::BigUintApi,
+	types::{Address, EsdtTokenData, H256},
+};
 
 impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 	type Storage = Self;
@@ -45,7 +48,7 @@ impl elrond_wasm::api::ContractHookApi<RustBigInt, RustBigUint> for TxContext {
 		Mock used when testing the marketplace contract
 
 		let mut addr_slice = [0u8; 32];
-		hex::decode_to_slice(b"6d61726b6574706c6163655f636f6e74726163745f5f5f5f5f5f5f5f5f5f5f5f", 
+		hex::decode_to_slice(b"6d61726b6574706c6163655f636f6e74726163745f5f5f5f5f5f5f5f5f5f5f5f",
 			&mut addr_slice);
 
 		_address == &Address::from_slice(&addr_slice)

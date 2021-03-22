@@ -13,7 +13,7 @@ mod transfer_execute;
 pub use arg_buffer::ArgBuffer;
 pub use async_call::AsyncCall;
 pub use callback_call::CallbackCall;
-pub use contract_call::ContractCall;
+pub use contract_call::{new_contract_call, ContractCall};
 pub use contract_proxy::ContractProxy;
 pub use send_egld::SendEgld;
 pub use send_esdt::SendEsdt;

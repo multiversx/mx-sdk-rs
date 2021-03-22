@@ -1,5 +1,5 @@
 
 #![no_std]
 
-pub use forwarder_same_shard_raw::*;
+pub use local_esdt_and_nft::*;
 pub use elrond_wasm_output::*;

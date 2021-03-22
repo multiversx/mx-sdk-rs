@@ -22,6 +22,7 @@ impl<BigUint: BigUintApi> EsdtTokenData<BigUint> {
 	}
 }
 
+#[allow(clippy::redundant_clone)]
 impl<BigUint: BigUintApi> NestedEncode for EsdtTokenData<BigUint> {
 	#[inline]
 	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
@@ -74,6 +75,7 @@ impl<BigUint: BigUintApi> TopEncode for EsdtTokenData<BigUint> {
 	}
 }
 
+#[allow(clippy::redundant_clone)]
 impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
 		let token_type = EsdtTokenType::dep_decode(input)?;
@@ -95,7 +97,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 			attributes,
 			creator,
 			royalties,
-			uris
+			uris,
 		})
 	}
 
@@ -123,7 +125,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 			attributes,
 			creator,
 			royalties,
-			uris
+			uris,
 		}
 	}
 }
