@@ -368,9 +368,7 @@ pub trait Erc1155Marketplace {
 
 	fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
 		let mut mapper = self.get_claimable_funds_mapper();
-		let mut total = mapper
-			.get(token_identifier)
-			.unwrap_or_else(|| BigUint::zero());
+		let mut total = mapper.get(token_identifier).unwrap_or_else(BigUint::zero);
 		total += amount;
 		mapper.insert(token_identifier.clone(), total);
 	}

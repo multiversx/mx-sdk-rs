@@ -376,7 +376,7 @@ pub fn execute_tx(
 }
 
 fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
-	if let Some(_) = panic_any.downcast_ref::<TxOutput>() {
+	if panic_any.downcast_ref::<TxOutput>().is_some() {
 		// async calls panic with the tx output directly
 		// it is not a failure, simply a way to kill the execution
 		return *panic_any.downcast::<TxOutput>().unwrap();

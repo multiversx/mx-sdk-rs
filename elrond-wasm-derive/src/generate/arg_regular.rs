@@ -23,7 +23,7 @@ pub fn generate_load_single_arg(
 				let referenced_type = &*type_reference.elem;
 				if let syn::Type::Path(syn::TypePath { path, .. }) = referenced_type {
 					if let Some(ident) = path.get_ident() {
-						if ident.to_string() == "str" {
+						if *ident == "str" {
 							// TODO: generalize for all unsized types using Box
 							return quote! {
 								elrond_wasm::load_single_arg::<T, Box<str>>(self.api.clone(), #arg_index_expr, #arg_name_expr)

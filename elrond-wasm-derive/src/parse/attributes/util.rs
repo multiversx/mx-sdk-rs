@@ -49,10 +49,7 @@ pub(super) fn find_attr_one_string_arg(
 			false
 		}
 	});
-	match attribute {
-		None => None,
-		Some(attr) => Some(attr_one_string_arg(attr)),
-	}
+	attribute.map(|attr| attr_one_string_arg(attr))
 }
 
 /// Finds a method attribute with given name and 1 single optional argument.

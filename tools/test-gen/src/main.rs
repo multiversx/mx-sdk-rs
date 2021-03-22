@@ -24,7 +24,7 @@ fn split_file_name(name: String, separator: &str) -> Vec<String> {
 		converted_collection.push(String::from(item));
 	}
 
-	return converted_collection;
+	converted_collection
 }
 
 fn read_dirs(path: &str) -> Vec<String> {
@@ -32,8 +32,7 @@ fn read_dirs(path: &str) -> Vec<String> {
 	let mut names: Vec<String> = Vec::new();
 
 	for dir in paths {
-		let dir_abs_path =
-			String::from(dir.unwrap().path().into_os_string().into_string().unwrap());
+		let dir_abs_path = dir.unwrap().path().into_os_string().into_string().unwrap();
 		let mut splitted_files_name: Vec<String> = split_file_name(dir_abs_path, "/");
 		let files_name_with_extension = splitted_files_name.pop().unwrap();
 		splitted_files_name = split_file_name(files_name_with_extension, ".");

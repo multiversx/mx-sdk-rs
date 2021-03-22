@@ -519,7 +519,7 @@ pub trait KittyOwnership {
 			return false;
 		}
 
-		return true;
+		true
 	}
 
 	// getters

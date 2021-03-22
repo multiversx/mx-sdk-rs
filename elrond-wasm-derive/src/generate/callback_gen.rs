@@ -112,9 +112,8 @@ pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_mac
 			if matches!(
 				arg.metadata.payment,
 				ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
-			) {
-				None
-			} else if arg.metadata.callback_call_result {
+			) || arg.metadata.callback_call_result
+			{
 				None
 			} else {
 				let pat = &arg.pat;
