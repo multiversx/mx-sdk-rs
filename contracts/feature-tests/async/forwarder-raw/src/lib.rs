@@ -8,6 +8,8 @@ pub trait ForwarderRaw {
 	#[init]
 	fn init(&self) {}
 
+	// ASYNC CALLS
+
 	#[endpoint]
 	#[payable("*")]
 	fn forward_payment(
@@ -43,7 +45,7 @@ pub trait ForwarderRaw {
 		payment: BigUint,
 		endpoint_name: BoxedBytes,
 		args: VarArgs<BoxedBytes>,
-	) -> ContractCall<BigUint> {
+	) -> ContractCall<BigUint, ()> {
 		let mut contract_call = ContractCall::new(to, token, payment, endpoint_name);
 		for arg in args.into_vec() {
 			contract_call.push_argument_raw_bytes(arg.as_slice());
@@ -153,10 +155,72 @@ pub trait ForwarderRaw {
 		let args_vec = args.into_vec();
 		self.callback_raw_event(&token, &payment, args_vec.as_slice().to_vec());
 
-		let _ = self.callback_data()
-			.push(&(token, payment, args_vec));
+		let _ = self.callback_data().push(&(token, payment, args_vec));
 	}
 
 	#[event("callback_raw")]
-	fn callback_raw_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint, arguments: Vec<BoxedBytes>);
+	fn callback_raw_event(
+		&self,
+		#[indexed] token: &TokenIdentifier,
+		#[indexed] payment: &BigUint,
+		arguments: Vec<BoxedBytes>,
+	);
+
+	// SYNC CALLS
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn call_execute_on_dest_context(
+		&self,
+		to: Address,
+		#[payment] payment: BigUint,
+		endpoint_name: BoxedBytes,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) {
+		let half_gas = self.get_gas_left() / 2;
+		let result = self.send().execute_on_dest_context_raw(
+			half_gas,
+			&to,
+			&payment,
+			endpoint_name.as_slice(),
+			&ArgBuffer::from(args.into_vec().as_slice()),
+		);
+
+		self.execute_on_dest_context_result(result.as_slice());
+	}
+
+	#[endpoint]
+	#[payable("EGLD")]
+	fn call_execute_on_dest_context_twice(
+		&self,
+		to: Address,
+		#[payment] payment: BigUint,
+		endpoint_name: BoxedBytes,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) {
+		let one_third_gas = self.get_gas_left() / 3;
+		let half_payment = payment / 2u32.into();
+		let arg_buffer = ArgBuffer::from(args.into_vec().as_slice());
+
+		let result = self.send().execute_on_dest_context_raw(
+			one_third_gas,
+			&to,
+			&half_payment,
+			endpoint_name.as_slice(),
+			&arg_buffer,
+		);
+		self.execute_on_dest_context_result(result.as_slice());
+
+		let result = self.send().execute_on_dest_context_raw(
+			one_third_gas,
+			&to,
+			&half_payment,
+			endpoint_name.as_slice(),
+			&arg_buffer,
+		);
+		self.execute_on_dest_context_result(result.as_slice());
+	}
+
+	#[event("execute_on_dest_context_result")]
+	fn execute_on_dest_context_result(&self, result: &[BoxedBytes]);
 }
