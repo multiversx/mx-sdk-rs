@@ -269,7 +269,7 @@ pub trait Multisig {
 	#[endpoint]
 	fn sign(&self, action_id: usize) -> SCResult<()> {
 		require!(
-			!self.action_mapper().is_empty_unchecked(action_id),
+			!self.action_mapper().item_is_empty_unchecked(action_id),
 			"action does not exist"
 		);
 
@@ -292,7 +292,7 @@ pub trait Multisig {
 	#[endpoint]
 	fn unsign(&self, action_id: usize) -> SCResult<()> {
 		require!(
-			!self.action_mapper().is_empty_unchecked(action_id),
+			!self.action_mapper().item_is_empty_unchecked(action_id),
 			"action does not exist"
 		);
 
