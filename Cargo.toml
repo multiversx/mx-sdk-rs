@@ -24,6 +24,8 @@ members = [
   "contracts/examples/crypto-kitties/kitty-auction",
   "contracts/examples/egld-esdt-swap",
   "contracts/examples/egld-esdt-swap/abi",
+  "contracts/examples/esdt-nft-marketplace",
+  "contracts/examples/esdt-nft-marketplace/abi",
   "contracts/examples/erc20",
   "contracts/examples/erc20/abi",
   "contracts/examples/erc1155",
