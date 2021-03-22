@@ -20,9 +20,9 @@ pub trait Erc20 {
 		sender: &Address,
 		recipient: &Address,
 		amount: &BigUint,
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 
-	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint>;
+	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(CrowdfundingImpl)]
