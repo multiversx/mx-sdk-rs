@@ -209,7 +209,7 @@ pub struct TxCallRaw {
 pub struct TxQueryRaw {
 	pub to: ValueSubTree,
 	pub function: String,
-	
+
 	#[serde(default)]
 	pub arguments: Vec<ValueSubTree>,
 }
