@@ -15,19 +15,19 @@ wasm-output-mode = ["elrond-wasm-node"]
 path = "../erc20"
 
 [dependencies.elrond-wasm]
-version = "0.13.0"
+version = "0.14.0"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
-version = "0.13.0"
+version = "0.14.0"
 path = "../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.13.0"
+version = "0.14.0"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.13.0"
+version = "0.14.0"
 path = "../../../elrond-wasm-debug"
 
