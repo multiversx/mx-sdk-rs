@@ -1,5 +1,5 @@
 use elrond_wasm::storage::mappers::LinkedListMapper;
-use elrond_wasm::storage::mappers::StorageMapper;
+use elrond_wasm::storage::mappers::{StorageClearable, StorageMapper};
 use elrond_wasm::types::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
@@ -83,4 +83,18 @@ fn test_list_iter_processing() {
 	let expected: Vec<u64> = (50..55).collect();
 	assert_eq!(processed, expected);
 	assert!(list.check_internal_consistency());
+}
+
+#[test]
+fn test_list_clear() {
+	let mut list = create_list();
+
+	list.push_back(44);
+	list.push_back(45);
+	list.push_back(46);
+	assert!(list.check_internal_consistency());
+	list.clear();
+	assert!(list.check_internal_consistency());
+	assert_eq!(list.len(), 0);
+	assert!(list.is_empty());
 }

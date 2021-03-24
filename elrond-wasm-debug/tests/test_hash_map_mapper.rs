@@ -1,5 +1,4 @@
-use elrond_wasm::storage::mappers::MapMapper;
-use elrond_wasm::storage::mappers::StorageMapper;
+use elrond_wasm::storage::mappers::{MapMapper, StorageClearable, StorageMapper};
 use elrond_wasm::types::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
@@ -30,4 +29,15 @@ fn test_map_remove() {
 	assert_eq!(map.remove(&42), Some(142));
 	assert_eq!(map.remove(&42), None);
 	assert_eq!(map.len(), 1);
+}
+
+#[test]
+fn test_map_clear() {
+	let mut map = create_map();
+	map.insert(420, 421);
+	map.insert(422, 423);
+	assert_eq!(map.len(), 2);
+	map.clear();
+	assert_eq!(map.len(), 0);
+	assert!(map.is_empty());
 }

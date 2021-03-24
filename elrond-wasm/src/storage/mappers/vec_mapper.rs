@@ -1,4 +1,4 @@
-use super::StorageMapper;
+use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
@@ -45,6 +45,16 @@ where
 			main_key,
 			_phantom: PhantomData,
 		}
+	}
+}
+
+impl<SA, T> StorageClearable for VecMapper<SA, T>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	T: TopEncode + TopDecode,
+{
+	fn clear(&mut self) {
+		self.clear();
 	}
 }
 

@@ -8,3 +8,8 @@ where
 	/// Will be called automatically by the `#[storage_mapper]` annotation generated code.
 	fn new(api: SA, key: BoxedBytes) -> Self;
 }
+
+pub trait StorageClearable {
+	/// Clears all the entries owned by the storage.
+	fn clear(&mut self);
+}
