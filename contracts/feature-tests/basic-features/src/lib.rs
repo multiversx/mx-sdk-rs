@@ -535,6 +535,87 @@ pub trait BasicFeatures {
 		map_mapper.remove(&item)
 	}
 
+	// MapStorageMapper
+
+	#[storage_mapper("map_storage_mapper")]
+	fn map_storage_mapper(
+		&self,
+	) -> MapStorageMapper<Self::Storage, u32, MapMapper<Self::Storage, u32, u32>>;
+
+	#[view]
+	fn map_storage_mapper_view(&self) -> MultiResultVec<u32> {
+		let mut vec: Vec<u32> = Vec::new();
+		for (key1, map) in self.map_storage_mapper().iter() {
+			for (key2, value) in map.iter() {
+				vec.push(key1);
+				vec.push(key2);
+				vec.push(value);
+			}
+		}
+		MultiResultVec::from(vec)
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_insert_default(&self, item: u32) -> bool {
+		let mut map_storage_mapper = self.map_storage_mapper();
+		map_storage_mapper.insert_default(item)
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_contains_key(&self, item: u32) -> bool {
+		let map_storage_mapper = self.map_storage_mapper();
+		map_storage_mapper.contains_key(&item)
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_get(&self, item: u32) -> SCResult<MultiResultVec<u32>> {
+		let map_storage_mapper = self.map_storage_mapper();
+		if let Some(map) = map_storage_mapper.get(&item) {
+			let mut vec = Vec::new();
+			for (key, value) in map.iter() {
+				vec.push(key);
+				vec.push(value);
+			}
+			return Ok(MultiResultVec::from(vec));
+		}
+		sc_error!("No storage!")
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_insert_value(
+		&self,
+		item: u32,
+		key: u32,
+		value: u32,
+	) -> SCResult<Option<u32>> {
+		let map_storage_mapper = self.map_storage_mapper();
+		if let Some(mut map) = map_storage_mapper.get(&item) {
+			return Ok(map.insert(key, value));
+		}
+		sc_error!("No storage!")
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_get_value(&self, item: u32, key: u32) -> SCResult<Option<u32>> {
+		let map_storage_mapper = self.map_storage_mapper();
+		if let Some(map) = map_storage_mapper.get(&item) {
+			return Ok(map.get(&key));
+		}
+		sc_error!("No storage!")
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_remove(&self, item: u32) -> bool {
+		let mut map_storage_mapper = self.map_storage_mapper();
+		map_storage_mapper.remove(&item)
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_clear(&self) {
+		let mut map_storage_mapper = self.map_storage_mapper();
+		map_storage_mapper.clear();
+	}
+
 	// BASIC API
 	#[endpoint(get_caller)]
 	fn get_caller_endpoint(&self) -> Address {

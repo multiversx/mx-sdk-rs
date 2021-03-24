@@ -1,5 +1,5 @@
 pub use super::linked_list_mapper::Iter;
-use super::{LinkedListMapper, StorageMapper};
+use super::{LinkedListMapper, StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
@@ -32,6 +32,19 @@ where
 			main_key: main_key.clone(),
 			linked_list_mapper: LinkedListMapper::<SA, T>::new(api, main_key),
 		}
+	}
+}
+
+impl<SA, T> StorageClearable for SetMapper<SA, T>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	T: TopEncode + TopDecode,
+{
+	fn clear(&mut self) {
+		for value in self.linked_list_mapper.iter() {
+			self.clear_node_id(&value);
+		}
+		self.linked_list_mapper.clear();
 	}
 }
 
