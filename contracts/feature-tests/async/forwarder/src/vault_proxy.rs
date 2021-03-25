@@ -5,7 +5,7 @@ pub trait Vault {
 	fn echo_arguments(
 		&self,
 		args: &VarArgs<BoxedBytes>,
-	) -> ContractCall<BigUint, VarArgs<BoxedBytes>>;
+	) -> ContractCall<BigUint, MultiResultVec<BoxedBytes>>;
 
 	#[payable("*")]
 	fn accept_funds(&self) -> ContractCall<BigUint, ()>;
