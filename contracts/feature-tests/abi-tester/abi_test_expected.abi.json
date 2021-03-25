@@ -84,7 +84,7 @@
                 },
                 {
                     "name": "_var_args",
-                    "type": "VarArgs<MultiArg<OnlyShowsUpAsNested04,i32,>>",
+                    "type": "variadic<multi2<OnlyShowsUpAsNested04,i32,>>",
                     "multi_arg": true
                 }
             ],
@@ -95,7 +95,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "MultiResultVec<OnlyShowsUpAsNested05>",
+                    "type": "variadic<OnlyShowsUpAsNested05>",
                     "multi_result": true
                 }
             ]
@@ -109,7 +109,7 @@
                 },
                 {
                     "name": "_opt_args",
-                    "type": "OptionalArg<OnlyShowsUpAsNested06>",
+                    "type": "optional<OnlyShowsUpAsNested06>",
                     "multi_arg": true
                 }
             ],
@@ -120,7 +120,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "OptionalResult<OnlyShowsUpAsNested07>",
+                    "type": "optional<OnlyShowsUpAsNested07>",
                     "multi_result": true
                 }
             ]
