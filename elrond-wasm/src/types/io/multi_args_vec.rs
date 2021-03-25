@@ -12,7 +12,7 @@ use elrond_codec::TopDecodeInput;
 pub struct MultiArgVec<T>(pub Vec<T>);
 
 /// Used for taking a variable number of arguments in an endpoint,
-/// it is synonymous with `MultiResult`.
+/// it is synonymous with `MultiResultVec`/`MultiArgVec`.
 pub type VarArgs<T> = MultiArgVec<T>;
 
 /// Used for returning a variable number of results from an endpoint,
