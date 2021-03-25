@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [elrond-wasm 0.14.1]
+- Unified variadic arguments with respective variadic results
+
 ## [elrond-wasm 0.14.0, mandos 0.6.0, elrond-codec 0.5.1]
 - ESDT functionality:
 	- ESDT system smart contract proxy, though which it is possible to mint, burn, issue, freeze, pause, etc.

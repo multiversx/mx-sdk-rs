@@ -5,7 +5,8 @@ use crate::{api::EndpointFinishApi, EndpointResult};
 use alloc::string::String;
 use elrond_codec::TopDecodeInput;
 
-/// A smart contract  or result that can be missing.
+/// A smart contract argument or result that can be missing.
+///
 /// If arguments stop before this argument, None will be returned.
 /// As an endpoint result, the contract decides if it produces it or not.
 ///
