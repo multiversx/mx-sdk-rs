@@ -59,10 +59,12 @@ where
 
 	/// Syntactic sugar, to more compactly express a get, update and set in one line.
 	/// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
-	pub fn update<F: FnOnce(&mut T)>(&self, f: F) {
+	/// Propagates the return value of the given function.
+	pub fn update<R, F: FnOnce(&mut T) -> R>(&self, f: F) -> R {
 		let mut value = self.get();
-		f(&mut value);
+		let result = f(&mut value);
 		self.set(&value);
+		result
 	}
 }
 
