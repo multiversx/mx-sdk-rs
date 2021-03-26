@@ -1,5 +1,5 @@
-use crate::error_hook;
 use super::unsafe_buffer;
+use crate::error_hook;
 
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Rem, Sub};
@@ -89,6 +89,12 @@ impl Clone for ArwenBigUint {
 				handle: clone_handle,
 			}
 		}
+	}
+}
+
+impl Default for ArwenBigUint {
+	fn default() -> Self {
+		Self::zero()
 	}
 }
 
@@ -413,7 +419,10 @@ impl ArwenBigUint {
 		}
 		unsafe_buffer::clear_buffer();
 		if byte_len > 0 {
-			bigIntGetUnsignedBytes(self.handle, unsafe_buffer::buffer_ptr().offset((nr_bytes - byte_len) as isize));
+			bigIntGetUnsignedBytes(
+				self.handle,
+				unsafe_buffer::buffer_ptr().offset((nr_bytes - byte_len) as isize),
+			);
 		}
 		unsafe_buffer::buffer_ptr()
 	}
