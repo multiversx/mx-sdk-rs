@@ -168,6 +168,26 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
 				self.api.get_prev_block_random_seed()
 			}
+
+			#[inline]
+			fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64 {
+				self.api.get_current_esdt_nft_nonce(address, token)
+			}
+
+			#[inline]
+			fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint {
+				self.api.get_esdt_balance(address, token, nonce)
+			}
+
+			#[inline]
+			fn get_esdt_token_data(
+				&self,
+				address: &Address,
+				token: &[u8],
+				nonce: u64,
+			) -> EsdtTokenData<BigUint> {
+				self.api.get_esdt_token_data(address, token, nonce)
+			}
 		}
 
 		impl <T, BigInt, BigUint> elrond_wasm::api::CryptoApi for #contract_struct<T, BigInt, BigUint>

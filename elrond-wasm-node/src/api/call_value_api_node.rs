@@ -1,7 +1,7 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{BoxedBytes, TokenIdentifier};
+use elrond_wasm::types::{BoxedBytes, EsdtTokenType, TokenIdentifier};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
@@ -13,6 +13,8 @@ extern "C" {
 	fn bigIntGetCallValue(dest: i32);
 	fn bigIntGetESDTCallValue(dest: i32);
 	fn getESDTTokenName(resultOffset: *const u8) -> i32;
+	fn getESDTTokenNonce() -> u64;
+	fn getESDTTokenType() -> i32;
 
 	/// TODO: decide if it is worth using or not
 	#[allow(dead_code)]
@@ -52,6 +54,16 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 			} else {
 				BoxedBytes::from(&name_buffer[..name_len as usize]).into()
 			}
+		}
+	}
+
+	fn esdt_token_nonce(&self) -> u64 {
+		unsafe { getESDTTokenNonce() }
+	}
+
+	fn esdt_token_type(&self) -> EsdtTokenType {
+		unsafe {
+			(getESDTTokenType() as u8).into()
 		}
 	}
 }

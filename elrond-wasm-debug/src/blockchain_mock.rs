@@ -13,12 +13,15 @@ use std::fmt::Write;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
+pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
+pub type AccountEsdt = HashMap<Vec<u8>, BigUint>;
+
 pub struct AccountData {
 	pub address: Address,
 	pub nonce: u64,
 	pub balance: BigUint,
-	pub storage: HashMap<Vec<u8>, Vec<u8>>,
-	pub esdt: HashMap<Vec<u8>, BigUint>,
+	pub storage: AccountStorage,
+	pub esdt: AccountEsdt,
 	pub contract_path: Option<Vec<u8>>,
 	pub contract_owner: Option<Address>,
 }
@@ -272,7 +275,9 @@ impl BlockchainMock {
 			let esdt_balance = account.esdt.get_mut(esdt_token_identifier).unwrap();
 			*esdt_balance += value;
 		} else {
-			account.esdt.insert(esdt_token_identifier.to_vec(), value.clone());
+			account
+				.esdt
+				.insert(esdt_token_identifier.to_vec(), value.clone());
 		}
 	}
 
@@ -348,13 +353,19 @@ impl BlockchainMock {
 
 pub fn execute_tx(
 	tx_context: TxContext,
-	contract_identifier: &Vec<u8>,
+	contract_identifier: &[u8],
 	contract_map: &ContractMap<TxContext>,
 ) -> TxOutput {
 	let func_name = tx_context.tx_input_box.func_name.clone();
 	let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
 	let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-		contract_inst.call(func_name.as_slice());
+		let call_successful = contract_inst.call(func_name.as_slice());
+		if !call_successful {
+			std::panic::panic_any(TxPanic {
+				status: 1,
+				message: b"invalid function (not found)".to_vec(),
+			});
+		}
 		let context = contract_inst.into_api();
 		context.into_output()
 	}));
@@ -365,7 +376,7 @@ pub fn execute_tx(
 }
 
 fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
-	if let Some(_) = panic_any.downcast_ref::<TxOutput>() {
+	if panic_any.downcast_ref::<TxOutput>().is_some() {
 		// async calls panic with the tx output directly
 		// it is not a failure, simply a way to kill the execution
 		return *panic_any.downcast::<TxOutput>().unwrap();

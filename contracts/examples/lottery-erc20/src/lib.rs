@@ -22,9 +22,9 @@ pub trait Erc20 {
 		sender: &Address,
 		recipient: &Address,
 		amount: &BigUint,
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 
-	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint>;
+	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::contract(LotteryImpl)]
@@ -313,7 +313,7 @@ pub trait Lottery {
 		)
 	}
 
-	fn get_random_winning_ticket_id(&self, prev_winners: &Vec<u32>, total_tickets: u32) -> u32 {
+	fn get_random_winning_ticket_id(&self, prev_winners: &[u32], total_tickets: u32) -> u32 {
 		let seed = self.get_block_random_seed();
 		let mut rand = Random::new(*seed);
 

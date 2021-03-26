@@ -1,3 +1,4 @@
+use crate::types::BoxedBytes;
 use alloc::vec::Vec;
 use elrond_codec::TopEncodeOutput;
 
@@ -64,6 +65,16 @@ impl ArgBuffer {
 		self.arg_lengths.append(&mut other.arg_lengths);
 		self.arg_data.append(&mut other.arg_data);
 		self
+	}
+}
+
+impl From<&[BoxedBytes]> for ArgBuffer {
+	fn from(raw_args: &[BoxedBytes]) -> Self {
+		let mut arg_buffer = ArgBuffer::new();
+		for bytes in raw_args {
+			arg_buffer.push_argument_bytes(bytes.as_slice());
+		}
+		arg_buffer
 	}
 }
 

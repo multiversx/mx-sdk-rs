@@ -21,7 +21,6 @@ jobs:
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
-          erdpy config set dependencies.arwentools.tag v1.1.0-6-g2f3d258
           erdpy deps install arwentools
       - name: Build the wasm contracts
         run: |
@@ -43,3 +42,17 @@ jobs:
           toolchain: nightly
       - name: Run rust tests
         run: cargo test
+  clippy_check:
+    name: Clippy linter check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            components: clippy
+            default: true
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args:

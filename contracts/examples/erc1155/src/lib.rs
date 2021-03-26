@@ -1,8 +1,8 @@
 #![no_std]
 
 use elrond_codec::test_util::top_encode_to_vec_or_panic;
-use elrond_wasm::HexCallDataSerializer;
 use elrond_wasm::types::MultiArg2;
+use elrond_wasm::HexCallDataSerializer;
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -49,7 +49,7 @@ pub trait Erc1155 {
 
 			sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
 
-			if self.is_smart_contract_address(&to) {
+			if self.is_smart_contract(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
 			} else {
 				self.increase_balance(&to, &type_id, &amount);
@@ -59,7 +59,7 @@ pub trait Erc1155 {
 
 			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
 
-			if self.is_smart_contract_address(&to) {
+			if self.is_smart_contract(&to) {
 				self.peform_async_call_single_transfer(from, to, type_id, value, data);
 			} else {
 				let amount = BigUint::from(1u32);
@@ -84,7 +84,7 @@ pub trait Erc1155 {
 		data: &[u8],
 	) -> SCResult<()> {
 		let caller = self.get_caller();
-		let is_receiver_smart_contract = self.is_smart_contract_address(&to);
+		let is_receiver_smart_contract = self.is_smart_contract(&to);
 
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
@@ -225,7 +225,7 @@ pub trait Erc1155 {
 	fn balance_of(&self, owner: &Address, type_id: &BigUint) -> BigUint {
 		self.get_balance_mapper(&owner)
 			.get(&type_id)
-			.unwrap_or_else(|| BigUint::zero())
+			.unwrap_or_else(BigUint::zero)
 	}
 
 	// returns balance for each (owner, id) pair
@@ -250,11 +250,6 @@ pub trait Erc1155 {
 	}
 
 	// private
-
-	// mock
-	fn is_smart_contract_address(&self, _address: &Address) -> bool {
-		false
-	}
 
 	fn is_valid_type_id(&self, type_id: &BigUint) -> bool {
 		type_id > &0 && type_id <= &self.get_last_valid_type_id()
@@ -402,9 +397,9 @@ pub trait Erc1155 {
 	// callbacks
 
 	#[callback_raw]
-	fn callback_raw(&self, result: Vec<Vec<u8>>) {
-		let is_transfer_accepted = result[0].len() == 0;
-		
+	fn callback_raw(&self, #[var_args] result: AsyncCallResult<VarArgs<BoxedBytes>>) {
+		let is_transfer_accepted = result.is_ok();
+
 		let tx_hash = self.get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
 		let type_ids = &pending_transfer.type_ids;

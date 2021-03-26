@@ -44,7 +44,7 @@ where
 		// TODO: build this more elegantly from elrond-codec
 		BoxedBytes::from_concat(&[
 			self.main_key.as_slice(),
-			&ADDRESS_TO_ID_SUFFIX[..],
+			ADDRESS_TO_ID_SUFFIX,
 			address.as_bytes(),
 		])
 	}
@@ -68,7 +68,7 @@ where
 		let id_bytes = (id as u32).to_be_bytes();
 		BoxedBytes::from_concat(&[
 			self.main_key.as_slice(),
-			&ID_TO_ADDRESS_SUFFIX[..],
+			ID_TO_ADDRESS_SUFFIX,
 			&id_bytes[..],
 		])
 	}
@@ -82,6 +82,13 @@ where
 		} else {
 			None
 		}
+	}
+
+	/// Yields the user address for a given id.
+	/// Will cause a deserialization error if the id is invalid.
+	pub fn get_user_address_unchecked(&self, id: usize) -> Address {
+		let key = self.get_user_address_key(id);
+		storage_get(self.api.clone(), key.as_slice())
 	}
 
 	/// Yields the user address for a given id, if the id is valid.
@@ -105,7 +112,7 @@ where
 	}
 
 	fn get_user_count_key(&self) -> BoxedBytes {
-		BoxedBytes::from_concat(&[self.main_key.as_slice(), &COUNT_SUFFIX[..]])
+		BoxedBytes::from_concat(&[self.main_key.as_slice(), COUNT_SUFFIX])
 	}
 
 	/// Number of users.
@@ -134,6 +141,29 @@ where
 			self.set_user_address(user_id, &address);
 		}
 		user_id
+	}
+
+	/// Tries to insert a number of addresses.
+	/// Calls a lambda function for each, with the new user id and whether of nor the user was already present.
+	pub fn get_or_create_users<F: FnMut(usize, bool)>(
+		&self,
+		addresses: &[Address],
+		mut user_id_lambda: F,
+	) {
+		let mut user_count = self.get_user_count();
+		for address in addresses {
+			let mut user_id = self.get_user_id(&address);
+			if user_id > 0 {
+				user_id_lambda(user_id, false);
+			} else {
+				user_count += 1;
+				user_id = user_count;
+				self.set_user_id(&address, user_id);
+				self.set_user_address(user_id, &address);
+				user_id_lambda(user_id, true);
+			}
+		}
+		self.set_user_count(user_count);
 	}
 
 	/// Loads all addresses from storage and places them in a Vec.

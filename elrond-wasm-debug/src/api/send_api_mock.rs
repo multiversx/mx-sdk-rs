@@ -51,7 +51,7 @@ impl TxContext {
 
 impl SendApi<RustBigUint> for TxContext {
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
-		if &amount.value() > &self.get_available_egld_balance() {
+		if amount.value() > self.get_available_egld_balance() {
 			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"failed transfer (insufficient funds)".to_vec(),
@@ -86,7 +86,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) {
-		if &amount.value() > &self.get_available_esdt_balance(token) {
+		if amount.value() > self.get_available_esdt_balance(token) {
 			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"insufficient funds".to_vec(),
@@ -99,6 +99,19 @@ impl SendApi<RustBigUint> for TxContext {
 			token: TokenIdentifier::from(token),
 			amount: amount.value(),
 		})
+	}
+
+	fn direct_esdt_nft_execute(
+		&self,
+		_to: &Address,
+		_token: &[u8],
+		_nonce: u64,
+		_amount: &RustBigUint,
+		_gas_limit: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("direct_esdt_nft_execute not implemented yet");
 	}
 
 	fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) -> ! {
@@ -124,29 +137,29 @@ impl SendApi<RustBigUint> for TxContext {
 		panic!("deploy_contract not yet implemented")
 	}
 
-	fn execute_on_dest_context(
+	fn execute_on_dest_context_raw(
 		&self,
 		_gas: u64,
 		_address: &Address,
 		_value: &RustBigUint,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
-		panic!("execute_on_dest_context not implemented yet!");
+	) -> Vec<BoxedBytes> {
+		panic!("execute_on_dest_context_raw not implemented yet!");
 	}
 
-	fn execute_on_dest_context_by_caller(
+	fn execute_on_dest_context_by_caller_raw(
 		&self,
 		_gas: u64,
 		_address: &Address,
 		_value: &RustBigUint,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
-		panic!("execute_on_dest_context_by_caller not implemented yet!");
+	) -> Vec<BoxedBytes> {
+		panic!("execute_on_dest_context_by_caller_raw not implemented yet!");
 	}
 
-	fn execute_on_same_context(
+	fn execute_on_same_context_raw(
 		&self,
 		_gas: u64,
 		_address: &Address,
@@ -154,7 +167,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) {
-		panic!("execute_on_same_context not implemented yet!");
+		panic!("execute_on_same_context_raw not implemented yet!");
 	}
 
 	fn storage_store_tx_hash_key(&self, data: &[u8]) {
@@ -165,5 +178,14 @@ impl SendApi<RustBigUint> for TxContext {
 	fn storage_load_tx_hash_key(&self) -> BoxedBytes {
 		let tx_hash = self.get_tx_hash();
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
+	}
+
+	fn call_local_esdt_built_in_function(
+		&self,
+		_gas: u64,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+	) {
+		panic!("call_local_esdt_built_in_function not implemented yet!");
 	}
 }

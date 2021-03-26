@@ -11,12 +11,9 @@ pub struct EventAttribute {
 
 impl EventAttribute {
 	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		match find_attr_one_string_arg(m, ATTR_EVENT) {
-			None => None,
-			Some(arg_str) => Some(EventAttribute {
-				identifier: arg_str,
-			}),
-		}
+		find_attr_one_string_arg(m, ATTR_EVENT).map(|arg_str| EventAttribute {
+			identifier: arg_str,
+		})
 	}
 }
 

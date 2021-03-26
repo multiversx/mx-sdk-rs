@@ -158,6 +158,38 @@ fn parse_execute_mandos_steps(
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
 				}
 			},
+			Step::ScQuery {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => {
+				let tx_input = TxInput {
+					from: tx.to.value.into(),
+					to: tx.to.value.into(),
+					call_value: BigUint::from(0u32),
+					esdt_value: BigUint::from(0u32),
+					esdt_token_identifier: Vec::new(),
+					func_name: tx.function.as_bytes().to_vec(),
+					args: tx
+						.arguments
+						.iter()
+						.map(|scen_arg| scen_arg.value.clone())
+						.collect(),
+					gas_limit: u64::MAX,
+					gas_price: 0u64,
+					tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
+				};
+
+				let (tx_result, opt_async_data) =
+					execute_sc_call(tx_input, state, contract_map).unwrap();
+				if tx_result.result_status == 0 && opt_async_data.is_some() {
+					panic!("Can't query a view function that performs an async call");
+				}
+				if let Some(tx_expect) = expect {
+					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
+				}
+			},
 			Step::ScDeploy {
 				tx_id,
 				comment,
@@ -303,7 +335,7 @@ fn execute_sc_call(
 
 fn execute_sc_create(
 	tx_input: TxInput,
-	contract_path: &Vec<u8>,
+	contract_path: &[u8],
 	state: &mut BlockchainMock,
 	contract_map: &ContractMap<TxContext>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
@@ -330,7 +362,7 @@ fn execute_sc_create(
 		let new_address = state.create_account_after_deploy(
 			&tx_input,
 			tx_output.contract_storage,
-			contract_path.clone(),
+			contract_path.to_vec(),
 		);
 		state.send_balance(&new_address, tx_output.send_balance_list.as_slice())?;
 	} else {
@@ -364,22 +396,22 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 		);
 	}
 
-	if let Some(expected_message) = &tx_expect.message {
-		let want_str = std::str::from_utf8(expected_message.value.as_slice()).unwrap();
-		let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
-		assert_eq!(
-			want_str, have_str,
-			"bad error message. Tx id: {}. Want: \"{}\". Have: \"{}\"",
-			tx_id, want_str, have_str
-		);
-	}
-
+	let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
 	assert!(
 		tx_expect.status.check(tx_result.result_status),
-		"bad tx status. Tx id: {}. Want: \"{}\". Have: \"{}\"",
+		"result code mismatch. Tx id: {}. Want: {}. Have: {}. Message: {}",
 		tx_id,
 		tx_expect.status,
-		tx_result.result_status
+		tx_result.result_status,
+		have_str,
+	);
+
+	assert!(
+		tx_expect.message.check(&tx_result.result_message),
+		"result message mismatch. Tx id: {}. Want: {}. Have: {}.",
+		tx_id,
+		&tx_expect.message,
+		have_str,
 	);
 
 	match &tx_expect.logs {
@@ -400,22 +432,16 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
 					tx_id,
 					verbose_hex(&expected_log.address.value),
-					vec_u8_to_string(&expected_log.identifier.value),
+					bytes_to_string(&expected_log.identifier.value),
 					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
 					verbose_hex(&expected_log.data.value),
 					address_hex(&actual_log.address),
-					vec_u8_to_string(&actual_log.identifier),
+					bytes_to_string(&actual_log.identifier),
 					actual_log.topics.iter().map(|topic| verbose_hex(&topic)).collect::<String>(),
 					verbose_hex(&actual_log.data),
 				);
 			}
 		},
-		CheckLogs::DefaultStar => assert!(
-			tx_result.result_logs.is_empty(),
-			"Log amounts do not match. Tx id: {}. Expected no logs, have: \"{:?}\"",
-			tx_id,
-			tx_result.result_logs
-		),
 	}
 }
 
@@ -472,7 +498,7 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 			}
 
 			match &expected_account.esdt {
-				Some(CheckEsdt::Equal(eq)) => {
+				CheckEsdt::Equal(eq) => {
 					let default_value = &BigUint::from(0u32);
 					for (expected_key, expected_value) in eq.iter() {
 						let actual_value = account
@@ -505,29 +531,12 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 						);
 					}
 				},
-
-				Some(CheckEsdt::Star) => {
+				CheckEsdt::Star => {
 					// nothing to be done for *
-				},
-
-				// we still have to check that the actual storage is empty
-				None => {
-					let default_check_value = CheckValue::Equal(BigUintValue::default());
-
-					for (actual_key, actual_value) in account.esdt.iter() {
-						assert!(
-							default_check_value.check(actual_value),
-							"bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
-							expected_address,
-							verbose_hex(actual_key),
-							default_check_value,
-							actual_value
-						);
-					}
 				},
 			}
 
-			if let Some(CheckEsdt::Equal(eq)) = &expected_account.esdt {
+			if let CheckEsdt::Equal(eq) = &expected_account.esdt {
 				let default_value = &BigUint::from(0u32);
 				for (expected_key, expected_value) in eq.iter() {
 					let actual_value = account
@@ -600,7 +609,7 @@ fn update_block_info(block_info: &mut super::BlockInfo, mandos_block_info: &mand
 		);
 
 		let mut seed = [0u8; SEED_LEN];
-		&seed[..].copy_from_slice(val.as_slice());
+		seed[..].copy_from_slice(val.as_slice());
 		block_info.block_random_seed = Box::from(seed);
 	}
 }
