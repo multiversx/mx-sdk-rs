@@ -105,13 +105,13 @@ where
 	/// Gets the given key's corresponding entry in the map for in-place manipulation.
 	pub fn entry(&mut self, key: K) -> Entry<'_, SA, K, V> {
 		if self.contains_key(&key) {
-			Entry::Vacant(VacantEntry {
+			Entry::Occupied(OccupiedEntry {
 				key,
 				map: self,
 				_marker: PhantomData,
 			})
 		} else {
-			Entry::Occupied(OccupiedEntry {
+			Entry::Vacant(VacantEntry {
 				key,
 				map: self,
 				_marker: PhantomData,
