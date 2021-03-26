@@ -97,3 +97,12 @@ impl<T> SCResult<T> {
 		}
 	}
 }
+
+impl<T> From<SCResult<T>> for Result<T, SCError> {
+	fn from(result: SCResult<T>) -> Self {
+		match result {
+			SCResult::Ok(ok) => Result::Ok(ok),
+			SCResult::Err(error) => Result::Err(error),
+		}
+	}
+}
