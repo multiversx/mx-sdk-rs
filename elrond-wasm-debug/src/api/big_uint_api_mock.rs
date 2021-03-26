@@ -60,6 +60,12 @@ impl Clone for RustBigUint {
 	}
 }
 
+impl Default for RustBigUint {
+	fn default() -> Self {
+		Self::zero()
+	}
+}
+
 macro_rules! binary_operator {
 	($trait:ident, $method:ident) => {
 		impl $trait for RustBigUint {
