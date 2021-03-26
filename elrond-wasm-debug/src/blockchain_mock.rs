@@ -161,7 +161,10 @@ impl BlockchainMock {
 				panic!("Recipient account is not a smart contract");
 			}
 		} else {
-			panic!("Account not found");
+			panic!(
+				"Account not found: {}",
+				&std::str::from_utf8(contract_address.as_ref()).unwrap()
+			);
 		}
 	}
 
@@ -282,10 +285,12 @@ impl BlockchainMock {
 	}
 
 	pub fn increase_nonce(&mut self, address: &Address) {
-		let account = self
-			.accounts
-			.get_mut(address)
-			.unwrap_or_else(|| panic!("Account not found"));
+		let account = self.accounts.get_mut(address).unwrap_or_else(|| {
+			panic!(
+				"Account not found: {}",
+				&std::str::from_utf8(address.as_ref()).unwrap()
+			)
+		});
 		account.nonce += 1;
 	}
 
@@ -333,10 +338,12 @@ impl BlockchainMock {
 	}
 
 	pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
-		let account = self
-			.accounts
-			.get_mut(address)
-			.unwrap_or_else(|| panic!("Account not found"));
+		let account = self.accounts.get_mut(address).unwrap_or_else(|| {
+			panic!(
+				"Account not found: {}",
+				&std::str::from_utf8(address.as_ref()).unwrap()
+			)
+		});
 		account.balance += amount;
 		let mut storage_v_rew =
 			if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY) {
