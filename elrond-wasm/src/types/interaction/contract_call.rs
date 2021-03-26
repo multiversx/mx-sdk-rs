@@ -1,22 +1,39 @@
-use crate::api::{BigUintApi, ESDT_TRANSFER_STRING};
-use crate::hex_call_data::HexCallDataSerializer;
 use crate::types::{
 	Address, ArgBuffer, AsyncCall, BoxedBytes, TokenIdentifier, TransferEgldExecute,
 	TransferEsdtExecute, TransferExecute,
 };
+use crate::{
+	api::{BigUintApi, SendApi, ESDT_TRANSFER_STRING},
+	BytesArgLoader, DynArg,
+};
+use crate::{hex_call_data::HexCallDataSerializer, ArgId};
+use core::marker::PhantomData;
 
 /// Represents metadata for calling another contract.
 /// Can transform into either an async call, transfer call or other types of calls.
 #[must_use]
-pub struct ContractCall<BigUint: BigUintApi> {
+pub struct ContractCall<BigUint: BigUintApi + 'static, R> {
 	to: Address,
 	token: TokenIdentifier,
 	payment: BigUint,
 	endpoint_name: BoxedBytes,
 	pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
+	_return_type: PhantomData<R>,
 }
 
-impl<BigUint: BigUintApi> ContractCall<BigUint> {
+pub fn new_contract_call<BigUint: BigUintApi, R>(
+	to: Address,
+	token: TokenIdentifier,
+	payment: BigUint,
+	endpoint_name: BoxedBytes,
+) -> ContractCall<BigUint, R> {
+	ContractCall::<BigUint, R>::new(to, token, payment, endpoint_name)
+}
+
+impl<BigUint, R> ContractCall<BigUint, R>
+where
+	BigUint: BigUintApi,
+{
 	pub fn new(
 		to: Address,
 		token: TokenIdentifier,
@@ -29,6 +46,7 @@ impl<BigUint: BigUintApi> ContractCall<BigUint> {
 			payment,
 			endpoint_name,
 			arg_buffer: ArgBuffer::new(),
+			_return_type: PhantomData,
 		}
 	}
 
@@ -56,6 +74,7 @@ impl<BigUint: BigUintApi> ContractCall<BigUint> {
 				payment: BigUint::zero(),
 				endpoint_name: BoxedBytes::from(ESDT_TRANSFER_STRING),
 				arg_buffer: new_arg_buffer.concat(self.arg_buffer),
+				_return_type: PhantomData,
 			}
 		} else {
 			self
@@ -111,5 +130,30 @@ impl<BigUint: BigUintApi> ContractCall<BigUint> {
 			arg_buffer: self.arg_buffer,
 			gas_limit: 0,
 		}
+	}
+}
+
+impl<BigUint, R> ContractCall<BigUint, R>
+where
+	BigUint: BigUintApi,
+	R: DynArg,
+{
+	/// Executes immediately, synchronously, and returns contract call result.
+	/// Only works if the target contract is in the same shard.
+	pub fn execute_on_dest_context<SA>(mut self, gas: u64, api: SA) -> R
+	where
+		SA: SendApi<BigUint>,
+	{
+		self = self.convert_to_esdt_transfer_call();
+		let raw_result = api.execute_on_dest_context_raw(
+			gas,
+			&self.to,
+			&self.payment,
+			self.endpoint_name.as_slice(),
+			&self.arg_buffer,
+		);
+
+		let mut loader = BytesArgLoader::new(raw_result.as_slice(), api);
+		R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
 	}
 }

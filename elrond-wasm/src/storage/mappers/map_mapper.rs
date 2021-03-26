@@ -1,4 +1,4 @@
-use super::{set_mapper, SetMapper, StorageMapper};
+use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::storage::{storage_get, storage_set};
 use crate::types::BoxedBytes;
@@ -33,6 +33,20 @@ where
 			keys_set: SetMapper::<SA, K>::new(api, main_key),
 			_phantom: PhantomData,
 		}
+	}
+}
+
+impl<SA, K, V> StorageClearable for MapMapper<SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode,
+	V: TopEncode + TopDecode,
+{
+	fn clear(&mut self) {
+		for key in self.keys_set.iter() {
+			self.clear_mapped_value(&key);
+		}
+		self.keys_set.clear();
 	}
 }
 

@@ -1,0 +1,454 @@
+{
+    "name": "storage",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "before",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_view",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_insert_default",
+                "arguments": [
+                    "42"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-map-insert-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_insert_value",
+                "arguments": [
+                    "42",
+                    "420",
+                    "421"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    []
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:0",
+                        "``map_storage_mapper.value|u32:1": "42",
+                        "``map_storage_mapper.node_id|42": "1",
+                        "``map_storage_mapper.info": "u32:1|u32:1|u32:1|u32:1",
+                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:0",
+                        "``map_storage_mapper.storage|42|``.value|u32:1": "420",
+                        "``map_storage_mapper.storage|42|``.node_id|420": "1",
+                        "``map_storage_mapper.storage|42|``.mapped|420": "421",
+                        "``map_storage_mapper.storage|42|``.info": "u32:1|u32:1|u32:1|u32:1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-map-storage-after-first-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_view",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "42",
+                    "420",
+                    "421"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_insert_default",
+                "arguments": [
+                    "43"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "second-map-insert-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_insert_value",
+                "arguments": [
+                    "43",
+                    "430",
+                    "431"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    []
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-map-storage-after-second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_view",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "42",
+                    "420",
+                    "421",
+                    "43",
+                    "430",
+                    "431"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "``map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "``map_storage_mapper.value|u32:1": "42",
+                        "``map_storage_mapper.value|u32:2": "43",
+                        "``map_storage_mapper.node_id|42": "1",
+                        "``map_storage_mapper.node_id|43": "2",
+                        "``map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
+                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:0",
+                        "``map_storage_mapper.storage|42|``.value|u32:1": "420",
+                        "``map_storage_mapper.storage|42|``.node_id|420": "1",
+                        "``map_storage_mapper.storage|42|``.mapped|420": "421",
+                        "``map_storage_mapper.storage|42|``.info": "u32:1|u32:1|u32:1|u32:1",
+                        "``map_storage_mapper.storage|43|``.node_links|u32:1": "u32:0|u32:0",
+                        "``map_storage_mapper.storage|43|``.value|u32:1": "430",
+                        "``map_storage_mapper.storage|43|``.node_id|430": "1",
+                        "``map_storage_mapper.storage|43|``.mapped|430": "431",
+                        "``map_storage_mapper.storage|43|``.info": "u32:1|u32:1|u32:1|u32:1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-contains-after-second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_contains_key",
+                "arguments": [
+                    "42"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "insert-first-value-into-first-storage",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_insert_value",
+                "arguments": [
+                    "42",
+                    "100",
+                    "200"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "``map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "``map_storage_mapper.value|u32:1": "42",
+                        "``map_storage_mapper.value|u32:2": "43",
+                        "``map_storage_mapper.node_id|42": "1",
+                        "``map_storage_mapper.node_id|43": "2",
+                        "``map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
+                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:2",
+                        "``map_storage_mapper.storage|42|``.value|u32:1": "420",
+                        "``map_storage_mapper.storage|42|``.node_id|420": "1",
+                        "``map_storage_mapper.storage|42|``.mapped|420": "421",
+                        "``map_storage_mapper.storage|42|``.node_links|u32:2": "u32:1|u32:0",
+                        "``map_storage_mapper.storage|42|``.value|u32:2": "100",
+                        "``map_storage_mapper.storage|42|``.node_id|100": "2",
+                        "``map_storage_mapper.storage|42|``.mapped|100": "200",
+                        "``map_storage_mapper.storage|42|``.info": "u32:2|u32:1|u32:2|u32:2",
+                        "``map_storage_mapper.storage|43|``.node_links|u32:1": "u32:0|u32:0",
+                        "``map_storage_mapper.storage|43|``.value|u32:1": "430",
+                        "``map_storage_mapper.storage|43|``.node_id|430": "1",
+                        "``map_storage_mapper.storage|43|``.mapped|430": "431",
+                        "``map_storage_mapper.storage|43|``.info": "u32:1|u32:1|u32:1|u32:1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-remove",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_remove",
+                "arguments": [
+                    "42"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``map_storage_mapper.node_links|u32:2": "u32:0|u32:0",
+                        "``map_storage_mapper.value|u32:2": "43",
+                        "``map_storage_mapper.node_id|43": "2",
+                        "``map_storage_mapper.info": "u32:1|u32:2|u32:2|u32:2",
+                        "``map_storage_mapper.storage|43|``.node_links|u32:1": "u32:0|u32:0",
+                        "``map_storage_mapper.storage|43|``.value|u32:1": "430",
+                        "``map_storage_mapper.storage|43|``.node_id|430": "1",
+                        "``map_storage_mapper.storage|43|``.mapped|430": "431",
+                        "``map_storage_mapper.storage|43|``.info": "u32:1|u32:1|u32:1|u32:1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "clear-map-storage",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_clear",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-get-after-second-remove",
+            "tx": {
+                "from": "address:an_account",
+                "to": "address:features_contract",
+                "value": "0",
+                "function": "map_storage_mapper_get",
+                "arguments": [
+                    "42"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:No storage!",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

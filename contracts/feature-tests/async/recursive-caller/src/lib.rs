@@ -4,15 +4,15 @@ elrond_wasm::imports!();
 
 #[elrond_wasm_derive::callable(VaultProxy)]
 pub trait Vault {
-	fn echo_arguments(&self, args: VarArgs<BoxedBytes>) -> ContractCall<BigUint>;
+	fn echo_arguments(&self, args: VarArgs<BoxedBytes>) -> ContractCall<BigUint, ()>;
 
 	#[payable("*")]
-	fn accept_funds(&self) -> ContractCall<BigUint>;
+	fn accept_funds(&self) -> ContractCall<BigUint, ()>;
 
 	#[payable("*")]
-	fn reject_funds(&self) -> ContractCall<BigUint>;
+	fn reject_funds(&self) -> ContractCall<BigUint, ()>;
 
-	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) -> ContractCall<BigUint>;
+	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) -> ContractCall<BigUint, ()>;
 }
 
 #[elrond_wasm_derive::callable(AlsoRecursiveCallerProxy)]
@@ -23,7 +23,7 @@ pub trait AlsoRecursiveCaller {
 		token_identifier: &TokenIdentifier,
 		amount: &BigUint,
 		counter: u32,
-	) -> ContractCall<BigUint>;
+	) -> ContractCall<BigUint, ()>;
 }
 
 /// Test contract for investigating async calls.

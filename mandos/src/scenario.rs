@@ -43,6 +43,12 @@ pub enum Step {
 		tx: Box<TxCall>,
 		expect: Option<TxExpect>,
 	},
+	ScQuery {
+		tx_id: String,
+		comment: Option<String>,
+		tx: Box<TxQuery>,
+		expect: Option<TxExpect>,
+	},
 	ScDeploy {
 		tx_id: String,
 		comment: Option<String>,
@@ -114,6 +120,17 @@ impl InterpretableFrom<StepRaw> for Step {
 				tx_id,
 				comment,
 				tx: Box::new(TxCall::interpret_from(tx, context)),
+				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
+			},
+			StepRaw::ScQuery {
+				tx_id,
+				comment,
+				tx,
+				expect,
+			} => Step::ScQuery {
+				tx_id,
+				comment,
+				tx: Box::new(TxQuery::interpret_from(tx, context)),
 				expect: expect.map(|v| TxExpect::interpret_from(v, context)),
 			},
 			StepRaw::ScDeploy {
@@ -239,6 +256,27 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
 }
 
 #[derive(Debug)]
+pub struct TxQuery {
+	pub to: AddressValue,
+	pub function: String,
+	pub arguments: Vec<BytesValue>,
+}
+
+impl InterpretableFrom<TxQueryRaw> for TxQuery {
+	fn interpret_from(from: TxQueryRaw, context: &InterpreterContext) -> Self {
+		TxQuery {
+			to: AddressValue::interpret_from(from.to, context),
+			function: from.function,
+			arguments: from
+				.arguments
+				.into_iter()
+				.map(|t| BytesValue::interpret_from(t, context))
+				.collect(),
+		}
+	}
+}
+
+#[derive(Debug)]
 pub struct TxDeploy {
 	pub from: AddressValue,
 	pub call_value: BigUintValue,
@@ -309,10 +347,10 @@ impl InterpretableFrom<TxValidatorRewardRaw> for TxValidatorReward {
 pub struct TxExpect {
 	pub out: Vec<CheckValue<BytesValue>>,
 	pub status: CheckValue<U64Value>,
+	pub message: CheckValue<BytesValue>,
 	pub logs: CheckLogs,
-	pub message: Option<BytesValue>,
 	pub gas: Option<CheckValue<U64Value>>,
-	pub refund: Option<CheckValue<U64Value>>,
+	pub refund: CheckValue<U64Value>,
 }
 
 impl InterpretableFrom<TxExpectRaw> for TxExpect {
@@ -325,13 +363,13 @@ impl InterpretableFrom<TxExpectRaw> for TxExpect {
 				.collect(),
 			status: CheckValue::<U64Value>::interpret_from(from.status, context),
 			logs: CheckLogs::interpret_from(from.logs, context),
-			message: from.message.map(|v| BytesValue::interpret_from(v, context)),
-			gas: from
-				.gas
-				.map(|v| CheckValue::<U64Value>::interpret_from(v, context)),
-			refund: from
-				.refund
-				.map(|v| CheckValue::<U64Value>::interpret_from(v, context)),
+			message: CheckValue::<BytesValue>::interpret_from(from.message, context),
+			gas: if let CheckBytesValueRaw::Unspecified = from.gas {
+				None // gas is an exception: by default it is "*" instead of "0"
+			} else {
+				Some(CheckValue::<U64Value>::interpret_from(from.gas, context))
+			},
+			refund: CheckValue::<U64Value>::interpret_from(from.refund, context),
 		}
 	}
 }
