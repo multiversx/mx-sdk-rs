@@ -1,0 +1,121 @@
+{
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "address:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context",
+            "tx": {
+                "from": "address:a_user",
+                "to": "address:forwarder",
+                "value": "0",
+                "function": "call_execute_on_dest_context",
+                "arguments": [
+                    "address:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "address:forwarder",
+                        "identifier": "str:execute_on_dest_context_result",
+                        "topics": [],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context_twice",
+            "tx": {
+                "from": "address:a_user",
+                "to": "address:forwarder",
+                "value": "0",
+                "function": "call_execute_on_dest_context_twice",
+                "arguments": [
+                    "address:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2",
+                    "1",
+                    "2"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "address:forwarder",
+                        "identifier": "str:execute_on_dest_context_result",
+                        "topics": [],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    },
+                    {
+                        "address": "address:forwarder",
+                        "identifier": "str:execute_on_dest_context_result",
+                        "topics": [],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

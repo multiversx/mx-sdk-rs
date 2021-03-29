@@ -27,7 +27,10 @@ impl<A> ContractMap<A> {
 		if let Some(new_contract_closure) = self.factories.get(contract_identifier) {
 			new_contract_closure(tx_context)
 		} else {
-			panic!("Unknown contract");
+			panic!(
+				"Unknown contract: {}",
+				std::str::from_utf8(contract_identifier).unwrap()
+			);
 		}
 	}
 
