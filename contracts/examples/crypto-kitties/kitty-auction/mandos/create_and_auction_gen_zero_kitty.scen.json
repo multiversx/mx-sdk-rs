@@ -28,6 +28,7 @@
                 "out": ["1"],
                 "message": "",
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

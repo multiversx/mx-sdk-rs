@@ -73,11 +73,11 @@ pub fn async_callback_tx_input(
 	}
 }
 
-pub fn merge_results(mut original: TxResult, new: TxResult) -> TxResult {
+pub fn merge_results(mut original: TxResult, mut new: TxResult) -> TxResult {
 	if original.result_status == 0 {
-		original
-			.result_values
-			.extend_from_slice(new.result_values.as_slice());
+		original.result_values.append(&mut new.result_values);
+		original.result_logs.append(&mut new.result_logs);
+		original.result_message = new.result_message;
 		original
 	} else {
 		new
