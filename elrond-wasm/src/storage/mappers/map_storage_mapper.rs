@@ -124,7 +124,11 @@ where
 		self.keys_set.insert(k)
 	}
 
-	/// Takes the value out of the entry, and returns it.
+	/// Removes the entry from the map.
+	///
+	/// If the entry was removed, `true` is returned.
+	///
+	/// If the map didn't contain an entry with this key, `false` is returned.
 	pub fn remove(&mut self, k: &K) -> bool {
 		if self.keys_set.remove(k) {
 			self.get_mapped_storage_value(k).clear();
@@ -382,7 +386,7 @@ where
 		f(&mut value)
 	}
 
-	/// Takes the value of the entry out of the map, removing it.
+	/// Removes the entry from the map.
 	pub fn remove(self) {
 		self.map.remove(&self.key);
 	}
