@@ -20,6 +20,7 @@
             "expect": {
                 "message": "",
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

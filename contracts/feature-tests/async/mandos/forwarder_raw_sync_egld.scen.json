@@ -1,0 +1,121 @@
+{
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "2000",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "address:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context",
+            "tx": {
+                "from": "address:a_user",
+                "to": "address:forwarder",
+                "value": "1000",
+                "function": "call_execute_on_dest_context",
+                "arguments": [
+                    "address:vault",
+                    "str:accept_funds"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "address:vault",
+                        "identifier": "str:accept_funds",
+                        "topics": [
+                            "str:EGLD",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "address:forwarder",
+                        "identifier": "str:execute_on_dest_context_result",
+                        "topics": [],
+                        "data": {}
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context_twice",
+            "tx": {
+                "from": "address:a_user",
+                "to": "address:forwarder",
+                "value": "1000",
+                "function": "call_execute_on_dest_context_twice",
+                "arguments": [
+                    "address:vault",
+                    "str:accept_funds"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "address:vault",
+                        "identifier": "str:accept_funds",
+                        "topics": [
+                            "str:EGLD",
+                            "500"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "address:forwarder",
+                        "identifier": "str:execute_on_dest_context_result",
+                        "topics": [],
+                        "data": {}
+                    },
+                    {
+                        "address": "address:vault",
+                        "identifier": "str:accept_funds",
+                        "topics": [
+                            "str:EGLD",
+                            "500"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "address:forwarder",
+                        "identifier": "str:execute_on_dest_context_result",
+                        "topics": [],
+                        "data": {}
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
