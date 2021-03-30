@@ -414,6 +414,18 @@ pub trait BasicFeatures {
 			.update(|value| *value += amount);
 	}
 
+	// Often times the update of a value is conditioned by a requirement
+	// For example, when subtracting from a balance, we must first check that we have enough funds
+	// The closure can return a Result, which can be propagated (either directly, or via sc_try!)
+	#[endpoint]
+	fn my_single_value_mapper_subtract_with_require(&self, amount: &BigInt) -> SCResult<()> {
+		self.map_my_single_value_mapper().update(|value| {
+			require!(*value >= *amount, "not enough funds");
+			*value -= amount;
+			Ok(())
+		})
+	}
+
 	#[endpoint]
 	fn clear_single_value_mapper(&self) {
 		self.map_my_single_value_mapper().clear();
@@ -535,6 +547,38 @@ pub trait BasicFeatures {
 		map_mapper.remove(&item)
 	}
 
+	#[endpoint]
+	fn map_mapper_entry_or_default_update_increment(&self, item: u32, increment: u32) -> u32 {
+		self.map_mapper().entry(item).or_default().update(|value| {
+			*value += increment;
+			*value
+		})
+	}
+
+	#[endpoint]
+	fn map_mapper_entry_or_insert_default(&self, item: u32, default: u32) -> u32 {
+		let mut mapper = self.map_mapper();
+		let entry = mapper.entry(item);
+		entry.or_insert_with(|| default).get()
+	}
+
+	#[endpoint]
+	fn map_mapper_entry_and_modify(&self, item: u32, increment: u32, otherwise: u32) -> u32 {
+		self.map_mapper()
+			.entry(item)
+			.and_modify(|value| *value += increment)
+			.or_insert(otherwise)
+			.get()
+	}
+
+	#[endpoint]
+	fn map_mapper_entry_or_insert_with_key(&self, item: u32, key_increment: u32) -> u32 {
+		self.map_mapper()
+			.entry(item)
+			.or_insert_with_key(|key| key + key_increment)
+			.get()
+	}
+
 	// MapStorageMapper
 
 	#[storage_mapper("map_storage_mapper")]
@@ -614,6 +658,52 @@ pub trait BasicFeatures {
 	fn map_storage_mapper_clear(&self) {
 		let mut map_storage_mapper = self.map_storage_mapper();
 		map_storage_mapper.clear();
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_entry_or_default_update_increment(
+		&self,
+		item: u32,
+		key: u32,
+		increment: u32,
+	) -> u32 {
+		let mut map = self.map_storage_mapper().entry(item).or_default().get();
+		map.entry(key).or_default().update(|value| {
+			*value += increment;
+			*value
+		})
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_entry_and_modify_increment_or_default(
+		&self,
+		item: u32,
+		key: u32,
+		value: u32,
+		other: u32,
+	) -> u32 {
+		let map = self
+			.map_storage_mapper()
+			.entry(item)
+			.and_modify(|map| {
+				map.insert(key, value);
+			})
+			.or_default()
+			.get();
+		map.get(&key).unwrap_or(other)
+	}
+
+	#[endpoint]
+	fn map_storage_mapper_entry_or_default_update(
+		&self,
+		item: u32,
+		key: u32,
+		value: u32,
+	) -> Option<u32> {
+		self.map_storage_mapper()
+			.entry(item)
+			.or_default()
+			.update(|map| map.insert(key, value))
 	}
 
 	// BASIC API
@@ -1166,5 +1256,12 @@ pub trait BasicFeatures {
 	#[view]
 	fn result_err_from_str<'a>(&self, e: &'a str) -> Result<(), &'a str> {
 		Result::Err(e)
+	}
+
+	#[endpoint]
+	fn result_echo(&self, arg: Option<String>, test: bool) -> Result<String, SCError> {
+		require!(test, "test argument is false");
+		let unwrapped = arg.ok_or("option argument is none")?;
+		Result::Ok(unwrapped)
 	}
 }
