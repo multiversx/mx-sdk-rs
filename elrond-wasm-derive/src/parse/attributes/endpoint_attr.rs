@@ -54,7 +54,7 @@ impl ViewAttribute {
 				view_name: Some(ident),
 			}),
 			Some(None) => Some(ViewAttribute { view_name: None }),
-			_ => panic!("unexpected endpoint argument tokens"),
+			_ => panic!("unexpected view argument tokens"),
 		}
 	}
 }

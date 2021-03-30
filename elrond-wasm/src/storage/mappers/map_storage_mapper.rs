@@ -98,6 +98,23 @@ where
 		None
 	}
 
+	/// Gets the given key's corresponding entry in the map for in-place manipulation.
+	pub fn entry(&mut self, key: K) -> Entry<SA, K, V> {
+		if self.contains_key(&key) {
+			Entry::Occupied(OccupiedEntry {
+				key,
+				map: self,
+				_marker: PhantomData,
+			})
+		} else {
+			Entry::Vacant(VacantEntry {
+				key,
+				map: self,
+				_marker: PhantomData,
+			})
+		}
+	}
+
 	/// Adds a default value for the key, if it is not already present.
 	///
 	/// If the map did not have this key present, `true` is returned.
@@ -107,16 +124,11 @@ where
 		self.keys_set.insert(k)
 	}
 
-	/// Returns the value corresponding to the key.
+	/// Removes the entry from the map.
 	///
-	/// If the key is not found, it is inserted and a new default value is returned.
-	pub fn get_or_insert_default(&mut self, k: K) -> V {
-		let value = self.get_mapped_storage_value(&k);
-		self.keys_set.insert(k);
-		value
-	}
-
-	/// Takes the value out of the entry, and returns it.
+	/// If the entry was removed, `true` is returned.
+	///
+	/// If the map didn't contain an entry with this key, `false` is returned.
 	pub fn remove(&mut self, k: &K) -> bool {
 		if self.keys_set.remove(k) {
 			self.get_mapped_storage_value(k).clear();
@@ -225,5 +237,157 @@ where
 			return Some(value);
 		}
 		None
+	}
+}
+
+pub enum Entry<'a, SA, K: 'a, V: 'a>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	/// A vacant entry.
+	Vacant(VacantEntry<'a, SA, K, V>),
+
+	/// An occupied entry.
+	Occupied(OccupiedEntry<'a, SA, K, V>),
+}
+
+/// A view into a vacant entry in a `MapStorageMapper`.
+/// It is part of the [`Entry`] enum.
+pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	pub(super) key: K,
+	pub(super) map: &'a mut MapStorageMapper<SA, K, V>,
+
+	// Be invariant in `K` and `V`
+	pub(super) _marker: PhantomData<&'a mut (K, V)>,
+}
+
+/// A view into an occupied entry in a `MapStorageMapper`.
+/// It is part of the [`Entry`] enum.
+pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	pub(super) key: K,
+	pub(super) map: &'a mut MapStorageMapper<SA, K, V>,
+
+	// Be invariant in `K` and `V`
+	pub(super) _marker: PhantomData<&'a mut (K, V)>,
+}
+
+impl<'a, SA, K, V> Entry<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + Clone + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	/// Ensures a value is in the entry by inserting the default if empty, and returns
+	/// an `OccupiedEntry`.
+	pub fn or_insert_default(self) -> OccupiedEntry<'a, SA, K, V> {
+		match self {
+			Entry::Occupied(entry) => entry,
+			Entry::Vacant(entry) => entry.insert_default(),
+		}
+	}
+
+	/// Returns a reference to this entry's key.
+	pub fn key(&self) -> &K {
+		match *self {
+			Entry::Occupied(ref entry) => entry.key(),
+			Entry::Vacant(ref entry) => entry.key(),
+		}
+	}
+
+	/// Provides in-place mutable access to an occupied entry before any
+	/// potential inserts into the map.
+	pub fn and_modify<F>(self, f: F) -> Self
+	where
+		F: FnOnce(&mut V),
+	{
+		match self {
+			Entry::Occupied(mut entry) => {
+				entry.update(f);
+				Entry::Occupied(entry)
+			},
+			Entry::Vacant(entry) => Entry::Vacant(entry),
+		}
+	}
+}
+
+impl<'a, SA, K, V> Entry<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + Clone + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	/// Ensures a value is in the entry by inserting the default value if empty,
+	/// and returns an `OccupiedEntry`.
+	pub fn or_default(self) -> OccupiedEntry<'a, SA, K, V> {
+		match self {
+			Entry::Occupied(entry) => entry,
+			Entry::Vacant(entry) => entry.insert_default(),
+		}
+	}
+}
+
+impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + Clone + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	/// Gets a reference to the key that would be used when inserting a value
+	/// through the VacantEntry.
+	pub fn key(&self) -> &K {
+		&self.key
+	}
+
+	/// Sets the value of the entry with the `VacantEntry`'s key,
+	/// and returns an `OccupiedEntry`.
+	pub fn insert_default(self) -> OccupiedEntry<'a, SA, K, V> {
+		self.map.insert_default(self.key.clone());
+		OccupiedEntry {
+			key: self.key,
+			map: self.map,
+			_marker: PhantomData,
+		}
+	}
+}
+
+impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
+where
+	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+	K: TopEncode + TopDecode + Clone + 'static,
+	V: StorageMapper<SA> + StorageClearable,
+{
+	/// Gets a reference to the key in the entry.
+	pub fn key(&self) -> &K {
+		&self.key
+	}
+
+	/// Gets the value in the entry.
+	pub fn get(&self) -> V {
+		self.map.get(&self.key).unwrap()
+	}
+
+	/// Syntactic sugar, to more compactly express a get, update and set in one line.
+	/// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
+	/// Propagates the return value of the given function.
+	pub fn update<R, F: FnOnce(&mut V) -> R>(&mut self, f: F) -> R {
+		let mut value = self.get();
+		f(&mut value)
+	}
+
+	/// Removes the entry from the map.
+	pub fn remove(self) {
+		self.map.remove(&self.key);
 	}
 }
