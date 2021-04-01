@@ -47,7 +47,7 @@
                 },
                 {
                     "name": "multi-result-2",
-                    "type": "[u8; 3]"
+                    "type": "array3<u8>"
                 },
                 {
                     "name": "multi-result-3",
@@ -65,7 +65,7 @@
                 },
                 {
                     "name": "multi-too-few-2",
-                    "type": "[u8; 3]"
+                    "type": "array3<u8>"
                 },
                 {
                     "type": "bytes"
@@ -248,7 +248,7 @@
                         "Also, just like above, recursive types need to work even when nested into a tuple."
                     ],
                     "name": "tuple_madness",
-                    "type": "(OnlyShowsUpAsNested02,Option<AbiTestType>)"
+                    "type": "tuple2<OnlyShowsUpAsNested02,Option<AbiTestType>>"
                 }
             ]
         },

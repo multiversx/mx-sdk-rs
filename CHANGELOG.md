@@ -5,6 +5,7 @@ There are several crates in this repo, this changelog will keep track of all of 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+- Simplified ABI syntax for tuples and fixed-size arrays
 
 ## [elrond-wasm 0.14.2]
 - Fixed contract call/callback logs in mandos-rs
