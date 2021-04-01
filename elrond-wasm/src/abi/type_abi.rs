@@ -187,14 +187,16 @@ macro_rules! tuple_impls {
                 $($name: TypeAbi,)+
             {
 				fn type_name() -> String {
-					let mut repr = String::from("(");
+					let mut repr = String::from("tuple");
+					repr.push_str(stringify!($len));
+					repr.push_str("<");
 					$(
 						if $n > 0 {
 							repr.push(',');
 						}
 						repr.push_str($name::type_name().as_str());
                     )+
-					repr.push(')');
+					repr.push('>');
 					repr
 				}
 
@@ -232,11 +234,11 @@ macro_rules! array_impls {
         $(
             impl<T: TypeAbi> TypeAbi for [T; $n] {
 				fn type_name() -> String {
-					let mut repr = String::from("[");
-					repr.push_str(T::type_name().as_str());
-					repr.push_str("; ");
+					let mut repr = String::from("array");
 					repr.push_str(stringify!($n));
-					repr.push(']');
+					repr.push_str("<");
+					repr.push_str(T::type_name().as_str());
+					repr.push('>');
 					repr
 				}
 
