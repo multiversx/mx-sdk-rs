@@ -6,7 +6,7 @@ Whether you've been familiar with the world of cryptocurrency and blockchains fo
 
 As we all know, there really isn't such thing as "unique data" when it comes to computers. They copy and share data all the time. The key difference here is the immutability of data on the blockchain: Once an NFT is created, you will be able to trace its history through time, without having to worry about a third party modifying, or even deleting that said NFT.  
 
-But what if you decide you don't really have any value for said collectible item? That's where the NFT marketplace comes in.  
+But what if someone wants to exchange said collectible item for something else? That's where the NFT marketplace comes in.  
 
 ## Difference between ESDT NFTs and ERC1155 NFTs
 
