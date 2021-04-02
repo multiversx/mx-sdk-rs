@@ -20,11 +20,11 @@ By implementing NFTs on the protocol level, we've solved those problems by treat
 
 An ESDT NFT has a token identifier (like all the rest), which is also referred to as its "type" or "class". Then, a type can have "subtypes" or "subclasses", differentiated by `nonce`, `name`, and additional user-defined `attributes`.  
 
-Now that we've hyped ESDT NFTs, it's time to see how you can sell them through the marketplace.  
+Now that we have introduced NFT, it is time to see how they can be sold on the marketplace.  
 
 ## The Marketplace
 
-The marketplace has been designed to be as simple as possible. All it does is accept an NFT and auction it with your terms. It accepts bids from other accounts, and concludes the auction by either sending the token back to you if no bids were received, or send you the respective bid amount and the token to the new owner.
+The marketplace has been designed to be as simple as possible. All it does is accept an NFT and auction it with your terms. It accepts bids from other accounts, and finishes the auction by either sending the token to the winner, or back to the owner if no bids were received.  
 
 ## Royalties
 
