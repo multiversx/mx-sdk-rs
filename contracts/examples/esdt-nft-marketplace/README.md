@@ -53,7 +53,7 @@ Arguments are about what you would expect for an marketplace:
 `accepted_payment_token` - The token you wish to receive as payment. For eGLD, input `EGLD`.  
 `opt_accepted_payment_token_nonce` - "nonce" (also known as "id") for the ESDT token. For usual ESDTs (not NFTs), this is 0 and can be skipped.  
 
-To peform the transfer from your account to the smart contract, you have to use the following transaction format:
+To perform the transfer from your account to the smart contract, you have to use the following transaction format:
 
 ```
 TransferTransaction {
