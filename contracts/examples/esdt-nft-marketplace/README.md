@@ -101,4 +101,4 @@ Arguments are the same as the `bid` ones. If no bids were made, the NFT is retur
 
 ## Conclusion
 
-NFTs are the future of blockchain, and can be used both for entertainment purposes (like cryptokitties, for example) and for serious purposes (like ownership for art, music, etc.). In both cases, the marketplace can be used to sell NFTs as easily as possible.  
+NFTs are the future of blockchain, and can be used both for entertainment purposes (like cryptokitties, for example) and for serious purposes (like ownership of art, music, etc.). In both cases, the marketplace can be used to sell NFTs as easily as possible.  
