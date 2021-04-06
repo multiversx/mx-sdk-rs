@@ -72,7 +72,7 @@ pub trait EsdtNftMarketplace {
 			"Token is not an NFT"
 		);
 		require!(
-			!self.is_up_for_auction(&nft_type, nft_nonce),
+			!self.is_already_up_for_auction(&nft_type, nft_nonce),
 			"There is already an auction for that token"
 		);
 		require!(
@@ -108,7 +108,7 @@ pub trait EsdtNftMarketplace {
 	#[endpoint]
 	fn bid(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
 		require!(
-			self.is_up_for_auction(&nft_type, nft_nonce),
+			self.is_already_up_for_auction(&nft_type, nft_nonce),
 			"Token is not up for auction"
 		);
 
@@ -167,7 +167,7 @@ pub trait EsdtNftMarketplace {
 	#[endpoint(endAuction)]
 	fn end_auction(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
 		require!(
-			self.is_up_for_auction(&nft_type, nft_nonce),
+			self.is_already_up_for_auction(&nft_type, nft_nonce),
 			"Token is not up for auction"
 		);
 
@@ -259,9 +259,9 @@ pub trait EsdtNftMarketplace {
 
 	// views
 
-	#[view(isUpForAuction)]
-	fn is_up_for_auction(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> bool {
-		self.auction_for_token(nft_type, nft_nonce).is_empty()
+	#[view(isAlreadyUpForAuction)]
+	fn is_already_up_for_auction(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> bool {
+		!self.auction_for_token(nft_type, nft_nonce).is_empty()
 	}
 
 	#[view(getPaymentTokenForAuctionedNft)]
@@ -270,7 +270,7 @@ pub trait EsdtNftMarketplace {
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
 	) -> Option<EsdtToken> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(
 				self.auction_for_token(nft_type, nft_nonce)
 					.get()
@@ -287,7 +287,7 @@ pub trait EsdtNftMarketplace {
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
 	) -> Option<(BigUint, BigUint)> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			let auction = self.auction_for_token(nft_type, nft_nonce).get();
 
 			Some((auction.min_bid, auction.max_bid))
@@ -298,7 +298,7 @@ pub trait EsdtNftMarketplace {
 
 	#[view(getDeadline)]
 	fn get_deadline(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> Option<u64> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(self.auction_for_token(nft_type, nft_nonce).get().deadline)
 		} else {
 			None
@@ -307,7 +307,7 @@ pub trait EsdtNftMarketplace {
 
 	#[view(getOriginalOwner)]
 	fn get_original_owner(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> Option<Address> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(
 				self.auction_for_token(nft_type, nft_nonce)
 					.get()
@@ -324,7 +324,7 @@ pub trait EsdtNftMarketplace {
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
 	) -> Option<BigUint> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(
 				self.auction_for_token(nft_type, nft_nonce)
 					.get()
@@ -337,7 +337,7 @@ pub trait EsdtNftMarketplace {
 
 	#[view(getCurrentWinner)]
 	fn get_current_winner(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> Option<Address> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(
 				self.auction_for_token(nft_type, nft_nonce)
 					.get()
@@ -354,7 +354,7 @@ pub trait EsdtNftMarketplace {
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
 	) -> Option<Auction<BigUint>> {
-		if self.is_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(self.auction_for_token(nft_type, nft_nonce).get())
 		} else {
 			None
