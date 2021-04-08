@@ -9,4 +9,6 @@ pub struct DepositInfo<BigUint: BigUintApi> {
     pub depositor_address: Address,
     pub expiration_round: u64,
     pub token_name: TokenIdentifier,
+    pub nonce : u64
 }
+
