@@ -1,14 +1,49 @@
 #![no_std]
 
+mod call_async;
+mod call_sync;
+mod esdt;
+mod nft;
+mod roles;
+mod sft;
+mod storage;
 mod vault_proxy;
-use vault_proxy::*;
+
+use call_async::*;
+use call_sync::*;
+use esdt::*;
+use nft::*;
+use roles::*;
+use sft::*;
+use storage::*;
 
 elrond_wasm::imports!();
 
-/// Test contract for investigating async calls.
+/// Test contract for investigating contract calls.
 /// TODO: split into modules.
 #[elrond_wasm_derive::contract(ForwarderImpl)]
 pub trait Forwarder {
+	#[module(ForwarderAsyncCallModuleImpl)]
+	fn async_call_module(&self) -> ForwarderAsyncCallModuleImpl<T, BigInt, BigUint>;
+
+	#[module(ForwarderSyncCallModuleImpl)]
+	fn sync_call_module(&self) -> ForwarderSyncCallModuleImpl<T, BigInt, BigUint>;
+
+	#[module(ForwarderEsdtModuleImpl)]
+	fn esdt_module(&self) -> ForwarderEsdtModuleImpl<T, BigInt, BigUint>;
+
+	#[module(ForwarderNftModuleImpl)]
+	fn nft_module(&self) -> ForwarderNftModuleImpl<T, BigInt, BigUint>;
+
+	#[module(ForwarderSftModuleImpl)]
+	fn sft_module(&self) -> ForwarderSftModuleImpl<T, BigInt, BigUint>;
+
+	#[module(ForwarderRolesModuleImpl)]
+	fn roles_module(&self) -> ForwarderRolesModuleImpl<T, BigInt, BigUint>;
+
+	#[module(ForwarderStorageModuleImpl)]
+	fn storage_module(&self) -> ForwarderStorageModuleImpl<T, BigInt, BigUint>;
+
 	#[init]
 	fn init(&self) {}
 
@@ -26,113 +61,15 @@ pub trait Forwarder {
 		self.send().direct_egld(to, amount, data);
 	}
 
-	#[endpoint]
-	fn send_esdt(
-		&self,
-		to: &Address,
-		token_id: BoxedBytes,
-		amount: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
-	}
-
-	#[endpoint]
-	fn send_esdt_twice(
-		&self,
-		to: &Address,
-		token_id: BoxedBytes,
-		amount_first_time: &BigUint,
-		amount_second_time: &BigUint,
-		#[var_args] opt_data: OptionalArg<BoxedBytes>,
-	) {
-		let data = match &opt_data {
-			OptionalArg::Some(data) => data.as_slice(),
-			OptionalArg::None => &[],
-		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn forward_async_accept_funds(
-		&self,
-		to: Address,
-		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to, VaultProxy)
-			.with_token_transfer(token, payment)
-			.accept_funds()
-			.async_call()
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn forward_async_accept_funds_half_payment(
-		&self,
-		to: Address,
-		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
-	) -> AsyncCall<BigUint> {
-		let half_payment = payment / 2u32.into();
-		contract_call!(self, to, VaultProxy)
-			.with_token_transfer(token, half_payment)
-			.accept_funds()
-			.async_call()
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn retrieve_funds(
-		&self,
-		to: Address,
-		token: TokenIdentifier,
-		payment: BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to, VaultProxy)
-			.retrieve_funds(token, payment)
-			.async_call()
-			.with_callback(self.callbacks().retrieve_funds_callback())
-	}
-
 	#[callback]
 	fn retrieve_funds_callback(
 		&self,
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: BigUint,
 	) {
-		let _ = self.callback_data().push(&(
-			BoxedBytes::from(&b"retrieve_funds_callback"[..]),
-			token,
-			payment,
-			Vec::new(),
-		));
-	}
-
-	#[endpoint]
-	fn send_funds_twice(
-		&self,
-		to: &Address,
-		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to.clone(), VaultProxy)
-			.with_token_transfer(token_identifier.clone(), amount.clone())
-			.accept_funds()
-			.async_call()
-			.with_callback(
-				self.callbacks()
-					.send_funds_twice_callback(to, token_identifier, amount),
-			)
+		// manual callback forwarding to modules is currently necessary
+		self.async_call_module()
+			.retrieve_funds_callback(token, payment)
 	}
 
 	#[callback]
@@ -142,78 +79,47 @@ pub trait Forwarder {
 		token_identifier: &TokenIdentifier,
 		amount: &BigUint,
 	) -> AsyncCall<BigUint> {
-		contract_call!(self, to.clone(), VaultProxy)
-			.with_token_transfer(token_identifier.clone(), amount.clone())
-			.accept_funds()
-			.async_call()
+		// manual callback forwarding to modules is currently necessary
+		self.async_call_module()
+			.send_funds_twice_callback(to, token_identifier, amount)
 	}
 
-	#[view]
-	#[storage_mapper("callback_data")]
-	fn callback_data(
+	#[callback]
+	fn esdt_issue_callback(
 		&self,
-	) -> VecMapper<Self::Storage, (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>)>;
-
-	#[view]
-	fn callback_data_at_index(
-		&self,
-		index: usize,
-	) -> MultiResult4<BoxedBytes, TokenIdentifier, BigUint, MultiResultVec<BoxedBytes>> {
-		let (cb_name, token, payment, args) = self.callback_data().get(index);
-		(cb_name, token, payment, args.into()).into()
-	}
-
-	#[endpoint]
-	fn clear_callback_data(&self) {
-		self.callback_data().clear();
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn echo_arguments_sync(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
-		let half_gas = self.get_gas_left() / 2;
-
-		let result = contract_call!(self, to, VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context(half_gas, self.send());
-
-		self.execute_on_dest_context_result(result.as_slice());
-	}
-
-	#[endpoint]
-	#[payable("*")]
-	fn echo_arguments_sync_twice(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
-		let one_third_gas = self.get_gas_left() / 3;
-
-		let result = contract_call!(self, to.clone(), VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context(one_third_gas, self.send());
-
-		self.execute_on_dest_context_result(result.as_slice());
-
-		let result = contract_call!(self, to, VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context(one_third_gas, self.send());
-
-		self.execute_on_dest_context_result(result.as_slice());
-	}
-
-	#[event("execute_on_dest_context_result")]
-	fn execute_on_dest_context_result(&self, result: &[BoxedBytes]);
-
-	#[endpoint]
-	#[payable("*")]
-	fn forward_sync_accept_funds(
-		&self,
-		to: Address,
-		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
+		caller: &Address,
+		#[payment_token] token_identifier: TokenIdentifier,
+		#[payment] returned_tokens: BigUint,
+		#[call_result] result: AsyncCallResult<()>,
 	) {
-		let half_gas = self.get_gas_left() / 2;
+		// manual callback forwarding to modules is currently necessary
+		self.esdt_module()
+			.esdt_issue_callback(caller, token_identifier, returned_tokens, result)
+	}
 
-		let () = contract_call!(self, to, VaultProxy)
-			.with_token_transfer(token, payment)
-			.accept_funds()
-			.execute_on_dest_context(half_gas, self.send());
+	#[callback]
+	fn nft_issue_callback(
+		&self,
+		caller: &Address,
+		#[call_result] result: AsyncCallResult<TokenIdentifier>,
+	) {
+		// manual callback forwarding to modules is currently necessary
+		self.nft_module().nft_issue_callback(caller, result)
+	}
+
+	#[callback]
+	fn sft_issue_callback(
+		&self,
+		caller: &Address,
+		#[call_result] result: AsyncCallResult<TokenIdentifier>,
+	) {
+		// manual callback forwarding to modules is currently necessary
+		self.sft_module().sft_issue_callback(caller, result)
+	}
+
+	#[callback]
+	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
+		// manual callback forwarding to modules is currently necessary
+		self.roles_module().change_roles_callback(result)
 	}
 }
