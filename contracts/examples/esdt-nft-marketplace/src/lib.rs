@@ -146,13 +146,12 @@ pub trait EsdtNftMarketplace {
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
-			let data = self.data_or_empty_if_sc(&auction.current_winner, b"bid refund");
-			self.send().direct_esdt_nft_via_transfer_exec(
+			self.transfer_esdt(
 				&auction.current_winner,
-				&auction.payment_token.token_type.as_esdt_identifier(),
+				&auction.payment_token.token_type,
 				auction.payment_token.nonce,
 				&auction.current_bid,
-				data,
+				b"bid refund",
 			);
 		}
 
@@ -202,37 +201,37 @@ pub trait EsdtNftMarketplace {
 			let seller_amount_to_send =
 				&auction.current_bid - &creator_royalties - bid_cut_amount.clone();
 
-			let token = auction.payment_token.token_type.as_esdt_identifier();
+			let token_id = &auction.payment_token.token_type;
 			let nonce = auction.payment_token.nonce;
 
 			if bid_cut_amount > BigUint::zero() {
 				// send part as cut for contract owner
 				let owner = self.get_owner_address();
-				self.send().direct_esdt_nft_via_transfer_exec(
+				self.transfer_esdt(
 					&owner,
-					token,
+					token_id,
 					nonce,
 					&bid_cut_amount,
-					self.data_or_empty_if_sc(&owner, b"bid cut for sold token"),
+					b"bid cut for sold token",
 				);
 			}
 
 			// send part as royalties to creator
-			self.send().direct_esdt_nft_via_transfer_exec(
+			self.transfer_esdt(
 				&nft_info.creator,
-				token,
+				token_id,
 				nonce,
 				&creator_royalties,
-				self.data_or_empty_if_sc(&nft_info.creator, b"royalties for sold token"),
+				b"royalties for sold token",
 			);
 
 			// send rest of the bid to original owner
-			self.send().direct_esdt_nft_via_transfer_exec(
+			self.transfer_esdt(
 				&auction.original_owner,
-				token,
+				token_id,
 				nonce,
 				&seller_amount_to_send,
-				self.data_or_empty_if_sc(&auction.original_owner, b"sold token"),
+				b"sold token",
 			);
 
 			// send NFT to auction winner
@@ -365,6 +364,33 @@ pub trait EsdtNftMarketplace {
 
 	fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: &BigUint) -> BigUint {
 		total_amount * cut_percentage / BigUint::from(PERCENTAGE_TOTAL)
+	}
+
+	fn transfer_esdt(
+		&self,
+		to: &Address,
+		token_id: &TokenIdentifier,
+		nonce: u64,
+		amount: &BigUint,
+		data: &'static [u8],
+	) {
+		// nonce 0 means fungible ESDT
+		if nonce == 0 {
+			self.send().direct_esdt_via_transf_exec(
+				to,
+				token_id.as_esdt_identifier(),
+				amount,
+				self.data_or_empty_if_sc(to, data),
+			);
+		} else {
+			self.send().direct_esdt_nft_via_transfer_exec(
+				to,
+				token_id.as_esdt_identifier(),
+				nonce,
+				amount,
+				self.data_or_empty_if_sc(to, data),
+			);
+		}
 	}
 
 	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
