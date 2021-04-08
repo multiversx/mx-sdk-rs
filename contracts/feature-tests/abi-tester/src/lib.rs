@@ -17,6 +17,12 @@ use only_nested::*;
 /// including Rust docs.
 #[elrond_wasm_derive::contract(AbiTesterImpl)]
 pub trait AbiTester {
+	/// Contract constructor.
+	#[init]
+	#[payable("EGLD")]
+	fn init(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {}
+
+	/// Example endpoint docs.
 	#[endpoint]
 	#[output_name("single output")]
 	#[output_name("this one doesn't show up")]
