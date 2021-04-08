@@ -1,16 +1,17 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-use elrond_wasm::{imports, require, sc_error};
-imports!();
+use elrond_wasm::{require, sc_error};
+elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
 
 mod deposit_info;
 use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
 
-#[elrond_wasm_derive::contract(DepositImpl)]
-pub trait Deposit {
+#[elrond_wasm_derive::contract(DigitalCashImpl)]
+pub trait DigitalCash {
     #[init]
     fn init(&self) {}
 
@@ -32,11 +33,14 @@ pub trait Deposit {
         require!(payment > 0, "amount must be greater than 0");
         require!(self.deposit(&address).is_empty(), "key already used");
 
+        let nft_nonce = self.call_value().esdt_token_nonce();
+
         let deposit = &DepositInfo {
             amount: payment,
             depositor_address: self.get_caller(),
             expiration_round: self.get_expiration_round(valability),
             token_name: token,
+            nonce: nft_nonce,
         };
 
         self.deposit(&address).set(deposit);
@@ -54,14 +58,23 @@ pub trait Deposit {
             deposit.expiration_round < self.get_block_round(),
             "withdrawal has not been available yet"
         );
-
-        self.send().direct(
-            &deposit.depositor_address,
-            &deposit.token_name,
-            &deposit.amount,
-            b"successful withdrawal",
-        );
-        self.deposit(&address).clear();
+        if deposit.nonce != 0 {
+            self.send().direct_esdt_nft_via_transfer_exec(
+                &deposit.depositor_address,
+                &deposit.token_name.as_esdt_identifier(),
+                deposit.nonce,
+                &deposit.amount,
+                b"successful withdrawal",
+            );
+        } else {
+            self.send().direct(
+                &deposit.depositor_address,
+                &deposit.token_name,
+                &deposit.amount,
+                b"successful withdrawal",
+            );
+            self.deposit(&address).clear();
+        };
 
         Ok(())
     }
@@ -82,12 +95,22 @@ pub trait Deposit {
             "invalid signature"
         );
 
-        self.send().direct(
-            &self.get_caller(),
-            &deposit.token_name,
-            &deposit.amount,
-            b"successful claim",
-        );
+        if deposit.nonce != 0 {
+            self.send().direct_esdt_nft_via_transfer_exec(
+                &self.get_caller(),
+                &deposit.token_name.as_esdt_identifier(),
+                deposit.nonce,
+                &deposit.amount,
+                b"successful withdrawal",
+            );
+        } else {
+            self.send().direct(
+                &self.get_caller(),
+                &deposit.token_name,
+                &deposit.amount,
+                b"successful claim",
+            );
+        }
         self.deposit(&address).clear();
 
         Ok(())
@@ -96,7 +119,7 @@ pub trait Deposit {
     #[view(amount)]
     fn get_amount(&self, address: Address) -> SCResult<BigUint> {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
-        
+
         let data = self.deposit(&address).get();
 
         Ok(data.amount)
@@ -108,3 +131,4 @@ pub trait Deposit {
     #[storage_mapper("deposit")]
     fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, DepositInfo<BigUint>>;
 }
+
