@@ -84,9 +84,13 @@ pub trait EsdtNftMarketplace {
 			"Deadline can't be in the past"
 		);
 
-		let accepted_payment_nft_nonce = opt_accepted_payment_token_nonce
-			.into_option()
-			.unwrap_or_default();
+		let accepted_payment_nft_nonce = if accepted_payment_token.is_egld() {
+			0
+		} else {
+			opt_accepted_payment_token_nonce
+				.into_option()
+				.unwrap_or_default()
+		};
 
 		self.auction_for_token(&nft_type, nft_nonce).set(&Auction {
 			payment_token: EsdtToken {
@@ -374,14 +378,10 @@ pub trait EsdtNftMarketplace {
 		amount: &BigUint,
 		data: &'static [u8],
 	) {
-		// nonce 0 means fungible ESDT
+		// nonce 0 means fungible ESDT or EGLD
 		if nonce == 0 {
-			self.send().direct_esdt_via_transf_exec(
-				to,
-				token_id.as_esdt_identifier(),
-				amount,
-				self.data_or_empty_if_sc(to, data),
-			);
+			self.send()
+				.direct(to, &token_id, amount, self.data_or_empty_if_sc(to, data));
 		} else {
 			self.send().direct_esdt_nft_via_transfer_exec(
 				to,
