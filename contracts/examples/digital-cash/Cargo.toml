@@ -2,7 +2,7 @@
 name = "digital-cash"
 version = "0.0.0"
 authors = [ "Valentin Craciun"]
-edition = "2021"
+edition = "2018"
 publish = false
 
 [lib]
