@@ -23,7 +23,7 @@ impl From<&ContractAbi> for ContractAbiJson {
 			constructor: abi
 				.constructor
 				.as_ref()
-				.map(|c| ConstructorAbiJson::from(c)),
+				.map(ConstructorAbiJson::from),
 			endpoints: Vec::new(),
 			types: BTreeMap::new(),
 		};
