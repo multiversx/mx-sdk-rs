@@ -77,7 +77,7 @@ pub trait FirstContract {
 
 		self.call_esdt_second_contract(
 			&expected_token_name,
-			&(esdt_value / BigUint::from(2u32)),
+			&esdt_value,
 			&self.get_second_contract_address(),
 			SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
 			&[],
