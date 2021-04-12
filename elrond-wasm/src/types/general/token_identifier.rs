@@ -68,7 +68,6 @@ impl TokenIdentifier {
 		}
 	}
 
-	#[inline]
 	pub fn is_valid_esdt_identifier(&self) -> bool {
 		if self.is_egld() {
 			return false;
