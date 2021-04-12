@@ -64,7 +64,7 @@ pub trait FirstContract {
 	}
 
 	#[payable("*")]
-	#[endpoint]
+	#[endpoint(transferToSecondContractRejected)]
 	fn transfer_to_second_contract_rejected(
 		&self,
 		#[payment] esdt_value: BigUint,
@@ -77,10 +77,60 @@ pub trait FirstContract {
 
 		self.call_esdt_second_contract(
 			&expected_token_name,
-			&(esdt_value / BigUint::from(2u32)),
+			&esdt_value,
 			&self.get_second_contract_address(),
 			SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
 			&[],
+		);
+
+		Ok(())
+	}
+
+	#[payable("*")]
+	#[endpoint(transferToSecondContractRejectedWithTransferAndExecute)]
+	fn transfer_to_second_contract_rejected_with_transfer_and_execute(
+		&self,
+		#[payment] esdt_value: BigUint,
+		#[payment_token] actual_token_name: TokenIdentifier,
+	) -> SCResult<()> {
+		let second_contract_address = self.get_second_contract_address();
+		let expected_token_name = self.get_contract_esdt_token_name();
+
+		require!(esdt_value > 0, "no esdt transfered!");
+		require!(actual_token_name == expected_token_name, "Wrong esdt token");
+
+		self.send().direct_esdt_execute(
+			&second_contract_address,
+			expected_token_name.as_esdt_identifier(),
+			&esdt_value,
+			self.get_gas_left(),
+			SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
+			&ArgBuffer::new(),
+		);
+
+		Ok(())
+	}
+
+	#[payable("*")]
+	#[endpoint(transferToSecondContractFullWithTransferAndExecute)]
+	fn transfer_to_second_contract_full_with_transfer_and_execute(
+		&self,
+		#[payment] esdt_value: BigUint,
+		#[payment_token] actual_token_name: TokenIdentifier,
+	) -> SCResult<()> {
+		let second_contract_address = self.get_second_contract_address();
+		let expected_token_name = self.get_contract_esdt_token_name();
+
+		require!(esdt_value > 0, "no esdt transfered!");
+		require!(actual_token_name == expected_token_name, "Wrong esdt token");
+
+		self.send().direct_esdt_execute(
+			&second_contract_address,
+			expected_token_name.as_esdt_identifier(),
+			&esdt_value,
+			self.get_gas_left(),
+			SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
+			&ArgBuffer::new(),
 		);
 
 		Ok(())
