@@ -1,5 +1,5 @@
 {
-    "name": "isSmartContract hook check",
+    "name": "smart contract properties: is_smart_contract, owner, more to follow",
     "gasSchedule": "v2",
     "steps": [
         {
@@ -9,7 +9,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../output/basic-features.wasm",
+                    "owner": "address:someone_else"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -37,11 +38,7 @@
                 ]
             },
             "expect": {
-                "out": [ "false" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "out": [ "false" ]
             }
         },
         {
@@ -55,11 +52,19 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "out": [ "true" ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "get_owner_address",
+            "tx": {
+                "to": "address:features_contract",
+                "function": "get_owner_address",
+                "arguments": []
+            },
+            "expect": {
+                "out": [ "address:someone_else" ]
             }
         },
         {
@@ -74,11 +79,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "out": []
             }
         },
         {
@@ -92,11 +93,44 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "out": [ "true" ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "get_owner_address",
+            "tx": {
+                "to": "address:also_features_contract",
+                "function": "get_owner_address",
+                "arguments": []
+            },
+            "expect": {
+                "out": [ "address:an_account" ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm",
+                    "owner": "address:someone_else"
+                },
+                "address:an_account": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:also_features_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm",
+                    "owner": "address:an_account"
+                }
             }
         }
     ]
