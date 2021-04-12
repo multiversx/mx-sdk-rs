@@ -75,6 +75,7 @@ impl TokenIdentifier {
 		}
 
 		let id_len = self.0.len();
+		#[allow(clippy::manual_range_contains)]
 		if id_len < Self::IDENTIFIER_MIN_LENGTH || id_len > Self::IDENTIFIER_MAX_LENGTH {
 			return false;
 		}
@@ -85,7 +86,7 @@ impl TokenIdentifier {
 		let ticker_len = id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
 		let ticker = &id_as_slice[..ticker_len];
 		for ticker_char in ticker {
-			let is_uppercase_letter = ticker_char >= &b'A' && ticker_char <= &b'Z';
+			let is_uppercase_letter = (&b'A'..=&b'Z').contains(&ticker_char);
 			if !is_uppercase_letter {
 				return false;
 			}
@@ -99,8 +100,8 @@ impl TokenIdentifier {
 		// random chars are alphanumeric lowercase
 		let random_chars = &id_as_slice[(id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH)..];
 		for rand_char in random_chars {
-			let is_lowercase_letter = rand_char >= &b'a' && rand_char <= &b'z';
-			let is_number = rand_char >= &b'0' && rand_char <= &b'9';
+			let is_lowercase_letter = (&b'a'..=&b'z').contains(&rand_char);
+			let is_number = (&b'0'..=&b'9').contains(&rand_char);
 			if !is_lowercase_letter && !is_number {
 				return false;
 			}
