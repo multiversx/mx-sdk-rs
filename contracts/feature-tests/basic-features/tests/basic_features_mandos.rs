@@ -141,14 +141,6 @@ fn get_caller() {
 	parse_execute_mandos("mandos/get_caller.scen.json", &contract_map());
 }
 
-// TODO: Fix by implementing is_smart_contract mock
-/*
-#[test]
-fn is_smart_contract() {
-	parse_execute_mandos("mandos/is_smart_contract.scen.json", &contract_map());
-}
-*/
-
 #[test]
 fn panic() {
 	parse_execute_mandos("mandos/panic.scen.json", &contract_map());
@@ -158,6 +150,14 @@ fn panic() {
 fn return_codes() {
 	parse_execute_mandos("mandos/return_codes.scen.json", &contract_map());
 }
+
+// TODO: Fix by implementing is_smart_contract mock
+/*
+#[test]
+fn sc_properties() {
+	parse_execute_mandos("mandos/sc_properties.scen.json", &contract_map());
+}
+*/
 
 #[test]
 fn sc_result() {
