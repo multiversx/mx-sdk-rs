@@ -722,6 +722,11 @@ pub trait BasicFeatures {
 		self.is_smart_contract(address)
 	}
 
+	#[endpoint(get_owner_address)]
+	fn get_owner_address_endpoint(&self) -> Address {
+		self.get_owner_address()
+	}
+
 	#[endpoint(get_gas_left)]
 	fn get_gas_left_endpoint(&self) -> u64 {
 		self.get_gas_left()
