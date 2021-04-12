@@ -5,6 +5,7 @@ use alloc::vec::Vec;
 pub struct ContractAbi {
 	pub docs: &'static [&'static str],
 	pub name: &'static str,
+	pub constructor: Option<EndpointAbi>,
 	pub endpoints: Vec<EndpointAbi>,
 	pub type_descriptions: TypeDescriptionContainerImpl,
 }

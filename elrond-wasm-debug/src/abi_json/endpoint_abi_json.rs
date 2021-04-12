@@ -45,6 +45,33 @@ impl From<&OutputAbi> for OutputAbiJson {
 	}
 }
 
+/// Same as EndpointAbiJson but ignores the name
+#[derive(Serialize, Deserialize)]
+pub struct ConstructorAbiJson {
+	#[serde(skip_serializing_if = "Vec::is_empty")]
+	pub docs: Vec<String>,
+	#[serde(rename = "payableInTokens")]
+	#[serde(skip_serializing_if = "Vec::is_empty")]
+	pub payable_in_tokens: Vec<String>,
+	pub inputs: Vec<InputAbiJson>,
+	pub outputs: Vec<OutputAbiJson>,
+}
+
+impl From<&EndpointAbi> for ConstructorAbiJson {
+	fn from(abi: &EndpointAbi) -> Self {
+		ConstructorAbiJson {
+			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
+			payable_in_tokens: abi
+				.payable_in_tokens
+				.iter()
+				.map(|d| d.to_string())
+				.collect(),
+			inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
+			outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
+		}
+	}
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct EndpointAbiJson {
 	#[serde(skip_serializing_if = "Vec::is_empty")]
