@@ -7,8 +7,30 @@
         "including Rust docs."
     ],
     "name": "AbiTester",
+    "constructor": {
+        "docs": [
+            "Contract constructor."
+        ],
+        "payableInTokens": [
+            "EGLD"
+        ],
+        "inputs": [
+            {
+                "name": "_constructor_arg_1",
+                "type": "i32"
+            },
+            {
+                "name": "_constructor_arg_2",
+                "type": "OnlyShowsUpInConstructor"
+            }
+        ],
+        "outputs": []
+    },
     "endpoints": [
         {
+            "docs": [
+                "Example endpoint docs."
+            ],
             "name": "echo_abi_test_type",
             "inputs": [
                 {
@@ -349,6 +371,18 @@
             ]
         },
         "OnlyShowsUpAsNested09": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpInConstructor": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
