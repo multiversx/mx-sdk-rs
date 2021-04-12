@@ -18,6 +18,13 @@ impl TokenIdentifier {
 	pub const TICKER_MIN_LENGTH: usize = 3;
 	pub const TICKER_MAX_LENGTH: usize = 10;
 	pub const ADDITIONAL_RANDOM_CHARS_LENGTH: usize = 6;
+	// +1 because of the '-' (dash) between ticker and the random chars
+	pub const IDENTIFIER_MIN_LENGTH: usize =
+		Self::TICKER_MIN_LENGTH + Self::ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
+	pub const IDENTIFIER_MAX_LENGTH: usize =
+		Self::TICKER_MAX_LENGTH + Self::ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
+
+	pub const DASH_CHARACTER: u8 = b'-';
 
 	/// New instance of the special EGLD token representation.
 	pub fn egld() -> Self {
@@ -69,11 +76,7 @@ impl TokenIdentifier {
 			let id_len = self.0.len();
 			let id_as_slice = self.0.as_slice();
 
-			// +1 because of the '-' (dash) between ticker and the random chars
-			let min_length = Self::TICKER_MIN_LENGTH + Self::ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
-			let max_length = Self::TICKER_MAX_LENGTH + Self::ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
-
-			if id_len < min_length || id_len > max_length {
+			if id_len < Self::IDENTIFIER_MIN_LENGTH || id_len > Self::IDENTIFIER_MAX_LENGTH {
 				return false;
 			}
 
@@ -84,11 +87,11 @@ impl TokenIdentifier {
 				let is_uppercase_letter = ticker_char >= &b'A' && ticker_char <= &b'Z';
 				if !is_uppercase_letter {
 					return false;
-				} 
+				}
 			}
 
 			let dash_position = ticker_len;
-			if id_as_slice[dash_position] != b'-' {
+			if id_as_slice[dash_position] != Self::DASH_CHARACTER {
 				return false;
 			}
 
