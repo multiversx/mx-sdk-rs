@@ -71,42 +71,42 @@ impl TokenIdentifier {
 	#[inline]
 	pub fn is_valid_esdt_identifier(&self) -> bool {
 		if self.is_egld() {
-			false
-		} else {
-			let id_len = self.0.len();
-			let id_as_slice = self.0.as_slice();
-
-			if id_len < Self::IDENTIFIER_MIN_LENGTH || id_len > Self::IDENTIFIER_MAX_LENGTH {
-				return false;
-			}
-
-			// ticker must be all uppercase
-			let ticker_len = id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
-			let ticker = &id_as_slice[..ticker_len];
-			for ticker_char in ticker {
-				let is_uppercase_letter = ticker_char >= &b'A' && ticker_char <= &b'Z';
-				if !is_uppercase_letter {
-					return false;
-				}
-			}
-
-			let dash_position = ticker_len;
-			if id_as_slice[dash_position] != Self::DASH_CHARACTER {
-				return false;
-			}
-
-			// random chars are alphanumeric lowercase
-			let random_chars = &id_as_slice[(id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH)..];
-			for rand_char in random_chars {
-				let is_lowercase_letter = rand_char >= &b'a' && rand_char <= &b'z';
-				let is_number = rand_char >= &b'0' && rand_char <= &b'9';
-				if !is_lowercase_letter && !is_number {
-					return false;
-				}
-			}
-
-			true
+			return false;
 		}
+
+		let id_len = self.0.len();
+		if id_len < Self::IDENTIFIER_MIN_LENGTH || id_len > Self::IDENTIFIER_MAX_LENGTH {
+			return false;
+		}
+
+		let id_as_slice = self.0.as_slice();
+
+		// ticker must be all uppercase
+		let ticker_len = id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
+		let ticker = &id_as_slice[..ticker_len];
+		for ticker_char in ticker {
+			let is_uppercase_letter = ticker_char >= &b'A' && ticker_char <= &b'Z';
+			if !is_uppercase_letter {
+				return false;
+			}
+		}
+
+		let dash_position = ticker_len;
+		if id_as_slice[dash_position] != Self::DASH_CHARACTER {
+			return false;
+		}
+
+		// random chars are alphanumeric lowercase
+		let random_chars = &id_as_slice[(id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH)..];
+		for rand_char in random_chars {
+			let is_lowercase_letter = rand_char >= &b'a' && rand_char <= &b'z';
+			let is_number = rand_char >= &b'0' && rand_char <= &b'9';
+			if !is_lowercase_letter && !is_number {
+				return false;
+			}
+		}
+
+		true
 	}
 }
 
