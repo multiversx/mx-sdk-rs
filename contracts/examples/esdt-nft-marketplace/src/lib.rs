@@ -260,6 +260,38 @@ pub trait EsdtNftMarketplace {
 		Ok(())
 	}
 
+	#[endpoint]
+	fn withdraw(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+		require!(
+			self.is_already_up_for_auction(&nft_type, nft_nonce),
+			"Token is not up for auction"
+		);
+
+		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
+		let caller = self.get_caller();
+
+		require!(
+			auction.original_owner == caller,
+			"Only the original owner can withdraw"
+		);
+		require!(
+			auction.current_bid == 0,
+			"Can't withdraw, NFT already has bids"
+		);
+
+		self.auction_for_token(&nft_type, nft_nonce).clear();
+
+		self.send().direct_esdt_nft_via_transfer_exec(
+			&caller,
+			nft_type.as_esdt_identifier(),
+			nft_nonce,
+			&BigUint::from(NFT_AMOUNT),
+			self.data_or_empty_if_sc(&caller, b"returned token"),
+		);
+
+		Ok(())
+	}
+
 	// views
 
 	#[view(isAlreadyUpForAuction)]
