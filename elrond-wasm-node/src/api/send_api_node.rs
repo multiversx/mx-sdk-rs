@@ -108,15 +108,15 @@ extern "C" {
 }
 
 impl SendApi<ArwenBigUint> for ArwenApiImpl {
-	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
+	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) ->i32 {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			let _ = transferValue(
+			transferValue(
 				to.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				data.as_ptr(),
 				data.len() as i32,
-			);
+			)
 		}
 	}
 
@@ -127,10 +127,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) {
+	) -> i32 {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			let _ = transferValueExecute(
+			transferValueExecute(
 				to.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				gas_limit as i64,
@@ -139,7 +139,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			);
+			)
 		}
 	}
 
@@ -151,10 +151,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) {
+	) -> i32 {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			let _ = transferESDTExecute(
+			transferESDTExecute(
 				to.as_ref().as_ptr(),
 				token.as_ptr(),
 				token.len() as i32,
@@ -165,7 +165,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			);
+			)
 		}
 	}
 
@@ -178,10 +178,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) {
+	) -> i32 {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			let _ = transferESDTNFTExecute(
+			transferESDTNFTExecute(
 				to.as_ref().as_ptr(),
 				token.as_ptr(),
 				token.len() as i32,
@@ -193,7 +193,7 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			);
+			)
 		}
 	}
 
