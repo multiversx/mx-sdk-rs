@@ -17,7 +17,7 @@ where
 {
 	/// Sends EGLD to a given address, directly.
 	/// Used especially for sending EGLD to regular accounts.
-	fn direct_egld(&self, to: &Address, amount: &BigUint, data: &[u8]);
+	fn direct_egld(&self, to: &Address, amount: &BigUint, data: &[u8]) -> i32;
 
 	/// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
 	fn direct_egld_execute(
@@ -27,7 +27,7 @@ where
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	);
+	) -> i32;
 
 	/// Sends an ESDT token to a given address, directly.
 	/// Used especially for sending ESDT to regular accounts.
@@ -39,8 +39,8 @@ where
 		token: &[u8],
 		amount: &BigUint,
 		data: &[u8],
-	) {
-		self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
+	) -> i32 {
+		self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new())
 	}
 
 	/// Sends ESDT to an address and executes like an async call, but without callback.
@@ -52,7 +52,7 @@ where
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	);
+	) -> i32;
 
 	/// Sends ESDT NFT to an address and executes like an async call, but without callback.
 	fn direct_esdt_nft_execute(
@@ -64,15 +64,15 @@ where
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	);
+	) -> i32;
 
 	/// Sends either EGLD or an ESDT token to the target address,
 	/// depending on what token identifier was specified.
-	fn direct(&self, to: &Address, token: &TokenIdentifier, amount: &BigUint, data: &[u8]) {
+	fn direct(&self, to: &Address, token: &TokenIdentifier, amount: &BigUint, data: &[u8]) -> i32 {
 		if token.is_egld() {
-			self.direct_egld(to, amount, data);
+			self.direct_egld(to, amount, data)
 		} else {
-			self.direct_esdt_via_transf_exec(to, token.as_esdt_identifier(), amount, data);
+			self.direct_esdt_via_transf_exec(to, token.as_esdt_identifier(), amount, data)
 		}
 	}
 
