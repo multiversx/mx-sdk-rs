@@ -108,15 +108,20 @@ extern "C" {
 }
 
 impl SendApi<ArwenBigUint> for ArwenApiImpl {
-	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) ->i32 {
+	fn direct_egld(
+		&self,
+		to: &Address,
+		amount: &ArwenBigUint,
+		data: &[u8],
+	) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			transferValue(
+			let _ = transferValue(
 				to.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				data.as_ptr(),
 				data.len() as i32,
-			)
+			);
 		}
 	}
 
@@ -127,10 +132,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) -> i32 {
+	) -> Result<(), &'static [u8]> {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			transferValueExecute(
+			let result = transferValueExecute(
 				to.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				gas_limit as i64,
@@ -139,7 +144,12 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			)
+			);
+			if result == 0 {
+				Ok(())
+			} else {
+				Err(b"transferValueExecute failed")
+			}
 		}
 	}
 
@@ -151,10 +161,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) -> i32 {
+	) -> Result<(), &'static [u8]> {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			transferESDTExecute(
+			let result = transferESDTExecute(
 				to.as_ref().as_ptr(),
 				token.as_ptr(),
 				token.len() as i32,
@@ -165,7 +175,12 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			)
+			);
+			if result == 0 {
+				Ok(())
+			} else {
+				Err(b"transferESDTExecute failed")
+			}
 		}
 	}
 
@@ -178,10 +193,10 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 		gas_limit: u64,
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
-	) -> i32 {
+	) -> Result<(), &'static [u8]> {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
-			transferESDTNFTExecute(
+			let result = transferESDTNFTExecute(
 				to.as_ref().as_ptr(),
 				token.as_ptr(),
 				token.len() as i32,
@@ -193,7 +208,12 @@ impl SendApi<ArwenBigUint> for ArwenApiImpl {
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),
 				arg_buffer.arg_data_ptr(),
-			)
+			);
+			if result == 0 {
+				Ok(())
+			} else {
+				Err(b"transferESDTNFTExecute failed")
+			}
 		}
 	}
 
