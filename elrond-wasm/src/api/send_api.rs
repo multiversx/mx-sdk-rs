@@ -68,13 +68,7 @@ where
 
 	/// Sends either EGLD or an ESDT token to the target address,
 	/// depending on what token identifier was specified.
-	fn direct(
-		&self,
-		to: &Address,
-		token: &TokenIdentifier,
-		amount: &BigUint,
-		data: &[u8],
-	) {
+	fn direct(&self, to: &Address, token: &TokenIdentifier, amount: &BigUint, data: &[u8]) {
 		if token.is_egld() {
 			self.direct_egld(to, amount, data);
 		} else {

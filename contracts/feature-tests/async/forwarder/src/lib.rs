@@ -38,7 +38,8 @@ pub trait Forwarder {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		let _ = self.send()
+		let _ = self
+			.send()
 			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
