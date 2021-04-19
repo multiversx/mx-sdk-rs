@@ -89,7 +89,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 		quote! {}
 	} else {
 		quote! {
-			let ___tx_hash___ = self.api.get_tx_hash();
+			let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.api);
 			let ___cb_data_raw___ = self.api.storage_load_boxed_bytes(&___tx_hash___.as_bytes());
 			self.api.storage_store_slice_u8(&___tx_hash___.as_bytes(), &[]); // cleanup
 			let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());

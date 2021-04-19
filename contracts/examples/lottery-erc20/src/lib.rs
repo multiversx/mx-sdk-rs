@@ -90,7 +90,7 @@ pub trait Lottery {
 	) -> SCResult<()> {
 		require!(!lottery_name.is_empty(), "Name can't be empty!");
 
-		let timestamp = self.get_block_timestamp();
+		let timestamp = self.blockchain().get_block_timestamp();
 
 		let total_tickets = opt_total_tickets.unwrap_or(u32::MAX);
 		let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
@@ -200,7 +200,7 @@ pub trait Lottery {
 
 		let info = self.get_lottery_info(&lottery_name);
 
-		if self.get_block_timestamp() > info.deadline || info.tickets_left == 0 {
+		if self.blockchain().get_block_timestamp() > info.deadline || info.tickets_left == 0 {
 			return Status::Ended;
 		}
 
@@ -213,7 +213,7 @@ pub trait Lottery {
 		token_amount: &BigUint,
 	) -> SCResult<AsyncCall<BigUint>> {
 		let info = self.get_lottery_info(&lottery_name);
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(
 			info.whitelist.is_empty() || info.whitelist.contains(&caller),
@@ -233,7 +233,7 @@ pub trait Lottery {
 		self.reserve_ticket(lottery_name);
 
 		let erc20_address = self.get_erc20_contract_address();
-		let lottery_contract_address = self.get_sc_address();
+		let lottery_contract_address = self.blockchain().get_sc_address();
 		Ok(contract_call!(self, erc20_address, Erc20Proxy)
 			.transferFrom(&caller, &lottery_contract_address, token_amount)
 			.async_call()
@@ -314,7 +314,7 @@ pub trait Lottery {
 	}
 
 	fn get_random_winning_ticket_id(&self, prev_winners: &[u32], total_tickets: u32) -> u32 {
-		let seed = self.get_block_random_seed();
+		let seed = self.blockchain().get_block_random_seed();
 		let mut rand = Random::new(*seed);
 
 		loop {

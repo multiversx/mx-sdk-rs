@@ -29,7 +29,7 @@ pub trait Erc20 {
 pub trait Crowdfunding {
 	#[init]
 	fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: Address) {
-		let my_address: Address = self.get_caller();
+		let my_address: Address = self.blockchain().get_caller();
 
 		self.set_owner(&my_address);
 		self.set_erc20_contract_address(&erc20_contract_address);
@@ -39,13 +39,13 @@ pub trait Crowdfunding {
 
 	#[endpoint]
 	fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall<BigUint>> {
-		if self.get_block_nonce() > self.get_deadline() {
+		if self.blockchain().get_block_nonce() > self.get_deadline() {
 			return sc_error!("cannot fund after deadline");
 		}
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let erc20_address = self.get_erc20_contract_address();
-		let cf_contract_address = self.get_sc_address();
+		let cf_contract_address = self.blockchain().get_sc_address();
 
 		Ok(contract_call!(self, erc20_address, Erc20Proxy)
 			.transferFrom(&caller, &cf_contract_address, &token_amount)
@@ -58,9 +58,9 @@ pub trait Crowdfunding {
 
 	#[view]
 	fn status(&self) -> Status {
-		if self.get_block_nonce() <= self.get_deadline() {
+		if self.blockchain().get_block_nonce() <= self.get_deadline() {
 			Status::FundingPeriod
-		} else if self.get_sc_balance() >= self.get_target() {
+		} else if self.blockchain().get_sc_balance() >= self.get_target() {
 			Status::Successful
 		} else {
 			Status::Failed
@@ -72,7 +72,7 @@ pub trait Crowdfunding {
 		match self.status() {
 			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
 			Status::Successful => {
-				let caller = self.get_caller();
+				let caller = self.blockchain().get_caller();
 				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
@@ -88,7 +88,7 @@ pub trait Crowdfunding {
 				))
 			},
 			Status::Failed => {
-				let caller = self.get_caller();
+				let caller = self.blockchain().get_caller();
 				let deposit = self.get_deposit(&caller);
 
 				if deposit > 0 {
@@ -117,7 +117,7 @@ pub trait Crowdfunding {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				// transaction started before deadline, ended after -> refund
-				if self.get_block_nonce() > self.get_deadline() {
+				if self.blockchain().get_block_nonce() > self.get_deadline() {
 					let erc20_address = self.get_erc20_contract_address();
 					return OptionalResult::Some(
 						contract_call!(self, erc20_address, Erc20Proxy)
