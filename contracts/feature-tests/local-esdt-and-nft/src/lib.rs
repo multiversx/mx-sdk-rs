@@ -177,7 +177,7 @@ pub trait LocalEsdtAndEsdtNft {
 			arg_buffer.push_argument_bytes(arg.as_slice());
 		}
 
-		self.send().direct_esdt_nft_execute(
+		let _ = self.send().direct_esdt_nft_execute(
 			&to,
 			token_identifier.as_esdt_identifier(),
 			nonce,

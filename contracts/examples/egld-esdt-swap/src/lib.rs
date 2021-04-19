@@ -144,7 +144,7 @@ pub trait EgldEsdtSwap {
 		self.unused_wrapped_egld().set(&unused_wrapped_egld);
 
 		let caller = self.get_caller();
-		self.send().direct_esdt_via_transf_exec(
+		let _ = self.send().direct_esdt_via_transf_exec(
 			&caller,
 			self.wrapped_egld_token_id().get().as_esdt_identifier(),
 			&payment,

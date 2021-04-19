@@ -34,7 +34,7 @@ pub trait ForwarderRaw {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: BigUint,
 	) {
-		self.send()
+		let _ = self.send()
 			.direct_esdt_via_transf_exec(&to, &token.as_esdt_identifier(), &payment, &[]);
 	}
 
