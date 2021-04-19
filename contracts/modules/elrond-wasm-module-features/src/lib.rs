@@ -38,7 +38,7 @@ pub trait FeaturesModule {
 	#[endpoint(setFeatureFlag)]
 	fn set_feature_flag_endpoint(&self, feature_name: Vec<u8>, value: bool) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.get_owner_address(),
+			self.blockchain().get_caller() == self.blockchain().get_owner_address(),
 			"only owner allowed to change features"
 		);
 

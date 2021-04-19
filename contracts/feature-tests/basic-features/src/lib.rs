@@ -709,27 +709,27 @@ pub trait BasicFeatures {
 	// BASIC API
 	#[endpoint(get_caller)]
 	fn get_caller_endpoint(&self) -> Address {
-		self.get_caller()
+		self.blockchain().get_caller()
 	}
 
 	#[endpoint(get_shard_of_address)]
 	fn get_shard_of_address_endpoint(&self, address: &Address) -> u32 {
-		self.get_shard_of_address(address)
+		self.blockchain().get_shard_of_address(address)
 	}
 
 	#[endpoint(is_smart_contract)]
 	fn is_smart_contract_endpoint(&self, address: &Address) -> bool {
-		self.is_smart_contract(address)
+		self.blockchain().is_smart_contract(address)
 	}
 
 	#[endpoint(get_owner_address)]
 	fn get_owner_address_endpoint(&self) -> Address {
-		self.get_owner_address()
+		self.blockchain().get_owner_address()
 	}
 
 	#[endpoint(get_gas_left)]
 	fn get_gas_left_endpoint(&self) -> u64 {
-		self.get_gas_left()
+		self.blockchain().get_gas_left()
 	}
 
 	// EVENTS
@@ -772,52 +772,52 @@ pub trait BasicFeatures {
 
 	#[view(get_block_timestamp)]
 	fn get_block_timestamp_view(&self) -> u64 {
-		self.get_block_timestamp()
+		self.blockchain().get_block_timestamp()
 	}
 
 	#[view(get_block_nonce)]
 	fn get_block_nonce_view(&self) -> u64 {
-		self.get_block_nonce()
+		self.blockchain().get_block_nonce()
 	}
 
 	#[view(get_block_round)]
 	fn get_block_round_view(&self) -> u64 {
-		self.get_block_round()
+		self.blockchain().get_block_round()
 	}
 
 	#[view(get_block_epoch)]
 	fn get_block_epoch_view(&self) -> u64 {
-		self.get_block_epoch()
+		self.blockchain().get_block_epoch()
 	}
 
 	#[view(get_block_random_seed)]
 	fn get_block_random_seed_view(&self) -> Box<[u8; 48]> {
-		self.get_block_random_seed()
+		self.blockchain().get_block_random_seed()
 	}
 
 	#[view(get_prev_block_timestamp)]
 	fn get_prev_block_timestamp_view(&self) -> u64 {
-		self.get_prev_block_timestamp()
+		self.blockchain().get_prev_block_timestamp()
 	}
 
 	#[view(get_prev_block_nonce)]
 	fn get_prev_block_nonce_view(&self) -> u64 {
-		self.get_prev_block_nonce()
+		self.blockchain().get_prev_block_nonce()
 	}
 
 	#[view(get_prev_block_round)]
 	fn get_prev_block_round_view(&self) -> u64 {
-		self.get_prev_block_round()
+		self.blockchain().get_prev_block_round()
 	}
 
 	#[view(get_prev_block_epoch)]
 	fn get_prev_block_epoch_view(&self) -> u64 {
-		self.get_prev_block_epoch()
+		self.blockchain().get_prev_block_epoch()
 	}
 
 	#[view(get_prev_block_random_seed)]
 	fn get_prev_block_random_seed_view(&self) -> Box<[u8; 48]> {
-		self.get_prev_block_random_seed()
+		self.blockchain().get_prev_block_random_seed()
 	}
 
 	// BIG INT OPERATIONS
@@ -1189,29 +1189,29 @@ pub trait BasicFeatures {
 
 	#[endpoint(computeSha256)]
 	fn compute_sha256(&self, input: Vec<u8>) -> H256 {
-		self.sha256(&input)
+		self.crypto().sha256(&input)
 	}
 
 	#[endpoint(computeKeccak256)]
 	fn compute_keccak256(&self, input: Vec<u8>) -> H256 {
-		self.keccak256(&input)
+		self.crypto().keccak256(&input)
 	}
 
 	// Not called, they currently just panic with "Not implemented yet!"
 
 	#[endpoint]
 	fn verify_bls_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-		self.verify_bls(key, message, signature)
+		self.crypto().verify_bls(key, message, signature)
 	}
 
 	#[endpoint]
 	fn verify_ed25519_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-		self.verify_ed25519(key, message, signature)
+		self.crypto().verify_ed25519(key, message, signature)
 	}
 
 	#[endpoint]
 	fn verify_secp256k1_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-		self.verify_secp256k1(key, message, signature)
+		self.crypto().verify_secp256k1(key, message, signature)
 	}
 
 	// MACROS

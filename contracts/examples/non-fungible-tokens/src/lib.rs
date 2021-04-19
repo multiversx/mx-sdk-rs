@@ -6,7 +6,7 @@ elrond_wasm::imports!();
 pub trait NonFungibleTokens {
 	#[init]
 	fn init(&self, initial_minted: u64) {
-		let owner = self.get_caller();
+		let owner = self.blockchain().get_caller();
 
 		self.set_owner(&owner);
 		self.perform_mint(initial_minted, &owner);
@@ -19,7 +19,7 @@ pub trait NonFungibleTokens {
 	#[endpoint]
 	fn mint(&self, count: u64, new_token_owner: Address) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.get_owner(),
+			self.blockchain().get_caller() == self.get_owner(),
 			"Only owner can mint new tokens!"
 		);
 
@@ -34,7 +34,7 @@ pub trait NonFungibleTokens {
 	fn approve(&self, token_id: u64, approved_address: Address) -> SCResult<()> {
 		require!(token_id < self.get_total_minted(), "Token does not exist!");
 		require!(
-			self.get_caller() == self.get_token_owner(token_id),
+			self.blockchain().get_caller() == self.get_token_owner(token_id),
 			"Only the token owner can approve!"
 		);
 
@@ -49,7 +49,7 @@ pub trait NonFungibleTokens {
 	fn revoke(&self, token_id: u64) -> SCResult<()> {
 		require!(token_id < self.get_total_minted(), "Token does not exist!");
 		require!(
-			self.get_caller() == self.get_token_owner(token_id),
+			self.blockchain().get_caller() == self.get_token_owner(token_id),
 			"Only the token owner can revoke approval!"
 		);
 
@@ -65,7 +65,7 @@ pub trait NonFungibleTokens {
 	fn transfer(&self, token_id: u64, to: Address) -> SCResult<()> {
 		require!(token_id < self.get_total_minted(), "Token does not exist!");
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let token_owner = self.get_token_owner(token_id);
 
 		if caller == token_owner {
