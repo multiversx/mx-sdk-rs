@@ -28,7 +28,7 @@ pub trait LocalEsdtAndEsdtNft {
 		token_ticker: BoxedBytes,
 		initial_supply: BigUint,
 	) -> AsyncCall<BigUint> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		ESDTSystemSmartContractProxy::new()
 			.issue_fungible(
@@ -55,7 +55,7 @@ pub trait LocalEsdtAndEsdtNft {
 	#[endpoint(localMint)]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: BigUint) {
 		self.send().esdt_local_mint(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			&amount,
 		);
@@ -64,7 +64,7 @@ pub trait LocalEsdtAndEsdtNft {
 	#[endpoint(localBurn)]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
 		self.send().esdt_local_burn(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			&amount,
 		);
@@ -80,7 +80,7 @@ pub trait LocalEsdtAndEsdtNft {
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 	) -> AsyncCall<BigUint> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		ESDTSystemSmartContractProxy::new()
 			.issue_non_fungible(
@@ -112,7 +112,7 @@ pub trait LocalEsdtAndEsdtNft {
 		uri: BoxedBytes,
 	) {
 		self.send().esdt_nft_create::<Color>(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			&amount,
 			&name,
@@ -126,7 +126,7 @@ pub trait LocalEsdtAndEsdtNft {
 	#[endpoint(nftAddQuantity)]
 	fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
 		self.send().esdt_nft_add_quantity(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			nonce,
 			&amount,
@@ -136,7 +136,7 @@ pub trait LocalEsdtAndEsdtNft {
 	#[endpoint(nftBurn)]
 	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
 		self.send().esdt_nft_burn(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			nonce,
 			&amount,
@@ -153,7 +153,7 @@ pub trait LocalEsdtAndEsdtNft {
 		data: BoxedBytes,
 	) {
 		self.send().direct_esdt_nft_via_async_call(
-			&self.get_sc_address(),
+			&self.blockchain().get_sc_address(),
 			&to,
 			token_identifier.as_esdt_identifier(),
 			nonce,
@@ -182,7 +182,7 @@ pub trait LocalEsdtAndEsdtNft {
 			token_identifier.as_esdt_identifier(),
 			nonce,
 			&amount,
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			function.as_slice(),
 			&arg_buffer,
 		);
@@ -198,7 +198,7 @@ pub trait LocalEsdtAndEsdtNft {
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 	) -> AsyncCall<BigUint> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		ESDTSystemSmartContractProxy::new()
 			.issue_semi_fungible(
@@ -258,8 +258,8 @@ pub trait LocalEsdtAndEsdtNft {
 
 	#[view(getFungibleEsdtBalance)]
 	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
-		self.get_esdt_balance(
-			&self.get_sc_address(),
+		self.blockchain().get_esdt_balance(
+			&self.blockchain().get_sc_address(),
 			token_identifier.as_esdt_identifier(),
 			0,
 		)
@@ -267,8 +267,8 @@ pub trait LocalEsdtAndEsdtNft {
 
 	#[view(getNftBalance)]
 	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
-		self.get_esdt_balance(
-			&self.get_sc_address(),
+		self.blockchain().get_esdt_balance(
+			&self.blockchain().get_sc_address(),
 			token_identifier.as_esdt_identifier(),
 			nonce,
 		)
