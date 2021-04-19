@@ -240,7 +240,7 @@ pub trait EsdtNftMarketplace {
 			);
 
 			// send NFT to auction winner
-			self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_esdt_nft_via_transfer_exec(
 				&auction.current_winner,
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
@@ -249,7 +249,7 @@ pub trait EsdtNftMarketplace {
 			);
 		} else {
 			// return to original owner
-			self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_esdt_nft_via_transfer_exec(
 				&auction.original_owner,
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
@@ -282,7 +282,7 @@ pub trait EsdtNftMarketplace {
 
 		self.auction_for_token(&nft_type, nft_nonce).clear();
 
-		self.send().direct_esdt_nft_via_transfer_exec(
+		let _ = self.send().direct_esdt_nft_via_transfer_exec(
 			&caller,
 			nft_type.as_esdt_identifier(),
 			nft_nonce,
@@ -416,7 +416,7 @@ pub trait EsdtNftMarketplace {
 			self.send()
 				.direct(to, &token_id, amount, self.data_or_empty_if_sc(to, data));
 		} else {
-			self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_esdt_nft_via_transfer_exec(
 				to,
 				token_id.as_esdt_identifier(),
 				nonce,

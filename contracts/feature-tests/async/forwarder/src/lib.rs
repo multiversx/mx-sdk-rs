@@ -38,7 +38,8 @@ pub trait Forwarder {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send()
+		let _ = self
+			.send()
 			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
@@ -55,10 +56,18 @@ pub trait Forwarder {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
-		self.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
+		let _ = self.send().direct_esdt_via_transf_exec(
+			to,
+			token_id.as_slice(),
+			amount_first_time,
+			data,
+		);
+		let _ = self.send().direct_esdt_via_transf_exec(
+			to,
+			token_id.as_slice(),
+			amount_second_time,
+			data,
+		);
 	}
 
 	#[endpoint]

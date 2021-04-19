@@ -99,7 +99,7 @@ pub trait FirstContract {
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-		self.send().direct_esdt_execute(
+		let _ = self.send().direct_esdt_execute(
 			&second_contract_address,
 			expected_token_name.as_esdt_identifier(),
 			&esdt_value,
@@ -124,7 +124,7 @@ pub trait FirstContract {
 		require!(esdt_value > 0, "no esdt transfered!");
 		require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-		self.send().direct_esdt_execute(
+		let _ = self.send().direct_esdt_execute(
 			&second_contract_address,
 			expected_token_name.as_esdt_identifier(),
 			&esdt_value,
