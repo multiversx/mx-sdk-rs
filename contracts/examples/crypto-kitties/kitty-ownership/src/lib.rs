@@ -60,8 +60,11 @@ pub trait KittyOwnership {
 	fn claim(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
-		self.send()
-			.direct_egld(&self.get_caller(), &self.get_sc_balance(), b"claim");
+		self.send().direct_egld(
+			&self.blockchain().get_caller(),
+			&self.blockchain().get_sc_balance(),
+			b"claim",
+		);
 
 		Ok(())
 	}
@@ -89,7 +92,7 @@ pub trait KittyOwnership {
 
 	#[endpoint]
 	fn approve(&self, to: Address, kitty_id: u32) -> SCResult<()> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
@@ -105,7 +108,7 @@ pub trait KittyOwnership {
 
 	#[endpoint]
 	fn transfer(&self, to: Address, kitty_id: u32) -> SCResult<()> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
@@ -113,7 +116,7 @@ pub trait KittyOwnership {
 			"Can't transfer to default address 0x0!"
 		);
 		require!(
-			to != self.get_sc_address(),
+			to != self.blockchain().get_sc_address(),
 			"Can't transfer to this contract!"
 		);
 		require!(
@@ -128,7 +131,7 @@ pub trait KittyOwnership {
 
 	#[endpoint]
 	fn transfer_from(&self, from: Address, to: Address, kitty_id: u32) -> SCResult<()> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
@@ -136,7 +139,7 @@ pub trait KittyOwnership {
 			"Can't transfer to default address 0x0!"
 		);
 		require!(
-			to != self.get_sc_address(),
+			to != self.blockchain().get_sc_address(),
 			"Can't transfer to this contract!"
 		);
 		require!(
@@ -180,7 +183,7 @@ pub trait KittyOwnership {
 		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
-			self.get_caller() == kitty_auction_addr,
+			self.blockchain().get_caller() == kitty_auction_addr,
 			"Only auction contract may call this function!"
 		);
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
@@ -210,7 +213,7 @@ pub trait KittyOwnership {
 		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
-			self.get_caller() == kitty_auction_addr,
+			self.blockchain().get_caller() == kitty_auction_addr,
 			"Only auction contract may call this function!"
 		);
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
@@ -235,11 +238,14 @@ pub trait KittyOwnership {
 		let kitty_auction_addr = self._get_kitty_auction_contract_address_or_default();
 
 		require!(
-			self.get_caller() == kitty_auction_addr,
+			self.blockchain().get_caller() == kitty_auction_addr,
 			"Only auction contract may call this function!"
 		);
 
-		let mut random = Random::new(*self.get_block_random_seed(), self.get_tx_hash().as_bytes());
+		let mut random = Random::new(
+			*self.blockchain().get_block_random_seed(),
+			self.blockchain().get_tx_hash().as_bytes(),
+		);
 		let genes = KittyGenes::get_random(&mut random);
 		let kitty_id = self._create_new_gen_zero_kitty(&genes);
 
@@ -290,7 +296,7 @@ pub trait KittyOwnership {
 	fn approve_siring(&self, address: Address, kitty_id: u32) -> SCResult<()> {
 		require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
 		require!(
-			self.get_kitty_owner(kitty_id) == self.get_caller(),
+			self.get_kitty_owner(kitty_id) == self.blockchain().get_caller(),
 			"You are not the owner of the kitty!"
 		);
 		require!(
@@ -315,7 +321,7 @@ pub trait KittyOwnership {
 		require!(self._is_valid_id(sire_id), "Invalid sire id!");
 
 		let auto_birth_fee = self.get_birth_fee();
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(payment == auto_birth_fee, "Wrong fee!");
 		require!(
@@ -366,8 +372,10 @@ pub trait KittyOwnership {
 					.generateKittyGenes(matron, sire)
 					.async_call()
 					.with_callback(
-						self.callbacks()
-							.generate_kitty_genes_callback(matron_id, self.get_caller()),
+						self.callbacks().generate_kitty_genes_callback(
+							matron_id,
+							self.blockchain().get_caller(),
+						),
 					),
 			)
 		} else {
@@ -414,7 +422,7 @@ pub trait KittyOwnership {
 		let new_kitty_id = total_kitties;
 		let kitty = Kitty::new(
 			genes,
-			self.get_block_timestamp(),
+			self.blockchain().get_block_timestamp(),
 			matron_id,
 			sire_id,
 			generation,
@@ -447,7 +455,7 @@ pub trait KittyOwnership {
 
 	fn _trigger_cooldown(&self, kitty: &mut Kitty) {
 		let cooldown = kitty.get_next_cooldown_time();
-		kitty.cooldown_end = self.get_block_timestamp() + cooldown;
+		kitty.cooldown_end = self.blockchain().get_block_timestamp() + cooldown;
 	}
 
 	fn _breed(&self, matron_id: u32, sire_id: u32) {
@@ -475,7 +483,7 @@ pub trait KittyOwnership {
 	}
 
 	fn _is_ready_to_breed(&self, kitty: &Kitty) -> bool {
-		kitty.siring_with_id == 0 && kitty.cooldown_end < self.get_block_timestamp()
+		kitty.siring_with_id == 0 && kitty.cooldown_end < self.blockchain().get_block_timestamp()
 	}
 
 	fn _is_siring_permitted(&self, matron_id: u32, sire_id: u32) -> bool {
@@ -487,7 +495,7 @@ pub trait KittyOwnership {
 	}
 
 	fn _is_ready_to_give_birth(&self, matron: &Kitty) -> bool {
-		matron.siring_with_id != 0 && matron.cooldown_end < self.get_block_timestamp()
+		matron.siring_with_id != 0 && matron.cooldown_end < self.blockchain().get_block_timestamp()
 	}
 
 	fn _is_valid_mating_pair(&self, matron_id: u32, sire_id: u32) -> bool {

@@ -31,7 +31,7 @@ pub trait EgldEsdtSwap {
 			"wrapped egld was already issued"
 		);
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		self.issue_started_event(&caller, token_ticker.as_slice(), &initial_supply);
 
@@ -96,7 +96,7 @@ pub trait EgldEsdtSwap {
 
 		let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
 		let esdt_token_id = wrapped_egld_token_id.as_esdt_identifier();
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		self.mint_started_event(&caller, &amount);
 
 		Ok(ESDTSystemSmartContractProxy::new()
@@ -143,7 +143,7 @@ pub trait EgldEsdtSwap {
 		unused_wrapped_egld -= &payment;
 		self.unused_wrapped_egld().set(&unused_wrapped_egld);
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		self.send().direct_esdt_via_transf_exec(
 			&caller,
 			self.wrapped_egld_token_id().get().as_esdt_identifier(),
@@ -179,7 +179,7 @@ pub trait EgldEsdtSwap {
 		require!(wrapped_egld_payment > 0, "Must pay more than 0 tokens!");
 		// this should never happen, but we'll check anyway
 		require!(
-			wrapped_egld_payment <= self.get_sc_balance(),
+			wrapped_egld_payment <= self.blockchain().get_sc_balance(),
 			"Contract does not have enough funds"
 		);
 
@@ -187,7 +187,7 @@ pub trait EgldEsdtSwap {
 			.update(|unused_wrapped_egld| *unused_wrapped_egld += &wrapped_egld_payment);
 
 		// 1 wrapped EGLD = 1 EGLD, so we pay back the same amount
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		self.send()
 			.direct_egld(&caller, &wrapped_egld_payment, b"unwrapping");
 
@@ -198,7 +198,7 @@ pub trait EgldEsdtSwap {
 
 	#[view(getLockedEgldBalance)]
 	fn get_locked_egld_balance(&self) -> BigUint {
-		self.get_sc_balance()
+		self.blockchain().get_sc_balance()
 	}
 
 	// storage
