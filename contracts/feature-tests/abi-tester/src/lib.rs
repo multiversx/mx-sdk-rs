@@ -52,7 +52,7 @@ pub trait AbiTester {
 			1,
 			[2; 3],
 			BoxedBytes::empty(),
-			OnlyShowsUpAsNested03 { something: () },
+			OnlyShowsUpAsNested03(),
 		)
 			.into()
 	}
