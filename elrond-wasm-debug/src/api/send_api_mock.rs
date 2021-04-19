@@ -63,7 +63,7 @@ impl SendApi<RustBigUint> for TxContext {
 			recipient: to.clone(),
 			token: TokenIdentifier::egld(),
 			amount: amount.value(),
-		})
+		});
 	}
 
 	fn direct_egld_execute(
@@ -73,7 +73,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_gas_limit: u64,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Result<(), &'static [u8]> {
 		panic!("direct_egld_execute not yet implemented")
 	}
 
@@ -85,7 +85,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_gas: u64,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Result<(), &'static [u8]> {
 		if amount.value() > self.get_available_esdt_balance(token) {
 			std::panic::panic_any(TxPanic {
 				status: 10,
@@ -98,7 +98,8 @@ impl SendApi<RustBigUint> for TxContext {
 			recipient: to.clone(),
 			token: TokenIdentifier::from(token),
 			amount: amount.value(),
-		})
+		});
+		Ok(())
 	}
 
 	fn direct_esdt_nft_execute(
@@ -110,7 +111,7 @@ impl SendApi<RustBigUint> for TxContext {
 		_gas_limit: u64,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Result<(), &'static [u8]> {
 		panic!("direct_esdt_nft_execute not implemented yet");
 	}
 
