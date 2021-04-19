@@ -15,7 +15,7 @@ pub enum Status {
 pub trait Crowdfunding {
 	#[init]
 	fn init(&self, target: BigUint, deadline: u64) {
-		let my_address: Address = self.get_caller();
+		let my_address: Address = self.blockchain().get_caller();
 		self.set_owner(&my_address);
 		self.set_target(&target);
 		self.set_deadline(deadline);
@@ -24,11 +24,11 @@ pub trait Crowdfunding {
 	#[payable("EGLD")]
 	#[endpoint]
 	fn fund(&self, #[payment] payment: BigUint) -> SCResult<()> {
-		if self.get_block_nonce() > self.get_deadline() {
+		if self.blockchain().get_block_nonce() > self.get_deadline() {
 			return sc_error!("cannot fund after deadline");
 		}
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let mut deposit = self.get_deposit(&caller);
 		deposit += payment;
 		self.set_deposit(&caller, &deposit);
@@ -38,9 +38,9 @@ pub trait Crowdfunding {
 
 	#[view]
 	fn status(&self) -> Status {
-		if self.get_block_nonce() <= self.get_deadline() {
+		if self.blockchain().get_block_nonce() <= self.get_deadline() {
 			Status::FundingPeriod
-		} else if self.get_sc_balance() >= self.get_target() {
+		} else if self.blockchain().get_sc_balance() >= self.get_target() {
 			Status::Successful
 		} else {
 			Status::Failed
@@ -49,7 +49,7 @@ pub trait Crowdfunding {
 
 	#[view(currentFunds)]
 	fn current_funds(&self) -> SCResult<BigUint> {
-		Ok(self.get_sc_balance())
+		Ok(self.blockchain().get_sc_balance())
 	}
 
 	#[endpoint]
@@ -57,16 +57,19 @@ pub trait Crowdfunding {
 		match self.status() {
 			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
 			Status::Successful => {
-				let caller = self.get_caller();
+				let caller = self.blockchain().get_caller();
 				if caller != self.get_owner() {
 					return sc_error!("only owner can claim successful funding");
 				}
-				self.send()
-					.direct_egld(&caller, &self.get_sc_balance(), b"funding success");
+				self.send().direct_egld(
+					&caller,
+					&self.blockchain().get_sc_balance(),
+					b"funding success",
+				);
 				Ok(())
 			},
 			Status::Failed => {
-				let caller = self.get_caller();
+				let caller = self.blockchain().get_caller();
 				let deposit = self.get_deposit(&caller);
 				if deposit > 0 {
 					self.send()

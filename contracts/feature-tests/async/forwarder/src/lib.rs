@@ -179,7 +179,7 @@ pub trait Forwarder {
 	#[endpoint]
 	#[payable("*")]
 	fn echo_arguments_sync(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
-		let half_gas = self.get_gas_left() / 2;
+		let half_gas = self.blockchain().get_gas_left() / 2;
 
 		let result = contract_call!(self, to, VaultProxy)
 			.echo_arguments(&args)
@@ -191,7 +191,7 @@ pub trait Forwarder {
 	#[endpoint]
 	#[payable("*")]
 	fn echo_arguments_sync_twice(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
-		let one_third_gas = self.get_gas_left() / 3;
+		let one_third_gas = self.blockchain().get_gas_left() / 3;
 
 		let result = contract_call!(self, to.clone(), VaultProxy)
 			.echo_arguments(&args)
@@ -217,7 +217,7 @@ pub trait Forwarder {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: BigUint,
 	) {
-		let half_gas = self.get_gas_left() / 2;
+		let half_gas = self.blockchain().get_gas_left() / 2;
 
 		let () = contract_call!(self, to, VaultProxy)
 			.with_token_transfer(token, payment)

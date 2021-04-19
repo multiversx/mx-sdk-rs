@@ -1,7 +1,7 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
-use elrond_wasm::api::{ContractHookApi, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 
 extern "C" {

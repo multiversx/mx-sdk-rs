@@ -10,7 +10,7 @@ pub trait CryptoBubbles {
 	/// is called immediately after the contract is created
 	#[init]
 	fn init(&self) {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		self.set_owner(&caller);
 	}
 
@@ -18,7 +18,7 @@ pub trait CryptoBubbles {
 	#[payable("EGLD")]
 	#[endpoint(topUp)]
 	fn top_up(&self, #[payment] payment: BigUint) {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		let mut balance = self.get_player_balance(&caller);
 		balance += &payment;
@@ -30,7 +30,7 @@ pub trait CryptoBubbles {
 	/// player withdraws funds
 	#[endpoint]
 	fn withdraw(&self, amount: &BigUint) -> SCResult<()> {
-		self._transfer_back_to_player_wallet(&self.get_caller(), amount)
+		self._transfer_back_to_player_wallet(&self.blockchain().get_caller(), amount)
 	}
 
 	/// server calls withdraw on behalf of the player
@@ -75,7 +75,7 @@ pub trait CryptoBubbles {
 	#[payable("EGLD")]
 	#[endpoint(joinGame)]
 	fn join_game(&self, game_index: BigUint, #[payment] bet: BigUint) -> SCResult<()> {
-		let player = self.get_caller();
+		let player = self.blockchain().get_caller();
 		self.top_up(self.call_value().egld_value());
 		self._add_player_to_game_state_change(&game_index, &player, &bet)
 	}
@@ -88,7 +88,7 @@ pub trait CryptoBubbles {
 		winner: &Address,
 		prize: &BigUint,
 	) -> SCResult<()> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let owner: Address = self.get_owner();
 		require!(
 			caller == owner,

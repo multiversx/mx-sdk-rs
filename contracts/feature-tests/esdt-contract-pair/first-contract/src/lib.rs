@@ -103,7 +103,7 @@ pub trait FirstContract {
 			&second_contract_address,
 			expected_token_name.as_esdt_identifier(),
 			&esdt_value,
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
 			&ArgBuffer::new(),
 		);
@@ -128,7 +128,7 @@ pub trait FirstContract {
 			&second_contract_address,
 			expected_token_name.as_esdt_identifier(),
 			&esdt_value,
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
 			&ArgBuffer::new(),
 		);

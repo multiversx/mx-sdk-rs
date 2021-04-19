@@ -62,7 +62,7 @@ pub trait Erc1155Marketplace {
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.token_ownership_contract_address().get(),
+			self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
 			"Only the token ownership contract may call this function"
 		);
 
@@ -91,7 +91,7 @@ pub trait Erc1155Marketplace {
 		args: AuctionArgument<BigUint>,
 	) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.token_ownership_contract_address().get(),
+			self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
 			"Only the token ownership contract may call this function"
 		);
 		require!(
@@ -122,7 +122,7 @@ pub trait Erc1155Marketplace {
 	fn claim(&self) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let data = self.data_or_empty_if_sc(&caller, b"claim");
 
 		let claimable_funds_mapper = self.get_claimable_funds_mapper();
@@ -154,7 +154,7 @@ pub trait Erc1155Marketplace {
 		only_owner!(self, "Only owner may call this function!");
 		require!(!new_address.is_zero(), "Cannot set to zero address");
 		require!(
-			self.is_smart_contract(&new_address),
+			self.blockchain().is_smart_contract(&new_address),
 			"The provided address is not a smart contract"
 		);
 
@@ -179,7 +179,7 @@ pub trait Erc1155Marketplace {
 			"Token is not up for auction"
 		);
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let mut auction = self.auction_for_token(&type_id, &nft_id).get();
 
 		require!(
@@ -187,7 +187,7 @@ pub trait Erc1155Marketplace {
 			"Can't bid on your own token"
 		);
 		require!(
-			self.get_block_timestamp() < auction.deadline,
+			self.blockchain().get_block_timestamp() < auction.deadline,
 			"Auction ended already"
 		);
 		require!(
@@ -237,7 +237,8 @@ pub trait Erc1155Marketplace {
 		let auction = self.auction_for_token(&type_id, &nft_id).get();
 
 		require!(
-			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
+			self.blockchain().get_block_timestamp() > auction.deadline
+				|| auction.current_bid == auction.max_bid,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
@@ -328,7 +329,7 @@ pub trait Erc1155Marketplace {
 			"Min bid can't be 0 or higher than max bid"
 		);
 		require!(
-			deadline > self.get_block_timestamp(),
+			deadline > self.blockchain().get_block_timestamp(),
 			"Deadline can't be in the past"
 		);
 
@@ -351,7 +352,7 @@ pub trait Erc1155Marketplace {
 		nft_id: BigUint,
 		to: Address,
 	) -> AsyncCall<BigUint> {
-		let sc_own_address = self.get_sc_address();
+		let sc_own_address = self.blockchain().get_sc_address();
 		let token_ownership_contract_address = self.token_ownership_contract_address().get();
 
 		contract_call!(
@@ -380,7 +381,7 @@ pub trait Erc1155Marketplace {
 	}
 
 	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
-		if self.is_smart_contract(dest) {
+		if self.blockchain().is_smart_contract(dest) {
 			&[]
 		} else {
 			data
