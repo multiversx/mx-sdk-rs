@@ -45,7 +45,7 @@ pub trait Vault {
 			OptionalArg::None => &[],
 		};
 		self.send()
-			.direct_via_async_call(&self.get_caller(), &token, &amount, data);
+			.direct_via_async_call(&self.blockchain().get_caller(), &token, &amount, data);
 	}
 
 	#[event("accept_funds")]

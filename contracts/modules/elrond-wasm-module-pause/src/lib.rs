@@ -25,7 +25,7 @@ pub trait PauseModule {
 	#[endpoint(pause)]
 	fn pause_endpoint(&self) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.get_owner_address(),
+			self.blockchain().get_caller() == self.blockchain().get_owner_address(),
 			"only owner allowed to pause contract"
 		);
 
@@ -37,7 +37,7 @@ pub trait PauseModule {
 	#[endpoint(unpause)]
 	fn unpause_endpoint(&self) -> SCResult<()> {
 		require!(
-			self.get_caller() == self.get_owner_address(),
+			self.blockchain().get_caller() == self.blockchain().get_owner_address(),
 			"only owner allowed to unpause contract"
 		);
 

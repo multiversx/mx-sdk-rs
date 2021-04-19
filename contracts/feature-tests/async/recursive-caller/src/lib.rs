@@ -66,9 +66,13 @@ pub trait RecursiveCaller {
 
 		if counter > 1 {
 			OptionalResult::Some(
-				contract_call!(self, self.get_sc_address(), AlsoRecursiveCallerProxy)
-					.recursive_send_funds(&to, token_identifier, amount, counter - 1)
-					.async_call(),
+				contract_call!(
+					self,
+					self.blockchain().get_sc_address(),
+					AlsoRecursiveCallerProxy
+				)
+				.recursive_send_funds(&to, token_identifier, amount, counter - 1)
+				.async_call(),
 			)
 		} else {
 			OptionalResult::None

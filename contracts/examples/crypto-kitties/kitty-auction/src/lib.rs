@@ -109,7 +109,7 @@ pub trait KittyAuction {
 		ending_price: BigUint,
 		duration: u64,
 	) -> SCResult<OptionalResult<AsyncCall<BigUint>>> {
-		let deadline = self.get_block_timestamp() + duration;
+		let deadline = self.blockchain().get_block_timestamp() + duration;
 
 		require!(
 			!self.is_up_for_auction(kitty_id),
@@ -121,7 +121,7 @@ pub trait KittyAuction {
 			"starting price must be less than ending price!"
 		);
 		require!(
-			deadline > self.get_block_timestamp(),
+			deadline > self.blockchain().get_block_timestamp(),
 			"deadline can't be in the past!"
 		);
 
@@ -142,7 +142,7 @@ pub trait KittyAuction {
 		ending_price: BigUint,
 		duration: u64,
 	) -> SCResult<OptionalResult<AsyncCall<BigUint>>> {
-		let deadline = self.get_block_timestamp() + duration;
+		let deadline = self.blockchain().get_block_timestamp() + duration;
 
 		require!(
 			!self.is_up_for_auction(kitty_id),
@@ -154,7 +154,7 @@ pub trait KittyAuction {
 			"starting price must be less than ending price!"
 		);
 		require!(
-			deadline > self.get_block_timestamp(),
+			deadline > self.blockchain().get_block_timestamp(),
 			"deadline can't be in the past!"
 		);
 
@@ -175,7 +175,7 @@ pub trait KittyAuction {
 			"Kitty is not up for auction!"
 		);
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let mut auction = self.get_auction(kitty_id);
 
 		require!(
@@ -183,7 +183,7 @@ pub trait KittyAuction {
 			"can't bid on your own kitty!"
 		);
 		require!(
-			self.get_block_timestamp() < auction.deadline,
+			self.blockchain().get_block_timestamp() < auction.deadline,
 			"auction ended already!"
 		);
 		require!(
@@ -223,7 +223,7 @@ pub trait KittyAuction {
 		let auction = self.get_auction(kitty_id);
 
 		require!(
-			self.get_block_timestamp() > auction.deadline
+			self.blockchain().get_block_timestamp() > auction.deadline
 				|| auction.current_bid == auction.ending_price,
 			"auction has not ended yet!"
 		);
@@ -253,7 +253,7 @@ pub trait KittyAuction {
 		ending_price: BigUint,
 		deadline: u64,
 	) -> OptionalResult<AsyncCall<BigUint>> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		let kitty_ownership_contract_address =
 			self._get_kitty_ownership_contract_address_or_default();
@@ -280,14 +280,14 @@ pub trait KittyAuction {
 		let starting_price = self.get_gen_zero_kitty_starting_price();
 		let ending_price = self.get_gen_zero_kitty_ending_price();
 		let duration = self.get_gen_zero_kitty_auction_duration();
-		let deadline = self.get_block_timestamp() + duration;
+		let deadline = self.blockchain().get_block_timestamp() + duration;
 
 		let auction = Auction::new(
 			AuctionType::Selling,
 			&starting_price,
 			&ending_price,
 			deadline,
-			&self.get_sc_address(),
+			&self.blockchain().get_sc_address(),
 		);
 
 		self.set_auction(kitty_id, &auction);
@@ -378,7 +378,7 @@ pub trait KittyAuction {
 				// send winning bid money to kitty owner
 				// condition needed for gen zero kitties, since this sc is their owner
 				// and for when no bid was made
-				if auction.kitty_owner != self.get_sc_address()
+				if auction.kitty_owner != self.blockchain().get_sc_address()
 					&& auction.current_winner != Address::zero()
 				{
 					self.send().direct_egld(

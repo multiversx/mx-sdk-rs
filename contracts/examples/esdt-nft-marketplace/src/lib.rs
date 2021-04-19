@@ -80,7 +80,7 @@ pub trait EsdtNftMarketplace {
 			"Min bid can't be 0 or higher than max bid"
 		);
 		require!(
-			deadline > self.get_block_timestamp(),
+			deadline > self.blockchain().get_block_timestamp(),
 			"Deadline can't be in the past"
 		);
 
@@ -100,7 +100,7 @@ pub trait EsdtNftMarketplace {
 			min_bid,
 			max_bid,
 			deadline,
-			original_owner: self.get_caller(),
+			original_owner: self.blockchain().get_caller(),
 			current_bid: BigUint::zero(),
 			current_winner: Address::zero(),
 		});
@@ -118,7 +118,7 @@ pub trait EsdtNftMarketplace {
 
 		let (payment_amount, payment_token) = self.call_value().payment_token_pair();
 		let payment_token_nonce = self.call_value().esdt_token_nonce();
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let mut auction = self.auction_for_token(&nft_type, nft_nonce).get();
 
 		require!(
@@ -126,7 +126,7 @@ pub trait EsdtNftMarketplace {
 			"Can't bid on your own token"
 		);
 		require!(
-			self.get_block_timestamp() < auction.deadline,
+			self.blockchain().get_block_timestamp() < auction.deadline,
 			"Auction ended already"
 		);
 		require!(
@@ -177,15 +177,16 @@ pub trait EsdtNftMarketplace {
 		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
 
 		require!(
-			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
+			self.blockchain().get_block_timestamp() > auction.deadline
+				|| auction.current_bid == auction.max_bid,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
 		self.auction_for_token(&nft_type, nft_nonce).clear();
 
 		if auction.current_winner != Address::zero() {
-			let nft_info = self.get_esdt_token_data(
-				&self.get_sc_address(),
+			let nft_info = self.blockchain().get_esdt_token_data(
+				&self.blockchain().get_sc_address(),
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
 			);
@@ -210,7 +211,7 @@ pub trait EsdtNftMarketplace {
 
 			if bid_cut_amount > BigUint::zero() {
 				// send part as cut for contract owner
-				let owner = self.get_owner_address();
+				let owner = self.blockchain().get_owner_address();
 				self.transfer_esdt(
 					&owner,
 					token_id,
@@ -268,7 +269,7 @@ pub trait EsdtNftMarketplace {
 		);
 
 		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(
 			auction.original_owner == caller,
@@ -426,7 +427,7 @@ pub trait EsdtNftMarketplace {
 	}
 
 	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
-		if self.is_smart_contract(dest) {
+		if self.blockchain().is_smart_contract(dest) {
 			&[]
 		} else {
 			data

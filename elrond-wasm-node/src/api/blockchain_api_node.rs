@@ -1,6 +1,6 @@
-use super::{ArwenBigInt, ArwenBigUint};
+use super::ArwenBigUint;
 use crate::ArwenApiImpl;
-use elrond_wasm::api::ContractHookApi;
+use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, H256};
 
 extern "C" {
@@ -88,26 +88,7 @@ extern "C" {
 	) -> i32;
 }
 
-impl ContractHookApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
-	type Storage = Self;
-	type CallValue = Self;
-	type SendApi = Self;
-
-	#[inline]
-	fn get_storage_raw(&self) -> Self::Storage {
-		self.clone()
-	}
-
-	#[inline]
-	fn call_value(&self) -> Self::CallValue {
-		self.clone()
-	}
-
-	#[inline]
-	fn send(&self) -> Self::SendApi {
-		self.clone()
-	}
-
+impl BlockchainApi<ArwenBigUint> for ArwenApiImpl {
 	#[inline]
 	fn get_sc_address(&self) -> Address {
 		unsafe {

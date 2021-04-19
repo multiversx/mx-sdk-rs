@@ -40,7 +40,7 @@ pub trait PingPong {
 	) {
 		self.ping_amount().set(ping_amount);
 		let activation_timestamp =
-			opt_activation_timestamp.unwrap_or_else(|| self.get_block_timestamp());
+			opt_activation_timestamp.unwrap_or_else(|| self.blockchain().get_block_timestamp());
 		let deadline = activation_timestamp + duration_in_seconds;
 		self.deadline().set(&deadline);
 		self.activation_timestamp().set(&activation_timestamp);
@@ -61,7 +61,7 @@ pub trait PingPong {
 			"the payment must match the fixed sum"
 		);
 
-		let block_timestamp = self.get_block_timestamp();
+		let block_timestamp = self.blockchain().get_block_timestamp();
 		require!(
 			self.activation_timestamp().get() <= block_timestamp,
 			"smart contract not active yet"
@@ -74,12 +74,12 @@ pub trait PingPong {
 
 		if let Some(max_funds) = self.max_funds().get() {
 			require!(
-				&self.get_sc_balance() + payment <= max_funds,
+				&self.blockchain().get_sc_balance() + payment <= max_funds,
 				"smart contract full"
 			);
 		}
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let user_id = self.user_mapper().get_or_create_user(&caller);
 		let user_status = self.user_status(user_id).get();
 		match user_status {
@@ -123,11 +123,11 @@ pub trait PingPong {
 	#[endpoint]
 	fn pong(&self) -> SCResult<()> {
 		require!(
-			self.get_block_timestamp() >= self.deadline().get(),
+			self.blockchain().get_block_timestamp() >= self.deadline().get(),
 			"can't withdraw before deadline"
 		);
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let user_id = self.user_mapper().get_user_id(&caller);
 		self.pong_by_user_id(user_id)
 	}
@@ -140,7 +140,7 @@ pub trait PingPong {
 	#[endpoint(pongAll)]
 	fn pong_all(&self) -> SCResult<OperationCompletionStatus> {
 		require!(
-			self.get_block_timestamp() >= self.deadline().get(),
+			self.blockchain().get_block_timestamp() >= self.deadline().get(),
 			"can't withdraw before deadline"
 		);
 
@@ -154,7 +154,7 @@ pub trait PingPong {
 				return Ok(OperationCompletionStatus::Completed);
 			}
 
-			if self.get_gas_left() < PONG_ALL_LOW_GAS_LIMIT {
+			if self.blockchain().get_gas_left() < PONG_ALL_LOW_GAS_LIMIT {
 				self.pong_all_last_user().set(&pong_all_last_user);
 				return Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas);
 			}
