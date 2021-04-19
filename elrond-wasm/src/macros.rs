@@ -15,7 +15,9 @@ macro_rules! imports {
 		use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 		use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 		use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
-		use elrond_wasm::api::{BigIntApi, BigUintApi, CallValueApi, ContractHookApi, SendApi};
+		use elrond_wasm::api::{
+			BigIntApi, BigUintApi, BlockchainApi, CallValueApi, ContractSelfApi, CryptoApi, SendApi,
+		};
 		use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
 		use elrond_wasm::err_msg;
 		use elrond_wasm::esdt::*;
@@ -68,14 +70,15 @@ macro_rules! sc_try {
 ///
 /// ```rust
 /// # use elrond_wasm::*;
+/// # use elrond_wasm::api::BlockchainApi;
 /// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
+/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractSelfApi<BigInt, BigUint>
 /// # where
 /// #   BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
 /// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
-///     require!(self.get_caller() == self.get_owner_address(), "Caller must be owner");
+///     require!(self.blockchain().get_caller() == self.blockchain().get_owner_address(), "Caller must be owner");
 ///     Ok(())
 /// }
 /// # }
@@ -95,8 +98,9 @@ macro_rules! require {
 ///
 /// ```rust
 /// # use elrond_wasm::*;
+/// # use elrond_wasm::api::BlockchainApi;
 /// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
+/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractSelfApi<BigInt, BigUint>
 /// # where
 /// #   BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
 /// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
@@ -110,7 +114,7 @@ macro_rules! require {
 #[macro_export]
 macro_rules! only_owner {
 	($trait_self: expr, $error_msg:expr) => {
-		if ($trait_self.get_caller() != $trait_self.get_owner_address()) {
+		if ($trait_self.blockchain().get_caller() != $trait_self.blockchain().get_owner_address()) {
 			return sc_error!($error_msg);
 		}
 	};
