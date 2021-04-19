@@ -106,7 +106,7 @@
                 },
                 {
                     "name": "_var_args",
-                    "type": "variadic<multi2<OnlyShowsUpAsNested04,i32,>>",
+                    "type": "variadic<multi<OnlyShowsUpAsNested04,i32>>",
                     "multi_arg": true
                 }
             ],
@@ -117,7 +117,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "variadic<OnlyShowsUpAsNested05>",
+                    "type": "variadic<multi<OnlyShowsUpAsNested05,bool,()>>",
                     "multi_result": true
                 }
             ]
@@ -270,7 +270,7 @@
                         "Also, just like above, recursive types need to work even when nested into a tuple."
                     ],
                     "name": "tuple_madness",
-                    "type": "tuple2<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                    "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
                 }
             ]
         },
