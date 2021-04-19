@@ -4,16 +4,22 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-- Simplified ABI syntax for tuples and fixed-size arrays
+## [elrond-wasm 0.15.0, elrond-codec 0.5.2] - 2021-04-19
+- ABI
+	- Constructor representation
+	- Simplified ABI syntax for tuples and fixed-size arrays
+- Final cleanup for the contract APIs: split off blockchain and crypto APIs
+- Small fixes in the send API
+- `TokenIdentifier` validation
+- Minor refactoring in the elrond-codec 
 
-## [elrond-wasm 0.14.2]
+## [elrond-wasm 0.14.2] - 2021-03-29
 - Fixed contract call/callback logs in mandos-rs
 
-## [elrond-wasm 0.14.1]
+## [elrond-wasm 0.14.1] - 2021-03-25
 - Unified variadic arguments with respective variadic results
 
-## [elrond-wasm 0.14.0, mandos 0.6.0, elrond-codec 0.5.1]
+## [elrond-wasm 0.14.0, mandos 0.6.0, elrond-codec 0.5.1] - 2021-03-22
 - ESDT functionality:
 	- ESDT system smart contract proxy, though which it is possible to mint, burn, issue, freeze, pause, etc.
 	- Endpoints to handle NFTs. Also added NFT management in the  ESDT system smart contract proxy
