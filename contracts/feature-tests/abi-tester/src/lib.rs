@@ -66,7 +66,7 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
-	fn multi_result_vec(&self) -> MultiResultVec<OnlyShowsUpAsNested05> {
+	fn multi_result_vec(&self) -> MultiResultVec<MultiResult3<OnlyShowsUpAsNested05, bool, ()>> {
 		MultiResultVec::new()
 	}
 
