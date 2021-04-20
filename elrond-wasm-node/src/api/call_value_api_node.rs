@@ -62,8 +62,6 @@ impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
 	}
 
 	fn esdt_token_type(&self) -> EsdtTokenType {
-		unsafe {
-			(getESDTTokenType() as u8).into()
-		}
+		unsafe { (getESDTTokenType() as u8).into() }
 	}
 }

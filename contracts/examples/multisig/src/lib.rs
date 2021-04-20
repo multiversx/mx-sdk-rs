@@ -87,7 +87,7 @@ pub trait Multisig {
 	fn deposit(&self) {}
 
 	fn propose_action(&self, action: Action<BigUint>) -> SCResult<usize> {
-		let caller_address = self.get_caller();
+		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(
@@ -273,7 +273,7 @@ pub trait Multisig {
 			"action does not exist"
 		);
 
-		let caller_address = self.get_caller();
+		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(caller_role.can_sign(), "only board members can sign");
@@ -296,7 +296,7 @@ pub trait Multisig {
 			"action does not exist"
 		);
 
-		let caller_address = self.get_caller();
+		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(caller_role.can_sign(), "only board members can un-sign");
@@ -402,7 +402,7 @@ pub trait Multisig {
 	/// Proposers and board members use this to launch signed actions.
 	#[endpoint(performAction)]
 	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<PerformActionResult<BigUint>> {
-		let caller_address = self.get_caller();
+		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(
@@ -472,7 +472,7 @@ pub trait Multisig {
 				code_metadata,
 				arguments,
 			} => {
-				let gas_left = self.get_gas_left();
+				let gas_left = self.blockchain().get_gas_left();
 				let mut arg_buffer = ArgBuffer::new();
 				for arg in arguments {
 					arg_buffer.push_argument_bytes(arg.as_slice());
@@ -518,7 +518,7 @@ pub trait Multisig {
 	/// Otherwise this endpoint would be prone to abuse.
 	#[endpoint(discardAction)]
 	fn discard_action(&self, action_id: usize) -> SCResult<()> {
-		let caller_address = self.get_caller();
+		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
 		require!(
