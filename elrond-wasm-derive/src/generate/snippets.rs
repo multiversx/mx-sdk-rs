@@ -56,7 +56,7 @@ pub fn api_where() -> proc_macro2::TokenStream {
 	}
 }
 
-pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::TokenStream {
+pub fn contract_trait_api_impl(contract_struct: &syn::Ident) -> proc_macro2::TokenStream {
 	let api_where = api_where();
 	quote! {
 		impl <T, BigInt, BigUint> elrond_wasm::api::ContractSelfApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>

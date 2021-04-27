@@ -10,7 +10,6 @@ pub fn contract_implementation(
 	contract: &ContractTrait,
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
-	let contract_impl_ident = contract.contract_impl_name.clone();
 	let trait_name_ident = contract.trait_name.clone();
 	let method_impls = extract_method_impls(&contract);
 
@@ -29,121 +28,138 @@ pub fn contract_implementation(
 	let api_where = snippets::api_where();
 
 	let supertrait_impls = generate_supertrait_impls(&contract);
-	let contract_trait_api_impl = snippets::contract_trait_api_impl(&contract_impl_ident);
+	let contract_trait_api_impl = snippets::contract_trait_api_impl(&trait_name_ident);
 
 	// this definition is common to release and debug mode
 	let main_definition = quote! {
-	  pub trait #trait_name_ident<T, BigInt, BigUint>:
-	  ContractSelfApi<BigInt, BigUint>
-	  // #( + #supertrait_paths <T, BigInt, BigUint>)* // currently not supported
-	  + Sized
-	  #api_where
-	  {
-		#(#method_impls)*
+		pub trait #trait_name_ident<T, BigInt, BigUint>:
+		ContractSelfApi<BigInt, BigUint>
+		// #( + #supertrait_paths <T, BigInt, BigUint>)* // currently not supported
+		+ Sized
+		#api_where
+		{
+			#(#method_impls)*
 
-		#(#auto_impl_defs)*
+			#(#auto_impl_defs)*
 
-		fn callback(&self);
+			fn callback(&self);
 
-		fn callbacks(&self) -> CallbackProxies<T, BigInt, BigUint>;
-	  }
-
-	  pub struct #contract_impl_ident<T, BigInt, BigUint>
-	  #api_where
-	  {
-		  api: T,
-		  _phantom1: core::marker::PhantomData<BigInt>,
-		  _phantom2: core::marker::PhantomData<BigUint>,
-	  }
-
-	  impl <T, BigInt, BigUint> #contract_impl_ident<T, BigInt, BigUint>
-	  #api_where
-	  {
-		pub fn new(api: T) -> Self {
-		  #contract_impl_ident {
-			api,
-			_phantom1: core::marker::PhantomData,
-			_phantom2: core::marker::PhantomData,
-		  }
+			fn callbacks(&self) -> callback_proxy::CallbackProxies<T, BigInt, BigUint>;
 		}
-	  }
+	};
 
-	  #contract_trait_api_impl
+	let implementation_mod = quote! {
+		pub mod implementation {
+			use super::*;
+			use super::#trait_name_ident as ContractDef;
 
-	  #(#supertrait_impls)*
+			pub struct #trait_name_ident<T, BigInt, BigUint>
+			#api_where
+			{
+				api: T,
+				_phantom1: core::marker::PhantomData<BigInt>,
+				_phantom2: core::marker::PhantomData<BigUint>,
+			}
 
-	  impl <T, BigInt, BigUint> #trait_name_ident<T, BigInt, BigUint> for #contract_impl_ident<T, BigInt, BigUint>
-	  #api_where
-	  {
-		#(#auto_impls)*
+			impl <T, BigInt, BigUint> elrond_wasm::api::ContractImpl<T> for #trait_name_ident<T, BigInt, BigUint>
+			#api_where
+			{
+				fn new_contract_impl(api: T) -> Self {
+					#trait_name_ident {
+						api,
+						_phantom1: core::marker::PhantomData,
+						_phantom2: core::marker::PhantomData,
+					}
+				}
+			}
 
-		fn callback(&self) {
-		  #callback_body
+			impl <T, BigInt, BigUint> elrond_wasm::api::CallableContract<T> for #trait_name_ident<T, BigInt, BigUint>
+			#api_where
+			{
+				fn call(&self, fn_name: &[u8]) -> bool {
+					#function_selector_body
+				}
+
+				fn clone_contract(&self) -> Box<dyn elrond_wasm::api::CallableContract<T>> {
+					Box::new(elrond_wasm::api::new_contract_impl::<T, #trait_name_ident<T, BigInt, BigUint>>(self.api.clone()))
+				}
+
+				fn into_api(self: Box<Self>) -> T {
+					self.api
+				}
+			}
+
+			#contract_trait_api_impl
+
+			#(#supertrait_impls)*
+
+			impl <T, BigInt, BigUint> super::#trait_name_ident<T, BigInt, BigUint> for #trait_name_ident<T, BigInt, BigUint>
+			#api_where
+			{
+				#(#auto_impls)*
+
+				fn callback(&self) {
+					#callback_body
+				}
+
+				fn callbacks(&self) -> super::callback_proxy::CallbackProxies<T, BigInt, BigUint> {
+					super::callback_proxy::CallbackProxies::new(self.api.clone())
+				}
+			}
+
+			impl <T, BigInt, BigUint> #trait_name_ident<T, BigInt, BigUint>
+			#api_where
+			{
+				#(#call_methods)*
+			}
+
+			impl <T, BigInt, BigUint> elrond_wasm::api::ContractWithAbi for #trait_name_ident<T, BigInt, BigUint>
+			#api_where
+			{
+				type Storage = T::Storage;
+
+				fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
+					#abi_body
+				}
+			}
 		}
 
-		fn callbacks(&self) -> CallbackProxies<T, BigInt, BigUint> {
-			CallbackProxies::new(self.api.clone())
+		mod callback_proxy {
+			use super::*;
+			#callback_proxies
 		}
-	  }
+	};
 
-	  impl <T, BigInt, BigUint> #contract_impl_ident<T, BigInt, BigUint>
-	  #api_where
-	  {
-		#(#call_methods)*
-	  }
-
-	  #callback_proxies
-
+	let helper = quote! {
+		pub fn contract_obj<T, BigInt, BigUint>(api: T) -> implementation::#trait_name_ident<T, BigInt, BigUint>
+		#api_where
+		{
+			elrond_wasm::api::new_contract_impl(api)
+		}
 	};
 
 	let wasm_endpoints = quote! {
 		#[cfg(feature = "wasm-output-mode")]
 		#[allow(non_snake_case)]
 		pub mod endpoints {
-		  use super::*;
+			use super::*;
 
-		  fn new_arwen_instance() -> #contract_impl_ident<elrond_wasm_node::ArwenApiImpl, elrond_wasm_node::api::ArwenBigInt, elrond_wasm_node::api::ArwenBigUint> {
-			let api = elrond_wasm_node::ArwenApiImpl{};
-			#contract_impl_ident::new(api)
-		  }
+			fn new_arwen_instance() -> super::implementation::#trait_name_ident<elrond_wasm_node::ArwenApiImpl, elrond_wasm_node::api::ArwenBigInt, elrond_wasm_node::api::ArwenBigUint> {
+				let api = elrond_wasm_node::ArwenApiImpl{};
+				elrond_wasm::api::new_contract_impl(api)
+			}
 
-		  #(#endpoints)*
+			#(#endpoints)*
 		}
-	};
-
-	let function_selector = quote! {
-	  impl <T, BigInt, BigUint> elrond_wasm::api::CallableContract<T> for #contract_impl_ident<T, BigInt, BigUint>
-	  #api_where
-	  {
-		fn call(&self, fn_name: &[u8]) -> bool {
-		  #function_selector_body
-		}
-
-		fn clone_contract(&self) -> Box<dyn elrond_wasm::api::CallableContract<T>> {
-		  Box::new(#contract_impl_ident::new(self.api.clone()))
-		}
-
-		fn into_api(self: Box<Self>) -> T {
-		  self.api
-		}
-	  }
-
-	  impl <T, BigInt, BigUint> elrond_wasm::api::ContractWithAbi for #contract_impl_ident<T, BigInt, BigUint>
-	  #api_where
-	  {
-		type Storage = T::Storage;
-
-		fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
-			#abi_body
-		}
-	  }
 	};
 
 	quote! {
-	  #main_definition
+		#main_definition
 
-	  #wasm_endpoints
+		#implementation_mod
 
-	  #function_selector
+		#helper
+
+		#wasm_endpoints
 	}
 }

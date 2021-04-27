@@ -1,5 +1,3 @@
-extern crate abi_tester;
-use abi_tester::*;
 use elrond_wasm_debug::*;
 
 use std::fs;
@@ -12,7 +10,7 @@ fn test_abi_generated_ok() {
 	let expected_abi_json = fs::read_to_string("./abi_test_expected.abi.json").unwrap();
 
 	// generate ABI
-	let contract = AbiTesterImpl::new(TxContext::dummy());
+	let contract = abi_tester::contract_obj(TxContext::dummy());
 	let contract_abi_json = abi_json::contract_abi(&contract);
 
 	// save generated ABI to disk for easier comparison in case something is off

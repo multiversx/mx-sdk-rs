@@ -1,7 +1,6 @@
 use elrond_wasm_debug::*;
-use erc1155::*;
 
 fn main() {
-	let contract = Erc1155Impl::new(TxContext::dummy());
+	let contract = erc1155::contract_obj(TxContext::dummy());
 	print!("{}", abi_json::contract_abi(&contract));
 }

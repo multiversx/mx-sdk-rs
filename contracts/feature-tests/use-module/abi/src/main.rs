@@ -1,7 +1,6 @@
 use elrond_wasm_debug::*;
-use use_module::*;
 
 fn main() {
-	let contract = UseModuleImpl::new(TxContext::dummy());
+	let contract = use_module::contract_obj(TxContext::dummy());
 	print!("{}", abi_json::contract_abi(&contract));
 }

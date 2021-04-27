@@ -1,5 +1,3 @@
-extern crate crypto_bubbles;
-use crypto_bubbles::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -7,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/crypto-bubbles.wasm",
-		Box::new(|context| Box::new(CryptoBubblesImpl::new(context))),
+		Box::new(|context| Box::new(crypto_bubbles::contract_obj(context))),
 	);
 	contract_map
 }

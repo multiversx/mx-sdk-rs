@@ -13,16 +13,16 @@ pub fn process_contract(
 	validate_contract(&contract);
 
 	let contract_impl = contract_implementation(&contract, true);
-	let contract_impl_ident = contract.contract_impl_name;
+	let trait_name_ident = contract.trait_name.clone();
 
 	let wasm_callback_endpoint = quote! {
 		#[cfg(feature = "wasm-output-mode")]
 		pub mod callback_endpoint {
 			use super::*;
 
-			fn new_arwen_instance() -> #contract_impl_ident<elrond_wasm_node::ArwenApiImpl, elrond_wasm_node::api::ArwenBigInt, elrond_wasm_node::api::ArwenBigUint> {
+			fn new_arwen_instance() -> super::implementation::#trait_name_ident<elrond_wasm_node::ArwenApiImpl, elrond_wasm_node::api::ArwenBigInt, elrond_wasm_node::api::ArwenBigUint> {
 				let api = elrond_wasm_node::ArwenApiImpl{};
-				#contract_impl_ident::new(api)
+				elrond_wasm::api::new_contract_impl(api)
 			}
 
 			#[no_mangle]
