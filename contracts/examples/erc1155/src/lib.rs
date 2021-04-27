@@ -45,31 +45,47 @@ pub trait Erc1155 {
 		);
 
 		if self.is_fungible(&type_id) {
-			let amount = &value;
-
-			sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
-
-			if self.blockchain().is_smart_contract(&to) {
-				self.peform_async_call_single_transfer(from, to, type_id, value, data);
-			} else {
-				self.increase_balance(&to, &type_id, &amount);
-			}
+			self.safe_transfer_from_fungible(from, to, type_id, value, data)
 		} else {
-			let nft_id = &value;
-
-			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
-
-			if self.blockchain().is_smart_contract(&to) {
-				self.peform_async_call_single_transfer(from, to, type_id, value, data);
-			} else {
-				let amount = BigUint::from(1u32);
-				self.increase_balance(&to, &type_id, &amount);
-				self.set_token_owner(&type_id, nft_id, &to);
-			}
+			self.safe_transfer_from_non_fungible(from, to, type_id, value, data)
 		}
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+	}
 
+	fn safe_transfer_from_fungible(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		amount: BigUint,
+		data: &[u8],
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
+		if self.blockchain().is_smart_contract(&to) {
+			self.peform_async_call_single_transfer(from, to, type_id, amount, data);
+		} else {
+			self.increase_balance(&to, &type_id, &amount);
+		}
+		Ok(())
+	}
+
+	fn safe_transfer_from_non_fungible(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		nft_id: BigUint,
+		data: &[u8],
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
+		if self.blockchain().is_smart_contract(&to) {
+			self.peform_async_call_single_transfer(from, to, type_id, nft_id, data);
+		} else {
+			let amount = BigUint::from(1u32);
+			self.increase_balance(&to, &type_id, &amount);
+			self.set_token_owner(&type_id, &nft_id, &to);
+		}
 		Ok(())
 	}
 
@@ -104,25 +120,21 @@ pub trait Erc1155 {
 		// so the reverting is handled automatically if one of the transfers fails
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.is_fungible(type_id) {
-				let amount = value;
-
-				sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
-
-				if !is_receiver_smart_contract {
-					self.increase_balance(&to, &type_id, &amount);
-				}
+				sc_try!(self.safe_batch_item_transfer_from_fungible(
+					is_receiver_smart_contract,
+					&from,
+					&to,
+					type_id,
+					&value
+				))
 			} else {
-				let nft_id = value;
-
-				sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
-
-				if !is_receiver_smart_contract {
-					let amount = BigUint::from(1u32);
-					self.increase_balance(&to, &type_id, &amount);
-					self.set_token_owner(&type_id, &nft_id, &to);
-				} else {
-					self.set_token_owner(&type_id, &nft_id, &Address::zero());
-				}
+				sc_try!(self.safe_batch_item_transfer_from_non_fungible(
+					is_receiver_smart_contract,
+					&from,
+					&to,
+					type_id,
+					value
+				))
 			}
 		}
 
@@ -132,6 +144,40 @@ pub trait Erc1155 {
 
 		// self.transfer_batch_event(&caller, &from, &to, ids, amounts);
 
+		Ok(())
+	}
+
+	fn safe_batch_item_transfer_from_fungible(
+		&self,
+		is_receiver_smart_contract: bool,
+		from: &Address,
+		to: &Address,
+		type_id: &BigUint,
+		amount: &BigUint,
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_fungible(from, type_id, amount));
+		if !is_receiver_smart_contract {
+			self.increase_balance(to, type_id, amount);
+		}
+		Ok(())
+	}
+
+	fn safe_batch_item_transfer_from_non_fungible(
+		&self,
+		is_receiver_smart_contract: bool,
+		from: &Address,
+		to: &Address,
+		type_id: &BigUint,
+		nft_id: &BigUint,
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_non_fungible(from, type_id, nft_id));
+		if !is_receiver_smart_contract {
+			let amount = BigUint::from(1u32);
+			self.increase_balance(to, type_id, &amount);
+			self.set_token_owner(type_id, nft_id, to);
+		} else {
+			self.set_token_owner(type_id, nft_id, &Address::zero());
+		}
 		Ok(())
 	}
 
@@ -414,13 +460,11 @@ pub trait Erc1155 {
 
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.is_fungible(type_id) {
-				let amount = value;
-				self.increase_balance(&dest_address, &type_id, &amount);
+				self.increase_balance(&dest_address, &type_id, &value);
 			} else {
-				let nft_id = value;
 				let amount = BigUint::from(1u32);
 				self.increase_balance(&dest_address, &type_id, &amount);
-				self.set_token_owner(&type_id, nft_id, &dest_address);
+				self.set_token_owner(&type_id, value, &dest_address);
 			}
 		}
 
