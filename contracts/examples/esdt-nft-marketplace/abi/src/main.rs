@@ -1,7 +1,6 @@
 use elrond_wasm_debug::*;
-use esdt_nft_marketplace::*;
 
 fn main() {
-	let contract = EsdtNftMarketplaceImpl::new(TxContext::dummy());
+	let contract = esdt_nft_marketplace::contract_obj(TxContext::dummy());
 	print!("{}", abi_json::contract_abi(&contract));
 }

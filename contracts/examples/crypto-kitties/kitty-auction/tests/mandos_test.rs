@@ -1,9 +1,3 @@
-extern crate kitty_auction;
-use kitty_auction::*;
-
-extern crate kitty_ownership;
-use kitty_ownership::*;
-
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -12,11 +6,11 @@ fn contract_map() -> ContractMap<TxContext> {
 
 	contract_map.register_contract(
 		"file:../../kitty-ownership/output/kitty-ownership.wasm",
-		Box::new(|context| Box::new(KittyOwnershipImpl::new(context))),
+		Box::new(|context| Box::new(kitty_ownership::contract_obj(context))),
 	);
 	contract_map.register_contract(
 		"file:../output/kitty-auction.wasm",
-		Box::new(|context| Box::new(KittyAuctionImpl::new(context))),
+		Box::new(|context| Box::new(kitty_auction::contract_obj(context))),
 	);
 
 	contract_map

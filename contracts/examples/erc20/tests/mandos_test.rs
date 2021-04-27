@@ -1,6 +1,3 @@
-extern crate erc20;
-use erc20::*;
-
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -8,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/erc20.wasm",
-		Box::new(|context| Box::new(SimpleErc20TokenImpl::new(context))),
+		Box::new(|context| Box::new(erc20::contract_obj(context))),
 	);
 	contract_map
 }

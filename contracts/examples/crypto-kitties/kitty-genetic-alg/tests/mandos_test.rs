@@ -1,6 +1,3 @@
-extern crate kitty_genetic_alg;
-use kitty_genetic_alg::*;
-
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -8,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/kitty-genetic-alg.wasm",
-		Box::new(|context| Box::new(KittyGeneticAlgImpl::new(context))),
+		Box::new(|context| Box::new(kitty_genetic_alg::contract_obj(context))),
 	);
 	contract_map
 }

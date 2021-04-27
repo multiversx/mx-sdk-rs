@@ -1,13 +1,10 @@
-extern crate ping_pong_egld;
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
-use ping_pong_egld::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/ping-pong-egld.wasm",
-		Box::new(|context| Box::new(PingPongImpl::new(context))),
+		Box::new(|context| Box::new(ping_pong_egld::contract_obj(context))),
 	);
 	contract_map
 }
