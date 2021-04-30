@@ -15,7 +15,7 @@ pub trait ForwarderSftModule {
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 	) -> AsyncCall<BigUint> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		ESDTSystemSmartContractProxy::new()
 			.issue_semi_fungible(

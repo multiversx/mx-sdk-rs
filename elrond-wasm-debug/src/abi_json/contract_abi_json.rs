@@ -20,10 +20,7 @@ impl From<&ContractAbi> for ContractAbiJson {
 		let mut contract_json = ContractAbiJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
-			constructor: abi
-				.constructor
-				.as_ref()
-				.map(ConstructorAbiJson::from),
+			constructor: abi.constructor.as_ref().map(ConstructorAbiJson::from),
 			endpoints: Vec::new(),
 			types: BTreeMap::new(),
 		};

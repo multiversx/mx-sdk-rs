@@ -80,7 +80,7 @@ pub trait EsdtNftMarketplace {
 			"Min bid can't be 0 or higher than max bid"
 		);
 		require!(
-			deadline > self.get_block_timestamp(),
+			deadline > self.blockchain().get_block_timestamp(),
 			"Deadline can't be in the past"
 		);
 
@@ -100,7 +100,7 @@ pub trait EsdtNftMarketplace {
 			min_bid,
 			max_bid,
 			deadline,
-			original_owner: self.get_caller(),
+			original_owner: self.blockchain().get_caller(),
 			current_bid: BigUint::zero(),
 			current_winner: Address::zero(),
 		});
@@ -118,7 +118,7 @@ pub trait EsdtNftMarketplace {
 
 		let (payment_amount, payment_token) = self.call_value().payment_token_pair();
 		let payment_token_nonce = self.call_value().esdt_token_nonce();
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let mut auction = self.auction_for_token(&nft_type, nft_nonce).get();
 
 		require!(
@@ -126,7 +126,7 @@ pub trait EsdtNftMarketplace {
 			"Can't bid on your own token"
 		);
 		require!(
-			self.get_block_timestamp() < auction.deadline,
+			self.blockchain().get_block_timestamp() < auction.deadline,
 			"Auction ended already"
 		);
 		require!(
@@ -177,15 +177,16 @@ pub trait EsdtNftMarketplace {
 		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
 
 		require!(
-			self.get_block_timestamp() > auction.deadline || auction.current_bid == auction.max_bid,
+			self.blockchain().get_block_timestamp() > auction.deadline
+				|| auction.current_bid == auction.max_bid,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
 		self.auction_for_token(&nft_type, nft_nonce).clear();
 
 		if auction.current_winner != Address::zero() {
-			let nft_info = self.get_esdt_token_data(
-				&self.get_sc_address(),
+			let nft_info = self.blockchain().get_esdt_token_data(
+				&self.blockchain().get_sc_address(),
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
 			);
@@ -210,7 +211,7 @@ pub trait EsdtNftMarketplace {
 
 			if bid_cut_amount > BigUint::zero() {
 				// send part as cut for contract owner
-				let owner = self.get_owner_address();
+				let owner = self.blockchain().get_owner_address();
 				self.transfer_esdt(
 					&owner,
 					token_id,
@@ -239,7 +240,7 @@ pub trait EsdtNftMarketplace {
 			);
 
 			// send NFT to auction winner
-			self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_esdt_nft_via_transfer_exec(
 				&auction.current_winner,
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
@@ -248,7 +249,7 @@ pub trait EsdtNftMarketplace {
 			);
 		} else {
 			// return to original owner
-			self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_esdt_nft_via_transfer_exec(
 				&auction.original_owner,
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
@@ -256,6 +257,38 @@ pub trait EsdtNftMarketplace {
 				self.data_or_empty_if_sc(&auction.original_owner, b"returned token"),
 			);
 		}
+
+		Ok(())
+	}
+
+	#[endpoint]
+	fn withdraw(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+		require!(
+			self.is_already_up_for_auction(&nft_type, nft_nonce),
+			"Token is not up for auction"
+		);
+
+		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
+		let caller = self.blockchain().get_caller();
+
+		require!(
+			auction.original_owner == caller,
+			"Only the original owner can withdraw"
+		);
+		require!(
+			auction.current_bid == 0,
+			"Can't withdraw, NFT already has bids"
+		);
+
+		self.auction_for_token(&nft_type, nft_nonce).clear();
+
+		let _ = self.send().direct_esdt_nft_via_transfer_exec(
+			&caller,
+			nft_type.as_esdt_identifier(),
+			nft_nonce,
+			&BigUint::from(NFT_AMOUNT),
+			self.data_or_empty_if_sc(&caller, b"returned token"),
+		);
 
 		Ok(())
 	}
@@ -383,7 +416,7 @@ pub trait EsdtNftMarketplace {
 			self.send()
 				.direct(to, &token_id, amount, self.data_or_empty_if_sc(to, data));
 		} else {
-			self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_esdt_nft_via_transfer_exec(
 				to,
 				token_id.as_esdt_identifier(),
 				nonce,
@@ -394,7 +427,7 @@ pub trait EsdtNftMarketplace {
 	}
 
 	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
-		if self.is_smart_contract(dest) {
+		if self.blockchain().is_smart_contract(dest) {
 			&[]
 		} else {
 			data

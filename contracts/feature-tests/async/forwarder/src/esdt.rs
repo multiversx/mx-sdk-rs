@@ -9,8 +9,8 @@ pub trait ForwarderEsdtModule {
 
 	#[view(getFungibleEsdtBalance)]
 	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
-		self.get_esdt_balance(
-			&self.get_sc_address(),
+		self.blockchain().get_esdt_balance(
+			&self.blockchain().get_sc_address(),
 			token_identifier.as_esdt_identifier(),
 			0,
 		)
@@ -28,7 +28,7 @@ pub trait ForwarderEsdtModule {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send()
+		let _ = self.send()
 			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
 	}
 
@@ -45,9 +45,9 @@ pub trait ForwarderEsdtModule {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send()
+		let _ = self.send()
 			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_first_time, data);
-		self.send()
+		let _ = self.send()
 			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount_second_time, data);
 	}
 
@@ -60,7 +60,7 @@ pub trait ForwarderEsdtModule {
 		token_ticker: BoxedBytes,
 		initial_supply: BigUint,
 	) -> AsyncCall<BigUint> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		ESDTSystemSmartContractProxy::new()
 			.issue_fungible(
@@ -117,7 +117,7 @@ pub trait ForwarderEsdtModule {
 	#[endpoint]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: BigUint) {
 		self.send().esdt_local_mint(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			&amount,
 		);
@@ -126,7 +126,7 @@ pub trait ForwarderEsdtModule {
 	#[endpoint]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
 		self.send().esdt_local_burn(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			&amount,
 		);

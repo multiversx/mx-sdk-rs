@@ -106,7 +106,7 @@
                 },
                 {
                     "name": "_var_args",
-                    "type": "variadic<multi2<OnlyShowsUpAsNested04,i32,>>",
+                    "type": "variadic<multi<OnlyShowsUpAsNested04,i32>>",
                     "multi_arg": true
                 }
             ],
@@ -117,7 +117,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "variadic<OnlyShowsUpAsNested05>",
+                    "type": "variadic<multi<OnlyShowsUpAsNested05,bool,()>>",
                     "multi_result": true
                 }
             ]
@@ -270,7 +270,7 @@
                         "Also, just like above, recursive types need to work even when nested into a tuple."
                     ],
                     "name": "tuple_madness",
-                    "type": "tuple2<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                    "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
                 }
             ]
         },
@@ -278,12 +278,6 @@
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested02": {
@@ -294,7 +288,7 @@
             "fields": [
                 {
                     "name": "something",
-                    "type": "()"
+                    "type": "array0<u8>"
                 }
             ]
         },
@@ -302,84 +296,42 @@
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested04": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested05": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested06": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested07": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested08": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpAsNested09": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
-            ],
-            "fields": [
-                {
-                    "name": "something",
-                    "type": "()"
-                }
             ]
         },
         "OnlyShowsUpInConstructor": {

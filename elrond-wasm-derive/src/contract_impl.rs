@@ -34,7 +34,7 @@ pub fn contract_implementation(
 	// this definition is common to release and debug mode
 	let main_definition = quote! {
 	  pub trait #trait_name_ident<T, BigInt, BigUint>:
-	  ContractHookApi<BigInt, BigUint>
+	  ContractSelfApi<BigInt, BigUint>
 	  // #( + #supertrait_paths <T, BigInt, BigUint>)* // currently not supported
 	  + Sized
 	  #api_where
