@@ -48,13 +48,7 @@ pub trait AbiTester {
 	#[output_name("multi-too-few-1")]
 	#[output_name("multi-too-few-2")]
 	fn multi_result_4(&self) -> MultiResult4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03> {
-		(
-			1,
-			[2; 3],
-			BoxedBytes::empty(),
-			OnlyShowsUpAsNested03(),
-		)
-			.into()
+		(1, [2; 3], BoxedBytes::empty(), OnlyShowsUpAsNested03()).into()
 	}
 
 	#[endpoint]
