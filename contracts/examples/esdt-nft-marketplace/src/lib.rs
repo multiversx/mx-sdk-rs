@@ -15,6 +15,8 @@ pub struct Auction<BigUint: BigUintApi> {
 	pub original_owner: Address,
 	pub current_bid: BigUint,
 	pub current_winner: Address,
+	pub marketplace_cut_percentage: BigUint,
+	pub creator_royalties_percentage: BigUint,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
@@ -84,6 +86,14 @@ pub trait EsdtNftMarketplace {
 			"Deadline can't be in the past"
 		);
 
+		let marketplace_cut_percentage = self.bid_cut_percentage().get();
+		let creator_royalties_percentage = self.get_nft_info(&nft_type, nft_nonce).royalties;
+
+		require!(
+			&marketplace_cut_percentage + &creator_royalties_percentage < PERCENTAGE_TOTAL,
+			"Marketplace cut plus royalties exceeds 100%"
+		);
+
 		let accepted_payment_nft_nonce = if accepted_payment_token.is_egld() {
 			0
 		} else {
@@ -103,6 +113,8 @@ pub trait EsdtNftMarketplace {
 			original_owner: self.blockchain().get_caller(),
 			current_bid: BigUint::zero(),
 			current_winner: Address::zero(),
+			marketplace_cut_percentage,
+			creator_royalties_percentage,
 		});
 
 		Ok(())
@@ -185,41 +197,27 @@ pub trait EsdtNftMarketplace {
 		self.auction_for_token(&nft_type, nft_nonce).clear();
 
 		if auction.current_winner != Address::zero() {
-			let nft_info = self.blockchain().get_esdt_token_data(
-				&self.blockchain().get_sc_address(),
-				nft_type.as_esdt_identifier(),
-				nft_nonce,
-			);
+			let nft_info = self.get_nft_info(&nft_type, nft_nonce);
 
-			let percentage_cut = self.bid_cut_percentage().get();
-			let creator_royalties =
-				self.calculate_cut_amount(&auction.current_bid, &nft_info.royalties);
-
-			// don't take anything if bid_cut would make it so the seller gets nothing
-			let bid_cut_amount =
-				if &percentage_cut + &nft_info.royalties < BigUint::from(PERCENTAGE_TOTAL) {
-					self.calculate_cut_amount(&auction.current_bid, &percentage_cut)
-				} else {
-					BigUint::zero()
-				};
-
+			let creator_royalties = self
+				.calculate_cut_amount(&auction.current_bid, &auction.creator_royalties_percentage);
+			let bid_cut_amount = self
+				.calculate_cut_amount(&auction.current_bid, &auction.marketplace_cut_percentage);
 			let seller_amount_to_send =
 				&auction.current_bid - &creator_royalties - bid_cut_amount.clone();
 
 			let token_id = &auction.payment_token.token_type;
 			let nonce = auction.payment_token.nonce;
 
-			if bid_cut_amount > BigUint::zero() {
-				// send part as cut for contract owner
-				let owner = self.blockchain().get_owner_address();
-				self.transfer_esdt(
-					&owner,
-					token_id,
-					nonce,
-					&bid_cut_amount,
-					b"bid cut for sold token",
-				);
-			}
+			// send part as cut for contract owner
+			let owner = self.blockchain().get_owner_address();
+			self.transfer_esdt(
+				&owner,
+				token_id,
+				nonce,
+				&bid_cut_amount,
+				b"bid cut for sold token",
+			);
 
 			// send part as royalties to creator
 			self.transfer_esdt(
@@ -432,6 +430,14 @@ pub trait EsdtNftMarketplace {
 		} else {
 			data
 		}
+	}
+
+	fn get_nft_info(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> EsdtTokenData<BigUint> {
+		self.blockchain().get_esdt_token_data(
+			&self.blockchain().get_sc_address(),
+			nft_type.as_esdt_identifier(),
+			nft_nonce,
+		)
 	}
 
 	// storage

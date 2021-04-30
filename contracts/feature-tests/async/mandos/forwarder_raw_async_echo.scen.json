@@ -10,13 +10,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:vault": {
+                "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:forwarder": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -29,11 +29,11 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:forwarder",
+                "to": "sc:forwarder",
                 "value": "0",
                 "function": "forward_async_call",
                 "arguments": [
-                    "address:vault",
+                    "sc:vault",
                     "str:echo_arguments",
                     "1",
                     "2"
@@ -49,7 +49,7 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "address:forwarder",
+                        "address": "sc:forwarder",
                         "identifier": "str:callback_raw",
                         "topics": [
                             "str:EGLD",
@@ -77,13 +77,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:vault": {
+                "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:forwarder": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
