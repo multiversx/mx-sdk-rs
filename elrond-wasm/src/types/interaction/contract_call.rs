@@ -156,4 +156,35 @@ where
 		let mut loader = BytesArgLoader::new(raw_result.as_slice(), api);
 		R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
 	}
+
+	/// Executes immediately, synchronously, and returns contract call result.
+	/// Only works if the target contract is in the same shard.
+	/// This is a workaround to handle nested sync calls.
+	/// Please do not use this method unless there is absolutely no other option.
+	/// Will be eliminated after some future Arwen hook redesign.
+	/// `range_closure` takes the number of results before, the number of results after,
+	/// and is expected to return the start index (inclusive) and end index (exclusive).
+	pub fn execute_on_dest_context_custom_range<SA, F>(
+		mut self,
+		gas: u64,
+		range_closure: F,
+		api: SA,
+	) -> R
+	where
+		SA: SendApi<BigUint>,
+		F: FnOnce(usize, usize) -> (usize, usize),
+	{
+		self = self.convert_to_esdt_transfer_call();
+		let raw_result = api.execute_on_dest_context_raw_custom_result_range(
+			gas,
+			&self.to,
+			&self.payment,
+			self.endpoint_name.as_slice(),
+			&self.arg_buffer,
+			range_closure,
+		);
+
+		let mut loader = BytesArgLoader::new(raw_result.as_slice(), api);
+		R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+	}
 }
