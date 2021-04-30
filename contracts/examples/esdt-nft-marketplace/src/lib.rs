@@ -197,7 +197,7 @@ pub trait EsdtNftMarketplace {
 
 			// don't take anything if bid_cut would make it so the seller gets nothing
 			let bid_cut_amount =
-				if &percentage_cut + &nft_info.royalties < BigUint::from(PERCENTAGE_TOTAL) {
+				if &percentage_cut + &nft_info.royalties < PERCENTAGE_TOTAL {
 					self.calculate_cut_amount(&auction.current_bid, &percentage_cut)
 				} else {
 					BigUint::zero()
