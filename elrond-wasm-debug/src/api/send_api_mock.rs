@@ -149,6 +149,21 @@ impl SendApi<RustBigUint> for TxContext {
 		panic!("execute_on_dest_context_raw not implemented yet!");
 	}
 
+	fn execute_on_dest_context_raw_custom_result_range<F>(
+		&self,
+		_gas: u64,
+		_address: &Address,
+		_value: &RustBigUint,
+		_function: &[u8],
+		_arg_buffer: &ArgBuffer,
+		_range_closure: F,
+	) -> Vec<BoxedBytes>
+	where
+		F: FnOnce(usize, usize) -> (usize, usize),
+	{
+		panic!("execute_on_dest_context_raw_custom_result_range not implemented yet!");
+	}
+
 	fn execute_on_dest_context_by_caller_raw(
 		&self,
 		_gas: u64,

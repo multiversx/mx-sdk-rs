@@ -142,6 +142,7 @@ where
 		arg_buffer: &ArgBuffer,
 	) -> Address;
 
+	/// Same shard, in-line execution of another contract.
 	fn execute_on_dest_context_raw(
 		&self,
 		gas: u64,
@@ -150,6 +151,25 @@ where
 		function: &[u8],
 		arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes>;
+
+	/// Same shard, in-line execution of another contract.
+	/// Allows the contract to specify which result range to extract as sync call result.
+	/// This is a workaround to handle nested sync calls.
+	/// Please do not use this method unless there is absolutely no other option.
+	/// Will be eliminated after some future Arwen hook redesign.
+	/// `range_closure` takes the number of results before, the number of results after,
+	/// and is expected to return the start index (inclusive) and end index (exclusive).
+	fn execute_on_dest_context_raw_custom_result_range<F>(
+		&self,
+		gas: u64,
+		address: &Address,
+		value: &BigUint,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+		range_closure: F,
+	) -> Vec<BoxedBytes>
+	where
+		F: FnOnce(usize, usize) -> (usize, usize);
 
 	fn execute_on_dest_context_by_caller_raw(
 		&self,
