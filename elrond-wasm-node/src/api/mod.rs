@@ -1,7 +1,8 @@
 mod big_int_api_node;
 mod big_uint_api_node;
+mod blockchain_api_node;
 mod call_value_api_node;
-mod contract_api_node;
+mod contract_self_api_node;
 mod crypto_api_node;
 mod endpoint_arg_api_node;
 mod endpoint_finish_api_node;
@@ -13,8 +14,9 @@ mod unsafe_buffer;
 
 pub use big_int_api_node::*;
 pub use big_uint_api_node::*;
+pub use blockchain_api_node::*;
 pub use call_value_api_node::*;
-pub use contract_api_node::*;
+pub use contract_self_api_node::*;
 pub use crypto_api_node::*;
 pub use endpoint_arg_api_node::*;
 pub use endpoint_finish_api_node::*;

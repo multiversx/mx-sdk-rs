@@ -34,8 +34,12 @@ pub trait ForwarderRaw {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: BigUint,
 	) {
-		self.send()
-			.direct_esdt_via_transf_exec(&to, &token.as_esdt_identifier(), &payment, &[]);
+		let _ = self.send().direct_esdt_via_transf_exec(
+			&to,
+			&token.as_esdt_identifier(),
+			&payment,
+			&[],
+		);
 	}
 
 	fn forward_contract_call(
@@ -92,7 +96,7 @@ pub trait ForwarderRaw {
 	) -> TransferEgldExecute<BigUint> {
 		self.forward_contract_call(to, TokenIdentifier::egld(), payment, endpoint_name, args)
 			.transfer_egld_execute()
-			.with_gas_limit(self.get_gas_left() / 2)
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
 	}
 
 	#[endpoint]
@@ -107,7 +111,7 @@ pub trait ForwarderRaw {
 	) -> TransferEsdtExecute<BigUint> {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
 			.transfer_esdt_execute()
-			.with_gas_limit(self.get_gas_left() / 2)
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
 	}
 
 	#[endpoint]
@@ -122,7 +126,7 @@ pub trait ForwarderRaw {
 	) -> TransferExecute<BigUint> {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
 			.transfer_execute()
-			.with_gas_limit(self.get_gas_left() / 2)
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
 	}
 
 	#[view]
@@ -177,7 +181,7 @@ pub trait ForwarderRaw {
 		endpoint_name: BoxedBytes,
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
-		let half_gas = self.get_gas_left() / 2;
+		let half_gas = self.blockchain().get_gas_left() / 2;
 		let result = self.send().execute_on_dest_context_raw(
 			half_gas,
 			&to,
@@ -198,7 +202,7 @@ pub trait ForwarderRaw {
 		endpoint_name: BoxedBytes,
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
-		let one_third_gas = self.get_gas_left() / 3;
+		let one_third_gas = self.blockchain().get_gas_left() / 3;
 		let half_payment = payment / 2u32.into();
 		let arg_buffer = ArgBuffer::from(args.into_vec().as_slice());
 

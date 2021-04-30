@@ -18,8 +18,8 @@ pub trait ForwarderNftModule {
 
 	#[view]
 	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
-		self.get_esdt_balance(
-			&self.get_sc_address(),
+		self.blockchain().get_esdt_balance(
+			&self.blockchain().get_sc_address(),
 			token_identifier.as_esdt_identifier(),
 			nonce,
 		)
@@ -33,7 +33,7 @@ pub trait ForwarderNftModule {
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 	) -> AsyncCall<BigUint> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		ESDTSystemSmartContractProxy::new()
 			.issue_non_fungible(
@@ -92,7 +92,7 @@ pub trait ForwarderNftModule {
 		uri: BoxedBytes,
 	) {
 		self.send().esdt_nft_create::<Color>(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			&amount,
 			&name,
@@ -106,7 +106,7 @@ pub trait ForwarderNftModule {
 	#[endpoint]
 	fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
 		self.send().esdt_nft_add_quantity(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			nonce,
 			&amount,
@@ -116,7 +116,7 @@ pub trait ForwarderNftModule {
 	#[endpoint]
 	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
 		self.send().esdt_nft_burn(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
 			nonce,
 			&amount,
@@ -133,7 +133,7 @@ pub trait ForwarderNftModule {
 		data: BoxedBytes,
 	) {
 		self.send().direct_esdt_nft_via_async_call(
-			&self.get_sc_address(),
+			&self.blockchain().get_sc_address(),
 			&to,
 			token_identifier.as_esdt_identifier(),
 			nonce,
@@ -157,12 +157,12 @@ pub trait ForwarderNftModule {
 			arg_buffer.push_argument_bytes(arg.as_slice());
 		}
 
-		self.send().direct_esdt_nft_execute(
+		let _ = self.send().direct_esdt_nft_execute(
 			&to,
 			token_identifier.as_esdt_identifier(),
 			nonce,
 			&amount,
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			function.as_slice(),
 			&arg_buffer,
 		);

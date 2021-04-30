@@ -29,7 +29,7 @@ pub trait Parent {
 	#[endpoint(deployChildContract)]
 	fn deploy_child_contract(&self, code: BoxedBytes) {
 		let child_contract_address = self.send().deploy_contract(
-			self.get_gas_left(),
+			self.blockchain().get_gas_left(),
 			&BigUint::zero(),
 			&code,
 			CodeMetadata::DEFAULT,

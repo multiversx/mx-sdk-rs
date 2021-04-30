@@ -30,13 +30,16 @@ where
 {
 	#[inline]
 	fn finish(&self, api: FA) {
-		api.direct_egld_execute(
+		let result = api.direct_egld_execute(
 			&self.to,
 			&self.egld_payment,
 			self.gas_limit,
 			self.endpoint_name.as_slice(),
 			&self.arg_buffer,
 		);
+		if let Err(e) = result {
+			api.signal_error(e);
+		}
 	}
 }
 

@@ -15,6 +15,17 @@ impl TokenIdentifier {
 	/// This special representation is interpreted as the EGLD token.
 	pub const EGLD_REPRESENTATION: &'static [u8] = b"EGLD";
 
+	pub const TICKER_MIN_LENGTH: usize = 3;
+	pub const TICKER_MAX_LENGTH: usize = 10;
+	pub const ADDITIONAL_RANDOM_CHARS_LENGTH: usize = 6;
+	// +1 because of the '-' (dash) between ticker and the random chars
+	pub const IDENTIFIER_MIN_LENGTH: usize =
+		Self::TICKER_MIN_LENGTH + Self::ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
+	pub const IDENTIFIER_MAX_LENGTH: usize =
+		Self::TICKER_MAX_LENGTH + Self::ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
+
+	pub const DASH_CHARACTER: u8 = b'-';
+
 	/// New instance of the special EGLD token representation.
 	pub fn egld() -> Self {
 		TokenIdentifier(BoxedBytes::empty())
@@ -55,6 +66,47 @@ impl TokenIdentifier {
 		} else {
 			self.0.as_slice()
 		}
+	}
+
+	pub fn is_valid_esdt_identifier(&self) -> bool {
+		if self.is_egld() {
+			return false;
+		}
+
+		let id_len = self.0.len();
+		#[allow(clippy::manual_range_contains)]
+		if id_len < Self::IDENTIFIER_MIN_LENGTH || id_len > Self::IDENTIFIER_MAX_LENGTH {
+			return false;
+		}
+
+		let id_as_slice = self.0.as_slice();
+
+		// ticker must be all uppercase
+		let ticker_len = id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
+		let ticker = &id_as_slice[..ticker_len];
+		for ticker_char in ticker {
+			let is_uppercase_letter = (&b'A'..=&b'Z').contains(&ticker_char);
+			if !is_uppercase_letter {
+				return false;
+			}
+		}
+
+		let dash_position = ticker_len;
+		if id_as_slice[dash_position] != Self::DASH_CHARACTER {
+			return false;
+		}
+
+		// random chars are alphanumeric lowercase
+		let random_chars = &id_as_slice[(id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH)..];
+		for rand_char in random_chars {
+			let is_lowercase_letter = (&b'a'..=&b'z').contains(&rand_char);
+			let is_number = (&b'0'..=&b'9').contains(&rand_char);
+			if !is_lowercase_letter && !is_number {
+				return false;
+			}
+		}
+
+		true
 	}
 }
 
@@ -198,5 +250,32 @@ mod tests {
 			TokenIdentifier::egld(),
 			check_dep_decode::<TokenIdentifier>(&[0, 0, 0, 0])
 		);
+	}
+
+	#[test]
+	fn test_is_valid_esdt_identifier() {
+		// valid identifier
+		assert!(TokenIdentifier::from(&b"ALC-6258d2"[..]).is_valid_esdt_identifier());
+
+		// missing dash
+		assert!(!TokenIdentifier::from(&b"ALC6258d2"[..]).is_valid_esdt_identifier());
+
+		// wrong dash position
+		assert!(!TokenIdentifier::from(&b"AL-C6258d2"[..]).is_valid_esdt_identifier());
+
+		// lowercase ticker
+		assert!(!TokenIdentifier::from(&b"alc-6258d2"[..]).is_valid_esdt_identifier());
+
+		// uppercase random chars
+		assert!(!TokenIdentifier::from(&b"ALC-6258D2"[..]).is_valid_esdt_identifier());
+
+		// too many random chars
+		assert!(!TokenIdentifier::from(&b"ALC-6258d2ff"[..]).is_valid_esdt_identifier());
+
+		// ticker too short
+		assert!(!TokenIdentifier::from(&b"AL-6258d2"[..]).is_valid_esdt_identifier());
+
+		// ticker too long
+		assert!(!TokenIdentifier::from(&b"ALCCCCCCCCC-6258d2"[..]).is_valid_esdt_identifier());
 	}
 }

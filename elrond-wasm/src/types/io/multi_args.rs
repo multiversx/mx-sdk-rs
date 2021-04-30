@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
 
 macro_rules! multi_arg_impls {
-    ($(($marg_struct:ident $mres_struct:ident $abi_name:ident $($n:tt $name:ident)+) )+) => {
+    ($(($marg_struct:ident $mres_struct:ident $($n:tt $name:ident)+) )+) => {
         $(
             pub struct $marg_struct<$($name,)+>(pub ($($name,)+));
 
@@ -70,11 +70,13 @@ macro_rules! multi_arg_impls {
                 $($name: TypeAbi,)+
             {
                 fn type_name() -> String {
-                    let mut repr = String::from(stringify!($abi_name));
+                    let mut repr = String::from("multi");
                     repr.push('<');
                     $(
+                        if $n > 0 {
+                            repr.push(',');
+                        }
                         repr.push_str($name::type_name().as_str());
-                        repr.push(',');
                     )+
                     repr.push('>');
                     repr
@@ -123,19 +125,19 @@ macro_rules! multi_arg_impls {
 }
 
 multi_arg_impls! {
-	(MultiArg2  MultiResult2  multi2  0 T0 1 T1)
-	(MultiArg3  MultiResult3  multi3  0 T0 1 T1 2 T2)
-	(MultiArg4  MultiResult4  multi4  0 T0 1 T1 2 T2 3 T3)
-	(MultiArg5  MultiResult5  multi5  0 T0 1 T1 2 T2 3 T3 4 T4)
-	(MultiArg6  MultiResult6  multi6  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-	(MultiArg7  MultiResult7  multi7  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-	(MultiArg8  MultiResult8  multi8  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-	(MultiArg9  MultiResult9  multi9  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-	(MultiArg10 MultiResult10 multi10 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-	(MultiArg11 MultiResult11 multi11 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-	(MultiArg12 MultiResult12 multi12 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-	(MultiArg13 MultiResult13 multi13 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-	(MultiArg14 MultiResult14 multi14 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-	(MultiArg15 MultiResult15 multi15 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-	(MultiArg16 MultiResult16 multi16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+	(MultiArg2  MultiResult2  0 T0 1 T1)
+	(MultiArg3  MultiResult3  0 T0 1 T1 2 T2)
+	(MultiArg4  MultiResult4  0 T0 1 T1 2 T2 3 T3)
+	(MultiArg5  MultiResult5  0 T0 1 T1 2 T2 3 T3 4 T4)
+	(MultiArg6  MultiResult6  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
+	(MultiArg7  MultiResult7  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
+	(MultiArg8  MultiResult8  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
+	(MultiArg9  MultiResult9  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
+	(MultiArg10 MultiResult10 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
+	(MultiArg11 MultiResult11 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
+	(MultiArg12 MultiResult12 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
+	(MultiArg13 MultiResult13 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
+	(MultiArg14 MultiResult14 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
+	(MultiArg15 MultiResult15 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
+	(MultiArg16 MultiResult16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }

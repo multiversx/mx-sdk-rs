@@ -35,7 +35,7 @@ pub trait Erc1155 {
 		value: BigUint,
 		data: &[u8],
 	) -> SCResult<()> {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		require!(to != Address::zero(), "Can't transfer to address zero");
 		require!(self.is_valid_type_id(&type_id), "Token id is invalid");
@@ -45,31 +45,47 @@ pub trait Erc1155 {
 		);
 
 		if self.is_fungible(&type_id) {
-			let amount = &value;
-
-			sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
-
-			if self.is_smart_contract(&to) {
-				self.peform_async_call_single_transfer(from, to, type_id, value, data);
-			} else {
-				self.increase_balance(&to, &type_id, &amount);
-			}
+			self.safe_transfer_from_fungible(from, to, type_id, value, data)
 		} else {
-			let nft_id = &value;
-
-			sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
-
-			if self.is_smart_contract(&to) {
-				self.peform_async_call_single_transfer(from, to, type_id, value, data);
-			} else {
-				let amount = BigUint::from(1u32);
-				self.increase_balance(&to, &type_id, &amount);
-				self.set_token_owner(&type_id, nft_id, &to);
-			}
+			self.safe_transfer_from_non_fungible(from, to, type_id, value, data)
 		}
 
 		// self.transfer_single_event(&caller, &from, &to, &id, &amount);
+	}
 
+	fn safe_transfer_from_fungible(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		amount: BigUint,
+		data: &[u8],
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
+		if self.blockchain().is_smart_contract(&to) {
+			self.peform_async_call_single_transfer(from, to, type_id, amount, data);
+		} else {
+			self.increase_balance(&to, &type_id, &amount);
+		}
+		Ok(())
+	}
+
+	fn safe_transfer_from_non_fungible(
+		&self,
+		from: Address,
+		to: Address,
+		type_id: BigUint,
+		nft_id: BigUint,
+		data: &[u8],
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
+		if self.blockchain().is_smart_contract(&to) {
+			self.peform_async_call_single_transfer(from, to, type_id, nft_id, data);
+		} else {
+			let amount = BigUint::from(1u32);
+			self.increase_balance(&to, &type_id, &amount);
+			self.set_token_owner(&type_id, &nft_id, &to);
+		}
 		Ok(())
 	}
 
@@ -83,8 +99,8 @@ pub trait Erc1155 {
 		values: &[BigUint],
 		data: &[u8],
 	) -> SCResult<()> {
-		let caller = self.get_caller();
-		let is_receiver_smart_contract = self.is_smart_contract(&to);
+		let caller = self.blockchain().get_caller();
+		let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to);
 
 		require!(
 			caller == from || self.get_is_approved(&caller, &from),
@@ -104,25 +120,21 @@ pub trait Erc1155 {
 		// so the reverting is handled automatically if one of the transfers fails
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.is_fungible(type_id) {
-				let amount = value;
-
-				sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
-
-				if !is_receiver_smart_contract {
-					self.increase_balance(&to, &type_id, &amount);
-				}
+				sc_try!(self.safe_batch_item_transfer_from_fungible(
+					is_receiver_smart_contract,
+					&from,
+					&to,
+					type_id,
+					&value
+				))
 			} else {
-				let nft_id = value;
-
-				sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
-
-				if !is_receiver_smart_contract {
-					let amount = BigUint::from(1u32);
-					self.increase_balance(&to, &type_id, &amount);
-					self.set_token_owner(&type_id, &nft_id, &to);
-				} else {
-					self.set_token_owner(&type_id, &nft_id, &Address::zero());
-				}
+				sc_try!(self.safe_batch_item_transfer_from_non_fungible(
+					is_receiver_smart_contract,
+					&from,
+					&to,
+					type_id,
+					value
+				))
 			}
 		}
 
@@ -135,9 +147,43 @@ pub trait Erc1155 {
 		Ok(())
 	}
 
+	fn safe_batch_item_transfer_from_fungible(
+		&self,
+		is_receiver_smart_contract: bool,
+		from: &Address,
+		to: &Address,
+		type_id: &BigUint,
+		amount: &BigUint,
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_fungible(from, type_id, amount));
+		if !is_receiver_smart_contract {
+			self.increase_balance(to, type_id, amount);
+		}
+		Ok(())
+	}
+
+	fn safe_batch_item_transfer_from_non_fungible(
+		&self,
+		is_receiver_smart_contract: bool,
+		from: &Address,
+		to: &Address,
+		type_id: &BigUint,
+		nft_id: &BigUint,
+	) -> SCResult<()> {
+		sc_try!(self.try_reserve_non_fungible(from, type_id, nft_id));
+		if !is_receiver_smart_contract {
+			let amount = BigUint::from(1u32);
+			self.increase_balance(to, type_id, &amount);
+			self.set_token_owner(type_id, nft_id, to);
+		} else {
+			self.set_token_owner(type_id, nft_id, &Address::zero());
+		}
+		Ok(())
+	}
+
 	#[endpoint(setApprovalForAll)]
 	fn set_approved_for_all(&self, operator: Address, approved: bool) {
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 
 		self.set_is_approved(&operator, &caller, approved);
 
@@ -154,7 +200,7 @@ pub trait Erc1155 {
 	) -> BigUint {
 		let big_uint_one = BigUint::from(1u32);
 
-		let creator = self.get_caller();
+		let creator = self.blockchain().get_caller();
 		let type_id = &self.get_last_valid_type_id() + &big_uint_one;
 
 		self.set_balance(&creator, &type_id, &initial_supply);
@@ -181,7 +227,7 @@ pub trait Erc1155 {
 		let creator = self.get_token_type_creator(&type_id);
 
 		require!(
-			self.get_caller() == creator,
+			self.blockchain().get_caller() == creator,
 			"Only the token creator may mint more tokens"
 		);
 
@@ -209,7 +255,7 @@ pub trait Erc1155 {
 			"Only fungible tokens can be burned"
 		);
 
-		let caller = self.get_caller();
+		let caller = self.blockchain().get_caller();
 		let balance = self.balance_of(&caller, &type_id);
 
 		require!(balance >= amount, "Not enough tokens to burn");
@@ -342,14 +388,14 @@ pub trait Erc1155 {
 		data: &[u8],
 	) {
 		let mut serializer = HexCallDataSerializer::new(ON_ERC_RECEIVED_ENDPOINT_NAME);
-		serializer.push_argument_bytes(&self.get_caller().as_bytes());
+		serializer.push_argument_bytes(&self.blockchain().get_caller().as_bytes());
 		serializer.push_argument_bytes(&from.as_bytes());
 		serializer.push_argument_bytes(&type_id.to_bytes_be());
 		serializer.push_argument_bytes(&value.to_bytes_be());
 		serializer.push_argument_bytes(data);
 
 		self.set_pending_transfer(
-			&self.get_tx_hash(),
+			&self.blockchain().get_tx_hash(),
 			&Transfer {
 				from,
 				to: to.clone(),
@@ -374,14 +420,14 @@ pub trait Erc1155 {
 		let values_encoded = top_encode_to_vec_or_panic(&values);
 
 		let mut serializer = HexCallDataSerializer::new(ON_ERC_BATCH_RECEIVED_ENDPOINT_NAME);
-		serializer.push_argument_bytes(&self.get_caller().as_bytes());
+		serializer.push_argument_bytes(&self.blockchain().get_caller().as_bytes());
 		serializer.push_argument_bytes(&from.as_bytes());
 		serializer.push_argument_bytes(type_ids_encoded.as_slice());
 		serializer.push_argument_bytes(values_encoded.as_slice());
 		serializer.push_argument_bytes(data);
 
 		self.set_pending_transfer(
-			&self.get_tx_hash(),
+			&self.blockchain().get_tx_hash(),
 			&Transfer {
 				from,
 				to: to.clone(),
@@ -400,7 +446,7 @@ pub trait Erc1155 {
 	fn callback_raw(&self, #[var_args] result: AsyncCallResult<VarArgs<BoxedBytes>>) {
 		let is_transfer_accepted = result.is_ok();
 
-		let tx_hash = self.get_tx_hash();
+		let tx_hash = self.blockchain().get_tx_hash();
 		let pending_transfer = self.get_pending_transfer(&tx_hash);
 		let type_ids = &pending_transfer.type_ids;
 		let values = &pending_transfer.values;
@@ -414,13 +460,11 @@ pub trait Erc1155 {
 
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.is_fungible(type_id) {
-				let amount = value;
-				self.increase_balance(&dest_address, &type_id, &amount);
+				self.increase_balance(&dest_address, &type_id, &value);
 			} else {
-				let nft_id = value;
 				let amount = BigUint::from(1u32);
 				self.increase_balance(&dest_address, &type_id, &amount);
-				self.set_token_owner(&type_id, nft_id, &dest_address);
+				self.set_token_owner(&type_id, value, &dest_address);
 			}
 		}
 
