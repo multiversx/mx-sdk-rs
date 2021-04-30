@@ -235,6 +235,8 @@ pub trait Lottery {
 			// distribute to the first place last. Laws of probability say that order doesn't matter.
 			// this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
 			// 1st place will get the spare money instead.
+			let total_prize = info.prize_pool.clone();
+
 			for i in (0..for_loop_end).rev() {
 				let mut winning_ticket_id: u32;
 
@@ -250,8 +252,8 @@ pub trait Lottery {
 
 						if i != 0 {
 							prize =
-								BigUint::from(info.prize_distribution[i] as u32)
-									* info.prize_pool.clone() / BigUint::from(PERCENTAGE_TOTAL as u32);
+								&BigUint::from(info.prize_distribution[i] as u32)
+									* &total_prize / BigUint::from(PERCENTAGE_TOTAL as u32);
 						} else {
 							prize = info.prize_pool.clone();
 						}
