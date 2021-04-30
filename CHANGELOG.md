@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.15.1] - 2021-04-30
+- Mitigating nested sync calls with Send API `execute_on_dest_context_raw_custom_result_range`
+
 ## [elrond-wasm 0.15.0, elrond-codec 0.5.2] - 2021-04-19
 - ABI
 	- Constructor representation

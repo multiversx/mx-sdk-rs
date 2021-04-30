@@ -9,13 +9,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:vault": {
+                "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:forwarder": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "1000",
                     "storage": {},
@@ -28,11 +28,11 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:forwarder",
+                "to": "sc:forwarder",
                 "value": "0",
                 "function": "send_funds_twice",
                 "arguments": [
-                    "address:vault",
+                    "sc:vault",
                     "str:EGLD",
                     "1"
                 ],
@@ -44,7 +44,7 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "address:vault",
+                        "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
@@ -53,7 +53,7 @@
                         "data": ""
                     },
                     {
-                        "address": "address:vault",
+                        "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
@@ -75,13 +75,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:vault": {
+                "sc:vault": {
                     "nonce": "0",
                     "balance": "2",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:forwarder": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "998",
                     "storage": {},
