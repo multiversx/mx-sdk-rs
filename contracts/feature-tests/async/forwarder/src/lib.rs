@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(clippy::too_many_arguments)]
 
 mod call_async;
 mod call_sync;
@@ -116,7 +117,7 @@ pub trait Forwarder {
 		// manual callback forwarding to modules is currently necessary
 		self.sft_module().sft_issue_callback(caller, result)
 	}
-	
+
 	#[callback]
 	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
 		// manual callback forwarding to modules is currently necessary
