@@ -142,7 +142,7 @@ where
 	/// Only works if the target contract is in the same shard.
 	pub fn execute_on_dest_context<SA>(mut self, gas: u64, api: SA) -> R
 	where
-		SA: SendApi<BigUint>,
+		SA: SendApi<AmountType = BigUint>,
 	{
 		self = self.convert_to_esdt_transfer_call();
 		let raw_result = api.execute_on_dest_context_raw(
@@ -171,7 +171,7 @@ where
 		api: SA,
 	) -> R
 	where
-		SA: SendApi<BigUint>,
+		SA: SendApi<AmountType = BigUint>,
 		F: FnOnce(usize, usize) -> (usize, usize),
 	{
 		self = self.convert_to_esdt_transfer_call();
