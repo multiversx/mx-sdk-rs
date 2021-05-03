@@ -15,7 +15,7 @@ pub struct SendToken<BigUint: BigUintApi> {
 impl<FA, BigUint> EndpointResult<FA> for SendToken<BigUint>
 where
 	BigUint: BigUintApi + 'static,
-	FA: EndpointFinishApi + SendApi<BigUint> + ErrorApi + Clone + 'static,
+	FA: EndpointFinishApi + SendApi<AmountType = BigUint> + ErrorApi + Clone + 'static,
 {
 	#[inline]
 	fn finish(&self, api: FA) {

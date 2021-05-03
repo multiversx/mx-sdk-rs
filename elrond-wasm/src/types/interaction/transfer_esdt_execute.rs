@@ -27,7 +27,7 @@ where
 impl<FA, BigUint> EndpointResult<FA> for TransferEsdtExecute<BigUint>
 where
 	BigUint: BigUintApi + 'static,
-	FA: SendApi<BigUint> + ErrorApi + Clone + 'static,
+	FA: SendApi<AmountType = BigUint> + ErrorApi + Clone + 'static,
 {
 	#[inline]
 	fn finish(&self, api: FA) {

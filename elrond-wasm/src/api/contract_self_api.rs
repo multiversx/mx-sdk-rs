@@ -1,8 +1,11 @@
 use super::{
-	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, ErrorApi, SendApi,
-	StorageReadApi, StorageWriteApi,
+	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
+	EndpointFinishApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi,
 };
-use crate::storage;
+use crate::{
+	storage,
+	types::{Address, TokenIdentifier},
+};
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -10,21 +13,21 @@ use crate::storage;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractSelfApi<BigInt, BigUint>: Sized
-where
-	BigInt: BigIntApi<BigUint> + 'static,
-	BigUint: BigUintApi + 'static,
-{
+pub trait ContractSelfApi: Sized {
+	type BigUint: BigUintApi + 'static;
+
+	type BigInt: BigIntApi + 'static;
+
 	/// Abstracts the lower-level storage functionality.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
 	/// Abstracts the call value handling at the beginning of a function call.
-	type CallValue: CallValueApi<BigUint> + ErrorApi + Clone + 'static;
+	type CallValue: CallValueApi + ErrorApi + Clone + 'static;
 
 	/// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
-	type SendApi: SendApi<BigUint> + Clone + 'static;
+	type SendApi: SendApi + Clone + 'static;
 
-	type BlockchainApi: BlockchainApi<BigUint> + Clone + 'static;
+	type BlockchainApi: BlockchainApi + Clone + 'static;
 
 	type CryptoApi: CryptoApi + Clone + 'static;
 
@@ -50,10 +53,51 @@ where
 	/// Retrieves validator rewards, as set by the protocol.
 	/// TODO: move to the storage API, once BigUint gets refactored
 	#[inline]
-	fn storage_load_cumulated_validator_reward(&self) -> BigUint {
+	fn storage_load_cumulated_validator_reward(&self) -> Self::BigUint {
 		storage::storage_get(
 			self.get_storage_raw(),
 			storage::protected_keys::ELROND_REWARD_KEY,
 		)
 	}
+}
+
+pub trait ContractPrivateApi {
+	type ArgumentApi: EndpointArgumentApi + Clone + 'static;
+
+	type FinishApi: EndpointFinishApi + ErrorApi + Clone + 'static;
+
+	fn argument_api(&self) -> Self::ArgumentApi;
+
+	fn finish_api(&self) -> Self::FinishApi;
+}
+
+pub trait ProxyObjApi {
+	type BigUint: BigUintApi + 'static;
+
+	type BigInt: BigIntApi + 'static;
+
+	type PaymentType: BigUintApi + 'static;
+
+	type ProxySendApi: SendApi + Clone + 'static;
+
+	// type ContractCall<R>;
+
+	// fn new_proxy_obj(api: Self::ProxySendApi, address: Address) -> Self;
+
+	fn with_token_transfer(self, token: TokenIdentifier, payment: Self::PaymentType) -> Self;
+
+	fn into_fields(
+		self,
+	) -> (
+		Self::ProxySendApi,
+		Address,
+		TokenIdentifier,
+		Self::PaymentType,
+	);
+
+	// fn get_address(&self) -> Address;
+
+	// fn get_token(&self) -> TokenIdentifier;
+
+	// fn get_payment(&self) -> Self::BigUint;
 }

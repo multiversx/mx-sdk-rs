@@ -26,7 +26,7 @@ impl<BigUint: BigUintApi> AsyncCall<BigUint> {
 impl<FA, BigUint> EndpointResult<FA> for AsyncCall<BigUint>
 where
 	BigUint: BigUintApi + 'static,
-	FA: SendApi<BigUint> + ErrorApi + Clone + 'static,
+	FA: SendApi<AmountType = BigUint> + ErrorApi + Clone + 'static,
 {
 	#[inline]
 	fn finish(&self, api: FA) {

@@ -11,9 +11,9 @@ pub enum Sign {
 }
 
 /// Definition of the BigInt type required by the API.
-pub trait BigIntApi<BigUint>:
+pub trait BigIntApi:
 	Sized
-	+ From<BigUint>
+	+ From<Self::BigUint>
 	+ From<i64>
 	+ From<i32>
 	+ Clone
@@ -40,11 +40,13 @@ pub trait BigIntApi<BigUint>:
 	+ elrond_codec::TopDecode
 	+ abi::TypeAbi
 {
+	type BigUint;
+
 	fn zero() -> Self {
 		0i64.into()
 	}
 
-	fn abs_uint(&self) -> BigUint;
+	fn abs_uint(&self) -> Self::BigUint;
 
 	fn sign(&self) -> Sign;
 

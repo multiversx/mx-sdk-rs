@@ -2,19 +2,18 @@ use super::{BigUintApi, ErrorApi};
 use crate::err_msg;
 use crate::types::{EsdtTokenType, TokenIdentifier};
 
-pub trait CallValueApi<BigUint>: ErrorApi + Sized
-where
-	BigUint: BigUintApi + 'static,
-{
+pub trait CallValueApi: ErrorApi + Sized {
+	type AmountType: BigUintApi + 'static;
+
 	fn check_not_payable(&self);
 
 	/// Retrieves the EGLD call value from the VM.
 	/// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-	fn egld_value(&self) -> BigUint;
+	fn egld_value(&self) -> Self::AmountType;
 
 	/// Retrieves the ESDT call value from the VM.
 	/// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-	fn esdt_value(&self) -> BigUint;
+	fn esdt_value(&self) -> Self::AmountType;
 
 	/// Returns the call value token identifier of the current call.
 	/// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
@@ -34,7 +33,7 @@ where
 	/// Will return the EGLD call value,
 	/// but also fail with an error if ESDT is sent.
 	/// Especially used in the auto-generated call value processing.
-	fn require_egld(&self) -> BigUint {
+	fn require_egld(&self) -> Self::AmountType {
 		if !self.token().is_egld() {
 			self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
 		}
@@ -44,7 +43,7 @@ where
 	/// Will return the ESDT call value,
 	/// but also fail with an error if EGLD or the wrong ESDT token is sent.
 	/// Especially used in the auto-generated call value processing.
-	fn require_esdt(&self, token: &[u8]) -> BigUint {
+	fn require_esdt(&self, token: &[u8]) -> Self::AmountType {
 		if self.token() != token {
 			self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
 		}
@@ -55,7 +54,7 @@ where
 	/// Especially used in the `#[payable("*")] auto-generated snippets.
 	/// The method might seem redundant, but there is such a hook in Arwen
 	/// that might be used in this scenario in the future.
-	fn payment_token_pair(&self) -> (BigUint, TokenIdentifier) {
+	fn payment_token_pair(&self) -> (Self::AmountType, TokenIdentifier) {
 		let token = self.token();
 		if token.is_egld() {
 			(self.egld_value(), token)

@@ -14,7 +14,7 @@ pub struct SendEgld<BigUint: BigUintApi> {
 impl<FA, BigUint> EndpointResult<FA> for SendEgld<BigUint>
 where
 	BigUint: BigUintApi + 'static,
-	FA: EndpointFinishApi + SendApi<BigUint> + ErrorApi + Clone + 'static,
+	FA: EndpointFinishApi + SendApi<AmountType = BigUint> + ErrorApi + Clone + 'static,
 {
 	#[inline]
 	fn finish(&self, api: FA) {
