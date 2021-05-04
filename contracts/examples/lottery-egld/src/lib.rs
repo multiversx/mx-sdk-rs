@@ -249,8 +249,6 @@ pub trait Lottery {
 			&info.prize_pool,
 			b"You won the lottery, 1st place! Congratulations!",
 		);
-
-		self.lottery_info(lottery_name).set(&info);
 	}
 
 	fn clear_storage(&self, lottery_name: &BoxedBytes) {
