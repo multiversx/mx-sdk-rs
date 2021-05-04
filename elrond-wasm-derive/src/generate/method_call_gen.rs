@@ -21,7 +21,7 @@ pub fn generate_call_method(m: &Method) -> proc_macro2::TokenStream {
 	let call_method_body = generate_call_method_body(m);
 	quote! {
 		#[inline]
-		pub(crate) fn #call_method_ident (&self) {
+		fn #call_method_ident (&self) {
 			#call_method_body
 		}
 	}
@@ -67,7 +67,7 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
 
 	quote! {
 		#payable_snippet
-		self.api.check_num_arguments(#nr_args);
+		elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), #nr_args);
 		#(#arg_init_snippets)*
 		#body_with_result
 	}
@@ -123,7 +123,7 @@ pub fn generate_body_with_result(
 				if type_str == "Result" {
 					return quote! {
 						let result = elrond_wasm::types::SCResult::from_result(#mbody);
-						EndpointResult::<T>::finish(&result, self.api.clone());
+						elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
 					};
 				}
 			}
@@ -131,7 +131,7 @@ pub fn generate_body_with_result(
 			// default implementation, using the EndpointResult trait
 			quote! {
 				let result = #mbody;
-				EndpointResult::<T>::finish(&result, self.api.clone());
+				elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
 			}
 		},
 	}

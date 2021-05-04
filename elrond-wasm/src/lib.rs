@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(never_type)]
+// #![feature(generic_associated_types)]
 
 // re-export basic heap types
 extern crate alloc;

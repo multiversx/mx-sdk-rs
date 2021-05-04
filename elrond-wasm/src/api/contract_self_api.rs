@@ -13,7 +13,7 @@ use crate::{
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractSelfApi: Sized {
+pub trait ContractBase: Sized {
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;

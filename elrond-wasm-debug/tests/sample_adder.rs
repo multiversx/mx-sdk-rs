@@ -11,16 +11,12 @@ use elrond_wasm::types::Address;
 use crate::module_1::VersionModule;
 
 mod module_1 {
-	use elrond_wasm::api::{
-		ContractPrivateApi, EndpointArgumentApi, EndpointFinishApi, ProxyObjApi,
-	};
-
 	elrond_wasm::imports!();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//////// CONTRACT TRAIT /////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	pub trait VersionModule: ContractSelfApi + Sized
+	pub trait VersionModule: elrond_wasm::api::ContractBase + Sized
 	where
 		for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
@@ -57,7 +53,7 @@ mod module_1 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//////// AUTO-IMPLEMENTED METHODS ///////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	pub trait AutoImpl: ContractSelfApi {}
+	pub trait AutoImpl: elrond_wasm::api::ContractBase {}
 
 	impl<C> VersionModule for C
 	where
@@ -96,7 +92,7 @@ mod module_1 {
 		}
 	}
 
-	pub trait CallMethods: VersionModule + ContractPrivateApi
+	pub trait EndpointWrappers: VersionModule + elrond_wasm::api::ContractPrivateApi
 	where
 		for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
@@ -131,7 +127,7 @@ mod module_1 {
 		fn call_version(&self) {
 			self.call_value().check_not_payable();
 			let result = self.version();
-			EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
 		}
 
 		fn call(&self, fn_name: &[u8]) -> bool {
@@ -152,7 +148,7 @@ mod module_1 {
 		}
 	}
 
-	pub trait CallProxy: ProxyObjApi + Sized {
+	pub trait CallProxy: elrond_wasm::api::ProxyObjApi + Sized {
 		fn version(self) -> ContractCall<Self::PaymentType, Self::BigInt> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -167,16 +163,13 @@ mod module_1 {
 }
 
 mod sample_adder {
-	use elrond_wasm::api::{
-		ContractPrivateApi, EndpointArgumentApi, EndpointFinishApi, ProxyObjApi,
-	};
-
 	elrond_wasm::imports!();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//////// CONTRACT TRAIT /////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	pub trait Adder: super::module_1::VersionModule + ContractSelfApi + Sized
+	pub trait Adder:
+		super::module_1::VersionModule + elrond_wasm::api::ContractBase + Sized
 	where
 		for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
@@ -228,7 +221,7 @@ mod sample_adder {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//////// AUTO-IMPLEMENTED METHODS ///////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	pub trait AutoImpl: ContractSelfApi {}
+	pub trait AutoImpl: elrond_wasm::api::ContractBase {}
 
 	impl<C> Adder for C
 	where
@@ -273,7 +266,8 @@ mod sample_adder {
 		fn callback(&self) {}
 	}
 
-	pub trait CallMethods: Adder + ContractPrivateApi + super::module_1::CallMethods
+	pub trait EndpointWrappers:
+		Adder + elrond_wasm::api::ContractPrivateApi + super::module_1::EndpointWrappers
 	where
 		for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
@@ -307,14 +301,14 @@ mod sample_adder {
 		#[inline]
 		fn call_get_sum(&self) {
 			self.call_value().check_not_payable();
-			self.argument_api().check_num_arguments(0i32);
+			elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 0i32);
 			let result = self.get_sum();
-			EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
 		}
 		#[inline]
 		fn call_init(&self) {
 			self.call_value().check_not_payable();
-			self.argument_api().check_num_arguments(1i32);
+			elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 1i32);
 			let initial_value = elrond_wasm::load_single_arg::<Self::ArgumentApi, Self::BigInt>(
 				self.argument_api(),
 				0i32,
@@ -325,14 +319,14 @@ mod sample_adder {
 		#[inline]
 		fn call_add(&self) {
 			self.call_value().check_not_payable();
-			self.argument_api().check_num_arguments(1i32);
+			elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 1i32);
 			let value = elrond_wasm::load_single_arg::<Self::ArgumentApi, Self::BigInt>(
 				self.argument_api(),
 				0i32,
 				ArgId::from(&b"value"[..]),
 			);
 			let result = self.add(&value);
-			EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
 		}
 
 		fn call(&self, fn_name: &[u8]) -> bool {
@@ -357,14 +351,14 @@ mod sample_adder {
 			} {
 				return true;
 			}
-			if super::module_1::CallMethods::call(self, fn_name) {
+			if super::module_1::EndpointWrappers::call(self, fn_name) {
 				return true;
 			}
 			false
 		}
 	}
 
-	pub trait CallProxy: ProxyObjApi + super::module_1::CallProxy {
+	pub trait CallProxy: elrond_wasm::api::ProxyObjApi + super::module_1::CallProxy {
 		fn get_sum(self) -> ContractCall<Self::PaymentType, Self::BigInt> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -381,7 +375,7 @@ mod sample_adder {
 				___address___,
 				___token___,
 				___payment___,
-				elrond_wasm::types::BoxedBytes::from(&b"get_sum"[..]),
+				elrond_wasm::types::BoxedBytes::from(&b"add"[..]),
 			);
 			elrond_wasm::io::serialize_contract_call_arg(
 				amount,
@@ -395,25 +389,16 @@ mod sample_adder {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//////// CONTRACT OBJECT ////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	pub struct ContractObj<A: ContractSelfApi> {
+	pub struct ContractObj<A: elrond_wasm::api::ContractBase> {
 		api: A,
-	}
-
-	impl<A> ContractObj<A>
-	where
-		A: ContractSelfApi,
-	{
-		pub fn new_contract_obj(api: A) -> Self {
-			ContractObj { api }
-		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//////// CONTRACT OBJECT as CONTRACT BASE ///////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	impl<A> ContractSelfApi for ContractObj<A>
+	impl<A> elrond_wasm::api::ContractBase for ContractObj<A>
 	where
-		A: ContractSelfApi
+		A: elrond_wasm::api::ContractBase
 			+ elrond_wasm::api::ErrorApi
 			+ elrond_wasm::api::EndpointArgumentApi
 			+ elrond_wasm::api::EndpointFinishApi
@@ -451,7 +436,7 @@ mod sample_adder {
 	}
 
 	impl<A> super::module_1::AutoImpl for ContractObj<A> where
-		A: ContractSelfApi
+		A: elrond_wasm::api::ContractBase
 			+ elrond_wasm::api::ErrorApi
 			+ elrond_wasm::api::EndpointArgumentApi
 			+ elrond_wasm::api::EndpointFinishApi
@@ -461,7 +446,7 @@ mod sample_adder {
 	}
 
 	impl<A> AutoImpl for ContractObj<A> where
-		A: ContractSelfApi
+		A: elrond_wasm::api::ContractBase
 			+ elrond_wasm::api::ErrorApi
 			+ elrond_wasm::api::EndpointArgumentApi
 			+ elrond_wasm::api::EndpointFinishApi
@@ -470,9 +455,9 @@ mod sample_adder {
 	{
 	}
 
-	impl<A> ContractPrivateApi for ContractObj<A>
+	impl<A> elrond_wasm::api::ContractPrivateApi for ContractObj<A>
 	where
-		A: ContractSelfApi
+		A: elrond_wasm::api::ContractBase
 			+ elrond_wasm::api::ErrorApi
 			+ elrond_wasm::api::EndpointArgumentApi
 			+ elrond_wasm::api::EndpointFinishApi
@@ -494,9 +479,9 @@ mod sample_adder {
 		}
 	}
 
-	impl<A> super::module_1::CallMethods for ContractObj<A>
+	impl<A> super::module_1::EndpointWrappers for ContractObj<A>
 	where
-		A: ContractSelfApi
+		A: elrond_wasm::api::ContractBase
 			+ elrond_wasm::api::ErrorApi
 			+ elrond_wasm::api::EndpointArgumentApi
 			+ elrond_wasm::api::EndpointFinishApi
@@ -533,9 +518,9 @@ mod sample_adder {
 	{
 	}
 
-	impl<A> CallMethods for ContractObj<A>
+	impl<A> EndpointWrappers for ContractObj<A>
 	where
-		A: ContractSelfApi
+		A: elrond_wasm::api::ContractBase
 			+ elrond_wasm::api::ErrorApi
 			+ elrond_wasm::api::EndpointArgumentApi
 			+ elrond_wasm::api::EndpointFinishApi
@@ -570,11 +555,96 @@ mod sample_adder {
 		for<'b> Self::BigInt: core::ops::DivAssign<&'b Self::BigInt>,
 		for<'b> Self::BigInt: core::ops::RemAssign<&'b Self::BigInt>,
 	{
+	}
+
+	impl<A> elrond_wasm::api::CallableContract<A> for ContractObj<A>
+	where
+		A: elrond_wasm::api::ContractBase
+			+ elrond_wasm::api::ErrorApi
+			+ elrond_wasm::api::EndpointArgumentApi
+			+ elrond_wasm::api::EndpointFinishApi
+			+ Clone
+			+ 'static,
+		for<'a, 'b> &'a A::BigUint: core::ops::Add<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Sub<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Mul<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Div<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Rem<&'b A::BigUint, Output = A::BigUint>,
+		for<'b> A::BigUint: core::ops::AddAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::SubAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::MulAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::DivAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::RemAssign<&'b A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::BitAnd<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::BitOr<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::BitXor<&'b A::BigUint, Output = A::BigUint>,
+		for<'b> A::BigUint: core::ops::BitAndAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::BitOrAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::BitXorAssign<&'b A::BigUint>,
+		for<'a> &'a A::BigUint: core::ops::Shr<usize, Output = A::BigUint>,
+		for<'a> &'a A::BigUint: core::ops::Shl<usize, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Add<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Sub<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Mul<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Div<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Rem<&'b A::BigInt, Output = A::BigInt>,
+		for<'b> A::BigInt: core::ops::AddAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::SubAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::MulAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::DivAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::RemAssign<&'b A::BigInt>,
+	{
+		fn call(&self, fn_name: &[u8]) -> bool {
+			EndpointWrappers::call(self, fn_name)
+		}
+		fn into_api(self: Box<Self>) -> A {
+			self.api
+		}
+	}
+
+	pub fn contract_obj<A>(api: A) -> ContractObj<A>
+	where
+		A: elrond_wasm::api::ContractBase
+			+ elrond_wasm::api::ErrorApi
+			+ elrond_wasm::api::EndpointArgumentApi
+			+ elrond_wasm::api::EndpointFinishApi
+			+ Clone
+			+ 'static,
+		for<'a, 'b> &'a A::BigUint: core::ops::Add<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Sub<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Mul<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Div<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::Rem<&'b A::BigUint, Output = A::BigUint>,
+		for<'b> A::BigUint: core::ops::AddAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::SubAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::MulAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::DivAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::RemAssign<&'b A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::BitAnd<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::BitOr<&'b A::BigUint, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigUint: core::ops::BitXor<&'b A::BigUint, Output = A::BigUint>,
+		for<'b> A::BigUint: core::ops::BitAndAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::BitOrAssign<&'b A::BigUint>,
+		for<'b> A::BigUint: core::ops::BitXorAssign<&'b A::BigUint>,
+		for<'a> &'a A::BigUint: core::ops::Shr<usize, Output = A::BigUint>,
+		for<'a> &'a A::BigUint: core::ops::Shl<usize, Output = A::BigUint>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Add<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Sub<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Mul<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Div<&'b A::BigInt, Output = A::BigInt>,
+		for<'a, 'b> &'a A::BigInt: core::ops::Rem<&'b A::BigInt, Output = A::BigInt>,
+		for<'b> A::BigInt: core::ops::AddAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::SubAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::MulAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::DivAssign<&'b A::BigInt>,
+		for<'b> A::BigInt: core::ops::RemAssign<&'b A::BigInt>,
+	{
+		ContractObj { api }
 	}
 
 	pub struct ProxyObj<SA>
 	where
-		SA: SendApi + 'static,
+		SA: elrond_wasm::api::SendApi + 'static,
 	{
 		pub api: SA,
 		pub address: Address,
@@ -584,7 +654,7 @@ mod sample_adder {
 
 	impl<SA> ProxyObj<SA>
 	where
-		SA: SendApi + 'static,
+		SA: elrond_wasm::api::SendApi + 'static,
 	{
 		pub fn new_proxy_obj(api: SA, address: Address) -> Self {
 			ProxyObj {
@@ -596,9 +666,9 @@ mod sample_adder {
 		}
 	}
 
-	impl<SA> ProxyObjApi for ProxyObj<SA>
+	impl<SA> elrond_wasm::api::ProxyObjApi for ProxyObj<SA>
 	where
-		SA: SendApi + 'static,
+		SA: elrond_wasm::api::SendApi + 'static,
 	{
 		type BigUint = SA::ProxyBigUint;
 
@@ -630,22 +700,22 @@ mod sample_adder {
 		}
 	}
 
-	impl<SA> super::module_1::CallProxy for ProxyObj<SA> where SA: SendApi {}
+	impl<SA> super::module_1::CallProxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
 
-	impl<SA> CallProxy for ProxyObj<SA> where SA: SendApi {}
+	impl<SA> CallProxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
 }
 
 #[test]
 fn test_add() {
-	use elrond_wasm::api::ContractSelfApi;
+	use elrond_wasm::api::ContractBase;
 	use elrond_wasm_debug::api::RustBigInt;
 	use elrond_wasm_debug::TxContext;
-	use sample_adder::{Adder, CallMethods, CallProxy};
-	// use module_1::{VersionModule, CallMethods};
+	use sample_adder::{Adder, CallProxy, EndpointWrappers};
+	// use module_1::{VersionModule, EndpointWrappers};
 
 	let tx_context = TxContext::dummy();
 
-	let adder = sample_adder::ContractObj::new_contract_obj(tx_context.clone());
+	let adder = sample_adder::contract_obj(tx_context.clone());
 
 	adder.init(&RustBigInt::from(5));
 	assert_eq!(RustBigInt::from(5), adder.get_sum());
@@ -667,4 +737,21 @@ fn test_add() {
 
 	let own_proxy = sample_adder::ProxyObj::new_proxy_obj(adder.send().clone(), Address::zero());
 	let _ = own_proxy.get_sum();
+}
+
+fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::TxContext> {
+	let mut contract_map = elrond_wasm_debug::ContractMap::new();
+	contract_map.register_contract(
+		"file:../output/adder.wasm",
+		Box::new(|context| Box::new(sample_adder::contract_obj(context))),
+	);
+	contract_map
+}
+
+#[test]
+fn test_mandos() {
+	elrond_wasm_debug::parse_execute_mandos(
+		"../contracts/examples/adder/mandos/adder.scen.json",
+		&contract_map(),
+	);
 }
