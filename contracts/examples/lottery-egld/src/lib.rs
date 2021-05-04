@@ -89,31 +89,24 @@ pub trait Lottery {
 			self.status(&lottery_name) == Status::Inactive,
 			"Lottery is already active!"
 		);
-
 		require!(ticket_price > 0, "Ticket price must be higher than 0!");
-
 		require!(
 			total_tickets > 0,
 			"Must have more than 0 tickets available!"
 		);
-
 		require!(
 			total_tickets <= MAX_TICKETS,
 			"Only 800 or less total tickets per lottery are allowed!"
 		);
-
 		require!(deadline > timestamp, "Deadline can't be in the past!");
-
 		require!(
 			deadline <= timestamp + THIRTY_DAYS_IN_SECONDS,
 			"Deadline can't be later than 30 days from now!"
 		);
-
 		require!(
 			max_entries_per_user > 0,
 			"Must have more than 0 max entries per user!"
 		);
-
 		require!(
 			self.sum_array(&prize_distribution) == PERCENTAGE_TOTAL,
 			"Prize distribution must add up to exactly 100(%)!"
@@ -130,7 +123,7 @@ pub trait Lottery {
 			prize_pool: BigUint::zero(),
 		};
 
-		self.set_lottery_info(&lottery_name, &info);
+		self.lottery_info(&lottery_name).set(&info);
 
 		Ok(())
 	}
@@ -162,13 +155,13 @@ pub trait Lottery {
 
 	#[view]
 	fn status(&self, lottery_name: &BoxedBytes) -> Status {
-		if self.is_empty_lottery_info(lottery_name) {
+		if self.lottery_info(lottery_name).is_empty() {
 			return Status::Inactive;
 		}
 
-		let info = self.get_lottery_info(&lottery_name);
-
-		if self.blockchain().get_block_timestamp() > info.deadline || info.tickets_left == 0 {
+		let info = self.lottery_info(&lottery_name).get();
+		let current_time = self.blockchain().get_block_timestamp();
+		if current_time > info.deadline || info.tickets_left == 0 {
 			return Status::Ended;
 		}
 
@@ -180,24 +173,25 @@ pub trait Lottery {
 		lottery_name: &BoxedBytes,
 		payment: &BigUint,
 	) -> SCResult<()> {
-		let mut info = self.get_lottery_info(&lottery_name);
+		let mut info = self.lottery_info(&lottery_name).get();
 		let caller = self.blockchain().get_caller();
 
 		require!(
 			info.whitelist.is_empty() || info.whitelist.contains(&caller),
 			"You are not allowed to participate in this lottery!"
 		);
-
 		require!(payment == &info.ticket_price, "Wrong ticket fee!");
 
-		let mut entries = self.get_number_of_entries_for_user(&lottery_name, &caller);
-
+		let mut entries = self
+			.number_of_entries_for_user(&lottery_name, &caller)
+			.get();
 		require!(
 			entries < info.max_entries_per_user,
 			"Ticket limit exceeded for this lottery!"
 		);
 
-		self.set_ticket_holder(&lottery_name, info.current_ticket_number, &caller);
+		self.ticket_holder(&lottery_name, info.current_ticket_number)
+			.set(&caller);
 		entries += 1;
 		info.current_ticket_number += 1;
 		info.tickets_left -= 1;
@@ -205,14 +199,15 @@ pub trait Lottery {
 		let ticket_price = info.ticket_price.clone();
 		info.prize_pool += ticket_price;
 
-		self.set_number_of_entries_for_user(lottery_name, &caller, entries);
-		self.set_lottery_info(lottery_name, &info);
+		self.number_of_entries_for_user(lottery_name, &caller)
+			.set(&entries);
+		self.lottery_info(lottery_name).set(&info);
 
 		Ok(())
 	}
 
 	fn distribute_prizes(&self, lottery_name: &BoxedBytes) {
-		let mut info = self.get_lottery_info(&lottery_name);
+		let mut info = self.lottery_info(&lottery_name).get();
 		let total_tickets = info.current_ticket_number;
 
 		if info.current_ticket_number > 0 {
@@ -247,13 +242,12 @@ pub trait Lottery {
 
 					if !prev_winning_tickets.contains(&winning_ticket_id) {
 						let winner_address =
-							self.get_ticket_holder(&lottery_name, winning_ticket_id);
+							self.ticket_holder(&lottery_name, winning_ticket_id).get();
 						let prize: BigUint;
 
 						if i != 0 {
-							prize =
-								&BigUint::from(info.prize_distribution[i] as u32)
-									* &total_prize / BigUint::from(PERCENTAGE_TOTAL as u32);
+							prize = &BigUint::from(info.prize_distribution[i] as u32)
+								* &total_prize / BigUint::from(PERCENTAGE_TOTAL as u32);
 						} else {
 							prize = info.prize_pool.clone();
 						}
@@ -273,20 +267,20 @@ pub trait Lottery {
 			}
 		}
 
-		self.set_lottery_info(lottery_name, &info);
+		self.lottery_info(lottery_name).set(&info);
 	}
 
 	fn clear_storage(&self, lottery_name: &BoxedBytes) {
-		let info = self.get_lottery_info(lottery_name);
+		let info = self.lottery_info(lottery_name).get();
 
 		for i in 0..info.current_ticket_number {
-			let addr = self.get_ticket_holder(lottery_name, i);
+			let addr = self.ticket_holder(lottery_name, i).get();
 
-			self.clear_ticket_holder(lottery_name, i);
-			self.clear_number_of_entries_for_user(lottery_name, &addr);
+			self.ticket_holder(lottery_name, i).clear();
+			self.number_of_entries_for_user(lottery_name, &addr).clear();
 		}
 
-		self.clear_lottery_info(lottery_name);
+		self.lottery_info(lottery_name).clear();
 	}
 
 	fn sum_array(&self, array: &[u8]) -> u16 {
@@ -301,39 +295,24 @@ pub trait Lottery {
 
 	// storage
 
-	#[storage_set("lotteryInfo")]
-	fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<BigUint>);
+	#[view(getLotteryInfo)]
+	#[storage_mapper("lotteryInfo")]
+	fn lottery_info(
+		&self,
+		lottery_name: &BoxedBytes,
+	) -> SingleValueMapper<Self::Storage, LotteryInfo<BigUint>>;
 
-	#[view(lotteryInfo)]
-	#[storage_get("lotteryInfo")]
-	fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<BigUint>;
+	#[storage_mapper("ticketHolder")]
+	fn ticket_holder(
+		&self,
+		lottery_name: &BoxedBytes,
+		ticket_id: u32,
+	) -> SingleValueMapper<Self::Storage, Address>;
 
-	#[storage_is_empty("lotteryInfo")]
-	fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;
-
-	#[storage_clear("lotteryInfo")]
-	fn clear_lottery_info(&self, lottery_name: &BoxedBytes);
-
-	#[storage_set("ticketHolder")]
-	fn set_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32, ticket_holder: &Address);
-
-	#[storage_get("ticketHolder")]
-	fn get_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32) -> Address;
-
-	#[storage_clear("ticketHolder")]
-	fn clear_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32);
-
-	#[storage_set("numberOfEntriesForUser")]
-	fn set_number_of_entries_for_user(
+	#[storage_mapper("numberOfEntriesForUser")]
+	fn number_of_entries_for_user(
 		&self,
 		lottery_name: &BoxedBytes,
 		user: &Address,
-		nr_entries: u32,
-	);
-
-	#[storage_get("numberOfEntriesForUser")]
-	fn get_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address) -> u32;
-
-	#[storage_clear("numberOfEntriesForUser")]
-	fn clear_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address);
+	) -> SingleValueMapper<Self::Storage, u32>;
 }
