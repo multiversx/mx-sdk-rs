@@ -11,7 +11,7 @@ use lottery_info::LotteryInfo;
 use random::Random;
 use status::Status;
 
-const PERCENTAGE_TOTAL: u16 = 100;
+const PERCENTAGE_TOTAL: u32 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 const MAX_TICKETS: u32 = 800;
 
@@ -77,7 +77,6 @@ pub trait Lottery {
 		require!(!lottery_name.is_empty(), "Name can't be empty!");
 
 		let timestamp = self.blockchain().get_block_timestamp();
-
 		let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
 		let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
 		let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
@@ -119,7 +118,7 @@ pub trait Lottery {
 			max_entries_per_user,
 			prize_distribution,
 			whitelist,
-			current_ticket_number: 0u32,
+			current_ticket_number: 0,
 			prize_pool: BigUint::zero(),
 		};
 
@@ -210,62 +209,46 @@ pub trait Lottery {
 		let mut info = self.lottery_info(&lottery_name).get();
 		let total_tickets = info.current_ticket_number;
 
-		if info.current_ticket_number > 0 {
-			let mut prev_winning_tickets: Vec<u32> = Vec::new();
-
-			let seed = self.blockchain().get_block_random_seed();
-			let mut rand = Random::new(*seed);
-
-			// if there are less tickets that the distributed prize pool,
-			// the 1st place gets the leftover, maybe could split between the remaining
-			// but this is a rare case anyway and it's not worth the overhead
-			let for_loop_end: usize;
-
-			if total_tickets < info.prize_distribution.len() as u32 {
-				for_loop_end = total_tickets as usize;
-			} else {
-				for_loop_end = info.prize_distribution.len();
-			}
-
-			// distribute to the first place last. Laws of probability say that order doesn't matter.
-			// this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
-			// 1st place will get the spare money instead.
-			let total_prize = info.prize_pool.clone();
-
-			for i in (0..for_loop_end).rev() {
-				let mut winning_ticket_id: u32;
-
-				loop {
-					// smallest change in input results in entirely different hash, creating "randomness"
-					// +1 just to protect against infinite loop for id = 0
-					winning_ticket_id = rand.next() % total_tickets;
-
-					if !prev_winning_tickets.contains(&winning_ticket_id) {
-						let winner_address =
-							self.ticket_holder(&lottery_name, winning_ticket_id).get();
-						let prize: BigUint;
-
-						if i != 0 {
-							prize = &BigUint::from(info.prize_distribution[i] as u32)
-								* &total_prize / BigUint::from(PERCENTAGE_TOTAL as u32);
-						} else {
-							prize = info.prize_pool.clone();
-						}
-
-						self.send().direct_egld(
-							&winner_address,
-							&prize,
-							b"You won the lottery! Congratulations!",
-						);
-						info.prize_pool -= prize;
-
-						prev_winning_tickets.push(winning_ticket_id);
-
-						break;
-					}
-				}
-			}
+		if total_tickets == 0 {
+			return;
 		}
+
+		// if there are less tickets than the distributed prize pool,
+		// the 1st place gets the leftover, maybe could split between the remaining
+		// but this is a rare case anyway and it's not worth the overhead
+		let total_winning_tickets = if total_tickets < info.prize_distribution.len() {
+			total_tickets as usize
+		} else {
+			info.prize_distribution.len()
+		};
+		let total_prize = info.prize_pool.clone();
+		let winning_tickets = self.get_distinct_random(0, total_tickets, total_winning_tickets);
+		let percentage_total = BigUint::from(PERCENTAGE_TOTAL);
+
+		// distribute to the first place last. Laws of probability say that order doesn't matter.
+		// this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
+		// 1st place will get the spare money instead.
+		for i in (1..total_winning_tickets).rev() {
+			let winning_ticket_id = winning_tickets[i];
+			let winner_address = self.ticket_holder(&lottery_name, winning_ticket_id).get();
+			let prize = &(&BigUint::from(info.prize_distribution[i] as u32) * &total_prize)
+				/ &percentage_total;
+
+			self.send().direct_egld(
+				&winner_address,
+				&prize,
+				b"You won the lottery! Congratulations!",
+			);
+			info.prize_pool -= prize;
+		}
+
+		// send leftover to first place
+		let first_place_winner = self.ticket_holder(&lottery_name, winning_tickets[0]).get();
+		self.send().direct_egld(
+			&first_place_winner,
+			&info.prize_pool,
+			b"You won the lottery, 1st place! Congratulations!",
+		);
 
 		self.lottery_info(lottery_name).set(&info);
 	}
@@ -283,14 +266,28 @@ pub trait Lottery {
 		self.lottery_info(lottery_name).clear();
 	}
 
-	fn sum_array(&self, array: &[u8]) -> u16 {
-		let mut sum = 0u16; // u16 to protect against overflow
+	fn sum_array(&self, array: &[u8]) -> u32 {
+		let mut sum = 0;
 
 		for &item in array {
-			sum += item as u16;
+			sum += item as u32;
 		}
 
 		sum
+	}
+
+	/// does not check if max - min >= amount, that is the caller's job
+	fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
+		let mut rand_numbers: Vec<usize> = (min..max).collect();
+		let seed = self.blockchain().get_block_random_seed();
+		let mut rand = Random::new(*seed);
+
+		for i in 0..amount {
+			let rand_index = (rand.next() as usize) % amount;
+			rand_numbers.swap(i, rand_index);
+		}
+
+		rand_numbers
 	}
 
 	// storage
@@ -306,7 +303,7 @@ pub trait Lottery {
 	fn ticket_holder(
 		&self,
 		lottery_name: &BoxedBytes,
-		ticket_id: u32,
+		ticket_id: usize,
 	) -> SingleValueMapper<Self::Storage, Address>;
 
 	#[storage_mapper("numberOfEntriesForUser")]
