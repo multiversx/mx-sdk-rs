@@ -1,7 +1,7 @@
 use super::{big_uint_api_mock::*, RustBigInt};
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
-use elrond_wasm::api::{BlockchainApi, ContractSelfApi, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BlockchainApi, ContractBase, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 use num_bigint::BigUint;
 use num_traits::Zero;

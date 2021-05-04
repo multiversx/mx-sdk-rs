@@ -2,7 +2,9 @@ use super::big_int_api_mock::*;
 use super::big_uint_api_mock::*;
 use crate::TxContext;
 
-impl elrond_wasm::api::ContractSelfApi<RustBigInt, RustBigUint> for TxContext {
+impl elrond_wasm::api::ContractBase for TxContext {
+	type BigUint = RustBigUint;
+	type BigInt = RustBigInt;
 	type Storage = Self;
 	type CallValue = Self;
 	type SendApi = Self;
