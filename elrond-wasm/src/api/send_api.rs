@@ -77,7 +77,8 @@ where
 	}
 
 	/// Sends ESDT tokens to the target address. Handles any type of ESDT.
-	fn transfer_esdt(&self, token: &TokenIdentifier, nonce: u64, amount: &BigUint, to: &Address) {
+	/// Note: this does not work with EGLD, use only with ESDT.
+	fn transfer_tokens(&self, token: &TokenIdentifier, nonce: u64, amount: &BigUint, to: &Address) {
 		if amount > &0 {
 			if nonce == 0 {
 				let _ =
@@ -296,7 +297,8 @@ where
 	}
 
 	/// Burns ESDT tokens. Handles any type of ESDT.
-	fn burn_esdt(&self, token: &TokenIdentifier, nonce: u64, amount: &BigUint, gas: u64) {
+	/// Note: this does not work with EGLD, use only with ESDT.
+	fn burn_tokens(&self, token: &TokenIdentifier, nonce: u64, amount: &BigUint, gas: u64) {
 		if amount > &0 {
 			if nonce == 0 {
 				self.esdt_local_burn(gas, token.as_esdt_identifier(), amount);
