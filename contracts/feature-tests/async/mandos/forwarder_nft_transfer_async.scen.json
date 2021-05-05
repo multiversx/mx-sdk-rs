@@ -6,21 +6,27 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "nonce": "1",
+                            "balance": "0"
+                        }
+                    },
                     "storage": {},
                     "code": ""
-                },
-                "sc:vault": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "nonce": "1",
+                            "balance": "1"
+                        }
+                    },
                     "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
@@ -30,10 +36,13 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "1000",
-                "function": "forward_payment",
+                "function": "transfer_nft_via_async_call",
                 "arguments": [
-                    "sc:vault"
+                    "address:a_user",
+                    "str:NFT-0001",
+                    "1",
+                    "1",
+                    ""
                 ],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -41,7 +50,6 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
@@ -52,20 +60,26 @@
                 "address:a_user": {
                     "nonce": "*",
                     "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "nonce": "1",
+                            "balance": "1"
+                        }
+                    },
                     "storage": {},
                     "code": ""
-                },
-                "sc:vault": {
-                    "nonce": "0",
-                    "balance": "1000",
-                    "storage": {},
-                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "nonce": "1",
+                            "balance": "0"
+                        }
+                    },
                     "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         }

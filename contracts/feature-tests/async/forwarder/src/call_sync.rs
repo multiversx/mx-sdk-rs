@@ -18,6 +18,24 @@ pub trait ForwarderSyncCallModule {
 
 	#[endpoint]
 	#[payable("*")]
+	fn echo_arguments_sync_range(
+		&self,
+		to: Address,
+		start: usize,
+		end: usize,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) {
+		let half_gas = self.blockchain().get_gas_left() / 2;
+
+		let result = contract_call!(self, to, VaultProxy)
+			.echo_arguments(&args)
+			.execute_on_dest_context_custom_range(half_gas, |_, _| (start, end), self.send());
+
+		self.execute_on_dest_context_result(result.as_slice());
+	}
+
+	#[endpoint]
+	#[payable("*")]
 	fn echo_arguments_sync_twice(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
 		let one_third_gas = self.blockchain().get_gas_left() / 3;
 

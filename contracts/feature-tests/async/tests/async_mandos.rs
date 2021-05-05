@@ -37,58 +37,58 @@ fn contract_map() -> ContractMap<TxContext> {
 	contract_map
 }
 
-#[test]
-fn forwarder_async_accept_egld() {
-	parse_execute_mandos(
-		"mandos/forwarder_async_accept_egld.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_async_accept_egld() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_async_accept_egld.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_async_accept_esdt() {
-	parse_execute_mandos(
-		"mandos/forwarder_async_accept_esdt.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_async_accept_esdt() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_async_accept_esdt.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_async_accept_egld() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_async_accept_egld.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_async_accept_egld() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_async_accept_egld.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_async_accept_esdt() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_async_accept_esdt.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_async_accept_esdt() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_async_accept_esdt.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_async_echo() {
-	parse_execute_mandos("mandos/forwarder_raw_async_echo.scen.json", &contract_map());
-}
+// #[test]
+// fn forwarder_raw_async_echo() {
+// 	parse_execute_mandos("mandos/forwarder_raw_async_echo.scen.json", &contract_map());
+// }
 
-#[test]
-fn forwarder_raw_direct_egld() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_direct_egld.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_direct_egld() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_direct_egld.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_direct_esdt() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_direct_esdt.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_direct_esdt() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_direct_esdt.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
 // #[test]
 // fn forwarder_raw_sync_echo() {
