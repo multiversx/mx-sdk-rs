@@ -5,6 +5,7 @@ use crate::generate::auto_impl::generate_auto_impls;
 use crate::generate::callback_gen::*;
 use crate::generate::contract_gen::*;
 use crate::generate::function_selector::generate_function_selector_body;
+use crate::generate::supertrait_gen;
 
 pub fn contract_implementation(
 	contract: &ContractTrait,
@@ -12,11 +13,6 @@ pub fn contract_implementation(
 ) -> proc_macro2::TokenStream {
 	let trait_name_ident = contract.trait_name.clone();
 	let method_impls = extract_method_impls(&contract);
-
-	if !contract.supertrait_paths.is_empty() {
-		panic!("contract inheritance currently not supported");
-	}
-
 	let call_methods = generate_call_methods(&contract);
 	let auto_impl_defs = generate_auto_impl_defs(&contract);
 	let auto_impls = generate_auto_impls(&contract);
@@ -26,16 +22,14 @@ pub fn contract_implementation(
 	let callback_body = generate_callback_body(&contract.methods);
 	let callback_proxies = generate_callback_proxies(&contract.methods);
 	let where_self_big_int = snippets::where_self_big_int();
-	let api_where = snippets::api_where();
-
-	let supertrait_impls = generate_supertrait_impls(&contract);
 
 	// this definition is common to release and debug mode
+	let supertraits_main = supertrait_gen::main_supertrait_decl(contract.supertraits.as_slice());
 	let main_definition = quote! {
 		pub trait #trait_name_ident:
 		ContractBase
-		// #( + #supertrait_paths <T, BigInt, BigUint>)* // currently not supported
 		+ Sized
+		#(#supertraits_main)*
 		#where_self_big_int
 		{
 			#(#method_impls)*
@@ -51,9 +45,9 @@ pub fn contract_implementation(
 	let auto_impl_trait = quote! {
 		pub trait AutoImpl: elrond_wasm::api::ContractBase {}
 
-		impl<C> Adder for C
+		impl<C> #trait_name_ident for C
 		#where_self_big_int
-		C: AutoImpl /*+ super::module_1::VersionModule*/,
+		C: AutoImpl #(#supertraits_main)*
 		{
 			#(#auto_impls)*
 
@@ -67,8 +61,12 @@ pub fn contract_implementation(
 		}
 	};
 
-	let endpoint_wrappers = quote!{
-		pub trait EndpointWrappers: #trait_name_ident + elrond_wasm::api::ContractPrivateApi /*+ super::module_1::EndpointWrappers*/
+	let endpoint_wrapper_supertrait_decl =
+		supertrait_gen::endpoint_wrapper_supertrait_decl(contract.supertraits.as_slice());
+	let endpoint_wrappers = quote! {
+		pub trait EndpointWrappers:
+			elrond_wasm::api::ContractPrivateApi 
+			+ #trait_name_ident #(#endpoint_wrapper_supertrait_decl)*
 		#where_self_big_int
 		{
 			#(#call_methods)*
@@ -79,7 +77,6 @@ pub fn contract_implementation(
 		}
 	};
 
-	
 	let abi = quote! {
 		// impl <T, BigInt, BigUint> elrond_wasm::api::ContractWithAbi for #trait_name_ident<T, BigInt, BigUint>
 		// #api_where
@@ -129,9 +126,10 @@ pub fn contract_implementation(
 
 	let contract_object_def = snippets::contract_object_def();
 	let impl_contract_base = snippets::impl_contract_base();
-	let impl_auto_impl = snippets::impl_auto_impl();
+	let impl_all_auto_impl = supertrait_gen::impl_all_auto_impl(contract.supertraits.as_slice());
 	let impl_private_api = snippets::impl_private_api();
-	let impl_endpoint_wrappers = snippets::impl_endpoint_wrappers();
+	let impl_all_endpoint_wrappers =
+		supertrait_gen::impl_all_endpoint_wrappers(contract.supertraits.as_slice());
 	let impl_callable_contract = snippets::impl_callable_contract();
 
 	let contract_only_code = quote! {
@@ -139,11 +137,11 @@ pub fn contract_implementation(
 
 		#impl_contract_base
 
-		#impl_auto_impl
+		#(#impl_all_auto_impl)*
 
 		#impl_private_api
 
-		#impl_endpoint_wrappers
+		#(#impl_all_endpoint_wrappers)*
 
 		#impl_callable_contract
 
