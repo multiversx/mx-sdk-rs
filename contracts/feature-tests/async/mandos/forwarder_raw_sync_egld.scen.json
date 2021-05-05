@@ -10,13 +10,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:vault": {
+                "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:forwarder": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -29,11 +29,11 @@
             "txId": "call_execute_on_dest_context",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:forwarder",
+                "to": "sc:forwarder",
                 "value": "1000",
                 "function": "call_execute_on_dest_context",
                 "arguments": [
-                    "address:vault",
+                    "sc:vault",
                     "str:accept_funds"
                 ],
                 "gasLimit": "1,000,000",
@@ -44,7 +44,7 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "address:vault",
+                        "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
@@ -53,7 +53,7 @@
                         "data": ""
                     },
                     {
-                        "address": "address:forwarder",
+                        "address": "sc:forwarder",
                         "identifier": "str:execute_on_dest_context_result",
                         "topics": [],
                         "data": {}
@@ -68,11 +68,11 @@
             "txId": "call_execute_on_dest_context_twice",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:forwarder",
+                "to": "sc:forwarder",
                 "value": "1000",
                 "function": "call_execute_on_dest_context_twice",
                 "arguments": [
-                    "address:vault",
+                    "sc:vault",
                     "str:accept_funds"
                 ],
                 "gasLimit": "1,000,000",
@@ -83,7 +83,7 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "address:vault",
+                        "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
@@ -92,13 +92,13 @@
                         "data": ""
                     },
                     {
-                        "address": "address:forwarder",
+                        "address": "sc:forwarder",
                         "identifier": "str:execute_on_dest_context_result",
                         "topics": [],
                         "data": {}
                     },
                     {
-                        "address": "address:vault",
+                        "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
@@ -107,7 +107,7 @@
                         "data": ""
                     },
                     {
-                        "address": "address:forwarder",
+                        "address": "sc:forwarder",
                         "identifier": "str:execute_on_dest_context_result",
                         "topics": [],
                         "data": {}
