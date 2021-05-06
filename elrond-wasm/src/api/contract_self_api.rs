@@ -1,6 +1,6 @@
 use super::{
 	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
-	EndpointFinishApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi,
+	EndpointFinishApi, ErrorApi, LogApi, SendApi, StorageReadApi, StorageWriteApi,
 };
 use crate::{
 	storage,
@@ -31,6 +31,8 @@ pub trait ContractBase: Sized {
 
 	type CryptoApi: CryptoApi + Clone + 'static;
 
+	type LogApi: LogApi + ErrorApi + Clone + 'static;
+
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
 	/// Using it directly is not recommended.
@@ -49,6 +51,12 @@ pub trait ContractBase: Sized {
 
 	/// Stateless crypto functions provided by the Arwen VM.
 	fn crypto(&self) -> Self::CryptoApi;
+
+	/// Gateway into the lower-level event log functionality.
+	/// Gets called in auto-generated
+	/// Using it directly is not recommended.
+	/// TODO: consider moving to `ContractPrivateApi`.
+	fn log_api_raw(&self) -> Self::LogApi;
 
 	/// Retrieves validator rewards, as set by the protocol.
 	/// TODO: move to the storage API, once BigUint gets refactored

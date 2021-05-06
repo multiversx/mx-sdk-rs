@@ -440,6 +440,7 @@ mod sample_adder {
 		type SendApi = A::SendApi;
 		type BlockchainApi = A::BlockchainApi;
 		type CryptoApi = A::CryptoApi;
+		type LogApi = A::LogApi;
 
 		#[inline]
 		fn get_storage_raw(&self) -> Self::Storage {

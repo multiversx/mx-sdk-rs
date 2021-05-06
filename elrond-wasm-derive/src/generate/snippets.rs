@@ -113,6 +113,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 			type SendApi = A::SendApi;
 			type BlockchainApi = A::BlockchainApi;
 			type CryptoApi = A::CryptoApi;
+			type LogApi = A::LogApi;
 
 			#[inline]
 			fn get_storage_raw(&self) -> Self::Storage {
@@ -133,6 +134,10 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 			#[inline]
 			fn crypto(&self) -> Self::CryptoApi {
 				self.api.crypto()
+			}
+			#[inline]
+			fn log_api_raw(&self) -> Self::LogApi {
+				self.api.log_api_raw()
 			}
 		}
 	}

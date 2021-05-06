@@ -10,6 +10,7 @@ impl ContractBase for ArwenApiImpl {
 	type SendApi = Self;
 	type BlockchainApi = Self;
 	type CryptoApi = Self;
+	type LogApi = Self;
 
 	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
@@ -33,6 +34,11 @@ impl ContractBase for ArwenApiImpl {
 
 	#[inline]
 	fn crypto(&self) -> Self::CryptoApi {
+		self.clone()
+	}
+
+	#[inline]
+	fn log_api_raw(&self) -> Self::LogApi {
 		self.clone()
 	}
 }
