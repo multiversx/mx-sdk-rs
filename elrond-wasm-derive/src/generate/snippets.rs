@@ -1,6 +1,7 @@
 pub fn where_self_big_int() -> proc_macro2::TokenStream {
 	quote! {
 		where
+			Self::BigUint: elrond_wasm::api::BigUintApi,
 			for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 			for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
 			for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
@@ -19,6 +20,7 @@ pub fn where_self_big_int() -> proc_macro2::TokenStream {
 			for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
 			for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
 			for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
+			Self::BigInt: elrond_wasm::api::BigIntApi,
 			for<'a, 'b> &'a Self::BigInt: core::ops::Add<&'b Self::BigInt, Output = Self::BigInt>,
 			for<'a, 'b> &'a Self::BigInt: core::ops::Sub<&'b Self::BigInt, Output = Self::BigInt>,
 			for<'a, 'b> &'a Self::BigInt: core::ops::Mul<&'b Self::BigInt, Output = Self::BigInt>,
@@ -35,6 +37,7 @@ pub fn where_self_big_int() -> proc_macro2::TokenStream {
 pub fn where_api_big_int() -> proc_macro2::TokenStream {
 	quote! {
 		where
+			A::BigUint: elrond_wasm::api::BigUintApi,
 			for<'a, 'b> &'a A::BigUint: core::ops::Add<&'b A::BigUint, Output = A::BigUint>,
 			for<'a, 'b> &'a A::BigUint: core::ops::Sub<&'b A::BigUint, Output = A::BigUint>,
 			for<'a, 'b> &'a A::BigUint: core::ops::Mul<&'b A::BigUint, Output = A::BigUint>,
@@ -53,6 +56,7 @@ pub fn where_api_big_int() -> proc_macro2::TokenStream {
 			for<'b> A::BigUint: core::ops::BitXorAssign<&'b A::BigUint>,
 			for<'a> &'a A::BigUint: core::ops::Shr<usize, Output = A::BigUint>,
 			for<'a> &'a A::BigUint: core::ops::Shl<usize, Output = A::BigUint>,
+			A::BigInt: elrond_wasm::api::BigIntApi,
 			for<'a, 'b> &'a A::BigInt: core::ops::Add<&'b A::BigInt, Output = A::BigInt>,
 			for<'a, 'b> &'a A::BigInt: core::ops::Sub<&'b A::BigInt, Output = A::BigInt>,
 			for<'a, 'b> &'a A::BigInt: core::ops::Mul<&'b A::BigInt, Output = A::BigInt>,

@@ -154,9 +154,9 @@ mod module_1 {
 	pub struct AbiProvider {}
 
 	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-		type Storage = elrond_wasm::api::StorageAbiOnly;
-		type BigUint = elrond_wasm::api::BigUintAbiOnly;
-		type BigInt = elrond_wasm::api::BigIntAbiOnly;
+		type Storage = elrond_wasm::api::uncallable::StorageApiUncallable;
+		type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
+		type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
 
 		fn abi() -> elrond_wasm::abi::ContractAbi {
 			let mut contract_abi = elrond_wasm :: abi :: ContractAbi { docs : & [ "One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment." ] , name : "Adder" , constructor : None , endpoints : Vec :: new ( ) , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new ( ) , } ;
@@ -197,6 +197,7 @@ mod sample_adder {
 	pub trait Adder:
 		super::module_1::VersionModule + elrond_wasm::api::ContractBase + Sized
 	where
+		Self::BigInt: elrond_wasm::api::BigIntApi,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
@@ -229,16 +230,16 @@ mod sample_adder {
 		fn init(&self, initial_value: &Self::BigInt) {
 			self.set_sum(initial_value);
 		}
-		fn add(&self, value: &Self::BigInt) -> SCResult<()> {
+		fn add(&self, value: Self::BigInt) -> SCResult<()> {
 			let mut sum = self.get_sum();
-			sum += value;
+			sum.add_assign(value);
 			self.set_sum(&sum);
 			Ok(())
 		}
 		fn get_sum(&self) -> Self::BigInt;
 		fn set_sum(&self, sum: &Self::BigInt);
 		fn add_version(&self) -> SCResult<()> {
-			self.add(&self.version())
+			self.add(self.version())
 		}
 		fn callback(&self);
 		// fn callbacks(&self) -> callback_proxy::CallbackProxies<T, BigInt, BigUint>;
@@ -353,7 +354,7 @@ mod sample_adder {
 				0i32,
 				ArgId::from(&b"value"[..]),
 			);
-			let result = self.add(&value);
+			let result = self.add(value);
 			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
 		}
 
@@ -461,6 +462,10 @@ mod sample_adder {
 		#[inline]
 		fn crypto(&self) -> Self::CryptoApi {
 			self.api.crypto()
+		}
+		#[inline]
+		fn log_api_raw(&self) -> Self::LogApi {
+			self.api.log_api_raw()
 		}
 	}
 
@@ -634,9 +639,9 @@ mod sample_adder {
 	pub struct AbiProvider {}
 
 	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-		type Storage = elrond_wasm::api::StorageAbiOnly;
-		type BigUint = elrond_wasm::api::BigUintAbiOnly;
-		type BigInt = elrond_wasm::api::BigIntAbiOnly;
+		type Storage = elrond_wasm::api::uncallable::StorageApiUncallable;
+		type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
+		type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
 
 		fn abi() -> elrond_wasm::abi::ContractAbi {
 			let mut contract_abi = elrond_wasm :: abi :: ContractAbi { docs : & [ "One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment." ] , name : "Adder" , constructor : None , endpoints : Vec :: new ( ) , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new ( ) , } ;
@@ -797,10 +802,10 @@ fn test_add() {
 	adder.init(&RustBigInt::from(5));
 	assert_eq!(RustBigInt::from(5), adder.get_sum());
 
-	let _ = adder.add(&RustBigInt::from(7));
+	let _ = adder.add(RustBigInt::from(7));
 	assert_eq!(RustBigInt::from(12), adder.get_sum());
 
-	let _ = adder.add(&RustBigInt::from(-1));
+	let _ = adder.add(RustBigInt::from(-1));
 	assert_eq!(RustBigInt::from(11), adder.get_sum());
 
 	assert_eq!(RustBigInt::from(100), adder.version());
