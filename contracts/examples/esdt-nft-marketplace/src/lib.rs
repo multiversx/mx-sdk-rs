@@ -37,7 +37,7 @@ pub trait EsdtNftMarketplace {
 	#[endpoint(setCutPercentage)]
 	fn set_percentage_cut(&self, new_cut_percentage: u64) -> SCResult<()> {
 		only_owner!(self, "Only owner may call this function!");
-		sc_try!(self.try_set_bid_cut_percentage(new_cut_percentage))
+		self.try_set_bid_cut_percentage(new_cut_percentage)
 	}
 
 	// endpoints
