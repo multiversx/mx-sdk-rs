@@ -18,7 +18,6 @@ pub fn contract_implementation(
 	let auto_impls = generate_auto_impls(&contract);
 	let endpoints = generate_wasm_endpoints(&contract);
 	let function_selector_body = generate_function_selector_body(&contract);
-	let abi_body = abi_gen::generate_abi_method_body(&contract);
 	let callback_body = generate_callback_body(&contract.methods);
 	let callback_proxies = generate_callback_proxies(&contract.methods);
 	let where_self_big_int = snippets::where_self_big_int();
@@ -77,16 +76,19 @@ pub fn contract_implementation(
 		}
 	};
 
+	let abi_body = abi_gen::generate_abi_method_body(&contract, is_contract_main);
 	let abi = quote! {
-		// impl <T, BigInt, BigUint> elrond_wasm::api::ContractWithAbi for #trait_name_ident<T, BigInt, BigUint>
-		// #api_where
-		// {
-		// 	type Storage = T::Storage;
+		pub struct AbiProvider {}
 
-		// 	fn abi(&self, include_modules: bool) -> elrond_wasm::abi::ContractAbi{
-		// 		#abi_body
-		// 	}
-		// }
+		impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
+			type Storage = elrond_wasm::api::StorageAbiOnly;
+			type BigUint = elrond_wasm::api::BigUintAbiOnly;
+			type BigInt = elrond_wasm::api::BigIntAbiOnly;
+
+			fn abi() -> elrond_wasm::abi::ContractAbi {
+				#abi_body
+			}
+		}
 	};
 
 	let callback_proxy = quote! {

@@ -13,7 +13,6 @@ pub fn process_contract(
 	validate_contract(&contract);
 
 	let contract_impl = contract_implementation(&contract, true);
-	let trait_name_ident = contract.trait_name.clone();
 
 	proc_macro::TokenStream::from(quote! {
 		#[macro_use]

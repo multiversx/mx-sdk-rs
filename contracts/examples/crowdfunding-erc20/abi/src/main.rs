@@ -1,6 +1,3 @@
-use elrond_wasm_debug::*;
-
 fn main() {
-	let contract = crowdfunding_erc20::contract_obj(TxContext::dummy());
-	print!("{}", abi_json::contract_abi(&contract));
+	elrond_wasm_debug::abi_json::print_abi::<crowdfunding_erc20::AbiProvider>();
 }

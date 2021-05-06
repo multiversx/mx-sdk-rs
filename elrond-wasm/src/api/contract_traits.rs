@@ -8,7 +8,7 @@ pub trait ContractImpl {
 	fn new_contract_impl(api: Self::Api) -> Self;
 }
 
-pub fn new_contract_impl<A, C: ContractImpl<Api=A>>(api: A) -> C {
+pub fn new_contract_impl<A, C: ContractImpl<Api = A>>(api: A) -> C {
 	C::new_contract_impl(api)
 }
 
