@@ -17,7 +17,7 @@ pub fn contract_implementation(
 	let auto_impl_defs = generate_auto_impl_defs(&contract);
 	let auto_impls = generate_auto_impls(&contract);
 	let endpoints = generate_wasm_endpoints(&contract);
-	let function_selector_body = generate_function_selector_body(&contract, is_contract_main);
+	let function_selector_body = generate_function_selector_body(&contract);
 	let abi_body = abi_gen::generate_abi_method_body(&contract);
 	let callback_body = generate_callback_body(&contract.methods);
 	let callback_proxies = generate_callback_proxies(&contract.methods);
@@ -65,7 +65,7 @@ pub fn contract_implementation(
 		supertrait_gen::endpoint_wrapper_supertrait_decl(contract.supertraits.as_slice());
 	let endpoint_wrappers = quote! {
 		pub trait EndpointWrappers:
-			elrond_wasm::api::ContractPrivateApi 
+			elrond_wasm::api::ContractPrivateApi
 			+ #trait_name_ident #(#endpoint_wrapper_supertrait_decl)*
 		#where_self_big_int
 		{
@@ -93,24 +93,7 @@ pub fn contract_implementation(
 		// #callback_proxies
 	};
 
-	let new_contract_object_fn = snippets::new_contract_object_fn();
-
-	let wasm_endpoints = quote! {
-		#[cfg(feature = "wasm-output-mode")]
-		#[allow(non_snake_case)]
-		pub mod endpoints {
-			use super::*;
-
-			fn new_arwen_instance() -> super::ContractObj {
-				let api = elrond_wasm_node::ArwenApiImpl{};
-				elrond_wasm::api::new_contract_impl(api)
-			}
-
-			#(#endpoints)*
-		}
-	};
-
-	let module_code = quote! {
+	let contract_traits_code = quote! {
 		#main_definition
 
 		#auto_impl_trait
@@ -118,8 +101,6 @@ pub fn contract_implementation(
 		#endpoint_wrappers
 
 		#callback_proxy
-
-		#wasm_endpoints
 
 		#abi
 	};
@@ -131,8 +112,10 @@ pub fn contract_implementation(
 	let impl_all_endpoint_wrappers =
 		supertrait_gen::impl_all_endpoint_wrappers(contract.supertraits.as_slice());
 	let impl_callable_contract = snippets::impl_callable_contract();
+	let new_contract_object_fn = snippets::new_contract_object_fn();
 
-	let contract_only_code = quote! {
+	let contract_obj_code = quote! {
+
 		#contract_object_def
 
 		#impl_contract_base
@@ -148,13 +131,50 @@ pub fn contract_implementation(
 		#new_contract_object_fn
 	};
 
-	if is_contract_main {
+	let wasm_callback_fn = if is_contract_main {
 		quote! {
-			#module_code
-
-			#contract_only_code
+			#[no_mangle]
+			pub fn callBack () {
+				let inst = super::endpoints::new_arwen_instance();
+				inst.callback();
+			}
 		}
 	} else {
-		module_code
+		quote! {}
+	};
+
+	let wasm_endpoints = quote! {
+		#[cfg(feature = "wasm-output-mode")]
+		#[allow(non_snake_case)]
+		mod endpoints {
+			use super::*;
+
+			fn new_arwen_instance() -> super::ContractObj<elrond_wasm_node::ArwenApiImpl> {
+				let api = elrond_wasm_node::ArwenApiImpl{};
+				super::contract_obj(api)
+			}
+
+			#(#endpoints)*
+
+			#wasm_callback_fn
+		}
+	};
+
+	quote! {
+		#contract_traits_code
+
+		#contract_obj_code
+
+		#wasm_endpoints
 	}
+
+	// if is_contract_main {
+	// 	quote! {
+	// 		#module_code
+
+	// 		#contract_only_code
+	// 	}
+	// } else {
+	// 	module_code
+	// }
 }
