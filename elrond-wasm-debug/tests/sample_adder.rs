@@ -48,6 +48,8 @@ mod module_1 {
 		for<'b> Self::BigInt: core::ops::RemAssign<&'b Self::BigInt>,
 	{
 		fn version(&self) -> Self::BigInt;
+
+		fn callback(&self);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +92,8 @@ mod module_1 {
 		fn version(&self) -> Self::BigInt {
 			Self::BigInt::from(100)
 		}
+
+		fn callback(&self) {}
 	}
 
 	pub trait EndpointWrappers: VersionModule + elrond_wasm::api::ContractPrivateApi
@@ -132,10 +136,10 @@ mod module_1 {
 
 		fn call(&self, fn_name: &[u8]) -> bool {
 			if match fn_name {
-				// b"callBack" => {
-				//     self.callback();
-				//     return true;
-				// }
+				b"callBack" => {
+					self.callback();
+					return true;
+				},
 				b"version" => {
 					self.call_version();
 					true
@@ -145,6 +149,28 @@ mod module_1 {
 				return true;
 			}
 			false
+		}
+	}
+	pub struct AbiProvider {}
+
+	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
+		type Storage = elrond_wasm::api::StorageAbiOnly;
+		type BigUint = elrond_wasm::api::BigUintAbiOnly;
+		type BigInt = elrond_wasm::api::BigIntAbiOnly;
+
+		fn abi() -> elrond_wasm::abi::ContractAbi {
+			let mut contract_abi = elrond_wasm :: abi :: ContractAbi { docs : & [ "One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment." ] , name : "Adder" , constructor : None , endpoints : Vec :: new ( ) , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new ( ) , } ;
+			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
+				docs: &[],
+				name: "version",
+				payable_in_tokens: &[],
+				inputs: Vec::new(),
+				outputs: Vec::new(),
+			};
+			endpoint_abi.add_output::<Self::BigInt>(&[]);
+			contract_abi.add_type_descriptions::<Self::BigInt>();
+			contract_abi.endpoints.push(endpoint_abi);
+			contract_abi
 		}
 	}
 
@@ -223,9 +249,11 @@ mod sample_adder {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	pub trait AutoImpl: elrond_wasm::api::ContractBase {}
 
+	// impl<C> super::module_1::AutoImpl for C where C: AutoImpl {}
+
 	impl<C> Adder for C
 	where
-		C: AutoImpl + super::module_1::VersionModule,
+		C: AutoImpl + super::module_1::AutoImpl,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
 		for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
@@ -331,10 +359,10 @@ mod sample_adder {
 
 		fn call(&self, fn_name: &[u8]) -> bool {
 			if match fn_name {
-				// b"callBack" => {
-				//     self.callback();
-				//     return true;
-				// }
+				b"callBack" => {
+					Adder::callback(self);
+					return true;
+				},
 				[103u8, 101u8, 116u8, 83u8, 117u8, 109u8] => {
 					self.call_get_sum();
 					true
@@ -602,6 +630,54 @@ mod sample_adder {
 		}
 	}
 
+	pub struct AbiProvider {}
+
+	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
+		type Storage = elrond_wasm::api::StorageAbiOnly;
+		type BigUint = elrond_wasm::api::BigUintAbiOnly;
+		type BigInt = elrond_wasm::api::BigIntAbiOnly;
+
+		fn abi() -> elrond_wasm::abi::ContractAbi {
+			let mut contract_abi = elrond_wasm :: abi :: ContractAbi { docs : & [ "One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment." ] , name : "Adder" , constructor : None , endpoints : Vec :: new ( ) , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new ( ) , } ;
+			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
+				docs: &[],
+				name: "getSum",
+				payable_in_tokens: &[],
+				inputs: Vec::new(),
+				outputs: Vec::new(),
+			};
+			endpoint_abi.add_output::<Self::BigInt>(&[]);
+			contract_abi.add_type_descriptions::<Self::BigInt>();
+			contract_abi.endpoints.push(endpoint_abi);
+			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
+				docs: &[],
+				name: "init",
+				payable_in_tokens: &[],
+				inputs: Vec::new(),
+				outputs: Vec::new(),
+			};
+			endpoint_abi.add_input::<&Self::BigInt>("initial_value");
+			contract_abi.add_type_descriptions::<&Self::BigInt>();
+			contract_abi.constructor = Some(endpoint_abi);
+			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
+				docs: &["Add desired amount to the storage variable."],
+				name: "add",
+				payable_in_tokens: &[],
+				inputs: Vec::new(),
+				outputs: Vec::new(),
+			};
+			endpoint_abi.add_input::<&Self::BigInt>("value");
+			contract_abi.add_type_descriptions::<&Self::BigInt>();
+			endpoint_abi.add_output::<SCResult<()>>(&[]);
+			contract_abi.add_type_descriptions::<SCResult<()>>();
+			contract_abi.endpoints.push(endpoint_abi);
+			contract_abi.coalesce(
+				<super::module_1::AbiProvider as elrond_wasm::api::ContractAbiProvider>::abi(),
+			);
+			contract_abi
+		}
+	}
+
 	pub fn contract_obj<A>(api: A) -> ContractObj<A>
 	where
 		A: elrond_wasm::api::ContractBase
@@ -737,6 +813,8 @@ fn test_add() {
 
 	let own_proxy = sample_adder::ProxyObj::new_proxy_obj(adder.send().clone(), Address::zero());
 	let _ = own_proxy.get_sum();
+
+	let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
 fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::TxContext> {
