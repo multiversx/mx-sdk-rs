@@ -17,7 +17,7 @@ pub trait CryptoBubbles {
 	/// player adds funds
 	#[payable("EGLD")]
 	#[endpoint(topUp)]
-	fn top_up(&self, #[payment] payment: BigUint) {
+	fn top_up(&self, #[payment] payment: Self::BigUint) {
 		let caller = self.blockchain().get_caller();
 
 		let mut balance = self.get_player_balance(&caller);
@@ -29,12 +29,16 @@ pub trait CryptoBubbles {
 
 	/// player withdraws funds
 	#[endpoint]
-	fn withdraw(&self, amount: &BigUint) -> SCResult<()> {
+	fn withdraw(&self, amount: &Self::BigUint) -> SCResult<()> {
 		self._transfer_back_to_player_wallet(&self.blockchain().get_caller(), amount)
 	}
 
 	/// server calls withdraw on behalf of the player
-	fn _transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
+	fn _transfer_back_to_player_wallet(
+		&self,
+		player: &Address,
+		amount: &Self::BigUint,
+	) -> SCResult<()> {
 		let mut balance = self.get_player_balance(player);
 
 		require!(
@@ -55,9 +59,9 @@ pub trait CryptoBubbles {
 	/// player joins game
 	fn _add_player_to_game_state_change(
 		&self,
-		game_index: &BigUint,
+		game_index: &Self::BigUint,
 		player: &Address,
-		bet: &BigUint,
+		bet: &Self::BigUint,
 	) -> SCResult<()> {
 		let mut balance = self.get_player_balance(player);
 
@@ -74,7 +78,7 @@ pub trait CryptoBubbles {
 	// player tops up + joins a game
 	#[payable("EGLD")]
 	#[endpoint(joinGame)]
-	fn join_game(&self, game_index: BigUint, #[payment] bet: BigUint) -> SCResult<()> {
+	fn join_game(&self, game_index: Self::BigUint, #[payment] bet: Self::BigUint) -> SCResult<()> {
 		let player = self.blockchain().get_caller();
 		self.top_up(self.call_value().egld_value());
 		self._add_player_to_game_state_change(&game_index, &player, &bet)
@@ -84,9 +88,9 @@ pub trait CryptoBubbles {
 	#[endpoint(rewardWinner)]
 	fn reward_winner(
 		&self,
-		game_index: &BigUint,
+		game_index: &Self::BigUint,
 		winner: &Address,
-		prize: &BigUint,
+		prize: &Self::BigUint,
 	) -> SCResult<()> {
 		let caller = self.blockchain().get_caller();
 		let owner: Address = self.get_owner();
@@ -108,9 +112,9 @@ pub trait CryptoBubbles {
 	#[endpoint(rewardAndSendToWallet)]
 	fn reward_and_send_to_wallet(
 		&self,
-		game_index: &BigUint,
+		game_index: &Self::BigUint,
 		winner: &Address,
-		prize: &BigUint,
+		prize: &Self::BigUint,
 	) -> SCResult<()> {
 		sc_try!(self.reward_winner(game_index, winner, prize));
 		sc_try!(self._transfer_back_to_player_wallet(winner, prize));
@@ -121,10 +125,10 @@ pub trait CryptoBubbles {
 
 	#[view(balanceOf)]
 	#[storage_get("playerBalance")]
-	fn get_player_balance(&self, player: &Address) -> BigUint;
+	fn get_player_balance(&self, player: &Address) -> Self::BigUint;
 
 	#[storage_set("playerBalance")]
-	fn set_player_balance(&self, player: &Address, balance: &BigUint);
+	fn set_player_balance(&self, player: &Address, balance: &Self::BigUint);
 
 	#[storage_get("owner")]
 	fn get_owner(&self) -> Address;
@@ -135,14 +139,24 @@ pub trait CryptoBubbles {
 	// Events
 
 	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000001")]
-	fn top_up_event(&self, player: &Address, amount: &BigUint);
+	fn top_up_event(&self, player: &Address, amount: &Self::BigUint);
 
 	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000002")]
-	fn withdraw_event(&self, player: &Address, amount: &BigUint);
+	fn withdraw_event(&self, player: &Address, amount: &Self::BigUint);
 
 	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000003")]
-	fn player_joins_game_event(&self, game_index: &BigUint, player: &Address, bet: &BigUint);
+	fn player_joins_game_event(
+		&self,
+		game_index: &Self::BigUint,
+		player: &Address,
+		bet: &Self::BigUint,
+	);
 
 	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000004")]
-	fn reward_winner_event(&self, game_index: &BigUint, winner: &Address, prize: &BigUint);
+	fn reward_winner_event(
+		&self,
+		game_index: &Self::BigUint,
+		winner: &Address,
+		prize: &Self::BigUint,
+	);
 }
