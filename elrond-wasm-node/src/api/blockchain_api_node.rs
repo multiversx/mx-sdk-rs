@@ -63,7 +63,7 @@ extern "C" {
 		nameOffset: *const u8,
 		attributesOffset: *const u8,
 		creatorOffset: *const u8,
-		royaltiesOffset: i32,
+		royaltiesOffset: *const u8,
 		urisOffset: *const u8,
 	) -> i32;
 
@@ -273,7 +273,9 @@ impl BlockchainApi<ArwenBigUint> for ArwenApiImpl {
 			let mut uris_buffer = BoxedBytes::allocate(uris_len);
 
 			let mut creator = Address::zero();
-			let royalties = bigIntNew(0);
+
+			// u64
+			let mut royalties = BoxedBytes::allocate(8);
 
 			getESDTTokenData(
 				address.as_ref().as_ptr(),
@@ -286,7 +288,7 @@ impl BlockchainApi<ArwenBigUint> for ArwenApiImpl {
 				name_buffer.as_mut_ptr(),
 				attr_buffer.as_mut_ptr(),
 				creator.as_mut_ptr(),
-				royalties,
+				royalties.as_mut_ptr(),
 				uris_buffer.as_mut_ptr(),
 			);
 
@@ -305,6 +307,9 @@ impl BlockchainApi<ArwenBigUint> for ArwenApiImpl {
 			// Token is frozen is properties is not 0
 			let frozen = properties[0] == 0 && properties[1] == 0;
 
+			let mut royalties_as_array = [0u8; 8];
+			royalties_as_array.copy_from_slice(royalties.as_slice());
+
 			EsdtTokenData {
 				token_type,
 				amount: ArwenBigUint { handle: value },
@@ -313,7 +318,7 @@ impl BlockchainApi<ArwenBigUint> for ArwenApiImpl {
 				name: name_buffer,
 				attributes: attr_buffer,
 				creator,
-				royalties: ArwenBigUint { handle: royalties },
+				royalties: u64::from_le_bytes(royalties_as_array),
 				uris: [uris_buffer].to_vec(),
 			}
 		}

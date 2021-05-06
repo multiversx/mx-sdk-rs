@@ -12,7 +12,7 @@ pub struct EsdtTokenData<BigUint: BigUintApi> {
 	pub name: BoxedBytes,
 	pub attributes: BoxedBytes,
 	pub creator: Address,
-	pub royalties: BigUint,
+	pub royalties: u64,
 	pub uris: Vec<BoxedBytes>,
 }
 
@@ -85,7 +85,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 		let name = BoxedBytes::dep_decode(input)?;
 		let attributes = BoxedBytes::dep_decode(input)?;
 		let creator = Address::dep_decode(input)?;
-		let royalties = BigUint::dep_decode(input)?;
+		let royalties = u64::dep_decode(input)?;
 		let uris = Vec::<BoxedBytes>::dep_decode(input)?;
 
 		Ok(Self {
@@ -113,7 +113,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 		let name = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
 		let attributes = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
 		let creator = Address::dep_decode_or_exit(input, c.clone(), exit);
-		let royalties = BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let royalties = u64::dep_decode_or_exit(input, c.clone(), exit);
 		let uris = Vec::<BoxedBytes>::dep_decode_or_exit(input, c.clone(), exit);
 
 		Self {

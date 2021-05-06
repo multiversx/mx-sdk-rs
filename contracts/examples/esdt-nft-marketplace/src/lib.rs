@@ -78,7 +78,8 @@ pub trait EsdtNftMarketplace {
 		);
 
 		let marketplace_cut_percentage = self.bid_cut_percentage().get();
-		let creator_royalties_percentage = self.get_nft_info(&nft_type, nft_nonce).royalties;
+		let creator_royalties_percentage =
+			BigUint::from(self.get_nft_info(&nft_type, nft_nonce).royalties);
 
 		require!(
 			&marketplace_cut_percentage + &creator_royalties_percentage < PERCENTAGE_TOTAL,
