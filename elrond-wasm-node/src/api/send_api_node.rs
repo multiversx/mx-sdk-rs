@@ -1,4 +1,4 @@
-use super::ArwenBigUint;
+use super::{ArwenBigInt, ArwenBigUint};
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
@@ -107,7 +107,13 @@ extern "C" {
 	fn getReturnData(result_index: i32, dataOffset: *const u8) -> i32;
 }
 
-impl SendApi<ArwenBigUint> for ArwenApiImpl {
+impl SendApi for ArwenApiImpl {
+	type AmountType = ArwenBigUint;
+
+	type ProxyBigUint = ArwenBigUint;
+
+	type ProxyBigInt = ArwenBigInt;
+
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);

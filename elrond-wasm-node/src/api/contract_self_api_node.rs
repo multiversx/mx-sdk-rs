@@ -1,8 +1,10 @@
 use super::{ArwenBigInt, ArwenBigUint};
 use crate::ArwenApiImpl;
-use elrond_wasm::api::ContractSelfApi;
+use elrond_wasm::api::ContractBase;
 
-impl ContractSelfApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
+impl ContractBase for ArwenApiImpl {
+	type BigUint = ArwenBigUint;
+	type BigInt = ArwenBigInt;
 	type Storage = Self;
 	type CallValue = Self;
 	type SendApi = Self;

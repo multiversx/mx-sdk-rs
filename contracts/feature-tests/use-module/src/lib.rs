@@ -1,8 +1,8 @@
 #![no_std]
 
-pub mod internal_mod_a;
-pub mod internal_mod_b;
-pub mod internal_mod_c;
+mod internal_mod_a;
+mod internal_mod_b;
+mod internal_mod_c;
 
 elrond_wasm::imports!();
 

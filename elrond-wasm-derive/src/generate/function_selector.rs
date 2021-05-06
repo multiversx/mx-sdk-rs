@@ -15,10 +15,7 @@ fn function_selector_match_arm(m: &Method, endpoint_name: &str) -> proc_macro2::
 	}
 }
 
-pub fn generate_function_selector_body(
-	contract: &ContractTrait,
-	_include_submodules: bool,
-) -> proc_macro2::TokenStream {
+pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let match_arms: Vec<proc_macro2::TokenStream> = contract
 		.methods
 		.iter()
