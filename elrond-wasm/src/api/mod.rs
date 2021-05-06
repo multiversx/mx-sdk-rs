@@ -12,6 +12,7 @@ mod error_api;
 mod log_api;
 mod send_api;
 mod storage_api;
+pub mod uncallable;
 
 pub use big_int_api::*;
 pub use big_uint_api::*;

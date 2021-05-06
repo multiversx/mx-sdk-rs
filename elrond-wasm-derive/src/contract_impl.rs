@@ -81,9 +81,9 @@ pub fn contract_implementation(
 		pub struct AbiProvider {}
 
 		impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-			type Storage = elrond_wasm::api::StorageAbiOnly;
-			type BigUint = elrond_wasm::api::BigUintAbiOnly;
-			type BigInt = elrond_wasm::api::BigIntAbiOnly;
+			type Storage = elrond_wasm::api::uncallable::StorageApiUncallable;
+			type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
+			type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
 
 			fn abi() -> elrond_wasm::abi::ContractAbi {
 				#abi_body
