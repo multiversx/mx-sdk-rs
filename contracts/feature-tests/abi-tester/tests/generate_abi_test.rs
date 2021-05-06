@@ -10,8 +10,7 @@ fn test_abi_generated_ok() {
 	let expected_abi_json = fs::read_to_string("./abi_test_expected.abi.json").unwrap();
 
 	// generate ABI
-	let contract = abi_tester::contract_obj(TxContext::dummy());
-	let contract_abi_json = abi_json::contract_abi(&contract);
+	let contract_abi_json = abi_json::contract_abi::<abi_tester::AbiProvider>();
 
 	// save generated ABI to disk for easier comparison in case something is off
 	let mut file = File::create("abi_test_generated.abi.json").unwrap();
