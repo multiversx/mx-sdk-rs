@@ -18,6 +18,7 @@ macro_rules! imports {
 		use elrond_wasm::api::{
 			BigIntApi, BigUintApi, BlockchainApi, CallValueApi, ContractBase, CryptoApi, SendApi,
 		};
+		use elrond_wasm::api::{LogApi, ErrorApi}; // TODO: remove at some point, they shouldn't be public
 		use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
 		use elrond_wasm::err_msg;
 		use elrond_wasm::esdt::*;

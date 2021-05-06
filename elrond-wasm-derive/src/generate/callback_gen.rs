@@ -143,7 +143,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 							if arg.metadata.callback_call_result {
 								quote! {}
 							} else {
-								arg_serialize_push(arg, &arg_accumulator)
+								arg_serialize_push(arg, &arg_accumulator, &quote!{ self.api.clone() })
 							}
 						} else {
 							quote! {}
@@ -170,7 +170,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 		pub struct CallbackProxies<A, BigInt, BigUint>
 		where
 			BigUint: elrond_wasm::api::BigUintApi + 'static,
-			BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+			BigInt: elrond_wasm::api::BigIntApi + 'static,
 			A: elrond_wasm::api::ErrorApi + Clone + 'static,
 		{
 			pub api: A,
@@ -181,7 +181,7 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 		impl<A, BigInt, BigUint> CallbackProxies<A, BigInt, BigUint>
 		where
 			BigUint: elrond_wasm::api::BigUintApi + 'static,
-			BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+			BigInt: elrond_wasm::api::BigIntApi + 'static,
 			A: elrond_wasm::api::ErrorApi + Clone + 'static,
 		{
 			pub fn new(api: A) -> Self {

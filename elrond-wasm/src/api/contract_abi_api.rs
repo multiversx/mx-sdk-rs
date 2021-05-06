@@ -25,6 +25,7 @@ pub trait ContractAbiProvider {
 
 /// Dummy type with no implementation.
 /// Provides context in ABI generators.
+#[derive(Clone)]
 pub struct StorageAbiOnly;
 
 /// Dummy type with no implementation, just the ABI.

@@ -46,7 +46,7 @@ pub fn generate_method_impl(callable_trait: &CallableTrait) -> Vec<proc_macro2::
 					let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
 
 					match &arg.metadata.payment {
-						ArgPaymentMetadata::NotPayment => arg_serialize_push(arg, &arg_accumulator),
+						ArgPaymentMetadata::NotPayment => arg_serialize_push(arg, &arg_accumulator, &quote!{ self.api.clone() }),
 						ArgPaymentMetadata::Payment => {
 							payment_count += 1;
 							let pat = &arg.pat;

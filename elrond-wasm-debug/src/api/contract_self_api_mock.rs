@@ -10,29 +10,29 @@ impl elrond_wasm::api::ContractBase for TxContext {
 	type SendApi = Self;
 	type BlockchainApi = Self;
 	type CryptoApi = Self;
+	type LogApi = Self;
 
-	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
 		self.clone()
 	}
 
-	#[inline]
 	fn call_value(&self) -> Self::CallValue {
 		self.clone()
 	}
 
-	#[inline]
 	fn send(&self) -> Self::SendApi {
 		self.clone()
 	}
 
-	#[inline]
 	fn blockchain(&self) -> Self::BlockchainApi {
 		self.clone()
 	}
 
-	#[inline]
 	fn crypto(&self) -> Self::CryptoApi {
+		self.clone()
+	}
+
+	fn log_api_raw(&self) -> Self::LogApi {
 		self.clone()
 	}
 }
