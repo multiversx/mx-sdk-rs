@@ -82,16 +82,20 @@ pub trait AbiTester {
 		(address, h256).into()
 	}
 
+	#[view]
+	#[storage_mapper("sample_storage_mapper")]
+	fn sample_storage_mapper(&self) -> SingleValueMapper<Self::Storage, OnlyShowsUpAsNested10>;
+
 	#[endpoint]
 	#[payable("EGLD")]
-	fn payable_egld(&self, #[payment] _payment: BigUint, #[payment_token] _token: TokenIdentifier) {
+	fn payable_egld(&self, #[payment] _payment: Self::BigUint, #[payment_token] _token: TokenIdentifier) {
 	}
 
 	#[endpoint]
 	#[payable("TOKEN-FOR-ABI")]
 	fn payable_some_token(
 		&self,
-		#[payment] _payment: BigUint,
+		#[payment] _payment: Self::BigUint,
 		#[payment_token] _token: TokenIdentifier,
 	) {
 	}
@@ -100,7 +104,7 @@ pub trait AbiTester {
 	#[payable("*")]
 	fn payable_any_token(
 		&self,
-		#[payment] _payment: BigUint,
+		#[payment] _payment: Self::BigUint,
 		#[payment_token] _token: TokenIdentifier,
 	) {
 	}

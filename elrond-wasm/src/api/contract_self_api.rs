@@ -22,12 +22,17 @@ pub trait ContractBase: Sized {
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
 	/// Abstracts the call value handling at the beginning of a function call.
-	type CallValue: CallValueApi + ErrorApi + Clone + 'static;
+	type CallValue: CallValueApi<AmountType = Self::BigUint> + ErrorApi + Clone + 'static;
 
 	/// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
-	type SendApi: SendApi + Clone + 'static;
+	type SendApi: SendApi<
+			AmountType = Self::BigUint,
+			ProxyBigUint = Self::BigUint,
+			ProxyBigInt = Self::BigInt,
+		> + Clone
+		+ 'static;
 
-	type BlockchainApi: BlockchainApi + Clone + 'static;
+	type BlockchainApi: BlockchainApi<BalanceType = Self::BigUint> + Clone + 'static;
 
 	type CryptoApi: CryptoApi + Clone + 'static;
 

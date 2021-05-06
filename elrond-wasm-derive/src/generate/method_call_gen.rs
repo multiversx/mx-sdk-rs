@@ -94,7 +94,7 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
 	quote! {
 		#payable_snippet
 
-		let mut ___arg_loader = EndpointDynArgLoader::new(self.api.clone());
+		let mut ___arg_loader = EndpointDynArgLoader::new(self.argument_api());
 
 		#(#arg_init_snippets)*
 

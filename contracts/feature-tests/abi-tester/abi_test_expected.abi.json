@@ -169,6 +169,15 @@
             ]
         },
         {
+            "name": "sample_storage_mapper",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OnlyShowsUpAsNested10"
+                }
+            ]
+        },
+        {
             "name": "payable_egld",
             "payableInTokens": [
                 "EGLD"
@@ -329,6 +338,12 @@
             ]
         },
         "OnlyShowsUpAsNested09": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested10": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
