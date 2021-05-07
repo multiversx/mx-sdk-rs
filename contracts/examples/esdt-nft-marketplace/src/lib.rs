@@ -294,13 +294,14 @@ pub trait EsdtNftMarketplace {
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> OptionalResult<EsdtToken> {
+	) -> OptionalResult<MultiResult2<TokenIdentifier, u64>> {
 		if self.is_already_up_for_auction(nft_type, nft_nonce) {
-			OptionalResult::Some(
-				self.auction_for_token(nft_type, nft_nonce)
-					.get()
-					.payment_token,
-			)
+			let esdt_token = self
+				.auction_for_token(nft_type, nft_nonce)
+				.get()
+				.payment_token;
+
+			OptionalResult::Some((esdt_token.token_type, esdt_token.nonce).into())
 		} else {
 			OptionalResult::None
 		}
@@ -311,11 +312,11 @@ pub trait EsdtNftMarketplace {
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> OptionalResult<(BigUint, BigUint)> {
+	) -> OptionalResult<MultiResult2<BigUint, BigUint>> {
 		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			let auction = self.auction_for_token(nft_type, nft_nonce).get();
 
-			OptionalResult::Some((auction.min_bid, auction.max_bid))
+			OptionalResult::Some((auction.min_bid, auction.max_bid).into())
 		} else {
 			OptionalResult::None
 		}
