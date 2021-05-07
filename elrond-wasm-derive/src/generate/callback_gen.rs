@@ -1,13 +1,12 @@
 use super::{
 	arg_regular::*,
-	arg_str_serialize::arg_serialize_push,
 	method_call_gen::{
 		generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
 	},
 	payable_gen::*,
 	util::*,
 };
-use crate::model::{ArgPaymentMetadata, Method, MethodArgument, PublicRole};
+use crate::model::{ArgPaymentMetadata, Method, PublicRole};
 
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 	let raw_decl = find_raw_callback(methods);
@@ -100,103 +99,6 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 				#(#match_arms)*
 				other => self.error_api().signal_error(err_msg::CALLBACK_BAD_FUNC)
 			}
-		}
-	}
-}
-
-/// Excludes the `#[call_result]`.
-pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::TokenStream> {
-	method_args
-		.iter()
-		.filter_map(|arg| {
-			if matches!(
-				arg.metadata.payment,
-				ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
-			) || arg.metadata.callback_call_result
-			{
-				None
-			} else {
-				let pat = &arg.pat;
-				let ty = &arg.ty;
-				Some(quote! {#pat : #ty })
-			}
-		})
-		.collect()
-}
-
-pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream {
-	let proxy_methods: Vec<proc_macro2::TokenStream> = methods
-		.iter()
-		.filter_map(|m| {
-			if matches!(m.public_role, PublicRole::Callback) {
-				let method_name = &m.name;
-				let arg_decl = cb_proxy_arg_declarations(&m.method_args);
-				let cb_name_literal = ident_str_literal(&method_name);
-
-				let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
-					.method_args
-					.iter()
-					.map(|arg| {
-						let arg_accumulator = quote! { &mut ___closure_arg_buffer___ };
-
-						if let ArgPaymentMetadata::NotPayment = arg.metadata.payment {
-							if arg.metadata.callback_call_result {
-								quote! {}
-							} else {
-								arg_serialize_push(
-									arg,
-									&arg_accumulator,
-									&quote! { self.api.clone() },
-								)
-							}
-						} else {
-							quote! {}
-						}
-					})
-					.collect();
-				let proxy_decl = quote! {
-					pub fn #method_name ( &self , #(#arg_decl),* ) -> elrond_wasm::types::CallbackCall{
-						let mut ___closure_arg_buffer___ = elrond_wasm::types::ArgBuffer::new();
-						#(#arg_push_snippets)*
-						elrond_wasm::types::CallbackCall::from_arg_buffer(#cb_name_literal, &___closure_arg_buffer___)
-					}
-
-				};
-
-				Some(proxy_decl)
-			} else {
-				None
-			}
-		})
-		.collect();
-
-	quote! {
-		pub struct CallbackProxies<A, BigInt, BigUint>
-		where
-			BigUint: elrond_wasm::api::BigUintApi + 'static,
-			BigInt: elrond_wasm::api::BigIntApi + 'static,
-			A: elrond_wasm::api::ErrorApi + Clone + 'static,
-		{
-			pub api: A,
-			_phantom1: core::marker::PhantomData<BigInt>,
-			_phantom2: core::marker::PhantomData<BigUint>,
-		}
-
-		impl<A, BigInt, BigUint> CallbackProxies<A, BigInt, BigUint>
-		where
-			BigUint: elrond_wasm::api::BigUintApi + 'static,
-			BigInt: elrond_wasm::api::BigIntApi + 'static,
-			A: elrond_wasm::api::ErrorApi + Clone + 'static,
-		{
-			pub fn new(api: A) -> Self {
-				CallbackProxies {
-					api,
-					_phantom1: core::marker::PhantomData,
-					_phantom2: core::marker::PhantomData,
-				}
-			}
-
-			#(#proxy_methods)*
 		}
 	}
 }
