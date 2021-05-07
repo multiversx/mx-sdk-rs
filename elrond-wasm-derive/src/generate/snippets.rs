@@ -179,29 +179,34 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
 }
 pub fn impl_private_api() -> proc_macro2::TokenStream {
 	quote! {
-	impl<A> elrond_wasm::api::ContractPrivateApi for ContractObj<A>
-	where
-		A: elrond_wasm::api::ContractBase
-			+ elrond_wasm::api::ErrorApi
-			+ elrond_wasm::api::EndpointArgumentApi
-			+ elrond_wasm::api::EndpointFinishApi
-			+ Clone
-			+ 'static,
-	{
-		type ArgumentApi = A;
+		impl<A> elrond_wasm::api::ContractPrivateApi for ContractObj<A>
+		where
+			A: elrond_wasm::api::ContractBase
+				+ elrond_wasm::api::ErrorApi
+				+ elrond_wasm::api::EndpointArgumentApi
+				+ elrond_wasm::api::EndpointFinishApi
+				+ Clone
+				+ 'static,
+		{
+			type ArgumentApi = A;
+			type FinishApi = A;
+			type ErrorApi = A;
 
-		type FinishApi = A;
+			#[inline]
+			fn argument_api(&self) -> Self::ArgumentApi {
+				self.api.clone()
+			}
 
-		#[inline]
-		fn argument_api(&self) -> Self::ArgumentApi {
-			self.api.clone()
+			#[inline]
+			fn finish_api(&self) -> Self::FinishApi {
+				self.api.clone()
+			}
+
+			#[inline]
+			fn error_api(&self) -> Self::ErrorApi {
+				self.api.clone()
+			}
 		}
-
-		#[inline]
-		fn finish_api(&self) -> Self::FinishApi {
-			self.api.clone()
-		}
-	}
 	}
 }
 
