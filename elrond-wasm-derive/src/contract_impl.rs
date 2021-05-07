@@ -35,8 +35,6 @@ pub fn contract_implementation(
 
 			#(#auto_impl_defs)*
 
-			fn callback(&self);
-
 			// fn callbacks(&self) -> callback_proxy::CallbackProxies<T, BigInt, BigUint>;
 		}
 	};
@@ -49,10 +47,6 @@ pub fn contract_implementation(
 		C: AutoImpl #(#supertraits_main)*
 		{
 			#(#auto_impls)*
-
-			fn callback(&self) {
-				#callback_body
-			}
 
 			// fn callbacks(&self) -> super::callback_proxy::CallbackProxies<T, BigInt, BigUint> {
 			// 	super::callback_proxy::CallbackProxies::new(self.api.clone())
@@ -73,6 +67,10 @@ pub fn contract_implementation(
 
 			fn call(&self, fn_name: &[u8]) -> bool {
 				#function_selector_body
+			}
+
+			fn callback(&self) {
+				#callback_body
 			}
 		}
 	};
@@ -139,7 +137,7 @@ pub fn contract_implementation(
 			#[no_mangle]
 			pub fn callBack () {
 				let inst = super::endpoints::new_arwen_instance();
-				inst.callback();
+				super::EndpointWrappers::callback(&inst);
 			}
 		}
 	} else {

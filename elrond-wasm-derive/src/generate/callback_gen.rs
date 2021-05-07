@@ -71,7 +71,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 					#fn_name_literal =>
 					{
 						#payable_snippet
-						let mut ___cb_closure_loader___ = CallDataArgLoader::new(___cb_data_deserializer___, self.api.clone());
+						let mut ___cb_closure_loader___ = CallDataArgLoader::new(___cb_data_deserializer___, self.error_api());
 						#(#arg_init_snippets)*
 						___cb_closure_loader___.assert_no_more_args();
 						#call_result_assert_no_more_args
@@ -89,16 +89,16 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 		quote! {}
 	} else {
 		quote! {
-			let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.api);
-			let ___cb_data_raw___ = self.api.storage_load_boxed_bytes(&___tx_hash___.as_bytes());
-			self.api.storage_store_slice_u8(&___tx_hash___.as_bytes(), &[]); // cleanup
+			let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.blockchain());
+			let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.get_storage_raw(), &___tx_hash___.as_bytes());
+			elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &___tx_hash___.as_bytes(), &[]); // cleanup
 			let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
-			let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.api.clone());
+			let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.argument_api());
 
 			match ___cb_data_deserializer___.get_func_name() {
 				[] => { return; }
 				#(#match_arms)*
-				other => self.api.signal_error(err_msg::CALLBACK_BAD_FUNC)
+				other => self.error_api().signal_error(err_msg::CALLBACK_BAD_FUNC)
 			}
 		}
 	}
@@ -143,7 +143,11 @@ pub fn generate_callback_proxies(methods: &[Method]) -> proc_macro2::TokenStream
 							if arg.metadata.callback_call_result {
 								quote! {}
 							} else {
-								arg_serialize_push(arg, &arg_accumulator, &quote!{ self.api.clone() })
+								arg_serialize_push(
+									arg,
+									&arg_accumulator,
+									&quote! { self.api.clone() },
+								)
 							}
 						} else {
 							quote! {}
