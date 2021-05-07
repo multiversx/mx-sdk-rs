@@ -1,11 +1,8 @@
 use super::{
 	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
-	EndpointFinishApi, ErrorApi, LogApi, SendApi, StorageReadApi, StorageWriteApi,
+	EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
 };
-use crate::{
-	storage,
-	types::{Address, TokenIdentifier},
-};
+use crate::{storage, types::Address};
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -27,8 +24,8 @@ pub trait ContractBase: Sized {
 	/// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
 	type SendApi: SendApi<
 			AmountType = Self::BigUint,
-			ProxyBigUint = Self::BigUint,
 			ProxyBigInt = Self::BigInt,
+			ProxyStorage = Self::Storage,
 		> + Clone
 		+ 'static;
 
@@ -72,6 +69,10 @@ pub trait ContractBase: Sized {
 			storage::protected_keys::ELROND_REWARD_KEY,
 		)
 	}
+
+	fn proxy<P: ProxyObjApi<ProxySendApi = Self::SendApi>>(&self, address: Address) -> P {
+		P::new_proxy_obj(self.send(), address)
+	}
 }
 
 pub trait ContractPrivateApi {
@@ -82,35 +83,4 @@ pub trait ContractPrivateApi {
 	fn argument_api(&self) -> Self::ArgumentApi;
 
 	fn finish_api(&self) -> Self::FinishApi;
-}
-
-pub trait ProxyObjApi {
-	type BigUint: BigUintApi + 'static;
-
-	type BigInt: BigIntApi + 'static;
-
-	type PaymentType: BigUintApi + 'static;
-
-	type ProxySendApi: SendApi + Clone + 'static;
-
-	// type ContractCall<R>;
-
-	// fn new_proxy_obj(api: Self::ProxySendApi, address: Address) -> Self;
-
-	fn with_token_transfer(self, token: TokenIdentifier, payment: Self::PaymentType) -> Self;
-
-	fn into_fields(
-		self,
-	) -> (
-		Self::ProxySendApi,
-		Address,
-		TokenIdentifier,
-		Self::PaymentType,
-	);
-
-	// fn get_address(&self) -> Address;
-
-	// fn get_token(&self) -> TokenIdentifier;
-
-	// fn get_payment(&self) -> Self::BigUint;
 }

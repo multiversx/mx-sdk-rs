@@ -242,3 +242,57 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
 		}
 	}
 }
+
+pub fn proxy_object_def() -> proc_macro2::TokenStream {
+	quote! {
+		pub struct ProxyObj<SA>
+		where
+			SA: elrond_wasm::api::SendApi + 'static,
+		{
+			pub api: SA,
+			pub address: Address,
+			pub token: elrond_wasm::types::TokenIdentifier,
+			pub payment: SA::AmountType,
+		}
+
+		impl<SA> elrond_wasm::api::ProxyObjApi for ProxyObj<SA>
+		where
+			SA: elrond_wasm::api::SendApi + 'static,
+		{
+			type BigUint = SA::AmountType;
+			type BigInt = SA::ProxyBigInt;
+			type Storage = SA::ProxyStorage;
+			type ProxySendApi = SA;
+
+			fn new_proxy_obj(api: SA, address: Address) -> Self {
+				ProxyObj {
+					api,
+					address,
+					token: elrond_wasm::types::TokenIdentifier::egld(),
+					payment: Self::BigUint::zero(),
+				}
+			}
+
+			fn with_token_transfer(
+				mut self,
+				token: TokenIdentifier,
+				payment: Self::BigUint,
+			) -> Self {
+				self.token = token;
+				self.payment = payment;
+				self
+			}
+
+			fn into_fields(
+				self,
+			) -> (
+				Self::ProxySendApi,
+				Address,
+				TokenIdentifier,
+				Self::BigUint,
+			) {
+				(self.api, self.address, self.token, self.payment)
+			}
+		}
+	}
+}

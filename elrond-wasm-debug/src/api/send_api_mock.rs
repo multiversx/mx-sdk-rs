@@ -51,10 +51,8 @@ impl TxContext {
 
 impl SendApi for TxContext {
 	type AmountType = RustBigUint;
-
-	type ProxyBigUint = RustBigUint;
-
 	type ProxyBigInt = RustBigInt;
+	type ProxyStorage = Self;
 
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if amount.value() > self.get_available_egld_balance() {

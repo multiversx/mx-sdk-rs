@@ -12,6 +12,7 @@ pub mod function_selector;
 pub mod method_call_gen;
 pub mod method_gen;
 pub mod payable_gen;
+pub mod proxy_gen;
 pub mod snippets;
 pub mod supertrait_gen;
 pub mod util;
