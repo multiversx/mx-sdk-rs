@@ -1,0 +1,102 @@
+{
+    "name": "deploy",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:nft_creator": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:seller": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:first_bidder": {
+                    "nonce": "0",
+                    "balance": "1,000",
+                    "storage": {}
+                },
+                "address:second_bidder": {
+                    "nonce": "0",
+                    "balance": "1,000",
+                    "storage": {}
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:marketplace"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "comment": "10% cut for the marketplace",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../output/esdt-nft-marketplace.wasm",
+                "arguments": [
+                    "1000"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:marketplace": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bidCutPerecentage": "1000"
+                    },
+                    "code": "file:../output/esdt-nft-marketplace.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}
