@@ -118,6 +118,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 			type BlockchainApi = A::BlockchainApi;
 			type CryptoApi = A::CryptoApi;
 			type LogApi = A::LogApi;
+			type ErrorApi = A::ErrorApi;
 
 			#[inline]
 			fn get_storage_raw(&self) -> Self::Storage {
@@ -142,6 +143,10 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 			#[inline]
 			fn log_api_raw(&self) -> Self::LogApi {
 				self.api.log_api_raw()
+			}
+			#[inline]
+			fn error_api(&self) -> Self::ErrorApi {
+				self.api.error_api()
 			}
 		}
 	}
@@ -190,7 +195,6 @@ pub fn impl_private_api() -> proc_macro2::TokenStream {
 		{
 			type ArgumentApi = A;
 			type FinishApi = A;
-			type ErrorApi = A;
 
 			#[inline]
 			fn argument_api(&self) -> Self::ArgumentApi {
@@ -199,11 +203,6 @@ pub fn impl_private_api() -> proc_macro2::TokenStream {
 
 			#[inline]
 			fn finish_api(&self) -> Self::FinishApi {
-				self.api.clone()
-			}
-
-			#[inline]
-			fn error_api(&self) -> Self::ErrorApi {
 				self.api.clone()
 			}
 		}

@@ -1,6 +1,7 @@
 use super::generate::{abi_gen, snippets};
 use crate::generate::auto_impl::generate_auto_impls;
 use crate::generate::callback_gen::*;
+use crate::generate::callback_proxies_gen::*;
 use crate::generate::contract_gen::*;
 use crate::generate::function_selector::generate_function_selector_body;
 use crate::generate::proxy_gen;
@@ -19,8 +20,10 @@ pub fn contract_implementation(
 	let endpoints = generate_wasm_endpoints(&contract);
 	let function_selector_body = generate_function_selector_body(&contract);
 	let callback_body = generate_callback_body(&contract.methods);
-	// let callback_proxies = generate_callback_proxies(&contract.methods);
 	let where_self_big_int = snippets::where_self_big_int();
+
+	let (callbacks_def, callbacks_impl, callback_proxies_obj) =
+		generate_callback_proxies(&contract);
 
 	// this definition is common to release and debug mode
 	let supertraits_main = supertrait_gen::main_supertrait_decl(contract.supertraits.as_slice());
@@ -35,7 +38,7 @@ pub fn contract_implementation(
 
 			#(#auto_impl_defs)*
 
-			// fn callbacks(&self) -> callback_proxy::CallbackProxies<T, BigInt, BigUint>;
+			#callbacks_def
 		}
 	};
 
@@ -48,9 +51,7 @@ pub fn contract_implementation(
 		{
 			#(#auto_impls)*
 
-			// fn callbacks(&self) -> super::callback_proxy::CallbackProxies<T, BigInt, BigUint> {
-			// 	super::callback_proxy::CallbackProxies::new(self.api.clone())
-			// }
+			#callbacks_impl
 		}
 	};
 
@@ -197,6 +198,8 @@ pub fn contract_implementation(
 		#proxy_trait
 
 		#proxy_obj_code
+
+		#callback_proxies_obj
 	}
 
 	// if is_contract_main {

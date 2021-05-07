@@ -35,6 +35,8 @@ pub trait ContractBase: Sized {
 
 	type LogApi: LogApi + ErrorApi + Clone + 'static;
 
+	type ErrorApi: ErrorApi + Clone + 'static;
+
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
 	/// Using it directly is not recommended.
@@ -60,6 +62,11 @@ pub trait ContractBase: Sized {
 	/// TODO: consider moving to `ContractPrivateApi`.
 	fn log_api_raw(&self) -> Self::LogApi;
 
+	/// Currently for some auto-generated code involving callbacks.
+	/// Please avoid using it directly.
+	/// TODO: find a way to hide this API.
+	fn error_api(&self) -> Self::ErrorApi;
+
 	/// Retrieves validator rewards, as set by the protocol.
 	/// TODO: move to the storage API, once BigUint gets refactored
 	#[inline]
@@ -80,11 +87,7 @@ pub trait ContractPrivateApi {
 
 	type FinishApi: EndpointFinishApi + ErrorApi + Clone + 'static;
 
-	type ErrorApi: ErrorApi + Clone + 'static;
-
 	fn argument_api(&self) -> Self::ArgumentApi;
 
 	fn finish_api(&self) -> Self::FinishApi;
-
-	fn error_api(&self) -> Self::FinishApi;
 }
