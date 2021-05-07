@@ -1,0 +1,94 @@
+{
+    "name": "auction token",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "setState",
+            "comment": "set current block timestamp",
+            "currentBlockInfo": {
+                "blockTimestamp": "123,000"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "auctionToken",
+            "comment": "arguments are: min_bid, max_bid, deadline, payment token. Nonce is skipped, since EGLD has no nonce",
+            "tx": {
+                "from": "address:seller",
+                "to": "sc:marketplace",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:NFT-123456",
+                    "nonce": "1",
+                    "value": "1"
+                },
+                "function": "auctionToken",
+                "arguments": [
+                    "100",
+                    "1,000",
+                    "123,456",
+                    "str:EGLD"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:seller": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": []
+                        }
+                    },
+                    "storage": {}
+                },
+                "sc:marketplace": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:bidCutPerecentage": "1000",
+                        "str:auctionForToken|nested:str:NFT-123456|u64:1": {
+                            "0-payment_token": "nested:str:EGLD|u64:0",
+                            "1-min_bid": "biguint:100",
+                            "2-max_bid": "biguint:1000",
+                            "3-deadline": "u64:123,456",
+                            "4-original_owner": "address:seller",
+                            "5-current_bid": "biguint:0",
+                            "6-current_winner": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                            "7-marketplace_cut_percentage": "biguint:1000",
+                            "8-creator_royalties_percentage": "biguint:2000"
+                        }
+                    },
+                    "code": "file:../output/esdt-nft-marketplace.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}

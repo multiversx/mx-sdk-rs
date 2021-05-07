@@ -1,0 +1,79 @@
+{
+    "name": "second bid",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "bid_first.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "second bid",
+            "tx": {
+                "from": "address:second_bidder",
+                "to": "sc:marketplace",
+                "value": "200",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:first_bidder": {
+                    "nonce": "1",
+                    "balance": "1000",
+                    "storage": {}
+                },
+                "address:second_bidder": {
+                    "nonce": "1",
+                    "balance": "800",
+                    "storage": {}
+                },
+                "sc:marketplace": {
+                    "nonce": "0",
+                    "balance": "200",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:bidCutPerecentage": "1000",
+                        "str:auctionForToken|nested:str:NFT-123456|u64:1": {
+                            "0-payment_token": "nested:str:EGLD|u64:0",
+                            "1-min_bid": "biguint:100",
+                            "2-max_bid": "biguint:1000",
+                            "3-deadline": "u64:123,456",
+                            "4-original_owner": "address:seller",
+                            "5-current_bid": "biguint:200",
+                            "6-current_winner": "address:second_bidder",
+                            "7-marketplace_cut_percentage": "biguint:1000",
+                            "8-creator_royalties_percentage": "biguint:2000"
+                        }
+                    },
+                    "code": "file:../output/esdt-nft-marketplace.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}
