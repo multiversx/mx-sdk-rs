@@ -1,4 +1,3 @@
-use super::snippets;
 use super::util::*;
 use super::{method_call_gen::generate_call_method, method_gen};
 use crate::model::{ContractTrait, Method, MethodImpl, PublicRole};
