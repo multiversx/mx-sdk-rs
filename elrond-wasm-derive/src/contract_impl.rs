@@ -1,11 +1,11 @@
-use crate::model::ContractTrait;
-
 use super::generate::{abi_gen, snippets};
 use crate::generate::auto_impl::generate_auto_impls;
 use crate::generate::callback_gen::*;
 use crate::generate::contract_gen::*;
 use crate::generate::function_selector::generate_function_selector_body;
+use crate::generate::proxy_gen;
 use crate::generate::supertrait_gen;
+use crate::model::ContractTrait;
 
 pub fn contract_implementation(
 	contract: &ContractTrait,
@@ -19,7 +19,7 @@ pub fn contract_implementation(
 	let endpoints = generate_wasm_endpoints(&contract);
 	let function_selector_body = generate_function_selector_body(&contract);
 	let callback_body = generate_callback_body(&contract.methods);
-	let callback_proxies = generate_callback_proxies(&contract.methods);
+	// let callback_proxies = generate_callback_proxies(&contract.methods);
 	let where_self_big_int = snippets::where_self_big_int();
 
 	// this definition is common to release and debug mode
@@ -65,7 +65,8 @@ pub fn contract_implementation(
 	let endpoint_wrappers = quote! {
 		pub trait EndpointWrappers:
 			elrond_wasm::api::ContractPrivateApi
-			+ #trait_name_ident #(#endpoint_wrapper_supertrait_decl)*
+			+ #trait_name_ident
+			#(#endpoint_wrapper_supertrait_decl)*
 		#where_self_big_int
 		{
 			#(#call_methods)*
@@ -95,7 +96,7 @@ pub fn contract_implementation(
 		// #callback_proxies
 	};
 
-	let contract_traits_code = quote! {
+	let module_traits_code = quote! {
 		#main_definition
 
 		#auto_impl_trait
@@ -162,12 +163,42 @@ pub fn contract_implementation(
 		}
 	};
 
+	let proxy_supertrait_decl =
+		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
+	let proxy_methods_impl = proxy_gen::generate_method_impl(&contract);
+	let proxy_trait = quote! {
+		pub trait Proxy:
+			elrond_wasm::api::ProxyObjApi
+			+ Sized
+			#(#proxy_supertrait_decl)*
+		{
+			#(#proxy_methods_impl)*
+		}
+	};
+
+	let proxy_obj_code = if is_contract_main {
+		let proxy_object_def = snippets::proxy_object_def();
+		let impl_all_proxy_traits =
+			supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice());
+		quote! {
+			#proxy_object_def
+
+			#(#impl_all_proxy_traits)*
+		}
+	} else {
+		quote! {}
+	};
+
 	quote! {
-		#contract_traits_code
+		#module_traits_code
 
 		#contract_obj_code
 
 		#wasm_endpoints
+
+		#proxy_trait
+
+		#proxy_obj_code
 	}
 
 	// if is_contract_main {

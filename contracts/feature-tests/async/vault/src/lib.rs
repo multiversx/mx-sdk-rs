@@ -16,7 +16,11 @@ pub trait Vault {
 
 	#[payable("*")]
 	#[endpoint]
-	fn accept_funds(&self, #[payment_token] token: TokenIdentifier, #[payment] payment: BigUint) {
+	fn accept_funds(
+		&self,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: Self::BigUint,
+	) {
 		self.accept_funds_event(&token, &payment);
 	}
 
@@ -25,7 +29,7 @@ pub trait Vault {
 	fn reject_funds(
 		&self,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
+		#[payment] payment: Self::BigUint,
 	) -> SCResult<()> {
 		self.reject_funds_event(&token, &payment);
 		sc_error!("reject_funds")
@@ -35,7 +39,7 @@ pub trait Vault {
 	fn retrieve_funds(
 		&self,
 		token: TokenIdentifier,
-		amount: BigUint,
+		amount: Self::BigUint,
 		#[var_args] return_message: OptionalArg<BoxedBytes>,
 	) {
 		self.retrieve_funds_event(&token, &amount);
@@ -49,11 +53,23 @@ pub trait Vault {
 	}
 
 	#[event("accept_funds")]
-	fn accept_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint);
+	fn accept_funds_event(
+		&self,
+		#[indexed] token: &TokenIdentifier,
+		#[indexed] payment: &Self::BigUint,
+	);
 
 	#[event("reject_funds")]
-	fn reject_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint);
+	fn reject_funds_event(
+		&self,
+		#[indexed] token: &TokenIdentifier,
+		#[indexed] payment: &Self::BigUint,
+	);
 
 	#[event("retrieve_funds")]
-	fn retrieve_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] amount: &BigUint);
+	fn retrieve_funds_event(
+		&self,
+		#[indexed] token: &TokenIdentifier,
+		#[indexed] amount: &Self::BigUint,
+	);
 }

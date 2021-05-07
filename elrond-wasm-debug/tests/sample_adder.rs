@@ -174,8 +174,8 @@ mod module_1 {
 		}
 	}
 
-	pub trait CallProxy: elrond_wasm::api::ProxyObjApi + Sized {
-		fn version(self) -> ContractCall<Self::PaymentType, Self::BigInt> {
+	pub trait Proxy: elrond_wasm::api::ProxyObjApi + Sized {
+		fn version(self) -> ContractCall<Self::BigUint, Self::BigInt> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 				___address___,
@@ -387,8 +387,8 @@ mod sample_adder {
 		}
 	}
 
-	pub trait CallProxy: elrond_wasm::api::ProxyObjApi + super::module_1::CallProxy {
-		fn get_sum(self) -> ContractCall<Self::PaymentType, Self::BigInt> {
+	pub trait Proxy: elrond_wasm::api::ProxyObjApi + super::module_1::Proxy {
+		fn get_sum(self) -> elrond_wasm::types::ContractCall<Self::BigUint, Self::BigInt> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 				___address___,
@@ -398,7 +398,7 @@ mod sample_adder {
 			);
 			___contract_call___
 		}
-		fn add(self, amount: &Self::BigInt) -> ContractCall<Self::PaymentType, SCResult<()>> {
+		fn add(self, amount: &Self::BigInt) -> ContractCall<Self::BigUint, SCResult<()>> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 				___address___,
@@ -752,39 +752,34 @@ mod sample_adder {
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
-		type BigUint = SA::ProxyBigUint;
-
+		type BigUint = SA::AmountType;
 		type BigInt = SA::ProxyBigInt;
-
-		type PaymentType = SA::AmountType;
-
+		type Storage = SA::ProxyStorage;
 		type ProxySendApi = SA;
 
-		fn with_token_transfer(
-			mut self,
-			token: TokenIdentifier,
-			payment: Self::PaymentType,
-		) -> Self {
+		fn new_proxy_obj(api: SA, address: Address) -> Self {
+			ProxyObj {
+				api,
+				address,
+				token: elrond_wasm::types::TokenIdentifier::egld(),
+				payment: SA::AmountType::zero(),
+			}
+		}
+
+		fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
 			self.token = token;
 			self.payment = payment;
 			self
 		}
 
-		fn into_fields(
-			self,
-		) -> (
-			Self::ProxySendApi,
-			Address,
-			TokenIdentifier,
-			Self::PaymentType,
-		) {
+		fn into_fields(self) -> (Self::ProxySendApi, Address, TokenIdentifier, Self::BigUint) {
 			(self.api, self.address, self.token, self.payment)
 		}
 	}
 
-	impl<SA> super::module_1::CallProxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+	impl<SA> super::module_1::Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
 
-	impl<SA> CallProxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+	impl<SA> Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
 }
 
 #[test]
@@ -792,7 +787,7 @@ fn test_add() {
 	use elrond_wasm::api::ContractBase;
 	use elrond_wasm_debug::api::RustBigInt;
 	use elrond_wasm_debug::TxContext;
-	use sample_adder::{Adder, CallProxy, EndpointWrappers};
+	use sample_adder::{Adder, EndpointWrappers, Proxy};
 	// use module_1::{VersionModule, EndpointWrappers};
 
 	let tx_context = TxContext::dummy();
@@ -817,7 +812,7 @@ fn test_add() {
 
 	assert!(adder.call(b"version"));
 
-	let own_proxy = sample_adder::ProxyObj::new_proxy_obj(adder.send().clone(), Address::zero());
+	let own_proxy = sample_adder::ProxyObj::new_proxy_obj(adder.send(), Address::zero());
 	let _ = own_proxy.get_sum();
 
 	let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();

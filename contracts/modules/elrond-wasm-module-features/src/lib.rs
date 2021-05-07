@@ -50,6 +50,9 @@ pub trait FeaturesModule {
 	}
 }
 
+elrond_wasm::derive_imports!();
+
+#[derive(TopEncode)]
 pub struct FeatureName<'a>(&'a [u8]);
 
 use elrond_wasm::elrond_codec::*;

@@ -3,6 +3,8 @@ use crate::err_msg;
 use crate::types::{EsdtTokenType, TokenIdentifier};
 
 pub trait CallValueApi: ErrorApi + Sized {
+	/// The type of the payment arguments.
+	/// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
 	type AmountType: BigUintApi + 'static;
 
 	fn check_not_payable(&self);

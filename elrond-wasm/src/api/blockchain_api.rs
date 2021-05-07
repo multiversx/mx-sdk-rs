@@ -9,6 +9,8 @@ use alloc::boxed::Box;
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait BlockchainApi: Sized {
+	/// The type of the token balances.
+	/// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
 	type BalanceType: BigUintApi + 'static;
 
 	fn get_sc_address(&self) -> Address;

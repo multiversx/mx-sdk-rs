@@ -109,10 +109,8 @@ extern "C" {
 
 impl SendApi for ArwenApiImpl {
 	type AmountType = ArwenBigUint;
-
-	type ProxyBigUint = ArwenBigUint;
-
 	type ProxyBigInt = ArwenBigInt;
+	type ProxyStorage = Self;
 
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {

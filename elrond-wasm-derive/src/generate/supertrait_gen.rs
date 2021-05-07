@@ -5,6 +5,7 @@ use crate::{
 	model::{ModulePath, Supertrait},
 };
 
+// TODO: would be nice to explicitly write `self::...` instead of no prefix.
 pub fn self_module_path() -> ModulePath {
 	Punctuated::new()
 }
@@ -21,14 +22,27 @@ pub fn main_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::Toke
 		.collect()
 }
 
-// currently not used
-pub fn endpoint_wrapper_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
+pub fn endpoint_wrapper_supertrait_decl(
+	supertraits: &[Supertrait],
+) -> Vec<proc_macro2::TokenStream> {
 	supertraits
 		.iter()
 		.map(|supertrait| {
 			let module_path = &supertrait.module_path;
 			quote! {
 				+ #module_path EndpointWrappers
+			}
+		})
+		.collect()
+}
+
+pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
+	supertraits
+		.iter()
+		.map(|supertrait| {
+			let module_path = &supertrait.module_path;
+			quote! {
+				+ #module_path Proxy
 			}
 		})
 		.collect()
@@ -98,7 +112,6 @@ pub fn impl_all_endpoint_wrappers(supertraits: &[Supertrait]) -> Vec<proc_macro2
 	implementations
 }
 
-
 pub fn endpoint_wrappers_inheritance(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
 	let where_self_big_int = snippets::where_self_big_int();
 	supertraits
@@ -128,4 +141,21 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 			}
 		})
 		.collect()
+}
+
+fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
+	quote! {
+		impl<SA> #module_path Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+	}
+}
+
+pub fn impl_all_proxy_traits(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
+	let mut implementations: Vec<proc_macro2::TokenStream> = supertraits
+		.iter()
+		.map(|supertrait| impl_proxy_trait(&supertrait.module_path))
+		.collect();
+
+	implementations.push(impl_proxy_trait(&self_module_path()));
+
+	implementations
 }

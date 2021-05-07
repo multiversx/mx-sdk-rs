@@ -10,4 +10,3 @@ pub struct Supertrait {
 	pub trait_name: syn::PathSegment,
 	pub module_path: ModulePath,
 }
-

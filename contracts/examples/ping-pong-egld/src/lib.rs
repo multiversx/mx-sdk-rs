@@ -53,11 +53,11 @@ pub trait PingPong {
 	#[endpoint]
 	fn ping(
 		&self,
-		#[payment] payment: &Self::BigUint,
+		#[payment] payment: Self::BigUint,
 		#[var_args] _data: OptionalArg<BoxedBytes>,
 	) -> SCResult<()> {
 		require!(
-			payment == &self.ping_amount().get(),
+			payment == self.ping_amount().get(),
 			"the payment must match the fixed sum"
 		);
 
@@ -74,7 +74,7 @@ pub trait PingPong {
 
 		if let Some(max_funds) = self.max_funds().get() {
 			require!(
-				&self.blockchain().get_sc_balance() + payment <= max_funds,
+				&self.blockchain().get_sc_balance() + &payment <= max_funds,
 				"smart contract full"
 			);
 		}

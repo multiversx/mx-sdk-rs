@@ -1,8 +1,10 @@
-use crate::abi::TypeAbi;
 use crate::io::{ArgId, DynArg, DynArgInput};
 use crate::types::BoxedBytes;
+use crate::{abi::TypeAbi, types::ArgBuffer, ContractCallArg};
 use alloc::string::String;
 use elrond_codec::TopDecodeInput;
+
+use super::SCError;
 
 pub struct AsyncCallError {
 	pub err_code: u32,
@@ -50,6 +52,34 @@ where
 			};
 			AsyncCallResult::Err(AsyncCallError { err_code, err_msg })
 		}
+	}
+}
+
+impl<T> ContractCallArg for &AsyncCallResult<T>
+where
+	T: ContractCallArg,
+{
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+		match self {
+			AsyncCallResult::Ok(result) => {
+				0u32.push_async_arg(serializer)?;
+				result.push_async_arg(serializer)?;
+			},
+			AsyncCallResult::Err(error_message) => {
+				error_message.err_code.push_async_arg(serializer)?;
+				error_message.err_msg.push_async_arg(serializer)?;
+			},
+		}
+		Ok(())
+	}
+}
+
+impl<T> ContractCallArg for AsyncCallResult<T>
+where
+	T: ContractCallArg,
+{
+	fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+		(&self).push_async_arg(serializer)
 	}
 }
 
