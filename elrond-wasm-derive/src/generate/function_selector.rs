@@ -30,11 +30,10 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
 		.collect();
 	let module_calls =
 		supertrait_gen::function_selector_module_calls(contract.supertraits.as_slice());
-	let contract_trait_name = &contract.trait_name;
 	quote! {
 		if match fn_name {
 			b"callBack" => {
-				#contract_trait_name::callback(self);
+				self::EndpointWrappers::callback(self);
 				return true;
 			}
 			#(#match_arms)*

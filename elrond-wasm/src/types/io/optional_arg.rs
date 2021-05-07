@@ -13,6 +13,7 @@ use elrond_codec::TopDecodeInput;
 /// As a principle, optional arguments or results should come last,
 /// otherwise there is ambiguity as to how to interpret what comes after.
 #[must_use]
+#[derive(Clone)]
 pub enum OptionalArg<T> {
 	Some(T),
 	None,

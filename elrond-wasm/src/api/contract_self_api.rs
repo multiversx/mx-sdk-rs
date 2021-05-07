@@ -80,7 +80,11 @@ pub trait ContractPrivateApi {
 
 	type FinishApi: EndpointFinishApi + ErrorApi + Clone + 'static;
 
+	type ErrorApi: ErrorApi + Clone + 'static;
+
 	fn argument_api(&self) -> Self::ArgumentApi;
 
 	fn finish_api(&self) -> Self::FinishApi;
+
+	fn error_api(&self) -> Self::FinishApi;
 }

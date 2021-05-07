@@ -499,8 +499,8 @@ mod sample_adder {
 			+ 'static,
 	{
 		type ArgumentApi = A;
-
 		type FinishApi = A;
+		type ErrorApi = A;
 
 		#[inline]
 		fn argument_api(&self) -> Self::ArgumentApi {
@@ -509,6 +509,11 @@ mod sample_adder {
 
 		#[inline]
 		fn finish_api(&self) -> Self::FinishApi {
+			self.api.clone()
+		}
+
+		#[inline]
+		fn error_api(&self) -> Self::ErrorApi {
 			self.api.clone()
 		}
 	}
@@ -780,6 +785,12 @@ mod sample_adder {
 	impl<SA> super::module_1::Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
 
 	impl<SA> Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+
+	pub fn new_proxy_obj<SA>(api: SA, address: Address) -> impl Proxy 
+	where SA: elrond_wasm::api::SendApi + 'static
+	{
+		ProxyObj::new_proxy_obj(api, address)
+	}
 }
 
 #[test]
@@ -812,7 +823,7 @@ fn test_add() {
 
 	assert!(adder.call(b"version"));
 
-	let own_proxy = sample_adder::ProxyObj::new_proxy_obj(adder.send(), Address::zero());
+	let own_proxy = sample_adder::new_proxy_obj(adder.send(), Address::zero());
 	let _ = own_proxy.get_sum();
 
 	let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
