@@ -76,21 +76,7 @@ pub fn contract_implementation(
 		}
 	};
 
-	let abi_body = abi_gen::generate_abi_method_body(&contract, is_contract_main);
-	let abi = quote! {
-		pub struct AbiProvider {}
-
-		impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-			type Storage = elrond_wasm::api::uncallable::StorageApiUncallable;
-			type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
-			type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
-
-			fn abi() -> elrond_wasm::abi::ContractAbi {
-				#abi_body
-			}
-		}
-	};
-
+	let abi_provider = abi_gen::generate_abi_provider(&contract, is_contract_main);
 
 	let module_traits_code = quote! {
 		#main_definition
@@ -99,7 +85,7 @@ pub fn contract_implementation(
 
 		#endpoint_wrappers
 
-		#abi
+		#abi_provider
 	};
 
 	let contract_object_def = snippets::contract_object_def();

@@ -1,5 +1,5 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, ErrorApi, SendApi};
+use crate::api::SendApi;
 use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::EndpointResult;
 use crate::types::{Address, CallbackCall};
@@ -35,7 +35,7 @@ where
 	SA: SendApi + 'static,
 {
 	#[inline]
-	fn finish(&self, api: FA) {
+	fn finish(&self, _api: FA) {
 		// first, save the callback closure
 		self.api
 			.storage_store_tx_hash_key(self.callback_data.as_slice());
