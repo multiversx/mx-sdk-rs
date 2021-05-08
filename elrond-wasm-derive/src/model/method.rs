@@ -72,6 +72,16 @@ impl Method {
 		}
 	}
 
+	/// Returns Some with the endpoint name as `String` if the method is public.
+	/// None if the method is not [ublic.]
+	pub fn endpoint_name(&self) -> Option<String> {
+		match &self.public_role {
+			PublicRole::Init(_) => Some("init".to_string()),
+			PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_metadata.public_name.to_string()),
+			_ => None,
+		}
+	}
+
 	pub fn has_variable_nr_args(&self) -> bool {
 		self.method_args.iter().any(|arg| arg.metadata.var_args)
 	}
