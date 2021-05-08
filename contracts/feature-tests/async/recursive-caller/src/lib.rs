@@ -2,29 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::callable(VaultProxy)]
-pub trait Vault {
-	fn echo_arguments(&self, args: VarArgs<BoxedBytes>) -> ContractCall<BigUint, ()>;
-
-	#[payable("*")]
-	fn accept_funds(&self) -> ContractCall<BigUint, ()>;
-
-	#[payable("*")]
-	fn reject_funds(&self) -> ContractCall<BigUint, ()>;
-
-	fn retrieve_funds(&self, token: TokenIdentifier, amount: BigUint) -> ContractCall<BigUint, ()>;
-}
-
-#[elrond_wasm_derive::callable(AlsoRecursiveCallerProxy)]
-pub trait AlsoRecursiveCaller {
-	fn recursive_send_funds(
-		&self,
-		to: &Address,
-		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
-		counter: u32,
-	) -> ContractCall<BigUint, ()>;
-}
+use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
 /// Test contract for investigating async calls.
 #[elrond_wasm_derive::contract(ForwarderImpl)]
@@ -37,14 +15,13 @@ pub trait RecursiveCaller {
 		&self,
 		to: &Address,
 		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
+		amount: &Self::BigUint,
 		counter: u32,
-	) -> AsyncCall<BigUint> {
+	) -> AsyncCall<Self::SendApi> {
 		self.recursive_send_funds_event(to, token_identifier, amount, counter);
 
-		contract_call!(self, to.clone(), VaultProxy)
-			.with_token_transfer(token_identifier.clone(), amount.clone())
-			.accept_funds()
+		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+			.accept_funds(token_identifier.clone(), amount.clone())
 			.async_call()
 			.with_callback(self.callbacks().recursive_send_funds_callback(
 				to,
@@ -59,20 +36,16 @@ pub trait RecursiveCaller {
 		&self,
 		to: &Address,
 		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
+		amount: &Self::BigUint,
 		counter: u32,
-	) -> OptionalResult<AsyncCall<BigUint>> {
+	) -> OptionalResult<AsyncCall<Self::SendApi>> {
 		self.recursive_send_funds_callback_event(to, token_identifier, amount, counter);
 
 		if counter > 1 {
 			OptionalResult::Some(
-				contract_call!(
-					self,
-					self.blockchain().get_sc_address(),
-					AlsoRecursiveCallerProxy
-				)
-				.recursive_send_funds(&to, token_identifier, amount, counter - 1)
-				.async_call(),
+				self::ProxyObj::new_proxy_obj(self.send(), self.blockchain().get_sc_address())
+					.recursive_send_funds(&to, token_identifier, amount, counter - 1)
+					.async_call(),
 			)
 		} else {
 			OptionalResult::None
@@ -84,7 +57,7 @@ pub trait RecursiveCaller {
 		&self,
 		#[indexed] to: &Address,
 		#[indexed] token_identifier: &TokenIdentifier,
-		#[indexed] amount: &BigUint,
+		#[indexed] amount: &Self::BigUint,
 		counter: u32,
 	);
 
@@ -93,7 +66,7 @@ pub trait RecursiveCaller {
 		&self,
 		#[indexed] to: &Address,
 		#[indexed] token_identifier: &TokenIdentifier,
-		#[indexed] amount: &BigUint,
+		#[indexed] amount: &Self::BigUint,
 		counter: u32,
 	);
 }
