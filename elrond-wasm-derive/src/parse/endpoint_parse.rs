@@ -1,8 +1,8 @@
-use crate::model::{EndpointMetadata, InitMetadata, PublicRole};
+use crate::model::{CallbackMetadata, EndpointMetadata, InitMetadata, PublicRole};
 
 use super::{
 	attributes::{
-		is_callback_decl, is_callback_raw_decl, is_init, EndpointAttribute, ViewAttribute,
+		is_callback_raw_decl, is_init, CallbackAttribute, EndpointAttribute, ViewAttribute,
 	},
 	process_payable,
 };
@@ -10,7 +10,7 @@ use super::{
 pub fn process_public_role(m: &syn::TraitItemMethod) -> PublicRole {
 	let endpoint_attr_opt = EndpointAttribute::parse(m);
 	let view_attr_opt = ViewAttribute::parse(m);
-	let callback = is_callback_decl(m);
+	let callback_attr_opt = CallbackAttribute::parse(m);
 	let callback_raw = is_callback_raw_decl(m);
 
 	let payable = process_payable(m);
@@ -24,7 +24,7 @@ pub fn process_public_role(m: &syn::TraitItemMethod) -> PublicRole {
 		if view_attr_opt.is_some() {
 			panic!("Cannot annotate with both #[init] and #[view].");
 		}
-		if callback {
+		if callback_attr_opt.is_some() {
 			panic!("Cannot annotate with both #[init] and #[callback].");
 		}
 		if callback_raw {
@@ -38,7 +38,7 @@ pub fn process_public_role(m: &syn::TraitItemMethod) -> PublicRole {
 		if view_attr_opt.is_some() {
 			panic!("Cannot annotate with both #[endpoint] and #[view].");
 		}
-		if callback {
+		if callback_attr_opt.is_some() {
 			panic!("Cannot annotate with both #[endpoint] and #[callback].");
 		}
 		if callback_raw {
@@ -56,7 +56,7 @@ pub fn process_public_role(m: &syn::TraitItemMethod) -> PublicRole {
 
 	// view
 	if let Some(view_attr) = view_attr_opt {
-		if callback {
+		if callback_attr_opt.is_some() {
 			panic!("Cannot annotate with both #[view] and #[callback].");
 		}
 		if callback_raw {
@@ -72,11 +72,17 @@ pub fn process_public_role(m: &syn::TraitItemMethod) -> PublicRole {
 		});
 	}
 
-	if callback {
+	if let Some(callback_attr) = callback_attr_opt {
 		if callback_raw {
 			panic!("Cannot annotate with both #[callback] and #[callback_raw].");
 		}
-		return PublicRole::Callback;
+		let callback_ident = match callback_attr.callback_name {
+			Some(ident) => ident,
+			None => m.sig.ident.clone(),
+		};
+		return PublicRole::Callback(CallbackMetadata {
+			callback_name: callback_ident,
+		});
 	}
 
 	if callback_raw {
