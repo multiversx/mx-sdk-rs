@@ -1,0 +1,218 @@
+{
+    "name": "invalid bids",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "bid_second.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "bid on non-auctioned token",
+            "tx": {
+                "from": "address:first_bidder",
+                "to": "sc:marketplace",
+                "value": "500",
+                "function": "bid",
+                "arguments": [
+                    "str:ANOTHERNFT-123456",
+                    "5"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Token is not up for auction",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "bid on own token",
+            "tx": {
+                "from": "address:seller",
+                "to": "sc:marketplace",
+                "value": "0",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Can't bid on your own token",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "set current block timestamp",
+            "currentBlockInfo": {
+                "blockTimestamp": "234,567"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "bid after deadline",
+            "tx": {
+                "from": "address:first_bidder",
+                "to": "sc:marketplace",
+                "value": "500",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Auction ended already",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset current block timestamp",
+            "currentBlockInfo": {
+                "blockTimestamp": "123,000"
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "give user some random tokens",
+            "accounts": {
+                "address:first_bidder": {
+                    "nonce": "0",
+                    "balance": "2000",
+                    "esdt": {
+                        "str:RANDTOK-123456": "100"
+                    },
+                    "storage": {}
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "bid wrong payment",
+            "tx": {
+                "from": "address:first_bidder",
+                "to": "sc:marketplace",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:RANDTOK-123456",
+                    "value": "100"
+                },
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Wrong token used as payment",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "second bidder outbidding themselves",
+            "tx": {
+                "from": "address:second_bidder",
+                "to": "sc:marketplace",
+                "value": "300",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Can't outbid yourself",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "bid lower than minimum",
+            "tx": {
+                "from": "address:first_bidder",
+                "to": "sc:marketplace",
+                "value": "50",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Bid must be higher than or equal to the min bid",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "bid lower than current bid",
+            "tx": {
+                "from": "address:first_bidder",
+                "to": "sc:marketplace",
+                "value": "150",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Bid must be higher than the current winning bid",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "bid higher than max bid",
+            "tx": {
+                "from": "address:first_bidder",
+                "to": "sc:marketplace",
+                "value": "1500",
+                "function": "bid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Bid must be less than or equal to the max bid",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

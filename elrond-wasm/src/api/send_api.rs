@@ -89,6 +89,25 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		}
 	}
 
+	/// Sends ESDT tokens to the target address. Handles any type of ESDT.
+	/// Note: this does not work with EGLD, use only with ESDT.
+	fn transfer_tokens(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType, to: &Address) {
+		if amount > &0 {
+			if nonce == 0 {
+				let _ =
+					self.direct_esdt_via_transf_exec(to, token.as_esdt_identifier(), amount, &[]);
+			} else {
+				let _ = self.direct_esdt_nft_via_transfer_exec(
+					to,
+					token.as_esdt_identifier(),
+					nonce,
+					amount,
+					&[],
+				);
+			}
+		}
+	}
+
 	/// Performs a simple ESDT transfer, but via async call.
 	/// This is the preferred way to send ESDT.
 	fn direct_esdt_via_async_call(
@@ -288,6 +307,18 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTBurn", &arg_buffer);
+	}
+
+	/// Burns ESDT tokens. Handles any type of ESDT.
+	/// Note: this does not work with EGLD, use only with ESDT.
+	fn burn_tokens(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType, gas: u64) {
+		if amount > &0 {
+			if nonce == 0 {
+				self.esdt_local_burn(gas, token.as_esdt_identifier(), amount);
+			} else {
+				self.esdt_nft_burn(gas, token.as_esdt_identifier(), nonce, amount);
+			}
+		}
 	}
 
 	/// Performs a simple ESDT NFT transfer, but via async call.
