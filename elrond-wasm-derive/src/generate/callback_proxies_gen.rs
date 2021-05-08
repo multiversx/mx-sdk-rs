@@ -1,7 +1,4 @@
-use super::{
-	arg_str_serialize::arg_serialize_push,
-	util::*,
-};
+use super::{arg_str_serialize::arg_serialize_push, snippets, util::*};
 use crate::model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole};
 
 /// Excludes the `#[call_result]`.
@@ -46,7 +43,7 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 								arg_serialize_push(
 									arg,
 									&arg_accumulator,
-									&quote! { self.api.clone() },
+									&quote! { ___api___.clone() },
 								)
 							}
 						} else {
@@ -55,7 +52,8 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 					})
 					.collect();
 				let proxy_decl = quote! {
-					pub fn #method_name ( &self , #(#arg_decl),* ) -> elrond_wasm::types::CallbackCall{
+					fn #method_name (self, #(#arg_decl),* ) -> elrond_wasm::types::CallbackCall{
+						let ___api___ = self.into_api();
 						let mut ___closure_arg_buffer___ = elrond_wasm::types::ArgBuffer::new();
 						#(#arg_push_snippets)*
 						elrond_wasm::types::CallbackCall::from_arg_buffer(#cb_name_literal, &___closure_arg_buffer___)
@@ -70,24 +68,16 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 		})
 		.collect();
 
+	let callback_proxy_object_def = snippets::callback_proxy_object_def();
+
 	quote! {
-		pub struct CallbackProxies<A>
-		where
-			A: elrond_wasm::api::ErrorApi + Clone + 'static,
-		{
-			pub api: A,
-		}
+		#callback_proxy_object_def
 
-		impl<A> CallbackProxies<A>
-		where
-			A: elrond_wasm::api::ErrorApi + Clone + 'static,
-		{
-			pub fn new(api: A) -> Self {
-				CallbackProxies { api }
-			}
-
+		pub trait CallbackProxy: elrond_wasm::api::CallbackProxyObjApi + Sized {
 			#(#proxy_methods)*
 		}
+
+		impl<SA> self::CallbackProxy for CallbackProxyObj<SA> where SA: elrond_wasm::api::SendApi + 'static {}
 	}
 }
 
@@ -103,11 +93,11 @@ pub fn generate_callback_proxies(
 	} else {
 		(
 			quote! {
-				fn callbacks(&self) -> self::CallbackProxies<Self::ErrorApi>;
+				fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi>;
 			},
 			quote! {
-				fn callbacks(&self) -> self::CallbackProxies<Self::ErrorApi> {
-					self::CallbackProxies::new(self.error_api())
+				fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi> {
+					<self::CallbackProxyObj::<Self::SendApi> as elrond_wasm::api::CallbackProxyObjApi>::new_cb_proxy_obj(self.send())
 				}
 			},
 			generate_callback_proxies_object(contract.methods.as_slice()),

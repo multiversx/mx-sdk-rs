@@ -135,7 +135,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Sends an asynchronous call to another contract, with either EGLD or ESDT value.
 	/// The `token` argument decides which one it will be.
 	/// Calling this method immediately terminates tx execution.
-	fn async_call(&self, async_call: AsyncCall<Self::AmountType>) -> ! {
+	fn async_call(&self, async_call: AsyncCall<Self>) -> ! {
 		self.async_call_raw(
 			&async_call.to,
 			&async_call.egld_payment,
