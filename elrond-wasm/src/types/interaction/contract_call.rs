@@ -152,8 +152,7 @@ where
 {
 	/// Executes immediately, synchronously, and returns contract call result.
 	/// Only works if the target contract is in the same shard.
-	pub fn execute_on_dest_context(mut self, gas: u64) -> R
-	{
+	pub fn execute_on_dest_context(mut self, gas: u64) -> R {
 		self = self.convert_to_esdt_transfer_call();
 		let raw_result = self.api.execute_on_dest_context_raw(
 			gas,
@@ -174,11 +173,7 @@ where
 	/// Will be eliminated after some future Arwen hook redesign.
 	/// `range_closure` takes the number of results before, the number of results after,
 	/// and is expected to return the start index (inclusive) and end index (exclusive).
-	pub fn execute_on_dest_context_custom_range<F>(
-		mut self,
-		gas: u64,
-		range_closure: F,
-	) -> R
+	pub fn execute_on_dest_context_custom_range<F>(mut self, gas: u64, range_closure: F) -> R
 	where
 		F: FnOnce(usize, usize) -> (usize, usize),
 	{

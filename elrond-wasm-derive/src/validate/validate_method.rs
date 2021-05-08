@@ -82,7 +82,7 @@ fn validate_callback_call_result_arg(m: &Method) {
 		.filter(|&arg| arg.metadata.callback_call_result)
 		.count();
 
-	if matches!(&m.public_role, PublicRole::Callback) {
+	if matches!(&m.public_role, PublicRole::Callback(_)) {
 		if num_call_result > 1 {
 			panic!("only one `#[call_result]` argument allowed");
 		}

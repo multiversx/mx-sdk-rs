@@ -25,10 +25,9 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 	let proxy_methods: Vec<proc_macro2::TokenStream> = methods
 		.iter()
 		.filter_map(|m| {
-			if matches!(m.public_role, PublicRole::Callback) {
-				let method_name = &m.name;
+			if let PublicRole::Callback(callback) = &m.public_role {
 				let arg_decl = cb_proxy_arg_declarations(&m.method_args);
-				let cb_name_literal = ident_str_literal(&method_name);
+				let cb_name_literal = ident_str_literal(&callback.callback_name);
 
 				let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
 					.method_args
@@ -51,6 +50,7 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 						}
 					})
 					.collect();
+				let method_name = &m.name;
 				let proxy_decl = quote! {
 					fn #method_name (self, #(#arg_decl),* ) -> elrond_wasm::types::CallbackCall{
 						let ___api___ = self.into_api();

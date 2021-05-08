@@ -29,7 +29,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 	let match_arms: Vec<proc_macro2::TokenStream> = methods
 		.iter()
 		.filter_map(|m| {
-			if matches!(m.public_role, PublicRole::Callback) {
+			if let PublicRole::Callback(callback) = &m.public_role {
 				let payable_snippet = generate_payable_snippet(m);
 				let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
 					.method_args
@@ -53,9 +53,8 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 					})
 					.collect();
 
-				let fn_ident = &m.name;
-				let fn_name_str = &fn_ident.to_string();
-				let fn_name_literal = array_literal(fn_name_str.as_bytes());
+				let callback_name_str = &callback.callback_name.to_string();
+				let callback_name_literal = array_literal(callback_name_str.as_bytes());
 				let call = generate_call_to_method_expr(&m);
 				let call_result_assert_no_more_args = if has_call_result {
 					quote! {
@@ -67,7 +66,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 				let body_with_result = generate_body_with_result(&m.return_type, &call);
 
 				let match_arm = quote! {
-					#fn_name_literal =>
+					#callback_name_literal =>
 					{
 						#payable_snippet
 						let mut ___cb_closure_loader___ = CallDataArgLoader::new(___cb_data_deserializer___, self.error_api());

@@ -19,7 +19,7 @@ impl ContractTrait {
 	pub fn callback_count(&self) -> usize {
 		self.methods
 			.iter()
-			.filter(|m| matches!(m.public_role, PublicRole::Callback))
+			.filter(|m| matches!(m.public_role, PublicRole::Callback(_)))
 			.count()
 	}
 }
