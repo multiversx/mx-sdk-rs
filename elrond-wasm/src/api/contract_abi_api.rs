@@ -1,4 +1,4 @@
-use super::{ErrorApi, StorageReadApi, StorageWriteApi};
+use super::{ErrorApi, SendApi, StorageReadApi, StorageWriteApi};
 use crate::abi::{ContractAbi, TypeAbi};
 
 /// Required by contract ABI generators.
@@ -17,6 +17,11 @@ pub trait ContractAbiProvider {
 	/// It sometimes references the contract storage manager type in with storage mappers,
 	/// as for example in `SingleValueMapper<Self::Storage, i32>`.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+
+	/// The generated ABI generation code uses the same types as the contract to provide `TypeAbi`s to endpoints.
+	/// It is referenced by contract calls in general,
+	/// as for example in `AsyncCall<Self::Send>`.
+	type SendApi: SendApi<AmountType = Self::BigUint, ProxyBigInt = Self::BigInt> + Clone + 'static;
 
 	/// Associated function that provides the contract or module ABI.
 	/// Since ABI generation is static, no state from the contract is required.

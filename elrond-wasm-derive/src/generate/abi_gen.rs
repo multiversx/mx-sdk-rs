@@ -53,7 +53,7 @@ fn generate_endpoint_snippet(m: &Method, endpoint_name: &str) -> proc_macro2::To
 	}
 }
 
-pub fn generate_abi_method_body(
+fn generate_abi_method_body(
 	contract: &ContractTrait,
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
@@ -115,5 +115,26 @@ pub fn generate_abi_method_body(
 		#(#endpoint_snippets)*
 		#(#supertrait_snippets)*
 		contract_abi
+	}
+}
+
+pub fn generate_abi_provider(
+	contract: &ContractTrait,
+	is_contract_main: bool,
+) -> proc_macro2::TokenStream {
+	let abi_body = generate_abi_method_body(&contract, is_contract_main);
+	quote! {
+		pub struct AbiProvider {}
+
+		impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
+			type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
+			type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
+			type Storage = elrond_wasm::api::uncallable::UncallableApi;
+			type SendApi = elrond_wasm::api::uncallable::UncallableApi;
+
+			fn abi() -> elrond_wasm::abi::ContractAbi {
+				#abi_body
+			}
+		}
 	}
 }

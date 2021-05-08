@@ -1,12 +1,7 @@
-use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{StorageReadApi, StorageWriteApi};
 use alloc::vec::Vec;
 
-/// Dummy type with no implementation.
-/// Provides context in ABI generators.
-#[derive(Clone)]
-pub struct StorageApiUncallable;
-
-impl StorageReadApi for StorageApiUncallable {
+impl StorageReadApi for super::UncallableApi {
 	fn storage_load_len(&self, _key: &[u8]) -> usize {
 		unreachable!()
 	}
@@ -28,7 +23,7 @@ impl StorageReadApi for StorageApiUncallable {
 	}
 }
 
-impl StorageWriteApi for StorageApiUncallable {
+impl StorageWriteApi for super::UncallableApi {
 	fn storage_store_slice_u8(&self, _key: &[u8], _value: &[u8]) {
 		unreachable!()
 	}
@@ -42,12 +37,6 @@ impl StorageWriteApi for StorageApiUncallable {
 	}
 
 	fn storage_store_i64(&self, _key: &[u8], _value: i64) {
-		unreachable!()
-	}
-}
-
-impl ErrorApi for StorageApiUncallable {
-	fn signal_error(&self, _message: &[u8]) -> ! {
 		unreachable!()
 	}
 }
