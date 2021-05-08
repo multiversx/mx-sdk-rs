@@ -266,7 +266,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
 			type Storage = SA::ProxyStorage;
-			type ProxySendApi = SA;
+			type SendApi = SA;
 
 			fn new_proxy_obj(api: SA, address: Address) -> Self {
 				ProxyObj {
@@ -290,12 +290,44 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 			fn into_fields(
 				self,
 			) -> (
-				Self::ProxySendApi,
+				Self::SendApi,
 				Address,
 				TokenIdentifier,
 				Self::BigUint,
 			) {
 				(self.api, self.address, self.token, self.payment)
+			}
+		}
+	}
+}
+
+pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
+	quote! {
+		pub struct CallbackProxyObj<SA>
+		where
+			SA: elrond_wasm::api::SendApi + 'static,
+		{
+			pub api: SA,
+		}
+
+		impl<SA> elrond_wasm::api::CallbackProxyObjApi for CallbackProxyObj<SA>
+		where
+			SA: elrond_wasm::api::SendApi + 'static,
+		{
+			type BigUint = SA::AmountType;
+			type BigInt = SA::ProxyBigInt;
+			type Storage = SA::ProxyStorage;
+			type SendApi = SA;
+			type ErrorApi = SA;
+
+			fn new_cb_proxy_obj(api: SA) -> Self {
+				CallbackProxyObj {
+					api,
+				}
+			}
+
+			fn into_api(self) -> Self::ErrorApi {
+				self.api
 			}
 		}
 	}

@@ -91,9 +91,6 @@ pub fn contract_implementation(
 		}
 	};
 
-	let callback_proxy = quote! {
-		// #callback_proxies
-	};
 
 	let module_traits_code = quote! {
 		#main_definition
@@ -101,8 +98,6 @@ pub fn contract_implementation(
 		#auto_impl_trait
 
 		#endpoint_wrappers
-
-		#callback_proxy
 
 		#abi
 	};

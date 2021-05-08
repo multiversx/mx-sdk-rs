@@ -16,7 +16,7 @@ pub fn generate_proxy_sig(method: &Method) -> proc_macro2::TokenStream {
 		fn #method_name #generics (
 			self,
 			#(#arg_decl),*
-		) -> elrond_wasm::types::ContractCall<Self::BigUint, #ret_tok>
+		) -> elrond_wasm::types::ContractCall<Self::SendApi, #ret_tok>
 		#generics_where
 	};
 	result
@@ -78,6 +78,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 				#msig {
 					let (___api___, ___address___, #token_local_decl, #payment_local_decl) = self.into_fields();
 					let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
+						___api___.clone(),
 						___address___,
 						#token_expr,
 						#payment_expr,
