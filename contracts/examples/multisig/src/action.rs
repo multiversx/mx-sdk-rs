@@ -47,17 +47,20 @@ pub struct ActionFullInfo<BigUint: BigUintApi> {
 }
 
 #[derive(TypeAbi)]
-pub enum PerformActionResult<BigUint: BigUintApi> {
+pub enum PerformActionResult<SA>
+where
+	SA: SendApi + 'static,
+{
 	Nothing,
-	SendEgld(SendEgld<BigUint>),
+	SendEgld(SendEgld<SA>),
 	DeployResult(Address),
-	AsyncCall(AsyncCall<BigUint>),
+	AsyncCall(AsyncCall<SA>),
 }
 
-impl<FA, BigUint> EndpointResult<FA> for PerformActionResult<BigUint>
+impl<FA, SA> EndpointResult<FA> for PerformActionResult<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: EndpointFinishApi + ErrorApi + SendApi<BigUint> + Clone + 'static,
+	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
+	SA: SendApi + Clone + 'static,
 {
 	fn finish(&self, api: FA) {
 		match self {

@@ -9,10 +9,10 @@ pub struct SendEgld<SA>
 where
 	SA: SendApi + 'static,
 {
-	pub(super) api: SA,
-	pub(super) to: Address,
-	pub(super) amount: SA::AmountType,
-	pub(super) data: BoxedBytes,
+	pub api: SA,
+	pub to: Address,
+	pub amount: SA::AmountType,
+	pub data: BoxedBytes,
 }
 
 impl<FA, SA> EndpointResult<FA> for SendEgld<SA>

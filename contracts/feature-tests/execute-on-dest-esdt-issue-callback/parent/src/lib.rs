@@ -1,21 +1,12 @@
 #![no_std]
 #![allow(unused_attributes)]
-#![allow(non_snake_case)]
 
 elrond_wasm::imports!();
 
 // Base cost for standalone + estimate cost of actual sc call
 const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 
-#[elrond_wasm_derive::callable(ChildProxy)]
-pub trait Child {
-	fn issueWrappedEgld(
-		&self,
-		token_display_name: BoxedBytes,
-		token_ticker: BoxedBytes,
-		initial_supply: BigUint,
-	) -> ContractCall<BigUint, ()>; // payable EGLD
-}
+use child::Proxy as _;
 
 #[elrond_wasm_derive::contract(ParentImpl)]
 pub trait Parent {
@@ -30,7 +21,7 @@ pub trait Parent {
 	fn deploy_child_contract(&self, code: BoxedBytes) {
 		let child_contract_address = self.send().deploy_contract(
 			self.blockchain().get_gas_left(),
-			&BigUint::zero(),
+			&Self::BigUint::zero(),
 			&code,
 			CodeMetadata::DEFAULT,
 			&ArgBuffer::new(),
@@ -45,14 +36,13 @@ pub trait Parent {
 		&self,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-		initial_supply: BigUint,
-		#[payment] issue_cost: BigUint,
+		initial_supply: Self::BigUint,
+		#[payment] issue_cost: Self::BigUint,
 	) {
 		let child_contract_adress = self.child_contract_address().get();
-		contract_call!(self, child_contract_adress, ChildProxy)
-			.with_token_transfer(TokenIdentifier::egld(), issue_cost)
-			.issueWrappedEgld(token_display_name, token_ticker, initial_supply)
-			.execute_on_dest_context(ISSUE_EXPECTED_GAS_COST, self.send());
+		child::ProxyObj::new_proxy_obj(self.send(), child_contract_adress)
+			.issue_wrapped_egld(token_display_name, token_ticker, initial_supply, issue_cost)
+			.execute_on_dest_context_ignore_result(ISSUE_EXPECTED_GAS_COST);
 	}
 
 	// storage

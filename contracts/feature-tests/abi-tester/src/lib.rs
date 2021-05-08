@@ -88,7 +88,11 @@ pub trait AbiTester {
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn payable_egld(&self, #[payment] _payment: Self::BigUint, #[payment_token] _token: TokenIdentifier) {
+	fn payable_egld(
+		&self,
+		#[payment] _payment: Self::BigUint,
+		#[payment_token] _token: TokenIdentifier,
+	) {
 	}
 
 	#[endpoint]

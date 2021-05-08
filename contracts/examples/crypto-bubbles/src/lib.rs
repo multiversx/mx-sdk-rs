@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(non_snake_case)]
 #![allow(clippy::string_lit_as_bytes)]
 
 elrond_wasm::imports!();

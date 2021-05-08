@@ -21,9 +21,9 @@ pub trait EgldEsdtSwap {
 		&self,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-		initial_supply: BigUint,
-		#[payment] issue_cost: BigUint,
-	) -> SCResult<AsyncCall<BigUint>> {
+		initial_supply: Self::BigUint,
+		#[payment] issue_cost: Self::BigUint,
+	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
 		require!(
@@ -35,7 +35,7 @@ pub trait EgldEsdtSwap {
 
 		self.issue_started_event(&caller, token_ticker.as_slice(), &initial_supply);
 
-		Ok(ESDTSystemSmartContractProxy::new()
+		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_fungible(
 				issue_cost,
 				&token_display_name,
@@ -62,7 +62,7 @@ pub trait EgldEsdtSwap {
 		&self,
 		caller: &Address,
 		#[payment_token] token_identifier: TokenIdentifier,
-		#[payment] returned_tokens: BigUint,
+		#[payment] returned_tokens: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
 		// callback is called with ESDTTransfer of the newly issued token, with the amount requested,
@@ -86,7 +86,7 @@ pub trait EgldEsdtSwap {
 	}
 
 	#[endpoint(mintWrappedEgld)]
-	fn mint_wrapped_egld(&self, amount: BigUint) -> SCResult<AsyncCall<BigUint>> {
+	fn mint_wrapped_egld(&self, amount: Self::BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
 		require!(
@@ -99,7 +99,7 @@ pub trait EgldEsdtSwap {
 		let caller = self.blockchain().get_caller();
 		self.mint_started_event(&caller, &amount);
 
-		Ok(ESDTSystemSmartContractProxy::new()
+		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.mint(esdt_token_id, &amount)
 			.async_call()
 			.with_callback(self.callbacks().esdt_mint_callback(&caller, &amount)))
@@ -109,7 +109,7 @@ pub trait EgldEsdtSwap {
 	fn esdt_mint_callback(
 		&self,
 		caller: &Address,
-		amount: &BigUint,
+		amount: &Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
 		match result {
@@ -128,7 +128,7 @@ pub trait EgldEsdtSwap {
 
 	#[payable("EGLD")]
 	#[endpoint(wrapEgld)]
-	fn wrap_egld(&self, #[payment] payment: BigUint) -> SCResult<()> {
+	fn wrap_egld(&self, #[payment] payment: Self::BigUint) -> SCResult<()> {
 		require!(payment > 0, "Payment must be more than 0");
 		require!(
 			!self.wrapped_egld_token_id().is_empty(),
@@ -160,7 +160,7 @@ pub trait EgldEsdtSwap {
 	#[endpoint(unwrapEgld)]
 	fn unwrap_egld(
 		&self,
-		#[payment] wrapped_egld_payment: BigUint,
+		#[payment] wrapped_egld_payment: Self::BigUint,
 		#[payment_token] token_identifier: TokenIdentifier,
 	) -> SCResult<()> {
 		require!(
@@ -197,7 +197,7 @@ pub trait EgldEsdtSwap {
 	}
 
 	#[view(getLockedEgldBalance)]
-	fn get_locked_egld_balance(&self) -> BigUint {
+	fn get_locked_egld_balance(&self) -> Self::BigUint {
 		self.blockchain().get_sc_balance()
 	}
 
@@ -209,7 +209,7 @@ pub trait EgldEsdtSwap {
 
 	#[view(getUnusedWrappedEgld)]
 	#[storage_mapper("unused_wrapped_egld")]
-	fn unused_wrapped_egld(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+	fn unused_wrapped_egld(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	// events
 
@@ -218,7 +218,7 @@ pub trait EgldEsdtSwap {
 		&self,
 		#[indexed] caller: &Address,
 		#[indexed] token_ticker: &[u8],
-		initial_supply: &BigUint,
+		initial_supply: &Self::BigUint,
 	);
 
 	#[event("issue-success")]
@@ -226,14 +226,14 @@ pub trait EgldEsdtSwap {
 		&self,
 		#[indexed] caller: &Address,
 		#[indexed] token_identifier: &TokenIdentifier,
-		initial_supply: &BigUint,
+		initial_supply: &Self::BigUint,
 	);
 
 	#[event("issue-failure")]
 	fn issue_failure_event(&self, #[indexed] caller: &Address, message: &[u8]);
 
 	#[event("mint-started")]
-	fn mint_started_event(&self, #[indexed] caller: &Address, amount: &BigUint);
+	fn mint_started_event(&self, #[indexed] caller: &Address, amount: &Self::BigUint);
 
 	#[event("mint-success")]
 	fn mint_success_event(&self, #[indexed] caller: &Address);
@@ -242,8 +242,8 @@ pub trait EgldEsdtSwap {
 	fn mint_failure_event(&self, #[indexed] caller: &Address, message: &[u8]);
 
 	#[event("wrap-egld")]
-	fn wrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+	fn wrap_egld_event(&self, #[indexed] user: &Address, amount: &Self::BigUint);
 
 	#[event("unwrap-egld")]
-	fn unwrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+	fn unwrap_egld_event(&self, #[indexed] user: &Address, amount: &Self::BigUint);
 }

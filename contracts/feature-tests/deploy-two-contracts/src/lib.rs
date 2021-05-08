@@ -83,7 +83,7 @@ pub trait DeployTwoContracts {
 	fn deploy(&self) -> Address {
 		self.send().deploy_contract(
 			self.blockchain().get_gas_left(),
-			&BigUint::zero(),
+			&Self::BigUint::zero(),
 			&BoxedBytes::from(CONTRACT_CODE),
 			CodeMetadata::DEFAULT,
 			&ArgBuffer::new(),
