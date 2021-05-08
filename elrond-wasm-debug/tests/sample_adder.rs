@@ -165,9 +165,10 @@ mod module_1 {
 	pub struct AbiProvider {}
 
 	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-		type Storage = elrond_wasm::api::uncallable::StorageApiUncallable;
 		type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
 		type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
+		type Storage = elrond_wasm::api::uncallable::UncallableApi;
+		type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
 		fn abi() -> elrond_wasm::abi::ContractAbi {
 			let mut contract_abi = elrond_wasm :: abi :: ContractAbi { docs : & [ "One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment." ] , name : "Adder" , constructor : None , endpoints : Vec :: new ( ) , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new ( ) , } ;
@@ -660,9 +661,10 @@ mod sample_adder {
 	pub struct AbiProvider {}
 
 	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-		type Storage = elrond_wasm::api::uncallable::StorageApiUncallable;
 		type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
 		type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
+		type Storage = elrond_wasm::api::uncallable::UncallableApi;
+		type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
 		fn abi() -> elrond_wasm::abi::ContractAbi {
 			let mut contract_abi = elrond_wasm :: abi :: ContractAbi { docs : & [ "One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment." ] , name : "Adder" , constructor : None , endpoints : Vec :: new ( ) , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new ( ) , } ;
