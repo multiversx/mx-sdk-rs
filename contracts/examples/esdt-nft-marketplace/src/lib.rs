@@ -30,7 +30,7 @@ pub trait EsdtNftMarketplace {
 	#[init]
 	fn init(&self, bid_cut_percentage: u64) {
 		self.bid_cut_percentage()
-			.set(&BigUint::from(bid_cut_percentage));
+			.set(&Self::BigUint::from(bid_cut_percentage));
 	}
 
 	// endpoints - owner-only
@@ -44,7 +44,7 @@ pub trait EsdtNftMarketplace {
 		);
 
 		self.bid_cut_percentage()
-			.set(&BigUint::from(new_cut_percentage));
+			.set(&Self::BigUint::from(new_cut_percentage));
 
 		Ok(())
 	}
@@ -56,8 +56,8 @@ pub trait EsdtNftMarketplace {
 	#[endpoint(auctionToken)]
 	fn auction_token(
 		&self,
-		min_bid: BigUint,
-		max_bid: BigUint,
+		min_bid: Self::BigUint,
+		max_bid: Self::BigUint,
 		deadline: u64,
 		accepted_payment_token: TokenIdentifier,
 		#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,
@@ -70,7 +70,7 @@ pub trait EsdtNftMarketplace {
 			"Only Non-Fungible tokens can be auctioned"
 		);
 		require!(
-			self.call_value().esdt_value() == BigUint::from(NFT_AMOUNT),
+			self.call_value().esdt_value() == Self::BigUint::from(NFT_AMOUNT),
 			"Token is not an NFT"
 		);
 		require!(
@@ -111,7 +111,7 @@ pub trait EsdtNftMarketplace {
 			max_bid,
 			deadline,
 			original_owner: self.blockchain().get_caller(),
-			current_bid: BigUint::zero(),
+			current_bid: Self::BigUint::zero(),
 			current_winner: Address::zero(),
 			marketplace_cut_percentage,
 			creator_royalties_percentage,
@@ -242,7 +242,7 @@ pub trait EsdtNftMarketplace {
 				&auction.current_winner,
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
-				&BigUint::from(NFT_AMOUNT),
+				&Self::BigUint::from(NFT_AMOUNT),
 				self.data_or_empty_if_sc(&auction.current_winner, b"bought token at auction"),
 			);
 		} else {
@@ -251,7 +251,7 @@ pub trait EsdtNftMarketplace {
 				&auction.original_owner,
 				nft_type.as_esdt_identifier(),
 				nft_nonce,
-				&BigUint::from(NFT_AMOUNT),
+				&Self::BigUint::from(NFT_AMOUNT),
 				self.data_or_empty_if_sc(&auction.original_owner, b"returned token"),
 			);
 		}
@@ -284,7 +284,7 @@ pub trait EsdtNftMarketplace {
 			&caller,
 			nft_type.as_esdt_identifier(),
 			nft_nonce,
-			&BigUint::from(NFT_AMOUNT),
+			&Self::BigUint::from(NFT_AMOUNT),
 			self.data_or_empty_if_sc(&caller, b"returned token"),
 		);
 
@@ -320,7 +320,7 @@ pub trait EsdtNftMarketplace {
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> Option<(BigUint, BigUint)> {
+	) -> Option<(Self::BigUint, Self::BigUint)> {
 		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			let auction = self.auction_for_token(nft_type, nft_nonce).get();
 
@@ -357,7 +357,7 @@ pub trait EsdtNftMarketplace {
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> Option<BigUint> {
+	) -> Option<Self::BigUint> {
 		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(
 				self.auction_for_token(nft_type, nft_nonce)
@@ -387,7 +387,7 @@ pub trait EsdtNftMarketplace {
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> Option<Auction<BigUint>> {
+	) -> Option<Auction<Self::BigUint>> {
 		if self.is_already_up_for_auction(nft_type, nft_nonce) {
 			Some(self.auction_for_token(nft_type, nft_nonce).get())
 		} else {
@@ -397,8 +397,8 @@ pub trait EsdtNftMarketplace {
 
 	// private
 
-	fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: &BigUint) -> BigUint {
-		total_amount * cut_percentage / BigUint::from(PERCENTAGE_TOTAL)
+	fn calculate_cut_amount(&self, total_amount: &Self::BigUint, cut_percentage: &Self::BigUint) -> Self::BigUint {
+		total_amount * cut_percentage / Self::BigUint::from(PERCENTAGE_TOTAL)
 	}
 
 	fn transfer_esdt(
@@ -406,7 +406,7 @@ pub trait EsdtNftMarketplace {
 		to: &Address,
 		token_id: &TokenIdentifier,
 		nonce: u64,
-		amount: &BigUint,
+		amount: &Self::BigUint,
 		data: &'static [u8],
 	) {
 		// nonce 0 means fungible ESDT or EGLD
@@ -432,7 +432,7 @@ pub trait EsdtNftMarketplace {
 		}
 	}
 
-	fn get_nft_info(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> EsdtTokenData<BigUint> {
+	fn get_nft_info(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> EsdtTokenData<Self::BigUint> {
 		self.blockchain().get_esdt_token_data(
 			&self.blockchain().get_sc_address(),
 			nft_type.as_esdt_identifier(),
@@ -443,12 +443,12 @@ pub trait EsdtNftMarketplace {
 	// storage
 
 	#[storage_mapper("bidCutPerecentage")]
-	fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+	fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	#[storage_mapper("auctionForToken")]
 	fn auction_for_token(
 		&self,
 		nft_type: &TokenIdentifier,
 		nft_nonce: u64,
-	) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
+	) -> SingleValueMapper<Self::Storage, Auction<Self::BigUint>>;
 }
