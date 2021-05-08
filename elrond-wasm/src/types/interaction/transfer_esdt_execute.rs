@@ -1,37 +1,40 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, ErrorApi, SendApi};
+use crate::api::SendApi;
 use crate::io::EndpointResult;
 use crate::types::{Address, ArgBuffer, BoxedBytes};
 use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
-pub struct TransferEsdtExecute<BigUint: BigUintApi> {
+pub struct TransferEsdtExecute<SA>
+where
+	SA: SendApi + 'static,
+{
+	pub(super) api: SA,
 	pub(super) to: Address,
 	pub(super) token_name: BoxedBytes,
-	pub(super) amount: BigUint,
+	pub(super) amount: SA::AmountType,
 	pub(super) endpoint_name: BoxedBytes,
 	pub(super) arg_buffer: ArgBuffer,
 	pub(super) gas_limit: u64,
 }
 
-impl<BigUint> TransferEsdtExecute<BigUint>
+impl<SA> TransferEsdtExecute<SA>
 where
-	BigUint: BigUintApi + 'static,
+	SA: SendApi + 'static,
 {
 	pub fn with_gas_limit(self, gas_limit: u64) -> Self {
 		TransferEsdtExecute { gas_limit, ..self }
 	}
 }
 
-impl<FA, BigUint> EndpointResult<FA> for TransferEsdtExecute<BigUint>
+impl<FA, SA> EndpointResult<FA> for TransferEsdtExecute<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: SendApi<AmountType = BigUint> + ErrorApi + Clone + 'static,
+	SA: SendApi + 'static,
 {
 	#[inline]
-	fn finish(&self, api: FA) {
-		let result = api.direct_esdt_execute(
+	fn finish(&self, _api: FA) {
+		let result = self.api.direct_esdt_execute(
 			&self.to,
 			self.token_name.as_slice(),
 			&self.amount,
@@ -40,12 +43,15 @@ where
 			&self.arg_buffer,
 		);
 		if let Err(e) = result {
-			api.signal_error(e);
+			self.api.signal_error(e);
 		}
 	}
 }
 
-impl<BigUint: BigUintApi> TypeAbi for TransferEsdtExecute<BigUint> {
+impl<SA> TypeAbi for TransferEsdtExecute<SA>
+where
+	SA: SendApi + 'static,
+{
 	fn type_name() -> String {
 		"TransferEsdtExecute".into()
 	}

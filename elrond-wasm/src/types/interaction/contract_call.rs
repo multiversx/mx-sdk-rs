@@ -108,8 +108,9 @@ where
 
 	/// Produces an EGLD (or no value) transfer-execute call, no callback.
 	/// Will always result in a `transferValueExecute` call.
-	pub fn transfer_egld_execute(self) -> TransferEgldExecute<SA::AmountType> {
+	pub fn transfer_egld_execute(self) -> TransferEgldExecute<SA> {
 		TransferEgldExecute {
+			api: self.api,
 			to: self.to,
 			egld_payment: self.payment,
 			endpoint_name: self.endpoint_name,
@@ -120,8 +121,9 @@ where
 
 	/// Produces an ESDT transfer-execute call, no callback.
 	/// Will always result in a `transferESDTExecute` call.
-	pub fn transfer_esdt_execute(self) -> TransferEsdtExecute<SA::AmountType> {
+	pub fn transfer_esdt_execute(self) -> TransferEsdtExecute<SA> {
 		TransferEsdtExecute {
+			api: self.api,
 			to: self.to,
 			token_name: self.token.into_boxed_bytes(),
 			amount: self.payment,
@@ -133,8 +135,9 @@ where
 
 	/// Produces a transfer-execute call, no callback.
 	/// Will result in either a `transferValueExecute` or a `transferESDTExecute` call, depending on input.
-	pub fn transfer_execute(self) -> TransferExecute<SA::AmountType> {
+	pub fn transfer_execute(self) -> TransferExecute<SA> {
 		TransferExecute {
+			api: self.api,
 			to: self.to,
 			token: self.token,
 			amount: self.payment,
