@@ -11,6 +11,9 @@ path = "src/lib.rs"
 [features]
 wasm-output-mode = ["elrond-wasm-node"]
 
+[dependencies.child]
+path = "../child"
+
 [dependencies.elrond-wasm]
 version = "0.15.1"
 path = "../../../../elrond-wasm"

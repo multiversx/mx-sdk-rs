@@ -194,3 +194,22 @@ where
 		R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
 	}
 }
+
+impl<SA, R> ContractCall<SA, R>
+where
+	SA: SendApi + 'static,
+{
+	/// Executes immediately, synchronously.
+	/// The result (if any) is ignored.
+	/// Only works if the target contract is in the same shard.
+	pub fn execute_on_dest_context_ignore_result(mut self, gas: u64) {
+		self = self.convert_to_esdt_transfer_call();
+		let _ = self.api.execute_on_dest_context_raw(
+			gas,
+			&self.to,
+			&self.payment,
+			self.endpoint_name.as_slice(),
+			&self.arg_buffer,
+		);
+	}
+}

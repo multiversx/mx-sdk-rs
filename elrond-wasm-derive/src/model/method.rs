@@ -77,7 +77,9 @@ impl Method {
 	pub fn endpoint_name(&self) -> Option<String> {
 		match &self.public_role {
 			PublicRole::Init(_) => Some("init".to_string()),
-			PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_metadata.public_name.to_string()),
+			PublicRole::Endpoint(endpoint_metadata) => {
+				Some(endpoint_metadata.public_name.to_string())
+			},
 			_ => None,
 		}
 	}

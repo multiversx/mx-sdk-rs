@@ -24,7 +24,7 @@ pub trait Lottery {
 	fn start(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -46,7 +46,7 @@ pub trait Lottery {
 	fn create_lottery_pool(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -67,7 +67,7 @@ pub trait Lottery {
 	fn start_lottery(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -127,7 +127,7 @@ pub trait Lottery {
 			prize_distribution,
 			whitelist,
 			current_ticket_number: 0u32,
-			prize_pool: BigUint::zero(),
+			prize_pool: Self::BigUint::zero(),
 		};
 
 		self.set_lottery_info(&lottery_name, &info);
@@ -137,7 +137,11 @@ pub trait Lottery {
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn buy_ticket(&self, lottery_name: BoxedBytes, #[payment] payment: BigUint) -> SCResult<()> {
+	fn buy_ticket(
+		&self,
+		lottery_name: BoxedBytes,
+		#[payment] payment: Self::BigUint,
+	) -> SCResult<()> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
 			Status::Running => self.update_after_buy_ticket(&lottery_name, &payment),
@@ -178,7 +182,7 @@ pub trait Lottery {
 	fn update_after_buy_ticket(
 		&self,
 		lottery_name: &BoxedBytes,
-		payment: &BigUint,
+		payment: &Self::BigUint,
 	) -> SCResult<()> {
 		let mut info = self.get_lottery_info(&lottery_name);
 		let caller = self.blockchain().get_caller();
@@ -233,7 +237,7 @@ pub trait Lottery {
 			}
 
 			// distribute to the first place last. Laws of probability say that order doesn't matter.
-			// this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
+			// this is done to mitigate the effects of Self::BigUint division leading to "spare" prize money being left out at times
 			// 1st place will get the spare money instead.
 			let total_prize = info.prize_pool.clone();
 
@@ -248,12 +252,11 @@ pub trait Lottery {
 					if !prev_winning_tickets.contains(&winning_ticket_id) {
 						let winner_address =
 							self.get_ticket_holder(&lottery_name, winning_ticket_id);
-						let prize: BigUint;
+						let prize: Self::BigUint;
 
 						if i != 0 {
-							prize =
-								&BigUint::from(info.prize_distribution[i] as u32)
-									* &total_prize / BigUint::from(PERCENTAGE_TOTAL as u32);
+							prize = &Self::BigUint::from(info.prize_distribution[i] as u32)
+								* &total_prize / Self::BigUint::from(PERCENTAGE_TOTAL as u32);
 						} else {
 							prize = info.prize_pool.clone();
 						}
@@ -302,11 +305,15 @@ pub trait Lottery {
 	// storage
 
 	#[storage_set("lotteryInfo")]
-	fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<BigUint>);
+	fn set_lottery_info(
+		&self,
+		lottery_name: &BoxedBytes,
+		lottery_info: &LotteryInfo<Self::BigUint>,
+	);
 
 	#[view(lotteryInfo)]
 	#[storage_get("lotteryInfo")]
-	fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<BigUint>;
+	fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::BigUint>;
 
 	#[storage_is_empty("lotteryInfo")]
 	fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;
