@@ -40,19 +40,24 @@ fn validate_payment_args(m: &Method) {
 		.filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentToken))
 		.count();
 	if num_payment > 1 {
-		panic!("only one `#[payment]` argument allowed");
+		panic!(
+			"only one `#[payment]` argument allowed (method: `{}`)",
+			m.name.to_string()
+		);
 	}
 	if num_payment_token > 1 {
-		panic!("only one `#[payment_token]` argument allowed");
+		panic!(
+			"only one `#[payment_token]` argument allowed (method: `{}`)",
+			m.name.to_string()
+		);
 	}
 	if !m.is_payable() {
 		if num_payment > 0 {
-			panic!("`#[payment]` only allowed in payable endpoints, payable init or callbacks");
+			panic!("`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
 		}
 		if num_payment_token > 0 {
 			panic!(
-				"`#[payment_token]` only allowed in payable endpoints, payable init or callbacks"
-			);
+				"`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
 		}
 	}
 	if let PublicRole::Init(init_metadata) = &m.public_role {

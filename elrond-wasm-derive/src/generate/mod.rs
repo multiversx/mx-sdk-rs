@@ -5,7 +5,6 @@ pub mod auto_impl;
 pub mod auto_impl_event;
 pub mod auto_impl_module;
 pub mod auto_impl_storage;
-pub mod callable_gen;
 pub mod callback_gen;
 pub mod callback_proxies_gen;
 pub mod contract_gen;

@@ -12,7 +12,7 @@ pub fn process_method_impl(m: &syn::TraitItemMethod) -> MethodImpl {
 	} else if let Some(body) = m.default.clone() {
 		MethodImpl::Explicit(body)
 	} else {
-		panic!("method without an auto-implementation need a default implementation")
+		MethodImpl::NoImplementation
 	}
 }
 

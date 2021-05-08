@@ -19,6 +19,10 @@ pub enum MethodImpl {
 
 	/// Methods where the developer has provided an explicit implementation.
 	Explicit(syn::Block),
+
+	/// Methods that have no implementation and are not annotated as such.
+	/// They are not allowed in contracts and modules, but they are used in call proxies.
+	NoImplementation,
 }
 
 /// Models any method argument from a contract, module or callable proxy trait.

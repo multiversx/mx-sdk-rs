@@ -8,6 +8,8 @@ use crate::generate::proxy_gen;
 use crate::generate::supertrait_gen;
 use crate::model::ContractTrait;
 
+/// Provides the implementation for both modules and contracts.
+/// TODO: not a great pattern to have the `is_contract_main` flag, reorganize the code and get rid of it.
 pub fn contract_implementation(
 	contract: &ContractTrait,
 	is_contract_main: bool,
@@ -143,28 +145,9 @@ pub fn contract_implementation(
 		}
 	};
 
-	let proxy_supertrait_decl =
-		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
-	let proxy_methods_impl = proxy_gen::generate_method_impl(&contract);
-	let proxy_trait = quote! {
-		pub trait Proxy:
-			elrond_wasm::api::ProxyObjApi
-			+ Sized
-			#(#proxy_supertrait_decl)*
-		{
-			#(#proxy_methods_impl)*
-		}
-	};
-
+	let proxy_trait = proxy_gen::proxy_trait(&contract);
 	let proxy_obj_code = if is_contract_main {
-		let proxy_object_def = snippets::proxy_object_def();
-		let impl_all_proxy_traits =
-			supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice());
-		quote! {
-			#proxy_object_def
-
-			#(#impl_all_proxy_traits)*
-		}
+		proxy_gen::proxy_obj_code(&contract)
 	} else {
 		quote! {}
 	};
@@ -182,14 +165,4 @@ pub fn contract_implementation(
 
 		#callback_proxies_obj
 	}
-
-	// if is_contract_main {
-	// 	quote! {
-	// 		#module_code
-
-	// 		#contract_only_code
-	// 	}
-	// } else {
-	// 	module_code
-	// }
 }
