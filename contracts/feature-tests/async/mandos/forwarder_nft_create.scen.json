@@ -37,6 +37,7 @@
         {
             "step": "scCall",
             "txId": "1",
+            "comment": "Attributes are Color(128, 128, 128)",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -47,7 +48,7 @@
                     "str:nft-create-name",
                     "0",
                     "str:nft-create-hash-----------------",
-                    "0x000000",
+                    "0x808080",
                     "str:nft-create-uri"
                 ],
                 "gasLimit": "1,000,000",
@@ -85,9 +86,16 @@
                                     "nonce": "1",
                                     "balance": "1"
                                 },
-                                                            {
+                                {
                                     "nonce": "2",
-                                    "balance": "1"
+                                    "balance": "1",
+                                    "creator": "sc:forwarder",
+                                    "royalties": "0",
+                                    "hash": "str:nft-create-hash-----------------",
+                                    "attributes": "0x808080",
+                                    "uri": [
+                                        "str:nft-create-uri"
+                                    ]
                                 }
                             ],
                             "lastNonce": "2",

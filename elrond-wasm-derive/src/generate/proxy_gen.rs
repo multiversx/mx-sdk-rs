@@ -1,7 +1,10 @@
 use super::arg_str_serialize::*;
 use super::method_gen::*;
 use super::util::*;
-use crate::model::{ArgPaymentMetadata, ContractTrait, Method};
+use crate::{
+	generate::{snippets, supertrait_gen},
+	model::{ArgPaymentMetadata, ContractTrait, Method},
+};
 
 pub fn generate_proxy_sig(method: &Method) -> proc_macro2::TokenStream {
 	let method_name = &method.name;
@@ -91,4 +94,30 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 			sig
 		})
 		.collect()
+}
+
+pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
+	let proxy_supertrait_decl =
+		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
+	let proxy_methods_impl = generate_method_impl(&contract);
+	quote! {
+		pub trait Proxy:
+			elrond_wasm::api::ProxyObjApi
+			+ Sized
+			#(#proxy_supertrait_decl)*
+		{
+			#(#proxy_methods_impl)*
+		}
+	}
+}
+
+pub fn proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
+	let proxy_object_def = snippets::proxy_object_def();
+	let impl_all_proxy_traits =
+		supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice());
+	quote! {
+		#proxy_object_def
+
+		#(#impl_all_proxy_traits)*
+	}
 }

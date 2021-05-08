@@ -8,29 +8,33 @@ use hex_literal::hex;
 static HARDCODED_ADDRESS: [u8; 32] =
 	hex!("fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe");
 
-#[elrond_wasm_derive::callable(PayMeProxy)]
-pub trait PayMe {
-	#[payable("EGLD")]
-	fn payMe(&self, #[payment] _payment: BigUint, _arg1: i64) -> ContractCall<BigUint, ()>;
+mod pay_me_proxy {
+	elrond_wasm::imports!();
 
-	#[payable("EGLD")]
-	fn payMeWithResult(
-		&self,
-		#[payment] _payment: BigUint,
-		_arg1: i64,
-	) -> ContractCall<BigUint, ()>;
+	#[elrond_wasm_derive::proxy(PayMeProxy)]
+	pub trait PayMe {
+		#[payable("EGLD")]
+		#[endpoint]
+		fn payMe(&self, #[payment] payment: Self::BigUint, arg1: i64);
+
+		#[payable("EGLD")]
+		#[endpoint]
+		fn payMeWithResult(&self, #[payment] payment: Self::BigUint, arg1: i64);
+	}
 }
 
-#[elrond_wasm_derive::callable(MessageMeProxy)]
-pub trait MessageMe {
-	fn messageMe(
-		&self,
-		arg1: i64,
-		arg2: &BigUint,
-		arg3: Vec<u8>,
-		arg4: &Address,
-	) -> ContractCall<BigUint, ()>;
+mod message_me_proxy {
+	elrond_wasm::imports!();
+
+	#[elrond_wasm_derive::proxy(MessageMeProxy)]
+	pub trait MessageMe {
+		#[endpoint]
+		fn messageMe(&self, arg1: i64, arg2: &Self::BigUint, arg3: Vec<u8>, arg4: &Address);
+	}
 }
+
+use message_me_proxy::Proxy as _; // currently needed for contract calls, TODO: better syntax
+use pay_me_proxy::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
 #[elrond_wasm_derive::contract(AliceImpl)]
 pub trait Alice {
@@ -50,9 +54,12 @@ pub trait Alice {
 
 	#[payable("EGLD")]
 	#[endpoint]
-	fn forwardToOtherContract(&self, #[payment] payment: BigUint) -> AsyncCall<BigUint> {
+	fn forwardToOtherContract(
+		&self,
+		#[payment] payment: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		contract_call!(self, other_contract, PayMeProxy)
+		pay_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
 			.payMe(payment, 0x56)
 			.async_call()
 	}
@@ -61,24 +68,22 @@ pub trait Alice {
 	#[endpoint]
 	fn forwardToOtherContractWithCallback(
 		&self,
-		#[payment] payment: BigUint,
-	) -> AsyncCall<BigUint> {
+		#[payment] payment: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-
-		contract_call!(self, other_contract, PayMeProxy)
+		pay_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
 			.payMeWithResult(payment, 0x56)
 			.async_call()
 			.with_callback(self.callbacks().payCallback())
 	}
 
 	#[endpoint]
-	fn messageOtherContract(&self) -> AsyncCall<BigUint> {
+	fn messageOtherContract(&self) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-
-		contract_call!(self, other_contract, MessageMeProxy)
+		message_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
 			.messageMe(
 				0x01,
-				&BigUint::from(0x02u64),
+				&Self::BigUint::from(0x02u64),
 				[3u8; 3].to_vec(),
 				&HARDCODED_ADDRESS.into(),
 			)
@@ -86,13 +91,12 @@ pub trait Alice {
 	}
 
 	#[endpoint]
-	fn messageOtherContractWithCallback(&self) -> AsyncCall<BigUint> {
+	fn messageOtherContractWithCallback(&self) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-
-		contract_call!(self, other_contract, MessageMeProxy)
+		message_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
 			.messageMe(
 				0x01,
-				&BigUint::from(0x02u64),
+				&Self::BigUint::from(0x02u64),
 				[3u8; 3].to_vec(),
 				&HARDCODED_ADDRESS.into(),
 			)
