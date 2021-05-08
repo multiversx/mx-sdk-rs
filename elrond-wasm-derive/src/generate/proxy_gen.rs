@@ -29,69 +29,75 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 	contract_trait
 		.methods
 		.iter()
-		.map(|m| {
-			let msig = generate_proxy_sig(&m);
+		.filter_map(|m| {
+			if let Some(endpoint_name) = m.endpoint_name() {
+				let msig = generate_proxy_sig(&m);
 
-			let mut payment_count = 0;
-			let mut payment_local_decl = quote! { ___payment___ };
-			let mut payment_expr = quote! { ___payment___ };
-			let mut token_count = 0;
-			let mut token_local_decl = quote! { ___token___ };
-			let mut token_expr = quote! { ___token___ };
+				let mut payment_count = 0;
+				let mut payment_local_decl = quote! { ___payment___ };
+				let mut payment_expr = quote! { ___payment___ };
+				let mut token_count = 0;
+				let mut token_local_decl = quote! { ___token___ };
+				let mut token_expr = quote! { ___token___ };
 
-			let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
-				.method_args
-				.iter()
-				.map(|arg| {
-					let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
+				let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
+					.method_args
+					.iter()
+					.map(|arg| {
+						let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
 
-					match &arg.metadata.payment {
-						ArgPaymentMetadata::NotPayment => {
-							arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.clone() })
-						},
-						ArgPaymentMetadata::Payment => {
-							payment_count += 1;
-							let pat = &arg.pat;
-							payment_local_decl = quote! { _ };
-							payment_expr = quote! { #pat };
+						match &arg.metadata.payment {
+							ArgPaymentMetadata::NotPayment => arg_serialize_push(
+								arg,
+								&arg_accumulator,
+								&quote! { ___api___.clone() },
+							),
+							ArgPaymentMetadata::Payment => {
+								payment_count += 1;
+								let pat = &arg.pat;
+								payment_local_decl = quote! { _ };
+								payment_expr = quote! { #pat };
 
-							quote! {}
-						},
-						ArgPaymentMetadata::PaymentToken => {
-							token_count += 1;
-							let pat = &arg.pat;
-							token_local_decl = quote! { _ };
-							token_expr = quote! { #pat };
+								quote! {}
+							},
+							ArgPaymentMetadata::PaymentToken => {
+								token_count += 1;
+								let pat = &arg.pat;
+								token_local_decl = quote! { _ };
+								token_expr = quote! { #pat };
 
-							quote! {}
-						},
-					}
-				})
-				.collect();
+								quote! {}
+							},
+						}
+					})
+					.collect();
 
-			if payment_count > 1 {
-				panic!("No more than one payment argument allowed in call proxy");
-			}
-			if token_count > 1 {
-				panic!("No more than one payment token argument allowed in call proxy");
-			}
-
-			let m_name_literal = ident_str_literal(&m.name);
-			let sig = quote! {
-				#msig {
-					let (___api___, ___address___, #token_local_decl, #payment_local_decl) = self.into_fields();
-					let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-						___api___.clone(),
-						___address___,
-						#token_expr,
-						#payment_expr,
-						elrond_wasm::types::BoxedBytes::from(#m_name_literal),
-					);
-					#(#arg_push_snippets)*
-					___contract_call___
+				if payment_count > 1 {
+					panic!("No more than one payment argument allowed in call proxy");
 				}
-			};
-			sig
+				if token_count > 1 {
+					panic!("No more than one payment token argument allowed in call proxy");
+				}
+
+				let endpoint_name_literal = byte_str_slice_literal(&endpoint_name.as_bytes());
+				let sig = quote! {
+					#msig {
+						let (___api___, ___address___, #token_local_decl, #payment_local_decl) = self.into_fields();
+						let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
+							___api___.clone(),
+							___address___,
+							#token_expr,
+							#payment_expr,
+							elrond_wasm::types::BoxedBytes::from(#endpoint_name_literal),
+						);
+						#(#arg_push_snippets)*
+						___contract_call___
+					}
+				};
+				Some(sig)
+			} else {
+				None
+			}
 		})
 		.collect()
 }
