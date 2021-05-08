@@ -1,23 +1,20 @@
 elrond_wasm::imports!();
 
-use super::storage::*;
+use super::storage;
 
 #[elrond_wasm_derive::module(ForwarderSftModuleImpl)]
-pub trait ForwarderSftModule {
-	#[module(ForwarderStorageModuleImpl)]
-	fn storage_module(&self) -> ForwarderStorageModuleImpl<T, BigInt, BigUint>;
-
+pub trait ForwarderSftModule: storage::ForwarderStorageModule {
 	#[payable("EGLD")]
 	#[endpoint]
 	fn sft_issue(
 		&self,
-		#[payment] issue_cost: BigUint,
+		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-	) -> AsyncCall<BigUint> {
+	) -> AsyncCall<Self::SendApi> {
 		let caller = self.blockchain().get_caller();
 
-		ESDTSystemSmartContractProxy::new()
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_semi_fungible(
 				issue_cost,
 				&token_display_name,
@@ -43,10 +40,8 @@ pub trait ForwarderSftModule {
 	) {
 		match result {
 			AsyncCallResult::Ok(token_identifier) => {
-				self.storage_module()
-					.last_issued_token()
-					.set(&token_identifier);
-				self.storage_module().last_error_message().clear();
+				self.last_issued_token().set(&token_identifier);
+				self.last_error_message().clear();
 			},
 			AsyncCallResult::Err(message) => {
 				// return issue cost to the caller
@@ -55,9 +50,7 @@ pub trait ForwarderSftModule {
 					self.send().direct_egld(caller, &returned_tokens, &[]);
 				}
 
-				self.storage_module()
-					.last_error_message()
-					.set(&message.err_msg);
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
 	}
