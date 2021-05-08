@@ -1,36 +1,39 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, ErrorApi, SendApi};
+use crate::api::SendApi;
 use crate::io::EndpointResult;
 use crate::types::{Address, ArgBuffer, BoxedBytes};
 use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
-pub struct TransferEgldExecute<BigUint: BigUintApi> {
+pub struct TransferEgldExecute<SA>
+where
+	SA: SendApi + 'static,
+{
+	pub(super) api: SA,
 	pub(super) to: Address,
-	pub(super) egld_payment: BigUint,
+	pub(super) egld_payment: SA::AmountType,
 	pub(super) endpoint_name: BoxedBytes,
 	pub(super) arg_buffer: ArgBuffer,
 	pub(super) gas_limit: u64,
 }
 
-impl<BigUint> TransferEgldExecute<BigUint>
+impl<SA> TransferEgldExecute<SA>
 where
-	BigUint: BigUintApi + 'static,
+	SA: SendApi + 'static,
 {
 	pub fn with_gas_limit(self, gas_limit: u64) -> Self {
 		TransferEgldExecute { gas_limit, ..self }
 	}
 }
 
-impl<FA, BigUint> EndpointResult<FA> for TransferEgldExecute<BigUint>
+impl<FA, SA> EndpointResult<FA> for TransferEgldExecute<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: SendApi<AmountType = BigUint> + ErrorApi + Clone + 'static,
+	SA: SendApi + 'static,
 {
 	#[inline]
-	fn finish(&self, api: FA) {
-		let result = api.direct_egld_execute(
+	fn finish(&self, _api: FA) {
+		let result = self.api.direct_egld_execute(
 			&self.to,
 			&self.egld_payment,
 			self.gas_limit,
@@ -38,12 +41,15 @@ where
 			&self.arg_buffer,
 		);
 		if let Err(e) = result {
-			api.signal_error(e);
+			self.api.signal_error(e);
 		}
 	}
 }
 
-impl<BigUint: BigUintApi> TypeAbi for TransferEgldExecute<BigUint> {
+impl<SA> TypeAbi for TransferEgldExecute<SA>
+where
+	SA: SendApi + 'static,
+{
 	fn type_name() -> String {
 		"TransferEgldExecute".into()
 	}
