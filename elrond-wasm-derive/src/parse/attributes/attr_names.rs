@@ -19,3 +19,4 @@ pub(super) static ATTR_STORAGE_MAPPER: &str = "storage_mapper";
 pub(super) static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 pub(super) static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 pub(super) static ATTR_MODULE: &str = "module";
+pub(super) static ATTR_PROXY: &str = "proxy";
