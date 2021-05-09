@@ -1,5 +1,7 @@
 elrond_wasm::imports!();
 
+type CallbackDataTuple<BigUint> = (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>);
+
 use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
 #[elrond_wasm_derive::module]
@@ -89,9 +91,7 @@ pub trait ForwarderAsyncCallModule {
 
 	#[view]
 	#[storage_mapper("callback_data")]
-	fn callback_data(
-		&self,
-	) -> VecMapper<Self::Storage, (BoxedBytes, TokenIdentifier, Self::BigUint, Vec<BoxedBytes>)>;
+	fn callback_data(&self) -> VecMapper<Self::Storage, CallbackDataTuple<Self::BigUint>>;
 
 	#[view]
 	fn callback_data_at_index(
