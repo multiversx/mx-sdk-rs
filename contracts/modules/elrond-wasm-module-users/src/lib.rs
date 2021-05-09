@@ -9,7 +9,7 @@ elrond_wasm::imports!();
 /// The module deals with temporarily pausing contract operations.
 /// It provides a flag that contracts can use to check if owner decided to users the entire contract.
 /// Use the features module for more granular on/off switches.
-#[elrond_wasm_derive::module(UsersModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait UsersModule {
 	/// Each user gets a user id. This is in order to be able to iterate over their data.
 	/// This is a mapping from user address to user id.

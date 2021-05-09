@@ -9,7 +9,7 @@ const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 const SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT: &[u8] = b"acceptEsdtPayment";
 const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &[u8] = b"rejectEsdtPayment";
 
-#[elrond_wasm_derive::contract(FirstContractImpl)]
+#[elrond_wasm_derive::contract]
 pub trait FirstContract {
 	#[init]
 	fn init(&self, esdt_token_name: TokenIdentifier, second_contract_address: Address) {

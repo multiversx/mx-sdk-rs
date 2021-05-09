@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 use super::storage;
 
-#[elrond_wasm_derive::module(ForwarderRolesModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(

@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 
 /// General test contract.
 /// Used especially for investigating async calls and contract interaction in general.
-#[elrond_wasm_derive::contract(VaultImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Vault {
 	#[init]
 	fn init(&self) {}

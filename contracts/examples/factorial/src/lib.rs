@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(FactorialImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Factorial {
 	#[init]
 	fn init(&self) {}

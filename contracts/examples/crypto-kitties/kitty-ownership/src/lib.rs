@@ -8,7 +8,7 @@ use random::*;
 
 use kitty_genetic_alg::Proxy as _;
 
-#[elrond_wasm_derive::contract(KittyOwnershipImpl)]
+#[elrond_wasm_derive::contract]
 pub trait KittyOwnership {
 	#[init]
 	fn init(

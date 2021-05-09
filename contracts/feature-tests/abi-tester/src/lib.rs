@@ -15,7 +15,7 @@ use only_nested::*;
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
-#[elrond_wasm_derive::contract(AbiTesterImpl)]
+#[elrond_wasm_derive::contract]
 pub trait AbiTester {
 	/// Contract constructor.
 	#[init]

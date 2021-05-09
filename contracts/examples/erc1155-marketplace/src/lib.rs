@@ -28,7 +28,7 @@ pub struct AuctionArgument<BigUint: BigUintApi> {
 
 use erc1155::Proxy as _;
 
-#[elrond_wasm_derive::contract(Erc1155MarketplaceImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Erc1155Marketplace {
 	/// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
 	#[init]

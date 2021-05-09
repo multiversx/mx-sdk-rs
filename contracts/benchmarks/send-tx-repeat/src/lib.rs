@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(SendTxRepeatImpl)]
+#[elrond_wasm_derive::contract]
 pub trait SendTxRepeat {
 	#[init]
 	fn init(&self) {}
