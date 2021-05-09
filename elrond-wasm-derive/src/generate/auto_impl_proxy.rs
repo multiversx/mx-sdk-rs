@@ -1,4 +1,8 @@
-use crate::{generate::method_gen, model::Method, parse::split_path_last};
+use crate::{
+	generate::method_gen,
+	model::{AutoImpl, ContractTrait, Method, MethodImpl},
+	parse::split_path_last,
+};
 use syn::punctuated::Punctuated;
 use syn::token::Colon2;
 
@@ -50,4 +54,21 @@ pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
 			#module_path ProxyObj::new_proxy_obj(self.send(), #address_arg_name)
 		}
 	}
+}
+
+pub fn generate_all_proxy_trait_imports(c: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
+	c.methods
+		.iter()
+		.filter_map(|m| {
+			if let MethodImpl::Generated(AutoImpl::Proxy) = &m.implementation {
+				let parsed_return_type = proxy_getter_return_type(m);
+				let module_path = &parsed_return_type.module_path;
+				Some(quote! {
+					use #module_path Proxy as _;
+				})
+			} else {
+				None
+			}
+		})
+		.collect()
 }

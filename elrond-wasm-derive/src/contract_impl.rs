@@ -1,11 +1,13 @@
 use super::generate::{abi_gen, snippets};
-use crate::generate::auto_impl::generate_auto_impls;
 use crate::generate::callback_gen::*;
 use crate::generate::callback_proxies_gen::*;
 use crate::generate::contract_gen::*;
 use crate::generate::function_selector::generate_function_selector_body;
 use crate::generate::proxy_gen;
 use crate::generate::supertrait_gen;
+use crate::generate::{
+	auto_impl::generate_auto_impls, auto_impl_proxy::generate_all_proxy_trait_imports,
+};
 use crate::model::ContractTrait;
 
 /// Provides the implementation for both modules and contracts.
@@ -14,6 +16,7 @@ pub fn contract_implementation(
 	contract: &ContractTrait,
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
+	let proxy_trait_imports = generate_all_proxy_trait_imports(&contract);
 	let trait_name_ident = contract.trait_name.clone();
 	let method_impls = extract_method_impls(&contract);
 	let call_methods = generate_call_methods(&contract);
@@ -30,6 +33,8 @@ pub fn contract_implementation(
 	// this definition is common to release and debug mode
 	let supertraits_main = supertrait_gen::main_supertrait_decl(contract.supertraits.as_slice());
 	let main_definition = quote! {
+		#(#proxy_trait_imports)*
+
 		pub trait #trait_name_ident:
 		elrond_wasm::api::ContractBase
 		+ Sized
