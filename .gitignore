@@ -16,7 +16,7 @@ Cargo.lock
 tutorial/book
 
 # Others
-arwen.sh
+my-arwen.sh
 publish.sh
 
 tags
