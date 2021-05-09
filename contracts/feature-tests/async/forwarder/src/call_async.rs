@@ -2,8 +2,6 @@ elrond_wasm::imports!();
 
 type CallbackDataTuple<BigUint> = (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>);
 
-use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
-
 #[elrond_wasm_derive::module]
 pub trait ForwarderAsyncCallModule {
 	#[proxy]
