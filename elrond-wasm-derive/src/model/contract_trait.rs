@@ -4,7 +4,6 @@ use super::{Method, PublicRole, Supertrait};
 pub struct ContractTrait {
 	pub docs: Vec<String>,
 	pub trait_name: proc_macro2::Ident,
-	pub contract_impl_name: syn::Path,
 	pub supertraits: Vec<Supertrait>,
 
 	/// It is possible to automatically implement a contract module for all contracts that use it indirectly.

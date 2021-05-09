@@ -8,7 +8,7 @@ const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 
 use child::Proxy as _;
 
-#[elrond_wasm_derive::contract(ParentImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Parent {
 	#[init]
 	fn init(&self) {}

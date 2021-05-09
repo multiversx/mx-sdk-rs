@@ -8,7 +8,7 @@ use auction::*;
 
 use kitty_ownership::Proxy as _;
 
-#[elrond_wasm_derive::contract(KittyAuctionImpl)]
+#[elrond_wasm_derive::contract]
 pub trait KittyAuction {
 	#[init]
 	fn init(

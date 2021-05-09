@@ -11,7 +11,7 @@ pub enum Status {
 	Failed,
 }
 
-#[elrond_wasm_derive::contract(CrowdfundingImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Crowdfunding {
 	#[init]
 	fn init(&self, target: Self::BigUint, deadline: u64) {

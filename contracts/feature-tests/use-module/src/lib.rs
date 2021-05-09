@@ -22,7 +22,7 @@ use features::feature_guard;
 /// Also provides testing for the most common modules:
 /// - FeaturesModule
 /// - PauseModule
-#[elrond_wasm_derive::contract(UseModuleImpl)]
+#[elrond_wasm_derive::contract]
 pub trait UseModule:
 	internal_mod_a::InternalModuleA
 	+ internal_mod_b::InternalModuleB

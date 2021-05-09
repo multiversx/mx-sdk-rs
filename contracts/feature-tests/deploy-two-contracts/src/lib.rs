@@ -47,7 +47,7 @@ const CONTRACT_CODE: &[u8] = &[
 	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73,
 ];
 
-#[elrond_wasm_derive::contract(DeployTwoContractsImpl)]
+#[elrond_wasm_derive::contract]
 pub trait DeployTwoContracts {
 	#[init]
 	fn init(&self) {}

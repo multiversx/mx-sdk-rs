@@ -20,7 +20,7 @@ use simple_enum::*;
 
 use core::num::NonZeroUsize;
 
-#[elrond_wasm_derive::contract(BasicFeaturesImpl)]
+#[elrond_wasm_derive::contract]
 pub trait BasicFeatures {
 	#[init]
 	fn init(&self) {}

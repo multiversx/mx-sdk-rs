@@ -3,7 +3,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(CryptoBubblesImpl)]
+#[elrond_wasm_derive::contract]
 pub trait CryptoBubbles {
 	/// constructor function
 	/// is called immediately after the contract is created

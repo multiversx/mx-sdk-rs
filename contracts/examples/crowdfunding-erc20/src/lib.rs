@@ -14,7 +14,7 @@ pub enum Status {
 
 use erc20::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
-#[elrond_wasm_derive::contract(CrowdfundingImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Crowdfunding {
 	#[init]
 	fn init(&self, target: Self::BigUint, deadline: u64, erc20_contract_address: Address) {

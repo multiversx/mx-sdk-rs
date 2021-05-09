@@ -91,7 +91,13 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
 	/// Sends ESDT tokens to the target address. Handles any type of ESDT.
 	/// Note: this does not work with EGLD, use only with ESDT.
-	fn transfer_tokens(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType, to: &Address) {
+	fn transfer_tokens(
+		&self,
+		token: &TokenIdentifier,
+		nonce: u64,
+		amount: &Self::AmountType,
+		to: &Address,
+	) {
 		if amount > &0 {
 			if nonce == 0 {
 				let _ =
@@ -311,7 +317,13 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
 	/// Burns ESDT tokens. Handles any type of ESDT.
 	/// Note: this does not work with EGLD, use only with ESDT.
-	fn burn_tokens(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType, gas: u64) {
+	fn burn_tokens(
+		&self,
+		token: &TokenIdentifier,
+		nonce: u64,
+		amount: &Self::AmountType,
+		gas: u64,
+	) {
 		if amount > &0 {
 			if nonce == 0 {
 				self.esdt_local_burn(gas, token.as_esdt_identifier(), amount);

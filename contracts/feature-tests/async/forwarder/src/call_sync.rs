@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
-#[elrond_wasm_derive::module(ForwarderSyncCallModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait ForwarderSyncCallModule {
 	#[endpoint]
 	#[payable("*")]

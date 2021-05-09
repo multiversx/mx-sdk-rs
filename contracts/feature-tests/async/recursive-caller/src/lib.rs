@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
 /// Test contract for investigating async calls.
-#[elrond_wasm_derive::contract(ForwarderImpl)]
+#[elrond_wasm_derive::contract]
 pub trait RecursiveCaller {
 	#[init]
 	fn init(&self) {}

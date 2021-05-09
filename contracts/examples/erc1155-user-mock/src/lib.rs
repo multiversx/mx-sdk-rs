@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(Erc1155UserMockImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Erc1155UserMock {
 	#[init]
 	fn init(&self) {}

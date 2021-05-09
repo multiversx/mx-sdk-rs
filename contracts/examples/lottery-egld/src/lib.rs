@@ -15,7 +15,7 @@ const PERCENTAGE_TOTAL: u32 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 const MAX_TICKETS: u32 = 800;
 
-#[elrond_wasm_derive::contract(LotteryImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Lottery {
 	#[init]
 	fn init(&self) {}

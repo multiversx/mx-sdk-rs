@@ -16,7 +16,7 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 
 use erc20::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
-#[elrond_wasm_derive::contract(LotteryImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Lottery {
 	#[init]
 	fn init(&self, erc20_contract_address: Address) {

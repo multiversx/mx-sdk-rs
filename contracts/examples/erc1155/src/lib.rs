@@ -18,7 +18,7 @@ pub struct Transfer<BigUint: BigUintApi> {
 	pub values: Vec<BigUint>,
 }
 
-#[elrond_wasm_derive::contract(Erc1155Impl)]
+#[elrond_wasm_derive::contract]
 pub trait Erc1155 {
 	#[init]
 	fn init(&self) {}

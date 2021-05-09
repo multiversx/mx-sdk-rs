@@ -3,7 +3,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(BobImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Bob {
 	#[storage_set("last_payment")]
 	fn set_last_payment(&self, last_payment: &Self::BigUint);

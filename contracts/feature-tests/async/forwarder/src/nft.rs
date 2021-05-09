@@ -11,7 +11,7 @@ pub struct Color {
 	b: u8,
 }
 
-#[elrond_wasm_derive::module(ForwarderNftModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 	#[view]
 	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> Self::BigUint {

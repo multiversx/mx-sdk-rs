@@ -11,7 +11,7 @@ static HARDCODED_ADDRESS: [u8; 32] =
 mod pay_me_proxy {
 	elrond_wasm::imports!();
 
-	#[elrond_wasm_derive::proxy(PayMeProxy)]
+	#[elrond_wasm_derive::proxy]
 	pub trait PayMe {
 		#[payable("EGLD")]
 		#[endpoint]
@@ -26,7 +26,7 @@ mod pay_me_proxy {
 mod message_me_proxy {
 	elrond_wasm::imports!();
 
-	#[elrond_wasm_derive::proxy(MessageMeProxy)]
+	#[elrond_wasm_derive::proxy]
 	pub trait MessageMe {
 		#[endpoint]
 		fn messageMe(&self, arg1: i64, arg2: &Self::BigUint, arg3: Vec<u8>, arg4: &Address);
@@ -36,7 +36,7 @@ mod message_me_proxy {
 use message_me_proxy::Proxy as _; // currently needed for contract calls, TODO: better syntax
 use pay_me_proxy::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
-#[elrond_wasm_derive::contract(AliceImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Alice {
 	#[storage_get("other_contract")]
 	fn get_other_contract(&self) -> Address;

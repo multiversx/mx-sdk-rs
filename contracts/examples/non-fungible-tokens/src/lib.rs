@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(NonFungibleTokensImpl)]
+#[elrond_wasm_derive::contract]
 pub trait NonFungibleTokens {
 	#[init]
 	fn init(&self, initial_minted: u64) {

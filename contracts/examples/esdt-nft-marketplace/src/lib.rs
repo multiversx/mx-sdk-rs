@@ -25,7 +25,7 @@ pub struct EsdtToken {
 	pub nonce: u64,
 }
 
-#[elrond_wasm_derive::contract(EsdtNftMarketplaceImpl)]
+#[elrond_wasm_derive::contract]
 pub trait EsdtNftMarketplace {
 	#[init]
 	fn init(&self, bid_cut_percentage: u64) -> SCResult<()> {
@@ -397,7 +397,11 @@ pub trait EsdtNftMarketplace {
 
 	// private
 
-	fn calculate_cut_amount(&self, total_amount: &Self::BigUint, cut_percentage: &Self::BigUint) -> Self::BigUint {
+	fn calculate_cut_amount(
+		&self,
+		total_amount: &Self::BigUint,
+		cut_percentage: &Self::BigUint,
+	) -> Self::BigUint {
 		total_amount * cut_percentage / Self::BigUint::from(PERCENTAGE_TOTAL)
 	}
 
@@ -432,7 +436,11 @@ pub trait EsdtNftMarketplace {
 		}
 	}
 
-	fn get_nft_info(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> EsdtTokenData<Self::BigUint> {
+	fn get_nft_info(
+		&self,
+		nft_type: &TokenIdentifier,
+		nft_nonce: u64,
+	) -> EsdtTokenData<Self::BigUint> {
 		self.blockchain().get_esdt_token_data(
 			&self.blockchain().get_sc_address(),
 			nft_type.as_esdt_identifier(),

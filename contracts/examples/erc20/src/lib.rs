@@ -3,7 +3,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(SimpleErc20TokenImpl)]
+#[elrond_wasm_derive::contract]
 pub trait SimpleErc20Token {
 	// STORAGE
 
