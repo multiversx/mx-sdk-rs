@@ -25,6 +25,9 @@ extern "C" {
 	fn bigIntMul(dest: i32, x: i32, y: i32);
 	fn bigIntTDiv(dest: i32, x: i32, y: i32);
 	fn bigIntTMod(dest: i32, x: i32, y: i32);
+    fn bigIntSqrt(dest: i32, x: i32);
+    fn bigIntPow(dest: i32, x: i32, y:i32);
+    fn bigIntLog2(x: i32) -> i32;
 
 	fn bigIntCmp(x: i32, y: i32) -> i32;
 	fn bigIntSign(x: i32) -> i32;
@@ -409,6 +412,30 @@ impl BigUintApi for ArwenBigUint {
 			ArwenBigUint { handle }
 		}
 	}
+
+    fn sqrt(&self) -> Self {
+        unsafe {
+			let result = bigIntNew(0);
+			bigIntSqrt(result, self.handle);
+			ArwenBigUint { handle: result }
+		}
+    }
+
+    fn pow(&self, exp: u32) -> Self
+    {
+        unsafe {
+			let handle = bigIntNew(0);
+            let exp_handle = bigIntNew(exp as i64);
+			bigIntPow(handle, self.handle, exp_handle);
+			ArwenBigUint { handle }
+		}
+    }
+
+    fn log2(&self) -> u32 {
+        unsafe {
+            bigIntLog2(self.handle) as u32
+        }
+    }
 }
 
 impl ArwenBigUint {
