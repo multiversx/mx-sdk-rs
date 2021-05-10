@@ -61,7 +61,7 @@ pub trait Erc1155 {
 		amount: Self::BigUint,
 		data: &[u8],
 	) -> SCResult<()> {
-		sc_try!(self.try_reserve_fungible(&from, &type_id, &amount));
+		self.try_reserve_fungible(&from, &type_id, &amount)?;
 		if self.blockchain().is_smart_contract(&to) {
 			self.peform_async_call_single_transfer(from, to, type_id, amount, data);
 		} else {
@@ -78,7 +78,7 @@ pub trait Erc1155 {
 		nft_id: Self::BigUint,
 		data: &[u8],
 	) -> SCResult<()> {
-		sc_try!(self.try_reserve_non_fungible(&from, &type_id, &nft_id));
+		self.try_reserve_non_fungible(&from, &type_id, &nft_id)?;
 		if self.blockchain().is_smart_contract(&to) {
 			self.peform_async_call_single_transfer(from, to, type_id, nft_id, data);
 		} else {
@@ -120,21 +120,21 @@ pub trait Erc1155 {
 		// so the reverting is handled automatically if one of the transfers fails
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.is_fungible(type_id) {
-				sc_try!(self.safe_batch_item_transfer_from_fungible(
+				self.safe_batch_item_transfer_from_fungible(
 					is_receiver_smart_contract,
 					&from,
 					&to,
 					type_id,
-					&value
-				))
+					&value,
+				)?;
 			} else {
-				sc_try!(self.safe_batch_item_transfer_from_non_fungible(
+				self.safe_batch_item_transfer_from_non_fungible(
 					is_receiver_smart_contract,
 					&from,
 					&to,
 					type_id,
-					value
-				))
+					value,
+				)?;
 			}
 		}
 
@@ -155,7 +155,7 @@ pub trait Erc1155 {
 		type_id: &Self::BigUint,
 		amount: &Self::BigUint,
 	) -> SCResult<()> {
-		sc_try!(self.try_reserve_fungible(from, type_id, amount));
+		self.try_reserve_fungible(from, type_id, amount)?;
 		if !is_receiver_smart_contract {
 			self.increase_balance(to, type_id, amount);
 		}
@@ -170,7 +170,7 @@ pub trait Erc1155 {
 		type_id: &Self::BigUint,
 		nft_id: &Self::BigUint,
 	) -> SCResult<()> {
-		sc_try!(self.try_reserve_non_fungible(from, type_id, nft_id));
+		self.try_reserve_non_fungible(from, type_id, nft_id)?;
 		if !is_receiver_smart_contract {
 			let amount = Self::BigUint::from(1u32);
 			self.increase_balance(to, type_id, &amount);
