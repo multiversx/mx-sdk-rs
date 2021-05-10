@@ -50,12 +50,12 @@
             "nonce": "0",
             "balance": "250,000,000,000",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''deposit|address:donor1": "250,000,000,000"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:EGLD",
+              "str:deposit|address:donor1": "250,000,000,000"
             },
-            "code": "file:../output/crowdfunding-egld.wasm"
+            "code": "file:../output/crowdfunding-esdt.wasm"
           }
         }
       }

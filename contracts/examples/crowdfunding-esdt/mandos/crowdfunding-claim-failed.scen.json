@@ -1,5 +1,6 @@
 {
     "name": "claiming successful crowdfunding",
+    "gasSchedule": "dummy",
     "steps": [
       {
         "step": "externalSteps",
@@ -25,8 +26,10 @@
             "from": "address:donor2",
             "to": "address:the_crowdfunding_contract",
             "value": "0",
-            "esdtTokenName": "str:CrowdToken",
-            "esdtValue": "200,000,000,000",
+            "esdt": {
+              "tokenIdentifier": "str:CrowdToken",
+              "value": "200,000,000,000"
+            },
             "function": "fund",
             "arguments": [],
             "gasLimit": "100,000,000",
@@ -51,7 +54,7 @@
             "balance": "0",
             "storage": {},
             "esdt": {
-              "''CrowdToken": "150,000,000,000"
+              "str:CrowdToken": "150,000,000,000"
             }
           },
           "address:donor2": {
@@ -59,23 +62,21 @@
             "balance": "0",
             "storage": {},
             "esdt": {
-              "''CrowdToken": "800,000,000,000"
+              "str:CrowdToken": "800,000,000,000"
             }
           },
           "address:the_crowdfunding_contract": {
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''esdtTokenName": "str:CrowdToken",
-              "''esdtBalance": "450,000,000,000",
-              "''deposit|address:donor1": "250,000,000,000",
-              "''deposit|address:donor2": "200,000,000,000"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:CrowdToken",
+              "str:deposit|address:donor1": "250,000,000,000",
+              "str:deposit|address:donor2": "200,000,000,000"
             },
             "esdt": {
-              "''CrowdToken": "450,000,000,000"
+              "str:CrowdToken": "450,000,000,000"
             },
             "code": "file:../output/crowdfunding-esdt.wasm"
           }
@@ -84,7 +85,7 @@
     {
         "step": "setState",
         "currentBlockInfo": {
-            "blockNonce": "123,001"
+            "blockTimestamp": "123,001"
         }
     },
       {
@@ -136,7 +137,7 @@
             "balance": "0",
             "storage": {},
             "esdt": {
-              "''CrowdToken": "400,000,000,000"
+              "str:CrowdToken": "400,000,000,000"
             }
           },
           "address:donor2": {
@@ -144,23 +145,21 @@
             "balance": "0",
             "storage": {},
             "esdt": {
-              "''CrowdToken": "1,000,000,000,000"
+              "str:CrowdToken": "1,000,000,000,000"
             }
           },
           "address:the_crowdfunding_contract": {
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''esdtTokenName": "str:CrowdToken",
-              "''esdtBalance": "0",
-              "''deposit|address:donor1": "0",
-              "''deposit|address:donor2": "0"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:CrowdToken",
+              "str:deposit|address:donor1": "0",
+              "str:deposit|address:donor2": "0"
             },
             "esdt": {
-              "''CrowdToken": "0"
+              "str:CrowdToken": "0"
             },
             "code": "file:../output/crowdfunding-esdt.wasm"
           }
