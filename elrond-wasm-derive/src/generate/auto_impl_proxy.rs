@@ -51,7 +51,7 @@ pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
 
 	quote! {
 		#msig {
-			#module_path ProxyObj::new_proxy_obj(self.send(), #address_arg_name)
+			#module_path Proxy::new_proxy_obj(self.send(), #address_arg_name)
 		}
 	}
 }
@@ -60,11 +60,11 @@ pub fn generate_all_proxy_trait_imports(c: &ContractTrait) -> Vec<proc_macro2::T
 	c.methods
 		.iter()
 		.filter_map(|m| {
-			if let MethodImpl::Generated(AutoImpl::Proxy) = &m.implementation {
+			if let MethodImpl::Generated(AutoImpl::ProxyGetter) = &m.implementation {
 				let parsed_return_type = proxy_getter_return_type(m);
 				let module_path = &parsed_return_type.module_path;
 				Some(quote! {
-					use #module_path Proxy as _;
+					use #module_path ProxyTrait as _;
 				})
 			} else {
 				None

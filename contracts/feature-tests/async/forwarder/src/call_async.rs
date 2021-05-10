@@ -5,7 +5,7 @@ type CallbackDataTuple<BigUint> = (BoxedBytes, TokenIdentifier, BigUint, Vec<Box
 #[elrond_wasm_derive::module]
 pub trait ForwarderAsyncCallModule {
 	#[proxy]
-	fn vault_proxy(&self, to: Address) -> vault::ProxyObj<Self::SendApi>;
+	fn vault_proxy(&self, to: Address) -> vault::Proxy<Self::SendApi>;
 
 	#[endpoint]
 	#[payable("*")]

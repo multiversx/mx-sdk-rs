@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 #[elrond_wasm_derive::module]
 pub trait ForwarderSyncCallModule {
 	#[proxy]
-	fn vault_proxy(&self, to: Address) -> vault::ProxyObj<Self::SendApi>;
+	fn vault_proxy(&self, to: Address) -> vault::Proxy<Self::SendApi>;
 
 	#[endpoint]
 	#[payable("*")]

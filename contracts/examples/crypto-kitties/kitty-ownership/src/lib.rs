@@ -612,7 +612,7 @@ pub trait KittyOwnership {
 	// proxy
 
 	#[proxy]
-	fn kitty_genetic_alg_proxy(&self, to: Address) -> kitty_genetic_alg::ProxyObj<Self::SendApi>;
+	fn kitty_genetic_alg_proxy(&self, to: Address) -> kitty_genetic_alg::Proxy<Self::SendApi>;
 
 	// storage - General
 

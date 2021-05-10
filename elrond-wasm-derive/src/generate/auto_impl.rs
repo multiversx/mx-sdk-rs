@@ -39,7 +39,7 @@ fn generate_auto_impl(m: &Method, auto_impl: &AutoImpl) -> proc_macro2::TokenStr
 		AutoImpl::StorageMapper { identifier } => generate_mapper_impl(m, identifier),
 		AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(m, identifier),
 		AutoImpl::StorageClear { identifier } => generate_clear_impl(m, identifier),
-		AutoImpl::Proxy => generate_proxy_getter_impl(m),
+		AutoImpl::ProxyGetter => generate_proxy_getter_impl(m),
 		AutoImpl::Module { impl_path } => generate_module_getter_impl(m, &impl_path),
 	}
 }
