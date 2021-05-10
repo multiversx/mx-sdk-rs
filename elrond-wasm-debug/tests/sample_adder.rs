@@ -137,12 +137,12 @@ mod module_1 {
 		fn call_version(&self) {
 			self.call_value().check_not_payable();
 			let result = self.version();
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api())
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api())
 		}
 
 		fn call_some_async(&self) {
 			let result = self.some_async();
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api())
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api())
 		}
 
 		fn call(&self, fn_name: &[u8]) -> bool {
@@ -187,7 +187,10 @@ mod module_1 {
 	}
 
 	pub trait ProxyTrait: elrond_wasm::api::ProxyObjApi + Sized {
-		fn version(self) -> ContractCall<Self::SendApi, Self::BigInt> {
+		fn version(
+			self,
+		) -> ContractCall<Self::SendApi, <Self::BigInt as elrond_wasm::io::EndpointResult>::DecodeAs>
+		{
 			let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
 				self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -350,7 +353,7 @@ mod sample_adder {
 			self.call_value().check_not_payable();
 			elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 0i32);
 			let result = self.get_sum();
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api());
 		}
 		#[inline]
 		fn call_init(&self) {
@@ -373,7 +376,7 @@ mod sample_adder {
 				ArgId::from(&b"value"[..]),
 			);
 			let result = self.add(value);
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api());
 		}
 
 		fn call(&self, fn_name: &[u8]) -> bool {
@@ -406,7 +409,12 @@ mod sample_adder {
 	}
 
 	pub trait ProxyTrait: elrond_wasm::api::ProxyObjApi + super::module_1::ProxyTrait {
-		fn get_sum(self) -> elrond_wasm::types::ContractCall<Self::SendApi, Self::BigInt> {
+		fn get_sum(
+			self,
+		) -> elrond_wasm::types::ContractCall<
+			Self::SendApi,
+			<Self::BigInt as elrond_wasm::io::EndpointResult>::DecodeAs,
+		> {
 			let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
 				self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -419,7 +427,11 @@ mod sample_adder {
 			);
 			___contract_call___
 		}
-		fn add(self, amount: &Self::BigInt) -> ContractCall<Self::SendApi, SCResult<()>> {
+		fn add(
+			self,
+			amount: &Self::BigInt,
+		) -> ContractCall<Self::SendApi, <SCResult<()> as elrond_wasm::io::EndpointResult>::DecodeAs>
+		{
 			let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
 				self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(

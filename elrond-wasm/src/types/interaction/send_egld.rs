@@ -15,12 +15,14 @@ where
 	pub data: BoxedBytes,
 }
 
-impl<FA, SA> EndpointResult<FA> for SendEgld<SA>
+impl<SA> EndpointResult for SendEgld<SA>
 where
 	SA: SendApi + 'static,
 {
+	type DecodeAs = ();
+
 	#[inline]
-	fn finish(&self, _api: FA) {
+	fn finish<FA>(&self, _api: FA) {
 		self.api
 			.direct_egld(&self.to, &self.amount, self.data.as_slice());
 	}

@@ -123,7 +123,7 @@ pub fn generate_body_with_result(
 				if type_str == "Result" {
 					return quote! {
 						let result = elrond_wasm::types::SCResult::from_result(#mbody);
-						elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+						elrond_wasm::io::EndpointResult::finish(&result, self.finish_api());
 					};
 				}
 			}
@@ -131,7 +131,7 @@ pub fn generate_body_with_result(
 			// default implementation, using the EndpointResult trait
 			quote! {
 				let result = #mbody;
-				elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+				elrond_wasm::io::EndpointResult::finish(&result, self.finish_api());
 			}
 		},
 	}

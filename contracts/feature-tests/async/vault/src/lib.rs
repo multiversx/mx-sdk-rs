@@ -10,8 +10,11 @@ pub trait Vault {
 	fn init(&self) {}
 
 	#[endpoint]
-	fn echo_arguments(&self, #[var_args] args: VarArgs<BoxedBytes>) -> MultiResultVec<BoxedBytes> {
-		args.into_vec().into()
+	fn echo_arguments(
+		&self,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) -> SCResult<MultiResultVec<BoxedBytes>> {
+		Ok(args.into_vec().into())
 	}
 
 	#[payable("*")]

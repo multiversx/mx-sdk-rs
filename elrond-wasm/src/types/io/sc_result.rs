@@ -1,6 +1,6 @@
 use super::sc_error::SCError;
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{EndpointFinishApi, ErrorApi};
+use crate::api::EndpointFinishApi;
 use crate::EndpointResult;
 use crate::*;
 
@@ -53,13 +53,19 @@ impl<T> SCResult<T> {
 	}
 }
 
-impl<FA, T> EndpointResult<FA> for SCResult<T>
+impl<T> EndpointResult for SCResult<T>
 where
-	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
-	T: EndpointResult<FA>,
+	T: EndpointResult,
 {
+	/// Error implies the transaction fails, so if there is a result,
+	/// it is of type `T`.
+	type DecodeAs = T::DecodeAs;
+
 	#[inline]
-	fn finish(&self, api: FA) {
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		match self {
 			SCResult::Ok(t) => {
 				t.finish(api);

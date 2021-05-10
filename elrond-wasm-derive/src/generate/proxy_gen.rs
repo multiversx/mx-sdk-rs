@@ -19,7 +19,7 @@ pub fn generate_proxy_sig(method: &Method) -> proc_macro2::TokenStream {
 		fn #method_name #generics (
 			self,
 			#(#arg_decl),*
-		) -> elrond_wasm::types::ContractCall<Self::SendApi, #ret_tok>
+		) -> elrond_wasm::types::ContractCall<Self::SendApi, <#ret_tok as elrond_wasm::io::EndpointResult>::DecodeAs>
 		#generics_where
 	};
 	result
