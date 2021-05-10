@@ -52,11 +52,15 @@ pub trait Crowdfunding {
 
 	#[view(getCurrentFunds)]
 	fn get_current_funds(&self) -> Self::BigUint {
-		let token_name = self.cf_token_name().get();
+		let token = self.cf_token_name().get();
 		let sc_address = self.blockchain().get_sc_address();
 
-		self.blockchain()
-			.get_esdt_balance(&sc_address, token_name.as_esdt_identifier(), 0)
+		if token.is_egld() {
+			self.blockchain().get_sc_balance()
+		} else {
+			self.blockchain()
+				.get_esdt_balance(&sc_address, token.as_esdt_identifier(), 0)
+		}
 	}
 
 	#[endpoint]
@@ -114,6 +118,6 @@ pub trait Crowdfunding {
 	fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	#[view(getCrowdfundingTokenName)]
-	#[storage_mapper("esdtTokenName")]
+	#[storage_mapper("tokenName")]
 	fn cf_token_name(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
 }

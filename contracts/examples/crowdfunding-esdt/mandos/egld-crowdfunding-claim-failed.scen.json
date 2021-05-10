@@ -55,20 +55,20 @@
             "nonce": "0",
             "balance": "450,000,000,000",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''deposit|address:donor1": "250,000,000,000",
-              "''deposit|address:donor2": "200,000,000,000"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:EGLD",
+              "str:deposit|address:donor1": "250,000,000,000",
+              "str:deposit|address:donor2": "200,000,000,000"
             },
-            "code": "file:../output/crowdfunding-egld.wasm"
+            "code": "file:../output/crowdfunding-esdt.wasm"
           }
         }
     },
     {
         "step": "setState",
         "currentBlockInfo": {
-            "blockNonce": "123,001"
+            "blockTimestamp": "123,001"
         }
     },
       {
@@ -129,13 +129,13 @@
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''deposit|address:donor1": "0",
-              "''deposit|address:donor2": "0"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:EGLD",
+              "str:deposit|address:donor1": "0",
+              "str:deposit|address:donor2": "0"
             },
-            "code": "file:../output/crowdfunding-egld.wasm"
+            "code": "file:../output/crowdfunding-esdt.wasm"
           }
         }
       }
