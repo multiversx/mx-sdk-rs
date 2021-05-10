@@ -295,3 +295,18 @@ fn storage_usize_bad() {
 fn storage_vec_u8() {
 	parse_execute_mandos("mandos/storage_vec_u8.scen.json", &contract_map());
 }
+
+#[test]
+fn sqrt() {
+	parse_execute_mandos("mandos/sqrt.scen.json", &contract_map());
+}
+
+#[test]
+fn log2() {
+	parse_execute_mandos("mandos/log2.scen.json", &contract_map());
+}
+
+#[test]
+fn pow() {
+	parse_execute_mandos("mandos/pow.scen.json", &contract_map());
+}
