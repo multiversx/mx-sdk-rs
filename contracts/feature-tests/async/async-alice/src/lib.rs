@@ -1,5 +1,5 @@
 #![no_std]
-#![allow(non_snake_case)]
+#![allow(non_snake_case)] // TODO: clean up all camelCase
 
 elrond_wasm::imports!();
 
@@ -33,11 +33,14 @@ mod message_me_proxy {
 	}
 }
 
-use message_me_proxy::Proxy as _; // currently needed for contract calls, TODO: better syntax
-use pay_me_proxy::Proxy as _; // currently needed for contract calls, TODO: better syntax
-
 #[elrond_wasm_derive::contract]
 pub trait Alice {
+	#[proxy]
+	fn pay_me_proxy(&self, to: Address) -> pay_me_proxy::ProxyObj<Self::SendApi>;
+
+	#[proxy]
+	fn message_me_proxy(&self, to: Address) -> message_me_proxy::ProxyObj<Self::SendApi>;
+
 	#[storage_get("other_contract")]
 	fn get_other_contract(&self) -> Address;
 
@@ -59,7 +62,7 @@ pub trait Alice {
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		pay_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
+		self.pay_me_proxy(other_contract)
 			.payMe(payment, 0x56)
 			.async_call()
 	}
@@ -71,7 +74,7 @@ pub trait Alice {
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		pay_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
+		self.pay_me_proxy(other_contract)
 			.payMeWithResult(payment, 0x56)
 			.async_call()
 			.with_callback(self.callbacks().payCallback())
@@ -80,7 +83,7 @@ pub trait Alice {
 	#[endpoint]
 	fn messageOtherContract(&self) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		message_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
+		self.message_me_proxy(other_contract)
 			.messageMe(
 				0x01,
 				&Self::BigUint::from(0x02u64),
@@ -93,7 +96,7 @@ pub trait Alice {
 	#[endpoint]
 	fn messageOtherContractWithCallback(&self) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		message_me_proxy::ProxyObj::new_proxy_obj(self.send(), other_contract)
+		self.message_me_proxy(other_contract)
 			.messageMe(
 				0x01,
 				&Self::BigUint::from(0x02u64),

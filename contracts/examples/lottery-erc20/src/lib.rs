@@ -14,10 +14,11 @@ use status::Status;
 const PERCENTAGE_TOTAL: u16 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 
-use erc20::Proxy as _; // currently needed for contract calls, TODO: better syntax
-
 #[elrond_wasm_derive::contract]
 pub trait Lottery {
+	#[proxy]
+	fn erc20_proxy(&self, to: Address) -> erc20::ProxyObj<Self::SendApi>;
+
 	#[init]
 	fn init(&self, erc20_contract_address: Address) {
 		self.set_erc20_contract_address(&erc20_contract_address);
@@ -223,7 +224,8 @@ pub trait Lottery {
 
 		let erc20_address = self.get_erc20_contract_address();
 		let lottery_contract_address = self.blockchain().get_sc_address();
-		Ok(erc20::ProxyObj::new_proxy_obj(self.send(), erc20_address)
+		Ok(self
+			.erc20_proxy(erc20_address)
 			.transfer_from(caller.clone(), lottery_contract_address, token_amount)
 			.async_call()
 			.with_callback(
@@ -299,7 +301,7 @@ pub trait Lottery {
 
 		let erc20_address = self.get_erc20_contract_address();
 		OptionalResult::Some(
-			erc20::ProxyObj::new_proxy_obj(self.send(), erc20_address)
+			self.erc20_proxy(erc20_address)
 				.transfer(winner_address, prize)
 				.async_call()
 				.with_callback(self.callbacks().distribute_prizes_callback(lottery_name)),
