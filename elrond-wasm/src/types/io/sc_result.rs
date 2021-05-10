@@ -53,6 +53,24 @@ impl<T> SCResult<T> {
 	}
 }
 
+/// Implementing the `Try` trait overloads the `?` operator.
+impl<T> core::ops::Try for SCResult<T> {
+	type Ok = T;
+	type Error = SCError;
+	fn into_result(self) -> Result<T, SCError> {
+		match self {
+			SCResult::Ok(t) => Ok(t),
+			SCResult::Err(e) => Err(e),
+		}
+	}
+	fn from_error(v: SCError) -> Self {
+		SCResult::Err(v)
+	}
+	fn from_ok(v: T) -> Self {
+		SCResult::Ok(v)
+	}
+}
+
 impl<T> EndpointResult for SCResult<T>
 where
 	T: EndpointResult,
