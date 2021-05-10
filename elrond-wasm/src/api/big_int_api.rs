@@ -51,4 +51,6 @@ pub trait BigIntApi<BigUint>:
 	fn to_signed_bytes_be(&self) -> Vec<u8>;
 
 	fn from_signed_bytes_be(bytes: &[u8]) -> Self;
+
+	fn pow(&self, exp: u32) -> Self;
 }

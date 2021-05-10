@@ -67,4 +67,10 @@ pub trait BigUintApi:
 	fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
 
 	fn from_bytes_be(bytes: &[u8]) -> Self;
+
+	fn sqrt(&self) -> Self;
+
+	fn pow(&self, exp: u32) -> Self;
+
+	fn log2(&self) -> u32;
 }
