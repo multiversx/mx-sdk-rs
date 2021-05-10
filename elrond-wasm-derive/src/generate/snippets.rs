@@ -89,7 +89,7 @@ pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::Toke
 			}
 
 			#[inline]
-			fn crypto(&self) -> Self::CryptoApi {
+			fn crypto(&self) -> Self::CryptoApi<BigInt, BigUint> {
 				self.api.crypto()
 			}
 		}

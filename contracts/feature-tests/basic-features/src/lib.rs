@@ -903,7 +903,38 @@ pub trait BasicFeatures {
 	fn rem_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
 		a % b
 	}
-
+	#[endpoint]
+	fn sqrt_big_uint(&self, a: BigUint) -> BigUint {
+		a.sqrt()
+	}
+	#[endpoint]
+	fn sqrt_big_uint_ref(&self, a: &BigUint) -> BigUint {
+		a.sqrt()
+	}
+	#[endpoint]
+	fn log2_big_uint(&self, a: BigUint) -> u32 {
+		a.log2()
+	}
+	#[endpoint]
+	fn log2_big_uint_ref(&self, a: &BigUint) -> u32 {
+		a.log2()
+	}
+	#[endpoint]
+	fn pow_big_int(&self, a: BigInt, b: u32) -> BigInt {
+		a.pow(b)
+	}
+	#[endpoint]
+	fn pow_big_int_ref(&self, a: &BigInt, b: u32) -> BigInt {
+		a.pow(b)
+	}
+	#[endpoint]
+	fn pow_big_uint(&self, a: BigUint, b: u32) -> BigUint {
+		a.pow(b)
+	}
+	#[endpoint]
+	fn pow_big_uint_ref(&self, a: &BigUint, b: u32) -> BigUint {
+		a.pow(b)
+	}
 	// assign version of all operators above
 	#[endpoint]
 	fn add_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
@@ -1214,6 +1245,116 @@ pub trait BasicFeatures {
 		self.crypto().verify_secp256k1(key, message, signature)
 	}
 
+	#[endpoint]
+	fn add_ec(
+		&self,
+		//curve: &EllipticCurve<BigUint>,
+		field_order: BigUint,
+		base_point_order: BigUint,
+		eq_constant: BigUint,
+		x_base_point: BigUint,
+		y_base_point: BigUint,
+		size_of_field: i32,
+		x_first_point: BigUint,
+		y_first_point: BigUint,
+		x_second_point: BigUint,
+		y_second_point: BigUint,
+	) -> (BigUint, BigUint) {
+		let curve = EllipticCurve::<BigUint>::new(
+			field_order,
+			base_point_order,
+			eq_constant,
+			x_base_point,
+			y_base_point,
+			size_of_field,
+		);
+		self.crypto().add_ec(
+			curve,
+			x_first_point,
+			y_first_point,
+			x_second_point,
+			y_second_point,
+		)
+	}
+
+	#[endpoint]
+	fn double_ec(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		x_point: BigUint,
+		y_point: BigUint,
+	) -> (BigUint, BigUint) {
+		self.crypto().double_ec(curve, x_point, y_point)
+	}
+
+	#[endpoint]
+	fn is_on_curve_ec(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		x_point: BigUint,
+		y_point: BigUint,
+	) -> bool {
+		self.crypto().is_on_curve_ec(curve, x_point, y_point)
+	}
+
+	#[endpoint]
+	fn scalar_mult(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		x_point: BigUint,
+		y_point: BigUint,
+		data: BoxedBytes,
+	) -> (BigUint, BigUint) {
+		self.crypto().scalar_mult(curve, x_point, y_point, data)
+	}
+
+	#[endpoint]
+	fn scalar_base_mult(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		data: BoxedBytes,
+	) -> (BigUint, BigUint) {
+		self.crypto().scalar_base_mult(curve, data)
+	}
+
+	#[endpoint]
+	fn marshal_ec(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		x_pair: BigUint,
+		y_pair: BigUint,
+	) -> BoxedBytes {
+		self.crypto().marshal_ec(curve, x_pair, y_pair)
+	}
+
+	#[endpoint]
+	fn marshal_compressed_ec(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		x_pair: BigUint,
+		y_pair: BigUint,
+	) -> BoxedBytes {
+		self.crypto().marshal_compressed_ec(curve, x_pair, y_pair)
+	}
+
+	#[endpoint]
+	fn unmarshal_ec(&self, curve: &EllipticCurve<BigUint>, data: BoxedBytes) -> (BigUint, BigUint) {
+		self.crypto().unmarshal_ec(curve, data)
+	}
+
+	#[endpoint]
+	fn unmarshal_compressed_ec(
+		&self,
+		curve: &EllipticCurve<BigUint>,
+		data: BoxedBytes,
+	) -> (BigUint, BigUint) {
+		self.crypto().unmarshal_compressed_ec(curve, data)
+	}
+
+	#[endpoint]
+	fn generate_key_ec(&self, curve: &EllipticCurve<BigUint>) -> (BigUint, BigUint, BoxedBytes) {
+		self.crypto().generate_key_ec(curve)
+	}
 	// MACROS
 
 	#[view]

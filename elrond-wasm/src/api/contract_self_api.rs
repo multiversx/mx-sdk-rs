@@ -26,7 +26,7 @@ where
 
 	type BlockchainApi: BlockchainApi<BigUint> + Clone + 'static;
 
-	type CryptoApi: CryptoApi + Clone + 'static;
+	type CryptoApi: CryptoApi<BigInt, BigUint> + Clone + 'static;
 
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
