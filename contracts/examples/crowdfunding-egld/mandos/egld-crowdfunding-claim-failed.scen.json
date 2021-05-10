@@ -3,7 +3,7 @@
     "steps": [
       {
         "step": "externalSteps",
-        "path": "crowdfunding-fund.scen.json"
+        "path": "egld-crowdfunding-fund.scen.json"
       },
       {
         "step": "setState",
