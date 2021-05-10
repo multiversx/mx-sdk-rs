@@ -6,8 +6,6 @@ elrond_wasm::imports!();
 use kitty::{kitty_genes::*, Kitty};
 use random::*;
 
-use kitty_genetic_alg::Proxy as _;
-
 #[elrond_wasm_derive::contract]
 pub trait KittyOwnership {
 	#[init]
@@ -363,16 +361,14 @@ pub trait KittyOwnership {
 
 		let gene_science_contract_address = self._get_gene_science_contract_address_or_default();
 		if gene_science_contract_address != Address::zero() {
-			Ok(kitty_genetic_alg::ProxyObj::new_proxy_obj(
-				self.send(),
-				gene_science_contract_address,
-			)
-			.generate_kitty_genes(matron, sire)
-			.async_call()
-			.with_callback(
-				self.callbacks()
-					.generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
-			))
+			Ok(self
+				.kitty_genetic_alg_proxy(gene_science_contract_address)
+				.generate_kitty_genes(matron, sire)
+				.async_call()
+				.with_callback(
+					self.callbacks()
+						.generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
+				))
 		} else {
 			sc_error!("Gene science contract address not set!")
 		}
@@ -612,6 +608,11 @@ pub trait KittyOwnership {
 			},
 		}
 	}
+
+	// proxy
+
+	#[proxy]
+	fn kitty_genetic_alg_proxy(&self, to: Address) -> kitty_genetic_alg::ProxyObj<Self::SendApi>;
 
 	// storage - General
 

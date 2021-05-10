@@ -69,7 +69,7 @@ pub trait ForwarderAsyncCallModule {
 		token_identifier: &TokenIdentifier,
 		amount: &Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+		self.vault_proxy(to.clone())
 			.accept_funds(token_identifier.clone(), amount.clone())
 			.async_call()
 			.with_callback(
@@ -85,7 +85,7 @@ pub trait ForwarderAsyncCallModule {
 		token_identifier: &TokenIdentifier,
 		cb_amount: &Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+		self.vault_proxy(to.clone())
 			.accept_funds(token_identifier.clone(), cb_amount.clone())
 			.async_call()
 	}
