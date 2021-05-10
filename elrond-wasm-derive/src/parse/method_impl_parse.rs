@@ -95,8 +95,7 @@ fn extract_auto_impl(m: &syn::TraitItemMethod) -> Option<AutoImpl> {
 
 	if is_proxy {
 		assert_no_other_auto_impl(&result);
-		// panic!("Hello proxy");
-		result = Some(AutoImpl::Proxy);
+		result = Some(AutoImpl::ProxyGetter);
 	}
 
 	if let Some(module_attr) = module_opt {

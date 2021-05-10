@@ -36,10 +36,10 @@ mod message_me_proxy {
 #[elrond_wasm_derive::contract]
 pub trait Alice {
 	#[proxy]
-	fn pay_me_proxy(&self, to: Address) -> pay_me_proxy::ProxyObj<Self::SendApi>;
+	fn pay_me_proxy(&self, to: Address) -> pay_me_proxy::Proxy<Self::SendApi>;
 
 	#[proxy]
-	fn message_me_proxy(&self, to: Address) -> message_me_proxy::ProxyObj<Self::SendApi>;
+	fn message_me_proxy(&self, to: Address) -> message_me_proxy::Proxy<Self::SendApi>;
 
 	#[storage_get("other_contract")]
 	fn get_other_contract(&self) -> Address;

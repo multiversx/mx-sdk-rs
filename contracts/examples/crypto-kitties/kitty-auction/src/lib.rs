@@ -421,7 +421,7 @@ pub trait KittyAuction {
 	// proxy
 
 	#[proxy]
-	fn kitty_ownership_proxy(&self, to: Address) -> kitty_ownership::ProxyObj<Self::SendApi>;
+	fn kitty_ownership_proxy(&self, to: Address) -> kitty_ownership::Proxy<Self::SendApi>;
 
 	// storage
 

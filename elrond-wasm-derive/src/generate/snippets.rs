@@ -249,7 +249,7 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
 
 pub fn proxy_object_def() -> proc_macro2::TokenStream {
 	quote! {
-		pub struct ProxyObj<SA>
+		pub struct Proxy<SA>
 		where
 			SA: elrond_wasm::api::SendApi + 'static,
 		{
@@ -259,7 +259,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 			pub payment: SA::AmountType,
 		}
 
-		impl<SA> elrond_wasm::api::ProxyObjApi for ProxyObj<SA>
+		impl<SA> elrond_wasm::api::ProxyObjApi for Proxy<SA>
 		where
 			SA: elrond_wasm::api::SendApi + 'static,
 		{
@@ -269,7 +269,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 			type SendApi = SA;
 
 			fn new_proxy_obj(api: SA, address: Address) -> Self {
-				ProxyObj {
+				Proxy {
 					api,
 					address,
 					token: elrond_wasm::types::TokenIdentifier::egld(),
