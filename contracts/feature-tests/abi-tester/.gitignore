@@ -7,4 +7,4 @@
 output
 
 # Used for debugging the ABI generator test
-abi_test_generated.abi.json
+abi_tester_generated.abi.json

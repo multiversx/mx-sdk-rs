@@ -15,9 +15,10 @@ fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_m
 			.iter()
 			.map(|arg| {
 				let arg_pat = &arg.pat;
+				// TODO: needs to be converted to dep_encode_or_exit
 				quote! {
 					if let Result::Err(encode_error) = #arg_pat.dep_encode(&mut key) {
-						self.api.signal_error(encode_error.message_bytes());
+						self.get_storage_raw().signal_error(encode_error.message_bytes());
 					}
 				}
 			})

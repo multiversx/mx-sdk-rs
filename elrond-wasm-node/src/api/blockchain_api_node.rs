@@ -88,7 +88,9 @@ extern "C" {
 	) -> i32;
 }
 
-impl BlockchainApi<ArwenBigUint> for ArwenApiImpl {
+impl BlockchainApi for ArwenApiImpl {
+	type BalanceType = ArwenBigUint;
+
 	#[inline]
 	fn get_sc_address(&self) -> Address {
 		unsafe {

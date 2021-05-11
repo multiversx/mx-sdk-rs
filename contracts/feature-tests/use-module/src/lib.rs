@@ -1,40 +1,35 @@
 #![no_std]
 
 mod internal_mod_a;
-pub use internal_mod_a::*;
 mod internal_mod_b;
-pub use internal_mod_b::*;
+mod internal_mod_c;
 
 elrond_wasm::imports!();
 
 #[cfg(feature = "elrond-wasm-module-features-default")]
-use elrond_wasm_module_features_default::*;
+pub use elrond_wasm_module_features_default as features;
 #[cfg(feature = "elrond-wasm-module-features-wasm")]
-use elrond_wasm_module_features_wasm::*;
+pub use elrond_wasm_module_features_wasm as features;
 
 #[cfg(feature = "elrond-wasm-module-pause-default")]
-use elrond_wasm_module_pause_default::*;
+pub use elrond_wasm_module_pause_default as pause;
 #[cfg(feature = "elrond-wasm-module-pause-wasm")]
-use elrond_wasm_module_pause_wasm::*;
+pub use elrond_wasm_module_pause_wasm as pause;
+
+use features::feature_guard;
 
 /// Contract that tests that using modules works correctly.
 /// Also provides testing for the most common modules:
 /// - FeaturesModule
 /// - PauseModule
-#[elrond_wasm_derive::contract(UseModuleImpl)]
-pub trait UseModule {
-	#[module(InteralModuleAImpl)]
-	fn internal_module_a(&self) -> InteralModuleAImpl<T, BigInt, BigUint>;
-
-	#[module(InteralModuleBImpl)]
-	fn internal_module_b(&self) -> InteralModuleBImpl<T, BigInt, BigUint>;
-
-	#[module(FeaturesModuleImpl)]
-	fn features_module(&self) -> FeaturesModuleImpl<T, BigInt, BigUint>;
-
-	#[module(PauseModuleImpl)]
-	fn pause_module(&self) -> PauseModuleImpl<T, BigInt, BigUint>;
-
+#[elrond_wasm_derive::contract]
+pub trait UseModule:
+	internal_mod_a::InternalModuleA
+	+ internal_mod_b::InternalModuleB
+	+ internal_mod_c::InternalModuleC
+	+ features::FeaturesModule
+	+ pause::PauseModule
+{
 	#[init]
 	fn init(&self) {}
 
@@ -42,12 +37,12 @@ pub trait UseModule {
 	/// Uses the `feature_guard!` macro.
 	#[endpoint(checkFeatureGuard)]
 	fn check_feature_guard(&self) -> SCResult<()> {
-		feature_guard!(self.features_module(), b"featureName", true);
+		feature_guard!(self, b"featureName", true);
 		Ok(())
 	}
 
 	#[endpoint(checkPause)]
 	fn check_pause(&self) -> SCResult<bool> {
-		Ok(self.pause_module().is_paused())
+		Ok(self.is_paused())
 	}
 }

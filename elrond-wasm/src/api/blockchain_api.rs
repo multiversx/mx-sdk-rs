@@ -8,10 +8,11 @@ use alloc::boxed::Box;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait BlockchainApi<BigUint>: Sized
-where
-	BigUint: BigUintApi + 'static,
-{
+pub trait BlockchainApi: Sized {
+	/// The type of the token balances.
+	/// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
+	type BalanceType: BigUintApi + 'static;
+
 	fn get_sc_address(&self) -> Address;
 
 	fn get_owner_address(&self) -> Address;
@@ -22,9 +23,9 @@ where
 
 	fn get_caller(&self) -> Address;
 
-	fn get_balance(&self, address: &Address) -> BigUint;
+	fn get_balance(&self, address: &Address) -> Self::BalanceType;
 
-	fn get_sc_balance(&self) -> BigUint {
+	fn get_sc_balance(&self) -> Self::BalanceType {
 		self.get_balance(&self.get_sc_address())
 	}
 
@@ -54,12 +55,12 @@ where
 
 	fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64;
 
-	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint;
+	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> Self::BalanceType;
 
 	fn get_esdt_token_data(
 		&self,
 		address: &Address,
 		token: &[u8],
 		nonce: u64,
-	) -> EsdtTokenData<BigUint>;
+	) -> EsdtTokenData<Self::BalanceType>;
 }

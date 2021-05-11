@@ -12,7 +12,7 @@ pub fn validate_contract(contract_trait: &ContractTrait) {
 
 pub fn validate_method(m: &Method) {
 	validate_method_name(m);
-	validate_payable_arg(m);
+	validate_payment_args(m);
 	validate_callback_call_result_arg(m);
 }
 
@@ -28,7 +28,7 @@ fn validate_method_name(m: &Method) {
 	}
 }
 
-fn validate_payable_arg(m: &Method) {
+fn validate_payment_args(m: &Method) {
 	let num_payment = m
 		.method_args
 		.iter()
@@ -40,24 +40,42 @@ fn validate_payable_arg(m: &Method) {
 		.filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentToken))
 		.count();
 	if num_payment > 1 {
-		panic!("only one `#[payment]` argument allowed");
+		panic!(
+			"only one `#[payment]` argument allowed (method: `{}`)",
+			m.name.to_string()
+		);
 	}
 	if num_payment_token > 1 {
-		panic!("only one `#[payment_token]` argument allowed");
+		panic!(
+			"only one `#[payment_token]` argument allowed (method: `{}`)",
+			m.name.to_string()
+		);
 	}
 	if !m.is_payable() {
 		if num_payment > 0 {
-			panic!("`#[payment]` only allowed in payable endpoints, payable init or callbacks");
+			panic!("`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
 		}
 		if num_payment_token > 0 {
 			panic!(
-				"`#[payment_token]` only allowed in payable endpoints, payable init or callbacks"
-			);
+				"`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
 		}
 	}
 	if let PublicRole::Init(init_metadata) = &m.public_role {
 		if !init_metadata.payable.no_esdt() {
 			panic!("only EGLD payments currently allowed in constructors");
+		}
+	}
+	validate_payment_args_not_reference(m);
+}
+
+pub fn validate_payment_args_not_reference(m: &Method) {
+	if let Some(payment_arg) = m.payment_arg() {
+		match &payment_arg.ty {
+			syn::Type::Path(_) => {},
+			syn::Type::Reference(_) => {
+				panic!("The payment argument is expected to be an owned BigUint, references are not allowed.");
+			},
+			_ => panic!("Unsupported payment argument type"),
 		}
 	}
 }
@@ -69,7 +87,7 @@ fn validate_callback_call_result_arg(m: &Method) {
 		.filter(|&arg| arg.metadata.callback_call_result)
 		.count();
 
-	if matches!(&m.public_role, PublicRole::Callback) {
+	if matches!(&m.public_role, PublicRole::Callback(_)) {
 		if num_call_result > 1 {
 			panic!("only one `#[call_result]` argument allowed");
 		}

@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use super::storage::*;
+use super::storage;
 
 // used as mock attributes for NFTs
 #[derive(TopEncode, TopDecode, TypeAbi)]
@@ -11,13 +11,10 @@ pub struct Color {
 	b: u8,
 }
 
-#[elrond_wasm_derive::module(ForwarderNftModuleImpl)]
-pub trait ForwarderNftModule {
-	#[module(ForwarderStorageModuleImpl)]
-	fn storage_module(&self) -> ForwarderStorageModuleImpl<T, BigInt, BigUint>;
-
+#[elrond_wasm_derive::module]
+pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 	#[view]
-	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
+	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> Self::BigUint {
 		self.blockchain().get_esdt_balance(
 			&self.blockchain().get_sc_address(),
 			token_identifier.as_esdt_identifier(),
@@ -29,13 +26,13 @@ pub trait ForwarderNftModule {
 	#[endpoint]
 	fn nft_issue(
 		&self,
-		#[payment] issue_cost: BigUint,
+		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-	) -> AsyncCall<BigUint> {
+	) -> AsyncCall<Self::SendApi> {
 		let caller = self.blockchain().get_caller();
 
-		ESDTSystemSmartContractProxy::new()
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_non_fungible(
 				issue_cost,
 				&token_display_name,
@@ -61,10 +58,8 @@ pub trait ForwarderNftModule {
 	) {
 		match result {
 			AsyncCallResult::Ok(token_identifier) => {
-				self.storage_module()
-					.last_issued_token()
-					.set(&token_identifier);
-				self.storage_module().last_error_message().clear();
+				self.last_issued_token().set(&token_identifier);
+				self.last_error_message().clear();
 			},
 			AsyncCallResult::Err(message) => {
 				// return issue cost to the caller
@@ -73,9 +68,7 @@ pub trait ForwarderNftModule {
 					self.send().direct_egld(caller, &returned_tokens, &[]);
 				}
 
-				self.storage_module()
-					.last_error_message()
-					.set(&message.err_msg);
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
 	}
@@ -84,9 +77,9 @@ pub trait ForwarderNftModule {
 	fn nft_create(
 		&self,
 		token_identifier: TokenIdentifier,
-		amount: BigUint,
+		amount: Self::BigUint,
 		name: BoxedBytes,
-		royalties: BigUint,
+		royalties: Self::BigUint,
 		hash: H256,
 		color: Color,
 		uri: BoxedBytes,
@@ -104,7 +97,12 @@ pub trait ForwarderNftModule {
 	}
 
 	#[endpoint]
-	fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
+	fn nft_add_quantity(
+		&self,
+		token_identifier: TokenIdentifier,
+		nonce: u64,
+		amount: Self::BigUint,
+	) {
 		self.send().esdt_nft_add_quantity(
 			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
@@ -114,7 +112,7 @@ pub trait ForwarderNftModule {
 	}
 
 	#[endpoint]
-	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
+	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
 		self.send().esdt_nft_burn(
 			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
@@ -129,7 +127,7 @@ pub trait ForwarderNftModule {
 		to: Address,
 		token_identifier: TokenIdentifier,
 		nonce: u64,
-		amount: BigUint,
+		amount: Self::BigUint,
 		data: BoxedBytes,
 	) {
 		self.send().direct_esdt_nft_via_async_call(
@@ -148,7 +146,7 @@ pub trait ForwarderNftModule {
 		to: Address,
 		token_identifier: TokenIdentifier,
 		nonce: u64,
-		amount: BigUint,
+		amount: Self::BigUint,
 		function: BoxedBytes,
 		#[var_args] arguments: VarArgs<BoxedBytes>,
 	) {

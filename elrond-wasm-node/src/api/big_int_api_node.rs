@@ -307,7 +307,9 @@ impl elrond_wasm::abi::TypeAbi for ArwenBigInt {
 	}
 }
 
-impl BigIntApi<ArwenBigUint> for ArwenBigInt {
+impl BigIntApi for ArwenBigInt {
+	type BigUint = ArwenBigUint;
+
 	fn abs_uint(&self) -> ArwenBigUint {
 		unsafe {
 			let result = bigIntNew(0);

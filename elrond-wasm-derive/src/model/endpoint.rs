@@ -11,6 +11,11 @@ pub struct EndpointMetadata {
 	pub payable: MethodPayableMetadata,
 }
 
+#[derive(Clone, Debug)]
+pub struct CallbackMetadata {
+	pub callback_name: syn::Ident,
+}
+
 /// Method visibility from the point of view of the smart contract
 #[derive(Clone, Debug)]
 pub enum PublicRole {
@@ -20,7 +25,7 @@ pub enum PublicRole {
 	/// Means it gets a smart contract function generated for it
 	Endpoint(EndpointMetadata),
 
-	Callback,
+	Callback(CallbackMetadata),
 
 	CallbackRaw,
 

@@ -15,7 +15,7 @@ const PERCENTAGE_TOTAL: u32 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 const MAX_TICKETS: u32 = 800;
 
-#[elrond_wasm_derive::contract(LotteryImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Lottery {
 	#[init]
 	fn init(&self) {}
@@ -24,7 +24,7 @@ pub trait Lottery {
 	fn start(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -46,7 +46,7 @@ pub trait Lottery {
 	fn create_lottery_pool(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -67,7 +67,7 @@ pub trait Lottery {
 	fn start_lottery(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -119,7 +119,7 @@ pub trait Lottery {
 			prize_distribution,
 			whitelist,
 			current_ticket_number: 0,
-			prize_pool: BigUint::zero(),
+			prize_pool: Self::BigUint::zero(),
 		};
 
 		self.lottery_info(&lottery_name).set(&info);
@@ -129,7 +129,11 @@ pub trait Lottery {
 
 	#[endpoint]
 	#[payable("EGLD")]
-	fn buy_ticket(&self, lottery_name: BoxedBytes, #[payment] payment: BigUint) -> SCResult<()> {
+	fn buy_ticket(
+		&self,
+		lottery_name: BoxedBytes,
+		#[payment] payment: Self::BigUint,
+	) -> SCResult<()> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
 			Status::Running => self.update_after_buy_ticket(&lottery_name, &payment),
@@ -170,7 +174,7 @@ pub trait Lottery {
 	fn update_after_buy_ticket(
 		&self,
 		lottery_name: &BoxedBytes,
-		payment: &BigUint,
+		payment: &Self::BigUint,
 	) -> SCResult<()> {
 		let mut info = self.lottery_info(&lottery_name).get();
 		let caller = self.blockchain().get_caller();
@@ -223,7 +227,7 @@ pub trait Lottery {
 		};
 		let total_prize = info.prize_pool.clone();
 		let winning_tickets = self.get_distinct_random(0, total_tickets, total_winning_tickets);
-		let percentage_total = BigUint::from(PERCENTAGE_TOTAL);
+		let percentage_total = Self::BigUint::from(PERCENTAGE_TOTAL);
 
 		// distribute to the first place last. Laws of probability say that order doesn't matter.
 		// this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
@@ -231,7 +235,7 @@ pub trait Lottery {
 		for i in (1..total_winning_tickets).rev() {
 			let winning_ticket_id = winning_tickets[i];
 			let winner_address = self.ticket_holder(&lottery_name, winning_ticket_id).get();
-			let prize = &(&BigUint::from(info.prize_distribution[i] as u32) * &total_prize)
+			let prize = &(&Self::BigUint::from(info.prize_distribution[i] as u32) * &total_prize)
 				/ &percentage_total;
 
 			self.send().direct_egld(
@@ -295,7 +299,7 @@ pub trait Lottery {
 	fn lottery_info(
 		&self,
 		lottery_name: &BoxedBytes,
-	) -> SingleValueMapper<Self::Storage, LotteryInfo<BigUint>>;
+	) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::BigUint>>;
 
 	#[storage_mapper("ticketHolder")]
 	fn ticket_holder(

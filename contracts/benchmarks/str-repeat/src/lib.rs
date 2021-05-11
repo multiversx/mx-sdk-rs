@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(StrRepeatImpl)]
+#[elrond_wasm_derive::contract]
 pub trait StrRepeat {
 	#[init]
 	fn init(&self) {}

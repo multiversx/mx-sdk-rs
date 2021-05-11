@@ -1,11 +1,5 @@
-pub fn extract_struct_name(args: syn::AttributeArgs) -> syn::Path {
-	if args.len() != 1 {
-		panic!("Exactly one argument expected in contract annotation, specifying the implementation struct name.");
-	}
-
-	if let syn::NestedMeta::Meta(syn::Meta::Path(path)) = args.get(0).unwrap() {
-		path.clone()
-	} else {
-		panic!("Malformed contract implementation struct name")
+pub fn validate_attribute_args(args: syn::AttributeArgs) {
+	if !args.is_empty() {
+		panic!("No arguments expected in contract, module or proxy annotation.");
 	}
 }

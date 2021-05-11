@@ -5,7 +5,6 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
 impl StorageReadApi for TxContext {
-	#[inline]
 	fn storage_load_len(&self, key: &[u8]) -> usize {
 		self.storage_load_vec_u8(key).len()
 	}

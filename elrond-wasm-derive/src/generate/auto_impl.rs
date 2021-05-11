@@ -17,6 +17,12 @@ pub fn generate_auto_impls(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
 		.filter_map(|m| match &m.implementation {
 			MethodImpl::Explicit(_) => None,
 			MethodImpl::Generated(auto_impl) => Some(generate_auto_impl(m, auto_impl)),
+			MethodImpl::NoImplementation => {
+				panic!(
+					"method `{}` needs either an auto-implementation or a default implementation",
+					m.name.to_string()
+				)
+			},
 		})
 		.collect()
 }

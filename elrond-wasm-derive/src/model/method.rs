@@ -19,6 +19,10 @@ pub enum MethodImpl {
 
 	/// Methods where the developer has provided an explicit implementation.
 	Explicit(syn::Block),
+
+	/// Methods that have no implementation and are not annotated as such.
+	/// They are not allowed in contracts and modules, but they are used in call proxies.
+	NoImplementation,
 }
 
 /// Models any method argument from a contract, module or callable proxy trait.
@@ -54,7 +58,7 @@ impl Method {
 		match &self.public_role {
 			PublicRole::Init(init_metadata) => init_metadata.payable.is_payable(),
 			PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.is_payable(),
-			PublicRole::Callback | PublicRole::CallbackRaw => true,
+			PublicRole::Callback(_) | PublicRole::CallbackRaw => true,
 			PublicRole::Private => false,
 		}
 	}
@@ -63,8 +67,20 @@ impl Method {
 		match &self.public_role {
 			PublicRole::Init(init_metadata) => init_metadata.payable.clone(),
 			PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.clone(),
-			PublicRole::Callback | PublicRole::CallbackRaw => MethodPayableMetadata::AnyToken,
+			PublicRole::Callback(_) | PublicRole::CallbackRaw => MethodPayableMetadata::AnyToken,
 			PublicRole::Private => MethodPayableMetadata::NotPayable,
+		}
+	}
+
+	/// Returns Some with the endpoint name as `String` if the method is public.
+	/// None if the method is not [public.]
+	pub fn endpoint_name(&self) -> Option<String> {
+		match &self.public_role {
+			PublicRole::Init(_) => Some("init".to_string()),
+			PublicRole::Endpoint(endpoint_metadata) => {
+				Some(endpoint_metadata.public_name.to_string())
+			},
+			_ => None,
 		}
 	}
 

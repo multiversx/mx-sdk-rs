@@ -1,7 +1,7 @@
-use super::big_uint_api_mock::*;
+use super::{big_uint_api_mock::*, RustBigInt};
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
-use elrond_wasm::api::{BlockchainApi, ContractSelfApi, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BlockchainApi, ContractBase, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -49,7 +49,11 @@ impl TxContext {
 	}
 }
 
-impl SendApi<RustBigUint> for TxContext {
+impl SendApi for TxContext {
+	type AmountType = RustBigUint;
+	type ProxyBigInt = RustBigInt;
+	type ProxyStorage = Self;
+
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if amount.value() > self.get_available_egld_balance() {
 			std::panic::panic_any(TxPanic {

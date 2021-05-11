@@ -1,8 +1,10 @@
 elrond_wasm::imports!();
 
-use super::vault_proxy::*;
+type CallbackDataTuple<BigUint> = (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>);
 
-#[elrond_wasm_derive::module(ForwarderAsyncCallModuleImpl)]
+use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
+
+#[elrond_wasm_derive::module]
 pub trait ForwarderAsyncCallModule {
 	#[endpoint]
 	#[payable("*")]
@@ -10,11 +12,10 @@ pub trait ForwarderAsyncCallModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to, VaultProxy)
-			.with_token_transfer(token, payment)
-			.accept_funds()
+		#[payment] payment: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
+		vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.accept_funds(token, payment)
 			.async_call()
 	}
 
@@ -24,12 +25,11 @@ pub trait ForwarderAsyncCallModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
-	) -> AsyncCall<BigUint> {
+		#[payment] payment: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
 		let half_payment = payment / 2u32.into();
-		contract_call!(self, to, VaultProxy)
-			.with_token_transfer(token, half_payment)
-			.accept_funds()
+		vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.accept_funds(token, half_payment)
 			.async_call()
 	}
 
@@ -39,10 +39,10 @@ pub trait ForwarderAsyncCallModule {
 		&self,
 		to: Address,
 		token: TokenIdentifier,
-		payment: BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to, VaultProxy)
-			.retrieve_funds(token, payment)
+		payment: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
+		vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.retrieve_funds(token, payment, OptionalArg::None)
 			.async_call()
 			.with_callback(self.callbacks().retrieve_funds_callback())
 	}
@@ -51,7 +51,7 @@ pub trait ForwarderAsyncCallModule {
 	fn retrieve_funds_callback(
 		&self,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
+		#[payment] payment: Self::BigUint,
 	) {
 		let _ = self.callback_data().push(&(
 			BoxedBytes::from(&b"retrieve_funds_callback"[..]),
@@ -66,11 +66,10 @@ pub trait ForwarderAsyncCallModule {
 		&self,
 		to: &Address,
 		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to.clone(), VaultProxy)
-			.with_token_transfer(token_identifier.clone(), amount.clone())
-			.accept_funds()
+		amount: &Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
+		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+			.accept_funds(token_identifier.clone(), amount.clone())
 			.async_call()
 			.with_callback(
 				self.callbacks()
@@ -83,25 +82,22 @@ pub trait ForwarderAsyncCallModule {
 		&self,
 		to: &Address,
 		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
-	) -> AsyncCall<BigUint> {
-		contract_call!(self, to.clone(), VaultProxy)
-			.with_token_transfer(token_identifier.clone(), amount.clone())
-			.accept_funds()
+		cb_amount: &Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
+		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+			.accept_funds(token_identifier.clone(), cb_amount.clone())
 			.async_call()
 	}
 
 	#[view]
 	#[storage_mapper("callback_data")]
-	fn callback_data(
-		&self,
-	) -> VecMapper<Self::Storage, (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>)>;
+	fn callback_data(&self) -> VecMapper<Self::Storage, CallbackDataTuple<Self::BigUint>>;
 
 	#[view]
 	fn callback_data_at_index(
 		&self,
 		index: usize,
-	) -> MultiResult4<BoxedBytes, TokenIdentifier, BigUint, MultiResultVec<BoxedBytes>> {
+	) -> MultiResult4<BoxedBytes, TokenIdentifier, Self::BigUint, MultiResultVec<BoxedBytes>> {
 		let (cb_name, token, payment, args) = self.callback_data().get(index);
 		(cb_name, token, payment, args.into()).into()
 	}
