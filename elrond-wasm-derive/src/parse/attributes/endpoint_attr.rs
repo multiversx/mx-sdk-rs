@@ -1,12 +1,16 @@
 use super::attr_names::*;
 use super::util::*;
 
+pub fn is_init(m: &syn::TraitItemMethod) -> bool {
+	has_attribute(&m.attrs, ATTR_INIT)
+}
+
 pub fn is_callback_raw_decl(m: &syn::TraitItemMethod) -> bool {
 	has_attribute(&m.attrs, ATTR_CALLBACK_RAW_DECL)
 }
 
-pub fn is_init(m: &syn::TraitItemMethod) -> bool {
-	has_attribute(&m.attrs, ATTR_INIT)
+pub fn is_proxy(m: &syn::TraitItemMethod) -> bool {
+	has_attribute(&m.attrs, ATTR_PROXY)
 }
 
 pub fn is_var_args(pat: &syn::PatType) -> bool {
