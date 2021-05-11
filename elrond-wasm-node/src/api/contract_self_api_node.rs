@@ -44,7 +44,7 @@ impl ContractBase for ArwenApiImpl {
 	}
 
 	#[inline]
-	fn error_api(&self) -> Self::LogApi {
+	fn error_api(&self) -> Self::ErrorApi {
 		self.clone()
 	}
 }

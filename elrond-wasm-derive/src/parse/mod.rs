@@ -7,6 +7,7 @@ mod method_impl_parse;
 mod method_parse;
 mod parse_util;
 mod payable_parse;
+mod split_path;
 mod supertrait_parse;
 
 pub use argument_parse::*;
@@ -14,4 +15,5 @@ pub use contract_trait_parse::*;
 pub use endpoint_parse::*;
 pub use method_parse::*;
 pub use payable_parse::*;
+pub use split_path::*;
 pub use supertrait_parse::*;

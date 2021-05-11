@@ -2,10 +2,11 @@ elrond_wasm::imports!();
 
 type CallbackDataTuple<BigUint> = (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>);
 
-use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
-
 #[elrond_wasm_derive::module]
 pub trait ForwarderAsyncCallModule {
+	#[proxy]
+	fn vault_proxy(&self, to: Address) -> vault::Proxy<Self::SendApi>;
+
 	#[endpoint]
 	#[payable("*")]
 	fn forward_async_accept_funds(
@@ -14,7 +15,7 @@ pub trait ForwarderAsyncCallModule {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		vault::ProxyObj::new_proxy_obj(self.send(), to)
+		self.vault_proxy(to)
 			.accept_funds(token, payment)
 			.async_call()
 	}
@@ -28,7 +29,7 @@ pub trait ForwarderAsyncCallModule {
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		let half_payment = payment / 2u32.into();
-		vault::ProxyObj::new_proxy_obj(self.send(), to)
+		self.vault_proxy(to)
 			.accept_funds(token, half_payment)
 			.async_call()
 	}
@@ -41,7 +42,7 @@ pub trait ForwarderAsyncCallModule {
 		token: TokenIdentifier,
 		payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		vault::ProxyObj::new_proxy_obj(self.send(), to)
+		self.vault_proxy(to)
 			.retrieve_funds(token, payment, OptionalArg::None)
 			.async_call()
 			.with_callback(self.callbacks().retrieve_funds_callback())
@@ -68,7 +69,7 @@ pub trait ForwarderAsyncCallModule {
 		token_identifier: &TokenIdentifier,
 		amount: &Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+		self.vault_proxy(to.clone())
 			.accept_funds(token_identifier.clone(), amount.clone())
 			.async_call()
 			.with_callback(
@@ -84,7 +85,7 @@ pub trait ForwarderAsyncCallModule {
 		token_identifier: &TokenIdentifier,
 		cb_amount: &Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+		self.vault_proxy(to.clone())
 			.accept_funds(token_identifier.clone(), cb_amount.clone())
 			.async_call()
 	}

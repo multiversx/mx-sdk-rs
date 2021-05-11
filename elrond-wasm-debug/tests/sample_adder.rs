@@ -186,7 +186,7 @@ mod module_1 {
 		}
 	}
 
-	pub trait Proxy: elrond_wasm::api::ProxyObjApi + Sized {
+	pub trait ProxyTrait: elrond_wasm::api::ProxyObjApi + Sized {
 		fn version(self) -> ContractCall<Self::SendApi, Self::BigInt> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -403,7 +403,7 @@ mod sample_adder {
 		}
 	}
 
-	pub trait Proxy: elrond_wasm::api::ProxyObjApi + super::module_1::Proxy {
+	pub trait ProxyTrait: elrond_wasm::api::ProxyObjApi + super::module_1::ProxyTrait {
 		fn get_sum(self) -> elrond_wasm::types::ContractCall<Self::SendApi, Self::BigInt> {
 			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -747,7 +747,7 @@ mod sample_adder {
 		ContractObj { api }
 	}
 
-	pub struct ProxyObj<SA>
+	pub struct Proxy<SA>
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
@@ -757,12 +757,12 @@ mod sample_adder {
 		pub payment: SA::AmountType,
 	}
 
-	impl<SA> ProxyObj<SA>
+	impl<SA> Proxy<SA>
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
 		pub fn new_proxy_obj(api: SA, address: Address) -> Self {
-			ProxyObj {
+			Proxy {
 				api,
 				address,
 				token: elrond_wasm::types::TokenIdentifier::egld(),
@@ -771,7 +771,7 @@ mod sample_adder {
 		}
 	}
 
-	impl<SA> elrond_wasm::api::ProxyObjApi for ProxyObj<SA>
+	impl<SA> elrond_wasm::api::ProxyObjApi for Proxy<SA>
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
@@ -781,7 +781,7 @@ mod sample_adder {
 		type SendApi = SA;
 
 		fn new_proxy_obj(api: SA, address: Address) -> Self {
-			ProxyObj {
+			Proxy {
 				api,
 				address,
 				token: elrond_wasm::types::TokenIdentifier::egld(),
@@ -800,15 +800,15 @@ mod sample_adder {
 		}
 	}
 
-	impl<SA> super::module_1::Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+	impl<SA> super::module_1::ProxyTrait for Proxy<SA> where SA: elrond_wasm::api::SendApi {}
 
-	impl<SA> Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+	impl<SA> ProxyTrait for Proxy<SA> where SA: elrond_wasm::api::SendApi {}
 
-	pub fn new_proxy_obj<SA>(api: SA, address: Address) -> impl Proxy
+	pub fn new_proxy_obj<SA>(api: SA, address: Address) -> impl ProxyTrait
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
-		ProxyObj::new_proxy_obj(api, address)
+		Proxy::new_proxy_obj(api, address)
 	}
 
 	pub struct CallbackProxyObj<SA>
@@ -857,7 +857,7 @@ fn test_add() {
 	use elrond_wasm::api::ContractBase;
 	use elrond_wasm_debug::api::RustBigInt;
 	use elrond_wasm_debug::TxContext;
-	use sample_adder::{Adder, EndpointWrappers, Proxy};
+	use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 	// use module_1::{VersionModule, EndpointWrappers};
 
 	let tx_context = TxContext::dummy();

@@ -4,6 +4,7 @@ pub mod arg_str_serialize;
 pub mod auto_impl;
 pub mod auto_impl_event;
 pub mod auto_impl_module;
+pub mod auto_impl_proxy;
 pub mod auto_impl_storage;
 pub mod callback_gen;
 pub mod callback_proxies_gen;
