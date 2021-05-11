@@ -1,9 +1,3 @@
-extern crate kitty_ownership;
-use kitty_ownership::*;
-
-extern crate kitty_genetic_alg;
-use kitty_genetic_alg::*;
-
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -12,11 +6,11 @@ fn contract_map() -> ContractMap<TxContext> {
 
 	contract_map.register_contract(
 		"file:../../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
-		Box::new(|context| Box::new(KittyGeneticAlgImpl::new(context))),
+		Box::new(|context| Box::new(kitty_genetic_alg::contract_obj(context))),
 	);
 	contract_map.register_contract(
 		"file:../output/kitty-ownership.wasm",
-		Box::new(|context| Box::new(KittyOwnershipImpl::new(context))),
+		Box::new(|context| Box::new(kitty_ownership::contract_obj(context))),
 	);
 
 	contract_map

@@ -229,7 +229,9 @@ impl elrond_wasm::abi::TypeAbi for RustBigInt {
 	}
 }
 
-impl elrond_wasm::api::BigIntApi<RustBigUint> for RustBigInt {
+impl elrond_wasm::api::BigIntApi for RustBigInt {
+	type BigUint = RustBigUint;
+
 	fn abs_uint(&self) -> RustBigUint {
 		RustBigUint(self.0.abs())
 	}

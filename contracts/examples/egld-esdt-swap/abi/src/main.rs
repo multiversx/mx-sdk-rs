@@ -1,7 +1,3 @@
-use egld_esdt_swap::*;
-use elrond_wasm_debug::*;
-
 fn main() {
-	let contract = EgldEsdtSwapImpl::new(TxContext::dummy());
-	print!("{}", abi_json::contract_abi(&contract));
+	elrond_wasm_debug::abi_json::print_abi::<egld_esdt_swap::AbiProvider>();
 }

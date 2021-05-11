@@ -110,8 +110,8 @@ The init function is as follows:
 
 ```
 fn init(
-	gen_zero_kitty_starting_price: BigUint,
-	gen_zero_kitty_ending_price: BigUint,
+	gen_zero_kitty_starting_price: Self::BigUint,
+	gen_zero_kitty_ending_price: Self::BigUint,
 	gen_zero_kitty_auction_duration: u64,
 	#[var_args] opt_kitty_ownership_contract_address: OptionalArg<Address>,
 )
@@ -152,7 +152,7 @@ Returns `true` if the kitty is up for auction, `false` otherwise.
 Returns the relevant `Auction` struct (described above) if it exists, throws an error otherwise.
 
 `#[view(getCurrentWinningBid)]`  
-`fn get_current_winning_bid(kitty_id: u32) -> SCResult<BigUint>`
+`fn get_current_winning_bid(kitty_id: u32) -> SCResult<Self::BigUint>`
 
 Returns the current winning bid for a kitty's auction if it exists, throws an error otherwise. Cheaper version of `get_auction_status` is you're only interested in the winning bid.
 
@@ -162,8 +162,8 @@ Returns the current winning bid for a kitty's auction if it exists, throws an er
 #[endpoint(createSaleAuction)]
 fn create_sale_auction(
 	kitty_id: u32,
-	starting_price: BigUint,
-	ending_price: BigUint,
+	starting_price: Self::BigUint,
+	ending_price: Self::BigUint,
 	duration: u64,
 ) -> SCResult<()>
 ```
@@ -174,8 +174,8 @@ Puts the kitty up for a sale auction. Only the owner of the kitty may call this 
 #[endpoint(createSiringAuction)]
 fn create_siring_auction(
 	kitty_id: u32,
-	starting_price: BigUint,
-	ending_price: BigUint,
+	starting_price: Self::BigUint,
+	ending_price: Self::BigUint,
 	duration: u64,
 ) -> SCResult<()>
 ```
@@ -227,7 +227,7 @@ The *init* method is as follows:
 
 ```
 fn init(
-	birth_fee: BigUint,
+	birth_fee: Self::BigUint,
 	#[var_args] opt_gene_science_contract_address: OptionalArg<Address>,
 	#[var_args] opt_kitty_auction_contract_address: OptionalArg<Address>,
 )
@@ -262,7 +262,7 @@ Checks if the kitty is pregnant by checking if `siring_with_id` is not 0.
 Checks if the matron can breed with the sire. Kitties can't breed with themselves, their parents, nor their siblings/half-siblings.
 
 #[view(birthFee)]
-fn get_birth_fee() -> BigUint;
+fn get_birth_fee() -> Self::BigUint;
 
 Gets the `birth_fee` set by the owner.
 
@@ -277,7 +277,7 @@ Approves an address to use the kitty as a sire. Only the owner of `kitty_id` may
 #[payable("EGLD")]
 #[endpoint(breedWith)]
 fn breed_with(
-	#[payment] payment: BigUint,
+	#[payment] payment: Self::BigUint,
 	matron_id: u32,
 	sire_id: u32,
 ) -> SCResult<()>

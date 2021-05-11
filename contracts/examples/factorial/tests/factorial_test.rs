@@ -1,11 +1,10 @@
-extern crate factorial;
 use elrond_wasm_debug::api::RustBigUint;
 use elrond_wasm_debug::TxContext;
 use factorial::*;
 
 #[test]
 fn test_add() {
-	let factorial = FactorialImpl::new(TxContext::dummy());
+	let factorial = factorial::contract_obj(TxContext::dummy());
 
 	assert_eq!(
 		RustBigUint::from(1u32),

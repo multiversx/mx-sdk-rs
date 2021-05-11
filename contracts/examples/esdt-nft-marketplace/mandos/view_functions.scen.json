@@ -1,0 +1,193 @@
+{
+    "name": "testing view functions after second bid",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "bid_second.scen.json"
+        },
+        {
+            "step": "scQuery",
+            "txId": "isAlreadyUpForAuction",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "isAlreadyUpForAuction",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "isAlreadyUpForAuction",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "isAlreadyUpForAuction",
+                "arguments": [
+                    "str:ANOTHERNFT-123456",
+                    "5"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getPaymentTokenForAuctionedNft",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getPaymentTokenForAuctionedNft",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:EGLD",
+                    "0"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getMinMaxBid",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getMinMaxBid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "100",
+                    "1000"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getDeadline",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getDeadline",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "123,456"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getOriginalOwner",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getOriginalOwner",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:seller"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getCurrentWinningBid",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getCurrentWinningBid",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "200"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getCurrentWinner",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getCurrentWinner",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:second_bidder"
+                ],
+                "status": "0",
+                "message": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "getFullAuctionData",
+            "tx": {
+                "to": "sc:marketplace",
+                "function": "getFullAuctionData",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    {
+                        "0-payment_token": "nested:str:EGLD|u64:0",
+                        "1-min_bid": "biguint:100",
+                        "2-max_bid": "biguint:1000",
+                        "3-deadline": "u64:123,456",
+                        "4-original_owner": "address:seller",
+                        "5-current_bid": "biguint:200",
+                        "6-current_winner": "address:second_bidder",
+                        "7-marketplace_cut_percentage": "biguint:1000",
+                        "8-creator_royalties_percentage": "biguint:2000"
+                    }
+                ],
+                "status": "0",
+                "message": ""
+            }
+        }
+    ]
+}

@@ -2,7 +2,7 @@
 /// Would make more sense to be in elrond-wasm-derive, but Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
 #[macro_export]
 macro_rules! contract_call {
-	($s:expr, $address:expr, $proxy_trait:ident) => {
+	($s:expr, $address:expr, $proxy_path:ident) => {
 		$proxy_trait::<Self::SendApi, BigInt, BigUint>::new($s.send(), $address)
 	};
 }
@@ -16,8 +16,10 @@ macro_rules! imports {
 		use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 		use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 		use elrond_wasm::api::{
-			BigIntApi, BigUintApi, BlockchainApi, CallValueApi, ContractSelfApi, CryptoApi, SendApi,
+			BigIntApi, BigUintApi, BlockchainApi, CallValueApi, ContractBase, CryptoApi,
+			ProxyObjApi, SendApi,
 		};
+		use elrond_wasm::api::{ErrorApi, LogApi}; // TODO: remove at some point, they shouldn't be public
 		use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
 		use elrond_wasm::err_msg;
 		use elrond_wasm::esdt::*;
@@ -72,9 +74,9 @@ macro_rules! sc_try {
 /// # use elrond_wasm::*;
 /// # use elrond_wasm::api::BlockchainApi;
 /// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractSelfApi<BigInt, BigUint>
+/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractBase
 /// # where
-/// #   BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+/// #   BigInt: elrond_wasm::api::BigIntApi + 'static,
 /// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
@@ -100,9 +102,9 @@ macro_rules! require {
 /// # use elrond_wasm::*;
 /// # use elrond_wasm::api::BlockchainApi;
 /// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractSelfApi<BigInt, BigUint>
+/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractBase
 /// # where
-/// #   BigInt: elrond_wasm::api::BigIntApi<BigUint> + 'static,
+/// #   BigInt: elrond_wasm::api::BigIntApi + 'static,
 /// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {

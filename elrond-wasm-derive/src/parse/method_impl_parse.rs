@@ -12,19 +12,20 @@ pub fn process_method_impl(m: &syn::TraitItemMethod) -> MethodImpl {
 	} else if let Some(body) = m.default.clone() {
 		MethodImpl::Explicit(body)
 	} else {
-		panic!("method without an auto-implementation need a default implementation")
+		MethodImpl::NoImplementation
 	}
 }
 
 fn assert_no_other_auto_impl(auto_impl: &Option<AutoImpl>) {
 	assert!(
 		auto_impl.is_none(),
-		"Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}",
+		"Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}{}",
 		"`#[storage_get]`, ",
 		"`#[storage_set]`, ",
 		"`#[storage_mapper]`, ",
 		"`#[storage_is_empty]`, ",
 		"`#[storage_clear]`, ",
+		"`#[proxy]`, ",
 		"`#[module]`, ",
 		"`#[event]`, ",
 		"`#[legacy-event]`."
@@ -39,6 +40,7 @@ fn extract_auto_impl(m: &syn::TraitItemMethod) -> Option<AutoImpl> {
 	let storage_mapper_opt = StorageMapperAttribute::parse(m);
 	let storage_is_empty_opt = StorageIsEmptyAttribute::parse(m);
 	let storage_clear_opt = StorageClearAttribute::parse(m);
+	let is_proxy = is_proxy(m);
 	let module_opt = ModuleAttribute::parse(m);
 
 	let mut result = None;
@@ -89,6 +91,11 @@ fn extract_auto_impl(m: &syn::TraitItemMethod) -> Option<AutoImpl> {
 		result = Some(AutoImpl::StorageClear {
 			identifier: storage_clear.identifier,
 		});
+	}
+
+	if is_proxy {
+		assert_no_other_auto_impl(&result);
+		result = Some(AutoImpl::ProxyGetter);
 	}
 
 	if let Some(module_attr) = module_opt {

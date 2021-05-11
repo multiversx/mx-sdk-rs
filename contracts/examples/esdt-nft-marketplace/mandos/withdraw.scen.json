@@ -1,0 +1,64 @@
+{
+    "name": "withdraw token",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "auction_token.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "withdraw token",
+            "tx": {
+                "from": "address:seller",
+                "to": "sc:marketplace",
+                "value": "0",
+                "function": "withdraw",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:seller": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "sc:marketplace": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bidCutPerecentage": "1000",
+                        "str:auctionForToken|nested:str:NFT-123456|u64:1": ""
+                    },
+                    "code": "file:../output/esdt-nft-marketplace.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}

@@ -9,6 +9,7 @@ use elrond_codec::TopDecodeInput;
 macro_rules! multi_arg_impls {
     ($(($marg_struct:ident $mres_struct:ident $($n:tt $name:ident)+) )+) => {
         $(
+            #[derive(Clone)]
             pub struct $marg_struct<$($name,)+>(pub ($($name,)+));
 
             pub type $mres_struct<$($name,)+> = $marg_struct<$($name,)+>;

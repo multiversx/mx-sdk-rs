@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(NftReceiverImpl)]
+#[elrond_wasm_derive::contract]
 pub trait NftReceiver {
 	#[init]
 	fn init(&self) {}

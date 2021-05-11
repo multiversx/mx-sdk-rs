@@ -11,7 +11,7 @@ elrond_wasm::imports!();
 /// Multi-signature smart contract implementation.
 /// Acts like a wallet that needs multiple signers for any action performed.
 /// See the readme file for more detailed documentation.
-#[elrond_wasm_derive::contract(MultisigImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Multisig {
 	/// Minimum number of signatures needed to perform any action.
 	#[view(getQuorum)]
@@ -40,7 +40,7 @@ pub trait Multisig {
 	fn num_proposers(&self) -> SingleValueMapper<Self::Storage, usize>;
 
 	#[storage_mapper("action_data")]
-	fn action_mapper(&self) -> VecMapper<Self::Storage, Action<BigUint>>;
+	fn action_mapper(&self) -> VecMapper<Self::Storage, Action<Self::BigUint>>;
 
 	/// The index of the last proposed action.
 	/// 0 means that no action was ever proposed yet.
@@ -51,7 +51,7 @@ pub trait Multisig {
 
 	/// Serialized action data of an action with index.
 	#[view(getActionData)]
-	fn get_action_data(&self, action_id: usize) -> Action<BigUint> {
+	fn get_action_data(&self, action_id: usize) -> Action<Self::BigUint> {
 		self.action_mapper().get(action_id)
 	}
 
@@ -86,7 +86,7 @@ pub trait Multisig {
 	#[endpoint]
 	fn deposit(&self) {}
 
-	fn propose_action(&self, action: Action<BigUint>) -> SCResult<usize> {
+	fn propose_action(&self, action: Action<Self::BigUint>) -> SCResult<usize> {
 		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -111,7 +111,7 @@ pub trait Multisig {
 	/// - the serialized action data
 	/// - (number of signers followed by) list of signer addresses.
 	#[view(getPendingActionFullInfo)]
-	fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<BigUint>> {
+	fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::BigUint>> {
 		let mut result = Vec::new();
 		let action_last_index = self.get_action_last_index();
 		let action_mapper = self.action_mapper();
@@ -157,7 +157,7 @@ pub trait Multisig {
 	fn propose_send_egld(
 		&self,
 		to: Address,
-		amount: BigUint,
+		amount: Self::BigUint,
 		#[var_args] opt_data: OptionalArg<BoxedBytes>,
 	) -> SCResult<usize> {
 		let data = match opt_data {
@@ -170,7 +170,7 @@ pub trait Multisig {
 	#[endpoint(proposeSCDeploy)]
 	fn propose_sc_deploy(
 		&self,
-		amount: BigUint,
+		amount: Self::BigUint,
 		code: BoxedBytes,
 		upgradeable: bool,
 		payable: bool,
@@ -201,7 +201,7 @@ pub trait Multisig {
 	fn propose_sc_call(
 		&self,
 		to: Address,
-		egld_payment: BigUint,
+		egld_payment: Self::BigUint,
 		endpoint_name: BoxedBytes,
 		#[var_args] arguments: VarArgs<BoxedBytes>,
 	) -> SCResult<usize> {
@@ -401,7 +401,10 @@ pub trait Multisig {
 
 	/// Proposers and board members use this to launch signed actions.
 	#[endpoint(performAction)]
-	fn perform_action_endpoint(&self, action_id: usize) -> SCResult<PerformActionResult<BigUint>> {
+	fn perform_action_endpoint(
+		&self,
+		action_id: usize,
+	) -> SCResult<PerformActionResult<Self::SendApi>> {
 		let caller_address = self.blockchain().get_caller();
 		let caller_id = self.user_mapper().get_user_id(&caller_address);
 		let caller_role = self.get_user_id_to_role(caller_id);
@@ -417,7 +420,7 @@ pub trait Multisig {
 		self.perform_action(action_id)
 	}
 
-	fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<BigUint>> {
+	fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::SendApi>> {
 		let action = self.action_mapper().get(action_id);
 
 		// clean up storage
@@ -463,9 +466,12 @@ pub trait Multisig {
 				self.quorum().set(&new_quorum);
 				Ok(PerformActionResult::Nothing)
 			},
-			Action::SendEgld { to, amount, data } => {
-				Ok(PerformActionResult::SendEgld(SendEgld { to, amount, data }))
-			},
+			Action::SendEgld { to, amount, data } => Ok(PerformActionResult::SendEgld(SendEgld {
+				api: self.send(),
+				to,
+				amount,
+				data,
+			})),
 			Action::SCDeploy {
 				amount,
 				code,
@@ -492,7 +498,8 @@ pub trait Multisig {
 				endpoint_name,
 				arguments,
 			} => {
-				let mut contract_call_raw = ContractCall::<BigUint, ()>::new(
+				let mut contract_call_raw = ContractCall::<Self::SendApi, ()>::new(
+					self.send(),
 					to,
 					TokenIdentifier::egld(),
 					egld_payment,

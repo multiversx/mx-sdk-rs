@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract(SendTxRepeatImpl)]
+#[elrond_wasm_derive::contract]
 pub trait SendTxRepeat {
 	#[init]
 	fn init(&self) {}
@@ -12,7 +12,7 @@ pub trait SendTxRepeat {
 	fn repeat(
 		&self,
 		to: Address,
-		amount: BigUint,
+		amount: Self::BigUint,
 		times: usize,
 		#[var_args] opt_data: OptionalArg<Vec<u8>>,
 	) {

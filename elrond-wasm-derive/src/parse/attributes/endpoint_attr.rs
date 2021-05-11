@@ -1,16 +1,16 @@
 use super::attr_names::*;
 use super::util::*;
 
-pub fn is_callback_decl(m: &syn::TraitItemMethod) -> bool {
-	has_attribute(&m.attrs, ATTR_CALLBACK_DECL)
+pub fn is_init(m: &syn::TraitItemMethod) -> bool {
+	has_attribute(&m.attrs, ATTR_INIT)
 }
 
 pub fn is_callback_raw_decl(m: &syn::TraitItemMethod) -> bool {
 	has_attribute(&m.attrs, ATTR_CALLBACK_RAW_DECL)
 }
 
-pub fn is_init(m: &syn::TraitItemMethod) -> bool {
-	has_attribute(&m.attrs, ATTR_INIT)
+pub fn is_proxy(m: &syn::TraitItemMethod) -> bool {
+	has_attribute(&m.attrs, ATTR_PROXY)
 }
 
 pub fn is_var_args(pat: &syn::PatType) -> bool {
@@ -55,6 +55,26 @@ impl ViewAttribute {
 			}),
 			Some(None) => Some(ViewAttribute { view_name: None }),
 			_ => panic!("unexpected view argument tokens"),
+		}
+	}
+}
+
+#[derive(Clone, Debug)]
+pub struct CallbackAttribute {
+	pub callback_name: Option<syn::Ident>,
+}
+
+impl CallbackAttribute {
+	pub fn parse(m: &syn::TraitItemMethod) -> Option<CallbackAttribute> {
+		match find_attr_with_one_opt_token_tree_arg(m, ATTR_CALLBACK_DECL) {
+			None => None,
+			Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(CallbackAttribute {
+				callback_name: Some(ident),
+			}),
+			Some(None) => Some(CallbackAttribute {
+				callback_name: None,
+			}),
+			_ => panic!("unexpected endpoint argument tokens"),
 		}
 	}
 }

@@ -53,7 +53,10 @@ fn generate_endpoint_snippet(m: &Method, endpoint_name: &str) -> proc_macro2::To
 	}
 }
 
-pub fn generate_abi_method_body(contract: &ContractTrait) -> proc_macro2::TokenStream {
+fn generate_abi_method_body(
+	contract: &ContractTrait,
+	is_contract_main: bool,
+) -> proc_macro2::TokenStream {
 	let endpoint_snippets: Vec<proc_macro2::TokenStream> = contract
 		.methods
 		.iter()
@@ -84,6 +87,21 @@ pub fn generate_abi_method_body(contract: &ContractTrait) -> proc_macro2::TokenS
 		})
 		.collect();
 
+	let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
+		contract
+			.supertraits
+			.iter()
+			.map(|supertrait| {
+				let module_path = &supertrait.module_path;
+				quote! {
+					contract_abi.coalesce(<#module_path AbiProvider as elrond_wasm::api::ContractAbiProvider>::abi());
+				}
+			})
+			.collect()
+	} else {
+		Vec::new()
+	};
+
 	let contract_docs = &contract.docs;
 	let contract_name = &contract.trait_name.to_string();
 	quote! {
@@ -95,6 +113,28 @@ pub fn generate_abi_method_body(contract: &ContractTrait) -> proc_macro2::TokenS
 			type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),
 		};
 		#(#endpoint_snippets)*
+		#(#supertrait_snippets)*
 		contract_abi
+	}
+}
+
+pub fn generate_abi_provider(
+	contract: &ContractTrait,
+	is_contract_main: bool,
+) -> proc_macro2::TokenStream {
+	let abi_body = generate_abi_method_body(&contract, is_contract_main);
+	quote! {
+		pub struct AbiProvider {}
+
+		impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
+			type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
+			type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
+			type Storage = elrond_wasm::api::uncallable::UncallableApi;
+			type SendApi = elrond_wasm::api::uncallable::UncallableApi;
+
+			fn abi() -> elrond_wasm::abi::ContractAbi {
+				#abi_body
+			}
+		}
 	}
 }

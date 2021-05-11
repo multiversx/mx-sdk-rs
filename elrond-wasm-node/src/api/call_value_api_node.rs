@@ -21,7 +21,9 @@ extern "C" {
 	fn getCallValueTokenName(callValueOffset: *const u8, resultOffset: *const u8) -> i32;
 }
 
-impl CallValueApi<ArwenBigUint> for ArwenApiImpl {
+impl CallValueApi for ArwenApiImpl {
+	type AmountType = ArwenBigUint;
+
 	#[inline]
 	fn check_not_payable(&self) {
 		unsafe {

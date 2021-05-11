@@ -11,10 +11,10 @@ pub enum Status {
 	Failed,
 }
 
-#[elrond_wasm_derive::contract(CrowdfundingImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Crowdfunding {
 	#[init]
-	fn init(&self, target: BigUint, deadline: u64) {
+	fn init(&self, target: Self::BigUint, deadline: u64) {
 		let my_address: Address = self.blockchain().get_caller();
 		self.set_owner(&my_address);
 		self.set_target(&target);
@@ -23,7 +23,7 @@ pub trait Crowdfunding {
 
 	#[payable("EGLD")]
 	#[endpoint]
-	fn fund(&self, #[payment] payment: BigUint) -> SCResult<()> {
+	fn fund(&self, #[payment] payment: Self::BigUint) -> SCResult<()> {
 		if self.blockchain().get_block_nonce() > self.get_deadline() {
 			return sc_error!("cannot fund after deadline");
 		}
@@ -48,7 +48,7 @@ pub trait Crowdfunding {
 	}
 
 	#[view(currentFunds)]
-	fn current_funds(&self) -> SCResult<BigUint> {
+	fn current_funds(&self) -> SCResult<Self::BigUint> {
 		Ok(self.blockchain().get_sc_balance())
 	}
 
@@ -74,7 +74,7 @@ pub trait Crowdfunding {
 				if deposit > 0 {
 					self.send()
 						.direct_egld(&caller, &deposit, b"reclaim failed funding");
-					self.set_deposit(&caller, &BigUint::zero());
+					self.set_deposit(&caller, &Self::BigUint::zero());
 				}
 				Ok(())
 			},
@@ -91,11 +91,11 @@ pub trait Crowdfunding {
 	fn get_owner(&self) -> Address;
 
 	#[storage_set("target")]
-	fn set_target(&self, target: &BigUint);
+	fn set_target(&self, target: &Self::BigUint);
 
 	#[view]
 	#[storage_get("target")]
-	fn get_target(&self) -> BigUint;
+	fn get_target(&self) -> Self::BigUint;
 
 	#[storage_set("deadline")]
 	fn set_deadline(&self, deadline: u64);
@@ -105,9 +105,9 @@ pub trait Crowdfunding {
 	fn get_deadline(&self) -> u64;
 
 	#[storage_set("deposit")]
-	fn set_deposit(&self, donor: &Address, amount: &BigUint);
+	fn set_deposit(&self, donor: &Address, amount: &Self::BigUint);
 
 	#[view]
 	#[storage_get("deposit")]
-	fn get_deposit(&self, donor: &Address) -> BigUint;
+	fn get_deposit(&self, donor: &Address) -> Self::BigUint;
 }

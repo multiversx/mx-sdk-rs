@@ -1,4 +1,3 @@
-use basic_features::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -6,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/basic-features.wasm",
-		Box::new(|context| Box::new(BasicFeaturesImpl::new(context))),
+		Box::new(|context| Box::new(basic_features::contract_obj(context))),
 	);
 	contract_map
 }
