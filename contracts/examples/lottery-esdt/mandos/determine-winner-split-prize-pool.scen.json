@@ -1,5 +1,6 @@
 {
     "name": "determine winner with split prize pool acc5 1st, acc1 2nd",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -9,7 +10,7 @@
             "step": "setState",
             "currentBlockInfo": {
                 "blockTimestamp": "123456789",
-                "blockNonce": "987654321"
+                "blockRandomSeed": "0x000000040000000400000000000000000000000000000000000000000000000000000000000000000000000000000000"
             }
         },
         {
@@ -42,27 +43,33 @@
                 },
                 "address:acc1": {
                     "nonce": "1",
-                    "balance": "1,000,025",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "125"
+                    },
                     "storage": {}
                 },
                 "address:acc2": {
                     "nonce": "1",
-                    "balance": "999,900",
+                    "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc3": {
                     "nonce": "1",
-                    "balance": "999,900",
+                    "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc4": {
                     "nonce": "2",
-                    "balance": "999,900",
+                    "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc5": {
                     "nonce": "1",
-                    "balance": "1,000,275",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "375"
+                    },
                     "storage": {}
                 },
                 "address:the_lottery_contract": {
