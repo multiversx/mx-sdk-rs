@@ -37,7 +37,7 @@ impl elrond_wasm::api::ContractBase for TxContext {
 		self.clone()
 	}
 
-	fn error_api(&self) -> Self::LogApi {
+	fn error_api(&self) -> Self::ErrorApi {
 		self.clone()
 	}
 }

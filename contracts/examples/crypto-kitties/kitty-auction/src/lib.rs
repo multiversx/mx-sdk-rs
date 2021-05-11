@@ -6,8 +6,6 @@ elrond_wasm::imports!();
 pub mod auction;
 use auction::*;
 
-use kitty_ownership::Proxy as _;
-
 #[elrond_wasm_derive::contract]
 pub trait KittyAuction {
 	#[init]
@@ -46,13 +44,11 @@ pub trait KittyAuction {
 		let kitty_ownership_contract_address =
 			self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
-			Ok(kitty_ownership::ProxyObj::new_proxy_obj(
-				self.send(),
-				kitty_ownership_contract_address,
-			)
-			.create_gen_zero_kitty()
-			.async_call()
-			.with_callback(self.callbacks().create_gen_zero_kitty_callback()))
+			Ok(self
+				.kitty_ownership_proxy(kitty_ownership_contract_address)
+				.create_gen_zero_kitty()
+				.async_call()
+				.with_callback(self.callbacks().create_gen_zero_kitty_callback()))
 		} else {
 			sc_error!("Kitty Ownership contract address not set!")
 		}
@@ -245,20 +241,17 @@ pub trait KittyAuction {
 			self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			OptionalResult::Some(
-				kitty_ownership::ProxyObj::new_proxy_obj(
-					self.send(),
-					kitty_ownership_contract_address,
-				)
-				.allow_auctioning(caller.clone(), kitty_id)
-				.async_call()
-				.with_callback(self.callbacks().allow_auctioning_callback(
-					auction_type,
-					kitty_id,
-					starting_price,
-					ending_price,
-					deadline,
-					caller,
-				)),
+				self.kitty_ownership_proxy(kitty_ownership_contract_address)
+					.allow_auctioning(caller.clone(), kitty_id)
+					.async_call()
+					.with_callback(self.callbacks().allow_auctioning_callback(
+						auction_type,
+						kitty_id,
+						starting_price,
+						ending_price,
+						deadline,
+						caller,
+					)),
 			)
 		} else {
 			OptionalResult::None
@@ -291,13 +284,10 @@ pub trait KittyAuction {
 			self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			OptionalResult::Some(
-				kitty_ownership::ProxyObj::new_proxy_obj(
-					self.send(),
-					kitty_ownership_contract_address,
-				)
-				.transfer(address, kitty_id)
-				.async_call()
-				.with_callback(self.callbacks().transfer_callback(kitty_id)),
+				self.kitty_ownership_proxy(kitty_ownership_contract_address)
+					.transfer(address, kitty_id)
+					.async_call()
+					.with_callback(self.callbacks().transfer_callback(kitty_id)),
 			)
 		} else {
 			OptionalResult::None
@@ -314,14 +304,11 @@ pub trait KittyAuction {
 			self._get_kitty_ownership_contract_address_or_default();
 		if kitty_ownership_contract_address != Address::zero() {
 			OptionalResult::Some(
-				kitty_ownership::ProxyObj::new_proxy_obj(
-					self.send(),
-					kitty_ownership_contract_address,
-				)
-				.approve_siring_and_return_kitty(approved_address, kitty_owner, kitty_id)
-				// not a mistake, same callback for transfer and approveSiringAndReturnKitty
-				.async_call()
-				.with_callback(self.callbacks().transfer_callback(kitty_id)),
+				self.kitty_ownership_proxy(kitty_ownership_contract_address)
+					.approve_siring_and_return_kitty(approved_address, kitty_owner, kitty_id)
+					// not a mistake, same callback for transfer and approveSiringAndReturnKitty
+					.async_call()
+					.with_callback(self.callbacks().transfer_callback(kitty_id)),
 			)
 		} else {
 			OptionalResult::None
@@ -430,6 +417,11 @@ pub trait KittyAuction {
 			},
 		}
 	}
+
+	// proxy
+
+	#[proxy]
+	fn kitty_ownership_proxy(&self, to: Address) -> kitty_ownership::Proxy<Self::SendApi>;
 
 	// storage
 
