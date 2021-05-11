@@ -352,7 +352,7 @@ impl elrond_wasm::api::BigUintApi for RustBigUint {
 				let offset = nr_bytes - bytes_be.len();
 				res[offset..].clone_from_slice(&bytes_be[..]);
 				Some(res)
-			}
+			},
 		}
 	}
 

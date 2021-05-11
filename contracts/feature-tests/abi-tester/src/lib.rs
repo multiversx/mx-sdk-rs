@@ -83,8 +83,7 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
-	fn take_ellicptic_curve(&self, _ec: EllipticCurve<Self::BigUint>) {
-	}
+	fn take_ellicptic_curve(&self, _ec: EllipticCurve<Self::BigUint>) {}
 
 	#[view]
 	#[storage_mapper("sample_storage_mapper")]
