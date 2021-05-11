@@ -1,7 +1,3 @@
-use elrond_wasm_debug::*;
-use lottery_erc20::*;
-
 fn main() {
-	let contract = LotteryImpl::new(TxContext::dummy());
-	print!("{}", abi_json::contract_abi(&contract));
+	elrond_wasm_debug::abi_json::print_abi::<lottery_erc20::AbiProvider>();
 }

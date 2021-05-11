@@ -4,8 +4,8 @@ use crate::types::{Address, TokenIdentifier};
 pub trait ContractProxy<SA, BigInt, BigUint>
 where
 	BigUint: BigUintApi + 'static,
-	BigInt: BigIntApi<BigUint> + 'static,
-	SA: SendApi<BigUint> + Clone + 'static,
+	BigInt: BigIntApi<BigUint = BigUint> + 'static,
+	SA: SendApi<AmountType = BigUint> + Clone + 'static,
 {
 	fn new(send_api: SA, address: Address) -> Self;
 

@@ -1,13 +1,11 @@
-extern crate payable_features;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
-use payable_features::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/payable-features.wasm",
-		Box::new(|context| Box::new(PayableFeaturesImpl::new(context))),
+		Box::new(|context| Box::new(payable_features::contract_obj(context))),
 	);
 	contract_map
 }

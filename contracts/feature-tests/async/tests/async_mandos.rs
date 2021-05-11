@@ -1,9 +1,3 @@
-use async_alice::*;
-use async_bob::*;
-use forwarder::*;
-use forwarder_raw::*;
-use vault::*;
-
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -11,84 +5,84 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../async-alice/output/async-alice.wasm",
-		Box::new(|context| Box::new(AliceImpl::new(context))),
+		Box::new(|context| Box::new(async_alice::contract_obj(context))),
 	);
 
 	contract_map.register_contract(
 		"file:../async-bob/output/async-bob.wasm",
-		Box::new(|context| Box::new(BobImpl::new(context))),
+		Box::new(|context| Box::new(async_bob::contract_obj(context))),
 	);
 
 	contract_map.register_contract(
 		"file:../forwarder/output/forwarder.wasm",
-		Box::new(|context| Box::new(ForwarderImpl::new(context))),
+		Box::new(|context| Box::new(forwarder::contract_obj(context))),
 	);
 
 	contract_map.register_contract(
 		"file:../forwarder-raw/output/forwarder-raw.wasm",
-		Box::new(|context| Box::new(ForwarderRawImpl::new(context))),
+		Box::new(|context| Box::new(forwarder_raw::contract_obj(context))),
 	);
 
 	contract_map.register_contract(
 		"file:../vault/output/vault.wasm",
-		Box::new(|context| Box::new(VaultImpl::new(context))),
+		Box::new(|context| Box::new(vault::contract_obj(context))),
 	);
 
 	contract_map
 }
 
-#[test]
-fn forwarder_async_accept_egld() {
-	parse_execute_mandos(
-		"mandos/forwarder_async_accept_egld.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_async_accept_egld() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_async_accept_egld.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_async_accept_esdt() {
-	parse_execute_mandos(
-		"mandos/forwarder_async_accept_esdt.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_async_accept_esdt() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_async_accept_esdt.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_async_accept_egld() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_async_accept_egld.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_async_accept_egld() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_async_accept_egld.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_async_accept_esdt() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_async_accept_esdt.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_async_accept_esdt() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_async_accept_esdt.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_async_echo() {
-	parse_execute_mandos("mandos/forwarder_raw_async_echo.scen.json", &contract_map());
-}
+// #[test]
+// fn forwarder_raw_async_echo() {
+// 	parse_execute_mandos("mandos/forwarder_raw_async_echo.scen.json", &contract_map());
+// }
 
-#[test]
-fn forwarder_raw_direct_egld() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_direct_egld.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_direct_egld() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_direct_egld.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
-#[test]
-fn forwarder_raw_direct_esdt() {
-	parse_execute_mandos(
-		"mandos/forwarder_raw_direct_esdt.scen.json",
-		&contract_map(),
-	);
-}
+// #[test]
+// fn forwarder_raw_direct_esdt() {
+// 	parse_execute_mandos(
+// 		"mandos/forwarder_raw_direct_esdt.scen.json",
+// 		&contract_map(),
+// 	);
+// }
 
 // #[test]
 // fn forwarder_raw_sync_echo() {

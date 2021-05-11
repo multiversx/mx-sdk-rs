@@ -38,8 +38,8 @@ First, you have to transfer the NFT to the marketplace, by calling the `auctionT
 #[endpoint(auctionToken)]
 fn auction_token(
 	&self,
-	min_bid: BigUint,
-	max_bid: BigUint,
+	min_bid: Self::BigUint,
+	max_bid: Self::BigUint,
 	deadline: u64,
 	accepted_payment_token: TokenIdentifier,
 	#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,

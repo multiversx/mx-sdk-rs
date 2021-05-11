@@ -1,6 +1,5 @@
 #![no_std]
 #![allow(clippy::too_many_arguments)]
-#![allow(non_snake_case)]
 
 elrond_wasm::imports!();
 
@@ -15,20 +14,11 @@ use status::Status;
 const PERCENTAGE_TOTAL: u16 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 
-#[elrond_wasm_derive::callable(Erc20Proxy)]
-pub trait Erc20 {
-	fn transferFrom(
-		&self,
-		sender: &Address,
-		recipient: &Address,
-		amount: &BigUint,
-	) -> ContractCall<BigUint, ()>;
-
-	fn transfer(&self, to: &Address, amount: &BigUint) -> ContractCall<BigUint, ()>;
-}
-
-#[elrond_wasm_derive::contract(LotteryImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Lottery {
+	#[proxy]
+	fn erc20_proxy(&self, to: Address) -> erc20::Proxy<Self::SendApi>;
+
 	#[init]
 	fn init(&self, erc20_contract_address: Address) {
 		self.set_erc20_contract_address(&erc20_contract_address);
@@ -38,7 +28,7 @@ pub trait Lottery {
 	fn start(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -60,7 +50,7 @@ pub trait Lottery {
 	fn create_lottery_pool(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -81,7 +71,7 @@ pub trait Lottery {
 	fn start_lottery(
 		&self,
 		lottery_name: BoxedBytes,
-		ticket_price: BigUint,
+		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
 		opt_max_entries_per_user: Option<u32>,
@@ -136,7 +126,7 @@ pub trait Lottery {
 			prize_distribution,
 			whitelist,
 			current_ticket_number: 0u32,
-			prize_pool: BigUint::zero(),
+			prize_pool: Self::BigUint::zero(),
 			queued_tickets: 0u32,
 		};
 
@@ -149,11 +139,11 @@ pub trait Lottery {
 	fn buy_ticket(
 		&self,
 		lottery_name: BoxedBytes,
-		token_amount: BigUint,
-	) -> SCResult<AsyncCall<BigUint>> {
+		token_amount: Self::BigUint,
+	) -> SCResult<AsyncCall<Self::SendApi>> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
-			Status::Running => self.update_after_buy_ticket(&lottery_name, &token_amount),
+			Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
 			Status::Ended => {
 				sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
 			},
@@ -167,7 +157,7 @@ pub trait Lottery {
 	fn determine_winner(
 		&self,
 		lottery_name: BoxedBytes,
-	) -> SCResult<OptionalResult<AsyncCall<BigUint>>> {
+	) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is inactive!"),
 			Status::Running => sc_error!("Lottery is still running!"),
@@ -210,8 +200,8 @@ pub trait Lottery {
 	fn update_after_buy_ticket(
 		&self,
 		lottery_name: &BoxedBytes,
-		token_amount: &BigUint,
-	) -> SCResult<AsyncCall<BigUint>> {
+		token_amount: Self::BigUint,
+	) -> SCResult<AsyncCall<Self::SendApi>> {
 		let info = self.get_lottery_info(&lottery_name);
 		let caller = self.blockchain().get_caller();
 
@@ -220,9 +210,9 @@ pub trait Lottery {
 			"You are not allowed to participate in this lottery!"
 		);
 
-		require!(token_amount == &info.ticket_price, "Wrong ticket fee!");
+		require!(token_amount == info.ticket_price, "Wrong ticket fee!");
 
-		let entries = self.get_number_of_entries_for_user(&lottery_name, &caller);
+		let entries = self.get_number_of_entries_for_user(lottery_name, &caller);
 
 		require!(
 			entries < info.max_entries_per_user,
@@ -234,8 +224,9 @@ pub trait Lottery {
 
 		let erc20_address = self.get_erc20_contract_address();
 		let lottery_contract_address = self.blockchain().get_sc_address();
-		Ok(contract_call!(self, erc20_address, Erc20Proxy)
-			.transferFrom(&caller, &lottery_contract_address, token_amount)
+		Ok(self
+			.erc20_proxy(erc20_address)
+			.transfer_from(caller.clone(), lottery_contract_address, token_amount)
 			.async_call()
 			.with_callback(
 				self.callbacks()
@@ -252,14 +243,17 @@ pub trait Lottery {
 		self.set_lottery_info(lottery_name, &info);
 	}
 
-	fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: BigUint) {
+	fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: Self::BigUint) {
 		let mut info = self.get_lottery_info(&lottery_name);
 		info.prize_pool -= value;
 
 		self.set_lottery_info(lottery_name, &info);
 	}
 
-	fn distribute_prizes(&self, lottery_name: &BoxedBytes) -> OptionalResult<AsyncCall<BigUint>> {
+	fn distribute_prizes(
+		&self,
+		lottery_name: &BoxedBytes,
+	) -> OptionalResult<AsyncCall<Self::SendApi>> {
 		let info = self.get_lottery_info(&lottery_name);
 
 		let total_tickets = info.current_ticket_number;
@@ -287,12 +281,13 @@ pub trait Lottery {
 		let winning_ticket_id = self.get_random_winning_ticket_id(&prev_winners, total_tickets);
 
 		let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
-		let prize: BigUint;
+		let prize: Self::BigUint;
 
 		if current_winning_ticket_index != 0 {
-			prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
-				* info.prize_pool.clone()
-				/ BigUint::from(PERCENTAGE_TOTAL as u32);
+			prize =
+				Self::BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
+					* info.prize_pool.clone()
+					/ Self::BigUint::from(PERCENTAGE_TOTAL as u32);
 		} else {
 			prize = info.prize_pool.clone();
 		}
@@ -306,8 +301,8 @@ pub trait Lottery {
 
 		let erc20_address = self.get_erc20_contract_address();
 		OptionalResult::Some(
-			contract_call!(self, erc20_address, Erc20Proxy)
-				.transfer(&winner_address, &prize)
+			self.erc20_proxy(erc20_address)
+				.transfer(winner_address, prize)
 				.async_call()
 				.with_callback(self.callbacks().distribute_prizes_callback(lottery_name)),
 		)
@@ -389,7 +384,7 @@ pub trait Lottery {
 		&self,
 		#[call_result] result: AsyncCallResult<()>,
 		cb_lottery_name: &BoxedBytes,
-	) -> OptionalResult<AsyncCall<BigUint>> {
+	) -> OptionalResult<AsyncCall<Self::SendApi>> {
 		match result {
 			AsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
 			AsyncCallResult::Err(_) => {
@@ -402,11 +397,15 @@ pub trait Lottery {
 	// storage
 
 	#[storage_set("lotteryInfo")]
-	fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<BigUint>);
+	fn set_lottery_info(
+		&self,
+		lottery_name: &BoxedBytes,
+		lottery_info: &LotteryInfo<Self::BigUint>,
+	);
 
 	#[view(lotteryInfo)]
 	#[storage_get("lotteryInfo")]
-	fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<BigUint>;
+	fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::BigUint>;
 
 	#[storage_is_empty("lotteryInfo")]
 	fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;

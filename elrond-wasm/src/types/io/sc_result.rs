@@ -6,7 +6,7 @@ use crate::*;
 
 /// Default way to optionally return an error from a smart contract endpoint.
 #[must_use]
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SCResult<T> {
 	Ok(T),
 	Err(SCError),

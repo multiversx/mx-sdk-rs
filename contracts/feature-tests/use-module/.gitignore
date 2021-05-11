@@ -5,3 +5,6 @@
 
 # The erdpy output
 output
+
+# Used for debugging the ABI generator test
+use_module_generated.abi.json

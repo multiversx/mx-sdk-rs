@@ -1,0 +1,99 @@
+{
+    "name": "end auction by reaching the deadline",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "bid_second.scen.json"
+        },
+        {
+            "step": "setState",
+            "comment": "set current block timestamp",
+            "currentBlockInfo": {
+                "blockTimestamp": "234,567"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "auction end deadline",
+            "comment": "owner, creator and seller will receive part of the final bid",
+            "tx": {
+                "from": "address:second_bidder",
+                "to": "sc:marketplace",
+                "value": "0",
+                "function": "endAuction",
+                "arguments": [
+                    "str:NFT-123456",
+                    "1"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "20",
+                    "storage": {}
+                },
+                "address:nft_creator": {
+                    "nonce": "0",
+                    "balance": "40",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:seller": {
+                    "nonce": "1",
+                    "balance": "140",
+                    "storage": {}
+                },
+                "address:first_bidder": {
+                    "nonce": "1",
+                    "balance": "1000",
+                    "storage": {}
+                },
+                "address:second_bidder": {
+                    "nonce": "2",
+                    "balance": "800",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "sc:marketplace": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bidCutPerecentage": "1000",
+                        "str:auctionForToken|nested:str:NFT-123456|u64:1": ""
+                    },
+                    "code": "file:../output/esdt-nft-marketplace.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}

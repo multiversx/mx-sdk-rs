@@ -1,6 +1,3 @@
-extern crate lottery_egld;
-use lottery_egld::*;
-
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -8,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/lottery-egld.wasm",
-		Box::new(|context| Box::new(LotteryImpl::new(context))),
+		Box::new(|context| Box::new(lottery_egld::contract_obj(context))),
 	);
 	contract_map
 }

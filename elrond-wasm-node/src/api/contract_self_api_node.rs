@@ -1,13 +1,17 @@
 use super::{ArwenBigInt, ArwenBigUint};
 use crate::ArwenApiImpl;
-use elrond_wasm::api::ContractSelfApi;
+use elrond_wasm::api::ContractBase;
 
-impl ContractSelfApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
+impl ContractBase for ArwenApiImpl {
+	type BigUint = ArwenBigUint;
+	type BigInt = ArwenBigInt;
 	type Storage = Self;
 	type CallValue = Self;
 	type SendApi = Self;
 	type BlockchainApi = Self;
 	type CryptoApi = Self;
+	type LogApi = Self;
+	type ErrorApi = Self;
 
 	#[inline]
 	fn get_storage_raw(&self) -> Self::Storage {
@@ -31,6 +35,16 @@ impl ContractSelfApi<ArwenBigInt, ArwenBigUint> for ArwenApiImpl {
 
 	#[inline]
 	fn crypto(&self) -> Self::CryptoApi {
+		self.clone()
+	}
+
+	#[inline]
+	fn log_api_raw(&self) -> Self::LogApi {
+		self.clone()
+	}
+
+	#[inline]
+	fn error_api(&self) -> Self::ErrorApi {
 		self.clone()
 	}
 }

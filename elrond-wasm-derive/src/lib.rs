@@ -9,11 +9,11 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
-mod callable;
 mod contract_impl;
-mod contract_macro_main;
-mod contract_macro_module;
 mod generate;
+mod macro_contract;
+mod macro_module;
+mod macro_proxy;
 mod model;
 mod parse;
 mod type_abi_derive;
@@ -24,7 +24,7 @@ pub fn contract(
 	args: proc_macro::TokenStream,
 	input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-	contract_macro_main::process_contract(args, input)
+	macro_contract::process_contract(args, input)
 }
 
 #[proc_macro_attribute]
@@ -32,15 +32,15 @@ pub fn module(
 	args: proc_macro::TokenStream,
 	input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-	contract_macro_module::process_module(args, input)
+	macro_module::process_module(args, input)
 }
 
 #[proc_macro_attribute]
-pub fn callable(
+pub fn proxy(
 	args: proc_macro::TokenStream,
 	input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-	callable::process_callable(args, input)
+	macro_proxy::process_proxy(args, input)
 }
 
 #[proc_macro_derive(TypeAbi)]
