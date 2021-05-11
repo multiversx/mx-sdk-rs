@@ -32,8 +32,6 @@ members = [
   "contracts/examples/erc1155-user-mock/abi",
   "contracts/examples/factorial",
   "contracts/examples/factorial/abi",
-  "contracts/examples/lottery-egld",
-  "contracts/examples/lottery-egld/abi",
   "contracts/examples/lottery-erc20",
   "contracts/examples/lottery-erc20/abi",
   "contracts/examples/lottery-esdt",
