@@ -10,6 +10,7 @@ pub enum AutoImpl {
 	StorageMapper { identifier: String },
 	StorageIsEmpty { identifier: String },
 	StorageClear { identifier: String },
+	ProxyGetter,
 	Module { impl_path: proc_macro2::TokenTree },
 }
 #[derive(Clone, Debug)]

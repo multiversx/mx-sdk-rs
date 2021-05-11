@@ -12,8 +12,6 @@ pub enum Status {
 	Failed,
 }
 
-use erc20::Proxy as _; // currently needed for contract calls, TODO: better syntax
-
 #[elrond_wasm_derive::contract]
 pub trait Crowdfunding {
 	#[init]
@@ -36,7 +34,8 @@ pub trait Crowdfunding {
 		let erc20_address = self.get_erc20_contract_address();
 		let cf_contract_address = self.blockchain().get_sc_address();
 
-		Ok(erc20::ProxyObj::new_proxy_obj(self.send(), erc20_address)
+		Ok(self
+			.erc20_proxy(erc20_address)
 			.transfer_from(caller.clone(), cf_contract_address, token_amount.clone())
 			.async_call()
 			.with_callback(
@@ -71,7 +70,7 @@ pub trait Crowdfunding {
 
 				let erc20_address = self.get_erc20_contract_address();
 				Ok(OptionalResult::Some(
-					erc20::ProxyObj::new_proxy_obj(self.send(), erc20_address)
+					self.erc20_proxy(erc20_address)
 						.transfer(caller, balance)
 						.async_call(),
 				))
@@ -85,7 +84,7 @@ pub trait Crowdfunding {
 
 					let erc20_address = self.get_erc20_contract_address();
 					Ok(OptionalResult::Some(
-						erc20::ProxyObj::new_proxy_obj(self.send(), erc20_address)
+						self.erc20_proxy(erc20_address)
 							.transfer(caller, deposit)
 							.async_call(),
 					))
@@ -109,7 +108,7 @@ pub trait Crowdfunding {
 				if self.blockchain().get_block_nonce() > self.get_deadline() {
 					let erc20_address = self.get_erc20_contract_address();
 					return OptionalResult::Some(
-						erc20::ProxyObj::new_proxy_obj(self.send(), erc20_address)
+						self.erc20_proxy(erc20_address)
 							.transfer(cb_sender, cb_amount)
 							.async_call(),
 					);
@@ -128,6 +127,11 @@ pub trait Crowdfunding {
 			AsyncCallResult::Err(_) => OptionalResult::None,
 		}
 	}
+
+	// proxy
+
+	#[proxy]
+	fn erc20_proxy(&self, to: Address) -> erc20::Proxy<Self::SendApi>;
 
 	// storage
 

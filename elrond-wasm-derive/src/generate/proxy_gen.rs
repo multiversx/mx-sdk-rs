@@ -107,7 +107,7 @@ pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
 		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
 	let proxy_methods_impl = generate_method_impl(&contract);
 	quote! {
-		pub trait Proxy:
+		pub trait ProxyTrait:
 			elrond_wasm::api::ProxyObjApi
 			+ Sized
 			#(#proxy_supertrait_decl)*
