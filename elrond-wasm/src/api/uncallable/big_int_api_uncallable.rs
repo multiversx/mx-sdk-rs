@@ -222,4 +222,8 @@ impl BigIntApi for BigIntUncallable {
 	fn from_signed_bytes_be(_bytes: &[u8]) -> Self {
 		unreachable!()
 	}
+
+	fn pow(&self, _exp: u32) -> Self {
+		unreachable!()
+	}
 }

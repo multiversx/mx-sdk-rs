@@ -82,6 +82,10 @@ pub trait AbiTester {
 		(address, h256).into()
 	}
 
+	#[endpoint]
+	fn take_ellicptic_curve(&self, _ec: EllipticCurve<Self::BigUint>) {
+	}
+
 	#[view]
 	#[storage_mapper("sample_storage_mapper")]
 	fn sample_storage_mapper(&self) -> SingleValueMapper<Self::Storage, OnlyShowsUpAsNested10>;

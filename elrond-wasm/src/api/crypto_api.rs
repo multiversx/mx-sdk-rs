@@ -1,11 +1,10 @@
-use super::{BigIntApi, BigUintApi};
+use super::BigUintApi;
 use crate::types::{BoxedBytes, EllipticCurve, H256};
 
-pub trait CryptoApi<BigInt, BigUint>
-where
-	BigInt: BigIntApi<BigUint> + 'static,
-	BigUint: BigUintApi + 'static,
-{
+pub trait CryptoApi {
+	/// Numeric type used in some of the Arwen hooks.
+	type BigUint: BigUintApi + 'static;
+
 	fn sha256(&self, data: &[u8]) -> H256;
 
 	fn keccak256(&self, data: &[u8]) -> H256;
@@ -22,62 +21,69 @@ where
 
 	fn add_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_first_point: BigUint,
-		y_first_point: BigUint,
-		x_second_point: BigUint,
-		y_second_point: BigUint,
-	) -> (BigUint, BigUint);
+		curve: &EllipticCurve<Self::BigUint>,
+		x_first_point: Self::BigUint,
+		y_first_point: Self::BigUint,
+		x_second_point: Self::BigUint,
+		y_second_point: Self::BigUint,
+	) -> (Self::BigUint, Self::BigUint);
 
 	fn double_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_point: BigUint,
-		y_point: BigUint,
-	) -> (BigUint, BigUint);
+		curve: &EllipticCurve<Self::BigUint>,
+		x_point: Self::BigUint,
+		y_point: Self::BigUint,
+	) -> (Self::BigUint, Self::BigUint);
 
 	fn is_on_curve_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_point: BigUint,
-		y_point: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_point: Self::BigUint,
+		y_point: Self::BigUint,
 	) -> bool;
 
 	fn scalar_mult(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_point: BigUint,
-		y_point: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_point: Self::BigUint,
+		y_point: Self::BigUint,
 		data: BoxedBytes,
-	) -> (BigUint, BigUint);
+	) -> (Self::BigUint, Self::BigUint);
 
 	fn scalar_base_mult(
 		&self,
-		curve: &EllipticCurve<BigUint>,
+		curve: &EllipticCurve<Self::BigUint>,
 		data: BoxedBytes,
-	) -> (BigUint, BigUint);
+	) -> (Self::BigUint, Self::BigUint);
 
 	fn marshal_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_pair: BigUint,
-		y_pair: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_pair: Self::BigUint,
+		y_pair: Self::BigUint,
 	) -> BoxedBytes;
 
 	fn marshal_compressed_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_pair: BigUint,
-		y_pair: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_pair: Self::BigUint,
+		y_pair: Self::BigUint,
 	) -> BoxedBytes;
 
-	fn unmarshal_ec(&self, curve: &EllipticCurve<BigUint>, data: BoxedBytes) -> (BigUint, BigUint);
+	fn unmarshal_ec(
+		&self,
+		curve: &EllipticCurve<Self::BigUint>,
+		data: BoxedBytes,
+	) -> (Self::BigUint, Self::BigUint);
 
 	fn unmarshal_compressed_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
+		curve: &EllipticCurve<Self::BigUint>,
 		data: BoxedBytes,
-	) -> (BigUint, BigUint);
+	) -> (Self::BigUint, Self::BigUint);
 
-	fn generate_key_ec(&self, curve: &EllipticCurve<BigUint>) -> (BigUint, BigUint, BoxedBytes);
+	fn generate_key_ec(
+		&self,
+		curve: &EllipticCurve<Self::BigUint>,
+	) -> (Self::BigUint, Self::BigUint, BoxedBytes);
 }

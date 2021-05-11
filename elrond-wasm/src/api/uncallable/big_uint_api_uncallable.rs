@@ -294,4 +294,16 @@ impl BigUintApi for BigUintUncallable {
 	fn from_bytes_be(_bytes: &[u8]) -> Self {
 		unreachable!()
 	}
+
+	fn sqrt(&self) -> Self {
+		unreachable!()
+	}
+
+	fn pow(&self, _exp: u32) -> Self {
+		unreachable!()
+	}
+
+	fn log2(&self) -> u32 {
+		unreachable!()
+	}
 }
