@@ -15,8 +15,10 @@ pub trait ForwarderAsyncCallModule {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
+		let token_nonce = self.call_value().esdt_token_nonce();
 		self.vault_proxy(to)
 			.accept_funds(token, payment)
+			.with_nft_nonce(token_nonce)
 			.async_call()
 	}
 
