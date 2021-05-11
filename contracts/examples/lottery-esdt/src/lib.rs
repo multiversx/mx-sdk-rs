@@ -24,6 +24,7 @@ pub trait Lottery {
 	fn start(
 		&self,
 		lottery_name: BoxedBytes,
+		token_name: TokenIdentifier,
 		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -33,6 +34,7 @@ pub trait Lottery {
 	) -> SCResult<()> {
 		self.start_lottery(
 			lottery_name,
+			token_name,
 			ticket_price,
 			opt_total_tickets,
 			opt_deadline,
@@ -46,6 +48,7 @@ pub trait Lottery {
 	fn create_lottery_pool(
 		&self,
 		lottery_name: BoxedBytes,
+		token_name: TokenIdentifier,
 		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -55,6 +58,7 @@ pub trait Lottery {
 	) -> SCResult<()> {
 		self.start_lottery(
 			lottery_name,
+			token_name,
 			ticket_price,
 			opt_total_tickets,
 			opt_deadline,
@@ -67,6 +71,7 @@ pub trait Lottery {
 	fn start_lottery(
 		&self,
 		lottery_name: BoxedBytes,
+		token_name: TokenIdentifier,
 		ticket_price: Self::BigUint,
 		opt_total_tickets: Option<u32>,
 		opt_deadline: Option<u64>,
@@ -87,6 +92,11 @@ pub trait Lottery {
 		require!(
 			self.status(&lottery_name) == Status::Inactive,
 			"Lottery is already active!"
+		);
+		require!(!lottery_name.is_empty(), "Can't have empty lottery name!");
+		require!(
+			token_name.is_egld() || token_name.is_valid_esdt_identifier(),
+			"Invalid token name provided!"
 		);
 		require!(ticket_price > 0, "Ticket price must be higher than 0!");
 		require!(
@@ -112,13 +122,13 @@ pub trait Lottery {
 		);
 
 		let info = LotteryInfo {
+			token_name,
 			ticket_price,
 			tickets_left: total_tickets,
 			deadline,
 			max_entries_per_user,
 			prize_distribution,
 			whitelist,
-			current_ticket_number: 0,
 			prize_pool: Self::BigUint::zero(),
 		};
 
@@ -132,11 +142,12 @@ pub trait Lottery {
 	fn buy_ticket(
 		&self,
 		lottery_name: BoxedBytes,
+		#[payment_token] token_name: TokenIdentifier,
 		#[payment] payment: Self::BigUint,
 	) -> SCResult<()> {
 		match self.status(&lottery_name) {
 			Status::Inactive => sc_error!("Lottery is currently inactive."),
-			Status::Running => self.update_after_buy_ticket(&lottery_name, &payment),
+			Status::Running => self.update_after_buy_ticket(&lottery_name, &token_name, &payment),
 			Status::Ended => {
 				sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
 			},
@@ -174,6 +185,7 @@ pub trait Lottery {
 	fn update_after_buy_ticket(
 		&self,
 		lottery_name: &BoxedBytes,
+		token_name: &TokenIdentifier,
 		payment: &Self::BigUint,
 	) -> SCResult<()> {
 		let mut info = self.lottery_info(&lottery_name).get();
@@ -183,7 +195,10 @@ pub trait Lottery {
 			info.whitelist.is_empty() || info.whitelist.contains(&caller),
 			"You are not allowed to participate in this lottery!"
 		);
-		require!(payment == &info.ticket_price, "Wrong ticket fee!");
+		require!(
+			token_name == &info.token_name && payment == &info.ticket_price,
+			"Wrong ticket fee!"
+		);
 
 		let mut entries = self
 			.number_of_entries_for_user(&lottery_name, &caller)
@@ -193,14 +208,11 @@ pub trait Lottery {
 			"Ticket limit exceeded for this lottery!"
 		);
 
-		self.ticket_holder(&lottery_name, info.current_ticket_number)
-			.set(&caller);
-		entries += 1;
-		info.current_ticket_number += 1;
-		info.tickets_left -= 1;
+		self.ticket_holders(&lottery_name).push(&caller);
 
-		let ticket_price = info.ticket_price.clone();
-		info.prize_pool += ticket_price;
+		entries += 1;
+		info.tickets_left -= 1;
+		info.prize_pool += &info.ticket_price;
 
 		self.number_of_entries_for_user(lottery_name, &caller)
 			.set(&entries);
@@ -211,7 +223,7 @@ pub trait Lottery {
 
 	fn distribute_prizes(&self, lottery_name: &BoxedBytes) {
 		let mut info = self.lottery_info(&lottery_name).get();
-		let total_tickets = info.current_ticket_number;
+		let total_tickets = self.ticket_holders(&lottery_name).len();
 
 		if total_tickets == 0 {
 			return;
@@ -226,7 +238,7 @@ pub trait Lottery {
 			info.prize_distribution.len()
 		};
 		let total_prize = info.prize_pool.clone();
-		let winning_tickets = self.get_distinct_random(0, total_tickets, total_winning_tickets);
+		let winning_tickets = self.get_distinct_random(1, total_tickets, total_winning_tickets);
 		let percentage_total = Self::BigUint::from(PERCENTAGE_TOTAL);
 
 		// distribute to the first place last. Laws of probability say that order doesn't matter.
@@ -234,12 +246,13 @@ pub trait Lottery {
 		// 1st place will get the spare money instead.
 		for i in (1..total_winning_tickets).rev() {
 			let winning_ticket_id = winning_tickets[i];
-			let winner_address = self.ticket_holder(&lottery_name, winning_ticket_id).get();
+			let winner_address = self.ticket_holders(&lottery_name).get(winning_ticket_id);
 			let prize = &(&Self::BigUint::from(info.prize_distribution[i] as u32) * &total_prize)
 				/ &percentage_total;
 
-			self.send().direct_egld(
+			self.send().direct(
 				&winner_address,
+				&info.token_name,
 				&prize,
 				b"You won the lottery! Congratulations!",
 			);
@@ -247,24 +260,24 @@ pub trait Lottery {
 		}
 
 		// send leftover to first place
-		let first_place_winner = self.ticket_holder(&lottery_name, winning_tickets[0]).get();
-		self.send().direct_egld(
+		let first_place_winner = self.ticket_holders(&lottery_name).get(winning_tickets[0]);
+		self.send().direct(
 			&first_place_winner,
+			&info.token_name,
 			&info.prize_pool,
 			b"You won the lottery, 1st place! Congratulations!",
 		);
 	}
 
 	fn clear_storage(&self, lottery_name: &BoxedBytes) {
-		let info = self.lottery_info(lottery_name).get();
+		let current_ticket_number = self.ticket_holders(&lottery_name).len();
 
-		for i in 0..info.current_ticket_number {
-			let addr = self.ticket_holder(lottery_name, i).get();
-
-			self.ticket_holder(lottery_name, i).clear();
+		for i in 1..=current_ticket_number {
+			let addr = self.ticket_holders(lottery_name).get(i);
 			self.number_of_entries_for_user(lottery_name, &addr).clear();
 		}
 
+		self.ticket_holders(lottery_name).clear();
 		self.lottery_info(lottery_name).clear();
 	}
 
@@ -280,12 +293,13 @@ pub trait Lottery {
 
 	/// does not check if max - min >= amount, that is the caller's job
 	fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
-		let mut rand_numbers: Vec<usize> = (min..max).collect();
+		let mut rand_numbers: Vec<usize> = (min..=max).collect();
+		let total_numbers = rand_numbers.len();
 		let seed = self.blockchain().get_block_random_seed();
 		let mut rand = Random::new(*seed);
 
 		for i in 0..amount {
-			let rand_index = (rand.next() as usize) % amount;
+			let rand_index = (rand.next() as usize) % total_numbers;
 			rand_numbers.swap(i, rand_index);
 		}
 
@@ -302,11 +316,7 @@ pub trait Lottery {
 	) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::BigUint>>;
 
 	#[storage_mapper("ticketHolder")]
-	fn ticket_holder(
-		&self,
-		lottery_name: &BoxedBytes,
-		ticket_id: usize,
-	) -> SingleValueMapper<Self::Storage, Address>;
+	fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<Self::Storage, Address>;
 
 	#[storage_mapper("numberOfEntriesForUser")]
 	fn number_of_entries_for_user(

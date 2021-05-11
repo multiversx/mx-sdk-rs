@@ -12,6 +12,5 @@ pub struct LotteryInfo<BigUint: BigUintApi> {
 	pub max_entries_per_user: u32,
 	pub prize_distribution: Vec<u8>,
 	pub whitelist: Vec<Address>,
-	pub current_ticket_number: usize,
 	pub prize_pool: BigUint,
 }
