@@ -1351,7 +1351,11 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn unmarshal_ec(&self, curve: &EllipticCurve<Self::BigUint>, data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+	fn unmarshal_ec(
+		&self,
+		curve: &EllipticCurve<Self::BigUint>,
+		data: BoxedBytes,
+	) -> (Self::BigUint, Self::BigUint) {
 		self.crypto().unmarshal_ec(curve, data)
 	}
 
@@ -1365,7 +1369,10 @@ pub trait BasicFeatures {
 	}
 
 	#[endpoint]
-	fn generate_key_ec(&self, curve: &EllipticCurve<Self::BigUint>) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
+	fn generate_key_ec(
+		&self,
+		curve: &EllipticCurve<Self::BigUint>,
+	) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
 		self.crypto().generate_key_ec(curve)
 	}
 	// MACROS
