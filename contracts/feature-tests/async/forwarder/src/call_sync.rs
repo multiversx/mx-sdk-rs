@@ -69,9 +69,11 @@ pub trait ForwarderSyncCallModule {
 		#[payment] payment: Self::BigUint,
 	) {
 		let half_gas = self.blockchain().get_gas_left() / 2;
+		let token_nonce = self.call_value().esdt_token_nonce();
 
 		let result: MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64> = self
 			.vault_proxy(to)
+			.with_nft_nonce(token_nonce)
 			.accept_funds_echo_payment(token, payment)
 			.execute_on_dest_context(half_gas);
 		let (token_identifier, token_type_str, token_payment, token_nonce) = result.into_tuple();
