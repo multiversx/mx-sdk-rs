@@ -138,7 +138,7 @@ pub trait Lottery {
 	}
 
 	#[endpoint]
-	#[payable("EGLD")]
+	#[payable("*")]
 	fn buy_ticket(
 		&self,
 		lottery_name: BoxedBytes,
