@@ -42,7 +42,7 @@ pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 		.map(|supertrait| {
 			let module_path = &supertrait.module_path;
 			quote! {
-				+ #module_path Proxy
+				+ #module_path ProxyTrait
 			}
 		})
 		.collect()
@@ -145,7 +145,7 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 
 fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
 	quote! {
-		impl<SA> #module_path Proxy for ProxyObj<SA> where SA: elrond_wasm::api::SendApi {}
+		impl<SA> #module_path ProxyTrait for Proxy<SA> where SA: elrond_wasm::api::SendApi {}
 	}
 }
 

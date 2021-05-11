@@ -26,8 +26,6 @@ pub struct AuctionArgument<BigUint: BigUintApi> {
 	pub deadline: u64,
 }
 
-use erc1155::Proxy as _;
-
 #[elrond_wasm_derive::contract]
 pub trait Erc1155Marketplace {
 	/// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
@@ -360,7 +358,7 @@ pub trait Erc1155Marketplace {
 		let sc_own_address = self.blockchain().get_sc_address();
 		let token_ownership_contract_address = self.token_ownership_contract_address().get();
 
-		erc1155::ProxyObj::new_proxy_obj(self.send(), token_ownership_contract_address)
+		self.erc1155_proxy(token_ownership_contract_address)
 			.safe_transfer_from(sc_own_address, to, type_id, nft_id, &[])
 			.async_call()
 	}
@@ -394,6 +392,11 @@ pub trait Erc1155Marketplace {
 			data
 		}
 	}
+
+	// proxy
+
+	#[proxy]
+	fn erc1155_proxy(&self, to: Address) -> erc1155::Proxy<Self::SendApi>;
 
 	// storage
 
