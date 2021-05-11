@@ -90,21 +90,13 @@ where
 	/// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
 	/// Async calls require this step, but not `transfer_esdt_execute`.
 	fn convert_to_esdt_transfer_call(self) -> Self {
-		if !self.payment_token.is_egld() {
-			let builtin_function_name = if self.payment_nonce > 0 {
-				ESDT_NFT_TRANSFER_STRING
-			} else {
-				ESDT_TRANSFER_STRING
-			};
-
+		if self.payment_token.is_egld() {
+			self
+		} else if self.payment_nonce == 0 {
+			// fungible ESDT
 			let mut new_arg_buffer = ArgBuffer::new();
 			new_arg_buffer.push_argument_bytes(self.payment_token.as_esdt_identifier());
 			new_arg_buffer.push_argument_bytes(self.payment_amount.to_bytes_be().as_slice());
-			if self.payment_nonce > 0 {
-				new_arg_buffer.push_argument_bytes(
-					elrond_codec::top_encode_no_err(&self.payment_nonce).as_slice(),
-				);
-			}
 			new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 
 			ContractCall {
@@ -113,12 +105,39 @@ where
 				payment_token: TokenIdentifier::egld(),
 				payment_amount: SA::AmountType::zero(),
 				payment_nonce: 0,
-				endpoint_name: BoxedBytes::from(builtin_function_name),
+				endpoint_name: BoxedBytes::from(ESDT_TRANSFER_STRING),
 				arg_buffer: new_arg_buffer.concat(self.arg_buffer),
 				_return_type: PhantomData,
 			}
 		} else {
-			self
+			// NFT
+			// `ESDTNFTTransfer` takes 4 arguments:
+			// arg0 - token identifier
+			// arg1 - nonce
+			// arg2 - quantity to transfer
+			// arg3 - destination address
+			let mut new_arg_buffer = ArgBuffer::new();
+			new_arg_buffer.push_argument_bytes(self.payment_token.as_esdt_identifier());
+			new_arg_buffer.push_argument_bytes(
+				elrond_codec::top_encode_no_err(&self.payment_nonce).as_slice(),
+			);
+			new_arg_buffer.push_argument_bytes(self.payment_amount.to_bytes_be().as_slice());
+			new_arg_buffer.push_argument_bytes(self.to.as_bytes());
+			new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
+
+			// send to self, sender = receiver
+			let recipient_addr = self.api.get_sc_address();
+
+			ContractCall {
+				api: self.api,
+				to: recipient_addr,
+				payment_token: TokenIdentifier::egld(),
+				payment_amount: SA::AmountType::zero(),
+				payment_nonce: 0,
+				endpoint_name: BoxedBytes::from(ESDT_NFT_TRANSFER_STRING),
+				arg_buffer: new_arg_buffer.concat(self.arg_buffer),
+				_return_type: PhantomData,
+			}
 		}
 	}
 

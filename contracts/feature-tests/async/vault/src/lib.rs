@@ -34,19 +34,24 @@ pub trait Vault {
 	#[endpoint]
 	fn accept_funds_echo_payment(
 		&self,
-		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: Self::BigUint,
+		#[payment_token] token_identifier: TokenIdentifier,
+		#[payment] token_payment: Self::BigUint,
 	) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64>> {
-		let nonce = self.call_value().esdt_token_nonce();
+		let token_nonce = self.call_value().esdt_token_nonce();
 		let token_type = self.call_value().esdt_token_type();
 
-		self.accept_funds_event(&token, token_type.as_type_name(), &payment, nonce);
+		self.accept_funds_event(
+			&token_identifier,
+			token_type.as_type_name(),
+			&token_payment,
+			token_nonce,
+		);
 
 		Ok((
-			token,
+			token_identifier,
 			BoxedBytes::from(token_type.as_type_name()),
-			payment,
-			nonce,
+			token_payment,
+			token_nonce,
 		)
 			.into())
 	}
