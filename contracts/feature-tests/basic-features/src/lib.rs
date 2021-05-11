@@ -917,35 +917,35 @@ pub trait BasicFeatures {
 		a % b
 	}
 	#[endpoint]
-	fn sqrt_big_uint(&self, a: BigUint) -> BigUint {
+	fn sqrt_big_uint(&self, a: Self::BigUint) -> Self::BigUint {
 		a.sqrt()
 	}
 	#[endpoint]
-	fn sqrt_big_uint_ref(&self, a: &BigUint) -> BigUint {
+	fn sqrt_big_uint_ref(&self, a: &Self::BigUint) -> Self::BigUint {
 		a.sqrt()
 	}
 	#[endpoint]
-	fn log2_big_uint(&self, a: BigUint) -> u32 {
+	fn log2_big_uint(&self, a: Self::BigUint) -> u32 {
 		a.log2()
 	}
 	#[endpoint]
-	fn log2_big_uint_ref(&self, a: &BigUint) -> u32 {
+	fn log2_big_uint_ref(&self, a: &Self::BigUint) -> u32 {
 		a.log2()
 	}
 	#[endpoint]
-	fn pow_big_int(&self, a: BigInt, b: u32) -> BigInt {
+	fn pow_big_int(&self, a: Self::BigInt, b: u32) -> Self::BigInt {
 		a.pow(b)
 	}
 	#[endpoint]
-	fn pow_big_int_ref(&self, a: &BigInt, b: u32) -> BigInt {
+	fn pow_big_int_ref(&self, a: &Self::BigInt, b: u32) -> Self::BigInt {
 		a.pow(b)
 	}
 	#[endpoint]
-	fn pow_big_uint(&self, a: BigUint, b: u32) -> BigUint {
+	fn pow_big_uint(&self, a: Self::BigUint, b: u32) -> Self::BigUint {
 		a.pow(b)
 	}
 	#[endpoint]
-	fn pow_big_uint_ref(&self, a: &BigUint, b: u32) -> BigUint {
+	fn pow_big_uint_ref(&self, a: &Self::BigUint, b: u32) -> Self::BigUint {
 		a.pow(b)
 	}
 	// assign version of all operators above
@@ -1261,19 +1261,19 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn add_ec(
 		&self,
-		//curve: &EllipticCurve<BigUint>,
-		field_order: BigUint,
-		base_point_order: BigUint,
-		eq_constant: BigUint,
-		x_base_point: BigUint,
-		y_base_point: BigUint,
+		//curve: &EllipticCurve<Self::BigUint>,
+		field_order: Self::BigUint,
+		base_point_order: Self::BigUint,
+		eq_constant: Self::BigUint,
+		x_base_point: Self::BigUint,
+		y_base_point: Self::BigUint,
 		size_of_field: i32,
-		x_first_point: BigUint,
-		y_first_point: BigUint,
-		x_second_point: BigUint,
-		y_second_point: BigUint,
-	) -> (BigUint, BigUint) {
-		let curve = EllipticCurve::<BigUint>::new(
+		x_first_point: Self::BigUint,
+		y_first_point: Self::BigUint,
+		x_second_point: Self::BigUint,
+		y_second_point: Self::BigUint,
+	) -> (Self::BigUint, Self::BigUint) {
+		let curve = EllipticCurve::<Self::BigUint>::new(
 			field_order,
 			base_point_order,
 			eq_constant,
@@ -1282,7 +1282,7 @@ pub trait BasicFeatures {
 			size_of_field,
 		);
 		self.crypto().add_ec(
-			curve,
+			&curve,
 			x_first_point,
 			y_first_point,
 			x_second_point,
@@ -1293,19 +1293,19 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn double_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_point: BigUint,
-		y_point: BigUint,
-	) -> (BigUint, BigUint) {
+		curve: &EllipticCurve<Self::BigUint>,
+		x_point: Self::BigUint,
+		y_point: Self::BigUint,
+	) -> (Self::BigUint, Self::BigUint) {
 		self.crypto().double_ec(curve, x_point, y_point)
 	}
 
 	#[endpoint]
 	fn is_on_curve_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_point: BigUint,
-		y_point: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_point: Self::BigUint,
+		y_point: Self::BigUint,
 	) -> bool {
 		self.crypto().is_on_curve_ec(curve, x_point, y_point)
 	}
@@ -1313,29 +1313,29 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn scalar_mult(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_point: BigUint,
-		y_point: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_point: Self::BigUint,
+		y_point: Self::BigUint,
 		data: BoxedBytes,
-	) -> (BigUint, BigUint) {
+	) -> (Self::BigUint, Self::BigUint) {
 		self.crypto().scalar_mult(curve, x_point, y_point, data)
 	}
 
 	#[endpoint]
 	fn scalar_base_mult(
 		&self,
-		curve: &EllipticCurve<BigUint>,
+		curve: &EllipticCurve<Self::BigUint>,
 		data: BoxedBytes,
-	) -> (BigUint, BigUint) {
+	) -> (Self::BigUint, Self::BigUint) {
 		self.crypto().scalar_base_mult(curve, data)
 	}
 
 	#[endpoint]
 	fn marshal_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_pair: BigUint,
-		y_pair: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_pair: Self::BigUint,
+		y_pair: Self::BigUint,
 	) -> BoxedBytes {
 		self.crypto().marshal_ec(curve, x_pair, y_pair)
 	}
@@ -1343,29 +1343,29 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn marshal_compressed_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
-		x_pair: BigUint,
-		y_pair: BigUint,
+		curve: &EllipticCurve<Self::BigUint>,
+		x_pair: Self::BigUint,
+		y_pair: Self::BigUint,
 	) -> BoxedBytes {
 		self.crypto().marshal_compressed_ec(curve, x_pair, y_pair)
 	}
 
 	#[endpoint]
-	fn unmarshal_ec(&self, curve: &EllipticCurve<BigUint>, data: BoxedBytes) -> (BigUint, BigUint) {
+	fn unmarshal_ec(&self, curve: &EllipticCurve<Self::BigUint>, data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
 		self.crypto().unmarshal_ec(curve, data)
 	}
 
 	#[endpoint]
 	fn unmarshal_compressed_ec(
 		&self,
-		curve: &EllipticCurve<BigUint>,
+		curve: &EllipticCurve<Self::BigUint>,
 		data: BoxedBytes,
-	) -> (BigUint, BigUint) {
+	) -> (Self::BigUint, Self::BigUint) {
 		self.crypto().unmarshal_compressed_ec(curve, data)
 	}
 
 	#[endpoint]
-	fn generate_key_ec(&self, curve: &EllipticCurve<BigUint>) -> (BigUint, BigUint, BoxedBytes) {
+	fn generate_key_ec(&self, curve: &EllipticCurve<Self::BigUint>) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
 		self.crypto().generate_key_ec(curve)
 	}
 	// MACROS

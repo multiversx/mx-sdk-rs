@@ -31,7 +31,7 @@ pub trait ContractBase: Sized {
 
 	type BlockchainApi: BlockchainApi<BalanceType = Self::BigUint> + Clone + 'static;
 
-	type CryptoApi: CryptoApi<BigInt, BigUint> + Clone + 'static;
+	type CryptoApi: CryptoApi<BigUint = Self::BigUint> + Clone + 'static;
 
 	type LogApi: LogApi + ErrorApi + Clone + 'static;
 

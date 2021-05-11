@@ -137,7 +137,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 				self.api.blockchain()
 			}
 			#[inline]
-			fn crypto(&self) -> Self::CryptoApi<BigInt, BigUint> {
+			fn crypto(&self) -> Self::CryptoApi {
 				self.api.crypto()
 			}
 			#[inline]
