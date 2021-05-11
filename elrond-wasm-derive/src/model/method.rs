@@ -74,7 +74,7 @@ impl Method {
 	}
 
 	/// Returns Some with the endpoint name as `String` if the method is public.
-	/// None if the method is not [ublic.]
+	/// None if the method is not [public.]
 	pub fn endpoint_name(&self) -> Option<String> {
 		match &self.public_role {
 			PublicRole::Init(_) => Some("init".to_string()),
