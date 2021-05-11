@@ -1,13 +1,10 @@
-extern crate send_tx_repeat;
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
-use send_tx_repeat::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/send-tx-repeat.wasm",
-		Box::new(|context| Box::new(SendTxRepeatImpl::new(context))),
+		Box::new(|context| Box::new(send_tx_repeat::contract_obj(context))),
 	);
 	contract_map
 }

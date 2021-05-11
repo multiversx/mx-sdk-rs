@@ -4,7 +4,9 @@ use elrond_wasm::api::CallValueApi;
 use elrond_wasm::err_msg;
 use elrond_wasm::types::{EsdtTokenType, TokenIdentifier};
 
-impl CallValueApi<RustBigUint> for TxContext {
+impl CallValueApi for TxContext {
+	type AmountType = RustBigUint;
+
 	fn check_not_payable(&self) {
 		if self.egld_value() > 0 {
 			std::panic::panic_any(TxPanic {

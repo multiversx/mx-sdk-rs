@@ -1,14 +1,11 @@
 elrond_wasm::imports!();
 
-use super::storage::*;
+use super::storage;
 
-#[elrond_wasm_derive::module(ForwarderEsdtModuleImpl)]
-pub trait ForwarderEsdtModule {
-	#[module(ForwarderStorageModuleImpl)]
-	fn storage_module(&self) -> ForwarderStorageModuleImpl<T, BigInt, BigUint>;
-
+#[elrond_wasm_derive::module]
+pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 	#[view(getFungibleEsdtBalance)]
-	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
+	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> Self::BigUint {
 		self.blockchain().get_esdt_balance(
 			&self.blockchain().get_sc_address(),
 			token_identifier.as_esdt_identifier(),
@@ -21,7 +18,7 @@ pub trait ForwarderEsdtModule {
 		&self,
 		to: &Address,
 		token_id: BoxedBytes,
-		amount: &BigUint,
+		amount: &Self::BigUint,
 		#[var_args] opt_data: OptionalArg<BoxedBytes>,
 	) {
 		let data = match &opt_data {
@@ -38,8 +35,8 @@ pub trait ForwarderEsdtModule {
 		&self,
 		to: &Address,
 		token_id: BoxedBytes,
-		amount_first_time: &BigUint,
-		amount_second_time: &BigUint,
+		amount_first_time: &Self::BigUint,
+		amount_second_time: &Self::BigUint,
 		#[var_args] opt_data: OptionalArg<BoxedBytes>,
 	) {
 		let data = match &opt_data {
@@ -64,14 +61,14 @@ pub trait ForwarderEsdtModule {
 	#[endpoint]
 	fn issue_fungible_token(
 		&self,
-		#[payment] issue_cost: BigUint,
+		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-		initial_supply: BigUint,
-	) -> AsyncCall<BigUint> {
+		initial_supply: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
 		let caller = self.blockchain().get_caller();
 
-		ESDTSystemSmartContractProxy::new()
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_fungible(
 				issue_cost,
 				&token_display_name,
@@ -98,17 +95,15 @@ pub trait ForwarderEsdtModule {
 		&self,
 		caller: &Address,
 		#[payment_token] token_identifier: TokenIdentifier,
-		#[payment] returned_tokens: BigUint,
+		#[payment] returned_tokens: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
 		// callback is called with ESDTTransfer of the newly issued token, with the amount requested,
 		// so we can get the token identifier and amount from the call data
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.storage_module()
-					.last_issued_token()
-					.set(&token_identifier);
-				self.storage_module().last_error_message().clear();
+				self.last_issued_token().set(&token_identifier);
+				self.last_error_message().clear();
 			},
 			AsyncCallResult::Err(message) => {
 				// return issue cost to the caller
@@ -116,15 +111,13 @@ pub trait ForwarderEsdtModule {
 					self.send().direct_egld(caller, &returned_tokens, &[]);
 				}
 
-				self.storage_module()
-					.last_error_message()
-					.set(&message.err_msg);
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
 	}
 
 	#[endpoint]
-	fn local_mint(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
 		self.send().esdt_local_mint(
 			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),
@@ -133,7 +126,7 @@ pub trait ForwarderEsdtModule {
 	}
 
 	#[endpoint]
-	fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
 		self.send().esdt_local_burn(
 			self.blockchain().get_gas_left(),
 			token_identifier.as_esdt_identifier(),

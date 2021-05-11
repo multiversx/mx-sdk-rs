@@ -6,7 +6,7 @@ use elrond_codec::EncodeError;
 /// Contains a smart contract execution error message.
 ///
 /// Implemented as a simple boxed slice, for performance reasons.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SCError(BoxedBytes);
 
 impl SCError {

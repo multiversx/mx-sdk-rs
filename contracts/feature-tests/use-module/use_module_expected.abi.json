@@ -1,0 +1,82 @@
+{
+    "docs": [
+        "Contract that tests that using modules works correctly.",
+        "Also provides testing for the most common modules:",
+        "- FeaturesModule",
+        "- PauseModule"
+    ],
+    "name": "UseModule",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "docs": [
+                "Validates that the \"featureName\" feature is on.",
+                "Uses the `feature_guard!` macro."
+            ],
+            "name": "checkFeatureGuard",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "checkPause",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "call_mod_a",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_mod_b",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_mod_c",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "setFeatureFlag",
+            "inputs": [
+                {
+                    "name": "feature_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "value",
+                    "type": "bool"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "isPaused",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "pause",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unpause",
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "types": {}
+}

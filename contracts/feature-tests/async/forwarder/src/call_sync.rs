@@ -1,17 +1,17 @@
 elrond_wasm::imports!();
 
-use super::vault_proxy::*;
+use vault::Proxy as _; // currently needed for contract calls, TODO: better syntax
 
-#[elrond_wasm_derive::module(ForwarderSyncCallModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait ForwarderSyncCallModule {
 	#[endpoint]
 	#[payable("*")]
 	fn echo_arguments_sync(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
-		let result = contract_call!(self, to, VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context(half_gas, self.send());
+		let result = vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.echo_arguments(args)
+			.execute_on_dest_context(half_gas);
 
 		self.execute_on_dest_context_result(result.as_slice());
 	}
@@ -27,9 +27,9 @@ pub trait ForwarderSyncCallModule {
 	) {
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
-		let result = contract_call!(self, to, VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context_custom_range(half_gas, |_, _| (start, end), self.send());
+		let result = vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.echo_arguments(args)
+			.execute_on_dest_context_custom_range(half_gas, |_, _| (start, end));
 
 		self.execute_on_dest_context_result(result.as_slice());
 	}
@@ -39,15 +39,15 @@ pub trait ForwarderSyncCallModule {
 	fn echo_arguments_sync_twice(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
 		let one_third_gas = self.blockchain().get_gas_left() / 3;
 
-		let result = contract_call!(self, to.clone(), VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context(one_third_gas, self.send());
+		let result = vault::ProxyObj::new_proxy_obj(self.send(), to.clone())
+			.echo_arguments(args.clone())
+			.execute_on_dest_context(one_third_gas);
 
 		self.execute_on_dest_context_result(result.as_slice());
 
-		let result = contract_call!(self, to, VaultProxy)
-			.echo_arguments(&args)
-			.execute_on_dest_context(one_third_gas, self.send());
+		let result = vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.echo_arguments(args)
+			.execute_on_dest_context(one_third_gas);
 
 		self.execute_on_dest_context_result(result.as_slice());
 	}
@@ -61,13 +61,12 @@ pub trait ForwarderSyncCallModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
+		#[payment] payment: Self::BigUint,
 	) {
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
-		let () = contract_call!(self, to, VaultProxy)
-			.with_token_transfer(token, payment)
-			.accept_funds()
-			.execute_on_dest_context(half_gas, self.send());
+		let () = vault::ProxyObj::new_proxy_obj(self.send(), to)
+			.accept_funds(token, payment)
+			.execute_on_dest_context(half_gas);
 	}
 }

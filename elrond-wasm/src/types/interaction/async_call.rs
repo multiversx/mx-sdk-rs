@@ -1,5 +1,5 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, ErrorApi, SendApi};
+use crate::api::SendApi;
 use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::EndpointResult;
 use crate::types::{Address, CallbackCall};
@@ -7,14 +7,21 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[must_use]
-pub struct AsyncCall<BigUint: BigUintApi> {
+pub struct AsyncCall<SA>
+where
+	SA: SendApi + 'static,
+{
+	pub(crate) api: SA,
 	pub(crate) to: Address,
-	pub(crate) egld_payment: BigUint,
+	pub(crate) egld_payment: SA::AmountType,
 	pub(crate) hex_data: HexCallDataSerializer,
 	pub(crate) callback_data: HexCallDataSerializer,
 }
 
-impl<BigUint: BigUintApi> AsyncCall<BigUint> {
+impl<SA> AsyncCall<SA>
+where
+	SA: SendApi + 'static,
+{
 	pub fn with_callback(self, callback: CallbackCall) -> Self {
 		AsyncCall {
 			callback_data: callback.closure_data,
@@ -23,22 +30,26 @@ impl<BigUint: BigUintApi> AsyncCall<BigUint> {
 	}
 }
 
-impl<FA, BigUint> EndpointResult<FA> for AsyncCall<BigUint>
+impl<FA, SA> EndpointResult<FA> for AsyncCall<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: SendApi<BigUint> + ErrorApi + Clone + 'static,
+	SA: SendApi + 'static,
 {
 	#[inline]
-	fn finish(&self, api: FA) {
+	fn finish(&self, _api: FA) {
 		// first, save the callback closure
-		api.storage_store_tx_hash_key(self.callback_data.as_slice());
+		self.api
+			.storage_store_tx_hash_key(self.callback_data.as_slice());
 
 		// last, send the async call, which will kill the execution
-		api.async_call_raw(&self.to, &self.egld_payment, self.hex_data.as_slice());
+		self.api
+			.async_call_raw(&self.to, &self.egld_payment, self.hex_data.as_slice());
 	}
 }
 
-impl<BigUint: BigUintApi> TypeAbi for AsyncCall<BigUint> {
+impl<SA> TypeAbi for AsyncCall<SA>
+where
+	SA: SendApi + 'static,
+{
 	fn type_name() -> String {
 		"AsyncCall".into()
 	}

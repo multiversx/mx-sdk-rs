@@ -11,7 +11,7 @@ pub const FEATURE_ON: u8 = 1;
 pub const FEATURE_OFF: u8 = 2;
 
 /// Standard module for managing feature flags.
-#[elrond_wasm_derive::module(FeaturesModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait FeaturesModule {
 	#[storage_get("feat:")]
 	fn get_feature_flag(&self, feature_name: FeatureName) -> u8;
@@ -50,6 +50,9 @@ pub trait FeaturesModule {
 	}
 }
 
+elrond_wasm::derive_imports!();
+
+#[derive(TopEncode)]
 pub struct FeatureName<'a>(&'a [u8]);
 
 use elrond_wasm::elrond_codec::*;

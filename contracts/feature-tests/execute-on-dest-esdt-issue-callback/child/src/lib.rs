@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 
 const EGLD_DECIMALS: usize = 18;
 
-#[elrond_wasm_derive::contract(ChildImpl)]
+#[elrond_wasm_derive::contract]
 pub trait Child {
 	#[init]
 	fn init(&self) {}
@@ -16,10 +16,10 @@ pub trait Child {
 		&self,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-		initial_supply: BigUint,
-		#[payment] issue_cost: BigUint,
-	) -> AsyncCall<BigUint> {
-		ESDTSystemSmartContractProxy::new()
+		initial_supply: Self::BigUint,
+		#[payment] issue_cost: Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_fungible(
 				issue_cost,
 				&token_display_name,
@@ -47,7 +47,7 @@ pub trait Child {
 	fn esdt_issue_callback(
 		&self,
 		#[payment_token] token_identifier: TokenIdentifier,
-		#[payment] _amount: BigUint,
+		#[payment] _amount: Self::BigUint,
 		#[call_result] _result: AsyncCallResult<()>,
 	) {
 		self.wrapped_egld_token_identifier().set(&token_identifier);

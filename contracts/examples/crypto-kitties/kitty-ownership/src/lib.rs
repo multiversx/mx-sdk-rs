@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(non_snake_case)]
 #![allow(clippy::suspicious_operation_groupings)]
 
 elrond_wasm::imports!();
@@ -7,17 +6,14 @@ elrond_wasm::imports!();
 use kitty::{kitty_genes::*, Kitty};
 use random::*;
 
-#[elrond_wasm_derive::callable(GeneScienceProxy)]
-pub trait GeneScience {
-	fn generateKittyGenes(&self, matron: Kitty, sire: Kitty) -> ContractCall<BigUint, ()>;
-}
+use kitty_genetic_alg::Proxy as _;
 
-#[elrond_wasm_derive::contract(KittyOwnershipImpl)]
+#[elrond_wasm_derive::contract]
 pub trait KittyOwnership {
 	#[init]
 	fn init(
 		&self,
-		birth_fee: BigUint,
+		birth_fee: Self::BigUint,
 		#[var_args] opt_gene_science_contract_address: OptionalArg<Address>,
 		#[var_args] opt_kitty_auction_contract_address: OptionalArg<Address>,
 	) {
@@ -313,7 +309,7 @@ pub trait KittyOwnership {
 	#[endpoint(breedWith)]
 	fn breed_with(
 		&self,
-		#[payment] payment: BigUint,
+		#[payment] payment: Self::BigUint,
 		matron_id: u32,
 		sire_id: u32,
 	) -> SCResult<()> {
@@ -352,7 +348,7 @@ pub trait KittyOwnership {
 	}
 
 	#[endpoint(giveBirth)]
-	fn give_birth(&self, matron_id: u32) -> SCResult<AsyncCall<BigUint>> {
+	fn give_birth(&self, matron_id: u32) -> SCResult<AsyncCall<Self::SendApi>> {
 		require!(self._is_valid_id(matron_id), "Invalid kitty id!");
 
 		let matron = self.get_kitty_by_id(matron_id);
@@ -367,17 +363,16 @@ pub trait KittyOwnership {
 
 		let gene_science_contract_address = self._get_gene_science_contract_address_or_default();
 		if gene_science_contract_address != Address::zero() {
-			Ok(
-				contract_call!(self, gene_science_contract_address, GeneScienceProxy)
-					.generateKittyGenes(matron, sire)
-					.async_call()
-					.with_callback(
-						self.callbacks().generate_kitty_genes_callback(
-							matron_id,
-							self.blockchain().get_caller(),
-						),
-					),
+			Ok(kitty_genetic_alg::ProxyObj::new_proxy_obj(
+				self.send(),
+				gene_science_contract_address,
 			)
+			.generate_kitty_genes(matron, sire)
+			.async_call()
+			.with_callback(
+				self.callbacks()
+					.generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
+			))
 		} else {
 			sc_error!("Gene science contract address not set!")
 		}
@@ -640,10 +635,10 @@ pub trait KittyOwnership {
 
 	#[view(birthFee)]
 	#[storage_get("birthFee")]
-	fn get_birth_fee(&self) -> BigUint;
+	fn get_birth_fee(&self) -> Self::BigUint;
 
 	#[storage_set("birthFee")]
-	fn set_birth_fee(&self, fee: BigUint);
+	fn set_birth_fee(&self, fee: Self::BigUint);
 
 	// storage - Kitties
 

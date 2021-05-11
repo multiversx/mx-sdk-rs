@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::module(ForwarderStorageModuleImpl)]
+#[elrond_wasm_derive::module]
 pub trait ForwarderStorageModule {
 	#[view(lastIssuedToken)]
 	#[storage_mapper("lastIssuedToken")]

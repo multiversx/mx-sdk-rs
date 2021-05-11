@@ -17,19 +17,20 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
 	}
 
 	let arg_accumulator = quote! { &mut ___topic_buffer___ };
+	let error_api_getter = quote! { self.log_api_raw() };
 	let topic_push_snippets: Vec<proc_macro2::TokenStream> = topic_args
 		.iter()
-		.map(|arg| arg_serialize_push(arg, &arg_accumulator))
+		.map(|arg| arg_serialize_push(arg, &arg_accumulator, &error_api_getter))
 		.collect();
 	let write_log_snippet = if let Some(data_arg) = data_arg {
 		let data_pat = &data_arg.pat;
 		quote! {
-			let ___data_bytes___ = elrond_wasm::log_util::serialize_log_data(#data_pat, self.api.clone());
-			self.api.write_event_log(&___topic_buffer___, ___data_bytes___.as_slice());
+			let ___data_bytes___ = elrond_wasm::log_util::serialize_log_data(#data_pat, self.log_api_raw());
+			self.log_api_raw().write_event_log(&___topic_buffer___, ___data_bytes___.as_slice());
 		}
 	} else {
 		quote! {
-			self.api.write_event_log(&___topic_buffer___, &[]);
+			self.log_api_raw().write_event_log(&___topic_buffer___, &[]);
 		}
 	};
 
@@ -111,7 +112,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
 				quote! {
 					let data_vec = match elrond_wasm::elrond_codec::top_encode_to_vec(&#pat) {
 						Result::Ok(data_vec) => data_vec,
-						Result::Err(encode_err) => self.api.signal_error(encode_err.message_bytes()),
+						Result::Err(encode_err) => self.log_api_raw().signal_error(encode_err.message_bytes()),
 					};
 				}
 			};
@@ -126,7 +127,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
 			let mut topics = [[0u8; 32]; #nr_topics];
 			topics[0] = #event_id_literal;
 			#(#topic_conv_snippets)*
-			self.api.write_legacy_log(&topics[..], &data_vec.as_slice());
+			self.log_api_raw().write_legacy_log(&topics[..], &data_vec.as_slice());
 		}
 	}
 }

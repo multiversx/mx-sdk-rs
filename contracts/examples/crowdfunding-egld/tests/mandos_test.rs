@@ -1,5 +1,3 @@
-extern crate crowdfunding_egld;
-use crowdfunding_egld::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
@@ -7,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/crowdfunding-egld.wasm",
-		Box::new(|context| Box::new(CrowdfundingImpl::new(context))),
+		Box::new(|context| Box::new(crowdfunding_egld::contract_obj(context))),
 	);
 	contract_map
 }

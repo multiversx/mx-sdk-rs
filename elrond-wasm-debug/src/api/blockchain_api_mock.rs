@@ -5,7 +5,9 @@ use elrond_wasm::{
 	types::{Address, EsdtTokenData, H256},
 };
 
-impl elrond_wasm::api::BlockchainApi<RustBigUint> for TxContext {
+impl elrond_wasm::api::BlockchainApi for TxContext {
+	type BalanceType = RustBigUint;
+
 	fn get_sc_address(&self) -> Address {
 		self.tx_input_box.to.clone()
 	}

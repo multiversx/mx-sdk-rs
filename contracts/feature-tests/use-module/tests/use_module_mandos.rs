@@ -1,13 +1,11 @@
-extern crate use_module;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
-use use_module::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/use-module.wasm",
-		Box::new(|context| Box::new(UseModuleImpl::new(context))),
+		Box::new(|context| Box::new(use_module::contract_obj(context))),
 	);
 	contract_map
 }

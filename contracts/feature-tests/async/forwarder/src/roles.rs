@@ -1,20 +1,17 @@
 elrond_wasm::imports!();
 
-use super::storage::*;
+use super::storage;
 
-#[elrond_wasm_derive::module(ForwarderRolesModuleImpl)]
-pub trait ForwarderRolesModule {
-	#[module(ForwarderStorageModuleImpl)]
-	fn storage_module(&self) -> ForwarderStorageModuleImpl<T, BigInt, BigUint>;
-
+#[elrond_wasm_derive::module]
+pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(
 		&self,
 		address: Address,
 		token_identifier: TokenIdentifier,
 		#[var_args] roles: VarArgs<EsdtLocalRole>,
-	) -> AsyncCall<BigUint> {
-		ESDTSystemSmartContractProxy::new()
+	) -> AsyncCall<Self::SendApi> {
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.set_special_roles(
 				&address,
 				token_identifier.as_esdt_identifier(),
@@ -30,8 +27,8 @@ pub trait ForwarderRolesModule {
 		address: Address,
 		token_identifier: TokenIdentifier,
 		#[var_args] roles: VarArgs<EsdtLocalRole>,
-	) -> AsyncCall<BigUint> {
-		ESDTSystemSmartContractProxy::new()
+	) -> AsyncCall<Self::SendApi> {
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.unset_special_roles(
 				&address,
 				token_identifier.as_esdt_identifier(),
@@ -45,12 +42,10 @@ pub trait ForwarderRolesModule {
 	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.storage_module().last_error_message().clear();
+				self.last_error_message().clear();
 			},
 			AsyncCallResult::Err(message) => {
-				self.storage_module()
-					.last_error_message()
-					.set(&message.err_msg);
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
 	}

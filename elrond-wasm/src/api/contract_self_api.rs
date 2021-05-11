@@ -1,8 +1,8 @@
 use super::{
-	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, ErrorApi, SendApi,
-	StorageReadApi, StorageWriteApi,
+	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
+	EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
 };
-use crate::storage;
+use crate::{storage, types::Address};
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -10,23 +10,32 @@ use crate::storage;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractSelfApi<BigInt, BigUint>: Sized
-where
-	BigInt: BigIntApi<BigUint> + 'static,
-	BigUint: BigUintApi + 'static,
-{
+pub trait ContractBase: Sized {
+	type BigUint: BigUintApi + 'static;
+
+	type BigInt: BigIntApi + 'static;
+
 	/// Abstracts the lower-level storage functionality.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
 	/// Abstracts the call value handling at the beginning of a function call.
-	type CallValue: CallValueApi<BigUint> + ErrorApi + Clone + 'static;
+	type CallValue: CallValueApi<AmountType = Self::BigUint> + ErrorApi + Clone + 'static;
 
 	/// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
-	type SendApi: SendApi<BigUint> + Clone + 'static;
+	type SendApi: SendApi<
+			AmountType = Self::BigUint,
+			ProxyBigInt = Self::BigInt,
+			ProxyStorage = Self::Storage,
+		> + Clone
+		+ 'static;
 
-	type BlockchainApi: BlockchainApi<BigUint> + Clone + 'static;
+	type BlockchainApi: BlockchainApi<BalanceType = Self::BigUint> + Clone + 'static;
 
 	type CryptoApi: CryptoApi + Clone + 'static;
+
+	type LogApi: LogApi + ErrorApi + Clone + 'static;
+
+	type ErrorApi: ErrorApi + Clone + 'static;
 
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
@@ -47,13 +56,38 @@ where
 	/// Stateless crypto functions provided by the Arwen VM.
 	fn crypto(&self) -> Self::CryptoApi;
 
+	/// Gateway into the lower-level event log functionality.
+	/// Gets called in auto-generated
+	/// Using it directly is not recommended.
+	/// TODO: consider moving to `ContractPrivateApi`.
+	fn log_api_raw(&self) -> Self::LogApi;
+
+	/// Currently for some auto-generated code involving callbacks.
+	/// Please avoid using it directly.
+	/// TODO: find a way to hide this API.
+	fn error_api(&self) -> Self::ErrorApi;
+
 	/// Retrieves validator rewards, as set by the protocol.
 	/// TODO: move to the storage API, once BigUint gets refactored
 	#[inline]
-	fn storage_load_cumulated_validator_reward(&self) -> BigUint {
+	fn storage_load_cumulated_validator_reward(&self) -> Self::BigUint {
 		storage::storage_get(
 			self.get_storage_raw(),
 			storage::protected_keys::ELROND_REWARD_KEY,
 		)
 	}
+
+	fn proxy<P: ProxyObjApi<SendApi = Self::SendApi>>(&self, address: Address) -> P {
+		P::new_proxy_obj(self.send(), address)
+	}
+}
+
+pub trait ContractPrivateApi {
+	type ArgumentApi: EndpointArgumentApi + Clone + 'static;
+
+	type FinishApi: EndpointFinishApi + ErrorApi + Clone + 'static;
+
+	fn argument_api(&self) -> Self::ArgumentApi;
+
+	fn finish_api(&self) -> Self::FinishApi;
 }

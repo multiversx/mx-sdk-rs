@@ -18,7 +18,7 @@ Once the SC has been deployed, anyone can start a lottery, using the following f
 
 ```
 start(lottery_name: Vec<u8>,
-        ticket_price: BigUint, 
+        ticket_price: Self::BigUint, 
         opt_total_tickets: Option<u32>, 
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -81,7 +81,7 @@ The functions described above only give very basic information about a lottery. 
 ```
 #[view(lotteryInfo)]
 #[storage_get_mut("lotteryInfo")]
-fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigUint>)
+fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<Self::BigUint>)
 ```
 
 
@@ -114,7 +114,7 @@ Up until now, we’ve only looked at functions that allow you to get information
 Using the following function, you may buy a ticket for one of the available lotteries:
 
 ```
-fn buy_ticket(lottery_name: Vec<u8>, payment: BigUint)
+fn buy_ticket(lottery_name: Vec<u8>, payment: Self::BigUint)
 ``` 
 
 All you need to do is pass along the name of the lottery you wish to purchase the ticket for and the appropriate sum of erc20 tokens, corresponding to the ticket cost.

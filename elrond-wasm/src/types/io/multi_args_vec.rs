@@ -9,6 +9,7 @@ use elrond_codec::TopDecodeInput;
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
+#[derive(Clone)]
 pub struct MultiArgVec<T>(pub Vec<T>);
 
 /// Used for taking a variable number of arguments in an endpoint,

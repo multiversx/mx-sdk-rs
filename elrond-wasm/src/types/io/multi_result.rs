@@ -6,6 +6,7 @@ use alloc::vec::Vec;
 macro_rules! multi_result_impls {
     ($(($mr:ident $($n:tt $name:ident)+) )+) => {
         $(
+            #[derive(Clone)]
             pub struct $mr<$($name,)+>(pub ($($name,)+));
 
             impl<FA, $($name),+> EndpointResult<FA> for $mr<$($name,)+>

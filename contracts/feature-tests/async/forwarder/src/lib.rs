@@ -8,43 +8,21 @@ mod nft;
 mod roles;
 mod sft;
 mod storage;
-mod vault_proxy;
-
-use call_async::*;
-use call_sync::*;
-use esdt::*;
-use nft::*;
-use roles::*;
-use sft::*;
-use storage::*;
 
 elrond_wasm::imports!();
 
 /// Test contract for investigating contract calls.
 /// TODO: split into modules.
-#[elrond_wasm_derive::contract(ForwarderImpl)]
-pub trait Forwarder {
-	#[module(ForwarderAsyncCallModuleImpl)]
-	fn async_call_module(&self) -> ForwarderAsyncCallModuleImpl<T, BigInt, BigUint>;
-
-	#[module(ForwarderSyncCallModuleImpl)]
-	fn sync_call_module(&self) -> ForwarderSyncCallModuleImpl<T, BigInt, BigUint>;
-
-	#[module(ForwarderEsdtModuleImpl)]
-	fn esdt_module(&self) -> ForwarderEsdtModuleImpl<T, BigInt, BigUint>;
-
-	#[module(ForwarderNftModuleImpl)]
-	fn nft_module(&self) -> ForwarderNftModuleImpl<T, BigInt, BigUint>;
-
-	#[module(ForwarderSftModuleImpl)]
-	fn sft_module(&self) -> ForwarderSftModuleImpl<T, BigInt, BigUint>;
-
-	#[module(ForwarderRolesModuleImpl)]
-	fn roles_module(&self) -> ForwarderRolesModuleImpl<T, BigInt, BigUint>;
-
-	#[module(ForwarderStorageModuleImpl)]
-	fn storage_module(&self) -> ForwarderStorageModuleImpl<T, BigInt, BigUint>;
-
+#[elrond_wasm_derive::contract]
+pub trait Forwarder:
+	call_sync::ForwarderSyncCallModule
+	+ call_async::ForwarderAsyncCallModule
+	+ esdt::ForwarderEsdtModule
+	+ sft::ForwarderSftModule
+	+ nft::ForwarderNftModule
+	+ roles::ForwarderRolesModule
+	+ storage::ForwarderStorageModule
+{
 	#[init]
 	fn init(&self) {}
 
@@ -52,7 +30,7 @@ pub trait Forwarder {
 	fn send_egld(
 		&self,
 		to: &Address,
-		amount: &BigUint,
+		amount: &Self::BigUint,
 		#[var_args] opt_data: OptionalArg<BoxedBytes>,
 	) {
 		let data = match &opt_data {
@@ -62,65 +40,62 @@ pub trait Forwarder {
 		self.send().direct_egld(to, amount, data);
 	}
 
-	#[callback]
-	fn retrieve_funds_callback(
+	#[callback(retrieve_funds_callback)]
+	fn retrieve_funds_callback_root(
 		&self,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: BigUint,
+		#[payment] payment: Self::BigUint,
 	) {
 		// manual callback forwarding to modules is currently necessary
-		self.async_call_module()
-			.retrieve_funds_callback(token, payment)
+		self.retrieve_funds_callback(token, payment)
 	}
 
-	#[callback]
-	fn send_funds_twice_callback(
+	#[callback(send_funds_twice_callback)]
+	fn send_funds_twice_callback_root(
 		&self,
 		to: &Address,
 		token_identifier: &TokenIdentifier,
-		amount: &BigUint,
-	) -> AsyncCall<BigUint> {
+		amount: &Self::BigUint,
+	) -> AsyncCall<Self::SendApi> {
 		// manual callback forwarding to modules is currently necessary
-		self.async_call_module()
-			.send_funds_twice_callback(to, token_identifier, amount)
+		self.send_funds_twice_callback(to, token_identifier, amount)
 	}
 
-	#[callback]
-	fn esdt_issue_callback(
+	#[callback(esdt_issue_callback)]
+	fn esdt_issue_callback_root(
 		&self,
 		caller: &Address,
 		#[payment_token] token_identifier: TokenIdentifier,
-		#[payment] returned_tokens: BigUint,
+		#[payment] returned_tokens: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
 		// manual callback forwarding to modules is currently necessary
-		self.esdt_module()
-			.esdt_issue_callback(caller, token_identifier, returned_tokens, result)
+		self.esdt_issue_callback(caller, token_identifier, returned_tokens, result)
 	}
 
-	#[callback]
-	fn nft_issue_callback(
+	#[callback(nft_issue_callback)]
+	fn nft_issue_callback_root(
 		&self,
 		caller: &Address,
 		#[call_result] result: AsyncCallResult<TokenIdentifier>,
 	) {
 		// manual callback forwarding to modules is currently necessary
-		self.nft_module().nft_issue_callback(caller, result)
+		self.nft_issue_callback(caller, result)
 	}
 
-	#[callback]
-	fn sft_issue_callback(
+	#[callback(sft_issue_callback)]
+	fn sft_issue_callback_root(
 		&self,
 		caller: &Address,
 		#[call_result] result: AsyncCallResult<TokenIdentifier>,
 	) {
 		// manual callback forwarding to modules is currently necessary
-		self.sft_module().sft_issue_callback(caller, result)
+		self.sft_issue_callback(caller, result)
 	}
 
-	#[callback]
-	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
+	#[callback(change_roles_callback)]
+	fn change_roles_callback_root(&self, #[call_result] result: AsyncCallResult<()>) {
 		// manual callback forwarding to modules is currently necessary
-		self.roles_module().change_roles_callback(result)
+		self.change_roles_callback(result)
 	}
 }
