@@ -23,11 +23,12 @@
       "txId": "deploy",
       "tx": {
         "from": "address:my_address",
-        "contractCode": "file:../output/crowdfunding-egld.wasm",
+        "contractCode": "file:../output/crowdfunding-esdt.wasm",
         "value": "0",
         "arguments": [
             "500,000,000,000",
-            "123,000"
+            "123,000",
+            "str:EGLD"
         ],
         "gasLimit": "1,000,000",
         "gasPrice": "0"
@@ -50,11 +51,11 @@
           "nonce": "0",
           "balance": "0",
           "storage": {
-            "''owner": "address:my_address",
-            "''target": "500,000,000,000",
-            "''deadline": "123,000"
+            "str:target": "500,000,000,000",
+            "str:deadline": "123,000",
+            "str:tokenName": "str:EGLD"
           },
-          "code": "file:../output/crowdfunding-egld.wasm"
+          "code": "file:../output/crowdfunding-esdt.wasm"
         }
       }
     }

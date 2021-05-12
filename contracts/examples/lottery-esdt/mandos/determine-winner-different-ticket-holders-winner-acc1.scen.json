@@ -1,5 +1,6 @@
 {
     "name": "acc1 winner",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -44,7 +45,7 @@
                     "balance": "1,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:lottery_token": "200"
+                        "str:LOTTERY-123456": "200"
                     }
                 },
                 "address:acc2": {
