@@ -1,22 +1,23 @@
 {
-    "name": "same account both tickets",
+    "name": "determine winner with split prize pool acc5 1st, acc1 2nd",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "buy-ticket-same-account.scen.json"
+            "path": "buy-all-tickets-different-accounts.scen.json"
         },
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,567",
-                "blockTimestamp": "123456789"
+                "blockTimestamp": "123456789",
+                "blockRandomSeed": "0x000000040000000400000000000000000000000000000000000000000000000000000000000000000000000000000000"
             }
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-same-ticket-holder",
+            "txId": "determine-winner-with-split-prize-pool",
             "tx": {
-                "from": "address:my_address",
+                "from": "address:acc4",
                 "to": "address:the_lottery_contract",
                 "value": "0",
                 "function": "determine_winner",
@@ -36,25 +37,46 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "3",
-                    "balance": "1,000,000",
-                    "storage": {}
-                },
-                "address:acc1": {
                     "nonce": "2",
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:acc2": {
-                    "nonce": "0",
+                "address:acc1": {
+                    "nonce": "1",
                     "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "125"
+                    },
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc4": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc5": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "375"
+                    },
                     "storage": {}
                 },
                 "address:the_lottery_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/lottery-egld.wasm"
+                    "code": "file:../output/lottery-esdt.wasm"
                 }
             }
         }
