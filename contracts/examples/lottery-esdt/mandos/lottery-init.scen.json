@@ -1,5 +1,6 @@
 {
     "name": "lottery deployment test",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
