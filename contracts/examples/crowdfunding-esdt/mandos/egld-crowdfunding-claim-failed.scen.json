@@ -3,7 +3,7 @@
     "steps": [
       {
         "step": "externalSteps",
-        "path": "crowdfunding-fund.scen.json"
+        "path": "egld-crowdfunding-fund.scen.json"
       },
       {
         "step": "setState",
@@ -21,7 +21,7 @@
         "tx": {
             "from": "address:donor2",
             "to": "address:the_crowdfunding_contract",
-            "value": "250,000,000,000",
+            "value": "200,000,000,000",
             "function": "fund",
             "arguments": [],
             "gasLimit": "100,000,000",
@@ -48,32 +48,32 @@
           },
           "address:donor2": {
             "nonce": "1",
-            "balance": "750,000,000,000",
+            "balance": "800,000,000,000",
             "storage": {}
           },
           "address:the_crowdfunding_contract": {
             "nonce": "0",
-            "balance": "500,000,000,000",
+            "balance": "450,000,000,000",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''deposit|address:donor1": "250,000,000,000",
-              "''deposit|address:donor2": "250,000,000,000"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:EGLD",
+              "str:deposit|address:donor1": "250,000,000,000",
+              "str:deposit|address:donor2": "200,000,000,000"
             },
-            "code": "file:../output/crowdfunding-egld.wasm"
+            "code": "file:../output/crowdfunding-esdt.wasm"
           }
         }
     },
     {
         "step": "setState",
         "currentBlockInfo": {
-            "blockNonce": "123,001"
+            "blockTimestamp": "123,001"
         }
     },
       {
         "step": "scCall",
-        "txId": "claim-donor",
+        "txId": "claim-donor1",
         "tx": {
             "from": "address:donor1",
             "to": "address:the_crowdfunding_contract",
@@ -84,17 +84,16 @@
             "gasPrice": "0"
         },
         "expect": {
-            "message": "str:only owner can claim successful funding",
-            "status": "4",
+            "status": "0",
             "gas": "*",
             "refund": "*"
         }
       },
       {
         "step": "scCall",
-        "txId": "claim-owner",
+        "txId": "claim-donor2",
         "tx": {
-            "from": "address:my_address",
+            "from": "address:donor2",
             "to": "address:the_crowdfunding_contract",
             "value": "0",
             "function": "claim",
@@ -112,33 +111,33 @@
         "step": "checkState",
         "accounts": {
           "address:my_address": {
-            "nonce": "2",
-            "balance": "500,001,000,000",
+            "nonce": "1",
+            "balance": "1,000,000",
             "storage": {}
           },
           "address:donor1": {
             "nonce": "2",
-            "balance": "150,000,000,000",
+            "balance": "400,000,000,000",
             "storage": {}
           },
           "address:donor2": {
-            "nonce": "1",
-            "balance": "750,000,000,000",
+            "nonce": "2",
+            "balance": "1,000,000,000,000",
             "storage": {}
           },
           "address:the_crowdfunding_contract": {
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''owner": "address:my_address",
-              "''target": "500,000,000,000",
-              "''deadline": "123,000",
-              "''deposit|address:donor1": "250,000,000,000",
-              "''deposit|address:donor2": "250,000,000,000"
+              "str:target": "500,000,000,000",
+              "str:deadline": "123,000",
+              "str:tokenName": "str:EGLD",
+              "str:deposit|address:donor1": "0",
+              "str:deposit|address:donor2": "0"
             },
-            "code": "file:../output/crowdfunding-egld.wasm"
+            "code": "file:../output/crowdfunding-esdt.wasm"
           }
         }
-    }
+      }
     ]
   }

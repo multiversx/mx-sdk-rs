@@ -51,10 +51,9 @@
           "nonce": "0",
           "balance": "0",
           "storage": {
-            "''owner": "address:my_address",
-            "''target": "500,000,000,000",
-            "''deadline": "123,000",
-            "''esdtTokenName": "str:CrowdToken"
+            "str:target": "500,000,000,000",
+            "str:deadline": "123,000",
+            "str:tokenName": "str:CrowdToken"
           },
           "code": "file:../output/crowdfunding-esdt.wasm"
         }
