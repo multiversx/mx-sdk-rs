@@ -1,6 +1,6 @@
 {
     "name": "trying withdraw the funds before the deadline has passed",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -16,7 +16,7 @@
             "step": "scCall",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
+                "to": "sc:ping-pong",
                 "value": "0",
                 "function": "pong",
                 "arguments": [],
@@ -48,7 +48,7 @@
                     "balance": "2,500,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "500,000,000,000",
                     "storage": {

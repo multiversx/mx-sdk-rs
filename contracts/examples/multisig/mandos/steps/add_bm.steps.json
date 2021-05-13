@@ -7,7 +7,7 @@
             "txId": "bm-add-1",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "proposeAddBoardMember",
                 "arguments": [
@@ -29,7 +29,7 @@
             "txId": "prop-signers-2",
             "tx": {
                 "from": "address:owner",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionSigners",
                 "arguments": ["2"],
@@ -51,7 +51,7 @@
             "txId": "bm-sign-alice",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["2"],
@@ -71,7 +71,7 @@
             "txId": "prop-signers-2",
             "tx": {
                 "from": "address:owner",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionSigners",
                 "arguments": ["2"],
@@ -93,7 +93,7 @@
             "txId": "bm-add-1-try-perform-insufficient-signatures-num-valid-signatures",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionValidSignerCount",
                 "arguments": ["2"],
@@ -113,7 +113,7 @@
             "txId": "bm-add-1-try-perform-insufficient-signatures",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["2"],
@@ -134,7 +134,7 @@
             "txId": "prop-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["2"],
@@ -154,7 +154,7 @@
             "txId": "prop-signers-3",
             "tx": {
                 "from": "address:owner",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionSigners",
                 "arguments": ["2"],
@@ -176,7 +176,7 @@
             "txId": "prop-signers-3-count",
             "tx": {
                 "from": "address:owner",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionSignerCount",
                 "arguments": ["2"],
@@ -198,7 +198,7 @@
             "txId": "bm-add-1-perform",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["2"],
@@ -218,7 +218,7 @@
             "txId": "getAllBoardMembers",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getAllBoardMembers",
                 "arguments": [],

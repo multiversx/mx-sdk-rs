@@ -1,12 +1,12 @@
 {
     "name": "crypto",
     "comment": "does not currently work with mandos-rs, because the crypto functions are not yet mocked",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -25,7 +25,7 @@
             "txId": "3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "verify_bls_signature",
                 "arguments": [
@@ -49,7 +49,7 @@
             "txId": "4",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "verify_ed25519_signature",
                 "arguments": [
@@ -73,7 +73,7 @@
             "txId": "5 - compressed key",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "verify_secp256k1_signature",
                 "arguments": [
@@ -97,7 +97,7 @@
             "txId": "6 - uncompressed key",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "verify_secp256k1_signature",
                 "arguments": [
