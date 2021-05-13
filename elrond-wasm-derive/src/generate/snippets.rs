@@ -255,8 +255,9 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 		{
 			pub api: SA,
 			pub address: Address,
-			pub token: elrond_wasm::types::TokenIdentifier,
-			pub payment: SA::AmountType,
+			pub payment_token: elrond_wasm::types::TokenIdentifier,
+			pub payment_amount: SA::AmountType,
+			pub payment_nonce: u64,
 		}
 
 		impl<SA> elrond_wasm::api::ProxyObjApi for Proxy<SA>
@@ -272,30 +273,33 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 				Proxy {
 					api,
 					address,
-					token: elrond_wasm::types::TokenIdentifier::egld(),
-					payment: Self::BigUint::zero(),
+					payment_token: elrond_wasm::types::TokenIdentifier::egld(),
+					payment_amount: Self::BigUint::zero(),
+					payment_nonce: 0,
 				}
 			}
 
-			fn with_token_transfer(
-				mut self,
-				token: TokenIdentifier,
-				payment: Self::BigUint,
-			) -> Self {
-				self.token = token;
-				self.payment = payment;
+			fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
+				self.payment_token = token;
+				self.payment_amount = payment;
 				self
 			}
 
-			fn into_fields(
-				self,
-			) -> (
-				Self::SendApi,
-				Address,
-				TokenIdentifier,
-				Self::BigUint,
-			) {
-				(self.api, self.address, self.token, self.payment)
+			#[inline]
+			fn with_nft_nonce(mut self, nonce: u64) -> Self {
+				self.payment_nonce = nonce;
+				self
+			}
+
+			#[inline]
+			fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint, u64) {
+				(
+					self.api,
+					self.address,
+					self.payment_token,
+					self.payment_amount,
+					self.payment_nonce,
+				)
 			}
 		}
 	}

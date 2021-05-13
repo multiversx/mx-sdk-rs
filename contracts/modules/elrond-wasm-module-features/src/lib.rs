@@ -79,6 +79,6 @@ impl<'a> NestedEncode for FeatureName<'a> {
 #[macro_export]
 macro_rules! feature_guard {
 	($feature_module: expr, $feature_name:expr, $default:expr) => {
-		sc_try!($feature_module.check_feature_on(&$feature_name[..], $default));
+		$feature_module.check_feature_on(&$feature_name[..], $default)?;
 	};
 }

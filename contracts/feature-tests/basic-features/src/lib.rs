@@ -1247,39 +1247,40 @@ pub trait BasicFeatures {
 	}
 
 	#[view]
-	fn result_ok(&self) -> Result<(), !> {
-		Result::Ok(())
+	fn result_ok(&self) -> SCResult<()> {
+		SCResult::Ok(())
 	}
 
 	#[view]
-	fn result_err_from_bytes_1(&self, e: BoxedBytes) -> Result<(), BoxedBytes> {
-		Result::Err(e)
+	fn result_err_from_bytes_1(&self, e: BoxedBytes) -> SCResult<()> {
+		SCResult::Err(e.into())?;
+		unreachable!()
 	}
 
 	#[view]
-	fn result_err_from_bytes_2<'a>(&self, e: &'a [u8]) -> Result<(), &'a [u8]> {
-		Result::Err(e)
+	fn result_err_from_bytes_2<'a>(&self, e: &'a [u8]) -> SCResult<()> {
+		SCResult::Err(e.into())
 	}
 
 	#[view]
-	fn result_err_from_bytes_3(&self, e: Vec<u8>) -> Result<(), Vec<u8>> {
-		Result::Err(e)
+	fn result_err_from_bytes_3(&self, e: Vec<u8>) -> SCResult<()> {
+		SCResult::Err(e.into())
 	}
 
 	#[view]
-	fn result_err_from_string(&self, e: String) -> Result<(), String> {
-		Result::Err(e)
+	fn result_err_from_string(&self, e: String) -> SCResult<()> {
+		SCResult::Err(e.into())
 	}
 
 	#[view]
-	fn result_err_from_str<'a>(&self, e: &'a str) -> Result<(), &'a str> {
-		Result::Err(e)
+	fn result_err_from_str<'a>(&self, e: &'a str) -> SCResult<()> {
+		SCResult::Err(e.into())
 	}
 
 	#[endpoint]
-	fn result_echo(&self, arg: Option<String>, test: bool) -> Result<String, SCError> {
+	fn result_echo(&self, arg: Option<String>, test: bool) -> SCResult<String> {
 		require!(test, "test argument is false");
-		let unwrapped = arg.ok_or("option argument is none")?;
-		Result::Ok(unwrapped)
+		let unwrapped = SCResult::from_result(arg.ok_or("option argument is none"))?;
+		Ok(unwrapped)
 	}
 }

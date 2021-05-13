@@ -22,6 +22,10 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Not used by `SendApi`, but forwarded to the proxy traits.
 	type ProxyStorage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
+	/// Required for ESDTNFTTransfer.
+	/// Same as the implementation from BlockchainApi.
+	fn get_sc_address(&self) -> Address;
+
 	/// Sends EGLD to a given address, directly.
 	/// Used especially for sending EGLD to regular accounts.
 	fn direct_egld(&self, to: &Address, amount: &Self::AmountType, data: &[u8]);

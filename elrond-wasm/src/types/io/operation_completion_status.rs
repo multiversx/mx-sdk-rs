@@ -1,8 +1,4 @@
-use crate::{
-	abi::TypeAbi,
-	api::{EndpointFinishApi, ErrorApi},
-	EndpointResult,
-};
+use crate::{abi::TypeAbi, api::EndpointFinishApi, types::BoxedBytes, EndpointResult};
 use alloc::string::String;
 
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.
@@ -31,12 +27,14 @@ impl OperationCompletionStatus {
 	}
 }
 
-impl<FA> EndpointResult<FA> for OperationCompletionStatus
-where
-	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
-{
+impl EndpointResult for OperationCompletionStatus {
+	type DecodeAs = BoxedBytes;
+
 	#[inline]
-	fn finish(&self, api: FA) {
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		self.output_bytes().finish(api);
 	}
 }

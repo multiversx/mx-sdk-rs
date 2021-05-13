@@ -16,12 +16,14 @@ where
 	pub(super) data: BoxedBytes,
 }
 
-impl<FA, SA> EndpointResult<FA> for SendEsdt<SA>
+impl<SA> EndpointResult for SendEsdt<SA>
 where
 	SA: SendApi + 'static,
 {
+	type DecodeAs = ();
+
 	#[inline]
-	fn finish(&self, _api: FA) {
+	fn finish<FA>(&self, _api: FA) {
 		self.api.direct_esdt_via_async_call(
 			&self.to,
 			&self.token_name.as_slice(),

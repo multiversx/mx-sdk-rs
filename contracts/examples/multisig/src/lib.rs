@@ -498,13 +498,9 @@ pub trait Multisig {
 				endpoint_name,
 				arguments,
 			} => {
-				let mut contract_call_raw = ContractCall::<Self::SendApi, ()>::new(
-					self.send(),
-					to,
-					TokenIdentifier::egld(),
-					egld_payment,
-					endpoint_name,
-				);
+				let mut contract_call_raw =
+					ContractCall::<Self::SendApi, ()>::new(self.send(), to, endpoint_name)
+						.with_token_transfer(TokenIdentifier::egld(), egld_payment);
 				for arg in arguments {
 					contract_call_raw.push_argument_raw_bytes(arg.as_slice());
 				}

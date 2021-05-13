@@ -4,14 +4,14 @@ use crate::Vec;
 
 struct ApiOutputAdapter<FA>
 where
-	FA: EndpointFinishApi + 'static,
+	FA: EndpointFinishApi + Clone + 'static,
 {
 	api: FA,
 }
 
 impl<FA> ApiOutputAdapter<FA>
 where
-	FA: EndpointFinishApi + 'static,
+	FA: EndpointFinishApi + Clone + 'static,
 {
 	#[inline]
 	fn new(api: FA) -> Self {
@@ -21,7 +21,7 @@ where
 
 impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
-	FA: EndpointFinishApi + 'static,
+	FA: EndpointFinishApi + Clone + 'static,
 {
 	fn set_slice_u8(self, bytes: &[u8]) {
 		self.api.finish_slice_u8(bytes);
@@ -51,17 +51,28 @@ where
 	}
 }
 
-pub trait EndpointResult<FA>: Sized {
-	fn finish(&self, api: FA);
+/// All types that are returned from endpoints need to implement this trait.
+pub trait EndpointResult: Sized {
+	/// Indicates how the result of the endpoint can be interpreted when called via proxy.
+	/// `Self` for most types.
+	type DecodeAs;
+
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static;
 }
 
 /// All serializable objects can be used as smart contract function result.
-impl<FA, T> EndpointResult<FA> for T
+impl<T> EndpointResult for T
 where
-	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
 	T: TopEncode,
 {
-	fn finish(&self, api: FA) {
+	type DecodeAs = Self;
+
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		self.top_encode_or_exit(ApiOutputAdapter::new(api.clone()), api, finish_exit);
 	}
 }

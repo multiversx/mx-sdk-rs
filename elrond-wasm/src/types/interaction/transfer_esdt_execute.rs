@@ -28,12 +28,14 @@ where
 	}
 }
 
-impl<FA, SA> EndpointResult<FA> for TransferEsdtExecute<SA>
+impl<SA> EndpointResult for TransferEsdtExecute<SA>
 where
 	SA: SendApi + 'static,
 {
+	type DecodeAs = ();
+
 	#[inline]
-	fn finish(&self, _api: FA) {
+	fn finish<FA>(&self, _api: FA) {
 		let result = self.api.direct_esdt_execute(
 			&self.to,
 			self.token_name.as_slice(),

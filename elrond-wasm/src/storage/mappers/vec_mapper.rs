@@ -207,13 +207,17 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, FA, T> EndpointResult<FA> for VecMapper<SA, T>
+impl<SA, T> EndpointResult for VecMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	FA: EndpointFinishApi + Clone + 'static,
-	T: TopEncode + TopDecode + EndpointResult<FA>,
+	T: TopEncode + TopDecode + EndpointResult,
 {
-	fn finish(&self, api: FA) {
+	type DecodeAs = MultiResultVec<T::DecodeAs>;
+
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		let v = self.load_as_vec();
 		MultiResultVec::<T>::from(v).finish(api);
 	}

@@ -8,6 +8,10 @@ impl SendApi for super::UncallableApi {
 	type ProxyBigInt = BigIntUncallable;
 	type ProxyStorage = Self;
 
+	fn get_sc_address(&self) -> Address {
+		unreachable!()
+	}
+
 	fn direct_egld(&self, _to: &Address, _amount: &BigUintUncallable, _data: &[u8]) {
 		unreachable!()
 	}
