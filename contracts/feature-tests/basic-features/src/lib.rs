@@ -1261,26 +1261,12 @@ pub trait BasicFeatures {
 	#[endpoint]
 	fn add_ec(
 		&self,
-		//curve: &EllipticCurve<Self::BigUint>,
-		field_order: Self::BigUint,
-		base_point_order: Self::BigUint,
-		eq_constant: Self::BigUint,
-		x_base_point: Self::BigUint,
-		y_base_point: Self::BigUint,
-		size_of_field: i32,
+		curve: &EllipticCurve<Self::BigUint>,
 		x_first_point: Self::BigUint,
 		y_first_point: Self::BigUint,
 		x_second_point: Self::BigUint,
 		y_second_point: Self::BigUint,
 	) -> (Self::BigUint, Self::BigUint) {
-		let curve = EllipticCurve::<Self::BigUint>::new(
-			field_order,
-			base_point_order,
-			eq_constant,
-			x_base_point,
-			y_base_point,
-			size_of_field,
-		);
 		self.crypto().add_ec(
 			&curve,
 			x_first_point,
