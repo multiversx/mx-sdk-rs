@@ -68,13 +68,17 @@ where
 	}
 }
 
-impl<SA, FA, T> EndpointResult<FA> for SingleValueMapper<SA, T>
+impl<SA, T> EndpointResult for SingleValueMapper<SA, T>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	FA: EndpointFinishApi + 'static,
-	T: TopEncode + TopDecode + EndpointResult<FA>,
+	T: TopEncode + TopDecode + EndpointResult,
 {
-	fn finish(&self, api: FA) {
+	type DecodeAs = T::DecodeAs;
+
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		self.get().finish(api);
 	}
 }

@@ -53,15 +53,15 @@ pub trait Erc1155Marketplace {
 			"Only the token ownership contract may call this function"
 		);
 
-		sc_try!(self.try_create_auction(
+		self.try_create_auction(
 			&type_id,
 			&nft_id,
 			&from,
 			&args.token_identifier,
 			&args.min_bid,
 			&args.max_bid,
-			args.deadline
-		));
+			args.deadline,
+		)?;
 
 		Ok(())
 	}
@@ -89,15 +89,15 @@ pub trait Erc1155Marketplace {
 		// Don't have to worry about checking if there are duplicates in the entries,
 		// an error here will revert all storage changes automatically
 		for (type_id, nft_id) in type_ids.iter().zip(nft_ids.iter()) {
-			sc_try!(self.try_create_auction(
+			self.try_create_auction(
 				type_id,
 				nft_id,
 				&from,
 				&args.token_identifier,
 				&args.min_bid,
 				&args.max_bid,
-				args.deadline
-			));
+				args.deadline,
+			)?;
 		}
 
 		Ok(())

@@ -21,7 +21,9 @@ pub trait ProxyObjApi {
 
 	fn with_token_transfer(self, token: TokenIdentifier, payment: Self::BigUint) -> Self;
 
-	fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint);
+	fn with_nft_nonce(self, nonce: u64) -> Self;
+
+	fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint, u64);
 }
 
 pub trait CallbackProxyObjApi {

@@ -54,6 +54,10 @@ impl SendApi for TxContext {
 	type ProxyBigInt = RustBigInt;
 	type ProxyStorage = Self;
 
+	fn get_sc_address(&self) -> Address {
+		BlockchainApi::get_sc_address(self)
+	}
+
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if amount.value() > self.get_available_egld_balance() {
 			std::panic::panic_any(TxPanic {

@@ -1,6 +1,9 @@
-use elrond_wasm::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
-use elrond_wasm::io::EndpointResult;
-use elrond_wasm::types::{Address, AsyncCall, BoxedBytes, CodeMetadata, SendEgld, Vec};
+use elrond_wasm::{
+	api::{BigUintApi, EndpointFinishApi, SendApi},
+	io::EndpointResult,
+	types::{Address, AsyncCall, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
+};
+
 elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
@@ -57,12 +60,16 @@ where
 	AsyncCall(AsyncCall<SA>),
 }
 
-impl<FA, SA> EndpointResult<FA> for PerformActionResult<SA>
+impl<SA> EndpointResult for PerformActionResult<SA>
 where
-	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
 	SA: SendApi + Clone + 'static,
 {
-	fn finish(&self, api: FA) {
+	type DecodeAs = OptionalResult<Address>;
+
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		match self {
 			PerformActionResult::Nothing => (),
 			PerformActionResult::SendEgld(send_egld) => send_egld.finish(api),
