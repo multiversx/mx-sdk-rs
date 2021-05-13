@@ -53,7 +53,11 @@ macro_rules! sc_error {
 	};
 }
 
-/// Equivalent of the ? operator for SCResult.
+/// Equivalent to the `?` operator for SCResult.
+#[deprecated(
+	since = "0.16.0",
+	note = "The `?` operator can now be used on `SCResult`, please use it instead."
+)]
 #[macro_export]
 macro_rules! sc_try {
 	($s:expr) => {

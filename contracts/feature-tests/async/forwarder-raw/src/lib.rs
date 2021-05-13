@@ -46,12 +46,13 @@ pub trait ForwarderRaw {
 	fn forward_contract_call(
 		&self,
 		to: Address,
-		token: TokenIdentifier,
-		payment: Self::BigUint,
+		payment_token: TokenIdentifier,
+		payment_amount: Self::BigUint,
 		endpoint_name: BoxedBytes,
 		args: VarArgs<BoxedBytes>,
 	) -> ContractCall<Self::SendApi, ()> {
-		let mut contract_call = ContractCall::new(self.send(), to, token, payment, endpoint_name);
+		let mut contract_call = ContractCall::new(self.send(), to, endpoint_name)
+			.with_token_transfer(payment_token, payment_amount);
 		for arg in args.into_vec() {
 			contract_call.push_argument_raw_bytes(arg.as_slice());
 		}
