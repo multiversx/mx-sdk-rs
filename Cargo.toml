@@ -38,6 +38,8 @@ members = [
   "contracts/examples/lottery-esdt/abi",
   "contracts/examples/multisig",
   "contracts/examples/multisig/abi",
+  "contracts/examples/nft-storage-prepay",
+  "contracts/examples/nft-storage-prepay/abi",
   "contracts/examples/non-fungible-tokens",
   "contracts/examples/non-fungible-tokens/abi",
   "contracts/examples/ping-pong-egld",
