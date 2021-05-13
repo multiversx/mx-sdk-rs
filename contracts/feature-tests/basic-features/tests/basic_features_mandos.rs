@@ -302,10 +302,10 @@ fn sqrt() {
 
 #[test]
 fn log2() {
-	parse_execute_mandos("mandos/log2.scen.json", &contract_map());
+	parse_execute_mandos("mandos/log2_func.scen.json", &contract_map());
 }
 
 #[test]
 fn pow() {
-	parse_execute_mandos("mandos/pow.scen.json", &contract_map());
+	parse_execute_mandos("mandos/pow_func.scen.json", &contract_map());
 }
