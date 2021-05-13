@@ -1,11 +1,11 @@
 {
     "name": "echo_async_result_empty",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "1-ok",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_async_result_empty",
                 "arguments": [
@@ -46,7 +46,7 @@
             "txId": "2-err",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_async_result_empty",
                 "arguments": [
@@ -70,7 +70,7 @@
             "txId": "2-err-no-message",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_async_result_empty",
                 "arguments": [

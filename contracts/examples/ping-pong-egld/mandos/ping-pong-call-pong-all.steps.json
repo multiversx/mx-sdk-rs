@@ -1,13 +1,13 @@
 {
     "name": "call pong all in order to send the funds back to everyone",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "scCall",
             "txId": "pong-all-complete",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
+                "to": "sc:ping-pong",
                 "value": "0",
                 "function": "pongAll",
                 "arguments": [],
@@ -40,7 +40,7 @@
                     "balance": "2,500,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "*",
                     "storage": {

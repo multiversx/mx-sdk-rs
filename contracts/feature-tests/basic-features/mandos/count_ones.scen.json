@@ -1,12 +1,12 @@
 {
     "name": "count ones",
     "comment": "should fail if the processor doesn't support the `count ones` instruction",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -25,7 +25,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "count_ones",
                 "arguments": [

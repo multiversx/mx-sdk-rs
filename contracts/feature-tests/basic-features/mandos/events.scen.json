@@ -1,10 +1,10 @@
 {
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -23,7 +23,7 @@
             "txId": "A1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "logEventA",
                 "arguments": [
@@ -37,7 +37,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
+                        "address": "sc:basic-features",
                         "identifier": "str:event_a",
                         "topics": [],
                         "data": ""
@@ -52,7 +52,7 @@
             "txId": "A2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "logEventA",
                 "arguments": [
@@ -66,7 +66,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
+                        "address": "sc:basic-features",
                         "identifier": "str:event_a",
                         "topics": [],
                         "data": "0x1234abc"
@@ -81,7 +81,7 @@
             "txId": "B1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "logEventB",
                 "arguments": [
@@ -98,7 +98,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
+                        "address": "sc:basic-features",
                         "identifier": "str:event_b",
                         "topics": [
                             "0xa1",

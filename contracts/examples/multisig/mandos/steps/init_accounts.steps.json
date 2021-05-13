@@ -46,7 +46,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "0",
-                    "newAddress": "address:multisig"
+                    "newAddress": "sc:multisig"
                 }
             ]
         }

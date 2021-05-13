@@ -223,12 +223,26 @@ fn interpret_esdt_token_name(
 }
 
 #[derive(Debug)]
+pub struct TxESDT {
+	pub esdt_token_name: BytesValue,
+	pub esdt_value: BigUintValue,
+}
+
+impl InterpretableFrom<TxESDTRaw> for TxESDT {
+	fn interpret_from(from: TxESDTRaw, context: &InterpreterContext) -> Self {
+		TxESDT {
+			esdt_token_name: interpret_esdt_token_name(from.token_identifier, context),
+			esdt_value: BigUintValue::interpret_from(from.value, context),
+		}
+	}
+}
+
+#[derive(Debug)]
 pub struct TxCall {
 	pub from: AddressValue,
 	pub to: AddressValue,
 	pub call_value: BigUintValue,
-	pub esdt_value: BigUintValue,
-	pub esdt_token_name: BytesValue,
+	pub esdt_value: Option<TxESDT>,
 	pub function: String,
 	pub arguments: Vec<BytesValue>,
 	pub gas_limit: U64Value,
@@ -241,8 +255,9 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
 			from: AddressValue::interpret_from(from.from, context),
 			to: AddressValue::interpret_from(from.to, context),
 			call_value: BigUintValue::interpret_from(from.value, context),
-			esdt_value: BigUintValue::interpret_from(from.esdt_value, context),
-			esdt_token_name: interpret_esdt_token_name(from.esdt_token_name, context),
+			esdt_value: from
+				.esdt
+				.map(|esdt_value| TxESDT::interpret_from(esdt_value, context)),
 			function: from.function,
 			arguments: from
 				.arguments

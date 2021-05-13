@@ -6,7 +6,7 @@
             "txId": "processed-action-id-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["1"],
@@ -27,7 +27,7 @@
             "txId": "processed-action-id-unsign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "unsign",
                 "arguments": ["1"],
@@ -48,7 +48,7 @@
             "txId": "huge-action-id-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["1000"],
@@ -69,7 +69,7 @@
             "txId": "huge-action-id-unsign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "unsign",
                 "arguments": ["1000"],

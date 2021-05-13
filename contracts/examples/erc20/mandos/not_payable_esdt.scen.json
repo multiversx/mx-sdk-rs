@@ -8,10 +8,13 @@
                 "``account_1_____________________s1": {
                     "nonce": "0",
                     "balance": "0x10000000",
+                    "esdt": {
+                        "str:ANY_TOKEN": "1000"
+                    },
                     "storage": {},
                     "code": ""
                 },
-                "``busd__________________________s1": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -27,9 +30,11 @@
             "txId": "1",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
-                "esdtValue": "0x01",
-                "esdtTokenName": "str:ANY_TOKEN",
+                "to": "sc:erc20",
+                "esdt": {
+                    "tokenIdentifier": "str:ANY_TOKEN",
+                    "value": "1"
+                },
                 "function": "totalSupply",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -49,9 +54,11 @@
             "txId": "2",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
-                "esdtValue": "0x01",
-                "esdtTokenName": "str:ANY_TOKEN",
+                "to": "sc:erc20",
+                "esdt": {
+                    "tokenIdentifier": "str:ANY_TOKEN",
+                    "value": "1"
+                },
                 "function": "balanceOf",
                 "arguments": [
                     "``account_1_____________________s1"
@@ -73,9 +80,11 @@
             "txId": "3",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
-                "esdtValue": "0x01",
-                "esdtTokenName": "str:ANY_TOKEN",
+                "to": "sc:erc20",
+                "esdt": {
+                    "tokenIdentifier": "str:ANY_TOKEN",
+                    "value": "1"
+                },
                 "function": "allowance",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -98,9 +107,11 @@
             "txId": "4",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
-                "esdtValue": "0x01",
-                "esdtTokenName": "str:ANY_TOKEN",
+                "to": "sc:erc20",
+                "esdt": {
+                    "tokenIdentifier": "str:ANY_TOKEN",
+                    "value": "1"
+                },
                 "function": "transfer",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -123,9 +134,11 @@
             "txId": "5",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
-                "esdtValue": "0x01",
-                "esdtTokenName": "str:ANY_TOKEN",
+                "to": "sc:erc20",
+                "esdt": {
+                    "tokenIdentifier": "str:ANY_TOKEN",
+                    "value": "1"
+                },
                 "function": "approve",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -148,9 +161,11 @@
             "txId": "6",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
-                "esdtValue": "0x01",
-                "esdtTokenName": "str:ANY_TOKEN",
+                "to": "sc:erc20",
+                "esdt": {
+                    "tokenIdentifier": "str:ANY_TOKEN",
+                    "value": "1"
+                },
                 "function": "transferFrom",
                 "arguments": [
                     "``account_1_____________________s1",
@@ -175,10 +190,13 @@
                 "``account_1_____________________s1": {
                     "nonce": "6",
                     "balance": "0xfa00000",
+                    "esdt": {
+                        "str:ANY_TOKEN": "1000"
+                    },
                     "storage": {},
                     "code": ""
                 },
-                "``busd__________________________s1": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

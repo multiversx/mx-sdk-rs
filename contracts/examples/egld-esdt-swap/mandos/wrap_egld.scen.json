@@ -9,7 +9,7 @@
                     "balance": "1000",
                     "storage": {}
                 },
-                "address:contract": {
+                "sc:egld-esdt-swap": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -28,7 +28,7 @@
             "txId": "wrap-egld",
             "tx": {
                 "from": "address:user",
-                "to": "address:contract",
+                "to": "sc:egld-esdt-swap",
                 "value": "500",
                 "function": "wrapEgld",
                 "arguments": [],
@@ -40,7 +40,7 @@
                 "message": "",
                 "logs": [
                     {
-                        "address": "address:contract",
+                        "address": "sc:egld-esdt-swap",
                         "identifier": "str:wrap-egld",
                         "topics": [
                             "address:user"
@@ -63,7 +63,7 @@
                     },
                     "storage": {}
                 },
-                "address:contract": {
+                "sc:egld-esdt-swap": {
                     "nonce": "0",
                     "balance": "500",
                     "esdt": {
