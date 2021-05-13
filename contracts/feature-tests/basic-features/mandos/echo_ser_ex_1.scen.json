@@ -1,10 +1,10 @@
 {
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -23,7 +23,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_ser_example_1",
                 "arguments": [
@@ -62,7 +62,7 @@
             "comment": "also checks that map keys are sorted, but it's the same as above",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_boxed_ser_example_1",
                 "arguments": [

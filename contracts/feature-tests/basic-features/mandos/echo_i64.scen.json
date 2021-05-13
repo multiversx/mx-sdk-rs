@@ -1,11 +1,11 @@
 {
     "name": "echo_i64",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -48,7 +48,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -72,7 +72,7 @@
             "txId": "3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -96,7 +96,7 @@
             "txId": "4",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -119,7 +119,7 @@
             "txId": "5",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -143,7 +143,7 @@
             "txId": "6",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -167,7 +167,7 @@
             "txId": "7",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -190,7 +190,7 @@
             "txId": "8",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -213,7 +213,7 @@
             "txId": "9-zero",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "echo_i64",
                 "arguments": [
@@ -233,7 +233,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "*",
                     "balance": "*",
                     "storage": {},

@@ -1,6 +1,6 @@
 {
     "name": "call pong all in order to send the funds back to everyone after one user already got his funds back by calling pong himself",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -16,7 +16,7 @@
             "step": "scCall",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
+                "to": "sc:ping-pong",
                 "value": "0",
                 "function": "pongAll",
                 "arguments": [],
@@ -49,7 +49,7 @@
                     "balance": "2,500,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

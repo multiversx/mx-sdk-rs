@@ -1,6 +1,6 @@
 {
     "name": "try to ping the wrong ammount of funds",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,7 +10,7 @@
             "step": "scCall",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
+                "to": "sc:ping-pong",
                 "value": "450,000,000,000",
                 "function": "ping",
                 "arguments": [],
@@ -42,7 +42,7 @@
                     "balance": "2,500,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

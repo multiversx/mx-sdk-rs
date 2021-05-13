@@ -1,12 +1,12 @@
 {
     "name": "count ones",
     "comment": "should fail if the processor doesn't support the `count ones` instruction",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -25,7 +25,7 @@
             "txId": "return_sc_error",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "return_sc_error",
                 "arguments": [],
@@ -46,7 +46,7 @@
             "txId": "result_ok",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_ok",
                 "arguments": [],
@@ -67,7 +67,7 @@
             "txId": "result_err_from_bytes_1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_err_from_bytes_1",
                 "arguments": [
@@ -90,7 +90,7 @@
             "txId": "result_err_from_bytes_2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_err_from_bytes_2",
                 "arguments": [
@@ -113,7 +113,7 @@
             "txId": "result_err_from_bytes_3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_err_from_bytes_3",
                 "arguments": [
@@ -136,7 +136,7 @@
             "txId": "result_err_from_string",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_err_from_string",
                 "arguments": [
@@ -159,7 +159,7 @@
             "txId": "result_err_from_str",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_err_from_str",
                 "arguments": [
@@ -182,7 +182,7 @@
             "txId": "result_echo - require failure",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_echo",
                 "arguments": [
@@ -206,7 +206,7 @@
             "txId": "result_echo - option is none",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_echo",
                 "arguments": [
@@ -230,7 +230,7 @@
             "txId": "result_echo - ok",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "result_echo",
                 "arguments": [

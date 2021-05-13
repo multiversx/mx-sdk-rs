@@ -48,7 +48,9 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
-                            "1000"
+                            "str:FungibleESDT",
+                            "1000",
+                            "0"
                         ],
                         "data": ""
                     },
@@ -87,7 +89,9 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
-                            "500"
+                            "str:FungibleESDT",
+                            "500",
+                            "0"
                         ],
                         "data": ""
                     },
@@ -102,7 +106,9 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
-                            "500"
+                            "str:FungibleESDT",
+                            "500",
+                            "0"
                         ],
                         "data": ""
                     },
