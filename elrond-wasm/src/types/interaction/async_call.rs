@@ -30,12 +30,14 @@ where
 	}
 }
 
-impl<FA, SA> EndpointResult<FA> for AsyncCall<SA>
+impl<SA> EndpointResult for AsyncCall<SA>
 where
 	SA: SendApi + 'static,
 {
+	type DecodeAs = ();
+
 	#[inline]
-	fn finish(&self, _api: FA) {
+	fn finish<FA>(&self, _api: FA) {
 		// first, save the callback closure
 		self.api
 			.storage_store_tx_hash_key(self.callback_data.as_slice());

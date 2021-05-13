@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(never_type)]
+#![feature(try_trait)]
 
 // re-export basic heap types
 extern crate alloc;

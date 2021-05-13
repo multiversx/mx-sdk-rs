@@ -27,12 +27,14 @@ where
 	}
 }
 
-impl<FA, SA> EndpointResult<FA> for TransferEgldExecute<SA>
+impl<SA> EndpointResult for TransferEgldExecute<SA>
 where
 	SA: SendApi + 'static,
 {
+	type DecodeAs = ();
+
 	#[inline]
-	fn finish(&self, _api: FA) {
+	fn finish<FA>(&self, _api: FA) {
 		let result = self.api.direct_egld_execute(
 			&self.to,
 			&self.egld_payment,

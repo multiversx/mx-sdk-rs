@@ -115,8 +115,8 @@ pub trait CryptoBubbles {
 		winner: &Address,
 		prize: &Self::BigUint,
 	) -> SCResult<()> {
-		sc_try!(self.reward_winner(game_index, winner, prize));
-		sc_try!(self._transfer_back_to_player_wallet(winner, prize));
+		self.reward_winner(game_index, winner, prize)?;
+		self._transfer_back_to_player_wallet(winner, prize)?;
 		Ok(())
 	}
 

@@ -137,12 +137,12 @@ mod module_1 {
 		fn call_version(&self) {
 			self.call_value().check_not_payable();
 			let result = self.version();
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api())
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api())
 		}
 
 		fn call_some_async(&self) {
 			let result = self.some_async();
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api())
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api())
 		}
 
 		fn call(&self, fn_name: &[u8]) -> bool {
@@ -187,13 +187,18 @@ mod module_1 {
 	}
 
 	pub trait ProxyTrait: elrond_wasm::api::ProxyObjApi + Sized {
-		fn version(self) -> ContractCall<Self::SendApi, Self::BigInt> {
-			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
+		fn version(
+			self,
+		) -> ContractCall<Self::SendApi, <Self::BigInt as elrond_wasm::io::EndpointResult>::DecodeAs>
+		{
+			let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
+				self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 				___api___.clone(),
 				___address___,
 				___token___,
 				___payment___,
+				___nonce___,
 				elrond_wasm::types::BoxedBytes::from(&b"version"[..]),
 			);
 			___contract_call___
@@ -348,7 +353,7 @@ mod sample_adder {
 			self.call_value().check_not_payable();
 			elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 0i32);
 			let result = self.get_sum();
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api());
 		}
 		#[inline]
 		fn call_init(&self) {
@@ -371,7 +376,7 @@ mod sample_adder {
 				ArgId::from(&b"value"[..]),
 			);
 			let result = self.add(value);
-			elrond_wasm::io::EndpointResult::<Self::FinishApi>::finish(&result, self.finish_api());
+			elrond_wasm::io::EndpointResult::finish(&result, self.finish_api());
 		}
 
 		fn call(&self, fn_name: &[u8]) -> bool {
@@ -404,24 +409,37 @@ mod sample_adder {
 	}
 
 	pub trait ProxyTrait: elrond_wasm::api::ProxyObjApi + super::module_1::ProxyTrait {
-		fn get_sum(self) -> elrond_wasm::types::ContractCall<Self::SendApi, Self::BigInt> {
-			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
+		fn get_sum(
+			self,
+		) -> elrond_wasm::types::ContractCall<
+			Self::SendApi,
+			<Self::BigInt as elrond_wasm::io::EndpointResult>::DecodeAs,
+		> {
+			let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
+				self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 				___api___.clone(),
 				___address___,
 				___token___,
 				___payment___,
+				___nonce___,
 				elrond_wasm::types::BoxedBytes::from(&b"get_sum"[..]),
 			);
 			___contract_call___
 		}
-		fn add(self, amount: &Self::BigInt) -> ContractCall<Self::SendApi, SCResult<()>> {
-			let (___api___, ___address___, ___token___, ___payment___) = self.into_fields();
+		fn add(
+			self,
+			amount: &Self::BigInt,
+		) -> ContractCall<Self::SendApi, <SCResult<()> as elrond_wasm::io::EndpointResult>::DecodeAs>
+		{
+			let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
+				self.into_fields();
 			let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 				___api___.clone(),
 				___address___,
 				___token___,
 				___payment___,
+				___nonce___,
 				elrond_wasm::types::BoxedBytes::from(&b"add"[..]),
 			);
 			elrond_wasm::io::serialize_contract_call_arg(
@@ -753,22 +771,9 @@ mod sample_adder {
 	{
 		pub api: SA,
 		pub address: Address,
-		pub token: elrond_wasm::types::TokenIdentifier,
-		pub payment: SA::AmountType,
-	}
-
-	impl<SA> Proxy<SA>
-	where
-		SA: elrond_wasm::api::SendApi + 'static,
-	{
-		pub fn new_proxy_obj(api: SA, address: Address) -> Self {
-			Proxy {
-				api,
-				address,
-				token: elrond_wasm::types::TokenIdentifier::egld(),
-				payment: SA::AmountType::zero(),
-			}
-		}
+		pub payment_token: elrond_wasm::types::TokenIdentifier,
+		pub payment_amount: SA::AmountType,
+		pub payment_nonce: u64,
 	}
 
 	impl<SA> elrond_wasm::api::ProxyObjApi for Proxy<SA>
@@ -784,19 +789,33 @@ mod sample_adder {
 			Proxy {
 				api,
 				address,
-				token: elrond_wasm::types::TokenIdentifier::egld(),
-				payment: SA::AmountType::zero(),
+				payment_token: elrond_wasm::types::TokenIdentifier::egld(),
+				payment_amount: Self::BigUint::zero(),
+				payment_nonce: 0,
 			}
 		}
 
 		fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
-			self.token = token;
-			self.payment = payment;
+			self.payment_token = token;
+			self.payment_amount = payment;
 			self
 		}
 
-		fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint) {
-			(self.api, self.address, self.token, self.payment)
+		#[inline]
+		fn with_nft_nonce(mut self, nonce: u64) -> Self {
+			self.payment_nonce = nonce;
+			self
+		}
+
+		#[inline]
+		fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint, u64) {
+			(
+				self.api,
+				self.address,
+				self.payment_token,
+				self.payment_amount,
+				self.payment_nonce,
+			)
 		}
 	}
 
