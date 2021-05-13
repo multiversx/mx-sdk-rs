@@ -72,7 +72,7 @@ extern "C" {
 		pointY: i32,
 	) -> i32;
 
-	fn scalarMult(
+	fn scalarMultEC(
 		xResultHandle: i32,
 		yResultHandle: i32,
 		fieldOrder: i32,
@@ -87,7 +87,7 @@ extern "C" {
 		length: i32,
 	);
 
-	fn scalarBaseMult(
+	fn scalarBaseMultEC(
 		xResultHandle: i32,
 		yResultHandle: i32,
 		fieldOrder: i32,
@@ -318,7 +318,7 @@ impl CryptoApi for ArwenApiImpl {
 		unsafe {
 			let x_result_handle = bigIntNew(0);
 			let y_result_handle = bigIntNew(0);
-			scalarMult(
+			scalarMultEC(
 				x_result_handle,
 				y_result_handle,
 				curve.field_order.handle,
@@ -351,7 +351,7 @@ impl CryptoApi for ArwenApiImpl {
 		unsafe {
 			let x_result_handle = bigIntNew(0);
 			let y_result_handle = bigIntNew(0);
-			scalarBaseMult(
+			scalarBaseMultEC(
 				x_result_handle,
 				y_result_handle,
 				curve.field_order.handle,
