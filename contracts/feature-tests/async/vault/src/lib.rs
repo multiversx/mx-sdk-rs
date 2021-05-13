@@ -49,8 +49,9 @@ pub trait Vault {
 			&token_payment,
 			token_nonce,
 		);
-		
-		self.call_counts(b"accept_funds_echo_payment").update(|c| *c += 1);
+
+		self.call_counts(b"accept_funds_echo_payment")
+			.update(|c| *c += 1);
 
 		Ok((
 			token_identifier,
