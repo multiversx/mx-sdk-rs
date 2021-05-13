@@ -10,7 +10,7 @@
         "txId": "claim-too-early-donor",
         "tx": {
             "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "function": "claim",
             "arguments": [],
@@ -29,7 +29,7 @@
         "txId": "claim-too-early-owner",
         "tx": {
             "from": "address:my_address",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "function": "claim",
             "arguments": [],

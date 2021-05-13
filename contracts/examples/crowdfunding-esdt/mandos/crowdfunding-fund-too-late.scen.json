@@ -16,7 +16,7 @@
         "txId": "fund-too-late",
         "tx": {
             "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "esdt": {
               "tokenIdentifier": "str:CrowdToken",
@@ -50,7 +50,7 @@
               "str:CrowdToken": "150,000,000,000"
             }
           },
-          "address:the_crowdfunding_contract": {
+          "sc:crowdfunding": {
             "nonce": "0",
             "balance": "0",
             "storage": {
@@ -71,7 +71,7 @@
         "txId": "check-status",
         "tx": {
             "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "function": "status",
             "arguments": [],
