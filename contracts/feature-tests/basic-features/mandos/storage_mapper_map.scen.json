@@ -1,11 +1,11 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "before",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_keys",
                 "arguments": [],
@@ -44,7 +44,7 @@
             "txId": "first-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_insert",
                 "arguments": [
@@ -67,7 +67,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -92,7 +92,7 @@
             "txId": "check-map-keys-after-first-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_keys",
                 "arguments": [],
@@ -114,7 +114,7 @@
             "txId": "check-map-values-after-first-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_values",
                 "arguments": [],
@@ -136,7 +136,7 @@
             "txId": "second-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_insert",
                 "arguments": [
@@ -161,7 +161,7 @@
             "txId": "check-map-keys-after-second-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_keys",
                 "arguments": [],
@@ -184,7 +184,7 @@
             "txId": "check-map-values-after-second-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_values",
                 "arguments": [],
@@ -205,7 +205,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -234,7 +234,7 @@
             "txId": "check-contains-after-second-insert",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_contains_key",
                 "arguments": [
@@ -258,7 +258,7 @@
             "txId": "first-remove",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_remove",
                 "arguments": [
@@ -280,7 +280,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -305,7 +305,7 @@
             "txId": "second-remove",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_remove",
                 "arguments": [
@@ -327,7 +327,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -346,7 +346,7 @@
             "txId": "check-get-after-second-remove",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_get",
                 "arguments": [
@@ -368,7 +368,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -387,7 +387,7 @@
             "txId": "entry or default for a non-existing item",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_or_default_update_increment",
                 "arguments": [
@@ -410,7 +410,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -435,7 +435,7 @@
             "txId": "entry or default for the previously added item",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_or_default_update_increment",
                 "arguments": [
@@ -458,7 +458,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -483,7 +483,7 @@
             "txId": "entry or insert default for an existing entry shouldn't change anything, only return its existing value",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_or_insert_default",
                 "arguments": [
@@ -506,7 +506,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -531,7 +531,7 @@
             "txId": "entry or insert default for an non-existing entry should add it",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_or_insert_default",
                 "arguments": [
@@ -554,7 +554,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -583,7 +583,7 @@
             "txId": "entry or modify should simply increment the value if it exists",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_and_modify",
                 "arguments": [
@@ -609,7 +609,7 @@
             "txId": "entry or modify should set the value if the entry doesn't exist",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_and_modify",
                 "arguments": [
@@ -633,7 +633,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -666,7 +666,7 @@
             "txId": "entry or insert with key should do nothing if the key already exists",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_or_insert_with_key",
                 "arguments": [
@@ -691,7 +691,7 @@
             "txId": "entry or insert with key should add a new value if the key doesn't exist",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_mapper_entry_or_insert_with_key",
                 "arguments": [
@@ -714,7 +714,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

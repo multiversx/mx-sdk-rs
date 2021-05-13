@@ -26,11 +26,15 @@ pub trait NftStoragePrepay {
 
 		let storage_cost = self.get_cost_for_size(file_size);
 		let mut user_deposit = self.deposit(&address).get();
-		require!(user_deposit >= storage_cost, "User does not have enough deposit");
+		require!(
+			user_deposit >= storage_cost,
+			"User does not have enough deposit"
+		);
 
 		user_deposit -= &storage_cost;
 		self.deposit(&address).set(&user_deposit);
-		self.total_reserved().update(|reserved| *reserved += storage_cost);
+		self.total_reserved()
+			.update(|reserved| *reserved += storage_cost);
 
 		Ok(())
 	}
@@ -66,7 +70,7 @@ pub trait NftStoragePrepay {
 		let mut user_deposit = self.deposit(&caller).get();
 		let amount = match opt_amount {
 			OptionalArg::Some(amt) => amt,
-			OptionalArg::None => user_deposit.clone()
+			OptionalArg::None => user_deposit.clone(),
 		};
 
 		require!(user_deposit >= amount, "Can't withdraw more than deposit");

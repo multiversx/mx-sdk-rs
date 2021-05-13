@@ -1,13 +1,14 @@
 {
     "name": "adder",
     "comment": "add then check",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:owner": {
                     "nonce": "5",
-                    "balance": "0x500000",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 }
@@ -16,7 +17,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "5",
-                    "newAddress": "address:adder_address"
+                    "newAddress": "sc:adder"
                 }
             ]
         },
@@ -30,8 +31,8 @@
                 "arguments": [
                     "0x05"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [],
@@ -42,25 +43,19 @@
             }
         },
         {
-            "step": "scCall",
+            "step": "scQuery",
             "txId": "2",
             "tx": {
-                "from": "address:owner",
-                "to": "address:adder_address",
-                "value": "0",
+                "to": "sc:adder",
                 "function": "getSum",
-                "arguments": [],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "arguments": []
             },
             "expect": {
                 "out": [
                     "5"
                 ],
                 "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "logs": []
             }
         },
         {
@@ -68,14 +63,14 @@
             "txId": "3",
             "tx": {
                 "from": "address:owner",
-                "to": "address:adder_address",
+                "to": "sc:adder",
                 "value": "0",
                 "function": "add",
                 "arguments": [
                     "3"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [],
@@ -89,12 +84,12 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "8",
-                    "balance": "0x200000",
+                    "nonce": "7",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "address:adder_address": {
+                "sc:adder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

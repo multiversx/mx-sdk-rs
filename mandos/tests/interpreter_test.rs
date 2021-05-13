@@ -44,6 +44,10 @@ fn test_address() {
 		interpret_string("address:a", context)
 	);
 	assert_eq!(
+		b"a\x05______________________________".to_vec(),
+		interpret_string("address:a\x05", context)
+	);
+	assert_eq!(
 		b"an_address______________________".to_vec(),
 		interpret_string("address:an_address", context)
 	);
@@ -54,6 +58,70 @@ fn test_address() {
 	assert_eq!(
 		b"12345678901234567890123456789012".to_vec(),
 		interpret_string("address:123456789012345678901234567890123", context)
+	);
+}
+
+#[test]
+fn test_address_with_shard_id() {
+	let context = &InterpreterContext::default();
+
+	assert_eq!(
+		b"_______________________________\x05".to_vec(),
+		interpret_string("address:#05", context)
+	);
+	assert_eq!(
+		b"a______________________________\xbb".to_vec(),
+		interpret_string("address:a#bb", context)
+	);
+	assert_eq!(
+		b"an_address_____________________\x99".to_vec(),
+		interpret_string("address:an_address#99", context)
+	);
+	assert_eq!(
+		b"1234567890123456789012345678901\x66".to_vec(),
+		interpret_string("address:1234567890123456789012345678901#66", context)
+	);
+	assert_eq!(
+		b"1234567890123456789012345678901\x66".to_vec(),
+		interpret_string("address:12345678901234567890123456789012#66", context)
+	);
+}
+
+#[test]
+fn test_sc_address() {
+	let context = &InterpreterContext::default();
+
+	assert_eq!(
+		b"\x00\x00\x00\x00\x00\x00\x00\x00a_______________________".to_vec(),
+		interpret_string("sc:a", context)
+	);
+	assert_eq!(
+		b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120s".to_vec(),
+		interpret_string("sc:12345678901234567890120s", context)
+	);
+	// trims excess
+	assert_eq!(
+		b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120s".to_vec(),
+		interpret_string("sc:12345678901234567890120sx", context)
+	);
+}
+
+#[test]
+fn test_sc_address_with_shard_id() {
+	let context = &InterpreterContext::default();
+
+	assert_eq!(
+		b"\x00\x00\x00\x00\x00\x00\x00\x00a______________________\x44".to_vec(),
+		interpret_string("sc:a#44", context)
+	);
+	assert_eq!(
+		b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120\x88".to_vec(),
+		interpret_string("sc:12345678901234567890120#88", context)
+	);
+	// trims excess
+	assert_eq!(
+		b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120\x88".to_vec(),
+		interpret_string("sc:12345678901234567890120x#88", context)
 	);
 }
 

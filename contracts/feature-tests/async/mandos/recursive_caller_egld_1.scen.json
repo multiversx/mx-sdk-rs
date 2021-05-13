@@ -1,5 +1,5 @@
 {
-    "gasSchedule": "dummy",
+    "comment": "not the main test, just warmup",
     "steps": [
         {
             "step": "setState",
@@ -16,11 +16,11 @@
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "sc:forwarder": {
+                "sc:recursive-caller": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }
             }
         },
@@ -29,39 +29,52 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "sc:forwarder",
+                "to": "sc:recursive-caller",
                 "value": "0",
-                "function": "forward_async_call",
+                "function": "recursive_send_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:echo_arguments",
+                    "str:EGLD",
                     "1",
-                    "2"
+                    "1"
                 ],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:forwarder",
-                        "identifier": "str:callback_raw",
+                        "address": "sc:recursive-caller",
+                        "identifier": "str:recursive_send_funds",
+                        "topics": [
+                            "sc:vault",
+                            "str:EGLD",
+                            "1"
+                        ],
+                        "data": "1"
+                    },
+                    {
+                        "address": "sc:vault",
+                        "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
+                            "str:FungibleESDT",
+                            "1",
                             "0"
                         ],
-                        "data": {
-                            "0-status": "biguint:0",
-                            "1-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:recursive-caller",
+                        "identifier": "str:recursive_send_funds_callback",
+                        "topics": [
+                            "sc:vault",
+                            "str:EGLD",
+                            "1"
+                        ],
+                        "data": "1"
                     }
                 ],
                 "gas": "*",
@@ -79,27 +92,17 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
+                    "balance": "1",
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "1"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "sc:forwarder": {
+                "sc:recursive-caller": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {
-                        "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:1": {
-                            "0-token": ["u32:4", "str:EGLD"],
-                            "1-payment": "u32:0",
-                            "2-num-arguments": "u32:3",
-                            "3-arguments": [
-                                "biguint:0",
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
-                    },
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "balance": "999",
+                    "storage": {},
+                    "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }
             }
         }
