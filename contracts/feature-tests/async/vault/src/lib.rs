@@ -117,5 +117,5 @@ pub trait Vault {
 	/// this additional counter has the role of showing that storage also gets saved correctly.
 	#[view]
 	#[storage_mapper("call_counts")]
-	fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<Self::Storage, u32>;
+	fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<Self::Storage, usize>;
 }

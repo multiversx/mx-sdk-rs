@@ -3,6 +3,7 @@
 
 mod call_async;
 mod call_sync;
+mod call_transf_exec;
 mod esdt;
 mod nft;
 mod roles;
@@ -17,6 +18,7 @@ elrond_wasm::imports!();
 pub trait Forwarder:
 	call_sync::ForwarderSyncCallModule
 	+ call_async::ForwarderAsyncCallModule
+	+ call_transf_exec::ForwarderTransferExecuteModule
 	+ esdt::ForwarderEsdtModule
 	+ sft::ForwarderSftModule
 	+ nft::ForwarderNftModule
