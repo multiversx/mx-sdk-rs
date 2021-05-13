@@ -1,7 +1,4 @@
-use crate::types::{
-	Address, ArgBuffer, AsyncCall, BoxedBytes, TokenIdentifier, TransferEgldExecute,
-	TransferEsdtExecute, TransferExecute,
-};
+use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, TokenIdentifier};
 use crate::{
 	api::{BigUintApi, SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
 	BytesArgLoader, DynArg,
@@ -154,47 +151,6 @@ where
 			callback_data: HexCallDataSerializer::new(&[]),
 		}
 	}
-
-	/// Produces an EGLD (or no value) transfer-execute call, no callback.
-	/// Will always result in a `transferValueExecute` call.
-	pub fn transfer_egld_execute(self) -> TransferEgldExecute<SA> {
-		TransferEgldExecute {
-			api: self.api,
-			to: self.to,
-			egld_payment: self.payment_amount,
-			endpoint_name: self.endpoint_name,
-			arg_buffer: self.arg_buffer,
-			gas_limit: 0,
-		}
-	}
-
-	/// Produces an ESDT transfer-execute call, no callback.
-	/// Will always result in a `transferESDTExecute` call.
-	pub fn transfer_esdt_execute(self) -> TransferEsdtExecute<SA> {
-		TransferEsdtExecute {
-			api: self.api,
-			to: self.to,
-			token_name: self.payment_token.into_boxed_bytes(),
-			amount: self.payment_amount,
-			endpoint_name: self.endpoint_name,
-			arg_buffer: self.arg_buffer,
-			gas_limit: 0,
-		}
-	}
-
-	/// Produces a transfer-execute call, no callback.
-	/// Will result in either a `transferValueExecute` or a `transferESDTExecute` call, depending on input.
-	pub fn transfer_execute(self) -> TransferExecute<SA> {
-		TransferExecute {
-			api: self.api,
-			to: self.to,
-			token: self.payment_token,
-			amount: self.payment_amount,
-			endpoint_name: self.endpoint_name,
-			arg_buffer: self.arg_buffer,
-			gas_limit: 0,
-		}
-	}
 }
 
 impl<SA, R> ContractCall<SA, R>
@@ -260,5 +216,44 @@ where
 			self.endpoint_name.as_slice(),
 			&self.arg_buffer,
 		);
+	}
+
+	/// Immediately launches a transfer-execute call.
+	/// This is similar to an async call, but there is no callback
+	/// and there can be more than one such call per transaction.
+	pub fn transfer_execute(self, gas_limit: u64) {
+		let result = if self.payment_token.is_egld() {
+			self.api.direct_egld_execute(
+				&self.to,
+				&self.payment_amount,
+				gas_limit,
+				self.endpoint_name.as_slice(),
+				&self.arg_buffer,
+			)
+		} else if self.payment_nonce == 0 {
+			// fungible ESDT
+			self.api.direct_esdt_execute(
+				&self.to,
+				self.payment_token.as_esdt_identifier(),
+				&self.payment_amount,
+				gas_limit,
+				self.endpoint_name.as_slice(),
+				&self.arg_buffer,
+			)
+		} else {
+			// non-fungible/semi-fungible ESDT
+			self.api.direct_esdt_nft_execute(
+				&self.to,
+				self.payment_token.as_esdt_identifier(),
+				self.payment_nonce,
+				&self.payment_amount,
+				gas_limit,
+				self.endpoint_name.as_slice(),
+				&self.arg_buffer,
+			)
+		};
+		if let Err(e) = result {
+			self.api.signal_error(e);
+		}
 	}
 }
