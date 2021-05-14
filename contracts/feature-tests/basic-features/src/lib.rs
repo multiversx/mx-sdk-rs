@@ -366,6 +366,21 @@ pub trait BasicFeatures {
 		self.storage_load_cumulated_validator_reward()
 	}
 
+	#[endpoint(storage_load_esdt_local_roles)]
+	fn storage_load_esdt_local_roles_endpoint(
+		&self,
+		token_id: TokenIdentifier,
+	) -> MultiResultVec<BoxedBytes> {
+		let mut role_names = Vec::new();
+
+		let roles = self.storage_load_esdt_local_roles(token_id.as_esdt_identifier());
+		for role in &roles {
+			role_names.push(role.as_role_name().into());
+		}
+
+		role_names.into()
+	}
+
 	#[view]
 	#[storage_is_empty("opt_addr")]
 	fn is_empty_opt_addr(&self) -> bool;
