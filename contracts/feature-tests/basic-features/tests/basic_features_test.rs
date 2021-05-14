@@ -1,6 +1,7 @@
-use basic_features::*;
 use elrond_wasm::types::{SCError, SCResult};
 use elrond_wasm_debug::*;
+
+use basic_features::macros::Macros;
 
 #[test]
 fn test_sc_error() {
