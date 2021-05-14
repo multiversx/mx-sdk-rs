@@ -10,7 +10,7 @@
             "txId": "start with all options",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "function": "start",
                 "arguments": [
@@ -60,12 +60,12 @@
                         "''balance|address:acc3": "1,000,000",
                         "''balance|address:acc4": "1,000,000",
                         "''balance|address:acc5": "1,000,000",
-                        "''balance|address:the_lottery_contract": "0",
-                        "''allowance|address:acc1|address:the_lottery_contract": "100",
-                        "''allowance|address:acc2|address:the_lottery_contract": "100",
-                        "''allowance|address:acc3|address:the_lottery_contract": "100",
-                        "''allowance|address:acc4|address:the_lottery_contract": "100",
-                        "''allowance|address:acc5|address:the_lottery_contract": "100",
+                        "''balance|sc:lottery": "0",
+                        "''allowance|address:acc1|sc:lottery": "100",
+                        "''allowance|address:acc2|sc:lottery": "100",
+                        "''allowance|address:acc3|sc:lottery": "100",
+                        "''allowance|address:acc4|sc:lottery": "100",
+                        "''allowance|address:acc5|sc:lottery": "100",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
@@ -110,7 +110,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -130,12 +130,12 @@
                         "''balance|address:acc3": "1,000,000",
                         "''balance|address:acc4": "1,000,000",
                         "''balance|address:acc5": "1,000,000",
-                        "''balance|address:the_lottery_contract": "00",
-                        "''allowance|address:acc1|address:the_lottery_contract": "100",
-                        "''allowance|address:acc2|address:the_lottery_contract": "100",
-                        "''allowance|address:acc3|address:the_lottery_contract": "100",
-                        "''allowance|address:acc4|address:the_lottery_contract": "100",
-                        "''allowance|address:acc5|address:the_lottery_contract": "100",
+                        "''balance|sc:lottery": "00",
+                        "''allowance|address:acc1|sc:lottery": "100",
+                        "''allowance|address:acc2|sc:lottery": "100",
+                        "''allowance|address:acc3|sc:lottery": "100",
+                        "''allowance|address:acc4|sc:lottery": "100",
+                        "''allowance|address:acc5|sc:lottery": "100",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"

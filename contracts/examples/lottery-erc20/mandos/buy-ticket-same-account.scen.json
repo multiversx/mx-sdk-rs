@@ -20,9 +20,9 @@
                         "''balance|address:my_address": "1,000,000",
                         "''balance|address:acc1": "999,900",
                         "''balance|address:acc2": "1,000,000",
-                        "''balance|address:the_lottery_contract": "100",
-                        "''allowance|address:acc1|address:the_lottery_contract": "100",
-                        "''allowance|address:acc2|address:the_lottery_contract": "100",
+                        "''balance|sc:lottery": "100",
+                        "''allowance|address:acc1|sc:lottery": "100",
+                        "''allowance|address:acc2|sc:lottery": "100",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
@@ -34,7 +34,7 @@
             "txId": "buy-ticket-2-same-account",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
@@ -69,7 +69,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -89,9 +89,9 @@
                         "''balance|address:my_address": "1,000,000",
                         "''balance|address:acc1": "999,800",
                         "''balance|address:acc2": "1,000,000",
-                        "''balance|address:the_lottery_contract": "200",
-                        "''allowance|address:acc1|address:the_lottery_contract": "0",
-                        "''allowance|address:acc2|address:the_lottery_contract": "100",
+                        "''balance|sc:lottery": "200",
+                        "''allowance|address:acc1|sc:lottery": "0",
+                        "''allowance|address:acc2|sc:lottery": "100",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"

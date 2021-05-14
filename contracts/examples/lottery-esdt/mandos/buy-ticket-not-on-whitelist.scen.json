@@ -24,7 +24,7 @@
             "txId": "buy-ticket-not-on-whitelist",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "esdt": {
                     "tokenIdentifier": "str:LOTTERY-123456",
@@ -70,7 +70,7 @@
                         "str:LOTTERY-123456": "100"
                     }
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
