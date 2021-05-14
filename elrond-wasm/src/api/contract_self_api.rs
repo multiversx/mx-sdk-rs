@@ -2,7 +2,10 @@ use super::{
 	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
 	EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
 };
-use crate::{storage, types::Address};
+use crate::{
+	storage,
+	types::{Address, BoxedBytes, EsdtLocalRole, Vec},
+};
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -75,6 +78,39 @@ pub trait ContractBase: Sized {
 			self.get_storage_raw(),
 			storage::protected_keys::ELROND_REWARD_KEY,
 		)
+	}
+
+	/// Retrieves local roles for the token, by reading protected storage.
+	#[inline]
+	fn storage_load_esdt_local_roles(&self, token_id: &[u8]) -> Vec<EsdtLocalRole> {
+		let mut roles = Vec::new();
+
+		let key = [storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY, token_id].concat();
+		let raw_storage = storage::storage_get::<Self::Storage, BoxedBytes>(
+			self.get_storage_raw(),
+			&key,
+		);
+		let raw_storage_bytes = raw_storage.as_slice();
+		let mut current_index = 0;
+
+		while current_index < raw_storage_bytes.len() {
+			// first character before each role is a \n, so we skip it
+			current_index += 1;
+
+			// next is the length of the role as string
+			let role_len = raw_storage_bytes[current_index];
+			current_index += 1;
+
+			// next is role's ASCII string representation
+			let end_index = current_index + role_len as usize;
+			let role_name = &raw_storage_bytes[current_index..end_index];
+			current_index = end_index;
+
+			let esdt_local_role = EsdtLocalRole::from(role_name);
+			roles.push(esdt_local_role);
+		}
+
+		roles
 	}
 
 	fn proxy<P: ProxyObjApi<SendApi = Self::SendApi>>(&self, address: Address) -> P {
