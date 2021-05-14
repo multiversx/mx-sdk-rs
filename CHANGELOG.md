@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+### New math hooks exposed from Arwen:
+- `pow`, `log2`, `sqrt`
+- cryptography: elliptic curves
+
 
 ## [elrond-wasm 0.16.0, mandos 0.7.0, elrond-codec 0.5.3] - 2021-05-14
 ### Major redesign of important framework components:
@@ -17,10 +22,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Callbacks and callback proxies needed to be adapted to the new system, but work similar to how they did in the past.
 - Contracts can define proxy getter methods using the `#[proxy]` annotation.
 - Callbacks can now have names, just like endpoints. This name gets saved in the callback closure in storage, but has no other impact on the contract. The reason I needed it was to help me with defining callback forwarders and avoiding some name collisions there. Callback forwarders are still needed for a little longer, until module callbacks are properly implemented.
-
-### New math hooks exposed from Arwen:
-- `pow`, `log2`, `sqrt`
-- cryptography: elliptic curves
 
 ### Mandos
 - mandos-rs syntax synchronized with mandos-go (`sc:` syntax, new ESDT call value syntax, _no NFTs yet_).
@@ -251,7 +252,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [elrond-wasm 0.4.4] - 2020-05-19
 - Serialization fixes for small ints
-- `storage_load_cumulated_validator_reward` hook
+- `get_cumulated_validator_rewards` hook
 
 ## [elrond-wasm 0.4.3] - 2020-05-11
 - Allow any (macro-based) serializable argument in async call
