@@ -16,7 +16,7 @@
         "txId": "fund-too-late",
         "tx": {
             "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "10,000,000,000",
             "function": "fund",
             "arguments": [],
@@ -43,7 +43,7 @@
             "balance": "150,000,000,000",
             "storage": {}
           },
-          "address:the_crowdfunding_contract": {
+          "sc:crowdfunding": {
             "nonce": "0",
             "balance": "250,000,000,000",
             "storage": {
@@ -61,7 +61,7 @@
         "txId": "check-status",
         "tx": {
             "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "function": "status",
             "arguments": [],
