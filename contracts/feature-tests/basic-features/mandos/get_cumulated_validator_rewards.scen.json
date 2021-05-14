@@ -26,7 +26,7 @@
                 "from": "address:viewer",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "storage_load_cumulated_validator_reward",
+                "function": "get_cumulated_validator_rewards",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -54,7 +54,7 @@
                 "from": "address:viewer",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "storage_load_cumulated_validator_reward",
+                "function": "get_cumulated_validator_rewards",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -82,7 +82,7 @@
                 "from": "address:viewer",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "storage_load_cumulated_validator_reward",
+                "function": "get_cumulated_validator_rewards",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
