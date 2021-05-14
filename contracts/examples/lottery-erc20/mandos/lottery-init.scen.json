@@ -34,7 +34,7 @@
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:the_lottery_contract"
+                    "newAddress": "sc:lottery"
                 }
             ]
         },
@@ -142,7 +142,7 @@
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

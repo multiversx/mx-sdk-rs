@@ -18,7 +18,7 @@
             "txId": "determine-winner-with-split-prize-pool",
             "tx": {
                 "from": "address:acc4",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "function": "determine_winner",
                 "arguments": [
@@ -72,7 +72,7 @@
                     },
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
