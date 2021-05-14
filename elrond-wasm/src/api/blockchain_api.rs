@@ -1,7 +1,7 @@
 use super::{BigUintApi, ErrorApi, StorageReadApi};
-use crate::types::{Address, EsdtTokenData, H256, Vec, EsdtLocalRole, BoxedBytes};
-use alloc::boxed::Box;
 use crate::storage;
+use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, Vec, H256};
+use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -69,10 +69,7 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 	/// TODO: move to the storage API, once BigUint gets refactored
 	#[inline]
 	fn get_cumulated_validator_rewards(&self) -> Self::BalanceType {
-		storage::storage_get(
-			self.clone(),
-			storage::protected_keys::ELROND_REWARD_KEY,
-		)
+		storage::storage_get(self.clone(), storage::protected_keys::ELROND_REWARD_KEY)
 	}
 
 	/// Retrieves local roles for the token, by reading protected storage.
