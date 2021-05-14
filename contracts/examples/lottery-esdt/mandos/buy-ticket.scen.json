@@ -24,7 +24,7 @@
             "txId": "buy-ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "esdt": {
                     "tokenIdentifier": "str:LOTTERY-123456",
@@ -61,7 +61,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

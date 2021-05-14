@@ -31,6 +31,7 @@ pub trait Lottery {
 		opt_max_entries_per_user: Option<u32>,
 		opt_prize_distribution: Option<Vec<u8>>,
 		opt_whitelist: Option<Vec<Address>>,
+		#[var_args] opt_burn_percentage: OptionalArg<Self::BigUint>,
 	) -> SCResult<()> {
 		self.start_lottery(
 			lottery_name,
@@ -41,6 +42,7 @@ pub trait Lottery {
 			opt_max_entries_per_user,
 			opt_prize_distribution,
 			opt_whitelist,
+			opt_burn_percentage,
 		)
 	}
 
@@ -55,6 +57,7 @@ pub trait Lottery {
 		opt_max_entries_per_user: Option<u32>,
 		opt_prize_distribution: Option<Vec<u8>>,
 		opt_whitelist: Option<Vec<Address>>,
+		#[var_args] opt_burn_percentage: OptionalArg<Self::BigUint>,
 	) -> SCResult<()> {
 		self.start_lottery(
 			lottery_name,
@@ -65,6 +68,7 @@ pub trait Lottery {
 			opt_max_entries_per_user,
 			opt_prize_distribution,
 			opt_whitelist,
+			opt_burn_percentage,
 		)
 	}
 
@@ -78,6 +82,7 @@ pub trait Lottery {
 		opt_max_entries_per_user: Option<u32>,
 		opt_prize_distribution: Option<Vec<u8>>,
 		opt_whitelist: Option<Vec<Address>>,
+		#[var_args] opt_burn_percentage: OptionalArg<Self::BigUint>,
 	) -> SCResult<()> {
 		require!(!lottery_name.is_empty(), "Name can't be empty!");
 
@@ -120,6 +125,26 @@ pub trait Lottery {
 			self.sum_array(&prize_distribution) == PERCENTAGE_TOTAL,
 			"Prize distribution must add up to exactly 100(%)!"
 		);
+
+		match opt_burn_percentage {
+			OptionalArg::Some(burn_percentage) => {
+				require!(!token_name.is_egld(), "EGLD can't be burned!");
+
+				let roles = self.storage_load_esdt_local_roles(token_name.as_esdt_identifier());
+				require!(
+					roles.contains(&EsdtLocalRole::Burn),
+					"The contract can't burn the selected token!"
+				);
+
+				require!(
+					burn_percentage < Self::BigUint::from(PERCENTAGE_TOTAL),
+					"Invalid burn percentage!"
+				);
+				self.burn_percentage_for_lottery(&lottery_name)
+					.set(&burn_percentage);
+			},
+			OptionalArg::None => {},
+		}
 
 		let info = LotteryInfo {
 			token_name,
@@ -229,6 +254,24 @@ pub trait Lottery {
 			return;
 		}
 
+		let burn_percentage = self.burn_percentage_for_lottery(lottery_name).get();
+		if burn_percentage > 0 {
+			let burn_amount = self.calculate_percentage_of(&info.prize_pool, &burn_percentage);
+
+			// Prevent crashing if the role was unset while the lottery was running
+			// The tokens will simply remain locked forever
+			let roles = self.storage_load_esdt_local_roles(info.token_name.as_esdt_identifier());
+			if roles.contains(&EsdtLocalRole::Burn) {
+				self.send().esdt_local_burn(
+					self.blockchain().get_gas_left(),
+					info.token_name.as_esdt_identifier(),
+					&burn_amount,
+				);
+			}
+
+			info.prize_pool -= burn_amount;
+		}
+
 		// if there are less tickets than the distributed prize pool,
 		// the 1st place gets the leftover, maybe could split between the remaining
 		// but this is a rare case anyway and it's not worth the overhead
@@ -239,7 +282,6 @@ pub trait Lottery {
 		};
 		let total_prize = info.prize_pool.clone();
 		let winning_tickets = self.get_distinct_random(1, total_tickets, total_winning_tickets);
-		let percentage_total = Self::BigUint::from(PERCENTAGE_TOTAL);
 
 		// distribute to the first place last. Laws of probability say that order doesn't matter.
 		// this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
@@ -247,8 +289,10 @@ pub trait Lottery {
 		for i in (1..total_winning_tickets).rev() {
 			let winning_ticket_id = winning_tickets[i];
 			let winner_address = self.ticket_holders(&lottery_name).get(winning_ticket_id);
-			let prize = &(&Self::BigUint::from(info.prize_distribution[i] as u32) * &total_prize)
-				/ &percentage_total;
+			let prize = self.calculate_percentage_of(
+				&total_prize,
+				&Self::BigUint::from(info.prize_distribution[i] as u32),
+			);
 
 			self.send().direct(
 				&winner_address,
@@ -279,6 +323,7 @@ pub trait Lottery {
 
 		self.ticket_holders(lottery_name).clear();
 		self.lottery_info(lottery_name).clear();
+		self.burn_percentage_for_lottery(lottery_name).clear();
 	}
 
 	fn sum_array(&self, array: &[u8]) -> u32 {
@@ -306,6 +351,14 @@ pub trait Lottery {
 		rand_numbers
 	}
 
+	fn calculate_percentage_of(
+		&self,
+		value: &Self::BigUint,
+		percentage: &Self::BigUint,
+	) -> Self::BigUint {
+		value * percentage / Self::BigUint::from(PERCENTAGE_TOTAL)
+	}
+
 	// storage
 
 	#[view(getLotteryInfo)]
@@ -324,4 +377,10 @@ pub trait Lottery {
 		lottery_name: &BoxedBytes,
 		user: &Address,
 	) -> SingleValueMapper<Self::Storage, u32>;
+
+	#[storage_mapper("burnPercentageForLottery")]
+	fn burn_percentage_for_lottery(
+		&self,
+		lottery_name: &BoxedBytes,
+	) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 }
