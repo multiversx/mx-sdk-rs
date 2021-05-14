@@ -14,7 +14,7 @@
         {
           "creatorAddress": "address:my_address",
           "creatorNonce": "0",
-          "newAddress": "address:the_crowdfunding_contract"
+          "newAddress": "sc:crowdfunding"
         }
       ]
     },
@@ -47,7 +47,7 @@
           "balance": "1,000,000",
           "storage": {}
         },
-        "address:the_crowdfunding_contract": {
+        "sc:crowdfunding": {
           "nonce": "0",
           "balance": "0",
           "storage": {
