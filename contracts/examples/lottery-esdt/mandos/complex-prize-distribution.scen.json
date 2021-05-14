@@ -67,7 +67,7 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "60700",
                     "storage": {
@@ -112,7 +112,7 @@
             "txId": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "function": "determine_winner",
                 "arguments": [
@@ -185,7 +185,7 @@
                     "balance": "30350",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
