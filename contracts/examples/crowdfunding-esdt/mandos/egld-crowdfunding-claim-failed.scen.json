@@ -20,7 +20,7 @@
         "txId": "fund-2",
         "tx": {
             "from": "address:donor2",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "200,000,000,000",
             "function": "fund",
             "arguments": [],
@@ -51,7 +51,7 @@
             "balance": "800,000,000,000",
             "storage": {}
           },
-          "address:the_crowdfunding_contract": {
+          "sc:crowdfunding": {
             "nonce": "0",
             "balance": "450,000,000,000",
             "storage": {
@@ -76,7 +76,7 @@
         "txId": "claim-donor1",
         "tx": {
             "from": "address:donor1",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "function": "claim",
             "arguments": [],
@@ -94,7 +94,7 @@
         "txId": "claim-donor2",
         "tx": {
             "from": "address:donor2",
-            "to": "address:the_crowdfunding_contract",
+            "to": "sc:crowdfunding",
             "value": "0",
             "function": "claim",
             "arguments": [],
@@ -125,7 +125,7 @@
             "balance": "1,000,000,000,000",
             "storage": {}
           },
-          "address:the_crowdfunding_contract": {
+          "sc:crowdfunding": {
             "nonce": "0",
             "balance": "0",
             "storage": {
