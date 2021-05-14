@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "0",
                     "storage": {},
@@ -27,7 +27,7 @@
             "txId": "not-enough",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "send_esdt",
                 "arguments": [
@@ -50,7 +50,7 @@
             "txId": "without-message",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "send_esdt",
                 "arguments": [
@@ -72,7 +72,7 @@
             "txId": "with-message",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "send_esdt",
                 "arguments": [
@@ -93,7 +93,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "0",
                     "storage": {},

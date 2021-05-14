@@ -93,4 +93,25 @@ pub trait ForwarderSyncCallModule {
 		#[indexed] token_payment: &Self::BigUint,
 		#[indexed] token_nonce: u64,
 	);
+
+	#[endpoint]
+	#[payable("*")]
+	fn forward_sync_accept_funds_then_read(
+		&self,
+		to: Address,
+		#[payment_token] token: TokenIdentifier,
+		#[payment] payment: Self::BigUint,
+	) -> usize {
+		let token_nonce = self.call_value().esdt_token_nonce();
+
+		let _ = self
+			.vault_proxy(to.clone())
+			.with_nft_nonce(token_nonce)
+			.accept_funds(token, payment)
+			.execute_on_dest_context(self.blockchain().get_gas_left());
+
+		self.vault_proxy(to)
+			.call_counts(b"accept_funds")
+			.execute_on_dest_context(self.blockchain().get_gas_left())
+	}
 }

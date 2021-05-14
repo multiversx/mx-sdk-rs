@@ -1,11 +1,11 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "before",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper",
                 "arguments": [],
@@ -44,7 +44,7 @@
             "txId": "first-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper_push_back",
                 "arguments": [
@@ -64,7 +64,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -87,7 +87,7 @@
             "txId": "check-list-after-first-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper",
                 "arguments": [],
@@ -109,7 +109,7 @@
             "txId": "second-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper_push_back",
                 "arguments": [
@@ -131,7 +131,7 @@
             "txId": "check-list-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper",
                 "arguments": [],
@@ -152,7 +152,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -177,7 +177,7 @@
             "txId": "check-front-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper_front",
                 "arguments": [],
@@ -199,7 +199,7 @@
             "txId": "first-pop-front",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper_pop_front",
                 "arguments": [],
@@ -219,7 +219,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -242,7 +242,7 @@
             "txId": "second-pop-front",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper_pop_front",
                 "arguments": [],
@@ -262,7 +262,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -281,7 +281,7 @@
             "txId": "check-front-after-second-pop-front",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "list_mapper_front",
                 "arguments": [],

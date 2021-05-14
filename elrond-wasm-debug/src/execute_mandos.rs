@@ -4,6 +4,7 @@ use super::*;
 use elrond_wasm::types::*;
 use mandos::*;
 use num_bigint::BigUint;
+use num_traits::Zero;
 use std::path::Path;
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
@@ -91,8 +92,18 @@ fn parse_execute_mandos_steps(
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),
 					call_value: tx.call_value.value.clone(),
-					esdt_value: tx.esdt_value.value.clone(),
-					esdt_token_identifier: tx.esdt_token_name.value.clone(),
+					esdt_value: if let Some(esdt) = &tx.esdt_value {
+						// TODO: clean this up
+						esdt.esdt_value.value.clone()
+					} else {
+						BigUint::zero()
+					},
+					esdt_token_identifier: if let Some(esdt) = &tx.esdt_value {
+						// TODO: clean this up
+						esdt.esdt_token_name.value.clone()
+					} else {
+						Vec::new()
+					},
 					func_name: tx.function.as_bytes().to_vec(),
 					args: tx
 						.arguments

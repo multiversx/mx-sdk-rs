@@ -1,5 +1,5 @@
 {
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -22,7 +22,7 @@
             "txId": "proposeSCDeploy",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "proposeSCDeploy",
                 "arguments": [
@@ -47,7 +47,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:multisig": {
+                "sc:multisig": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -92,7 +92,7 @@
             "txId": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
@@ -112,7 +112,7 @@
             "txId": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
@@ -131,9 +131,9 @@
             "step": "setState",
             "newAddresses": [
                 {
-                    "creatorAddress": "address:multisig",
+                    "creatorAddress": "sc:multisig",
                     "creatorNonce": "0",
-                    "newAddress": "address:adder"
+                    "newAddress": "sc:adder"
                 }
             ]
         },
@@ -142,7 +142,7 @@
             "txId": "sc-deploy-perform",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["3"],
@@ -151,7 +151,7 @@
             },
             "expect": {
                 "out": [
-                    "address:adder"
+                    "sc:adder"
                 ],
                 "status": "",
                 "logs": [],
@@ -162,7 +162,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:adder": {
+                "sc:adder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -178,11 +178,11 @@
             "txId": "proposeSCCall",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "proposeSCCall",
                 "arguments": [
-                    "address:adder",
+                    "sc:adder",
                     "0",
                     "str:add",
                     "1234"
@@ -203,7 +203,7 @@
             "txId": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["4"],
@@ -223,7 +223,7 @@
             "txId": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["4"],
@@ -243,7 +243,7 @@
             "txId": "sc-deploy-perform",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["4"],
@@ -264,7 +264,7 @@
             "txId": "check-cleanup-1",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionData",
                 "arguments": ["4"],
@@ -285,7 +285,7 @@
             "txId": "check-cleanup-2",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionSigners",
                 "arguments": ["4"],
@@ -303,7 +303,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:adder": {
+                "sc:adder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

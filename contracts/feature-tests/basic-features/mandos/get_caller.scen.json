@@ -1,11 +1,11 @@
 {
     "name": "get caller",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "get_caller",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "get_caller",
                 "arguments": [],
@@ -43,11 +43,11 @@
             "step": "scQuery",
             "txId": "get_caller_query",
             "tx": {
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "function": "get_caller"
             },
             "expect": {
-                "out": [ "address:features_contract" ],
+                "out": [ "sc:basic-features" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
