@@ -1,11 +1,11 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "before",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
@@ -46,7 +46,7 @@
             "txId": "increment-1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "my_single_value_mapper_increment_1",
                 "arguments": [
@@ -68,7 +68,7 @@
             "txId": "after-1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
@@ -90,7 +90,7 @@
             "txId": "increment-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "my_single_value_mapper_increment_2",
                 "arguments": [
@@ -112,7 +112,7 @@
             "txId": "subtract-too-much",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "my_single_value_mapper_subtract_with_require",
                 "arguments": [
@@ -135,7 +135,7 @@
             "txId": "subtract-ok",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "my_single_value_mapper_subtract_with_require",
                 "arguments": [
@@ -157,7 +157,7 @@
             "txId": "after-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
@@ -177,7 +177,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -198,7 +198,7 @@
             "txId": "is-empty-before-clear",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
@@ -220,7 +220,7 @@
             "txId": "clear-single-value-mapper",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "clear_single_value_mapper",
                 "arguments": [],
@@ -240,7 +240,7 @@
             "txId": "is-empty-after-clear",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
@@ -260,7 +260,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

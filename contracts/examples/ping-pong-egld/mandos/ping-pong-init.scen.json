@@ -1,6 +1,6 @@
 {
     "name": "ping-pong deployment test",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
       {
         "step": "setState",
@@ -25,7 +25,7 @@
           {
             "creatorAddress": "address:my_address",
             "creatorNonce": "0",
-            "newAddress": "address:the_ping_pong_contract"
+            "newAddress": "sc:ping-pong"
           }
         ]
       },
@@ -68,7 +68,7 @@
             "balance": "2,500,000,000,000",
             "storage": {}
           },
-          "address:the_ping_pong_contract": {
+          "sc:ping-pong": {
             "nonce": "0",
             "balance": "0",
             "storage": {

@@ -11,15 +11,15 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:alice": {
+                "sc:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "address:bob"
+                        "``other_contract": "sc:bob"
                     },
                     "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "address:bob": {
+                "sc:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -32,7 +32,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:alice",
+                "to": "sc:alice",
                 "value": "0",
                 "function": "messageOtherContractWithCallback",
                 "arguments": [],
@@ -56,16 +56,16 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:alice": {
+                "sc:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "address:bob",
+                        "``other_contract": "sc:bob",
                         "``callback_info": "0x5555"
                     },
                     "code": "file:../async-alice/output/async-alice.wasm"
                 },
-                "address:bob": {
+                "sc:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

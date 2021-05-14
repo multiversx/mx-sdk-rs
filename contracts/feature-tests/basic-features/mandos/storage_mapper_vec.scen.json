@@ -1,11 +1,11 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "before",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
@@ -44,7 +44,7 @@
             "txId": "increment-1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_push",
                 "arguments": [ "123" ],
@@ -64,7 +64,7 @@
             "txId": "after-1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
@@ -84,7 +84,7 @@
             "txId": "increment-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_push",
                 "arguments": [ "111" ],
@@ -104,7 +104,7 @@
             "txId": "after-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
@@ -124,7 +124,7 @@
             "txId": "after-2-len",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_len",
                 "arguments": [],
@@ -142,7 +142,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -165,7 +165,7 @@
             "txId": "index-0",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [ "0" ],
@@ -186,7 +186,7 @@
             "txId": "index-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [ "2" ],
@@ -206,7 +206,7 @@
             "txId": "index-3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [ "3" ],

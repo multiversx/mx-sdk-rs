@@ -1,12 +1,13 @@
 use super::context::*;
+use super::functions::*;
 use super::value_raw::*;
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::identities::Zero;
-use sha3::{Digest, Keccak256};
 
 const STR_PREFIXES: &[&str] = &["str:", "``", "''"];
 
 const ADDR_PREFIX: &str = "address:";
+const SC_ADDR_PREFIX: &str = "sc:";
 const FILE_PREFIX: &str = "file:";
 const KECCAK256_PREFIX: &str = "keccak256:";
 
@@ -72,7 +73,11 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 	}
 
 	if let Some(stripped) = s.strip_prefix(ADDR_PREFIX) {
-		return address(stripped);
+		return address_expression(stripped);
+	}
+
+	if let Some(stripped) = s.strip_prefix(SC_ADDR_PREFIX) {
+		return sc_address_expression(stripped);
 	}
 
 	if s.starts_with(FILE_PREFIX) {
@@ -246,21 +251,4 @@ fn big_int_to_bytes_be(bi: &BigInt) -> Vec<u8> {
 	} else {
 		bi.to_signed_bytes_be()
 	}
-}
-
-fn address(s: &str) -> Vec<u8> {
-	let bytes = s.as_bytes();
-	if bytes.len() > 32 {
-		return bytes[..32].to_vec();
-	}
-	let mut result = vec![b'_'; 32];
-	result[..bytes.len()].copy_from_slice(bytes);
-	result
-}
-
-fn keccak256(data: &[u8]) -> Vec<u8> {
-	let mut hasher = Keccak256::new();
-	hasher.update(data);
-	let hash: [u8; 32] = hasher.finalize().into();
-	hash.into()
 }

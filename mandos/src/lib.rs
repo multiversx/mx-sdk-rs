@@ -4,6 +4,7 @@ mod account_raw;
 mod account_raw_check;
 mod address;
 mod context;
+mod functions;
 mod logs;
 mod logs_raw;
 mod parse_util;
