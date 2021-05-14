@@ -20,7 +20,7 @@
                                     "balance": "1",
                                     "creator": "address:nft_creator",
                                     "royalties": "1000",
-                                    "hash": "0x516d566d3465387063525237566f6a71345175525634395165795a5735584148",
+                                    "hash": "0x36623836623237336666333466636531396436623830346566663561336635373437616461346561613232663164343963303165353264646237383735623462",
                                     "attributes": "str:attributes",
                                     "uri": [
                                         "str:https://ipfs.io/ipfs/QmVm4e8pcRR7Vojq4QuRV49QeyZW5XAHsEyV9eiZriSHzs"
@@ -94,7 +94,7 @@
                                     "balance": "1",
                                     "creator": "address:nft_creator",
                                     "royalties": "1000",
-                                    "hash": "0x516d566d3465387063525237566f6a71345175525634395165795a5735584148",
+                                    "hash": "0x36623836623237336666333466636531396436623830346566663561336635373437616461346561613232663164343963303165353264646237383735623462",
                                     "attributes": "str:attributes",
                                     "uri": [
                                         "str:https://ipfs.io/ipfs/QmVm4e8pcRR7Vojq4QuRV49QeyZW5XAHsEyV9eiZriSHzs"
