@@ -10,7 +10,7 @@
             "txId": "start with no options altenrative name",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "function": "createLotteryPool",
                 "arguments": [
@@ -49,7 +49,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
