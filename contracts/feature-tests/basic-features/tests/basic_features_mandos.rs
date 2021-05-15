@@ -141,6 +141,23 @@ fn get_caller() {
 }
 
 #[test]
+fn get_cumulated_validator_rewards() {
+	parse_execute_mandos(
+		"mandos/get_cumulated_validator_rewards.scen.json",
+		&contract_map(),
+	);
+}
+
+// TODO: uncomment after implemented the full ESDT format in mandos-rs
+// #[test]
+// fn get_esdt_local_roles() {
+// 	parse_execute_mandos(
+// 		"mandos/get_esdt_local_roles.scen.json",
+// 		&contract_map(),
+// 	);
+// }
+
+#[test]
 fn panic() {
 	parse_execute_mandos("mandos/panic.scen.json", &contract_map());
 }
@@ -196,14 +213,6 @@ fn storage_i64() {
 #[test]
 fn storage_i64_bad() {
 	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
-}
-
-#[test]
-fn storage_load_cumulated_validator_reward() {
-	parse_execute_mandos(
-		"mandos/storage_load_cumulated_validator_reward.scen.json",
-		&contract_map(),
-	);
 }
 
 #[test]

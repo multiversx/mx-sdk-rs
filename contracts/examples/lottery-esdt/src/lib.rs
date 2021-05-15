@@ -130,7 +130,9 @@ pub trait Lottery {
 			OptionalArg::Some(burn_percentage) => {
 				require!(!token_name.is_egld(), "EGLD can't be burned!");
 
-				let roles = self.storage_load_esdt_local_roles(token_name.as_esdt_identifier());
+				let roles = self
+					.blockchain()
+					.get_esdt_local_roles(token_name.as_esdt_identifier());
 				require!(
 					roles.contains(&EsdtLocalRole::Burn),
 					"The contract can't burn the selected token!"
@@ -260,7 +262,9 @@ pub trait Lottery {
 
 			// Prevent crashing if the role was unset while the lottery was running
 			// The tokens will simply remain locked forever
-			let roles = self.storage_load_esdt_local_roles(info.token_name.as_esdt_identifier());
+			let roles = self
+				.blockchain()
+				.get_esdt_local_roles(info.token_name.as_esdt_identifier());
 			if roles.contains(&EsdtLocalRole::Burn) {
 				self.send().esdt_local_burn(
 					self.blockchain().get_gas_left(),
