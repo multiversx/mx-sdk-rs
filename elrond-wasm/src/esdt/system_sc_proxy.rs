@@ -142,10 +142,9 @@ where
 		let mut contract_call = ContractCall::new(
 			self.api,
 			esdt_system_sc_address(),
-			TokenIdentifier::egld(),
-			issue_cost,
 			BoxedBytes::from(endpoint_name),
-		);
+		)
+		.with_token_transfer(TokenIdentifier::egld(), issue_cost);
 
 		contract_call.push_argument_raw_bytes(token_display_name.as_slice());
 		contract_call.push_argument_raw_bytes(token_ticker.as_slice());
@@ -335,13 +334,7 @@ where
 	}
 
 	fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
-		ContractCall::new(
-			self.api,
-			esdt_system_sc_address(),
-			TokenIdentifier::egld(),
-			SA::AmountType::zero(),
-			endpoint_name.into(),
-		)
+		ContractCall::new(self.api, esdt_system_sc_address(), endpoint_name.into())
 	}
 }
 

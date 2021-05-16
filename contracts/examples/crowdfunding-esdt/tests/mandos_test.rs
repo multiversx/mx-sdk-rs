@@ -1,7 +1,7 @@
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn contract_map() -> ContractMap<TxContext> {
+fn _contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/crowdfunding-esdt.wasm",
@@ -10,6 +10,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	contract_map
 }
 
+/*
 #[test]
 fn crowdfunding_claim_failed() {
 	parse_execute_mandos(
@@ -51,3 +52,4 @@ fn crowdfunding_fund_too_late() {
 fn crowdfunding_init() {
 	parse_execute_mandos("mandos/crowdfunding-init.scen.json", &contract_map());
 }
+*/

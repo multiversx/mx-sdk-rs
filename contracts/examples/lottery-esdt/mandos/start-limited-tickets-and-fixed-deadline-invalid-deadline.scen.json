@@ -1,5 +1,6 @@
 {
     "name": "start with limited tickets and fixed deadline with invalid deadline arg",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -16,12 +17,12 @@
             "txId": "start limited tickets, fixed deadline, invalid deadline arg",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
-                    "str:lottery_token",
+                    "str:LOTTERY-123456",
                     "100",
                     "0x01|u32:2",
                     "0x01|u64:123,456",
@@ -57,7 +58,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

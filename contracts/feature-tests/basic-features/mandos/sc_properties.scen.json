@@ -1,11 +1,11 @@
 {
     "name": "smart contract properties: is_smart_contract, owner, more to follow",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -23,7 +23,7 @@
                 {
                     "creatorAddress": "address:an_account",
                     "creatorNonce": "0",
-                    "newAddress": "address:also_features_contract"
+                    "newAddress": "sc:also-features-contract"
                 }
             ]
         },
@@ -31,7 +31,7 @@
             "step": "scQuery",
             "txId": "is_smart_contract",
             "tx": {
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "function": "is_smart_contract",
                 "arguments": [
                     "address:an_account"
@@ -45,10 +45,10 @@
             "step": "scQuery",
             "txId": "is_smart_contract",
             "tx": {
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "function": "is_smart_contract",
                 "arguments": [
-                    "address:features_contract"
+                    "sc:basic-features"
                 ]
             },
             "expect": {
@@ -59,7 +59,7 @@
             "step": "scQuery",
             "txId": "get_owner_address",
             "tx": {
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "function": "get_owner_address",
                 "arguments": []
             },
@@ -86,10 +86,10 @@
             "step": "scQuery",
             "txId": "is_smart_contract_deployed",
             "tx": {
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "function": "is_smart_contract",
                 "arguments": [
-                    "address:also_features_contract"
+                    "sc:also-features-contract"
                 ]
             },
             "expect": {
@@ -100,7 +100,7 @@
             "step": "scQuery",
             "txId": "get_owner_address",
             "tx": {
-                "to": "address:also_features_contract",
+                "to": "sc:also-features-contract",
                 "function": "get_owner_address",
                 "arguments": []
             },
@@ -111,7 +111,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -124,7 +124,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:also_features_contract": {
+                "sc:also-features-contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

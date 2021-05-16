@@ -51,7 +51,9 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:FWD-TOKEN",
-                            "1"
+                            "str:FungibleESDT",
+                            "1",
+                            "0"
                         ],
                         "data": ""
                     },
@@ -60,7 +62,9 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:FWD-TOKEN",
-                            "1"
+                            "str:FungibleESDT",
+                            "1",
+                            "0"
                         ],
                         "data": ""
                     }
@@ -84,7 +88,9 @@
                     "esdt": {
                         "str:FWD-TOKEN": "2"
                     },
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "2"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {

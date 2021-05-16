@@ -16,12 +16,14 @@ where
 	pub data: BoxedBytes,
 }
 
-impl<FA, SA> EndpointResult<FA> for SendToken<SA>
+impl<SA> EndpointResult for SendToken<SA>
 where
 	SA: SendApi + 'static,
 {
+	type DecodeAs = ();
+
 	#[inline]
-	fn finish(&self, _api: FA) {
+	fn finish<FA>(&self, _api: FA) {
 		self.api
 			.direct_via_async_call(&self.to, &self.token, &self.amount, self.data.as_slice());
 	}

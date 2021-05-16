@@ -1,5 +1,5 @@
 {
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -23,7 +23,7 @@
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "proposeSCDeploy",
                 "arguments": [
@@ -49,7 +49,7 @@
             "txId": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
@@ -69,7 +69,7 @@
             "txId": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
                 "arguments": ["3"],
@@ -88,9 +88,9 @@
             "step": "setState",
             "newAddresses": [
                 {
-                    "creatorAddress": "address:multisig",
+                    "creatorAddress": "sc:multisig",
                     "creatorNonce": "0",
-                    "newAddress": "address:adder"
+                    "newAddress": "sc:adder"
                 }
             ]
         },
@@ -99,7 +99,7 @@
             "txId": "sc-deploy-perform",
             "tx": {
                 "from": "address:paul",
-                "to": "address:multisig",
+                "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
                 "arguments": ["3"],
@@ -109,6 +109,7 @@
             "expect": {
                 "out": [],
                 "status": "5",
+                "message": "str:not enough gas",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

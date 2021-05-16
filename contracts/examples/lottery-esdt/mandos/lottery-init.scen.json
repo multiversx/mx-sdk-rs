@@ -1,5 +1,6 @@
 {
     "name": "lottery deployment test",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
@@ -24,7 +25,7 @@
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:the_lottery_contract"
+                    "newAddress": "sc:lottery"
                 }
             ]
         },
@@ -63,7 +64,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

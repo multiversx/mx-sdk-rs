@@ -13,7 +13,7 @@
                     "balance": "1,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:lottery_token": "100"
+                        "str:LOTTERY-123456": "100"
                     }
                 }
             }
@@ -23,10 +23,12 @@
             "txId": "buy-ticket-after-announced-winner",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_lottery_contract",
+                "to": "sc:lottery",
                 "value": "0",
-                "esdtTokenName": "str:lottery_token",
-                "esdtValue": "100",
+                "esdt": {
+                    "tokenIdentifier": "str:LOTTERY-123456",
+                    "value": "100"
+                },
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -54,7 +56,7 @@
                     "balance": "1,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:lottery_token": "100"
+                        "str:LOTTERY-123456": "100"
                     }
                 },
                 "address:acc2": {
@@ -62,7 +64,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

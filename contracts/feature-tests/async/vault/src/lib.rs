@@ -10,8 +10,12 @@ pub trait Vault {
 	fn init(&self) {}
 
 	#[endpoint]
-	fn echo_arguments(&self, #[var_args] args: VarArgs<BoxedBytes>) -> MultiResultVec<BoxedBytes> {
-		args.into_vec().into()
+	fn echo_arguments(
+		&self,
+		#[var_args] args: VarArgs<BoxedBytes>,
+	) -> SCResult<MultiResultVec<BoxedBytes>> {
+		self.call_counts(b"echo_arguments").update(|c| *c += 1);
+		Ok(args.into_vec().into())
 	}
 
 	#[payable("*")]
@@ -21,7 +25,41 @@ pub trait Vault {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: Self::BigUint,
 	) {
-		self.accept_funds_event(&token, &payment);
+		let nonce = self.call_value().esdt_token_nonce();
+		let token_type = self.call_value().esdt_token_type();
+
+		self.accept_funds_event(&token, token_type.as_type_name(), &payment, nonce);
+
+		self.call_counts(b"accept_funds").update(|c| *c += 1);
+	}
+
+	#[payable("*")]
+	#[endpoint]
+	fn accept_funds_echo_payment(
+		&self,
+		#[payment_token] token_identifier: TokenIdentifier,
+		#[payment] token_payment: Self::BigUint,
+	) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64>> {
+		let token_nonce = self.call_value().esdt_token_nonce();
+		let token_type = self.call_value().esdt_token_type();
+
+		self.accept_funds_event(
+			&token_identifier,
+			token_type.as_type_name(),
+			&token_payment,
+			token_nonce,
+		);
+
+		self.call_counts(b"accept_funds_echo_payment")
+			.update(|c| *c += 1);
+
+		Ok((
+			token_identifier,
+			BoxedBytes::from(token_type.as_type_name()),
+			token_payment,
+			token_nonce,
+		)
+			.into())
 	}
 
 	#[payable("*")]
@@ -55,8 +93,10 @@ pub trait Vault {
 	#[event("accept_funds")]
 	fn accept_funds_event(
 		&self,
-		#[indexed] token: &TokenIdentifier,
-		#[indexed] payment: &Self::BigUint,
+		#[indexed] token_identifier: &TokenIdentifier,
+		#[indexed] token_type: &[u8],
+		#[indexed] token_payment: &Self::BigUint,
+		#[indexed] token_nonce: u64,
 	);
 
 	#[event("reject_funds")]
@@ -72,4 +112,10 @@ pub trait Vault {
 		#[indexed] token: &TokenIdentifier,
 		#[indexed] amount: &Self::BigUint,
 	);
+
+	/// We already leave a trace of the calls using the event logs;
+	/// this additional counter has the role of showing that storage also gets saved correctly.
+	#[view]
+	#[storage_mapper("call_counts")]
+	fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<Self::Storage, usize>;
 }

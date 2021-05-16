@@ -235,6 +235,12 @@ impl BlockchainApi for ArwenApiImpl {
 		}
 	}
 
+	///////////////////////////////////////////
+	// ----------------- TODO -----------------
+	// Hash is currently ignored, fix when hash gets a getHashLength function
+	// Hash is not limited to 32 bytes, so also fix EsdtTokenData struct when that happens
+	// Also fix in mandos.
+	///////////////////////////////////////////
 	#[inline]
 	fn get_esdt_token_data(
 		&self,
@@ -245,7 +251,7 @@ impl BlockchainApi for ArwenApiImpl {
 		unsafe {
 			let value = bigIntNew(0);
 			let mut properties = [0u8; 2]; // always 2 bytes
-			let mut hash = H256::zero();
+			let mut hash = [0u8; 128];
 
 			let name_len = getESDTNFTNameLength(
 				address.as_ref().as_ptr(),
@@ -311,7 +317,7 @@ impl BlockchainApi for ArwenApiImpl {
 				token_type,
 				amount: ArwenBigUint { handle: value },
 				frozen,
-				hash,
+				hash: H256::zero(),
 				name: name_buffer,
 				attributes: attr_buffer,
 				creator,

@@ -180,12 +180,16 @@ where
 
 /// Behaves like a MultiResultVec<Address> when an endpoint result,
 /// and lists all users addresses.
-impl<SA, FA> EndpointResult<FA> for UserMapper<SA>
+impl<SA> EndpointResult for UserMapper<SA>
 where
 	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	FA: EndpointFinishApi + ErrorApi + Clone + 'static,
 {
-	fn finish(&self, api: FA) {
+	type DecodeAs = MultiResultVec<Address>;
+
+	fn finish<FA>(&self, api: FA)
+	where
+		FA: EndpointFinishApi + Clone + 'static,
+	{
 		let addr_vec = self.get_all_addresses();
 		MultiResultVec::<Address>::from(addr_vec).finish(api);
 	}

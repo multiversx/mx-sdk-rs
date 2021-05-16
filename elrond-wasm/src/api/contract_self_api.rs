@@ -2,7 +2,7 @@ use super::{
 	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
 	EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
 };
-use crate::{storage, types::Address};
+use crate::types::Address;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -66,16 +66,6 @@ pub trait ContractBase: Sized {
 	/// Please avoid using it directly.
 	/// TODO: find a way to hide this API.
 	fn error_api(&self) -> Self::ErrorApi;
-
-	/// Retrieves validator rewards, as set by the protocol.
-	/// TODO: move to the storage API, once BigUint gets refactored
-	#[inline]
-	fn storage_load_cumulated_validator_reward(&self) -> Self::BigUint {
-		storage::storage_get(
-			self.get_storage_raw(),
-			storage::protected_keys::ELROND_REWARD_KEY,
-		)
-	}
 
 	fn proxy<P: ProxyObjApi<SendApi = Self::SendApi>>(&self, address: Address) -> P {
 		P::new_proxy_obj(self.send(), address)
