@@ -4,7 +4,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -23,7 +23,7 @@
             "txId": "call-a-function-which-does-not-exist",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "function_which_does_not_exist",
                 "arguments": [],

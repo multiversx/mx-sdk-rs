@@ -1,0 +1,99 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:viewer": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "0",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "get_cumulated_validator_rewards",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "validatorReward",
+            "txId": "validatorReward-1",
+            "tx": {
+                "to": "sc:basic-features",
+                "value": "100,000,000"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "0",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "get_cumulated_validator_rewards",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "100,000,000" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "validatorReward",
+            "txId": "validatorReward-1",
+            "tx": {
+                "to": "sc:basic-features",
+                "value": "300"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "0",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "get_cumulated_validator_rewards",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "100,000,300" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

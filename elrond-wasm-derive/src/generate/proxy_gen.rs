@@ -19,7 +19,7 @@ pub fn generate_proxy_sig(method: &Method) -> proc_macro2::TokenStream {
 		fn #method_name #generics (
 			self,
 			#(#arg_decl),*
-		) -> elrond_wasm::types::ContractCall<Self::SendApi, #ret_tok>
+		) -> elrond_wasm::types::ContractCall<Self::SendApi, <#ret_tok as elrond_wasm::io::EndpointResult>::DecodeAs>
 		#generics_where
 	};
 	result
@@ -82,12 +82,14 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 				let endpoint_name_literal = byte_str_slice_literal(&endpoint_name.as_bytes());
 				let sig = quote! {
 					#msig {
-						let (___api___, ___address___, #token_local_decl, #payment_local_decl) = self.into_fields();
+						let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
+							self.into_fields();
 						let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
 							___api___.clone(),
 							___address___,
 							#token_expr,
 							#payment_expr,
+							___nonce___,
 							elrond_wasm::types::BoxedBytes::from(#endpoint_name_literal),
 						);
 						#(#arg_push_snippets)*

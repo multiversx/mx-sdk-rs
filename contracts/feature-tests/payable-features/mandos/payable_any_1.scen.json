@@ -1,11 +1,11 @@
 {
     "name": "payable",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -28,7 +28,7 @@
             "txId": "payable_any_1.1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "payable_any_1",
                 "arguments": [],
@@ -48,7 +48,7 @@
             "txId": "payable_any_1.2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "5",
                 "function": "payable_any_1",
                 "arguments": [],
@@ -68,10 +68,12 @@
             "txId": "payable_any_1.3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
-                "esdtTokenName": "str:PAYABLE-FEATURES-TOKEN",
-                "esdtValue": "100",
+                "esdt": {
+                    "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
+                    "value": "100"
+                },
                 "function": "payable_any_1",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -79,28 +81,6 @@
             },
             "expect": {
                 "out": [ "100", "str:PAYABLE-FEATURES-TOKEN" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "payable_any_1.4",
-            "tx": {
-                "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "esdtTokenName": "str:PAYABLE-FEATURES-TOKEN",
-                "esdtValue": "0",
-                "function": "payable_any_1",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [ "0", "str:PAYABLE-FEATURES-TOKEN" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

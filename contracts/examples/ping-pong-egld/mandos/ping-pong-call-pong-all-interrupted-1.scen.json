@@ -1,6 +1,6 @@
 {
     "comment": "initially, the gas is not enough to even perform a single pong",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -18,7 +18,7 @@
             "comment": "initially, the gas is only enough to perform 0 of 2 pongs",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
+                "to": "sc:ping-pong",
                 "value": "0",
                 "function": "pongAll",
                 "arguments": [],
@@ -51,7 +51,7 @@
                     "balance": "2,000,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "1,000,000,000,000",
                     "storage": {

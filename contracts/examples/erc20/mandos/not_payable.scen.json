@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "``busd__________________________s1": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -27,7 +27,7 @@
             "txId": "1",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "value": "0x01",
                 "function": "totalSupply",
                 "arguments": [],
@@ -48,7 +48,7 @@
             "txId": "2",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "value": "0x01",
                 "function": "balanceOf",
                 "arguments": [
@@ -71,7 +71,7 @@
             "txId": "3",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "value": "0x01",
                 "function": "allowance",
                 "arguments": [
@@ -95,7 +95,7 @@
             "txId": "4",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "value": "0x01",
                 "function": "transfer",
                 "arguments": [
@@ -119,7 +119,7 @@
             "txId": "5",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "value": "0x01",
                 "function": "approve",
                 "arguments": [
@@ -143,7 +143,7 @@
             "txId": "6",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "value": "0x01",
                 "function": "transferFrom",
                 "arguments": [
@@ -172,7 +172,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "``busd__________________________s1": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
