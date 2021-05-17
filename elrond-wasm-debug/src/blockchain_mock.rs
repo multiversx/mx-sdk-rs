@@ -22,27 +22,13 @@ pub struct AccountData {
 	pub balance: BigUint,
 	pub storage: AccountStorage,
 	pub esdt: AccountEsdt,
+	pub username: Vec<u8>,
 	pub contract_path: Option<Vec<u8>>,
 	pub contract_owner: Option<Address>,
 }
 
 impl fmt::Display for AccountData {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let mut storage_buf = String::new();
-		let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-		storage_keys.sort();
-
-		for key in &storage_keys {
-			let value = self.storage.get(key).unwrap();
-			write!(
-				&mut storage_buf,
-				"\n\t\t{} -> 0x{}",
-				key_hex(key.as_slice()),
-				hex::encode(value.as_slice())
-			)
-			.unwrap();
-		}
-
 		let mut esdt_buf = String::new();
 		let mut esdt_keys: Vec<Vec<u8>> =
 			self.esdt.clone().iter().map(|(k, _)| k.clone()).collect();
@@ -52,17 +38,42 @@ impl fmt::Display for AccountData {
 			let value = self.esdt.get(key).unwrap();
 			write!(
 				&mut esdt_buf,
-				"\n\t\t{} -> 0x{}",
+				"\n\t\t\t\t{} -> 0x{}",
 				key_hex(key.as_slice()),
 				hex::encode(value.to_bytes_be())
 			)
 			.unwrap();
 		}
 
+		let mut storage_buf = String::new();
+		let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+		storage_keys.sort();
+
+		for key in &storage_keys {
+			let value = self.storage.get(key).unwrap();
+			write!(
+				&mut storage_buf,
+				"\n\t\t\t{} -> 0x{}",
+				key_hex(key.as_slice()),
+				hex::encode(value.as_slice())
+			)
+			.unwrap();
+		}
+
 		write!(
 			f,
-			"AccountData {{ nonce: {}, balance: {}, storage: [{} ], esdt: [{} ] }}",
-			self.nonce, self.balance, storage_buf, esdt_buf
+			"AccountData {{
+		nonce: {},
+		balance: {},
+		esdt: [{} ],
+		username: {},
+		storage: [{} ]
+	}}",
+			self.nonce,
+			self.balance,
+			esdt_buf,
+			String::from_utf8(self.username.clone()).unwrap(),
+			storage_buf
 		)
 	}
 }
@@ -326,6 +337,7 @@ impl BlockchainMock {
 				balance: tx_input.call_value.clone(),
 				storage: new_storage,
 				esdt,
+				username: Vec::new(),
 				contract_path: Some(contract_path),
 				contract_owner: Some(tx_input.from.clone()),
 			},
@@ -355,6 +367,21 @@ impl BlockchainMock {
 		account
 			.storage
 			.insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
+	}
+
+	pub fn try_set_username(&mut self, address: &Address, username: &[u8]) -> bool {
+		let account = self.accounts.get_mut(address).unwrap_or_else(|| {
+			panic!(
+				"Account not found: {}",
+				&std::str::from_utf8(address.as_ref()).unwrap()
+			)
+		});
+		if account.username.is_empty() {
+			account.username = username.to_vec();
+			true
+		} else {
+			false
+		}
 	}
 }
 

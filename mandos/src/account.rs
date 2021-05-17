@@ -6,8 +6,9 @@ pub struct Account {
 	pub comment: Option<String>,
 	pub nonce: U64Value,
 	pub balance: BigUintValue,
-	pub storage: BTreeMap<BytesKey, BytesValue>,
 	pub esdt: Option<BTreeMap<BytesKey, BigUintValue>>,
+	pub username: Option<BytesValue>,
+	pub storage: BTreeMap<BytesKey, BytesValue>,
 	pub code: Option<BytesValue>,
 }
 
@@ -17,16 +18,6 @@ impl InterpretableFrom<AccountRaw> for Account {
 			comment: from.comment,
 			nonce: U64Value::interpret_from(from.nonce, context),
 			balance: BigUintValue::interpret_from(from.balance, context),
-			storage: from
-				.storage
-				.into_iter()
-				.map(|(k, v)| {
-					(
-						BytesKey::interpret_from(k, context),
-						BytesValue::interpret_from(v, context),
-					)
-				})
-				.collect(),
 			esdt: from.esdt.map(|tree| {
 				tree.into_iter()
 					.map(|(k, v)| {
@@ -37,6 +28,19 @@ impl InterpretableFrom<AccountRaw> for Account {
 					})
 					.collect()
 			}),
+			username: from
+				.username
+				.map(|c| BytesValue::interpret_from(c, context)),
+			storage: from
+				.storage
+				.into_iter()
+				.map(|(k, v)| {
+					(
+						BytesKey::interpret_from(k, context),
+						BytesValue::interpret_from(v, context),
+					)
+				})
+				.collect(),
 			code: from.code.map(|c| BytesValue::interpret_from(c, context)),
 		}
 	}
