@@ -2,6 +2,7 @@ pub mod abi_json;
 pub mod api;
 mod async_data;
 mod blockchain_mock;
+mod builtin_func_exec;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
@@ -10,6 +11,7 @@ mod tx_context;
 
 pub use async_data::*;
 pub use blockchain_mock::*;
+pub use builtin_func_exec::*;
 pub use contract_map::*;
 pub use display_util::*;
 pub use execute_mandos::*;

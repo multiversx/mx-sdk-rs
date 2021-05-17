@@ -1,13 +1,11 @@
 #![allow(unused_variables)] // for now
 
-use super::*;
+use crate::*;
 use elrond_wasm::types::*;
 use mandos::*;
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::path::Path;
-
-const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 pub fn parse_execute_mandos<P: AsRef<Path>>(
 	relative_path: P,
@@ -59,8 +57,13 @@ fn parse_execute_mandos_steps(
 						address: address.value.into(),
 						nonce: account.nonce.value,
 						balance: account.balance.value.clone(),
-						storage,
 						esdt,
+						username: account
+							.username
+							.as_ref()
+							.map(|bytes_value| bytes_value.value.clone())
+							.unwrap_or_default(),
+						storage,
 						contract_path: account
 							.code
 							.as_ref()
@@ -88,6 +91,8 @@ fn parse_execute_mandos_steps(
 				tx,
 				expect,
 			} => {
+				println!("Executing {}", tx_id);
+
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),
@@ -123,11 +128,6 @@ fn parse_execute_mandos_steps(
 						if state.accounts.contains_key(&async_data.to) {
 							let async_input = async_call_tx_input(&async_data, &contract_address);
 
-							if async_input.func_name == ESDT_TRANSFER_STRING {
-								execute_esdt_async_call(async_input, state);
-								return;
-							}
-
 							let (async_result, opt_more_async) =
 								execute_sc_call(async_input, state, contract_map).unwrap();
 							assert!(
@@ -156,8 +156,9 @@ fn parse_execute_mandos_steps(
 								address: async_data.to.clone(),
 								nonce: 0,
 								balance: async_data.call_value.clone(),
-								storage: HashMap::new(),
 								esdt: HashMap::new(),
+								username: Vec::new(),
+								storage: HashMap::new(),
 								contract_path: None,
 								contract_owner: None,
 							});
@@ -268,21 +269,15 @@ fn parse_execute_mandos_steps(
 	}
 }
 
-fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
-	let from = tx_input.from.clone();
-	let to = tx_input.to.clone();
-	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
-	let esdt_value = tx_input.esdt_value;
-
-	state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
-	state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
-}
-
 fn execute_sc_call(
 	tx_input: TxInput,
 	state: &mut BlockchainMock,
 	contract_map: &ContractMap<TxContext>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
+	if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
+		return Ok((tx_result, None));
+	}
+
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let call_value = tx_input.call_value.clone();
@@ -473,6 +468,14 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 				expected_address,
 				expected_account.balance,
 				account.balance
+			);
+
+			assert!(
+				expected_account.username.check(&account.username),
+				"bad account username. Address: {}. Want: {}. Have: {}",
+				expected_address,
+				expected_account.username,
+				std::str::from_utf8(account.username.as_slice()).unwrap()
 			);
 
 			if let CheckStorage::Equal(eq) = &expected_account.storage {
