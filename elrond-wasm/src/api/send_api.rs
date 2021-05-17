@@ -2,9 +2,7 @@ use elrond_codec::TopEncode;
 
 use super::{BigIntApi, BigUintApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::hex_call_data::HexCallDataSerializer;
-use crate::types::{
-	Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec, H256,
-};
+use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec};
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
@@ -270,7 +268,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		amount: &Self::AmountType,
 		name: &BoxedBytes,
 		royalties: &Self::AmountType,
-		hash: &H256,
+		hash: &BoxedBytes,
 		attributes: &T,
 		uris: &[BoxedBytes],
 	) {
@@ -279,7 +277,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 		arg_buffer.push_argument_bytes(name.as_slice());
 		arg_buffer.push_argument_bytes(royalties.to_bytes_be().as_slice());
-		arg_buffer.push_argument_bytes(hash.as_bytes());
+		arg_buffer.push_argument_bytes(hash.as_slice());
 
 		let mut top_encoded_attributes = Vec::new();
 		let _ = attributes.top_encode(&mut top_encoded_attributes);
