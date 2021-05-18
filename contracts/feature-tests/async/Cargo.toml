@@ -42,7 +42,3 @@ optional = true
 [dev-dependencies.elrond-wasm-debug]
 version = "0.16.1"
 path = "../../../elrond-wasm-debug"
-
-[dev-dependencies.elrond-wasm-sc-dns]
-# version = "0.16.0"
-path = "../../../../sc-dns-rs/dns"
