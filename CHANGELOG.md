@@ -9,6 +9,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - `pow`, `log2`, `sqrt`
 - cryptography: elliptic curves
 
+## [elrond-wasm 0.16.1, mandos 0.7.1] - 2021-05-18
+- Improvements in mandos-rs: username, contract owner, nested async calls
 
 ## [elrond-wasm 0.16.0, mandos 0.7.0, elrond-codec 0.5.3] - 2021-05-14
 ### Major redesign of important framework components:
