@@ -107,7 +107,7 @@ pub trait LocalEsdtAndEsdtNft {
 		amount: Self::BigUint,
 		name: BoxedBytes,
 		royalties: Self::BigUint,
-		hash: H256,
+		hash: BoxedBytes,
 		color: Color,
 		uri: BoxedBytes,
 	) {
