@@ -12,8 +12,12 @@ mod storage;
 
 elrond_wasm::imports!();
 
+#[cfg(feature = "elrond-wasm-module-dns-default")]
+pub use elrond_wasm_module_dns_default as dns;
+#[cfg(feature = "elrond-wasm-module-dns-wasm")]
+pub use elrond_wasm_module_dns_wasm as dns;
+
 /// Test contract for investigating contract calls.
-/// TODO: split into modules.
 #[elrond_wasm_derive::contract]
 pub trait Forwarder:
 	call_sync::ForwarderSyncCallModule
@@ -24,6 +28,7 @@ pub trait Forwarder:
 	+ nft::ForwarderNftModule
 	+ roles::ForwarderRolesModule
 	+ storage::ForwarderStorageModule
+	+ dns::DnsModule
 {
 	#[init]
 	fn init(&self) {}
