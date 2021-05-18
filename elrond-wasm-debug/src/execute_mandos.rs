@@ -331,7 +331,7 @@ fn execute_sc_call_with_async_and_callback(
 				state.add_account(AccountData {
 					address: async_data.to.clone(),
 					nonce: 0,
-					balance: async_data.call_value.clone(),
+					balance: async_data.call_value,
 					esdt: HashMap::new(),
 					username: Vec::new(),
 					storage: HashMap::new(),
