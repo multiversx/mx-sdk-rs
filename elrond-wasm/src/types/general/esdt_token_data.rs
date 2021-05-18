@@ -2,13 +2,13 @@ use crate::{abi::TypeAbi, api::BigUintApi};
 use alloc::string::String;
 use elrond_codec::*;
 
-use super::{Address, BoxedBytes, EsdtTokenType, H256};
+use super::{Address, BoxedBytes, EsdtTokenType};
 
 pub struct EsdtTokenData<BigUint: BigUintApi> {
 	pub token_type: EsdtTokenType,
 	pub amount: BigUint,
 	pub frozen: bool,
-	pub hash: H256,
+	pub hash: BoxedBytes,
 	pub name: BoxedBytes,
 	pub attributes: BoxedBytes,
 	pub creator: Address,
@@ -81,7 +81,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 		let token_type = EsdtTokenType::dep_decode(input)?;
 		let amount = BigUint::dep_decode(input)?;
 		let frozen = bool::dep_decode(input)?;
-		let hash = H256::dep_decode(input)?;
+		let hash = BoxedBytes::dep_decode(input)?;
 		let name = BoxedBytes::dep_decode(input)?;
 		let attributes = BoxedBytes::dep_decode(input)?;
 		let creator = Address::dep_decode(input)?;
@@ -109,7 +109,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
 		let token_type = EsdtTokenType::dep_decode_or_exit(input, c.clone(), exit);
 		let amount = BigUint::dep_decode_or_exit(input, c.clone(), exit);
 		let frozen = bool::dep_decode_or_exit(input, c.clone(), exit);
-		let hash = H256::dep_decode_or_exit(input, c.clone(), exit);
+		let hash = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
 		let name = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
 		let attributes = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
 		let creator = Address::dep_decode_or_exit(input, c.clone(), exit);
