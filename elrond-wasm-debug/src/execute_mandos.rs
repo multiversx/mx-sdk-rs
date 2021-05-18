@@ -123,52 +123,8 @@ fn parse_execute_mandos_steps(
 					tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
 				};
 				state.increase_nonce(&tx_input.from);
-				let (mut tx_result, opt_async_data) =
-					execute_sc_call(tx_input, state, contract_map).unwrap();
-				if tx_result.result_status == 0 {
-					if let Some(async_data) = opt_async_data {
-						let contract_address = tx.to.value.into();
-						if state.accounts.contains_key(&async_data.to) {
-							let async_input = async_call_tx_input(&async_data, &contract_address);
-
-							let (async_result, opt_more_async) =
-								execute_sc_call(async_input, state, contract_map).unwrap();
-							assert!(
-								opt_more_async.is_none(),
-								"nested asyncs currently not supported"
-							);
-							tx_result = merge_results(tx_result, async_result.clone());
-
-							let callback_input = async_callback_tx_input(
-								&async_data,
-								&contract_address,
-								&async_result,
-							);
-							let (callback_result, opt_more_async) =
-								execute_sc_call(callback_input, state, contract_map).unwrap();
-							assert!(
-								opt_more_async.is_none(),
-								"successive asyncs currently not supported"
-							);
-							tx_result = merge_results(tx_result, callback_result);
-						} else {
-							state
-								.subtract_tx_payment(&contract_address, &async_data.call_value)
-								.unwrap();
-							state.add_account(AccountData {
-								address: async_data.to.clone(),
-								nonce: 0,
-								balance: async_data.call_value.clone(),
-								esdt: HashMap::new(),
-								username: Vec::new(),
-								storage: HashMap::new(),
-								contract_path: None,
-								contract_owner: None,
-							});
-							state.print_accounts();
-						}
-					}
-				}
+				let tx_result =
+					execute_sc_call_with_async_and_callback(tx_input, state, contract_map).unwrap();
 				if let Some(tx_expect) = expect {
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
 				}
@@ -340,6 +296,52 @@ fn execute_sc_call(
 	}
 
 	Ok((tx_result, tx_output.async_call))
+}
+
+fn execute_sc_call_with_async_and_callback(
+	tx_input: TxInput,
+	state: &mut BlockchainMock,
+	contract_map: &ContractMap<TxContext>,
+) -> Result<TxResult, BlockchainMockError> {
+	let contract_address = tx_input.to.clone();
+	let (mut tx_result, opt_async_data) = execute_sc_call(tx_input, state, contract_map)?;
+	if tx_result.result_status == 0 {
+		if let Some(async_data) = opt_async_data {
+			if state.accounts.contains_key(&async_data.to) {
+				let async_input = async_call_tx_input(&async_data, &contract_address);
+
+				let async_result =
+					execute_sc_call_with_async_and_callback(async_input, state, contract_map)?;
+
+				tx_result = merge_results(tx_result, async_result.clone());
+
+				let callback_input =
+					async_callback_tx_input(&async_data, &contract_address, &async_result);
+				let (callback_result, opt_more_async) =
+					execute_sc_call(callback_input, state, contract_map)?;
+				assert!(
+					opt_more_async.is_none(),
+					"successive asyncs currently not supported"
+				);
+				tx_result = merge_results(tx_result, callback_result);
+			} else {
+				state
+					.subtract_tx_payment(&contract_address, &async_data.call_value)
+					.unwrap();
+				state.add_account(AccountData {
+					address: async_data.to.clone(),
+					nonce: 0,
+					balance: async_data.call_value.clone(),
+					esdt: HashMap::new(),
+					username: Vec::new(),
+					storage: HashMap::new(),
+					contract_path: None,
+					contract_owner: None,
+				});
+			}
+		}
+	}
+	Ok(tx_result)
 }
 
 fn execute_sc_create(
