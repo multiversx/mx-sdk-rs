@@ -68,7 +68,10 @@ fn parse_execute_mandos_steps(
 							.code
 							.as_ref()
 							.map(|bytes_value| bytes_value.value.clone()),
-						contract_owner: None, // TODO: add contract owner in mandos
+						contract_owner: account
+							.owner
+							.as_ref()
+							.map(|address_value| address_value.value.clone().into()),
 					});
 				}
 				for new_address in new_addresses.iter() {
