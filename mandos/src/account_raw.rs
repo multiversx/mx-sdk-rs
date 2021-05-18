@@ -26,4 +26,8 @@ pub struct AccountRaw {
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub code: Option<ValueSubTree>,
+
+	#[serde(default)]
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub owner: Option<ValueSubTree>,
 }

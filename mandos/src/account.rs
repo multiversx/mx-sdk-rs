@@ -10,6 +10,7 @@ pub struct Account {
 	pub username: Option<BytesValue>,
 	pub storage: BTreeMap<BytesKey, BytesValue>,
 	pub code: Option<BytesValue>,
+	pub owner: Option<AddressValue>,
 }
 
 impl InterpretableFrom<AccountRaw> for Account {
@@ -42,6 +43,7 @@ impl InterpretableFrom<AccountRaw> for Account {
 				})
 				.collect(),
 			code: from.code.map(|c| BytesValue::interpret_from(c, context)),
+			owner: from.owner.map(|v| AddressValue::interpret_from(v, context)),
 		}
 	}
 }
