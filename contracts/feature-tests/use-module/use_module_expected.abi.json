@@ -2,6 +2,7 @@
     "docs": [
         "Contract that tests that using modules works correctly.",
         "Also provides testing for the most common modules:",
+        "- DnsModule",
         "- FeaturesModule",
         "- PauseModule"
     ],
@@ -75,6 +76,23 @@
         {
             "name": "unpause",
             "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "dnsRegister",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "dns_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                }
+            ],
             "outputs": []
         }
     ],

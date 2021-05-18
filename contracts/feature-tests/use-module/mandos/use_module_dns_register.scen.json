@@ -10,11 +10,11 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:forwarder": {
+                "address:use_module_address": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm",
+                    "code": "file:../output/use-module.wasm",
                     "owner": "address:a_user"
                 },
                 "sc:dns#87": {
@@ -32,7 +32,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "sc:forwarder",
+                "to": "address:use_module_address",
                 "value": "1000",
                 "function": "dnsRegister",
                 "arguments": [
@@ -53,37 +53,14 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:forwarder": {
+                "address:use_module_address": {
                     "nonce": "0",
                     "balance": "*",
                     "username": "str:coolname0001.elrond",
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
-                },
-                "sc:dns#87": {
-                    "nonce": "0",
-                    "balance": "1,000",
-                    "storage": {
-                        "str:registration_cost": "1,000",
-                        "str:value_state|keccak256:str:coolname0001.elrond": "u8:2|sc:forwarder"
-                    },
-                    "code": "file:../test-wasm/dns.wasm"
+                    "code": "file:../output/use-module.wasm"
                 },
                 "+": ""
-            }
-        },
-        {
-            "step": "scQuery",
-            "txId": "resolve-coolname0001",
-            "tx": {
-                "to": "sc:dns#87",
-                "function": "resolve",
-                "arguments": [
-                    "str:coolname0001.elrond"
-                ]
-            },
-            "expect": {
-                "out": [ "sc:forwarder" ]
             }
         }
     ]

@@ -11,25 +11,7 @@ path = "src/lib.rs"
 [features]
 wasm-output-mode = [
     "elrond-wasm-node",
-    "elrond-wasm-module-dns-wasm",
 ]
-
-default = [
-    "elrond-wasm-module-dns-default",
-]
-
-[dependencies.elrond-wasm-module-dns-wasm]
-package = "elrond-wasm-module-dns"
-version = "0.16.0"
-path = "../../../modules/elrond-wasm-module-dns"
-features = ["wasm-output-mode"]
-optional = true
-
-[dependencies.elrond-wasm-module-dns-default]
-package = "elrond-wasm-module-dns"
-version = "0.16.0"
-path = "../../../modules/elrond-wasm-module-dns"
-optional = true
 
 [dependencies.vault]
 path = "../vault"
