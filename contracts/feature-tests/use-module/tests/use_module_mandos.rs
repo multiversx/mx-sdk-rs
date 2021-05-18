@@ -1,7 +1,5 @@
-elrond_wasm::imports!();
-
 mod user_builtin {
-	use super::*;
+	elrond_wasm::imports!();
 
 	#[elrond_wasm_derive::proxy]
 	pub trait UserBuiltin {
@@ -10,22 +8,26 @@ mod user_builtin {
 	}
 }
 
-#[elrond_wasm_derive::contract]
-pub trait DnsMock {
-	#[proxy]
-	fn user_builtin_proxy(&self, to: Address) -> user_builtin::Proxy<Self::SendApi>;
+mod dns_mock {
+	elrond_wasm::imports!();
 
-	#[payable("EGLD")]
-	#[endpoint]
-	fn register(
-		&self,
-		name: BoxedBytes,
-		#[payment] _payment: Self::BigUint,
-	) -> AsyncCall<Self::SendApi> {
-		let address = self.blockchain().get_caller();
-		self.user_builtin_proxy(address)
-			.set_user_name(&name)
-			.async_call()
+	#[elrond_wasm_derive::contract]
+	pub trait DnsMock {
+		#[proxy]
+		fn user_builtin_proxy(&self, to: Address) -> super::user_builtin::Proxy<Self::SendApi>;
+
+		#[payable("EGLD")]
+		#[endpoint]
+		fn register(
+			&self,
+			name: BoxedBytes,
+			#[payment] _payment: Self::BigUint,
+		) -> AsyncCall<Self::SendApi> {
+			let address = self.blockchain().get_caller();
+			self.user_builtin_proxy(address)
+				.set_user_name(&name)
+				.async_call()
+		}
 	}
 }
 
@@ -40,7 +42,7 @@ fn contract_map() -> ContractMap<TxContext> {
 
 	contract_map.register_contract(
 		"file:../test-wasm/dns.wasm",
-		Box::new(|context| Box::new(self::contract_obj(context))),
+		Box::new(|context| Box::new(dns_mock::contract_obj(context))),
 	);
 
 	contract_map

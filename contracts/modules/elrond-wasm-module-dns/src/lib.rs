@@ -1,11 +1,8 @@
 #![no_std]
 
-#[macro_use]
-extern crate elrond_wasm;
 mod dns_proxy;
 
 elrond_wasm::imports!();
-// use elrond_wasm::only_owner;
 
 /// The module deals with registering usernames in a DNS contract.
 #[elrond_wasm_derive::module]

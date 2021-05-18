@@ -1,9 +1,6 @@
 #![no_std]
 #![allow(clippy::string_lit_as_bytes)]
 
-#[macro_use]
-extern crate elrond_wasm;
-
 elrond_wasm::imports!();
 
 pub const FEATURE_NOT_SET: u8 = 0;
