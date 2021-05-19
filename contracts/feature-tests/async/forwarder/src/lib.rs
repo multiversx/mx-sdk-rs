@@ -13,7 +13,6 @@ mod storage;
 elrond_wasm::imports!();
 
 /// Test contract for investigating contract calls.
-/// TODO: split into modules.
 #[elrond_wasm_derive::contract]
 pub trait Forwarder:
 	call_sync::ForwarderSyncCallModule

@@ -67,8 +67,9 @@ pub struct CheckAccount {
 	pub comment: Option<String>,
 	pub nonce: CheckValue<U64Value>,
 	pub balance: CheckValue<BigUintValue>,
-	pub storage: CheckStorage,
 	pub esdt: CheckEsdt,
+	pub username: CheckValue<BytesValue>,
+	pub storage: CheckStorage,
 	pub code: CheckValue<BytesValue>,
 	pub async_call_data: CheckValue<BytesValue>,
 }
@@ -79,8 +80,9 @@ impl InterpretableFrom<CheckAccountRaw> for CheckAccount {
 			comment: from.comment,
 			nonce: CheckValue::<U64Value>::interpret_from(from.nonce, context),
 			balance: CheckValue::<BigUintValue>::interpret_from(from.balance, context),
-			storage: CheckStorage::interpret_from(from.storage, context),
 			esdt: CheckEsdt::interpret_from(from.esdt, context),
+			username: CheckValue::<BytesValue>::interpret_from(from.username, context),
+			storage: CheckStorage::interpret_from(from.storage, context),
 			code: CheckValue::<BytesValue>::interpret_from(from.code, context),
 			async_call_data: CheckValue::<BytesValue>::interpret_from(
 				from.async_call_data,
