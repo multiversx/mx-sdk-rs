@@ -176,7 +176,20 @@
                     "type": "EllipticCurve"
                 }
             ],
-            "outputs": []
+            "outputs": [
+            {
+                "type": "EsdtLocalRole"
+            }
+            ]
+        },
+        {
+            "name": "esdt_local_role",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtLocalRole"
+                }
+            ]
         },
         {
             "name": "sample_storage_mapper",
@@ -319,6 +332,35 @@
                 {
                     "name": "size_of_field",
                     "type": "i32"
+                }
+            ]
+        },
+        "EsdtLocalRole": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Mint",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Burn",
+                    "discriminant": 2
+                },
+                {
+                    "name": "NftCreate",
+                    "discriminant": 3
+                },
+                {
+                    "name": "NftAddQuantity",
+                    "discriminant": 4
+                },
+                {
+                    "name": "NftBurn",
+                    "discriminant": 5
                 }
             ]
         },

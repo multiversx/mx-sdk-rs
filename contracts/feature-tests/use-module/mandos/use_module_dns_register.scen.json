@@ -1,0 +1,67 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "comment": "«dns#87» is not arbitrary, it is the address that «coolname0001.elrond» maps to",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:use_module_address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/use-module.wasm",
+                    "owner": "address:a_user"
+                },
+                "sc:dns#87": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:registration_cost": "1000"
+                    },
+                    "code": "file:../test-wasm/dns.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "address:use_module_address",
+                "value": "1000",
+                "function": "dnsRegister",
+                "arguments": [
+                    "sc:dns#87",
+                    "str:coolname0001.elrond"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:use_module_address": {
+                    "nonce": "0",
+                    "balance": "*",
+                    "username": "str:coolname0001.elrond",
+                    "storage": {},
+                    "code": "file:../output/use-module.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

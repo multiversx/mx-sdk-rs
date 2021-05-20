@@ -1,13 +1,11 @@
 #![allow(unused_variables)] // for now
 
-use super::*;
+use crate::*;
 use elrond_wasm::types::*;
 use mandos::*;
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::path::Path;
-
-const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 
 pub fn parse_execute_mandos<P: AsRef<Path>>(
 	relative_path: P,
@@ -59,13 +57,21 @@ fn parse_execute_mandos_steps(
 						address: address.value.into(),
 						nonce: account.nonce.value,
 						balance: account.balance.value.clone(),
-						storage,
 						esdt,
+						username: account
+							.username
+							.as_ref()
+							.map(|bytes_value| bytes_value.value.clone())
+							.unwrap_or_default(),
+						storage,
 						contract_path: account
 							.code
 							.as_ref()
 							.map(|bytes_value| bytes_value.value.clone()),
-						contract_owner: None, // TODO: add contract owner in mandos
+						contract_owner: account
+							.owner
+							.as_ref()
+							.map(|address_value| address_value.value.into()),
 					});
 				}
 				for new_address in new_addresses.iter() {
@@ -88,6 +94,8 @@ fn parse_execute_mandos_steps(
 				tx,
 				expect,
 			} => {
+				println!("Executing {}", tx_id);
+
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),
@@ -115,56 +123,8 @@ fn parse_execute_mandos_steps(
 					tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
 				};
 				state.increase_nonce(&tx_input.from);
-				let (mut tx_result, opt_async_data) =
-					execute_sc_call(tx_input, state, contract_map).unwrap();
-				if tx_result.result_status == 0 {
-					if let Some(async_data) = opt_async_data {
-						let contract_address = tx.to.value.into();
-						if state.accounts.contains_key(&async_data.to) {
-							let async_input = async_call_tx_input(&async_data, &contract_address);
-
-							if async_input.func_name == ESDT_TRANSFER_STRING {
-								execute_esdt_async_call(async_input, state);
-								return;
-							}
-
-							let (async_result, opt_more_async) =
-								execute_sc_call(async_input, state, contract_map).unwrap();
-							assert!(
-								opt_more_async.is_none(),
-								"nested asyncs currently not supported"
-							);
-							tx_result = merge_results(tx_result, async_result.clone());
-
-							let callback_input = async_callback_tx_input(
-								&async_data,
-								&contract_address,
-								&async_result,
-							);
-							let (callback_result, opt_more_async) =
-								execute_sc_call(callback_input, state, contract_map).unwrap();
-							assert!(
-								opt_more_async.is_none(),
-								"successive asyncs currently not supported"
-							);
-							tx_result = merge_results(tx_result, callback_result);
-						} else {
-							state
-								.subtract_tx_payment(&contract_address, &async_data.call_value)
-								.unwrap();
-							state.add_account(AccountData {
-								address: async_data.to.clone(),
-								nonce: 0,
-								balance: async_data.call_value.clone(),
-								storage: HashMap::new(),
-								esdt: HashMap::new(),
-								contract_path: None,
-								contract_owner: None,
-							});
-							state.print_accounts();
-						}
-					}
-				}
+				let tx_result =
+					execute_sc_call_with_async_and_callback(tx_input, state, contract_map).unwrap();
 				if let Some(tx_expect) = expect {
 					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
 				}
@@ -268,21 +228,15 @@ fn parse_execute_mandos_steps(
 	}
 }
 
-fn execute_esdt_async_call(tx_input: TxInput, state: &mut BlockchainMock) {
-	let from = tx_input.from.clone();
-	let to = tx_input.to.clone();
-	let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
-	let esdt_value = tx_input.esdt_value;
-
-	state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
-	state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
-}
-
 fn execute_sc_call(
 	tx_input: TxInput,
 	state: &mut BlockchainMock,
 	contract_map: &ContractMap<TxContext>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
+	if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
+		return Ok((tx_result, None));
+	}
+
 	let from = tx_input.from.clone();
 	let to = tx_input.to.clone();
 	let call_value = tx_input.call_value.clone();
@@ -342,6 +296,52 @@ fn execute_sc_call(
 	}
 
 	Ok((tx_result, tx_output.async_call))
+}
+
+fn execute_sc_call_with_async_and_callback(
+	tx_input: TxInput,
+	state: &mut BlockchainMock,
+	contract_map: &ContractMap<TxContext>,
+) -> Result<TxResult, BlockchainMockError> {
+	let contract_address = tx_input.to.clone();
+	let (mut tx_result, opt_async_data) = execute_sc_call(tx_input, state, contract_map)?;
+	if tx_result.result_status == 0 {
+		if let Some(async_data) = opt_async_data {
+			if state.accounts.contains_key(&async_data.to) {
+				let async_input = async_call_tx_input(&async_data, &contract_address);
+
+				let async_result =
+					execute_sc_call_with_async_and_callback(async_input, state, contract_map)?;
+
+				tx_result = merge_results(tx_result, async_result.clone());
+
+				let callback_input =
+					async_callback_tx_input(&async_data, &contract_address, &async_result);
+				let (callback_result, opt_more_async) =
+					execute_sc_call(callback_input, state, contract_map)?;
+				assert!(
+					opt_more_async.is_none(),
+					"successive asyncs currently not supported"
+				);
+				tx_result = merge_results(tx_result, callback_result);
+			} else {
+				state
+					.subtract_tx_payment(&contract_address, &async_data.call_value)
+					.unwrap();
+				state.add_account(AccountData {
+					address: async_data.to.clone(),
+					nonce: 0,
+					balance: async_data.call_value,
+					esdt: HashMap::new(),
+					username: Vec::new(),
+					storage: HashMap::new(),
+					contract_path: None,
+					contract_owner: None,
+				});
+			}
+		}
+	}
+	Ok(tx_result)
 }
 
 fn execute_sc_create(
@@ -473,6 +473,14 @@ fn check_state(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 				expected_address,
 				expected_account.balance,
 				account.balance
+			);
+
+			assert!(
+				expected_account.username.check(&account.username),
+				"bad account username. Address: {}. Want: {}. Have: {}",
+				expected_address,
+				expected_account.username,
+				std::str::from_utf8(account.username.as_slice()).unwrap()
 			);
 
 			if let CheckStorage::Equal(eq) = &expected_account.storage {

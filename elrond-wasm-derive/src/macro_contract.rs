@@ -14,10 +14,5 @@ pub fn process_contract(
 
 	let contract_impl = contract_implementation(&contract, true);
 
-	proc_macro::TokenStream::from(quote! {
-		#[macro_use]
-		extern crate elrond_wasm;
-
-		#contract_impl
-	})
+	proc_macro::TokenStream::from(contract_impl)
 }

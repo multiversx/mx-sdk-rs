@@ -116,6 +116,7 @@ mod tests {
 
 		let cb_eq = CheckValue::Equal(bv);
 		assert!(cb_eq.check(&b"abc"[..]));
+		assert!(!cb_eq.check(&b"abd"[..]));
 
 		let cb_star: CheckValue<BytesValue> = CheckValue::Star;
 		assert!(cb_star.check(&b"anything_really"[..]));
