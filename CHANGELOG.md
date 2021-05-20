@@ -9,7 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - `pow`, `log2`, `sqrt`
 - cryptography: elliptic curves
 
-## [elrond-wasm 0.16.2] - 2021-05-20
+## [elrond-wasm 0.16.2, mandos 0.7.2] - 2021-05-20
 - New implementation for the `Try` trait for `SCResult`, in accordance to feature `try_trait_v2`
 - Published DNS module, which helps contracts register usernames for themselves
 - `ESDTLocalRole` more expressive type ABI
