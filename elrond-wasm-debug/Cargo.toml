@@ -27,5 +27,5 @@ version = "0.16.2"
 path = "../elrond-wasm"
 
 [dependencies.mandos]
-version = "0.7.1"
+version = "0.7.2"
 path = "../mandos"
