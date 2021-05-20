@@ -82,6 +82,11 @@ pub trait AbiTester {
 		(address, h256).into()
 	}
 
+	#[endpoint]
+	fn esdt_local_role(&self) -> EsdtLocalRole {
+		EsdtLocalRole::None
+	}
+
 	#[view]
 	#[storage_mapper("sample_storage_mapper")]
 	fn sample_storage_mapper(&self) -> SingleValueMapper<Self::Storage, OnlyShowsUpAsNested10>;

@@ -71,7 +71,7 @@ fn parse_execute_mandos_steps(
 						contract_owner: account
 							.owner
 							.as_ref()
-							.map(|address_value| address_value.value.clone().into()),
+							.map(|address_value| address_value.value.into()),
 					});
 				}
 				for new_address in new_addresses.iter() {
