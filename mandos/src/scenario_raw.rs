@@ -274,6 +274,7 @@ pub struct TxExpectRaw {
 	#[serde(default)]
 	pub out: Vec<CheckBytesValueRaw>,
 
+	#[serde(default)]
 	pub status: CheckBytesValueRaw,
 
 	#[serde(default)]

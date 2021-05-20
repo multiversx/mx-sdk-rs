@@ -85,6 +85,11 @@ pub trait AbiTester {
 	#[endpoint]
 	fn take_ellicptic_curve(&self, _ec: EllipticCurve<Self::BigUint>) {}
 
+    #[endpoint]
+	fn esdt_local_role(&self) -> EsdtLocalRole {
+		EsdtLocalRole::None
+	}
+
 	#[view]
 	#[storage_mapper("sample_storage_mapper")]
 	fn sample_storage_mapper(&self) -> SingleValueMapper<Self::Storage, OnlyShowsUpAsNested10>;

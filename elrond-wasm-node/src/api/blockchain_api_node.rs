@@ -251,7 +251,7 @@ impl BlockchainApi for ArwenApiImpl {
 		unsafe {
 			let value = bigIntNew(0);
 			let mut properties = [0u8; 2]; // always 2 bytes
-			let mut hash = [0u8; 128];
+			let mut hash = BoxedBytes::allocate(128);
 
 			let name_len = getESDTNFTNameLength(
 				address.as_ref().as_ptr(),
@@ -317,7 +317,7 @@ impl BlockchainApi for ArwenApiImpl {
 				token_type,
 				amount: ArwenBigUint { handle: value },
 				frozen,
-				hash: H256::zero(),
+				hash,
 				name: name_buffer,
 				attributes: attr_buffer,
 				creator,

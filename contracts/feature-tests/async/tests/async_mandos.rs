@@ -31,106 +31,155 @@ fn contract_map() -> ContractMap<TxContext> {
 	contract_map
 }
 
+#[test]
+fn forw_raw_async_accept_egld() {
+	parse_execute_mandos(
+		"mandos/forw_raw_async_accept_egld.scen.json",
+		&contract_map(),
+	);
+}
+
 // #[test]
-// fn forwarder_async_accept_egld() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_async_accept_egld.scen.json",
-// 		&contract_map(),
-// 	);
+// fn forw_raw_async_accept_esdt() {
+//     parse_execute_mandos("mandos/forw_raw_async_accept_esdt.scen.json", &contract_map());
+// }
+
+#[test]
+fn forw_raw_async_echo() {
+	parse_execute_mandos("mandos/forw_raw_async_echo.scen.json", &contract_map());
+}
+
+#[test]
+fn forw_raw_direct_egld() {
+	parse_execute_mandos("mandos/forw_raw_direct_egld.scen.json", &contract_map());
+}
+
+#[test]
+fn forw_raw_direct_esdt() {
+	parse_execute_mandos("mandos/forw_raw_direct_esdt.scen.json", &contract_map());
+}
+
+// #[test]
+// fn forw_raw_sync_echo() {
+//     parse_execute_mandos("mandos/forw_raw_sync_echo.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_async_accept_esdt() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_async_accept_esdt.scen.json",
-// 		&contract_map(),
-// 	);
+// fn forw_raw_sync_egld() {
+//     parse_execute_mandos("mandos/forw_raw_sync_egld.scen.json", &contract_map());
+// }
+
+#[test]
+fn forwarder_call_async_accept_egld() {
+	parse_execute_mandos(
+		"mandos/forwarder_call_async_accept_egld.scen.json",
+		&contract_map(),
+	);
+}
+
+// #[test]
+// fn forwarder_call_async_accept_esdt() {
+//     parse_execute_mandos("mandos/forwarder_call_async_accept_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_async_accept_egld() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_raw_async_accept_egld.scen.json",
-// 		&contract_map(),
-// 	);
+// fn forwarder_call_async_accept_nft() {
+//     parse_execute_mandos("mandos/forwarder_call_async_accept_nft.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_async_accept_esdt() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_raw_async_accept_esdt.scen.json",
-// 		&contract_map(),
-// 	);
+// fn forwarder_call_sync_accept_egld() {
+//     parse_execute_mandos("mandos/forwarder_call_sync_accept_egld.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_async_echo() {
-// 	parse_execute_mandos("mandos/forwarder_raw_async_echo.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_esdt() {
+//     parse_execute_mandos("mandos/forwarder_call_sync_accept_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_direct_egld() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_raw_direct_egld.scen.json",
-// 		&contract_map(),
-// 	);
+// fn forwarder_call_sync_accept_nft() {
+//     parse_execute_mandos("mandos/forwarder_call_sync_accept_nft.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_direct_esdt() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_raw_direct_esdt.scen.json",
-// 		&contract_map(),
-// 	);
+// fn forwarder_call_sync_accept_then_read_egld() {
+//     parse_execute_mandos("mandos/forwarder_call_sync_accept_then_read_egld.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_sync_echo() {
-// 	parse_execute_mandos("mandos/forwarder_raw_sync_echo.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_then_read_esdt() {
+//     parse_execute_mandos("mandos/forwarder_call_sync_accept_then_read_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_raw_sync_egld() {
-// 	parse_execute_mandos("mandos/forwarder_raw_sync_egld.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_then_read_nft() {
+//     parse_execute_mandos("mandos/forwarder_call_sync_accept_then_read_nft.scen.json", &contract_map());
 // }
 
-// TODO: successive asyncs currently not supported
+// #[test]
+// fn forwarder_call_transf_exec_accept_egld() {
+//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_egld.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_call_transf_exec_accept_egld_twice() {
+//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_egld_twice.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_call_transf_exec_accept_esdt() {
+//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_esdt.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_call_transf_exec_accept_esdt_twice() {
+//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_esdt_twice.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_call_transf_exec_accept_nft() {
+//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_nft.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_call_transf_exec_accept_sft_twice() {
+//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_sft_twice.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_nft_create() {
+//     parse_execute_mandos("mandos/forwarder_nft_create.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_nft_transfer_async() {
+//     parse_execute_mandos("mandos/forwarder_nft_transfer_async.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_nft_transfer_exec() {
+//     parse_execute_mandos("mandos/forwarder_nft_transfer_exec.scen.json", &contract_map());
+// }
+
 // #[test]
 // fn forwarder_send_twice_egld() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_send_twice_egld.scen.json",
-// 		&contract_map(),
-// 	);
+//     parse_execute_mandos("mandos/forwarder_send_twice_egld.scen.json", &contract_map());
 // }
 
-// TODO: successive asyncs currently not supported
 // #[test]
 // fn forwarder_send_twice_esdt() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_send_twice_esdt.scen.json",
-// 		&contract_map(),
-// 	);
-// }
-
-// #[test]
-// fn forwarder_sync_accept_egld() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_sync_accept_egld.scen.json",
-// 		&contract_map(),
-// 	);
-// }
-
-// #[test]
-// fn forwarder_sync_accept_esdt() {
-// 	parse_execute_mandos(
-// 		"mandos/forwarder_sync_accept_esdt.scen.json",
-// 		&contract_map(),
-// 	);
+//     parse_execute_mandos("mandos/forwarder_send_twice_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
 // fn forwarder_sync_echo() {
-// 	parse_execute_mandos("mandos/forwarder_sync_echo.scen.json", &contract_map());
+//     parse_execute_mandos("mandos/forwarder_sync_echo.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn forwarder_sync_echo_range() {
+//     parse_execute_mandos("mandos/forwarder_sync_echo_range.scen.json", &contract_map());
 // }
 
 #[test]
@@ -184,6 +233,36 @@ fn payment_sameshard_callback() {
 		&contract_map(),
 	);
 }
+
+// #[test]
+// fn recursive_caller_egld_1() {
+//     parse_execute_mandos("mandos/recursive_caller_egld_1.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn recursive_caller_egld_2() {
+//     parse_execute_mandos("mandos/recursive_caller_egld_2.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn recursive_caller_egld_x() {
+//     parse_execute_mandos("mandos/recursive_caller_egld_x.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn recursive_caller_esdt_1() {
+//     parse_execute_mandos("mandos/recursive_caller_esdt_1.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn recursive_caller_esdt_2() {
+//     parse_execute_mandos("mandos/recursive_caller_esdt_2.scen.json", &contract_map());
+// }
+
+// #[test]
+// fn recursive_caller_esdt_x() {
+//     parse_execute_mandos("mandos/recursive_caller_esdt_x.scen.json", &contract_map());
+// }
 
 #[test]
 fn send_egld() {

@@ -1,11 +1,5 @@
-/// Handy way of casting to a contract proxy trait.
-/// Would make more sense to be in elrond-wasm-derive, but Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
-#[macro_export]
-macro_rules! contract_call {
-	($s:expr, $address:expr, $proxy_path:ident) => {
-		$proxy_trait::<Self::SendApi, BigInt, BigUint>::new($s.send(), $address)
-	};
-}
+// Note: Simple macros cannot be placed in elrond-wasm-derive,
+// because Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
 
 /// Getting all imports needed for a smart contract.
 #[macro_export]
@@ -28,6 +22,7 @@ macro_rules! imports {
 		use elrond_wasm::storage::mappers::*;
 		use elrond_wasm::types::*;
 		use elrond_wasm::types::{SCResult::Err, SCResult::Ok};
+		use elrond_wasm::{non_zero_usize, only_owner, require, sc_error};
 		use elrond_wasm::{Box, Vec};
 	};
 }
@@ -125,14 +120,6 @@ macro_rules! only_owner {
 		}
 	};
 }
-
-/// Compact way to represent the BorrowedMutStorage type.
-#[macro_export]
-macro_rules! mut_storage (
-    ($t:ty) => (
-        BorrowedMutStorage<T, $t>
-    )
-);
 
 /// Converts usize to NonZeroUsize or returns SCError.
 #[macro_export]
