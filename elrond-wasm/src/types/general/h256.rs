@@ -62,7 +62,7 @@ impl H256 {
 	pub fn from_slice(slice: &[u8]) -> Self {
 		let mut arr = [0u8; 32];
 		let len = core::cmp::min(slice.len(), 32);
-		arr[..len].copy_from_slice(slice);
+		arr[..len].copy_from_slice(&slice[..len]);
 		H256(Box::new(arr))
 	}
 }
