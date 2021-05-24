@@ -19,14 +19,12 @@ pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
 		.expect("failed to execute process");
 
 	if output.status.success() {
-		println!(
-			"{}",
-			core::str::from_utf8(output.stdout.as_slice()).unwrap()
-		);
+		println!("{}", String::from_utf8_lossy(output.stdout.as_slice()));
 	} else {
 		panic!(
-			"Mandos-go output:\n{}",
-			core::str::from_utf8(output.stdout.as_slice()).unwrap()
+			"Mandos-go output:\n{}\n{}",
+			String::from_utf8_lossy(output.stdout.as_slice()),
+			String::from_utf8_lossy(output.stderr.as_slice())
 		);
 	}
 }
