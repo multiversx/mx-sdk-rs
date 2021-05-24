@@ -10,16 +10,16 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn test_change_board() {
-	parse_execute_mandos("mandos/changeBoard.scen.json", &contract_map());
+fn test_change_board_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/changeBoard.scen.json", &contract_map());
 }
 
 #[test]
-fn test_change_quorum() {
-	parse_execute_mandos("mandos/changeQuorum.scen.json", &contract_map());
+fn test_change_quorum_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/changeQuorum.scen.json", &contract_map());
 }
 
 #[test]
-fn test_change_quorum_too_big() {
-	parse_execute_mandos("mandos/changeQuorum_tooBig.scen.json", &contract_map());
+fn test_change_quorum_too_big_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/changeQuorum_tooBig.scen.json", &contract_map());
 }

@@ -49,21 +49,21 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn use_module_dns_register() {
-	parse_execute_mandos("mandos/use_module_dns_register.scen.json", &contract_map());
+fn use_module_dns_register_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/use_module_dns_register.scen.json", &contract_map());
 }
 
 #[test]
-fn use_module_features() {
-	parse_execute_mandos("mandos/use_module_features.scen.json", &contract_map());
+fn use_module_features_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/use_module_features.scen.json", &contract_map());
 }
 
 #[test]
-fn use_module_internal() {
-	parse_execute_mandos("mandos/use_module_internal.scen.json", &contract_map());
+fn use_module_internal_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/use_module_internal.scen.json", &contract_map());
 }
 
 #[test]
-fn use_module_pause() {
-	parse_execute_mandos("mandos/use_module_pause.scen.json", &contract_map());
+fn use_module_pause_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", &contract_map());
 }

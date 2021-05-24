@@ -12,44 +12,44 @@ fn _contract_map() -> ContractMap<TxContext> {
 
 /*
 #[test]
-fn crowdfunding_claim_failed() {
-	parse_execute_mandos(
+fn crowdfunding_claim_failed_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/crowdfunding-claim-failed.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn crowdfunding_claim_successful() {
-	parse_execute_mandos(
+fn crowdfunding_claim_successful_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/crowdfunding-claim-successful.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn crowdfunding_claim_too_early() {
-	parse_execute_mandos(
+fn crowdfunding_claim_too_early_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/crowdfunding-claim-too-early.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn crowdfunding_fund_ok() {
-	parse_execute_mandos("mandos/crowdfunding-fund.scen.json", &contract_map());
+fn crowdfunding_fund_ok_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/crowdfunding-fund.scen.json", &contract_map());
 }
 
 #[test]
-fn crowdfunding_fund_too_late() {
-	parse_execute_mandos(
+fn crowdfunding_fund_too_late_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/crowdfunding-fund-too-late.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn crowdfunding_init() {
-	parse_execute_mandos("mandos/crowdfunding-init.scen.json", &contract_map());
+fn crowdfunding_init_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/crowdfunding-init.scen.json", &contract_map());
 }
 */

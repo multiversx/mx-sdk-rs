@@ -11,138 +11,138 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn block_info() {
-	parse_execute_mandos("mandos/block_info.scen.json", &contract_map());
+fn block_info_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/block_info.scen.json", &contract_map());
 }
 
 #[test]
-fn boxed_bytes_zeros() {
-	parse_execute_mandos("mandos/boxed_bytes_zeros.scen.json", &contract_map());
+fn boxed_bytes_zeros_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/boxed_bytes_zeros.scen.json", &contract_map());
 }
 
 #[test]
-fn count_ones() {
-	parse_execute_mandos("mandos/count_ones.scen.json", &contract_map());
+fn count_ones_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", &contract_map());
 }
 
 #[test]
-fn crypto_keccak256() {
-	parse_execute_mandos("mandos/crypto_keccak256.scen.json", &contract_map());
+fn crypto_keccak256_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", &contract_map());
 }
 
 #[test]
-fn crypto_sha256() {
-	parse_execute_mandos("mandos/crypto_sha256.scen.json", &contract_map());
+fn crypto_sha256_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_array_u8() {
-	parse_execute_mandos("mandos/echo_array_u8.scen.json", &contract_map());
+fn echo_array_u8_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_array_u8.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_async_result_empty() {
-	parse_execute_mandos("mandos/echo_async_result_empty.scen.json", &contract_map());
+fn echo_async_result_empty_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_async_result_empty.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_big_int() {
-	parse_execute_mandos("mandos/echo_big_int.scen.json", &contract_map());
+fn echo_big_int_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_big_int.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_big_uint() {
-	parse_execute_mandos("mandos/echo_big_uint.scen.json", &contract_map());
+fn echo_big_uint_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_big_uint.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_boxed_bytes() {
-	parse_execute_mandos("mandos/echo_boxed_bytes.scen.json", &contract_map());
+fn echo_boxed_bytes_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_boxed_bytes.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_i32() {
-	parse_execute_mandos("mandos/echo_i32.scen.json", &contract_map());
+fn echo_i32_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_i32.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_i64() {
-	parse_execute_mandos("mandos/echo_i64.scen.json", &contract_map());
+fn echo_i64_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_i64.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_nothing() {
-	parse_execute_mandos("mandos/echo_nothing.scen.json", &contract_map());
+fn echo_nothing_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_nothing.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_ser_ex_1() {
-	parse_execute_mandos("mandos/echo_ser_ex_1.scen.json", &contract_map());
+fn echo_ser_ex_1_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_ser_ex_1.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_slice_u8() {
-	parse_execute_mandos("mandos/echo_slice_u8.scen.json", &contract_map());
+fn echo_slice_u8_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_slice_u8.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_str() {
-	parse_execute_mandos("mandos/echo_str.scen.json", &contract_map());
+fn echo_str_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_str.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_str_box() {
-	parse_execute_mandos("mandos/echo_str_box.scen.json", &contract_map());
+fn echo_str_box_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_str_box.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_string() {
-	parse_execute_mandos("mandos/echo_string.scen.json", &contract_map());
+fn echo_string_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_string.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_u64() {
-	parse_execute_mandos("mandos/echo_u64.scen.json", &contract_map());
+fn echo_u64_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_u64.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_usize() {
-	parse_execute_mandos("mandos/echo_usize.scen.json", &contract_map());
+fn echo_usize_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_usize.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_varags_tuples() {
-	parse_execute_mandos("mandos/echo_varags_tuples.scen.json", &contract_map());
+fn echo_varags_tuples_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_varags_tuples.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_varargs_u32() {
-	parse_execute_mandos("mandos/echo_varargs_u32.scen.json", &contract_map());
+fn echo_varargs_u32_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_varargs_u32.scen.json", &contract_map());
 }
 
 #[test]
-fn echo_vec_u8() {
-	parse_execute_mandos("mandos/echo_vec_u8.scen.json", &contract_map());
+fn echo_vec_u8_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/echo_vec_u8.scen.json", &contract_map());
 }
 
 #[test]
-fn events() {
-	parse_execute_mandos("mandos/events.scen.json", &contract_map());
+fn events_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/events.scen.json", &contract_map());
 }
 
 #[test]
-fn events_legacy() {
-	parse_execute_mandos("mandos/events_legacy.scen.json", &contract_map());
+fn events_legacy_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/events_legacy.scen.json", &contract_map());
 }
 
 #[test]
-fn get_caller() {
-	parse_execute_mandos("mandos/get_caller.scen.json", &contract_map());
+fn get_caller_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/get_caller.scen.json", &contract_map());
 }
 
 #[test]
-fn get_cumulated_validator_rewards() {
-	parse_execute_mandos(
+fn get_cumulated_validator_rewards_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/get_cumulated_validator_rewards.scen.json",
 		&contract_map(),
 	);
@@ -150,156 +150,156 @@ fn get_cumulated_validator_rewards() {
 
 // TODO: uncomment after implemented the full ESDT format in mandos-rs
 // #[test]
-// fn get_esdt_local_roles() {
-// 	parse_execute_mandos(
+// fn get_esdt_local_roles_rs() {
+// 	elrond_wasm_debug::mandos_rs(
 // 		"mandos/get_esdt_local_roles.scen.json",
 // 		&contract_map(),
 // 	);
 // }
 
 #[test]
-fn panic() {
-	parse_execute_mandos("mandos/panic.scen.json", &contract_map());
+fn panic_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/panic.scen.json", &contract_map());
 }
 
 #[test]
-fn return_codes() {
-	parse_execute_mandos("mandos/return_codes.scen.json", &contract_map());
+fn return_codes_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/return_codes.scen.json", &contract_map());
 }
 
 // TODO: Fix by implementing is_smart_contract mock
 /*
 #[test]
-fn sc_properties() {
-	parse_execute_mandos("mandos/sc_properties.scen.json", &contract_map());
+fn sc_properties_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/sc_properties.scen.json", &contract_map());
 }
 */
 
 #[test]
-fn sc_result() {
-	parse_execute_mandos("mandos/sc_result.scen.json", &contract_map());
+fn sc_result_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/sc_result.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_addr() {
-	parse_execute_mandos("mandos/storage_addr.scen.json", &contract_map());
+fn storage_addr_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_addr.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_big_int() {
-	parse_execute_mandos("mandos/storage_big_int.scen.json", &contract_map());
+fn storage_big_int_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_big_int.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_big_uint() {
-	parse_execute_mandos("mandos/storage_big_uint.scen.json", &contract_map());
+fn storage_big_uint_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_big_uint.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_bool() {
-	parse_execute_mandos("mandos/storage_bool.scen.json", &contract_map());
+fn storage_bool_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_bool.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_clear() {
-	parse_execute_mandos("mandos/storage_clear.scen.json", &contract_map());
+fn storage_clear_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_clear.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_i64() {
-	parse_execute_mandos("mandos/storage_i64.scen.json", &contract_map());
+fn storage_i64_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_i64.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_i64_bad() {
-	parse_execute_mandos("mandos/storage_i64_bad.scen.json", &contract_map());
+fn storage_i64_bad_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_i64_bad.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_map1() {
-	parse_execute_mandos("mandos/storage_map1.scen.json", &contract_map());
+fn storage_map1_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_map1.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_map2() {
-	parse_execute_mandos("mandos/storage_map2.scen.json", &contract_map());
+fn storage_map2_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_map2.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_map3() {
-	parse_execute_mandos("mandos/storage_map3.scen.json", &contract_map());
+fn storage_map3_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_map3.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_mapper_linked_list() {
-	parse_execute_mandos(
+fn storage_mapper_linked_list_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/storage_mapper_linked_list.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn storage_mapper_map() {
-	parse_execute_mandos("mandos/storage_mapper_map.scen.json", &contract_map());
+fn storage_mapper_map_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_mapper_map.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_mapper_set() {
-	parse_execute_mandos("mandos/storage_mapper_set.scen.json", &contract_map());
+fn storage_mapper_set_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_mapper_set.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_mapper_map_storage() {
-	parse_execute_mandos(
+fn storage_mapper_map_storage_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/storage_mapper_map_storage.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn storage_mapper_single_value() {
-	parse_execute_mandos(
+fn storage_mapper_single_value_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/storage_mapper_single_value.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn storage_mapper_vec() {
-	parse_execute_mandos("mandos/storage_mapper_vec.scen.json", &contract_map());
+fn storage_mapper_vec_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_mapper_vec.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_opt_addr() {
-	parse_execute_mandos("mandos/storage_opt_addr.scen.json", &contract_map());
+fn storage_opt_addr_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_opt_addr.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_reserved() {
-	parse_execute_mandos("mandos/storage_reserved.scen.json", &contract_map());
+fn storage_reserved_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_reserved.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_u64() {
-	parse_execute_mandos("mandos/storage_u64.scen.json", &contract_map());
+fn storage_u64_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_u64.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_u64_bad() {
-	parse_execute_mandos("mandos/storage_u64_bad.scen.json", &contract_map());
+fn storage_u64_bad_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_u64_bad.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_usize() {
-	parse_execute_mandos("mandos/storage_usize.scen.json", &contract_map());
+fn storage_usize_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_usize.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_usize_bad() {
-	parse_execute_mandos("mandos/storage_usize_bad.scen.json", &contract_map());
+fn storage_usize_bad_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_usize_bad.scen.json", &contract_map());
 }
 
 #[test]
-fn storage_vec_u8() {
-	parse_execute_mandos("mandos/storage_vec_u8.scen.json", &contract_map());
+fn storage_vec_u8_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/storage_vec_u8.scen.json", &contract_map());
 }

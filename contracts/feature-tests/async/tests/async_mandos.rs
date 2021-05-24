@@ -32,244 +32,244 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn forw_raw_async_accept_egld() {
-	parse_execute_mandos(
+fn forw_raw_async_accept_egld_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/forw_raw_async_accept_egld.scen.json",
 		&contract_map(),
 	);
 }
 
 // #[test]
-// fn forw_raw_async_accept_esdt() {
-//     parse_execute_mandos("mandos/forw_raw_async_accept_esdt.scen.json", &contract_map());
+// fn forw_raw_async_accept_esdt_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_accept_esdt.scen.json", &contract_map());
 // }
 
 #[test]
-fn forw_raw_async_echo() {
-	parse_execute_mandos("mandos/forw_raw_async_echo.scen.json", &contract_map());
+fn forw_raw_async_echo_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", &contract_map());
 }
 
 #[test]
-fn forw_raw_direct_egld() {
-	parse_execute_mandos("mandos/forw_raw_direct_egld.scen.json", &contract_map());
+fn forw_raw_direct_egld_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn forw_raw_direct_esdt() {
-	parse_execute_mandos("mandos/forw_raw_direct_esdt.scen.json", &contract_map());
+fn forw_raw_direct_esdt_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_esdt.scen.json", &contract_map());
 }
 
 // #[test]
-// fn forw_raw_sync_echo() {
-//     parse_execute_mandos("mandos/forw_raw_sync_echo.scen.json", &contract_map());
+// fn forw_raw_sync_echo_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_echo.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forw_raw_sync_egld() {
-//     parse_execute_mandos("mandos/forw_raw_sync_egld.scen.json", &contract_map());
+// fn forw_raw_sync_egld_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_egld.scen.json", &contract_map());
 // }
 
 #[test]
-fn forwarder_call_async_accept_egld() {
-	parse_execute_mandos(
+fn forwarder_call_async_accept_egld_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/forwarder_call_async_accept_egld.scen.json",
 		&contract_map(),
 	);
 }
 
 // #[test]
-// fn forwarder_call_async_accept_esdt() {
-//     parse_execute_mandos("mandos/forwarder_call_async_accept_esdt.scen.json", &contract_map());
+// fn forwarder_call_async_accept_esdt_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_async_accept_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_async_accept_nft() {
-//     parse_execute_mandos("mandos/forwarder_call_async_accept_nft.scen.json", &contract_map());
+// fn forwarder_call_async_accept_nft_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_async_accept_nft.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_sync_accept_egld() {
-//     parse_execute_mandos("mandos/forwarder_call_sync_accept_egld.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_egld_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_sync_accept_egld.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_sync_accept_esdt() {
-//     parse_execute_mandos("mandos/forwarder_call_sync_accept_esdt.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_esdt_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_sync_accept_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_sync_accept_nft() {
-//     parse_execute_mandos("mandos/forwarder_call_sync_accept_nft.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_nft_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_sync_accept_nft.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_sync_accept_then_read_egld() {
-//     parse_execute_mandos("mandos/forwarder_call_sync_accept_then_read_egld.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_then_read_egld_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_sync_accept_then_read_egld.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_sync_accept_then_read_esdt() {
-//     parse_execute_mandos("mandos/forwarder_call_sync_accept_then_read_esdt.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_then_read_esdt_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_sync_accept_then_read_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_sync_accept_then_read_nft() {
-//     parse_execute_mandos("mandos/forwarder_call_sync_accept_then_read_nft.scen.json", &contract_map());
+// fn forwarder_call_sync_accept_then_read_nft_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_sync_accept_then_read_nft.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_transf_exec_accept_egld() {
-//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_egld.scen.json", &contract_map());
+// fn forwarder_call_transf_exec_accept_egld_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_egld.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_transf_exec_accept_egld_twice() {
-//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_egld_twice.scen.json", &contract_map());
+// fn forwarder_call_transf_exec_accept_egld_twice_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_egld_twice.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_transf_exec_accept_esdt() {
-//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_esdt.scen.json", &contract_map());
+// fn forwarder_call_transf_exec_accept_esdt_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_transf_exec_accept_esdt_twice() {
-//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_esdt_twice.scen.json", &contract_map());
+// fn forwarder_call_transf_exec_accept_esdt_twice_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_esdt_twice.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_transf_exec_accept_nft() {
-//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_nft.scen.json", &contract_map());
+// fn forwarder_call_transf_exec_accept_nft_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_nft.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_call_transf_exec_accept_sft_twice() {
-//     parse_execute_mandos("mandos/forwarder_call_transf_exec_accept_sft_twice.scen.json", &contract_map());
+// fn forwarder_call_transf_exec_accept_sft_twice_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_sft_twice.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_nft_create() {
-//     parse_execute_mandos("mandos/forwarder_nft_create.scen.json", &contract_map());
+// fn forwarder_nft_create_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_nft_transfer_async() {
-//     parse_execute_mandos("mandos/forwarder_nft_transfer_async.scen.json", &contract_map());
+// fn forwarder_nft_transfer_async_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_transfer_async.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_nft_transfer_exec() {
-//     parse_execute_mandos("mandos/forwarder_nft_transfer_exec.scen.json", &contract_map());
+// fn forwarder_nft_transfer_exec_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_transfer_exec.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_send_twice_egld() {
-//     parse_execute_mandos("mandos/forwarder_send_twice_egld.scen.json", &contract_map());
+// fn forwarder_send_twice_egld_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_send_twice_egld.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_send_twice_esdt() {
-//     parse_execute_mandos("mandos/forwarder_send_twice_esdt.scen.json", &contract_map());
+// fn forwarder_send_twice_esdt_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_send_twice_esdt.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_sync_echo() {
-//     parse_execute_mandos("mandos/forwarder_sync_echo.scen.json", &contract_map());
+// fn forwarder_sync_echo_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn forwarder_sync_echo_range() {
-//     parse_execute_mandos("mandos/forwarder_sync_echo_range.scen.json", &contract_map());
+// fn forwarder_sync_echo_range_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo_range.scen.json", &contract_map());
 // }
 
 #[test]
-fn message_othershard() {
-	parse_execute_mandos("mandos/message_otherShard.scen.json", &contract_map());
+fn message_othershard_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/message_otherShard.scen.json", &contract_map());
 }
 
 #[test]
-fn message_othershard_callback() {
-	parse_execute_mandos(
+fn message_othershard_callback_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/message_otherShard_callback.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn message_sameshard() {
-	parse_execute_mandos("mandos/message_sameShard.scen.json", &contract_map());
+fn message_sameshard_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/message_sameShard.scen.json", &contract_map());
 }
 
 #[test]
-fn message_sameshard_callback() {
-	parse_execute_mandos(
+fn message_sameshard_callback_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/message_sameShard_callback.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn payment_othershard() {
-	parse_execute_mandos("mandos/payment_otherShard.scen.json", &contract_map());
+fn payment_othershard_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payment_otherShard.scen.json", &contract_map());
 }
 
 #[test]
-fn payment_othershard_callback() {
-	parse_execute_mandos(
+fn payment_othershard_callback_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/payment_otherShard_callback.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn payment_sameshard() {
-	parse_execute_mandos("mandos/payment_sameShard.scen.json", &contract_map());
+fn payment_sameshard_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payment_sameShard.scen.json", &contract_map());
 }
 
 #[test]
-fn payment_sameshard_callback() {
-	parse_execute_mandos(
+fn payment_sameshard_callback_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/payment_sameShard_callback.scen.json",
 		&contract_map(),
 	);
 }
 
 // #[test]
-// fn recursive_caller_egld_1() {
-//     parse_execute_mandos("mandos/recursive_caller_egld_1.scen.json", &contract_map());
+// fn recursive_caller_egld_1_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_egld_1.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn recursive_caller_egld_2() {
-//     parse_execute_mandos("mandos/recursive_caller_egld_2.scen.json", &contract_map());
+// fn recursive_caller_egld_2_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_egld_2.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn recursive_caller_egld_x() {
-//     parse_execute_mandos("mandos/recursive_caller_egld_x.scen.json", &contract_map());
+// fn recursive_caller_egld_x_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_egld_x.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn recursive_caller_esdt_1() {
-//     parse_execute_mandos("mandos/recursive_caller_esdt_1.scen.json", &contract_map());
+// fn recursive_caller_esdt_1_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_esdt_1.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn recursive_caller_esdt_2() {
-//     parse_execute_mandos("mandos/recursive_caller_esdt_2.scen.json", &contract_map());
+// fn recursive_caller_esdt_2_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_esdt_2.scen.json", &contract_map());
 // }
 
 // #[test]
-// fn recursive_caller_esdt_x() {
-//     parse_execute_mandos("mandos/recursive_caller_esdt_x.scen.json", &contract_map());
+// fn recursive_caller_esdt_x_rs() {
+//	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_esdt_x.scen.json", &contract_map());
 // }
 
 #[test]
-fn send_egld() {
-	parse_execute_mandos("mandos/send_egld.scen.json", &contract_map());
+fn send_egld_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/send_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn send_esdt() {
-	parse_execute_mandos("mandos/send_esdt.scen.json", &contract_map());
+fn send_esdt_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/send_esdt.scen.json", &contract_map());
 }
