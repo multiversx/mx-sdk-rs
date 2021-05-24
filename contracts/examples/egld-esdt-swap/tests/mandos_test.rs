@@ -11,11 +11,11 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn wrap_egld_test() {
-	parse_execute_mandos("mandos/wrap_egld.scen.json", &contract_map());
+fn wrap_egld_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/wrap_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn wrap_then_unwrap_egld_test() {
-	parse_execute_mandos("mandos/unwrap_egld.scen.json", &contract_map());
+fn wrap_then_unwrap_egld_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/unwrap_egld.scen.json", &contract_map());
 }

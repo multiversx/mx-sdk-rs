@@ -16,52 +16,52 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn deploy_test() {
-	parse_execute_mandos("mandos/deploy.scen.json", &contract_map());
+fn deploy_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/deploy.scen.json", &contract_map());
 }
 
 // Create token tests
 
 #[test]
-fn create_token_fungible_test() {
-	parse_execute_mandos("mandos/create_token_fungible.scen.json", &contract_map());
+fn create_token_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/create_token_fungible.scen.json", &contract_map());
 }
 
 #[test]
-fn create_token_non_fungible_test() {
-	parse_execute_mandos(
+fn create_token_non_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/create_token_non_fungible.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn create_two_fungible_same_creator_test() {
-	parse_execute_mandos(
+fn create_two_fungible_same_creator_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/create_two_tokens_both_fungible_same_creator.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn create_two_fungible_different_creator_test() {
-	parse_execute_mandos(
+fn create_two_fungible_different_creator_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/create_two_tokens_both_fungible_different_creator.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn create_two_non_fungible_same_creator_test() {
-	parse_execute_mandos(
+fn create_two_non_fungible_same_creator_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/create_two_tokens_both_non_fungible_same_creator.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn create_one_fungible_one_non_fungible_test() {
-	parse_execute_mandos(
+fn create_one_fungible_one_non_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/create_one_fungible_one_non_fungible.scen.json",
 		&contract_map(),
 	);
@@ -71,39 +71,39 @@ fn create_one_fungible_one_non_fungible_test() {
 
 // transfer tests -  to account
 #[test]
-fn transfer_fungible_ok_test() {
-	parse_execute_mandos("mandos/transfer_fungible_ok.scen.json", &contract_map());
+fn transfer_fungible_ok_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/transfer_fungible_ok.scen.json", &contract_map());
 }
 
 #[test]
-fn transfer_fungible_not_enough_balance_test() {
-	parse_execute_mandos(
+fn transfer_fungible_not_enough_balance_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/transfer_fungible_not_enough_balance.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn transfer_non_fungible_ok_test() {
-	parse_execute_mandos("mandos/transfer_non_fungible_ok.scen.json", &contract_map());
+fn transfer_non_fungible_ok_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/transfer_non_fungible_ok.scen.json", &contract_map());
 }
 
 #[test]
-fn batch_transfer_fungible_test() {
-	parse_execute_mandos("mandos/batch_transfer_fungible.scen.json", &contract_map());
+fn batch_transfer_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/batch_transfer_fungible.scen.json", &contract_map());
 }
 
 #[test]
-fn batch_transfer_non_fungible_test() {
-	parse_execute_mandos(
+fn batch_transfer_non_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/batch_transfer_non_fungible.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn batch_transfer_both_types_test() {
-	parse_execute_mandos(
+fn batch_transfer_both_types_test_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/batch_transfer_both_types.scen.json",
 		&contract_map(),
 	);
@@ -113,29 +113,29 @@ fn batch_transfer_both_types_test() {
 // TODO: Uncomment once IsSmartContractAddress is added to framework
 
 /*#[test]
-fn transfer_fungible_ok_to_sc_test() {
-	parse_execute_mandos("mandos/transfer_fungible_ok_to_sc.scen.json", &contract_map());
+fn transfer_fungible_ok_to_sc_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/transfer_fungible_ok_to_sc.scen.json", &contract_map());
 }
 
 #[test]
-fn transfer_non_fungible_ok_to_sc_test() {
-	parse_execute_mandos("mandos/transfer_non_fungible_ok_to_sc.scen.json", &contract_map());
+fn transfer_non_fungible_ok_to_sc_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/transfer_non_fungible_ok_to_sc.scen.json", &contract_map());
 }
 
 
 #[test]
-fn batch_transfer_fungible_to_sc_test() {
-	parse_execute_mandos("mandos/batch_transfer_fungible_to_sc.scen.json", &contract_map());
+fn batch_transfer_fungible_to_sc_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/batch_transfer_fungible_to_sc.scen.json", &contract_map());
 }
 
 #[test]
-fn batch_transfer_non_fungible_to_sc_test() {
-	parse_execute_mandos("mandos/batch_transfer_non_fungible_to_sc.scen.json", &contract_map());
+fn batch_transfer_non_fungible_to_sc_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/batch_transfer_non_fungible_to_sc.scen.json", &contract_map());
 }
 
 #[test]
-fn batch_transfer_both_types_to_sc_test() {
-	parse_execute_mandos("mandos/batch_transfer_both_types_to_sc.scen.json", &contract_map());
+fn batch_transfer_both_types_to_sc_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/batch_transfer_both_types_to_sc.scen.json", &contract_map());
 }
 */
 
@@ -143,28 +143,28 @@ fn batch_transfer_both_types_to_sc_test() {
 // mint tests
 
 #[test]
-fn mint_fungible_test() {
-	parse_execute_mandos("mandos/mint_fungible.scen.json", &contract_map());
+fn mint_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/mint_fungible.scen.json", &contract_map());
 }
 
 #[test]
-fn mint_non_fungible_test() {
-	parse_execute_mandos("mandos/mint_non_fungible.scen.json", &contract_map());
+fn mint_non_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/mint_non_fungible.scen.json", &contract_map());
 }
 
 #[test]
-fn mint_not_creator_test() {
-	parse_execute_mandos("mandos/mint_not_creator.scen.json", &contract_map());
+fn mint_not_creator_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/mint_not_creator.scen.json", &contract_map());
 }
 
 // burn tests
 
 #[test]
-fn burn_fungible_test() {
-	parse_execute_mandos("mandos/burn_fungible.scen.json", &contract_map());
+fn burn_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/burn_fungible.scen.json", &contract_map());
 }
 
 #[test]
-fn burn_non_fungible_test() {
-	parse_execute_mandos("mandos/burn_non_fungible.scen.json", &contract_map());
+fn burn_non_fungible_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/burn_non_fungible.scen.json", &contract_map());
 }

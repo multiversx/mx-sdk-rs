@@ -8,19 +8,19 @@ fn contract_map() -> ContractMap<TxContext> {
 
 /// Checks that externalSteps work fine.
 #[test]
-fn external_steps() {
-	parse_execute_mandos(
+fn external_steps_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"tests/mandos/external_steps/external_steps.scen.json",
 		&contract_map(),
 	);
 }
 
 #[test]
-fn transfer() {
-	parse_execute_mandos("tests/mandos/transfer.scen.json", &contract_map());
+fn transfer_rs() {
+	elrond_wasm_debug::mandos_rs("tests/mandos/transfer.scen.json", &contract_map());
 }
 
 #[test]
-fn validator_reward() {
-	parse_execute_mandos("tests/mandos/validatorReward.scen.json", &contract_map());
+fn validator_reward_rs() {
+	elrond_wasm_debug::mandos_rs("tests/mandos/validatorReward.scen.json", &contract_map());
 }

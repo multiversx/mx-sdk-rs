@@ -7,10 +7,10 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 use std::path::Path;
 
-pub fn parse_execute_mandos<P: AsRef<Path>>(
-	relative_path: P,
-	contract_map: &ContractMap<TxContext>,
-) {
+/// Runs mandos test using the Rust infrastructure and the debug mode.
+/// Uses a contract map to replace the references to the wasm bytecode
+/// with the contracts running in debug mode.
+pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: &ContractMap<TxContext>) {
 	let mut absolute_path = std::env::current_dir().unwrap();
 	absolute_path.push(relative_path);
 	let mut state = BlockchainMock::new();

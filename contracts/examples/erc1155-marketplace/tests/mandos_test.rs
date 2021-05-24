@@ -18,33 +18,33 @@ fn _contract_map() -> ContractMap<TxContext> {
 /* is_smart_contract not yet implemented, uncomment later
 
 #[test]
-fn auction_single_token_egld_test() {
-	parse_execute_mandos("mandos/auction_single_token_egld.scen.json", &contract_map());
+fn auction_single_token_egld_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/auction_single_token_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn auction_batch_test() {
-	parse_execute_mandos("mandos/auction_batch.scen.json", &contract_map());
+fn auction_batch_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/auction_batch.scen.json", &contract_map());
 }
 
 #[test]
-fn bid_first_egld_test() {
-	parse_execute_mandos("mandos/bid_first_egld.scen.json", &contract_map());
+fn bid_first_egld_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/bid_first_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn bid_second_egld_test() {
-	parse_execute_mandos("mandos/bid_second_egld.scen.json", &contract_map());
+fn bid_second_egld_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/bid_second_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn bid_third_egld_test() {
-	parse_execute_mandos("mandos/bid_third_egld.scen.json", &contract_map());
+fn bid_third_egld_test_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/bid_third_egld.scen.json", &contract_map());
 }
 
 #[test]
-fn end_auction_test() {
-	parse_execute_mandos("/home/elrond/elrond-wasm-rs/contracts/examples/erc1155-marketplace/mandos/end_auction.scen.json", &contract_map());
+fn end_auction_test_rs() {
+	elrond_wasm_debug::mandos_rs("/home/elrond/elrond-wasm-rs/contracts/examples/erc1155-marketplace/mandos/end_auction.scen.json", &contract_map());
 }
 
 */

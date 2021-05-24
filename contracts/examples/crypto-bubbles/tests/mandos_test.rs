@@ -11,56 +11,56 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn balanceof() {
-	parse_execute_mandos("mandos/balanceOf.scen.json", &contract_map());
+fn balanceof_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/balanceOf.scen.json", &contract_map());
 }
 
 #[test]
-fn create() {
-	parse_execute_mandos("mandos/create.scen.json", &contract_map());
+fn create_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/create.scen.json", &contract_map());
 }
 
 #[test]
-fn exceptions() {
-	parse_execute_mandos("mandos/exceptions.scen.json", &contract_map());
+fn exceptions_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/exceptions.scen.json", &contract_map());
 }
 
 #[test]
-fn joingame() {
-	parse_execute_mandos("mandos/joinGame.scen.json", &contract_map());
+fn joingame_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/joinGame.scen.json", &contract_map());
 }
 
 #[test]
-fn rewardandsendtowallet() {
-	parse_execute_mandos("mandos/rewardAndSendToWallet.scen.json", &contract_map());
+fn rewardandsendtowallet_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/rewardAndSendToWallet.scen.json", &contract_map());
 }
 
 #[test]
-fn rewardwinner_last() {
-	parse_execute_mandos("mandos/rewardWinner_Last.scen.json", &contract_map());
+fn rewardwinner_last_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/rewardWinner_Last.scen.json", &contract_map());
 }
 
 #[test]
-fn rewardwinner_simple() {
-	parse_execute_mandos("mandos/rewardWinner.scen.json", &contract_map());
+fn rewardwinner_simple_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/rewardWinner.scen.json", &contract_map());
 }
 
 #[test]
-fn topup_ok() {
-	parse_execute_mandos("mandos/topUp_ok.scen.json", &contract_map());
+fn topup_ok_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/topUp_ok.scen.json", &contract_map());
 }
 
 #[test]
-fn topup_withdraw() {
-	parse_execute_mandos("mandos/topUp_withdraw.scen.json", &contract_map());
+fn topup_withdraw_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/topUp_withdraw.scen.json", &contract_map());
 }
 
 #[test]
-fn withdraw_ok() {
-	parse_execute_mandos("mandos/withdraw_Ok.scen.json", &contract_map());
+fn withdraw_ok_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/withdraw_Ok.scen.json", &contract_map());
 }
 
 #[test]
-fn withdraw_toomuch() {
-	parse_execute_mandos("mandos/withdraw_TooMuch.scen.json", &contract_map());
+fn withdraw_toomuch_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/withdraw_TooMuch.scen.json", &contract_map());
 }

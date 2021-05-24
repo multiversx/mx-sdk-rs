@@ -11,66 +11,66 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn payable_any_1() {
-	parse_execute_mandos("mandos/payable_any_1.scen.json", &contract_map());
+fn payable_any_1_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_any_1.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_any_2() {
-	parse_execute_mandos("mandos/payable_any_2.scen.json", &contract_map());
+fn payable_any_2_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_any_2.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_any_3() {
-	parse_execute_mandos("mandos/payable_any_3.scen.json", &contract_map());
+fn payable_any_3_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_any_3.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_any_4() {
-	parse_execute_mandos("mandos/payable_any_4.scen.json", &contract_map());
+fn payable_any_4_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_any_4.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_egld_0() {
-	parse_execute_mandos("mandos/payable_egld_0.scen.json", &contract_map());
+fn payable_egld_0_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_egld_0.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_egld_1() {
-	parse_execute_mandos("mandos/payable_egld_1.scen.json", &contract_map());
+fn payable_egld_1_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_egld_1.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_egld_2() {
-	parse_execute_mandos("mandos/payable_egld_2.scen.json", &contract_map());
+fn payable_egld_2_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_egld_2.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_egld_3() {
-	parse_execute_mandos("mandos/payable_egld_3.scen.json", &contract_map());
+fn payable_egld_3_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_egld_3.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_egld_4() {
-	parse_execute_mandos("mandos/payable_egld_4.scen.json", &contract_map());
+fn payable_egld_4_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_egld_4.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_token_1() {
-	parse_execute_mandos("mandos/payable_token_1.scen.json", &contract_map());
+fn payable_token_1_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_token_1.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_token_2() {
-	parse_execute_mandos("mandos/payable_token_2.scen.json", &contract_map());
+fn payable_token_2_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_token_2.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_token_3() {
-	parse_execute_mandos("mandos/payable_token_3.scen.json", &contract_map());
+fn payable_token_3_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_token_3.scen.json", &contract_map());
 }
 
 #[test]
-fn payable_token_4() {
-	parse_execute_mandos("mandos/payable_token_4.scen.json", &contract_map());
+fn payable_token_4_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/payable_token_4.scen.json", &contract_map());
 }

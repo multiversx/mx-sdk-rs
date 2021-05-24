@@ -16,23 +16,23 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn init() {
-	parse_execute_mandos("mandos/init.scen.json", &contract_map());
+fn init_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/init.scen.json", &contract_map());
 }
 
 #[test]
-fn simple_transfer_full() {
-	parse_execute_mandos("mandos/simple_transfer_full.scen.json", &contract_map());
+fn simple_transfer_full_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/simple_transfer_full.scen.json", &contract_map());
 }
 
 #[test]
-fn simple_transfer_half() {
-	parse_execute_mandos("mandos/simple_transfer_half.scen.json", &contract_map());
+fn simple_transfer_half_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/simple_transfer_half.scen.json", &contract_map());
 }
 
 #[test]
-fn simple_transfer_full_wrong_token() {
-	parse_execute_mandos(
+fn simple_transfer_full_wrong_token_rs() {
+	elrond_wasm_debug::mandos_rs(
 		"mandos/simple_transfer_full_wrong_token.scen.json",
 		&contract_map(),
 	);
@@ -40,6 +40,6 @@ fn simple_transfer_full_wrong_token() {
 
 // TODO: implement ESDTTransfer + async call
 // #[test]
-// fn rejected_transfer() {
-// 	parse_execute_mandos("mandos/reject_transfer.scen.json", &contract_map());
+// fn rejected_transfer_rs() {
+// 	elrond_wasm_debug::mandos_rs("mandos/reject_transfer.scen.json", &contract_map());
 // }
