@@ -11,9 +11,7 @@ pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
 	let mut absolute_path = std::env::current_dir().unwrap();
 	absolute_path.push(relative_path);
 
-	let exec_path = arwen_mandos_full_path();
-
-	let output = Command::new(exec_path)
+	let output = Command::new("mandos-test")
 		.arg(absolute_path)
 		.output()
 		.expect("failed to execute process");
@@ -29,6 +27,7 @@ pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
 	}
 }
 
+#[allow(dead_code)]
 fn arwen_mandos_full_path() -> PathBuf {
 	let crate_dir = env!("CARGO_MANIFEST_DIR");
 	let mut am_exec_path = PathBuf::from(crate_dir);
