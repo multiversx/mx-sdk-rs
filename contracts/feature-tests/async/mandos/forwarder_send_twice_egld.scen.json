@@ -1,5 +1,5 @@
 {
-    "gasSchedule": "dummy",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -37,7 +37,7 @@
                     "str:EGLD",
                     "1"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
