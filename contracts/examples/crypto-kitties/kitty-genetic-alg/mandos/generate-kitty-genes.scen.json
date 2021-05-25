@@ -1,5 +1,6 @@
 {
     "name": "generate kitty genes test",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -18,7 +19,7 @@
             "comment": "arguments are matron and sire serialized kitties.",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:contract_address",
+                "to": "sc:kitty_genetic_alg",
                 "value": "0",
                 "function": "generateKittyGenes",
                 "arguments": [

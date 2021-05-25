@@ -94,8 +94,6 @@ fn parse_execute_mandos_steps(
 				tx,
 				expect,
 			} => {
-				println!("Executing {}", tx_id);
-
 				let tx_input = TxInput {
 					from: tx.from.value.into(),
 					to: tx.to.value.into(),

@@ -1,5 +1,6 @@
 {
     "name": "burn non-fungible",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,7 +11,7 @@
             "txId": "burn-non-fungible-token",
             "tx": {
                 "from": "address:creator",
-                "to": "address:contract_address",
+                "to": "sc:erc1155",
                 "value": "0",
                 "function": "burn",
                 "arguments": [
@@ -42,7 +43,7 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:contract_address": {
+                "sc:erc1155": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

@@ -22,9 +22,11 @@ fn read_dirs(path: &str) -> Vec<String> {
 		let dir_abs_path = dir.unwrap().path().into_os_string().into_string().unwrap();
 		let mut splitted_files_name: Vec<String> = split_file_name(dir_abs_path, "/");
 		let files_name_with_extension = splitted_files_name.pop().unwrap();
-		splitted_files_name = split_file_name(files_name_with_extension, ".");
-		let files_names = String::from(splitted_files_name.first().unwrap());
-		names.push(files_names);
+		if files_name_with_extension.ends_with(".scen.json") {
+			splitted_files_name = split_file_name(files_name_with_extension, ".");
+			let files_names = String::from(splitted_files_name.first().unwrap());
+			names.push(files_names);
+		}
 	}
 
 	names.sort();

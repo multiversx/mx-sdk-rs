@@ -36,13 +36,13 @@ fn rewardandsendtowallet_rs() {
 }
 
 #[test]
-fn rewardwinner_last_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/rewardWinner_Last.scen.json", &contract_map());
+fn rewardwinner_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/rewardWinner.scen.json", &contract_map());
 }
 
 #[test]
-fn rewardwinner_simple_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/rewardWinner.scen.json", &contract_map());
+fn rewardwinner_last_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/rewardWinner_Last.scen.json", &contract_map());
 }
 
 #[test]

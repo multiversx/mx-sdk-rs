@@ -1,20 +1,21 @@
 {
     "name": "topUp_ok",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:creator_address": {
+                "address:crypto_bubbles_owner": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "address:contract_address": {
+                "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''owner": "address:creator_address"
+                        "''owner": "address:crypto_bubbles_owner"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
@@ -37,7 +38,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:contract_address",
+                "to": "sc:crypto_bubbles",
                 "value": "0x100",
                 "function": "topUp",
                 "arguments": [],
@@ -49,7 +50,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:contract_address",
+                        "address": "sc:crypto_bubbles",
                         "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:acc1"
@@ -66,7 +67,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:acc2",
-                "to": "address:contract_address",
+                "to": "sc:crypto_bubbles",
                 "value": "0x100",
                 "function": "topUp",
                 "arguments": [],
@@ -78,7 +79,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:contract_address",
+                        "address": "sc:crypto_bubbles",
                         "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:acc2"
@@ -93,17 +94,17 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:creator_address": {
+                "address:crypto_bubbles_owner": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "address:contract_address": {
+                "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x200",
                     "storage": {
-                        "''owner": "address:creator_address",
+                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x100",
                         "''playerBalance|address:acc2": "0x100"
                     },

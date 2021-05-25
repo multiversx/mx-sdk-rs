@@ -1,5 +1,6 @@
 {
     "comment": "not the main test, just warmup",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",

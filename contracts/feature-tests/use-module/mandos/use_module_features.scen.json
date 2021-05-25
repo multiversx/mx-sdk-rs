@@ -15,7 +15,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "5",
-                    "newAddress": "address:use_module_address"
+                    "newAddress": "sc:use_module"
                 }
             ]
         },
@@ -27,7 +27,7 @@
                 "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,11 +43,11 @@
             "txId": "2",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
+                "to": "sc:use_module",
                 "value": "0",
                 "function": "checkFeatureGuard",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -63,14 +63,14 @@
             "txId": "3",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
+                "to": "sc:use_module",
                 "value": "0",
                 "function": "setFeatureFlag",
                 "arguments": [
                     "str:featureName",
                     "0"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -86,11 +86,11 @@
             "txId": "4",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
+                "to": "sc:use_module",
                 "value": "0",
                 "function": "checkFeatureGuard",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {

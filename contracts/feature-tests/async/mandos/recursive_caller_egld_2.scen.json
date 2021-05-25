@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
