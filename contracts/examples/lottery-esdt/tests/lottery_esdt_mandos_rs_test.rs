@@ -1,26 +1,17 @@
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
+#[allow(dead_code)]
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
-		"file:../output/lottery-erc20.wasm",
-		Box::new(|context| Box::new(lottery_erc20::contract_obj(context))),
+		"file:../output/lottery-esdt.wasm",
+		Box::new(|context| Box::new(lottery_esdt::contract_obj(context))),
 	);
-
-	contract_map.register_contract(
-		"file:../../erc20/output/erc20.wasm",
-		Box::new(|context| Box::new(erc20::contract_obj(context))),
-	);
-
 	contract_map
 }
 
-#[test]
-fn lottery_init_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/lottery-init.scen.json", &contract_map());
-}
-
+/* Uncomment when mandos-rs is brought up to date with mandos-go features
 #[test]
 fn buy_all_tickets_different_accounts_rs() {
 	elrond_wasm_debug::mandos_rs(
@@ -101,7 +92,7 @@ fn buy_ticket_wrong_fee_rs() {
 }
 
 #[test]
-fn buy_ticket_rs() {
+fn buy_ticket_simple_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/buy-ticket.scen.json", &contract_map());
 }
 
@@ -126,11 +117,20 @@ fn determine_winner_same_ticket_holder_rs() {
 	);
 }
 
-// TODO: uncomment after rust-mandos supports chaining async calls
-// #[test]
-// fn determine_winner_split_prize_pool_rs() {
-//	elrond_wasm_debug::mandos_rs("mandos/determine-winner-split-prize-pool.scen.json", &contract_map());
-// }
+/* NOT SUPPORTED YET
+#[test]
+fn determine_winner_split_prize_pool_rs() {
+	elrond_wasm_debug::mandos_rs(
+		"mandos/determine-winner-split-prize-pool.scen.json",
+		&contract_map(),
+	);
+}
+*/
+
+#[test]
+fn lottery_init_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/lottery-init.scen.json", &contract_map());
+}
 
 #[test]
 fn start_after_announced_winner_rs() {
@@ -178,7 +178,7 @@ fn start_limited_tickets_and_fixed_deadline_invalid_ticket_price_arg_rs() {
 }
 
 #[test]
-fn start_limited_tickets_and_fixed_deadline_rs() {
+fn start_limited_tickets_and_fixed_deadline_valid_rs() {
 	elrond_wasm_debug::mandos_rs(
 		"mandos/start-limited-tickets-and-fixed-deadline.scen.json",
 		&contract_map(),
@@ -186,7 +186,7 @@ fn start_limited_tickets_and_fixed_deadline_rs() {
 }
 
 #[test]
-fn start_limited_tickets_rs() {
+fn start_limited_tickets_simple_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/start-limited-tickets.scen.json", &contract_map());
 }
 
@@ -204,3 +204,4 @@ fn start_with_all_options_rs() {
 fn start_with_no_options_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/start-with-no-options.scen.json", &contract_map());
 }
+*/

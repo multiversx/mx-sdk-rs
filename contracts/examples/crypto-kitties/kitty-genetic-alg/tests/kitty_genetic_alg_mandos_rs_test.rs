@@ -11,11 +11,11 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn init_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/init.scen.json", &contract_map());
+fn generate_kitty_genes_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/generate-kitty-genes.scen.json", &contract_map());
 }
 
 #[test]
-fn generate_kitty_genes_test_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/generate-kitty-genes.scen.json", &contract_map());
+fn init_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/init.scen.json", &contract_map());
 }

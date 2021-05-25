@@ -1,5 +1,6 @@
 {
     "name": "breed ok",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step" :"externalSteps",
@@ -10,7 +11,7 @@
             "txId": "tx-breed-ok",
             "tx": {
                 "from": "address:acc2",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "10",
                 "function": "breedWith",
                 "arguments": [
@@ -45,12 +46,12 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:kitty_ownership_contract_address": {
+                "sc:kitty_ownership_contract": {
                     "nonce": "0",
                     "balance": "10",
                     "storage": {
-                        "str:geneScienceContractAddress": "address:kitty_genetic_alg_contract_address",
-                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:geneScienceContractAddress": "sc:kitty_genetic_alg",
+                        "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:birthFee": "10",
                         "str:totalKitties": "3",
 
@@ -65,7 +66,8 @@
                         "str:nrOwnedKitties|address:acc2": "1"
                     },
                     "code": "file:../output/kitty-ownership.wasm"
-                }
+                },
+                "+": ""
             }
         }
     ]
