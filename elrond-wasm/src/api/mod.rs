@@ -1,5 +1,3 @@
-mod big_int_api;
-mod big_uint_api;
 mod blockchain_api;
 mod call_value_api;
 mod contract_abi_api;
@@ -14,9 +12,9 @@ mod proxy_obj_api;
 mod send_api;
 mod storage_api;
 pub mod uncallable;
+mod managed_types;
 
-pub use big_int_api::*;
-pub use big_uint_api::*;
+pub use managed_types::*;
 pub use blockchain_api::*;
 pub use call_value_api::*;
 pub use contract_abi_api::*;

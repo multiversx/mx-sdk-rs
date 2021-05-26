@@ -1,5 +1,5 @@
 use super::{
-	BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
+	EllipticCurveApi ,BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi,
 	EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
 };
 use crate::types::Address;
@@ -14,6 +14,8 @@ pub trait ContractBase: Sized {
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
+
+    type EllipticCurve : EllipticCurveApi + 'static;
 
 	/// Abstracts the lower-level storage functionality.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
@@ -36,6 +38,9 @@ pub trait ContractBase: Sized {
 	type LogApi: LogApi + ErrorApi + Clone + 'static;
 
 	type ErrorApi: ErrorApi + Clone + 'static;
+
+    // Elliptic Curves functions provided by the Arwen VM.
+    fn elliptic_curve(&self) -> Self::EllipticCurve;
 
 	/// Gateway into the lower-level storage functionality.
 	/// Storage related annotations make use of this.
