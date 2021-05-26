@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:panic_features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:panic_features",
                 "value": "0",
                 "function": "panicWithMessage",
                 "arguments": [],
@@ -34,7 +34,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:example panic message",
+                "message": "str:panic occurred: example panic message",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
@@ -43,7 +43,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:panic_features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

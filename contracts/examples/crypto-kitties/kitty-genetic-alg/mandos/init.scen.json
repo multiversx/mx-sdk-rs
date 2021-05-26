@@ -1,5 +1,6 @@
 {
     "name": "deploy kitty genetic alg",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
@@ -14,7 +15,7 @@
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:contract_address"
+                    "newAddress": "sc:kitty_genetic_alg"
                 }
             ]
         },
@@ -43,7 +44,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:contract_address": {
+                "sc:kitty_genetic_alg": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

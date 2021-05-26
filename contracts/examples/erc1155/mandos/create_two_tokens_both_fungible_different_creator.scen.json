@@ -1,5 +1,6 @@
 {
     "name": "create two fungible tokens",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -20,7 +21,7 @@
             "txId": "create-second-fungible-token",
             "tx": {
                 "from": "address:second_creator",
-                "to": "address:contract_address",
+                "to": "sc:erc1155",
                 "value": "0",
                 "function": "createToken",
                 "arguments": [
@@ -58,7 +59,7 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:contract_address": {
+                "sc:erc1155": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

@@ -1,14 +1,15 @@
 {
     "name": "set initial balance for accounts",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:the_erc20_contract": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner_address": "997,000,000",
+                        "''balance|address:erc20_owner": "997,000,000",
                         "''balance|address:my_address": "1,000,000",
                         "''balance|address:acc1": "1,000,000",
                         "''balance|address:acc2": "1,000,000",

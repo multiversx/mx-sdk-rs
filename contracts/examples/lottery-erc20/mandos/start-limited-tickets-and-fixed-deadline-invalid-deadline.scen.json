@@ -1,5 +1,6 @@
 {
     "name": "start with limited tickets and fixed deadline with invalid deadline arg",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -60,20 +61,20 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''erc20_contract_address": "address:the_erc20_contract"
+                        "''erc20_contract_address": "sc:erc20"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
                 },
-                "address:the_erc20_contract": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner_address": "1,000,000,000",
+                        "''balance|address:erc20_owner": "1,000,000,000",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },
-                "address:erc20_owner_address": {
+                "address:erc20_owner": {
                     "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}

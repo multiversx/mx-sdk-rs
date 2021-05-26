@@ -1,5 +1,6 @@
 {
     "name": "start with all options",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -49,11 +50,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_erc20_contract": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner_address": "994,000,000",
+                        "''balance|address:erc20_owner": "994,000,000",
                         "''balance|address:my_address": "1,000,000",
                         "''balance|address:acc1": "1,000,000",
                         "''balance|address:acc2": "1,000,000",
@@ -80,7 +81,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:erc20_owner_address": {
+                "address:erc20_owner": {
                     "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
@@ -115,15 +116,15 @@
                     "balance": "0",
                     "storage": {
                         "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:5|u64:123,456|u32:1|u32:2|u8:75|u8:25|u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5|u32:0|u32:0|u32:0",
-                        "''erc20_contract_address": "address:the_erc20_contract"
+                        "''erc20_contract_address": "sc:erc20"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
                 },
-                "address:the_erc20_contract": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner_address": "994,000,000",
+                        "''balance|address:erc20_owner": "994,000,000",
                         "''balance|address:my_address": "1,000,000",
                         "''balance|address:acc1": "1,000,000",
                         "''balance|address:acc2": "1,000,000",
