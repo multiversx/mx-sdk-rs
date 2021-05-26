@@ -10,6 +10,6 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
-fn test_str_repeat_mandos() {
-	parse_execute_mandos("mandos/str_repeat.scen.json", &contract_map());
+fn test_str_repeat_mandos_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/str_repeat.scen.json", &contract_map());
 }

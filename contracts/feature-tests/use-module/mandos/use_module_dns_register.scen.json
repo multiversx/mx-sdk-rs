@@ -10,7 +10,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:use_module_address": {
+                "sc:use_module": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -29,17 +29,17 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "dnsRegister",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:use_module_address",
+                "to": "sc:use_module",
                 "value": "1000",
                 "function": "dnsRegister",
                 "arguments": [
                     "sc:dns#87",
                     "str:coolname0001.elrond"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -53,7 +53,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:use_module_address": {
+                "sc:use_module": {
                     "nonce": "0",
                     "balance": "*",
                     "username": "str:coolname0001.elrond",

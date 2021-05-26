@@ -918,7 +918,7 @@ fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::TxContext
 
 #[test]
 fn test_mandos() {
-	elrond_wasm_debug::parse_execute_mandos(
+	elrond_wasm_debug::mandos_rs(
 		"../contracts/examples/adder/mandos/adder.scen.json",
 		&contract_map(),
 	);

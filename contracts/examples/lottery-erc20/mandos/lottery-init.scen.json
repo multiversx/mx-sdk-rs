@@ -1,10 +1,11 @@
 {
     "name": "lottery deployment test",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:erc20_owner_address": {
+                "address:erc20_owner": {
                     "nonce": "0",
                     "balance": "1,000,000",
                     "storage": {}
@@ -27,9 +28,9 @@
             },
             "newAddresses": [
                 {
-                    "creatorAddress": "address:erc20_owner_address",
+                    "creatorAddress": "address:erc20_owner",
                     "creatorNonce": "0",
-                    "newAddress": "address:the_erc20_contract"
+                    "newAddress": "sc:erc20"
                 },
                 {
                     "creatorAddress": "address:my_address",
@@ -42,7 +43,7 @@
             "step": "scDeploy",
             "txId": "deploy",
             "tx": {
-                "from": "address:erc20_owner_address",
+                "from": "address:erc20_owner",
                 "contractCode": "file:../../erc20/output/erc20.wasm",
                 "value": "0",
                 "arguments": [
@@ -60,7 +61,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:erc20_owner_address": {
+                "address:erc20_owner": {
                     "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
@@ -80,11 +81,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_erc20_contract": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner_address": "1,000,000,000",
+                        "''balance|address:erc20_owner": "1,000,000,000",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
@@ -99,7 +100,7 @@
                 "contractCode": "file:../output/lottery-erc20.wasm",
                 "value": "0",
                 "arguments": [
-                    "address:the_erc20_contract"
+                    "sc:erc20"
                 ],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -113,7 +114,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:erc20_owner_address": {
+                "address:erc20_owner": {
                     "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
@@ -133,11 +134,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_erc20_contract": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner_address": "1,000,000,000",
+                        "''balance|address:erc20_owner": "1,000,000,000",
                         "''total_supply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
@@ -146,7 +147,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''erc20_contract_address": "address:the_erc20_contract"
+                        "''erc20_contract_address": "sc:erc20"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
                 }

@@ -20,7 +20,7 @@
             "txId": "mint-more-tokens",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_nft_contract",
+                "to": "sc:the_nft_contract",
                 "value": "0",
                 "function": "mint",
                 "arguments": [
@@ -50,7 +50,7 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:the_nft_contract": {
+                "sc:the_nft_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -60,7 +60,8 @@
                         "str:tokenOwner|u64:0": "address:contract_owner",
                         "str:tokenOwner|u64:1": "address:contract_owner",
                         "str:tokenOwner|u64:2": "address:contract_owner"
-                    }
+                    },
+                    "code": "*"
                 }
             }
         }

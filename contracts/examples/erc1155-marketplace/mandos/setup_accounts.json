@@ -1,5 +1,6 @@
 {
     "name": "setup accounts",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
@@ -28,7 +29,7 @@
                     },
                     "storage": {}
                 },
-                "address:ownership_contract": {
+                "sc:ownership_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -53,11 +54,11 @@
                     },
                     "code": "file:../../erc1155/output/erc1155.wasm"
                 },
-                "address:marketplace_contract": {
+                "sc:marketplace_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:tokenOwnershipContractAddress": "address:ownership_contract",
+                        "str:tokenOwnershipContractAddress": "sc:ownership_contract",
                         "str:percentageCut": "10"
                     },
                     "code": "file:../output/erc1155-marketplace.wasm"

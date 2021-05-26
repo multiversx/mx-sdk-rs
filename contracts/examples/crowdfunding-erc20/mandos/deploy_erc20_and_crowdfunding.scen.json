@@ -4,12 +4,12 @@
       {
         "step": "setState",
         "accounts": {
-          "address:erc20_owner_address": {
+          "address:erc20_owner": {
             "nonce": "0",
             "balance": "0",
             "storage": {}
           },
-          "address:crowdfunding_owner_address": {
+          "address:crowdfunding_owner": {
             "nonce": "0",
             "balance": "0",
             "storage": {}
@@ -17,14 +17,14 @@
         },
         "newAddresses": [
           {
-            "creatorAddress": "address:erc20_owner_address",
+            "creatorAddress": "address:erc20_owner",
             "creatorNonce": "0",
-            "newAddress": "address:the_erc20_contract"
+            "newAddress": "sc:erc20"
           },
           {
-            "creatorAddress": "address:crowdfunding_owner_address",
+            "creatorAddress": "address:crowdfunding_owner",
             "creatorNonce": "0",
-            "newAddress": "address:the_crowdfunding_contract"
+            "newAddress": "sc:crowdfunding"
           }
         ]
       },
@@ -32,13 +32,13 @@
         "step": "scDeploy",
         "txId": "deploy",
         "tx": {
-          "from": "address:erc20_owner_address",
+          "from": "address:erc20_owner",
           "contractCode": "file:../../erc20/output/erc20.wasm",
           "value": "0",
           "arguments": [
               "1,000,000,000"
           ],
-          "gasLimit": "1,000,000",
+          "gasLimit": "50,000,000",
           "gasPrice": "0"
         },
         "expect": {
@@ -50,21 +50,21 @@
       {
         "step": "checkState",
         "accounts": {
-          "address:erc20_owner_address": {
+          "address:erc20_owner": {
             "nonce": "1",
             "balance": "0",
             "storage": {}
           },
-          "address:crowdfunding_owner_address": {
+          "address:crowdfunding_owner": {
             "nonce": "0",
             "balance": "0",
             "storage": {}
           },
-          "address:the_erc20_contract": {
+          "sc:erc20": {
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''balance|address:erc20_owner_address": "1,000,000,000",
+              "''balance|address:erc20_owner": "1,000,000,000",
               "''total_supply": "1,000,000,000"
             },
             "code": "file:../../erc20/output/erc20.wasm"
@@ -75,15 +75,15 @@
         "step": "scDeploy",
         "txId": "deploy",
         "tx": {
-          "from": "address:crowdfunding_owner_address",
+          "from": "address:crowdfunding_owner",
           "contractCode": "file:../output/crowdfunding-erc20.wasm",
           "value": "0",
           "arguments": [
               "1,000,000",
               "123,456",
-              "address:the_erc20_contract"
+              "sc:erc20"
           ],
-          "gasLimit": "1,000,000",
+          "gasLimit": "50,000,000",
           "gasPrice": "0"
         },
         "expect": {
@@ -95,33 +95,33 @@
       {
         "step": "checkState",
         "accounts": {
-          "address:erc20_owner_address": {
+          "address:erc20_owner": {
             "nonce": "1",
             "balance": "0",
             "storage": {}
           },
-          "address:crowdfunding_owner_address": {
+          "address:crowdfunding_owner": {
             "nonce": "1",
             "balance": "0",
             "storage": {}
           },
-          "address:the_erc20_contract": {
+          "sc:erc20": {
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''balance|address:erc20_owner_address": "1,000,000,000",
+              "''balance|address:erc20_owner": "1,000,000,000",
               "''total_supply": "1,000,000,000"
             },
             "code": "file:../../erc20/output/erc20.wasm"
           },
-          "address:the_crowdfunding_contract": {
+          "sc:crowdfunding": {
             "nonce": "0",
             "balance": "0",
             "storage": {
-              "''owner": "address:crowdfunding_owner_address",
+              "''owner": "address:crowdfunding_owner",
               "''target": "1,000,000",
               "''deadline": "123,456",
-              "''erc20_contract_address": "address:the_erc20_contract"
+              "''erc20_contract_address": "sc:erc20"
             },
             "code": "file:../output/crowdfunding-erc20.wasm"
           }

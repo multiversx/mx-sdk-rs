@@ -1,20 +1,21 @@
 {
     "name": "rewardAndSendToWallet",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:creator_address": {
+                "address:crypto_bubbles_owner": {
                     "nonce": "0",
                     "balance": "0x10000000",
                     "storage": {},
                     "code": ""
                 },
-                "address:contract_address": {
+                "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x1000",
                     "storage": {
-                        "''owner": "address:creator_address",
+                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x100",
                         "''playerBalance|address:acc2": "0x100"
                     },
@@ -32,8 +33,8 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "address:creator_address",
-                "to": "address:contract_address",
+                "from": "address:crypto_bubbles_owner",
+                "to": "sc:crypto_bubbles",
                 "value": "0",
                 "function": "rewardAndSendToWallet",
                 "arguments": [
@@ -49,7 +50,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:contract_address",
+                        "address": "sc:crypto_bubbles",
                         "identifier": "0x1000000000000000000000000000000000000000000000000000000000000004",
                         "topics": [
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
@@ -58,7 +59,7 @@
                         "data": "0x200"
                     },
                     {
-                        "address": "address:contract_address",
+                        "address": "sc:crypto_bubbles",
                         "identifier": "0x1000000000000000000000000000000000000000000000000000000000000002",
                         "topics": [
                             "address:acc1"
@@ -73,17 +74,17 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:creator_address": {
+                "address:crypto_bubbles_owner": {
                     "nonce": "1",
                     "balance": "0xff00000",
                     "storage": {},
                     "code": ""
                 },
-                "address:contract_address": {
+                "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0xe00",
                     "storage": {
-                        "''owner": "address:creator_address",
+                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x100",
                         "''playerBalance|address:acc2": "0x100"
                     },
