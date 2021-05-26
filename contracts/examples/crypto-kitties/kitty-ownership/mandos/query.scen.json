@@ -1,5 +1,6 @@
 {
     "name": "test query functions",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,7 +11,7 @@
             "txId": "tx-total-supply",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "totalSupply",
                 "arguments": [],
@@ -30,7 +31,7 @@
             "txId": "tx-balance-of",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "balanceOf",
                 "arguments": ["address:acc1"],
@@ -50,7 +51,7 @@
             "txId": "tx-owner-of",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "ownerOf",
                 "arguments": ["2"],
@@ -70,7 +71,7 @@
             "txId": "tx-tokens-of-owner",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "tokensOfOwner",
                 "arguments": ["address:acc1"],
@@ -90,7 +91,7 @@
             "txId": "tx-get-kitty-by-id",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "getKittyById",
                 "arguments": ["1"],
@@ -110,7 +111,7 @@
             "txId": "tx-is-ready-to-breed",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "isReadyToBreed",
                 "arguments": ["1"],
@@ -130,7 +131,7 @@
             "txId": "tx-is-pregnant",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "isPregnant",
                 "arguments": ["1"],
@@ -150,7 +151,7 @@
             "txId": "tx-can-breed-with",
             "tx": {
                 "from": "address:acc3",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "canBreedWith",
                 "arguments": ["1", "2"],
