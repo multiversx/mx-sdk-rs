@@ -15,7 +15,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "5",
-                    "newAddress": "address:use_module_address"
+                    "newAddress": "sc:use_module"
                 }
             ]
         },
@@ -27,7 +27,7 @@
                 "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,11 +43,11 @@
             "txId": "call_mod_a",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
+                "to": "sc:use_module",
                 "value": "0",
                 "function": "call_mod_a",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -63,11 +63,11 @@
             "txId": "call_mod_a",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
+                "to": "sc:use_module",
                 "value": "0",
                 "function": "call_mod_b",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {

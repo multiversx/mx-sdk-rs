@@ -1,5 +1,6 @@
 {
     "name": "create siring auction ok",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -16,7 +17,7 @@
             "txId": "tx-create-siring-auction-ok",
             "tx": {
                 "from": "address:bidder2",
-                "to": "address:kitty_auction_contract_address",
+                "to": "sc:kitty_auction_contract",
                 "value": "0",
                 "function": "createSiringAuction",
                 "arguments": [
@@ -54,25 +55,25 @@
                     "balance": "999,500",
                     "storage": {}
                 },
-                "address:kitty_ownership_contract_address": {
+                "sc:kitty_ownership_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:totalKitties": "2",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:1": "u8:1|u8:2|u8:3|u8:4|u8:5|u8:6|u8:7|u64:123456|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
 
-                        "str:nrOwnedKitties|address:kitty_auction_contract_address": "1",
-                        "str:owner|u32:1": "address:kitty_auction_contract_address"
+                        "str:nrOwnedKitties|sc:kitty_auction_contract": "1",
+                        "str:owner|u32:1": "sc:kitty_auction_contract"
                     },
                     "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
                 },
-                "address:kitty_auction_contract_address": {
+                "sc:kitty_auction_contract": {
                     "nonce": "0",
                     "balance": "500",
                     "storage": {
-                        "str:kittyOwnershipContractAddress": "address:kitty_ownership_contract_address",
+                        "str:kittyOwnershipContractAddress": "sc:kitty_ownership_contract",
                         "str:genZeroKittyStartingPrice": "100",
                         "str:genZeroKittyEndingPrice": "500",
                         "str:genZeroKittyAuctionDuration": "100,000",

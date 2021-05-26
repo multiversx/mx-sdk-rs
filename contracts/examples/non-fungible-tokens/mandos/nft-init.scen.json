@@ -14,7 +14,7 @@
                 {
                     "creatorAddress": "address:contract_owner",
                     "creatorNonce": "0",
-                    "newAddress": "address:the_nft_contract"
+                    "newAddress": "sc:the_nft_contract"
                 }
             ]
         },
@@ -28,7 +28,7 @@
                 "arguments": [
                     "3"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -45,7 +45,7 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:the_nft_contract": {
+                "sc:the_nft_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -55,7 +55,8 @@
                         "str:tokenOwner|u64:0": "address:contract_owner",
                         "str:tokenOwner|u64:1": "address:contract_owner",
                         "str:tokenOwner|u64:2": "address:contract_owner"
-                    }
+                    },
+                    "code": "*"
                 }
             }
         }
