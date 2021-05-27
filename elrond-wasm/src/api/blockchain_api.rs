@@ -1,6 +1,6 @@
 use super::{BigUintApi, ErrorApi, StorageReadApi};
 use crate::storage;
-use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, Vec, H256};
+use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, H256, TokenIdentifier, Vec};
 use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
@@ -54,14 +54,14 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
 	fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
 
-	fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64;
+	fn get_current_esdt_nft_nonce(&self, address: &Address, token_id: &TokenIdentifier) -> u64;
 
-	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> Self::BalanceType;
+	fn get_esdt_balance(&self, address: &Address, token_id: &TokenIdentifier, nonce: u64) -> Self::BalanceType;
 
 	fn get_esdt_token_data(
 		&self,
 		address: &Address,
-		token: &[u8],
+		token_id: &TokenIdentifier,
 		nonce: u64,
 	) -> EsdtTokenData<Self::BalanceType>;
 
@@ -74,12 +74,12 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
 	/// Retrieves local roles for the token, by reading protected storage.
 	#[inline]
-	fn get_esdt_local_roles(&self, token_id: &[u8]) -> Vec<EsdtLocalRole> {
+	fn get_esdt_local_roles(&self, token_id: &TokenIdentifier) -> Vec<EsdtLocalRole> {
 		let mut roles = Vec::new();
 
 		let key = [
 			storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
-			token_id,
+			token_id.as_esdt_identifier(),
 		]
 		.concat();
 		let raw_storage = storage::storage_get::<Self, BoxedBytes>(self.clone(), &key);
