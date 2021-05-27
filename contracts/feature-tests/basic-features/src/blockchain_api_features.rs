@@ -37,7 +37,7 @@ pub trait BlockchainApiFeatures {
 	fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiResultVec<BoxedBytes> {
 		let roles = self
 			.blockchain()
-			.get_esdt_local_roles(token_id.as_esdt_identifier());
+			.get_esdt_local_roles(&token_id);
 		let role_names: Vec<BoxedBytes> = roles
 			.iter()
 			.map(|role| BoxedBytes::from(role.as_role_name()))

@@ -1,7 +1,10 @@
 use elrond_codec::TopEncode;
 
 use super::{BigIntApi, BigUintApi, ErrorApi, StorageReadApi, StorageWriteApi};
-use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec};
+use crate::{
+	types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec},
+	HexCallDataSerializer,
+};
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
@@ -60,6 +63,24 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer: &ArgBuffer,
 	) -> Result<(), &'static [u8]>;
 
+	/// Performs a simple ESDT transfer, but via async call.
+	/// This is the preferred way to send ESDT.
+	fn transfer_esdt_via_async_call(
+		&self,
+		to: &Address,
+		token: &TokenIdentifier,
+		amount: &Self::AmountType,
+		data: &[u8],
+	) -> ! {
+		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
+		serializer.push_argument_bytes(token.as_esdt_identifier());
+		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+		if !data.is_empty() {
+			serializer.push_argument_bytes(data);
+		}
+		self.async_call_raw(&to, &Self::AmountType::zero(), serializer.as_slice())
+	}
+
 	/// Sends either EGLD or an ESDT token to the target address,
 	/// depending on what token identifier was specified.
 	fn direct(
@@ -74,6 +95,17 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		} else {
 			let _ = self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
 		}
+	}
+
+	fn direct_nft(
+		&self,
+		to: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+		amount: &Self::AmountType,
+		data: &[u8],
+	) {
+		let _ = self.direct_esdt_nft_execute(to, token, nonce, amount, 0, data, &ArgBuffer::new());
 	}
 
 	/// Sends an asynchronous call to another contract.
@@ -252,5 +284,28 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
 		self.call_local_esdt_built_in_function(gas, b"ESDTNFTBurn", &arg_buffer);
+	}
+
+	/// Performs a simple ESDT NFT transfer, but via async call.
+	/// This is the preferred way to send ESDT.
+	/// Note: call is done to the SC itself, so `from` should be the SCs own address
+	fn transfer_esdt_nft_via_async_call(
+		&self,
+		from: &Address,
+		to: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+		amount: &Self::AmountType,
+		data: &[u8],
+	) {
+		let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
+		serializer.push_argument_bytes(token.as_esdt_identifier());
+		serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+		serializer.push_argument_bytes(to.as_bytes());
+		if !data.is_empty() {
+			serializer.push_argument_bytes(data);
+		}
+		self.async_call_raw(&from, &Self::AmountType::zero(), serializer.as_slice());
 	}
 }

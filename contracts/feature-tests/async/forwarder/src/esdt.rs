@@ -8,7 +8,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> Self::BigUint {
 		self.blockchain().get_esdt_balance(
 			&self.blockchain().get_sc_address(),
-			token_identifier.as_esdt_identifier(),
+			&token_identifier,
 			0,
 		)
 	}
@@ -17,7 +17,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 	fn send_esdt(
 		&self,
 		to: &Address,
-		token_id: BoxedBytes,
+		token_id: TokenIdentifier,
 		amount: &Self::BigUint,
 		#[var_args] opt_data: OptionalArg<BoxedBytes>,
 	) {
@@ -25,16 +25,14 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		let _ = self
-			.send()
-			.direct_esdt_via_transf_exec(to, token_id.as_slice(), amount, data);
+		let _ = self.send().direct(to, &token_id, amount, data);
 	}
 
 	#[endpoint]
 	fn send_esdt_twice(
 		&self,
 		to: &Address,
-		token_id: BoxedBytes,
+		token_id: TokenIdentifier,
 		amount_first_time: &Self::BigUint,
 		amount_second_time: &Self::BigUint,
 		#[var_args] opt_data: OptionalArg<BoxedBytes>,
@@ -43,18 +41,8 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		let _ = self.send().direct_esdt_via_transf_exec(
-			to,
-			token_id.as_slice(),
-			amount_first_time,
-			data,
-		);
-		let _ = self.send().direct_esdt_via_transf_exec(
-			to,
-			token_id.as_slice(),
-			amount_second_time,
-			data,
-		);
+		let _ = self.send().direct(to, &token_id, amount_first_time, data);
+		let _ = self.send().direct(to, &token_id, amount_second_time, data);
 	}
 
 	#[payable("EGLD")]
@@ -118,19 +106,13 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
 	#[endpoint]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_mint(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
-			&amount,
-		);
+		self.send()
+			.esdt_local_mint(self.blockchain().get_gas_left(), &token_identifier, &amount);
 	}
 
 	#[endpoint]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_burn(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
-			&amount,
-		);
+		self.send()
+			.esdt_local_burn(self.blockchain().get_gas_left(), &token_identifier, &amount);
 	}
 }
