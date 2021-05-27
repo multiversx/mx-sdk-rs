@@ -11,6 +11,7 @@ pub struct Auction<BigUint: BigUintApi> {
 	pub payment_token: EsdtToken,
 	pub min_bid: BigUint,
 	pub max_bid: BigUint,
+	pub start_time: u64,
 	pub deadline: u64,
 	pub original_owner: Address,
 	pub current_bid: BigUint,
@@ -52,9 +53,12 @@ pub trait EsdtNftMarketplace {
 		deadline: u64,
 		accepted_payment_token: TokenIdentifier,
 		#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,
+		#[var_args] opt_start_time: OptionalArg<u64>,
 	) -> SCResult<()> {
 		let nft_type = self.call_value().token();
 		let nft_nonce = self.call_value().esdt_token_nonce();
+		let current_time = self.blockchain().get_block_timestamp();
+		let start_time = opt_start_time.into_option().unwrap_or_else(|| current_time);
 
 		require!(
 			self.call_value().esdt_token_type() == EsdtTokenType::NonFungible,
@@ -72,9 +76,10 @@ pub trait EsdtNftMarketplace {
 			min_bid > 0 && min_bid <= max_bid,
 			"Min bid can't be 0 or higher than max bid"
 		);
+		require!(deadline > current_time, "Deadline can't be in the past");
 		require!(
-			deadline > self.blockchain().get_block_timestamp(),
-			"Deadline can't be in the past"
+			start_time >= current_time && start_time < deadline,
+			"Invalid start time"
 		);
 
 		let marketplace_cut_percentage = self.bid_cut_percentage().get();
@@ -100,6 +105,7 @@ pub trait EsdtNftMarketplace {
 			},
 			min_bid,
 			max_bid,
+			start_time,
 			deadline,
 			original_owner: self.blockchain().get_caller(),
 			current_bid: Self::BigUint::zero(),
@@ -122,6 +128,7 @@ pub trait EsdtNftMarketplace {
 		let (payment_amount, payment_token) = self.call_value().payment_token_pair();
 		let payment_token_nonce = self.call_value().esdt_token_nonce();
 		let caller = self.blockchain().get_caller();
+		let current_time = self.blockchain().get_block_timestamp();
 		let mut auction = self.auction_for_token(&nft_type, nft_nonce).get();
 
 		require!(
@@ -129,9 +136,10 @@ pub trait EsdtNftMarketplace {
 			"Can't bid on your own token"
 		);
 		require!(
-			self.blockchain().get_block_timestamp() < auction.deadline,
-			"Auction ended already"
+			current_time >= auction.start_time,
+			"Auction hasn't started yet"
 		);
+		require!(current_time < auction.deadline, "Auction ended already");
 		require!(
 			payment_token == auction.payment_token.token_type
 				&& payment_token_nonce == auction.payment_token.nonce,
@@ -310,11 +318,11 @@ pub trait EsdtNftMarketplace {
 	#[view(getMinMaxBid)]
 	fn get_min_max_bid(
 		&self,
-		nft_type: &TokenIdentifier,
+		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> OptionalResult<MultiResult2<Self::BigUint, Self::BigUint>> {
-		if self.is_already_up_for_auction(nft_type, nft_nonce) {
-			let auction = self.auction_for_token(nft_type, nft_nonce).get();
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
+			let auction = self.auction_for_token(&nft_type, nft_nonce).get();
 
 			OptionalResult::Some((auction.min_bid, auction.max_bid).into())
 		} else {
@@ -322,10 +330,23 @@ pub trait EsdtNftMarketplace {
 		}
 	}
 
+	#[view(getStartTime)]
+	fn get_start_time(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> OptionalResult<u64> {
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
+			OptionalResult::Some(
+				self.auction_for_token(&nft_type, nft_nonce)
+					.get()
+					.start_time,
+			)
+		} else {
+			OptionalResult::None
+		}
+	}
+
 	#[view(getDeadline)]
-	fn get_deadline(&self, nft_type: &TokenIdentifier, nft_nonce: u64) -> OptionalResult<u64> {
-		if self.is_already_up_for_auction(nft_type, nft_nonce) {
-			OptionalResult::Some(self.auction_for_token(nft_type, nft_nonce).get().deadline)
+	fn get_deadline(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> OptionalResult<u64> {
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
+			OptionalResult::Some(self.auction_for_token(&nft_type, nft_nonce).get().deadline)
 		} else {
 			OptionalResult::None
 		}
@@ -334,12 +355,12 @@ pub trait EsdtNftMarketplace {
 	#[view(getOriginalOwner)]
 	fn get_original_owner(
 		&self,
-		nft_type: &TokenIdentifier,
+		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> OptionalResult<Address> {
-		if self.is_already_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
 			OptionalResult::Some(
-				self.auction_for_token(nft_type, nft_nonce)
+				self.auction_for_token(&nft_type, nft_nonce)
 					.get()
 					.original_owner,
 			)
@@ -351,12 +372,12 @@ pub trait EsdtNftMarketplace {
 	#[view(getCurrentWinningBid)]
 	fn get_current_winning_bid(
 		&self,
-		nft_type: &TokenIdentifier,
+		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> OptionalResult<Self::BigUint> {
-		if self.is_already_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
 			OptionalResult::Some(
-				self.auction_for_token(nft_type, nft_nonce)
+				self.auction_for_token(&nft_type, nft_nonce)
 					.get()
 					.current_bid,
 			)
@@ -368,12 +389,12 @@ pub trait EsdtNftMarketplace {
 	#[view(getCurrentWinner)]
 	fn get_current_winner(
 		&self,
-		nft_type: &TokenIdentifier,
+		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> OptionalResult<Address> {
-		if self.is_already_up_for_auction(nft_type, nft_nonce) {
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
 			OptionalResult::Some(
-				self.auction_for_token(nft_type, nft_nonce)
+				self.auction_for_token(&nft_type, nft_nonce)
 					.get()
 					.current_winner,
 			)
@@ -385,11 +406,11 @@ pub trait EsdtNftMarketplace {
 	#[view(getFullAuctionData)]
 	fn get_full_auction_data(
 		&self,
-		nft_type: &TokenIdentifier,
+		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> OptionalResult<Auction<Self::BigUint>> {
-		if self.is_already_up_for_auction(nft_type, nft_nonce) {
-			OptionalResult::Some(self.auction_for_token(nft_type, nft_nonce).get())
+		if self.is_already_up_for_auction(&nft_type, nft_nonce) {
+			OptionalResult::Some(self.auction_for_token(&nft_type, nft_nonce).get())
 		} else {
 			OptionalResult::None
 		}
