@@ -81,14 +81,7 @@
         },
         {
             "step": "setState",
-            "comment": "reset current block timestamp",
-            "currentBlockInfo": {
-                "blockTimestamp": "123,000"
-            }
-        },
-        {
-            "step": "setState",
-            "comment": "give user some random tokens",
+            "comment": "give user some random tokens and reset timestamp",
             "accounts": {
                 "address:first_bidder": {
                     "nonce": "0",
@@ -98,6 +91,9 @@
                     },
                     "storage": {}
                 }
+            },
+            "currentBlockInfo": {
+                "blockTimestamp": "123,000"
             }
         },
         {
