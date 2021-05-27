@@ -82,12 +82,18 @@ pub trait Vault {
 	) {
 		self.retrieve_funds_event(&token, &amount);
 
+		let caller = self.blockchain().get_caller();
 		let data = match &return_message {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		self.send()
-			.direct_via_async_call(&self.blockchain().get_caller(), &token, &amount, data);
+
+		if token.is_egld() {
+			self.send().direct_egld(&caller, &amount, data);
+		} else {
+			self.send()
+				.transfer_esdt_via_async_call(&caller, &token, &amount, data);
+		}
 	}
 
 	#[event("accept_funds")]

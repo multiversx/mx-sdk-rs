@@ -234,7 +234,7 @@ where
 			// fungible ESDT
 			self.api.direct_esdt_execute(
 				&self.to,
-				self.payment_token.as_esdt_identifier(),
+				&self.payment_token,
 				&self.payment_amount,
 				gas_limit,
 				self.endpoint_name.as_slice(),
@@ -244,7 +244,7 @@ where
 			// non-fungible/semi-fungible ESDT
 			self.api.direct_esdt_nft_execute(
 				&self.to,
-				self.payment_token.as_esdt_identifier(),
+				&self.payment_token,
 				self.payment_nonce,
 				&self.payment_amount,
 				gas_limit,

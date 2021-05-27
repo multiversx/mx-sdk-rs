@@ -132,7 +132,7 @@ pub trait Lottery {
 
 				let roles = self
 					.blockchain()
-					.get_esdt_local_roles(token_name.as_esdt_identifier());
+					.get_esdt_local_roles(&token_name);
 				require!(
 					roles.contains(&EsdtLocalRole::Burn),
 					"The contract can't burn the selected token!"
@@ -264,11 +264,11 @@ pub trait Lottery {
 			// The tokens will simply remain locked forever
 			let roles = self
 				.blockchain()
-				.get_esdt_local_roles(info.token_name.as_esdt_identifier());
+				.get_esdt_local_roles(&info.token_name);
 			if roles.contains(&EsdtLocalRole::Burn) {
 				self.send().esdt_local_burn(
 					self.blockchain().get_gas_left(),
-					info.token_name.as_esdt_identifier(),
+					&info.token_name,
 					&burn_amount,
 				);
 			}

@@ -59,7 +59,7 @@ pub trait Crowdfunding {
 			self.blockchain().get_sc_balance()
 		} else {
 			self.blockchain()
-				.get_esdt_balance(&sc_address, token.as_esdt_identifier(), 0)
+				.get_esdt_balance(&sc_address, &token, 0)
 		}
 	}
 
