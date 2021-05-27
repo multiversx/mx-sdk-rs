@@ -42,6 +42,11 @@ impl TokenIdentifier {
 	}
 
 	#[inline]
+	pub fn len(&self) -> usize {
+		self.0.len()
+	}
+
+	#[inline]
 	pub fn into_boxed_bytes(self) -> BoxedBytes {
 		self.0
 	}
