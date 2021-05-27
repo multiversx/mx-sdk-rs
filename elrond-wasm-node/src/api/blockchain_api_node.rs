@@ -1,7 +1,9 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::BlockchainApi;
-use elrond_wasm::types::{Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, H256};
+use elrond_wasm::types::{
+	Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
+};
 
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
@@ -220,7 +222,12 @@ impl BlockchainApi for ArwenApiImpl {
 	}
 
 	#[inline]
-	fn get_esdt_balance(&self, address: &Address, token: &TokenIdentifier, nonce: u64) -> ArwenBigUint {
+	fn get_esdt_balance(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+	) -> ArwenBigUint {
 		unsafe {
 			let result = bigIntNew(0);
 			bigIntGetESDTExternalBalance(
