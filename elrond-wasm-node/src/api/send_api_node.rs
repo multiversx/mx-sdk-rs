@@ -160,7 +160,7 @@ impl SendApi for ArwenApiImpl {
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		amount: &ArwenBigUint,
 		gas_limit: u64,
 		function: &[u8],
@@ -191,7 +191,7 @@ impl SendApi for ArwenApiImpl {
 	fn direct_esdt_nft_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		nonce: u64,
 		amount: &ArwenBigUint,
 		gas_limit: u64,

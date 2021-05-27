@@ -88,7 +88,7 @@ impl SendApi for TxContext {
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		amount: &RustBigUint,
 		_gas: u64,
 		_function: &[u8],
@@ -113,7 +113,7 @@ impl SendApi for TxContext {
 	fn direct_esdt_nft_execute(
 		&self,
 		_to: &Address,
-		_token: &[u8],
+		_token: &TokenIdentifier,
 		_nonce: u64,
 		_amount: &RustBigUint,
 		_gas_limit: u64,
