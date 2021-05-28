@@ -1,9 +1,9 @@
-use crate::api::EllipticCurveApi;
-use crate::abi::TypeAbi;
 use super::BigUintUncallable;
-use alloc::string::String;
+use crate::abi::TypeAbi;
+use crate::api::EllipticCurveApi;
 use crate::elrond_codec::*;
 use crate::types::BoxedBytes;
+use alloc::string::String;
 
 /// Dummy type that implements `EllipticCurveApi`.
 /// Currently used to simplify generating ABIs, since we are not interested in values there.
@@ -11,15 +11,15 @@ use crate::types::BoxedBytes;
 pub struct EllipticCurveUncallable;
 
 impl TypeAbi for EllipticCurveUncallable {
-    fn type_name() -> String {
-        String::from("EllipticCurve")
-    }
+	fn type_name() -> String {
+		String::from("EllipticCurve")
+	}
 }
 
 impl NestedEncode for EllipticCurveUncallable {
-    const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
 
-    fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
+	fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
 		unreachable!()
 	}
 
@@ -82,67 +82,89 @@ impl TopDecode for EllipticCurveUncallable {
 	}
 }
 
-impl EllipticCurveApi for EllipticCurveUncallable{
-    type EllipticCurve = EllipticCurveUncallable;
-    type BigUint = BigUintUncallable;
+impl EllipticCurveApi for EllipticCurveUncallable {
+	type EllipticCurve = EllipticCurveUncallable;
+	type BigUint = BigUintUncallable;
 
-    fn new_elliptic_curve(_field_order: Self::BigUint, _base_point_order: Self::BigUint, _eq_constant: Self::BigUint, _x_base_point: Self::BigUint, _y_base_point: Self::BigUint, _size_of_field: i32) -> Self {
-        unreachable!()
-    }
+	fn new_elliptic_curve(
+		_field_order: Self::BigUint,
+		_base_point_order: Self::BigUint,
+		_eq_constant: Self::BigUint,
+		_x_base_point: Self::BigUint,
+		_y_base_point: Self::BigUint,
+		_size_of_field: i32,
+	) -> Self {
+		unreachable!()
+	}
 
-    fn p224_ec() -> Self {
-        unreachable!()
-    }
+	fn p224_ec() -> Self {
+		unreachable!()
+	}
 
-    fn p256_ec() -> Self {
-        unreachable!()
-    }
+	fn p256_ec() -> Self {
+		unreachable!()
+	}
 
-    fn p384_ec() -> Self {
-        unreachable!()
-    }
+	fn p384_ec() -> Self {
+		unreachable!()
+	}
 
-    fn p521_ec() -> Self {
-        unreachable!()
-    }
+	fn p521_ec() -> Self {
+		unreachable!()
+	}
 
-    fn add_ec(&self, _curve: &Self::EllipticCurve, _x_first_point: Self::BigUint, _y_first_point: Self::BigUint, _x_second_point: Self::BigUint, _y_second_point: Self::BigUint) ->(Self::BigUint,Self::BigUint) {
-        unreachable!()
-    }
+	fn add_ec(
+		&self,
+		_x_first_point: Self::BigUint,
+		_y_first_point: Self::BigUint,
+		_x_second_point: Self::BigUint,
+		_y_second_point: Self::BigUint,
+	) -> (Self::BigUint, Self::BigUint) {
+		unreachable!()
+	}
 
-    fn double_ec(&self, _curve: &Self::EllipticCurve, _x_point: Self::BigUint, _y_point: Self::BigUint) -> (Self::BigUint, Self::BigUint) {
-        unreachable!()
-    }
+	fn double_ec(
+		&self,
+		_x_point: Self::BigUint,
+		_y_point: Self::BigUint,
+	) -> (Self::BigUint, Self::BigUint) {
+		unreachable!()
+	}
 
-    fn is_on_curve_ec(&self, _curve: &Self::EllipticCurve, _x_point: Self::BigUint, _y_point: Self::BigUint) -> bool {
-        unreachable!()
-    }
+	fn is_on_curve_ec(&self, _x_point: Self::BigUint, _y_point: Self::BigUint) -> bool {
+		unreachable!()
+	}
 
-    fn scalar_mult(&self, _curve: &Self::EllipticCurve, _x_point: Self::BigUint, _y_point: Self::BigUint, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        unreachable!()
-    }
+	fn scalar_mult(
+		&self,
+		_x_point: Self::BigUint,
+		_y_point: Self::BigUint,
+		_data: BoxedBytes,
+	) -> (Self::BigUint, Self::BigUint) {
+		unreachable!()
+	}
 
-    fn scalar_base_mult(&self, _curve: &Self::EllipticCurve, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        unreachable!()
-    }
+	fn scalar_base_mult(&self, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+		unreachable!()
+	}
 
-    fn marshal_ec(&self, _curve: &Self::EllipticCurve, _x_pair: Self::BigUint, _y_pair: Self::BigUint) -> BoxedBytes {
-        unreachable!()
-    }
+	fn marshal_ec(&self, _x_pair: Self::BigUint, _y_pair: Self::BigUint) -> BoxedBytes {
+		unreachable!()
+	}
 
-    fn marshal_compressed_ec(&self, _curve: &Self::EllipticCurve, _x_pair: Self::BigUint, _y_pair: Self::BigUint) -> BoxedBytes {
-        unreachable!()
-    }
+	fn marshal_compressed_ec(&self, _x_pair: Self::BigUint, _y_pair: Self::BigUint) -> BoxedBytes {
+		unreachable!()
+	}
 
-    fn unmarshal_ec(&self, _curve: &Self::EllipticCurve, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        unreachable!()
-    }
+	fn unmarshal_ec(&self, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+		unreachable!()
+	}
 
-    fn unmarshal_compressed_ec(&self, _curve: &Self::EllipticCurve, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        unreachable!()
-    }
+	fn unmarshal_compressed_ec(&self, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+		unreachable!()
+	}
 
-    fn generate_key_ec(&self, _curve: &Self::EllipticCurve) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
-        unreachable!()
-    }
+	fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
+		unreachable!()
+	}
 }
