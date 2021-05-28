@@ -16,5 +16,4 @@ pub trait CryptoApi {
 	/// Note: the signature is minimum 2 bytes in length,
 	/// the second byte encodes the length of the remaining signature bytes.
 	fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool;
-
 }
