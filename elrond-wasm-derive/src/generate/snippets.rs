@@ -112,6 +112,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 		{
 			type BigUint = A::BigUint;
 			type BigInt = A::BigInt;
+			type EllipticCurve = A::EllipticCurve;
 			type Storage = A::Storage;
 			type CallValue = A::CallValue;
 			type SendApi = A::SendApi;
@@ -264,6 +265,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 		where
 			SA: elrond_wasm::api::SendApi + 'static,
 		{
+			type EllipticCurve = SA::EllipticCurveType;
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
 			type Storage = SA::ProxyStorage;
@@ -318,6 +320,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
 		where
 			SA: elrond_wasm::api::SendApi + 'static,
 		{
+			type EllipticCurve = SA::EllipticCurveType;
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
 			type Storage = SA::ProxyStorage;
