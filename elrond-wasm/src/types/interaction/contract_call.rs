@@ -11,6 +11,9 @@ use core::marker::PhantomData;
 /// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
 const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 
+/// In case of `transfer_execute`, we leave by default a little gas for the calling transaction to finish.
+const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
+
 /// Represents metadata for calling another contract.
 /// Can transform into either an async call, transfer call or other types of calls.
 #[must_use]
@@ -240,11 +243,23 @@ where
 		);
 	}
 
+	fn resolve_gas_limit_with_leftover(&self) -> u64 {
+		if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
+			let mut gas_left = self.api.get_gas_left();
+			if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
+				gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
+			}
+			gas_left
+		} else {
+			self.explicit_gas_limit
+		}
+	}
+
 	/// Immediately launches a transfer-execute call.
 	/// This is similar to an async call, but there is no callback
 	/// and there can be more than one such call per transaction.
 	pub fn transfer_execute(self) {
-		let gas_limit = self.resolve_gas_limit();
+		let gas_limit = self.resolve_gas_limit_with_leftover();
 		let result = if self.payment_token.is_egld() {
 			self.api.direct_egld_execute(
 				&self.to,
