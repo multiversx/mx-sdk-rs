@@ -85,7 +85,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		uri: BoxedBytes,
 	) {
 		self.send().esdt_nft_create::<Color>(
-			self.blockchain().get_gas_left(),
 			&token_identifier,
 			&amount,
 			&name,
@@ -103,22 +102,13 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		nonce: u64,
 		amount: Self::BigUint,
 	) {
-		self.send().esdt_nft_add_quantity(
-			self.blockchain().get_gas_left(),
-			&token_identifier,
-			nonce,
-			&amount,
-		);
+		self.send()
+			.esdt_nft_add_quantity(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint]
 	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
-		self.send().esdt_nft_burn(
-			self.blockchain().get_gas_left(),
-			&token_identifier,
-			nonce,
-			&amount,
-		);
+		self.send().esdt_nft_burn(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint]
