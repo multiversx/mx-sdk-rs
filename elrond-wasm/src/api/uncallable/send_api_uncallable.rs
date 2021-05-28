@@ -1,4 +1,4 @@
-use super::{BigIntUncallable, BigUintUncallable};
+use super::{BigIntUncallable, BigUintUncallable, EllipticCurveUncallable};
 use crate::api::SendApi;
 use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
 use alloc::vec::Vec;
@@ -7,6 +7,7 @@ impl SendApi for super::UncallableApi {
 	type AmountType = BigUintUncallable;
 	type ProxyBigInt = BigIntUncallable;
 	type ProxyStorage = Self;
+	type EllipticCurveType = EllipticCurveUncallable;
 
 	fn get_sc_address(&self) -> Address {
 		unreachable!()
