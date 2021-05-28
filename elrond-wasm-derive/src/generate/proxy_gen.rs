@@ -39,6 +39,9 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 				let mut token_count = 0;
 				let mut token_local_decl = quote! { ___token___ };
 				let mut token_expr = quote! { ___token___ };
+				let mut nonce_count = 0;
+				let mut nonce_local_decl = quote! { ___nonce___ };
+				let mut nonce_expr = quote! { ___nonce___ };
 
 				let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
 					.method_args
@@ -52,7 +55,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 								&arg_accumulator,
 								&quote! { ___api___.clone() },
 							),
-							ArgPaymentMetadata::Payment => {
+							ArgPaymentMetadata::PaymentAmount => {
 								payment_count += 1;
 								let pat = &arg.pat;
 								payment_local_decl = quote! { _ };
@@ -68,6 +71,14 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 
 								quote! {}
 							},
+							ArgPaymentMetadata::PaymentNonce => {
+								nonce_count += 1;
+								let pat = &arg.pat;
+								nonce_local_decl = quote! { _ };
+								nonce_expr = quote! { #pat };
+
+								quote! {}
+							},
 						}
 					})
 					.collect();
@@ -77,6 +88,9 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 				}
 				if token_count > 1 {
 					panic!("No more than one payment token argument allowed in call proxy");
+				}
+				if nonce_count > 1 {
+					panic!("No more than one payment nonce argument allowed in call proxy");
 				}
 
 				let endpoint_name_literal = byte_str_slice_literal(&endpoint_name.as_bytes());
@@ -89,7 +103,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 							___address___,
 							#token_expr,
 							#payment_expr,
-							___nonce___,
+							#nonce_expr,
 							elrond_wasm::types::BoxedBytes::from(#endpoint_name_literal),
 						);
 						#(#arg_push_snippets)*

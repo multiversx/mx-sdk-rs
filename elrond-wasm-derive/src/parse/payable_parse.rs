@@ -12,8 +12,9 @@ pub fn process_payable(m: &syn::TraitItemMethod) -> MethodPayableMetadata {
 				_ => MethodPayableMetadata::SingleEsdtToken(identifier),
 			}
 		} else {
-			eprintln!("Warning: usage of #[payable] without argument is deprecated. Replace with #[payable(\"EGLD\")]. Method name: {}", m.sig.ident.to_string());
-			MethodPayableMetadata::Egld
+			panic!(
+				"Endpoint `payable` attribute requires one argument. Replace with `#[payable(\"*\")]` or `#[payable(\"EGLD\")]`. Method name: {}",
+				m.sig.ident.to_string())
 		}
 	} else {
 		MethodPayableMetadata::NotPayable
