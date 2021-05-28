@@ -1,7 +1,11 @@
-use super::{BigIntApi, BigUintApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi};
+use super::{
+	BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi,
+};
 use crate::types::{Address, TokenIdentifier};
 
 pub trait ProxyObjApi {
+	type EllipticCurve: EllipticCurveApi + 'static;
+
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
@@ -27,6 +31,8 @@ pub trait ProxyObjApi {
 }
 
 pub trait CallbackProxyObjApi {
+	type EllipticCurve: EllipticCurveApi + 'static;
+
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
