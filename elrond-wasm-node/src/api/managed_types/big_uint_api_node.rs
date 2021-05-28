@@ -1,4 +1,4 @@
-use super::unsafe_buffer;
+use crate::api::unsafe_buffer;
 use crate::error_hook;
 
 use core::cmp::Ordering;
