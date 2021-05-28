@@ -11,9 +11,9 @@ pub trait ForwarderTransferExecuteModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: Self::BigUint,
+		#[payment_amount] payment: Self::BigUint,
+		#[payment_nonce] token_nonce: u64,
 	) {
-		let token_nonce = self.call_value().esdt_token_nonce();
 		self.vault_proxy(to)
 			.accept_funds(token, payment)
 			.with_nft_nonce(token_nonce)
@@ -27,9 +27,9 @@ pub trait ForwarderTransferExecuteModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: Self::BigUint,
+		#[payment_amount] payment: Self::BigUint,
+		#[payment_nonce] token_nonce: u64,
 	) {
-		let token_nonce = self.call_value().esdt_token_nonce();
 		let half_payment = payment / Self::BigUint::from(2u32);
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
