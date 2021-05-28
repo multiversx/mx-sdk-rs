@@ -95,12 +95,12 @@ pub trait EgldEsdtSwap {
 		);
 
 		let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
-		let esdt_token_id = wrapped_egld_token_id.as_esdt_identifier();
+		let esdt_token_id = wrapped_egld_token_id;
 		let caller = self.blockchain().get_caller();
 		self.mint_started_event(&caller, &amount);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.mint(esdt_token_id, &amount)
+			.mint(&esdt_token_id, &amount)
 			.async_call()
 			.with_callback(self.callbacks().esdt_mint_callback(&caller, &amount)))
 	}
@@ -144,9 +144,9 @@ pub trait EgldEsdtSwap {
 		self.unused_wrapped_egld().set(&unused_wrapped_egld);
 
 		let caller = self.blockchain().get_caller();
-		let _ = self.send().direct_esdt_via_transf_exec(
+		let _ = self.send().direct(
 			&caller,
-			self.wrapped_egld_token_id().get().as_esdt_identifier(),
+			&self.wrapped_egld_token_id().get(),
 			&payment,
 			b"wrapping",
 		);

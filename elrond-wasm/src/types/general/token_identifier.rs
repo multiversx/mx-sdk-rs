@@ -33,12 +33,22 @@ impl TokenIdentifier {
 
 	#[inline]
 	pub fn is_egld(&self) -> bool {
-		self.0.is_empty()
+		self.is_empty()
 	}
 
 	#[inline]
 	pub fn is_esdt(&self) -> bool {
 		!self.is_egld()
+	}
+
+	#[inline]
+	pub fn len(&self) -> usize {
+		self.0.len()
+	}
+
+	#[inline]
+	pub fn is_empty(&self) -> bool {
+		self.0.is_empty()
 	}
 
 	#[inline]
@@ -57,6 +67,11 @@ impl TokenIdentifier {
 	#[inline]
 	pub fn as_esdt_identifier(&self) -> &[u8] {
 		self.0.as_slice()
+	}
+
+	#[inline]
+	pub fn as_ptr(&self) -> *const u8 {
+		self.0.as_ptr()
 	}
 
 	#[inline]
