@@ -1,16 +1,12 @@
 use super::{arg_str_serialize::arg_serialize_push, snippets, util::*};
 use crate::model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole};
 
-/// Excludes the `#[call_result]`.
+/// Excludes the `#[call_result]` and the payment args.
 pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::TokenStream> {
 	method_args
 		.iter()
 		.filter_map(|arg| {
-			if matches!(
-				arg.metadata.payment,
-				ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
-			) || arg.metadata.callback_call_result
-			{
+			if arg.metadata.payment.is_payment_arg() || arg.metadata.callback_call_result {
 				None
 			} else {
 				let pat = &arg.pat;
