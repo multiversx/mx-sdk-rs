@@ -11,11 +11,7 @@ impl elrond_wasm::api::ContractBase for TxContext {
 	type CryptoApi = Self;
 	type LogApi = Self;
 	type ErrorApi = Self;
-    type EllipticCurve = EllipticCurveMock;
-
-    fn elliptic_curve(&self) -> Self::EllipticCurve {
-        self.clone()
-    }
+	type EllipticCurve = EllipticCurveMock;
 
 	fn get_storage_raw(&self) -> Self::Storage {
 		self.clone()
