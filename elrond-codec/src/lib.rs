@@ -61,7 +61,7 @@ pub enum TypeInfo {
 	BigUint,
 	BigInt,
 	Unit,
-    EllipticCurve,
+	EllipticCurve,
 }
 
 /// Until we have derive capabilities, here are some structures with explicit encode/decode, for testing.

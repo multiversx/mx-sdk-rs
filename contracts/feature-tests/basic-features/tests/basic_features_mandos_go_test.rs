@@ -285,7 +285,7 @@ fn storage_vec_u8_go() {
 
 #[test]
 fn sqrt() {
-    elrond_wasm_debug::mandos_go("mandos/sqrt.scen.json");
+	elrond_wasm_debug::mandos_go("mandos/sqrt.scen.json");
 }
 
 #[test]

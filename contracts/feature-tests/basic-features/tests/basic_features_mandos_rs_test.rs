@@ -306,15 +306,15 @@ fn storage_vec_u8_rs() {
 
 #[test]
 fn sqrt() {
-    elrond_wasm_debug::mandos_rs("mandos/sqrt.scen.json",&contract_map());
+	elrond_wasm_debug::mandos_rs("mandos/sqrt.scen.json", &contract_map());
 }
 
 #[test]
 fn log2() {
-	elrond_wasm_debug::mandos_rs("mandos/log2_func.scen.json",&contract_map());
+	elrond_wasm_debug::mandos_rs("mandos/log2_func.scen.json", &contract_map());
 }
 
 #[test]
 fn pow() {
-	elrond_wasm_debug::mandos_rs("mandos/pow_func.scen.json",&contract_map());
+	elrond_wasm_debug::mandos_rs("mandos/pow_func.scen.json", &contract_map());
 }
