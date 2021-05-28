@@ -17,7 +17,8 @@ pub trait ForwarderTransferExecuteModule {
 		self.vault_proxy(to)
 			.accept_funds(token, payment)
 			.with_nft_nonce(token_nonce)
-			.transfer_execute(self.blockchain().get_gas_left());
+			.with_gas_limit(self.blockchain().get_gas_left())
+			.transfer_execute();
 	}
 
 	#[endpoint]
@@ -35,11 +36,13 @@ pub trait ForwarderTransferExecuteModule {
 		self.vault_proxy(to.clone())
 			.accept_funds(token.clone(), half_payment.clone())
 			.with_nft_nonce(token_nonce)
-			.transfer_execute(half_gas);
+			.with_gas_limit(half_gas)
+			.transfer_execute();
 
 		self.vault_proxy(to)
 			.accept_funds(token, half_payment)
 			.with_nft_nonce(token_nonce)
-			.transfer_execute(half_gas);
+			.with_gas_limit(half_gas)
+			.transfer_execute();
 	}
 }

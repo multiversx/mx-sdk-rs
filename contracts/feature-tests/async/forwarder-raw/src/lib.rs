@@ -92,7 +92,8 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		self.forward_contract_call(to, TokenIdentifier::egld(), payment, endpoint_name, args)
-			.transfer_execute(self.blockchain().get_gas_left() / 2);
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
+			.transfer_execute();
 	}
 
 	#[endpoint]
@@ -106,7 +107,8 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
-			.transfer_execute(self.blockchain().get_gas_left() / 2);
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
+			.transfer_execute();
 	}
 
 	#[endpoint]
@@ -120,7 +122,8 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
-			.transfer_execute(self.blockchain().get_gas_left() / 2);
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
+			.transfer_execute();
 	}
 
 	#[view]
