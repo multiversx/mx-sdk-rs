@@ -1,6 +1,7 @@
+use crate::api::RustBigUint;
 use crate::TxContext;
 use elrond_wasm::api::CryptoApi;
-use elrond_wasm::types::{BoxedBytes, EllipticCurve, H256};
+use elrond_wasm::types::H256;
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
