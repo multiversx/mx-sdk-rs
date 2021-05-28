@@ -19,11 +19,6 @@ fn payable_any_4_go() {
 }
 
 #[test]
-fn payable_egld_0_go() {
-	elrond_wasm_debug::mandos_go("mandos/payable_egld_0.scen.json");
-}
-
-#[test]
 fn payable_egld_1_go() {
 	elrond_wasm_debug::mandos_go("mandos/payable_egld_1.scen.json");
 }
