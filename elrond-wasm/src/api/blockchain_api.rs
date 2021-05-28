@@ -1,6 +1,6 @@
 use super::{BigUintApi, ErrorApi, StorageReadApi};
 use crate::storage;
-use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, H256, TokenIdentifier, Vec};
+use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, TokenIdentifier, Vec, H256};
 use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
@@ -56,7 +56,12 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
 	fn get_current_esdt_nft_nonce(&self, address: &Address, token_id: &TokenIdentifier) -> u64;
 
-	fn get_esdt_balance(&self, address: &Address, token_id: &TokenIdentifier, nonce: u64) -> Self::BalanceType;
+	fn get_esdt_balance(
+		&self,
+		address: &Address,
+		token_id: &TokenIdentifier,
+		nonce: u64,
+	) -> Self::BalanceType;
 
 	fn get_esdt_token_data(
 		&self,

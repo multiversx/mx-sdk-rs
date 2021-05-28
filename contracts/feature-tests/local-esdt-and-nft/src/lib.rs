@@ -54,20 +54,14 @@ pub trait LocalEsdtAndEsdtNft {
 
 	#[endpoint(localMint)]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_mint(
-			self.blockchain().get_gas_left(),
-			&token_identifier,
-			&amount,
-		);
+		self.send()
+			.esdt_local_mint(self.blockchain().get_gas_left(), &token_identifier, &amount);
 	}
 
 	#[endpoint(localBurn)]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_burn(
-			self.blockchain().get_gas_left(),
-			&token_identifier,
-			&amount,
-		);
+		self.send()
+			.esdt_local_burn(self.blockchain().get_gas_left(), &token_identifier, &amount);
 	}
 
 	// Non-Fungible Tokens
@@ -233,11 +227,7 @@ pub trait LocalEsdtAndEsdtNft {
 		#[var_args] roles: VarArgs<EsdtLocalRole>,
 	) -> AsyncCall<Self::SendApi> {
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.set_special_roles(
-				&address,
-				&token_identifier,
-				roles.as_slice(),
-			)
+			.set_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
 			.with_callback(self.callbacks().change_roles_callback())
 	}
@@ -250,11 +240,7 @@ pub trait LocalEsdtAndEsdtNft {
 		#[var_args] roles: VarArgs<EsdtLocalRole>,
 	) -> AsyncCall<Self::SendApi> {
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.unset_special_roles(
-				&address,
-				&token_identifier,
-				roles.as_slice(),
-			)
+			.unset_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
 			.with_callback(self.callbacks().change_roles_callback())
 	}
