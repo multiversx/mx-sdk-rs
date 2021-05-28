@@ -2,7 +2,7 @@ use super::big_uint_api_mock::*;
 use crate::TxContext;
 use elrond_wasm::{
 	api::BigUintApi,
-	types::{Address, EsdtTokenData, H256, TokenIdentifier},
+	types::{Address, EsdtTokenData, TokenIdentifier, H256},
 };
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
@@ -108,14 +108,23 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
 	}
 
 	// TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
-	fn get_esdt_balance(&self, address: &Address, token: &TokenIdentifier, _nonce: u64) -> RustBigUint {
+	fn get_esdt_balance(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		_nonce: u64,
+	) -> RustBigUint {
 		if address != &self.get_sc_address() {
 			panic!(
 				"get_esdt_balance not yet implemented for accounts other than the contract itself"
 			);
 		}
 
-		match self.blockchain_info_box.contract_esdt.get(&token.as_esdt_identifier().to_vec()) {
+		match self
+			.blockchain_info_box
+			.contract_esdt
+			.get(&token.as_esdt_identifier().to_vec())
+		{
 			Some(value) => value.clone().into(),
 			None => RustBigUint::zero(),
 		}

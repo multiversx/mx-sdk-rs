@@ -35,12 +35,7 @@ pub trait ForwarderRaw {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: Self::BigUint,
 	) {
-		let _ = self.send().direct(
-			&to,
-			&token,
-			&payment,
-			&[],
-		);
+		let _ = self.send().direct(&to, &token, &payment, &[]);
 	}
 
 	fn forward_contract_call(
