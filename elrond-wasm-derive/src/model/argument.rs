@@ -20,8 +20,20 @@ pub struct ArgMetadata {
 #[derive(Clone, Debug)]
 pub enum ArgPaymentMetadata {
 	NotPayment,
-	Payment,
+	PaymentAmount,
 	PaymentToken,
+	PaymentNonce,
+}
+
+impl ArgPaymentMetadata {
+	pub fn is_payment_arg(&self) -> bool {
+		matches!(
+			self,
+			ArgPaymentMetadata::PaymentAmount
+				| ArgPaymentMetadata::PaymentToken
+				| ArgPaymentMetadata::PaymentNonce
+		)
+	}
 }
 
 impl MethodArgument {

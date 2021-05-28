@@ -70,15 +70,14 @@ pub trait ForwarderSyncCallModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: Self::BigUint,
+		#[payment_amount] payment: Self::BigUint,
+		#[payment_nonce] token_nonce: u64,
 	) {
 		let half_gas = self.blockchain().get_gas_left() / 2;
-		let token_nonce = self.call_value().esdt_token_nonce();
 
 		let result: MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64> = self
 			.vault_proxy(to)
-			.with_nft_nonce(token_nonce)
-			.accept_funds_echo_payment(token, payment)
+			.accept_funds_echo_payment(token, payment, token_nonce)
 			.with_gas_limit(half_gas)
 			.execute_on_dest_context();
 
@@ -106,10 +105,9 @@ pub trait ForwarderSyncCallModule {
 		&self,
 		to: Address,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: Self::BigUint,
+		#[payment_amount] payment: Self::BigUint,
+		#[payment_nonce] token_nonce: u64,
 	) -> usize {
-		let token_nonce = self.call_value().esdt_token_nonce();
-
 		let _ = self
 			.vault_proxy(to.clone())
 			.with_nft_nonce(token_nonce)
