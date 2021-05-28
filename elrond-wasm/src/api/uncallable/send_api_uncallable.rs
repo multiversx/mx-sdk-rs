@@ -12,6 +12,10 @@ impl SendApi for super::UncallableApi {
 		unreachable!()
 	}
 
+	fn get_gas_left(&self) -> u64 {
+		unreachable!()
+	}
+
 	fn direct_egld(&self, _to: &Address, _amount: &BigUintUncallable, _data: &[u8]) {
 		unreachable!()
 	}

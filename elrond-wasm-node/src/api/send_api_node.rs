@@ -117,6 +117,11 @@ impl SendApi for ArwenApiImpl {
 		BlockchainApi::get_sc_address(self)
 	}
 
+	#[inline]
+	fn get_gas_left(&self) -> u64 {
+		BlockchainApi::get_gas_left(self)
+	}
+
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);

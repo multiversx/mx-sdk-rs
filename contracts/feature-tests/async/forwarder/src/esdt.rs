@@ -106,13 +106,11 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
 	#[endpoint]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send()
-			.esdt_local_mint(self.blockchain().get_gas_left(), &token_identifier, &amount);
+		self.send().esdt_local_mint(&token_identifier, &amount);
 	}
 
 	#[endpoint]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send()
-			.esdt_local_burn(self.blockchain().get_gas_left(), &token_identifier, &amount);
+		self.send().esdt_local_burn(&token_identifier, &amount);
 	}
 }

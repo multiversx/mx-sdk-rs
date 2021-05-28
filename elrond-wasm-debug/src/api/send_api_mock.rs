@@ -58,6 +58,10 @@ impl SendApi for TxContext {
 		BlockchainApi::get_sc_address(self)
 	}
 
+	fn get_gas_left(&self) -> u64 {
+		BlockchainApi::get_gas_left(self)
+	}
+
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if amount.value() > self.get_available_egld_balance() {
 			std::panic::panic_any(TxPanic {

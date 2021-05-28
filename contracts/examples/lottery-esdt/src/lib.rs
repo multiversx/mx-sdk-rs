@@ -262,11 +262,7 @@ pub trait Lottery {
 			// The tokens will simply remain locked forever
 			let roles = self.blockchain().get_esdt_local_roles(&info.token_name);
 			if roles.contains(&EsdtLocalRole::Burn) {
-				self.send().esdt_local_burn(
-					self.blockchain().get_gas_left(),
-					&info.token_name,
-					&burn_amount,
-				);
+				self.send().esdt_local_burn(&info.token_name, &burn_amount);
 			}
 
 			info.prize_pool -= burn_amount;

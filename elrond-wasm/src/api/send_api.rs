@@ -26,6 +26,10 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Same as the implementation from BlockchainApi.
 	fn get_sc_address(&self) -> Address;
 
+	/// To be used internally by the SendApi implementation.
+	/// Do not use directly from contracts. It might be removed from this trait at some point or reworked.
+	fn get_gas_left(&self) -> u64;
+
 	/// Sends EGLD to a given address, directly.
 	/// Used especially for sending EGLD to regular accounts.
 	fn direct_egld(&self, to: &Address, amount: &Self::AmountType, data: &[u8]);
@@ -198,21 +202,21 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer);
 
 	/// Allows synchronous minting of ESDT tokens. Execution is resumed afterwards.
-	fn esdt_local_mint(&self, gas: u64, token: &TokenIdentifier, amount: &Self::AmountType) {
+	fn esdt_local_mint(&self, token: &TokenIdentifier, amount: &Self::AmountType) {
 		let mut arg_buffer = ArgBuffer::new();
 		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.call_local_esdt_built_in_function(gas, b"ESDTLocalMint", &arg_buffer);
+		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTLocalMint", &arg_buffer);
 	}
 
 	/// Allows synchronous burning of ESDT tokens. Execution is resumed afterwards.
-	fn esdt_local_burn(&self, gas: u64, token: &TokenIdentifier, amount: &Self::AmountType) {
+	fn esdt_local_burn(&self, token: &TokenIdentifier, amount: &Self::AmountType) {
 		let mut arg_buffer = ArgBuffer::new();
 		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.call_local_esdt_built_in_function(gas, b"ESDTLocalBurn", &arg_buffer);
+		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTLocalBurn", &arg_buffer);
 	}
 
 	/// Creates a new NFT token of a certain type (determined by `token_identifier`).  
@@ -220,7 +224,6 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// This is a built-in function, so the smart contract execution is resumed after.
 	fn esdt_nft_create<T: elrond_codec::TopEncode>(
 		&self,
-		gas: u64,
 		token: &TokenIdentifier,
 		amount: &Self::AmountType,
 		name: &BoxedBytes,
@@ -249,14 +252,13 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 			arg_buffer.push_argument_bytes(top_encoded_uri.as_slice());
 		}
 
-		self.call_local_esdt_built_in_function(gas, b"ESDTNFTCreate", &arg_buffer);
+		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTNFTCreate", &arg_buffer);
 	}
 
 	/// Adds quantity for an Non-Fungible Token. (which makes it a Semi-Fungible Token by definition)  
 	/// This is a built-in function, so the smart contract execution is resumed after.
 	fn esdt_nft_add_quantity(
 		&self,
-		gas: u64,
 		token: &TokenIdentifier,
 		nonce: u64,
 		amount: &Self::AmountType,
@@ -266,24 +268,22 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.call_local_esdt_built_in_function(gas, b"ESDTNFTAddQuantity", &arg_buffer);
+		self.call_local_esdt_built_in_function(
+			self.get_gas_left(),
+			b"ESDTNFTAddQuantity",
+			&arg_buffer,
+		);
 	}
 
 	/// The reverse operation of `esdt_nft_add_quantity`, this locally decreases
 	/// This is a built-in function, so the smart contract execution is resumed after.
-	fn esdt_nft_burn(
-		&self,
-		gas: u64,
-		token: &TokenIdentifier,
-		nonce: u64,
-		amount: &Self::AmountType,
-	) {
+	fn esdt_nft_burn(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType) {
 		let mut arg_buffer = ArgBuffer::new();
 		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
 		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.call_local_esdt_built_in_function(gas, b"ESDTNFTBurn", &arg_buffer);
+		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTNFTBurn", &arg_buffer);
 	}
 
 	/// Performs a simple ESDT NFT transfer, but via async call.
