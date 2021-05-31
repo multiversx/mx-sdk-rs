@@ -1,12 +1,18 @@
 ALICE="${USERS}/alice.pem"
+BOB="${USERS}/bob.pem"
+
 ADDRESS=$(erdpy data load --key=address-devnet)
 DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-devnet)
-DEPLOY_ARGUMENTS="12 4096 0xABBAABBA"
+
 DEPLOY_GAS="80000000"
+TARGET=10
+DEADLINE_UNIX_TIMESTAMP=1609452000 # Fri Jan 01 2021 00:00:00 GMT+0200 (Eastern European Standard Time)
+EGLD_TOKEN_ID=0x45474c44 # "EGLD"
 
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
-          --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
+          --gas-limit=${DEPLOY_GAS} \
+          --arguments ${TARGET} ${DEADLINE_UNIX_TIMESTAMP} ${EGLD_TOKEN_ID} \
           --outfile="deploy-devnet.interaction.json" --send || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['hash']")
@@ -21,7 +27,8 @@ deploy() {
 
 deploySimulate() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
-          --gas-limit=${DEPLOY_GAS} --arguments ${DEPLOY_ARGUMENTS} \
+          --gas-limit=${DEPLOY_GAS} \
+          --arguments ${TARGET} ${DEADLINE_UNIX_TIMESTAMP} ${EGLD_TOKEN_ID} \
           --outfile="simulate-devnet.interaction.json" --simulate || return
 
     TRANSACTION=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['hash']")
@@ -41,16 +48,46 @@ checkDeployment() {
     erdpy account get --address=$ADDRESS --omit-fields="['code']"
 }
 
+# BOB sends funds
+sendFunds() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${BOB} --gas-limit=10000000 \
+        --function="fund" --value=5 \
+        --send
+}
+
+# ALICE claims
+claimFunds() {
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=10000000 \
+        --function="claim" \
+        --send
+}
+
+# 0 - Funding Period
+# 1 - Successful
+# 2 - Failed
 status() {
     erdpy --verbose contract query ${ADDRESS} --function="status"
 }
 
-currentFunds() {
-    erdpy --verbose contract query ${ADDRESS} --function="currentFunds"
+getCurrentFunds() {
+    erdpy --verbose contract query ${ADDRESS} --function="getCurrentFunds"
 }
 
-sendFunds() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=10000000 \
-        --function="fund" --value=3\
-        --send
+getTarget() {
+    erdpy --verbose contract query ${ADDRESS} --function="getTarget"
+}
+
+getDeadline() {
+    erdpy --verbose contract query ${ADDRESS} --function="getDeadline"
+}
+
+# BOB's deposit
+getDeposit() {
+    local BOB_ADDRESS=0x8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8
+
+    erdpy --verbose contract query ${ADDRESS} --function="getDeposit" --arguments ${BOB_ADDRESS}
+}
+
+getDeadline() {
+    erdpy --verbose contract query ${ADDRESS} --function="getCrowdfundingTokenName"
 }
