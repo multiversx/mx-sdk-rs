@@ -1,5 +1,6 @@
 {
     "name": "approve siring",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,7 +11,7 @@
             "txId": "tx-approve-siring",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:kitty_ownership_contract_address",
+                "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "approveSiring",
                 "arguments": [
@@ -30,12 +31,12 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:kitty_ownership_contract_address": {
+                "sc:kitty_ownership_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:geneScienceContractAddress": "address:kitty_genetic_alg_contract_address",
-                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:geneScienceContractAddress": "sc:kitty_genetic_alg",
+                        "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:birthFee": "10",
                         "str:totalKitties": "3",
 
@@ -52,7 +53,8 @@
                         "str:sireAllowedAddress|u32:1": "address:acc2"
                     },
                     "code": "file:../output/kitty-ownership.wasm"
-                }
+                },
+                "+": ""
             }
         }
     ]

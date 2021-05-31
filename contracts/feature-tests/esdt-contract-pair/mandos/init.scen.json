@@ -1,5 +1,6 @@
 {
     "name": "init",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
@@ -14,12 +15,12 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "0",
-                    "newAddress": "address:first_contract"
+                    "newAddress": "sc:first_contract"
                 },
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "1",
-                    "newAddress": "address:second_contract"
+                    "newAddress": "sc:second_contract"
                 }
             ]
         },
@@ -32,7 +33,7 @@
                 "value": "0",
                 "arguments": [
                     "str:cool_token",
-                    "address:second_contract"
+                    "sc:second_contract"
                 ],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -70,21 +71,24 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:first_contract": {
+                "sc:first_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "str:esdtTokenName": "str:cool_token",
-                        "str:secondContractAddress": "address:second_contract"
-                    }
+                        "str:secondContractAddress": "sc:second_contract"
+                    },
+                    "code": "*"
                 },
-                "address:second_contract": {
+                "sc:second_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "str:esdtTokenName": "str:cool_token"
-                    }
-                }
+                    },
+                    "code": "*"
+                },
+                "+": ""
             }
         }
     ]

@@ -58,6 +58,10 @@ impl SendApi for TxContext {
 		BlockchainApi::get_sc_address(self)
 	}
 
+	fn get_gas_left(&self) -> u64 {
+		BlockchainApi::get_gas_left(self)
+	}
+
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if amount.value() > self.get_available_egld_balance() {
 			std::panic::panic_any(TxPanic {
@@ -88,13 +92,13 @@ impl SendApi for TxContext {
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		amount: &RustBigUint,
 		_gas: u64,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) -> Result<(), &'static [u8]> {
-		if amount.value() > self.get_available_esdt_balance(token) {
+		if amount.value() > self.get_available_esdt_balance(token.as_esdt_identifier()) {
 			std::panic::panic_any(TxPanic {
 				status: 10,
 				message: b"insufficient funds".to_vec(),
@@ -104,7 +108,7 @@ impl SendApi for TxContext {
 		let mut tx_output = self.tx_output_cell.borrow_mut();
 		tx_output.send_balance_list.push(SendBalance {
 			recipient: to.clone(),
-			token: TokenIdentifier::from(token),
+			token: token.clone(),
 			amount: amount.value(),
 		});
 		Ok(())
@@ -113,7 +117,7 @@ impl SendApi for TxContext {
 	fn direct_esdt_nft_execute(
 		&self,
 		_to: &Address,
-		_token: &[u8],
+		_token: &TokenIdentifier,
 		_nonce: u64,
 		_amount: &RustBigUint,
 		_gas_limit: u64,

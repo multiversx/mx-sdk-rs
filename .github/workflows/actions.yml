@@ -21,16 +21,16 @@ jobs:
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
+          erdpy config set dependencies.arwentools.tag v1.3.3
           erdpy deps install arwentools
       - name: Build the wasm contracts
         run: |
           source .github/workflows/env
           ./build-wasm.sh
-      # # Running the mandos tests through Arwen is not yet stable enough
-      # - name: Run the wasm mandos tests
-      #   run: |
-      #     source .github/workflows/env
-      #     mandos-test .
+      - name: Run Arwen tests
+        run: |
+          source .github/workflows/env
+          cargo test --features arwen-tests
   rust_test:
     name: Rust tests
     runs-on: ubuntu-latest

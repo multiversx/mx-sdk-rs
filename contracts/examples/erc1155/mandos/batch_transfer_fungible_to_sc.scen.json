@@ -1,5 +1,6 @@
 {
     "name": "batch transfer fungible",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -8,7 +9,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:user_mock_sc": {
+                "sc:user_mock": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -21,12 +22,12 @@
             "txId": "batch-transfer-fungible",
             "tx": {
                 "from": "address:creator",
-                "to": "address:contract_address",
+                "to": "sc:erc1155",
                 "value": "0",
                 "function": "safeBatchTransferFrom",
                 "arguments": [
                     "address:creator",
-                    "address:user_mock_sc",
+                    "sc:user_mock",
                     "u32:1|u8:1|u32:1|u8:2",
                     "u32:2|u16:400|u32:1|u8:20",
                     "str:data"
@@ -56,13 +57,13 @@
                     "balance": "0",
                     "storage": {}
                 },
-                "address:user_mock_sc": {
+                "sc:user_mock": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../../erc1155-user-mock/output/erc1155-user-mock.wasm"
                 },
-                "address:contract_address": {
+                "sc:erc1155": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -70,13 +71,13 @@
                         "str:isFungible|u32:1|u8:1": "true",
                         "str:tokenTypeUri|u32:1|u8:1": "str:https://token-cdn-domain/{id}.json",
                         "str:balanceOf|address:creator|str:.mapped|u8:1": "600",
-                        "str:balanceOf|address:user_mock_sc|str:.mapped|u8:1": "400",
+                        "str:balanceOf|sc:user_mock|str:.mapped|u8:1": "400",
 
                         "str:tokenTypeCreator|u32:1|u8:2": "address:creator",
                         "str:isFungible|u32:1|u8:2": "true",
                         "str:tokenTypeUri|u32:1|u8:2": "str:https://token-cdn-domain/{id}.json",
                         "str:balanceOf|address:creator|str:.mapped|u8:2": "22",
-                        "str:balanceOf|address:user_mock_sc|str:.mapped|u8:2": "20",
+                        "str:balanceOf|sc:user_mock|str:.mapped|u8:2": "20",
 
                         "str:lastValidTypeId": "2",
 
@@ -90,15 +91,15 @@
 
                         "str:balanceOf|address:creator|str:.info": "u32:2|u32:1|u32:2|u32:2",
 
-                        "str:balanceOf|address:user_mock_sc|str:.node_links|u32:1": "u32:0|u32:2",
-                        "str:balanceOf|address:user_mock_sc|str:.value|u32:1": "1",
-                        "str:balanceOf|address:user_mock_sc|str:.node_id|u8:1": "1",
+                        "str:balanceOf|sc:user_mock|str:.node_links|u32:1": "u32:0|u32:2",
+                        "str:balanceOf|sc:user_mock|str:.value|u32:1": "1",
+                        "str:balanceOf|sc:user_mock|str:.node_id|u8:1": "1",
 
-                        "str:balanceOf|address:user_mock_sc|str:.node_links|u32:2": "u32:1|u32:0",
-                        "str:balanceOf|address:user_mock_sc|str:.value|u32:2": "2",
-                        "str:balanceOf|address:user_mock_sc|str:.node_id|u8:2": "2",
+                        "str:balanceOf|sc:user_mock|str:.node_links|u32:2": "u32:1|u32:0",
+                        "str:balanceOf|sc:user_mock|str:.value|u32:2": "2",
+                        "str:balanceOf|sc:user_mock|str:.node_id|u8:2": "2",
 
-                        "str:balanceOf|address:user_mock_sc|str:.info": "u32:2|u32:1|u32:2|u32:2"
+                        "str:balanceOf|sc:user_mock|str:.info": "u32:2|u32:1|u32:2|u32:2"
                     },
                     "code": "file:../output/erc1155.wasm"
                 }

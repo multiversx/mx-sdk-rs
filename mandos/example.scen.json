@@ -16,10 +16,10 @@
                     "comment": "we can comment on individual account initializations",
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
-                    "storage": {},
                     "esdt": {
                         "str:MyToken": "400,000,000,000"
                     },
+                    "storage": {},
                     "code": ""
                 },
                 "address:smart_contract_address": {

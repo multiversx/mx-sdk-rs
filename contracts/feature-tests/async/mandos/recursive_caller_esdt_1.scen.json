@@ -1,5 +1,6 @@
 {
     "comment": "not the main test, just warmup",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -41,7 +42,7 @@
                     "1",
                     "1"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {

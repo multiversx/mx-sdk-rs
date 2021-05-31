@@ -1,5 +1,6 @@
 {
     "name": "create sale auction not owner",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -16,7 +17,7 @@
             "txId": "tx-create-sale-auction-not-owner",
             "tx": {
                 "from": "address:bidder1",
-                "to": "address:kitty_auction_contract_address",
+                "to": "sc:kitty_auction_contract",
                 "value": "0",
                 "function": "createSaleAuction",
                 "arguments": [
@@ -53,11 +54,11 @@
                     "balance": "999,500",
                     "storage": {}
                 },
-                "address:kitty_ownership_contract_address": {
+                "sc:kitty_ownership_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:totalKitties": "2",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:1": "u8:1|u8:2|u8:3|u8:4|u8:5|u8:6|u8:7|u64:123456|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
@@ -67,11 +68,11 @@
                     },
                     "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
                 },
-                "address:kitty_auction_contract_address": {
+                "sc:kitty_auction_contract": {
                     "nonce": "0",
                     "balance": "500",
                     "storage": {
-                        "str:kittyOwnershipContractAddress": "address:kitty_ownership_contract_address",
+                        "str:kittyOwnershipContractAddress": "sc:kitty_ownership_contract",
                         "str:genZeroKittyStartingPrice": "100",
                         "str:genZeroKittyEndingPrice": "500",
                         "str:genZeroKittyAuctionDuration": "100,000"

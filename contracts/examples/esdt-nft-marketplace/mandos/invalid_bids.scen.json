@@ -1,6 +1,5 @@
 {
     "name": "invalid bids",
-    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -18,8 +17,8 @@
                     "str:ANOTHERNFT-123456",
                     "5"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -40,8 +39,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -69,8 +68,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -81,14 +80,7 @@
         },
         {
             "step": "setState",
-            "comment": "reset current block timestamp",
-            "currentBlockInfo": {
-                "blockTimestamp": "123,000"
-            }
-        },
-        {
-            "step": "setState",
-            "comment": "give user some random tokens",
+            "comment": "give user some random tokens and reset timestamp",
             "accounts": {
                 "address:first_bidder": {
                     "nonce": "0",
@@ -98,6 +90,9 @@
                     },
                     "storage": {}
                 }
+            },
+            "currentBlockInfo": {
+                "blockTimestamp": "123,000"
             }
         },
         {
@@ -116,8 +111,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -138,8 +133,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -160,8 +155,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -182,8 +177,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
@@ -204,8 +199,8 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "8,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
