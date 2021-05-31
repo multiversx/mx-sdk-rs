@@ -104,6 +104,13 @@ fn forwarder_call_transf_exec_accept_nft_go() {
 }
 
 #[test]
+fn forwarder_call_transf_exec_accept_return_values_go() {
+	elrond_wasm_debug::mandos_go(
+		"mandos/forwarder_call_transf_exec_accept_return_values.scen.json",
+	);
+}
+
+#[test]
 fn forwarder_call_transf_exec_accept_sft_twice_go() {
 	elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_accept_sft_twice.scen.json");
 }

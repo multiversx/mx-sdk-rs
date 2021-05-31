@@ -6,6 +6,14 @@ use crate::{
 use crate::{hex_call_data::HexCallDataSerializer, ArgId};
 use core::marker::PhantomData;
 
+/// Using max u64 to represent maximum possible gas,
+/// so that the value zero is not reserved and can be specified explicitly.
+/// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
+const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
+
+/// In case of `transfer_execute`, we leave by default a little gas for the calling transaction to finish.
+const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
+
 /// Represents metadata for calling another contract.
 /// Can transform into either an async call, transfer call or other types of calls.
 #[must_use]
@@ -19,6 +27,7 @@ where
 	payment_amount: SA::AmountType,
 	payment_nonce: u64,
 	endpoint_name: BoxedBytes,
+	explicit_gas_limit: u64,
 	pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
 	_return_type: PhantomData<R>,
 }
@@ -54,6 +63,7 @@ where
 			payment_token: TokenIdentifier::egld(),
 			payment_amount: SA::AmountType::zero(),
 			payment_nonce: 0,
+			explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
 			endpoint_name,
 			arg_buffer: ArgBuffer::new(),
 			_return_type: PhantomData,
@@ -72,6 +82,11 @@ where
 
 	pub fn with_nft_nonce(mut self, payment_nonce: u64) -> Self {
 		self.payment_nonce = payment_nonce;
+		self
+	}
+
+	pub fn with_gas_limit(mut self, gas_limit: u64) -> Self {
+		self.explicit_gas_limit = gas_limit;
 		self
 	}
 
@@ -102,6 +117,7 @@ where
 				payment_token: TokenIdentifier::egld(),
 				payment_amount: SA::AmountType::zero(),
 				payment_nonce: 0,
+				explicit_gas_limit: self.explicit_gas_limit,
 				endpoint_name: BoxedBytes::from(ESDT_TRANSFER_STRING),
 				arg_buffer: new_arg_buffer.concat(self.arg_buffer),
 				_return_type: PhantomData,
@@ -131,10 +147,19 @@ where
 				payment_token: TokenIdentifier::egld(),
 				payment_amount: SA::AmountType::zero(),
 				payment_nonce: 0,
+				explicit_gas_limit: self.explicit_gas_limit,
 				endpoint_name: BoxedBytes::from(ESDT_NFT_TRANSFER_STRING),
 				arg_buffer: new_arg_buffer.concat(self.arg_buffer),
 				_return_type: PhantomData,
 			}
+		}
+	}
+
+	fn resolve_gas_limit(&self) -> u64 {
+		if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
+			self.api.get_gas_left()
+		} else {
+			self.explicit_gas_limit
 		}
 	}
 
@@ -160,10 +185,10 @@ where
 {
 	/// Executes immediately, synchronously, and returns contract call result.
 	/// Only works if the target contract is in the same shard.
-	pub fn execute_on_dest_context(mut self, gas: u64) -> R {
+	pub fn execute_on_dest_context(mut self) -> R {
 		self = self.convert_to_esdt_transfer_call();
 		let raw_result = self.api.execute_on_dest_context_raw(
-			gas,
+			self.resolve_gas_limit(),
 			&self.to,
 			&self.payment_amount,
 			self.endpoint_name.as_slice(),
@@ -181,13 +206,13 @@ where
 	/// Will be eliminated after some future Arwen hook redesign.
 	/// `range_closure` takes the number of results before, the number of results after,
 	/// and is expected to return the start index (inclusive) and end index (exclusive).
-	pub fn execute_on_dest_context_custom_range<F>(mut self, gas: u64, range_closure: F) -> R
+	pub fn execute_on_dest_context_custom_range<F>(mut self, range_closure: F) -> R
 	where
 		F: FnOnce(usize, usize) -> (usize, usize),
 	{
 		self = self.convert_to_esdt_transfer_call();
 		let raw_result = self.api.execute_on_dest_context_raw_custom_result_range(
-			gas,
+			self.resolve_gas_limit(),
 			&self.to,
 			&self.payment_amount,
 			self.endpoint_name.as_slice(),
@@ -207,10 +232,10 @@ where
 	/// Executes immediately, synchronously.
 	/// The result (if any) is ignored.
 	/// Only works if the target contract is in the same shard.
-	pub fn execute_on_dest_context_ignore_result(mut self, gas: u64) {
+	pub fn execute_on_dest_context_ignore_result(mut self) {
 		self = self.convert_to_esdt_transfer_call();
 		let _ = self.api.execute_on_dest_context_raw(
-			gas,
+			self.resolve_gas_limit(),
 			&self.to,
 			&self.payment_amount,
 			self.endpoint_name.as_slice(),
@@ -218,10 +243,23 @@ where
 		);
 	}
 
+	fn resolve_gas_limit_with_leftover(&self) -> u64 {
+		if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
+			let mut gas_left = self.api.get_gas_left();
+			if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
+				gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
+			}
+			gas_left
+		} else {
+			self.explicit_gas_limit
+		}
+	}
+
 	/// Immediately launches a transfer-execute call.
 	/// This is similar to an async call, but there is no callback
 	/// and there can be more than one such call per transaction.
-	pub fn transfer_execute(self, gas_limit: u64) {
+	pub fn transfer_execute(self) {
+		let gas_limit = self.resolve_gas_limit_with_leftover();
 		let result = if self.payment_token.is_egld() {
 			self.api.direct_egld_execute(
 				&self.to,
@@ -234,7 +272,7 @@ where
 			// fungible ESDT
 			self.api.direct_esdt_execute(
 				&self.to,
-				self.payment_token.as_esdt_identifier(),
+				&self.payment_token,
 				&self.payment_amount,
 				gas_limit,
 				self.endpoint_name.as_slice(),
@@ -244,7 +282,7 @@ where
 			// non-fungible/semi-fungible ESDT
 			self.api.direct_esdt_nft_execute(
 				&self.to,
-				self.payment_token.as_esdt_identifier(),
+				&self.payment_token,
 				self.payment_nonce,
 				&self.payment_amount,
 				gas_limit,
