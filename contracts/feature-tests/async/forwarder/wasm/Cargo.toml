@@ -17,10 +17,11 @@ panic = "abort"
 
 [dependencies.forwarder]
 path = ".."
+default-features = false
 features=["wasm-output-mode"]
 
 [dependencies.elrond-wasm-output]
-version = "0.16.0"
+version = "0.17.0"
 path = "../../../../../elrond-wasm-output"
 features=["wasm-output-mode"]
 

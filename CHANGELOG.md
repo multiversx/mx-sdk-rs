@@ -9,6 +9,21 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - `pow`, `log2`, `sqrt`
 - cryptography: elliptic curves
 
+## [elrond-wasm 0.17.0] - 2021-05-28
+- Integration tests can now call Arwen-Mandos (mandos-go)
+- Send API refactoring and cleanup
+	- ESDT builtin function calls no longer require explicit gas
+	- sync calls and transfer-execute no longer require explicit gas
+- `#[payment_nonce]` endpoint argument annotation
+- `#[payable]` annotation no longer allowed without argument
+
+## [elrond-wasm 0.16.2, mandos 0.7.2] - 2021-05-20
+- New implementation for the `Try` trait for `SCResult`, in accordance to feature `try_trait_v2`
+- Published DNS module, which helps contracts register usernames for themselves
+- `ESDTLocalRole` more expressive type ABI
+
+## [elrond-wasm 0.16.1, mandos 0.7.1] - 2021-05-18
+- Improvements in mandos-rs: username, contract owner, nested async calls
 
 ## [elrond-wasm 0.16.0, mandos 0.7.0, elrond-codec 0.5.3] - 2021-05-14
 ### Major redesign of important framework components:

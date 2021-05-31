@@ -1,5 +1,6 @@
 {
     "name": "deploy kitty ownership",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
@@ -10,19 +11,19 @@
                     "storage": {}
                 }
             },
-            "blockInfo": {
+            "currentBlockInfo": {
                 "blockTimestamp": "0"
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:kitty_genetic_alg_contract_address"
+                    "newAddress": "sc:kitty_genetic_alg"
                 },
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "1",
-                    "newAddress": "address:kitty_ownership_contract_address"
+                    "newAddress": "sc:kitty_ownership_contract"
                 }
             ]
         },
@@ -53,8 +54,8 @@
                 "value": "0",
                 "arguments": [
                     "10",
-                    "address:kitty_genetic_alg_contract_address",
-                    "address:kitty_auction_contract_address"
+                    "sc:kitty_genetic_alg",
+                    "sc:kitty_auction_contract"
                 ],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -74,18 +75,19 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:kitty_ownership_contract_address": {
+                "sc:kitty_ownership_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:geneScienceContractAddress": "address:kitty_genetic_alg_contract_address",
-                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:geneScienceContractAddress": "sc:kitty_genetic_alg",
+                        "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:birthFee": "10",
                         "str:totalKitties": "1",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"
                     },
                     "code": "file:../output/kitty-ownership.wasm"
-                }
+                },
+                "+": ""
             }
         }
     ]

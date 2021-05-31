@@ -1,6 +1,7 @@
 #![no_std]
 #![feature(never_type)]
-#![feature(try_trait)]
+#![feature(try_trait_v2)]
+#![feature(control_flow_enum)]
 
 // re-export basic heap types
 extern crate alloc;

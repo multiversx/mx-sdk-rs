@@ -1,5 +1,6 @@
 {
     "name": "simple transfer full",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -23,7 +24,7 @@
             "txId": "transfer-full",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:first_contract",
+                "to": "sc:first_contract",
                 "value": "0",
                 "esdt": {
                     "tokenIdentifier": "str:cool_token",
@@ -52,15 +53,16 @@
                     },
                     "storage": {}
                 },
-                "address:first_contract": {
+                "sc:first_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "str:esdtTokenName": "str:cool_token",
-                        "str:secondContractAddress": "address:second_contract"
-                    }
+                        "str:secondContractAddress": "sc:second_contract"
+                    },
+                    "code": "*"
                 },
-                "address:second_contract": {
+                "sc:second_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -68,8 +70,10 @@
                     },
                     "storage": {
                         "str:esdtTokenName": "str:cool_token"
-                    }
-                }
+                    },
+                    "code": "*"
+                },
+                "+": ""
             }
         }
     ]

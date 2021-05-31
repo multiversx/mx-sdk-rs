@@ -54,20 +54,12 @@ pub trait LocalEsdtAndEsdtNft {
 
 	#[endpoint(localMint)]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_mint(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
-			&amount,
-		);
+		self.send().esdt_local_mint(&token_identifier, &amount);
 	}
 
 	#[endpoint(localBurn)]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_burn(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
-			&amount,
-		);
+		self.send().esdt_local_burn(&token_identifier, &amount);
 	}
 
 	// Non-Fungible Tokens
@@ -112,8 +104,7 @@ pub trait LocalEsdtAndEsdtNft {
 		uri: BoxedBytes,
 	) {
 		self.send().esdt_nft_create::<Color>(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
+			&token_identifier,
 			&amount,
 			&name,
 			&royalties,
@@ -130,22 +121,13 @@ pub trait LocalEsdtAndEsdtNft {
 		nonce: u64,
 		amount: Self::BigUint,
 	) {
-		self.send().esdt_nft_add_quantity(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
-			nonce,
-			&amount,
-		);
+		self.send()
+			.esdt_nft_add_quantity(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint(nftBurn)]
 	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
-		self.send().esdt_nft_burn(
-			self.blockchain().get_gas_left(),
-			token_identifier.as_esdt_identifier(),
-			nonce,
-			&amount,
-		);
+		self.send().esdt_nft_burn(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint(transferNftViaAsyncCall)]
@@ -157,10 +139,10 @@ pub trait LocalEsdtAndEsdtNft {
 		amount: Self::BigUint,
 		data: BoxedBytes,
 	) {
-		self.send().direct_esdt_nft_via_async_call(
+		self.send().transfer_esdt_nft_via_async_call(
 			&self.blockchain().get_sc_address(),
 			&to,
-			token_identifier.as_esdt_identifier(),
+			&token_identifier,
 			nonce,
 			&amount,
 			data.as_slice(),
@@ -184,7 +166,7 @@ pub trait LocalEsdtAndEsdtNft {
 
 		let _ = self.send().direct_esdt_nft_execute(
 			&to,
-			token_identifier.as_esdt_identifier(),
+			&token_identifier,
 			nonce,
 			&amount,
 			self.blockchain().get_gas_left(),
@@ -233,11 +215,7 @@ pub trait LocalEsdtAndEsdtNft {
 		#[var_args] roles: VarArgs<EsdtLocalRole>,
 	) -> AsyncCall<Self::SendApi> {
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.set_special_roles(
-				&address,
-				token_identifier.as_esdt_identifier(),
-				roles.as_slice(),
-			)
+			.set_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
 			.with_callback(self.callbacks().change_roles_callback())
 	}
@@ -250,11 +228,7 @@ pub trait LocalEsdtAndEsdtNft {
 		#[var_args] roles: VarArgs<EsdtLocalRole>,
 	) -> AsyncCall<Self::SendApi> {
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.unset_special_roles(
-				&address,
-				token_identifier.as_esdt_identifier(),
-				roles.as_slice(),
-			)
+			.unset_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
 			.with_callback(self.callbacks().change_roles_callback())
 	}
@@ -265,7 +239,7 @@ pub trait LocalEsdtAndEsdtNft {
 	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> Self::BigUint {
 		self.blockchain().get_esdt_balance(
 			&self.blockchain().get_sc_address(),
-			token_identifier.as_esdt_identifier(),
+			&token_identifier,
 			0,
 		)
 	}
@@ -274,7 +248,7 @@ pub trait LocalEsdtAndEsdtNft {
 	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> Self::BigUint {
 		self.blockchain().get_esdt_balance(
 			&self.blockchain().get_sc_address(),
-			token_identifier.as_esdt_identifier(),
+			&token_identifier,
 			nonce,
 		)
 	}

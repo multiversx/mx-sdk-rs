@@ -35,12 +35,7 @@ pub trait ForwarderRaw {
 		#[payment_token] token: TokenIdentifier,
 		#[payment] payment: Self::BigUint,
 	) {
-		let _ = self.send().direct_esdt_via_transf_exec(
-			&to,
-			&token.as_esdt_identifier(),
-			&payment,
-			&[],
-		);
+		let _ = self.send().direct(&to, &token, &payment, &[]);
 	}
 
 	fn forward_contract_call(
@@ -97,7 +92,8 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		self.forward_contract_call(to, TokenIdentifier::egld(), payment, endpoint_name, args)
-			.transfer_execute(self.blockchain().get_gas_left() / 2);
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
+			.transfer_execute();
 	}
 
 	#[endpoint]
@@ -111,7 +107,8 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
-			.transfer_execute(self.blockchain().get_gas_left() / 2);
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
+			.transfer_execute();
 	}
 
 	#[endpoint]
@@ -125,7 +122,8 @@ pub trait ForwarderRaw {
 		#[var_args] args: VarArgs<BoxedBytes>,
 	) {
 		self.forward_contract_call(to, token, payment, endpoint_name, args)
-			.transfer_execute(self.blockchain().get_gas_left() / 2);
+			.with_gas_limit(self.blockchain().get_gas_left() / 2)
+			.transfer_execute();
 	}
 
 	#[view]
