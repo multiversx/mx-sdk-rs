@@ -83,7 +83,6 @@ impl TopDecode for EllipticCurveUncallable {
 }
 
 impl EllipticCurveApi for EllipticCurveUncallable {
-	type EllipticCurve = EllipticCurveUncallable;
 	type BigUint = BigUintUncallable;
 
 	fn new_elliptic_curve(

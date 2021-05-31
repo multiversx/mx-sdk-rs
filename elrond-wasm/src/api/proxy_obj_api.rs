@@ -4,11 +4,11 @@ use super::{
 use crate::types::{Address, TokenIdentifier};
 
 pub trait ProxyObjApi {
-	type EllipticCurve: EllipticCurveApi + 'static;
-
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
+
+	type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
 	/// The code generator produces the same types in the proxy, as for the main contract.
 	/// Sometimes endpoints return types that contain a `Self::Storage` type argument,
@@ -31,11 +31,11 @@ pub trait ProxyObjApi {
 }
 
 pub trait CallbackProxyObjApi {
-	type EllipticCurve: EllipticCurveApi + 'static;
-
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
+
+	type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
 	/// The code generator produces the same types in the proxy, as for the main contract.
 	/// Sometimes endpoints return types that contain a `Self::Storage` type argument,
