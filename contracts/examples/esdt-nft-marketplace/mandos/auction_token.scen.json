@@ -1,6 +1,5 @@
 {
     "name": "auction token",
-    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -33,12 +32,12 @@
                     "123,456",
                     "str:EGLD"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x00"
+                "gasLimit": "13,500,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "status": "0",
-                "message": "",
+                "message": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -77,12 +76,13 @@
                             "0-payment_token": "nested:str:EGLD|u64:0",
                             "1-min_bid": "biguint:100",
                             "2-max_bid": "biguint:1000",
-                            "3-deadline": "u64:123,456",
-                            "4-original_owner": "address:seller",
-                            "5-current_bid": "biguint:0",
-                            "6-current_winner": "0x0000000000000000000000000000000000000000000000000000000000000000",
-                            "7-marketplace_cut_percentage": "biguint:1000",
-                            "8-creator_royalties_percentage": "biguint:2000"
+                            "3-start_time": "u64:123,000",
+                            "4-deadline": "u64:123,456",
+                            "5-original_owner": "address:seller",
+                            "6-current_bid": "biguint:0",
+                            "7-current_winner": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                            "8-marketplace_cut_percentage": "biguint:1000",
+                            "9-creator_royalties_percentage": "biguint:2000"
                         }
                     },
                     "code": "file:../output/esdt-nft-marketplace.wasm"

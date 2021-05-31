@@ -2,7 +2,7 @@ use super::{ArwenBigInt, ArwenBigUint, ArwenEllipticCurve};
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
+use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 
 extern "C" {
 	fn transferValue(
@@ -118,6 +118,11 @@ impl SendApi for ArwenApiImpl {
 		BlockchainApi::get_sc_address(self)
 	}
 
+	#[inline]
+	fn get_gas_left(&self) -> u64 {
+		BlockchainApi::get_gas_left(self)
+	}
+
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
@@ -161,7 +166,7 @@ impl SendApi for ArwenApiImpl {
 	fn direct_esdt_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		amount: &ArwenBigUint,
 		gas_limit: u64,
 		function: &[u8],
@@ -192,7 +197,7 @@ impl SendApi for ArwenApiImpl {
 	fn direct_esdt_nft_execute(
 		&self,
 		to: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		nonce: u64,
 		amount: &ArwenBigUint,
 		gas_limit: u64,

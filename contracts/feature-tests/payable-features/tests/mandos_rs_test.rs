@@ -31,11 +31,6 @@ fn payable_any_4_rs() {
 }
 
 #[test]
-fn payable_egld_0_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/payable_egld_0.scen.json", &contract_map());
-}
-
-#[test]
 fn payable_egld_1_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/payable_egld_1.scen.json", &contract_map());
 }

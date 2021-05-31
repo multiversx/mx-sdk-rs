@@ -2,7 +2,7 @@ use super::managed_types::RustBigUint;
 use crate::TxContext;
 use elrond_wasm::{
 	api::BigUintApi,
-	types::{Address, EsdtTokenData, H256},
+	types::{Address, EsdtTokenData, TokenIdentifier, H256},
 };
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
@@ -102,20 +102,29 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
 			.clone()
 	}
 
-	fn get_current_esdt_nft_nonce(&self, _address: &Address, _token: &[u8]) -> u64 {
+	fn get_current_esdt_nft_nonce(&self, _address: &Address, _token: &TokenIdentifier) -> u64 {
 		// TODO: Implement
 		0u64
 	}
 
 	// TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
-	fn get_esdt_balance(&self, address: &Address, token: &[u8], _nonce: u64) -> RustBigUint {
+	fn get_esdt_balance(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		_nonce: u64,
+	) -> RustBigUint {
 		if address != &self.get_sc_address() {
 			panic!(
 				"get_esdt_balance not yet implemented for accounts other than the contract itself"
 			);
 		}
 
-		match self.blockchain_info_box.contract_esdt.get(&token.to_vec()) {
+		match self
+			.blockchain_info_box
+			.contract_esdt
+			.get(&token.as_esdt_identifier().to_vec())
+		{
 			Some(value) => value.clone().into(),
 			None => RustBigUint::zero(),
 		}
@@ -124,7 +133,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
 	fn get_esdt_token_data(
 		&self,
 		_address: &Address,
-		_token: &[u8],
+		_token: &TokenIdentifier,
 		_nonce: u64,
 	) -> EsdtTokenData<RustBigUint> {
 		panic!("get_esdt_token_data not yet implemented")

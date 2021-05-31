@@ -1,5 +1,5 @@
 use super::util::*;
-use crate::model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole};
+use crate::model::{ContractTrait, Method, PublicRole};
 
 fn generate_endpoint_snippet(m: &Method, endpoint_name: &str) -> proc_macro2::TokenStream {
 	let endpoint_docs = &m.docs;
@@ -9,10 +9,7 @@ fn generate_endpoint_snippet(m: &Method, endpoint_name: &str) -> proc_macro2::To
 		.method_args
 		.iter()
 		.filter_map(|arg| {
-			if matches!(
-				arg.metadata.payment,
-				ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
-			) {
+			if arg.metadata.payment.is_payment_arg() {
 				None
 			} else {
 				let mut arg_type = arg.ty.clone();
