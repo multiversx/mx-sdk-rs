@@ -88,6 +88,6 @@ getDeposit() {
     erdpy --verbose contract query ${ADDRESS} --function="getDeposit" --arguments ${BOB_ADDRESS}
 }
 
-getDeadline() {
+getCrowdfundingTokenName() {
     erdpy --verbose contract query ${ADDRESS} --function="getCrowdfundingTokenName"
 }
