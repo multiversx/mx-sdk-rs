@@ -58,7 +58,7 @@ pub trait EsdtNftMarketplace {
 		let nft_type = self.call_value().token();
 		let nft_nonce = self.call_value().esdt_token_nonce();
 		let current_time = self.blockchain().get_block_timestamp();
-		let start_time = opt_start_time.into_option().unwrap_or_else(|| current_time);
+		let start_time = opt_start_time.into_option().unwrap_or(current_time);
 
 		require!(
 			self.call_value().esdt_token_type() == EsdtTokenType::NonFungible,
