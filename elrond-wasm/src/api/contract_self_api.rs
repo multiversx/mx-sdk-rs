@@ -16,7 +16,7 @@ pub trait ContractBase: Sized {
 
 	type BigInt: BigIntApi + 'static;
 
-	type EllipticCurve: EllipticCurveApi + 'static;
+	type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
 	/// Abstracts the lower-level storage functionality.
 	type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
@@ -26,9 +26,9 @@ pub trait ContractBase: Sized {
 
 	/// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
 	type SendApi: SendApi<
-			EllipticCurveType = Self::EllipticCurve,
 			AmountType = Self::BigUint,
 			ProxyBigInt = Self::BigInt,
+			ProxyEllipticCurve = Self::EllipticCurve,
 			ProxyStorage = Self::Storage,
 		> + Clone
 		+ 'static;

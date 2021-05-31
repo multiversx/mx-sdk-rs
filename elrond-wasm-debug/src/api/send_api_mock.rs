@@ -50,9 +50,9 @@ impl TxContext {
 }
 
 impl SendApi for TxContext {
-	type EllipticCurveType = EllipticCurveMock;
 	type AmountType = RustBigUint;
 	type ProxyBigInt = RustBigInt;
+	type ProxyEllipticCurve = EllipticCurveMock;
 	type ProxyStorage = Self;
 
 	fn get_sc_address(&self) -> Address {

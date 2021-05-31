@@ -265,9 +265,9 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 		where
 			SA: elrond_wasm::api::SendApi + 'static,
 		{
-			type EllipticCurve = SA::EllipticCurveType;
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
+			type EllipticCurve = SA::ProxyEllipticCurve;
 			type Storage = SA::ProxyStorage;
 			type SendApi = SA;
 
@@ -320,9 +320,9 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
 		where
 			SA: elrond_wasm::api::SendApi + 'static,
 		{
-			type EllipticCurve = SA::EllipticCurveType;
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
+			type EllipticCurve = SA::ProxyEllipticCurve;
 			type Storage = SA::ProxyStorage;
 			type SendApi = SA;
 			type ErrorApi = SA;

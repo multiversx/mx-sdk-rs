@@ -1,4 +1,4 @@
-use super::{ArwenEllipticCurve,ArwenBigInt, ArwenBigUint};
+use super::{ArwenBigInt, ArwenBigUint, ArwenEllipticCurve};
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
@@ -110,8 +110,8 @@ extern "C" {
 impl SendApi for ArwenApiImpl {
 	type AmountType = ArwenBigUint;
 	type ProxyBigInt = ArwenBigInt;
+	type ProxyEllipticCurve = ArwenEllipticCurve;
 	type ProxyStorage = Self;
-    type EllipticCurveType = ArwenEllipticCurve;
 
 	#[inline]
 	fn get_sc_address(&self) -> Address {

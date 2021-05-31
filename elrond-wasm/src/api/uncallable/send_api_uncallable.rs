@@ -6,8 +6,8 @@ use alloc::vec::Vec;
 impl SendApi for super::UncallableApi {
 	type AmountType = BigUintUncallable;
 	type ProxyBigInt = BigIntUncallable;
+	type ProxyEllipticCurve = EllipticCurveUncallable;
 	type ProxyStorage = Self;
-	type EllipticCurveType = EllipticCurveUncallable;
 
 	fn get_sc_address(&self) -> Address {
 		unreachable!()

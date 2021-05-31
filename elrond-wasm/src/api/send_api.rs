@@ -10,14 +10,14 @@ pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 #[allow(clippy::too_many_arguments)] // TODO: some arguments should be grouped though
 pub trait SendApi: ErrorApi + Clone + Sized {
-	type EllipticCurveType: EllipticCurveApi + 'static;
-
 	/// The type of the payment arguments.
 	/// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
 	type AmountType: BigUintApi + 'static;
 
 	/// Not used by `SendApi`, but forwarded to the proxy traits.
 	type ProxyBigInt: BigIntApi + 'static;
+
+	type ProxyEllipticCurve: EllipticCurveApi<BigUint = Self::AmountType> + 'static;
 
 	/// Not used by `SendApi`, but forwarded to the proxy traits.
 	type ProxyStorage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;

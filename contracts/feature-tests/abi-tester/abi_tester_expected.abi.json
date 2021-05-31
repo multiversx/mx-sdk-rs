@@ -169,18 +169,14 @@
             ]
         },
         {
-            "name": "take_ellicptic_curve",
+            "name": "take_elliptic_curve",
             "inputs": [
                 {
                     "name": "_ec",
                     "type": "EllipticCurve"
                 }
             ],
-            "outputs": [
-            {
-                "type": "EsdtLocalRole"
-            }
-            ]
+            "outputs": []
         },
         {
             "name": "esdt_local_role",
@@ -303,35 +299,6 @@
                     ],
                     "name": "tuple_madness",
                     "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
-                }
-            ]
-        },
-        "EllipticCurve": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "field_order",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "base_point_order",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "eq_constant",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "x_base_point",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "y_base_point",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "size_of_field",
-                    "type": "i32"
                 }
             ]
         },

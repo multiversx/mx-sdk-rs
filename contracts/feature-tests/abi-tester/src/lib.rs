@@ -82,8 +82,8 @@ pub trait AbiTester {
 		(address, h256).into()
 	}
 
-	// #[endpoint] - QUESTION : IS THIS NECCESSARY?I Think it needs to be changed?
-	// fn take_ellicptic_curve(&self, _ec: EllipticCurve<Self::BigUint>) {}
+	#[endpoint]
+	fn take_elliptic_curve(&self, _ec: Self::EllipticCurve) {}
 
 	#[endpoint]
 	fn esdt_local_role(&self) -> EsdtLocalRole {

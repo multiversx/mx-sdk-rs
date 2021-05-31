@@ -79,7 +79,6 @@ impl elrond_wasm::abi::TypeAbi for EllipticCurveMock {
 }
 
 impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
-	type EllipticCurve = EllipticCurveMock;
 	type BigUint = RustBigUint;
 
 	fn new_elliptic_curve(

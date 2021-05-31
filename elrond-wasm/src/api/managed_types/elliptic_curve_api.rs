@@ -10,7 +10,6 @@ pub trait EllipticCurveApi:
 	+ elrond_codec::TopDecode
 	+ abi::TypeAbi
 {
-	type EllipticCurve;
 	type BigUint;
 
 	fn new_elliptic_curve(

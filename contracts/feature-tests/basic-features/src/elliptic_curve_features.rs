@@ -43,7 +43,7 @@ pub trait EllipticCurveFeatures {
 		y_point: Self::BigUint,
 		data: BoxedBytes,
 	) -> (Self::BigUint, Self::BigUint) {
-		self.elliptic_curve().scalar_mult(x_point, y_point, data)
+		curve.scalar_mult(x_point, y_point, data)
 	}
 
 	#[endpoint]
@@ -62,7 +62,7 @@ pub trait EllipticCurveFeatures {
 		x_pair: Self::BigUint,
 		y_pair: Self::BigUint,
 	) -> BoxedBytes {
-		self.elliptic_curve().marshal_ec(x_pair, y_pair)
+		curve.marshal_ec(x_pair, y_pair)
 	}
 
 	#[endpoint]
@@ -72,7 +72,7 @@ pub trait EllipticCurveFeatures {
 		x_pair: Self::BigUint,
 		y_pair: Self::BigUint,
 	) -> BoxedBytes {
-		self.elliptic_curve().marshal_compressed_ec(x_pair, y_pair)
+		curve.marshal_compressed_ec(x_pair, y_pair)
 	}
 
 	#[endpoint]
