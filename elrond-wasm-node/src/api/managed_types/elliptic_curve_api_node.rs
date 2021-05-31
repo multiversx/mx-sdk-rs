@@ -1,5 +1,4 @@
 use elrond_wasm::api::EllipticCurveApi;
-//use crate::ArwenApiImpl;
 use super::ArwenBigUint;
 use elrond_wasm::elrond_codec::*;
 use crate::String;
@@ -96,6 +95,14 @@ extern "C" {
         sizeOfField: i32
     ) -> i32;
 
+    fn getCurveLengthEC(
+        ecHandle: i32
+    ) -> i32;
+
+    fn getPrivKeyLengthEC(
+        ecHandle: i32
+    ) -> i32;
+
     fn p224Ec() -> i32;
 
     fn p256Ec() -> i32;
@@ -104,15 +111,6 @@ extern "C" {
 
     fn p521Ec() -> i32;
 }
-
-// pub struct ArwenEllipticCurve {
-//     field_order : ArwenBigUint,
-//     base_point_order : ArwenBigUint,
-//     eq_constant : ArwenBigUint,
-//     x_base_point : ArwenBigUint,
-//     y_base_point : ArwenBigUint,
-//     size_of_field : u32,
-// }
 
 pub struct ArwenEllipticCurve{
     pub handle: i32,
@@ -267,7 +265,8 @@ impl EllipticCurveApi for ArwenEllipticCurve{
 
     fn marshal_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
         unsafe {
-			let mut result = BoxedBytes::allocate(1 + 2 * (curve.size_of_field as usize + 7) / 8);
+            let curve_length = getCurveLengthEC(self.handle);
+			let mut result = BoxedBytes::allocate(1 + 2 * (curve_length as usize + 7) / 8);
 			marshalEC(
 				x_pair.handle,
 				y_pair.handle,
@@ -280,7 +279,8 @@ impl EllipticCurveApi for ArwenEllipticCurve{
 
     fn marshal_compressed_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
         unsafe {
-			let mut result = BoxedBytes::allocate(1 + (curve.size_of_field as usize + 7) / 8);
+            let curve_length = getCurveLengthEC(self.handle);
+			let mut result = BoxedBytes::allocate(1 + (curve_length as usize + 7) / 8);
 			marshalCompressedEC(
 				x_pair.handle,
 				y_pair.handle,
@@ -317,7 +317,7 @@ impl EllipticCurveApi for ArwenEllipticCurve{
         unsafe {
 			let x_pair_handle = bigIntNew(0);
 			let y_pair_handle = bigIntNew(0);
-			unmarshalEC(
+			unmarshalCompressedEC(
 				x_pair_handle,
 				y_pair_handle,
 				self.handle,
@@ -339,8 +339,9 @@ impl EllipticCurveApi for ArwenEllipticCurve{
         unsafe {
 			let x_pub_key_handle = bigIntNew(0);
 			let y_pub_key_handle = bigIntNew(0);
+            let priv_key_length = getPrivKeyLengthEC(self.handle);
 			let mut private_key =
-				BoxedBytes::allocate(curve.base_point_order.byte_length() as usize);
+				BoxedBytes::allocate(priv_key_length as usize);
 			generateKeyEC(
 				x_pub_key_handle,
 				y_pub_key_handle,
