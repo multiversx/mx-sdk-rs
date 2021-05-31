@@ -61,17 +61,6 @@ pub trait PayableFeatures {
 		self.call_value().payment_token_pair().into()
 	}
 
-	/// Will issue a warning, but this is ok, this is the test.
-	#[endpoint]
-	#[payable]
-	fn payable_egld_0(
-		&self,
-		#[payment] payment: Self::BigUint,
-		#[payment_token] token: TokenIdentifier,
-	) -> MultiResult2<Self::BigUint, TokenIdentifier> {
-		(payment, token).into()
-	}
-
 	#[endpoint]
 	#[payable("EGLD")]
 	fn payable_egld_1(

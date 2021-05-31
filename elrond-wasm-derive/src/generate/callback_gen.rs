@@ -6,7 +6,7 @@ use super::{
 	payable_gen::*,
 	util::*,
 };
-use crate::model::{ArgPaymentMetadata, Method, PublicRole};
+use crate::model::{Method, PublicRole};
 
 pub fn generate_callback_body(methods: &[Method]) -> proc_macro2::TokenStream {
 	let raw_decl = find_raw_callback(methods);
@@ -35,10 +35,7 @@ fn generate_callback_body_regular(methods: &[Method]) -> proc_macro2::TokenStrea
 					.method_args
 					.iter()
 					.map(|arg| {
-						if matches!(
-							arg.metadata.payment,
-							ArgPaymentMetadata::Payment | ArgPaymentMetadata::PaymentToken
-						) {
+						if arg.metadata.payment.is_payment_arg() {
 							quote! {}
 						} else if arg.metadata.callback_call_result {
 							has_call_result = true;

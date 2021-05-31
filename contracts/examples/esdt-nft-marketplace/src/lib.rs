@@ -237,18 +237,18 @@ pub trait EsdtNftMarketplace {
 			);
 
 			// send NFT to auction winner
-			let _ = self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_nft(
 				&auction.current_winner,
-				nft_type.as_esdt_identifier(),
+				&nft_type,
 				nft_nonce,
 				&Self::BigUint::from(NFT_AMOUNT),
 				self.data_or_empty_if_sc(&auction.current_winner, b"bought token at auction"),
 			);
 		} else {
 			// return to original owner
-			let _ = self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_nft(
 				&auction.original_owner,
-				nft_type.as_esdt_identifier(),
+				&nft_type,
 				nft_nonce,
 				&Self::BigUint::from(NFT_AMOUNT),
 				self.data_or_empty_if_sc(&auction.original_owner, b"returned token"),
@@ -279,9 +279,9 @@ pub trait EsdtNftMarketplace {
 
 		self.auction_for_token(&nft_type, nft_nonce).clear();
 
-		let _ = self.send().direct_esdt_nft_via_transfer_exec(
+		let _ = self.send().direct_nft(
 			&caller,
-			nft_type.as_esdt_identifier(),
+			&nft_type,
 			nft_nonce,
 			&Self::BigUint::from(NFT_AMOUNT),
 			self.data_or_empty_if_sc(&caller, b"returned token"),
@@ -439,9 +439,9 @@ pub trait EsdtNftMarketplace {
 			self.send()
 				.direct(to, &token_id, amount, self.data_or_empty_if_sc(to, data));
 		} else {
-			let _ = self.send().direct_esdt_nft_via_transfer_exec(
+			let _ = self.send().direct_nft(
 				to,
-				token_id.as_esdt_identifier(),
+				&token_id,
 				nonce,
 				amount,
 				self.data_or_empty_if_sc(to, data),
@@ -464,7 +464,7 @@ pub trait EsdtNftMarketplace {
 	) -> EsdtTokenData<Self::BigUint> {
 		self.blockchain().get_esdt_token_data(
 			&self.blockchain().get_sc_address(),
-			nft_type.as_esdt_identifier(),
+			&nft_type,
 			nft_nonce,
 		)
 	}

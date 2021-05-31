@@ -41,17 +41,24 @@ pub struct Method {
 }
 
 impl Method {
-	pub fn payment_arg(&self) -> Option<MethodArgument> {
-		self.method_args
-			.iter()
-			.find(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::Payment))
-			.cloned()
-	}
-
-	pub fn token_arg(&self) -> Option<MethodArgument> {
+	pub fn payment_token_arg(&self) -> Option<MethodArgument> {
 		self.method_args
 			.iter()
 			.find(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentToken))
+			.cloned()
+	}
+
+	pub fn payment_amount_arg(&self) -> Option<MethodArgument> {
+		self.method_args
+			.iter()
+			.find(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentAmount))
+			.cloned()
+	}
+
+	pub fn payment_nonce_arg(&self) -> Option<MethodArgument> {
+		self.method_args
+			.iter()
+			.find(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentNonce))
 			.cloned()
 	}
 

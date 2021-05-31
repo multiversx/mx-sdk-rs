@@ -143,6 +143,14 @@ fn forwarder_call_async_accept_egld_rs() {
 // }
 
 // #[test]
+// fn forwarder_call_transf_exec_accept_return_values_rs() {
+// 	elrond_wasm_debug::mandos_rs(
+// 		"mandos/forwarder_call_transf_exec_accept_return_values.scen.json",
+// 		&contract_map(),
+// 	);
+// }
+
+// #[test]
 // fn forwarder_call_transf_exec_accept_sft_twice_rs() {
 //	elrond_wasm_debug::mandos_rs("mandos/forwarder_call_transf_exec_accept_sft_twice.scen.json", &contract_map());
 // }
