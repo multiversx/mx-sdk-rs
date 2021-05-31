@@ -29,17 +29,22 @@ fn validate_method_name(m: &Method) {
 }
 
 fn validate_payment_args(m: &Method) {
-	let num_payment = m
+	let num_payment_amount = m
 		.method_args
 		.iter()
-		.filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::Payment))
+		.filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentAmount))
 		.count();
 	let num_payment_token = m
 		.method_args
 		.iter()
 		.filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentToken))
 		.count();
-	if num_payment > 1 {
+	let num_payment_nonce = m
+		.method_args
+		.iter()
+		.filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentNonce))
+		.count();
+	if num_payment_amount > 1 {
 		panic!(
 			"only one `#[payment]` argument allowed (method: `{}`)",
 			m.name.to_string()
@@ -51,8 +56,14 @@ fn validate_payment_args(m: &Method) {
 			m.name.to_string()
 		);
 	}
+	if num_payment_nonce > 1 {
+		panic!(
+			"only one `#[payment_nonce]` argument allowed (method: `{}`)",
+			m.name.to_string()
+		);
+	}
 	if !m.is_payable() {
-		if num_payment > 0 {
+		if num_payment_amount > 0 {
 			panic!("`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
 		}
 		if num_payment_token > 0 {
@@ -69,7 +80,7 @@ fn validate_payment_args(m: &Method) {
 }
 
 pub fn validate_payment_args_not_reference(m: &Method) {
-	if let Some(payment_arg) = m.payment_arg() {
+	if let Some(payment_arg) = m.payment_amount_arg() {
 		match &payment_arg.ty {
 			syn::Type::Path(_) => {},
 			syn::Type::Reference(_) => {

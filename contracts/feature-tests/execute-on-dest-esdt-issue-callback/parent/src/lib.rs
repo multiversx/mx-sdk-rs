@@ -43,7 +43,8 @@ pub trait Parent {
 		let child_contract_adress = self.child_contract_address().get();
 		self.child_proxy(child_contract_adress)
 			.issue_wrapped_egld(token_display_name, token_ticker, initial_supply, issue_cost)
-			.execute_on_dest_context_ignore_result(ISSUE_EXPECTED_GAS_COST);
+			.with_gas_limit(ISSUE_EXPECTED_GAS_COST)
+			.execute_on_dest_context_ignore_result();
 	}
 
 	// storage

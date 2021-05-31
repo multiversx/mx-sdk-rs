@@ -1,6 +1,6 @@
 use super::{BigIntUncallable, BigUintUncallable, EllipticCurveUncallable};
 use crate::api::SendApi;
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
+use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
 use alloc::vec::Vec;
 
 impl SendApi for super::UncallableApi {
@@ -10,6 +10,10 @@ impl SendApi for super::UncallableApi {
 	type ProxyStorage = Self;
 
 	fn get_sc_address(&self) -> Address {
+		unreachable!()
+	}
+
+	fn get_gas_left(&self) -> u64 {
 		unreachable!()
 	}
 
@@ -31,7 +35,7 @@ impl SendApi for super::UncallableApi {
 	fn direct_esdt_execute(
 		&self,
 		_to: &Address,
-		_token: &[u8],
+		_token: &TokenIdentifier,
 		_amount: &BigUintUncallable,
 		_gas: u64,
 		_function: &[u8],
@@ -43,7 +47,7 @@ impl SendApi for super::UncallableApi {
 	fn direct_esdt_nft_execute(
 		&self,
 		_to: &Address,
-		_token: &[u8],
+		_token: &TokenIdentifier,
 		_nonce: u64,
 		_amount: &BigUintUncallable,
 		_gas_limit: u64,

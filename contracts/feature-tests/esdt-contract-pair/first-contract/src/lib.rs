@@ -101,7 +101,7 @@ pub trait FirstContract {
 
 		let _ = self.send().direct_esdt_execute(
 			&second_contract_address,
-			expected_token_name.as_esdt_identifier(),
+			&expected_token_name,
 			&esdt_value,
 			self.blockchain().get_gas_left(),
 			SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
@@ -126,7 +126,7 @@ pub trait FirstContract {
 
 		let _ = self.send().direct_esdt_execute(
 			&second_contract_address,
-			expected_token_name.as_esdt_identifier(),
+			&expected_token_name,
 			&esdt_value,
 			self.blockchain().get_gas_left(),
 			SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,

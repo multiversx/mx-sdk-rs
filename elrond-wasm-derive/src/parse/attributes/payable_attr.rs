@@ -3,12 +3,16 @@ use super::util::*;
 
 static EGLD_DEFAULT: &str = "EGLD";
 
-pub fn is_payment(pat: &syn::PatType) -> bool {
-	has_attribute(&pat.attrs, ATTR_PAYMENT)
+pub fn is_payment_amount(pat: &syn::PatType) -> bool {
+	has_attribute(&pat.attrs, ATTR_PAYMENT_AMOUNT) || has_attribute(&pat.attrs, ATTR_PAYMENT)
 }
 
 pub fn is_payment_token(pat: &syn::PatType) -> bool {
 	has_attribute(&pat.attrs, ATTR_PAYMENT_TOKEN)
+}
+
+pub fn is_payment_nonce(pat: &syn::PatType) -> bool {
+	has_attribute(&pat.attrs, ATTR_PAYMENT_NONCE)
 }
 
 pub struct PayableAttribute {

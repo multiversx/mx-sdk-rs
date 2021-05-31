@@ -1,7 +1,9 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::BlockchainApi;
-use elrond_wasm::types::{Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, H256};
+use elrond_wasm::types::{
+	Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
+};
 
 extern "C" {
 	fn getSCAddress(resultOffset: *mut u8);
@@ -209,7 +211,7 @@ impl BlockchainApi for ArwenApiImpl {
 	}
 
 	#[inline]
-	fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64 {
+	fn get_current_esdt_nft_nonce(&self, address: &Address, token: &TokenIdentifier) -> u64 {
 		unsafe {
 			getCurrentESDTNFTNonce(
 				address.as_ref().as_ptr(),
@@ -220,7 +222,12 @@ impl BlockchainApi for ArwenApiImpl {
 	}
 
 	#[inline]
-	fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> ArwenBigUint {
+	fn get_esdt_balance(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+	) -> ArwenBigUint {
 		unsafe {
 			let result = bigIntNew(0);
 			bigIntGetESDTExternalBalance(
@@ -235,17 +242,11 @@ impl BlockchainApi for ArwenApiImpl {
 		}
 	}
 
-	///////////////////////////////////////////
-	// ----------------- TODO -----------------
-	// Hash is currently ignored, fix when hash gets a getHashLength function
-	// Hash is not limited to 32 bytes, so also fix EsdtTokenData struct when that happens
-	// Also fix in mandos.
-	///////////////////////////////////////////
 	#[inline]
 	fn get_esdt_token_data(
 		&self,
 		address: &Address,
-		token: &[u8],
+		token: &TokenIdentifier,
 		nonce: u64,
 	) -> EsdtTokenData<ArwenBigUint> {
 		unsafe {
