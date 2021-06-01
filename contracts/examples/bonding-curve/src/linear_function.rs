@@ -8,7 +8,7 @@ use crate::bc_function::{BCFunction, CurveArguments};
 // y - exchanging token
 // a & b - linear equation coeficients
 // because of selling n tokens at a time, the total price y' will be
-// a* (nx + (n - 1) n / 2) = y'
+// a* (nx + (n - 1) n / 2) + nb = y'
 
 pub struct LinearFunction<BigUint: BigUintApi> {
 	pub a: BigUint,
