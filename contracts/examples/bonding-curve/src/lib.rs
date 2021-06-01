@@ -5,20 +5,17 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 mod bc_function;
-use bc_function::{CurveArguments, Token};
+use bc_function::{BCFunction, CurveArguments, SupplyType, Token};
 
-const EGLD_NUM_DECIMALS: usize = 18;
+mod linear_function;
+use linear_function::LinearFunction;
+
+const TOKEN_NUM_DECIMALS: usize = 18;
 
 #[elrond_wasm_derive::contract]
 pub trait BondingCurve {
 	#[init]
-	fn init(
-		&self,
-		issued_token: Token,
-		exchanging_token: Token,
-		arguments: CurveArguments<Self::BigUint>,
-	) {
-		self.arguments().set(&arguments);
+	fn init(&self, issued_token: Token, exchanging_token: Token) {
 		self.issued_token().set(&issued_token);
 		self.exchanging_token().set(&exchanging_token);
 	}
@@ -54,7 +51,7 @@ pub trait BondingCurve {
 				&self.issued_token().get().identifier.into_boxed_bytes(),
 				&initial_supply,
 				FungibleTokenProperties {
-					num_decimals: EGLD_NUM_DECIMALS,
+					num_decimals: TOKEN_NUM_DECIMALS,
 					can_freeze: false,
 					can_wipe: false,
 					can_pause: false,
@@ -80,14 +77,11 @@ pub trait BondingCurve {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.issue_success_event(caller, &identifier, &amount);
-				self.minted_supply().set(&amount);
-				self.available_supply().set(&amount);
+				self.supply().set(&amount);
+				self.balance().set(&amount);
 			},
 			AsyncCallResult::Err(message) => {
 				self.issue_failure_event(caller, message.err_msg.as_slice());
-
-				// return issue cost to the owner
-				// TODO: test that it works
 				if identifier.is_egld() && amount > 0 {
 					self.send().direct_egld(caller, &amount, &[]);
 				}
@@ -107,12 +101,23 @@ pub trait BondingCurve {
 			])));
 		}
 
-		let esdt_token_id = identifier.as_esdt_identifier();
+		require!(
+			self.supply_type().get() != SupplyType::Limited
+				|| self.max_supply().get() > self.supply().get(),
+			"Maximum supply limit reached!"
+		);
+
+		require!(
+			self.supply_type().get() != SupplyType::Limited
+				|| self.max_supply().get() >= self.supply().get() + amount.clone(),
+			"Minting will exceed the maximum supply limit!"
+		);
+
 		let caller = self.blockchain().get_caller();
 		self.mint_started_event(&caller, &amount);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.mint(esdt_token_id, &amount)
+			.mint(&identifier, &amount)
 			.async_call()
 			.with_callback(self.callbacks().mint_callback(&caller, &amount)))
 	}
@@ -127,10 +132,8 @@ pub trait BondingCurve {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.mint_success_event(caller);
-				self.minted_supply()
-					.update(|minted_supply| *minted_supply += amount);
-				self.available_supply()
-					.update(|available_supply| *available_supply += amount);
+				self.supply().update(|supply| *supply += amount);
+				self.balance().update(|balance| *balance += amount);
 			},
 			AsyncCallResult::Err(message) => {
 				self.mint_failure_event(caller, message.err_msg.as_slice());
@@ -153,7 +156,7 @@ pub trait BondingCurve {
 				b" tokens accepted",
 			])));
 		}
-		if self.available_supply().get() == Self::BigUint::zero() {
+		if self.balance().get() < amount.clone() {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Contract does not have enough ",
 				token.as_esdt_identifier(),
@@ -173,7 +176,6 @@ pub trait BondingCurve {
 		amount: &Self::BigUint,
 	) -> SCResult<()> {
 		let exchanging_token = &self.exchanging_token().get().identifier;
-
 		if exchanging_token != token {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
@@ -187,37 +189,48 @@ pub trait BondingCurve {
 		);
 		Ok(())
 	}
+	fn get_curve_arguments(self) -> CurveArguments<Self::BigUint> {
+		CurveArguments {
+			supply_type: self.supply_type().get(),
+			max_supply: self.max_supply().get().into(),
+			current_supply: self.supply().get().into(),
+			balance: self.balance().get().into(),
+		}
+	}
+
+	fn get_function(&self) -> LinearFunction<Self::BigUint> {
+		LinearFunction {
+			a: Self::BigUint::from(3u64),
+			b: Self::BigUint::from(5u64),
+		}
+	}
 
 	fn calculate_buy_price(&self, amount: Self::BigUint) -> SCResult<Self::BigUint> {
-		Ok(Self::BigUint::zero())
+		self.get_function().buy(amount, self.get_curve_arguments())
 	}
 
 	fn calculate_sale_price(&self, amount: Self::BigUint) -> SCResult<Self::BigUint> {
-		Ok(Self::BigUint::zero())
+		self.get_function().sell(amount, self.get_curve_arguments())
 	}
 
 	#[payable("*")]
 	#[endpoint(buyToken)]
 	fn buy_token(
 		&self,
-		#[payment] amount: Self::BigUint,
+		#[payment] buy_amount: Self::BigUint,
 		#[payment_token] token_identifier: TokenIdentifier,
 	) -> SCResult<()> {
-		self.check_buy_requirements(&token_identifier, &amount)?;
+		self.check_buy_requirements(&token_identifier, &buy_amount)?;
 
-		let calculated_price = &self.calculate_buy_price(amount).unwrap();
+		let calculated_price = &self.calculate_buy_price(buy_amount.clone()).unwrap();
 
-		self.available_supply()
-			.update(|available_supply| *available_supply += calculated_price);
+		self.balance().update(|balance| *balance += buy_amount);
 
 		let caller = self.blockchain().get_caller();
 
-		let _ = self.send().direct_esdt_via_transf_exec(
-			&caller,
-			token_identifier.as_esdt_identifier(),
-			&calculated_price,
-			b"buying",
-		);
+		let _ = self
+			.send()
+			.direct(&caller, &token_identifier, &calculated_price, b"buying");
 
 		self.buy_token_event(&caller, &calculated_price);
 
@@ -228,24 +241,21 @@ pub trait BondingCurve {
 	#[endpoint(sellToken)]
 	fn sell_token(
 		&self,
-		#[payment] amount: Self::BigUint,
+		#[payment] sell_amount: Self::BigUint,
 		#[payment_token] token_identifier: TokenIdentifier,
 	) -> SCResult<()> {
-		self.check_sell_requirements(&token_identifier, &amount)?;
+		self.check_sell_requirements(&token_identifier, &sell_amount)?;
 
-		let calculated_price = &self.calculate_sale_price(amount).unwrap();
+		let calculated_price = &self.calculate_sale_price(sell_amount).unwrap();
 
-		self.available_supply()
-			.update(|available_supply| *available_supply -= calculated_price);
+		self.balance()
+			.update(|balance| *balance -= calculated_price);
 
 		let caller = self.blockchain().get_caller();
 
-		let _ = self.send().direct_esdt_via_transf_exec(
-			&caller,
-			token_identifier.as_esdt_identifier(),
-			&calculated_price,
-			b"selling",
-		);
+		let _ = self
+			.send()
+			.direct(&caller, &token_identifier, &calculated_price, b"selling");
 
 		self.sell_token_event(&caller, &calculated_price);
 		Ok(())
@@ -253,9 +263,13 @@ pub trait BondingCurve {
 
 	// storage
 
-	#[view(getArguments)]
-	#[storage_mapper("arguments")]
-	fn arguments(&self) -> SingleValueMapper<Self::Storage, CurveArguments<Self::BigUint>>;
+	#[view(supplyType)]
+	#[storage_mapper("supply_type")]
+	fn supply_type(&self) -> SingleValueMapper<Self::Storage, SupplyType>;
+
+	#[view(maxSupply)]
+	#[storage_mapper("max_supply")]
+	fn max_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	#[view(getIssuedToken)]
 	#[storage_mapper("issued_token")]
@@ -266,12 +280,12 @@ pub trait BondingCurve {
 	fn exchanging_token(&self) -> SingleValueMapper<Self::Storage, Token>;
 
 	#[view(getMintedSupply)]
-	#[storage_mapper("minted_supply")]
-	fn minted_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+	#[storage_mapper("supply")]
+	fn supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	#[view(getAvailableSupply)]
-	#[storage_mapper("available_supply")]
-	fn available_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+	#[storage_mapper("balance")]
+	fn balance(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	//events
 
