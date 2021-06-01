@@ -3,9 +3,9 @@ elrond_wasm::derive_imports!();
 
 use crate::bc_function::{BCFunction, CurveArguments};
 
-pub struct PowerFunction<BigUint: BigUintApi> {}
+pub struct LogarithmicFunction<BigUint: BigUintApi> {}
 
-impl<BigUint> BCFunction<BigUint> for PowerFunction<BigUint>
+impl<BigUint> BCFunction<BigUint> for LogarithmicFunction<BigUint>
 where
 	BigUint: BigUintApi,
 {
