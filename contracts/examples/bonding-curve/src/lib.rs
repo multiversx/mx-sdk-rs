@@ -73,16 +73,16 @@ pub trait BondingCurve {
 		#[payment] amount: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
-		let identifier = self.issued_token().get().identifier.clone();
+		let token = self.issued_token().get().identifier;
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.issue_success_event(caller, &identifier, &amount);
+				self.issue_success_event(caller, &token, &amount);
 				self.supply().set(&amount);
 				self.balance().set(&amount);
 			},
 			AsyncCallResult::Err(message) => {
 				self.issue_failure_event(caller, message.err_msg.as_slice());
-				if identifier.is_egld() && amount > 0 {
+				if token.is_egld() && amount > 0 {
 					self.send().direct_egld(caller, &amount, &[]);
 				}
 			},
@@ -93,10 +93,10 @@ pub trait BondingCurve {
 	fn mint_token(&self, amount: Self::BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
-		let identifier = self.issued_token().get().identifier.clone();
+		let token = self.issued_token().get().identifier;
 		if self.issued_token().is_empty() {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
-				identifier.as_esdt_identifier(),
+				token.as_esdt_identifier(),
 				b" was not issued yet",
 			])));
 		}
@@ -117,7 +117,7 @@ pub trait BondingCurve {
 		self.mint_started_event(&caller, &amount);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.mint(&identifier, &amount)
+			.mint(&token, &amount)
 			.async_call()
 			.with_callback(self.callbacks().mint_callback(&caller, &amount)))
 	}
@@ -192,9 +192,9 @@ pub trait BondingCurve {
 	fn get_curve_arguments(self) -> CurveArguments<Self::BigUint> {
 		CurveArguments {
 			supply_type: self.supply_type().get(),
-			max_supply: self.max_supply().get().into(),
-			current_supply: self.supply().get().into(),
-			balance: self.balance().get().into(),
+			max_supply: self.max_supply().get(),
+			current_supply: self.supply().get(),
+			balance: self.balance().get(),
 		}
 	}
 

@@ -29,5 +29,5 @@ where
 	}
 }
 fn sum_interval<BigUint: BigUintApi>(n: BigUint, x: BigUint) -> BigUint {
-	x.clone() * n.clone() + (n.clone() - BigUint::from(1u64)) * n / BigUint::from(2u64)
+	x * n.clone() + (n.clone() - BigUint::from(1u64)) * n / BigUint::from(2u64)
 }
