@@ -13,7 +13,7 @@
             "balance": "0",
             "storage": {},
             "esdt": {
-              "str:CrowdToken": "400,000,000,000"
+              "str:CROWD-123456": "400,000,000,000"
             }
           }
         }
@@ -26,7 +26,7 @@
             "to": "sc:crowdfunding",
             "value": "0",
             "esdt": {
-              "tokenIdentifier": "str:CrowdToken",
+              "tokenIdentifier": "str:CROWD-123456",
               "value": "250,000,000,000"
             },
             "function": "fund",
@@ -53,7 +53,7 @@
             "balance": "0",
             "storage": {},
             "esdt": {
-              "str:CrowdToken": "150,000,000,000"
+              "str:CROWD-123456": "150,000,000,000"
             }
           },
           "sc:crowdfunding": {
@@ -62,11 +62,11 @@
             "storage": {
               "str:target": "500,000,000,000",
               "str:deadline": "123,000",
-              "str:tokenName": "str:CrowdToken",
+              "str:tokenName": "str:CROWD-123456",
               "str:deposit|address:donor1": "250,000,000,000"
             },
             "esdt": {
-              "str:CrowdToken": "250,000,000,000"
+              "str:CROWD-123456": "250,000,000,000"
             },
             "code": "file:../output/crowdfunding-esdt.wasm"
           }
