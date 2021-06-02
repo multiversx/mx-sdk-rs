@@ -21,6 +21,16 @@ pub trait EllipticCurveApi:
 		size_of_field: i32,
 	) -> Self;
 
+	fn get_values(
+		&self,
+	) -> (
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+	);
+
 	fn p224_ec() -> Self;
 
 	fn p256_ec() -> Self;

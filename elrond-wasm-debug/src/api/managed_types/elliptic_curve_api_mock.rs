@@ -92,6 +92,18 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		panic!("new_elliptic_curve not implemented yet!")
 	}
 
+	fn get_values(
+		&self,
+	) -> (
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+	) {
+		panic!("elliptic curve get_values not implemented yet!")
+	}
+
 	fn p224_ec() -> Self {
 		panic!("p224_ec not implemented yet!")
 	}

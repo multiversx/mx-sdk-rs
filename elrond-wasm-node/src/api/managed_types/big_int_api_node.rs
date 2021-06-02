@@ -92,7 +92,7 @@ macro_rules! binary_operator {
 			fn $method(self, other: ArwenBigInt) -> ArwenBigInt {
 				unsafe {
 					let result = bigIntNew(0);
-					$api_func(result, self.handle, other.handle);
+					$api_func(self.handle, self.handle, other.handle);
 					ArwenBigInt { handle: result }
 				}
 			}

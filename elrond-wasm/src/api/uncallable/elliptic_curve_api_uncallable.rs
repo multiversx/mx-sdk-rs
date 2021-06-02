@@ -96,6 +96,18 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		unreachable!()
 	}
 
+	fn get_values(
+		&self,
+	) -> (
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+		Self::BigUint,
+	) {
+		unreachable!()
+	}
+
 	fn p224_ec() -> Self {
 		unreachable!()
 	}
