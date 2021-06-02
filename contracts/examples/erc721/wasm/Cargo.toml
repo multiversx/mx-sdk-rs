@@ -1,5 +1,5 @@
 [package]
-name = "non-fungible-tokens-wasm"
+name = "erc721-wasm"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -17,7 +17,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.non-fungible-tokens]
+[dependencies.erc721]
 features = [ "wasm-output-mode",]
 default-features = false
 path = ".."
