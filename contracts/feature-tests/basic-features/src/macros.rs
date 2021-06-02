@@ -59,4 +59,10 @@ pub trait Macros {
 		let unwrapped = SCResult::from_result(arg.ok_or("option argument is none"))?;
 		Ok(unwrapped)
 	}
+
+	#[endpoint]
+	fn result_echo_2(&self, arg: Option<String>) -> SCResult<String> {
+		let unwrapped = arg.ok_or("option argument is none")?;
+		Ok(unwrapped)
+	}
 }
