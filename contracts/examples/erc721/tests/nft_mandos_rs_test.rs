@@ -5,7 +5,7 @@ fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
 		"file:../output/erc721.wasm",
-		Box::new(|context| Box::new(non_fungible_tokens::contract_obj(context))),
+		Box::new(|context| Box::new(erc721::contract_obj(context))),
 	);
 	contract_map
 }
