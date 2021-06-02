@@ -1,5 +1,5 @@
 [package]
-name = "non-fungible-tokens"
+name = "erc721"
 version = "0.0.0"
 authors = [ "Dorin Iancu <dorin.iancu@elrond.com>",]
 edition = "2018"
