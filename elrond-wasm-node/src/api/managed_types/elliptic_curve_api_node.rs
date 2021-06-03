@@ -1,8 +1,8 @@
 use super::ArwenBigUint;
 use crate::String;
 use elrond_wasm::api::EllipticCurveApi;
-use elrond_wasm::elrond_codec::*;
 use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::*;
 
 extern "C" {
 	fn bigIntNew(value: i64) -> i32;
@@ -127,7 +127,7 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		eq_constant: Self::BigUint,
 		x_base_point: Self::BigUint,
 		y_base_point: Self::BigUint,
-		size_of_field: i32,
+		size_of_field: u32,
 	) -> Self {
 		unsafe {
 			let handle = ellipticCurveNew(
@@ -136,7 +136,7 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 				eq_constant.handle,
 				x_base_point.handle,
 				y_base_point.handle,
-				size_of_field,
+				size_of_field as i32,
 			);
 			ArwenEllipticCurve { handle }
 		}
@@ -415,68 +415,112 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 	}
 }
 
-impl NestedEncode for ArwenEllipticCurve {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+use elrond_codec::*;
 
-	fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
-		panic!("not implemented")
+impl NestedEncode for ArwenEllipticCurve {
+	
+
+	fn dep_encode<O: NestedEncodeOutput>(
+		&self,
+		dest: &mut O,
+	) -> core::result::Result<(), EncodeError> {
+		let (field_order, base_point_order, eq_constant, x_base_point, y_base_point) =
+			self.get_values();
+		NestedEncode::dep_encode(&field_order, dest)?;
+		NestedEncode::dep_encode(&base_point_order, dest)?;
+		NestedEncode::dep_encode(&eq_constant, dest)?;
+		NestedEncode::dep_encode(&x_base_point, dest)?;
+		NestedEncode::dep_encode(&y_base_point, dest)?;
+		Ok(())
 	}
 
 	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
 		&self,
-		_dest: &mut O,
-		_c: ExitCtx,
-		_exit: fn(ExitCtx, EncodeError) -> !,
+		dest: &mut O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
-		panic!("not implemented")
+		let (field_order, base_point_order, eq_constant, x_base_point, y_base_point) =
+			self.get_values();
+		NestedEncode::dep_encode_or_exit(&field_order, dest, c.clone(), exit);
+		NestedEncode::dep_encode_or_exit(&base_point_order, dest, c.clone(), exit);
+		NestedEncode::dep_encode_or_exit(&eq_constant, dest, c.clone(), exit);
+		NestedEncode::dep_encode_or_exit(&x_base_point, dest, c.clone(), exit);
+		NestedEncode::dep_encode_or_exit(&y_base_point, dest, c, exit);
 	}
 }
 
 impl TopEncode for ArwenEllipticCurve {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
-	fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
-		panic!("not implemented")
+	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+		top_encode_from_nested(self, output)
 	}
 
 	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
 		&self,
-		_output: O,
-		_c: ExitCtx,
-		_exit: fn(ExitCtx, EncodeError) -> !,
+		output: O,
+		c: ExitCtx,
+		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
-		panic!("not implemented")
+		top_encode_from_nested_or_exit(self, output, c, exit);
 	}
 }
 
 impl NestedDecode for ArwenEllipticCurve {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
-	fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
-		panic!("not implemented")
+	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+		let field_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let base_point_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let eq_constant = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let x_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let y_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let size_of_field = u32::dep_decode(input)?;
+		Ok(ArwenEllipticCurve::new_elliptic_curve(
+			field_order,
+			base_point_order,
+			eq_constant,
+			x_base_point,
+			y_base_point,
+			size_of_field,
+		))
 	}
 
 	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-		_input: &mut I,
-		_c: ExitCtx,
-		_exit: fn(ExitCtx, DecodeError) -> !,
+		input: &mut I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		panic!("not implemented")
+		let field_order = <Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let base_point_order = <Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let eq_constant = <Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let x_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let y_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let size_of_field = u32::dep_decode_or_exit(input, c, exit);
+		ArwenEllipticCurve::new_elliptic_curve(
+			field_order,
+			base_point_order,
+			eq_constant,
+			x_base_point,
+			y_base_point,
+			size_of_field,
+		)
 	}
 }
 
 impl TopDecode for ArwenEllipticCurve {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
-	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
-		panic!("not implemented")
+	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+		top_decode_from_nested(input)
 	}
 
 	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		_input: I,
-		_: ExitCtx,
-		_: fn(ExitCtx, DecodeError) -> !,
+		input: I,
+		c: ExitCtx,
+		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		panic!("not implemented")
+		top_decode_from_nested_or_exit(input, c, exit)
 	}
 }

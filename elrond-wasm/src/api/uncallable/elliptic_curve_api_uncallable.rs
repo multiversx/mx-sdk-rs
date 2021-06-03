@@ -17,7 +17,7 @@ impl TypeAbi for EllipticCurveUncallable {
 }
 
 impl NestedEncode for EllipticCurveUncallable {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
 		unreachable!()
@@ -34,7 +34,7 @@ impl NestedEncode for EllipticCurveUncallable {
 }
 
 impl TopEncode for EllipticCurveUncallable {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
 		unreachable!()
@@ -51,7 +51,7 @@ impl TopEncode for EllipticCurveUncallable {
 }
 
 impl NestedDecode for EllipticCurveUncallable {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
 		unreachable!()
@@ -67,7 +67,7 @@ impl NestedDecode for EllipticCurveUncallable {
 }
 
 impl TopDecode for EllipticCurveUncallable {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
 		unreachable!()
@@ -91,7 +91,7 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		_eq_constant: Self::BigUint,
 		_x_base_point: Self::BigUint,
 		_y_base_point: Self::BigUint,
-		_size_of_field: i32,
+		_size_of_field: u32,
 	) -> Self {
 		unreachable!()
 	}
