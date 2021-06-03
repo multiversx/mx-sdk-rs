@@ -11,7 +11,7 @@ mod views;
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 const NFT_AMOUNT: u32 = 1; // Token has to be unique to be considered NFT
 
-struct BidSplitAmounts<BigUint: BigUintApi> {
+pub struct BidSplitAmounts<BigUint: BigUintApi> {
 	creator: BigUint,
 	marketplace: BigUint,
 	seller: BigUint,
@@ -138,11 +138,9 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> SCResult<()> {
-		self.require_auction_exists(auction_id)?;
-
+		let mut auction = self.try_get_auction(auction_id)?;
 		let caller = self.blockchain().get_caller();
 		let current_time = self.blockchain().get_block_timestamp();
-		let mut auction = self.auction_by_id(auction_id).get();
 
 		require!(
 			auction.auctioned_token.token_type == nft_type
@@ -198,9 +196,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 	#[endpoint(endAuction)]
 	fn end_auction(&self, auction_id: u64) -> SCResult<()> {
-		self.require_auction_exists(auction_id)?;
-
-		let mut auction = self.auction_by_id(auction_id).get();
+		let mut auction = self.try_get_auction(auction_id)?;
 		let current_time = self.blockchain().get_block_timestamp();
 
 		require!(
@@ -232,9 +228,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> SCResult<()> {
-		self.require_auction_exists(auction_id)?;
-
-		let mut auction = self.auction_by_id(auction_id).get();
+		let mut auction = self.try_get_auction(auction_id)?;
 
 		require!(
 			auction.auctioned_token.token_type == nft_type
@@ -268,13 +262,8 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	}
 
 	#[endpoint]
-	fn withdraw(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
-		require!(
-			self.does_auction_exist(&nft_type, nft_nonce),
-			"Token is not up for auction"
-		);
-
-		let auction = self.auction_by_id(&nft_type, nft_nonce).get();
+	fn withdraw(&self, auction_id: u64) -> SCResult<()> {
+		let auction = self.try_get_auction(auction_id)?;
 		let caller = self.blockchain().get_caller();
 
 		require!(
@@ -282,31 +271,29 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			"Only the original owner can withdraw"
 		);
 		require!(
-			auction.current_bid == 0,
+			auction.current_bid == 0
+				|| auction.auction_status == AuctionStatus::SftWaitingForBuyOrOwnerClaim,
 			"Can't withdraw, NFT already has bids"
 		);
 
-		self.auction_by_id(&nft_type, nft_nonce).clear();
+		self.auction_by_id(auction_id).clear();
 
-		let _ = self.send().direct_nft(
-			&caller,
-			&nft_type,
-			nft_nonce,
-			&Self::BigUint::from(NFT_AMOUNT),
-			self.data_or_empty_if_sc(&caller, b"returned token"),
-		);
+		let nft_type = &auction.auctioned_token.token_type;
+		let nft_nonce = auction.auctioned_token.nonce;
+		let nft_amount = &auction.nr_auctioned_tokens;
+		self.transfer_esdt(&caller, nft_type, nft_nonce, &nft_amount, b"returned token");
 
 		Ok(())
 	}
 
 	// private
 
-	fn require_auction_exists(&self, auction_id: u64) -> SCResult<()> {
+	fn try_get_auction(&self, auction_id: u64) -> SCResult<Auction<Self::BigUint>> {
 		require!(
 			self.does_auction_exist(auction_id),
 			"Auction does not exist"
 		);
-		Ok(())
+		Ok(self.auction_by_id(auction_id).get())
 	}
 
 	fn calculate_cut_amount(
