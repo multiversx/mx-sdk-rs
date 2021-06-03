@@ -123,18 +123,29 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 	#[payable("*")]
 	#[endpoint]
-	fn bid(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+	fn bid(
+		&self,
+		#[payment_token] payment_token: TokenIdentifier,
+		#[payment_nonce] payment_token_nonce: u64,
+		#[payment_amount] payment_amount: Self::BigUint,
+		auction_id: u64,
+		nft_type: TokenIdentifier,
+		nft_nonce: u64,
+	) -> SCResult<()> {
 		require!(
-			self.does_auction_exist(&nft_type, nft_nonce),
-			"Token is not up for auction"
+			self.does_auction_exist(auction_id),
+			"Auction does not exist"
 		);
 
-		let (payment_amount, payment_token) = self.call_value().payment_token_pair();
-		let payment_token_nonce = self.call_value().esdt_token_nonce();
 		let caller = self.blockchain().get_caller();
 		let current_time = self.blockchain().get_block_timestamp();
-		let mut auction = self.auction_by_id(&nft_type, nft_nonce).get();
+		let mut auction = self.auction_by_id(auction_id).get();
 
+		require!(
+			auction.auctioned_token.token_type == nft_type
+				&& auction.auctioned_token.nonce == nft_nonce,
+			"Auction ID does not match the token"
+		);
 		require!(
 			auction.original_owner != caller,
 			"Can't bid on your own token"
@@ -177,37 +188,39 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		// update auction bid and winner
 		auction.current_bid = payment_amount;
 		auction.current_winner = caller;
-		self.auction_by_id(&nft_type, nft_nonce).set(&auction);
+		self.auction_by_id(auction_id).set(&auction);
 
 		Ok(())
 	}
 
 	#[endpoint(endAuction)]
-	fn end_auction(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
+	fn end_auction(&self, auction_id: u64) -> SCResult<()> {
 		require!(
-			self.does_auction_exist(&nft_type, nft_nonce),
-			"Token is not up for auction"
+			self.does_auction_exist(auction_id),
+			"Auction does not exist"
 		);
 
-		let auction = self.auction_by_id(&nft_type, nft_nonce).get();
+		let mut auction = self.auction_by_id(auction_id).get();
+		let current_time = self.blockchain().get_block_timestamp();
 
 		require!(
-			self.blockchain().get_block_timestamp() > auction.deadline
-				|| auction.current_bid == auction.max_bid,
+			current_time > auction.deadline || auction.current_bid == auction.max_bid,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
-		self.auction_by_id(&nft_type, nft_nonce).clear();
+		let nft_type = &auction.auctioned_token.token_type;
+		let nft_nonce = auction.auctioned_token.nonce;
 
 		if auction.current_winner != Address::zero() {
-			let nft_info = self.get_nft_info(&nft_type, nft_nonce);
+			let nft_info = self.get_nft_info(nft_type, nft_nonce);
 
 			let creator_royalties = self
 				.calculate_cut_amount(&auction.current_bid, &auction.creator_royalties_percentage);
 			let bid_cut_amount = self
 				.calculate_cut_amount(&auction.current_bid, &auction.marketplace_cut_percentage);
-			let seller_amount_to_send =
-				&auction.current_bid - &creator_royalties - bid_cut_amount.clone();
+			let mut seller_amount_to_send = auction.current_bid.clone();
+			seller_amount_to_send -= &creator_royalties;
+			seller_amount_to_send -= &bid_cut_amount;
 
 			let token_id = &auction.payment_token.token_type;
 			let nonce = auction.payment_token.nonce;
@@ -241,11 +254,15 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			);
 
 			// send NFT to auction winner
-			let _ = self.send().direct_nft(
+			let nft_amount_to_send = match auction.auction_type {
+				AuctionType::Nft | AuctionType::SftOnePerUser => NFT_AMOUNT.into(),
+				_ => auction.nr_auctioned_tokens.clone(),
+			};
+			self.send().direct_nft(
 				&auction.current_winner,
 				&nft_type,
 				nft_nonce,
-				&Self::BigUint::from(NFT_AMOUNT),
+				&nft_amount_to_send,
 				self.data_or_empty_if_sc(&auction.current_winner, b"bought token at auction"),
 			);
 		} else {
@@ -254,9 +271,17 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 				&auction.original_owner,
 				&nft_type,
 				nft_nonce,
-				&Self::BigUint::from(NFT_AMOUNT),
+				&auction.nr_auctioned_tokens,
 				self.data_or_empty_if_sc(&auction.original_owner, b"returned token"),
 			);
+		}
+
+		if auction.auction_type == AuctionType::SftOnePerUser {
+			auction.auction_status = AuctionStatus::SftWaitingForBuyOrOwnerClaim;
+			auction.nr_auctioned_tokens -= Self::BigUint::from(1u32);
+			self.auction_by_id(auction_id).set(&auction);
+		} else {
+			self.auction_by_id(auction_id).clear();
 		}
 
 		Ok(())
@@ -301,7 +326,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		total_amount: &Self::BigUint,
 		cut_percentage: &Self::BigUint,
 	) -> Self::BigUint {
-		total_amount * cut_percentage / Self::BigUint::from(PERCENTAGE_TOTAL)
+		total_amount * cut_percentage / PERCENTAGE_TOTAL.into()
 	}
 
 	fn transfer_esdt(

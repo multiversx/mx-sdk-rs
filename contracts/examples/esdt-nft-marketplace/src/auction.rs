@@ -21,7 +21,7 @@ pub struct Auction<BigUint: BigUintApi> {
 	pub creator_royalties_percentage: BigUint,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq)]
 pub enum AuctionType {
     None,
     Nft,
@@ -29,7 +29,7 @@ pub enum AuctionType {
     SftOnePerUser
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq)]
 pub enum AuctionStatus {
     None,
     Running,
