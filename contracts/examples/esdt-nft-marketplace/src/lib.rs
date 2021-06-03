@@ -203,6 +203,10 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			current_time > auction.deadline || auction.current_bid == auction.max_bid,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
+		require!(
+			auction.auction_status == AuctionStatus::Running,
+			"Auction already ended"
+		);
 
 		self.distribute_tokens_after_auction_end(&auction);
 
@@ -229,6 +233,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		nft_nonce: u64,
 	) -> SCResult<()> {
 		let mut auction = self.try_get_auction(auction_id)?;
+		let caller = self.blockchain().get_caller();
 
 		require!(
 			auction.auctioned_token.token_type == nft_type
@@ -249,6 +254,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			"Wrong amount paid, must pay equal to current winning bid"
 		);
 
+		auction.current_winner = caller;
 		self.distribute_tokens_after_auction_end(&auction);
 
 		auction.nr_auctioned_tokens -= &NFT_AMOUNT.into();
