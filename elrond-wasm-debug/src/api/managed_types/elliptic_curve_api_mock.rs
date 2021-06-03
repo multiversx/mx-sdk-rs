@@ -7,7 +7,7 @@ pub struct EllipticCurveMock;
 use elrond_wasm::elrond_codec::*;
 
 impl NestedEncode for EllipticCurveMock {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
 		panic!("not implemented")
@@ -24,7 +24,7 @@ impl NestedEncode for EllipticCurveMock {
 }
 
 impl TopEncode for EllipticCurveMock {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
 		panic!("not implemented")
@@ -41,7 +41,7 @@ impl TopEncode for EllipticCurveMock {
 }
 
 impl NestedDecode for EllipticCurveMock {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
 		panic!("not implemented")
@@ -57,7 +57,7 @@ impl NestedDecode for EllipticCurveMock {
 }
 
 impl TopDecode for EllipticCurveMock {
-	const TYPE_INFO: TypeInfo = TypeInfo::EllipticCurve;
+	
 
 	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
 		panic!("not implemented")
@@ -87,7 +87,7 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		_eq_constant: Self::BigUint,
 		_x_base_point: Self::BigUint,
 		_y_base_point: Self::BigUint,
-		_size_of_field: i32,
+		_size_of_field: u32,
 	) -> Self {
 		panic!("new_elliptic_curve not implemented yet!")
 	}

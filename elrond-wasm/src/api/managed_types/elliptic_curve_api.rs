@@ -18,7 +18,7 @@ pub trait EllipticCurveApi:
 		eq_constant: Self::BigUint,
 		x_base_point: Self::BigUint,
 		y_base_point: Self::BigUint,
-		size_of_field: i32,
+		size_of_field: u32,
 	) -> Self;
 
 	fn get_values(
