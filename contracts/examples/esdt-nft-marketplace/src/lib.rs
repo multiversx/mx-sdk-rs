@@ -11,6 +11,12 @@ mod views;
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 const NFT_AMOUNT: u32 = 1; // Token has to be unique to be considered NFT
 
+struct BidSplitAmounts<BigUint: BigUintApi> {
+	creator: BigUint,
+	marketplace: BigUint,
+	seller: BigUint,
+}
+
 #[elrond_wasm_derive::contract]
 pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	#[init]
@@ -132,10 +138,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		nft_type: TokenIdentifier,
 		nft_nonce: u64,
 	) -> SCResult<()> {
-		require!(
-			self.does_auction_exist(auction_id),
-			"Auction does not exist"
-		);
+		self.require_auction_exists(auction_id)?;
 
 		let caller = self.blockchain().get_caller();
 		let current_time = self.blockchain().get_block_timestamp();
@@ -195,10 +198,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 	#[endpoint(endAuction)]
 	fn end_auction(&self, auction_id: u64) -> SCResult<()> {
-		require!(
-			self.does_auction_exist(auction_id),
-			"Auction does not exist"
-		);
+		self.require_auction_exists(auction_id)?;
 
 		let mut auction = self.auction_by_id(auction_id).get();
 		let current_time = self.blockchain().get_block_timestamp();
@@ -208,80 +208,60 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
-		let nft_type = &auction.auctioned_token.token_type;
-		let nft_nonce = auction.auctioned_token.nonce;
-
-		if auction.current_winner != Address::zero() {
-			let nft_info = self.get_nft_info(nft_type, nft_nonce);
-
-			let creator_royalties = self
-				.calculate_cut_amount(&auction.current_bid, &auction.creator_royalties_percentage);
-			let bid_cut_amount = self
-				.calculate_cut_amount(&auction.current_bid, &auction.marketplace_cut_percentage);
-			let mut seller_amount_to_send = auction.current_bid.clone();
-			seller_amount_to_send -= &creator_royalties;
-			seller_amount_to_send -= &bid_cut_amount;
-
-			let token_id = &auction.payment_token.token_type;
-			let nonce = auction.payment_token.nonce;
-
-			// send part as cut for contract owner
-			let owner = self.blockchain().get_owner_address();
-			self.transfer_esdt(
-				&owner,
-				token_id,
-				nonce,
-				&bid_cut_amount,
-				b"bid cut for sold token",
-			);
-
-			// send part as royalties to creator
-			self.transfer_esdt(
-				&nft_info.creator,
-				token_id,
-				nonce,
-				&creator_royalties,
-				b"royalties for sold token",
-			);
-
-			// send rest of the bid to original owner
-			self.transfer_esdt(
-				&auction.original_owner,
-				token_id,
-				nonce,
-				&seller_amount_to_send,
-				b"sold token",
-			);
-
-			// send NFT to auction winner
-			let nft_amount_to_send = match auction.auction_type {
-				AuctionType::Nft | AuctionType::SftOnePerUser => NFT_AMOUNT.into(),
-				_ => auction.nr_auctioned_tokens.clone(),
-			};
-			self.send().direct_nft(
-				&auction.current_winner,
-				&nft_type,
-				nft_nonce,
-				&nft_amount_to_send,
-				self.data_or_empty_if_sc(&auction.current_winner, b"bought token at auction"),
-			);
-		} else {
-			// return to original owner
-			let _ = self.send().direct_nft(
-				&auction.original_owner,
-				&nft_type,
-				nft_nonce,
-				&auction.nr_auctioned_tokens,
-				self.data_or_empty_if_sc(&auction.original_owner, b"returned token"),
-			);
-		}
+		self.distribute_tokens_after_auction_end(&auction);
 
 		if auction.auction_type == AuctionType::SftOnePerUser {
 			auction.auction_status = AuctionStatus::SftWaitingForBuyOrOwnerClaim;
-			auction.nr_auctioned_tokens -= Self::BigUint::from(1u32);
+			auction.nr_auctioned_tokens -= &NFT_AMOUNT.into();
 			self.auction_by_id(auction_id).set(&auction);
 		} else {
 			self.auction_by_id(auction_id).clear();
+		}
+
+		Ok(())
+	}
+
+	#[payable("*")]
+	#[endpoint(buySftAfterEndAuction)]
+	fn buy_sft_after_end_auction(
+		&self,
+		#[payment_token] payment_token: TokenIdentifier,
+		#[payment_nonce] payment_token_nonce: u64,
+		#[payment_amount] payment_amount: Self::BigUint,
+		auction_id: u64,
+		nft_type: TokenIdentifier,
+		nft_nonce: u64,
+	) -> SCResult<()> {
+		self.require_auction_exists(auction_id)?;
+
+		let mut auction = self.auction_by_id(auction_id).get();
+
+		require!(
+			auction.auctioned_token.token_type == nft_type
+				&& auction.auctioned_token.nonce == nft_nonce,
+			"Auction ID does not match the token"
+		);
+		require!(
+			auction.auction_status == AuctionStatus::SftWaitingForBuyOrOwnerClaim,
+			"Cannot buy SFT for this auction"
+		);
+		require!(
+			payment_token == auction.payment_token.token_type
+				&& payment_token_nonce == auction.payment_token.nonce,
+			"Wrong token used as payment"
+		);
+		require!(
+			auction.current_bid == payment_amount,
+			"Wrong amount paid, must pay equal to current winning bid"
+		);
+
+		self.distribute_tokens_after_auction_end(&auction);
+
+		auction.nr_auctioned_tokens -= &NFT_AMOUNT.into();
+		if auction.nr_auctioned_tokens == 0 {
+			self.auction_by_id(auction_id).clear();
+		} else {
+			self.auction_by_id(auction_id).set(&auction);
 		}
 
 		Ok(())
@@ -321,12 +301,101 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 	// private
 
+	fn require_auction_exists(&self, auction_id: u64) -> SCResult<()> {
+		require!(
+			self.does_auction_exist(auction_id),
+			"Auction does not exist"
+		);
+		Ok(())
+	}
+
 	fn calculate_cut_amount(
 		&self,
 		total_amount: &Self::BigUint,
 		cut_percentage: &Self::BigUint,
 	) -> Self::BigUint {
 		total_amount * cut_percentage / PERCENTAGE_TOTAL.into()
+	}
+
+	fn calculate_winning_bid_split(
+		&self,
+		auction: &Auction<Self::BigUint>,
+	) -> BidSplitAmounts<Self::BigUint> {
+		let creator_royalties =
+			self.calculate_cut_amount(&auction.current_bid, &auction.creator_royalties_percentage);
+		let bid_cut_amount =
+			self.calculate_cut_amount(&auction.current_bid, &auction.marketplace_cut_percentage);
+		let mut seller_amount_to_send = auction.current_bid.clone();
+		seller_amount_to_send -= &creator_royalties;
+		seller_amount_to_send -= &bid_cut_amount;
+
+		BidSplitAmounts {
+			creator: creator_royalties,
+			marketplace: bid_cut_amount,
+			seller: seller_amount_to_send,
+		}
+	}
+
+	fn distribute_tokens_after_auction_end(&self, auction: &Auction<Self::BigUint>) {
+		let nft_type = &auction.auctioned_token.token_type;
+		let nft_nonce = auction.auctioned_token.nonce;
+
+		if auction.current_winner != Address::zero() {
+			let nft_info = self.get_nft_info(nft_type, nft_nonce);
+			let token_id = &auction.payment_token.token_type;
+			let nonce = auction.payment_token.nonce;
+			let bid_split_amounts = self.calculate_winning_bid_split(&auction);
+
+			// send part as cut for contract owner
+			let owner = self.blockchain().get_owner_address();
+			self.transfer_esdt(
+				&owner,
+				token_id,
+				nonce,
+				&bid_split_amounts.marketplace,
+				b"bid cut for sold token",
+			);
+
+			// send part as royalties to creator
+			self.transfer_esdt(
+				&nft_info.creator,
+				token_id,
+				nonce,
+				&bid_split_amounts.creator,
+				b"royalties for sold token",
+			);
+
+			// send rest of the bid to original owner
+			self.transfer_esdt(
+				&auction.original_owner,
+				token_id,
+				nonce,
+				&bid_split_amounts.seller,
+				b"sold token",
+			);
+
+			// send NFT to auction winner
+			let nft_amount_to_send = match auction.auction_type {
+				AuctionType::Nft | AuctionType::SftOnePerUser => NFT_AMOUNT.into(),
+				_ => auction.nr_auctioned_tokens.clone(),
+			};
+			self.transfer_esdt(
+				&auction.current_winner,
+				&nft_type,
+				nft_nonce,
+				&nft_amount_to_send,
+				b"bought token at auction",
+			);
+		} else {
+			// return to original owner
+			self.transfer_esdt(
+				&auction.original_owner,
+				&nft_type,
+				nft_nonce,
+				&auction.nr_auctioned_tokens,
+				b"returned token",
+			);
+		}
 	}
 
 	fn transfer_esdt(
@@ -342,7 +411,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			self.send()
 				.direct(to, &token_id, amount, self.data_or_empty_if_sc(to, data));
 		} else {
-			let _ = self.send().direct_nft(
+			self.send().direct_nft(
 				to,
 				&token_id,
 				nonce,
