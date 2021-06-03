@@ -14,10 +14,9 @@
                 "value": "0",
                 "function": "withdraw",
                 "arguments": [
-                    "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "7,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -52,7 +51,8 @@
                     "balance": "0",
                     "storage": {
                         "str:bidCutPerecentage": "1000",
-                        "str:auctionForToken|nested:str:NFT-123456|u64:1": ""
+                        "str:lastValidAuctionId": "1",
+                        "str:auctionById|nested:str:NFT-123456|u64:1": ""
                     },
                     "code": "file:../output/esdt-nft-marketplace.wasm"
                 },
