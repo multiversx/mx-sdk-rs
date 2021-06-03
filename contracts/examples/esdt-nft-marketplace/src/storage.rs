@@ -8,10 +8,13 @@ pub trait StorageModule {
 	#[storage_mapper("bidCutPerecentage")]
 	fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
-	#[storage_mapper("auctionForToken")]
-	fn auction_for_token(
+	#[storage_mapper("auctionById")]
+	fn auction_by_id(
 		&self,
-		nft_type: &TokenIdentifier,
-		nft_nonce: u64,
+		auction_id: u64,
 	) -> SingleValueMapper<Self::Storage, Auction<Self::BigUint>>;
+
+	#[view(getLastValidAuctionId)]
+	#[storage_mapper("lastValidAuctionId")]
+	fn last_valid_auction_id(&self) -> SingleValueMapper<Self::Storage, u64>;
 }
