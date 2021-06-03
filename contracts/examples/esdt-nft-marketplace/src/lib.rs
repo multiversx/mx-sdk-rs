@@ -28,38 +28,35 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 	// endpoints
 
-	// TODO: Add macro-generated token-payment arguments once they're all available
 	#[payable("*")]
 	#[endpoint(auctionToken)]
 	fn auction_token(
 		&self,
+		#[payment_token] nft_type: TokenIdentifier,
+		#[payment_nonce] nft_nonce: u64,
+		#[payment_amount] nft_amount: Self::BigUint,
 		min_bid: Self::BigUint,
 		max_bid: Self::BigUint,
 		deadline: u64,
 		accepted_payment_token: TokenIdentifier,
 		#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,
+		#[var_args] opt_sft_max_one_per_user: OptionalArg<bool>,
 		#[var_args] opt_start_time: OptionalArg<u64>,
 	) -> SCResult<()> {
-		let nft_type = self.call_value().token();
-		let nft_nonce = self.call_value().esdt_token_nonce();
 		let current_time = self.blockchain().get_block_timestamp();
 		let start_time = opt_start_time.into_option().unwrap_or(current_time);
 
 		require!(
-			self.call_value().esdt_token_type() == EsdtTokenType::NonFungible,
-			"Only Non-Fungible tokens can be auctioned"
-		);
-		require!(
-			self.call_value().esdt_value() == Self::BigUint::from(NFT_AMOUNT),
-			"Token is not an NFT"
-		);
-		require!(
-			!self.does_auction_exist(&nft_type, nft_nonce),
-			"There is already an auction for that token"
+			nft_nonce > 0,
+			"Only Semi-Fungible and Non-Fungible tokens can be auctioned"
 		);
 		require!(
 			min_bid > 0 && min_bid <= max_bid,
 			"Min bid can't be 0 or higher than max bid"
+		);
+		require!(
+			accepted_payment_token.is_egld() || accepted_payment_token.is_valid_esdt_identifier(),
+			"Invalid accepted payment token"
 		);
 		require!(deadline > current_time, "Deadline can't be in the past");
 		require!(
@@ -83,7 +80,28 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 				.unwrap_or_default()
 		};
 
-		self.auction_by_id(&nft_type, nft_nonce).set(&Auction {
+		let auction_id = self.last_valid_auction_id().get() + 1;
+		self.last_valid_auction_id().set(&auction_id);
+
+		let sft_max_one_per_user = opt_sft_max_one_per_user.into_option().unwrap_or_default();
+		let auction_type = if nft_amount > Self::BigUint::from(NFT_AMOUNT) {
+			match sft_max_one_per_user {
+				true => AuctionType::SftOnePerUser,
+				false => AuctionType::SftAll,
+			}
+		} else {
+			AuctionType::Nft
+		};
+
+		self.auction_by_id(auction_id).set(&Auction {
+			auctioned_token: EsdtToken {
+				token_type: nft_type,
+				nonce: nft_nonce,
+			},
+			nr_auctioned_tokens: nft_amount,
+			auction_type,
+			auction_status: AuctionStatus::Running,
+
 			payment_token: EsdtToken {
 				token_type: accepted_payment_token,
 				nonce: accepted_payment_nft_nonce,
@@ -92,6 +110,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			max_bid,
 			start_time,
 			deadline,
+
 			original_owner: self.blockchain().get_caller(),
 			current_bid: Self::BigUint::zero(),
 			current_winner: Address::zero(),
