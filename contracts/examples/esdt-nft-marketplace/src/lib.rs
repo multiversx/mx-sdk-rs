@@ -54,7 +54,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			"Token is not an NFT"
 		);
 		require!(
-			!self.is_already_up_for_auction(&nft_type, nft_nonce),
+			!self.does_auction_exist(&nft_type, nft_nonce),
 			"There is already an auction for that token"
 		);
 		require!(
@@ -83,7 +83,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 				.unwrap_or_default()
 		};
 
-		self.auction_for_token(&nft_type, nft_nonce).set(&Auction {
+		self.auction_by_id(&nft_type, nft_nonce).set(&Auction {
 			payment_token: EsdtToken {
 				token_type: accepted_payment_token,
 				nonce: accepted_payment_nft_nonce,
@@ -106,7 +106,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	#[endpoint]
 	fn bid(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
 		require!(
-			self.is_already_up_for_auction(&nft_type, nft_nonce),
+			self.does_auction_exist(&nft_type, nft_nonce),
 			"Token is not up for auction"
 		);
 
@@ -114,7 +114,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		let payment_token_nonce = self.call_value().esdt_token_nonce();
 		let caller = self.blockchain().get_caller();
 		let current_time = self.blockchain().get_block_timestamp();
-		let mut auction = self.auction_for_token(&nft_type, nft_nonce).get();
+		let mut auction = self.auction_by_id(&nft_type, nft_nonce).get();
 
 		require!(
 			auction.original_owner != caller,
@@ -158,7 +158,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		// update auction bid and winner
 		auction.current_bid = payment_amount;
 		auction.current_winner = caller;
-		self.auction_for_token(&nft_type, nft_nonce).set(&auction);
+		self.auction_by_id(&nft_type, nft_nonce).set(&auction);
 
 		Ok(())
 	}
@@ -166,11 +166,11 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	#[endpoint(endAuction)]
 	fn end_auction(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
 		require!(
-			self.is_already_up_for_auction(&nft_type, nft_nonce),
+			self.does_auction_exist(&nft_type, nft_nonce),
 			"Token is not up for auction"
 		);
 
-		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
+		let auction = self.auction_by_id(&nft_type, nft_nonce).get();
 
 		require!(
 			self.blockchain().get_block_timestamp() > auction.deadline
@@ -178,7 +178,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 
-		self.auction_for_token(&nft_type, nft_nonce).clear();
+		self.auction_by_id(&nft_type, nft_nonce).clear();
 
 		if auction.current_winner != Address::zero() {
 			let nft_info = self.get_nft_info(&nft_type, nft_nonce);
@@ -246,11 +246,11 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	#[endpoint]
 	fn withdraw(&self, nft_type: TokenIdentifier, nft_nonce: u64) -> SCResult<()> {
 		require!(
-			self.is_already_up_for_auction(&nft_type, nft_nonce),
+			self.does_auction_exist(&nft_type, nft_nonce),
 			"Token is not up for auction"
 		);
 
-		let auction = self.auction_for_token(&nft_type, nft_nonce).get();
+		let auction = self.auction_by_id(&nft_type, nft_nonce).get();
 		let caller = self.blockchain().get_caller();
 
 		require!(
@@ -262,7 +262,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			"Can't withdraw, NFT already has bids"
 		);
 
-		self.auction_for_token(&nft_type, nft_nonce).clear();
+		self.auction_by_id(&nft_type, nft_nonce).clear();
 
 		let _ = self.send().direct_nft(
 			&caller,
