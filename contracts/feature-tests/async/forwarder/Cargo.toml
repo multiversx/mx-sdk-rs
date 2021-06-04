@@ -17,19 +17,19 @@ wasm-output-mode = [
 path = "../vault"
 
 [dependencies.elrond-wasm]
-version = "0.17.0"
+version = "0.17.1"
 path = "../../../../elrond-wasm"
 # features = ["legacy-nft-transfer"] # only use on Arwen v1.2.*
 
 [dependencies.elrond-wasm-derive]
-version = "0.17.0"
+version = "0.17.1"
 path = "../../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
-version = "0.17.0"
+version = "0.17.1"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.17.0"
+version = "0.17.1"
 path = "../../../../elrond-wasm-debug"
