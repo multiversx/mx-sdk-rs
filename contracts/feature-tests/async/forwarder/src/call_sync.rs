@@ -118,4 +118,17 @@ pub trait ForwarderSyncCallModule {
 			.call_counts(b"accept_funds")
 			.execute_on_dest_context()
 	}
+
+	#[endpoint]
+	fn forward_sync_retrieve_funds(
+		&self,
+		to: Address,
+		token: TokenIdentifier,
+		token_nonce: u64,
+		amount: Self::BigUint,
+	) {
+		self.vault_proxy(to)
+			.retrieve_funds(token, token_nonce, amount, OptionalArg::None)
+			.execute_on_dest_context()
+	}
 }
