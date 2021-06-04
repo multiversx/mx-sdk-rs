@@ -9,6 +9,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - `pow`, `log2`, `sqrt`
 - cryptography: elliptic curves
 
+## [elrond-wasm 0.17.1] - 2021-06-04
+- `legacy-nft-transfer` feature for interacting with older versions of Arwen
+
 ## [elrond-wasm 0.17.0] - 2021-05-28
 - Integration tests can now call Arwen-Mandos (mandos-go)
 - Send API refactoring and cleanup
