@@ -45,7 +45,6 @@ pub trait ForwarderAsyncCallModule {
 	}
 
 	#[endpoint]
-	#[payable("*")]
 	fn forward_async_retrieve_funds(
 		&self,
 		to: Address,
