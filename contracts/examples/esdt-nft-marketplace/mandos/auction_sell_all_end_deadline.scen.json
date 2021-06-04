@@ -1,18 +1,26 @@
 {
-    "name": "withdraw token",
+    "name": "end auction by reaching the deadline",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "auction_token.scen.json"
+            "path": "bid_sft_sell_all_second.scen.json"
+        },
+        {
+            "step": "setState",
+            "comment": "set current block timestamp",
+            "currentBlockInfo": {
+                "blockTimestamp": "234,567"
+            }
         },
         {
             "step": "scCall",
-            "txId": "withdraw token",
+            "txId": "auction end deadline",
+            "comment": "owner, creator and seller will receive part of the final bid",
             "tx": {
-                "from": "address:seller",
+                "from": "address:second_bidder",
                 "to": "sc:marketplace",
                 "value": "0",
-                "function": "withdraw",
+                "function": "endAuction",
                 "arguments": [
                     "1"
                 ],
@@ -29,15 +37,42 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:seller": {
-                    "nonce": "2",
-                    "balance": "0",
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "20",
+                    "storage": {}
+                },
+                "address:nft_creator": {
+                    "nonce": "0",
+                    "balance": "40",
                     "esdt": {
                         "str:NFT-123456": {
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:seller": {
+                    "nonce": "1",
+                    "balance": "140",
+                    "storage": {}
+                },
+                "address:first_bidder": {
+                    "nonce": "1",
+                    "balance": "1000",
+                    "storage": {}
+                },
+                "address:second_bidder": {
+                    "nonce": "2",
+                    "balance": "800",
+                    "esdt": {
+                        "str:SFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1",
+                                    "balance": "10",
                                     "creator": "address:nft_creator",
                                     "royalties": "2000"
                                 }

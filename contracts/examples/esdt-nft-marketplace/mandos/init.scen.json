@@ -34,6 +34,16 @@
                                     "royalties": "2000"
                                 }
                             ]
+                        },
+                        "str:SFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "10",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
                         }
                     },
                     "storage": {}
@@ -68,7 +78,7 @@
                 "arguments": [
                     "1000"
                 ],
-                "gasLimit": "6,500,000",
+                "gasLimit": "8,000,000",
                 "gasPrice": "0"
             },
             "expect": {

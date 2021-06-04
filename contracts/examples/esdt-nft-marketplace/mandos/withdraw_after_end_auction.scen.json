@@ -1,19 +1,18 @@
 {
-    "name": "end auction by reaching max bid",
+    "name": "seller withdraw after end auction",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "bid_max.scen.json"
+            "path": "buy_sft_after_end_auction.scen.json"
         },
         {
             "step": "scCall",
-            "txId": "auction max bid reached",
-            "comment": "owner, creator and seller will receive part of the final bid",
+            "txId": "withdraw-after-end",
             "tx": {
-                "from": "address:first_bidder",
+                "from": "address:seller",
                 "to": "sc:marketplace",
                 "value": "0",
-                "function": "endAuction",
+                "function": "withdraw",
                 "arguments": [
                     "1"
                 ],
@@ -32,12 +31,12 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "1",
-                    "balance": "100",
+                    "balance": "40",
                     "storage": {}
                 },
                 "address:nft_creator": {
                     "nonce": "0",
-                    "balance": "200",
+                    "balance": "80",
                     "esdt": {
                         "str:NFT-123456": {
                             "roles": [
@@ -48,15 +47,27 @@
                     "storage": {}
                 },
                 "address:seller": {
-                    "nonce": "1",
-                    "balance": "700",
+                    "nonce": "2",
+                    "balance": "280",
+                    "esdt": {
+                        "str:SFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "8",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {}
                 },
                 "address:first_bidder": {
-                    "nonce": "3",
-                    "balance": "0",
+                    "nonce": "2",
+                    "balance": "800",
                     "esdt": {
-                        "str:NFT-123456": {
+                        "str:SFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -70,8 +81,20 @@
                     "storage": {}
                 },
                 "address:second_bidder": {
-                    "nonce": "1",
-                    "balance": "1000",
+                    "nonce": "2",
+                    "balance": "800",
+                    "esdt": {
+                        "str:SFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {}
                 },
                 "sc:marketplace": {
@@ -80,7 +103,7 @@
                     "storage": {
                         "str:bidCutPerecentage": "1000",
                         "str:lastValidAuctionId": "1",
-                        "str:auctionById|nested:str:NFT-123456|u64:1": ""
+                        "str:auctionById|u64:1": ""
                     },
                     "code": "file:../output/esdt-nft-marketplace.wasm"
                 },
