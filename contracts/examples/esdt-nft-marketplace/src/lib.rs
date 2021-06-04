@@ -12,12 +12,6 @@ mod views;
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 const NFT_AMOUNT: u32 = 1; // Token has to be unique to be considered NFT
 
-pub struct BidSplitAmounts<BigUint: BigUintApi> {
-	creator: BigUint,
-	marketplace: BigUint,
-	seller: BigUint,
-}
-
 #[elrond_wasm_derive::contract]
 pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	#[init]
@@ -47,7 +41,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		deadline: u64,
 		accepted_payment_token: TokenIdentifier,
 		#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,
-		#[var_args] opt_sft_max_one_per_user: OptionalArg<bool>,
+		#[var_args] opt_sft_max_one_per_payment: OptionalArg<bool>,
 		#[var_args] opt_start_time: OptionalArg<u64>,
 	) -> SCResult<()> {
 		let current_time = self.blockchain().get_block_timestamp();
@@ -90,10 +84,10 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		let auction_id = self.last_valid_auction_id().get() + 1;
 		self.last_valid_auction_id().set(&auction_id);
 
-		let sft_max_one_per_user = opt_sft_max_one_per_user.into_option().unwrap_or_default();
+		let sft_max_one_per_payment = opt_sft_max_one_per_payment.into_option().unwrap_or_default();
 		let auction_type = if nft_amount > Self::BigUint::from(NFT_AMOUNT) {
-			match sft_max_one_per_user {
-				true => AuctionType::SftOnePerUser,
+			match sft_max_one_per_payment {
+				true => AuctionType::SftOnePerPayment,
 				false => AuctionType::SftAll,
 			}
 		} else {
@@ -211,7 +205,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 		self.distribute_tokens_after_auction_end(&auction);
 
-		if auction.auction_type == AuctionType::SftOnePerUser {
+		if auction.auction_type == AuctionType::SftOnePerPayment {
 			auction.auction_status = AuctionStatus::SftWaitingForBuyOrOwnerClaim;
 			auction.nr_auctioned_tokens -= &NFT_AMOUNT.into();
 			self.auction_by_id(auction_id).set(&auction);
@@ -370,7 +364,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 			// send NFT to auction winner
 			let nft_amount_to_send = match auction.auction_type {
-				AuctionType::Nft | AuctionType::SftOnePerUser => NFT_AMOUNT.into(),
+				AuctionType::Nft | AuctionType::SftOnePerPayment => NFT_AMOUNT.into(),
 				_ => auction.nr_auctioned_tokens.clone(),
 			};
 			self.transfer_esdt(
