@@ -138,8 +138,7 @@ where
 			new_arg_buffer.push_argument_bytes(self.to.as_bytes());
 			new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 
-			// send to self, sender = receiver
-			let recipient_addr = self.api.get_sc_address();
+			let recipient_addr = Self::nft_transfer_recipient_address(&self.api, self.to);
 
 			ContractCall {
 				api: self.api,
@@ -153,6 +152,18 @@ where
 				_return_type: PhantomData,
 			}
 		}
+	}
+
+	/// nft transfer is sent to self, sender = receiver
+	#[cfg(not(feature = "legacy-nft-transfer"))]
+	fn nft_transfer_recipient_address(api: &SA, _to: Address) -> Address {
+		api.get_sc_address()
+	}
+
+	/// legacy nft transfer is sent to the actual intended destination
+	#[cfg(feature = "legacy-nft-transfer")]
+	fn nft_transfer_recipient_address(_api: &SA, to: Address) -> Address {
+		to
 	}
 
 	fn resolve_gas_limit(&self) -> u64 {
