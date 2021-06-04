@@ -1,6 +1,14 @@
 elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
 
-type CallbackDataTuple<BigUint> = (BoxedBytes, TokenIdentifier, BigUint, Vec<BoxedBytes>);
+#[derive(TopEncode, TopDecode, TypeAbi)]
+pub struct CallbackData<BigUint: BigUintApi> {
+	callback_name: BoxedBytes,
+	token_identifier: TokenIdentifier,
+	token_nonce: u64,
+	token_amount: BigUint,
+	args: Vec<BoxedBytes>,
+}
 
 #[elrond_wasm_derive::module]
 pub trait ForwarderAsyncCallModule {
@@ -38,14 +46,15 @@ pub trait ForwarderAsyncCallModule {
 
 	#[endpoint]
 	#[payable("*")]
-	fn retrieve_funds(
+	fn forward_async_retrieve_funds(
 		&self,
 		to: Address,
 		token: TokenIdentifier,
-		payment: Self::BigUint,
+		token_nonce: u64,
+		amount: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		self.vault_proxy(to)
-			.retrieve_funds(token, payment, OptionalArg::None)
+			.retrieve_funds(token, token_nonce, amount, OptionalArg::None)
 			.async_call()
 			.with_callback(self.callbacks().retrieve_funds_callback())
 	}
@@ -54,15 +63,27 @@ pub trait ForwarderAsyncCallModule {
 	fn retrieve_funds_callback(
 		&self,
 		#[payment_token] token: TokenIdentifier,
-		#[payment] payment: Self::BigUint,
+		#[payment_nonce] nonce: u64,
+		#[payment_amount] payment: Self::BigUint,
 	) {
-		let _ = self.callback_data().push(&(
-			BoxedBytes::from(&b"retrieve_funds_callback"[..]),
-			token,
-			payment,
-			Vec::new(),
-		));
+		self.retrieve_funds_callback_event(&token, nonce, &payment);
+
+		let _ = self.callback_data().push(&CallbackData {
+			callback_name: BoxedBytes::from(&b"retrieve_funds_callback"[..]),
+			token_identifier: token,
+			token_nonce: nonce,
+			token_amount: payment,
+			args: Vec::new(),
+		});
 	}
+
+	#[event("retrieve_funds_callback")]
+	fn retrieve_funds_callback_event(
+		&self,
+		#[indexed] token: &TokenIdentifier,
+		#[indexed] nonce: u64,
+		#[indexed] payment: &Self::BigUint,
+	);
 
 	#[endpoint]
 	fn send_funds_twice(
@@ -94,15 +115,22 @@ pub trait ForwarderAsyncCallModule {
 
 	#[view]
 	#[storage_mapper("callback_data")]
-	fn callback_data(&self) -> VecMapper<Self::Storage, CallbackDataTuple<Self::BigUint>>;
+	fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::BigUint>>;
 
 	#[view]
 	fn callback_data_at_index(
 		&self,
 		index: usize,
-	) -> MultiResult4<BoxedBytes, TokenIdentifier, Self::BigUint, MultiResultVec<BoxedBytes>> {
-		let (cb_name, token, payment, args) = self.callback_data().get(index);
-		(cb_name, token, payment, args.into()).into()
+	) -> MultiResult5<BoxedBytes, TokenIdentifier, u64, Self::BigUint, MultiResultVec<BoxedBytes>> {
+		let cb_data = self.callback_data().get(index);
+		(
+			cb_data.callback_name,
+			cb_data.token_identifier,
+			cb_data.token_nonce,
+			cb_data.token_amount,
+			cb_data.args.into(),
+		)
+			.into()
 	}
 
 	#[endpoint]
