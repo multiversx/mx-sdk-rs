@@ -26,7 +26,7 @@ pub enum AuctionType {
 	None,
 	Nft,
 	SftAll,
-	SftOnePerUser,
+	SftOnePerPayment,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq)]
@@ -40,4 +40,10 @@ pub enum AuctionStatus {
 pub struct EsdtToken {
 	pub token_type: TokenIdentifier,
 	pub nonce: u64,
+}
+
+pub struct BidSplitAmounts<BigUint: BigUintApi> {
+	pub creator: BigUint,
+	pub marketplace: BigUint,
+	pub seller: BigUint,
 }
