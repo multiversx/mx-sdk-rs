@@ -13,6 +13,9 @@ description = "Elrond WebAssembly smart contract API"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
+[features]
+legacy-nft-transfer = []
+
 [dependencies]
 wee_alloc = "0.4"
 arrayvec = { version = "0.5.2", default-features = false, features = ["array-sizes-33-128", "array-sizes-129-255"] }
