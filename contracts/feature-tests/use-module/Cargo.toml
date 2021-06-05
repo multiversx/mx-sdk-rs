@@ -11,55 +11,25 @@ path = "src/lib.rs"
 [features]
 wasm-output-mode = [
     "elrond-wasm-node",
-    "elrond-wasm-module-dns-wasm",
-    "elrond-wasm-module-features-wasm",
-    "elrond-wasm-module-pause-wasm"
+    "elrond-wasm-module-dns/wasm-output-mode",
+    "elrond-wasm-module-features/wasm-output-mode",
+    "elrond-wasm-module-pause/wasm-output-mode",
 ]
 
-default = [
-    "elrond-wasm-module-dns-default",
-    "elrond-wasm-module-features-default",
-    "elrond-wasm-module-pause-default"
-]
-
-[dependencies.elrond-wasm-module-dns-wasm]
+[dependencies.elrond-wasm-module-dns]
 package = "elrond-wasm-module-dns"
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-dns"
-features = ["wasm-output-mode"]
-optional = true
 
-[dependencies.elrond-wasm-module-dns-default]
-package = "elrond-wasm-module-dns"
-version = "0.17.2"
-path = "../../modules/elrond-wasm-module-dns"
-optional = true
-
-[dependencies.elrond-wasm-module-features-wasm]
+[dependencies.elrond-wasm-module-features]
 package = "elrond-wasm-module-features"
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-features"
-features = ["wasm-output-mode"]
-optional = true
 
-[dependencies.elrond-wasm-module-features-default]
-package = "elrond-wasm-module-features"
-version = "0.17.2"
-path = "../../modules/elrond-wasm-module-features"
-optional = true
-
-[dependencies.elrond-wasm-module-pause-wasm]
+[dependencies.elrond-wasm-module-pause]
 package = "elrond-wasm-module-pause"
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-pause"
-features = ["wasm-output-mode"]
-optional = true
-
-[dependencies.elrond-wasm-module-pause-default]
-package = "elrond-wasm-module-pause"
-version = "0.17.2"
-path = "../../modules/elrond-wasm-module-pause"
-optional = true
 
 [dependencies.elrond-wasm]
 version = "0.17.2"
