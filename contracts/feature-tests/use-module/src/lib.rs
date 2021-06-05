@@ -18,9 +18,9 @@ pub trait UseModule:
 	internal_mod_a::InternalModuleA
 	+ internal_mod_b::InternalModuleB
 	+ internal_mod_c::InternalModuleC
+	+ elrond_wasm_module_dns::DnsModule
 	+ elrond_wasm_module_features::FeaturesModule
 	+ elrond_wasm_module_pause::PauseModule
-	+ dns::DnsModule
 {
 	#[init]
 	fn init(&self) {}
