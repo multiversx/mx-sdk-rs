@@ -46,6 +46,23 @@
             "outputs": []
         },
         {
+            "name": "dnsRegister",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "dns_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "setFeatureFlag",
             "inputs": [
                 {
@@ -76,23 +93,6 @@
         {
             "name": "unpause",
             "inputs": [],
-            "outputs": []
-        },
-        {
-            "name": "dnsRegister",
-            "payableInTokens": [
-                "EGLD"
-            ],
-            "inputs": [
-                {
-                    "name": "dns_address",
-                    "type": "Address"
-                },
-                {
-                    "name": "name",
-                    "type": "bytes"
-                }
-            ],
             "outputs": []
         }
     ],
