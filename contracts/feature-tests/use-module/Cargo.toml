@@ -17,17 +17,14 @@ wasm-output-mode = [
 ]
 
 [dependencies.elrond-wasm-module-dns]
-package = "elrond-wasm-module-dns"
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-dns"
 
 [dependencies.elrond-wasm-module-features]
-package = "elrond-wasm-module-features"
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-features"
 
 [dependencies.elrond-wasm-module-pause]
-package = "elrond-wasm-module-pause"
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-pause"
 
