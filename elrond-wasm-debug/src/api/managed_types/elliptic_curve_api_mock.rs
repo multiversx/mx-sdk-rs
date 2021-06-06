@@ -7,8 +7,6 @@ pub struct EllipticCurveMock;
 use elrond_wasm::elrond_codec::*;
 
 impl NestedEncode for EllipticCurveMock {
-	
-
 	fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
 		panic!("not implemented")
 	}
@@ -24,8 +22,6 @@ impl NestedEncode for EllipticCurveMock {
 }
 
 impl TopEncode for EllipticCurveMock {
-	
-
 	fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
 		panic!("not implemented")
 	}
@@ -41,8 +37,6 @@ impl TopEncode for EllipticCurveMock {
 }
 
 impl NestedDecode for EllipticCurveMock {
-	
-
 	fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
 		panic!("not implemented")
 	}
@@ -57,8 +51,6 @@ impl NestedDecode for EllipticCurveMock {
 }
 
 impl TopDecode for EllipticCurveMock {
-	
-
 	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
 		panic!("not implemented")
 	}
@@ -100,6 +92,7 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		Self::BigUint,
 		Self::BigUint,
 		Self::BigUint,
+		u32,
 	) {
 		panic!("elliptic curve get_values not implemented yet!")
 	}
@@ -118,6 +111,10 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 
 	fn p521_ec() -> Self {
 		panic!("p521_ec not implemented yet!")
+	}
+
+	fn get_ec_length(&self) -> u32 {
+		panic!("get_ec_length not implemented yet!")
 	}
 
 	fn add_ec(

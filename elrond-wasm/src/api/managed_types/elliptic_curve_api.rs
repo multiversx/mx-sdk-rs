@@ -29,6 +29,7 @@ pub trait EllipticCurveApi:
 		Self::BigUint,
 		Self::BigUint,
 		Self::BigUint,
+		u32,
 	);
 
 	fn p224_ec() -> Self;
@@ -38,6 +39,8 @@ pub trait EllipticCurveApi:
 	fn p384_ec() -> Self;
 
 	fn p521_ec() -> Self;
+
+	fn get_ec_length(&self) -> u32;
 
 	fn add_ec(
 		&self,
