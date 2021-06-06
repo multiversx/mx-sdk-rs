@@ -16,15 +16,15 @@ pub fn contract_implementation(
 	contract: &ContractTrait,
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
-	let proxy_trait_imports = generate_all_proxy_trait_imports(&contract);
+	let proxy_trait_imports = generate_all_proxy_trait_imports(contract);
 	let trait_name_ident = contract.trait_name.clone();
-	let method_impls = extract_method_impls(&contract);
-	let call_methods = generate_call_methods(&contract);
-	let auto_impl_defs = generate_auto_impl_defs(&contract);
-	let auto_impls = generate_auto_impls(&contract);
-	let endpoints = generate_wasm_endpoints(&contract);
-	let function_selector_body = generate_function_selector_body(&contract);
-	let callback_body = generate_callback_body(&contract.methods);
+	let method_impls = extract_method_impls(contract);
+	let call_methods = generate_call_methods(contract);
+	let auto_impl_defs = generate_auto_impl_defs(contract);
+	let auto_impls = generate_auto_impls(contract);
+	let endpoints = generate_wasm_endpoints(contract);
+	let function_selector_body = generate_function_selector_body(contract);
+	let (callback_selector_body, callback_body) = generate_callback_selector_and_main(contract);
 	let where_self_big_int = snippets::where_self_big_int();
 
 	let (callbacks_def, callbacks_impl, callback_proxies_obj) =
@@ -75,6 +75,10 @@ pub fn contract_implementation(
 
 			fn call(&self, fn_name: &[u8]) -> bool {
 				#function_selector_body
+			}
+
+			fn callback_selector<'a>(&self, mut ___cb_data_deserializer___: elrond_wasm::hex_call_data::HexCallDataDeserializer<'a>) -> elrond_wasm::types::CallbackSelectorResult<'a> {
+				#callback_selector_body
 			}
 
 			fn callback(&self) {

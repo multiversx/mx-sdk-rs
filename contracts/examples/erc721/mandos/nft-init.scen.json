@@ -23,7 +23,7 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:contract_owner",
-                "contractCode": "file:../output/non-fungible-tokens.wasm",
+                "contractCode": "file:../output/erc721.wasm",
                 "value": "0",
                 "arguments": [
                     "3"

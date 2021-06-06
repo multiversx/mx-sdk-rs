@@ -4,8 +4,8 @@ use elrond_wasm_debug::*;
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
 	contract_map.register_contract(
-		"file:../output/non-fungible-tokens.wasm",
-		Box::new(|context| Box::new(non_fungible_tokens::contract_obj(context))),
+		"file:../output/erc721.wasm",
+		Box::new(|context| Box::new(erc721::contract_obj(context))),
 	);
 	contract_map
 }
