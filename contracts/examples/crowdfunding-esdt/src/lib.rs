@@ -14,10 +14,28 @@ pub enum Status {
 #[elrond_wasm_derive::contract]
 pub trait Crowdfunding {
 	#[init]
-	fn init(&self, target: Self::BigUint, deadline: u64, token_name: TokenIdentifier) {
+	fn init(
+		&self,
+		target: Self::BigUint,
+		deadline: u64,
+		token_name: TokenIdentifier,
+	) -> SCResult<()> {
+		require!(target > 0, "Target must be more than 0");
 		self.target().set(&target);
+
+		require!(
+			deadline > self.get_current_time(),
+			"Deadline can't be in the past"
+		);
 		self.deadline().set(&deadline);
+
+		require!(
+			token_name.is_egld() || token_name.is_valid_esdt_identifier(),
+			"Invalid token provided"
+		);
 		self.cf_token_name().set(&token_name);
+
+		Ok(())
 	}
 
 	#[endpoint]

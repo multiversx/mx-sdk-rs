@@ -14,15 +14,16 @@
                 "value": "500",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:ANOTHERNFT-123456",
                     "5"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "status": "4",
-                "message": "str:Token is not up for auction",
+                "message": "str:Auction ID does not match the token",
                 "gas": "*",
                 "refund": "*"
             }
@@ -36,10 +37,11 @@
                 "value": "0",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -65,10 +67,11 @@
                 "value": "500",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -108,10 +111,11 @@
                 },
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -130,10 +134,11 @@
                 "value": "300",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -152,10 +157,11 @@
                 "value": "50",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -174,10 +180,11 @@
                 "value": "150",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -196,10 +203,11 @@
                 "value": "1500",
                 "function": "bid",
                 "arguments": [
+                    "1",
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "8,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {

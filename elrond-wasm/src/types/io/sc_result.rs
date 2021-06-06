@@ -3,6 +3,7 @@ use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::EndpointFinishApi;
 use crate::EndpointResult;
 use crate::*;
+use core::convert;
 use core::ops::{ControlFlow, FromResidual, Try};
 
 /// Default way to optionally return an error from a smart contract endpoint.
@@ -75,6 +76,18 @@ impl<T> Try for SCResult<T> {
 impl<T> FromResidual for SCResult<T> {
 	fn from_residual(r: SCError) -> Self {
 		SCResult::Err(r)
+	}
+}
+
+impl<T, E> FromResidual<Result<convert::Infallible, E>> for SCResult<T>
+where
+	E: Into<SCError>,
+{
+	fn from_residual(residual: Result<convert::Infallible, E>) -> Self {
+		match residual {
+			Ok(_) => unreachable!(),
+			Err(e) => SCResult::Err(e.into()),
+		}
 	}
 }
 
