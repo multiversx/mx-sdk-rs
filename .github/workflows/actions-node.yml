@@ -11,8 +11,6 @@ jobs:
     name: Clippy linter check for elrond-wasm-node
     runs-on: ubuntu-latest
     steps:
-      -run:
-        working-directory: ./elrond-wasm-node
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -22,4 +20,4 @@ jobs:
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args:
+          args: --manifest-path ./elrond-wasm-node/Cargo.toml
