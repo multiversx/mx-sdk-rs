@@ -5,9 +5,6 @@ authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
 
-[lib]
-path = "src/lib.rs"
-
 [dependencies.async-alice]
 path = "async-alice"
 
