@@ -183,14 +183,14 @@ fn arwen_cmp_i64(bi: &ArwenBigInt, other: i64) -> i32 {
 impl PartialEq<i64> for ArwenBigInt {
 	#[inline]
 	fn eq(&self, other: &i64) -> bool {
-		arwen_cmp_i64(&self, *other) == 0
+		arwen_cmp_i64(self, *other) == 0
 	}
 }
 
 impl PartialOrd<i64> for ArwenBigInt {
 	#[inline]
 	fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-		let arwen_cmp = arwen_cmp_i64(&self, *other);
+		let arwen_cmp = arwen_cmp_i64(self, *other);
 		Some(arwen_cmp.cmp(&0))
 	}
 }
