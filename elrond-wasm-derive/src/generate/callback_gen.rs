@@ -102,7 +102,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
 
 				let callback_name_str = &callback.callback_name.to_string();
 				let callback_name_literal = array_literal(callback_name_str.as_bytes());
-				let call = generate_call_to_method_expr(&m);
+				let call = generate_call_to_method_expr(m);
 				let call_result_assert_no_more_args = if has_call_result {
 					quote! {
 						___call_result_loader___.assert_no_more_args();

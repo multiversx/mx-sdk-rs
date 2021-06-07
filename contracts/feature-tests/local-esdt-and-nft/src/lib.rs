@@ -237,18 +237,15 @@ pub trait LocalEsdtAndEsdtNft {
 
 	#[view(getFungibleEsdtBalance)]
 	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> Self::BigUint {
-		self.blockchain().get_esdt_balance(
-			&self.blockchain().get_sc_address(),
-			&token_identifier,
-			0,
-		)
+		self.blockchain()
+			.get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
 	}
 
 	#[view(getNftBalance)]
 	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> Self::BigUint {
 		self.blockchain().get_esdt_balance(
 			&self.blockchain().get_sc_address(),
-			&token_identifier,
+			token_identifier,
 			nonce,
 		)
 	}

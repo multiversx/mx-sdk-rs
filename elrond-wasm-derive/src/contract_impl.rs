@@ -27,8 +27,7 @@ pub fn contract_implementation(
 	let (callback_selector_body, callback_body) = generate_callback_selector_and_main(contract);
 	let where_self_big_int = snippets::where_self_big_int();
 
-	let (callbacks_def, callbacks_impl, callback_proxies_obj) =
-		generate_callback_proxies(&contract);
+	let (callbacks_def, callbacks_impl, callback_proxies_obj) = generate_callback_proxies(contract);
 
 	// this definition is common to release and debug mode
 	let supertraits_main = supertrait_gen::main_supertrait_decl(contract.supertraits.as_slice());
@@ -87,7 +86,7 @@ pub fn contract_implementation(
 		}
 	};
 
-	let abi_provider = abi_gen::generate_abi_provider(&contract, is_contract_main);
+	let abi_provider = abi_gen::generate_abi_provider(contract, is_contract_main);
 
 	let module_traits_code = quote! {
 		#main_definition
@@ -154,9 +153,9 @@ pub fn contract_implementation(
 		}
 	};
 
-	let proxy_trait = proxy_gen::proxy_trait(&contract);
+	let proxy_trait = proxy_gen::proxy_trait(contract);
 	let proxy_obj_code = if is_contract_main {
-		proxy_gen::proxy_obj_code(&contract)
+		proxy_gen::proxy_obj_code(contract)
 	} else {
 		quote! {}
 	};
