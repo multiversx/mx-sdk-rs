@@ -29,7 +29,7 @@ fn parse_execute_mandos_steps(
 			Step::ExternalSteps { path } => {
 				let parent_path = steps_path.parent().unwrap();
 				let new_path = parent_path.join(path);
-				parse_execute_mandos_steps(&new_path.as_path(), state, contract_map);
+				parse_execute_mandos_steps(new_path.as_path(), state, contract_map);
 			},
 			Step::SetState {
 				comment,
@@ -124,7 +124,7 @@ fn parse_execute_mandos_steps(
 				let tx_result =
 					execute_sc_call_with_async_and_callback(tx_input, state, contract_map).unwrap();
 				if let Some(tx_expect) = expect {
-					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
+					check_tx_output(tx_id.as_str(), tx_expect, &tx_result);
 				}
 			},
 			Step::ScQuery {
@@ -156,7 +156,7 @@ fn parse_execute_mandos_steps(
 					panic!("Can't query a view function that performs an async call");
 				}
 				if let Some(tx_expect) = expect {
-					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
+					check_tx_output(tx_id.as_str(), tx_expect, &tx_result);
 				}
 			},
 			Step::ScDeploy {
@@ -186,7 +186,7 @@ fn parse_execute_mandos_steps(
 					execute_sc_create(tx_input, &tx.contract_code.value, state, contract_map)
 						.unwrap();
 				if let Some(tx_expect) = expect {
-					check_tx_output(tx_id.as_str(), &tx_expect, &tx_result);
+					check_tx_output(tx_id.as_str(), tx_expect, &tx_result);
 				}
 			},
 			Step::Transfer { tx_id, comment, tx } => {
@@ -437,7 +437,7 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 			for (expected_log, actual_log) in expected_logs.iter().zip(tx_result.result_logs.iter())
 			{
 				assert!(
-					actual_log.equals(&expected_log),
+					actual_log.equals(expected_log),
 					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
 					tx_id,
 					verbose_hex(&expected_log.address.value),
@@ -446,7 +446,7 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 					verbose_hex(&expected_log.data.value),
 					address_hex(&actual_log.address),
 					bytes_to_string(&actual_log.identifier),
-					actual_log.topics.iter().map(|topic| verbose_hex(&topic)).collect::<String>(),
+					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),
 					verbose_hex(&actual_log.data),
 				);
 			}

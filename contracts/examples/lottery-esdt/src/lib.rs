@@ -198,7 +198,7 @@ pub trait Lottery {
 			return Status::Inactive;
 		}
 
-		let info = self.lottery_info(&lottery_name).get();
+		let info = self.lottery_info(lottery_name).get();
 		let current_time = self.blockchain().get_block_timestamp();
 		if current_time > info.deadline || info.tickets_left == 0 {
 			return Status::Ended;
@@ -213,7 +213,7 @@ pub trait Lottery {
 		token_name: &TokenIdentifier,
 		payment: &Self::BigUint,
 	) -> SCResult<()> {
-		let mut info = self.lottery_info(&lottery_name).get();
+		let mut info = self.lottery_info(lottery_name).get();
 		let caller = self.blockchain().get_caller();
 
 		require!(
@@ -225,15 +225,13 @@ pub trait Lottery {
 			"Wrong ticket fee!"
 		);
 
-		let mut entries = self
-			.number_of_entries_for_user(&lottery_name, &caller)
-			.get();
+		let mut entries = self.number_of_entries_for_user(lottery_name, &caller).get();
 		require!(
 			entries < info.max_entries_per_user,
 			"Ticket limit exceeded for this lottery!"
 		);
 
-		self.ticket_holders(&lottery_name).push(&caller);
+		self.ticket_holders(lottery_name).push(&caller);
 
 		entries += 1;
 		info.tickets_left -= 1;
@@ -247,8 +245,8 @@ pub trait Lottery {
 	}
 
 	fn distribute_prizes(&self, lottery_name: &BoxedBytes) {
-		let mut info = self.lottery_info(&lottery_name).get();
-		let total_tickets = self.ticket_holders(&lottery_name).len();
+		let mut info = self.lottery_info(lottery_name).get();
+		let total_tickets = self.ticket_holders(lottery_name).len();
 
 		if total_tickets == 0 {
 			return;
@@ -284,7 +282,7 @@ pub trait Lottery {
 		// 1st place will get the spare money instead.
 		for i in (1..total_winning_tickets).rev() {
 			let winning_ticket_id = winning_tickets[i];
-			let winner_address = self.ticket_holders(&lottery_name).get(winning_ticket_id);
+			let winner_address = self.ticket_holders(lottery_name).get(winning_ticket_id);
 			let prize = self.calculate_percentage_of(
 				&total_prize,
 				&Self::BigUint::from(info.prize_distribution[i] as u32),
@@ -300,7 +298,7 @@ pub trait Lottery {
 		}
 
 		// send leftover to first place
-		let first_place_winner = self.ticket_holders(&lottery_name).get(winning_tickets[0]);
+		let first_place_winner = self.ticket_holders(lottery_name).get(winning_tickets[0]);
 		self.send().direct(
 			&first_place_winner,
 			&info.token_name,
@@ -310,7 +308,7 @@ pub trait Lottery {
 	}
 
 	fn clear_storage(&self, lottery_name: &BoxedBytes) {
-		let current_ticket_number = self.ticket_holders(&lottery_name).len();
+		let current_ticket_number = self.ticket_holders(lottery_name).len();
 
 		for i in 1..=current_ticket_number {
 			let addr = self.ticket_holders(lottery_name).get(i);

@@ -39,7 +39,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
 		}
 	}
 
-    #[endpoint(getAuctionStatus)]
+	#[endpoint(getAuctionStatus)]
 	fn get_auction_status(&self, auction_id: u64) -> AuctionStatus {
 		if self.does_auction_exist(auction_id) {
 			self.auction_by_id(auction_id).get().auction_status

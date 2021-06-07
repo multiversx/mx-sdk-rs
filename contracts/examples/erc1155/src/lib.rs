@@ -125,7 +125,7 @@ pub trait Erc1155 {
 					&from,
 					&to,
 					type_id,
-					&value,
+					value,
 				)?;
 			} else {
 				self.safe_batch_item_transfer_from_non_fungible(
@@ -269,8 +269,8 @@ pub trait Erc1155 {
 
 	#[view(balanceOf)]
 	fn balance_of(&self, owner: &Address, type_id: &Self::BigUint) -> Self::BigUint {
-		self.get_balance_mapper(&owner)
-			.get(&type_id)
+		self.get_balance_mapper(owner)
+			.get(type_id)
 			.unwrap_or_else(Self::BigUint::zero)
 	}
 
@@ -330,12 +330,12 @@ pub trait Erc1155 {
 		type_id: &Self::BigUint,
 		amount: &Self::BigUint,
 	) -> SCResult<()> {
-		let balance = self.balance_of(&owner, &type_id);
+		let balance = self.balance_of(owner, type_id);
 
 		require!(amount > &0, "Must transfer more than 0");
 		require!(amount <= &balance, "Not enough balance for id");
 
-		self.decrease_balance(&owner, &type_id, &amount);
+		self.decrease_balance(owner, type_id, amount);
 
 		Ok(())
 	}
@@ -347,17 +347,17 @@ pub trait Erc1155 {
 		nft_id: &Self::BigUint,
 	) -> SCResult<()> {
 		require!(
-			self.is_valid_nft_id(&type_id, &nft_id),
+			self.is_valid_nft_id(type_id, nft_id),
 			"Token type-id pair is not valid"
 		);
 		require!(
-			&self.get_token_owner(&type_id, &nft_id) == owner,
+			&self.get_token_owner(type_id, nft_id) == owner,
 			"_from_ is not the owner of the token"
 		);
 
 		let amount = Self::BigUint::from(1u32);
-		self.decrease_balance(&owner, &type_id, &amount);
-		self.set_token_owner(&type_id, nft_id, &Address::zero());
+		self.decrease_balance(owner, type_id, &amount);
+		self.set_token_owner(type_id, nft_id, &Address::zero());
 
 		Ok(())
 	}
@@ -374,7 +374,7 @@ pub trait Erc1155 {
 		let mut nft_id = start.clone();
 
 		while &nft_id <= end {
-			self.set_token_owner(&type_id, &nft_id, &owner);
+			self.set_token_owner(type_id, &nft_id, owner);
 			nft_id += &big_uint_one;
 		}
 	}
@@ -388,8 +388,8 @@ pub trait Erc1155 {
 		data: &[u8],
 	) {
 		let mut serializer = HexCallDataSerializer::new(ON_ERC_RECEIVED_ENDPOINT_NAME);
-		serializer.push_argument_bytes(&self.blockchain().get_caller().as_bytes());
-		serializer.push_argument_bytes(&from.as_bytes());
+		serializer.push_argument_bytes(self.blockchain().get_caller().as_bytes());
+		serializer.push_argument_bytes(from.as_bytes());
 		serializer.push_argument_bytes(&type_id.to_bytes_be());
 		serializer.push_argument_bytes(&value.to_bytes_be());
 		serializer.push_argument_bytes(data);
@@ -420,8 +420,8 @@ pub trait Erc1155 {
 		let values_encoded = top_encode_to_vec_or_panic(&values);
 
 		let mut serializer = HexCallDataSerializer::new(ON_ERC_BATCH_RECEIVED_ENDPOINT_NAME);
-		serializer.push_argument_bytes(&self.blockchain().get_caller().as_bytes());
-		serializer.push_argument_bytes(&from.as_bytes());
+		serializer.push_argument_bytes(self.blockchain().get_caller().as_bytes());
+		serializer.push_argument_bytes(from.as_bytes());
 		serializer.push_argument_bytes(type_ids_encoded.as_slice());
 		serializer.push_argument_bytes(values_encoded.as_slice());
 		serializer.push_argument_bytes(data);
@@ -460,11 +460,11 @@ pub trait Erc1155 {
 
 		for (type_id, value) in type_ids.iter().zip(values.iter()) {
 			if self.is_fungible(type_id) {
-				self.increase_balance(&dest_address, &type_id, &value);
+				self.increase_balance(dest_address, type_id, value);
 			} else {
 				let amount = Self::BigUint::from(1u32);
-				self.increase_balance(&dest_address, &type_id, &amount);
-				self.set_token_owner(&type_id, value, &dest_address);
+				self.increase_balance(dest_address, type_id, &amount);
+				self.set_token_owner(type_id, value, dest_address);
 			}
 		}
 

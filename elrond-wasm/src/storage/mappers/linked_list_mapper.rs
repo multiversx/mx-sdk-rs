@@ -226,7 +226,7 @@ where
 			},
 		);
 		info.back = new_node_id;
-		self.set_value(new_node_id, &elt);
+		self.set_value(new_node_id, elt);
 		info.len += 1;
 		self.set_info(info);
 		new_node_id
