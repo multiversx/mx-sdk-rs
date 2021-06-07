@@ -8,7 +8,7 @@ on:
 
 jobs:
   clippy_check:
-    name: Clippy linter check
+    name: Clippy linter check for elrond-wasm-node
     runs-on: ubuntu-latest
     defaults:
       run:

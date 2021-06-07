@@ -8,7 +8,7 @@ on:
 
 jobs:
   wasm_test:
-    name: Wasm build + Arwen tests
+    name: Wasm tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
