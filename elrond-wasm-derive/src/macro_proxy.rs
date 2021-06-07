@@ -28,7 +28,7 @@ pub fn proxy_implementation(
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
 	let trait_name_ident = contract.trait_name.clone();
-	let method_impls = extract_method_impls(&contract);
+	let method_impls = extract_method_impls(contract);
 	let where_self_big_int = snippets::where_self_big_int();
 
 	// this definition is common to release and debug mode
@@ -44,9 +44,9 @@ pub fn proxy_implementation(
 		}
 	};
 
-	let proxy_trait = proxy_gen::proxy_trait(&contract);
+	let proxy_trait = proxy_gen::proxy_trait(contract);
 	let proxy_obj_code = if is_contract_main {
-		proxy_gen::proxy_obj_code(&contract)
+		proxy_gen::proxy_obj_code(contract)
 	} else {
 		quote! {}
 	};

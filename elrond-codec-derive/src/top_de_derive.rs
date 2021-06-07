@@ -112,10 +112,10 @@ fn top_decode_method_bodies(
 				data_enum.variants.len() < 256,
 				"enums with more than 256 variants not supported"
 			);
-			if is_fieldless_enum(&data_enum) {
+			if is_fieldless_enum(data_enum) {
 				// fieldless enums are special, they can be top-decoded as u8 directly
-				let top_decode_arms = fieldless_enum_match_arm_result_ok(&name, &data_enum);
-				let top_decode_or_exit_arms = fieldless_enum_match_arm(&name, &data_enum);
+				let top_decode_arms = fieldless_enum_match_arm_result_ok(name, data_enum);
+				let top_decode_or_exit_arms = fieldless_enum_match_arm(name, data_enum);
 
 				let top_decode_body = quote! {
 					match <u8 as elrond_codec::TopDecode>::top_decode(top_input)? {
@@ -131,9 +131,9 @@ fn top_decode_method_bodies(
 				};
 				(top_decode_body, top_decode_or_exit_body)
 			} else {
-				let variant_dep_decode_snippets = variant_dep_decode_snippets(&name, &data_enum);
+				let variant_dep_decode_snippets = variant_dep_decode_snippets(name, data_enum);
 				let variant_dep_decode_or_exit_snippets =
-					variant_dep_decode_or_exit_snippets(&name, &data_enum);
+					variant_dep_decode_or_exit_snippets(name, data_enum);
 
 				let top_decode_body = quote! {
 					let bytes = top_input.into_boxed_slice_u8();
@@ -170,7 +170,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 	let name = &ast.ident;
 	let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 	let (top_decode_body, top_decode_or_exit_body) = top_decode_method_bodies(ast);
-	let (auto_default, auto_default_or_exit) = auto_default(&ast);
+	let (auto_default, auto_default_or_exit) = auto_default(ast);
 
 	let gen = quote! {
 		impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
