@@ -10,10 +10,10 @@ jobs:
   clippy_check:
     name: Clippy linter check
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./elrond-wasm-node
     steps:
-      - run:
-          shell: bash
-          working-directory: elrond-wasm-node
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
