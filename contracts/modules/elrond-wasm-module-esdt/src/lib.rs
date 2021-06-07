@@ -101,13 +101,6 @@ pub trait EsdtModule {
 		Ok(())
 	}
 
-	fn mint_and_send(&self, to: &Address, amount: &Self::BigUint) -> SCResult<()> {
-		self.mint(amount)?;
-		self.send().direct(to, &self.token_id().get(), amount, &[]);
-
-		Ok(())
-	}
-
 	fn require_token_issued(&self) -> SCResult<()> {
 		require!(!self.token_id().is_empty(), "Token must be issued first");
 		Ok(())
