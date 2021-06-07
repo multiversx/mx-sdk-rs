@@ -84,20 +84,27 @@ pub trait EsdtModule {
 	}
 
 	fn mint(&self, amount: &Self::BigUint) -> SCResult<()> {
-		self.require_local_roles_set()?;
-		self.send().esdt_local_mint(&self.token_id().get(), amount);
+		let token_id = self.token_id().get();
+
+		self.require_local_roles_set(&token_id)?;
+		self.send().esdt_local_mint(&token_id, amount);
+
 		Ok(())
 	}
 
 	fn burn(&self, amount: &Self::BigUint) -> SCResult<()> {
-		self.require_local_roles_set()?;
-		self.send().esdt_local_burn(&self.token_id().get(), amount);
+		let token_id = self.token_id().get();
+
+		self.require_local_roles_set(&token_id)?;
+		self.send().esdt_local_burn(&token_id, amount);
+
 		Ok(())
 	}
 
 	fn mint_and_send(&self, to: &Address, amount: &Self::BigUint) -> SCResult<()> {
 		self.mint(amount)?;
 		self.send().direct(to, &self.token_id().get(), amount, &[]);
+
 		Ok(())
 	}
 
@@ -106,14 +113,12 @@ pub trait EsdtModule {
 		Ok(())
 	}
 
-	fn require_local_roles_set(&self) -> SCResult<()> {
-		let token_id = self.token_id().get();
-		let roles = self.blockchain().get_esdt_local_roles(&token_id);
+	fn require_local_roles_set(&self, token_id: &TokenIdentifier) -> SCResult<()> {
+		let roles = self.blockchain().get_esdt_local_roles(token_id);
 		require!(
 			roles.contains(&EsdtLocalRole::Mint) && roles.contains(&EsdtLocalRole::Burn),
 			"Must set local roles first"
 		);
-
 		Ok(())
 	}
 }
