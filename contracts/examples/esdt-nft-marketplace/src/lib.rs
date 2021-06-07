@@ -43,7 +43,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		#[var_args] opt_accepted_payment_token_nonce: OptionalArg<u64>,
 		#[var_args] opt_sft_max_one_per_payment: OptionalArg<bool>,
 		#[var_args] opt_start_time: OptionalArg<u64>,
-	) -> SCResult<()> {
+	) -> SCResult<u64> {
 		let current_time = self.blockchain().get_block_timestamp();
 		let start_time = opt_start_time.into_option().unwrap_or(current_time);
 
@@ -121,7 +121,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			creator_royalties_percentage,
 		});
 
-		Ok(())
+		Ok(auction_id)
 	}
 
 	#[payable("*")]

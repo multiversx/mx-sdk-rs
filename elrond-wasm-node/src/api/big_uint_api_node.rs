@@ -421,7 +421,7 @@ impl ArwenBigUint {
 		if byte_len > 0 {
 			bigIntGetUnsignedBytes(
 				self.handle,
-				unsafe_buffer::buffer_ptr().offset((nr_bytes - byte_len) as isize),
+				unsafe_buffer::buffer_ptr().add(nr_bytes - byte_len),
 			);
 		}
 		unsafe_buffer::buffer_ptr()
