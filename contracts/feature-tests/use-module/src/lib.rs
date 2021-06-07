@@ -19,6 +19,7 @@ pub trait UseModule:
 	+ internal_mod_b::InternalModuleB
 	+ internal_mod_c::InternalModuleC
 	+ elrond_wasm_module_dns::DnsModule
+	+ elrond_wasm_module_esdt::EsdtModule
 	+ elrond_wasm_module_features::FeaturesModule
 	+ elrond_wasm_module_pause::PauseModule
 {

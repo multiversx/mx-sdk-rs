@@ -15,7 +15,7 @@ pub trait EsdtModule {
 		&self,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
-		num_decimals: u8,
+		num_decimals: usize,
 		#[payment] issue_cost: Self::BigUint,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner can issue token");
