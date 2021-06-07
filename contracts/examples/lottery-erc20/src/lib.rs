@@ -182,13 +182,13 @@ pub trait Lottery {
 			return Status::Inactive;
 		}
 
-		let prev_winners = self.get_prev_winners(&lottery_name);
+		let prev_winners = self.get_prev_winners(lottery_name);
 
 		if !prev_winners.is_empty() {
 			return Status::DistributingPrizes;
 		}
 
-		let info = self.get_lottery_info(&lottery_name);
+		let info = self.get_lottery_info(lottery_name);
 
 		if self.blockchain().get_block_timestamp() > info.deadline || info.tickets_left == 0 {
 			return Status::Ended;
@@ -202,7 +202,7 @@ pub trait Lottery {
 		lottery_name: &BoxedBytes,
 		token_amount: Self::BigUint,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
-		let info = self.get_lottery_info(&lottery_name);
+		let info = self.get_lottery_info(lottery_name);
 		let caller = self.blockchain().get_caller();
 
 		require!(
@@ -235,7 +235,7 @@ pub trait Lottery {
 	}
 
 	fn reserve_ticket(&self, lottery_name: &BoxedBytes) {
-		let mut info = self.get_lottery_info(&lottery_name);
+		let mut info = self.get_lottery_info(lottery_name);
 
 		info.tickets_left -= 1;
 		info.queued_tickets += 1;
@@ -244,7 +244,7 @@ pub trait Lottery {
 	}
 
 	fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: Self::BigUint) {
-		let mut info = self.get_lottery_info(&lottery_name);
+		let mut info = self.get_lottery_info(lottery_name);
 		info.prize_pool -= value;
 
 		self.set_lottery_info(lottery_name, &info);
@@ -254,11 +254,11 @@ pub trait Lottery {
 		&self,
 		lottery_name: &BoxedBytes,
 	) -> OptionalResult<AsyncCall<Self::SendApi>> {
-		let info = self.get_lottery_info(&lottery_name);
+		let info = self.get_lottery_info(lottery_name);
 
 		let total_tickets = info.current_ticket_number;
 		let total_winning_tickets = info.prize_distribution.len();
-		let mut prev_winners = self.get_prev_winners(&lottery_name);
+		let mut prev_winners = self.get_prev_winners(lottery_name);
 		let prev_winners_count = prev_winners.len();
 		let winners_left = total_winning_tickets - prev_winners_count;
 
@@ -280,7 +280,7 @@ pub trait Lottery {
 		let current_winning_ticket_index = last_winning_ticket_index - prev_winners_count;
 		let winning_ticket_id = self.get_random_winning_ticket_id(&prev_winners, total_tickets);
 
-		let winner_address = self.get_ticket_holder(&lottery_name, winning_ticket_id);
+		let winner_address = self.get_ticket_holder(lottery_name, winning_ticket_id);
 		let prize: Self::BigUint;
 
 		if current_winning_ticket_index != 0 {
@@ -352,13 +352,13 @@ pub trait Lottery {
 		cb_lottery_name: &BoxedBytes,
 		cb_sender: &Address,
 	) {
-		let mut info = self.get_lottery_info(&cb_lottery_name);
+		let mut info = self.get_lottery_info(cb_lottery_name);
 
 		match result {
 			AsyncCallResult::Ok(()) => {
-				let mut entries = self.get_number_of_entries_for_user(&cb_lottery_name, &cb_sender);
+				let mut entries = self.get_number_of_entries_for_user(cb_lottery_name, cb_sender);
 
-				self.set_ticket_holder(&cb_lottery_name, info.current_ticket_number, &cb_sender);
+				self.set_ticket_holder(cb_lottery_name, info.current_ticket_number, cb_sender);
 
 				entries += 1;
 				info.current_ticket_number += 1;
@@ -366,7 +366,7 @@ pub trait Lottery {
 				let ticket_price = info.ticket_price.clone();
 				info.prize_pool += ticket_price;
 
-				self.set_number_of_entries_for_user(&cb_lottery_name, &cb_sender, entries);
+				self.set_number_of_entries_for_user(cb_lottery_name, cb_sender, entries);
 			},
 			AsyncCallResult::Err(_) => {
 				// payment error, return ticket to pool
@@ -376,7 +376,7 @@ pub trait Lottery {
 
 		info.queued_tickets -= 1;
 
-		self.set_lottery_info(&cb_lottery_name, &info);
+		self.set_lottery_info(cb_lottery_name, &info);
 	}
 
 	#[callback]

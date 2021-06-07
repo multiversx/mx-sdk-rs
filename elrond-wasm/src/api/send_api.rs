@@ -82,7 +82,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		if !data.is_empty() {
 			serializer.push_argument_bytes(data);
 		}
-		self.async_call_raw(&to, &Self::AmountType::zero(), serializer.as_slice())
+		self.async_call_raw(to, &Self::AmountType::zero(), serializer.as_slice())
 	}
 
 	/// Sends either EGLD or an ESDT token to the target address,
@@ -306,6 +306,6 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		if !data.is_empty() {
 			serializer.push_argument_bytes(data);
 		}
-		self.async_call_raw(&from, &Self::AmountType::zero(), serializer.as_slice());
+		self.async_call_raw(from, &Self::AmountType::zero(), serializer.as_slice());
 	}
 }

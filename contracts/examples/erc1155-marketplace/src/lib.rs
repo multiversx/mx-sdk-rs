@@ -324,7 +324,7 @@ pub trait Erc1155Marketplace {
 		deadline: u64,
 	) -> SCResult<()> {
 		require!(
-			!self.is_up_for_auction(&type_id, &nft_id),
+			!self.is_up_for_auction(type_id, nft_id),
 			"There is already an auction for that token"
 		);
 		require!(
@@ -336,7 +336,7 @@ pub trait Erc1155Marketplace {
 			"Deadline can't be in the past"
 		);
 
-		self.auction_for_token(&type_id, &nft_id).set(&Auction {
+		self.auction_for_token(type_id, nft_id).set(&Auction {
 			token_identifier: token.clone(),
 			min_bid: min_bid.clone(),
 			max_bid: max_bid.clone(),

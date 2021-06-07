@@ -48,7 +48,7 @@ pub trait CryptoBubbles {
 		balance -= amount;
 		self.set_player_balance(player, &balance);
 
-		self.send().direct_egld(player, &amount, b"crypto bubbles");
+		self.send().direct_egld(player, amount, b"crypto bubbles");
 
 		self.withdraw_event(player, amount);
 
@@ -102,7 +102,7 @@ pub trait CryptoBubbles {
 		balance += prize;
 		self.set_player_balance(winner, &balance);
 
-		self.reward_winner_event(game_index, &winner, &prize);
+		self.reward_winner_event(game_index, winner, prize);
 
 		Ok(())
 	}

@@ -53,9 +53,9 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 				let payment_metadata = determine_argument_payment_type(pat_typed);
 				let metadata = ArgMetadata {
 					payment: payment_metadata,
-					var_args: is_var_args(&pat_typed),
+					var_args: is_var_args(pat_typed),
 					callback_call_result: is_callback_result_arg(pat_typed),
-					event_topic: is_event_topic(&pat_typed),
+					event_topic: is_event_topic(pat_typed),
 				};
 				let arg = MethodArgument {
 					pat: pat.clone(),

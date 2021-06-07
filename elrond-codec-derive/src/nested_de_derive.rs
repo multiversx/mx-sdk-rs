@@ -107,9 +107,9 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 				data_enum.variants.len() < 256,
 				"enums with more than 256 variants not supported"
 			);
-			let variant_dep_decode_snippets = variant_dep_decode_snippets(&name, &data_enum);
+			let variant_dep_decode_snippets = variant_dep_decode_snippets(name, data_enum);
 			let variant_dep_decode_or_exit_snippets =
-				variant_dep_decode_or_exit_snippets(&name, &data_enum);
+				variant_dep_decode_or_exit_snippets(name, data_enum);
 
 			quote! {
 				impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
