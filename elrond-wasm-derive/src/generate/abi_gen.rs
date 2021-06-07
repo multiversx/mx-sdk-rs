@@ -119,7 +119,7 @@ pub fn generate_abi_provider(
 	contract: &ContractTrait,
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
-	let abi_body = generate_abi_method_body(&contract, is_contract_main);
+	let abi_body = generate_abi_method_body(contract, is_contract_main);
 	quote! {
 		pub struct AbiProvider {}
 

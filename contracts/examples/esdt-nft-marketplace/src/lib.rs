@@ -84,7 +84,9 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		let auction_id = self.last_valid_auction_id().get() + 1;
 		self.last_valid_auction_id().set(&auction_id);
 
-		let sft_max_one_per_payment = opt_sft_max_one_per_payment.into_option().unwrap_or_default();
+		let sft_max_one_per_payment = opt_sft_max_one_per_payment
+			.into_option()
+			.unwrap_or_default();
 		let auction_type = if nft_amount > Self::BigUint::from(NFT_AMOUNT) {
 			match sft_max_one_per_payment {
 				true => AuctionType::SftOnePerPayment,
@@ -282,7 +284,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		let nft_type = &auction.auctioned_token.token_type;
 		let nft_nonce = auction.auctioned_token.nonce;
 		let nft_amount = &auction.nr_auctioned_tokens;
-		self.transfer_esdt(&caller, nft_type, nft_nonce, &nft_amount, b"returned token");
+		self.transfer_esdt(&caller, nft_type, nft_nonce, nft_amount, b"returned token");
 
 		Ok(())
 	}
@@ -332,7 +334,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			let nft_info = self.get_nft_info(nft_type, nft_nonce);
 			let token_id = &auction.payment_token.token_type;
 			let nonce = auction.payment_token.nonce;
-			let bid_split_amounts = self.calculate_winning_bid_split(&auction);
+			let bid_split_amounts = self.calculate_winning_bid_split(auction);
 
 			// send part as cut for contract owner
 			let owner = self.blockchain().get_owner_address();
@@ -369,7 +371,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			};
 			self.transfer_esdt(
 				&auction.current_winner,
-				&nft_type,
+				nft_type,
 				nft_nonce,
 				&nft_amount_to_send,
 				b"bought token at auction",
@@ -378,7 +380,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			// return to original owner
 			self.transfer_esdt(
 				&auction.original_owner,
-				&nft_type,
+				nft_type,
 				nft_nonce,
 				&auction.nr_auctioned_tokens,
 				b"returned token",
@@ -397,11 +399,11 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		// nonce 0 means fungible ESDT or EGLD
 		if nonce == 0 {
 			self.send()
-				.direct(to, &token_id, amount, self.data_or_empty_if_sc(to, data));
+				.direct(to, token_id, amount, self.data_or_empty_if_sc(to, data));
 		} else {
 			self.send().direct_nft(
 				to,
-				&token_id,
+				token_id,
 				nonce,
 				amount,
 				self.data_or_empty_if_sc(to, data),
@@ -424,7 +426,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	) -> EsdtTokenData<Self::BigUint> {
 		self.blockchain().get_esdt_token_data(
 			&self.blockchain().get_sc_address(),
-			&nft_type,
+			nft_type,
 			nft_nonce,
 		)
 	}
