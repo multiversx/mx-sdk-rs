@@ -1,4 +1,4 @@
-name: Builds and tests - elrond-wasm-node
+name: Check elrond-wasm-node
 
 on:
   push:
@@ -7,17 +7,10 @@ on:
   pull_request:
 
 jobs:
-  rust_test:
-    name: Cargo build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          default: true
-          toolchain: nightly
-      - name: Run rust tests
-        run: cd elrond-wasm-node & cargo build
+  defaults:
+    run:
+      shell: bash
+      working-directory: elrond-wasm-node
   clippy_check:
     name: Clippy linter check
     runs-on: ubuntu-latest

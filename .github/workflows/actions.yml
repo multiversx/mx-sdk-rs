@@ -1,4 +1,4 @@
-name: Builds and tests
+name: Check framework and contracts
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   wasm_test:
-    name: Wasm tests
+    name: Wasm build + Arwen tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
