@@ -143,6 +143,32 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer: &ArgBuffer,
 	) -> Address;
 
+	/// Upgrades a child contract of the currently executing contract.
+	/// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
+	/// The child contract's new init function will be called with the provided arguments
+	fn upgrade_contract(
+		&self,
+		sc_address: &Address,
+		gas: u64,
+		amount: &Self::AmountType,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	);
+
+	fn change_owner_address(&self, child_sc_address: &Address, new_owner: &Address) {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_argument_bytes(new_owner.as_bytes());
+
+		let _ = self.execute_on_dest_context_raw(
+			self.get_gas_left(),
+			sc_address,
+			&Self::AmountType::zero(),
+			b"ChangeOwnerAddress",
+			&arg_buffer,
+		);
+	}
+
 	/// Same shard, in-line execution of another contract.
 	fn execute_on_dest_context_raw(
 		&self,
