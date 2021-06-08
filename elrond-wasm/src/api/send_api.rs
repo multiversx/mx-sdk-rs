@@ -162,7 +162,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
 		let _ = self.execute_on_dest_context_raw(
 			self.get_gas_left(),
-			sc_address,
+			child_sc_address,
 			&Self::AmountType::zero(),
 			b"ChangeOwnerAddress",
 			&arg_buffer,
