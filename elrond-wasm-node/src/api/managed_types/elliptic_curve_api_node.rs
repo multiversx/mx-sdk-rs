@@ -55,16 +55,16 @@ extern "C" {
 	) -> i32;
 
 	fn unmarshalEC(
-		xPairHandle: i32,
-		yPairHandle: i32,
+		xResultHandle: i32,
+		yResultHandle: i32,
 		ecHandle: i32,
 		dataOffset: *const u8,
 		length: i32,
 	) -> i32;
 
 	fn unmarshalCompressedEC(
-		xPairHandle: i32,
-		yPairHandle: i32,
+		xResultHandle: i32,
+		yResultHandle: i32,
 		ecHandle: i32,
 		dataOffset: *const u8,
 		length: i32,
@@ -108,6 +108,8 @@ extern "C" {
 	fn p521Ec() -> i32;
 }
 
+type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
+
 pub struct ArwenEllipticCurve {
 	pub handle: i32,
 }
@@ -142,16 +144,7 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		}
 	}
 
-	fn get_values(
-		&self,
-	) -> (
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		u32,
-	) {
+	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
 		unsafe {
 			let field_order_handle = bigIntNew(0);
 			let base_point_order_handle = bigIntNew(0);
@@ -218,6 +211,10 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 	fn get_ec_length(&self) -> u32 {
 		unsafe { getCurveLengthEC(self.handle) as u32 }
 	}
+
+    fn get_ec_byte_length(&self) -> u32 {
+        unsafe { getCurveByteLengthEC(self.handle) as u32}
+    }
 
 	fn add_ec(
 		&self,

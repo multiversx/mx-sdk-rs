@@ -8,6 +8,8 @@ use alloc::string::String;
 /// Dummy type that implements `EllipticCurveApi`.
 /// Currently used to simplify generating ABIs, since we are not interested in values there.
 /// Being completely content-less it can exist in `elrond-wasm` in a no-std environment.
+
+type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
 pub struct EllipticCurveUncallable;
 
 impl TypeAbi for EllipticCurveUncallable {
@@ -88,16 +90,7 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		unreachable!()
 	}
 
-	fn get_values(
-		&self,
-	) -> (
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		u32,
-	) {
+	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
 		unreachable!()
 	}
 
@@ -118,6 +111,10 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 	}
 
 	fn get_ec_length(&self) -> u32 {
+		unreachable!()
+	}
+
+    fn get_ec_byte_length(&self) -> u32 {
 		unreachable!()
 	}
 

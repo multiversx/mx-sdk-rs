@@ -1,6 +1,8 @@
 use crate::abi;
 use crate::types::BoxedBytes;
 
+type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
+
 /// Definition of the EllipticCurve type required by the API
 pub trait EllipticCurveApi:
 	Sized
@@ -21,16 +23,7 @@ pub trait EllipticCurveApi:
 		size_of_field: u32,
 	) -> Self;
 
-	fn get_values(
-		&self,
-	) -> (
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		u32,
-	);
+	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint>;
 
 	fn p224_ec() -> Self;
 
@@ -41,6 +34,8 @@ pub trait EllipticCurveApi:
 	fn p521_ec() -> Self;
 
 	fn get_ec_length(&self) -> u32;
+
+    fn get_ec_byte_length(&self) -> u32;
 
 	fn add_ec(
 		&self,
