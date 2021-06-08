@@ -63,6 +63,41 @@
             "outputs": []
         },
         {
+            "name": "issueToken",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_display_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "num_decimals",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "optional address to set roles for. Defaults to SC's address."
+            ],
+            "name": "setLocalRoles",
+            "inputs": [
+                {
+                    "name": "opt_dest_address",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "setFeatureFlag",
             "inputs": [
                 {
