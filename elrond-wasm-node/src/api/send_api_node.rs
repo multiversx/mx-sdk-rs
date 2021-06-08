@@ -399,7 +399,7 @@ impl SendApi for ArwenApiImpl {
 			&own_address,
 			&ArwenBigUint::from(0u32),
 			function,
-			&arg_buffer,
+			arg_buffer,
 		);
 	}
 }
