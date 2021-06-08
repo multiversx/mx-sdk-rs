@@ -1,8 +1,67 @@
 elrond_wasm::imports!();
+type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
 
 /// All elliptic curve functions provided by Arwen exposed here
 #[elrond_wasm_derive::module]
 pub trait EllipticCurveFeatures {
+	#[endpoint]
+	fn compute_new_elliptic_curve(
+		&self,
+		field_order: Self::BigUint,
+		base_point_order: Self::BigUint,
+		eq_constant: Self::BigUint,
+		x_base_point: Self::BigUint,
+		y_base_point: Self::BigUint,
+		size_of_field: u32,
+	) -> Self::EllipticCurve {
+		Self::EllipticCurve::new_elliptic_curve(
+			field_order,
+			base_point_order,
+			eq_constant,
+			x_base_point,
+			y_base_point,
+			size_of_field,
+		)
+	}
+
+ 	#[endpoint]
+	fn compute_get_values(
+		&self,
+		curve: Self::EllipticCurve,
+	) -> EllipticCurveComponents<Self::BigUint> {
+		curve.get_values()
+	}
+
+	#[endpoint]
+	fn compute_p224_ec(&self) -> Self::EllipticCurve {
+		Self::EllipticCurve::p224_ec()
+	}
+
+	#[endpoint]
+	fn compute_p256_ec(&self) -> Self::EllipticCurve {
+		Self::EllipticCurve::p256_ec()
+	}
+
+	#[endpoint]
+	fn compute_p384_ec(&self) -> Self::EllipticCurve {
+		Self::EllipticCurve::p384_ec()
+	}
+
+	#[endpoint]
+	fn compute_p521_ec(&self) -> Self::EllipticCurve {
+		Self::EllipticCurve::p521_ec()
+	}
+
+    #[endpoint]
+    fn compute_get_ec_length(&self, curve: Self::EllipticCurve) -> u32 {
+        curve.get_ec_length()
+    }
+
+    #[endpoint]
+    fn compute_get_ec_byte_length(&self, curve: Self::EllipticCurve) -> u32 {
+        curve.get_ec_byte_length()
+    }
+
 	#[endpoint]
 	fn compute_add_ec(
 		&self,
@@ -47,7 +106,7 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn scalar_base_mult(
+	fn compute_scalar_base_mult(
 		&self,
 		curve: Self::EllipticCurve,
 		data: BoxedBytes,
@@ -56,7 +115,7 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn marshal_ec(
+	fn compute_marshal_ec(
 		&self,
 		curve: Self::EllipticCurve,
 		x_pair: Self::BigUint,
@@ -66,7 +125,7 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn marshal_compressed_ec(
+	fn compute_marshal_compressed_ec(
 		&self,
 		curve: Self::EllipticCurve,
 		x_pair: Self::BigUint,
@@ -76,7 +135,7 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn unmarshal_ec(
+	fn compute_unmarshal_ec(
 		&self,
 		curve: Self::EllipticCurve,
 		data: BoxedBytes,
@@ -85,7 +144,7 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn unmarshal_compressed_ec(
+	fn compute_unmarshal_compressed_ec(
 		&self,
 		curve: Self::EllipticCurve,
 		data: BoxedBytes,
@@ -94,10 +153,10 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn generate_key_ec(
+	fn compute_generate_key_ec(
 		&self,
 		curve: Self::EllipticCurve,
 	) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
 		curve.generate_key_ec()
-	}
+	}  
 }
