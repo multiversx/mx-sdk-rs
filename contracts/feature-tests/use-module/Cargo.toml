@@ -12,6 +12,7 @@ path = "src/lib.rs"
 wasm-output-mode = [
     "elrond-wasm-node",
     "elrond-wasm-module-dns/wasm-output-mode",
+    "elrond-wasm-module-esdt/wasm-output-mode",
     "elrond-wasm-module-features/wasm-output-mode",
     "elrond-wasm-module-pause/wasm-output-mode",
 ]
@@ -19,6 +20,10 @@ wasm-output-mode = [
 [dependencies.elrond-wasm-module-dns]
 version = "0.17.2"
 path = "../../modules/elrond-wasm-module-dns"
+
+[dependencies.elrond-wasm-module-esdt]
+version = "0.17.2"
+path = "../../modules/elrond-wasm-module-esdt"
 
 [dependencies.elrond-wasm-module-features]
 version = "0.17.2"
