@@ -1,24 +1,22 @@
 use super::ArwenBigUint;
 use crate::ArwenApiImpl;
-use elrond_wasm::api::BigUintApi;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::H256;
 
 extern "C" {
-	fn bigIntNew(value: i64) -> i32;
-	
-    fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
-	
-    fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
-	
-    fn verifyBLS(
+
+	fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+
+	fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+
+	fn verifyBLS(
 		keyOffset: *const u8,
 		messageOffset: *const u8,
 		messageLength: i32,
 		sigOffset: *const u8,
 	) -> i32;
-	
-    fn verifyEd25519(
+
+	fn verifyEd25519(
 		keyOffset: *const u8,
 		messageOffset: *const u8,
 		messageLength: i32,
@@ -33,7 +31,7 @@ extern "C" {
 		sigOffset: *const u8,
 	) -> i32;
 
-} 
+}
 
 impl CryptoApi for ArwenApiImpl {
 	type BigUint = ArwenBigUint;
@@ -89,5 +87,4 @@ impl CryptoApi for ArwenApiImpl {
 			) == 0
 		}
 	}
-
 }
