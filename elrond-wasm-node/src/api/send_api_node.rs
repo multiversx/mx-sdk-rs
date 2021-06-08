@@ -58,19 +58,31 @@ extern "C" {
 	) -> !;
 
 	fn createContract(
-		gas: u64,
+		gas: i64,
 		valueOffset: *const u8,
 		codeOffset: *const u8,
 		codeMetadataOffset: *const u8,
-		length: i32,
+		codeLength: i32,
 		resultOffset: *const u8,
 		numArguments: i32,
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
 
+	fn upgradeContract(
+		scAddressOffset: *const u8,
+		gas: i64,
+		valueOffset: *const u8,
+		codeOffset: *const u8,
+		codeMetadataOffset: *const u8,
+		codeLength: i32,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	);
+
 	fn executeOnDestContext(
-		gas: u64,
+		gas: i64,
 		addressOffset: *const u8,
 		valueOffset: *const u8,
 		functionOffset: *const u8,
@@ -81,7 +93,7 @@ extern "C" {
 	) -> i32;
 
 	fn executeOnDestContextByCaller(
-		gas: u64,
+		gas: i64,
 		addressOffset: *const u8,
 		valueOffset: *const u8,
 		functionOffset: *const u8,
@@ -92,7 +104,7 @@ extern "C" {
 	) -> i32;
 
 	fn executeOnSameContext(
-		gas: u64,
+		gas: i64,
 		addressOffset: *const u8,
 		valueOffset: *const u8,
 		functionOffset: *const u8,
@@ -250,7 +262,7 @@ impl SendApi for ArwenApiImpl {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = createContract(
-				gas,
+				gas as i64,
 				amount_bytes32_ptr,
 				code.as_ptr(),
 				code_metadata.as_ptr(),
@@ -262,6 +274,31 @@ impl SendApi for ArwenApiImpl {
 			);
 		}
 		new_address
+	}
+
+	fn upgrade_contract(
+		&self,
+		sc_address: &Address,
+		gas: u64,
+		amount: &ArwenBigUint,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) {
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			upgradeContract(
+				sc_address.as_ref().as_ptr(),
+				gas as i64,
+				amount_bytes32_ptr,
+				code.as_ptr(),
+				code_metadata.as_ptr(),
+				code.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
 	}
 
 	fn execute_on_dest_context_raw(
@@ -277,7 +314,7 @@ impl SendApi for ArwenApiImpl {
 
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = executeOnDestContext(
-				gas,
+				gas as i64,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				function.as_ptr(),
@@ -309,7 +346,7 @@ impl SendApi for ArwenApiImpl {
 
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = executeOnDestContext(
-				gas,
+				gas as i64,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				function.as_ptr(),
@@ -341,7 +378,7 @@ impl SendApi for ArwenApiImpl {
 
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = executeOnDestContextByCaller(
-				gas,
+				gas as i64,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				function.as_ptr(),
@@ -367,7 +404,7 @@ impl SendApi for ArwenApiImpl {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
 			let _ = executeOnSameContext(
-				gas,
+				gas as i64,
 				address.as_ref().as_ptr(),
 				amount_bytes32_ptr,
 				function.as_ptr(),
