@@ -1,5 +1,7 @@
-use core::panic;
+use core::{panic};
 use elrond_wasm::types::BoxedBytes;
+
+type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
 
 use super::RustBigUint;
 pub struct EllipticCurveMock;
@@ -84,16 +86,7 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		panic!("new_elliptic_curve not implemented yet!")
 	}
 
-	fn get_values(
-		&self,
-	) -> (
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		Self::BigUint,
-		u32,
-	) {
+	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
 		panic!("elliptic curve get_values not implemented yet!")
 	}
 
@@ -116,6 +109,10 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 	fn get_ec_length(&self) -> u32 {
 		panic!("get_ec_length not implemented yet!")
 	}
+
+    fn get_ec_byte_length(&self) -> u32 {
+        panic!("get_ec_byte_length not implemented yet!")
+    }
 
 	fn add_ec(
 		&self,
