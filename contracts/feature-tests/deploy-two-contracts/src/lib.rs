@@ -45,8 +45,8 @@ pub trait DeployTwoContracts {
 		))
 	}
 
-	#[endpoint(upgradeContract)]
-	fn upgrade_contract(
+	#[endpoint(upgradeChildContract)]
+	fn upgrade_child_contract(
 		&self,
 		child_sc_address: Address,
 		new_code: BoxedBytes,
@@ -64,7 +64,7 @@ pub trait DeployTwoContracts {
 	fn upgrade(&self, child_sc_address: &Address, new_code: &BoxedBytes, arguments: &[BoxedBytes]) {
 		self.send().upgrade_contract(
 			child_sc_address,
-			self.blockchain().get_gas_left(),
+			self.blockchain().get_gas_left() / 2,
 			&Self::BigUint::zero(),
 			new_code,
 			CodeMetadata::DEFAULT,
