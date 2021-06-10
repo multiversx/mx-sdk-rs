@@ -46,6 +46,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
+                    "owner": "address:owner",
                     "code": "file:../../../../contracts/examples/factorial/output/factorial.wasm"
                 },
                 "+": {}
