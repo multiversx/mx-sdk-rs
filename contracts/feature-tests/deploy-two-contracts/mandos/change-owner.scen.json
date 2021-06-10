@@ -1,0 +1,55 @@
+{
+    "name": "change sc owner",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deploy-factorial.scen.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:new_owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "change-owner",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:deployer",
+                "value": "0",
+                "function": "changeOwnerAddress",
+                "arguments": [
+                    "sc:child",
+                    "address:new_owner"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "owner": "address:new_owner",
+                    "code": "file:../../../../contracts/examples/factorial/output/factorial.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}
