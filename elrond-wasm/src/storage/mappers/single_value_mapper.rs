@@ -52,6 +52,13 @@ where
 		self.api.storage_load_len(self.key.as_slice()) == 0
 	}
 
+	/// Saves argument to storage, but only if the underlying storage entry is empty
+	pub fn set_if_empty(&self, value: &T) {
+		if self.is_empty() {
+			self.set(value);
+		}
+	}
+
 	/// Clears the storage for this mapper
 	pub fn clear(&self) {
 		self.api.storage_store_slice_u8(self.key.as_slice(), &[]);
