@@ -2,6 +2,7 @@
 #![allow(clippy::too_many_arguments)]
 
 mod call_async;
+mod call_programmed;
 mod call_sync;
 mod call_transf_exec;
 mod esdt;
@@ -17,6 +18,7 @@ elrond_wasm::imports!();
 pub trait Forwarder:
 	call_sync::ForwarderSyncCallModule
 	+ call_async::ForwarderAsyncCallModule
+	+ call_programmed::ForwarderProgrammedCallModule
 	+ call_transf_exec::ForwarderTransferExecuteModule
 	+ esdt::ForwarderEsdtModule
 	+ sft::ForwarderSftModule
