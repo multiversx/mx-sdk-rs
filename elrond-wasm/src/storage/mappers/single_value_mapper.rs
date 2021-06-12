@@ -42,24 +42,25 @@ where
 		storage_get(self.api.clone(), self.key.as_slice())
 	}
 
+	/// Returns whether the storage managed by this mapper is empty.
+	pub fn is_empty(&self) -> bool {
+		self.api.storage_load_len(self.key.as_slice()) == 0
+	}
+
 	/// Saves argument to storage.
 	pub fn set(&self, new_value: &T) {
 		storage_set(self.api.clone(), self.key.as_slice(), new_value);
 	}
 
-	/// Returns whether the storage managed by this is empty
-	pub fn is_empty(&self) -> bool {
-		self.api.storage_load_len(self.key.as_slice()) == 0
-	}
-
-	/// Saves argument to storage, but only if the underlying storage entry is empty
+	/// Saves argument to storage only if the storage is empty.
+	/// Does nothing otherwise.
 	pub fn set_if_empty(&self, value: &T) {
 		if self.is_empty() {
 			self.set(value);
 		}
 	}
 
-	/// Clears the storage for this mapper
+	/// Clears the storage for this mapper.
 	pub fn clear(&self) {
 		self.api.storage_store_slice_u8(self.key.as_slice(), &[]);
 	}
