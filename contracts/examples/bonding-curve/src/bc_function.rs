@@ -4,7 +4,7 @@ elrond_wasm::derive_imports!();
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub enum SupplyType {
 	Limited,
-	Limitless,
+	Unlimited,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
@@ -20,7 +20,7 @@ where
 	BigUint: BigUintApi,
 {
 	fn first_token_available(&self) -> BigUint {
-		self.current_supply.clone() - self.balance.clone()
+		&self.current_supply - &self.balance
 	}
 }
 
