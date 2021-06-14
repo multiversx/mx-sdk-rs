@@ -42,7 +42,7 @@
         {
             "step": "scCall",
             "txId": "auctionToken",
-            "comment": "arguments are: min_bid, max_bid, deadline, payment token. Nonce is skipped, since EGLD has no nonce",
+            "comment": "arguments are: min_bid, max_bid, deadline, payment token. Nonce is skipped, since token is fungible.",
             "tx": {
                 "from": "address:other_seller",
                 "to": "sc:marketplace",
@@ -59,12 +59,15 @@
                     "0x60C63784",
                     "str:BUSD-123456"
                 ],
-                "gasLimit": "14,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "status": "0",
                 "message": "",
+                "out": [
+                    "1"
+                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -104,17 +107,22 @@
                     },
                     "storage": {
                         "str:bidCutPerecentage": "1000",
-                        "str:auctionForToken|nested:str:BBIT-1b9bb6|u64:1": {
-                            "0-payment_token": "nested:str:BUSD-123456|u64:0",
-                            "1-min_bid": "biguint:0x01",
-                            "2-max_bid": "biguint:0x46",
-                            "3-start_time": "u64:123,000",
-                            "4-deadline": "u64:0x60C63784",
-                            "5-original_owner": "address:other_seller",
-                            "6-current_bid": "biguint:0",
-                            "7-current_winner": "0x0000000000000000000000000000000000000000000000000000000000000000",
-                            "8-marketplace_cut_percentage": "biguint:1000",
-                            "9-creator_royalties_percentage": "biguint:1000"
+                        "str:lastValidAuctionId": "1",
+                        "str:auctionById|u64:1": {
+                            "00-auctioned_token": "nested:str:BBIT-1b9bb6|u64:1",
+                            "01-nr_auctioned_tokens": "biguint:1",
+                            "02-auction_type": "u8:1",
+                            "03-auction_status": "u8:1",
+                            "04-payment_token": "nested:str:BUSD-123456|u64:0",
+                            "05-min_bid": "biguint:0x01",
+                            "06-max_bid": "biguint:0x46",
+                            "07-start_time": "u64:123,000",
+                            "08-deadline": "u64:0x60C63784",
+                            "09-original_owner": "address:other_seller",
+                            "10-current_bid": "biguint:0",
+                            "11-current_winner": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                            "12-marketplace_cut_percentage": "biguint:1000",
+                            "13-creator_royalties_percentage": "biguint:1000"
                         }
                     },
                     "code": "file:../output/esdt-nft-marketplace.wasm"

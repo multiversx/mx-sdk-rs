@@ -165,7 +165,7 @@ impl BlockchainMock {
 	}
 
 	pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {
-		if let Some(account) = self.accounts.get(&contract_address) {
+		if let Some(account) = self.accounts.get(contract_address) {
 			if let Some(contract_path) = &account.contract_path {
 				contract_path.clone()
 			} else {
@@ -251,7 +251,7 @@ impl BlockchainMock {
 		let sender_account = self
 			.accounts
 			.get_mut(address)
-			.unwrap_or_else(|| panic!("Sender account {} not found", address_hex(&address)));
+			.unwrap_or_else(|| panic!("Sender account {} not found", address_hex(address)));
 
 		let esdt_balance = sender_account
 			.esdt
@@ -259,7 +259,7 @@ impl BlockchainMock {
 			.unwrap_or_else(|| {
 				panic!(
 					"Account {} has no esdt tokens with name {}",
-					address_hex(&address),
+					address_hex(address),
 					String::from_utf8(esdt_token_identifier.to_vec()).unwrap()
 				)
 			});

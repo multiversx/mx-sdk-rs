@@ -38,14 +38,14 @@ pub trait UsersModule {
 	fn set_num_users(&self, num_users: usize);
 
 	fn get_or_create_user(&self, address: &Address) -> usize {
-		let mut user_id = self.get_user_id(&address);
+		let mut user_id = self.get_user_id(address);
 		if user_id == 0 {
 			let mut num_users = self.get_num_users();
 			num_users += 1;
 			self.set_num_users(num_users);
 			user_id = num_users;
-			self.set_user_id(&address, user_id);
-			self.set_user_address(user_id, &address);
+			self.set_user_id(address, user_id);
+			self.set_user_address(user_id, address);
 		}
 		user_id
 	}
