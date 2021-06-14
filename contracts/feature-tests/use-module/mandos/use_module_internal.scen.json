@@ -27,7 +27,7 @@
                 "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "5,000,000",
+                "gasLimit": "6,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,7 +47,7 @@
                 "value": "0",
                 "function": "call_mod_a",
                 "arguments": [],
-                "gasLimit": "5,000,000",
+                "gasLimit": "7,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -60,14 +60,14 @@
         },
         {
             "step": "scCall",
-            "txId": "call_mod_a",
+            "txId": "call_mod_b",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
                 "value": "0",
                 "function": "call_mod_b",
                 "arguments": [],
-                "gasLimit": "5,000,000",
+                "gasLimit": "7,000,000",
                 "gasPrice": "0"
             },
             "expect": {

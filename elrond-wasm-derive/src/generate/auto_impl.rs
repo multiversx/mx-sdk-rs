@@ -40,6 +40,6 @@ fn generate_auto_impl(m: &Method, auto_impl: &AutoImpl) -> proc_macro2::TokenStr
 		AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(m, identifier),
 		AutoImpl::StorageClear { identifier } => generate_clear_impl(m, identifier),
 		AutoImpl::ProxyGetter => generate_proxy_getter_impl(m),
-		AutoImpl::Module { impl_path } => generate_module_getter_impl(m, &impl_path),
+		AutoImpl::Module { impl_path } => generate_module_getter_impl(m, impl_path),
 	}
 }
