@@ -109,7 +109,7 @@
             "expect": {
                 "out": [],
                 "status": "5",
-                "message": "*",
+                "message": "str:not enough gas",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
