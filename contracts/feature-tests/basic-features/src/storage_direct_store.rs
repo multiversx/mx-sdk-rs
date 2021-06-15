@@ -13,6 +13,10 @@ pub trait StorageStoreFeatures {
 	#[storage_set("big_int")]
 	fn store_big_int(&self, bi: Self::BigInt);
 
+    #[endpoint]
+    #[storage_set("elliptic_curve")]
+    fn store_elliptic_curve(&self, ec: Self::EllipticCurve);
+
 	#[endpoint]
 	#[storage_set("usize")]
 	fn store_usize(&self, i: usize);
