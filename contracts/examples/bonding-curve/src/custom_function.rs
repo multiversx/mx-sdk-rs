@@ -1,12 +1,32 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::bc_function::{BCFunction, CurveArguments};
+use core::marker::PhantomData;
 
-pub struct CustomFunction<BigUint: BigUintApi> {}
+use crate::curve_function::{CurveArguments, CurveFunction};
 
-impl<BigUint> BCFunction<BigUint> for CustomFunction<BigUint>
+pub trait CFType<BigUint> = Fn(BigUint, BigUint, &CurveArguments<BigUint>) -> SCResult<BigUint>;
+
+pub struct CustomFunction<F, BigUint>
 where
+	BigUint: BigUintApi,
+	F: CFType<BigUint>,
+{
+	pub thingy: F,
+	pub phantom: PhantomData<BigUint>,
+}
+
+impl<F, BigUint> CurveFunction<BigUint> for CustomFunction<F, BigUint>
+where
+	for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
+	for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
+	for<'a, 'b> &'a BigUint: core::ops::Mul<&'b BigUint, Output = BigUint>,
+	for<'a, 'b> &'a BigUint: core::ops::Div<&'b BigUint, Output = BigUint>,
+	for<'b> BigUint: core::ops::AddAssign<&'b BigUint>,
+	for<'b> BigUint: core::ops::SubAssign<&'b BigUint>,
+	for<'b> BigUint: core::ops::MulAssign<&'b BigUint>,
+	for<'b> BigUint: core::ops::DivAssign<&'b BigUint>,
+	F: CFType<BigUint>,
 	BigUint: BigUintApi,
 {
 	fn function(
@@ -15,10 +35,6 @@ where
 		amount: BigUint,
 		arguments: &CurveArguments<BigUint>,
 	) -> SCResult<BigUint> {
-		Ok(
-			(token_start + amount) * (token_start + amount) * (token_start + amount)
-				/ BigUint::from(3u64)
-				- arguments.balance,
-		)
+		(self.thingy)(token_start, amount, arguments)
 	}
 }

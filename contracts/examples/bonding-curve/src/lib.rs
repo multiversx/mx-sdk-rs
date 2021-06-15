@@ -1,14 +1,20 @@
 #![no_std]
 #![allow(unused_attributes)]
+#![feature(trait_alias)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-mod bc_function;
-use bc_function::{BCFunction, CurveArguments, SupplyType, Token};
+mod curve_function;
+use core::marker::PhantomData;
 
+use curve_function::{CurveArguments, CurveFunction, SupplyType, Token};
+/*
 mod linear_function;
 use linear_function::LinearFunction;
+*/
+mod custom_function;
+use custom_function::CustomFunction;
 
 const TOKEN_NUM_DECIMALS: usize = 18;
 
@@ -16,8 +22,8 @@ const TOKEN_NUM_DECIMALS: usize = 18;
 pub trait BondingCurve {
 	#[init]
 	fn init(&self, issued_token: Token, exchanging_token: Token) {
-		self.issuedToken().set(&issued_token);
-		self.exchangingToken().set(&exchanging_token);
+		self.issued_token().set(&issued_token);
+		self.exchanging_token().set(&exchanging_token);
 	}
 
 	// endpoint - owner-only
@@ -30,20 +36,20 @@ pub trait BondingCurve {
 		#[payment] issue_cost: Self::BigUint,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
-		
+
 		let caller = self.blockchain().get_caller();
 
 		self.issue_started_event(
 			&caller,
-			&self.issuedToken().get().identifier,
+			&self.issued_token().get().identifier,
 			&initial_supply,
 		);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_fungible(
 				issue_cost,
-				&self.issuedToken().get().name,
-				&self.issuedToken().get().identifier.into_boxed_bytes(),
+				&self.issued_token().get().name,
+				&self.issued_token().get().identifier.into_boxed_bytes(),
 				&initial_supply,
 				FungibleTokenProperties {
 					num_decimals: TOKEN_NUM_DECIMALS,
@@ -68,7 +74,7 @@ pub trait BondingCurve {
 		#[payment] amount: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
-		let token = self.issuedToken().get().identifier;
+		let token = self.issued_token().get().identifier;
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.issue_success_event(&caller, &token, &amount);
@@ -88,15 +94,15 @@ pub trait BondingCurve {
 	fn mint_token(&self, amount: Self::BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
-		let supply_type = self.supplyType().get();
+		let supply_type = self.supply_type().get();
 		let supply = self.supply().get();
-		let max_supply = self.maxSupply().get();
+		let max_supply = self.max_supply().get();
 		require!(
-			!self.issuedToken().is_empty(),
+			!self.issued_token().is_empty(),
 			"Must issue token before minting"
 		);
 
-		let token = self.issuedToken().get().identifier;
+		let token = self.issued_token().get().identifier;
 
 		require!(
 			supply_type == SupplyType::Unlimited || supply < max_supply,
@@ -104,8 +110,7 @@ pub trait BondingCurve {
 		);
 
 		require!(
-			supply_type == SupplyType::Unlimited
-				|| supply + amount.clone() <= max_supply,
+			supply_type == SupplyType::Unlimited || supply + amount.clone() <= max_supply,
 			"Minting will exceed the maximum supply limit!"
 		);
 
@@ -143,7 +148,7 @@ pub trait BondingCurve {
 		token: &TokenIdentifier,
 		amount: &Self::BigUint,
 	) -> SCResult<()> {
-		let issued_token = self.issuedToken().get().identifier;
+		let issued_token = self.issued_token().get().identifier;
 		if &issued_token != token {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
@@ -171,7 +176,7 @@ pub trait BondingCurve {
 		token: &TokenIdentifier,
 		amount: &Self::BigUint,
 	) -> SCResult<()> {
-		let exchanging_token = &self.exchangingToken().get().identifier;
+		let exchanging_token = &self.exchanging_token().get().identifier;
 		if exchanging_token != token {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
@@ -187,30 +192,19 @@ pub trait BondingCurve {
 	}
 	fn get_curve_arguments(self) -> CurveArguments<Self::BigUint> {
 		CurveArguments {
-			supply_type: self.supplyType().get(),
-			max_supply: self.maxSupply().get(),
+			supply_type: self.supply_type().get(),
+			max_supply: self.max_supply().get(),
 			current_supply: self.supply().get(),
 			balance: self.balance().get(),
 		}
 	}
 
-	fn get_function(&self) -> LinearFunction<Self::BigUint> {
-
-		const DEFAULT_CONSTANT_COEFFICIENT: u64 = 3u64;
-		const DEFAULT_LINEAR_COEFFICIENT: u64 = 5u64;
-
-		LinearFunction {
-			a: Self::BigUint::from(DEFAULT_CONSTANT_COEFFICIENT),
-			b: Self::BigUint::from(DEFAULT_LINEAR_COEFFICIENT),
-		}
-	}
-
 	fn calculate_buy_price(&self, amount: Self::BigUint) -> SCResult<Self::BigUint> {
-		self.get_function().buy(amount, self.get_curve_arguments())
+		get_function().buy(amount, self.get_curve_arguments())
 	}
 
 	fn calculate_sale_price(&self, amount: Self::BigUint) -> SCResult<Self::BigUint> {
-		self.get_function().sell(amount, self.get_curve_arguments())
+		get_function().sell(amount, self.get_curve_arguments())
 	}
 
 	#[payable("*")]
@@ -228,8 +222,7 @@ pub trait BondingCurve {
 
 		let caller = self.blockchain().get_caller();
 
-		self
-			.send()
+		self.send()
 			.direct(&caller, &token_identifier, &calculated_price, b"buying");
 
 		self.buy_token_event(&caller, &calculated_price);
@@ -246,35 +239,33 @@ pub trait BondingCurve {
 	) -> SCResult<()> {
 		self.check_sell_requirements(&token_identifier, &sell_amount)?;
 
-		let calculated_price = &self.calculate_sale_price(sell_amount).unwrap();
+		let calculated_price = &self.calculate_sale_price(sell_amount.clone()).unwrap();
 
-		self.balance()
-			.update(|balance| *balance -= sell_amount);
+		self.balance().update(|balance| *balance -= sell_amount);
 
 		let caller = self.blockchain().get_caller();
 
-		self
-			.send()
+		self.send()
 			.direct(&caller, &token_identifier, &calculated_price, b"selling");
 
 		self.sell_token_event(&caller, &calculated_price);
 		Ok(())
 	}
 
-	#[view(supplyType)]
-	#[storage_mapper("supplyType")]
+	#[view(supply_type)]
+	#[storage_mapper("supply_type")]
 	fn supply_type(&self) -> SingleValueMapper<Self::Storage, SupplyType>;
 
-	#[view(maxSupply)]
-	#[storage_mapper("maxSupply")]
+	#[view(max_supply)]
+	#[storage_mapper("max_supply")]
 	fn max_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
-	#[view(getIssuedToken)]
-	#[storage_mapper("issuedToken")]
+	#[view(getissued_token)]
+	#[storage_mapper("issued_token")]
 	fn issued_token(&self) -> SingleValueMapper<Self::Storage, Token>;
 
 	#[view(getExchangingToken)]
-	#[storage_mapper("exchangingToken")]
+	#[storage_mapper("exchanging_token")]
 	fn exchanging_token(&self) -> SingleValueMapper<Self::Storage, Token>;
 
 	#[view(getMintedSupply)]
@@ -318,4 +309,28 @@ pub trait BondingCurve {
 
 	#[event("sell-token")]
 	fn sell_token_event(&self, #[indexed] user: &Address, amount: &Self::BigUint);
+}
+
+fn get_function<BigUint>() -> impl CurveFunction<BigUint>
+where
+	for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
+	for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
+	for<'a, 'b> &'a BigUint: core::ops::Mul<&'b BigUint, Output = BigUint>,
+	for<'a, 'b> &'a BigUint: core::ops::Div<&'b BigUint, Output = BigUint>,
+	for<'b> BigUint: core::ops::AddAssign<&'b BigUint>,
+	for<'b> BigUint: core::ops::SubAssign<&'b BigUint>,
+	for<'b> BigUint: core::ops::MulAssign<&'b BigUint>,
+	for<'b> BigUint: core::ops::DivAssign<&'b BigUint>,
+	BigUint: BigUintApi,
+{
+	/*const DEFAULT_CONSTANT_COEFFICIENT: u64 = 3u64;
+			const DEFAULT_LINEAR_COEFFICIENT: u64 = 5u64;
+	*/
+	CustomFunction {
+		thingy: |token_start, amount, arguments: &CurveArguments<BigUint>| {
+			let sum = token_start + amount;
+			Ok(&(&sum * &sum * sum / BigUint::from(3u64)) - &arguments.balance)
+		},
+		phantom: PhantomData,
+	}
 }
