@@ -35,7 +35,7 @@ pub trait EllipticCurveApi:
 
 	fn get_ec_length(&self) -> u32;
 
-    fn get_ec_byte_length(&self) -> u32;
+    fn get_priv_key_byte_length(&self) -> u32;
 
 	fn add_ec(
 		&self,

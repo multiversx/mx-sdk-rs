@@ -97,7 +97,7 @@ extern "C" {
 
 	fn getCurveLengthEC(ecHandle: i32) -> i32;
 
-	fn getCurveByteLengthEC(ecHandle: i32) -> i32;
+	fn getPrivKeyByteLengthEC(ecHandle: i32) -> i32;
 
 	fn p224Ec() -> i32;
 
@@ -212,8 +212,8 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		unsafe { getCurveLengthEC(self.handle) as u32 }
 	}
 
-    fn get_ec_byte_length(&self) -> u32 {
-        unsafe { getCurveByteLengthEC(self.handle) as u32}
+    fn get_priv_key_byte_length(&self) -> u32 {
+        unsafe { getPrivKeyByteLengthEC(self.handle) as u32}
     }
 
 	fn add_ec(
@@ -329,8 +329,8 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 
 	fn marshal_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
 		unsafe {
-			let curve_length = getCurveLengthEC(self.handle);
-			let mut result = BoxedBytes::allocate(1 + 2 * (curve_length as usize + 7) / 8);
+			let byte_length = (getCurveLengthEC(self.handle)+7)/8;
+			let mut result = BoxedBytes::allocate(1 + 2 * byte_length as usize);
 			marshalEC(
 				x_pair.handle,
 				y_pair.handle,
@@ -343,8 +343,8 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 
 	fn marshal_compressed_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
 		unsafe {
-			let curve_length = getCurveLengthEC(self.handle);
-			let mut result = BoxedBytes::allocate(1 + (curve_length as usize + 7) / 8);
+			let byte_length = (getCurveLengthEC(self.handle)+7)/8;
+			let mut result = BoxedBytes::allocate(1 + byte_length as usize);
 			marshalCompressedEC(
 				x_pair.handle,
 				y_pair.handle,
@@ -403,7 +403,7 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		unsafe {
 			let x_pub_key_handle = bigIntNew(0);
 			let y_pub_key_handle = bigIntNew(0);
-			let priv_key_length = getCurveByteLengthEC(self.handle);
+			let priv_key_length = getPrivKeyByteLengthEC(self.handle);
 			let mut private_key = BoxedBytes::allocate(priv_key_length as usize);
 			generateKeyEC(
 				x_pub_key_handle,
