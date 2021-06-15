@@ -29,12 +29,12 @@
                 "function": "echo_elliptic_curve",
                 "arguments": [
                     {
-                        "field1" : "0x0",
-                        "field2" : "0x0",
-                        "field3" : "0x0",
-                        "field4" : "0x0",
-                        "field5" : "0x0",
-                        "field6" : "0"
+                        "field1" : "biguint:0x0",
+                        "field2" : "biguint:0x0",
+                        "field3" : "biguint:0x0",
+                        "field4" : "biguint:0x0",
+                        "field5" : "biguint:0x0",
+                        "field6" : "u32:0"
                     }
                 ],
                 "gasLimit": "50,000,000",
@@ -42,14 +42,7 @@
             },
             "expect": {
                 "out": [
-                    {
-                        "field1" : "0x0",
-                        "field2" : "0x0",
-                        "field3" : "0x0",
-                        "field4" : "0x0",
-                        "field5" : "0x0",
-                        "field6" : "0"
-                    }
+                    "0x000000000000000000000000000000000000000000000000"
                 ],
                 "status": "",
                 "logs": [],
@@ -72,7 +65,7 @@
                         "field3" : "biguint:0xb4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4",
                         "field4" : "biguint:0xb70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",
                         "field5" : "biguint:0xbd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34",
-                        "field6" : "224"
+                        "field6" : "u32:224"
                     }
                 ],
                 "gasLimit": "50,000,000",
@@ -80,14 +73,7 @@
             },
             "expect": {
                 "out": [
-                    {
-                        "field1" : "biguint:0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001",
-                        "field2" : "biguint:0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D",
-                        "field3" : "biguint:0xb4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4",
-                        "field4" : "biguint:0xb70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",
-                        "field5" : "biguint:0xbd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34",
-                        "field6" : "224"
-                    }
+                    "0x1cffffffffffffffffffffffffffffffff0000000000000000000000010000001cffffffffffffffffffffffffffff16a2e0b8f03e13dd29455c5c2a3d0000001cb4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb40000001cb70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d210000001cbd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34000000e0"
                 ],
                 "status": "",
                 "logs": [],

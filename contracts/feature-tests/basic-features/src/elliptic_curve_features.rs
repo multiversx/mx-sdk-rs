@@ -13,7 +13,7 @@ pub trait EllipticCurveFeatures {
 		x_base_point: Self::BigUint,
 		y_base_point: Self::BigUint,
 		size_of_field: u32,
-	) -> Self::EllipticCurve {
+	) -> EllipticCurveComponents<Self::BigUint> {
 		Self::EllipticCurve::new_elliptic_curve(
 			field_order,
 			base_point_order,
@@ -21,7 +21,7 @@ pub trait EllipticCurveFeatures {
 			x_base_point,
 			y_base_point,
 			size_of_field,
-		)
+		).get_values()
 	}
 
  	#[endpoint]
@@ -33,23 +33,23 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn compute_p224_ec(&self) -> Self::EllipticCurve {
-		Self::EllipticCurve::p224_ec()
+	fn compute_p224_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
+		Self::EllipticCurve::p224_ec().get_values()
 	}
 
 	#[endpoint]
-	fn compute_p256_ec(&self) -> Self::EllipticCurve {
-		Self::EllipticCurve::p256_ec()
+	fn compute_p256_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
+		Self::EllipticCurve::p256_ec().get_values()
 	}
 
 	#[endpoint]
-	fn compute_p384_ec(&self) -> Self::EllipticCurve {
-		Self::EllipticCurve::p384_ec()
+	fn compute_p384_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
+		Self::EllipticCurve::p384_ec().get_values()
 	}
 
 	#[endpoint]
-	fn compute_p521_ec(&self) -> Self::EllipticCurve {
-		Self::EllipticCurve::p521_ec()
+	fn compute_p521_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
+		Self::EllipticCurve::p521_ec().get_values()
 	}
 
     #[endpoint]
@@ -58,8 +58,8 @@ pub trait EllipticCurveFeatures {
     }
 
     #[endpoint]
-    fn compute_get_ec_byte_length(&self, curve: Self::EllipticCurve) -> u32 {
-        curve.get_ec_byte_length()
+    fn compute_get_priv_key_byte_length(&self, curve: Self::EllipticCurve) -> u32 {
+        curve.get_priv_key_byte_length()
     }
 
 	#[endpoint]
@@ -70,8 +70,8 @@ pub trait EllipticCurveFeatures {
 		y_first_point: Self::BigUint,
 		x_second_point: Self::BigUint,
 		y_second_point: Self::BigUint,
-	) -> (Self::BigUint, Self::BigUint) {
-		curve.add_ec(x_first_point, y_first_point, x_second_point, y_second_point)
+	) -> MultiResult2<Self::BigUint,Self::BigUint> {
+		curve.add_ec(x_first_point, y_first_point, x_second_point, y_second_point).into()
 	}
 
 	#[endpoint]
@@ -80,8 +80,8 @@ pub trait EllipticCurveFeatures {
 		curve: Self::EllipticCurve,
 		x_point: Self::BigUint,
 		y_point: Self::BigUint,
-	) -> (Self::BigUint, Self::BigUint) {
-		curve.double_ec(x_point, y_point)
+	) -> MultiResult2<Self::BigUint,Self::BigUint> {
+		curve.double_ec(x_point, y_point).into()
 	}
 
 	#[endpoint]
@@ -101,8 +101,8 @@ pub trait EllipticCurveFeatures {
 		x_point: Self::BigUint,
 		y_point: Self::BigUint,
 		data: BoxedBytes,
-	) -> (Self::BigUint, Self::BigUint) {
-		curve.scalar_mult(x_point, y_point, data)
+	) -> MultiResult2<Self::BigUint,Self::BigUint> {
+		curve.scalar_mult(x_point, y_point, data).into()
 	}
 
 	#[endpoint]
@@ -110,8 +110,8 @@ pub trait EllipticCurveFeatures {
 		&self,
 		curve: Self::EllipticCurve,
 		data: BoxedBytes,
-	) -> (Self::BigUint, Self::BigUint) {
-		curve.scalar_base_mult(data)
+	) -> MultiResult2<Self::BigUint,Self::BigUint> {
+		curve.scalar_base_mult(data).into()
 	}
 
 	#[endpoint]
@@ -139,8 +139,8 @@ pub trait EllipticCurveFeatures {
 		&self,
 		curve: Self::EllipticCurve,
 		data: BoxedBytes,
-	) -> (Self::BigUint, Self::BigUint) {
-		curve.unmarshal_ec(data)
+	) -> MultiResult2<Self::BigUint,Self::BigUint> {
+		curve.unmarshal_ec(data).into()
 	}
 
 	#[endpoint]
@@ -148,15 +148,15 @@ pub trait EllipticCurveFeatures {
 		&self,
 		curve: Self::EllipticCurve,
 		data: BoxedBytes,
-	) -> (Self::BigUint, Self::BigUint) {
-		curve.unmarshal_compressed_ec(data)
+	) -> MultiResult2<Self::BigUint,Self::BigUint> {
+		curve.unmarshal_compressed_ec(data).into()
 	}
 
 	#[endpoint]
 	fn compute_generate_key_ec(
 		&self,
 		curve: Self::EllipticCurve,
-	) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
-		curve.generate_key_ec()
+	) -> MultiResult3<Self::BigUint,Self::BigUint,BoxedBytes> {
+		curve.generate_key_ec().into()
 	}  
 }
