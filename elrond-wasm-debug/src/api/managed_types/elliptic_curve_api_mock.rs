@@ -110,7 +110,7 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		panic!("get_ec_length not implemented yet!")
 	}
 
-    fn get_ec_byte_length(&self) -> u32 {
+    fn get_priv_key_byte_length(&self) -> u32 {
         panic!("get_ec_byte_length not implemented yet!")
     }
 

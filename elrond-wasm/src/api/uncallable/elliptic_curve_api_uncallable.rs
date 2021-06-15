@@ -114,7 +114,7 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		unreachable!()
 	}
 
-    fn get_ec_byte_length(&self) -> u32 {
+    fn get_priv_key_byte_length(&self) -> u32 {
 		unreachable!()
 	}
 
