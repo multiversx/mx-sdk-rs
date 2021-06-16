@@ -7,8 +7,8 @@ pub fn extract_pub_method_sigs(contract_trait: &ContractTrait) -> Vec<proc_macro
 		.methods
 		.iter()
 		.filter_map(|m| match &m.public_role {
-			PublicRole::Init(_init_metadata) => Some(method_gen::generate_sig(&m)),
-			PublicRole::Endpoint(_endpoint_metadata) => Some(method_gen::generate_sig(&m)),
+			PublicRole::Init(_init_metadata) => Some(method_gen::generate_sig(m)),
+			PublicRole::Endpoint(_endpoint_metadata) => Some(method_gen::generate_sig(m)),
 			_ => None,
 		})
 		.collect()
@@ -20,7 +20,7 @@ pub fn extract_method_impls(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 		.iter()
 		.filter_map(|m| {
 			if let MethodImpl::Explicit(body) = &m.implementation {
-				let msig = method_gen::generate_sig(&m);
+				let msig = method_gen::generate_sig(m);
 				Some(quote! {
 					#msig
 					#body
@@ -37,8 +37,8 @@ pub fn generate_call_methods(contract_trait: &ContractTrait) -> Vec<proc_macro2:
 		.methods
 		.iter()
 		.filter_map(|m| match &m.public_role {
-			PublicRole::Init(_init_metadata) => Some(generate_call_method(&m)),
-			PublicRole::Endpoint(_endpoint_metadata) => Some(generate_call_method(&m)),
+			PublicRole::Init(_init_metadata) => Some(generate_call_method(m)),
+			PublicRole::Endpoint(_endpoint_metadata) => Some(generate_call_method(m)),
 			_ => None,
 		})
 		.collect()
@@ -51,7 +51,7 @@ pub fn generate_auto_impl_defs(contract_trait: &ContractTrait) -> Vec<proc_macro
 		.iter()
 		.filter_map(|m| {
 			if let MethodImpl::Generated(_) = &m.implementation {
-				let sig = method_gen::generate_sig(&m);
+				let sig = method_gen::generate_sig(m);
 				Some(quote! { #sig ; })
 			} else {
 				None
@@ -65,10 +65,10 @@ pub fn generate_wasm_endpoints(contract_trait: &ContractTrait) -> Vec<proc_macro
 		.methods
 		.iter()
 		.filter_map(|m| match &m.public_role {
-			PublicRole::Init(_) => Some(generate_wasm_endpoint(&m, &quote! { init })),
+			PublicRole::Init(_) => Some(generate_wasm_endpoint(m, &quote! { init })),
 			PublicRole::Endpoint(endpoint_metadata) => {
 				let endpoint_ident = &endpoint_metadata.public_name;
-				Some(generate_wasm_endpoint(&m, &quote! { #endpoint_ident }))
+				Some(generate_wasm_endpoint(m, &quote! { #endpoint_ident }))
 			},
 			_ => None,
 		})
@@ -80,7 +80,7 @@ fn generate_wasm_endpoint(
 	endpoint_ident: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
 	let fn_ident = &m.name;
-	let call_method_ident = generate_call_method_name(&fn_ident);
+	let call_method_ident = generate_call_method_name(fn_ident);
 	quote! {
 		#[no_mangle]
 		pub fn #endpoint_ident ()

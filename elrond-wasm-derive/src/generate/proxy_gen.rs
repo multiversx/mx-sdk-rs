@@ -31,7 +31,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 		.iter()
 		.filter_map(|m| {
 			if let Some(endpoint_name) = m.endpoint_name() {
-				let msig = generate_proxy_sig(&m);
+				let msig = generate_proxy_sig(m);
 
 				let mut payment_count = 0;
 				let mut payment_local_decl = quote! { ___payment___ };
@@ -93,7 +93,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 					panic!("No more than one payment nonce argument allowed in call proxy");
 				}
 
-				let endpoint_name_literal = byte_str_slice_literal(&endpoint_name.as_bytes());
+				let endpoint_name_literal = byte_str_slice_literal(endpoint_name.as_bytes());
 				let sig = quote! {
 					#msig {
 						let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
@@ -121,7 +121,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let proxy_supertrait_decl =
 		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
-	let proxy_methods_impl = generate_method_impl(&contract);
+	let proxy_methods_impl = generate_method_impl(contract);
 	quote! {
 		pub trait ProxyTrait:
 			elrond_wasm::api::ProxyObjApi

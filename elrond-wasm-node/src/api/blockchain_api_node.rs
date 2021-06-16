@@ -143,7 +143,7 @@ impl BlockchainApi for ArwenApiImpl {
 		unsafe {
 			let mut res = H256::zero();
 			getOriginalTxHash(res.as_mut_ptr());
-			res.into()
+			res
 		}
 	}
 

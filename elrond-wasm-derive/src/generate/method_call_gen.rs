@@ -61,7 +61,7 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
 		})
 		.collect();
 
-	let call = generate_call_to_method_expr(&m);
+	let call = generate_call_to_method_expr(m);
 	let body_with_result = generate_body_with_result(&m.return_type, &call);
 	let nr_args = arg_index + 1;
 
@@ -88,7 +88,7 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
 		})
 		.collect();
 
-	let call = generate_call_to_method_expr(&m);
+	let call = generate_call_to_method_expr(m);
 	let body_with_result = generate_body_with_result(&m.return_type, &call);
 
 	quote! {

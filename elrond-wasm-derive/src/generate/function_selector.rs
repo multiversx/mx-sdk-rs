@@ -20,9 +20,9 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
 		.methods
 		.iter()
 		.filter_map(|m| match &m.public_role {
-			PublicRole::Init(_) => Some(function_selector_match_arm(&m, "init")),
+			PublicRole::Init(_) => Some(function_selector_match_arm(m, "init")),
 			PublicRole::Endpoint(endpoint_metadata) => Some(function_selector_match_arm(
-				&m,
+				m,
 				endpoint_metadata.public_name.to_string().as_str(),
 			)),
 			_ => None,

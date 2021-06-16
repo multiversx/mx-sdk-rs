@@ -122,7 +122,7 @@ where
 	/// Gets a reference to the value in the entry.
 	pub fn get(&self, k: &K) -> Option<V> {
 		if self.keys_set.contains(k) {
-			return Some(self.get_mapped_value(&k));
+			return Some(self.get_mapped_value(k));
 		}
 		None
 	}
