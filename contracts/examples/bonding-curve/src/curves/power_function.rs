@@ -1,22 +1,17 @@
-elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
+elrond_wasm::imports!();
 
-use crate::bc_function::{CurveArguments, CurveFunction};
+use crate::curve_function::CurveFunction;
 
-// logic is ax + b  = y
-// x - issued token
-// y - exchanging token
-// a - linear_coefficient
-// b - constant_coefficient
-// because of selling n tokens at a time, the total price y' will be
-// a* (nx + (n - 1) n / 2) + nb = y'
+use crate::curve_arguments::CurveArguments;
 
-pub struct LinearFunction<BigUint: BigUintApi> {
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
+pub struct PowerFunction<BigUint: BigUintApi> {
 	pub linear_coefficient: BigUint,
 	pub constant_coefficient: BigUint,
 }
 
-impl<BigUint> CurveFunction<BigUint> for LinearFunction<BigUint>
+impl<BigUint> CurveFunction<BigUint> for PowerFunction<BigUint>
 where
 	for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
 	for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
