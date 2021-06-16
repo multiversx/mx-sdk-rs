@@ -8,11 +8,21 @@ pub trait StrRepeat {
 	fn init(&self) {}
 
 	#[endpoint]
-	fn repeat(&self, string: &[u8], num_repeats: usize) -> Vec<u8> {
-		let mut result = Vec::<u8>::new();
+	fn repeat(&self, string: &[u8], num_repeats: usize) {
+		let mut byte_array = self.byte_array().get();
 		for _ in 0..num_repeats {
-			result.extend_from_slice(string);
+			byte_array.extend_from_slice(string);
 		}
-		result
+
+		self.byte_array().set(&byte_array);
 	}
+
+	#[view(getByteArrayLength)]
+	fn get_byte_array_length(&self) -> usize {
+		self.byte_array().raw_byte_length()
+	}
+
+	#[view(getByteArray)]
+	#[storage_mapper("byteArray")]
+	fn byte_array(&self) -> SingleValueMapper<Self::Storage, Vec<u8>>;
 }
