@@ -1,15 +1,15 @@
 [package]
-name = "elrond-wasm-module-dns"
+name = "elrond-wasm-module-esdt"
 version = "0.17.3"
 edition = "2018"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>", "Elrond Network <contact@elrond.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://elrond.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly smart contract module that allows a contract to register its own name"
+description = "Elrond WebAssembly smart contract module for using a single ESDT"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
