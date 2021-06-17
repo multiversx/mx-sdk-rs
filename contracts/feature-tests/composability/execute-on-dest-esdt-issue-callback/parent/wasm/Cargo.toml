@@ -1,5 +1,5 @@
 [package]
-name = "child-wasm"
+name = "parent-wasm"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
 edition = "2018"
@@ -15,14 +15,14 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.child]
+[dependencies.parent]
 path = ".."
 features = ["wasm-output-mode"]
 default-features = false
 
 [dependencies.elrond-wasm-output]
 version = "0.17.3"
-path = "../../../../../elrond-wasm-output"
+path = "../../../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 
 [workspace]
