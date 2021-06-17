@@ -6,7 +6,7 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/nft_storage_prepay.rs"
 
 [features]
 wasm-output-mode = [ "elrond-wasm-node",]
