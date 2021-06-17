@@ -5,10 +5,10 @@ use crate::{curve_arguments::SupplyType, events, storage};
 
 const TOKEN_NUM_DECIMALS: usize = 18;
 #[elrond_wasm_derive::module]
-pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
-	#[payable("*")]
+pub trait FTModule: storage::StorageModule + events::EventsModule {
+	#[payable("EGLD")]
 	#[endpoint(issueFungibleToken)]
-	fn issue_fungible_token(
+	fn ft_issue(
 		&self,
 		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,
@@ -55,8 +55,6 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 			AsyncCallResult::Ok(()) => {
 				self.issued_token().set(&token_identifier);
 				self.issue_success_event(&caller, &token_identifier, &amount);
-				self.supply().set(&amount);
-				self.balance().set(&amount);
 			},
 			AsyncCallResult::Err(message) => {
 				self.issue_failure_event(&caller, message.err_msg.as_slice());
@@ -67,8 +65,8 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		}
 	}
 
-	#[endpoint(mintToken)]
-	fn mint_token(
+	#[endpoint(mintFungibleToken)]
+	fn mint_fungible_token(
 		&self,
 		token_identifier: TokenIdentifier,
 		amount: Self::BigUint,
@@ -99,11 +97,11 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.mint(&token_identifier, &amount)
 			.async_call()
-			.with_callback(self.callbacks().mint_callback(caller, &amount)))
+			.with_callback(self.callbacks().ft_mint_callback(caller, &amount)))
 	}
 
 	#[callback]
-	fn mint_callback(
+	fn ft_mint_callback(
 		&self,
 		caller: Address,
 		amount: &Self::BigUint,

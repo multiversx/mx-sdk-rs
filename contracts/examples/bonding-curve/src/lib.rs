@@ -21,25 +21,23 @@ mod curves_setup;
 mod events;
 #[path = "tokens/fungible_token.rs"]
 mod fungible_token;
+#[path = "tokens/non_fungible_token.rs"]
+mod non_fungible_token;
+#[path = "tokens/semi_fungible_token.rs"]
+mod semi_fungible_token;
 #[path = "utils/storage.rs"]
 mod storage;
 
 #[elrond_wasm_derive::contract]
 pub trait BondingCurve:
-	fungible_token::FungibleTokenModule + storage::StorageModule + events::EventsModule
+	fungible_token::FTModule
+	+ non_fungible_token::NFTModule
+	+ semi_fungible_token::SFTModule
+	+ storage::StorageModule
+	+ events::EventsModule
 {
 	#[init]
 	fn init(&self) {}
-
-	#[endpoint(localMint)]
-	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_mint(&token_identifier, &amount);
-	}
-
-	#[endpoint(localBurn)]
-	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_burn(&token_identifier, &amount);
-	}
 
 	#[view]
 	fn check_sell_requirements(
