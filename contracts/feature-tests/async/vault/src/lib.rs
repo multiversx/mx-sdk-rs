@@ -125,6 +125,11 @@ pub trait Vault {
 		#[indexed] amount: &Self::BigUint,
 	);
 
+	#[endpoint]
+	fn get_owner_address(&self) -> Address {
+		self.blockchain().get_owner_address()
+	}
+
 	/// We already leave a trace of the calls using the event logs;
 	/// this additional counter has the role of showing that storage also gets saved correctly.
 	#[view]
