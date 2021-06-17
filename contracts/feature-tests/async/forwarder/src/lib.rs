@@ -4,6 +4,8 @@
 mod call_async;
 mod call_sync;
 mod call_transf_exec;
+mod contract_deploy;
+mod contract_update;
 mod esdt;
 mod nft;
 mod roles;
@@ -18,6 +20,8 @@ pub trait Forwarder:
 	call_sync::ForwarderSyncCallModule
 	+ call_async::ForwarderAsyncCallModule
 	+ call_transf_exec::ForwarderTransferExecuteModule
+	+ contract_deploy::DeployContractModule
+	+ contract_update::UpgradeContractModule
 	+ esdt::ForwarderEsdtModule
 	+ sft::ForwarderSftModule
 	+ nft::ForwarderNftModule
