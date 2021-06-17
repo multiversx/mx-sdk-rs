@@ -17,13 +17,13 @@ pub trait StorageModule {
 	#[storage_mapper("supply")]
 	fn supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
-	#[view(getCurves)]
-	#[storage_mapper("curves")]
-	fn curves(&self) -> SingleValueMapper<Self::Storage, CurvesSetup<Self::BigUint>>;
-
 	#[view(getAvailableSupply)]
 	#[storage_mapper("balance")]
 	fn balance(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+	#[view(getCurves)]
+	#[storage_mapper("curves")]
+	fn curves(&self) -> SingleValueMapper<Self::Storage, CurvesSetup<Self::BigUint>>;
 
 	#[view(getExchangingToken)]
 	#[storage_mapper("exchanging_token")]
