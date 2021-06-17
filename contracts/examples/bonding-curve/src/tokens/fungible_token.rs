@@ -66,7 +66,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	}
 
 	#[endpoint(mintFungibleToken)]
-	fn mint_fungible_token(
+	fn ft_mint(
 		&self,
 		token_identifier: TokenIdentifier,
 		amount: Self::BigUint,

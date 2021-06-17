@@ -16,6 +16,8 @@ mod linear_function;
 #[path = "curves/power_function.rs"]
 mod power_function;
 
+#[path = "tokens/common_methods.rs"]
+mod common_methods;
 mod curves_setup;
 #[path = "utils/events.rs"]
 mod events;
