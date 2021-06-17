@@ -10,7 +10,16 @@ SC_CHILD_ADDRESS_HEX=0000000000000000050011d9d2104d1bb4703accbf6dd06b4ffa87a125b
 SC_CHILD_ADDRESS_BECH32=$(erdpy wallet bech32 --encode ${SC_CHILD_ADDRESS_HEX})
 
 deploy() {
-    erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --send --outfile="deploy-testnet.interaction.json" --proxy=${PROXY} --chain=${CHAIN_ID} || return
+    erdpy --verbose contract deploy \
+        --proxy=${PROXY} \
+        --chain=${CHAIN_ID} \
+        --recall-nonce \
+        --pem=${ALICE} \
+        --bytecode="../output/forwarder.wasm" \
+        --gas-limit=50000000 \
+        --send \
+        --outfile="deploy-testnet.interaction.json" \
+         || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['hash']")
     ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['address']")
