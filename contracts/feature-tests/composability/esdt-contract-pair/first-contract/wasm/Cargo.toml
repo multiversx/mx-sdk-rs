@@ -22,7 +22,7 @@ default-features = false
 
 [dependencies.elrond-wasm-output]
 version = "0.17.3"
-path = "../../../../../elrond-wasm-output"
+path = "../../../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 
 [workspace]

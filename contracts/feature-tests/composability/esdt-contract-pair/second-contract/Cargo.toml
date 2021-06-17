@@ -1,5 +1,5 @@
 [package]
-name = "esdt-contract-pair"
+name = "second-contract"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
 edition = "2018"
@@ -11,25 +11,20 @@ path = "src/lib.rs"
 [features]
 wasm-output-mode = ["elrond-wasm-node"]
 
-[dependencies.first-contract]
-path = "first-contract"
-
-[dependencies.second-contract]
-path = "second-contract"
-
 [dependencies.elrond-wasm]
 version = "0.17.3"
-path = "../../../elrond-wasm"
+path = "../../../../../elrond-wasm"
 
 [dependencies.elrond-wasm-derive]
 version = "0.17.3"
-path = "../../../elrond-wasm-derive"
+path = "../../../../../elrond-wasm-derive"
 
 [dependencies.elrond-wasm-node]
 version = "0.17.3"
-path = "../../../elrond-wasm-node"
+path = "../../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.17.3"
-path = "../../../elrond-wasm-debug"
+path = "../../../../../elrond-wasm-debug"
+
