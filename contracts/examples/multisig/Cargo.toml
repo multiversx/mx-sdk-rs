@@ -6,7 +6,7 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/multisig.rs"
 
 [features]
 wasm-output-mode = [
