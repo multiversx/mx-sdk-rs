@@ -1,5 +1,5 @@
 
 #![no_std]
 
-pub use async_alice::*;
+pub use proxy_test_first::*;
 pub use elrond_wasm_output::*;

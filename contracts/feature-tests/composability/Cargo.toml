@@ -5,17 +5,17 @@ authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
 
-[dependencies.async-alice]
-path = "async-alice"
-
-[dependencies.async-bob]
-path = "async-bob"
-
 [dependencies.forwarder]
 path = "forwarder"
 
 [dependencies.forwarder-raw]
 path = "forwarder-raw"
+
+[dependencies.proxy-test-first]
+path = "proxy-test-first"
+
+[dependencies.proxy-test-second]
+path = "proxy-test-second"
 
 [dependencies.vault]
 path = "vault"

@@ -3,15 +3,6 @@ use elrond_wasm_debug::*;
 
 fn contract_map() -> ContractMap<TxContext> {
 	let mut contract_map = ContractMap::new();
-	contract_map.register_contract(
-		"file:../async-alice/output/async-alice.wasm",
-		Box::new(|context| Box::new(async_alice::contract_obj(context))),
-	);
-
-	contract_map.register_contract(
-		"file:../async-bob/output/async-bob.wasm",
-		Box::new(|context| Box::new(async_bob::contract_obj(context))),
-	);
 
 	contract_map.register_contract(
 		"file:../forwarder/output/forwarder.wasm",
@@ -21,6 +12,16 @@ fn contract_map() -> ContractMap<TxContext> {
 	contract_map.register_contract(
 		"file:../forwarder-raw/output/forwarder-raw.wasm",
 		Box::new(|context| Box::new(forwarder_raw::contract_obj(context))),
+	);
+
+	contract_map.register_contract(
+		"file:../proxy-test-first/output/proxy-test-first.wasm",
+		Box::new(|context| Box::new(proxy_test_first::contract_obj(context))),
+	);
+
+	contract_map.register_contract(
+		"file:../proxy-test-second/output/proxy-test-second.wasm",
+		Box::new(|context| Box::new(proxy_test_second::contract_obj(context))),
 	);
 
 	contract_map.register_contract(

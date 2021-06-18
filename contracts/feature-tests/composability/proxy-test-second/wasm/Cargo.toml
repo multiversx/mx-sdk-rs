@@ -1,5 +1,5 @@
 [package]
-name = "async-alice-wasm"
+name = "proxy-test-second-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -15,7 +15,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.async-alice]
+[dependencies.proxy-test-second]
 path = ".."
 features=["wasm-output-mode"]
 
