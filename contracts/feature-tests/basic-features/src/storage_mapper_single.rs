@@ -33,6 +33,11 @@ pub trait SingleValueMapperFeatures {
 	}
 
 	#[endpoint]
+	fn my_single_value_mapper_set_if_empty(&self, value: Self::BigInt) {
+		self.map_my_single_value_mapper().set_if_empty(&value);
+	}
+
+	#[endpoint]
 	fn clear_single_value_mapper(&self) {
 		self.map_my_single_value_mapper().clear();
 	}
@@ -40,5 +45,10 @@ pub trait SingleValueMapperFeatures {
 	#[endpoint]
 	fn is_empty_single_value_mapper(&self) -> bool {
 		self.map_my_single_value_mapper().is_empty()
+	}
+
+	#[endpoint]
+	fn raw_byte_length_single_value_mapper(&self) -> usize {
+		self.map_my_single_value_mapper().raw_byte_length()
 	}
 }

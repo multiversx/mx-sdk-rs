@@ -273,6 +273,104 @@
                     "code": ""
                 }
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-empty-entry",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "my_single_value_mapper_set_if_empty",
+                "arguments": [
+                    "42"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:my_single_value_mapper": "42"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call-set-if-empty-on-non-empty-entry",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "my_single_value_mapper_set_if_empty",
+                "arguments": [
+                    "100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:my_single_value_mapper": "42"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "query-raw-byte-length",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "raw_byte_length_single_value_mapper"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "message": "",
+                "logs": []
+            }
         }
     ]
 }

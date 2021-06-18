@@ -13,13 +13,13 @@ erdpy --verbose contract build ./contracts/examples/multisig || return 1
 erdpy --verbose contract build ./contracts/examples/egld-esdt-swap || return 1
 erdpy --verbose contract build ./contracts/examples/erc20 || return 1
 erdpy --verbose contract build ./contracts/feature-tests/basic-features || return 1
+erdpy --verbose contract build ./contracts/feature-tests/composability/forwarder || return 1
+erdpy --verbose contract build ./contracts/feature-tests/composability/forwarder-raw || return 1
+erdpy --verbose contract build ./contracts/feature-tests/composability/proxy-test-first || return 1
+erdpy --verbose contract build ./contracts/feature-tests/composability/proxy-test-second || return 1
+erdpy --verbose contract build ./contracts/feature-tests/composability/recursive-caller || return 1
+erdpy --verbose contract build ./contracts/feature-tests/composability/vault || return 1
 erdpy --verbose contract build ./contracts/feature-tests/payable-features || return 1
-erdpy --verbose contract build ./contracts/feature-tests/async/async-alice || return 1
-erdpy --verbose contract build ./contracts/feature-tests/async/async-bob || return 1
-erdpy --verbose contract build ./contracts/feature-tests/async/forwarder || return 1
-erdpy --verbose contract build ./contracts/feature-tests/async/forwarder-raw || return 1
-erdpy --verbose contract build ./contracts/feature-tests/async/recursive-caller || return 1
-erdpy --verbose contract build ./contracts/feature-tests/async/vault || return 1
 
 # if you still want to build all:
 # ./build-wasm.sh
@@ -68,17 +68,17 @@ cp -R contracts/feature-tests/payable-features/output/payable-features.wasm \
 cp -R contracts/feature-tests/payable-features/mandos \
    $ARWEN_PATH/test/features/payable-features
 
-cp -R contracts/feature-tests/async/async-alice/output/async-alice.wasm \
-   $ARWEN_PATH/test/features/async/async-alice/output/async-alice.wasm
-cp -R contracts/feature-tests/async/async-bob/output/async-bob.wasm \
-   $ARWEN_PATH/test/features/async/async-bob/output/async-bob.wasm
-cp -R contracts/feature-tests/async/forwarder/output/forwarder.wasm \
-   $ARWEN_PATH/test/features/async/forwarder/output/forwarder.wasm
-cp -R contracts/feature-tests/async/forwarder-raw/output/forwarder-raw.wasm \
-   $ARWEN_PATH/test/features/async/forwarder-raw/output/forwarder-raw.wasm
-cp -R contracts/feature-tests/async/recursive-caller/output/recursive-caller.wasm \
-   $ARWEN_PATH/test/features/async/recursive-caller/output/recursive-caller.wasm
-cp -R contracts/feature-tests/async/vault/output/vault.wasm \
-   $ARWEN_PATH/test/features/async/vault/output/vault.wasm
-cp -R contracts/feature-tests/async/mandos \
-   $ARWEN_PATH/test/features/async
+cp -R contracts/feature-tests/composability/forwarder/output/forwarder.wasm \
+   $ARWEN_PATH/test/features/composability/forwarder/output/forwarder.wasm
+cp -R contracts/feature-tests/composability/forwarder-raw/output/forwarder-raw.wasm \
+   $ARWEN_PATH/test/features/composability/forwarder-raw/output/forwarder-raw.wasm
+cp -R contracts/feature-tests/composability/proxy-test-first/output/proxy-test-first.wasm \
+   $ARWEN_PATH/test/features/composability/proxy-test-first/output/proxy-test-first.wasm
+cp -R contracts/feature-tests/composability/proxy-test-second/output/proxy-test-second.wasm \
+   $ARWEN_PATH/test/features/composability/proxy-test-second/output/proxy-test-second.wasm
+cp -R contracts/feature-tests/composability/recursive-caller/output/recursive-caller.wasm \
+   $ARWEN_PATH/test/features/composability/recursive-caller/output/recursive-caller.wasm
+cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
+   $ARWEN_PATH/test/features/composability/vault/output/vault.wasm
+cp -R contracts/feature-tests/composability/mandos \
+   $ARWEN_PATH/test/features/composability
