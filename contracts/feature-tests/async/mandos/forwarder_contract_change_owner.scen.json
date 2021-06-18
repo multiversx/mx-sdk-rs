@@ -1,0 +1,54 @@
+{
+    "name": "change sc owner",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {},
+                "address:new_owner": {},
+                "sc:forwarder": {
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:child": {
+                    "owner": "sc:forwarder",
+                    "code":"file:../vault/output/vault.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "change-owner",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "changeOwnerAddress",
+                "arguments": [
+                    "sc:child",
+                    "address:new_owner"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "address:new_owner", "address:new_owner" ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "owner": "address:new_owner",
+                    "code":"file:../vault/output/vault.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}
