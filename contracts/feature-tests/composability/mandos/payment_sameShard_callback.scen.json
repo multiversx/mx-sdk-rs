@@ -17,13 +17,13 @@
                     "storage": {
                         "``other_contract": "sc:bob"
                     },
-                    "code": "file:../async-alice/output/async-alice.wasm"
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
                 "sc:bob": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../async-bob/output/async-bob.wasm"
+                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }
             }
         },
@@ -65,7 +65,7 @@
                         "``other_contract": "sc:bob",
                         "``callback_info": "0x7777"
                     },
-                    "code": "file:../async-alice/output/async-alice.wasm"
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
                 "sc:bob": {
                     "nonce": "0",
@@ -74,7 +74,7 @@
                         "``pay_me_arg": "0x56",
                         "``last_payment": "0x123400"
                     },
-                    "code": "file:../async-bob/output/async-bob.wasm"
+                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }
             }
         }

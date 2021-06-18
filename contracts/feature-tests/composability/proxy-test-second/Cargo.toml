@@ -1,12 +1,12 @@
 [package]
-name = "async-bob"
+name = "proxy-test-second"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/proxy-test-second.rs"
 
 [features]
 wasm-output-mode = ["elrond-wasm-node"]
