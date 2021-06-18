@@ -196,43 +196,43 @@ fn forwarder_sync_echo_range_go() {
 }
 
 #[test]
-fn message_othershard_go() {
-	elrond_wasm_debug::mandos_go("mandos/message_otherShard.scen.json");
+fn proxy_test_message_othershard_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_message_otherShard.scen.json");
 }
 
 #[test]
-fn message_othershard_callback_go() {
-	elrond_wasm_debug::mandos_go("mandos/message_otherShard_callback.scen.json");
+fn proxy_test_message_othershard_callback_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_message_otherShard_callback.scen.json");
 }
 
 #[test]
-fn message_sameshard_go() {
-	elrond_wasm_debug::mandos_go("mandos/message_sameShard.scen.json");
+fn proxy_test_message_sameshard_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_message_sameShard.scen.json");
 }
 
 #[test]
-fn message_sameshard_callback_go() {
-	elrond_wasm_debug::mandos_go("mandos/message_sameShard_callback.scen.json");
+fn proxy_test_message_sameshard_callback_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_message_sameShard_callback.scen.json");
 }
 
 #[test]
-fn payment_othershard_go() {
-	elrond_wasm_debug::mandos_go("mandos/payment_otherShard.scen.json");
+fn proxy_test_payment_othershard_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_otherShard.scen.json");
 }
 
 #[test]
-fn payment_othershard_callback_go() {
-	elrond_wasm_debug::mandos_go("mandos/payment_otherShard_callback.scen.json");
+fn proxy_test_payment_othershard_callback_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_otherShard_callback.scen.json");
 }
 
 #[test]
-fn payment_sameshard_go() {
-	elrond_wasm_debug::mandos_go("mandos/payment_sameShard.scen.json");
+fn proxy_test_payment_sameshard_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_sameShard.scen.json");
 }
 
 #[test]
-fn payment_sameshard_callback_go() {
-	elrond_wasm_debug::mandos_go("mandos/payment_sameShard_callback.scen.json");
+fn proxy_test_payment_sameshard_callback_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_sameShard_callback.scen.json");
 }
 
 #[test]
