@@ -4,7 +4,7 @@
 pub struct MethodArgument {
 	pub pat: syn::Pat,
 	pub ty: syn::Type,
-	pub remaining_attributes: Vec<syn::Attribute>,
+	pub unprocessed_attributes: Vec<syn::Attribute>,
 	pub metadata: ArgMetadata,
 }
 

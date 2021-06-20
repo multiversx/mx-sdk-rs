@@ -26,6 +26,12 @@ pub enum MethodImpl {
 	NoImplementation,
 }
 
+impl MethodImpl {
+	pub fn is_no_implementation(&self) -> bool {
+		matches!(self, MethodImpl::NoImplementation)
+	}
+}
+
 /// Models any method argument from a contract, module or callable proxy trait.
 #[derive(Clone, Debug)]
 pub struct Method {
@@ -33,7 +39,7 @@ pub struct Method {
 	pub public_role: PublicRole,
 	pub name: syn::Ident,
 	pub generics: syn::Generics,
-	pub remaining_attributes: Vec<syn::Attribute>,
+	pub unprocessed_attributes: Vec<syn::Attribute>,
 	pub method_args: Vec<MethodArgument>,
 	pub output_names: Vec<String>,
 	pub return_type: syn::ReturnType,

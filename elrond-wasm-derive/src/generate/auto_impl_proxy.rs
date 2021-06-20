@@ -44,7 +44,7 @@ pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
 		"Proxy getter must have 1 argument, which is the target address"
 	);
 
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	let address_arg_name = &m.method_args[0].pat;
 	let parsed_return_type = proxy_getter_return_type(m);
 	let module_path = &parsed_return_type.module_path;

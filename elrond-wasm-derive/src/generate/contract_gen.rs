@@ -20,7 +20,7 @@ pub fn extract_method_impls(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 		.iter()
 		.filter_map(|m| {
 			if let MethodImpl::Explicit(body) = &m.implementation {
-				let msig = method_gen::generate_sig(m);
+				let msig = method_gen::generate_sig_with_attributes(m);
 				Some(quote! {
 					#msig
 					#body

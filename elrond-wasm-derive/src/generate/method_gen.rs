@@ -25,6 +25,15 @@ pub fn generate_sig(m: &Method) -> proc_macro2::TokenStream {
 	result
 }
 
+pub fn generate_sig_with_attributes(m: &Method) -> proc_macro2::TokenStream {
+	let m_remaining_attr = &m.unprocessed_attributes;
+	let msig = generate_sig(m);
+	quote! {
+		#(#m_remaining_attr)*
+		#msig
+	}
+}
+
 pub fn generate_arg_call_name(arg: &MethodArgument) -> proc_macro2::TokenStream {
 	let pat = &arg.pat;
 	match &arg.ty {

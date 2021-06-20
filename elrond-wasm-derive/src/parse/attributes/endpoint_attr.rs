@@ -1,16 +1,16 @@
 use super::attr_names::*;
 use super::util::*;
 
-pub fn is_init(m: &syn::TraitItemMethod) -> bool {
-	has_attribute(&m.attrs, ATTR_INIT)
+pub fn is_init(attr: &syn::Attribute) -> bool {
+	is_attribute_with_no_args(attr, ATTR_INIT)
 }
 
-pub fn is_callback_raw_decl(m: &syn::TraitItemMethod) -> bool {
-	has_attribute(&m.attrs, ATTR_CALLBACK_RAW_DECL)
+pub fn is_callback_raw(attr: &syn::Attribute) -> bool {
+	is_attribute_with_no_args(attr, ATTR_CALLBACK_RAW_DECL)
 }
 
-pub fn is_proxy(m: &syn::TraitItemMethod) -> bool {
-	has_attribute(&m.attrs, ATTR_PROXY)
+pub fn is_proxy(attr: &syn::Attribute) -> bool {
+	is_attribute_with_no_args(attr, ATTR_PROXY)
 }
 
 pub fn is_var_args(pat: &syn::PatType) -> bool {
@@ -27,8 +27,8 @@ pub struct EndpointAttribute {
 }
 
 impl EndpointAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<EndpointAttribute> {
-		match find_attr_with_one_opt_token_tree_arg(m, ATTR_ENDPOINT) {
+	pub fn parse(attr: &syn::Attribute) -> Option<EndpointAttribute> {
+		match is_attr_with_one_opt_token_tree_arg(attr, ATTR_ENDPOINT) {
 			None => None,
 			Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(EndpointAttribute {
 				endpoint_name: Some(ident),
@@ -47,8 +47,8 @@ pub struct ViewAttribute {
 }
 
 impl ViewAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<ViewAttribute> {
-		match find_attr_with_one_opt_token_tree_arg(m, ATTR_VIEW) {
+	pub fn parse(attr: &syn::Attribute) -> Option<ViewAttribute> {
+		match is_attr_with_one_opt_token_tree_arg(attr, ATTR_VIEW) {
 			None => None,
 			Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(ViewAttribute {
 				view_name: Some(ident),
@@ -65,8 +65,8 @@ pub struct CallbackAttribute {
 }
 
 impl CallbackAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<CallbackAttribute> {
-		match find_attr_with_one_opt_token_tree_arg(m, ATTR_CALLBACK_DECL) {
+	pub fn parse(attr: &syn::Attribute) -> Option<CallbackAttribute> {
+		match is_attr_with_one_opt_token_tree_arg(attr, ATTR_CALLBACK_DECL) {
 			None => None,
 			Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(CallbackAttribute {
 				callback_name: Some(ident),

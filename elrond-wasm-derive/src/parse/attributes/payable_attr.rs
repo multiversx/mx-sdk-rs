@@ -20,17 +20,18 @@ pub struct PayableAttribute {
 }
 
 impl PayableAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<PayableAttribute> {
-		let payable_attr = m.attrs.iter().find(|attr| {
-			if let Some(first_seg) = attr.path.segments.first() {
-				first_seg.ident == ATTR_PAYABLE
+	pub fn parse(attr: &syn::Attribute) -> Option<PayableAttribute> {
+		if let Some(first_seg) = attr.path.segments.first() {
+			if first_seg.ident == ATTR_PAYABLE {
+				Some(PayableAttribute {
+					identifier: extract_token_identifier(attr),
+				})
 			} else {
-				false
+				None
 			}
-		});
-		payable_attr.map(|attr| PayableAttribute {
-			identifier: extract_token_identifier(attr),
-		})
+		} else {
+			None
+		}
 	}
 }
 
