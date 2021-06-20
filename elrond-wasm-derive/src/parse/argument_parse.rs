@@ -60,7 +60,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 				let arg = MethodArgument {
 					pat: pat.clone(),
 					ty: ty.clone(),
-					remaining_attributes: Vec::new(),
+					unprocessed_attributes: Vec::new(),
 					metadata,
 				};
 

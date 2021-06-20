@@ -10,8 +10,8 @@ pub struct EventAttribute {
 }
 
 impl EventAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		find_attr_one_string_arg(m, ATTR_EVENT).map(|arg_str| EventAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_EVENT).map(|arg_str| EventAttribute {
 			identifier: arg_str,
 		})
 	}
@@ -22,8 +22,8 @@ pub struct LegacyEventAttribute {
 }
 
 impl LegacyEventAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<LegacyEventAttribute> {
-		match find_attr_one_string_arg(m, ATTR_LEGACY_EVENT) {
+	pub fn parse(attr: &syn::Attribute) -> Option<LegacyEventAttribute> {
+		match is_attr_one_string_arg(attr, ATTR_LEGACY_EVENT) {
 			None => None,
 			Some(event_str) => {
 				if !event_str.starts_with("0x") {
