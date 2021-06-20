@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(unused_attributes)]
 #![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
