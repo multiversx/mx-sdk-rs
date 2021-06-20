@@ -74,6 +74,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 	}
 
 	#[endpoint]
+	#[allow(clippy::too_many_arguments)]
 	fn nft_create(
 		&self,
 		token_identifier: TokenIdentifier,

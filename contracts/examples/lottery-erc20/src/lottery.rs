@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 
@@ -25,6 +24,7 @@ pub trait Lottery {
 	}
 
 	#[endpoint]
+	#[allow(clippy::too_many_arguments)]
 	fn start(
 		&self,
 		lottery_name: BoxedBytes,
@@ -47,6 +47,7 @@ pub trait Lottery {
 	}
 
 	#[endpoint(createLotteryPool)]
+	#[allow(clippy::too_many_arguments)]
 	fn create_lottery_pool(
 		&self,
 		lottery_name: BoxedBytes,
@@ -68,6 +69,7 @@ pub trait Lottery {
 		)
 	}
 
+	#[allow(clippy::too_many_arguments)]
 	fn start_lottery(
 		&self,
 		lottery_name: BoxedBytes,
