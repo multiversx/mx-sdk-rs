@@ -1,32 +1,6 @@
 use super::attributes::*;
 use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
 
-fn determine_argument_payment_type(pat: &syn::PatType) -> ArgPaymentMetadata {
-	let payment_amount = is_payment_amount(pat);
-	let payment_token = is_payment_token(pat);
-	let payment_nonce = is_payment_nonce(pat);
-	if payment_amount {
-		if payment_token {
-			panic!("arguments cannot be annotated with both `#[payment]`/`#[payment_amount]` and `#[payment_token]`")
-		}
-		if payment_nonce {
-			panic!("arguments cannot be annotated with both `#[payment]`/`#[payment_amount]` and `#[payment_nonce]`")
-		}
-		ArgPaymentMetadata::PaymentAmount
-	} else if payment_token {
-		if payment_nonce {
-			panic!(
-				"arguments cannot be annotated with both `#[payment_token]` and `#[payment_nonce]`"
-			)
-		}
-		ArgPaymentMetadata::PaymentToken
-	} else if payment_nonce {
-		ArgPaymentMetadata::PaymentNonce
-	} else {
-		ArgPaymentMetadata::NotPayment
-	}
-}
-
 pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 	if m.sig.inputs.is_empty() {
 		missing_self_panic(m);
@@ -48,23 +22,8 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 				if !receiver_processed {
 					missing_self_panic(m);
 				}
-				let pat = &*pat_typed.pat;
-				let ty = &*pat_typed.ty;
-				let payment_metadata = determine_argument_payment_type(pat_typed);
-				let metadata = ArgMetadata {
-					payment: payment_metadata,
-					var_args: is_var_args(pat_typed),
-					callback_call_result: is_callback_result_arg(pat_typed),
-					event_topic: is_event_topic(pat_typed),
-				};
-				let arg = MethodArgument {
-					pat: pat.clone(),
-					ty: ty.clone(),
-					unprocessed_attributes: Vec::new(),
-					metadata,
-				};
 
-				Some(arg)
+				Some(extract_method_arg(pat_typed))
 			},
 		})
 		.collect()
@@ -75,4 +34,113 @@ fn missing_self_panic(m: &syn::TraitItemMethod) -> ! {
 		"Trait method `{}` must have `&self` as its first argument.",
 		m.sig.ident.to_string()
 	)
+}
+
+fn extract_method_arg(pat_typed: &syn::PatType) -> MethodArgument {
+	let pat = &*pat_typed.pat;
+	let ty = &*pat_typed.ty;
+	let mut arg_metadata = ArgMetadata {
+		payment: ArgPaymentMetadata::NotPayment,
+		var_args: false,
+		callback_call_result: false,
+		event_topic: false,
+	};
+	let mut unprocessed_attributes = Vec::new();
+
+	process_arg_attributes(
+		&pat_typed.attrs,
+		&mut arg_metadata,
+		&mut unprocessed_attributes,
+	);
+
+	MethodArgument {
+		pat: pat.clone(),
+		ty: ty.clone(),
+		unprocessed_attributes,
+		metadata: arg_metadata,
+	}
+}
+
+fn process_arg_attributes(
+	attrs: &[syn::Attribute],
+	arg_metadata: &mut ArgMetadata,
+	unprocessed_attributes: &mut Vec<syn::Attribute>,
+) {
+	for attr in attrs {
+		let processed = process_arg_attribute(attr, arg_metadata);
+		if !processed {
+			unprocessed_attributes.push(attr.clone());
+		}
+	}
+}
+
+fn process_arg_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+	process_payment_token_attribute(attr, arg_metadata)
+		|| process_payment_nonce_attribute(attr, arg_metadata)
+		|| process_payment_amount_attribute(attr, arg_metadata)
+		|| process_var_args_attribute(attr, arg_metadata)
+		|| process_callback_result_attribute(attr, arg_metadata)
+		|| process_event_topic_attribute(attr, arg_metadata)
+}
+
+fn check_no_other_payment_attr(arg_metadata: &ArgMetadata) {
+	if arg_metadata.payment.is_payment_arg() {
+		panic!(
+			"Can only annotate argument with one of the following attributes: `#[payment_token]`, `#[payment_nonce]` or `#[payment_amount]`/`#[payment]`."
+		);
+	}
+}
+
+fn process_payment_token_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+	let has_attr = is_payment_token(attr);
+	if has_attr {
+		check_no_other_payment_attr(&*arg_metadata);
+		arg_metadata.payment = ArgPaymentMetadata::PaymentToken;
+	}
+	has_attr
+}
+
+fn process_payment_nonce_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+	let has_attr = is_payment_nonce(attr);
+	if has_attr {
+		check_no_other_payment_attr(&*arg_metadata);
+		arg_metadata.payment = ArgPaymentMetadata::PaymentNonce;
+	}
+	has_attr
+}
+
+fn process_payment_amount_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+	let has_attr = is_payment_amount(attr);
+	if has_attr {
+		check_no_other_payment_attr(&*arg_metadata);
+		arg_metadata.payment = ArgPaymentMetadata::PaymentAmount;
+	}
+	has_attr
+}
+
+fn process_var_args_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+	let has_attr = is_var_args(attr);
+	if has_attr {
+		arg_metadata.var_args = true;
+	}
+	has_attr
+}
+
+fn process_callback_result_attribute(
+	attr: &syn::Attribute,
+	arg_metadata: &mut ArgMetadata,
+) -> bool {
+	let has_attr = is_callback_result_arg(attr);
+	if has_attr {
+		arg_metadata.callback_call_result = true;
+	}
+	has_attr
+}
+
+fn process_event_topic_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+	let has_attr = is_event_topic(attr);
+	if has_attr {
+		arg_metadata.event_topic = true;
+	}
+	has_attr
 }

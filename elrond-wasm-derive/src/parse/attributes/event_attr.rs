@@ -1,10 +1,6 @@
 use super::attr_names::*;
 use super::util::*;
 
-pub fn is_event_topic(pat: &syn::PatType) -> bool {
-	has_attribute(&pat.attrs, ATTR_EVENT_INDEXED)
-}
-
 pub struct EventAttribute {
 	pub identifier: String,
 }

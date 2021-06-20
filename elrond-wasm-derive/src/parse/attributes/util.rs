@@ -1,12 +1,3 @@
-pub(super) fn has_attribute(attrs: &[syn::Attribute], name: &str) -> bool {
-	attrs.iter().any(|attr| {
-		if let Some(first_seg) = attr.path.segments.first() {
-			return first_seg.ident == name;
-		};
-		false
-	})
-}
-
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
 	if let Some(first_seg) = attr.path.segments.first() {
 		if first_seg.ident == name {

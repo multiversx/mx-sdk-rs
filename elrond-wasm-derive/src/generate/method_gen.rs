@@ -4,9 +4,10 @@ pub fn arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::Toke
 	method_args
 		.iter()
 		.map(|arg| {
+			let unprocessed_attributes = &arg.unprocessed_attributes;
 			let pat = &arg.pat;
 			let ty = &arg.ty;
-			quote! {#pat : #ty }
+			quote! { #(#unprocessed_attributes)* #pat : #ty }
 		})
 		.collect()
 }
@@ -26,10 +27,10 @@ pub fn generate_sig(m: &Method) -> proc_macro2::TokenStream {
 }
 
 pub fn generate_sig_with_attributes(m: &Method) -> proc_macro2::TokenStream {
-	let m_remaining_attr = &m.unprocessed_attributes;
+	let unprocessed_attributes = &m.unprocessed_attributes;
 	let msig = generate_sig(m);
 	quote! {
-		#(#m_remaining_attr)*
+		#(#unprocessed_attributes)*
 		#msig
 	}
 }
