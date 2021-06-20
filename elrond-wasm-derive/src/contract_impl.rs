@@ -17,6 +17,7 @@ pub fn contract_implementation(
 	is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
 	let proxy_trait_imports = generate_all_proxy_trait_imports(contract);
+	let module_original_attributes = &contract.original_attributes;
 	let trait_name_ident = contract.trait_name.clone();
 	let method_impls = extract_method_impls(contract);
 	let call_methods = generate_call_methods(contract);
@@ -34,6 +35,7 @@ pub fn contract_implementation(
 	let main_definition = quote! {
 		#(#proxy_trait_imports)*
 
+		#(#module_original_attributes)*
 		pub trait #trait_name_ident:
 		elrond_wasm::api::ContractBase
 		+ Sized
