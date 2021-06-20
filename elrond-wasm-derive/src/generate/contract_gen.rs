@@ -7,8 +7,10 @@ pub fn extract_pub_method_sigs(contract_trait: &ContractTrait) -> Vec<proc_macro
 		.methods
 		.iter()
 		.filter_map(|m| match &m.public_role {
-			PublicRole::Init(_init_metadata) => Some(method_gen::generate_sig(m)),
-			PublicRole::Endpoint(_endpoint_metadata) => Some(method_gen::generate_sig(m)),
+			PublicRole::Init(_init_metadata) => Some(method_gen::generate_sig_with_attributes(m)),
+			PublicRole::Endpoint(_endpoint_metadata) => {
+				Some(method_gen::generate_sig_with_attributes(m))
+			},
 			_ => None,
 		})
 		.collect()
@@ -51,7 +53,7 @@ pub fn generate_auto_impl_defs(contract_trait: &ContractTrait) -> Vec<proc_macro
 		.iter()
 		.filter_map(|m| {
 			if let MethodImpl::Generated(_) = &m.implementation {
-				let sig = method_gen::generate_sig(m);
+				let sig = method_gen::generate_sig_with_attributes(m);
 				Some(quote! { #sig ; })
 			} else {
 				None
