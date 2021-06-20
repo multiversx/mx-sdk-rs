@@ -1,6 +1,5 @@
 #![no_std]
 #![allow(clippy::string_lit_as_bytes)]
-#![allow(clippy::redundant_clone)]
 
 elrond_wasm::imports!();
 
