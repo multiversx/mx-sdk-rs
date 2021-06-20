@@ -1,7 +1,5 @@
 use super::attr_names::*;
 
-static EGLD_DEFAULT: &str = "EGLD";
-
 pub struct PayableAttribute {
 	pub identifier: Option<String>,
 }

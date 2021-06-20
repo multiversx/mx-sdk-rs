@@ -73,6 +73,8 @@ pub fn impl_all_auto_impl(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenS
 	implementations
 }
 
+// TODO: explore auto-implementations of supertraits
+#[allow(dead_code)]
 pub fn auto_impl_inheritance(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
 	supertraits
 		.iter()
@@ -112,6 +114,7 @@ pub fn impl_all_endpoint_wrappers(supertraits: &[Supertrait]) -> Vec<proc_macro2
 	implementations
 }
 
+#[allow(dead_code)]
 pub fn endpoint_wrappers_inheritance(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
 	let where_self_big_int = snippets::where_self_big_int();
 	supertraits

@@ -11,7 +11,6 @@ pub enum AutoImpl {
 	StorageIsEmpty { identifier: String },
 	StorageClear { identifier: String },
 	ProxyGetter,
-	Module { impl_path: proc_macro2::TokenTree },
 }
 #[derive(Clone, Debug)]
 pub enum MethodImpl {
@@ -100,12 +99,5 @@ impl Method {
 
 	pub fn has_variable_nr_args(&self) -> bool {
 		self.method_args.iter().any(|arg| arg.metadata.var_args)
-	}
-
-	pub fn is_module(&self) -> bool {
-		matches!(
-			self.implementation,
-			MethodImpl::Generated(AutoImpl::Module { .. })
-		)
 	}
 }
