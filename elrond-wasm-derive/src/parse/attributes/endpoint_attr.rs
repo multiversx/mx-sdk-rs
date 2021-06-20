@@ -13,14 +13,6 @@ pub fn is_proxy(attr: &syn::Attribute) -> bool {
 	is_attribute_with_no_args(attr, ATTR_PROXY)
 }
 
-pub fn is_var_args(pat: &syn::PatType) -> bool {
-	has_attribute(&pat.attrs, ATTR_VAR_ARGS)
-}
-
-pub fn is_callback_result_arg(pat: &syn::PatType) -> bool {
-	has_attribute(&pat.attrs, ATTR_CALLBACK_CALL_RESULT)
-}
-
 #[derive(Clone, Debug)]
 pub struct EndpointAttribute {
 	pub endpoint_name: Option<syn::Ident>,
