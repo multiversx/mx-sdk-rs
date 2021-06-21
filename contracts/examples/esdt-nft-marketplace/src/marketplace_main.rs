@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 
@@ -31,6 +30,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
 	#[payable("*")]
 	#[endpoint(auctionToken)]
+	#[allow(clippy::too_many_arguments)]
 	fn auction_token(
 		&self,
 		#[payment_token] nft_type: TokenIdentifier,

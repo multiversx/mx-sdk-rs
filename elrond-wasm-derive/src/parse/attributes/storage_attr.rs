@@ -6,8 +6,8 @@ pub struct StorageGetAttribute {
 }
 
 impl StorageGetAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		find_attr_one_string_arg(m, ATTR_STORAGE_GET).map(|arg_str| StorageGetAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_STORAGE_GET).map(|arg_str| StorageGetAttribute {
 			identifier: arg_str,
 		})
 	}
@@ -18,8 +18,8 @@ pub struct StorageSetAttribute {
 }
 
 impl StorageSetAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		find_attr_one_string_arg(m, ATTR_STORAGE_SET).map(|arg_str| StorageSetAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_STORAGE_SET).map(|arg_str| StorageSetAttribute {
 			identifier: arg_str,
 		})
 	}
@@ -30,8 +30,8 @@ pub struct StorageMapperAttribute {
 }
 
 impl StorageMapperAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		find_attr_one_string_arg(m, ATTR_STORAGE_MAPPER).map(|arg_str| StorageMapperAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_STORAGE_MAPPER).map(|arg_str| StorageMapperAttribute {
 			identifier: arg_str,
 		})
 	}
@@ -42,8 +42,8 @@ pub struct StorageIsEmptyAttribute {
 }
 
 impl StorageIsEmptyAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		find_attr_one_string_arg(m, ATTR_STORAGE_IS_EMPTY).map(|arg_str| StorageIsEmptyAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_STORAGE_IS_EMPTY).map(|arg_str| StorageIsEmptyAttribute {
 			identifier: arg_str,
 		})
 	}
@@ -54,8 +54,8 @@ pub struct StorageClearAttribute {
 }
 
 impl StorageClearAttribute {
-	pub fn parse(m: &syn::TraitItemMethod) -> Option<Self> {
-		find_attr_one_string_arg(m, ATTR_STORAGE_CLEAR).map(|arg_str| StorageClearAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_STORAGE_CLEAR).map(|arg_str| StorageClearAttribute {
 			identifier: arg_str,
 		})
 	}

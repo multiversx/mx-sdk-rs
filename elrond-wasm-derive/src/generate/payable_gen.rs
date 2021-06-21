@@ -17,7 +17,6 @@ fn payable_snippet_for_metadata(
 	payment_nonce_arg: &Option<MethodArgument>,
 ) -> proc_macro2::TokenStream {
 	match mpm {
-		MethodPayableMetadata::NoMetadata => quote! {},
 		MethodPayableMetadata::NotPayable => {
 			let amount_init = zero_amount_init(payment_amount_arg);
 			let token_init = egld_token_init(payment_token_arg);

@@ -31,7 +31,7 @@ fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_m
 }
 
 pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);
 	match m.return_type.clone() {
 		syn::ReturnType::Default => panic!("getter should return some value"),
@@ -47,7 +47,7 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
 }
 
 pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	if m.method_args.is_empty() {
 		panic!("setter must have at least one argument, for the value");
 	}
@@ -67,7 +67,7 @@ pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
 }
 
 pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);
 	match m.return_type.clone() {
 		syn::ReturnType::Default => panic!("getter should return some value"),
@@ -86,7 +86,7 @@ pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
 }
 
 pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);
 	quote! {
 		#msig {
@@ -97,7 +97,7 @@ pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::Toke
 }
 
 pub fn generate_clear_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	if m.return_type != syn::ReturnType::Default {
 		panic!("storage clear should not return anything");
 	}
