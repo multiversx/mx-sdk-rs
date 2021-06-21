@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(unused_attributes)]
 
 elrond_wasm::imports!();
 

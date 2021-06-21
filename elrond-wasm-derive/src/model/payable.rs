@@ -2,7 +2,6 @@
 /// Only endpoints and the constructor can be marked payable.
 #[derive(Clone, Debug)]
 pub enum MethodPayableMetadata {
-	NoMetadata,
 	NotPayable,
 	Egld,
 	SingleEsdtToken(String),
@@ -23,7 +22,7 @@ impl MethodPayableMetadata {
 
 	pub fn abi_strings(&self) -> Vec<String> {
 		match self {
-			MethodPayableMetadata::NoMetadata | MethodPayableMetadata::NotPayable => Vec::new(),
+			MethodPayableMetadata::NotPayable => Vec::new(),
 			MethodPayableMetadata::Egld => vec!["EGLD".to_string()],
 			MethodPayableMetadata::SingleEsdtToken(s) => vec![s.clone()],
 			MethodPayableMetadata::AnyToken => vec!["*".to_string()],

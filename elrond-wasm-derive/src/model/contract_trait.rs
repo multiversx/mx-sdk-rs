@@ -3,6 +3,7 @@ use super::{Method, PublicRole, Supertrait};
 /// Models a contract or module trait.
 pub struct ContractTrait {
 	pub docs: Vec<String>,
+	pub original_attributes: Vec<syn::Attribute>,
 	pub trait_name: proc_macro2::Ident,
 	pub supertraits: Vec<Supertrait>,
 

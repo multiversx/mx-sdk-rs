@@ -34,7 +34,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
 		}
 	};
 
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	let event_identifier_literal = byte_slice_literal(event_identifier.as_bytes());
 	quote! {
 		#msig {
@@ -120,7 +120,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
 			result
 		})
 		.collect();
-	let msig = method_gen::generate_sig(m);
+	let msig = method_gen::generate_sig_with_attributes(m);
 	let event_id_literal = array_literal(event_id_bytes);
 	quote! {
 		#msig {

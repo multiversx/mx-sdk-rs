@@ -10,7 +10,6 @@ pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-#[allow(clippy::too_many_arguments)] // TODO: some arguments should be grouped though
 pub trait SendApi: ErrorApi + Clone + Sized {
 	/// The type of the payment arguments.
 	/// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
@@ -56,6 +55,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	) -> Result<(), &'static [u8]>;
 
 	/// Sends ESDT NFT to an address and executes like an async call, but without callback.
+	#[allow(clippy::too_many_arguments)]
 	fn direct_esdt_nft_execute(
 		&self,
 		to: &Address,
@@ -248,6 +248,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Creates a new NFT token of a certain type (determined by `token_identifier`).  
 	/// `attributes` can be any serializable custom struct.  
 	/// This is a built-in function, so the smart contract execution is resumed after.
+	#[allow(clippy::too_many_arguments)]
 	fn esdt_nft_create<T: elrond_codec::TopEncode>(
 		&self,
 		token: &TokenIdentifier,
