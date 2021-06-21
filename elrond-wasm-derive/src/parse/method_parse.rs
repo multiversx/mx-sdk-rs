@@ -26,16 +26,16 @@ pub fn process_method(m: &syn::TraitItemMethod) -> Method {
 		MethodImpl::NoImplementation
 	};
 
-	let mut pass_1_data = MethodAttributesPass1 {
+	let mut first_pass_data = MethodAttributesPass1 {
 		method_name: m.sig.ident.to_string(),
 		payable: MethodPayableMetadata::NotPayable,
 	};
-	let mut pass_1_unprocessed_attributes = Vec::new();
+	let mut first_pass_unprocessed_attributes = Vec::new();
 
-	process_attributes_pass_1(
+	process_attributes_first_pass(
 		&m.attrs,
-		&mut pass_1_data,
-		&mut pass_1_unprocessed_attributes,
+		&mut first_pass_data,
+		&mut first_pass_unprocessed_attributes,
 	);
 
 	let mut method = Method {
@@ -50,52 +50,56 @@ pub fn process_method(m: &syn::TraitItemMethod) -> Method {
 		implementation,
 	};
 
-	process_attributes_pass_2(&pass_1_unprocessed_attributes, &pass_1_data, &mut method);
+	process_attributes_second_pass(
+		&first_pass_unprocessed_attributes,
+		&first_pass_data,
+		&mut method,
+	);
 
 	method
 }
 
-fn process_attributes_pass_1(
+fn process_attributes_first_pass(
 	attrs: &[syn::Attribute],
-	pass_1_data: &mut MethodAttributesPass1,
-	pass_1_unprocessed_attributes: &mut Vec<syn::Attribute>,
+	first_pass_data: &mut MethodAttributesPass1,
+	first_pass_unprocessed_attributes: &mut Vec<syn::Attribute>,
 ) {
 	for attr in attrs {
-		let processed = process_attribute_pass_1(attr, pass_1_data);
+		let processed = process_attribute_first_pass(attr, first_pass_data);
 		if !processed {
-			pass_1_unprocessed_attributes.push(attr.clone());
+			first_pass_unprocessed_attributes.push(attr.clone());
 		}
 	}
 }
 
-fn process_attribute_pass_1(
+fn process_attribute_first_pass(
 	attr: &syn::Attribute,
-	pass_1_data: &mut MethodAttributesPass1,
+	first_pass_data: &mut MethodAttributesPass1,
 ) -> bool {
-	process_payable_attribute(attr, pass_1_data)
+	process_payable_attribute(attr, first_pass_data)
 }
 
-fn process_attributes_pass_2(
+fn process_attributes_second_pass(
 	attrs: &[syn::Attribute],
-	pass_1_data: &MethodAttributesPass1,
+	first_pass_data: &MethodAttributesPass1,
 	method: &mut Method,
 ) {
 	for attr in attrs {
-		let processed = process_attribute_pass_2(attr, pass_1_data, method);
+		let processed = process_attribute_second_pass(attr, first_pass_data, method);
 		if !processed {
 			method.unprocessed_attributes.push(attr.clone());
 		}
 	}
 }
 
-fn process_attribute_pass_2(
+fn process_attribute_second_pass(
 	attr: &syn::Attribute,
-	pass_1_data: &MethodAttributesPass1,
+	first_pass_data: &MethodAttributesPass1,
 	method: &mut Method,
 ) -> bool {
-	process_init_attribute(attr, pass_1_data, method)
-		|| process_endpoint_attribute(attr, pass_1_data, method)
-		|| process_view_attribute(attr, pass_1_data, method)
+	process_init_attribute(attr, first_pass_data, method)
+		|| process_endpoint_attribute(attr, first_pass_data, method)
+		|| process_view_attribute(attr, first_pass_data, method)
 		|| process_callback_raw_attribute(attr, method)
 		|| process_callback_attribute(attr, method)
 		|| process_legacy_event_attribute(attr, method)
