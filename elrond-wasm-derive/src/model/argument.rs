@@ -17,6 +17,17 @@ pub struct ArgMetadata {
 	pub event_topic: bool,
 }
 
+impl Default for ArgMetadata {
+	fn default() -> Self {
+		ArgMetadata {
+			payment: ArgPaymentMetadata::NotPayment,
+			var_args: false,
+			callback_call_result: false,
+			event_topic: false,
+		}
+	}
+}
+
 #[derive(Clone, Debug)]
 pub enum ArgPaymentMetadata {
 	NotPayment,

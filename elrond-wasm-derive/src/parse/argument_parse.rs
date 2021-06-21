@@ -39,12 +39,7 @@ fn missing_self_panic(m: &syn::TraitItemMethod) -> ! {
 fn extract_method_arg(pat_typed: &syn::PatType) -> MethodArgument {
 	let pat = &*pat_typed.pat;
 	let ty = &*pat_typed.ty;
-	let mut arg_metadata = ArgMetadata {
-		payment: ArgPaymentMetadata::NotPayment,
-		var_args: false,
-		callback_call_result: false,
-		event_topic: false,
-	};
+	let mut arg_metadata = ArgMetadata::default();
 	let mut unprocessed_attributes = Vec::new();
 
 	process_arg_attributes(
