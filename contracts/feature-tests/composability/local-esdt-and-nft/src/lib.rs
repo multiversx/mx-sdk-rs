@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -93,6 +92,7 @@ pub trait LocalEsdtAndEsdtNft {
 	}
 
 	#[endpoint(nftCreate)]
+	#[allow(clippy::too_many_arguments)]
 	fn nft_create(
 		&self,
 		token_identifier: TokenIdentifier,

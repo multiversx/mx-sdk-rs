@@ -69,29 +69,3 @@ pub fn generate_load_dyn_arg(
 		},
 	}
 }
-
-pub fn generate_load_dyn_multi_arg(
-	arg: &MethodArgument,
-	loader_expr: &proc_macro2::TokenStream,
-	num_expr: &proc_macro2::TokenStream,
-) -> proc_macro2::TokenStream {
-	let pat = &arg.pat;
-	let arg_ty = &arg.ty;
-	let arg_name_expr = arg_id_literal(pat);
-	match &arg.ty {
-		syn::Type::Reference(type_reference) => {
-			if type_reference.mutability.is_some() {
-				panic!("Mutable references not supported as contract method arguments");
-			}
-			let referenced_type = &*type_reference.elem;
-			quote! {
-				let #pat: & #referenced_type = &elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_expr, #num_expr);
-			}
-		},
-		_ => {
-			quote! {
-				let #pat: #arg_ty = elrond_wasm::load_dyn_multi_arg(#loader_expr, #arg_name_expr, #num_expr);
-			}
-		},
-	}
-}

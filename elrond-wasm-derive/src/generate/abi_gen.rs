@@ -71,13 +71,6 @@ fn generate_abi_method_body(
 					#endpoint_def
 					contract_abi.endpoints.push(endpoint_abi);
 				})
-			} else if m.is_module() {
-				let method_name = &m.name;
-				Some(quote! {
-					if include_modules {
-						contract_abi.coalesce(self.#method_name().abi(false));
-					}
-				})
 			} else {
 				None
 			}
