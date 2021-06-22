@@ -70,27 +70,6 @@ pub fn where_api_big_int() -> proc_macro2::TokenStream {
 	}
 }
 
-pub fn api_where() -> proc_macro2::TokenStream {
-	let where_self_big_int = where_self_big_int();
-
-	quote! {
-	  #where_self_big_int
-		T: elrond_wasm::api::ContractBase
-		 + elrond_wasm::api::ErrorApi
-		 + elrond_wasm::api::BlockchainApi
-		 + elrond_wasm::api::CallValueApi
-		 + elrond_wasm::api::SendApi
-		 + elrond_wasm::api::EndpointArgumentApi
-		 + elrond_wasm::api::EndpointFinishApi
-		 + elrond_wasm::api::StorageReadApi
-		 + elrond_wasm::api::StorageWriteApi
-		 + elrond_wasm::api::CryptoApi
-		 + elrond_wasm::api::LogApi
-		 + Clone
-		 + 'static,
-	}
-}
-
 pub fn contract_object_def() -> proc_macro2::TokenStream {
 	quote! {
 		pub struct ContractObj<A: elrond_wasm::api::ContractBase> {
@@ -169,6 +148,8 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
 	}
 }
 
+// TODO: explore auto-implementations of supertraits
+#[allow(dead_code)]
 pub fn impl_auto_impl() -> proc_macro2::TokenStream {
 	quote! {
 		impl<A> AutoImpl for ContractObj<A> where
@@ -205,22 +186,6 @@ pub fn impl_private_api() -> proc_macro2::TokenStream {
 			fn finish_api(&self) -> Self::FinishApi {
 				self.api.clone()
 			}
-		}
-	}
-}
-
-pub fn impl_endpoint_wrappers() -> proc_macro2::TokenStream {
-	let where_self_big_int = where_self_big_int();
-	quote! {
-		impl<A> EndpointWrappers for ContractObj<A>
-		#where_self_big_int
-			A: elrond_wasm::api::ContractBase
-				+ elrond_wasm::api::ErrorApi
-				+ elrond_wasm::api::EndpointArgumentApi
-				+ elrond_wasm::api::EndpointFinishApi
-				+ Clone
-				+ 'static,
-		{
 		}
 	}
 }

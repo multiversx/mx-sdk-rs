@@ -71,6 +71,18 @@ impl SendApi for super::UncallableApi {
 		unreachable!()
 	}
 
+	fn upgrade_contract(
+		&self,
+		_sc_address: &Address,
+		_gas: u64,
+		_amount: &BigUintUncallable,
+		_code: &BoxedBytes,
+		_code_metadata: CodeMetadata,
+		_arg_buffer: &ArgBuffer,
+	) {
+		unreachable!()
+	}
+
 	fn execute_on_dest_context_raw(
 		&self,
 		_gas: u64,

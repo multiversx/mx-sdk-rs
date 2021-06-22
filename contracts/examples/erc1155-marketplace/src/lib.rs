@@ -1,6 +1,4 @@
 #![no_std]
-#![allow(unused_attributes)]
-#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -313,6 +311,7 @@ pub trait Erc1155Marketplace {
 
 	// private
 
+	#[allow(clippy::too_many_arguments)]
 	fn try_create_auction(
 		&self,
 		type_id: &Self::BigUint,

@@ -2,25 +2,13 @@ use super::util::*;
 use super::{method_call_gen::generate_call_method, method_gen};
 use crate::model::{ContractTrait, Method, MethodImpl, PublicRole};
 
-pub fn extract_pub_method_sigs(contract_trait: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
-	contract_trait
-		.methods
-		.iter()
-		.filter_map(|m| match &m.public_role {
-			PublicRole::Init(_init_metadata) => Some(method_gen::generate_sig(m)),
-			PublicRole::Endpoint(_endpoint_metadata) => Some(method_gen::generate_sig(m)),
-			_ => None,
-		})
-		.collect()
-}
-
 pub fn extract_method_impls(contract_trait: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
 	contract_trait
 		.methods
 		.iter()
 		.filter_map(|m| {
 			if let MethodImpl::Explicit(body) = &m.implementation {
-				let msig = method_gen::generate_sig(m);
+				let msig = method_gen::generate_sig_with_attributes(m);
 				Some(quote! {
 					#msig
 					#body
@@ -51,7 +39,7 @@ pub fn generate_auto_impl_defs(contract_trait: &ContractTrait) -> Vec<proc_macro
 		.iter()
 		.filter_map(|m| {
 			if let MethodImpl::Generated(_) = &m.implementation {
-				let sig = method_gen::generate_sig(m);
+				let sig = method_gen::generate_sig_with_attributes(m);
 				Some(quote! { #sig ; })
 			} else {
 				None

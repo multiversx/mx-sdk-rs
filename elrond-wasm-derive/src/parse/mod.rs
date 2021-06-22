@@ -1,9 +1,9 @@
 pub mod attributes;
 
 mod argument_parse;
+mod auto_impl_parse;
 mod contract_trait_parse;
 mod endpoint_parse;
-mod method_impl_parse;
 mod method_parse;
 mod parse_util;
 mod payable_parse;
