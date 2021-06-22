@@ -14,15 +14,6 @@ pub trait EllipticCurveApi:
 {
 	type BigUint;
 
-	fn new_elliptic_curve(
-		field_order: Self::BigUint,
-		base_point_order: Self::BigUint,
-		eq_constant: Self::BigUint,
-		x_base_point: Self::BigUint,
-		y_base_point: Self::BigUint,
-		size_of_field: u32,
-	) -> Self;
-
 	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint>;
 
 	fn p224_ec() -> Self;

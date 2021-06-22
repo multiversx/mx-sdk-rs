@@ -79,17 +79,6 @@ impl TopDecode for EllipticCurveUncallable {
 impl EllipticCurveApi for EllipticCurveUncallable {
 	type BigUint = BigUintUncallable;
 
-	fn new_elliptic_curve(
-		_field_order: Self::BigUint,
-		_base_point_order: Self::BigUint,
-		_eq_constant: Self::BigUint,
-		_x_base_point: Self::BigUint,
-		_y_base_point: Self::BigUint,
-		_size_of_field: u32,
-	) -> Self {
-		unreachable!()
-	}
-
 	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
 		unreachable!()
 	}

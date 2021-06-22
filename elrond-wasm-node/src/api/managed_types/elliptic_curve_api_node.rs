@@ -77,15 +77,6 @@ extern "C" {
 		resultOffset: *mut u8,
 	) -> i32;
 
-	fn ellipticCurveNew(
-		fieldOrderHandle: i32,
-		basePointOrderHandle: i32,
-		eqConstantHandle: i32,
-		xBasePointHandle: i32,
-		yBasePointHandle: i32,
-		sizeOfField: i32,
-	) -> i32;
-
 	fn ellipticCurveGetValues(
 		ecHandle: i32,
 		fieldOrderHandle: i32,
@@ -122,27 +113,6 @@ impl elrond_wasm::abi::TypeAbi for ArwenEllipticCurve {
 
 impl EllipticCurveApi for ArwenEllipticCurve {
 	type BigUint = ArwenBigUint;
-
-	fn new_elliptic_curve(
-		field_order: Self::BigUint,
-		base_point_order: Self::BigUint,
-		eq_constant: Self::BigUint,
-		x_base_point: Self::BigUint,
-		y_base_point: Self::BigUint,
-		size_of_field: u32,
-	) -> Self {
-		unsafe {
-			let handle = ellipticCurveNew(
-				field_order.handle,
-				base_point_order.handle,
-				eq_constant.handle,
-				x_base_point.handle,
-				y_base_point.handle,
-				size_of_field as i32,
-			);
-			ArwenEllipticCurve { handle }
-		}
-	}
 
 	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
 		unsafe {
@@ -476,20 +446,27 @@ impl TopEncode for ArwenEllipticCurve {
 
 impl NestedDecode for ArwenEllipticCurve {
 	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-		let field_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let base_point_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let eq_constant = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let x_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let y_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let _field_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let _base_point_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let _eq_constant = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let _x_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
+		let _y_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
 		let size_of_field = u32::dep_decode(input)?;
-		Ok(ArwenEllipticCurve::new_elliptic_curve(
+		match size_of_field {
+            224 => Ok(ArwenEllipticCurve::p224_ec()),
+            256 => Ok(ArwenEllipticCurve::p256_ec()),
+            384 => Ok(ArwenEllipticCurve::p384_ec()),
+            521 => Ok(ArwenEllipticCurve::p521_ec()),
+            _ => Ok(ArwenEllipticCurve::p224_ec()), // this will never be reached but is necessary
+        }
+       /* Ok(ArwenEllipticCurve::new_elliptic_curve(
 			field_order,
 			base_point_order,
 			eq_constant,
 			x_base_point,
 			y_base_point,
 			size_of_field,
-		))
+		))*/
 	}
 
 	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -497,25 +474,32 @@ impl NestedDecode for ArwenEllipticCurve {
 		c: ExitCtx,
 		exit: fn(ExitCtx, DecodeError) -> !,
 	) -> Self {
-		let field_order =
+	 	let _field_order =
 			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let base_point_order =
+		let _base_point_order =
 			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let eq_constant =
+		let _eq_constant =
 			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let x_base_point =
+		let _x_base_point =
 			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let y_base_point =
-			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
+		let _y_base_point =
+			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit); 
 		let size_of_field = u32::dep_decode_or_exit(input, c, exit);
-		ArwenEllipticCurve::new_elliptic_curve(
+        match size_of_field {
+            224 => ArwenEllipticCurve::p224_ec(),
+            256 => ArwenEllipticCurve::p256_ec(),
+            384 => ArwenEllipticCurve::p384_ec(),
+            521 => ArwenEllipticCurve::p521_ec(),
+            _ => ArwenEllipticCurve::p224_ec(), // this will never be reached but is necessary
+        }
+		/*ArwenEllipticCurve::new_elliptic_curve(
 			field_order,
 			base_point_order,
 			eq_constant,
 			x_base_point,
 			y_base_point,
 			size_of_field,
-		)
+		)*/
 	}
 }
 
