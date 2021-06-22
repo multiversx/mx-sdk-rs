@@ -1,31 +1,31 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::{curve_arguments::SupplyType, curves_setup::CurvesSetup};
+use crate::{
+	function_selector::CurveArguments, function_selector::FunctionSelector,
+	function_selector::Token,
+};
 
 #[elrond_wasm_derive::module]
 pub trait StorageModule {
-	#[view(supply_type)]
-	#[storage_mapper("supply_type")]
-	fn supply_type(&self) -> SingleValueMapper<Self::Storage, SupplyType>;
+	#[view(getToken)]
+	#[storage_mapper("token")]
+	fn token(&self) -> MapMapper<Self::Storage, u64, TokenIdentifier>;
 
-	#[view(max_supply)]
-	#[storage_mapper("max_supply")]
-	fn max_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+	#[view(lastErrorMessage)]
+	#[storage_mapper("last_error_message")]
+	fn last_error_message(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
 
-	#[view(getMintedSupply)]
-	#[storage_mapper("supply")]
-	fn supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
-
-	#[view(getAvailableSupply)]
-	#[storage_mapper("balance")]
-	fn balance(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
-
-	#[view(getCurves)]
-	#[storage_mapper("curves")]
-	fn curves(&self) -> SingleValueMapper<Self::Storage, CurvesSetup<Self::BigUint>>;
-
-	#[view(getExchangingToken)]
-	#[storage_mapper("exchanging_token")]
-	fn exchanging_token(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+	#[view(getCurveFunction)]
+	#[storage_mapper("bonding_curve")]
+	fn bonding_curve(
+		&self,
+	) -> MapMapper<
+		Self::Storage,
+		Token,
+		(
+			FunctionSelector<Self::BigUint>,
+			CurveArguments<Self::BigUint>,
+		),
+	>;
 }

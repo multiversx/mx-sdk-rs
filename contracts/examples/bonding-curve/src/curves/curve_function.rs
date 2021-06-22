@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::curve_arguments::*;
+use crate::function_selector::*;
 pub trait CurveFunction<BigUint: BigUintApi>
 where
 	for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,

@@ -1,5 +1,5 @@
 mod linked_list_mapper;
-mod map_mapper;
+pub mod map_mapper;
 mod map_storage_mapper;
 mod mapper;
 mod set_mapper;
