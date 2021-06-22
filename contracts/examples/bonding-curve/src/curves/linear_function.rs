@@ -3,20 +3,20 @@ elrond_wasm::derive_imports!();
 
 use crate::curve_function::CurveFunction;
 
-use crate::curve_arguments::CurveArguments;
+use crate::function_selector::CurveArguments;
 
-// logic is ax + b  = y
+// the logic is ax + b  = y
 // x - issued token
 // y - exchanging token
 // a - linear_coefficient
-// b - constant_coefficient
+// b - initial price of the token (in the role of the constant coefficient)
 // because of selling n tokens at a time, the total price y' will be
 // a* (nx + (n - 1) n / 2) + nb = y'
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub struct LinearFunction<BigUint: BigUintApi> {
+	pub initial_price: BigUint,
 	pub linear_coefficient: BigUint,
-	pub constant_coefficient: BigUint,
 }
 
 impl<BigUint> CurveFunction<BigUint> for LinearFunction<BigUint>
@@ -39,7 +39,7 @@ where
 	) -> SCResult<BigUint> {
 		Ok(
 			&self.linear_coefficient * &sum_interval(&token_start, &amount)
-				+ &self.constant_coefficient * &amount,
+				+ &self.initial_price * &amount,
 		)
 	}
 }

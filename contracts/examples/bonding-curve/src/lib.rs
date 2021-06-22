@@ -5,30 +5,30 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-mod curve_arguments;
-use curve_arguments::CurveArguments;
-
 #[path = "curves/curve_function.rs"]
 mod curve_function;
 use curve_function::CurveFunction;
+
+mod function_selector;
+use function_selector::{CurveArguments, FunctionSelector, Token};
 #[path = "curves/linear_function.rs"]
 mod linear_function;
 #[path = "curves/power_function.rs"]
 mod power_function;
 
-#[path = "tokens/common_methods.rs"]
-mod common_methods;
-mod curves_setup;
 #[path = "utils/events.rs"]
 mod events;
+#[path = "utils/storage.rs"]
+mod storage;
+
+#[path = "tokens/common_methods.rs"]
+mod common_methods;
 #[path = "tokens/fungible_token.rs"]
 mod fungible_token;
 #[path = "tokens/non_fungible_token.rs"]
 mod non_fungible_token;
 #[path = "tokens/semi_fungible_token.rs"]
 mod semi_fungible_token;
-#[path = "utils/storage.rs"]
-mod storage;
 
 #[elrond_wasm_derive::contract]
 pub trait BondingCurve:
@@ -37,29 +37,71 @@ pub trait BondingCurve:
 	+ semi_fungible_token::SFTModule
 	+ storage::StorageModule
 	+ events::EventsModule
+	+ common_methods::CommonMethods
 {
 	#[init]
 	fn init(&self) {}
 
-	#[view]
-	fn check_sell_requirements(
+	#[endpoint(setLocalRoles)]
+	fn set_local_roles(
 		&self,
-		token: &TokenIdentifier,
-		amount: &Self::BigUint,
-	) -> SCResult<()> {
-		let issued_token = self.issued_token().get();
-		if &issued_token != token {
+		address: Address,
+		token_identifier: TokenIdentifier,
+		#[var_args] roles: VarArgs<EsdtLocalRole>,
+	) -> AsyncCall<Self::SendApi> {
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+			.set_special_roles(&address, &token_identifier, roles.as_slice())
+			.async_call()
+			.with_callback(BondingCurve::callbacks(self).change_roles_callback())
+	}
+
+	#[endpoint(unsetLocalRoles)]
+	fn unset_local_roles(
+		&self,
+		address: Address,
+		token_identifier: TokenIdentifier,
+		#[var_args] roles: VarArgs<EsdtLocalRole>,
+	) -> AsyncCall<Self::SendApi> {
+		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+			.unset_special_roles(&address, &token_identifier, roles.as_slice())
+			.async_call()
+			.with_callback(BondingCurve::callbacks(self).change_roles_callback())
+	}
+
+	#[callback]
+	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
+		match result {
+			AsyncCallResult::Ok(()) => {
+				self.last_error_message().clear();
+			},
+			AsyncCallResult::Err(message) => {
+				self.last_error_message().set(&message.err_msg);
+			},
+		}
+	}
+
+	#[endpoint(setBondingCurve)]
+	fn set_bonding_curve(
+		&self,
+		token: Token,
+		function: FunctionSelector<Self::BigUint>,
+		args: CurveArguments<Self::BigUint>,
+	) {
+		self.bonding_curve().insert(token, (function, args));
+	}
+
+	#[view]
+	fn check_sell_requirements(&self, token: Token, amount: &Self::BigUint) -> SCResult<()> {
+		if !self.bonding_curve().contains_key(&token) {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
-				b"Only ",
-				token.as_esdt_identifier(),
-				b" tokens accepted",
+				b"Token provided not accepted",
 			])));
 		}
-		if &self.balance().get() < amount {
+		let (_, args) = self.bonding_curve().get(&token).ok_or("Token not issued")?;
+
+		if &args.balance < amount {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
-				b"Contract does not have enough ",
-				token.as_esdt_identifier(),
-				b". Please try again once more is minted.",
+				b"Token provided not accepted",
 			])));
 		}
 		require!(
@@ -69,26 +111,12 @@ pub trait BondingCurve:
 		Ok(())
 	}
 
-	fn get_curve_arguments(self) -> CurveArguments<Self::BigUint> {
-		CurveArguments {
-			supply_type: self.supply_type().get(),
-			max_supply: self.max_supply().get(),
-			current_supply: self.supply().get(),
-			balance: self.balance().get(),
-		}
-	}
-
 	#[view]
-	fn check_buy_requirements(
-		&self,
-		token: &TokenIdentifier,
-		amount: &Self::BigUint,
-	) -> SCResult<()> {
-		let exchanging_token = &self.exchanging_token().get();
-		if exchanging_token != token {
+	fn check_buy_requirements(&self, token: Token, amount: &Self::BigUint) -> SCResult<()> {
+		if !self.bonding_curve().contains_key(&token) {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
-				exchanging_token.as_esdt_identifier(),
+				token.identifier.as_esdt_identifier(),
 				b" tokens accepted",
 			])));
 		}
@@ -102,23 +130,29 @@ pub trait BondingCurve:
 	#[endpoint(buyToken)]
 	fn buy_token(
 		&self,
-		#[payment] buy_amount: Self::BigUint,
-		#[payment_token] token_identifier: TokenIdentifier,
+		#[payment_amount] buy_amount: Self::BigUint,
+		#[payment_token] identifier: TokenIdentifier,
+		#[payment_nonce] nonce: u64,
 	) -> SCResult<()> {
-		self.check_buy_requirements(&token_identifier, &buy_amount)?;
+		let token = Token { identifier, nonce };
+		self.check_buy_requirements(token, &buy_amount)?;
 
-		let calculated_price = self
-			.curves()
-			.get()
-			.buy(buy_amount.clone(), self.get_curve_arguments())
-			.unwrap();
-
-		self.balance().update(|balance| *balance += buy_amount);
+		let calculated_price = match self.bonding_curve().entry(Token {
+			identifier: identifier.clone(),
+			nonce: nonce.clone(),
+		}) {
+			map_mapper::Entry::Occupied(mut entry) => entry.update(|(func, args)| {
+				let price = func.buy(buy_amount.clone(), args.clone());
+				args.balance += buy_amount;
+				price
+			}),
+			map_mapper::Entry::Vacant(_) => sc_error!("Token price not configured"),
+		}?;
 
 		let caller = self.blockchain().get_caller();
 
 		self.send()
-			.direct(&caller, &token_identifier, &calculated_price, b"buying");
+			.direct(&caller, &identifier, &calculated_price, b"buying");
 
 		self.buy_token_event(&caller, &calculated_price);
 
@@ -129,23 +163,28 @@ pub trait BondingCurve:
 	#[endpoint(sellToken)]
 	fn sell_token(
 		&self,
-		#[payment] sell_amount: Self::BigUint,
-		#[payment_token] token_identifier: TokenIdentifier,
+		#[payment_amount] sell_amount: Self::BigUint,
+		#[payment_token] identifier: TokenIdentifier,
+		#[payment_nonce] nonce: u64,
 	) -> SCResult<()> {
-		self.check_sell_requirements(&token_identifier, &sell_amount)?;
-
-		let calculated_price = self
-			.curves()
-			.get()
-			.sell(sell_amount.clone(), self.get_curve_arguments())
-			.unwrap();
-
-		self.balance().update(|balance| *balance -= sell_amount);
+		let token = Token { identifier, nonce };
+		self.check_sell_requirements(token, &sell_amount)?;
+		let calculated_price = match self.bonding_curve().entry(Token {
+			identifier: identifier.clone(),
+			nonce: nonce.clone(),
+		}) {
+			map_mapper::Entry::Occupied(mut entry) => entry.update(|(func, args)| {
+				let price = func.buy(sell_amount.clone(), args.clone());
+				args.balance -= sell_amount;
+				price
+			}),
+			map_mapper::Entry::Vacant(_) => sc_error!("Token price not configured"),
+		}?;
 
 		let caller = self.blockchain().get_caller();
 
 		self.send()
-			.direct(&caller, &token_identifier, &calculated_price, b"selling");
+			.direct(&caller, &identifier, &calculated_price, b"selling");
 
 		self.sell_token_event(&caller, &calculated_price);
 		Ok(())

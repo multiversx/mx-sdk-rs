@@ -1,6 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use crate::common_methods::CallbackProxy;
 use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]
@@ -33,6 +34,6 @@ pub trait NFTModule<Color>:
 				},
 			)
 			.async_call()
-			.with_callback(self.callbacks().nft_issue_callback(&caller))
+			.with_callback(self.callbacks().nft_issue_callback(caller))
 	}
 }

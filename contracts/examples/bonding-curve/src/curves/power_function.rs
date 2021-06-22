@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 
 use crate::curve_function::CurveFunction;
 
-use crate::curve_arguments::CurveArguments;
+use crate::function_selector::CurveArguments;
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub struct PowerFunction<BigUint: BigUintApi> {

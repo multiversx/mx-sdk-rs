@@ -1,25 +1,31 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::{curve_arguments::SupplyType, events, storage};
+use crate::{
+	events,
+	function_selector::FunctionSelector,
+	function_selector::SupplyType,
+	function_selector::{CurveArguments, Token},
+	storage,
+};
 
 const TOKEN_NUM_DECIMALS: usize = 18;
 #[elrond_wasm_derive::module]
 pub trait FTModule: storage::StorageModule + events::EventsModule {
 	#[payable("EGLD")]
-	#[endpoint(issueFungibleToken)]
+	#[endpoint(ftIssue)]
 	fn ft_issue(
 		&self,
 		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 		initial_supply: Self::BigUint,
+		supply_type: SupplyType,
+		maximum_suply: Self::BigUint,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
 		let caller = self.blockchain().get_caller();
-
-		self.issue_started_event(&caller, token_ticker.as_slice(), &initial_supply);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.issue_fungible(
@@ -40,32 +46,55 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 				},
 			)
 			.async_call()
-			.with_callback(self.callbacks().ft_issue_callback(caller)))
+			.with_callback(self.callbacks().ft_issue_callback(
+				caller,
+				initial_supply,
+				supply_type,
+				maximum_suply,
+			)))
 	}
-
 	#[callback]
 	fn ft_issue_callback(
 		&self,
 		caller: Address,
+		initial_supply: Self::BigUint,
+		supply_type: SupplyType,
+		maximum_supply: Self::BigUint,
 		#[payment_token] token_identifier: TokenIdentifier,
 		#[payment] amount: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.issued_token().set(&token_identifier);
-				self.issue_success_event(&caller, &token_identifier, &amount);
+				self.token().insert(self.token().len(), &token_identifier);
+				self.bonding_curve().insert(
+					Token {
+						identifier: token_identifier.clone(),
+						nonce: 0u64,
+					},
+					(
+						FunctionSelector::None,
+						CurveArguments {
+							supply_type,
+							max_supply: maximum_supply,
+							available_supply: initial_supply,
+							balance: initial_supply,
+						},
+					),
+				);
+				self.last_error_message().clear();
 			},
 			AsyncCallResult::Err(message) => {
-				self.issue_failure_event(&caller, message.err_msg.as_slice());
 				if token_identifier.is_egld() && amount > 0 {
 					self.send().direct_egld(&caller, &amount, &[]);
 				}
+
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
 	}
 
-	#[endpoint(mintFungibleToken)]
+	#[endpoint(ftmint)]
 	fn ft_mint(
 		&self,
 		token_identifier: TokenIdentifier,
@@ -73,49 +102,86 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
-		let supply_type = self.supply_type().get();
-		let supply = self.supply().get();
-		let max_supply = self.max_supply().get();
-		require!(
-			!self.issued_token().is_empty(),
-			"Must issue token before minting"
-		);
+		let (_, args) = self
+			.bonding_curve()
+			.get(&Token {
+				identifier: token_identifier.clone(),
+				nonce: 0u64,
+			})
+			.ok_or("Token not issued")?;
 
 		require!(
-			supply_type == SupplyType::Unlimited || supply < max_supply,
+			args.supply_type == SupplyType::Unlimited || args.available_supply < args.max_supply,
 			"Maximum supply limit reached!"
 		);
 
 		require!(
-			supply_type == SupplyType::Unlimited || supply + amount.clone() <= max_supply,
-			"Minting will exceed the maximum supply limit!"
+			args.supply_type == SupplyType::Unlimited || args.available_supply < args.max_supply,
+			"Maximum supply limit reached!"
 		);
 
-		let caller = self.blockchain().get_caller();
-		self.mint_started_event(&caller, &amount);
+		require!(
+			args.supply_type == SupplyType::Unlimited
+				|| args.available_supply + amount.clone() <= args.max_supply,
+			"Minting will exceed the maximum supply limit!"
+		);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.mint(&token_identifier, &amount)
 			.async_call()
-			.with_callback(self.callbacks().ft_mint_callback(caller, &amount)))
+			.with_callback(self.callbacks().ft_mint_callback(token_identifier, &amount)))
 	}
 
 	#[callback]
 	fn ft_mint_callback(
 		&self,
-		caller: Address,
+		token_identifier: TokenIdentifier,
 		amount: &Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
 	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.mint_success_event(&caller);
-				self.supply().update(|supply| *supply += amount);
-				self.balance().update(|balance| *balance += amount);
+				self.bonding_curve()
+					.entry(Token {
+						identifier: token_identifier.clone(),
+						nonce: 0u64,
+					})
+					.and_modify(|(_, args)| {
+						args.available_supply += amount;
+						args.balance += amount;
+					});
 			},
 			AsyncCallResult::Err(message) => {
-				self.mint_failure_event(&caller, message.err_msg.as_slice());
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
+	}
+
+	#[endpoint(ftLocalMint)]
+	fn ft_local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
+		self.send().esdt_local_mint(&token_identifier, &amount);
+		self.bonding_curve()
+			.entry(Token {
+				identifier: token_identifier.clone(),
+				nonce: 0u64,
+			})
+			.and_modify(|(_, args)| {
+				args.available_supply += &amount;
+				args.balance += &amount;
+			});
+	}
+
+	#[endpoint(ftLocalBurn)]
+	fn ft_local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
+		self.send().esdt_local_burn(&token_identifier, &amount);
+		self.bonding_curve()
+			.entry(Token {
+				identifier: token_identifier.clone(),
+				nonce: 0u64,
+			})
+			.and_modify(|(_, args)| {
+				args.available_supply -= &amount;
+				args.balance -= &amount;
+			});
 	}
 }

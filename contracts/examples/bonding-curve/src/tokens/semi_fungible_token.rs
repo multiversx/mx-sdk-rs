@@ -1,6 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use crate::common_methods::CallbackProxy;
 use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]

@@ -7,10 +7,11 @@ pub struct Color {
 	g: u8,
 	b: u8,
 }
-use crate::{curve_arguments::SupplyType, events, storage};
+
+use crate::{events, storage};
 
 #[elrond_wasm_derive::module]
-pub trait CommonMethods {
+pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 	#[callback]
 	fn nft_issue_callback(
 		&self,
@@ -19,13 +20,14 @@ pub trait CommonMethods {
 	) {
 		match result {
 			AsyncCallResult::Ok(token_identifier) => {
-				self.issued_token().set(&token_identifier);
+				self.token().insert(self.token().len(), &token_identifier);
 			},
-			AsyncCallResult::Err(_) => {
+			AsyncCallResult::Err(message) => {
 				let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
 				if token_identifier.is_egld() && returned_tokens > 0 {
 					self.send().direct_egld(&caller, &returned_tokens, &[]);
 				}
+				self.last_error_message().set(&message.err_msg);
 			},
 		}
 	}
