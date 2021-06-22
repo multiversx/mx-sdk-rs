@@ -75,17 +75,6 @@ impl elrond_wasm::abi::TypeAbi for EllipticCurveMock {
 impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 	type BigUint = RustBigUint;
 
-	fn new_elliptic_curve(
-		_field_order: Self::BigUint,
-		_base_point_order: Self::BigUint,
-		_eq_constant: Self::BigUint,
-		_x_base_point: Self::BigUint,
-		_y_base_point: Self::BigUint,
-		_size_of_field: u32,
-	) -> Self {
-		panic!("new_elliptic_curve not implemented yet!")
-	}
-
 	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
 		panic!("elliptic curve get_values not implemented yet!")
 	}

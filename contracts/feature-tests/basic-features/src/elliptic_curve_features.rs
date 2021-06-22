@@ -4,26 +4,6 @@ type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, Big
 /// All elliptic curve functions provided by Arwen exposed here
 #[elrond_wasm_derive::module]
 pub trait EllipticCurveFeatures {
-	#[endpoint]
-	fn compute_new_elliptic_curve(
-		&self,
-		field_order: Self::BigUint,
-		base_point_order: Self::BigUint,
-		eq_constant: Self::BigUint,
-		x_base_point: Self::BigUint,
-		y_base_point: Self::BigUint,
-		size_of_field: u32,
-	) -> EllipticCurveComponents<Self::BigUint> {
-		Self::EllipticCurve::new_elliptic_curve(
-			field_order,
-			base_point_order,
-			eq_constant,
-			x_base_point,
-			y_base_point,
-			size_of_field,
-		).get_values()
-	}
-
  	#[endpoint]
 	fn compute_get_values(
 		&self,
