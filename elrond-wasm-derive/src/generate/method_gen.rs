@@ -4,9 +4,10 @@ pub fn arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::Toke
 	method_args
 		.iter()
 		.map(|arg| {
+			let unprocessed_attributes = &arg.unprocessed_attributes;
 			let pat = &arg.pat;
 			let ty = &arg.ty;
-			quote! {#pat : #ty }
+			quote! { #(#unprocessed_attributes)* #pat : #ty }
 		})
 		.collect()
 }
@@ -23,6 +24,15 @@ pub fn generate_sig(m: &Method) -> proc_macro2::TokenStream {
 	let result =
 		quote! { fn #method_name #generics ( &self , #(#arg_decl),* ) #ret_tok #generics_where };
 	result
+}
+
+pub fn generate_sig_with_attributes(m: &Method) -> proc_macro2::TokenStream {
+	let unprocessed_attributes = &m.unprocessed_attributes;
+	let msig = generate_sig(m);
+	quote! {
+		#(#unprocessed_attributes)*
+		#msig
+	}
 }
 
 pub fn generate_arg_call_name(arg: &MethodArgument) -> proc_macro2::TokenStream {

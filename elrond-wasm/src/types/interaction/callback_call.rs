@@ -1,13 +1,5 @@
-#![allow(unused_imports)]
-
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, ErrorApi, SendApi, ESDT_TRANSFER_STRING};
 use crate::hex_call_data::HexCallDataSerializer;
-use crate::io::ContractCallArg;
-use crate::io::EndpointResult;
-use crate::types::{Address, ArgBuffer, SCError, TokenIdentifier};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::types::ArgBuffer;
 
 pub struct CallbackCall {
 	// TODO: maybe also convert this to the more lightweight ArgBuffer at some point

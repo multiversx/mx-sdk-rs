@@ -29,6 +29,7 @@ pub fn parse_contract_trait(
 
 	ContractTrait {
 		docs,
+		original_attributes: contract_trait.attrs.clone(),
 		trait_name: contract_trait.ident.clone(),
 		supertraits,
 		auto_inheritance_modules: Vec::new(),
