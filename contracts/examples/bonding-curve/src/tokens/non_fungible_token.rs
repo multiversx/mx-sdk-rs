@@ -6,7 +6,7 @@ use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]
 
-pub trait NFTModule<Color>:
+pub trait NFTModule:
 	storage::StorageModule + events::EventsModule + common_methods::CommonMethods
 {
 	#[payable("EGLD")]
