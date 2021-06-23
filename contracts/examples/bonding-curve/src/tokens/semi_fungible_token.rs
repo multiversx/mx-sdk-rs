@@ -5,7 +5,7 @@ use crate::common_methods::CallbackProxy;
 use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]
-pub trait SFTModule<Color>:
+pub trait SFTModule:
 	storage::StorageModule + events::EventsModule + common_methods::CommonMethods
 {
 	#[payable("EGLD")]

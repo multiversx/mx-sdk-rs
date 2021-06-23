@@ -80,6 +80,7 @@ where
 						+ initial_cost.clone(),
 				)
 			},
+			FunctionSelector::None => Err("Bonding Curve function is not assiged".into()),
 		}
 	}
 }

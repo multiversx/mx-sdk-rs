@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(unused_attributes)]
 #![feature(trait_alias)]
+#![feature(destructuring_assignment)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -10,7 +11,7 @@ mod curve_function;
 use curve_function::CurveFunction;
 
 mod function_selector;
-use function_selector::{CurveArguments, FunctionSelector, Token};
+use function_selector::{FunctionSelector, Token};
 #[path = "curves/linear_function.rs"]
 mod linear_function;
 #[path = "curves/power_function.rs"]
@@ -80,30 +81,22 @@ pub trait BondingCurve:
 		}
 	}
 
-	#[endpoint(setBondingCurve)]
-	fn set_bonding_curve(
-		&self,
-		token: Token,
-		function: FunctionSelector<Self::BigUint>,
-		args: CurveArguments<Self::BigUint>,
-	) {
-		self.bonding_curve().insert(token, (function, args));
+	fn set_bonding_curve(&self, token: Token, function: FunctionSelector<Self::BigUint>) {
+		self.bonding_curve(&token)
+			.update(|(func, _)| *func = function);
 	}
 
 	#[view]
-	fn check_sell_requirements(&self, token: Token, amount: &Self::BigUint) -> SCResult<()> {
-		if !self.bonding_curve().contains_key(&token) {
-			return Err(SCError::from(BoxedBytes::from_concat(&[
-				b"Token provided not accepted",
-			])));
-		}
-		let (_, args) = self.bonding_curve().get(&token).ok_or("Token not issued")?;
+	fn check_sell_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
+		require!(
+			self.bonding_curve(token).is_empty(),
+			"Token provided not accepted"
+		);
 
-		if &args.balance < amount {
-			return Err(SCError::from(BoxedBytes::from_concat(&[
-				b"Token provided not accepted",
-			])));
-		}
+		let (_, args) = self.bonding_curve(token).get();
+
+		require!(&args.balance >= amount, "Token provided not accepted");
+
 		require!(
 			amount > &Self::BigUint::zero(),
 			"Must pay more than 0 tokens!"
@@ -112,8 +105,8 @@ pub trait BondingCurve:
 	}
 
 	#[view]
-	fn check_buy_requirements(&self, token: Token, amount: &Self::BigUint) -> SCResult<()> {
-		if !self.bonding_curve().contains_key(&token) {
+	fn check_buy_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
+		if !self.bonding_curve(token).is_empty() {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
 				token.identifier.as_esdt_identifier(),
@@ -126,6 +119,7 @@ pub trait BondingCurve:
 		);
 		Ok(())
 	}
+
 	#[payable("*")]
 	#[endpoint(buyToken)]
 	fn buy_token(
@@ -135,24 +129,17 @@ pub trait BondingCurve:
 		#[payment_nonce] nonce: u64,
 	) -> SCResult<()> {
 		let token = Token { identifier, nonce };
-		self.check_buy_requirements(token, &buy_amount)?;
+		self.check_buy_requirements(&token, &buy_amount)?;
 
-		let calculated_price = match self.bonding_curve().entry(Token {
-			identifier: identifier.clone(),
-			nonce: nonce.clone(),
-		}) {
-			map_mapper::Entry::Occupied(mut entry) => entry.update(|(func, args)| {
-				let price = func.buy(buy_amount.clone(), args.clone());
-				args.balance += buy_amount;
-				price
-			}),
-			map_mapper::Entry::Vacant(_) => sc_error!("Token price not configured"),
-		}?;
-
+		let calculated_price = self.bonding_curve(&token).update(|(func, args)| {
+			let price = func.buy(buy_amount.clone(), args.clone());
+			args.balance += buy_amount;
+			price
+		})?;
 		let caller = self.blockchain().get_caller();
 
 		self.send()
-			.direct(&caller, &identifier, &calculated_price, b"buying");
+			.direct(&caller, &token.identifier, &calculated_price, b"buying");
 
 		self.buy_token_event(&caller, &calculated_price);
 
@@ -168,23 +155,17 @@ pub trait BondingCurve:
 		#[payment_nonce] nonce: u64,
 	) -> SCResult<()> {
 		let token = Token { identifier, nonce };
-		self.check_sell_requirements(token, &sell_amount)?;
-		let calculated_price = match self.bonding_curve().entry(Token {
-			identifier: identifier.clone(),
-			nonce: nonce.clone(),
-		}) {
-			map_mapper::Entry::Occupied(mut entry) => entry.update(|(func, args)| {
-				let price = func.buy(sell_amount.clone(), args.clone());
-				args.balance -= sell_amount;
-				price
-			}),
-			map_mapper::Entry::Vacant(_) => sc_error!("Token price not configured"),
-		}?;
+		self.check_sell_requirements(&token, &sell_amount)?;
+		let calculated_price = self.bonding_curve(&token).update(|(func, args)| {
+			let price = func.buy(sell_amount.clone(), args.clone());
+			args.balance -= sell_amount;
+			price
+		})?;
 
 		let caller = self.blockchain().get_caller();
 
 		self.send()
-			.direct(&caller, &identifier, &calculated_price, b"selling");
+			.direct(&caller, &token.identifier, &calculated_price, b"selling");
 
 		self.sell_token_event(&caller, &calculated_price);
 		Ok(())

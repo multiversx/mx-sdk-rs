@@ -9,7 +9,7 @@ use crate::{
 	storage,
 };
 
-const TOKEN_NUM_DECIMALS: usize = 18;
+const TOKEN_NUM_DECIMALS: usize = 0;
 #[elrond_wasm_derive::module]
 pub trait FTModule: storage::StorageModule + events::EventsModule {
 	#[payable("EGLD")]
@@ -66,22 +66,19 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.token().insert(self.token().len(), &token_identifier);
-				self.bonding_curve().insert(
-					Token {
-						identifier: token_identifier.clone(),
-						nonce: 0u64,
+				self.bonding_curve(&Token {
+					identifier: token_identifier.clone(),
+					nonce: 0u64,
+				})
+				.set(&(
+					FunctionSelector::None,
+					CurveArguments {
+						supply_type,
+						max_supply: maximum_supply,
+						available_supply: initial_supply.clone(),
+						balance: initial_supply,
 					},
-					(
-						FunctionSelector::None,
-						CurveArguments {
-							supply_type,
-							max_supply: maximum_supply,
-							available_supply: initial_supply,
-							balance: initial_supply,
-						},
-					),
-				);
+				));
 				self.last_error_message().clear();
 			},
 			AsyncCallResult::Err(message) => {
@@ -102,18 +99,22 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
+		require!(
+			!self
+				.bonding_curve(&Token {
+					identifier: token_identifier.clone(),
+					nonce: 0u64,
+				})
+				.is_empty(),
+			"Token not issued"
+		);
+
 		let (_, args) = self
-			.bonding_curve()
-			.get(&Token {
+			.bonding_curve(&Token {
 				identifier: token_identifier.clone(),
 				nonce: 0u64,
 			})
-			.ok_or("Token not issued")?;
-
-		require!(
-			args.supply_type == SupplyType::Unlimited || args.available_supply < args.max_supply,
-			"Maximum supply limit reached!"
-		);
+			.get();
 
 		require!(
 			args.supply_type == SupplyType::Unlimited || args.available_supply < args.max_supply,
@@ -141,15 +142,14 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	) {
 		match result {
 			AsyncCallResult::Ok(()) => {
-				self.bonding_curve()
-					.entry(Token {
-						identifier: token_identifier.clone(),
-						nonce: 0u64,
-					})
-					.and_modify(|(_, args)| {
-						args.available_supply += amount;
-						args.balance += amount;
-					});
+				self.bonding_curve(&Token {
+					identifier: token_identifier.clone(),
+					nonce: 0u64,
+				})
+				.update(|(_, args)| {
+					args.available_supply += amount;
+					args.balance += amount;
+				});
 			},
 			AsyncCallResult::Err(message) => {
 				self.last_error_message().set(&message.err_msg);
@@ -160,28 +160,26 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	#[endpoint(ftLocalMint)]
 	fn ft_local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
 		self.send().esdt_local_mint(&token_identifier, &amount);
-		self.bonding_curve()
-			.entry(Token {
-				identifier: token_identifier.clone(),
-				nonce: 0u64,
-			})
-			.and_modify(|(_, args)| {
-				args.available_supply += &amount;
-				args.balance += &amount;
-			});
+		self.bonding_curve(&Token {
+			identifier: token_identifier.clone(),
+			nonce: 0u64,
+		})
+		.update(|(_, args)| {
+			args.available_supply += &amount;
+			args.balance += &amount;
+		});
 	}
 
 	#[endpoint(ftLocalBurn)]
 	fn ft_local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
 		self.send().esdt_local_burn(&token_identifier, &amount);
-		self.bonding_curve()
-			.entry(Token {
-				identifier: token_identifier.clone(),
-				nonce: 0u64,
-			})
-			.and_modify(|(_, args)| {
-				args.available_supply -= &amount;
-				args.balance -= &amount;
-			});
+		self.bonding_curve(&Token {
+			identifier: token_identifier.clone(),
+			nonce: 0u64,
+		})
+		.update(|(_, args)| {
+			args.available_supply -= &amount;
+			args.balance -= &amount;
+		});
 	}
 }
