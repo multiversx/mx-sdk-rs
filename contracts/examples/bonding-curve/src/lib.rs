@@ -12,13 +12,10 @@ use curve_function::CurveFunction;
 
 mod function_selector;
 use function_selector::{FunctionSelector, Token};
-#[path = "curves/linear_function.rs"]
-mod linear_function;
-#[path = "curves/power_function.rs"]
-mod power_function;
-
 #[path = "utils/events.rs"]
 mod events;
+#[path = "curves/linear_function.rs"]
+mod linear_function;
 #[path = "utils/storage.rs"]
 mod storage;
 
