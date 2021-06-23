@@ -68,7 +68,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				identifier: token_identifier.clone(),
 				nonce: 0,
 			};
-			if self.bonding_curve(token).is_empty() {
+			if self.bonding_curve(&token).is_empty() {
 				args = CurveArguments {
 					supply_type,
 					max_supply,

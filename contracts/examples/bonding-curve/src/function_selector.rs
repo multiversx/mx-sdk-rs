@@ -3,7 +3,6 @@ elrond_wasm::derive_imports!();
 
 use crate::curve_function::CurveFunction;
 use crate::linear_function::LinearFunction;
-use crate::power_function::PowerFunction;
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub enum SupplyType {
@@ -42,7 +41,6 @@ where
 	BigUint: BigUintApi,
 {
 	Linear(LinearFunction<BigUint>),
-	Power(PowerFunction<BigUint>),
 	Custom1(BigUint),
 	None,
 }
@@ -68,9 +66,6 @@ where
 		match &self {
 			FunctionSelector::Linear(linear_function) => {
 				CurveFunction::function(linear_function, token_start, amount, arguments)
-			},
-			FunctionSelector::Power(power_function) => {
-				CurveFunction::function(power_function, token_start, amount, arguments)
 			},
 
 			FunctionSelector::Custom1(initial_cost) => {
