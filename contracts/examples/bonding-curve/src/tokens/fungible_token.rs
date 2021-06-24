@@ -67,7 +67,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.bonding_curve(&Token {
-					identifier: token_identifier.clone(),
+					identifier: token_identifier,
 					nonce: 0u64,
 				})
 				.set(&(
@@ -143,7 +143,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.bonding_curve(&Token {
-					identifier: token_identifier.clone(),
+					identifier: token_identifier,
 					nonce: 0u64,
 				})
 				.update(|(_, args)| {
@@ -161,7 +161,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	fn ft_local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
 		self.send().esdt_local_mint(&token_identifier, &amount);
 		self.bonding_curve(&Token {
-			identifier: token_identifier.clone(),
+			identifier: token_identifier,
 			nonce: 0u64,
 		})
 		.update(|(_, args)| {
@@ -174,7 +174,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 	fn ft_local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
 		self.send().esdt_local_burn(&token_identifier, &amount);
 		self.bonding_curve(&Token {
-			identifier: token_identifier.clone(),
+			identifier: token_identifier,
 			nonce: 0u64,
 		})
 		.update(|(_, args)| {
