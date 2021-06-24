@@ -37,9 +37,10 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		hash: BoxedBytes,
 		attributes: BoxedBytes,
 		uri: BoxedBytes,
-		max_supply: Self::BigUint,
-		supply_type: SupplyType,
-	) {
+		#[var_args] max_supply: OptionalArg<Self::BigUint>,
+		#[var_args] supply_type: OptionalArg<SupplyType>,
+		#[var_args] accepted_payment: OptionalArg<TokenIdentifier>,
+	) -> SCResult<()> {
 		self.send().esdt_nft_create(
 			&identifier,
 			&amount,
@@ -52,17 +53,25 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		let token;
 		let mut func = FunctionSelector::None;
 		let mut args;
+		let payment;
 		if self.call_value().esdt_token_type() == EsdtTokenType::SemiFungible {
 			token = Token {
 				nonce: self.get_current_nonce(&identifier),
 				identifier,
 			};
 			args = CurveArguments {
-				supply_type,
-				max_supply,
+				supply_type: supply_type
+					.into_option()
+					.ok_or("Expected provided supply_type for new created token")?,
+				max_supply: max_supply
+					.into_option()
+					.ok_or("Expected provided max_supply for new created token")?,
 				available_supply: amount.clone(),
 				balance: amount,
 			};
+			payment = accepted_payment
+				.into_option()
+				.ok_or("Expected provided accepted_payment for new created token")?;
 		} else {
 			token = Token {
 				identifier,
@@ -70,18 +79,27 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			};
 			if self.bonding_curve(&token).is_empty() {
 				args = CurveArguments {
-					supply_type,
-					max_supply,
+					supply_type: supply_type
+						.into_option()
+						.ok_or("Expected provided supply_type for new created token")?,
+					max_supply: max_supply
+						.into_option()
+						.ok_or("Expected provided max_supply for new created token")?,
 					available_supply: amount.clone(),
 					balance: amount,
 				};
+
+				payment = accepted_payment
+					.into_option()
+					.ok_or("Expected provided accepted_payment for new created token")?;
 			} else {
-				(func, args) = self.bonding_curve(&token).get();
+				(func, args, payment) = self.bonding_curve(&token).get();
 				args.balance += &amount;
 				args.available_supply += &amount;
 			}
 		}
-		self.bonding_curve(&token).set(&(func, args));
+		self.bonding_curve(&token).set(&(func, args, payment));
+		Ok(())
 	}
 
 	#[endpoint(nftBurn)]
@@ -98,10 +116,10 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			if self.bonding_curve(token).is_empty() {
 				return Err("Token has not been created.".into());
 			}
-			let (func, mut args) = self.bonding_curve(&token).get();
+			let (func, mut args, payment) = self.bonding_curve(&token).get();
 			args.balance += &amount;
 			args.available_supply += &amount;
-			self.bonding_curve(token).set(&(func, args));
+			self.bonding_curve(token).set(&(func, args, payment));
 		} else {
 			let token = &Token {
 				identifier,

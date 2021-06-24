@@ -22,6 +22,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 		initial_supply: Self::BigUint,
 		supply_type: SupplyType,
 		maximum_suply: Self::BigUint,
+		accepted_payment: TokenIdentifier,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
 
@@ -51,6 +52,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 				initial_supply,
 				supply_type,
 				maximum_suply,
+				accepted_payment,
 			)))
 	}
 	#[callback]
@@ -60,6 +62,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 		initial_supply: Self::BigUint,
 		supply_type: SupplyType,
 		maximum_supply: Self::BigUint,
+		accepted_payment: TokenIdentifier,
 		#[payment_token] token_identifier: TokenIdentifier,
 		#[payment] amount: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
@@ -78,6 +81,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 						available_supply: initial_supply.clone(),
 						balance: initial_supply,
 					},
+					accepted_payment,
 				));
 				self.last_error_message().clear();
 			},
@@ -109,7 +113,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 			"Token not issued"
 		);
 
-		let (_, args) = self
+		let (_, args, _) = self
 			.bonding_curve(&Token {
 				identifier: token_identifier.clone(),
 				nonce: 0u64,
@@ -146,7 +150,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 					identifier: token_identifier,
 					nonce: 0u64,
 				})
-				.update(|(_, args)| {
+				.update(|(_, args, _)| {
 					args.available_supply += amount;
 					args.balance += amount;
 				});
@@ -164,7 +168,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 			identifier: token_identifier,
 			nonce: 0u64,
 		})
-		.update(|(_, args)| {
+		.update(|(_, args, _)| {
 			args.available_supply += &amount;
 			args.balance += &amount;
 		});
@@ -177,7 +181,7 @@ pub trait FTModule: storage::StorageModule + events::EventsModule {
 			identifier: token_identifier,
 			nonce: 0u64,
 		})
-		.update(|(_, args)| {
+		.update(|(_, args, _)| {
 			args.available_supply -= &amount;
 			args.balance -= &amount;
 		});
