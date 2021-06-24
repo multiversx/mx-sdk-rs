@@ -30,7 +30,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 	#[endpoint(nftCreate)]
 	fn nft_create(
 		&self,
-		token_identifier: TokenIdentifier,
+		identifier: TokenIdentifier,
 		amount: Self::BigUint,
 		name: BoxedBytes,
 		royalties: Self::BigUint,
@@ -41,7 +41,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		supply_type: SupplyType,
 	) {
 		self.send().esdt_nft_create(
-			&token_identifier,
+			&identifier,
 			&amount,
 			&name,
 			&royalties,
@@ -54,8 +54,8 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		let mut args;
 		if self.call_value().esdt_token_type() == EsdtTokenType::SemiFungible {
 			token = Token {
-				identifier: token_identifier.clone(),
-				nonce: self.get_current_nonce(&token_identifier),
+				nonce: self.get_current_nonce(&identifier),
+				identifier,
 			};
 			args = CurveArguments {
 				supply_type,
@@ -65,8 +65,8 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			};
 		} else {
 			token = Token {
-				identifier: token_identifier.clone(),
-				nonce: 0,
+				identifier,
+				nonce: 0u64,
 			};
 			if self.bonding_curve(&token).is_empty() {
 				args = CurveArguments {
@@ -76,12 +76,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 					balance: amount,
 				};
 			} else {
-				(func, args) = self
-					.bonding_curve(&Token {
-						identifier: token_identifier.clone(),
-						nonce: 0u64,
-					})
-					.get();
+				(func, args) = self.bonding_curve(&token).get();
 				args.balance += &amount;
 				args.available_supply += &amount;
 			}
@@ -92,38 +87,30 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 	#[endpoint(nftBurn)]
 	fn nft_burn(
 		&self,
-		token_identifier: TokenIdentifier,
+		identifier: TokenIdentifier,
 		nonce: u64,
 		amount: Self::BigUint,
 	) -> SCResult<()> {
-		self.send().esdt_nft_burn(&token_identifier, nonce, &amount);
+		self.send().esdt_nft_burn(&identifier, nonce, &amount);
+		if self.call_value().esdt_token_type() == EsdtTokenType::SemiFungible {
+			let token = &Token { identifier, nonce };
 
-		if self
-			.bonding_curve(&Token {
-				identifier: token_identifier.clone(),
-				nonce: 0u64,
-			})
-			.is_empty()
-		{
-			return Err("Token has not been created.".into());
-		} else {
-			if self.call_value().esdt_token_type() == EsdtTokenType::SemiFungible {
-				let token = &Token {
-					identifier: token_identifier.clone(),
-					nonce,
-				};
-
-				let (func, mut args) = self.bonding_curve(&token).get();
-				args.balance += &amount;
-				args.available_supply += &amount;
-				self.bonding_curve(&token).set(&(func, args));
-			} else {
-				self.bonding_curve(&Token {
-					identifier: token_identifier.clone(),
-					nonce: 0u64,
-				})
-				.clear();
+			if self.bonding_curve(token).is_empty() {
+				return Err("Token has not been created.".into());
 			}
+			let (func, mut args) = self.bonding_curve(&token).get();
+			args.balance += &amount;
+			args.available_supply += &amount;
+			self.bonding_curve(token).set(&(func, args));
+		} else {
+			let token = &Token {
+				identifier,
+				nonce: 0u64,
+			};
+			if self.bonding_curve(token).is_empty() {
+				return Err("Token has not been created.".into());
+			}
+			self.bonding_curve(token).clear();
 		}
 		Ok(())
 	}
