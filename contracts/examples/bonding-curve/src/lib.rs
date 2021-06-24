@@ -38,7 +38,9 @@ pub trait BondingCurve:
 	+ common_methods::CommonMethods
 {
 	#[init]
-	fn init(&self) {}
+	fn init(&self, accepted_payment: TokenIdentifier) {
+		self.accepted_payment().set(&accepted_payment);
+	}
 
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(
@@ -103,10 +105,11 @@ pub trait BondingCurve:
 
 	#[view]
 	fn check_buy_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
-		if !self.bonding_curve(token).is_empty() {
+		let accepted_payment = self.accepted_payment().get();
+		if accepted_payment != token.identifier {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
-				token.identifier.as_esdt_identifier(),
+				accepted_payment.as_esdt_identifier(),
 				b" tokens accepted",
 			])));
 		}

@@ -8,6 +8,10 @@ use crate::{
 
 #[elrond_wasm_derive::module]
 pub trait StorageModule {
+	#[view(viewAccpedtedPayment)]
+	#[storage_mapper("accepted_payment")]
+	fn accepted_payment(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+
 	#[view(lastErrorMessage)]
 	#[storage_mapper("last_error_message")]
 	fn last_error_message(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
