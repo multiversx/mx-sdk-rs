@@ -27,6 +27,12 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		}
 	}
 
+	// Here is where we create the nonce, reason why for NFT and SFT would be the best place to store the details about the supply and the accepted_token
+	// Behaviour:
+	//	- SFT: you pass here once per nonce, so the optional arguments should always be provided
+	//  - NFT: first time you pass through here you should provide the optional arguments for setting them in the storage
+	//		   from 2nd time further the optional arguments are ignored.
+
 	#[endpoint(nftCreate)]
 	fn nft_create(
 		&self,
@@ -116,7 +122,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			if self.bonding_curve(token).is_empty() {
 				return Err("Token has not been created.".into());
 			}
-			let (func, mut args, payment) = self.bonding_curve(&token).get();
+			let (func, mut args, payment) = self.bonding_curve(token).get();
 			args.balance += &amount;
 			args.available_supply += &amount;
 			self.bonding_curve(token).set(&(func, args, payment));

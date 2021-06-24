@@ -2,6 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::common_methods::CallbackProxy;
+use crate::function_selector::Token;
 use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]
@@ -37,13 +38,14 @@ pub trait SFTModule:
 	}
 
 	#[endpoint(sftAddQuantity)]
-	fn sft_add_quantity(
-		&self,
-		token_identifier: TokenIdentifier,
-		nonce: u64,
-		amount: Self::BigUint,
-	) {
+	fn sft_add_quantity(&self, identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
 		self.send()
-			.esdt_nft_add_quantity(&token_identifier, nonce, &amount);
+			.esdt_nft_add_quantity(&identifier, nonce, &amount);
+
+		self.bonding_curve(&Token { identifier, nonce })
+			.update(|(_, args, _)| {
+				args.available_supply += &amount;
+				args.balance += amount;
+			});
 	}
 }

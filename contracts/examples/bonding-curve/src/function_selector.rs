@@ -35,6 +35,14 @@ pub struct Token {
 	pub nonce: u64,
 }
 
+// The FunctionSelector stores the pre-defined functions. For now the only one available is Linear.
+// Other fuctions such as Power, Sigmoid and Logarithmic can be implemented the same way once the math module is functional
+//
+// Custom functions can be defined by adding the name of it in the enum, followed by defining the function behaviour
+// in the implementation of CurveFunction, in the match contained by the function function
+//
+// FunctionSelector::None is the case which will not allow any by or sell to take place for a token until a function will be set for it
+
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub enum FunctionSelector<BigUint>
 where

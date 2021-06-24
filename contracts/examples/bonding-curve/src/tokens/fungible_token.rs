@@ -12,6 +12,8 @@ use crate::{
 const TOKEN_NUM_DECIMALS: usize = 0;
 #[elrond_wasm_derive::module]
 pub trait FTModule: storage::StorageModule + events::EventsModule {
+	// Upon issue the storage setting of the CurveArguments is done, reason why
+	// the supply details and the token accepted as payment are requested
 	#[payable("EGLD")]
 	#[endpoint(ftIssue)]
 	fn ft_issue(
