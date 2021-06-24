@@ -28,6 +28,32 @@ mod non_fungible_token;
 #[path = "tokens/semi_fungible_token.rs"]
 mod semi_fungible_token;
 
+// This contract enables using a bonding curve for defining the behaviour of the price of the token as its balance changes.
+//
+// The contract allows issuing of any ESDT token and together with its issue elements such as details about the supply
+// will be stored together with the Balance in an entity called CurveArguments. Because of working with different types of ESDT,
+// the entity under which we will make the mapping with the curve function will be called Token, containing the TokenIdentifier and the nonce.
+// The behaviour however is differend depending
+// on the issued token:
+// - FT:
+//		* defines one bonding curve
+//		* the nonce from Token should be set 0
+//		* the supply and balance are indicated by the amount minted
+// - SFT:
+//		* defines multiple bonding curves (one per each nonce)
+//		* the supply and balance are indicated by the amount of each nonce
+// - NFT:
+//		* defines one bonding curve
+//		* the nonce from Token should be set 0
+//		* the supply and balance are indicated by the number of nonces
+//
+// The bonding curve functions are set up in function_selector.rs
+//
+// When using this contract one should do the following process for each issued token:
+//	- issue the token
+//  - mint the token
+//	- set the curve function
+
 #[elrond_wasm_derive::contract]
 pub trait BondingCurve:
 	fungible_token::FTModule
@@ -78,6 +104,9 @@ pub trait BondingCurve:
 		}
 	}
 
+	// when setting the bonding curve by a predefined function one mush pay attention by the parameters requested by the certain function.
+	// All the predefined functions are set in the curves folder and are implementing the CurveFunction trait
+
 	fn set_bonding_curve(&self, token: Token, function: FunctionSelector<Self::BigUint>) {
 		self.bonding_curve(&token)
 			.update(|(func, _, _)| *func = function);
@@ -90,7 +119,12 @@ pub trait BondingCurve:
 			"Token is not issued yet!"
 		);
 
-		let (_, args, _) = self.bonding_curve(token).get();
+		let (func, args, _) = self.bonding_curve(token).get();
+
+		require!(
+			func != FunctionSelector::None,
+			"The token price was not set yet!"
+		);
 
 		require!(&args.balance >= amount, "Token provided not accepted");
 
@@ -103,7 +137,13 @@ pub trait BondingCurve:
 
 	#[view]
 	fn check_buy_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
-		let (_, _, payment) = self.bonding_curve(token).get();
+		let (func, _, payment) = self.bonding_curve(token).get();
+
+		require!(
+			func != FunctionSelector::None,
+			"The token price was not set yet!"
+		);
+
 		if payment != token.identifier {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
