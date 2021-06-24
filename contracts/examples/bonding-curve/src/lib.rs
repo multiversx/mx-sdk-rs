@@ -38,9 +38,7 @@ pub trait BondingCurve:
 	+ common_methods::CommonMethods
 {
 	#[init]
-	fn init(&self, accepted_payment: TokenIdentifier) {
-		self.accepted_payment().set(&accepted_payment);
-	}
+	fn init(&self) {}
 
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(
@@ -82,17 +80,17 @@ pub trait BondingCurve:
 
 	fn set_bonding_curve(&self, token: Token, function: FunctionSelector<Self::BigUint>) {
 		self.bonding_curve(&token)
-			.update(|(func, _)| *func = function);
+			.update(|(func, _, _)| *func = function);
 	}
 
 	#[view]
 	fn check_sell_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
 		require!(
-			self.bonding_curve(token).is_empty(),
-			"Token provided not accepted"
+			!self.bonding_curve(token).is_empty(),
+			"Token is not issued yet!"
 		);
 
-		let (_, args) = self.bonding_curve(token).get();
+		let (_, args, _) = self.bonding_curve(token).get();
 
 		require!(&args.balance >= amount, "Token provided not accepted");
 
@@ -105,11 +103,11 @@ pub trait BondingCurve:
 
 	#[view]
 	fn check_buy_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
-		let accepted_payment = self.accepted_payment().get();
-		if accepted_payment != token.identifier {
+		let (_, _, payment) = self.bonding_curve(token).get();
+		if payment != token.identifier {
 			return Err(SCError::from(BoxedBytes::from_concat(&[
 				b"Only ",
-				accepted_payment.as_esdt_identifier(),
+				payment.as_esdt_identifier(),
 				b" tokens accepted",
 			])));
 		}
@@ -131,7 +129,7 @@ pub trait BondingCurve:
 		let token = Token { identifier, nonce };
 		self.check_buy_requirements(&token, &buy_amount)?;
 
-		let calculated_price = self.bonding_curve(&token).update(|(func, args)| {
+		let calculated_price = self.bonding_curve(&token).update(|(func, args, _)| {
 			let price = func.buy(buy_amount.clone(), args.clone());
 			args.balance += buy_amount;
 			price
@@ -156,7 +154,7 @@ pub trait BondingCurve:
 	) -> SCResult<()> {
 		let token = Token { identifier, nonce };
 		self.check_sell_requirements(&token, &sell_amount)?;
-		let calculated_price = self.bonding_curve(&token).update(|(func, args)| {
+		let calculated_price = self.bonding_curve(&token).update(|(func, args, _)| {
 			let price = func.buy(sell_amount.clone(), args.clone());
 			args.balance -= sell_amount;
 			price
