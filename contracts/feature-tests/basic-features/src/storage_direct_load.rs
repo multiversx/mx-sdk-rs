@@ -12,11 +12,7 @@ pub trait StorageLoadFeatures {
 	#[endpoint]
 	#[storage_get("big_int")]
 	fn load_big_int(&self) -> Self::BigInt;
-
-    #[endpoint]
-    #[storage_get("elliptic_curve")]
-    fn load_elliptic_curve(&self) -> Self::EllipticCurve;
-
+    
 	#[endpoint]
 	#[storage_get("u64")]
 	fn load_u64(&self) -> u64;
