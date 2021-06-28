@@ -10,7 +10,6 @@ pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-#[allow(clippy::too_many_arguments)] // TODO: some arguments should be grouped though
 pub trait SendApi: ErrorApi + Clone + Sized {
 	/// The type of the payment arguments.
 	/// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
@@ -58,6 +57,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	) -> Result<(), &'static [u8]>;
 
 	/// Sends ESDT NFT to an address and executes like an async call, but without callback.
+	#[allow(clippy::too_many_arguments)]
 	fn direct_esdt_nft_execute(
 		&self,
 		to: &Address,
@@ -145,6 +145,32 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer: &ArgBuffer,
 	) -> Address;
 
+	/// Upgrades a child contract of the currently executing contract.
+	/// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
+	/// The child contract's new init function will be called with the provided arguments
+	fn upgrade_contract(
+		&self,
+		sc_address: &Address,
+		gas: u64,
+		amount: &Self::AmountType,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	);
+
+	fn change_owner_address(&self, child_sc_address: &Address, new_owner: &Address) {
+		let mut arg_buffer = ArgBuffer::new();
+		arg_buffer.push_argument_bytes(new_owner.as_bytes());
+
+		let _ = self.execute_on_dest_context_raw(
+			self.get_gas_left(),
+			child_sc_address,
+			&Self::AmountType::zero(),
+			b"ChangeOwnerAddress",
+			&arg_buffer,
+		);
+	}
+
 	/// Same shard, in-line execution of another contract.
 	fn execute_on_dest_context_raw(
 		&self,
@@ -224,6 +250,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Creates a new NFT token of a certain type (determined by `token_identifier`).  
 	/// `attributes` can be any serializable custom struct.  
 	/// This is a built-in function, so the smart contract execution is resumed after.
+	#[allow(clippy::too_many_arguments)]
 	fn esdt_nft_create<T: elrond_codec::TopEncode>(
 		&self,
 		token: &TokenIdentifier,
