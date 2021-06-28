@@ -44,7 +44,7 @@ macro_rules! derive_imports {
 #[macro_export]
 macro_rules! sc_error {
 	($s:expr) => {
-		elrond_wasm::types::SCResult::Err(elrond_wasm::types::SCError::from($s.as_bytes())).into()
+		elrond_wasm::types::SCResult::Err(elrond_wasm::types::SCError::from($s)).into()
 	};
 }
 

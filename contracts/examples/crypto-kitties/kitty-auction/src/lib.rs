@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(clippy::too_many_arguments)]
 
 elrond_wasm::imports!();
 
@@ -326,6 +325,7 @@ pub trait KittyAuction {
 	// callbacks
 
 	#[callback]
+	#[allow(clippy::too_many_arguments)]
 	fn allow_auctioning_callback(
 		&self,
 		#[call_result] result: AsyncCallResult<()>,

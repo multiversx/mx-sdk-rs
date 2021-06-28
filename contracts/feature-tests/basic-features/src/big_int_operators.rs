@@ -2,6 +2,7 @@ elrond_wasm::imports!();
 
 /// Checks that BigUint/BigInt operators work as expected.
 #[elrond_wasm_derive::module]
+#[allow(clippy::redundant_clone)]
 pub trait BigIntOperators {
 	#[endpoint]
 	fn add_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
