@@ -1,10 +1,11 @@
 {
     "name": "log2-function",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -23,15 +24,15 @@
             "txId": "log2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "log2_big_uint",
-                "arguments": ["11"],
+                "arguments": ["33"],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "3" ],
+                "out": [ "5" ],
                 "status": "0",
                 "logs": [],
                 "gas": "*",
