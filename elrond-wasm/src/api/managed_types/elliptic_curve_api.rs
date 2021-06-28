@@ -8,8 +8,6 @@ pub trait EllipticCurveApi:
 	Sized
 	+ elrond_codec::NestedEncode
 	+ elrond_codec::TopEncode
-	+ elrond_codec::NestedDecode
-	+ elrond_codec::TopDecode
 	+ abi::TypeAbi
 {
 	type BigUint;
@@ -62,4 +60,6 @@ pub trait EllipticCurveApi:
 	fn unmarshal_compressed_ec(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint);
 
 	fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes);
+
+    fn from_bitsize_ec(bitsize: u32) -> Option<Self>;
 }

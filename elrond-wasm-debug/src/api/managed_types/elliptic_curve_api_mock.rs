@@ -38,34 +38,6 @@ impl TopEncode for EllipticCurveMock {
 	}
 }
 
-impl NestedDecode for EllipticCurveMock {
-	fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
-		panic!("not implemented")
-	}
-
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-		_input: &mut I,
-		_c: ExitCtx,
-		_exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		panic!("not implemented")
-	}
-}
-
-impl TopDecode for EllipticCurveMock {
-	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
-		panic!("not implemented")
-	}
-
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		_input: I,
-		_: ExitCtx,
-		_: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		panic!("not implemented")
-	}
-}
-
 impl elrond_wasm::abi::TypeAbi for EllipticCurveMock {
 	fn type_name() -> String {
 		String::from("EllipticCurve")
@@ -157,4 +129,8 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 	fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
 		panic!("generate_key_ec not implemented yet!")
 	}
+
+    fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
+        panic!("from_bitsize_ec not impplemented yet!")
+    }
 }

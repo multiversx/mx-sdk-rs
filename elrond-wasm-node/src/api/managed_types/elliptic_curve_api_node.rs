@@ -392,6 +392,16 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 			)
 		}
 	}
+
+    fn from_bitsize_ec(bitsize: u32) -> Option<Self> {
+        match bitsize {
+            224 => Some(Self::p224_ec()),
+            256 => Some(Self::p256_ec()),
+            384 => Some(Self::p384_ec()),
+            521 => Some(Self::p521_ec()),
+            _ => None
+        }
+    }
 }
 
 use elrond_codec::*;
@@ -441,78 +451,5 @@ impl TopEncode for ArwenEllipticCurve {
 		exit: fn(ExitCtx, EncodeError) -> !,
 	) {
 		top_encode_from_nested_or_exit(self, output, c, exit);
-	}
-}
-
-impl NestedDecode for ArwenEllipticCurve {
-	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-		let _field_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let _base_point_order = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let _eq_constant = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let _x_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let _y_base_point = <Self as EllipticCurveApi>::BigUint::dep_decode(input)?;
-		let size_of_field = u32::dep_decode(input)?;
-		match size_of_field {
-            224 => Ok(ArwenEllipticCurve::p224_ec()),
-            256 => Ok(ArwenEllipticCurve::p256_ec()),
-            384 => Ok(ArwenEllipticCurve::p384_ec()),
-            521 => Ok(ArwenEllipticCurve::p521_ec()),
-            _ => Ok(ArwenEllipticCurve::p224_ec()), // this will never be reached but is necessary
-        }
-       /* Ok(ArwenEllipticCurve::new_elliptic_curve(
-			field_order,
-			base_point_order,
-			eq_constant,
-			x_base_point,
-			y_base_point,
-			size_of_field,
-		))*/
-	}
-
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-		input: &mut I,
-		c: ExitCtx,
-		exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-	 	let _field_order =
-			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let _base_point_order =
-			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let _eq_constant =
-			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let _x_base_point =
-			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit);
-		let _y_base_point =
-			<Self as EllipticCurveApi>::BigUint::dep_decode_or_exit(input, c.clone(), exit); 
-		let size_of_field = u32::dep_decode_or_exit(input, c, exit);
-        match size_of_field {
-            224 => ArwenEllipticCurve::p224_ec(),
-            256 => ArwenEllipticCurve::p256_ec(),
-            384 => ArwenEllipticCurve::p384_ec(),
-            521 => ArwenEllipticCurve::p521_ec(),
-            _ => ArwenEllipticCurve::p224_ec(), // this will never be reached but is necessary
-        }
-		/*ArwenEllipticCurve::new_elliptic_curve(
-			field_order,
-			base_point_order,
-			eq_constant,
-			x_base_point,
-			y_base_point,
-			size_of_field,
-		)*/
-	}
-}
-
-impl TopDecode for ArwenEllipticCurve {
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-		top_decode_from_nested(input)
-	}
-
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		input: I,
-		c: ExitCtx,
-		exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		top_decode_from_nested_or_exit(input, c, exit)
 	}
 }
