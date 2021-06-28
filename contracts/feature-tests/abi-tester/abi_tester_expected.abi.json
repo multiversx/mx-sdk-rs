@@ -169,16 +169,6 @@
             ]
         },
         {
-            "name": "take_elliptic_curve",
-            "inputs": [
-                {
-                    "name": "_ec",
-                    "type": "EllipticCurve"
-                }
-            ],
-            "outputs": []
-        },
-        {
             "name": "esdt_local_role",
             "inputs": [],
             "outputs": [
