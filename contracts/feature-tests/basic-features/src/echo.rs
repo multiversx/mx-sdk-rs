@@ -10,11 +10,6 @@ use elrond_wasm::String;
 #[elrond_wasm_derive::module]
 pub trait EchoTypes {
 	#[endpoint]
-	fn echo_elliptic_curve(&self, ec: Self::EllipticCurve) -> Self::EllipticCurve {
-		ec
-	}
-
-	#[endpoint]
 	fn echo_big_uint(&self, bi: Self::BigUint) -> Self::BigUint {
 		bi
 	}

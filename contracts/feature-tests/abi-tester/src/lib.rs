@@ -83,9 +83,6 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
-	fn take_elliptic_curve(&self, _ec: Self::EllipticCurve) {}
-
-	#[endpoint]
 	fn esdt_local_role(&self) -> EsdtLocalRole {
 		EsdtLocalRole::None
 	}
