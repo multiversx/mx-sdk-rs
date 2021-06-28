@@ -48,34 +48,6 @@ impl TopEncode for EllipticCurveUncallable {
 	}
 }
 
-impl NestedDecode for EllipticCurveUncallable {
-	fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
-		unreachable!()
-	}
-
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-		_input: &mut I,
-		_c: ExitCtx,
-		_exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		unreachable!()
-	}
-}
-
-impl TopDecode for EllipticCurveUncallable {
-	fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
-		unreachable!()
-	}
-
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		_input: I,
-		_: ExitCtx,
-		_: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		unreachable!()
-	}
-}
-
 impl EllipticCurveApi for EllipticCurveUncallable {
 	type BigUint = BigUintUncallable;
 
@@ -161,4 +133,8 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 	fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
 		unreachable!()
 	}
+
+    fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
+        unreachable!()
+    }
 }
