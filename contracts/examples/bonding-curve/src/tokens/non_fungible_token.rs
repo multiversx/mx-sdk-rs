@@ -6,12 +6,12 @@ use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]
 
-pub trait NFTModule:
+pub trait NonFungibleTokenModule:
 	storage::StorageModule + events::EventsModule + common_methods::CommonMethods
 {
 	#[payable("EGLD")]
 	#[endpoint(nftIssue)]
-	fn nft_issue(
+	fn issue(
 		&self,
 		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,

@@ -6,33 +6,23 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[path = "curves/curve_function.rs"]
-mod curve_function;
-use curve_function::CurveFunction;
-
+mod curves;
 mod function_selector;
-use function_selector::{FunctionSelector, Token};
-#[path = "utils/events.rs"]
-mod events;
-#[path = "curves/linear_function.rs"]
-mod linear_function;
-#[path = "utils/storage.rs"]
-mod storage;
-
-#[path = "tokens/common_methods.rs"]
-mod common_methods;
-#[path = "tokens/fungible_token.rs"]
-mod fungible_token;
-#[path = "tokens/non_fungible_token.rs"]
-mod non_fungible_token;
-#[path = "tokens/semi_fungible_token.rs"]
-mod semi_fungible_token;
+mod tokens;
+mod utils;
+use curves::curve_function::CurveFunction;
+use function_selector::FunctionSelector;
+use tokens::{common_methods, fungible_token, non_fungible_token, semi_fungible_token};
+use utils::{
+	events, storage,
+	structs::{CurveArguments, Token},
+};
 
 #[elrond_wasm_derive::contract]
-pub trait BondingCurve:
-	fungible_token::FTModule
-	+ non_fungible_token::NFTModule
-	+ semi_fungible_token::SFTModule
+pub trait BondingCurveContract:
+	fungible_token::FungibleTokenModule
+	+ non_fungible_token::NonFungibleTokenModule
+	+ semi_fungible_token::SemiFungibleTokenModule
 	+ storage::StorageModule
 	+ events::EventsModule
 	+ common_methods::CommonMethods
@@ -50,7 +40,7 @@ pub trait BondingCurve:
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.set_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
-			.with_callback(BondingCurve::callbacks(self).change_roles_callback())
+			.with_callback(BondingCurveContract::callbacks(self).change_roles_callback())
 	}
 
 	#[endpoint(unsetLocalRoles)]
@@ -63,7 +53,7 @@ pub trait BondingCurve:
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.unset_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
-			.with_callback(BondingCurve::callbacks(self).change_roles_callback())
+			.with_callback(BondingCurveContract::callbacks(self).change_roles_callback())
 	}
 
 	#[callback]
@@ -78,12 +68,9 @@ pub trait BondingCurve:
 		}
 	}
 
-	// when setting the bonding curve by a predefined function one mush pay attention by the parameters requested by the certain function.
-	// All the predefined functions are set in the curves folder and are implementing the CurveFunction trait
-
 	fn set_bonding_curve(&self, token: Token, function: FunctionSelector<Self::BigUint>) {
 		self.bonding_curve(&token)
-			.update(|(func, _, _)| *func = function);
+			.update(|bonding_curve| bonding_curve.curve = function);
 	}
 
 	#[view]
@@ -93,14 +80,17 @@ pub trait BondingCurve:
 			"Token is not issued yet!"
 		);
 
-		let (func, args, _) = self.bonding_curve(token).get();
+		let bonding_curve = self.bonding_curve(token).get();
 
 		require!(
-			func != FunctionSelector::None,
+			bonding_curve.curve != FunctionSelector::None,
 			"The token price was not set yet!"
 		);
 
-		require!(&args.balance >= amount, "Token provided not accepted");
+		require!(
+			&bonding_curve.arguments.balance >= amount,
+			"Token provided not accepted"
+		);
 
 		require!(
 			amount > &Self::BigUint::zero(),
@@ -111,24 +101,33 @@ pub trait BondingCurve:
 
 	#[view]
 	fn check_buy_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
-		let (func, _, payment) = self.bonding_curve(token).get();
+		let bonding_curve = self.bonding_curve(token).get();
 
 		require!(
-			func != FunctionSelector::None,
+			bonding_curve.curve != FunctionSelector::None,
 			"The token price was not set yet!"
 		);
 
-		if payment != token.identifier {
-			return Err(SCError::from(BoxedBytes::from_concat(&[
-				b"Only ",
-				payment.as_esdt_identifier(),
-				b" tokens accepted",
-			])));
-		}
 		require!(
 			amount > &Self::BigUint::zero(),
 			"Must pay more than 0 tokens!"
 		);
+
+		self.check_given_token(&bonding_curve.accepted_payment, &token.identifier)
+	}
+
+	fn check_given_token(
+		&self,
+		accepted_token: &TokenIdentifier,
+		given_token: &TokenIdentifier,
+	) -> SCResult<()> {
+		if given_token != accepted_token {
+			return Err(SCError::from(BoxedBytes::from_concat(&[
+				b"Only ",
+				accepted_token.as_esdt_identifier(),
+				b" tokens accepted",
+			])));
+		}
 		Ok(())
 	}
 
@@ -143,11 +142,16 @@ pub trait BondingCurve:
 		let token = Token { identifier, nonce };
 		self.check_buy_requirements(&token, &buy_amount)?;
 
-		let calculated_price = self.bonding_curve(&token).update(|(func, args, _)| {
-			let price = func.buy(buy_amount.clone(), args.clone());
-			args.balance += buy_amount;
+		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
+			let price = self.buy(
+				&bonding_curve.curve,
+				buy_amount.clone(),
+				bonding_curve.arguments.clone(),
+			);
+			bonding_curve.arguments.balance += buy_amount;
 			price
 		})?;
+
 		let caller = self.blockchain().get_caller();
 
 		self.send()
@@ -168,9 +172,14 @@ pub trait BondingCurve:
 	) -> SCResult<()> {
 		let token = Token { identifier, nonce };
 		self.check_sell_requirements(&token, &sell_amount)?;
-		let calculated_price = self.bonding_curve(&token).update(|(func, args, _)| {
-			let price = func.buy(sell_amount.clone(), args.clone());
-			args.balance -= sell_amount;
+
+		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
+			let price = self.sell(
+				&bonding_curve.curve,
+				sell_amount.clone(),
+				bonding_curve.arguments.clone(),
+			);
+			bonding_curve.arguments.balance -= sell_amount;
 			price
 		})?;
 
@@ -181,5 +190,25 @@ pub trait BondingCurve:
 
 		self.sell_token_event(&caller, &calculated_price);
 		Ok(())
+	}
+
+	fn sell(
+		&self,
+		function_selector: &FunctionSelector<Self::BigUint>,
+		amount: Self::BigUint,
+		arguments: CurveArguments<Self::BigUint>,
+	) -> SCResult<Self::BigUint> {
+		let token_start = arguments.first_token_available();
+		function_selector.calculate_price(token_start, amount, &arguments)
+	}
+
+	fn buy(
+		&self,
+		function_selector: &FunctionSelector<Self::BigUint>,
+		amount: Self::BigUint,
+		arguments: CurveArguments<Self::BigUint>,
+	) -> SCResult<Self::BigUint> {
+		let token_start = &arguments.first_token_available() - &amount - Self::BigUint::from(1u64);
+		function_selector.calculate_price(token_start, amount, &arguments)
 	}
 }
