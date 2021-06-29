@@ -2,7 +2,7 @@
 
 # Setting up the local testnet
 
-The following examples rely on having a (local testnet)[https://docs.elrond.com/developers/setup-local-testnet/] up and running.
+The following examples rely on having a [local testnet](https://docs.elrond.com/developers/setup-local-testnet/) up and running.
 
 # Installing @elrondnetwork/erdjs globally
 
