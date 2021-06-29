@@ -3,8 +3,9 @@ elrond_wasm::derive_imports!();
 
 use crate::{
 	events,
-	function_selector::{CurveArguments, FunctionSelector, SupplyType, Token},
+	function_selector::FunctionSelector,
 	storage,
+	utils::structs::{BondingCurve, CurveArguments, SupplyType, Token},
 };
 
 #[elrond_wasm_derive::module]
@@ -27,14 +28,8 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		}
 	}
 
-	// Here is where we create the nonce, reason why for NFT and SFT would be the best place to store the details about the supply and the accepted_token
-	// Behaviour:
-	//	- SFT: you pass here once per nonce, so the optional arguments should always be provided
-	//  - NFT: first time you pass through here you should provide the optional arguments for setting them in the storage
-	//		   from 2nd time further the optional arguments are ignored.
-
 	#[endpoint(nftCreate)]
-	fn nft_create(
+	fn create(
 		&self,
 		identifier: TokenIdentifier,
 		amount: Self::BigUint,
@@ -45,7 +40,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		uri: BoxedBytes,
 		#[var_args] max_supply: OptionalArg<Self::BigUint>,
 		#[var_args] supply_type: OptionalArg<SupplyType>,
-		#[var_args] accepted_payment: OptionalArg<TokenIdentifier>,
+		#[var_args] payment: OptionalArg<TokenIdentifier>,
 	) -> SCResult<()> {
 		self.send().esdt_nft_create(
 			&identifier,
@@ -57,15 +52,16 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			&[uri],
 		);
 		let token;
-		let mut func = FunctionSelector::None;
-		let mut args;
-		let payment;
+		let curve = FunctionSelector::None;
+		let mut arguments;
+		let accepted_payment;
+
 		if self.call_value().esdt_token_type() == EsdtTokenType::SemiFungible {
 			token = Token {
 				nonce: self.get_current_nonce(&identifier),
 				identifier,
 			};
-			args = CurveArguments {
+			arguments = CurveArguments {
 				supply_type: supply_type
 					.into_option()
 					.ok_or("Expected provided supply_type for new created token")?,
@@ -75,7 +71,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				available_supply: amount.clone(),
 				balance: amount,
 			};
-			payment = accepted_payment
+			accepted_payment = payment
 				.into_option()
 				.ok_or("Expected provided accepted_payment for new created token")?;
 		} else {
@@ -83,8 +79,9 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				identifier,
 				nonce: 0u64,
 			};
+
 			if self.bonding_curve(&token).is_empty() {
-				args = CurveArguments {
+				arguments = CurveArguments {
 					supply_type: supply_type
 						.into_option()
 						.ok_or("Expected provided supply_type for new created token")?,
@@ -95,42 +92,45 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 					balance: amount,
 				};
 
-				payment = accepted_payment
+				accepted_payment = payment
 					.into_option()
 					.ok_or("Expected provided accepted_payment for new created token")?;
 			} else {
-				(func, args, payment) = self.bonding_curve(&token).get();
-				args.balance += &amount;
-				args.available_supply += &amount;
+				let bonding_curve = self.bonding_curve(&token).get();
+				accepted_payment = bonding_curve.accepted_payment;
+				arguments = bonding_curve.arguments;
+				arguments.balance += amount.clone();
+				arguments.available_supply += amount;
 			}
 		}
-		self.bonding_curve(&token).set(&(func, args, payment));
+		self.bonding_curve(&token).set(&BondingCurve {
+			curve,
+			arguments,
+			accepted_payment,
+		});
 		Ok(())
 	}
 
 	#[endpoint(nftBurn)]
-	fn nft_burn(
-		&self,
-		identifier: TokenIdentifier,
-		nonce: u64,
-		amount: Self::BigUint,
-	) -> SCResult<()> {
+	fn burn(&self, identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) -> SCResult<()> {
 		self.send().esdt_nft_burn(&identifier, nonce, &amount);
+
 		if self.call_value().esdt_token_type() == EsdtTokenType::SemiFungible {
 			let token = &Token { identifier, nonce };
 
 			if self.bonding_curve(token).is_empty() {
 				return Err("Token has not been created.".into());
 			}
-			let (func, mut args, payment) = self.bonding_curve(token).get();
-			args.balance += &amount;
-			args.available_supply += &amount;
-			self.bonding_curve(token).set(&(func, args, payment));
+			let mut bonding_curve = self.bonding_curve(token).get();
+			bonding_curve.arguments.balance += &amount;
+			bonding_curve.arguments.available_supply += &amount;
+			self.bonding_curve(token).set(&bonding_curve);
 		} else {
 			let token = &Token {
 				identifier,
 				nonce: 0u64,
 			};
+
 			if self.bonding_curve(token).is_empty() {
 				return Err("Token has not been created.".into());
 			}

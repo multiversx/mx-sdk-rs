@@ -1,10 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::{
-	function_selector::CurveArguments, function_selector::FunctionSelector,
-	function_selector::Token,
-};
+use crate::utils::structs::{BondingCurve, Token};
 
 #[elrond_wasm_derive::module]
 pub trait StorageModule {
@@ -16,12 +13,5 @@ pub trait StorageModule {
 	fn bonding_curve(
 		&self,
 		token: &Token,
-	) -> SingleValueMapper<
-		Self::Storage,
-		(
-			FunctionSelector<Self::BigUint>,
-			CurveArguments<Self::BigUint>,
-			TokenIdentifier,
-		),
-	>;
+	) -> SingleValueMapper<Self::Storage, BondingCurve<Self::BigUint>>;
 }

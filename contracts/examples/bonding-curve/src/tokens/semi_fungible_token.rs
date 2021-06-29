@@ -2,16 +2,16 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::common_methods::CallbackProxy;
-use crate::function_selector::Token;
+use crate::utils::structs::Token;
 use crate::{common_methods, events, storage};
 
 #[elrond_wasm_derive::module]
-pub trait SFTModule:
+pub trait SemiFungibleTokenModule:
 	storage::StorageModule + events::EventsModule + common_methods::CommonMethods
 {
 	#[payable("EGLD")]
 	#[endpoint(sftIssue)]
-	fn sft_issue(
+	fn issue(
 		&self,
 		#[payment] issue_cost: Self::BigUint,
 		token_display_name: BoxedBytes,
@@ -38,14 +38,14 @@ pub trait SFTModule:
 	}
 
 	#[endpoint(sftAddQuantity)]
-	fn sft_add_quantity(&self, identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
+	fn add_quantity(&self, identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
 		self.send()
 			.esdt_nft_add_quantity(&identifier, nonce, &amount);
 
 		self.bonding_curve(&Token { identifier, nonce })
-			.update(|(_, args, _)| {
-				args.available_supply += &amount;
-				args.balance += amount;
+			.update(|bonding_curve| {
+				bonding_curve.arguments.available_supply += &amount;
+				bonding_curve.arguments.balance += amount;
 			});
 	}
 }
