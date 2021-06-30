@@ -13,7 +13,7 @@ where
 	BigUint: BigUintApi,
 {
 	Linear(LinearFunction<BigUint>),
-	Custom(BigUint),
+	CustomExample(BigUint),
 	None,
 }
 ```
