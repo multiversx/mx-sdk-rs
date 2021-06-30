@@ -12,6 +12,8 @@ use elrond_wasm_module_features::feature_guard;
 /// Also provides testing for the most common modules:
 /// - DnsModule
 /// - FeaturesModule
+/// - EsdtModule
+/// - GovernanceModule
 /// - PauseModule
 #[elrond_wasm_derive::contract]
 pub trait UseModule:
@@ -21,6 +23,7 @@ pub trait UseModule:
 	+ elrond_wasm_module_dns::DnsModule
 	+ elrond_wasm_module_esdt::EsdtModule
 	+ elrond_wasm_module_features::FeaturesModule
+	+ elrond_wasm_module_governance::GovernanceModule
 	+ elrond_wasm_module_pause::PauseModule
 {
 	#[init]
