@@ -67,4 +67,7 @@ pub trait BigUintApi:
 	fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
 
 	fn from_bytes_be(bytes: &[u8]) -> Self;
+
+	/// Will return `None` if the number is too big to be converted.
+	fn to_u64(&self) -> Option<u64>;
 }

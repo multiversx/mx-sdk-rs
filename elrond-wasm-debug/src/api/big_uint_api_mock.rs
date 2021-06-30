@@ -359,4 +359,20 @@ impl elrond_wasm::api::BigUintApi for RustBigUint {
 		let bi = BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
 		bi.into()
 	}
+
+	fn to_u64(&self) -> Option<u64> {
+		let (_, digits) = self.0.to_u64_digits();
+		match digits.len() {
+			0 => Some(0),
+			1 => {
+				let as_u64 = digits[0];
+				if as_u64 <= i64::MAX as u64 {
+					Some(digits[0])
+				} else {
+					None
+				}
+			},
+			_ => None,
+		}
+	}
 }
