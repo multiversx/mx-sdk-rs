@@ -100,7 +100,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				let bonding_curve = self.bonding_curve(&token).get();
 				accepted_payment = bonding_curve.accepted_payment;
 				arguments = bonding_curve.arguments;
-				arguments.balance += amount.clone();
+				arguments.balance += &amount;
 				arguments.available_supply += amount;
 			}
 		}

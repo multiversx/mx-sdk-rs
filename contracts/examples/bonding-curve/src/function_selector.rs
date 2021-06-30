@@ -12,7 +12,7 @@ where
 	BigUint: BigUintApi,
 {
 	Linear(LinearFunction<BigUint>),
-	Custom(BigUint),
+	CustomExample(BigUint),
 	None,
 }
 
@@ -31,7 +31,7 @@ where
 	fn calculate_price(
 		&self,
 		token_start: BigUint,
-		amount: BigUint,
+		amount: &BigUint,
 		arguments: &CurveArguments<BigUint>,
 	) -> SCResult<BigUint> {
 		match &self {
@@ -39,8 +39,8 @@ where
 				CurveFunction::calculate_price(linear_function, token_start, amount, arguments)
 			},
 
-			FunctionSelector::Custom(initial_cost) => {
-				let sum = token_start + amount;
+			FunctionSelector::CustomExample(initial_cost) => {
+				let sum = &token_start + amount;
 				let price = &(&sum * &sum * sum / BigUint::from(3u64)) - &arguments.balance
 					+ initial_cost.clone();
 				Ok(price)
