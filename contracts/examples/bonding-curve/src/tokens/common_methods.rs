@@ -29,6 +29,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 	}
 
 	#[endpoint(nftCreate)]
+	#[allow(clippy::too_many_arguments)]
 	fn create(
 		&self,
 		identifier: TokenIdentifier,
