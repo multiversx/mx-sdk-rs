@@ -30,7 +30,7 @@ where
 {
 	fn calculate_price(
 		&self,
-		token_start: BigUint,
+		token_start: &BigUint,
 		amount: &BigUint,
 		arguments: &CurveArguments<BigUint>,
 	) -> SCResult<BigUint> {
@@ -40,7 +40,7 @@ where
 			},
 
 			FunctionSelector::CustomExample(initial_cost) => {
-				let sum = &token_start + amount;
+				let sum = token_start + amount;
 				let price = &(&sum * &sum * sum / BigUint::from(3u64)) - &arguments.balance
 					+ initial_cost.clone();
 				Ok(price)
