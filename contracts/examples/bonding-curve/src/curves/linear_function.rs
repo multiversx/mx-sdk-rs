@@ -25,12 +25,12 @@ where
 {
 	fn calculate_price(
 		&self,
-		token_start: BigUint,
+		token_start: &BigUint,
 		amount: &BigUint,
 		_arguments: &CurveArguments<BigUint>,
 	) -> SCResult<BigUint> {
 		Ok(
-			&self.linear_coefficient * &sum_interval(&token_start, amount)
+			&self.linear_coefficient * &sum_interval(token_start, amount)
 				+ &self.initial_price * amount,
 		)
 	}
