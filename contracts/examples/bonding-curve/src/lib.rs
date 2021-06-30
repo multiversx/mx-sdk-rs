@@ -199,7 +199,7 @@ pub trait BondingCurveContract:
 		arguments: CurveArguments<Self::BigUint>,
 	) -> SCResult<Self::BigUint> {
 		let token_start = arguments.first_token_available();
-		function_selector.calculate_price(token_start, amount, &arguments)
+		function_selector.calculate_price(token_start, &amount, &arguments)
 	}
 
 	fn buy(
@@ -209,6 +209,6 @@ pub trait BondingCurveContract:
 		arguments: CurveArguments<Self::BigUint>,
 	) -> SCResult<Self::BigUint> {
 		let token_start = &arguments.first_token_available() - &amount - Self::BigUint::from(1u64);
-		function_selector.calculate_price(token_start, amount, &arguments)
+		function_selector.calculate_price(token_start, &amount, &arguments)
 	}
 }

@@ -17,7 +17,7 @@ where
 	fn calculate_price(
 		&self,
 		token_start: BigUint,
-		amount: BigUint,
+		amount: &BigUint,
 		arguments: &CurveArguments<BigUint>,
 	) -> SCResult<BigUint>;
 }

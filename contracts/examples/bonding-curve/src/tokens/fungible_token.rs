@@ -12,6 +12,7 @@ const TOKEN_NUM_DECIMALS: usize = 18;
 #[elrond_wasm_derive::module]
 pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 	#[payable("EGLD")]
+	#[allow(clippy::too_many_arguments)]
 	#[endpoint(ftIssue)]
 	fn issue(
 		&self,
@@ -56,6 +57,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 	}
 
 	#[callback]
+	#[allow(clippy::too_many_arguments)]
 	fn issue_callback(
 		&self,
 		caller: Address,
