@@ -222,4 +222,8 @@ impl BigIntApi for BigIntUncallable {
 	fn from_signed_bytes_be(_bytes: &[u8]) -> Self {
 		unreachable!()
 	}
+
+	fn to_i64(&self) -> Option<i64> {
+		unreachable!()
+	}
 }

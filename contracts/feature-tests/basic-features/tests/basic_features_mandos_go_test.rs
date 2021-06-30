@@ -1,4 +1,14 @@
 #[test]
+fn big_int_to_i64_go() {
+	elrond_wasm_debug::mandos_go("mandos/big_int_to_i64.scen.json");
+}
+
+#[test]
+fn big_uint_to_u64_go() {
+	elrond_wasm_debug::mandos_go("mandos/big_uint_to_u64.scen.json");
+}
+
+#[test]
 fn block_info_go() {
 	elrond_wasm_debug::mandos_go("mandos/block_info.scen.json");
 }
