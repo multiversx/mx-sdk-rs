@@ -57,14 +57,10 @@ pub trait BondingCurveContract:
 	}
 
 	#[callback]
-	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
+	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) -> SCResult<()> {
 		match result {
-			AsyncCallResult::Ok(()) => {
-				self.last_error_message().clear();
-			},
-			AsyncCallResult::Err(message) => {
-				self.last_error_message().set(&message.err_msg);
-			},
+			AsyncCallResult::Ok(()) => Ok(()),
+			AsyncCallResult::Err(message) => Err(message.err_msg.into()),
 		}
 	}
 
