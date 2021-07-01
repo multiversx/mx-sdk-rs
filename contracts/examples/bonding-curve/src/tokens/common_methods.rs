@@ -39,8 +39,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		hash: BoxedBytes,
 		attributes: BoxedBytes,
 		uri: BoxedBytes,
-		#[var_args] max_supply: OptionalArg<Self::BigUint>,
-		#[var_args] supply_type: OptionalArg<SupplyType>,
+		#[var_args] supply_type: OptionalArg<SupplyType<Self::BigUint>>,
 		#[var_args] payment: OptionalArg<TokenIdentifier>,
 	) -> SCResult<()> {
 		self.send().esdt_nft_create(
@@ -66,9 +65,6 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				supply_type: supply_type
 					.into_option()
 					.ok_or("Expected provided supply_type for new created token")?,
-				max_supply: max_supply
-					.into_option()
-					.ok_or("Expected provided max_supply for new created token")?,
 				available_supply: amount.clone(),
 				balance: amount,
 			};
@@ -86,9 +82,6 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 					supply_type: supply_type
 						.into_option()
 						.ok_or("Expected provided supply_type for new created token")?,
-					max_supply: max_supply
-						.into_option()
-						.ok_or("Expected provided max_supply for new created token")?,
 					available_supply: amount.clone(),
 					balance: amount,
 				};
