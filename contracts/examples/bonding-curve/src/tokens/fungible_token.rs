@@ -68,7 +68,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		#[payment_token] token_identifier: TokenIdentifier,
 		#[payment] amount: Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
-	) {
+	) -> SCResult<()> {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.bonding_curve(&Token {
@@ -85,14 +85,14 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 					},
 					accepted_payment,
 				});
-				self.last_error_message().clear();
+				Ok(())
 			},
 			AsyncCallResult::Err(message) => {
 				if token_identifier.is_egld() && amount > 0 {
 					self.send().direct_egld(&caller, &amount, &[]);
 				}
 
-				self.last_error_message().set(&message.err_msg);
+				Err(message.err_msg.into())
 			},
 		}
 	}
@@ -147,7 +147,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		token_identifier: TokenIdentifier,
 		amount: &Self::BigUint,
 		#[call_result] result: AsyncCallResult<()>,
-	) {
+	) -> SCResult<()> {
 		match result {
 			AsyncCallResult::Ok(()) => {
 				self.bonding_curve(&Token {
@@ -158,10 +158,9 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 					bonding_curve.arguments.available_supply += amount;
 					bonding_curve.arguments.balance += amount;
 				});
+				Ok(())
 			},
-			AsyncCallResult::Err(message) => {
-				self.last_error_message().set(&message.err_msg);
-			},
+			AsyncCallResult::Err(message) => Err(message.err_msg.into()),
 		}
 	}
 

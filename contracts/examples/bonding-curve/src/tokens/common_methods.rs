@@ -15,15 +15,15 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		&self,
 		caller: Address,
 		#[call_result] result: AsyncCallResult<TokenIdentifier>,
-	) {
+	) -> SCResult<()> {
 		match result {
-			AsyncCallResult::Ok(_) => {},
+			AsyncCallResult::Ok(_) => Ok(()),
 			AsyncCallResult::Err(message) => {
 				let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
 				if token_identifier.is_egld() && returned_tokens > 0 {
 					self.send().direct_egld(&caller, &returned_tokens, &[]);
 				}
-				self.last_error_message().set(&message.err_msg);
+				Err(message.err_msg.into())
 			},
 		}
 	}
