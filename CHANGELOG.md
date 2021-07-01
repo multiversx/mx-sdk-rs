@@ -9,6 +9,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - `pow`, `log2`, `sqrt`
 - cryptography: elliptic curves
 
+## [elrond-wasm 0.17.4] - 2021-06-30
+- conversions from big ints to small int: `BigUint::to_u64`, `BigInt::to_i64`
+
 ## [elrond-wasm 0.17.3] - 2021-06-11
 - `SingleValueMapper` `set_if_empty` method
 

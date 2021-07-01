@@ -294,4 +294,8 @@ impl BigUintApi for BigUintUncallable {
 	fn from_bytes_be(_bytes: &[u8]) -> Self {
 		unreachable!()
 	}
+
+	fn to_u64(&self) -> Option<u64> {
+		unreachable!()
+	}
 }

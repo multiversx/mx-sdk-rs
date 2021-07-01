@@ -57,7 +57,7 @@ impl<T> SCResult<T> {
 
 /// Implementing the `Try` trait overloads the `?` operator.
 /// Documentation on the new version of the trait:
-/// https://github.com/scottmcm/rfcs/blob/do-or-do-not/text/0000-try-trait-v2.md#the-try-trait
+/// <https://github.com/scottmcm/rfcs/blob/do-or-do-not/text/0000-try-trait-v2.md#the-try-trait>
 impl<T> Try for SCResult<T> {
 	type Output = T;
 	type Residual = SCError;
