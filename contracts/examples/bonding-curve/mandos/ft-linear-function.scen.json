@@ -1,0 +1,61 @@
+{
+    "name": "ft with price given by linear function",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "5,000,000,000,000,000,000",
+                    "storage": {}
+                },
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFFT-12345": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:1|biguint:1000|biguint:0|biguint:0|nested:str:EGLD"
+                    },
+                    "code": "file:../output/bonding-curve.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "5,000,000,000,000,000,000",
+                    "storage": {}
+                },
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:1|biguint:1000|biguint:0|biguint:0|nested:str:EGLD"
+                    },
+                    "code": "file:../output/bonding-curve.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}
