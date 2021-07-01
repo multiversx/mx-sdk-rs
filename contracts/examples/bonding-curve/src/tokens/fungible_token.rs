@@ -20,8 +20,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		token_display_name: BoxedBytes,
 		token_ticker: BoxedBytes,
 		initial_supply: Self::BigUint,
-		supply_type: SupplyType,
-		maximum_suply: Self::BigUint,
+		supply_type: SupplyType<Self::BigUint>,
 		accepted_payment: TokenIdentifier,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
 		only_owner!(self, "only owner may call this function");
@@ -51,7 +50,6 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 				caller,
 				initial_supply,
 				supply_type,
-				maximum_suply,
 				accepted_payment,
 			)))
 	}
@@ -62,8 +60,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		&self,
 		caller: Address,
 		initial_supply: Self::BigUint,
-		supply_type: SupplyType,
-		maximum_supply: Self::BigUint,
+		supply_type: SupplyType<Self::BigUint>,
 		accepted_payment: TokenIdentifier,
 		#[payment_token] token_identifier: TokenIdentifier,
 		#[payment] amount: Self::BigUint,
@@ -79,7 +76,6 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 					curve: FunctionSelector::None,
 					arguments: CurveArguments {
 						supply_type,
-						max_supply: maximum_supply,
 						available_supply: initial_supply.clone(),
 						balance: initial_supply,
 					},
@@ -97,7 +93,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 		}
 	}
 
-	#[endpoint(ftmint)]
+	#[endpoint(ftMint)]
 	fn mint(
 		&self,
 		token_identifier: TokenIdentifier,
@@ -122,19 +118,19 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 			})
 			.get();
 
-		require!(
-			bonding_curve.arguments.supply_type == SupplyType::Unlimited
-				|| bonding_curve.arguments.available_supply < bonding_curve.arguments.max_supply,
-			"Maximum supply limit reached!"
-		);
+		if bonding_curve.arguments.supply_type != SupplyType::Unlimited {
+			require!(
+				bonding_curve.arguments.available_supply
+					< bonding_curve.arguments.supply_type.get_limit()?,
+				"Maximum supply limit reached!"
+			);
 
-		require!(
-			bonding_curve.arguments.supply_type == SupplyType::Unlimited
-				|| bonding_curve.arguments.available_supply + amount.clone()
-					<= bonding_curve.arguments.max_supply,
-			"Minting will exceed the maximum supply limit!"
-		);
-
+			require!(
+				bonding_curve.arguments.available_supply + amount.clone()
+					<= bonding_curve.arguments.supply_type.get_limit()?,
+				"Minting will exceed the maximum supply limit!"
+			);
+		}
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.mint(&token_identifier, &amount)
 			.async_call()

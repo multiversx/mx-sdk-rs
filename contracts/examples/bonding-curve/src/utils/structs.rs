@@ -4,15 +4,29 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub enum SupplyType {
-	Limited,
+pub enum SupplyType<BigUint>
+where
+	BigUint: BigUintApi,
+{
+	Limited(BigUint),
 	Unlimited,
+}
+
+impl<BigUint> SupplyType<BigUint>
+where
+	BigUint: BigUintApi,
+{
+	pub fn get_limit(&self) -> SCResult<BigUint> {
+		match &self {
+			SupplyType::Limited(limit) => Ok(limit.clone()),
+			SupplyType::Unlimited => Err("Unlimited has no limit!".into()),
+		}
+	}
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub struct CurveArguments<BigUint: BigUintApi> {
-	pub supply_type: SupplyType,
-	pub max_supply: BigUint,
+	pub supply_type: SupplyType<BigUint>,
 	pub available_supply: BigUint,
 	pub balance: BigUint,
 }
