@@ -2,65 +2,38 @@
 
 elrond_wasm::imports!();
 
+pub mod governance_configurable;
+
+pub mod governance_proposal;
+use governance_proposal::*;
+
 #[elrond_wasm_derive::module]
-pub trait GovernanceModule {
-	// endpoint - owner-only
+pub trait GovernanceModule:
+	governance_configurable::GovernanceConfigurablePropertiesModule
+{
+	// endpoints
 
-	/// Will do nothing on a second call, or if the storage is modified manually beforehand from the main SC
-	#[endpoint(initGovernanceModule)]
-	fn init_governance_module(
-		&self,
-		governance_token_id: TokenIdentifier,
-		timelock_sc_address: Address,
-		quorum: Self::BigUint,
-	) -> SCResult<()> {
-		only_owner!(self, "Only owner may initialize governance module");
-		require!(
-			governance_token_id.is_valid_esdt_identifier(),
-			"Invalid ESDT token ID provided for governance_token_id"
-		);
-		require!(
-			self.blockchain().is_smart_contract(&timelock_sc_address),
-			"Timelock address provided is not a SC address"
-		);
-		require!(quorum > 0, "Quorum can't be set to 0");
+	// views
 
-		self.governance_token_id()
-			.set_if_empty(&governance_token_id);
-		self.timelock_sc_address()
-			.set_if_empty(&timelock_sc_address);
-		self.quorum().set_if_empty(&quorum);
-
-		Ok(())
+	#[view(getProposalStatus)]
+	fn get_proposal_status(&self, _proposal_id: usize) -> GovernanceProposalStatus {
+		GovernanceProposalStatus::None
 	}
-
-	// endpoints - timelock SC-only
-
-	#[endpoint(changeQuorum)]
-    fn change_quorum(&self, new_quorum: Self::BigUint) -> SCResult<()> {
-        self.require_caller_timelock_sc()?;
-        require!(new_quorum > 0, "Quorum can't be set to 0");
-
-        self.quorum().set(&new_quorum);
-
-        Ok(())
-    }
 
 	// private
 
-	fn require_caller_timelock_sc(&self) -> SCResult<()> {
+	fn require_payment_token_governance_token(&self) -> SCResult<()> {
 		require!(
-			self.blockchain().get_caller() == self.timelock_sc_address().get(),
-			"Only timelock SC may call this endpoint."
+			self.call_value().token() == self.governance_token_id().get(),
+			"Only Governance token accepted as payment"
 		);
 		Ok(())
 	}
 
-	// storage
+	// storage - general
 
-	#[view(getGovernanceTokenId)]
-	#[storage_mapper("governance:governanceTokenId")]
-	fn governance_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+	#[storage_mapper("governance:proposals")]
+	fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<Self::BigUint>>;
 
 	#[view(getClaimableGovernanceTokens)]
 	#[storage_mapper("governance:claimableGovernanceTokens")]
@@ -68,12 +41,4 @@ pub trait GovernanceModule {
 		&self,
 		address: &Address,
 	) -> SingleValueMapper<Self::Storage, Self::BigUint>;
-
-	#[view(getTimelockScAddress)]
-	#[storage_mapper("governance:timelockScAddress")]
-	fn timelock_sc_address(&self) -> SingleValueMapper<Self::Storage, Address>;
-
-	#[view(getQuorum)]
-	#[storage_mapper("governance:quorum")]
-	fn quorum(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 }
