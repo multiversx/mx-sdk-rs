@@ -24,6 +24,7 @@ pub trait UseModule:
 	+ elrond_wasm_module_esdt::EsdtModule
 	+ elrond_wasm_module_features::FeaturesModule
 	+ elrond_wasm_module_governance::GovernanceModule
+	+ elrond_wasm_module_governance::governance_configurable::GovernanceConfigurablePropertiesModule
 	+ elrond_wasm_module_pause::PauseModule
 {
 	#[init]
