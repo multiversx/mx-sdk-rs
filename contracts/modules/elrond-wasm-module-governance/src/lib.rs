@@ -60,10 +60,65 @@ pub trait GovernanceModule:
 		};
 		let proposal_id = self.proposals().push(&proposal);
 
+		let current_block = self.blockchain().get_block_nonce();
+		self.proposal_start_block(proposal_id).set(&current_block);
+
 		self.total_votes(proposal_id).set(&payment_amount);
 		self.votes(proposal_id).insert(proposer, payment_amount);
 
 		Ok(proposal_id)
+	}
+
+	#[payable("*")]
+	#[endpoint]
+	fn vote(
+		&self,
+		#[payment_amount] payment_amount: Self::BigUint,
+		proposal_id: usize,
+	) -> SCResult<()> {
+		self.require_payment_token_governance_token()?;
+		self.require_valid_proposal_id(proposal_id)?;
+		require!(
+			self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
+			"Proposal is not active"
+		);
+
+		let voter = self.blockchain().get_caller();
+
+		self.total_votes(proposal_id)
+			.update(|total_votes| *total_votes += &payment_amount);
+		self.votes(proposal_id)
+			.entry(voter)
+			.and_modify(|nr_votes| *nr_votes += &payment_amount)
+			.or_insert(payment_amount);
+
+		Ok(())
+	}
+
+	#[payable("*")]
+	#[endpoint]
+	fn downvote(
+		&self,
+		#[payment_amount] payment_amount: Self::BigUint,
+		proposal_id: usize,
+	) -> SCResult<()> {
+		self.require_payment_token_governance_token()?;
+		self.require_valid_proposal_id(proposal_id)?;
+		require!(
+			self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
+			"Proposal is not active"
+		);
+
+		let voter = self.blockchain().get_caller();
+
+		self.total_downvotes(proposal_id)
+			.update(|total_downvotes| *total_downvotes += &payment_amount);
+		self.downvotes(proposal_id)
+			.entry(voter)
+			.and_modify(|nr_downvotes| *nr_downvotes += &payment_amount)
+			.or_insert(payment_amount);
+
+		Ok(())
 	}
 
 	// views
@@ -73,8 +128,36 @@ pub trait GovernanceModule:
 		if !self.is_valid_proposal_id(proposal_id) {
 			return GovernanceProposalStatus::None;
 		}
+		if self.proposals().item_is_empty(proposal_id) {
+			return GovernanceProposalStatus::Canceled;
+		}
 
-		GovernanceProposalStatus::Canceled
+		let current_block = self.blockchain().get_block_nonce();
+		let proposal_block = self.proposal_start_block(proposal_id).get();
+		let voting_delay = self.voting_delay_in_blocks().get();
+		let voting_period = self.voting_period_in_blocks().get();
+
+		let voting_start = proposal_block + voting_delay;
+		let voting_end = voting_start + voting_period;
+
+		if current_block < voting_start {
+			return GovernanceProposalStatus::Pending;
+		}
+		if current_block >= voting_start && current_block <= voting_end {
+			return GovernanceProposalStatus::Active;
+		}
+		
+		let total_votes = self.total_votes(proposal_id).get();
+		let total_downvotes = self.total_downvotes(proposal_id).get();
+		let quorum = self.quorum().get();
+
+		if total_votes < total_downvotes || &total_votes - &total_downvotes >= quorum {
+			return GovernanceProposalStatus::Succeeded;
+		} else {
+			return GovernanceProposalStatus::Defeated;
+		}
+
+		// TODO: Other statuses
 	}
 
 	// private
@@ -83,6 +166,14 @@ pub trait GovernanceModule:
 		require!(
 			self.call_value().token() == self.governance_token_id().get(),
 			"Only Governance token accepted as payment"
+		);
+		Ok(())
+	}
+
+	fn require_valid_proposal_id(&self, proposal_id: usize) -> SCResult<()> {
+		require!(
+			self.is_valid_proposal_id(proposal_id),
+			"Invalid proposal ID"
 		);
 		Ok(())
 	}
@@ -104,6 +195,10 @@ pub trait GovernanceModule:
 
 	#[storage_mapper("governance:proposals")]
 	fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<Self::BigUint>>;
+
+	/// Not stored under "proposals", as that would require deserializing the whole struct
+	#[storage_mapper("governance:proposalStartBlock")]
+	fn proposal_start_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
 
 	#[storage_mapper("governance:votes")]
 	fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, Self::BigUint>;
