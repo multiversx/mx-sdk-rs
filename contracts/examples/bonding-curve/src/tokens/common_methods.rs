@@ -53,11 +53,10 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				})
 				.set(&BondingCurve {
 					curve: FunctionSelector::None,
-					arguments: CurveArguments {
-						supply_type,
-						available_supply: initial_supply.clone(),
-						balance: initial_supply,
-					},
+					arguments: self.create_curve_arguments(
+						elrond_wasm::types::OptionalArg::Some(supply_type),
+						initial_supply,
+					)?,
 					accepted_payment,
 				});
 				self.token_type(&token_identifier)
@@ -102,19 +101,14 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		let mut arguments;
 		let accepted_payment;
 
+		require!(!self.token_type(&identifier).is_empty(), "Token not issued");
 		if self.token_type(&identifier).get() == EsdtTokenType::SemiFungible {
 			token = Token {
 				nonce: self.get_current_nonce(&identifier),
 				identifier,
 			};
 			require!(token.nonce != 0, "Nonce should not be 0!");
-			arguments = CurveArguments {
-				supply_type: supply_type
-					.into_option()
-					.ok_or("Expected provided supply_type for new created token")?,
-				available_supply: amount.clone(),
-				balance: amount,
-			};
+			arguments = self.create_curve_arguments(supply_type, amount)?;
 			accepted_payment = payment
 				.into_option()
 				.ok_or("Expected provided accepted_payment for new created token")?;
@@ -125,14 +119,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			};
 
 			if self.bonding_curve(&token).is_empty() {
-				arguments = CurveArguments {
-					supply_type: supply_type
-						.into_option()
-						.ok_or("Expected provided supply_type for new created token")?,
-					available_supply: amount.clone(),
-					balance: amount,
-				};
-
+				arguments = self.create_curve_arguments(supply_type, amount)?;
 				accepted_payment = payment
 					.into_option()
 					.ok_or("Expected provided accepted_payment for new created token")?;
@@ -182,6 +169,19 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		Ok(())
 	}
 
+	fn create_curve_arguments(
+		&self,
+		#[var_args] supply_type: OptionalArg<SupplyType<Self::BigUint>>,
+		amount: Self::BigUint,
+	) -> SCResult<CurveArguments<Self::BigUint>> {
+		Ok(CurveArguments {
+			supply_type: supply_type
+				.into_option()
+				.ok_or("Expected provided supply_type for new created token")?,
+			available_supply: amount.clone(),
+			balance: amount,
+		})
+	}
 	fn get_current_nonce(&self, identifier: &TokenIdentifier) -> u64 {
 		self.blockchain()
 			.get_current_esdt_nft_nonce(&self.blockchain().get_sc_address(), identifier)
