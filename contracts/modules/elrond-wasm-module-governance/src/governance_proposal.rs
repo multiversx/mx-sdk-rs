@@ -17,9 +17,6 @@ pub enum GovernanceProposalStatus {
 	Defeated,
 	Succeeded,
 	Queued,
-	Expired,
-	Executed,
-	Canceled,
 }
 
 #[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode)]
