@@ -38,10 +38,81 @@ pub trait GovernanceConfigurablePropertiesModule {
 		Ok(())
 	}
 
-	fn try_change_quorum(&self, new_quorum: Self::BigUint) -> SCResult<()> {
-		require!(new_quorum > 0, "Quorum can't be set to 0");
+	// endpoints - these can only be called by the SC itself.
+	// i.e. only by proposing and executing an action with the SC as dest and the respectiv func name
 
-		self.quorum().set(&new_quorum);
+	#[endpoint(changeQuorum)]
+	fn change_quorum(&self, new_value: Self::BigUint) -> SCResult<()> {
+		self.require_caller_self()?;
+
+		self.try_change_quorum(new_value)?;
+
+		Ok(())
+	}
+
+	#[endpoint(changeMinTokenBalanceForProposing)]
+	fn change_min_token_balance_for_proposing(&self, new_value: Self::BigUint) -> SCResult<()> {
+		self.require_caller_self()?;
+
+		self.try_change_min_token_balance_for_proposing(new_value)?;
+
+		Ok(())
+	}
+
+	#[endpoint(changeMaxActionsPerProposal)]
+	fn change_max_actions_per_proposal(&self, new_value: usize) -> SCResult<()> {
+		self.require_caller_self()?;
+
+		self.try_change_max_actions_per_proposal(new_value)?;
+
+		Ok(())
+	}
+
+	#[endpoint(changeVotingDelayInBlocks)]
+	fn change_voting_delay_in_blocks(&self, new_value: u64) -> SCResult<()> {
+		self.require_caller_self()?;
+
+		self.try_change_voting_delay_in_blocks(new_value)?;
+
+		Ok(())
+	}
+
+	#[endpoint(changeVotingPeriodInBlocks)]
+	fn change_voting_period_in_blocks(&self, new_value: u64) -> SCResult<()> {
+		self.require_caller_self()?;
+
+		self.try_change_voting_period_in_blocks(new_value)?;
+
+		Ok(())
+	}
+
+	#[endpoint(changeLockTimeAfterVotingEndsInBlocks)]
+	fn change_lock_time_after_voting_ends_in_blocks(&self, new_value: u64) -> SCResult<()> {
+		self.require_caller_self()?;
+
+		self.try_change_lock_time_after_voting_ends_in_blocks(new_value)?;
+
+		Ok(())
+	}
+
+	// private
+
+	fn require_caller_self(&self) -> SCResult<()> {
+		let caller = self.blockchain().get_caller();
+		let sc_address = self.blockchain().get_sc_address();
+
+		require!(
+			caller == sc_address,
+			"Only the SC itself may call this function"
+		);
+
+		Ok(())
+	}
+
+	fn try_change_quorum(&self, new_value: Self::BigUint) -> SCResult<()> {
+		require!(new_value > 0, "Quorum can't be set to 0");
+
+		self.quorum().set(&new_value);
 
 		Ok(())
 	}

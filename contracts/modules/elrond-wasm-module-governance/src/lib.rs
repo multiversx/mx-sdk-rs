@@ -121,6 +121,48 @@ pub trait GovernanceModule:
 		Ok(())
 	}
 
+	#[endpoint]
+	fn queue(&self, proposal_id: usize) -> SCResult<()> {
+		require!(
+			self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Succeeded,
+			"Can only queue succeeded proposals"
+		);
+
+		let current_block = self.blockchain().get_block_nonce();
+		self.proposal_queue_block(proposal_id).set(&current_block);
+
+		Ok(())
+	}
+
+	#[endpoint]
+	fn execute(&self, _proposal_id: usize) -> SCResult<()> {
+		Ok(())
+	}
+
+	#[endpoint]
+	fn cancel(&self, proposal_id: usize) -> SCResult<()> {
+		let status = self.get_proposal_status(proposal_id);
+		match status {
+			GovernanceProposalStatus::None => {
+				return sc_error!("Proposal does not exist");
+			},
+			GovernanceProposalStatus::Defeated => {},
+			_ => {
+				let proposal = self.proposals().get(proposal_id);
+				let caller = self.blockchain().get_caller();
+
+				require!(
+					caller == proposal.proposer,
+					"Only original proposer may cancel a non-defeated proposal"
+				);
+			},
+		}
+
+		self.clear_proposal(proposal_id);
+
+		Ok(())
+	}
+
 	// views
 
 	#[view(getProposalStatus)]
@@ -189,6 +231,17 @@ pub trait GovernanceModule:
 			self.blockchain()
 				.get_esdt_balance(&self.blockchain().get_sc_address(), token_id, 0)
 		}
+	}
+
+	/// specific votes/downvotes are not cleared,
+	/// as they're used for reclaim tokens logic and cleared one by one
+	fn clear_proposal(&self, proposal_id: usize) {
+		self.proposals().clear_entry(proposal_id);
+		self.proposal_start_block(proposal_id).clear();
+		self.proposal_queue_block(proposal_id).clear();
+
+		self.total_votes(proposal_id).clear();
+		self.total_downvotes(proposal_id).clear();
 	}
 
 	// storage - general
