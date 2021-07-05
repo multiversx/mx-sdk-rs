@@ -1,0 +1,152 @@
+{
+    "name": "sft with 3 nonces + diverse curve functions",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "5,000,000,000,000,000,000",
+                    "storage": {}
+                },
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFSFT-24680": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:token_type": "u8:2"
+                    },
+                    "code": "file:../output/bonding-curve.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:token_type": "u8:2"
+                    },
+                    "code": "file:../output/bonding-curve.wasm"
+                },
+                "+": {}
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:bonding-curve",
+                "value": "0",
+                "function": "nftCreate",
+                "arguments": [
+                    "str:MFSFT-24680",
+                    "100",
+                    "str:nft-create-name",
+                    "0",
+                    "str:nft-create-hash-----------------",
+                    "0x808080",
+                    "str:nft-create-uri",
+                    "u8:1",
+                    "str:EGLD"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:10|biguint:10|nested:str:EGLD",
+                        "str:token_type": "u8:2"
+                    },
+                    "code": "file:../output/bonding-curve.wasm"
+                },
+                "+": {}
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:bonding-curve",
+                "value": "0",
+                "function": "nftCreate",
+                "arguments": [
+                    "str:MFSFT-24680",
+                    "10",
+                    "str:nft-create-name",
+                    "0",
+                    "str:nft-create-hash-----------------",
+                    "0x808080",
+                    "str:nft-create-uri",
+                    "u8:0|biguint:20",
+                    "str:EGLD"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "2",
+                    "balance": "5,000,000,000,000,000,000",
+                    "storage": {}
+                },
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:10|biguint:10|nested:str:EGLD",
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:2|u8:0|biguint:20|biguint:101|biguint:100|biguint:100|nested:str:EGLD",
+                        "str:token_type": "u8:2"
+                    },
+                    "code": "file:../output/bonding-curve.wasm"
+                }
+            }
+        }
+    ]
+}

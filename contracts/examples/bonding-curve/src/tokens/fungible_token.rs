@@ -1,16 +1,19 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use crate::common_methods::CallbackProxy;
 use crate::{
-	events,
-	function_selector::FunctionSelector,
-	storage,
-	utils::structs::{BondingCurve, CurveArguments, SupplyType, Token},
+	events, storage,
+	utils::structs::{SupplyType, Token},
 };
+
+use super::common_methods;
 
 const TOKEN_NUM_DECIMALS: usize = 18;
 #[elrond_wasm_derive::module]
-pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
+pub trait FungibleTokenModule:
+	storage::StorageModule + events::EventsModule + common_methods::CommonMethods
+{
 	#[payable("EGLD")]
 	#[allow(clippy::too_many_arguments)]
 	#[endpoint(ftIssue)]
@@ -46,51 +49,12 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 				},
 			)
 			.async_call()
-			.with_callback(self.callbacks().issue_callback(
+			.with_callback(self.callbacks().ft_issue_callback(
 				caller,
 				initial_supply,
 				supply_type,
 				accepted_payment,
 			)))
-	}
-
-	#[callback]
-	#[allow(clippy::too_many_arguments)]
-	fn issue_callback(
-		&self,
-		caller: Address,
-		initial_supply: Self::BigUint,
-		supply_type: SupplyType<Self::BigUint>,
-		accepted_payment: TokenIdentifier,
-		#[payment_token] token_identifier: TokenIdentifier,
-		#[payment] amount: Self::BigUint,
-		#[call_result] result: AsyncCallResult<()>,
-	) -> SCResult<()> {
-		match result {
-			AsyncCallResult::Ok(()) => {
-				self.bonding_curve(&Token {
-					identifier: token_identifier,
-					nonce: 0u64,
-				})
-				.set(&BondingCurve {
-					curve: FunctionSelector::None,
-					arguments: CurveArguments {
-						supply_type,
-						available_supply: initial_supply.clone(),
-						balance: initial_supply,
-					},
-					accepted_payment,
-				});
-				Ok(())
-			},
-			AsyncCallResult::Err(message) => {
-				if token_identifier.is_egld() && amount > 0 {
-					self.send().direct_egld(&caller, &amount, &[]);
-				}
-
-				Err(message.err_msg.into())
-			},
-		}
 	}
 
 	#[endpoint(ftMint)]
@@ -110,58 +74,28 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 				.is_empty(),
 			"Token not issued"
 		);
-
-		let bonding_curve = self
-			.bonding_curve(&Token {
+		self.check_supply(
+			&Token {
 				identifier: token_identifier.clone(),
 				nonce: 0u64,
-			})
-			.get();
-
-		if bonding_curve.arguments.supply_type != SupplyType::Unlimited {
-			require!(
-				bonding_curve.arguments.available_supply
-					< bonding_curve.arguments.supply_type.get_limit()?,
-				"Maximum supply limit reached!"
-			);
-
-			require!(
-				bonding_curve.arguments.available_supply + amount.clone()
-					<= bonding_curve.arguments.supply_type.get_limit()?,
-				"Minting will exceed the maximum supply limit!"
-			);
-		}
+			},
+			&amount,
+		)?;
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.mint(&token_identifier, &amount)
 			.async_call()
 			.with_callback(self.callbacks().mint_callback(token_identifier, &amount)))
 	}
 
-	#[callback]
-	fn mint_callback(
-		&self,
-		token_identifier: TokenIdentifier,
-		amount: &Self::BigUint,
-		#[call_result] result: AsyncCallResult<()>,
-	) -> SCResult<()> {
-		match result {
-			AsyncCallResult::Ok(()) => {
-				self.bonding_curve(&Token {
-					identifier: token_identifier,
-					nonce: 0u64,
-				})
-				.update(|bonding_curve| {
-					bonding_curve.arguments.available_supply += amount;
-					bonding_curve.arguments.balance += amount;
-				});
-				Ok(())
-			},
-			AsyncCallResult::Err(message) => Err(message.err_msg.into()),
-		}
-	}
-
 	#[endpoint(ftLocalMint)]
-	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
+	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) -> SCResult<()> {
+		self.check_supply(
+			&Token {
+				identifier: token_identifier.clone(),
+				nonce: 0u64,
+			},
+			&amount,
+		)?;
 		self.send().esdt_local_mint(&token_identifier, &amount);
 		self.bonding_curve(&Token {
 			identifier: token_identifier,
@@ -171,6 +105,7 @@ pub trait FungibleTokenModule: storage::StorageModule + events::EventsModule {
 			bonding_curve.arguments.available_supply += &amount;
 			bonding_curve.arguments.balance += &amount;
 		});
+		Ok(())
 	}
 
 	#[endpoint(ftLocalBurn)]

@@ -1,9 +1,9 @@
 {
-    "name": "ft with price given by linear function",
+    "name": "burn ft",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "ft-linear-function.scen.json"
+            "path": "ft-linear-mint.scen.json"
         },
         {
             "step": "scCall",
@@ -11,10 +11,10 @@
                 "from": "address:owner",
                 "to": "sc:bonding-curve",
                 "value": "0",
-                "function": "ftLocalMint",
+                "function": "ftLocalBurn",
                 "arguments": [
                     "str:MFFT-12345",
-                    "400"
+                    "100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -29,7 +29,7 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "2",
+                    "nonce": "4",
                     "balance": "5,000,000,000,000,000,000",
                     "storage": {}
                 },
@@ -42,11 +42,11 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:1|biguint:1000|biguint:400|biguint:400|nested:str:EGLD"
+                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:0|biguint:1000|biguint:300|biguint:300|nested:str:EGLD",
+                        "str:token_type": "u8:0"
                     },
                     "code": "file:../output/bonding-curve.wasm"
-                },
-                "+": {}
+                }
             }
         }
     ]
