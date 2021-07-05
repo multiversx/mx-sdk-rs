@@ -34,6 +34,9 @@ pub trait NonFungibleTokenModule:
 				},
 			)
 			.async_call()
-			.with_callback(self.callbacks().nft_issue_callback(caller))
+			.with_callback(
+				self.callbacks()
+					.nft_issue_callback(caller, EsdtTokenType::NonFungible),
+			)
 	}
 }

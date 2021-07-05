@@ -32,7 +32,7 @@
                 "contractCode": "file:../output/bonding-curve.wasm",
                 "value": "0",
                 "arguments": [],
-                "gasLimit": "11,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {

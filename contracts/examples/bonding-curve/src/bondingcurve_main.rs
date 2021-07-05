@@ -64,9 +64,19 @@ pub trait BondingCurveContract:
 		}
 	}
 
-	fn set_bonding_curve(&self, token: Token, function: FunctionSelector<Self::BigUint>) {
+	#[endpoint(setBondingCurve)]
+	fn set_bonding_curve(
+		&self,
+		token: Token,
+		function: FunctionSelector<Self::BigUint>,
+	) -> SCResult<()> {
+		require!(
+			!self.bonding_curve(&token).is_empty(),
+			"Token is not issued yet!"
+		);
 		self.bonding_curve(&token)
 			.update(|bonding_curve| bonding_curve.curve = function);
+		Ok(())
 	}
 
 	#[view]
