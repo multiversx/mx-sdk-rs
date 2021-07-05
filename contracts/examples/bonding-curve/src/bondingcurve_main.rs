@@ -138,37 +138,6 @@ pub trait BondingCurveContract:
 	}
 
 	#[payable("*")]
-	#[endpoint(buyToken)]
-	fn buy_token(
-		&self,
-		#[payment_amount] buy_amount: Self::BigUint,
-		#[payment_token] identifier: TokenIdentifier,
-		#[payment_nonce] nonce: u64,
-	) -> SCResult<()> {
-		let token = Token { identifier, nonce };
-		self.check_buy_requirements(&token, &buy_amount)?;
-
-		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
-			let price = self.buy(
-				&bonding_curve.curve,
-				buy_amount.clone(),
-				bonding_curve.arguments.clone(),
-			);
-			bonding_curve.arguments.balance += buy_amount;
-			price
-		})?;
-
-		let caller = self.blockchain().get_caller();
-
-		self.send()
-			.direct(&caller, &token.identifier, &calculated_price, b"buying");
-
-		self.buy_token_event(&caller, &calculated_price);
-
-		Ok(())
-	}
-
-	#[payable("*")]
 	#[endpoint(sellToken)]
 	fn sell_token(
 		&self,
@@ -177,7 +146,7 @@ pub trait BondingCurveContract:
 		#[payment_nonce] nonce: u64,
 	) -> SCResult<()> {
 		let token = Token { identifier, nonce };
-		self.check_sell_requirements(&token, &sell_amount)?;
+		self.check_buy_requirements(&token, &sell_amount)?;
 
 		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
 			let price = self.sell(
@@ -185,7 +154,7 @@ pub trait BondingCurveContract:
 				sell_amount.clone(),
 				bonding_curve.arguments.clone(),
 			);
-			bonding_curve.arguments.balance -= sell_amount;
+			bonding_curve.arguments.balance += sell_amount;
 			price
 		})?;
 
@@ -195,10 +164,41 @@ pub trait BondingCurveContract:
 			.direct(&caller, &token.identifier, &calculated_price, b"selling");
 
 		self.sell_token_event(&caller, &calculated_price);
+
 		Ok(())
 	}
 
-	fn sell(
+	#[payable("*")]
+	#[endpoint(buyToken)]
+	fn buy_token(
+		&self,
+		#[payment_amount] buy_amount: Self::BigUint,
+		#[payment_token] identifier: TokenIdentifier,
+		#[payment_nonce] nonce: u64,
+	) -> SCResult<()> {
+		let token = Token { identifier, nonce };
+		self.check_sell_requirements(&token, &buy_amount)?;
+
+		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
+			let price = self.buy(
+				&bonding_curve.curve,
+				buy_amount.clone(),
+				bonding_curve.arguments.clone(),
+			);
+			bonding_curve.arguments.balance -= buy_amount;
+			price
+		})?;
+
+		let caller = self.blockchain().get_caller();
+
+		self.send()
+			.direct(&caller, &token.identifier, &calculated_price, b"buying");
+
+		self.buy_token_event(&caller, &calculated_price);
+		Ok(())
+	}
+
+	fn buy(
 		&self,
 		function_selector: &FunctionSelector<Self::BigUint>,
 		amount: Self::BigUint,
@@ -208,7 +208,7 @@ pub trait BondingCurveContract:
 		function_selector.calculate_price(&token_start, &amount, &arguments)
 	}
 
-	fn buy(
+	fn sell(
 		&self,
 		function_selector: &FunctionSelector<Self::BigUint>,
 		amount: Self::BigUint,

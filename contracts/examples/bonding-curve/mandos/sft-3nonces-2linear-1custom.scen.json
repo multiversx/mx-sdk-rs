@@ -23,7 +23,7 @@
                         }
                     },
                     "storage": {
-                        "str:token_type": "u8:2"
+                        "str:token_type|nested:str:MFSFT-24680": "u8:2"
                     },
                     "code": "file:../output/bonding-curve.wasm",
                     "owner": "address:owner"
@@ -37,7 +37,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:token_type": "u8:2"
+                        "str:token_type|nested:str:MFSFT-24680": "u8:2"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -88,12 +88,18 @@
                                     "balance": "100",
                                     "creator": "sc:bonding-curve"
                                 }
-                            ]
+                            ],
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "1"
                         }
                     },
                     "storage": {
-                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:100|biguint:100|nested:str:EGLD",
-                        "str:token_type": "u8:2"
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:2|u8:1|biguint:100|biguint:100|nested:str:EGLD",
+                        "str:token_type|nested:str:MFSFT-24680": "u8:2"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -146,10 +152,27 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:MFSFT-24680": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "100",
+                                    "creator": "sc:bonding-curve"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "2"
+                        }
+                    },
                     "storage": {
-                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:100|biguint:100|nested:str:EGLD",
-                        "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:2|u8:0|biguint:20|biguint:10|biguint:10|nested:str:EGLD",
-                        "str:token_type": "u8:2"
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:2|u8:1|biguint:100|biguint:100|nested:str:EGLD",
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:2": "u8:2|u8:0|biguint:20|biguint:10|biguint:10|nested:str:EGLD",
+                        "str:token_type|nested:str:MFSFT-24680": "u8:2"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 }
