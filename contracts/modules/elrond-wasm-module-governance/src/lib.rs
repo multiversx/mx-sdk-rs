@@ -125,11 +125,13 @@ pub trait GovernanceModule:
 
 	#[view(getProposalStatus)]
 	fn get_proposal_status(&self, proposal_id: usize) -> GovernanceProposalStatus {
-		if !self.is_valid_proposal_id(proposal_id) {
+		if !self.is_valid_proposal_id(proposal_id) || self.proposals().item_is_empty(proposal_id) {
 			return GovernanceProposalStatus::None;
 		}
-		if self.proposals().item_is_empty(proposal_id) {
-			return GovernanceProposalStatus::Canceled;
+
+		let queue_block = self.proposal_queue_block(proposal_id).get();
+		if queue_block > 0 {
+			return GovernanceProposalStatus::Queued;
 		}
 
 		let current_block = self.blockchain().get_block_nonce();
@@ -143,10 +145,10 @@ pub trait GovernanceModule:
 		if current_block < voting_start {
 			return GovernanceProposalStatus::Pending;
 		}
-		if current_block >= voting_start && current_block <= voting_end {
+		if current_block >= voting_start && current_block < voting_end {
 			return GovernanceProposalStatus::Active;
 		}
-		
+
 		let total_votes = self.total_votes(proposal_id).get();
 		let total_downvotes = self.total_downvotes(proposal_id).get();
 		let quorum = self.quorum().get();
@@ -156,8 +158,6 @@ pub trait GovernanceModule:
 		} else {
 			return GovernanceProposalStatus::Defeated;
 		}
-
-		// TODO: Other statuses
 	}
 
 	// private
@@ -199,6 +199,9 @@ pub trait GovernanceModule:
 	/// Not stored under "proposals", as that would require deserializing the whole struct
 	#[storage_mapper("governance:proposalStartBlock")]
 	fn proposal_start_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
+
+	#[storage_mapper("governance:proposalQueueBlock")]
+	fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
 
 	#[storage_mapper("governance:votes")]
 	fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, Self::BigUint>;
