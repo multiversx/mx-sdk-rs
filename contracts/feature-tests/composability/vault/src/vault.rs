@@ -91,13 +91,9 @@ pub trait Vault {
 
 		if token.is_egld() {
 			self.send().direct_egld(&caller, &amount, data);
-		} else if nonce == 0 {
-			self.send()
-				.transfer_esdt_via_async_call(&caller, &token, &amount, data);
 		} else {
-			let from = self.blockchain().get_sc_address();
 			self.send()
-				.transfer_esdt_nft_via_async_call(&from, &caller, &token, nonce, &amount, data);
+				.transfer_esdt_via_async_call(&caller, &token, nonce, &amount, data);
 		}
 	}
 

@@ -262,7 +262,8 @@ pub trait Lottery {
 			// The tokens will simply remain locked forever
 			let roles = self.blockchain().get_esdt_local_roles(&info.token_name);
 			if roles.contains(&EsdtLocalRole::Burn) {
-				self.send().esdt_local_burn(&info.token_name, &burn_amount);
+				self.send()
+					.esdt_local_burn(&info.token_name, 0, &burn_amount);
 			}
 
 			info.prize_pool -= burn_amount;
@@ -293,6 +294,7 @@ pub trait Lottery {
 			self.send().direct(
 				&winner_address,
 				&info.token_name,
+				0,
 				&prize,
 				b"You won the lottery! Congratulations!",
 			);
@@ -304,6 +306,7 @@ pub trait Lottery {
 		self.send().direct(
 			&first_place_winner,
 			&info.token_name,
+			0,
 			&info.prize_pool,
 			b"You won the lottery, 1st place! Congratulations!",
 		);
