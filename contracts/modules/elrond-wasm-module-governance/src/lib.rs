@@ -33,6 +33,7 @@ pub trait GovernanceModule:
 			payment_amount >= self.min_token_balance_for_proposing().get(),
 			"Not enough tokens for proposing action"
 		);
+		require!(!actions.is_empty(), "Proposal has no actions");
 		require!(
 			actions.len() <= self.max_actions_per_proposal().get(),
 			"Exceeded max actions per proposal"
@@ -135,14 +136,33 @@ pub trait GovernanceModule:
 	}
 
 	#[endpoint]
-	fn execute(&self, _proposal_id: usize) -> SCResult<()> {
+	fn execute(&self, proposal_id: usize) -> SCResult<()> {
+		require!(
+			self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Queued,
+			"Can only execute queued proposals"
+		);
+
+		let current_block = self.blockchain().get_block_nonce();
+		let lock_blocks = self.lock_time_after_voting_ends_in_blocks().get();
+
+		let lock_start = self.proposal_queue_block(proposal_id).get();
+		let lock_end = lock_start + lock_blocks;
+
+		require!(
+			current_block >= lock_end,
+			"Proposal is in timelock status. Try again later"
+		);
+
+		let _proposal = self.proposals().get(proposal_id);
+
+		self.clear_proposal(proposal_id);
+
 		Ok(())
 	}
 
 	#[endpoint]
 	fn cancel(&self, proposal_id: usize) -> SCResult<()> {
-		let status = self.get_proposal_status(proposal_id);
-		match status {
+		match self.get_proposal_status(proposal_id) {
 			GovernanceProposalStatus::None => {
 				return sc_error!("Proposal does not exist");
 			},
@@ -167,7 +187,7 @@ pub trait GovernanceModule:
 
 	#[view(getProposalStatus)]
 	fn get_proposal_status(&self, proposal_id: usize) -> GovernanceProposalStatus {
-		if !self.is_valid_proposal_id(proposal_id) || self.proposals().item_is_empty(proposal_id) {
+		if !self.proposal_exists(proposal_id) {
 			return GovernanceProposalStatus::None;
 		}
 
@@ -202,6 +222,43 @@ pub trait GovernanceModule:
 		}
 	}
 
+	#[view(getProposer)]
+	fn get_proposer(&self, proposal_id: usize) -> OptionalArg<Address> {
+		if !self.proposal_exists(proposal_id) {
+			OptionalArg::None
+		} else {
+			OptionalArg::Some(self.proposals().get(proposal_id).proposer)
+		}
+	}
+
+	#[view(getProposalDescription)]
+	fn get_proposal_description(&self, proposal_id: usize) -> OptionalArg<BoxedBytes> {
+		if !self.proposal_exists(proposal_id) {
+			OptionalArg::None
+		} else {
+			OptionalArg::Some(self.proposals().get(proposal_id).description)
+		}
+	}
+
+	#[view]
+	fn get_proposal_actions(
+		&self,
+		proposal_id: usize,
+	) -> MultiResultVec<GovernanceActionAsMultiArg<Self::BigUint>> {
+		if !self.proposal_exists(proposal_id) {
+			return Vec::new().into();
+		}
+
+		let actions = self.proposals().get(proposal_id).actions;
+		let mut actions_as_multiarg = Vec::with_capacity(actions.len());
+
+		for action in actions {
+			actions_as_multiarg.push(action.into_multiarg());
+		}
+
+		actions_as_multiarg.into()
+	}
+
 	// private
 
 	fn require_payment_token_governance_token(&self) -> SCResult<()> {
@@ -222,6 +279,10 @@ pub trait GovernanceModule:
 
 	fn is_valid_proposal_id(&self, proposal_id: usize) -> bool {
 		proposal_id >= 1 && proposal_id <= self.proposals().len()
+	}
+
+	fn proposal_exists(&self, proposal_id: usize) -> bool {
+		self.is_valid_proposal_id(proposal_id) && !self.proposals().item_is_empty(proposal_id)
 	}
 
 	fn get_sc_balance(&self, token_id: &TokenIdentifier) -> Self::BigUint {
