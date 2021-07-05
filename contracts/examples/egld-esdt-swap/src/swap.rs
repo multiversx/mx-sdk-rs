@@ -180,7 +180,10 @@ pub trait EgldEsdtSwap {
 		require!(wrapped_egld_payment > 0, "Must pay more than 0 tokens!");
 		// this should never happen, but we'll check anyway
 		require!(
-			wrapped_egld_payment <= self.blockchain().get_sc_balance(),
+			wrapped_egld_payment
+				<= self
+					.blockchain()
+					.get_sc_balance(&TokenIdentifier::egld(), 0),
 			"Contract does not have enough funds"
 		);
 
@@ -199,7 +202,7 @@ pub trait EgldEsdtSwap {
 
 	#[view(getLockedEgldBalance)]
 	fn get_locked_egld_balance(&self) -> Self::BigUint {
-		self.blockchain().get_sc_balance()
+		self.blockchain().get_sc_balance(&TokenIdentifier::egld(), 0)
 	}
 
 	// storage
