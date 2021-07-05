@@ -147,6 +147,7 @@ pub trait EgldEsdtSwap {
 		let _ = self.send().direct(
 			&caller,
 			&self.wrapped_egld_token_id().get(),
+			0,
 			&payment,
 			b"wrapping",
 		);
