@@ -2,6 +2,10 @@
     "name": "ft with price given by linear function",
     "steps": [
         {
+            "step": "externalSteps",
+            "path": "deploy.scen.json"
+        },
+        {
             "step": "setState",
             "accounts": {
                 "address:owner": {
