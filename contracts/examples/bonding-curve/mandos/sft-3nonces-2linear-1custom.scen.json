@@ -2,23 +2,19 @@
     "name": "sft with 3 nonces + diverse curve functions",
     "steps": [
         {
+            "step": "externalSteps",
+            "path": "deploy.scen.json"
+        },
+        {
             "step": "setState",
             "accounts": {
-                "address:owner": {
-                    "nonce": "1",
-                    "balance": "5,000,000,000,000,000,000",
-                    "storage": {}
-                },
-                "address:user": {
-                    "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
-                },
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:MFSFT-24680": {
+                            "balance": "0",
+                            "lastNonce": "0",
                             "roles": [
                                 "ESDTRoleNFTCreate",
                                 "ESDTRoleNFTAddQuantity",
@@ -84,8 +80,19 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:MFSFT-24680": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "100",
+                                    "creator": "sc:bonding-curve"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {
-                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:10|biguint:10|nested:str:EGLD",
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:100|biguint:100|nested:str:EGLD",
                         "str:token_type": "u8:2"
                     },
                     "code": "file:../output/bonding-curve.wasm"
@@ -116,7 +123,7 @@
             },
             "expect": {
                 "out": [
-                    "1"
+                    "2"
                 ],
                 "status": "0",
                 "gas": "*",
@@ -127,7 +134,7 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "5,000,000,000,000,000,000",
                     "storage": {}
                 },
@@ -140,8 +147,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:10|biguint:10|nested:str:EGLD",
-                        "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:2|u8:0|biguint:20|biguint:101|biguint:100|biguint:100|nested:str:EGLD",
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:0": "u8:2|u8:1|biguint:100|biguint:100|nested:str:EGLD",
+                        "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:2|u8:0|biguint:20|biguint:10|biguint:10|nested:str:EGLD",
                         "str:token_type": "u8:2"
                     },
                     "code": "file:../output/bonding-curve.wasm"

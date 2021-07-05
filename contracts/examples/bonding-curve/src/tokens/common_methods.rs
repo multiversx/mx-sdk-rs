@@ -107,6 +107,7 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 				nonce: self.get_current_nonce(&identifier),
 				identifier,
 			};
+			require!(token.nonce != 0, "Nonce should not be 0!");
 			arguments = CurveArguments {
 				supply_type: supply_type
 					.into_option()

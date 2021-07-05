@@ -2,6 +2,10 @@
     "name": "nft with price given by custom example function",
     "steps": [
         {
+            "step": "externalSteps",
+            "path": "deploy.scen.json"
+        },
+        {
             "step": "setState",
             "accounts": {
                 "address:owner": {
@@ -19,6 +23,8 @@
                     "balance": "0",
                     "esdt": {
                         "str:MFNFT-67890": {
+                            "balance": "0",
+                            "lastNonce": "0",
                             "roles": [
                                 "ESDTRoleNFTCreate",
                                 "ESDTRoleNFTAddQuantity",
