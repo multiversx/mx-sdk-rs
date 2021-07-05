@@ -28,6 +28,19 @@ pub struct GovernanceAction<BigUint: BigUintApi> {
 	pub arguments: Vec<BoxedBytes>,
 }
 
+impl<BigUint: BigUintApi> GovernanceAction<BigUint> {
+	pub fn into_multiarg(self) -> GovernanceActionAsMultiArg<BigUint> {
+		(
+			self.dest_address,
+			self.token_id,
+			self.amount,
+			self.function_name,
+			self.arguments.into(),
+		)
+			.into()
+	}
+}
+
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct GovernanceProposal<BigUint: BigUintApi> {
 	pub proposer: Address,
