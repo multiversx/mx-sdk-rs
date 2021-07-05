@@ -35,15 +35,15 @@
                 },
                 "address:user": {
                     "nonce": "0",
-                    "balance": "1,000,000",
+                    "balance": "100",
                     "storage": {}
                 },
                 "sc:bonding-curve": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "400",
                     "storage": {
                         "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:0|biguint:1000|biguint:400|biguint:400|nested:str:EGLD",
-                        "str:token_type": "u8:0"
+                        "str:token_type|nested:str:MFFT-12345": "u8:0"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 }
