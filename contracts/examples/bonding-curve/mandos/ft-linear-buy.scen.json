@@ -1,0 +1,68 @@
+{
+    "name": "buy fts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "ft-linear-burn.scen.json"
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:bonding-curve",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:WEGLD-abcdef",
+                    "nonce": "0",
+                    "value": "10"
+                },
+                "function": "buyToken",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "logs": [
+                    {
+                        "address": "sc:bonding-curve",
+                        "identifier": "str:buy_token",
+                        "topics": [
+                            "address:user"
+                        ],
+                        "data": "10"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "5",
+                    "balance": "5,000,000,000,000,000,000",
+                    "storage": {}
+                },
+                "address:user": {
+                    "nonce": "1",
+                    "balance": "100",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "10"
+                    }
+                },
+                "sc:bonding-curve": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:0|biguint:1000|biguint:300|biguint:290|nested:str:EGLD",
+                        "str:token_type|nested:str:MFFT-12345": "u8:0"
+                    },
+                    "code": "file:../output/bonding-curve.wasm"
+                }
+            }
+        }
+    ]
+}
