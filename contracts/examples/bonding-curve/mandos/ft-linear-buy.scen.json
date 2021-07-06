@@ -12,8 +12,7 @@
                 "to": "sc:bonding-curve",
                 "value": "0",
                 "esdt": {
-                    "tokenIdentifier": "str:WEGLD-abcdef",
-                    "nonce": "0",
+                    "tokenIdentifier": "str:ESDT",
                     "value": "10"
                 },
                 "function": "buyToken",
@@ -43,14 +42,19 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "5",
-                    "balance": "5,000,000,000,000,000,000",
+                    "balance": "0",
                     "storage": {}
                 },
                 "address:user": {
                     "nonce": "1",
-                    "balance": "100",
+                    "balance": "0",
                     "esdt": {
-                        "str:WEGLD-abcdef": "10"
+                        "str:EGLD": {
+                            "balance": "179"
+                        },
+                        "str:MFFT-12345": {
+                            "balance": "10"
+                        }
                     }
                 },
                 "sc:bonding-curve": {

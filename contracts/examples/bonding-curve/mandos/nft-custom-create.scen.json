@@ -41,9 +41,19 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-67890": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "1"
+                        }
+                    },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890|u64:0": "u8:2|u8:0|biguint:3|biguint:1|biguint:1|nested:str:EGLD",
-                        "str:token_type|nested:str:MFNFT-67890": "u8:1"
+                        "str:token_type|nested:str:MFNFT-67890": "u8:0"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -76,9 +86,19 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-67890": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "1"
+                        }
+                    },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890|u64:0": "u8:1|biguint:1|u8:0|biguint:3|biguint:1|biguint:1|nested:str:EGLD",
-                        "str:token_type|nested:str:MFNFT-67890": "u8:1"
+                        "str:token_type|nested:str:MFNFT-67890": "u8:0"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -147,9 +167,19 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-67890": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "3"
+                        }
+                    },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890|u64:0": "u8:1|biguint:1|u8:0|biguint:3|biguint:3|biguint:3|nested:str:EGLD",
-                        "str:token_type|nested:str:MFNFT-67890": "u8:1"
+                        "str:token_type|nested:str:MFNFT-67890": "u8:0"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -198,9 +228,19 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-67890": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "3"
+                        }
+                    },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890|u64:0": "u8:1|biguint:1|u8:0|biguint:3|biguint:3|biguint:3|nested:str:EGLD",
-                        "str:token_type|nested:str:MFNFT-67890": "u8:1"
+                        "str:token_type|nested:str:MFNFT-67890": "u8:0"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 }
