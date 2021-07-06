@@ -65,7 +65,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:REC-TOKEN": "5"
+                        "str:REC-TOKEN": "2"
                     },
                     "storage": {
                         "str:call_counts|nested:str:accept_funds": "*"
@@ -76,7 +76,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:REC-TOKEN": "995"
+                        "str:REC-TOKEN": "998"
                     },
                     "storage": {},
                     "code": "file:../recursive-caller/output/recursive-caller.wasm"
