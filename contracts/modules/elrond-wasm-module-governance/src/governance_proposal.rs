@@ -1,13 +1,13 @@
 use elrond_wasm::{
 	api::BigUintApi,
-	types::{Address, BoxedBytes, MultiArg5, TokenIdentifier},
+	types::{Address, BoxedBytes, MultiArg6, TokenIdentifier},
 	Vec,
 };
 
 elrond_wasm::derive_imports!();
 
 pub type GovernanceActionAsMultiArg<BigUint> =
-	MultiArg5<Address, TokenIdentifier, BigUint, BoxedBytes, Vec<BoxedBytes>>;
+	MultiArg7<u64, Address, TokenIdentifier, u64, BigUint, BoxedBytes, Vec<BoxedBytes>>;
 
 #[derive(TypeAbi, TopEncode, TopDecode, PartialEq)]
 pub enum GovernanceProposalStatus {
@@ -21,8 +21,10 @@ pub enum GovernanceProposalStatus {
 
 #[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode)]
 pub struct GovernanceAction<BigUint: BigUintApi> {
+	pub gas_limit: u64,
 	pub dest_address: Address,
 	pub token_id: TokenIdentifier,
+	pub token_nonce: u64,
 	pub amount: BigUint,
 	pub function_name: BoxedBytes,
 	pub arguments: Vec<BoxedBytes>,
@@ -31,8 +33,10 @@ pub struct GovernanceAction<BigUint: BigUintApi> {
 impl<BigUint: BigUintApi> GovernanceAction<BigUint> {
 	pub fn into_multiarg(self) -> GovernanceActionAsMultiArg<BigUint> {
 		(
+			self.gas_limit,
 			self.dest_address,
 			self.token_id,
+			self.token_nonce,
 			self.amount,
 			self.function_name,
 			self.arguments.into(),

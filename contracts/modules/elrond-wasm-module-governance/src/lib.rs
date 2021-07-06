@@ -41,10 +41,13 @@ pub trait GovernanceModule:
 
 		let mut gov_actions = Vec::with_capacity(actions.len());
 		for action in actions.into_vec() {
-			let (dest_address, token_id, amount, function_name, arguments) = action.into_tuple();
+			let (gas_limit, dest_address, token_id, token_nonce, amount, function_name, arguments) =
+				action.into_tuple();
 			let gov_action = GovernanceAction {
+				gas_limit,
 				dest_address,
 				token_id,
+				token_nonce,
 				amount,
 				function_name,
 				arguments,
@@ -153,7 +156,36 @@ pub trait GovernanceModule:
 			"Proposal is in timelock status. Try again later"
 		);
 
-		let _proposal = self.proposals().get(proposal_id);
+		let total_gas_needed = self.total_gas_needed(&proposal.actions);
+		let gas_left = self.blockchain().get_gas_left();
+
+		// reserve double to account for the processing needed for each action, like argument serialization
+		require!(
+			gas_left >= total_gas_needed * 2,
+			"Not enough gas to execute all proposals"
+		);
+
+		let proposal = self.proposals().get(proposal_id);
+		for action in proposal.actions {
+			let mut contract_call = ContractCall::<Self::SendApi, ()>::new(
+				self.send(),
+				action.dest_address,
+				action.function_name,
+			)
+			.with_gas_limit(action.gas_limit);
+
+			if action.amount > 0 {
+				contract_call = contract_call
+					.with_token_transfer(action.token_id, action.amount)
+					.with_nft_nonce(action.token_nonce);
+			}
+
+			for arg in action.arguments {
+				contract_call.push_argument_raw_bytes(arg.as_slice());
+			}
+
+			contract_call.transfer_execute();
+		}
 
 		self.clear_proposal(proposal_id);
 
@@ -283,6 +315,15 @@ pub trait GovernanceModule:
 
 	fn proposal_exists(&self, proposal_id: usize) -> bool {
 		self.is_valid_proposal_id(proposal_id) && !self.proposals().item_is_empty(proposal_id)
+	}
+
+	fn total_gas_needed(&self, actions: &[GovernanceAction<Self::BigUint>]) -> u64 {
+		let mut total = 0;
+		for action in actions {
+			total += action.gas_limit;
+		}
+
+		total
 	}
 
 	fn get_sc_balance(&self, token_id: &TokenIdentifier) -> Self::BigUint {
