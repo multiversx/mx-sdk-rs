@@ -1,0 +1,55 @@
+{
+    "name": "init",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "storage": {}
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:governance"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../../output/use-module.wasm",
+                "arguments": [],
+                "gasLimit": "6,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {}
+                },
+                "sc:governance": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": "file:../../output/use-module.wasm"
+                }
+            }
+        }
+    ]
+}
