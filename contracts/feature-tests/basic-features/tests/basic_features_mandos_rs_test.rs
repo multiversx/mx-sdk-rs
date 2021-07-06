@@ -11,6 +11,16 @@ fn contract_map() -> ContractMap<TxContext> {
 }
 
 #[test]
+fn big_int_to_i64_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/big_int_to_i64.scen.json", &contract_map());
+}
+
+#[test]
+fn big_uint_to_u64_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/big_uint_to_u64.scen.json", &contract_map());
+}
+
+#[test]
 fn block_info_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/block_info.scen.json", &contract_map());
 }

@@ -20,6 +20,9 @@ extern "C" {
 	fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
 	fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
 
+	fn bigIntIsInt64(reference: i32) -> i32; // TODO: use unsigned casting to small int
+	fn bigIntGetInt64(reference: i32) -> i64; // TODO: use unsigned casting to small int
+
 	fn bigIntAdd(dest: i32, x: i32, y: i32);
 	fn bigIntSub(dest: i32, x: i32, y: i32);
 	fn bigIntMul(dest: i32, x: i32, y: i32);
@@ -432,6 +435,17 @@ impl BigUintApi for ArwenBigUint {
 
 	fn log2(&self) -> u32 {
 		unsafe { bigIntLog2(self.handle) as u32 }
+	}
+	/// TODO: use unsigned casting to small int
+	fn to_u64(&self) -> Option<u64> {
+		unsafe {
+			let is_i64_result = bigIntIsInt64(self.handle);
+			if is_i64_result > 0 {
+				Some(bigIntGetInt64(self.handle) as u64)
+			} else {
+				None
+			}
+		}
 	}
 }
 

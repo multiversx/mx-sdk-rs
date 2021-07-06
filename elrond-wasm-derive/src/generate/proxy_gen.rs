@@ -95,6 +95,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 
 				let endpoint_name_literal = byte_str_slice_literal(endpoint_name.as_bytes());
 				let sig = quote! {
+					#[allow(clippy::too_many_arguments)]
 					#msig {
 						let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
 							self.into_fields();

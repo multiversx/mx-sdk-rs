@@ -4,7 +4,7 @@
 pub struct MethodArgument {
 	pub pat: syn::Pat,
 	pub ty: syn::Type,
-	pub remaining_attributes: Vec<syn::Attribute>,
+	pub unprocessed_attributes: Vec<syn::Attribute>,
 	pub metadata: ArgMetadata,
 }
 
@@ -15,6 +15,17 @@ pub struct ArgMetadata {
 	pub var_args: bool,
 	pub callback_call_result: bool,
 	pub event_topic: bool,
+}
+
+impl Default for ArgMetadata {
+	fn default() -> Self {
+		ArgMetadata {
+			payment: ArgPaymentMetadata::NotPayment,
+			var_args: false,
+			callback_call_result: false,
+			event_topic: false,
+		}
+	}
 }
 
 #[derive(Clone, Debug)]

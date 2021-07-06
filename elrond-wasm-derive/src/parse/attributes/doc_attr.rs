@@ -51,17 +51,14 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
 		.collect()
 }
 
-/// Parses the `#[output_name]` attributes.
-pub fn find_output_names(m: &syn::TraitItemMethod) -> Vec<String> {
-	m.attrs
-		.iter()
-		.filter(|attr| {
-			if let Some(first_seg) = attr.path.segments.first() {
-				first_seg.ident == ATTR_OUTPUT_NAME
-			} else {
-				false
-			}
+pub struct OutputNameAttribute {
+	pub output_name: String,
+}
+
+impl OutputNameAttribute {
+	pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+		is_attr_one_string_arg(attr, ATTR_OUTPUT_NAME).map(|arg_str| OutputNameAttribute {
+			output_name: arg_str,
 		})
-		.map(attr_one_string_arg)
-		.collect()
+	}
 }

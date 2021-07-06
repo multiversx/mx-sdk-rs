@@ -73,4 +73,6 @@ pub trait BigUintApi:
 	fn pow(&self, exp: u32) -> Self;
 
 	fn log2(&self) -> u32;
+	/// Will return `None` if the number is too big to be converted.
+	fn to_u64(&self) -> Option<u64>;
 }

@@ -21,7 +21,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "0",
-                    "newAddress": "address:contract"
+                    "newAddress": "sc:contract"
                 }
             ]
         },
@@ -49,7 +49,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:owner",
-                "to": "address:contract",
+                "to": "sc:contract",
                 "value": "1000",
                 "function": "repeat",
                 "arguments": [
@@ -58,7 +58,7 @@
                     "1000",
                     "str:random_data"
                 ],
-                "gasLimit": "100,000,000",
+                "gasLimit": "100,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -84,7 +84,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:contract": {
+                "sc:contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
