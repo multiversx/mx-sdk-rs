@@ -107,11 +107,11 @@ pub trait BondingCurveContract:
 	#[view]
 	fn check_buy_requirements(
 		&self,
-		issued_token: &Token,
+		owned_token: &Token,
 		exchanging_token: &Token,
 		amount: &Self::BigUint,
 	) -> SCResult<()> {
-		let bonding_curve = self.bonding_curve(issued_token).get();
+		let bonding_curve = self.bonding_curve(owned_token).get();
 
 		require!(
 			bonding_curve.curve != FunctionSelector::None,
@@ -152,13 +152,13 @@ pub trait BondingCurveContract:
 		#[payment_token] offered_token: TokenIdentifier,
 		#[payment_nonce] nonce: u64,
 	) -> SCResult<()> {
-		let issued_token = Token {
+		let owned_token = Token {
 			identifier: offered_token,
 			nonce,
 		};
-		self.check_sell_requirements(&issued_token, &sell_amount)?;
+		self.check_sell_requirements(&owned_token, &sell_amount)?;
 
-		let calculated_price = self.bonding_curve(&issued_token).update(|bonding_curve| {
+		let calculated_price = self.bonding_curve(&owned_token).update(|bonding_curve| {
 			let price = self.sell(
 				&bonding_curve.curve,
 				sell_amount.clone(),
@@ -172,7 +172,7 @@ pub trait BondingCurveContract:
 
 		self.send().direct(
 			&caller,
-			&self.bonding_curve(&issued_token).get().accepted_payment,
+			&self.bonding_curve(&owned_token).get().accepted_payment,
 			&calculated_price,
 			b"selling",
 		);
@@ -196,23 +196,30 @@ pub trait BondingCurveContract:
 			identifier: offered_token,
 			nonce: 0u64,
 		};
-		let issued_token;
-		if self.token_type(&requested_token).get() == EsdtTokenType::SemiFungible {
-			issued_token = Token {
+		let token_type = self.token_type(&requested_token).get();
+		let mut desired_nonce = 0u64;
+		let owned_token;
+
+		if token_type != EsdtTokenType::Fungible {
+			desired_nonce = requested_nonce
+				.clone()
+				.into_option()
+				.ok_or("Expected nonce for the desired SFT")?;
+		}
+		if token_type == EsdtTokenType::SemiFungible {
+			owned_token = Token {
 				identifier: requested_token,
-				nonce: requested_nonce
-					.into_option()
-					.ok_or("Expected nonce for the desired SFT")?,
+				nonce: desired_nonce.clone(),
 			};
 		} else {
-			issued_token = Token {
+			owned_token = Token {
 				identifier: requested_token,
 				nonce: 0u64,
 			};
 		}
-		self.check_buy_requirements(&issued_token, &exchanging_token, &requested_amount)?;
+		self.check_buy_requirements(&owned_token, &exchanging_token, &requested_amount)?;
 
-		let calculated_price = self.bonding_curve(&issued_token).update(|bonding_curve| {
+		let calculated_price = self.bonding_curve(&owned_token).update(|bonding_curve| {
 			let price = self.buy(
 				&bonding_curve.curve,
 				requested_amount.clone(),
@@ -228,13 +235,22 @@ pub trait BondingCurveContract:
 
 		let caller = self.blockchain().get_caller();
 
-		self.send().direct(
-			&caller,
-			&issued_token.identifier,
-			&requested_amount,
-			b"buying",
-		);
-
+		if token_type == EsdtTokenType::Fungible {
+			self.send().direct(
+				&caller,
+				&owned_token.identifier,
+				&requested_amount,
+				b"buying",
+			);
+		} else {
+			self.send().direct_nft(
+				&caller,
+				&(owned_token.identifier),
+				desired_nonce,
+				&requested_amount,
+				b"buying",
+			);
+		}
 		self.send().direct(
 			&caller,
 			&exchanging_token.identifier,

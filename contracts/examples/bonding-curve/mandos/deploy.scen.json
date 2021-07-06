@@ -7,12 +7,12 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "5,000,000,000,000,000,000",
+                    "balance": "0",
                     "storage": {}
                 },
                 "address:user": {
                     "nonce": "0",
-                    "balance": "1,000,000",
+                    "balance": "0",
                     "storage": {}
                 }
             },
@@ -46,12 +46,12 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "1",
-                    "balance": "5,000,000,000,000,000,000",
+                    "balance": "0",
                     "storage": {}
                 },
                 "address:user": {
                     "nonce": "0",
-                    "balance": "1,000,000",
+                    "balance": "0",
                     "storage": {}
                 },
                 "sc:bonding-curve": {
