@@ -188,7 +188,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		);
 
 		self.send()
-			.direct_nft(&to, &token_identifier, token_nonce, &amount, b"NFT transfer");
+			.direct(&to, &token_identifier, token_nonce, &amount, b"NFT transfer");
 
 		self.send_event(&to, &token_identifier, token_nonce, &amount);
 	}
