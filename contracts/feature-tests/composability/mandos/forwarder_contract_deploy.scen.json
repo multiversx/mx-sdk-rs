@@ -1,0 +1,64 @@
+{
+    "name": "Deploy vault from forwarder",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:child"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-vault",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "deployContract",
+                "arguments": [
+                    "file:../vault/output/vault.wasm"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [
+                    "sc:child"
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "owner": "sc:forwarder",
+                    "code":"file:../vault/output/vault.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}

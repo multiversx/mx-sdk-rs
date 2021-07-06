@@ -44,7 +44,7 @@ where
 
 	/// Returns whether the storage managed by this mapper is empty.
 	pub fn is_empty(&self) -> bool {
-		self.api.storage_load_len(self.key.as_slice()) == 0
+		self.raw_byte_length() == 0
 	}
 
 	/// Saves argument to storage.
@@ -73,6 +73,10 @@ where
 		let result = f(&mut value);
 		self.set(&value);
 		result
+	}
+
+	pub fn raw_byte_length(&self) -> usize {
+		self.api.storage_load_len(self.key.as_slice())
 	}
 }
 

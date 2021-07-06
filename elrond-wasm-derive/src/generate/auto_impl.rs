@@ -2,7 +2,6 @@ use crate::model::{AutoImpl, ContractTrait, Method, MethodImpl};
 
 use super::{
 	auto_impl_event::{generate_event_impl, generate_legacy_event_impl},
-	auto_impl_module::generate_module_getter_impl,
 	auto_impl_proxy::generate_proxy_getter_impl,
 	auto_impl_storage::{
 		generate_clear_impl, generate_getter_impl, generate_is_empty_impl, generate_mapper_impl,
@@ -40,6 +39,5 @@ fn generate_auto_impl(m: &Method, auto_impl: &AutoImpl) -> proc_macro2::TokenStr
 		AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(m, identifier),
 		AutoImpl::StorageClear { identifier } => generate_clear_impl(m, identifier),
 		AutoImpl::ProxyGetter => generate_proxy_getter_impl(m),
-		AutoImpl::Module { impl_path } => generate_module_getter_impl(m, impl_path),
 	}
 }

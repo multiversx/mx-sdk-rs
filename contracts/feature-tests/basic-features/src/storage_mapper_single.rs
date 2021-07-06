@@ -46,4 +46,9 @@ pub trait SingleValueMapperFeatures {
 	fn is_empty_single_value_mapper(&self) -> bool {
 		self.map_my_single_value_mapper().is_empty()
 	}
+
+	#[endpoint]
+	fn raw_byte_length_single_value_mapper(&self) -> usize {
+		self.map_my_single_value_mapper().raw_byte_length()
+	}
 }
