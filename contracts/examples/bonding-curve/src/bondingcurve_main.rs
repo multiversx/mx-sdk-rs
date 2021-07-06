@@ -80,22 +80,21 @@ pub trait BondingCurveContract:
 	}
 
 	#[view]
-	fn check_sell_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
+	fn check_sell_requirements(
+		&self,
+		issued_token: &Token,
+		amount: &Self::BigUint,
+	) -> SCResult<()> {
 		require!(
-			!self.bonding_curve(token).is_empty(),
+			!self.bonding_curve(issued_token).is_empty(),
 			"Token is not issued yet!"
 		);
 
-		let bonding_curve = self.bonding_curve(token).get();
+		let bonding_curve = self.bonding_curve(issued_token).get();
 
 		require!(
 			bonding_curve.curve != FunctionSelector::None,
 			"The token price was not set yet!"
-		);
-
-		require!(
-			&bonding_curve.arguments.balance >= amount,
-			"Token provided not accepted"
 		);
 
 		require!(
@@ -106,8 +105,13 @@ pub trait BondingCurveContract:
 	}
 
 	#[view]
-	fn check_buy_requirements(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
-		let bonding_curve = self.bonding_curve(token).get();
+	fn check_buy_requirements(
+		&self,
+		issued_token: &Token,
+		exchanging_token: &Token,
+		amount: &Self::BigUint,
+	) -> SCResult<()> {
+		let bonding_curve = self.bonding_curve(issued_token).get();
 
 		require!(
 			bonding_curve.curve != FunctionSelector::None,
@@ -116,10 +120,13 @@ pub trait BondingCurveContract:
 
 		require!(
 			amount > &Self::BigUint::zero(),
-			"Must pay more than 0 tokens!"
+			"Must buy more than 0 tokens!"
 		);
 
-		self.check_given_token(&bonding_curve.accepted_payment, &token.identifier)
+		self.check_given_token(
+			&bonding_curve.accepted_payment,
+			&exchanging_token.identifier,
+		)
 	}
 
 	fn check_given_token(
@@ -142,13 +149,17 @@ pub trait BondingCurveContract:
 	fn sell_token(
 		&self,
 		#[payment_amount] sell_amount: Self::BigUint,
-		#[payment_token] identifier: TokenIdentifier,
+		#[payment_token] offered_token: TokenIdentifier,
 		#[payment_nonce] nonce: u64,
+		requested_token: TokenIdentifier,
 	) -> SCResult<()> {
-		let token = Token { identifier, nonce };
-		self.check_buy_requirements(&token, &sell_amount)?;
+		let issued_token = Token {
+			identifier: offered_token,
+			nonce,
+		};
+		self.check_sell_requirements(&issued_token, &sell_amount)?;
 
-		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
+		let calculated_price = self.bonding_curve(&issued_token).update(|bonding_curve| {
 			let price = self.sell(
 				&bonding_curve.curve,
 				sell_amount.clone(),
@@ -161,7 +172,7 @@ pub trait BondingCurveContract:
 		let caller = self.blockchain().get_caller();
 
 		self.send()
-			.direct(&caller, &token.identifier, &calculated_price, b"selling");
+			.direct(&caller, &requested_token, &calculated_price, b"selling");
 
 		self.sell_token_event(&caller, &calculated_price);
 
@@ -172,27 +183,61 @@ pub trait BondingCurveContract:
 	#[endpoint(buyToken)]
 	fn buy_token(
 		&self,
-		#[payment_amount] buy_amount: Self::BigUint,
-		#[payment_token] identifier: TokenIdentifier,
-		#[payment_nonce] nonce: u64,
+		#[payment_amount] payment: Self::BigUint,
+		#[payment_token] offered_token: TokenIdentifier,
+		requested_amount: Self::BigUint,
+		requested_token: TokenIdentifier,
+		#[var_args] requested_nonce: OptionalArg<u64>,
 	) -> SCResult<()> {
-		let token = Token { identifier, nonce };
-		self.check_sell_requirements(&token, &buy_amount)?;
+		let exchanging_token = Token {
+			identifier: offered_token,
+			nonce: 0u64,
+		};
+		let issued_token;
+		if self.token_type(&requested_token).get() == EsdtTokenType::SemiFungible {
+			issued_token = Token {
+				identifier: requested_token,
+				nonce: requested_nonce
+					.into_option()
+					.ok_or("Expected nonce for the desired SFT")?,
+			};
+		} else {
+			issued_token = Token {
+				identifier: requested_token,
+				nonce: 0u64,
+			};
+		}
+		self.check_buy_requirements(&issued_token, &exchanging_token, &requested_amount)?;
 
-		let calculated_price = self.bonding_curve(&token).update(|bonding_curve| {
+		let calculated_price = self.bonding_curve(&issued_token).update(|bonding_curve| {
 			let price = self.buy(
 				&bonding_curve.curve,
-				buy_amount.clone(),
+				requested_amount.clone(),
 				bonding_curve.arguments.clone(),
 			);
-			bonding_curve.arguments.balance -= buy_amount;
+			require!(
+				price.clone()? <= payment,
+				"The payment provided is not enough for the transaction"
+			);
+			bonding_curve.arguments.balance -= &requested_amount;
 			price
 		})?;
 
 		let caller = self.blockchain().get_caller();
 
-		self.send()
-			.direct(&caller, &token.identifier, &calculated_price, b"buying");
+		self.send().direct(
+			&caller,
+			&issued_token.identifier,
+			&requested_amount,
+			b"buying",
+		);
+
+		self.send().direct(
+			&caller,
+			&exchanging_token.identifier,
+			&(&payment - &calculated_price),
+			b"rest",
+		);
 
 		self.buy_token_event(&caller, &calculated_price);
 		Ok(())
