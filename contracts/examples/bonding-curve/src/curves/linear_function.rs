@@ -30,7 +30,7 @@ where
 		_arguments: &CurveArguments<BigUint>,
 	) -> SCResult<BigUint> {
 		Ok(
-			&self.linear_coefficient * &sum_interval(token_start, amount)
+			&self.linear_coefficient * &sum_interval(amount, token_start)
 				+ &self.initial_price * amount,
 		)
 	}
