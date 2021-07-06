@@ -156,6 +156,7 @@ pub trait GovernanceModule:
 			"Proposal is in timelock status. Try again later"
 		);
 
+		let proposal = self.proposals().get(proposal_id);
 		let total_gas_needed = self.total_gas_needed(&proposal.actions);
 		let gas_left = self.blockchain().get_gas_left();
 
@@ -165,7 +166,6 @@ pub trait GovernanceModule:
 			"Not enough gas to execute all proposals"
 		);
 
-		let proposal = self.proposals().get(proposal_id);
 		for action in proposal.actions {
 			let mut contract_call = ContractCall::<Self::SendApi, ()>::new(
 				self.send(),

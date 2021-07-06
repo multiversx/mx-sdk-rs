@@ -1,6 +1,6 @@
 use elrond_wasm::{
 	api::BigUintApi,
-	types::{Address, BoxedBytes, MultiArg6, TokenIdentifier},
+	types::{Address, BoxedBytes, MultiArg7, TokenIdentifier},
 	Vec,
 };
 
