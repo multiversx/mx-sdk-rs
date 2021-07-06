@@ -1,0 +1,99 @@
+{
+    "name": "propose change configurable parameters",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "propose-change-quorum",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:governance",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:GOV-123456",
+                    "value": "500"
+                },
+                "function": "propose",
+                "arguments": [
+                    "str:change-quorum",
+
+                    "50,000,000",
+                    "sc:governance",
+                    "",
+                    "0",
+                    "0",
+                    "str:changeQuorum",
+                    "biguint:1000"
+                ],
+                "gasLimit": "30,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user1": {
+                    "nonce": "*",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "500"
+                    },
+                    "storage": {}
+                },
+                "sc:governance": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:GOV-123456": "500"
+                    },
+                    "storage": {
+                        "str:governance:governanceTokenId": "str:GOV-123456",
+                        "str:governance:quorum": "1500",
+                        "str:governance:minTokenBalanceForProposing": "500",
+                        "str:governance:maxActionsPerProposal": "2",
+                        "str:governance:votingDelayInBlocks": "10",
+                        "str:governance:votingPeriodInBlocks": "20",
+                        "str:governance:lockTimeAfterVotingEndsInBlocks": "30",
+
+                        "str:governance:proposalStartBlock|u32:1": "10",
+                        "str:governance:votes|u32:1|str:.mapped|address:user1": "500",
+                        "str:governance:totalVotes|u32:1": "500",
+
+                        "str:governance:proposals.item|u32:1": {
+                            "1-proposer": "address:user1",
+                            "2-actions_len": "u32:1",
+                            "3-actions": {
+                                "3.01-gas_limit": "u64:50,000,000",
+                                "3.02-dest_address": "sc:governance",
+                                "3.03-token_id": "nested:str:EGLD",
+                                "3.04-token_nonce": "u64:0",
+                                "3.05-amount": "biguint:0",
+                                "3.06-function_name": "nested:str:changeQuorum",
+                                "3.07-arguments": {
+                                    "3.07.1-len": "u32:1",
+                                    "3.07.2": "biguint:1000"
+                                }
+                            },
+                            "4-description": "nested:str:change-quorum"
+                        },
+
+                        "+": {}
+                    },
+                    "code": "*"
+                },
+                "+": {}
+            }
+        }
+    ]
+}
