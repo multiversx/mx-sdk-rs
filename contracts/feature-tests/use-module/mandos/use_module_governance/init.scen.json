@@ -76,7 +76,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "",
+                "status": "0",
+                "message": "",
                 "gas": "*"
             }
         },
@@ -98,6 +99,12 @@
                     "code": "file:../../output/use-module.wasm"
                 },
                 "+": {}
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "10"
             }
         }
     ]
