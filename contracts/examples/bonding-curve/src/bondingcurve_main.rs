@@ -151,7 +151,6 @@ pub trait BondingCurveContract:
 		#[payment_amount] sell_amount: Self::BigUint,
 		#[payment_token] offered_token: TokenIdentifier,
 		#[payment_nonce] nonce: u64,
-		requested_token: TokenIdentifier,
 	) -> SCResult<()> {
 		let issued_token = Token {
 			identifier: offered_token,
@@ -171,8 +170,12 @@ pub trait BondingCurveContract:
 
 		let caller = self.blockchain().get_caller();
 
-		self.send()
-			.direct(&caller, &requested_token, &calculated_price, b"selling");
+		self.send().direct(
+			&caller,
+			&self.bonding_curve(&issued_token).get().accepted_payment,
+			&calculated_price,
+			b"selling",
+		);
 
 		self.sell_token_event(&caller, &calculated_price);
 
@@ -259,7 +262,7 @@ pub trait BondingCurveContract:
 		amount: Self::BigUint,
 		arguments: CurveArguments<Self::BigUint>,
 	) -> SCResult<Self::BigUint> {
-		let token_start = &arguments.first_token_available() - &amount - Self::BigUint::from(1u64);
+		let token_start = &arguments.first_token_available() - &amount;
 		function_selector.calculate_price(&token_start, &amount, &arguments)
 	}
 }
