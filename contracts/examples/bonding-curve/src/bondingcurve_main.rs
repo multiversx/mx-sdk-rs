@@ -202,14 +202,13 @@ pub trait BondingCurveContract:
 
 		if token_type != EsdtTokenType::Fungible {
 			desired_nonce = requested_nonce
-				.clone()
 				.into_option()
 				.ok_or("Expected nonce for the desired SFT")?;
 		}
 		if token_type == EsdtTokenType::SemiFungible {
 			owned_token = Token {
 				identifier: requested_token,
-				nonce: desired_nonce.clone(),
+				nonce: desired_nonce,
 			};
 		} else {
 			owned_token = Token {
