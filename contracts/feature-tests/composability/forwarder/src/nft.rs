@@ -84,7 +84,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		hash: BoxedBytes,
 		color: Color,
 		uri: BoxedBytes,
-	) {
+	) -> u64 {
 		self.send().esdt_nft_create::<Color>(
 			&token_identifier,
 			&amount,
@@ -94,6 +94,14 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 			&color,
 			&[uri],
 		);
+
+		let token_nonce = self
+			.blockchain()
+			.get_current_esdt_nft_nonce(&self.blockchain().get_sc_address(), &token_identifier);
+
+		self.create_event(&token_identifier, token_nonce, &amount);
+
+		token_nonce
 	}
 
 	#[endpoint]
@@ -156,4 +164,49 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 			&arg_buffer,
 		);
 	}
+
+	#[endpoint]
+	fn create_and_send(
+		&self,
+		to: Address,
+		token_identifier: TokenIdentifier,
+		amount: Self::BigUint,
+		name: BoxedBytes,
+		royalties: Self::BigUint,
+		hash: BoxedBytes,
+		color: Color,
+		uri: BoxedBytes,
+	) {
+		let token_nonce = self.nft_create(
+			token_identifier.clone(),
+			amount.clone(),
+			name,
+			royalties,
+			hash,
+			color,
+			uri,
+		);
+
+		self.send()
+			.direct_nft(&to, &token_identifier, token_nonce, &amount, b"NFT transfer");
+
+		self.send_event(&to, &token_identifier, token_nonce, &amount);
+	}
+
+	#[event("create")]
+	fn create_event(
+		&self,
+		#[indexed] token_id: &TokenIdentifier,
+		#[indexed] token_nonce: u64,
+		#[indexed] amount: &Self::BigUint,
+	);
+
+	#[event("send")]
+	fn send_event(
+		&self,
+		#[indexed] to: &Address,
+		#[indexed] token_id: &TokenIdentifier,
+		#[indexed] token_nonce: u64,
+		#[indexed] amount: &Self::BigUint,
+	);
 }
