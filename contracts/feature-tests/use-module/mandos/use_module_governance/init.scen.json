@@ -7,6 +7,25 @@
                 "address:owner": {
                     "nonce": "0",
                     "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
+                    "storage": {}
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
+                    "storage": {}
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
                     "storage": {}
                 }
             },
@@ -26,7 +45,33 @@
                 "value": "0",
                 "contractCode": "file:../../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "6,000,000",
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "init-governance-module",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:governance",
+                "value": "0",
+                "function": "initGovernanceModule",
+                "arguments": [
+                    "str:GOV-123456",
+                    "1500",
+                    "500",
+                    "2",
+                    "10",
+                    "20",
+                    "30"
+                ],
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -38,17 +83,21 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:owner": {
-                    "nonce": "*",
-                    "balance": "*",
-                    "storage": {}
-                },
                 "sc:governance": {
                     "nonce": "*",
                     "balance": "*",
-                    "storage": {},
+                    "storage": {
+                        "str:governance:governanceTokenId": "str:GOV-123456",
+                        "str:governance:quorum": "1500",
+                        "str:governance:minTokenBalanceForProposing": "500",
+                        "str:governance:maxActionsPerProposal": "2",
+                        "str:governance:votingDelayInBlocks": "10",
+                        "str:governance:votingPeriodInBlocks": "20",
+                        "str:governance:lockTimeAfterVotingEndsInBlocks": "30"
+                    },
                     "code": "file:../../output/use-module.wasm"
-                }
+                },
+                "+": {}
             }
         }
     ]
