@@ -12,7 +12,7 @@ mod tokens;
 mod utils;
 
 use crate::tokens::{common_methods, fungible_token, non_fungible_token, semi_fungible_token};
-use crate::utils::{events, storage};
+use crate::utils::{events, owner_endpoints, storage, user_endpoints};
 
 #[elrond_wasm_derive::contract]
 pub trait Contract:
@@ -22,6 +22,8 @@ pub trait Contract:
 	+ storage::StorageModule
 	+ events::EventsModule
 	+ common_methods::CommonMethods
+	+ user_endpoints::UserEndpointsModule
+	+ owner_endpoints::OwnerEndpointsModule
 {
 	#[init]
 	fn init(&self) {}

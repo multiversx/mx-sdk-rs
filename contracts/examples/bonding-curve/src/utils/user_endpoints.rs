@@ -10,7 +10,7 @@ use crate::utils::{
 };
 
 #[elrond_wasm_derive::module]
-pub trait EndpointsModule:
+pub trait UserEndpointsModule:
 	fungible_token::FungibleTokenModule
 	+ non_fungible_token::NonFungibleTokenModule
 	+ semi_fungible_token::SemiFungibleTokenModule
@@ -18,55 +18,6 @@ pub trait EndpointsModule:
 	+ events::EventsModule
 	+ common_methods::CommonMethods
 {
-	#[endpoint(setLocalRoles)]
-	fn set_local_roles(
-		&self,
-		address: Address,
-		token_identifier: TokenIdentifier,
-		#[var_args] roles: VarArgs<EsdtLocalRole>,
-	) -> AsyncCall<Self::SendApi> {
-		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.set_special_roles(&address, &token_identifier, roles.as_slice())
-			.async_call()
-			.with_callback(EndpointsModule::callbacks(self).change_roles_callback())
-	}
-
-	#[endpoint(unsetLocalRoles)]
-	fn unset_local_roles(
-		&self,
-		address: Address,
-		token_identifier: TokenIdentifier,
-		#[var_args] roles: VarArgs<EsdtLocalRole>,
-	) -> AsyncCall<Self::SendApi> {
-		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.unset_special_roles(&address, &token_identifier, roles.as_slice())
-			.async_call()
-			.with_callback(EndpointsModule::callbacks(self).change_roles_callback())
-	}
-
-	#[callback]
-	fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) -> SCResult<()> {
-		match result {
-			AsyncCallResult::Ok(()) => Ok(()),
-			AsyncCallResult::Err(message) => Err(message.err_msg.into()),
-		}
-	}
-
-	#[endpoint(setBondingCurve)]
-	fn set_bonding_curve(
-		&self,
-		token: Token,
-		function: FunctionSelector<Self::BigUint>,
-	) -> SCResult<()> {
-		require!(
-			!self.bonding_curve(&token).is_empty(),
-			"Token is not issued yet!"
-		);
-		self.bonding_curve(&token)
-			.update(|bonding_curve| bonding_curve.curve = function);
-		Ok(())
-	}
-
 	#[view]
 	fn check_sell_requirements(
 		&self,
@@ -147,7 +98,7 @@ pub trait EndpointsModule:
 		self.check_sell_requirements(&owned_token, &sell_amount)?;
 
 		let calculated_price = self.bonding_curve(&owned_token).update(|bonding_curve| {
-			let price = self.sell(
+			let price = self.get_sell_price(
 				&bonding_curve.curve,
 				sell_amount.clone(),
 				bonding_curve.arguments.clone(),
@@ -207,7 +158,7 @@ pub trait EndpointsModule:
 		self.check_buy_requirements(&owned_token, &exchanging_token, &requested_amount)?;
 
 		let calculated_price = self.bonding_curve(&owned_token).update(|bonding_curve| {
-			let price = self.buy(
+			let price = self.get_buy_price(
 				&bonding_curve.curve,
 				requested_amount.clone(),
 				bonding_curve.arguments.clone(),
@@ -252,7 +203,7 @@ pub trait EndpointsModule:
 		Ok(())
 	}
 
-	fn buy(
+	fn get_buy_price(
 		&self,
 		function_selector: &FunctionSelector<Self::BigUint>,
 		amount: Self::BigUint,
@@ -262,7 +213,7 @@ pub trait EndpointsModule:
 		function_selector.calculate_price(&token_start, &amount, &arguments)
 	}
 
-	fn sell(
+	fn get_sell_price(
 		&self,
 		function_selector: &FunctionSelector<Self::BigUint>,
 		amount: Self::BigUint,

@@ -38,7 +38,7 @@ where
 	BigUint: BigUintApi,
 {
 	pub fn first_token_available(&self) -> BigUint {
-		&self.available_supply - &self.balance + BigUint::from(1u64)
+		&self.available_supply - &self.balance
 	}
 }
 
