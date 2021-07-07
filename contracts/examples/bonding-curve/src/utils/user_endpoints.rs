@@ -3,86 +3,13 @@ elrond_wasm::derive_imports!();
 
 use crate::curves::curve_function::CurveFunction;
 use crate::function_selector::FunctionSelector;
-use crate::tokens::{common_methods, fungible_token, non_fungible_token, semi_fungible_token};
 use crate::utils::{
 	events, storage,
 	structs::{CurveArguments, Token},
 };
 
 #[elrond_wasm_derive::module]
-pub trait UserEndpointsModule:
-	fungible_token::FungibleTokenModule
-	+ non_fungible_token::NonFungibleTokenModule
-	+ semi_fungible_token::SemiFungibleTokenModule
-	+ storage::StorageModule
-	+ events::EventsModule
-	+ common_methods::CommonMethods
-{
-	#[view]
-	fn check_sell_requirements(
-		&self,
-		issued_token: &Token,
-		amount: &Self::BigUint,
-	) -> SCResult<()> {
-		require!(
-			!self.bonding_curve(issued_token).is_empty(),
-			"Token is not issued yet!"
-		);
-
-		let bonding_curve = self.bonding_curve(issued_token).get();
-
-		require!(
-			bonding_curve.curve != FunctionSelector::None,
-			"The token price was not set yet!"
-		);
-
-		require!(
-			amount > &Self::BigUint::zero(),
-			"Must pay more than 0 tokens!"
-		);
-		Ok(())
-	}
-
-	#[view]
-	fn check_buy_requirements(
-		&self,
-		owned_token: &Token,
-		exchanging_token: &Token,
-		amount: &Self::BigUint,
-	) -> SCResult<()> {
-		let bonding_curve = self.bonding_curve(owned_token).get();
-
-		require!(
-			bonding_curve.curve != FunctionSelector::None,
-			"The token price was not set yet!"
-		);
-
-		require!(
-			amount > &Self::BigUint::zero(),
-			"Must buy more than 0 tokens!"
-		);
-
-		self.check_given_token(
-			&bonding_curve.accepted_payment,
-			&exchanging_token.identifier,
-		)
-	}
-
-	fn check_given_token(
-		&self,
-		accepted_token: &TokenIdentifier,
-		given_token: &TokenIdentifier,
-	) -> SCResult<()> {
-		if given_token != accepted_token {
-			return Err(SCError::from(BoxedBytes::from_concat(&[
-				b"Only ",
-				accepted_token.as_esdt_identifier(),
-				b" tokens accepted",
-			])));
-		}
-		Ok(())
-	}
-
+pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 	#[payable("*")]
 	#[endpoint(sellToken)]
 	fn sell_token(
@@ -98,7 +25,7 @@ pub trait UserEndpointsModule:
 		self.check_sell_requirements(&owned_token, &sell_amount)?;
 
 		let calculated_price = self.bonding_curve(&owned_token).update(|bonding_curve| {
-			let price = self.get_sell_price(
+			let price = self.compute_sell_price(
 				&bonding_curve.curve,
 				sell_amount.clone(),
 				bonding_curve.arguments.clone(),
@@ -158,7 +85,7 @@ pub trait UserEndpointsModule:
 		self.check_buy_requirements(&owned_token, &exchanging_token, &requested_amount)?;
 
 		let calculated_price = self.bonding_curve(&owned_token).update(|bonding_curve| {
-			let price = self.get_buy_price(
+			let price = self.compute_buy_price(
 				&bonding_curve.curve,
 				requested_amount.clone(),
 				bonding_curve.arguments.clone(),
@@ -203,7 +130,105 @@ pub trait UserEndpointsModule:
 		Ok(())
 	}
 
+	#[view]
 	fn get_buy_price(
+		&self,
+		identifier: TokenIdentifier,
+		nonce: u64,
+		amount: Self::BigUint,
+	) -> SCResult<Self::BigUint> {
+		let token = Token { identifier, nonce };
+		self.check_token_exists(&token)?;
+
+		let bonding_curve = self.bonding_curve(&token).get();
+		self.compute_buy_price(&bonding_curve.curve, amount, bonding_curve.arguments)
+	}
+
+	#[view]
+	fn get_sell_price(
+		&self,
+		identifier: TokenIdentifier,
+		nonce: u64,
+		amount: Self::BigUint,
+	) -> SCResult<Self::BigUint> {
+		let token = Token { identifier, nonce };
+		self.check_token_exists(&token)?;
+
+		let bonding_curve = self.bonding_curve(&token).get();
+		self.compute_sell_price(&bonding_curve.curve, amount, bonding_curve.arguments)
+	}
+
+	fn check_token_exists(&self, issued_token: &Token) -> SCResult<()> {
+		require!(
+			!self.bonding_curve(issued_token).is_empty(),
+			"Token is not issued yet!"
+		);
+
+		Ok(())
+	}
+
+	fn check_sell_requirements(
+		&self,
+		issued_token: &Token,
+		amount: &Self::BigUint,
+	) -> SCResult<()> {
+		self.check_token_exists(issued_token)?;
+
+		let bonding_curve = self.bonding_curve(issued_token).get();
+
+		require!(
+			bonding_curve.curve != FunctionSelector::None,
+			"The token price was not set yet!"
+		);
+		require!(
+			amount > &Self::BigUint::zero(),
+			"Must pay more than 0 tokens!"
+		);
+		Ok(())
+	}
+
+	fn check_buy_requirements(
+		&self,
+		owned_token: &Token,
+		exchanging_token: &Token,
+		amount: &Self::BigUint,
+	) -> SCResult<()> {
+		self.check_token_exists(&owned_token)?;
+
+		let bonding_curve = self.bonding_curve(owned_token).get();
+
+		require!(
+			bonding_curve.curve != FunctionSelector::None,
+			"The token price was not set yet!"
+		);
+
+		require!(
+			amount > &Self::BigUint::zero(),
+			"Must buy more than 0 tokens!"
+		);
+
+		self.check_given_token(
+			&bonding_curve.accepted_payment,
+			&exchanging_token.identifier,
+		)
+	}
+
+	fn check_given_token(
+		&self,
+		accepted_token: &TokenIdentifier,
+		given_token: &TokenIdentifier,
+	) -> SCResult<()> {
+		if given_token != accepted_token {
+			return Err(SCError::from(BoxedBytes::from_concat(&[
+				b"Only ",
+				accepted_token.as_esdt_identifier(),
+				b" tokens accepted",
+			])));
+		}
+		Ok(())
+	}
+
+	fn compute_buy_price(
 		&self,
 		function_selector: &FunctionSelector<Self::BigUint>,
 		amount: Self::BigUint,
@@ -213,7 +238,7 @@ pub trait UserEndpointsModule:
 		function_selector.calculate_price(&token_start, &amount, &arguments)
 	}
 
-	fn get_sell_price(
+	fn compute_sell_price(
 		&self,
 		function_selector: &FunctionSelector<Self::BigUint>,
 		amount: Self::BigUint,
