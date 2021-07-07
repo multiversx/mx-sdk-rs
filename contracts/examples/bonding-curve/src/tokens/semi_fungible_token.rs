@@ -1,9 +1,10 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use super::common_methods;
 use crate::common_methods::CallbackProxy;
 use crate::utils::structs::Token;
-use crate::{common_methods, events, storage};
+use crate::utils::{events, storage};
 
 #[elrond_wasm_derive::module]
 pub trait SemiFungibleTokenModule:
