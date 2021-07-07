@@ -41,8 +41,8 @@ where
 
 			FunctionSelector::CustomExample(initial_cost) => {
 				let sum = token_start + amount;
-				let price = &(&sum * &sum * sum / BigUint::from(3u64)) - &arguments.balance
-					+ initial_cost.clone();
+				let price = &(&sum * &sum * sum / BigUint::from(3u64))
+					+ &arguments.balance + initial_cost.clone();
 				Ok(price)
 			},
 			FunctionSelector::None => Err("Bonding Curve function is not assiged".into()),
