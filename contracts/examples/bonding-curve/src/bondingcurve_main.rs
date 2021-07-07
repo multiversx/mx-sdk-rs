@@ -203,7 +203,7 @@ pub trait BondingCurveContract:
 		if token_type != EsdtTokenType::Fungible {
 			desired_nonce = requested_nonce
 				.into_option()
-				.ok_or("Expected nonce for the desired SFT")?;
+				.ok_or("Expected nonce for the desired NFT")?;
 		}
 		if token_type == EsdtTokenType::SemiFungible {
 			owned_token = Token {
@@ -228,7 +228,9 @@ pub trait BondingCurveContract:
 				price.clone()? <= payment,
 				"The payment provided is not enough for the transaction"
 			);
+
 			bonding_curve.arguments.balance -= &requested_amount;
+
 			price
 		})?;
 
@@ -250,6 +252,7 @@ pub trait BondingCurveContract:
 				b"buying",
 			);
 		}
+
 		self.send().direct(
 			&caller,
 			&exchanging_token.identifier,
