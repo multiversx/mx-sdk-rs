@@ -2,18 +2,10 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::function_selector::FunctionSelector;
-use crate::tokens::{common_methods, fungible_token, non_fungible_token, semi_fungible_token};
 use crate::utils::{events, storage, structs::Token};
 
 #[elrond_wasm_derive::module]
-pub trait OwnerEndpointsModule:
-	fungible_token::FungibleTokenModule
-	+ non_fungible_token::NonFungibleTokenModule
-	+ semi_fungible_token::SemiFungibleTokenModule
-	+ storage::StorageModule
-	+ events::EventsModule
-	+ common_methods::CommonMethods
-{
+pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(
 		&self,

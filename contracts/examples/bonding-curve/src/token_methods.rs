@@ -10,68 +10,39 @@ use crate::{
 };
 
 #[elrond_wasm_derive::module]
-pub trait CommonMethods: storage::StorageModule + events::EventsModule {
-	#[callback]
-	fn nft_issue_callback(
-		&self,
-		caller: Address,
-		token_type: EsdtTokenType,
-		#[payment_token] token_identifier: TokenIdentifier,
-		#[call_result] result: AsyncCallResult<TokenIdentifier>,
-	) -> SCResult<()> {
-		match result {
-			AsyncCallResult::Ok(_) => {
-				self.token_type(&token_identifier).set(&token_type);
-				Ok(())
+pub trait TokenMethods: storage::StorageModule + events::EventsModule {
+	#[endpoint(ftLocalMint)]
+	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) -> SCResult<()> {
+		self.check_supply(
+			&Token {
+				identifier: token_identifier.clone(),
+				nonce: 0u64,
 			},
-			AsyncCallResult::Err(message) => {
-				let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
-				if token_identifier.is_egld() && returned_tokens > 0 {
-					self.send().direct_egld(&caller, &returned_tokens, &[]);
-				}
-				Err(message.err_msg.into())
-			},
-		}
+			&amount,
+		)?;
+		self.send().esdt_local_mint(&token_identifier, &amount);
+		self.bonding_curve(&Token {
+			identifier: token_identifier,
+			nonce: 0u64,
+		})
+		.update(|bonding_curve| {
+			bonding_curve.arguments.available_supply += &amount;
+			bonding_curve.arguments.balance += &amount;
+		});
+		Ok(())
 	}
 
-	#[callback]
-	#[allow(clippy::too_many_arguments)]
-	fn ft_issue_callback(
-		&self,
-		caller: Address,
-		initial_supply: Self::BigUint,
-		supply_type: SupplyType<Self::BigUint>,
-		accepted_payment: TokenIdentifier,
-		#[payment_token] token_identifier: TokenIdentifier,
-		#[payment] amount: Self::BigUint,
-		#[call_result] result: AsyncCallResult<()>,
-	) -> SCResult<()> {
-		match result {
-			AsyncCallResult::Ok(()) => {
-				self.bonding_curve(&Token {
-					identifier: token_identifier.clone(),
-					nonce: 0u64,
-				})
-				.set(&BondingCurve {
-					curve: FunctionSelector::None,
-					arguments: self.create_curve_arguments(
-						elrond_wasm::types::OptionalArg::Some(supply_type),
-						initial_supply,
-					)?,
-					accepted_payment,
-				});
-				self.token_type(&token_identifier)
-					.set(&EsdtTokenType::Fungible);
-				Ok(())
-			},
-			AsyncCallResult::Err(message) => {
-				if token_identifier.is_egld() && amount > 0 {
-					self.send().direct_egld(&caller, &amount, &[]);
-				}
-
-				Err(message.err_msg.into())
-			},
-		}
+	#[endpoint(ftLocalBurn)]
+	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
+		self.send().esdt_local_burn(&token_identifier, &amount);
+		self.bonding_curve(&Token {
+			identifier: token_identifier,
+			nonce: 0u64,
+		})
+		.update(|bonding_curve| {
+			bonding_curve.arguments.available_supply -= &amount;
+			bonding_curve.arguments.balance -= &amount;
+		});
 	}
 
 	#[endpoint(nftCreate)]
@@ -170,6 +141,25 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 		Ok(())
 	}
 
+	#[endpoint(sftAddQuantity)]
+	fn add_quantity(
+		&self,
+		identifier: TokenIdentifier,
+		nonce: u64,
+		amount: Self::BigUint,
+	) -> SCResult<()> {
+		let token = Token { identifier, nonce };
+		self.check_supply(&token, &amount)?;
+		self.send()
+			.esdt_nft_add_quantity(&token.identifier, nonce, &amount);
+
+		self.bonding_curve(&token).update(|bonding_curve| {
+			bonding_curve.arguments.available_supply += &amount;
+			bonding_curve.arguments.balance += amount;
+		});
+		Ok(())
+	}
+
 	fn create_curve_arguments(
 		&self,
 		#[var_args] supply_type: OptionalArg<SupplyType<Self::BigUint>>,
@@ -205,28 +195,5 @@ pub trait CommonMethods: storage::StorageModule + events::EventsModule {
 			);
 		}
 		Ok(())
-	}
-
-	#[callback]
-	fn mint_callback(
-		&self,
-		token_identifier: TokenIdentifier,
-		amount: &Self::BigUint,
-		#[call_result] result: AsyncCallResult<()>,
-	) -> SCResult<()> {
-		match result {
-			AsyncCallResult::Ok(()) => {
-				self.bonding_curve(&Token {
-					identifier: token_identifier,
-					nonce: 0u64,
-				})
-				.update(|bonding_curve| {
-					bonding_curve.arguments.available_supply += amount;
-					bonding_curve.arguments.balance += amount;
-				});
-				Ok(())
-			},
-			AsyncCallResult::Err(message) => Err(message.err_msg.into()),
-		}
 	}
 }
