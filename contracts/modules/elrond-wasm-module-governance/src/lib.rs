@@ -11,6 +11,8 @@ use governance_proposal::*;
 pub trait GovernanceModule:
 	governance_configurable::GovernanceConfigurablePropertiesModule
 {
+	// TODO: Withdraw functionality after voting ends
+
 	// endpoints
 
 	// Used to deposit tokens for "payable" actions
@@ -247,7 +249,7 @@ pub trait GovernanceModule:
 		let total_downvotes = self.total_downvotes(proposal_id).get();
 		let quorum = self.quorum().get();
 
-		if total_votes < total_downvotes || &total_votes - &total_downvotes >= quorum {
+		if total_votes > total_downvotes && total_votes - total_downvotes >= quorum {
 			return GovernanceProposalStatus::Succeeded;
 		} else {
 			return GovernanceProposalStatus::Defeated;
