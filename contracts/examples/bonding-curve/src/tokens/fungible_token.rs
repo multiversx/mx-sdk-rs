@@ -2,9 +2,9 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::common_methods::CallbackProxy;
-use crate::{
+use crate::utils::{
 	events, storage,
-	utils::structs::{SupplyType, Token},
+	structs::{SupplyType, Token},
 };
 
 use super::common_methods;

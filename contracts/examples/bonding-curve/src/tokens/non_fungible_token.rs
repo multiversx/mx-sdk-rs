@@ -1,11 +1,11 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use super::common_methods;
 use crate::common_methods::CallbackProxy;
-use crate::{common_methods, events, storage};
+use crate::utils::{events, storage};
 
 #[elrond_wasm_derive::module]
-
 pub trait NonFungibleTokenModule:
 	storage::StorageModule + events::EventsModule + common_methods::CommonMethods
 {

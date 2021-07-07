@@ -1,25 +1,16 @@
-#![no_std]
-#![allow(unused_attributes)]
-#![feature(trait_alias)]
-#![feature(destructuring_assignment)]
-
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-mod curves;
-mod function_selector;
-mod tokens;
-mod utils;
-use curves::curve_function::CurveFunction;
-use function_selector::FunctionSelector;
-use tokens::{common_methods, fungible_token, non_fungible_token, semi_fungible_token};
-use utils::{
+use crate::curves::curve_function::CurveFunction;
+use crate::function_selector::FunctionSelector;
+use crate::tokens::{common_methods, fungible_token, non_fungible_token, semi_fungible_token};
+use crate::utils::{
 	events, storage,
 	structs::{CurveArguments, Token},
 };
 
-#[elrond_wasm_derive::contract]
-pub trait BondingCurveContract:
+#[elrond_wasm_derive::module]
+pub trait EndpointsModule:
 	fungible_token::FungibleTokenModule
 	+ non_fungible_token::NonFungibleTokenModule
 	+ semi_fungible_token::SemiFungibleTokenModule
@@ -27,9 +18,6 @@ pub trait BondingCurveContract:
 	+ events::EventsModule
 	+ common_methods::CommonMethods
 {
-	#[init]
-	fn init(&self) {}
-
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(
 		&self,
@@ -40,7 +28,7 @@ pub trait BondingCurveContract:
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.set_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
-			.with_callback(BondingCurveContract::callbacks(self).change_roles_callback())
+			.with_callback(EndpointsModule::callbacks(self).change_roles_callback())
 	}
 
 	#[endpoint(unsetLocalRoles)]
@@ -53,7 +41,7 @@ pub trait BondingCurveContract:
 		ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
 			.unset_special_roles(&address, &token_identifier, roles.as_slice())
 			.async_call()
-			.with_callback(BondingCurveContract::callbacks(self).change_roles_callback())
+			.with_callback(EndpointsModule::callbacks(self).change_roles_callback())
 	}
 
 	#[callback]

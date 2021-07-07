@@ -6,7 +6,7 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/bondingcurve_main.rs"
+path = "src/lib.rs"
 
 [features]
 wasm-output-mode = ["elrond-wasm-node"]

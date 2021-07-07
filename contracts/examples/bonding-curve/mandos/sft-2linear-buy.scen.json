@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "externalSteps",
-            "path": "sft-3nonces-2linear-1custom.scen.json"
+            "path": "sft-2linear.scen.json"
         },
         {
             "step": "scCall",

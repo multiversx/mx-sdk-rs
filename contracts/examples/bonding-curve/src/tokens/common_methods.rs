@@ -2,10 +2,11 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::{
-	events,
 	function_selector::FunctionSelector,
-	storage,
-	utils::structs::{BondingCurve, CurveArguments, SupplyType, Token},
+	utils::{
+		events, storage,
+		structs::{BondingCurve, CurveArguments, SupplyType, Token},
+	},
 };
 
 #[elrond_wasm_derive::module]
