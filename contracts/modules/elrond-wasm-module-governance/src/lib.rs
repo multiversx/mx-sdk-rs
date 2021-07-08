@@ -22,6 +22,36 @@ pub trait GovernanceModule:
 	#[endpoint(depositTokensForAction)]
 	fn deposit_tokens_for_action(&self) {}
 
+	// Used to withdraw the tokens after the action was executed or cancelled
+	#[endpoint(withdraw_governance_tokens)]
+	fn withdraw_governance_tokens(&self, proposal_id: usize) -> SCResult<()> {
+		self.require_valid_proposal_id(proposal_id)?;
+		require!(
+			self.get_proposal_status(proposal_id) == GovernanceProposalStatus::None,
+			"Proposal has to be executed or canceled first"
+		);
+
+		let caller = self.blockchain().get_caller();
+		let governance_token_id = self.governance_token_id().get();
+		let nr_votes_tokens = self.votes(proposal_id).get(&caller).unwrap_or_default();
+		let nr_downvotes_tokens = self.downvotes(proposal_id).get(&caller).unwrap_or_default();
+
+		if nr_votes_tokens > 0 {
+			self.send()
+				.direct(&caller, &governance_token_id, &nr_votes_tokens, &[]);
+
+			self.votes(proposal_id).remove(&caller);
+		}
+		if nr_downvotes_tokens > 0 {
+			self.send()
+				.direct(&caller, &governance_token_id, &nr_downvotes_tokens, &[]);
+
+			self.downvotes(proposal_id).remove(&caller);
+		}
+
+		Ok(())
+	}
+
 	#[payable("*")]
 	#[endpoint]
 	fn propose(
