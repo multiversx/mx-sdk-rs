@@ -39,7 +39,7 @@ impl<BigUint: BigUintApi> GovernanceAction<BigUint> {
 			self.token_nonce,
 			self.amount,
 			self.function_name,
-			self.arguments.into(),
+			self.arguments,
 		)
 			.into()
 	}
