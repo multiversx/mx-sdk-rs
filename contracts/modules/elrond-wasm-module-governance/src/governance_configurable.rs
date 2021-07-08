@@ -39,7 +39,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 	}
 
 	// endpoints - these can only be called by the SC itself.
-	// i.e. only by proposing and executing an action with the SC as dest and the respectiv func name
+	// i.e. only by proposing and executing an action with the SC as dest and the respective func name
 
 	#[endpoint(changeQuorum)]
 	fn change_quorum(&self, new_value: Self::BigUint) -> SCResult<()> {
@@ -110,7 +110,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 	}
 
 	fn try_change_quorum(&self, new_value: Self::BigUint) -> SCResult<()> {
-		require!(new_value > 0, "Quorum can't be set to 0");
+		require!(new_value != 0, "Quorum can't be set to 0");
 
 		self.quorum().set(&new_value);
 
@@ -119,7 +119,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 
 	fn try_change_min_token_balance_for_proposing(&self, new_value: Self::BigUint) -> SCResult<()> {
 		require!(
-			new_value > 0,
+			new_value != 0,
 			"Min token balance for proposing can't be set to 0"
 		);
 
@@ -129,7 +129,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 	}
 
 	fn try_change_max_actions_per_proposal(&self, new_value: usize) -> SCResult<()> {
-		require!(new_value > 0, "Max actions per proposal can't be set to 0");
+		require!(new_value != 0, "Max actions per proposal can't be set to 0");
 
 		self.max_actions_per_proposal().set(&new_value);
 
@@ -137,7 +137,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 	}
 
 	fn try_change_voting_delay_in_blocks(&self, new_value: u64) -> SCResult<()> {
-		require!(new_value > 0, "Voting delay in blocks can't be set to 0");
+		require!(new_value != 0, "Voting delay in blocks can't be set to 0");
 
 		self.voting_delay_in_blocks().set(&new_value);
 
@@ -145,7 +145,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 	}
 
 	fn try_change_voting_period_in_blocks(&self, new_value: u64) -> SCResult<()> {
-		require!(new_value > 0, "Voting period (in blocks) can't be set to 0");
+		require!(new_value != 0, "Voting period (in blocks) can't be set to 0");
 
 		self.voting_period_in_blocks().set(&new_value);
 
@@ -154,7 +154,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 
 	fn try_change_lock_time_after_voting_ends_in_blocks(&self, new_value: u64) -> SCResult<()> {
 		require!(
-			new_value > 0,
+			new_value != 0,
 			"Lock time after voting ends (in blocks) can't be set to 0"
 		);
 
