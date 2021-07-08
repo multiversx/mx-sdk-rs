@@ -285,9 +285,9 @@ pub trait GovernanceModule:
 		let quorum = self.quorum().get();
 
 		if total_votes > total_downvotes && total_votes - total_downvotes >= quorum {
-			return GovernanceProposalStatus::Succeeded;
+			GovernanceProposalStatus::Succeeded
 		} else {
-			return GovernanceProposalStatus::Defeated;
+			GovernanceProposalStatus::Defeated
 		}
 	}
 
