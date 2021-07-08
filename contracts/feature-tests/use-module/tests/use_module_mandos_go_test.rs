@@ -22,25 +22,27 @@ fn use_module_pause_go() {
 
 #[test]
 fn cancel_defeated_proposal_go() {
-    elrond_wasm_debug::mandos_go("mandos/use_module_governance/cancel_defeated_proposal.scen.json");
+	elrond_wasm_debug::mandos_go("mandos/use_module_governance/cancel_defeated_proposal.scen.json");
 }
 
 #[test]
 fn change_configuration_go() {
-    elrond_wasm_debug::mandos_go("mandos/use_module_governance/change_configuration.scen.json");
+	elrond_wasm_debug::mandos_go("mandos/use_module_governance/change_configuration.scen.json");
 }
 
 #[test]
 fn init_go() {
-    elrond_wasm_debug::mandos_go("mandos/use_module_governance/init.scen.json");
+	elrond_wasm_debug::mandos_go("mandos/use_module_governance/init.scen.json");
 }
 
 #[test]
 fn invalid_proposals_go() {
-    elrond_wasm_debug::mandos_go("mandos/use_module_governance/invalid_proposals.scen.json");
+	elrond_wasm_debug::mandos_go("mandos/use_module_governance/invalid_proposals.scen.json");
 }
 
 #[test]
 fn withdraw_governance_tokens_go() {
-    elrond_wasm_debug::mandos_go("mandos/use_module_governance/withdraw_governance_tokens.scen.json");
+	elrond_wasm_debug::mandos_go(
+		"mandos/use_module_governance/withdraw_governance_tokens.scen.json",
+	);
 }
