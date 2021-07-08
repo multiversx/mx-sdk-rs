@@ -195,13 +195,11 @@ pub trait GovernanceModule:
 		);
 
 		let proposal = self.proposals().get(proposal_id);
-		let total_gas_needed_execution = self.total_gas_needed(&proposal.actions);
-		let total_gas_needed_serialization = total_gas_needed_execution;
-		let total_gas_needed = total_gas_needed_execution + total_gas_needed_serialization;
+		let total_gas_needed = self.total_gas_needed(&proposal.actions);
 		let gas_left = self.blockchain().get_gas_left();
 
 		require!(
-			gas_left >= total_gas_needed,
+			gas_left > total_gas_needed,
 			"Not enough gas to execute all proposals"
 		);
 
@@ -359,11 +357,7 @@ pub trait GovernanceModule:
 	fn total_gas_needed(&self, actions: &[GovernanceAction<Self::BigUint>]) -> u64 {
 		let mut total = 0;
 		for action in actions {
-			let gas_needed_execution = action.gas_limit;
-			let gas_needed_misc = action.gas_limit;
-
-			total += gas_needed_execution;
-			total += gas_needed_misc;
+			total += action.gas_limit;
 		}
 
 		total
