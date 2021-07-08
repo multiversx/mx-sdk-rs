@@ -31,6 +31,7 @@ where
 			self.api.transfer_esdt_via_async_call(
 				&self.to,
 				&self.token,
+				0,
 				&self.amount,
 				self.data.as_slice(),
 			);

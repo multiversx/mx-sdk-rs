@@ -26,8 +26,14 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
 	fn get_balance(&self, address: &Address) -> Self::BalanceType;
 
-	fn get_sc_balance(&self) -> Self::BalanceType {
-		self.get_balance(&self.get_sc_address())
+	fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> Self::BalanceType {
+		let sc_address = self.get_sc_address();
+
+		if token.is_egld() {
+			self.get_balance(&sc_address)
+		} else {
+			self.get_esdt_balance(&sc_address, token, nonce)
+		}
 	}
 
 	fn get_tx_hash(&self) -> H256;

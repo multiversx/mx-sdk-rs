@@ -113,7 +113,7 @@ pub trait Erc1155Marketplace {
 		let claimable_funds_mapper = self.get_claimable_funds_mapper();
 		for (token_identifier, amount) in claimable_funds_mapper.iter() {
 			self.send()
-				.direct(&caller, &token_identifier, &amount, data);
+				.direct(&caller, &token_identifier, 0, &amount, data);
 
 			self.clear_claimable_funds(&token_identifier);
 		}
@@ -199,6 +199,7 @@ pub trait Erc1155Marketplace {
 			self.send().direct(
 				&auction.current_winner,
 				&auction.token_identifier,
+				0,
 				&auction.current_bid,
 				data,
 			);
@@ -245,6 +246,7 @@ pub trait Erc1155Marketplace {
 			self.send().direct(
 				&auction.original_owner,
 				&auction.token_identifier,
+				0,
 				&amount_to_send,
 				data,
 			);

@@ -70,13 +70,8 @@ pub trait Crowdfunding {
 	#[view(getCurrentFunds)]
 	fn get_current_funds(&self) -> Self::BigUint {
 		let token = self.cf_token_name().get();
-		let sc_address = self.blockchain().get_sc_address();
 
-		if token.is_egld() {
-			self.blockchain().get_sc_balance()
-		} else {
-			self.blockchain().get_esdt_balance(&sc_address, &token, 0)
-		}
+		self.blockchain().get_sc_balance(&token, 0)
 	}
 
 	#[endpoint]
@@ -93,7 +88,8 @@ pub trait Crowdfunding {
 				let token_name = self.cf_token_name().get();
 				let sc_balance = self.get_current_funds();
 
-				self.send().direct(&caller, &token_name, &sc_balance, &[]);
+				self.send()
+					.direct(&caller, &token_name, 0, &sc_balance, &[]);
 
 				Ok(())
 			},
@@ -105,7 +101,7 @@ pub trait Crowdfunding {
 					let token_name = self.cf_token_name().get();
 
 					self.deposit(&caller).clear();
-					self.send().direct(&caller, &token_name, &deposit, &[]);
+					self.send().direct(&caller, &token_name, 0, &deposit, &[]);
 				}
 
 				Ok(())

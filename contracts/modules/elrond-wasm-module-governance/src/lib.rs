@@ -42,7 +42,7 @@ pub trait GovernanceModule:
 			self.downvotes(proposal_id).remove(&caller);
 
 			self.send()
-				.direct(&caller, &governance_token_id, &total_tokens, &[]);
+				.direct(&caller, &governance_token_id, 0, &total_tokens, &[]);
 		}
 
 		Ok(())
