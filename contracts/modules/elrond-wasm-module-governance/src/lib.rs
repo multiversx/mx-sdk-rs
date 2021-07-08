@@ -7,12 +7,12 @@ pub mod governance_configurable;
 pub mod governance_proposal;
 use governance_proposal::*;
 
+const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
+
 #[elrond_wasm_derive::module]
 pub trait GovernanceModule:
 	governance_configurable::GovernanceConfigurablePropertiesModule
 {
-	// TODO: Withdraw functionality after voting ends
-
 	// endpoints
 
 	// Used to deposit tokens for "payable" actions
@@ -35,18 +35,14 @@ pub trait GovernanceModule:
 		let governance_token_id = self.governance_token_id().get();
 		let nr_votes_tokens = self.votes(proposal_id).get(&caller).unwrap_or_default();
 		let nr_downvotes_tokens = self.downvotes(proposal_id).get(&caller).unwrap_or_default();
+		let total_tokens = nr_votes_tokens + nr_downvotes_tokens;
 
-		if nr_votes_tokens > 0 {
-			self.send()
-				.direct(&caller, &governance_token_id, &nr_votes_tokens, &[]);
-
+		if total_tokens > 0 {
 			self.votes(proposal_id).remove(&caller);
-		}
-		if nr_downvotes_tokens > 0 {
-			self.send()
-				.direct(&caller, &governance_token_id, &nr_downvotes_tokens, &[]);
-
 			self.downvotes(proposal_id).remove(&caller);
+
+			self.send()
+				.direct(&caller, &governance_token_id, &total_tokens, &[]);
 		}
 
 		Ok(())
@@ -85,8 +81,18 @@ pub trait GovernanceModule:
 				arguments,
 			};
 
+			require!(
+				gas_limit < MAX_GAS_LIMIT_PER_BLOCK,
+				"A single action cannot use more than the max gas limit per block"
+			);
+
 			gov_actions.push(gov_action);
 		}
+
+		require!(
+			self.total_gas_needed(&gov_actions) < MAX_GAS_LIMIT_PER_BLOCK,
+			"Actions require too much gas to be executed"
+		);
 
 		let proposer = self.blockchain().get_caller();
 		let proposal = GovernanceProposal {
@@ -189,12 +195,13 @@ pub trait GovernanceModule:
 		);
 
 		let proposal = self.proposals().get(proposal_id);
-		let total_gas_needed = self.total_gas_needed(&proposal.actions);
+		let total_gas_needed_execution = self.total_gas_needed(&proposal.actions);
+		let total_gas_needed_serialization = total_gas_needed_execution;
+		let total_gas_needed = total_gas_needed_execution + total_gas_needed_serialization;
 		let gas_left = self.blockchain().get_gas_left();
 
-		// reserve double to account for the processing needed for each action, like argument serialization
 		require!(
-			gas_left >= total_gas_needed * 2,
+			gas_left >= total_gas_needed,
 			"Not enough gas to execute all proposals"
 		);
 
@@ -304,7 +311,7 @@ pub trait GovernanceModule:
 		}
 	}
 
-	#[view]
+	#[view(getProposalActions)]
 	fn get_proposal_actions(
 		&self,
 		proposal_id: usize,
@@ -352,19 +359,14 @@ pub trait GovernanceModule:
 	fn total_gas_needed(&self, actions: &[GovernanceAction<Self::BigUint>]) -> u64 {
 		let mut total = 0;
 		for action in actions {
-			total += action.gas_limit;
+			let gas_needed_execution = action.gas_limit;
+			let gas_needed_misc = action.gas_limit;
+
+			total += gas_needed_execution;
+			total += gas_needed_misc;
 		}
 
 		total
-	}
-
-	fn get_sc_balance(&self, token_id: &TokenIdentifier) -> Self::BigUint {
-		if token_id.is_egld() {
-			self.blockchain().get_sc_balance()
-		} else {
-			self.blockchain()
-				.get_esdt_balance(&self.blockchain().get_sc_address(), token_id, 0)
-		}
 	}
 
 	/// specific votes/downvotes are not cleared,
