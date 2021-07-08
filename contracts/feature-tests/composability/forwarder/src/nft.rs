@@ -112,12 +112,13 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		amount: Self::BigUint,
 	) {
 		self.send()
-			.esdt_nft_add_quantity(&token_identifier, nonce, &amount);
+			.esdt_local_mint(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint]
 	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
-		self.send().esdt_nft_burn(&token_identifier, nonce, &amount);
+		self.send()
+			.esdt_local_burn(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint]
@@ -129,8 +130,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		amount: Self::BigUint,
 		data: BoxedBytes,
 	) {
-		self.send().transfer_esdt_nft_via_async_call(
-			&self.blockchain().get_sc_address(),
+		self.send().transfer_esdt_via_async_call(
 			&to,
 			&token_identifier,
 			nonce,
@@ -188,7 +188,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 		);
 
 		self.send()
-			.direct_nft(&to, &token_identifier, token_nonce, &amount, b"NFT transfer");
+			.direct(&to, &token_identifier, token_nonce, &amount, b"NFT transfer");
 
 		self.send_event(&to, &token_identifier, token_nonce, &amount);
 	}
