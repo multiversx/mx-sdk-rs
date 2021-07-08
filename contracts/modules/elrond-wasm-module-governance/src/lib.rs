@@ -23,7 +23,7 @@ pub trait GovernanceModule:
 	fn deposit_tokens_for_action(&self) {}
 
 	// Used to withdraw the tokens after the action was executed or cancelled
-	#[endpoint(withdraw_governance_tokens)]
+	#[endpoint(withdrawGovernanceTokens)]
 	fn withdraw_governance_tokens(&self, proposal_id: usize) -> SCResult<()> {
 		self.require_valid_proposal_id(proposal_id)?;
 		require!(
