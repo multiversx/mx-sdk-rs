@@ -8,9 +8,8 @@ elrond_wasm::derive_imports!();
 
 mod curves;
 mod function_selector;
-mod utils;
-
 mod token_methods;
+mod utils;
 use crate::utils::{events, owner_endpoints, storage, user_endpoints};
 
 #[elrond_wasm_derive::contract]
@@ -21,6 +20,4 @@ pub trait Contract:
 	+ user_endpoints::UserEndpointsModule
 	+ owner_endpoints::OwnerEndpointsModule
 {
-	#[init]
-	fn init(&self) {}
 }

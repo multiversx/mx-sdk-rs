@@ -54,4 +54,39 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			.update(|bonding_curve| bonding_curve.curve = function);
 		Ok(())
 	}
+
+	/* 	#[endpoint]
+	#[payable("*")]
+	fn fund(
+		&self,
+		#[payment] payment: Self::BigUint,
+		#[payment_token] token: TokenIdentifier,
+	) -> SCResult<()> {
+		require!(
+			self.status() == Status::FundingPeriod,
+			"cannot fund after deadline"
+		);
+		require!(token == self.cf_token_name().get(), "wrong token");
+
+		let caller = self.blockchain().get_caller();
+		self.deposit(&caller).update(|deposit| *deposit += payment);
+
+		Ok(())
+	}
+
+	#[endpoint]
+	fn claim(&self) -> SCResult<()> {
+		let caller = self.blockchain().get_caller();
+		require!(
+			caller == self.blockchain().get_owner_address(),
+			"only owner can claim successful funding"
+		);
+
+		let token_name = self.cf_token_name().get();
+		let sc_balance = self.get_current_funds();
+
+		self.send().direct(&caller, &token_name, &sc_balance, &[]);
+
+		Ok(())
+	}*/
 }

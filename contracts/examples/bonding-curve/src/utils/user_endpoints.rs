@@ -133,9 +133,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 	#[view]
 	fn get_buy_price(
 		&self,
+		amount: Self::BigUint,
 		identifier: TokenIdentifier,
 		nonce: u64,
-		amount: Self::BigUint,
 	) -> SCResult<Self::BigUint> {
 		let token = Token { identifier, nonce };
 		self.check_token_exists(&token)?;
@@ -147,9 +147,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 	#[view]
 	fn get_sell_price(
 		&self,
+		amount: Self::BigUint,
 		identifier: TokenIdentifier,
 		nonce: u64,
-		amount: Self::BigUint,
 	) -> SCResult<Self::BigUint> {
 		let token = Token { identifier, nonce };
 		self.check_token_exists(&token)?;
@@ -165,6 +165,41 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 		);
 
 		Ok(())
+	}
+
+	#[view(getTokenAvailability)]
+	fn get_token_availability(
+		&self,
+		identifier: TokenIdentifier,
+	) -> MultiResultVec<MultiArg2<u64, Self::BigUint>> {
+		let token_type = self.token_type(&identifier).get();
+		let mut current_check_nonce = 0u64;
+		let mut max_loop_nonce = 0u64;
+		if token_type == EsdtTokenType::SemiFungible {
+			current_check_nonce = 1u64;
+			max_loop_nonce = self
+				.blockchain()
+				.get_current_esdt_nft_nonce(&self.blockchain().get_sc_address(), &identifier);
+		}
+		let mut availability = Vec::new();
+
+		loop {
+			let bonding_curve = self
+				.bonding_curve(&Token {
+					identifier: identifier.clone(),
+					nonce: current_check_nonce,
+				})
+				.get();
+			availability.push(MultiArg2((
+				current_check_nonce,
+				bonding_curve.arguments.balance,
+			)));
+			if current_check_nonce == max_loop_nonce {
+				break;
+			}
+			current_check_nonce += 1;
+		}
+		availability.into()
 	}
 
 	fn check_sell_requirements(

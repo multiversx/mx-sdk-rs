@@ -62,6 +62,25 @@
                     "code": "file:../output/bonding-curve.wasm"
                 }
             }
+        },
+        {
+            "step": "scQuery",
+            "tx": {
+                "to": "sc:bonding-curve",
+                "function": "getTokenAvailability",
+                "arguments": [
+                    "str:MFFT-12345"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x",
+                    "0x012c"
+                ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }
