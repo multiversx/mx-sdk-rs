@@ -177,6 +177,25 @@
                 },
                 "+": {}
             }
+        },
+        {
+            "step": "scQuery",
+            "tx": {
+                "to": "sc:bonding-curve",
+                "function": "getTokenAvailability",
+                "arguments": [
+                    "str:MFNFT-67890"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x",
+                    "0x02"
+                ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

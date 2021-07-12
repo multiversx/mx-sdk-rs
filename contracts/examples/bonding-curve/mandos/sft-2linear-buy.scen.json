@@ -180,6 +180,27 @@
                 },
                 "+": {}
             }
+        },
+        {
+            "step": "scQuery",
+            "tx": {
+                "to": "sc:bonding-curve",
+                "function": "getTokenAvailability",
+                "arguments": [
+                    "str:MFSFT-24680"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x01",
+                    "0x5a",
+                    "0x02",
+                    "0x"
+                ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }
