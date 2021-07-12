@@ -101,24 +101,15 @@ impl TokenIdentifier {
 		let number_range = &b'0'..=&b'9';
 
 		// ticker must be all uppercase alphanumeric
-		let mut ticker_contains_letter = false;
 		let ticker_len = id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
 		let ticker = &id_as_slice[..ticker_len];
 		for ticker_char in ticker {
 			let is_uppercase_letter = uppercase_letter_range.contains(&ticker_char);
 			let is_number = number_range.contains(&ticker_char);
 
-			if is_uppercase_letter {
-				ticker_contains_letter = true;
-			}
-
 			if !is_uppercase_letter && !is_number {
 				return false;
 			}
-		}
-
-		if !ticker_contains_letter {
-			return false;
 		}
 
 		let dash_position = ticker_len;
@@ -291,6 +282,9 @@ mod tests {
 		// valid identifier with numbers in ticker
 		assert!(TokenIdentifier::from(&b"ALC123-6258d2"[..]).is_valid_esdt_identifier());
 
+		// valid ticker only numbers
+		assert!(TokenIdentifier::from(&b"12345-6258d2"[..]).is_valid_esdt_identifier());
+
 		// missing dash
 		assert!(!TokenIdentifier::from(&b"ALC6258d2"[..]).is_valid_esdt_identifier());
 
@@ -311,8 +305,5 @@ mod tests {
 
 		// ticker too long
 		assert!(!TokenIdentifier::from(&b"ALCCCCCCCCC-6258d2"[..]).is_valid_esdt_identifier());
-
-		// ticker only numbers
-		assert!(!TokenIdentifier::from(&b"12345-6258d2"[..]).is_valid_esdt_identifier());
 	}
 }
