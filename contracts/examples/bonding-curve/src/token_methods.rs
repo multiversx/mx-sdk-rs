@@ -75,24 +75,28 @@ pub trait TokenMethods:
 			"Token not issued"
 		);
 
-		let token = Token { identifier, nonce };
+		let mut token = Token { identifier, nonce };
+
+		if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::NonFungible {
+			token.nonce = 0u64;
+		}
 
 		require!(
 			token_type != EsdtTokenType::SemiFungible || token.nonce != 0,
 			"Nonce should not be 0!"
 		);
 
-		self.store_bonding_curve(
-			token,
-			amount,
-			token_type,
-			supply_type
+		let mut set_payment = TokenIdentifier::egld();
+		let mut set_supply = SupplyType::Unlimited;
+		if self.bonding_curve(&token).is_empty() {
+			set_payment = payment
 				.into_option()
-				.ok_or("Expected provided supply_type for new created token")?,
-			payment
+				.ok_or("Expected provided accepted_payment for the token")?;
+			set_supply = supply_type
 				.into_option()
-				.ok_or("Expected provided accepted_payment for new created token")?,
-		)?;
+				.ok_or("Expected provided supply_type for the token")?;
+		}
+		self.store_bonding_curve(token, amount, set_supply, set_payment)?;
 		Ok(())
 	}
 

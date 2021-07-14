@@ -81,10 +81,10 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			token_type != EsdtTokenType::SemiFungible || nonce != 0,
 			"Nonce should not be 0!"
 		);
-		let token = Token { identifier, nonce };
+		let mut token = Token { identifier, nonce };
 		let mut set_payment = TokenIdentifier::egld();
 		let mut set_supply = SupplyType::Unlimited;
-		if !self.bonding_curve(&token).is_empty() {
+		if self.bonding_curve(&token).is_empty() {
 			set_payment = payment
 				.into_option()
 				.ok_or("Expected provided accepted_payment for the token")?;
@@ -103,7 +103,12 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 				"The token was alreade deposited by another address"
 			);
 		}
-		self.store_bonding_curve(token, amount, token_type, set_supply, set_payment)?;
+
+		if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::NonFungible {
+			token.nonce = 0u64;
+		}
+
+		self.store_bonding_curve(token, amount, set_supply, set_payment)?;
 		self.owned_tokens(&caller).set(&deposited_tokens);
 		Ok(())
 	}
@@ -193,9 +198,8 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
 	fn store_bonding_curve(
 		&self,
-		mut token: Token,
+		token: Token,
 		amount: Self::BigUint,
-		token_type: EsdtTokenType,
 		supply_type: SupplyType<Self::BigUint>,
 		payment: TokenIdentifier,
 	) -> SCResult<()> {
@@ -204,18 +208,14 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 		let payment_token;
 		let payment_amount: Self::BigUint;
 
-		if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::NonFungible {
-			token.nonce = 0u64;
-		}
-
 		if self.bonding_curve(&token).is_empty() {
 			arguments = CurveArguments {
 				supply_type,
 				available_supply: amount.clone(),
-				balance: amount.clone(),
+				balance: amount,
 			};
 			payment_token = payment;
-			payment_amount = amount;
+			payment_amount = 0u64.into();
 		} else {
 			self.check_supply(&token, &amount)?;
 			let bonding_curve = self.bonding_curve(&token).get();
