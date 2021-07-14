@@ -52,5 +52,6 @@ pub struct Token {
 pub struct BondingCurve<BigUint: BigUintApi> {
 	pub curve: FunctionSelector<BigUint>,
 	pub arguments: CurveArguments<BigUint>,
-	pub accepted_payment: TokenIdentifier,
+	pub payment_token: TokenIdentifier,
+	pub payment_amount: BigUint,
 }
