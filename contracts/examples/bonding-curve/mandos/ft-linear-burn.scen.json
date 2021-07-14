@@ -56,8 +56,8 @@
                         }
                     },
                     "storage": {
-                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:0|biguint:1000|biguint:300|biguint:300|nested:str:EGLD-12345",
-                        "str:token_type|nested:str:MFFT-12345": "u8:0"
+                        "str:bonding_curve|nested:str:MFFT-12345|u64:0": "u8:0|biguint:1|biguint:1|u8:0|biguint:1000|biguint:300|biguint:300|nested:str:EGLD-12345|biguint:0",
+                        "str:token_details|nested:str:MFFT-12345": "u8:0|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 }

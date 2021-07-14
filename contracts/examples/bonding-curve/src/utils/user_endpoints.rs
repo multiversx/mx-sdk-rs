@@ -30,7 +30,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 				sell_amount.clone(),
 				bonding_curve.arguments.clone(),
 			);
-			bonding_curve.payment_amount += price.clone()?;
+			bonding_curve.payment_amount -= price.clone()?;
 			bonding_curve.arguments.balance += sell_amount;
 			price
 		})?;
