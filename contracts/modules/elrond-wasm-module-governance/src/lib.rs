@@ -20,7 +20,16 @@ pub trait GovernanceModule:
 	// Funds can only be retrived through an action
 	#[payable("*")]
 	#[endpoint(depositTokensForAction)]
-	fn deposit_tokens_for_action(&self) {}
+	fn deposit_tokens_for_action(
+		&self,
+		#[payment_token] payment_token: TokenIdentifier,
+		#[payment_nonce] payment_nonce: u64,
+		#[payment_amount] payment_amount: Self::BigUint,
+	) {
+		let caller = self.blockchain().get_caller();
+
+		self.user_deposit_event(&caller, &payment_token, payment_nonce, &payment_amount);
+	}
 
 	// Used to withdraw the tokens after the action was executed or cancelled
 	#[endpoint(withdrawGovernanceTokens)]
@@ -95,14 +104,24 @@ pub trait GovernanceModule:
 		);
 
 		let proposer = self.blockchain().get_caller();
+		let current_block = self.blockchain().get_block_nonce();
+		let proposal_id = self.proposals().len() + 1;
+
+		self.proposal_created_event(
+			proposal_id,
+			&proposer,
+			current_block,
+			&description,
+			&gov_actions,
+		);
+
 		let proposal = GovernanceProposal {
 			proposer: proposer.clone(),
 			description,
 			actions: gov_actions,
 		};
-		let proposal_id = self.proposals().push(&proposal);
+		let _ = self.proposals().push(&proposal);
 
-		let current_block = self.blockchain().get_block_nonce();
 		self.proposal_start_block(proposal_id).set(&current_block);
 
 		self.total_votes(proposal_id).set(&payment_amount);
@@ -126,6 +145,8 @@ pub trait GovernanceModule:
 		);
 
 		let voter = self.blockchain().get_caller();
+
+		self.vote_cast_event(&voter, proposal_id, &payment_amount);
 
 		self.total_votes(proposal_id)
 			.update(|total_votes| *total_votes += &payment_amount);
@@ -151,12 +172,14 @@ pub trait GovernanceModule:
 			"Proposal is not active"
 		);
 
-		let voter = self.blockchain().get_caller();
+		let downvoter = self.blockchain().get_caller();
+
+		self.downvote_cast_event(&downvoter, proposal_id, &payment_amount);
 
 		self.total_downvotes(proposal_id)
 			.update(|total_downvotes| *total_downvotes += &payment_amount);
 		self.downvotes(proposal_id)
-			.entry(voter)
+			.entry(downvoter)
 			.and_modify(|nr_downvotes| *nr_downvotes += &payment_amount)
 			.or_insert(payment_amount);
 
@@ -172,6 +195,8 @@ pub trait GovernanceModule:
 
 		let current_block = self.blockchain().get_block_nonce();
 		self.proposal_queue_block(proposal_id).set(&current_block);
+
+		self.proposal_queued_event(proposal_id, current_block);
 
 		Ok(())
 	}
@@ -226,6 +251,8 @@ pub trait GovernanceModule:
 
 		self.clear_proposal(proposal_id);
 
+		self.proposal_executed_event(proposal_id);
+
 		Ok(())
 	}
 
@@ -248,6 +275,8 @@ pub trait GovernanceModule:
 		}
 
 		self.clear_proposal(proposal_id);
+
+		self.proposal_canceled_event(proposal_id);
 
 		Ok(())
 	}
@@ -381,16 +410,9 @@ pub trait GovernanceModule:
 		&self,
 		#[indexed] proposal_id: usize,
 		#[indexed] proposer: &Address,
-		#[indexed] gas_limit: u64,
-		#[indexed] targets: &[Address],
-		#[indexed] call_value_token_ids: &[TokenIdentifier],
-		#[indexed] call_value_nonces: &[u64],
-		#[indexed] call_value_amounts: &[Self::BigUint],
-		#[indexed] function_names: &[BoxedBytes],
-		#[indexed] arguments: &Vec<Vec<BoxedBytes>>,
-		#[indexed] voting_start_block: u64,
-		#[indexed] voting_end_block: u64,
-		description: &BoxedBytes,
+		#[indexed] start_block: u64,
+		#[indexed] description: &BoxedBytes,
+		actions: &[GovernanceAction<Self::BigUint>],
 	);
 
 	#[event("voteCast")]
@@ -413,10 +435,19 @@ pub trait GovernanceModule:
 	fn proposal_canceled_event(&self, #[indexed] proposal_id: usize);
 
 	#[event("proposalQueued")]
-	fn proposal_queued_event(&self, #[indexed] proposal_id: usize, #[indexed] can_execute_block: u64);
+	fn proposal_queued_event(&self, #[indexed] proposal_id: usize, #[indexed] queued_block: u64);
 
 	#[event("proposalExecuted")]
 	fn proposal_executed_event(&self, #[indexed] proposal_id: usize);
+
+	#[event("userDeposit")]
+	fn user_deposit_event(
+		&self,
+		#[indexed] address: &Address,
+		#[indexed] token_id: &TokenIdentifier,
+		#[indexed] token_nonce: u64,
+		amount: &Self::BigUint,
+	);
 
 	// storage - general
 
