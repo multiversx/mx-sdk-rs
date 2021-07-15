@@ -374,6 +374,50 @@ pub trait GovernanceModule:
 		self.total_downvotes(proposal_id).clear();
 	}
 
+	// events
+
+	#[event("proposalCreated")]
+	fn proposal_created_event(
+		&self,
+		#[indexed] proposal_id: usize,
+		#[indexed] proposer: &Address,
+		#[indexed] gas_limit: u64,
+		#[indexed] targets: &[Address],
+		#[indexed] call_value_token_ids: &[TokenIdentifier],
+		#[indexed] call_value_nonces: &[u64],
+		#[indexed] call_value_amounts: &[Self::BigUint],
+		#[indexed] function_names: &[BoxedBytes],
+		#[indexed] arguments: &Vec<Vec<BoxedBytes>>,
+		#[indexed] voting_start_block: u64,
+		#[indexed] voting_end_block: u64,
+		description: &BoxedBytes,
+	);
+
+	#[event("voteCast")]
+	fn vote_cast_event(
+		&self,
+		#[indexed] voter: &Address,
+		#[indexed] proposal_id: usize,
+		nr_votes: &Self::BigUint,
+	);
+
+	#[event("downvoteCast")]
+	fn downvote_cast_event(
+		&self,
+		#[indexed] downvoter: &Address,
+		#[indexed] proposal_id: usize,
+		nr_downvotes: &Self::BigUint,
+	);
+
+	#[event("proposalCanceled")]
+	fn proposal_canceled_event(&self, #[indexed] proposal_id: usize);
+
+	#[event("proposalQueued")]
+	fn proposal_queued_event(&self, #[indexed] proposal_id: usize, #[indexed] can_execute_block: u64);
+
+	#[event("proposalExecuted")]
+	fn proposal_executed_event(&self, #[indexed] proposal_id: usize);
+
 	// storage - general
 
 	#[storage_mapper("governance:proposals")]
