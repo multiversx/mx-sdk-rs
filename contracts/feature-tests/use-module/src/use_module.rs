@@ -15,7 +15,7 @@ use elrond_wasm_module_features::feature_guard;
 /// - EsdtModule
 /// - GovernanceModule
 /// - PauseModule
-/// - RmgModule
+/// - RngModule
 #[elrond_wasm_derive::contract]
 pub trait UseModule:
 	internal_mod_a::InternalModuleA
@@ -47,7 +47,7 @@ pub trait UseModule:
 
 	#[endpoint(initRngModule)]
 	fn rng_module(&self) {
-		self.init_rmg_module();
+		self.init_rng_module();
 	}
 
 	#[endpoint(getRandU8)]

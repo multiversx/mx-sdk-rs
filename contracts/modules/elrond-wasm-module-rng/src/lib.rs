@@ -3,14 +3,14 @@
 elrond_wasm::imports!();
 
 const SEED_SIZE: usize = 48;
-type RmgSeed = Box<[u8; SEED_SIZE]>;
+type RngSeed = Box<[u8; SEED_SIZE]>;
 
 /// The module deals with generating random numbers
 #[elrond_wasm_derive::module]
 pub trait RandomNumberGeneratorModule {
 	/// Remember to initialize the module first
-	fn init_rmg_module(&self) {
-		let mut init_seed = RmgSeed::new([0u8; SEED_SIZE]);
+	fn init_rng_module(&self) {
+		let mut init_seed = RngSeed::new([0u8; SEED_SIZE]);
 
 		self._refresh_seed(&mut init_seed);
 	}
@@ -52,8 +52,8 @@ pub trait RandomNumberGeneratorModule {
 			return 0;
 		}
 
-		let mut seed = self.rmg_seed().get();
-		let mut start = self.rmg_seed_index().get();
+		let mut seed = self.rng_seed().get();
+		let mut start = self.rng_seed_index().get();
 
 		if start + nr_bytes > SEED_SIZE {
 			self._refresh_seed(&mut seed);
@@ -61,7 +61,7 @@ pub trait RandomNumberGeneratorModule {
 		}
 
 		let end = start + nr_bytes;
-		self.rmg_seed_index().set(&end);
+		self.rng_seed_index().set(&end);
 
 		u64::top_decode(&seed[start..end]).unwrap_or_default()
 	}
@@ -69,22 +69,22 @@ pub trait RandomNumberGeneratorModule {
 	/// Parent contract should never call this function. Calling this directly leads to undefined behaviour.
 	/// Add new seed to old seed for cases when many random numbers are needed in the same block
 	/// This prevents infinite loops, where a contract may want distinct numbers (for example, lottery SC)
-	fn _refresh_seed(&self, old_seed: &mut RmgSeed) {
+	fn _refresh_seed(&self, old_seed: &mut RngSeed) {
 		let new_seed = self.blockchain().get_block_random_seed();
 
 		for i in 0..SEED_SIZE {
 			old_seed[i] = old_seed[i].wrapping_add(new_seed[i]);
 		}
 
-		self.rmg_seed().set(old_seed);
-		self.rmg_seed_index().clear();
+		self.rng_seed().set(old_seed);
+		self.rng_seed_index().clear();
 	}
 
 	// storage
 
-	#[storage_mapper("rmg:seed_index")]
-	fn rmg_seed_index(&self) -> SingleValueMapper<Self::Storage, usize>;
+	#[storage_mapper("rng:seed_index")]
+	fn rng_seed_index(&self) -> SingleValueMapper<Self::Storage, usize>;
 
-	#[storage_mapper("rmg:seed")]
-	fn rmg_seed(&self) -> SingleValueMapper<Self::Storage, RmgSeed>;
+	#[storage_mapper("rng:seed")]
+	fn rng_seed(&self) -> SingleValueMapper<Self::Storage, RngSeed>;
 }

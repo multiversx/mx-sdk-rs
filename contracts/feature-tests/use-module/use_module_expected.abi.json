@@ -7,7 +7,7 @@
         "- EsdtModule",
         "- GovernanceModule",
         "- PauseModule",
-        "- RmgModule"
+        "- RngModule"
     ],
     "name": "UseModule",
     "constructor": {
