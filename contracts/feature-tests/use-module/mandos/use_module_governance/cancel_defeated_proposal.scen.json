@@ -28,7 +28,7 @@
                     "str:changeQuorum",
                     "biguint:1000"
                 ],
-                "gasLimit": "30,000,000",
+                "gasLimit": "40,000,000",
                 "gasPrice": "0"
             },
             "expect": {
