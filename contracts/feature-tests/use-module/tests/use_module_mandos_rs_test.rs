@@ -78,6 +78,11 @@ fn use_module_pause_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", &contract_map());
 }
 
+#[test]
+fn use_module_rng_rs() {
+	elrond_wasm_debug::mandos_rs("mandos/use_module_rng.scen.json", &contract_map());
+}
+
 // Governance module tests
 
 /*

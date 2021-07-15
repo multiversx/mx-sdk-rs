@@ -44,4 +44,34 @@ pub trait UseModule:
 	fn check_pause(&self) -> SCResult<bool> {
 		Ok(self.is_paused())
 	}
+
+	#[endpoint(initRngModule)]
+	fn rng_module(&self) {
+		self.init_rmg_module();
+	}
+
+	#[endpoint(getRandU8)]
+	fn get_rand_u8(&self) -> u8 {
+		self.next_u8()
+	}
+
+	#[endpoint(getRandU16)]
+	fn get_rand_u16(&self) -> u16 {
+		self.next_u16()
+	}
+
+	#[endpoint(getRandU32)]
+	fn get_rand_u32(&self) -> u32 {
+		self.next_u32()
+	}
+
+	#[endpoint(getRandU64)]
+	fn get_rand_u64(&self) -> u64 {
+		self.next_u64()
+	}
+
+	#[endpoint(getTwoU64)]
+	fn get_two_u64(&self) -> MultiResult2<u64, u64> {
+		(self.next_u64(), self.next_u64()).into()
+	}
 }

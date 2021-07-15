@@ -6,7 +6,8 @@
         "- FeaturesModule",
         "- EsdtModule",
         "- GovernanceModule",
-        "- PauseModule"
+        "- PauseModule",
+        "- RmgModule"
     ],
     "name": "UseModule",
     "constructor": {
@@ -29,6 +30,54 @@
             "outputs": [
                 {
                     "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "getRandU8",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "getRandU16",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "getRandU32",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "getRandU64",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getTwoU64",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
                 }
             ]
         },

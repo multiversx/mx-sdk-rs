@@ -43,7 +43,7 @@ pub trait RandomNumberGeneratorModule {
 		// since wasm32 doesn't have u64, but only i64, we set the first bit to 0
 		// this is done to prevent any potential unintended bugs that are impossible to track down
 	
-		rand_nr & 0x7000000000000000
+		rand_nr & 0x7fffffffffffffff
 	}
 
 	/// please use one of the specific methods instead of directly calling this
@@ -61,6 +61,7 @@ pub trait RandomNumberGeneratorModule {
 		}
 
 		let end = start + nr_bytes;
+		self.rmg_seed_index().set(&end);
 
 		u64::top_decode(&seed[start..end]).unwrap_or_default()
 	}

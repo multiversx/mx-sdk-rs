@@ -18,6 +18,11 @@ fn use_module_pause_go() {
 	elrond_wasm_debug::mandos_go("mandos/use_module_pause.scen.json");
 }
 
+#[test]
+fn use_module_rng_go() {
+	elrond_wasm_debug::mandos_go("mandos/use_module_rng.scen.json");
+}
+
 // Governance module tests
 
 #[test]

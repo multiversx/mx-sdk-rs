@@ -1,0 +1,211 @@
+{
+    "name": "Random number generator module test",
+    "steps": [
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x010203040506070880706050403020100000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:rng": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/use-module.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "init-rng-module",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "initRngModule",
+                "arguments": [],
+                "gasLimit": "30,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:rng": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:rmg:seed": "0x010203040506070880706050403020100000000000000000000000000000000000000000000000000000000000000000",
+                        "str:rmg:seed_index": "0"
+                    },
+                    "code": "file:../output/use-module.wasm"
+                },
+                "+": {}
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-rand-u8",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getRandU8",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0x01" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-rand-u16",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getRandU16",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0x0203" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-rand-u32",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getRandU32",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0x04050607" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-rand-u8",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getRandU8",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0x08" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-rand-negative-u64",
+            "comment": "The 0x80 at the beginning it turned into 0x00",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getRandU64",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0x70605040302010" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-two-u64-zeroes-first",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getTwoU64",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0", "0" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-two-u64-zeroes-second",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getTwoU64",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0", "0" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-u16-after-seed-refresh",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:rng",
+                "value": "0",
+                "function": "getRandU16",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0x0204" ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
