@@ -16,7 +16,7 @@ pub trait RandomNumberGeneratorModule {
 	}
 
 	fn next_u8(&self) -> u8 {
-		let nr_bytes = (u8::BITS / u8::BITS) as usize;
+		let nr_bytes = 1;
 		let rand_nr = self._next_number(nr_bytes);
 		
 		rand_nr as u8
