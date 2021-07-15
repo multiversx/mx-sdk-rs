@@ -15,6 +15,7 @@ use elrond_wasm_module_features::feature_guard;
 /// - EsdtModule
 /// - GovernanceModule
 /// - PauseModule
+/// - RmgModule
 #[elrond_wasm_derive::contract]
 pub trait UseModule:
 	internal_mod_a::InternalModuleA
@@ -26,6 +27,7 @@ pub trait UseModule:
 	+ elrond_wasm_module_governance::GovernanceModule
 	+ elrond_wasm_module_governance::governance_configurable::GovernanceConfigurablePropertiesModule
 	+ elrond_wasm_module_pause::PauseModule
+	+ elrond_wasm_module_rng::RandomNumberGeneratorModule
 {
 	#[init]
 	fn init(&self) {}
