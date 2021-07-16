@@ -38,11 +38,8 @@ pub trait RandomNumberGeneratorModule {
 	fn next_u64(&self) -> u64 {
 		let nr_bytes = (u64::BITS / u8::BITS) as usize;
 		let rand_nr = self._next_number(nr_bytes);
-
-		// since wasm32 doesn't have u64, but only i64, we set the first bit to 0
-		// this is done to prevent any potential unintended bugs that are impossible to track down
 	
-		rand_nr & 0x7fffffffffffffff
+		rand_nr
 	}
 
 	/// please use one of the specific methods instead of directly calling this
