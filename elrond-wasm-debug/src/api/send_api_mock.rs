@@ -150,6 +150,17 @@ impl SendApi for TxContext {
 		panic!("deploy_contract not yet implemented")
 	}
 
+	fn deploy_from_source_contract(
+		&self,
+		_gas: u64,
+		_amount: &RustBigUint,
+		_source_contract_address: &Address,
+		_code_metadata: CodeMetadata,
+		_arg_buffer: &ArgBuffer,
+	) -> Address {
+		panic!("deploy_from_source_contract not yet implemented")
+	}
+
 	fn upgrade_contract(
 		&self,
 		_sc_address: &Address,

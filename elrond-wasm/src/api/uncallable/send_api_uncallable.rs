@@ -71,6 +71,17 @@ impl SendApi for super::UncallableApi {
 		unreachable!()
 	}
 
+	fn deploy_from_source_contract(
+		&self,
+		_gas: u64,
+		_amount: &BigUintUncallable,
+		_source_contract_address: &Address,
+		_code_metadata: CodeMetadata,
+		_arg_buffer: &ArgBuffer,
+	) -> Address {
+		unreachable!()
+	}
+
 	fn upgrade_contract(
 		&self,
 		_sc_address: &Address,
