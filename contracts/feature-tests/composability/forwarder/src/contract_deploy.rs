@@ -16,6 +16,21 @@ pub trait DeployContractModule {
 		Ok(deployed_contract_address)
 	}
 
+	#[endpoint(deployFromSource)]
+	fn deploy_from_source(
+		&self,
+		source_contract_address: Address,
+		#[var_args] arguments: VarArgs<BoxedBytes>,
+	) -> Address {
+		self.send().deploy_from_source_contract(
+			self.blockchain().get_gas_left(),
+			&Self::BigUint::zero(),
+			&source_contract_address,
+			CodeMetadata::DEFAULT,
+			&arguments.as_slice().into(),
+		)
+	}
+
 	#[endpoint(deployTwoContracts)]
 	fn deploy_two_contracts(
 		&self,
