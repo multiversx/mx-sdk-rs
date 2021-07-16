@@ -5,7 +5,6 @@ elrond_wasm::imports!();
 const SEED_SIZE: usize = 48;
 type RngSeed = Box<[u8; SEED_SIZE]>;
 
-/// The module deals with generating random numbers
 #[elrond_wasm_derive::module]
 pub trait RandomNumberGeneratorModule {
 	/// Remember to initialize the module first
