@@ -27,3 +27,6 @@ tags
 **/testnet/**
 **/erdpy.data-storage.json
 **/*.interaction.json
+
+# Python scripts
+**/__pycache__/**
