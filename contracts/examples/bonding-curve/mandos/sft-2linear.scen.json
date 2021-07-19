@@ -36,7 +36,7 @@
                         }
                     },
                     "storage": {
-                        "str:token_details|nested:str:MFSFT-24680": "u8:2|sc:bonding-curve"
+                        "str:token_details|nested:str:MFSFT-24680": "u8:2|u32:0|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm",
                     "owner": "address:owner"
@@ -50,7 +50,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:token_details|nested:str:MFSFT-24680": "u8:2|sc:bonding-curve"
+                        "str:token_details|nested:str:MFSFT-24680": "u8:2|u32:0|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -132,7 +132,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:0|biguint:1|biguint:0|u8:1|biguint:100|biguint:100|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFSFT-24680": "u8:2|sc:bonding-curve"
+                        "str:token_details|nested:str:MFSFT-24680": "u8:2|u32:1|u64:1|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -230,7 +230,7 @@
                     "storage": {
                         "str:bonding_curve|nested:str:MFSFT-24680|u64:1": "u8:0|biguint:1|biguint:0|u8:1|biguint:100|biguint:100|nested:str:EGLD-12345|biguint:0",
                         "str:bonding_curve|nested:str:MFSFT-24680|u64:2": "u8:0|biguint:0|biguint:1|u8:0|biguint:20|biguint:10|biguint:10|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFSFT-24680": "u8:2|sc:bonding-curve"
+                        "str:token_details|nested:str:MFSFT-24680": "u8:2|u32:2|u64:1|u64:2|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 }

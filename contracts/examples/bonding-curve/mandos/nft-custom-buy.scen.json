@@ -87,7 +87,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890|u64:0": "u8:1|biguint:1|u8:0|biguint:3|biguint:3|biguint:2|nested:str:EGLD-12345|biguint:4",
-                        "str:token_details|nested:str:MFNFT-67890": "u8:1|sc:bonding-curve"
+                        "str:token_details|nested:str:MFNFT-67890": "u8:1|u32:3|u64:1|u64:2|u64:3|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -171,7 +171,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890|u64:0": "u8:1|biguint:1|u8:0|biguint:3|biguint:3|biguint:2|nested:str:EGLD-12345|biguint:4",
-                        "str:token_details|nested:str:MFNFT-67890": "u8:1|sc:bonding-curve"
+                        "str:token_details|nested:str:MFNFT-67890": "u8:1|u32:3|u64:1|u64:2|u64:3|sc:bonding-curve"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 },
@@ -195,6 +195,26 @@
                 "status": "",
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:bonding-curve",
+                "value": "0",
+                "esdt": {
+                    "value": "50",
+                    "tokenIdentifier": "str:EGLD-12345"
+                },
+                "function": "buyToken",
+                "arguments": [
+                    "1",
+                    "str:MFNFT-67890",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
             }
         }
     ]

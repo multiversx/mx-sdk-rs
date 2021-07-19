@@ -63,16 +63,16 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 			identifier: offered_token,
 			nonce: 0u64,
 		};
-		let (token_type, _) = self.token_details(&requested_token).get();
+		let details = self.token_details(&requested_token).get();
 		let mut desired_nonce = 0u64;
 		let owned_token;
 
-		if token_type != EsdtTokenType::Fungible {
+		if details.token_type != EsdtTokenType::Fungible {
 			desired_nonce = requested_nonce
 				.into_option()
 				.ok_or("Expected nonce for the desired NFT")?;
 		}
-		if token_type == EsdtTokenType::SemiFungible {
+		if details.token_type == EsdtTokenType::SemiFungible {
 			owned_token = Token {
 				identifier: requested_token,
 				nonce: desired_nonce,
@@ -104,7 +104,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
 		let caller = self.blockchain().get_caller();
 
-		if token_type == EsdtTokenType::Fungible {
+		if details.token_type == EsdtTokenType::Fungible {
 			self.send().direct(
 				&caller,
 				&owned_token.identifier,
@@ -174,10 +174,13 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 		&self,
 		identifier: TokenIdentifier,
 	) -> MultiResultVec<MultiResult2<u64, Self::BigUint>> {
-		let (_, min_loop_nonce, max_loop_nonce) = self.get_token_nonce_ranges(&identifier);
+		let (token_type, mut token_nonces) = self.get_token_nonce_ranges(&identifier);
 		let mut availability = Vec::new();
 
-		for current_check_nonce in min_loop_nonce..=max_loop_nonce {
+		if token_type != EsdtTokenType::SemiFungible {
+			token_nonces = [0u64].to_vec()
+		}
+		for current_check_nonce in token_nonces {
 			let bonding_curve = self
 				.bonding_curve(&Token {
 					identifier: identifier.clone(),

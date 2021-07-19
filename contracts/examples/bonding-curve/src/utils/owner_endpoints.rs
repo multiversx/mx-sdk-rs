@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::function_selector::FunctionSelector;
-use crate::utils::structs::BondingCurve;
+use crate::utils::structs::{BondingCurve, TokenOwnershipDetails};
 use crate::utils::{events, storage, structs::Token};
 
 use super::structs::{CurveArguments, SupplyType};
@@ -70,10 +70,12 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 	) -> SCResult<()> {
 		let caller = self.blockchain().get_caller();
 		let mut deposited_tokens = Vec::new();
-		if self.owned_tokens(&caller).is_empty() {
-			deposited_tokens.push(identifier.clone());
-		} else {
+		if !self.owned_tokens(&caller).is_empty() {
 			deposited_tokens = self.owned_tokens(&caller).get();
+		}
+
+		if !deposited_tokens.contains(&identifier) {
+			deposited_tokens.push(identifier.clone());
 		}
 		let token_type = self.call_value().esdt_token_type();
 
@@ -91,17 +93,29 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			set_supply = supply_type
 				.into_option()
 				.ok_or("Expected provided supply_type for the token")?;
+			if amount > set_supply.get_limit()? {
+				return Err("Amount cannot be greater than the supply limit".into());
+			}
+		} else {
+			self.check_supply_limit(&token, &amount)?;
 		}
-
 		if self.token_details(&token.identifier).is_empty() {
 			self.token_details(&token.identifier)
-				.set(&(token_type.clone(), caller.clone()))
+				.set(&TokenOwnershipDetails {
+					token_type: token_type.clone(),
+					token_nonces: [token.nonce].to_vec(),
+					owner: caller.clone(),
+				});
 		} else {
-			let (_, stored_caller) = self.token_details(&token.identifier).get();
+			let details = self.token_details(&token.identifier).get();
 			require!(
-				stored_caller == caller,
+				details.owner == caller,
 				"The token was alreade deposited by another address"
 			);
+			if !details.token_nonces.contains(&token.nonce) {
+				self.token_details(&token.identifier)
+					.update(|new_details| new_details.token_nonces.push(token.nonce));
+			}
 		}
 
 		if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::NonFungible {
@@ -119,39 +133,83 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 		let owned_tokens = self.owned_tokens(&caller).get();
 
 		for token in owned_tokens {
-			let (token_type, min_loop_nonce, max_loop_nonce) = self.get_token_nonce_ranges(&token);
+			let (token_type, token_nonces) = self.get_token_nonce_ranges(&token);
+			if token_type == EsdtTokenType::NonFungible {
+				self.claim_nft(&caller, token_nonces, &token)
+			} else {
+				for current_check_nonce in token_nonces {
+					let bonding_curve = self
+						.bonding_curve(&Token {
+							identifier: token.clone(),
+							nonce: current_check_nonce,
+						})
+						.get();
 
-			for current_check_nonce in min_loop_nonce..=max_loop_nonce {
-				let bonding_curve = self
-					.bonding_curve(&Token {
+					self.send_token(
+						&caller,
+						token_type.clone(),
+						bonding_curve.arguments.balance,
+						&token,
+						current_check_nonce,
+					);
+					self.send_token(
+						&caller,
+						EsdtTokenType::Fungible,
+						bonding_curve.payment_amount,
+						&bonding_curve.payment_token,
+						0u64,
+					);
+					self.bonding_curve(&Token {
 						identifier: token.clone(),
 						nonce: current_check_nonce,
 					})
-					.get();
-
-				self.send_token(
-					&caller,
-					token_type.clone(),
-					bonding_curve.arguments.balance,
-					&token,
-					current_check_nonce,
-				);
-				self.send_token(
-					&caller,
-					token_type.clone(),
-					bonding_curve.payment_amount,
-					&bonding_curve.payment_token,
-					0u64,
-				);
-				self.bonding_curve(&Token {
-					identifier: token.clone(),
-					nonce: current_check_nonce,
-				})
-				.clear();
+					.clear();
+				}
 			}
 			self.token_details(&token).clear();
 		}
 		Ok(())
+	}
+
+	fn check_supply_limit(&self, token: &Token, amount: &Self::BigUint) -> SCResult<()> {
+		let supply = self.bonding_curve(token).get().arguments;
+		if supply.supply_type == SupplyType::Unlimited
+			|| (amount + &supply.available_supply) < supply.supply_type.get_limit()?
+		{
+			return Ok(());
+		}
+		Err("Supply limit has been reached".into())
+	}
+	fn claim_nft(&self, caller: &Address, token_nonces: Vec<u64>, identifier: &TokenIdentifier) {
+		for current_check_nonce in token_nonces {
+			self.send_token(
+				caller,
+				EsdtTokenType::NonFungible,
+				1u64.into(),
+				identifier,
+				current_check_nonce,
+			);
+		}
+		let bonding_curve = self
+			.bonding_curve(&Token {
+				identifier: identifier.clone(),
+				nonce: 0u64,
+			})
+			.get();
+
+		self.send_token(
+			caller,
+			EsdtTokenType::Fungible,
+			bonding_curve.payment_amount,
+			&bonding_curve.payment_token,
+			0u64,
+		);
+		self.bonding_curve(&Token {
+			identifier: identifier.clone(),
+			nonce: 0,
+		})
+		.clear();
+		self.token_details(identifier).clear();
 	}
 
 	fn send_token(
@@ -232,6 +290,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			payment_token,
 			payment_amount,
 		});
+
 		Ok(())
 	}
 }
