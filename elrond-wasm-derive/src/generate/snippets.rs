@@ -270,6 +270,58 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 	}
 }
 
+pub fn deploy_proxy_object_def() -> proc_macro2::TokenStream {
+	quote! {
+		pub struct DeployProxy<SA>
+		where
+			SA: elrond_wasm::api::SendApi + 'static,
+		{
+			pub api: SA,
+			pub code: elrond_wasm::types::BoxedBytes,
+			pub code_metadata: elrond_wasm::types::CodeMetadata,
+			pub payment_amount: SA::AmountType,
+		}
+
+		impl<SA> elrond_wasm::api::DeployProxyObjApi for DeployProxy<SA>
+		where
+			SA: elrond_wasm::api::SendApi + 'static,
+		{
+			type BigUint = SA::AmountType;
+			type BigInt = SA::ProxyBigInt;
+			type Storage = SA::ProxyStorage;
+			type SendApi = SA;
+
+			fn new_proxy_obj(
+				api: SA, 
+				code: elrond_wasm::types::BoxedBytes, 
+				code_metadata: elrond_wasm::types::CodeMetadata) -> Self {
+
+				DeployProxy {
+					api,
+					code,
+					code_metadata,
+					payment_amount: Self::BigUint::zero(),
+				}
+			}
+
+			fn with_egld_transfer(mut self, amount: Self::BigUint) -> Self {
+				self.payment_amount = amount;
+				self
+			}
+
+			#[inline]
+			fn into_fields(self) -> (Self::SendApi, BoxedBytes, CodeMetadata, Self::BigUint) {
+				(
+					self.api,
+					self.code,
+					self.code_metadata,
+					self.payment_amount,
+				)
+			}
+		}
+	}
+}
+
 pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
 	quote! {
 		pub struct CallbackProxyObj<SA>
