@@ -36,15 +36,13 @@ pub fn endpoint_wrapper_supertrait_decl(
 		.collect()
 }
 
-pub fn proxy_supertrait_decl(supertraits: &[Supertrait], proxy_trait_name: &str) -> Vec<proc_macro2::TokenStream> {
-	let ident = proc_macro2::Ident::new(proxy_trait_name, proc_macro2::Span::call_site());
-
+pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
 	supertraits
 		.iter()
 		.map(|supertrait| {
 			let module_path = &supertrait.module_path;
 			quote! {
-				+ #module_path #ident
+				+ #module_path ProxyTrait
 			}
 		})
 		.collect()
@@ -148,22 +146,19 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 		.collect()
 }
 
-fn impl_proxy_trait(module_path: &ModulePath, proxy_trait_name: &str, proxy_name: &str) -> proc_macro2::TokenStream {
-	let trait_ident = proc_macro2::Ident::new(proxy_trait_name, proc_macro2::Span::call_site());
-	let proxy_ident = proc_macro2::Ident::new(proxy_name, proc_macro2::Span::call_site());
-
+fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
 	quote! {
-		impl<SA> #module_path #trait_ident for #proxy_ident<SA> where SA: elrond_wasm::api::SendApi {}
+		impl<SA> #module_path ProxyTrait for Proxy<SA> where SA: elrond_wasm::api::SendApi {}
 	}
 }
 
-pub fn impl_all_proxy_traits(supertraits: &[Supertrait], proxy_trait_name: &str, proxy_name: &str) -> Vec<proc_macro2::TokenStream> {
+pub fn impl_all_proxy_traits(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
 	let mut implementations: Vec<proc_macro2::TokenStream> = supertraits
 		.iter()
-		.map(|supertrait| impl_proxy_trait(&supertrait.module_path, proxy_trait_name, proxy_name))
+		.map(|supertrait| impl_proxy_trait(&supertrait.module_path))
 		.collect();
 
-	implementations.push(impl_proxy_trait(&self_module_path(), proxy_trait_name, proxy_name));
+	implementations.push(impl_proxy_trait(&self_module_path()));
 
 	implementations
 }
