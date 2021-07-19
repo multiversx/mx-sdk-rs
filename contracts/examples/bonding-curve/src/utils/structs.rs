@@ -55,3 +55,10 @@ pub struct BondingCurve<BigUint: BigUintApi> {
 	pub payment_token: TokenIdentifier,
 	pub payment_amount: BigUint,
 }
+
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
+pub struct TokenOwnershipDetails {
+	pub token_type: EsdtTokenType,
+	pub token_nonces: Vec<u64>,
+	pub owner: Address,
+}

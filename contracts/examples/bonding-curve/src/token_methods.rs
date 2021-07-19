@@ -69,7 +69,7 @@ pub trait TokenMethods:
 		);
 
 		let nonce = self.get_current_nonce(&identifier);
-		let (token_type, _) = self.token_details(&identifier).get();
+		let details = self.token_details(&identifier).get();
 		require!(
 			!self.token_details(&identifier).is_empty(),
 			"Token not issued"
@@ -77,12 +77,14 @@ pub trait TokenMethods:
 
 		let mut token = Token { identifier, nonce };
 
-		if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::NonFungible {
+		if details.token_type == EsdtTokenType::Fungible
+			|| details.token_type == EsdtTokenType::NonFungible
+		{
 			token.nonce = 0u64;
 		}
 
 		require!(
-			token_type != EsdtTokenType::SemiFungible || token.nonce != 0,
+			details.token_type != EsdtTokenType::SemiFungible || token.nonce != 0,
 			"Nonce should not be 0!"
 		);
 
@@ -96,6 +98,10 @@ pub trait TokenMethods:
 				.into_option()
 				.ok_or("Expected provided supply_type for the token")?;
 		}
+
+		self.token_details(&token.identifier)
+			.update(|details| details.token_nonces.push(nonce));
+
 		self.store_bonding_curve(token, amount, set_supply, set_payment)?;
 		Ok(())
 	}
@@ -144,6 +150,8 @@ pub trait TokenMethods:
 			bonding_curve.arguments.available_supply += &amount;
 			bonding_curve.arguments.balance += amount;
 		});
+		self.token_details(&token.identifier)
+			.update(|details| details.token_nonces.push(nonce));
 		Ok(())
 	}
 }
