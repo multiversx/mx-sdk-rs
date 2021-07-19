@@ -51,11 +51,22 @@ pub fn proxy_implementation(
 		quote! {}
 	};
 
+	let deploy_proxy_trait = proxy_gen::deploy_proxy_trait(contract);
+	let deploy_proxy_obj_code = if is_contract_main {
+		proxy_gen::deploy_proxy_obj_code(contract)
+	} else {
+		quote! {}
+	};
+
 	quote! {
 		#main_definition
 
 		#proxy_trait
 
 		#proxy_obj_code
+
+		#deploy_proxy_trait
+
+		#deploy_proxy_obj_code
 	}
 }
