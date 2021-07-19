@@ -39,6 +39,15 @@ pub trait DeployContractModule {
 		))
 	}
 
+	#[endpoint]
+	fn deploy_vault_through_proxy(&self, code: BoxedBytes) -> OptionalResult<Address> {
+		self.vault_proxy(Address::zero())
+			.init()
+			.with_code(code, CodeMetadata::DEFAULT)
+			.execute()
+			.into()
+	}
+
 	fn deploy(&self, code: &BoxedBytes, arguments: &[BoxedBytes]) -> Address {
 		self.send().deploy_contract(
 			self.blockchain().get_gas_left(),
@@ -48,4 +57,7 @@ pub trait DeployContractModule {
 			&arguments.into(),
 		)
 	}
+
+	#[proxy]
+	fn vault_proxy(&self, sc_address: Address) -> vault::Proxy<Self::SendApi>;
 }
