@@ -53,12 +53,12 @@ pub trait LocalEsdtAndEsdtNft {
 
 	#[endpoint(localMint)]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_mint(&token_identifier, &amount);
+		self.send().esdt_local_mint(&token_identifier, 0, &amount);
 	}
 
 	#[endpoint(localBurn)]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_burn(&token_identifier, &amount);
+		self.send().esdt_local_burn(&token_identifier, 0, &amount);
 	}
 
 	// Non-Fungible Tokens
@@ -122,12 +122,13 @@ pub trait LocalEsdtAndEsdtNft {
 		amount: Self::BigUint,
 	) {
 		self.send()
-			.esdt_nft_add_quantity(&token_identifier, nonce, &amount);
+			.esdt_local_mint(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint(nftBurn)]
 	fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
-		self.send().esdt_nft_burn(&token_identifier, nonce, &amount);
+		self.send()
+			.esdt_local_burn(&token_identifier, nonce, &amount);
 	}
 
 	#[endpoint(transferNftViaAsyncCall)]
@@ -139,8 +140,7 @@ pub trait LocalEsdtAndEsdtNft {
 		amount: Self::BigUint,
 		data: BoxedBytes,
 	) {
-		self.send().transfer_esdt_nft_via_async_call(
-			&self.blockchain().get_sc_address(),
+		self.send().transfer_esdt_via_async_call(
 			&to,
 			&token_identifier,
 			nonce,

@@ -396,19 +396,13 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		amount: &Self::BigUint,
 		data: &'static [u8],
 	) {
-		// nonce 0 means fungible ESDT or EGLD
-		if nonce == 0 {
-			self.send()
-				.direct(to, token_id, amount, self.data_or_empty_if_sc(to, data));
-		} else {
-			self.send().direct_nft(
-				to,
-				token_id,
-				nonce,
-				amount,
-				self.data_or_empty_if_sc(to, data),
-			);
-		}
+		self.send().direct(
+			to,
+			token_id,
+			nonce,
+			amount,
+			self.data_or_empty_if_sc(to, data),
+		);
 	}
 
 	fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {

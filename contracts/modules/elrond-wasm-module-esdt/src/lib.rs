@@ -86,7 +86,7 @@ pub trait EsdtModule {
 		let token_id = self.token_id().get();
 
 		self.require_local_roles_set(&token_id)?;
-		self.send().esdt_local_mint(&token_id, amount);
+		self.send().esdt_local_mint(&token_id, 0, amount);
 
 		Ok(())
 	}
@@ -95,7 +95,7 @@ pub trait EsdtModule {
 		let token_id = self.token_id().get();
 
 		self.require_local_roles_set(&token_id)?;
-		self.send().esdt_local_burn(&token_id, amount);
+		self.send().esdt_local_burn(&token_id, 0, amount);
 
 		Ok(())
 	}

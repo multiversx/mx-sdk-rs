@@ -27,7 +27,7 @@
                 "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "6,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,7 +47,7 @@
                 "value": "0",
                 "function": "checkFeatureGuard",
                 "arguments": [],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -70,7 +70,7 @@
                     "str:featureName",
                     "0"
                 ],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -90,7 +90,7 @@
                 "value": "0",
                 "function": "checkFeatureGuard",
                 "arguments": [],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
