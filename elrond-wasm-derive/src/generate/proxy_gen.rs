@@ -202,7 +202,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 
 pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let proxy_supertrait_decl =
-		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice(), &"ProxyTrait");
+		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
 	let proxy_methods_impl = generate_method_impl(contract);
 	quote! {
 		pub trait ProxyTrait:
@@ -218,7 +218,7 @@ pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
 pub fn proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let proxy_object_def = snippets::proxy_object_def();
 	let impl_all_proxy_traits =
-		supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice(), &"ProxyTrait", &"Proxy");
+		supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice());
 	quote! {
 		#proxy_object_def
 
