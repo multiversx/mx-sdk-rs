@@ -21,7 +21,7 @@ jobs:
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
-          erdpy config set dependencies.arwentools.tag v1.3.3
+          erdpy config set dependencies.arwentools.tag v1.4.1
           erdpy deps install arwentools
       - name: Build the wasm contracts
         run: |
