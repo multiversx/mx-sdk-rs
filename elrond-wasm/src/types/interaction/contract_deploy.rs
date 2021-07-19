@@ -23,14 +23,12 @@ where
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
 pub fn new_contract_deploy<SA>(
 	api: SA,
-	code: BoxedBytes,
-	code_metadata: CodeMetadata,
 	payment_amount: SA::AmountType,
 ) -> ContractDeploy<SA>
 where
 	SA: SendApi + 'static,
 {
-	let mut contract_deploy = ContractDeploy::<SA>::new(api, code, code_metadata);
+	let mut contract_deploy = ContractDeploy::<SA>::new(api);
 	contract_deploy.payment_amount = payment_amount;
 
 	contract_deploy
@@ -40,15 +38,21 @@ impl<SA> ContractDeploy<SA>
 where
 	SA: SendApi + 'static,
 {
-	pub fn new(api: SA, code: BoxedBytes, code_metadata: CodeMetadata) -> Self {
+	pub fn new(api: SA) -> Self {
 		ContractDeploy {
 			api,
-			code,
-			code_metadata,
+			code: BoxedBytes::empty(),
+			code_metadata: CodeMetadata::DEFAULT,
 			payment_amount: SA::AmountType::zero(),
 			explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
 			arg_buffer: ArgBuffer::new(),
 		}
+	}
+
+	pub fn with_code(mut self, code: BoxedBytes, code_metadata: CodeMetadata) -> Self {
+		self.code = code;
+		self.code_metadata = code_metadata;
+		self
 	}
 
 	pub fn with_egld_transfer(mut self, payment_amount: SA::AmountType) -> Self {
@@ -83,15 +87,21 @@ impl<SA> ContractDeploy<SA>
 where
 	SA: SendApi + 'static,
 {
-	/// Executes immediately, synchronously, and returns the Address of the deployed contract.  
-	/// Will return Address::zero() if the deploy fails.  
-	pub fn execute(self) -> Address {
-		self.api.deploy_contract(
+	/// Executes immediately, synchronously, and returns Some(Address) of the deployed contract.  
+	/// Will return None if the deploy fails.  
+	pub fn execute(self) -> Option<Address> {
+		let address = self.api.deploy_contract(
 			self.resolve_gas_limit(),
 			&self.payment_amount,
 			&self.code,
 			self.code_metadata,
 			&self.arg_buffer,
-		)
+		);
+
+		if address.is_zero() {
+			None
+		} else {
+			Some(address)
+		}
 	}
 }

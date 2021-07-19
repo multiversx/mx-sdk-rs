@@ -27,7 +27,7 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
 }
 
 pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
-	let method_name = &proc_macro2::Ident::new(&"contract_deploy", proc_macro2::Span::call_site());
+	let method_name = &method.name;
 	let generics = &method.generics;
 	let generics_where = &method.generics.where_clause;
 	let arg_decl = arg_declarations(&method.method_args);
@@ -171,12 +171,10 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
 	let sig = quote! {
 		#[allow(clippy::too_many_arguments)]
 		#msig {
-			let (___api___, ___code___, ___code_metadata___, ___payment___) =
+			let (___api___, _, _, ___payment___, _) =
 				self.into_fields();
 			let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy(
 				___api___.clone(),
-				___code___,
-				___code_metadata___,
 				#payment_expr,
 			);
 			#(#arg_push_snippets)*
@@ -192,6 +190,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 		.methods
 		.iter()
 		.filter_map(|m| match &m.public_role {
+			PublicRole::Init(_) => Some(generate_proxy_deploy(m)),
 			PublicRole::Endpoint(endpoint_metadata) => Some(generate_proxy_endpoint(
 				m,
 				endpoint_metadata.public_name.to_string(),
@@ -199,18 +198,6 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
 			_ => None,
 		})
 		.collect()
-}
-
-pub fn generate_deploy_impl(contract_trait: &ContractTrait) -> Option<proc_macro2::TokenStream> {
-	let opt_init = contract_trait.methods.iter().find(|&m| {
-		if let PublicRole::Init(_) = m.public_role {
-			true
-		} else {
-			false
-		}
-	});
-
-	opt_init.map(|m| generate_proxy_deploy(m))
 }
 
 pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
@@ -232,32 +219,6 @@ pub fn proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
 	let proxy_object_def = snippets::proxy_object_def();
 	let impl_all_proxy_traits =
 		supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice(), &"ProxyTrait", &"Proxy");
-	quote! {
-		#proxy_object_def
-
-		#(#impl_all_proxy_traits)*
-	}
-}
-
-pub fn deploy_proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
-	let proxy_supertrait_decl =
-		supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice(), &"DeployProxyTrait");
-	let init_method_impl = generate_deploy_impl(contract).unwrap();
-	quote! {
-		pub trait DeployProxyTrait:
-			elrond_wasm::api::DeployProxyObjApi
-			+ Sized
-			#(#proxy_supertrait_decl)*
-		{
-			#init_method_impl
-		}
-	}
-}
-
-pub fn deploy_proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
-	let proxy_object_def = snippets::deploy_proxy_object_def();
-	let impl_all_proxy_traits =
-		supertrait_gen::impl_all_proxy_traits(contract.supertraits.as_slice(), &"DeployProxyTrait", &"DeployProxy");
 	quote! {
 		#proxy_object_def
 

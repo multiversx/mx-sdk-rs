@@ -162,13 +162,6 @@ pub fn contract_implementation(
 		quote! {}
 	};
 
-	let deploy_proxy_trait = proxy_gen::deploy_proxy_trait(contract);
-	let deploy_proxy_obj_code = if is_contract_main {
-		proxy_gen::deploy_proxy_obj_code(contract)
-	} else {
-		quote! {}
-	};
-
 	quote! {
 		#module_traits_code
 
@@ -179,10 +172,6 @@ pub fn contract_implementation(
 		#proxy_trait
 
 		#proxy_obj_code
-
-		#deploy_proxy_trait
-
-		#deploy_proxy_obj_code
 
 		#callback_proxies_obj
 	}
