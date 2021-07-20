@@ -4,29 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub enum SupplyType<BigUint>
-where
-	BigUint: BigUintApi,
-{
-	Limited(BigUint),
-	Unlimited,
-}
-
-impl<BigUint> SupplyType<BigUint>
-where
-	BigUint: BigUintApi,
-{
-	pub fn get_limit(&self) -> SCResult<BigUint> {
-		match &self {
-			SupplyType::Limited(limit) => Ok(limit.clone()),
-			SupplyType::Unlimited => Err("Unlimited has no limit!".into()),
-		}
-	}
-}
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub struct CurveArguments<BigUint: BigUintApi> {
-	pub supply_type: SupplyType<BigUint>,
 	pub available_supply: BigUint,
 	pub balance: BigUint,
 }
@@ -43,12 +21,6 @@ where
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct Token {
-	pub identifier: TokenIdentifier,
-	pub nonce: u64,
-}
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub struct BondingCurve<BigUint: BigUintApi> {
 	pub curve: FunctionSelector<BigUint>,
 	pub arguments: CurveArguments<BigUint>,
@@ -57,8 +29,24 @@ pub struct BondingCurve<BigUint: BigUintApi> {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct TokenOwnershipDetails {
-	pub token_type: EsdtTokenType,
+pub struct TokenOwnershipData {
 	pub token_nonces: Vec<u64>,
 	pub owner: Address,
+}
+
+impl TokenOwnershipData {
+	pub fn add_nonce(&mut self, nonce: u64) {
+		if !self.token_nonces.contains(&nonce) {
+			self.token_nonces.push(nonce);
+		}
+	}
+	pub fn remove_nonce(&mut self, nonce: u64) -> SCResult<()> {
+		let index = self
+			.token_nonces
+			.iter()
+			.position(|n| *n == nonce)
+			.ok_or("Nonce requested is not available")?;
+		self.token_nonces.remove(index);
+		Ok(())
+	}
 }
