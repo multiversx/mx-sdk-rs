@@ -483,13 +483,10 @@ pub trait Multisig {
 				for arg in arguments {
 					arg_buffer.push_argument_bytes(arg.as_slice());
 				}
-				let new_address = self.send().deploy_contract(
-					gas_left,
-					&amount,
-					&code,
-					code_metadata,
-					&arg_buffer,
-				);
+				let new_address = self
+					.send()
+					.deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer)
+					.ok_or("Contract deployment failed")?;
 				Ok(PerformActionResult::DeployResult(new_address))
 			},
 			Action::SCCall {
