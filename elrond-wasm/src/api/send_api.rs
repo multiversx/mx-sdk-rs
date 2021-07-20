@@ -149,6 +149,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Deploys a new contract in the same shard.
 	/// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
 	/// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
+	/// If the deployment fails, Option::None is returned
 	fn deploy_contract(
 		&self,
 		gas: u64,
@@ -156,7 +157,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		code: &BoxedBytes,
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
-	) -> Address;
+	) -> Option<Address>;
 
 	/// Upgrades a child contract of the currently executing contract.
 	/// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
