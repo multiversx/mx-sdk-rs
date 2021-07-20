@@ -22,7 +22,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		let _ = self.send().direct(to, &token_id, amount, data);
+		self.send().direct(to, &token_id, 0, amount, data);
 	}
 
 	#[endpoint]
@@ -38,8 +38,10 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 			OptionalArg::Some(data) => data.as_slice(),
 			OptionalArg::None => &[],
 		};
-		let _ = self.send().direct(to, &token_id, amount_first_time, data);
-		let _ = self.send().direct(to, &token_id, amount_second_time, data);
+		self.send()
+			.direct(to, &token_id, 0, amount_first_time, data);
+		self.send()
+			.direct(to, &token_id, 0, amount_second_time, data);
 	}
 
 	#[payable("EGLD")]
@@ -103,11 +105,11 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
 	#[endpoint]
 	fn local_mint(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_mint(&token_identifier, &amount);
+		self.send().esdt_local_mint(&token_identifier, 0, &amount);
 	}
 
 	#[endpoint]
 	fn local_burn(&self, token_identifier: TokenIdentifier, amount: Self::BigUint) {
-		self.send().esdt_local_burn(&token_identifier, &amount);
+		self.send().esdt_local_burn(&token_identifier, 0, &amount);
 	}
 }

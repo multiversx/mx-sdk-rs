@@ -258,7 +258,7 @@ impl SendApi for ArwenApiImpl {
 		code: &BoxedBytes,
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		let mut new_address = Address::zero();
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
@@ -274,7 +274,11 @@ impl SendApi for ArwenApiImpl {
 				arg_buffer.arg_data_ptr(),
 			);
 		}
-		new_address
+		if new_address.is_zero() {
+			None
+		} else {
+			Some(new_address)
+		}
 	}
 
 	fn upgrade_contract(
@@ -427,17 +431,22 @@ impl SendApi for ArwenApiImpl {
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
 
-	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer) {
+	fn call_local_esdt_built_in_function(
+		&self,
+		gas: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) -> Vec<BoxedBytes> {
 		// account-level built-in function, so the destination address is the contract itself
 		let own_address = BlockchainApi::get_sc_address(self);
 
-		let _ = self.execute_on_dest_context_raw(
+		self.execute_on_dest_context_raw(
 			gas,
 			&own_address,
 			&ArwenBigUint::from(0u32),
 			function,
 			arg_buffer,
-		);
+		)
 	}
 }
 

@@ -1,4 +1,4 @@
-use elrond_codec::TopEncode;
+use elrond_codec::{TopDecode, TopEncode};
 
 use super::{BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::{
@@ -69,41 +69,9 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer: &ArgBuffer,
 	) -> Result<(), &'static [u8]>;
 
-	/// Performs a simple ESDT transfer, but via async call.
-	/// This is the preferred way to send ESDT.
-	fn transfer_esdt_via_async_call(
-		&self,
-		to: &Address,
-		token: &TokenIdentifier,
-		amount: &Self::AmountType,
-		data: &[u8],
-	) -> ! {
-		let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-		serializer.push_argument_bytes(token.as_esdt_identifier());
-		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-		if !data.is_empty() {
-			serializer.push_argument_bytes(data);
-		}
-		self.async_call_raw(to, &Self::AmountType::zero(), serializer.as_slice())
-	}
-
-	/// Sends either EGLD or an ESDT token to the target address,
-	/// depending on what token identifier was specified.
+	/// Sends either EGLD, ESDT or NFT to the target address,
+	/// depending on the token identifier and nonce
 	fn direct(
-		&self,
-		to: &Address,
-		token: &TokenIdentifier,
-		amount: &Self::AmountType,
-		data: &[u8],
-	) {
-		if token.is_egld() {
-			self.direct_egld(to, amount, data);
-		} else {
-			let _ = self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
-		}
-	}
-
-	fn direct_nft(
 		&self,
 		to: &Address,
 		token: &TokenIdentifier,
@@ -111,7 +79,14 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		amount: &Self::AmountType,
 		data: &[u8],
 	) {
-		let _ = self.direct_esdt_nft_execute(to, token, nonce, amount, 0, data, &ArgBuffer::new());
+		if token.is_egld() {
+			self.direct_egld(to, amount, data);
+		} else if nonce == 0 {
+			let _ = self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
+		} else {
+			let _ =
+				self.direct_esdt_nft_execute(to, token, nonce, amount, 0, data, &ArgBuffer::new());
+		}
 	}
 
 	/// Sends an asynchronous call to another contract.
@@ -133,9 +108,50 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		)
 	}
 
+	/// Performs a simple ESDT/NFT transfer, but via async call.  
+	/// As with any async call, this immediately terminates the execution of the current call.  
+	/// So only use as the last call in your endpoint.  
+	/// If you want to perform multiple transfers, use `self.send().direct()` instead.  
+	/// Note that EGLD can NOT be transfered with this function.  
+	fn transfer_esdt_via_async_call(
+		&self,
+		to: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+		amount: &Self::AmountType,
+		data: &[u8],
+	) -> ! {
+		if nonce == 0 {
+			let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
+			serializer.push_argument_bytes(token.as_esdt_identifier());
+			serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+			if !data.is_empty() {
+				serializer.push_argument_bytes(data);
+			}
+
+			self.async_call_raw(to, &Self::AmountType::zero(), serializer.as_slice())
+		} else {
+			let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
+			serializer.push_argument_bytes(token.as_esdt_identifier());
+			serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+			serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
+			serializer.push_argument_bytes(to.as_bytes());
+			if !data.is_empty() {
+				serializer.push_argument_bytes(data);
+			}
+
+			self.async_call_raw(
+				&self.get_sc_address(),
+				&Self::AmountType::zero(),
+				serializer.as_slice(),
+			);
+		}
+	}
+
 	/// Deploys a new contract in the same shard.
 	/// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
 	/// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
+	/// If the deployment fails, Option::None is returned
 	fn deploy_contract(
 		&self,
 		gas: u64,
@@ -143,7 +159,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		code: &BoxedBytes,
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
-	) -> Address;
+	) -> Option<Address>;
 
 	/// Upgrades a child contract of the currently executing contract.
 	/// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
@@ -227,29 +243,62 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// Allows synchronously calling a local function by name. Execution is resumed afterwards.
 	/// You should never have to call this function directly.
 	/// Use the other specific methods instead.
-	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer);
+	fn call_local_esdt_built_in_function(
+		&self,
+		gas: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) -> Vec<BoxedBytes>;
 
-	/// Allows synchronous minting of ESDT tokens. Execution is resumed afterwards.
-	fn esdt_local_mint(&self, token: &TokenIdentifier, amount: &Self::AmountType) {
+	/// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
+	/// Note that the SC must have the ESDTLocalMint or ESDTNftAddQuantity roles set,
+	/// or this will fail with "action is not allowed"
+	/// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
+	/// This function cannot be used for NFTs.
+	fn esdt_local_mint(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType) {
 		let mut arg_buffer = ArgBuffer::new();
+		let func_name: &[u8];
+
 		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
+
+		if nonce == 0 {
+			func_name = b"ESDTLocalMint";
+		} else {
+			func_name = b"ESDTNFTAddQuantity";
+			arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+		}
+
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTLocalMint", &arg_buffer);
+		let _ = self.call_local_esdt_built_in_function(self.get_gas_left(), func_name, &arg_buffer);
 	}
 
-	/// Allows synchronous burning of ESDT tokens. Execution is resumed afterwards.
-	fn esdt_local_burn(&self, token: &TokenIdentifier, amount: &Self::AmountType) {
+	/// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
+	/// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
+	/// or this will fail with "action is not allowed"
+	fn esdt_local_burn(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType) {
 		let mut arg_buffer = ArgBuffer::new();
+		let func_name: &[u8];
+
 		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
+
+		if nonce == 0 {
+			func_name = b"ESDTLocalBurn";
+		} else {
+			func_name = b"ESDTNFTBurn";
+			arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+		}
+
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTLocalBurn", &arg_buffer);
+		let _ = self.call_local_esdt_built_in_function(self.get_gas_left(), func_name, &arg_buffer);
 	}
 
 	/// Creates a new NFT token of a certain type (determined by `token_identifier`).  
 	/// `attributes` can be any serializable custom struct.  
 	/// This is a built-in function, so the smart contract execution is resumed after.
+	/// Must have ESDTNftCreate role set, or this will fail with "action is not allowed".
+	/// Returns the nonce of the newly created NFT.
 	#[allow(clippy::too_many_arguments)]
 	fn esdt_nft_create<T: elrond_codec::TopEncode>(
 		&self,
@@ -260,7 +309,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		hash: &BoxedBytes,
 		attributes: &T,
 		uris: &[BoxedBytes],
-	) {
+	) -> u64 {
 		let mut arg_buffer = ArgBuffer::new();
 		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
 		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
@@ -281,60 +330,12 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 			arg_buffer.push_argument_bytes(top_encoded_uri.as_slice());
 		}
 
-		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTNFTCreate", &arg_buffer);
-	}
-
-	/// Adds quantity for an Non-Fungible Token. (which makes it a Semi-Fungible Token by definition)  
-	/// This is a built-in function, so the smart contract execution is resumed after.
-	fn esdt_nft_add_quantity(
-		&self,
-		token: &TokenIdentifier,
-		nonce: u64,
-		amount: &Self::AmountType,
-	) {
-		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
-		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
-		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
-
-		self.call_local_esdt_built_in_function(
+		let output = self.call_local_esdt_built_in_function(
 			self.get_gas_left(),
-			b"ESDTNFTAddQuantity",
+			b"ESDTNFTCreate",
 			&arg_buffer,
 		);
-	}
 
-	/// The reverse operation of `esdt_nft_add_quantity`, this locally decreases
-	/// This is a built-in function, so the smart contract execution is resumed after.
-	fn esdt_nft_burn(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType) {
-		let mut arg_buffer = ArgBuffer::new();
-		arg_buffer.push_argument_bytes(token.as_esdt_identifier());
-		arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
-		arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
-
-		self.call_local_esdt_built_in_function(self.get_gas_left(), b"ESDTNFTBurn", &arg_buffer);
-	}
-
-	/// Performs a simple ESDT NFT transfer, but via async call.
-	/// This is the preferred way to send ESDT.
-	/// Note: call is done to the SC itself, so `from` should be the SCs own address
-	fn transfer_esdt_nft_via_async_call(
-		&self,
-		from: &Address,
-		to: &Address,
-		token: &TokenIdentifier,
-		nonce: u64,
-		amount: &Self::AmountType,
-		data: &[u8],
-	) {
-		let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
-		serializer.push_argument_bytes(token.as_esdt_identifier());
-		serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
-		serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-		serializer.push_argument_bytes(to.as_bytes());
-		if !data.is_empty() {
-			serializer.push_argument_bytes(data);
-		}
-		self.async_call_raw(from, &Self::AmountType::zero(), serializer.as_slice());
+		u64::top_decode(output[0].as_slice()).unwrap_or_default()
 	}
 }

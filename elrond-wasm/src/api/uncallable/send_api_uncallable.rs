@@ -68,7 +68,7 @@ impl SendApi for super::UncallableApi {
 		_code: &BoxedBytes,
 		_code_metadata: CodeMetadata,
 		_arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		unreachable!()
 	}
 
@@ -145,7 +145,7 @@ impl SendApi for super::UncallableApi {
 		_gas: u64,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		unreachable!()
 	}
 }
