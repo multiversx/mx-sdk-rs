@@ -268,7 +268,7 @@ impl SendApi for ArwenApiImpl {
 		code: &BoxedBytes,
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		let mut new_address = Address::zero();
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
@@ -284,7 +284,11 @@ impl SendApi for ArwenApiImpl {
 				arg_buffer.arg_data_ptr(),
 			);
 		}
-		new_address
+		if new_address.is_zero() {
+			None
+		} else {
+			Some(new_address)
+		}
 	}
 
 	fn deploy_from_source_contract(
