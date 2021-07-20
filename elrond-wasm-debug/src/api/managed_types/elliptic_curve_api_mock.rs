@@ -1,4 +1,4 @@
-use core::{panic};
+use core::panic;
 use elrond_wasm::types::BoxedBytes;
 
 type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
@@ -71,9 +71,9 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		panic!("get_ec_length not implemented yet!")
 	}
 
-    fn get_priv_key_byte_length(&self) -> u32 {
-        panic!("get_ec_byte_length not implemented yet!")
-    }
+	fn get_priv_key_byte_length(&self) -> u32 {
+		panic!("get_ec_byte_length not implemented yet!")
+	}
 
 	fn add_ec(
 		&self,
@@ -130,7 +130,7 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		panic!("generate_key_ec not implemented yet!")
 	}
 
-    fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
-        panic!("from_bitsize_ec not impplemented yet!")
-    }
+	fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
+		panic!("from_bitsize_ec not impplemented yet!")
+	}
 }
