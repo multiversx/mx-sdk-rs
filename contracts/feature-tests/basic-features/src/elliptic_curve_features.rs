@@ -20,25 +20,10 @@ pub trait EllipticCurveFeatures {
 	}
 
 	#[endpoint]
-	fn compute_p224_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
-		Self::EllipticCurve::p224_ec().get_values()
+	fn compute_create_ec(&self, curve: &str) -> EllipticCurveComponents<Self::BigUint> {
+		Self::EllipticCurve::create_ec(curve).get_values()
 	}
-
-	#[endpoint]
-	fn compute_p256_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
-		Self::EllipticCurve::p256_ec().get_values()
-	}
-
-	#[endpoint]
-	fn compute_p384_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
-		Self::EllipticCurve::p384_ec().get_values()
-	}
-
-	#[endpoint]
-	fn compute_p521_ec(&self) -> EllipticCurveComponents<Self::BigUint> {
-		Self::EllipticCurve::p521_ec().get_values()
-	}
-
+    
 	#[endpoint]
 	fn compute_get_ec_length(&self, curve_bitsize: u32) -> u32 {
 		match Self::EllipticCurve::from_bitsize_ec(curve_bitsize) {

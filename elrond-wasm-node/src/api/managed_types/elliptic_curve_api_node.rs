@@ -90,13 +90,7 @@ extern "C" {
 
 	fn getPrivKeyByteLengthEC(ecHandle: i32) -> i32;
 
-	fn p224Ec() -> i32;
-
-	fn p256Ec() -> i32;
-
-	fn p384Ec() -> i32;
-
-	fn p521Ec() -> i32;
+	fn createEC(dataOffset: i32, dataLength: i32) -> i32;
 }
 
 type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
@@ -150,30 +144,11 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		}
 	}
 
-	fn p224_ec() -> Self {
+	fn create_ec(curve: &str) -> Self {
 		unsafe {
-			let handle = p224Ec();
-			ArwenEllipticCurve { handle }
-		}
-	}
-
-	fn p256_ec() -> Self {
-		unsafe {
-			let handle = p256Ec();
-			ArwenEllipticCurve { handle }
-		}
-	}
-
-	fn p384_ec() -> Self {
-		unsafe {
-			let handle = p384Ec();
-			ArwenEllipticCurve { handle }
-		}
-	}
-
-	fn p521_ec() -> Self {
-		unsafe {
-			let handle = p521Ec();
+            let curve_as_slice = curve.as_bytes();
+            let data: BoxedBytes = BoxedBytes::from(curve_as_slice);
+			let handle = createEC(data.as_ptr() as i32, data.len() as i32);
 			ArwenEllipticCurve { handle }
 		}
 	}
@@ -395,10 +370,10 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 
 	fn from_bitsize_ec(bitsize: u32) -> Option<Self> {
 		match bitsize {
-			224 => Some(Self::p224_ec()),
-			256 => Some(Self::p256_ec()),
-			384 => Some(Self::p384_ec()),
-			521 => Some(Self::p521_ec()),
+			224 => Some(Self::create_ec("p224")),
+			256 => Some(Self::create_ec("p256")),
+			384 => Some(Self::create_ec("p384")),
+			521 => Some(Self::create_ec("p521")),
 			_ => None,
 		}
 	}

@@ -51,20 +51,8 @@ impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
 		panic!("elliptic curve get_values not implemented yet!")
 	}
 
-	fn p224_ec() -> Self {
-		panic!("p224_ec not implemented yet!")
-	}
-
-	fn p256_ec() -> Self {
-		panic!("p256_ec not implemented yet!")
-	}
-
-	fn p384_ec() -> Self {
-		panic!("p384_ec not implemented yet!")
-	}
-
-	fn p521_ec() -> Self {
-		panic!("p521_ec not implemented yet!")
+	fn create_ec(_curve: &str) -> Self {
+		panic!("create_ec not implemented yet!")
 	}
 
 	fn get_ec_length(&self) -> u32 {
