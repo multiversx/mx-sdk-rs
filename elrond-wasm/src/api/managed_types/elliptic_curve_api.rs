@@ -11,13 +11,7 @@ pub trait EllipticCurveApi:
 
 	fn get_values(&self) -> EllipticCurveComponents<Self::BigUint>;
 
-	fn p224_ec() -> Self;
-
-	fn p256_ec() -> Self;
-
-	fn p384_ec() -> Self;
-
-	fn p521_ec() -> Self;
+	fn create_ec(curve: &str) -> Self;
 
 	fn get_ec_length(&self) -> u32;
 

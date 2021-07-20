@@ -55,19 +55,7 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		unreachable!()
 	}
 
-	fn p224_ec() -> Self {
-		unreachable!()
-	}
-
-	fn p256_ec() -> Self {
-		unreachable!()
-	}
-
-	fn p384_ec() -> Self {
-		unreachable!()
-	}
-
-	fn p521_ec() -> Self {
+	fn create_ec(_curve: &str) -> Self {
 		unreachable!()
 	}
 
