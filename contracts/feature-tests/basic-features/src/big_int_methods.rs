@@ -40,9 +40,9 @@ pub trait BigIntMethods {
 	#[endpoint]
 	fn pow_big_uint_ref(&self, a: &Self::BigUint, b: u32) -> Self::BigUint {
 		a.pow(b)
-    }
-    
-    #[endpoint]
+	}
+
+	#[endpoint]
 	fn big_uint_to_u64(&self, bu: &Self::BigUint) -> OptionalResult<u64> {
 		bu.to_u64().into()
 	}

@@ -75,7 +75,7 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		unreachable!()
 	}
 
-    fn get_priv_key_byte_length(&self) -> u32 {
+	fn get_priv_key_byte_length(&self) -> u32 {
 		unreachable!()
 	}
 
@@ -134,7 +134,7 @@ impl EllipticCurveApi for EllipticCurveUncallable {
 		unreachable!()
 	}
 
-    fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
-        unreachable!()
-    }
+	fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
+		unreachable!()
+	}
 }

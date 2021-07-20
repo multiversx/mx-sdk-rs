@@ -182,9 +182,9 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		unsafe { getCurveLengthEC(self.handle) as u32 }
 	}
 
-    fn get_priv_key_byte_length(&self) -> u32 {
-        unsafe { getPrivKeyByteLengthEC(self.handle) as u32}
-    }
+	fn get_priv_key_byte_length(&self) -> u32 {
+		unsafe { getPrivKeyByteLengthEC(self.handle) as u32 }
+	}
 
 	fn add_ec(
 		&self,
@@ -299,7 +299,7 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 
 	fn marshal_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
 		unsafe {
-			let byte_length = (getCurveLengthEC(self.handle)+7)/8;
+			let byte_length = (getCurveLengthEC(self.handle) + 7) / 8;
 			let mut result = BoxedBytes::allocate(1 + 2 * byte_length as usize);
 			marshalEC(
 				x_pair.handle,
@@ -313,7 +313,7 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 
 	fn marshal_compressed_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
 		unsafe {
-			let byte_length = (getCurveLengthEC(self.handle)+7)/8;
+			let byte_length = (getCurveLengthEC(self.handle) + 7) / 8;
 			let mut result = BoxedBytes::allocate(1 + byte_length as usize);
 			marshalCompressedEC(
 				x_pair.handle,
@@ -393,15 +393,15 @@ impl EllipticCurveApi for ArwenEllipticCurve {
 		}
 	}
 
-    fn from_bitsize_ec(bitsize: u32) -> Option<Self> {
-        match bitsize {
-            224 => Some(Self::p224_ec()),
-            256 => Some(Self::p256_ec()),
-            384 => Some(Self::p384_ec()),
-            521 => Some(Self::p521_ec()),
-            _ => None
-        }
-    }
+	fn from_bitsize_ec(bitsize: u32) -> Option<Self> {
+		match bitsize {
+			224 => Some(Self::p224_ec()),
+			256 => Some(Self::p256_ec()),
+			384 => Some(Self::p384_ec()),
+			521 => Some(Self::p521_ec()),
+			_ => None,
+		}
+	}
 }
 
 use elrond_codec::*;

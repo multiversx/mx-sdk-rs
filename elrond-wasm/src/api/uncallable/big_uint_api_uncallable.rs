@@ -304,9 +304,9 @@ impl BigUintApi for BigUintUncallable {
 	}
 
 	fn log2(&self) -> u32 {
-        unreachable!()
+		unreachable!()
 	}
-    
+
 	fn to_u64(&self) -> Option<u64> {
 		unreachable!()
 	}

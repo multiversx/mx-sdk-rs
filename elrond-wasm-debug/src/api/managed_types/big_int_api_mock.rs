@@ -259,8 +259,8 @@ impl elrond_wasm::api::BigIntApi for RustBigInt {
 
 	fn pow(&self, exp: u32) -> Self {
 		RustBigInt(pow(self.0.clone(), exp as usize))
-    }
-    
+	}
+
 	fn to_i64(&self) -> Option<i64> {
 		let (sign, digits) = self.0.to_u64_digits();
 		match sign {

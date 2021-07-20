@@ -5,10 +5,7 @@ type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, Big
 
 /// Definition of the EllipticCurve type required by the API
 pub trait EllipticCurveApi:
-	Sized
-	+ elrond_codec::NestedEncode
-	+ elrond_codec::TopEncode
-	+ abi::TypeAbi
+	Sized + elrond_codec::NestedEncode + elrond_codec::TopEncode + abi::TypeAbi
 {
 	type BigUint;
 
@@ -24,7 +21,7 @@ pub trait EllipticCurveApi:
 
 	fn get_ec_length(&self) -> u32;
 
-    fn get_priv_key_byte_length(&self) -> u32;
+	fn get_priv_key_byte_length(&self) -> u32;
 
 	fn add_ec(
 		&self,
@@ -61,5 +58,5 @@ pub trait EllipticCurveApi:
 
 	fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes);
 
-    fn from_bitsize_ec(bitsize: u32) -> Option<Self>;
+	fn from_bitsize_ec(bitsize: u32) -> Option<Self>;
 }
