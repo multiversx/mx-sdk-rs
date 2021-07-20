@@ -157,7 +157,7 @@ impl SendApi for TxContext {
 		_source_contract_address: &Address,
 		_code_metadata: CodeMetadata,
 		_arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		panic!("deploy_from_source_contract not yet implemented")
 	}
 

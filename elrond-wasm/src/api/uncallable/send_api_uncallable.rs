@@ -78,7 +78,7 @@ impl SendApi for super::UncallableApi {
 		_source_contract_address: &Address,
 		_code_metadata: CodeMetadata,
 		_arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		unreachable!()
 	}
 

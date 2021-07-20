@@ -159,8 +159,9 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		arg_buffer: &ArgBuffer,
 	) -> Option<Address>;
 
-	// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
-	// The deployment is done synchronously and the new contract's address is returned.
+	/// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
+	/// The deployment is done synchronously and the new contract's address is returned.
+	/// If the deployment fails, Option::None is returned
 	fn deploy_from_source_contract(
 		&self,
 		gas: u64,
@@ -168,7 +169,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		source_contract_address: &Address,
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
-	) -> Address;
+	) -> Option<Address>;
 
 	/// Upgrades a child contract of the currently executing contract.
 	/// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
