@@ -147,7 +147,7 @@ impl SendApi for TxContext {
 		_code: &BoxedBytes,
 		_code_metadata: CodeMetadata,
 		_arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		panic!("deploy_contract not yet implemented")
 	}
 
@@ -226,7 +226,7 @@ impl SendApi for TxContext {
 		_gas: u64,
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
-	) {
+	) -> Vec<BoxedBytes> {
 		panic!("call_local_esdt_built_in_function not implemented yet!");
 	}
 }

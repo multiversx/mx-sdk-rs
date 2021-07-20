@@ -39,7 +39,7 @@
                     "sc:dns#87",
                     "str:coolname0001.elrond"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {

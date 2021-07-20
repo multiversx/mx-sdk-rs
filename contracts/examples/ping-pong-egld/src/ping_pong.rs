@@ -73,7 +73,10 @@ pub trait PingPong {
 
 		if let Some(max_funds) = self.max_funds().get() {
 			require!(
-				&self.blockchain().get_sc_balance() + &payment <= max_funds,
+				&self
+					.blockchain()
+					.get_sc_balance(&TokenIdentifier::egld(), 0)
+					+ &payment <= max_funds,
 				"smart contract full"
 			);
 		}

@@ -96,12 +96,18 @@ impl TokenIdentifier {
 
 		let id_as_slice = self.0.as_slice();
 
-		// ticker must be all uppercase
+		let lowercase_letter_range = &b'a'..=&b'z';
+		let uppercase_letter_range = &b'A'..=&b'Z';
+		let number_range = &b'0'..=&b'9';
+
+		// ticker must be all uppercase alphanumeric
 		let ticker_len = id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
 		let ticker = &id_as_slice[..ticker_len];
 		for ticker_char in ticker {
-			let is_uppercase_letter = (&b'A'..=&b'Z').contains(&ticker_char);
-			if !is_uppercase_letter {
+			let is_uppercase_letter = uppercase_letter_range.contains(&ticker_char);
+			let is_number = number_range.contains(&ticker_char);
+
+			if !is_uppercase_letter && !is_number {
 				return false;
 			}
 		}
@@ -114,8 +120,9 @@ impl TokenIdentifier {
 		// random chars are alphanumeric lowercase
 		let random_chars = &id_as_slice[(id_len - Self::ADDITIONAL_RANDOM_CHARS_LENGTH)..];
 		for rand_char in random_chars {
-			let is_lowercase_letter = (&b'a'..=&b'z').contains(&rand_char);
-			let is_number = (&b'0'..=&b'9').contains(&rand_char);
+			let is_lowercase_letter = lowercase_letter_range.contains(&rand_char);
+			let is_number = number_range.contains(&rand_char);
+
 			if !is_lowercase_letter && !is_number {
 				return false;
 			}
@@ -271,6 +278,12 @@ mod tests {
 	fn test_is_valid_esdt_identifier() {
 		// valid identifier
 		assert!(TokenIdentifier::from(&b"ALC-6258d2"[..]).is_valid_esdt_identifier());
+
+		// valid identifier with numbers in ticker
+		assert!(TokenIdentifier::from(&b"ALC123-6258d2"[..]).is_valid_esdt_identifier());
+
+		// valid ticker only numbers
+		assert!(TokenIdentifier::from(&b"12345-6258d2"[..]).is_valid_esdt_identifier());
 
 		// missing dash
 		assert!(!TokenIdentifier::from(&b"ALC6258d2"[..]).is_valid_esdt_identifier());
