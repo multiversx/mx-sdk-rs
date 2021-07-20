@@ -350,6 +350,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
 	/// Sends thr NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
 	/// Returns the payment amount left after sending royalties.
+	#[allow(clippy::too_many_arguments)]
 	fn sell_nft(
 		&self,
 		nft_id: &TokenIdentifier,
