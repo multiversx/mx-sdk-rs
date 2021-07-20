@@ -378,6 +378,6 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 			payment_amount.clone() - royalties_amount
 		} else {
 			payment_amount.clone()
-		}		
+		}
 	}
 }
