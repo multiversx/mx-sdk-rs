@@ -1,9 +1,9 @@
 mod arg_buffer;
 mod async_call;
 mod callback_call;
-mod contract_deploy;
 mod callback_selector_result;
 mod contract_call;
+mod contract_deploy;
 mod send_egld;
 mod send_esdt;
 mod send_token;

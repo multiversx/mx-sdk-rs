@@ -21,10 +21,7 @@ where
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<SA>(
-	api: SA,
-	payment_amount: SA::AmountType,
-) -> ContractDeploy<SA>
+pub fn new_contract_deploy<SA>(api: SA, payment_amount: SA::AmountType) -> ContractDeploy<SA>
 where
 	SA: SendApi + 'static,
 {
