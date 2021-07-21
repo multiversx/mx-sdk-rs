@@ -6,8 +6,7 @@ pub fn generate_only_owner_snippet(m: &Method) -> proc_macro2::TokenStream {
 			let message = format!(
 				"Only owner can call {} !",
 				endpoint_metadata.public_name.to_string()
-			)
-			.to_owned();
+			);
 			return quote! {
 				self.blockchain().check_caller_is_owner(#message);
 			};

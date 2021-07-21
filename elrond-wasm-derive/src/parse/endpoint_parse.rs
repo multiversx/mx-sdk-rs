@@ -79,7 +79,7 @@ pub fn process_view_attribute(
 			method.public_role = PublicRole::Endpoint(EndpointMetadata {
 				public_name: view_ident,
 				payable: pass_1_data.payable.clone(),
-				only_owner: pass_1_data.only_owner.clone(),
+				only_owner: pass_1_data.only_owner,
 			});
 		})
 		.is_some()
