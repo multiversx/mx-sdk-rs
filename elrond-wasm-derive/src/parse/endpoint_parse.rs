@@ -60,7 +60,6 @@ pub fn process_endpoint_attribute(
 				payable: pass_1_data.payable.clone(),
 				only_owner: pass_1_data.only_owner,
 			});
-			println!("{}", pass_1_data.only_owner)
 		})
 		.is_some()
 }
