@@ -31,7 +31,9 @@
                 "from": "address:owner",
                 "contractCode": "file:../output/bonding-curve.wasm",
                 "value": "0",
-                "arguments": [],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
@@ -57,7 +59,9 @@
                 "sc:bonding-curve": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "str:sell_availability": "1"
+                    },
                     "code": "file:../output/bonding-curve.wasm"
                 }
             }
