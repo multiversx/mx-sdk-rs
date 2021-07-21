@@ -162,10 +162,10 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
 		panic!("No more than one payment argument allowed in call proxy");
 	}
 	if token_count > 0 {
-		panic!("No ESDT payment allowed in #init");
+		panic!("No ESDT payment allowed in #[init]");
 	}
-	if nonce_count > 1 {
-		panic!("No SFT/NFT payment allowed in #init");
+	if nonce_count > 0 {
+		panic!("No SFT/NFT payment allowed in #[init]");
 	}
 
 	let sig = quote! {
