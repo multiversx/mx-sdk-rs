@@ -2,6 +2,9 @@ elrond_wasm::imports!();
 
 #[elrond_wasm_derive::module]
 pub trait DeployContractModule {
+	#[proxy]
+	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+
 	#[endpoint(deployContract)]
 	fn deploy_contract(
 		&self,
@@ -41,7 +44,7 @@ pub trait DeployContractModule {
 
 	#[endpoint]
 	fn deploy_vault_through_proxy(&self, code: BoxedBytes) -> OptionalResult<Address> {
-		self.vault_proxy(Address::zero())
+		self.vault_proxy()
 			.init()
 			.with_code(code, CodeMetadata::DEFAULT)
 			.execute()
@@ -57,7 +60,4 @@ pub trait DeployContractModule {
 			&arguments.into(),
 		)
 	}
-
-	#[proxy]
-	fn vault_proxy(&self, sc_address: Address) -> vault::Proxy<Self::SendApi>;
 }
