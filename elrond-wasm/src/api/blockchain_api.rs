@@ -18,9 +18,9 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
 	fn get_owner_address(&self) -> Address;
 
-	fn check_caller_is_owner(&self, endpoint: &'static [u8]) {
+	fn check_caller_is_owner(&self, endpoint: &'static str) {
 		if self.get_owner_address() != self.get_caller() {
-			self.signal_error(endpoint);
+			self.signal_error(endpoint.as_bytes());
 		}
 	}
 
