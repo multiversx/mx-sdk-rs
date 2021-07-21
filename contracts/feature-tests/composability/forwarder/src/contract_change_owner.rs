@@ -15,7 +15,7 @@ pub trait ChangeOwnerModule {
 
 	fn get_owner_of_vault_contract(&self, address: Address) -> Address {
 		self.vault_proxy()
-		.contract(address)
+			.contract(address)
 			.get_owner_address()
 			.execute_on_dest_context()
 	}
