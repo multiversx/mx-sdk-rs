@@ -40,7 +40,7 @@
                         }
                     },
                     "storage": {
-                        "str:token_details|nested:str:MFNFT-67890": "u32:0|sc:bonding-curve"
+                        "str:token_details|nested:str:MFNFT-67890": "u32:0|address:owner"
                     },
                     "code": "file:../output/bonding-curve.wasm",
                     "owner": "address:owner"
@@ -72,7 +72,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:token_details|nested:str:MFNFT-67890": "u32:0|sc:bonding-curve"
+                        "str:token_details|nested:str:MFNFT-67890": "u32:0|address:owner"
                     },
                     "code": "file:../output/bonding-curve.wasm"
                 }

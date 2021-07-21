@@ -53,6 +53,14 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			!self.token_details(&identifier).is_empty(),
 			"Token is not issued yet!"
 		);
+
+		let caller = self.blockchain().get_caller();
+
+		let details = self.token_details(&identifier).get();
+		require!(
+			details.owner == caller,
+			"The price function can only be set by the seller."
+		);
 		self.bonding_curve(&identifier)
 			.update(|bonding_curve| bonding_curve.curve = function);
 		Ok(())

@@ -51,7 +51,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890": "u8:2|biguint:1|biguint:1|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFNFT-67890": "u32:1|u64:1|sc:bonding-curve",
+                        "str:token_details|nested:str:MFNFT-67890": "u32:1|u64:1|address:owner",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:1": "1"
                     },
                     "code": "file:../output/bonding-curve.wasm"
@@ -96,7 +96,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890": "u8:1|biguint:1|biguint:1|biguint:1|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFNFT-67890": "u32:1|u64:1|sc:bonding-curve",
+                        "str:token_details|nested:str:MFNFT-67890": "u32:1|u64:1|address:owner",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:1": "1"
                     },
                     "code": "file:../output/bonding-curve.wasm"
@@ -177,7 +177,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890": "u8:1|biguint:1|biguint:3|biguint:3|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFNFT-67890": "u32:3|u64:1|u64:2|u64:3|sc:bonding-curve",
+                        "str:token_details|nested:str:MFNFT-67890": "u32:3|u64:1|u64:2|u64:3|address:owner",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:1": "1",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:2": "1",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:3": "1"

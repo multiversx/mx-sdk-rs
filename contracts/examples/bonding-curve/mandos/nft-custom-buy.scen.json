@@ -47,8 +47,7 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "1"
                                 }
                             ]
                         }
@@ -63,18 +62,15 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "0",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "0"
                                 },
                                 {
                                     "nonce": "2",
-                                    "balance": "1",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "1"
                                 },
                                 {
                                     "nonce": "3",
-                                    "balance": "1",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "1"
                                 }
                             ],
                             "roles": [
@@ -86,7 +82,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890": "u8:1|biguint:1|biguint:3|biguint:2|nested:str:EGLD-12345|biguint:4",
-                        "str:token_details|nested:str:MFNFT-67890": "u32:2|u64:2|u64:3|sc:bonding-curve",
+                        "str:token_details|nested:str:MFNFT-67890": "u32:2|u64:2|u64:3|address:owner",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:2": "1",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:3": "1"
                     },
@@ -147,18 +143,15 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "0",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "0"
                                 },
                                 {
                                     "nonce": "2",
-                                    "balance": "1",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "1"
                                 },
                                 {
                                     "nonce": "3",
-                                    "balance": "1",
-                                    "creator": "sc:bonding-curve"
+                                    "balance": "1"
                                 }
                             ],
                             "roles": [
@@ -170,7 +163,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFNFT-67890": "u8:1|biguint:1|biguint:3|biguint:1|nested:str:EGLD-12345|biguint:9",
-                        "str:token_details|nested:str:MFNFT-67890": "u32:1|u64:3|sc:bonding-curve",
+                        "str:token_details|nested:str:MFNFT-67890": "u32:1|u64:3|address:owner",
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:3": "1"
                     },
                     "code": "file:../output/bonding-curve.wasm"
