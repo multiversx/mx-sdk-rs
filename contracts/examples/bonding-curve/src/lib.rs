@@ -1,7 +1,4 @@
 #![no_std]
-#![allow(unused_attributes)]
-#![feature(trait_alias)]
-#![feature(destructuring_assignment)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
