@@ -90,18 +90,12 @@ where
 	/// Executes immediately, synchronously, and returns Some(Address) of the deployed contract.  
 	/// Will return None if the deploy fails.  
 	pub fn execute(self) -> Option<Address> {
-		let address = self.api.deploy_contract(
+		self.api.deploy_contract(
 			self.resolve_gas_limit(),
 			&self.payment_amount,
 			&self.code,
 			self.code_metadata,
 			&self.arg_buffer,
-		);
-
-		if address.is_zero() {
-			None
-		} else {
-			Some(address)
-		}
+		)
 	}
 }

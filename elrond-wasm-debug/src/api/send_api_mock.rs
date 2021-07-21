@@ -62,6 +62,15 @@ impl SendApi for TxContext {
 		BlockchainApi::get_gas_left(self)
 	}
 
+	fn get_esdt_token_data(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+	) -> elrond_wasm::types::EsdtTokenData<Self::AmountType> {
+		BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+	}
+
 	fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
 		if amount.value() > self.get_available_egld_balance() {
 			std::panic::panic_any(TxPanic {
@@ -146,7 +155,7 @@ impl SendApi for TxContext {
 		_code: &BoxedBytes,
 		_code_metadata: CodeMetadata,
 		_arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		panic!("deploy_contract not yet implemented")
 	}
 
