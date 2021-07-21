@@ -19,7 +19,6 @@ pub trait Adder {
 	}
 
 	/// Add desired amount to the storage variable.
-	#[only_owner]
 	#[endpoint]
 	fn add(&self, value: &Self::BigInt) -> SCResult<()> {
 		let mut sum = self.get_sum();
