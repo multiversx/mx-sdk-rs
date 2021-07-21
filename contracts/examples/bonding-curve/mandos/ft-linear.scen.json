@@ -35,7 +35,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFFT-12345": "u8:2|biguint:0|biguint:0|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFFT-12345": "u32:1|u64:0|sc:bonding-curve",
+                        "str:token_details|nested:str:MFFT-12345": "u32:1|u64:0|address:owner",
                         "str:nonce_amount|nested:str:MFFT-12345|u64:0": "0",
                         "str:sell_availability": "1"
                     },
@@ -99,7 +99,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFFT-12345": "u8:0||biguint:1|biguint:1|biguint:0|biguint:0|nested:str:EGLD-12345|biguint:0",
-                        "str:token_details|nested:str:MFFT-12345": "u32:1|u64:0|sc:bonding-curve",
+                        "str:token_details|nested:str:MFFT-12345": "u32:1|u64:0|address:owner",
                         "str:nonce_amount|nested:str:MFFT-12345|u64:0": "0",
                         "str:sell_availability": "1"
                     },

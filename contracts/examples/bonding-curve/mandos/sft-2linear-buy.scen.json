@@ -87,7 +87,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFSFT-24680": "u8:0|biguint:0|biguint:1|biguint:110|biguint:100|nested:str:EGLD-12345|biguint:45",
-                        "str:token_details|nested:str:MFSFT-24680": "u32:2|u64:1|u64:2|sc:bonding-curve",
+                        "str:token_details|nested:str:MFSFT-24680": "u32:2|u64:1|u64:2|address:owner",
                         "str:nonce_amount|nested:str:MFSFT-24680|u64:1": "90",
                         "str:nonce_amount|nested:str:MFSFT-24680|u64:2": "10"
                     },
@@ -176,7 +176,7 @@
                     },
                     "storage": {
                         "str:bonding_curve|nested:str:MFSFT-24680": "u8:0|biguint:0|biguint:1|biguint:110|biguint:90|nested:str:EGLD-12345|biguint:190",
-                        "str:token_details|nested:str:MFSFT-24680": "u32:1|u64:1|sc:bonding-curve",
+                        "str:token_details|nested:str:MFSFT-24680": "u32:1|u64:1|address:owner",
                         "str:nonce_amount|nested:str:MFSFT-24680|u64:1": "90"
                     },
                     "code": "file:../output/bonding-curve.wasm"
