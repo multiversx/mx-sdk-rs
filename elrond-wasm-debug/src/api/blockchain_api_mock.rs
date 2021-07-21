@@ -19,12 +19,6 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
 			.unwrap_or_else(|| panic!("contract owner address not set"))
 	}
 
-	fn check_caller_is_owner(&self, endpoint: &'static [u8]) {
-		if self.get_owner_address() != self.get_caller() {
-			panic(endpoint)
-		}
-	}
-
 	fn get_shard_of_address(&self, _address: &Address) -> u32 {
 		panic!("get_shard_of_address not implemented")
 	}

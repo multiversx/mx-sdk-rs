@@ -36,6 +36,11 @@ fn count_ones_rs() {
 }
 
 #[test]
+fn only_owner() {
+	elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", &contract_map());
+}
+
+#[test]
 fn crypto_keccak256_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", &contract_map());
 }
