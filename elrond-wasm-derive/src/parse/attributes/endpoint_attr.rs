@@ -5,6 +5,10 @@ pub fn is_init(attr: &syn::Attribute) -> bool {
 	is_attribute_with_no_args(attr, ATTR_INIT)
 }
 
+pub fn is_only_owner(attr: &syn::Attribute) -> bool {
+	is_attribute_with_no_args(attr, ATTR_ONLY_OWNER)
+}
+
 pub fn is_callback_raw(attr: &syn::Attribute) -> bool {
 	is_attribute_with_no_args(attr, ATTR_CALLBACK_RAW_DECL)
 }
