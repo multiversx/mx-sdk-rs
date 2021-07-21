@@ -6,7 +6,7 @@ Depositing a token will set 2 storages:
   - `owned_tokens` which will store a list of `TokenIdentifier` of the tokens the seller deposits in the contract under the seller address as key and its pair
   - `token_details` which will storea `TokenOwnershipData` object containing a list of the stored nonces and the address of the owner.
   
-his approach with 2 storages was importand because as seller I am interested only of what tokens I have available and for claiming everything they should be easy to find without me requiring to give arguments of what token I want to claim. From buyer point of view I am not interested of who is the owner, but at the same time the contract needs to make sure the payment goes to the right address. 
+This approach with 2 storages was importand because as seller I am interested only of what tokens I have available and for claiming everything they should be easy to find without me requiring to give arguments of what token I want to claim. From buyer point of view I am not interested of who is the owner, but at the same time the contract needs to make sure the payment goes to the right address. 
 
 The payment was chosen to be stored under a storage named `BondingCurve` because here we have elements such as:
   - `FunctionSelector` - an enum that contains the functions available for setting
@@ -16,7 +16,7 @@ The payment was chosen to be stored under a storage named `BondingCurve` because
   - `TokenIdentifier` - containing the accepted payment token
   - `Biguint` - containing the payment for the sold tokens
   
-here the balance and the payment amount are variable and they will usually get changed together, reason why it was chosen for these elements to be kept away from `token_details`.
+Here the balance and the payment amount are variable and they will usually get changed together, reason why it was chosen for these elements to be kept away from `token_details`.
 
 **Important!** Only 1 seller can have a specific token to be sold at a time, avoiding this way scenarion of which token from which seller should be selled at one point.
 
