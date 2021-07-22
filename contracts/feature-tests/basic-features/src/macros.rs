@@ -13,9 +13,7 @@ pub trait Macros {
 
 	#[only_owner]
 	#[endpoint]
-	fn only_owner_endpoint(&self) -> SCResult<()> {
-		Ok(())
-	}
+	fn only_owner_endpoint(&self) {}
 
 	#[view]
 	fn require_equals(&self, a: u32, b: u32) -> SCResult<()> {
