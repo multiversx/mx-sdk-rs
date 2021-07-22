@@ -12,8 +12,6 @@ where
 	SA: SendApi + 'static,
 {
 	api: SA,
-	code: BoxedBytes,
-	code_metadata: CodeMetadata,
 	payment_amount: SA::AmountType,
 	explicit_gas_limit: u64,
 	pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
@@ -38,18 +36,10 @@ where
 	pub fn new(api: SA) -> Self {
 		ContractDeploy {
 			api,
-			code: BoxedBytes::empty(),
-			code_metadata: CodeMetadata::DEFAULT,
 			payment_amount: SA::AmountType::zero(),
 			explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
 			arg_buffer: ArgBuffer::new(),
 		}
-	}
-
-	pub fn with_code(mut self, code: BoxedBytes, code_metadata: CodeMetadata) -> Self {
-		self.code = code;
-		self.code_metadata = code_metadata;
-		self
 	}
 
 	pub fn with_egld_transfer(mut self, payment_amount: SA::AmountType) -> Self {
@@ -86,13 +76,19 @@ where
 {
 	/// Executes immediately, synchronously, and returns Some(Address) of the deployed contract.  
 	/// Will return None if the deploy fails.  
-	pub fn execute(self) -> Option<Address> {
+	pub fn deploy_contract(
+		self,
+		code: &BoxedBytes,
+		code_metadata: CodeMetadata,
+	) -> Option<Address> {
 		self.api.deploy_contract(
 			self.resolve_gas_limit(),
 			&self.payment_amount,
-			&self.code,
-			self.code_metadata,
+			code,
+			code_metadata,
 			&self.arg_buffer,
 		)
 	}
+
+	// TODO: deploy contract with code from another contract
 }
