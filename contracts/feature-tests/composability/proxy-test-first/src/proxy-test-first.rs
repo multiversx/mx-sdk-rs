@@ -28,7 +28,8 @@ mod message_me_proxy {
 	#[elrond_wasm_derive::proxy]
 	pub trait MessageMe {
 		#[init]
-		fn init(&self, init_arg: i32);
+		#[payable("EGLD")]
+		fn init(&self, #[payment] payment: Self::BigUint, init_arg: i32);
 
 		#[endpoint(messageMe)]
 		fn message_me(&self, arg1: i64, arg2: &Self::BigUint, arg3: Vec<u8>, arg4: &Address);
@@ -53,15 +54,20 @@ pub trait ProxyTestFirst {
 	fn set_callback_info(&self, callback_info: i64);
 
 	#[init]
-	fn init(&self, calee_address: &Address) {
-		self.set_other_contract(calee_address);
+	fn init(&self, other_contract_addr: &Address) {
+		self.set_other_contract(other_contract_addr);
 	}
 
+	#[payable("EGLD")]
 	#[endpoint(deploySecondContract)]
-	fn deploy_second_contract(&self, code: BoxedBytes) -> SCResult<()> {
+	fn deploy_second_contract(
+		&self,
+		#[payment] payment: Self::BigUint,
+		code: BoxedBytes,
+	) -> SCResult<()> {
 		let address = self
 			.message_me_proxy()
-			.init(123)
+			.init(payment, 123)
 			.with_code(code, CodeMetadata::DEFAULT)
 			.execute()
 			.ok_or("Deploy failed")?;
