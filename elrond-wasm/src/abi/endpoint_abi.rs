@@ -20,6 +20,7 @@ pub struct OutputAbi {
 pub struct EndpointAbi {
 	pub docs: &'static [&'static str],
 	pub name: &'static str,
+	pub only_owner: bool,
 	pub payable_in_tokens: &'static [&'static str],
 	pub inputs: Vec<InputAbi>,
 	pub outputs: Vec<OutputAbi>,
