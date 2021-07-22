@@ -68,8 +68,7 @@ pub trait ProxyTestFirst {
 		let address = self
 			.message_me_proxy()
 			.init(payment, 123)
-			.with_code(code, CodeMetadata::DEFAULT)
-			.execute()
+			.deploy_contract(&code, CodeMetadata::DEFAULT)
 			.ok_or("Deploy failed")?;
 		self.set_other_contract(&address);
 		Ok(())

@@ -7,19 +7,18 @@ pub trait DeployContractModule {
 
 	#[endpoint]
 	fn deploy_contract(&self, code: BoxedBytes) -> SCResult<Address> {
-		let deployed_contract_address = self.deploy_vault(code).ok_or("Deploy failed")?;
+		let deployed_contract_address = self.deploy_vault(&code).ok_or("Deploy failed")?;
 
 		Ok(deployed_contract_address)
 	}
 
 	#[endpoint]
 	fn deploy_two_contracts(&self, code: BoxedBytes) -> SCResult<MultiResult2<Address, Address>> {
-		let first_deployed_contract_address = self
-			.deploy_vault(code.clone())
-			.ok_or("First deploy failed")?;
+		let first_deployed_contract_address =
+			self.deploy_vault(&code).ok_or("First deploy failed")?;
 
 		let second_deployed_contract_address =
-			self.deploy_vault(code).ok_or("Second deploy failed")?;
+			self.deploy_vault(&code).ok_or("Second deploy failed")?;
 
 		Ok((
 			first_deployed_contract_address,
@@ -29,10 +28,9 @@ pub trait DeployContractModule {
 	}
 
 	#[endpoint]
-	fn deploy_vault(&self, code: BoxedBytes) -> Option<Address> {
+	fn deploy_vault(&self, code: &BoxedBytes) -> Option<Address> {
 		self.vault_proxy()
 			.init()
-			.with_code(code, CodeMetadata::DEFAULT)
-			.execute()
+			.deploy_contract(code, CodeMetadata::DEFAULT)
 	}
 }
