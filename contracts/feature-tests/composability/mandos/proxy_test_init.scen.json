@@ -6,7 +6,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "100",
                     "storage": {},
                     "code": ""
                 },
@@ -31,7 +31,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "value": "0",
+                "value": "100",
                 "function": "deploySecondContract",
                 "arguments": [
                     "file:../proxy-test-second/output/proxy-test-second.wasm"
@@ -66,9 +66,10 @@
                 },
                 "sc:proxy-second": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "100",
                     "storage": {
-                        "str:init_arg": "123"
+                        "str:init_arg": "123",
+                        "str:last_payment": "100"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }

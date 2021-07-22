@@ -26,10 +26,11 @@ pub trait ProxyTestSecond {
 	fn set_message_me_4(&self, s4: &Address);
 
 	#[init]
-	fn init(&self, init_arg: i32) {
+	#[payable("EGLD")]
+	fn init(&self, #[payment] payment: Self::BigUint, init_arg: i32) {
+		self.set_last_payment(&payment);
 		self.set_init_arg(init_arg);
 	}
-
 
 	#[payable("EGLD")]
 	#[endpoint(payMe)]
