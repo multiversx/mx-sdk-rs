@@ -4,7 +4,7 @@ pub fn generate_only_owner_snippet(m: &Method) -> proc_macro2::TokenStream {
 	if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
 		if endpoint_metadata.only_owner {
 			let message = format!(
-				"Only owner can call {} !",
+				"Only owner can call {}",
 				endpoint_metadata.public_name.to_string()
 			);
 			return quote! {
