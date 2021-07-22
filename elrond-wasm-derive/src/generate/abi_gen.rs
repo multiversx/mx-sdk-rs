@@ -1,7 +1,11 @@
 use super::util::*;
 use crate::model::{ContractTrait, Method, PublicRole};
 
-fn generate_endpoint_snippet(m: &Method, endpoint_name: &str) -> proc_macro2::TokenStream {
+fn generate_endpoint_snippet(
+	m: &Method,
+	endpoint_name: &str,
+	only_owner: bool,
+) -> proc_macro2::TokenStream {
 	let endpoint_docs = &m.docs;
 	let payable_in_tokens = m.payable_metadata().abi_strings();
 
@@ -41,6 +45,7 @@ fn generate_endpoint_snippet(m: &Method, endpoint_name: &str) -> proc_macro2::To
 		let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
 			docs: &[ #(#endpoint_docs),* ],
 			name: #endpoint_name,
+			only_owner: #only_owner,
 			payable_in_tokens: &[ #(#payable_in_tokens),* ],
 			inputs: Vec::new(),
 			outputs: Vec::new(),
@@ -59,14 +64,15 @@ fn generate_abi_method_body(
 		.iter()
 		.filter_map(|m| {
 			if let PublicRole::Init(_) = &m.public_role {
-				let endpoint_def = generate_endpoint_snippet(m, "init");
+				let endpoint_def = generate_endpoint_snippet(m, "init", false);
 				Some(quote! {
 					#endpoint_def
 					contract_abi.constructor = Some(endpoint_abi);
 				})
 			} else if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
 				let endpoint_name_str = endpoint_metadata.public_name.to_string();
-				let endpoint_def = generate_endpoint_snippet(m, &endpoint_name_str);
+				let endpoint_def =
+					generate_endpoint_snippet(m, &endpoint_name_str, endpoint_metadata.only_owner);
 				Some(quote! {
 					#endpoint_def
 					contract_abi.endpoints.push(endpoint_abi);
