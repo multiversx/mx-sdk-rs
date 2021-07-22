@@ -7,6 +7,9 @@ pub trait ProxyTestSecond {
 	#[storage_set("last_payment")]
 	fn set_last_payment(&self, last_payment: &Self::BigUint);
 
+	#[storage_set("init_arg")]
+	fn set_init_arg(&self, init_arg: i32);
+
 	#[storage_set("pay_me_arg")]
 	fn set_pay_me_arg(&self, arg: i64);
 
@@ -23,7 +26,10 @@ pub trait ProxyTestSecond {
 	fn set_message_me_4(&self, s4: &Address);
 
 	#[init]
-	fn init(&self) {}
+	fn init(&self, init_arg: i32) {
+		self.set_init_arg(init_arg);
+	}
+
 
 	#[payable("EGLD")]
 	#[endpoint(payMe)]
