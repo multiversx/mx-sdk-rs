@@ -175,6 +175,7 @@ mod module_1 {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &[],
 				name: "version",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -689,6 +690,7 @@ mod sample_adder {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &[],
 				name: "getSum",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -699,6 +701,7 @@ mod sample_adder {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &[],
 				name: "init",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -709,6 +712,7 @@ mod sample_adder {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &["Add desired amount to the storage variable."],
 				name: "add",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),

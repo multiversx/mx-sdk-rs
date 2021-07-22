@@ -154,6 +154,11 @@ fn get_esdt_local_roles_go() {
 }
 
 #[test]
+fn only_owner_go() {
+	elrond_wasm_debug::mandos_go("mandos/only_owner.scen.json");
+}
+
+#[test]
 fn out_of_gas_go() {
 	elrond_wasm_debug::mandos_go("mandos/out_of_gas.scen.json");
 }
