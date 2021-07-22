@@ -154,7 +154,7 @@ fn get_esdt_local_roles_go() {
 }
 
 #[test]
-fn only_owner() {
+fn only_owner_go() {
 	elrond_wasm_debug::mandos_go("mandos/only_owner.scen.json");
 }
 

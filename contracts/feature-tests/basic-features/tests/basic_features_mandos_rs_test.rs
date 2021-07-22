@@ -36,7 +36,7 @@ fn count_ones_rs() {
 }
 
 #[test]
-fn only_owner() {
+fn only_owner_rs() {
 	elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", &contract_map());
 }
 

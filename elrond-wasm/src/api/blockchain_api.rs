@@ -20,7 +20,7 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
 	fn check_caller_is_owner(&self) {
 		if self.get_owner_address() != self.get_caller() {
-			self.signal_error(b"Only owner can call this");
+			self.signal_error(b"Endpoint can olny be called by owner");
 		}
 	}
 
