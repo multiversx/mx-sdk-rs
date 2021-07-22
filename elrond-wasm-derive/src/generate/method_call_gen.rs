@@ -1,5 +1,6 @@
 use super::arg_regular::*;
 use super::method_gen::generate_arg_call_name;
+use super::only_owner_gen::*;
 use super::payable_gen::*;
 use super::util::*;
 use crate::model::Method;
@@ -37,6 +38,7 @@ pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
 
 pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStream {
 	let payable_snippet = generate_payable_snippet(m);
+	let only_owner_snippet = generate_only_owner_snippet(m);
 
 	let mut arg_index = -1i32;
 	let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
@@ -67,6 +69,7 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
 
 	quote! {
 		#payable_snippet
+		#only_owner_snippet
 		elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), #nr_args);
 		#(#arg_init_snippets)*
 		#body_with_result
@@ -75,6 +78,7 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
 
 fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenStream {
 	let payable_snippet = generate_payable_snippet(m);
+	let only_owner_snippet = generate_only_owner_snippet(m);
 
 	let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
 		.method_args
@@ -93,6 +97,8 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
 
 	quote! {
 		#payable_snippet
+
+		#only_owner_snippet
 
 		let mut ___arg_loader = EndpointDynArgLoader::new(self.argument_api());
 

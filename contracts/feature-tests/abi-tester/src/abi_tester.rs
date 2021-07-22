@@ -31,6 +31,7 @@ pub trait AbiTester {
 	}
 
 	#[endpoint]
+	#[only_owner]
 	fn echo_enum(&self, e: AbiEnum) -> AbiEnum {
 		e
 	}
