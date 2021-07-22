@@ -41,7 +41,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:Only owner can call only_owner_endpoint !",
+                "message": "str:Only owner can call this",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
