@@ -68,7 +68,7 @@ pub trait ContractBase: Sized {
 	fn error_api(&self) -> Self::ErrorApi;
 
 	fn proxy<P: ProxyObjApi<SendApi = Self::SendApi>>(&self, address: Address) -> P {
-		P::new_proxy_obj(self.send(), address)
+		P::new_proxy_obj(self.send()).contract(address)
 	}
 }
 
