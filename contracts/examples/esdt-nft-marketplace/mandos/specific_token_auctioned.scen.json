@@ -115,7 +115,7 @@
                             "03-auction_status": "u8:1",
                             "04-payment_token": "nested:str:BUSD-123456|u64:0",
                             "05-min_bid": "biguint:0x01",
-                            "06-max_bid": "biguint:0x46",
+                            "06-max_bid": "u8:1|biguint:0x46",
                             "07-start_time": "u64:123,000",
                             "08-deadline": "u64:0x60C63784",
                             "09-original_owner": "address:other_seller",
