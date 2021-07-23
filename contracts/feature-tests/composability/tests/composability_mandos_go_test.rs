@@ -14,6 +14,11 @@ fn forw_raw_async_echo_go() {
 }
 
 #[test]
+fn forw_raw_contract_deploy_go() {
+	elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_deploy.scen.json");
+}
+
+#[test]
 fn forw_raw_direct_egld_go() {
 	elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_egld.scen.json");
 }
@@ -153,6 +158,11 @@ fn forwarder_contract_change_owner_go() {
 #[test]
 fn forwarder_contract_deploy_go() {
 	elrond_wasm_debug::mandos_go("mandos/forwarder_contract_deploy.scen.json");
+}
+
+#[test]
+fn forwarder_contract_deploy_two_go() {
+	elrond_wasm_debug::mandos_go("mandos/forwarder_contract_deploy_two.scen.json");
 }
 
 #[test]

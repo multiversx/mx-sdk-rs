@@ -38,20 +38,28 @@ pub fn proxy_getter_return_type(m: &Method) -> ProxyGetterReturnType {
 	}
 }
 
-pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
-	assert!(
-		m.method_args.len() == 1,
-		"Proxy getter must have 1 argument, which is the target address"
-	);
+fn proxy_getter_address_snippet(m: &Method) -> proc_macro2::TokenStream {
+	match m.method_args.len() {
+		0 => quote! {},
+		1 => {
+			let address_arg_name = &m.method_args[0].pat;
+			quote! {
+				.contract(#address_arg_name)
+			}
+		},
+		_ => panic!("Proxy getter can have at most 1 argument, which is the target address"),
+	}
+}
 
+pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
 	let msig = method_gen::generate_sig_with_attributes(m);
-	let address_arg_name = &m.method_args[0].pat;
 	let parsed_return_type = proxy_getter_return_type(m);
 	let module_path = &parsed_return_type.module_path;
+	let address_snippet = proxy_getter_address_snippet(m);
 
 	quote! {
 		#msig {
-			#module_path Proxy::new_proxy_obj(self.send(), #address_arg_name)
+			#module_path Proxy::new_proxy_obj(self.send()) #address_snippet
 		}
 	}
 }
