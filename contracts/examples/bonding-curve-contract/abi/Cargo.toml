@@ -1,11 +1,11 @@
 [package]
-name = "bonding-curve-abi"
+name = "bonding-curve-contract-abi"
 version = "0.0.0"
 authors = ["Alin Cruceat <alin.cruceat@elrond.com>"]
 edition = "2018"
 publish = false
 
-[dependencies.bonding-curve]
+[dependencies.bonding-curve-contract]
 path = ".."
 
 [dependencies.elrond-wasm]
