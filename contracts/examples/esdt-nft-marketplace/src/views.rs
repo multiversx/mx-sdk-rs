@@ -70,7 +70,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
 		if self.does_auction_exist(auction_id) {
 			let auction = self.auction_by_id(auction_id).get();
 
-			OptionalResult::Some((auction.min_bid, auction.max_bid).into())
+			OptionalResult::Some((auction.min_bid, auction.max_bid.unwrap_or_default()).into())
 		} else {
 			OptionalResult::None
 		}
