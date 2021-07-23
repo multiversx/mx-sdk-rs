@@ -1,5 +1,5 @@
 [package]
-name = "bonding-curve-wasm"
+name = "bonding-curve-contract-wasm"
 version = "0.0.0"
 authors = ["Alin Cruceat <alin.cruceat@elrond.com>"]
 edition = "2018"
@@ -15,7 +15,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.bonding-curve]
+[dependencies.bonding-curve-contract]
 path = ".."
 features = ["wasm-output-mode"]
 default-features = false

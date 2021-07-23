@@ -88,14 +88,14 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 				owner: caller.clone(),
 			});
 		} else {
-			let details = self.token_details(&identifier).get();
+			let mut details = self.token_details(&identifier).get();
 			require!(
 				details.owner == caller,
 				"The token was already deposited by another address"
 			);
 			if !details.token_nonces.contains(&nonce) {
-				self.token_details(&identifier)
-					.update(|new_details| new_details.token_nonces.push(nonce));
+				details.token_nonces.push(nonce);
+				self.token_details(&identifier).set(&details);
 			}
 		}
 
@@ -149,7 +149,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 				balance: amount,
 			};
 			payment_token = payment;
-			payment_amount = 0u64.into();
+			payment_amount = Self::BigUint::zero();
 		} else {
 			let bonding_curve = self.bonding_curve(identifier).get();
 			payment_token = bonding_curve.payment_token;

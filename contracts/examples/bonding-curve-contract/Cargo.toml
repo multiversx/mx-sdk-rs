@@ -1,5 +1,5 @@
 [package]
-name = "bonding-curve"
+name = "bonding-curve-contract"
 version = "0.0.0"
 authors = ["Alin Cruceat <alin.cruceat@elrond.com>"]
 edition = "2018"
@@ -9,7 +9,14 @@ publish = false
 path = "src/lib.rs"
 
 [features]
-wasm-output-mode = ["elrond-wasm-node"]
+wasm-output-mode = [
+    "elrond-wasm-node",
+    "elrond-wasm-module-bonding-curve/wasm-output-mode"
+]
+
+[dependencies.elrond-wasm-module-bonding-curve]
+version = "0.17.4"
+path = "../../modules/elrond-wasm-module-bonding-curve"
 
 [dependencies.elrond-wasm]
 version = "0.17.4"
