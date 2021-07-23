@@ -47,16 +47,14 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		let current_time = self.blockchain().get_block_timestamp();
 		let start_time = opt_start_time.into_option().unwrap_or(current_time);
 		let opt_max_bid = if max_bid > 0 {
-			require!(
-				min_bid > 0 && min_bid <= max_bid,
-				"Min bid can't be 0 or higher than max bid"
-			);
+			require!(min_bid <= max_bid, "Min bid can't higher than max bid");
 
 			Some(max_bid)
 		} else {
 			None
 		};
 
+		require!(min_bid > 0, "Min bid must be higher than 0");
 		require!(
 			nft_nonce > 0,
 			"Only Semi-Fungible and Non-Fungible tokens can be auctioned"
