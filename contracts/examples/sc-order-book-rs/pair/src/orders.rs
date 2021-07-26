@@ -6,7 +6,7 @@ use crate::common::FEE_PENALTY_INCREASE_PERCENT;
 
 use super::common;
 use super::events;
-use super::sanity;
+use super::validation;
 
 use super::common::{
 	Order, OrderInputParams, OrderType, Payment, Transfer, FREE_ORDER_FROM_STORAGE_MIN_PENALTIES,
@@ -16,7 +16,7 @@ use core::iter::FromIterator;
 
 #[elrond_wasm_derive::module]
 pub trait OrdersModule:
-	events::EventsModule + common::CommonModule + sanity::SanityCheckModule
+	events::EventsModule + common::CommonModule + validation::ValidationModule
 {
 	fn create_order(
 		&self,

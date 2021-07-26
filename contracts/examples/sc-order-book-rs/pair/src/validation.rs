@@ -10,7 +10,7 @@ use super::common::{
 };
 
 #[elrond_wasm_derive::module]
-pub trait SanityCheckModule: common::CommonModule {
+pub trait ValidationModule: common::CommonModule {
 	fn require_valid_order_input_amount(
 		&self,
 		params: &OrderInputParams<Self::BigUint>,
@@ -45,13 +45,13 @@ pub trait SanityCheckModule: common::CommonModule {
 		match params.fee_config.clone() {
 			FeeConfig::Fixed(amount) => {
 				require!(amount < params.amount, "Invalid fee config fixed amount");
-			},
+			}
 			FeeConfig::Percent(percent) => {
 				require!(
 					percent < PERCENT_BASE_POINTS,
 					"Percent value above maximum value"
 				);
-			},
+			}
 		}
 
 		let amount_after_fee = self.calculate_amount_after_fee(&params.amount, &params.fee_config);
@@ -141,8 +141,8 @@ pub trait SanityCheckModule: common::CommonModule {
 			match &order.match_provider {
 				Some(address) => {
 					require!(address == caller, "Caller is not matched order id");
-				},
-				None => {},
+				}
+				None => {}
 			}
 		}
 		Ok(())
@@ -155,8 +155,8 @@ pub trait SanityCheckModule: common::CommonModule {
 			match &order.match_provider {
 				Some(address) => {
 					require!(address != caller, "Creator is the caller");
-				},
-				None => {},
+				}
+				None => {}
 			}
 		}
 		Ok(())
