@@ -167,7 +167,7 @@ where
 mod tests {
 	use elrond_codec::DecodeError;
 
-use super::*;
+	use super::*;
 
 	#[test]
 	fn test_result_to_sc_result() {
@@ -176,7 +176,8 @@ use super::*;
 
 		assert!(sc_result_ok.unwrap() == 5);
 
-		let result_err: Result<i32, DecodeError> = Result::Err(DecodeError::from(&b"Decode Error"[..]).into());
+		let result_err: Result<i32, DecodeError> =
+			Result::Err(DecodeError::from(&b"Decode Error"[..]).into());
 		let sc_result_err: SCResult<i32> = result_err.into();
 
 		assert!(sc_result_err.err().unwrap().as_bytes() == &b"Decode Error"[..]);
