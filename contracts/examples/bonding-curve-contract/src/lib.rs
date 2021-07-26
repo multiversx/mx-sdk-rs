@@ -14,7 +14,5 @@ pub trait Contract:
 	+ owner_endpoints::OwnerEndpointsModule
 {
 	#[init]
-	fn init(&self, sell_availability: bool) {
-		self.sell_availability().set(&sell_availability);
-	}
+	fn init(&self) {}
 }

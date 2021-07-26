@@ -24,6 +24,7 @@ where
 pub struct BondingCurve<BigUint: BigUintApi> {
 	pub curve: FunctionSelector<BigUint>,
 	pub arguments: CurveArguments<BigUint>,
+	pub sell_availability: bool,
 	pub payment_token: TokenIdentifier,
 	pub payment_amount: BigUint,
 }

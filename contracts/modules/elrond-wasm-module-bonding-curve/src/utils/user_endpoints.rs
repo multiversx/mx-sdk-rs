@@ -15,13 +15,13 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 		#[payment_nonce] nonce: u64,
 		#[payment_token] offered_token: TokenIdentifier,
 	) -> SCResult<()> {
-		require!(
-			self.sell_availability().get(),
-			"Selling is not available on this contract."
-		);
 		let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount)?;
 
 		let calculated_price = self.bonding_curve(&offered_token).update(|bonding_curve| {
+			require!(
+				bonding_curve.sell_availability,
+				"Selling is not available on this token"
+			);
 			let price = self.compute_sell_price(
 				&bonding_curve.curve,
 				sell_amount.clone(),
