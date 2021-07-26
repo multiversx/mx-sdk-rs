@@ -91,6 +91,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 		{
 			type BigUint = A::BigUint;
 			type BigInt = A::BigInt;
+			type EllipticCurve = A::EllipticCurve;
 			type Storage = A::Storage;
 			type CallValue = A::CallValue;
 			type SendApi = A::SendApi;
@@ -231,17 +232,24 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 		{
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
+			type EllipticCurve = SA::ProxyEllipticCurve;
 			type Storage = SA::ProxyStorage;
 			type SendApi = SA;
 
-			fn new_proxy_obj(api: SA, address: Address) -> Self {
+			fn new_proxy_obj(api: SA) -> Self {
 				Proxy {
 					api,
-					address,
+					address: Address::zero(),
 					payment_token: elrond_wasm::types::TokenIdentifier::egld(),
 					payment_amount: Self::BigUint::zero(),
 					payment_nonce: 0,
 				}
+			}
+
+			#[inline]
+			fn contract(mut self, address: Address) -> Self {
+				self.address = address;
+				self
 			}
 
 			fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
@@ -285,6 +293,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
 		{
 			type BigUint = SA::AmountType;
 			type BigInt = SA::ProxyBigInt;
+			type EllipticCurve = SA::ProxyEllipticCurve;
 			type Storage = SA::ProxyStorage;
 			type SendApi = SA;
 			type ErrorApi = SA;

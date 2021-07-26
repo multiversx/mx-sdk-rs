@@ -25,6 +25,7 @@ extern "C" {
 	fn bigIntTDiv(dest: i32, x: i32, y: i32);
 	fn bigIntTMod(dest: i32, x: i32, y: i32);
 
+	fn bigIntPow(dest: i32, x: i32, y: i32);
 	fn bigIntAbs(dest: i32, x: i32);
 	fn bigIntNeg(dest: i32, x: i32);
 	fn bigIntSign(x: i32) -> i32;
@@ -93,9 +94,10 @@ macro_rules! binary_operator {
 
 			fn $method(self, other: ArwenBigInt) -> ArwenBigInt {
 				unsafe {
-					let result = bigIntNew(0);
-					$api_func(result, self.handle, other.handle);
-					ArwenBigInt { handle: result }
+					$api_func(self.handle, self.handle, other.handle);
+					ArwenBigInt {
+						handle: self.handle,
+					}
 				}
 			}
 		}
@@ -357,6 +359,15 @@ impl BigIntApi for ArwenBigInt {
 			} else {
 				None
 			}
+		}
+	}
+
+	fn pow(&self, exp: u32) -> Self {
+		unsafe {
+			let handle = bigIntNew(0);
+			let exp_handle = bigIntNew(exp as i64);
+			bigIntPow(handle, self.handle, exp_handle);
+			ArwenBigInt { handle }
 		}
 	}
 }
