@@ -7,7 +7,7 @@ mod common;
 mod events;
 mod global;
 mod orders;
-mod sanity;
+mod validation;
 
 use common::OrderInputParams;
 
@@ -17,7 +17,7 @@ pub trait Pair:
 	+ orders::OrdersModule
 	+ events::EventsModule
 	+ common::CommonModule
-	+ sanity::SanityCheckModule
+	+ validation::ValidationModule
 {
 	#[init]
 	fn init(&self, first_token_id: TokenIdentifier, second_token_id: TokenIdentifier) {
