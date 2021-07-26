@@ -48,6 +48,7 @@
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1",
@@ -59,6 +60,7 @@
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1",

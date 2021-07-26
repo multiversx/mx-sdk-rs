@@ -50,8 +50,9 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:callback_raw",
+                        "identifier": "str:callBack",
                         "topics": [
+                            "str:callback_raw",
                             "str:EGLD",
                             "0"
                         ],

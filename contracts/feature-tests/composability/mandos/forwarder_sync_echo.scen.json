@@ -49,8 +49,10 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "identifier": "str:echo_arguments_sync",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:1",
@@ -90,8 +92,10 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "identifier": "str:echo_arguments_sync_twice",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:1",
@@ -101,8 +105,10 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "identifier": "str:echo_arguments_sync_twice",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:1",

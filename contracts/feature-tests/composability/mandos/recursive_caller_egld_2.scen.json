@@ -49,6 +49,7 @@
                         "address": "sc:recursive-caller",
                         "identifier": "str:recursive_send_funds",
                         "topics": [
+                            "str:recursive_send_funds",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -59,6 +60,7 @@
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1",
@@ -68,8 +70,9 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds_callback",
+                        "identifier": "str:callBack",
                         "topics": [
+                            "str:recursive_send_funds_callback",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -80,6 +83,7 @@
                         "address": "sc:recursive-caller",
                         "identifier": "str:recursive_send_funds",
                         "topics": [
+                            "str:recursive_send_funds",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -87,20 +91,10 @@
                         "data": "1"
                     },
                     {
-                        "address": "sc:vault",
-                        "identifier": "str:accept_funds",
-                        "topics": [
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
-                        ],
-                        "data": ""
-                    },
-                    {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds_callback",
+                        "identifier": "str:callBack",
                         "topics": [
+                            "str:recursive_send_funds_callback",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -123,15 +117,15 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "2",
+                    "balance": "1",
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds": "2"
+                        "str:call_counts|nested:str:accept_funds": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:recursive-caller": {
                     "nonce": "0",
-                    "balance": "998",
+                    "balance": "999",
                     "storage": {},
                     "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }

@@ -11,11 +11,11 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:proxy-first": {
+                "sc:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second"
+                        "``other_contract": "sc:bob"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 }
@@ -26,7 +26,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "sc:proxy-first",
+                "to": "sc:alice",
                 "value": "0x123400",
                 "function": "forwardToOtherContractWithCallback",
                 "arguments": [],
@@ -50,16 +50,16 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:proxy-first": {
+                "sc:alice": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second",
+                        "``other_contract": "sc:bob",
                         "``1...............................": "``payCallback"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
-                "sc:proxy-second": {
+                "sc:bob": {
                     "nonce": "0",
                     "balance": "0x123400",
                     "storage": {},
