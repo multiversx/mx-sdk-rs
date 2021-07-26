@@ -9,6 +9,7 @@ pub struct InitMetadata {
 pub struct EndpointMetadata {
 	pub public_name: syn::Ident,
 	pub payable: MethodPayableMetadata,
+	pub only_owner: bool,
 }
 
 #[derive(Clone, Debug)]

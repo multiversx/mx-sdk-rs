@@ -234,14 +234,20 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 			type Storage = SA::ProxyStorage;
 			type SendApi = SA;
 
-			fn new_proxy_obj(api: SA, address: Address) -> Self {
+			fn new_proxy_obj(api: SA) -> Self {
 				Proxy {
 					api,
-					address,
+					address: Address::zero(),
 					payment_token: elrond_wasm::types::TokenIdentifier::egld(),
 					payment_amount: Self::BigUint::zero(),
 					payment_nonce: 0,
 				}
+			}
+
+			#[inline]
+			fn contract(mut self, address: Address) -> Self {
+				self.address = address;
+				self
 			}
 
 			fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {

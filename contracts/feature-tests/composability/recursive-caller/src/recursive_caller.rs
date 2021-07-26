@@ -6,10 +6,10 @@ elrond_wasm::imports!();
 #[elrond_wasm_derive::contract]
 pub trait RecursiveCaller {
 	#[proxy]
-	fn vault_proxy(&self, to: Address) -> vault::Proxy<Self::SendApi>;
+	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
 
 	#[proxy]
-	fn self_proxy(&self, to: Address) -> self::Proxy<Self::SendApi>;
+	fn self_proxy(&self) -> self::Proxy<Self::SendApi>;
 
 	#[init]
 	fn init(&self) {}
@@ -24,7 +24,8 @@ pub trait RecursiveCaller {
 	) -> AsyncCall<Self::SendApi> {
 		self.recursive_send_funds_event(to, token_identifier, amount, counter);
 
-		self.vault_proxy(to.clone())
+		self.vault_proxy()
+			.contract(to.clone())
 			.accept_funds(token_identifier.clone(), amount.clone())
 			.async_call()
 			.with_callback(self.callbacks().recursive_send_funds_callback(
@@ -47,7 +48,8 @@ pub trait RecursiveCaller {
 
 		if counter > 1 {
 			OptionalResult::Some(
-				self.self_proxy(self.blockchain().get_sc_address())
+				self.self_proxy()
+					.contract(self.blockchain().get_sc_address())
 					.recursive_send_funds(to, token_identifier, amount, counter - 1)
 					.async_call(),
 			)
