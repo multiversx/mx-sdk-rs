@@ -48,6 +48,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 		&self,
 		identifier: TokenIdentifier,
 		function: FunctionSelector<Self::BigUint>,
+		sell_availability: bool,
 	) -> SCResult<()> {
 		require!(
 			!self.token_details(&identifier).is_empty(),
@@ -61,8 +62,10 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			details.owner == caller,
 			"The price function can only be set by the seller."
 		);
-		self.bonding_curve(&identifier)
-			.update(|bonding_curve| bonding_curve.curve = function);
+		self.bonding_curve(&identifier).update(|bonding_curve| {
+			bonding_curve.curve = function;
+			bonding_curve.sell_availability = sell_availability
+		});
 		Ok(())
 	}
 
@@ -126,6 +129,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 				self.nonce_amount(&token, nonce).clear();
 			}
 			self.token_details(&token).clear();
+			self.bonding_curve(&token).clear();
 		}
 		self.owned_tokens(&caller).clear();
 
@@ -142,6 +146,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 		let mut arguments;
 		let payment_token;
 		let payment_amount: Self::BigUint;
+		let sell_availability: bool;
 
 		if self.bonding_curve(identifier).is_empty() {
 			arguments = CurveArguments {
@@ -150,6 +155,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			};
 			payment_token = payment;
 			payment_amount = Self::BigUint::zero();
+			sell_availability = false;
 		} else {
 			let bonding_curve = self.bonding_curve(identifier).get();
 			payment_token = bonding_curve.payment_token;
@@ -158,10 +164,12 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 			arguments = bonding_curve.arguments;
 			arguments.balance += &amount;
 			arguments.available_supply += amount;
+			sell_availability = bonding_curve.sell_availability;
 		}
 		self.bonding_curve(identifier).set(&BondingCurve {
 			curve,
 			arguments,
+			sell_availability,
 			payment_token,
 			payment_amount,
 		});

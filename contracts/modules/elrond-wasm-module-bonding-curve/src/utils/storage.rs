@@ -27,7 +27,4 @@ pub trait StorageModule {
 		identifier: &TokenIdentifier,
 		nonce: u64,
 	) -> SingleValueMapper<Self::Storage, Self::BigUint>;
-
-	#[storage_mapper("sell_availability")]
-	fn sell_availability(&self) -> SingleValueMapper<Self::Storage, bool>;
 }
