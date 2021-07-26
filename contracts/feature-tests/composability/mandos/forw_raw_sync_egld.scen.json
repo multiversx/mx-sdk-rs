@@ -45,7 +45,7 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:EGLD",
@@ -57,7 +57,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:call_execute_on_dest_context",
+                        "endpoint": "str:call_execute_on_dest_context",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
@@ -89,7 +89,7 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:EGLD",
@@ -101,7 +101,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:call_execute_on_dest_context_twice",
+                        "endpoint": "str:call_execute_on_dest_context_twice",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
@@ -109,7 +109,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:EGLD",
@@ -121,7 +121,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:call_execute_on_dest_context_twice",
+                        "endpoint": "str:call_execute_on_dest_context_twice",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],

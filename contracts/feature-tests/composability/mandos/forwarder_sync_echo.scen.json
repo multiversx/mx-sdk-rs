@@ -49,7 +49,7 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync",
+                        "endpoint": "str:echo_arguments_sync",
                         "topics": [
                             "str:echo_arguments_sync_result"
                         ],
@@ -92,7 +92,7 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_twice",
+                        "endpoint": "str:echo_arguments_sync_twice",
                         "topics": [
                             "str:echo_arguments_sync_result"
                         ],
@@ -105,7 +105,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_twice",
+                        "endpoint": "str:echo_arguments_sync_twice",
                         "topics": [
                             "str:echo_arguments_sync_result"
                         ],

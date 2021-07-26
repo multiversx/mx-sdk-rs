@@ -50,7 +50,7 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds",
                         "topics": [
                             "str:retrieve_funds",
                             "str:TEST-TOKEN",
@@ -61,7 +61,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:ESDTTransfer",
+                        "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKEN",
                             "1000",

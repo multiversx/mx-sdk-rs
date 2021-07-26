@@ -1,0 +1,47 @@
+{
+    "name": "trying to claim too early",
+    "steps": [
+      {
+        "step": "externalSteps",
+        "path": "crowdfunding-fund.scen.json"
+      },
+      {
+        "step": "scCall",
+        "txId": "claim-too-early-donor",
+        "tx": {
+            "from": "address:donor1",
+            "to": "sc:crowdfunding",
+            "value": "0",
+            "function": "claim",
+            "arguments": [],
+            "gasLimit": "100,000,000",
+            "gasPrice": "0"
+        },
+        "expect": {
+            "message": "str:cannot claim before deadline",
+            "status": "4",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "claim-too-early-owner",
+        "tx": {
+            "from": "address:my_address",
+            "to": "sc:crowdfunding",
+            "value": "0",
+            "function": "claim",
+            "arguments": [],
+            "gasLimit": "100,000,000",
+            "gasPrice": "0"
+        },
+        "expect": {
+            "message": "str:cannot claim before deadline",
+            "status": "4",
+            "gas": "*",
+            "refund": "*"
+        }
+      }
+    ]
+  }
