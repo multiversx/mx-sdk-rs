@@ -47,9 +47,8 @@
                 "logs": [
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds",
+                        "endpoint": "str:recursive_send_funds",
                         "topics": [
-                            "str:recursive_send_funds",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -58,9 +57,8 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
-                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1",
@@ -70,9 +68,8 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:callBack",
+                        "endpoint": "str:recursive_send_funds_callback",
                         "topics": [
-                            "str:recursive_send_funds_callback",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -81,9 +78,8 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds",
+                        "endpoint": "str:recursive_send_funds",
                         "topics": [
-                            "str:recursive_send_funds",
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -91,10 +87,20 @@
                         "data": "1"
                     },
                     {
-                        "address": "sc:recursive-caller",
-                        "identifier": "str:callBack",
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
                         "topics": [
-                            "str:recursive_send_funds_callback",
+                            "str:EGLD",
+                            "str:FungibleESDT",
+                            "1",
+                            "0"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:recursive-caller",
+                        "endpoint": "str:recursive_send_funds_callback",
+                        "topics": [
                             "sc:vault",
                             "str:EGLD",
                             "1"
@@ -117,15 +123,15 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "1",
+                    "balance": "2",
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
+                        "str:call_counts|nested:str:accept_funds": "2"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:recursive-caller": {
                     "nonce": "0",
-                    "balance": "999",
+                    "balance": "998",
                     "storage": {},
                     "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }
