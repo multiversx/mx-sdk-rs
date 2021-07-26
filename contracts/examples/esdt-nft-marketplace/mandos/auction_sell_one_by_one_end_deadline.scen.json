@@ -57,6 +57,18 @@
                 "address:seller": {
                     "nonce": "1",
                     "balance": "140",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {}
                 },
                 "address:first_bidder": {
@@ -106,7 +118,7 @@
                             "03-auction_status": "u8:2",
                             "04-payment_token": "nested:str:EGLD|u64:0",
                             "05-min_bid": "biguint:100",
-                            "06-max_bid": "biguint:1000",
+                            "06-max_bid": "u8:1|biguint:1000",
                             "07-start_time": "u64:123,000",
                             "08-deadline": "u64:123,456",
                             "09-original_owner": "address:seller",
