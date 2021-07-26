@@ -148,20 +148,6 @@ pub trait ValidationModule: common::CommonModule {
 		Ok(())
 	}
 
-	fn require_creator_is_not_caller(&self, orders: &[Order<Self::BigUint>]) -> SCResult<()> {
-		let caller = &self.blockchain().get_caller();
-
-		for order in orders.iter() {
-			match &order.match_provider {
-				Some(address) => {
-					require!(address != caller, "Creator is the caller");
-				}
-				None => {}
-			}
-		}
-		Ok(())
-	}
-
 	fn require_contains_all(&self, vec_base: &[u64], items: &[u64]) -> SCResult<()> {
 		for item in items.iter() {
 			require!(vec_base.contains(item), "Base vec do not contain item");
