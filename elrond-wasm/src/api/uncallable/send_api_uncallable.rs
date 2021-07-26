@@ -17,6 +17,15 @@ impl SendApi for super::UncallableApi {
 		unreachable!()
 	}
 
+	fn get_esdt_token_data(
+		&self,
+		_address: &Address,
+		_token: &TokenIdentifier,
+		_nonce: u64,
+	) -> crate::types::EsdtTokenData<Self::AmountType> {
+		unreachable!()
+	}
+
 	fn direct_egld(&self, _to: &Address, _amount: &BigUintUncallable, _data: &[u8]) {
 		unreachable!()
 	}
@@ -146,6 +155,19 @@ impl SendApi for super::UncallableApi {
 		_function: &[u8],
 		_arg_buffer: &ArgBuffer,
 	) -> Vec<BoxedBytes> {
+		unreachable!()
+	}
+
+	fn sell_nft(
+		&self,
+		_nft_id: &TokenIdentifier,
+		_nft_nonce: u64,
+		_nft_amount: &Self::AmountType,
+		_buyer: &Address,
+		_payment_token: &TokenIdentifier,
+		_payment_nonce: u64,
+		_payment_amount: &Self::AmountType,
+	) -> Self::AmountType {
 		unreachable!()
 	}
 }

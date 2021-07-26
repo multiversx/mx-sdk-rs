@@ -176,6 +176,7 @@ mod module_1 {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &[],
 				name: "version",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -692,6 +693,7 @@ mod sample_adder {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &[],
 				name: "getSum",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -702,6 +704,7 @@ mod sample_adder {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &[],
 				name: "init",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -712,6 +715,7 @@ mod sample_adder {
 			let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
 				docs: &["Add desired amount to the storage variable."],
 				name: "add",
+				only_owner: false,
 				payable_in_tokens: &[],
 				inputs: Vec::new(),
 				outputs: Vec::new(),
@@ -789,14 +793,19 @@ mod sample_adder {
 		type Storage = SA::ProxyStorage;
 		type SendApi = SA;
 
-		fn new_proxy_obj(api: SA, address: Address) -> Self {
+		fn new_proxy_obj(api: SA) -> Self {
 			Proxy {
 				api,
-				address,
+				address: Address::zero(),
 				payment_token: elrond_wasm::types::TokenIdentifier::egld(),
 				payment_amount: Self::BigUint::zero(),
 				payment_nonce: 0,
 			}
+		}
+
+		fn contract(mut self, address: Address) -> Self {
+			self.address = address;
+			self
 		}
 
 		fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
@@ -831,7 +840,7 @@ mod sample_adder {
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
-		Proxy::new_proxy_obj(api, address)
+		Proxy::new_proxy_obj(api).contract(address)
 	}
 
 	pub struct CallbackProxyObj<SA>

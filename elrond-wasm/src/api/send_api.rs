@@ -9,6 +9,8 @@ use crate::{
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 
+const PERCENTAGE_TOTAL: u64 = 10_000;
+
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ErrorApi + Clone + Sized {
 	/// The type of the payment arguments.
@@ -30,6 +32,15 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 	/// To be used internally by the SendApi implementation.
 	/// Do not use directly from contracts. It might be removed from this trait at some point or reworked.
 	fn get_gas_left(&self) -> u64;
+
+	/// Used internally for sell_nft.
+	/// Do not use directly from contracts.
+	fn get_esdt_token_data(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+	) -> crate::types::EsdtTokenData<Self::AmountType>;
 
 	/// Sends EGLD to a given address, directly.
 	/// Used especially for sending EGLD to regular accounts.
@@ -337,5 +348,39 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 		);
 
 		u64::top_decode(output[0].as_slice()).unwrap_or_default()
+	}
+
+	/// Sends thr NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
+	/// Returns the payment amount left after sending royalties.
+	#[allow(clippy::too_many_arguments)]
+	fn sell_nft(
+		&self,
+		nft_id: &TokenIdentifier,
+		nft_nonce: u64,
+		nft_amount: &Self::AmountType,
+		buyer: &Address,
+		payment_token: &TokenIdentifier,
+		payment_nonce: u64,
+		payment_amount: &Self::AmountType,
+	) -> Self::AmountType {
+		let nft_token_data = self.get_esdt_token_data(&self.get_sc_address(), nft_id, nft_nonce);
+		let royalties_amount =
+			payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL.into();
+
+		self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
+
+		if royalties_amount > 0 {
+			self.direct(
+				&nft_token_data.creator,
+				payment_token,
+				payment_nonce,
+				&royalties_amount,
+				&[],
+			);
+
+			payment_amount.clone() - royalties_amount
+		} else {
+			payment_amount.clone()
+		}
 	}
 }

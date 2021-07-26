@@ -77,6 +77,9 @@ pub struct EndpointAbiJson {
 	#[serde(skip_serializing_if = "Vec::is_empty")]
 	pub docs: Vec<String>,
 	pub name: String,
+	#[serde(rename = "onlyOwner")]
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub only_owner: Option<bool>,
 	#[serde(rename = "payableInTokens")]
 	#[serde(skip_serializing_if = "Vec::is_empty")]
 	pub payable_in_tokens: Vec<String>,
@@ -89,6 +92,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
 		EndpointAbiJson {
 			docs: abi.docs.iter().map(|d| d.to_string()).collect(),
 			name: abi.name.to_string(),
+			only_owner: if abi.only_owner { Some(true) } else { None },
 			payable_in_tokens: abi
 				.payable_in_tokens
 				.iter()

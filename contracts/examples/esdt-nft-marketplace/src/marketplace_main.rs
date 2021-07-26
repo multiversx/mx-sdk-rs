@@ -46,14 +46,18 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	) -> SCResult<u64> {
 		let current_time = self.blockchain().get_block_timestamp();
 		let start_time = opt_start_time.into_option().unwrap_or(current_time);
+		let opt_max_bid = if max_bid > 0 {
+			require!(min_bid <= max_bid, "Min bid can't higher than max bid");
 
+			Some(max_bid)
+		} else {
+			None
+		};
+
+		require!(min_bid > 0, "Min bid must be higher than 0");
 		require!(
 			nft_nonce > 0,
 			"Only Semi-Fungible and Non-Fungible tokens can be auctioned"
-		);
-		require!(
-			min_bid > 0 && min_bid <= max_bid,
-			"Min bid can't be 0 or higher than max bid"
 		);
 		require!(
 			accepted_payment_token.is_egld() || accepted_payment_token.is_valid_esdt_identifier(),
@@ -110,7 +114,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 				nonce: accepted_payment_nft_nonce,
 			},
 			min_bid,
-			max_bid,
+			max_bid: opt_max_bid,
 			start_time,
 			deadline,
 
@@ -167,10 +171,13 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 			payment_amount > auction.current_bid,
 			"Bid must be higher than the current winning bid"
 		);
-		require!(
-			payment_amount <= auction.max_bid,
-			"Bid must be less than or equal to the max bid"
-		);
+
+		if let Some(max_bid) = &auction.max_bid {
+			require!(
+				&payment_amount <= max_bid,
+				"Bid must be less than or equal to the max bid"
+			);
+		}
 
 		// refund losing bid
 		if auction.current_winner != Address::zero() {
@@ -196,8 +203,15 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 		let mut auction = self.try_get_auction(auction_id)?;
 		let current_time = self.blockchain().get_block_timestamp();
 
+		let deadline_reached = current_time > auction.deadline;
+		let max_bid_reached = if let Some(max_bid) = &auction.max_bid {
+			&auction.current_bid == max_bid
+		} else {
+			false
+		};
+
 		require!(
-			current_time > auction.deadline || auction.current_bid == auction.max_bid,
+			deadline_reached || max_bid_reached,
 			"Auction deadline has not passed nor is the current bid equal to max bid"
 		);
 		require!(

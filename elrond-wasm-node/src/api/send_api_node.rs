@@ -135,6 +135,16 @@ impl SendApi for ArwenApiImpl {
 		BlockchainApi::get_gas_left(self)
 	}
 
+	#[inline]
+	fn get_esdt_token_data(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+	) -> elrond_wasm::types::EsdtTokenData<ArwenBigUint> {
+		BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+	} 
+
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
