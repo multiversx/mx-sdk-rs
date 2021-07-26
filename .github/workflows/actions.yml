@@ -7,31 +7,30 @@ on:
   pull_request:
 
 jobs:
-  # TODO: only temporarily disabled
-  # wasm_test:
-  #   name: Wasm tests
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         default: true
-  #         toolchain: nightly
-  #     - name: Install erdpy and arwentools
-  #       run : |
-  #         source .github/workflows/env
-  #         pip3 install erdpy
-  #         mkdir $HOME/elrondsdk
-  #         erdpy config set dependencies.arwentools.tag v1.4.3
-  #         erdpy deps install arwentools
-  #     - name: Build the wasm contracts
-  #       run: |
-  #         source .github/workflows/env
-  #         ./build-wasm.sh
-  #     - name: Run Arwen tests
-  #       run: |
-  #         source .github/workflows/env
-  #         cargo test --features elrond-wasm-debug/arwen-tests
+  wasm_test:
+    name: Wasm tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          toolchain: nightly
+      - name: Install erdpy and arwentools
+        run : |
+          source .github/workflows/env
+          pip3 install erdpy
+          mkdir $HOME/elrondsdk
+          erdpy config set dependencies.arwentools.tag v1.4.3
+          erdpy deps install arwentools
+      - name: Build the wasm contracts
+        run: |
+          source .github/workflows/env
+          ./build-wasm.sh
+      - name: Run Arwen tests
+        run: |
+          source .github/workflows/env
+          cargo test --features elrond-wasm-debug/arwen-tests
   rust_test:
     name: Rust tests
     runs-on: ubuntu-latest
