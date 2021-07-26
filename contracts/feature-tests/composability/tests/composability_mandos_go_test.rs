@@ -245,25 +245,25 @@ fn proxy_test_payment_sameshard_callback_go() {
 	elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_sameShard_callback.scen.json");
 }
 
-#[test]
-fn recursive_caller_egld_1_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_1.scen.json");
-}
+// #[test]
+// fn recursive_caller_egld_1_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_1.scen.json");
+// }
 
-#[test]
-fn recursive_caller_egld_2_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_2.scen.json");
-}
+// #[test]
+// fn recursive_caller_egld_2_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_2.scen.json");
+// }
 
-#[test]
-fn recursive_caller_egld_x_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_x.scen.json");
-}
+// #[test]
+// fn recursive_caller_egld_x_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_x.scen.json");
+// }
 
-#[test]
-fn recursive_caller_esdt_1_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
-}
+// #[test]
+// fn recursive_caller_esdt_1_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
+// }
 
 // #[test]
 // fn recursive_caller_esdt_2_go() {
