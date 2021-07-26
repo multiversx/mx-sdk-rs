@@ -21,7 +21,11 @@ pub trait ProxyObjApi {
 
 	// type ContractCall<R>;
 
-	fn new_proxy_obj(api: Self::SendApi, address: Address) -> Self;
+	fn new_proxy_obj(api: Self::SendApi) -> Self;
+
+	/// Specify the target contract to call.
+	/// Not taken into account for deploys.
+	fn contract(self, address: Address) -> Self;
 
 	fn with_token_transfer(self, token: TokenIdentifier, payment: Self::BigUint) -> Self;
 

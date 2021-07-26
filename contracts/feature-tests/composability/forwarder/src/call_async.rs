@@ -13,7 +13,7 @@ pub struct CallbackData<BigUint: BigUintApi> {
 #[elrond_wasm_derive::module]
 pub trait ForwarderAsyncCallModule {
 	#[proxy]
-	fn vault_proxy(&self, to: Address) -> vault::Proxy<Self::SendApi>;
+	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
 
 	#[endpoint]
 	#[payable("*")]
@@ -24,7 +24,8 @@ pub trait ForwarderAsyncCallModule {
 		#[payment_amount] payment: Self::BigUint,
 		#[payment_nonce] token_nonce: u64,
 	) -> AsyncCall<Self::SendApi> {
-		self.vault_proxy(to)
+		self.vault_proxy()
+			.contract(to)
 			.accept_funds(token, payment)
 			.with_nft_nonce(token_nonce)
 			.async_call()
@@ -39,7 +40,8 @@ pub trait ForwarderAsyncCallModule {
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		let half_payment = payment / 2u32.into();
-		self.vault_proxy(to)
+		self.vault_proxy()
+			.contract(to)
 			.accept_funds(token, half_payment)
 			.async_call()
 	}
@@ -52,7 +54,8 @@ pub trait ForwarderAsyncCallModule {
 		token_nonce: u64,
 		amount: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		self.vault_proxy(to)
+		self.vault_proxy()
+			.contract(to)
 			.retrieve_funds(token, token_nonce, amount, OptionalArg::None)
 			.async_call()
 			.with_callback(self.callbacks().retrieve_funds_callback())
@@ -91,7 +94,8 @@ pub trait ForwarderAsyncCallModule {
 		token_identifier: &TokenIdentifier,
 		amount: &Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		self.vault_proxy(to.clone())
+		self.vault_proxy()
+			.contract(to.clone())
 			.accept_funds(token_identifier.clone(), amount.clone())
 			.async_call()
 			.with_callback(
@@ -107,7 +111,8 @@ pub trait ForwarderAsyncCallModule {
 		token_identifier: &TokenIdentifier,
 		cb_amount: &Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
-		self.vault_proxy(to.clone())
+		self.vault_proxy()
+			.contract(to.clone())
 			.accept_funds(token_identifier.clone(), cb_amount.clone())
 			.async_call()
 	}

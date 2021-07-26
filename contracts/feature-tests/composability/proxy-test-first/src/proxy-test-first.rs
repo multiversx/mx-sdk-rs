@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(non_snake_case)] // TODO: clean up all camelCase
 
 elrond_wasm::imports!();
 
@@ -14,12 +13,12 @@ mod pay_me_proxy {
 	#[elrond_wasm_derive::proxy]
 	pub trait PayMe {
 		#[payable("EGLD")]
-		#[endpoint]
-		fn payMe(&self, #[payment] payment: Self::BigUint, arg1: i64);
+		#[endpoint(payMe)]
+		fn pay_me(&self, #[payment] payment: Self::BigUint, arg1: i64);
 
 		#[payable("EGLD")]
-		#[endpoint]
-		fn payMeWithResult(&self, #[payment] payment: Self::BigUint, arg1: i64);
+		#[endpoint(payMeWithResult)]
+		fn pay_me_with_result(&self, #[payment] payment: Self::BigUint, arg1: i64);
 	}
 }
 
@@ -28,18 +27,22 @@ mod message_me_proxy {
 
 	#[elrond_wasm_derive::proxy]
 	pub trait MessageMe {
-		#[endpoint]
-		fn messageMe(&self, arg1: i64, arg2: &Self::BigUint, arg3: Vec<u8>, arg4: &Address);
+		#[init]
+		#[payable("EGLD")]
+		fn init(&self, #[payment] payment: Self::BigUint, init_arg: i32);
+
+		#[endpoint(messageMe)]
+		fn message_me(&self, arg1: i64, arg2: &Self::BigUint, arg3: Vec<u8>, arg4: &Address);
 	}
 }
 
 #[elrond_wasm_derive::contract]
-pub trait Alice {
+pub trait ProxyTestFirst {
 	#[proxy]
-	fn pay_me_proxy(&self, to: Address) -> pay_me_proxy::Proxy<Self::SendApi>;
+	fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::SendApi>;
 
 	#[proxy]
-	fn message_me_proxy(&self, to: Address) -> message_me_proxy::Proxy<Self::SendApi>;
+	fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::SendApi>;
 
 	#[storage_get("other_contract")]
 	fn get_other_contract(&self) -> Address;
@@ -51,40 +54,59 @@ pub trait Alice {
 	fn set_callback_info(&self, callback_info: i64);
 
 	#[init]
-	fn init(&self, calee_address: &Address) {
-		self.set_other_contract(calee_address);
+	fn init(&self, other_contract_addr: &Address) {
+		self.set_other_contract(other_contract_addr);
 	}
 
 	#[payable("EGLD")]
-	#[endpoint]
-	fn forwardToOtherContract(
+	#[endpoint(deploySecondContract)]
+	fn deploy_second_contract(
+		&self,
+		#[payment] payment: Self::BigUint,
+		code: BoxedBytes,
+	) -> SCResult<()> {
+		let address = self
+			.message_me_proxy()
+			.init(payment, 123)
+			.deploy_contract(&code, CodeMetadata::DEFAULT)
+			.ok_or("Deploy failed")?;
+		self.set_other_contract(&address);
+		Ok(())
+	}
+
+	#[payable("EGLD")]
+	#[endpoint(forwardToOtherContract)]
+	fn forward_to_other_contract(
 		&self,
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		self.pay_me_proxy(other_contract)
-			.payMe(payment, 0x56)
+		self.pay_me_proxy()
+			.contract(other_contract)
+			.pay_me(payment, 0x56)
 			.async_call()
 	}
 
 	#[payable("EGLD")]
-	#[endpoint]
-	fn forwardToOtherContractWithCallback(
+	#[endpoint(forwardToOtherContractWithCallback)]
+	fn forward_to_other_contract_with_callback(
 		&self,
 		#[payment] payment: Self::BigUint,
 	) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		self.pay_me_proxy(other_contract)
-			.payMeWithResult(payment, 0x56)
+		self.pay_me_proxy()
+			.contract(other_contract)
+			.pay_me_with_result(payment, 0x56)
 			.async_call()
-			.with_callback(self.callbacks().payCallback())
+			.with_callback(self.callbacks().pay_callback())
 	}
 
-	#[endpoint]
-	fn messageOtherContract(&self) -> AsyncCall<Self::SendApi> {
+	#[endpoint(messageOtherContract)]
+	fn message_other_contract(&self) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		self.message_me_proxy(other_contract)
-			.messageMe(
+		self.message_me_proxy()
+			.contract(other_contract)
+			.message_me(
 				0x01,
 				&Self::BigUint::from(0x02u64),
 				[3u8; 3].to_vec(),
@@ -93,11 +115,12 @@ pub trait Alice {
 			.async_call()
 	}
 
-	#[endpoint]
-	fn messageOtherContractWithCallback(&self) -> AsyncCall<Self::SendApi> {
+	#[endpoint(messageOtherContractWithCallback)]
+	fn message_other_contract_with_callback(&self) -> AsyncCall<Self::SendApi> {
 		let other_contract = self.get_other_contract();
-		self.message_me_proxy(other_contract)
-			.messageMe(
+		self.message_me_proxy()
+			.contract(other_contract)
+			.message_me(
 				0x01,
 				&Self::BigUint::from(0x02u64),
 				[3u8; 3].to_vec(),
@@ -107,8 +130,8 @@ pub trait Alice {
 			.with_callback(self.callbacks().message_callback())
 	}
 
-	#[callback]
-	fn payCallback(&self, #[call_result] call_result: AsyncCallResult<i64>) {
+	#[callback(payCallback)] // although uncommon, custom callback names are possible
+	fn pay_callback(&self, #[call_result] call_result: AsyncCallResult<i64>) {
 		match call_result {
 			AsyncCallResult::Ok(cb_arg) => {
 				self.set_callback_info(cb_arg);

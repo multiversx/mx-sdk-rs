@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 #[elrond_wasm_derive::module]
 pub trait ForwarderSyncCallModule {
 	#[proxy]
-	fn vault_proxy(&self, to: Address) -> vault::Proxy<Self::SendApi>;
+	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
 
 	#[endpoint]
 	#[payable("*")]
@@ -11,7 +11,8 @@ pub trait ForwarderSyncCallModule {
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
 		let result = self
-			.vault_proxy(to)
+			.vault_proxy()
+			.contract(to)
 			.echo_arguments(args)
 			.with_gas_limit(half_gas)
 			.execute_on_dest_context();
@@ -31,7 +32,8 @@ pub trait ForwarderSyncCallModule {
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
 		let result = self
-			.vault_proxy(to)
+			.vault_proxy()
+			.contract(to)
 			.echo_arguments(args)
 			.with_gas_limit(half_gas)
 			.execute_on_dest_context_custom_range(|_, _| (start, end));
@@ -45,7 +47,8 @@ pub trait ForwarderSyncCallModule {
 		let one_third_gas = self.blockchain().get_gas_left() / 3;
 
 		let result = self
-			.vault_proxy(to.clone())
+			.vault_proxy()
+			.contract(to.clone())
 			.echo_arguments(args.clone())
 			.with_gas_limit(one_third_gas)
 			.execute_on_dest_context();
@@ -53,7 +56,8 @@ pub trait ForwarderSyncCallModule {
 		self.execute_on_dest_context_result_event(result.as_slice());
 
 		let result = self
-			.vault_proxy(to)
+			.vault_proxy()
+			.contract(to)
 			.echo_arguments(args)
 			.with_gas_limit(one_third_gas)
 			.execute_on_dest_context();
@@ -76,7 +80,8 @@ pub trait ForwarderSyncCallModule {
 		let half_gas = self.blockchain().get_gas_left() / 2;
 
 		let result: MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64> = self
-			.vault_proxy(to)
+			.vault_proxy()
+			.contract(to)
 			.accept_funds_echo_payment(token, payment, token_nonce)
 			.with_gas_limit(half_gas)
 			.execute_on_dest_context();
@@ -109,12 +114,14 @@ pub trait ForwarderSyncCallModule {
 		#[payment_nonce] token_nonce: u64,
 	) -> usize {
 		let _ = self
-			.vault_proxy(to.clone())
+			.vault_proxy()
+			.contract(to.clone())
 			.with_nft_nonce(token_nonce)
 			.accept_funds(token, payment)
 			.execute_on_dest_context();
 
-		self.vault_proxy(to)
+		self.vault_proxy()
+			.contract(to)
 			.call_counts(b"accept_funds")
 			.execute_on_dest_context()
 	}
@@ -127,7 +134,8 @@ pub trait ForwarderSyncCallModule {
 		token_nonce: u64,
 		amount: Self::BigUint,
 	) {
-		self.vault_proxy(to)
+		self.vault_proxy()
+			.contract(to)
 			.retrieve_funds(token, token_nonce, amount, OptionalArg::None)
 			.execute_on_dest_context()
 	}
