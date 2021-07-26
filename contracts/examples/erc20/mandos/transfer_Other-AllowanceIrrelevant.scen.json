@@ -45,6 +45,7 @@
                         "address": "sc:erc20",
                         "identifier": "str:approve",
                         "topics": [
+                            "str:approve",
                             "``account_1_____________________s1",
                             "``account_1_____________________s1"
                         ],
@@ -78,6 +79,7 @@
                         "address": "sc:erc20",
                         "identifier": "str:transfer",
                         "topics": [
+                            "str:transfer",
                             "``account_1_____________________s1",
                             "``account_7_____________________sz"
                         ],
