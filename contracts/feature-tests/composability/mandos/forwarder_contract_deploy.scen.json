@@ -30,7 +30,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "function": "deployContract",
+                "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm"
                 ],
