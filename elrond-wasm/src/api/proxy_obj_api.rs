@@ -1,10 +1,14 @@
-use super::{BigIntApi, BigUintApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi};
+use super::{
+	BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi,
+};
 use crate::types::{Address, TokenIdentifier};
 
 pub trait ProxyObjApi {
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
+
+	type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
 	/// The code generator produces the same types in the proxy, as for the main contract.
 	/// Sometimes endpoints return types that contain a `Self::Storage` type argument,
@@ -17,7 +21,11 @@ pub trait ProxyObjApi {
 
 	// type ContractCall<R>;
 
-	fn new_proxy_obj(api: Self::SendApi, address: Address) -> Self;
+	fn new_proxy_obj(api: Self::SendApi) -> Self;
+
+	/// Specify the target contract to call.
+	/// Not taken into account for deploys.
+	fn contract(self, address: Address) -> Self;
 
 	fn with_token_transfer(self, token: TokenIdentifier, payment: Self::BigUint) -> Self;
 
@@ -30,6 +38,8 @@ pub trait CallbackProxyObjApi {
 	type BigUint: BigUintApi + 'static;
 
 	type BigInt: BigIntApi + 'static;
+
+	type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
 	/// The code generator produces the same types in the proxy, as for the main contract.
 	/// Sometimes endpoints return types that contain a `Self::Storage` type argument,

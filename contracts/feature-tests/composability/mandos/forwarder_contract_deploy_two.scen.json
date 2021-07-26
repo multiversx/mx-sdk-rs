@@ -1,0 +1,86 @@
+{
+    "name": "Deploy 2 vaults from forwarder, through proxy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:child_1"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:child_2"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy_contract",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "deploy_two_contracts",
+                "arguments": [
+                    "file:../vault/output/vault.wasm"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [
+                    "sc:child_1",
+                    "sc:child_2"
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:child_1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "owner": "sc:forwarder",
+                    "code":"file:../vault/output/vault.wasm"
+                },
+                "sc:child_2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "owner": "sc:forwarder",
+                    "code":"file:../vault/output/vault.wasm"
+                }
+            }
+        }
+    ]
+}

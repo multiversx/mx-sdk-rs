@@ -167,6 +167,7 @@ mod module_1 {
 	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
 		type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
 		type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
+		type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
 		type Storage = elrond_wasm::api::uncallable::UncallableApi;
 		type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
@@ -473,6 +474,7 @@ mod sample_adder {
 	{
 		type BigUint = A::BigUint;
 		type BigInt = A::BigInt;
+		type EllipticCurve = A::EllipticCurve;
 		type Storage = A::Storage;
 		type CallValue = A::CallValue;
 		type SendApi = A::SendApi;
@@ -682,6 +684,7 @@ mod sample_adder {
 	impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
 		type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
 		type BigInt = elrond_wasm::api::uncallable::BigIntUncallable;
+		type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
 		type Storage = elrond_wasm::api::uncallable::UncallableApi;
 		type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
@@ -786,17 +789,23 @@ mod sample_adder {
 	{
 		type BigUint = SA::AmountType;
 		type BigInt = SA::ProxyBigInt;
+		type EllipticCurve = SA::ProxyEllipticCurve;
 		type Storage = SA::ProxyStorage;
 		type SendApi = SA;
 
-		fn new_proxy_obj(api: SA, address: Address) -> Self {
+		fn new_proxy_obj(api: SA) -> Self {
 			Proxy {
 				api,
-				address,
+				address: Address::zero(),
 				payment_token: elrond_wasm::types::TokenIdentifier::egld(),
 				payment_amount: Self::BigUint::zero(),
 				payment_nonce: 0,
 			}
+		}
+
+		fn contract(mut self, address: Address) -> Self {
+			self.address = address;
+			self
 		}
 
 		fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
@@ -831,7 +840,7 @@ mod sample_adder {
 	where
 		SA: elrond_wasm::api::SendApi + 'static,
 	{
-		Proxy::new_proxy_obj(api, address)
+		Proxy::new_proxy_obj(api).contract(address)
 	}
 
 	pub struct CallbackProxyObj<SA>
@@ -846,6 +855,7 @@ mod sample_adder {
 	{
 		type BigUint = SA::AmountType;
 		type BigInt = SA::ProxyBigInt;
+		type EllipticCurve = SA::ProxyEllipticCurve;
 		type Storage = SA::ProxyStorage;
 		type SendApi = SA;
 		type ErrorApi = SA;

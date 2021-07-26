@@ -1,5 +1,5 @@
 {
-    "name": "Deploy vault from forwarder",
+    "name": "Deploy vault from forwarder through proxy",
     "steps": [
         {
             "step": "setState",
@@ -25,12 +25,12 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault",
+            "txId": "deploy_contract",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "function": "deployContract",
+                "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm"
                 ],
