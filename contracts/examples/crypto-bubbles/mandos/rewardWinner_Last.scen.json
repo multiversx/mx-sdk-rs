@@ -45,7 +45,7 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "str:rewardWinner",
+                        "endpoint": "str:rewardWinner",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000004",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",

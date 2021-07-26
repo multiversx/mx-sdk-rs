@@ -46,7 +46,7 @@
                 "logs": [
                     {
                         "address": "sc:erc20",
-                        "identifier": "str:transferFrom",
+                        "endpoint": "str:transferFrom",
                         "topics": [
                             "str:transfer",
                             "``coin_holder_1_________________sx",

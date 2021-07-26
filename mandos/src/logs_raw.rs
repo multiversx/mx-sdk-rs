@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 pub struct CheckLogRaw {
 	pub address: ValueSubTree,
 
-	#[serde(rename = "identifier")]
 	pub endpoint: ValueSubTree,
 
 	#[serde(default)]

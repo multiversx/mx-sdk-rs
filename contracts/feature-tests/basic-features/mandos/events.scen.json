@@ -38,7 +38,7 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "str:logEventA",
+                        "endpoint": "str:logEventA",
                         "topics": [
                             "str:event_a"
                         ],
@@ -69,7 +69,7 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "str:logEventA",
+                        "endpoint": "str:logEventA",
                         "topics": [
                             "str:event_a"
                         ],
@@ -103,7 +103,7 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "str:logEventB",
+                        "endpoint": "str:logEventB",
                         "topics": [
                             "str:event_b",
                             "0xa1",

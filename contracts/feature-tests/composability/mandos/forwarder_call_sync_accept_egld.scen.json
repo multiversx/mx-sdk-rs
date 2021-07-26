@@ -49,7 +49,7 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds_echo_payment",
+                        "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
                             "str:EGLD",
@@ -61,7 +61,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:forward_sync_accept_funds",
+                        "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
                             "str:accept_funds_sync_result",
                             "str:EGLD",

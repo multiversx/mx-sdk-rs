@@ -51,7 +51,7 @@
                 "logs": [
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds",
+                        "endpoint": "str:recursive_send_funds",
                         "topics": [
                             "str:recursive_send_funds",
                             "sc:vault",
@@ -62,7 +62,7 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:ESDTTransfer",
+                        "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:REC-TOKEN",
                             "1",
@@ -72,7 +72,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:REC-TOKEN",
@@ -84,7 +84,7 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:callBack",
+                        "endpoint": "str:callBack",
                         "topics": [
                             "str:recursive_send_funds_callback",
                             "sc:vault",
