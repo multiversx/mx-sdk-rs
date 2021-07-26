@@ -1,6 +1,6 @@
 use elrond_codec::{TopDecode, TopEncode};
 
-use super::{BigIntApi, BigUintApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use super::{BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::{
 	types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec},
 	HexCallDataSerializer,
@@ -19,6 +19,8 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
 	/// Not used by `SendApi`, but forwarded to the proxy traits.
 	type ProxyBigInt: BigIntApi + 'static;
+
+	type ProxyEllipticCurve: EllipticCurveApi<BigUint = Self::AmountType> + 'static;
 
 	/// Not used by `SendApi`, but forwarded to the proxy traits.
 	type ProxyStorage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
