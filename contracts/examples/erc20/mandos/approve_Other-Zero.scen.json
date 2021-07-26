@@ -45,6 +45,7 @@
                         "address": "sc:erc20",
                         "identifier": "str:approve",
                         "topics": [
+                            "str:approve",
                             "``account_1_____________________s1",
                             "``account_2_____________________s1"
                         ],

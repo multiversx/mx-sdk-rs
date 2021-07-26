@@ -54,9 +54,20 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "sc:forwarder",
+                        "identifier": "str:ESDTNFTTransfer",
+                        "topics": [
+                            "str:NFT-0001",
+                            "5",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:NFT-0001",
                             "str:NonFungibleESDT",
                             "1",
@@ -65,9 +76,20 @@
                         "data": ""
                     },
                     {
+                        "address": "sc:forwarder",
+                        "identifier": "str:ESDTNFTTransfer",
+                        "topics": [
+                            "str:NFT-0001",
+                            "5",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:NFT-0001",
                             "str:NonFungibleESDT",
                             "1",

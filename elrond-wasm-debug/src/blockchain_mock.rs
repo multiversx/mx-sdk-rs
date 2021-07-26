@@ -1,6 +1,7 @@
 use super::mock_error::BlockchainMockError;
 use crate::contract_map::*;
 use crate::display_util::*;
+use crate::esdt_transfer_event_log;
 use crate::tx_context::*;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -220,6 +221,7 @@ impl BlockchainMock {
 		&mut self,
 		contract_address: &Address,
 		send_balance_list: &[SendBalance],
+		result_logs: &mut Vec<TxLog>,
 	) -> Result<(), BlockchainMockError> {
 		for send_balance in send_balance_list {
 			if send_balance.token.is_egld() {
@@ -237,6 +239,14 @@ impl BlockchainMock {
 					esdt_token_identifier,
 					&send_balance.amount,
 				);
+
+				let log = esdt_transfer_event_log(
+					contract_address.clone(),
+					send_balance.recipient.clone(),
+					esdt_token_identifier.to_vec(),
+					&send_balance.amount,
+				);
+				result_logs.insert(0, log); // TODO: it's a hack, should be inserted during execution, not here
 			}
 		}
 		Ok(())
