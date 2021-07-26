@@ -248,7 +248,7 @@ fn execute_sc_call(
 	let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
 	if esdt_used {
-		state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
+		state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
 	}
 
 	let contract_account = state
@@ -273,7 +273,7 @@ fn execute_sc_call(
 	);
 
 	let tx_output = execute_tx(tx_context, contract_path, contract_map);
-	let tx_result = tx_output.result;
+	let mut tx_result = tx_output.result;
 
 	if tx_result.result_status == 0 {
 		// replace storage with new one
@@ -284,7 +284,11 @@ fn execute_sc_call(
 			state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
 		}
 
-		state.send_balance(&to, tx_output.send_balance_list.as_slice())?;
+		state.send_balance(
+			&to,
+			tx_output.send_balance_list.as_slice(),
+			&mut tx_result.result_logs,
+		)?;
 	} else {
 		state.increase_balance(&from, &call_value);
 
@@ -365,7 +369,7 @@ fn execute_sc_create(
 	}
 
 	let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
-	let tx_output = execute_tx(tx_context, contract_path, contract_map);
+	let mut tx_output = execute_tx(tx_context, contract_path, contract_map);
 
 	if tx_output.result.result_status == 0 {
 		let new_address = state.create_account_after_deploy(
@@ -373,7 +377,11 @@ fn execute_sc_create(
 			tx_output.contract_storage,
 			contract_path.to_vec(),
 		);
-		state.send_balance(&new_address, tx_output.send_balance_list.as_slice())?;
+		state.send_balance(
+			&new_address,
+			tx_output.send_balance_list.as_slice(),
+			&mut tx_output.result.result_logs,
+		)?;
 	} else {
 		state.increase_balance(&from, &call_value);
 
@@ -441,11 +449,11 @@ fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
 					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
 					tx_id,
 					verbose_hex(&expected_log.address.value),
-					bytes_to_string(&expected_log.identifier.value),
+					bytes_to_string(&expected_log.endpoint.value),
 					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
 					verbose_hex(&expected_log.data.value),
 					address_hex(&actual_log.address),
-					bytes_to_string(&actual_log.identifier),
+					bytes_to_string(&actual_log.endpoint),
 					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),
 					verbose_hex(&actual_log.data),
 				);

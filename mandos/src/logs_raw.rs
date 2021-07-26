@@ -8,7 +8,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 pub struct CheckLogRaw {
 	pub address: ValueSubTree,
-	pub identifier: ValueSubTree,
+
+	pub endpoint: ValueSubTree,
 
 	#[serde(default)]
 	#[serde(skip_serializing_if = "Vec::is_empty")]
