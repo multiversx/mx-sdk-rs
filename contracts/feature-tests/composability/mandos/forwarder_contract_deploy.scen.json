@@ -1,5 +1,5 @@
 {
-    "name": "Deploy vault from forwarder through proxy",
+    "name": "Deploy vault from forwarder",
     "steps": [
         {
             "step": "setState",
@@ -25,7 +25,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy_contract",
+            "txId": "deploy-vault",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

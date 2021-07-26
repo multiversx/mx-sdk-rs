@@ -40,7 +40,7 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x04",
+                "status": "4",
                 "message": "str:Endpoint can olny be called by owner",
                 "logs": [],
                 "gas": "*",
@@ -61,7 +61,7 @@
             },
             "expect": {
                 "out": [],
-                "status": "0x",
+                "status": "0",
                 "message": "",
                 "logs": [],
                 "gas": "*",

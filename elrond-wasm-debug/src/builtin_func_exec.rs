@@ -1,3 +1,6 @@
+use elrond_wasm::types::Address;
+use num_bigint::BigUint;
+
 use crate::*;
 
 const ESDT_TRANSFER_FUNC: &[u8] = b"ESDTTransfer";
@@ -22,7 +25,31 @@ fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxRe
 
 	state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
 	state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
-	TxResult::empty()
+	TxResult {
+		result_status: 0,
+		result_message: Vec::new(),
+		result_values: Vec::new(),
+		result_logs: vec![esdt_transfer_event_log(
+			from.clone(),
+			to.clone(),
+			esdt_token_identifier,
+			&esdt_value,
+		)],
+	}
+}
+
+pub fn esdt_transfer_event_log(
+	from: Address,
+	to: Address,
+	esdt_token_identifier: Vec<u8>,
+	esdt_value: &BigUint,
+) -> TxLog {
+	TxLog {
+		address: from,
+		endpoint: b"ESDTTransfer".to_vec(),
+		topics: vec![esdt_token_identifier, esdt_value.to_bytes_be(), to.to_vec()],
+		data: vec![],
+	}
 }
 
 fn execute_set_username(tx_input: &TxInput, state: &mut BlockchainMock) -> TxResult {
