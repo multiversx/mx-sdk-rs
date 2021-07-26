@@ -51,7 +51,7 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "str:rewardAndSendToWallet",
+                        "endpoint": "str:rewardAndSendToWallet",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000004",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
@@ -61,7 +61,7 @@
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "str:rewardAndSendToWallet",
+                        "endpoint": "str:rewardAndSendToWallet",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000002",
                             "address:acc1"

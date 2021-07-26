@@ -48,7 +48,7 @@
                 "logs": [
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds",
+                        "endpoint": "str:recursive_send_funds",
                         "topics": [
                             "str:recursive_send_funds",
                             "sc:vault",
@@ -59,7 +59,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:EGLD",
@@ -71,7 +71,7 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:callBack",
+                        "endpoint": "str:callBack",
                         "topics": [
                             "str:recursive_send_funds_callback",
                             "sc:vault",

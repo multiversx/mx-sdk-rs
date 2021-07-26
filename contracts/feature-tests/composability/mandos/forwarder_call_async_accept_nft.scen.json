@@ -59,7 +59,7 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:ESDTNFTTransfer",
+                        "endpoint": "str:ESDTNFTTransfer",
                         "topics": [
                             "str:NFT-0001",
                             "5",
@@ -69,7 +69,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:NFT-0001",

@@ -53,7 +53,7 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds",
                         "topics": [
                             "str:retrieve_funds",
                             "str:NFT-0001",
@@ -64,7 +64,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:ESDTNFTTransfer",
+                        "endpoint": "str:ESDTNFTTransfer",
                         "topics": [
                             "str:NFT-0001",
                             "5",

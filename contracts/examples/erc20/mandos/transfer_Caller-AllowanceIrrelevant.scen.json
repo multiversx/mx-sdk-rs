@@ -43,7 +43,7 @@
                 "logs": [
                     {
                         "address": "sc:erc20",
-                        "identifier": "str:approve",
+                        "endpoint": "str:approve",
                         "topics": [
                             "str:approve",
                             "``account_1_____________________s1",
@@ -77,7 +77,7 @@
                 "logs": [
                     {
                         "address": "sc:erc20",
-                        "identifier": "str:transfer",
+                        "endpoint": "str:transfer",
                         "topics": [
                             "str:transfer",
                             "``account_1_____________________s1",

@@ -62,7 +62,7 @@
                 "logs": [
                     {
                       "address": "sc:forwarder",
-                      "identifier": "str:ESDTNFTCreate",
+                      "endpoint": "str:ESDTNFTCreate",
                       "topics": [
                         "str:NFT-0001",
                         "2",
@@ -72,7 +72,7 @@
                     },
                     {
                       "address": "sc:forwarder",
-                      "identifier": "str:create_and_send",
+                      "endpoint": "str:create_and_send",
                       "topics": [
                         "str:create",
                         "str:NFT-0001",
@@ -83,7 +83,7 @@
                     },
                     {
                       "address": "sc:forwarder",
-                      "identifier": "str:ESDTNFTTransfer",
+                      "endpoint": "str:ESDTNFTTransfer",
                       "topics": [
                         "str:NFT-0001",
                         "2",
@@ -93,7 +93,7 @@
                     },
                     {
                       "address": "sc:forwarder",
-                      "identifier": "str:create_and_send",
+                      "endpoint": "str:create_and_send",
                       "topics": [
                         "str:send",
                         "address:a_user",

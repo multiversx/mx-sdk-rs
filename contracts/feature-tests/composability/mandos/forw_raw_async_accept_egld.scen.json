@@ -45,7 +45,7 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
                             "str:EGLD",
@@ -57,7 +57,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:callBack",
+                        "endpoint": "str:callBack",
                         "topics": [
                             "str:callback_raw",
                             "str:EGLD",
