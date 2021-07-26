@@ -52,9 +52,20 @@
                         "address": "sc:vault",
                         "identifier": "str:retrieve_funds",
                         "topics": [
+                            "str:retrieve_funds",
                             "str:TEST-TOKEN",
                             "0",
                             "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "identifier": "str:ESDTTransfer",
+                        "topics": [
+                            "str:TEST-TOKEN",
+                            "1000",
+                            "sc:forwarder"
                         ],
                         "data": ""
                     }

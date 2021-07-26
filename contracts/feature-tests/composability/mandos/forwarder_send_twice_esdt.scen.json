@@ -40,7 +40,7 @@
                     "str:FWD-TOKEN",
                     "1"
                 ],
-                "gasLimit": "70,000,000",
+                "gasLimit": "80,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -48,9 +48,20 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "sc:forwarder",
+                        "identifier": "str:ESDTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "1",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:FWD-TOKEN",
                             "str:FungibleESDT",
                             "1",
@@ -59,9 +70,20 @@
                         "data": ""
                     },
                     {
+                        "address": "sc:forwarder",
+                        "identifier": "str:ESDTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "1",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "identifier": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:FWD-TOKEN",
                             "str:FungibleESDT",
                             "1",

@@ -49,6 +49,7 @@
                         "address": "sc:vault",
                         "identifier": "str:retrieve_funds",
                         "topics": [
+                            "str:retrieve_funds",
                             "str:EGLD",
                             "0",
                             "1000"
