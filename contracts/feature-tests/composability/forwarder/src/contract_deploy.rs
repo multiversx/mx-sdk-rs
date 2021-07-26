@@ -12,6 +12,24 @@ pub trait DeployContractModule {
 		Ok(deployed_contract_address)
 	}
 
+	#[endpoint(deployFromSource)]
+	fn deploy_from_source(
+		&self,
+		source_contract_address: Address,
+		#[var_args] arguments: VarArgs<BoxedBytes>,
+	) -> SCResult<Address> {
+		self.send()
+			.deploy_from_source_contract(
+				self.blockchain().get_gas_left(),
+				&Self::BigUint::zero(),
+				&source_contract_address,
+				CodeMetadata::DEFAULT,
+				&arguments.as_slice().into(),
+			)
+			.ok_or("Deploy from source contract failed")
+			.into()
+	}
+
 	#[endpoint]
 	fn deploy_two_contracts(&self, code: BoxedBytes) -> SCResult<MultiResult2<Address, Address>> {
 		let first_deployed_contract_address =

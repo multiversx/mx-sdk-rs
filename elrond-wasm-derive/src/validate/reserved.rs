@@ -37,6 +37,7 @@ const RESERVED: &[&str] = &[
 	"asyncCall",
 	"delegateExecution",
 	"createContract",
+	"deployFromSourceContract",
 	"executeReadOnly",
 	"getNumReturnData",
 	"getReturnDataSize",
