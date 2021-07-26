@@ -3,6 +3,7 @@
 elrond_wasm::imports!();
 
 /// Test contract for investigating async calls.
+/// TODO: split into modules
 #[elrond_wasm_derive::contract]
 pub trait ForwarderRaw {
 	#[init]
@@ -224,4 +225,24 @@ pub trait ForwarderRaw {
 
 	#[event("execute_on_dest_context_result")]
 	fn execute_on_dest_context_result(&self, result: &[BoxedBytes]);
+
+	#[endpoint]
+	fn deploy_contract(
+		&self,
+		code: BoxedBytes,
+		#[var_args] arguments: VarArgs<BoxedBytes>,
+	) -> SCResult<Address> {
+		let deployed_contract_address = self
+			.send()
+			.deploy_contract(
+				self.blockchain().get_gas_left(),
+				&Self::BigUint::zero(),
+				&code,
+				CodeMetadata::DEFAULT,
+				&arguments.as_slice().into(),
+			)
+			.ok_or("Deploy failed")?;
+
+		Ok(deployed_contract_address)
+	}
 }

@@ -2,8 +2,8 @@ use crate::model::{CallbackMetadata, EndpointMetadata, InitMetadata, Method, Pub
 
 use super::{
 	attributes::{
-		is_callback_raw, is_init, CallbackAttribute, EndpointAttribute, OutputNameAttribute,
-		ViewAttribute,
+		is_callback_raw, is_init, is_only_owner, CallbackAttribute, EndpointAttribute,
+		OutputNameAttribute, ViewAttribute,
 	},
 	MethodAttributesPass1,
 };
@@ -32,6 +32,17 @@ pub fn process_init_attribute(
 	}
 }
 
+pub fn process_only_owner_attribute(
+	attr: &syn::Attribute,
+	pass_1_data: &mut MethodAttributesPass1,
+) -> bool {
+	let is_only_owner = is_only_owner(attr);
+	if is_only_owner {
+		pass_1_data.only_owner = true;
+	}
+	is_only_owner
+}
+
 pub fn process_endpoint_attribute(
 	attr: &syn::Attribute,
 	pass_1_data: &MethodAttributesPass1,
@@ -47,6 +58,7 @@ pub fn process_endpoint_attribute(
 			method.public_role = PublicRole::Endpoint(EndpointMetadata {
 				public_name: endpoint_ident,
 				payable: pass_1_data.payable.clone(),
+				only_owner: pass_1_data.only_owner,
 			});
 		})
 		.is_some()
@@ -67,6 +79,7 @@ pub fn process_view_attribute(
 			method.public_role = PublicRole::Endpoint(EndpointMetadata {
 				public_name: view_ident,
 				payable: pass_1_data.payable.clone(),
+				only_owner: pass_1_data.only_owner,
 			});
 		})
 		.is_some()

@@ -10,7 +10,7 @@ pub struct Auction<BigUint: BigUintApi> {
 
 	pub payment_token: EsdtToken,
 	pub min_bid: BigUint,
-	pub max_bid: BigUint,
+	pub max_bid: Option<BigUint>,
 	pub start_time: u64,
 	pub deadline: u64,
 

@@ -42,6 +42,16 @@
                                     "royalties": "2000"
                                 }
                             ]
+                        },
+                        "str:SFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "10",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
                         }
                     },
                     "storage": {}

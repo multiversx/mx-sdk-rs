@@ -9,12 +9,13 @@ use super::{
 		process_storage_set_attribute,
 	},
 	extract_method_args, process_callback_attribute, process_callback_raw_attribute,
-	process_endpoint_attribute, process_init_attribute, process_output_names_attribute,
-	process_payable_attribute, process_view_attribute,
+	process_endpoint_attribute, process_init_attribute, process_only_owner_attribute,
+	process_output_names_attribute, process_payable_attribute, process_view_attribute,
 };
 pub struct MethodAttributesPass1 {
 	pub method_name: String,
 	pub payable: MethodPayableMetadata,
+	pub only_owner: bool,
 }
 
 pub fn process_method(m: &syn::TraitItemMethod) -> Method {
@@ -29,6 +30,7 @@ pub fn process_method(m: &syn::TraitItemMethod) -> Method {
 	let mut first_pass_data = MethodAttributesPass1 {
 		method_name: m.sig.ident.to_string(),
 		payable: MethodPayableMetadata::NotPayable,
+		only_owner: false,
 	};
 	let mut first_pass_unprocessed_attributes = Vec::new();
 
@@ -77,6 +79,7 @@ fn process_attribute_first_pass(
 	first_pass_data: &mut MethodAttributesPass1,
 ) -> bool {
 	process_payable_attribute(attr, first_pass_data)
+		|| process_only_owner_attribute(attr, first_pass_data)
 }
 
 fn process_attributes_second_pass(
