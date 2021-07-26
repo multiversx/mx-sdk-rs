@@ -58,9 +58,20 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTTransfer",
                         "topics": [
+                            "str:NFT-0001",
+                            "5",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
                             "str:NFT-0001",
                             "str:NonFungibleESDT",
                             "1",
@@ -80,7 +91,12 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:TEST-TOKEN": "0"
+                        "str:NFT-0001": {
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
                     },
                     "storage": {},
                     "code": ""
@@ -92,7 +108,10 @@
                         "str:call_counts|nested:str:accept_funds": "1"
                     },
                     "esdt": {
-                        "str:TEST-TOKEN": "1000"
+                        "str:NFT-0001": {
+                            "nonce": "5",
+                            "balance": "1"
+                        }
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
