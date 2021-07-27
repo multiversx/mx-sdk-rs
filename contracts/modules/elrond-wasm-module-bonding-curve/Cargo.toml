@@ -1,0 +1,34 @@
+[package]
+name = "elrond-wasm-module-bonding-curve"
+version = "0.17.4"
+edition = "2018"
+
+authors = ["Alin Cruceat <alin.cruceat@elrond.com>", "Elrond Network <contact@elrond.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://elrond.com/"
+documentation = "https://docs.elrond.com/"
+description = "Elrond Webassembly smart contract module that allows an address to sell tokens through a contract by defining a bonding curve that controls the evolution of the price"
+keywords = ["elrond", "wasm", "bonding-curve", "blockchain", "contract"]
+categories = ["no-std", "wasm"]
+
+[features]
+wasm-output-mode = ["elrond-wasm-node"]
+
+[dependencies.elrond-wasm]
+version = "0.17.4"
+path = "../../../elrond-wasm"
+
+[dependencies.elrond-wasm-derive]
+version = "0.17.4"
+path = "../../../elrond-wasm-derive"
+
+[dependencies.elrond-wasm-node]
+version = "0.17.4"
+path = "../../../elrond-wasm-node"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.17.4"
+path = "../../../elrond-wasm-debug"
