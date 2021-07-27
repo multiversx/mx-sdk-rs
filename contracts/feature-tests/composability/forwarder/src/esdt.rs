@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 use super::storage;
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 	#[view(getFungibleEsdtBalance)]
 	fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> Self::BigUint {

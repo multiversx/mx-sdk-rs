@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait DeployContractModule {
 	#[proxy]
 	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;

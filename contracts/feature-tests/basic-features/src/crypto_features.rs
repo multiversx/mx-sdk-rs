@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 
 /// All crypto functions provided by Arwen exposed here.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait CryptoFeatures {
 	#[endpoint(computeSha256)]
 	fn compute_sha256(&self, input: Vec<u8>) -> H256 {

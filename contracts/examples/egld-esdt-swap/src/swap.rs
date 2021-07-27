@@ -8,7 +8,7 @@ const EGLD_NUM_DECIMALS: usize = 18;
 /// Converts between EGLD and a wrapped EGLD ESDT token.
 ///	1 EGLD = 1 wrapped EGLD and is interchangeable at all times.
 /// Also manages the supply of wrapped EGLD tokens.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait EgldEsdtSwap {
 	#[init]
 	fn init(&self) {}

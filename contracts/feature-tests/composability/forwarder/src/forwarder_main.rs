@@ -15,7 +15,7 @@ mod storage;
 elrond_wasm::imports!();
 
 /// Test contract for investigating contract calls.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Forwarder:
 	call_sync::ForwarderSyncCallModule
 	+ call_async::ForwarderAsyncCallModule

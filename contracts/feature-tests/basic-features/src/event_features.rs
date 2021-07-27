@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 
 /// Tests event logs.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait EventFeatures {
 	#[endpoint(logEventA)]
 	fn log_event_a(&self, data: &Self::BigUint) {

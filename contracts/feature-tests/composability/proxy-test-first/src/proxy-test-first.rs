@@ -10,7 +10,7 @@ static HARDCODED_ADDRESS: [u8; 32] =
 mod pay_me_proxy {
 	elrond_wasm::imports!();
 
-	#[elrond_wasm_derive::proxy]
+	#[elrond_wasm::proxy]
 	pub trait PayMe {
 		#[payable("EGLD")]
 		#[endpoint(payMe)]
@@ -25,7 +25,7 @@ mod pay_me_proxy {
 mod message_me_proxy {
 	elrond_wasm::imports!();
 
-	#[elrond_wasm_derive::proxy]
+	#[elrond_wasm::proxy]
 	pub trait MessageMe {
 		#[init]
 		#[payable("EGLD")]
@@ -36,7 +36,7 @@ mod message_me_proxy {
 	}
 }
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait ProxyTestFirst {
 	#[proxy]
 	fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::SendApi>;
