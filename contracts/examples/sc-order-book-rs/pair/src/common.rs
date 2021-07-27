@@ -118,7 +118,7 @@ impl<BigUint: BigUintApi> Default for Order<BigUint> {
 	}
 }
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait CommonModule {
 	fn new_order(
 		&self,

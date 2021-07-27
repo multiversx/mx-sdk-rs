@@ -5,7 +5,7 @@ elrond_wasm::derive_imports!();
 
 use elrond_wasm_module_bonding_curve::utils::{events, owner_endpoints, storage, user_endpoints};
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Contract:
 	elrond_wasm_module_bonding_curve::BondingCurveModule
 	+ storage::StorageModule

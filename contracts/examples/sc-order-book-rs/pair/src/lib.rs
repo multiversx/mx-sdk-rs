@@ -11,7 +11,7 @@ mod validation;
 
 use common::OrderInputParams;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Pair:
 	global::GlobalOperationModule
 	+ orders::OrdersModule
