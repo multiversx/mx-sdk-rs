@@ -15,6 +15,7 @@ pub trait EgldEsdtSwap {
 
 	// endpoints - owner-only
 
+	#[only_owner]
 	#[payable("EGLD")]
 	#[endpoint(issueWrappedEgld)]
 	fn issue_wrapped_egld(
@@ -24,7 +25,6 @@ pub trait EgldEsdtSwap {
 		initial_supply: Self::BigUint,
 		#[payment] issue_cost: Self::BigUint,
 	) -> SCResult<AsyncCall<Self::SendApi>> {
-		only_owner!(self, "only owner may call this function");
 
 		require!(
 			self.wrapped_egld_token_id().is_empty(),
@@ -85,22 +85,20 @@ pub trait EgldEsdtSwap {
 		}
 	}
 
+	#[only_owner]
 	#[endpoint(mintWrappedEgld)]
 	fn mint_wrapped_egld(&self, amount: Self::BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
-		only_owner!(self, "only owner may call this function");
-
 		require!(
 			!self.wrapped_egld_token_id().is_empty(),
 			"Wrapped EGLD was not issued yet"
 		);
 
 		let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
-		let esdt_token_id = wrapped_egld_token_id;
 		let caller = self.blockchain().get_caller();
 		self.mint_started_event(&caller, &amount);
 
 		Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
-			.mint(&esdt_token_id, &amount)
+			.mint(&wrapped_egld_token_id, &amount)
 			.async_call()
 			.with_callback(self.callbacks().esdt_mint_callback(&caller, &amount)))
 	}
@@ -135,16 +133,19 @@ pub trait EgldEsdtSwap {
 			"Wrapped EGLD was not issued yet"
 		);
 
-		let mut unused_wrapped_egld = self.unused_wrapped_egld().get();
-		require!(
-			unused_wrapped_egld > payment,
-			"Contract does not have enough wrapped EGLD. Please try again once more is minted."
-		);
-		unused_wrapped_egld -= &payment;
-		self.unused_wrapped_egld().set(&unused_wrapped_egld);
+		self.unused_wrapped_egld().update(|unused_wrapped_egld| {
+			require!(
+				*unused_wrapped_egld > payment,
+				"Contract does not have enough wrapped EGLD. Please try again once more is minted."
+			);
+
+			*unused_wrapped_egld -= &payment;
+
+			Ok(())
+		})?;
 
 		let caller = self.blockchain().get_caller();
-		let _ = self.send().direct(
+		self.send().direct(
 			&caller,
 			&self.wrapped_egld_token_id().get(),
 			0,
@@ -168,10 +169,8 @@ pub trait EgldEsdtSwap {
 			!self.wrapped_egld_token_id().is_empty(),
 			"Wrapped EGLD was not issued yet"
 		);
-		require!(token_identifier.is_esdt(), "Only ESDT tokens accepted");
 
 		let wrapped_egld_token_identifier = self.wrapped_egld_token_id().get();
-
 		require!(
 			token_identifier == wrapped_egld_token_identifier,
 			"Wrong esdt token"
