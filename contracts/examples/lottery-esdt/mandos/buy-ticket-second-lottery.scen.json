@@ -90,7 +90,7 @@
                         "str:numberOfEntriesForUser|u32:12|str:lottery_$$$$|address:acc1": "1"
                     },
                     "esdt": {
-                        "str:lottery_tok$$": "500"
+                        "str:LOTTO-123456": "500"
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

@@ -1,5 +1,5 @@
 {
-    "name": "Deploy vault from forwarder through proxy",
+    "name": "Deploy vault from forwarder",
     "steps": [
         {
             "step": "setState",
@@ -20,12 +20,17 @@
                     "creatorAddress": "sc:forwarder",
                     "creatorNonce": "0",
                     "newAddress": "sc:child"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:child-2"
                 }
             ]
         },
         {
             "step": "scCall",
-            "txId": "deploy_contract",
+            "txId": "deploy-vault",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -55,9 +60,46 @@
                     "balance": "0",
                     "storage": {},
                     "owner": "sc:forwarder",
-                    "code":"file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "+": {}
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-vault",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "deployFromSource",
+                "arguments": [
+                    "sc:child"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [
+                    "sc:child-2"
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child-2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "owner": "sc:forwarder",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "+": ""
             }
         }
     ]

@@ -50,21 +50,32 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKEN",
-                            "str:FungibleESDT",
                             "1000",
-                            "0"
+                            "sc:vault"
                         ],
                         "data": ""
-                    }
-                ],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:TEST-TOKEN",
+                            "str:FungibleESDT",
+                                                "1000",
+                                                "0"
+                                            ],
+                                            "data": ""
+                                        }
+                                    ],
+                                    "gas": "*",
+                                    "refund": "*"
+                                }
+                            },
         {
             "step": "checkState",
             "accounts": {
