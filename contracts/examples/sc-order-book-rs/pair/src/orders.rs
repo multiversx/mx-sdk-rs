@@ -14,7 +14,7 @@ use super::common::{
 };
 use core::iter::FromIterator;
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait OrdersModule:
 	events::EventsModule + common::CommonModule + validation::ValidationModule
 {

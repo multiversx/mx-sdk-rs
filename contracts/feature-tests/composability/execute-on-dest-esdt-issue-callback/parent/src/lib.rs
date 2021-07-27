@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 // Base cost for standalone + estimate cost of actual sc call
 const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Parent {
 	#[proxy]
 	fn child_proxy(&self, to: Address) -> child::Proxy<Self::SendApi>;

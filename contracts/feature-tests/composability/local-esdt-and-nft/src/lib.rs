@@ -11,7 +11,7 @@ pub struct Color {
 	b: u8,
 }
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait LocalEsdtAndEsdtNft {
 	#[init]
 	fn init(&self) {}

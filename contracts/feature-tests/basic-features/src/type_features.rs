@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 use core::num::NonZeroUsize;
 
 /// Exposes various methods of various types provided by elrond-wasm.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait TypeFeatures {
 	// H256
 

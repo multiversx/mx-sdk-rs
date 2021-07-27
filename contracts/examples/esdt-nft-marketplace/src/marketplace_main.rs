@@ -11,7 +11,7 @@ mod views;
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 const NFT_AMOUNT: u32 = 1; // Token has to be unique to be considered NFT
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 	#[init]
 	fn init(&self, bid_cut_percentage: u64) -> SCResult<()> {

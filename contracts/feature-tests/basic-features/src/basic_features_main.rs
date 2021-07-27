@@ -23,7 +23,7 @@ pub mod storage_mapper_vec;
 pub mod type_features;
 pub mod types;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait BasicFeatures:
 	big_int_methods::BigIntMethods
 	+ big_int_operators::BigIntOperators

@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 
 /// Test contract for investigating async calls.
 /// TODO: split into modules
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait ForwarderRaw {
 	#[init]
 	fn init(&self) {}

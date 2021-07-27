@@ -5,7 +5,7 @@ use crate::curves::curve_function::CurveFunction;
 use crate::function_selector::FunctionSelector;
 use crate::utils::{events, storage, structs::CurveArguments};
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 	#[payable("*")]
 	#[endpoint(sellToken)]

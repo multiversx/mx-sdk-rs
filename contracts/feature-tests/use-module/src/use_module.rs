@@ -15,7 +15,7 @@ use elrond_wasm_module_features::feature_guard;
 /// - EsdtModule
 /// - GovernanceModule
 /// - PauseModule
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait UseModule:
 	internal_mod_a::InternalModuleA
 	+ internal_mod_b::InternalModuleB

@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 use kitty::{kitty_genes::*, Kitty};
 use random::Random;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait KittyGeneticAlg {
 	#[init]
 	fn init(&self) {}

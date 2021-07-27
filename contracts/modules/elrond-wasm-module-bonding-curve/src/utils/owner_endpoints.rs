@@ -7,7 +7,7 @@ use crate::utils::{events, storage};
 
 use super::structs::CurveArguments;
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 	#[endpoint(setLocalRoles)]
 	fn set_local_roles(

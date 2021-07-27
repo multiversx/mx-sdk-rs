@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 /// Explores panic messaging.
 /// Sending panic messages to the VM is possible, as shown in this contract,
 /// but it greatly inflates the bytecode size.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait PanicMessageFeatures {
 	#[endpoint(panicWithMessage)]
 	fn panic_with_message(&self) {

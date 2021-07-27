@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 
 /// Contract that only tests the call value features,
 /// i.e. the framework/Arwen functionality for accepting EGLD and ESDT payments.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait PayableFeatures {
 	#[view]
 	#[payable("*")]

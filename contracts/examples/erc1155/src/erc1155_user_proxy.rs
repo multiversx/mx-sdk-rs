@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::proxy]
+#[elrond_wasm::proxy]
 pub trait Erc1155UserProxy {
     #[endpoint(onERC1155Received)]
 	fn on_erc1155_received(
