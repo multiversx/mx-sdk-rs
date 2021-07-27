@@ -52,6 +52,10 @@ members = [
   "contracts/examples/erc1155/abi",
   "contracts/examples/erc1155-user-mock",
   "contracts/examples/erc1155-user-mock/abi",
+  "contracts/examples/sc-order-book-rs/factory",
+  "contracts/examples/sc-order-book-rs/factory/abi",
+  "contracts/examples/sc-order-book-rs/pair",
+  "contracts/examples/sc-order-book-rs/pair/abi",
 
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/abi",
