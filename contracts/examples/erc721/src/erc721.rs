@@ -7,8 +7,6 @@ pub trait NonFungibleTokens {
 	#[init]
 	fn init(&self, initial_minted: u64) {
 		let owner = self.blockchain().get_caller();
-
-		self.set_owner(&owner);
 		self.perform_mint(initial_minted, &owner);
 	}
 
@@ -16,13 +14,9 @@ pub trait NonFungibleTokens {
 
 	/// Creates new tokens and sets their ownership to the specified account.
 	/// Only the contract owner may call this function.
+	#[only_owner]
 	#[endpoint]
 	fn mint(&self, count: u64, new_token_owner: Address) -> SCResult<()> {
-		require!(
-			self.blockchain().get_caller() == self.get_owner(),
-			"Only owner can mint new tokens!"
-		);
-
 		self.perform_mint(count, &new_token_owner);
 
 		Ok(())
@@ -32,13 +26,16 @@ pub trait NonFungibleTokens {
 	/// Only the owner of the token may call this function.
 	#[endpoint]
 	fn approve(&self, token_id: u64, approved_address: Address) -> SCResult<()> {
-		require!(token_id < self.get_total_minted(), "Token does not exist!");
 		require!(
-			self.blockchain().get_caller() == self.get_token_owner(token_id),
+			token_id < self.total_minted().get(),
+			"Token does not exist!"
+		);
+		require!(
+			self.blockchain().get_caller() == self.token_owner(token_id).get(),
 			"Only the token owner can approve!"
 		);
 
-		self.set_approval(token_id, &approved_address);
+		self.approval(token_id).set(&approved_address);
 
 		Ok(())
 	}
@@ -47,15 +44,16 @@ pub trait NonFungibleTokens {
 	/// Only the owner of the token may call this function.
 	#[endpoint]
 	fn revoke(&self, token_id: u64) -> SCResult<()> {
-		require!(token_id < self.get_total_minted(), "Token does not exist!");
 		require!(
-			self.blockchain().get_caller() == self.get_token_owner(token_id),
+			token_id < self.total_minted().get(),
+			"Token does not exist!"
+		);
+		require!(
+			self.blockchain().get_caller() == self.token_owner(token_id).get(),
 			"Only the token owner can revoke approval!"
 		);
 
-		if !self.approval_is_empty(token_id) {
-			self.clear_approval(token_id);
-		}
+		self.approval(token_id).clear();
 
 		Ok(())
 	}
@@ -63,17 +61,20 @@ pub trait NonFungibleTokens {
 	/// Transfer ownership of the token to a new account.
 	#[endpoint]
 	fn transfer(&self, token_id: u64, to: Address) -> SCResult<()> {
-		require!(token_id < self.get_total_minted(), "Token does not exist!");
+		require!(
+			token_id < self.total_minted().get(),
+			"Token does not exist!"
+		);
 
 		let caller = self.blockchain().get_caller();
-		let token_owner = self.get_token_owner(token_id);
+		let token_owner = self.token_owner(token_id).get();
 
 		if caller == token_owner {
 			self.perform_transfer(token_id, &token_owner, &to);
 
 			return Ok(());
-		} else if !self.approval_is_empty(token_id) {
-			let approved_address = self.get_approval(token_id);
+		} else if !self.approval(token_id).is_empty() {
+			let approved_address = self.approval(token_id).get();
 
 			if caller == approved_address {
 				self.perform_transfer(token_id, &token_owner, &to);
@@ -88,71 +89,44 @@ pub trait NonFungibleTokens {
 	// private methods
 
 	fn perform_mint(&self, count: u64, new_token_owner: &Address) {
-		let new_owner_current_total = self.get_token_count(new_token_owner);
-		let total_minted = self.get_total_minted();
+		let new_owner_current_total = self.token_count(new_token_owner).get();
+		let total_minted = self.total_minted().get();
 		let first_new_id = total_minted;
 		let last_new_id = total_minted + count;
 
 		for id in first_new_id..last_new_id {
-			self.set_token_owner(id, new_token_owner);
+			self.token_owner(id).set(new_token_owner);
 		}
 
-		self.set_total_minted(total_minted + count);
-		self.set_token_count(new_token_owner, new_owner_current_total + count);
+		self.total_minted().set(&(total_minted + count));
+		self.token_count(new_token_owner)
+			.set(&(new_owner_current_total + count));
 	}
 
 	fn perform_transfer(&self, token_id: u64, from: &Address, to: &Address) {
-		let prev_owner_token_count = self.get_token_count(from);
-		let new_owner_token_count = self.get_token_count(to);
+		self.token_count(from).update(|count| *count -= 1);
+		self.token_count(to).update(|count| *count += 1);
+		self.token_owner(token_id).set(to);
 
 		// new ownership revokes approvals by previous owner
-		self.clear_approval(token_id);
-
-		self.set_token_count(from, prev_owner_token_count - 1);
-		self.set_token_count(to, new_owner_token_count + 1);
-		self.set_token_owner(token_id, to);
+		self.approval(token_id).clear();
 	}
 
 	// storage
 
-	#[view(contractOwner)]
-	#[storage_get("owner")]
-	fn get_owner(&self) -> Address;
-
-	#[storage_set("owner")]
-	fn set_owner(&self, owner: &Address);
-
 	#[view(totalMinted)]
-	#[storage_get("totalMinted")]
-	fn get_total_minted(&self) -> u64;
-
-	#[storage_set("totalMinted")]
-	fn set_total_minted(&self, total_minted: u64);
+	#[storage_mapper("totalMinted")]
+	fn total_minted(&self) -> SingleValueMapper<Self::Storage, u64>;
 
 	#[view(tokenOwner)]
-	#[storage_get("tokenOwner")]
-	fn get_token_owner(&self, token_id: u64) -> Address;
-
-	#[storage_set("tokenOwner")]
-	fn set_token_owner(&self, token_id: u64, owner: &Address);
+	#[storage_mapper("tokenOwner")]
+	fn token_owner(&self, token_id: u64) -> SingleValueMapper<Self::Storage, Address>;
 
 	#[view(tokenCount)]
-	#[storage_get("tokenCount")]
-	fn get_token_count(&self, owner: &Address) -> u64;
-
-	#[storage_set("tokenCount")]
-	fn set_token_count(&self, owner: &Address, token_count: u64);
-
-	#[storage_is_empty("approval")]
-	fn approval_is_empty(&self, token_id: u64) -> bool;
+	#[storage_mapper("tokenCount")]
+	fn token_count(&self, owner: &Address) -> SingleValueMapper<Self::Storage, u64>;
 
 	#[view(approval)]
-	#[storage_get("approval")]
-	fn get_approval(&self, token_id: u64) -> Address;
-
-	#[storage_set("approval")]
-	fn set_approval(&self, token_id: u64, approved_address: &Address);
-
-	#[storage_clear("approval")]
-	fn clear_approval(&self, token_id: u64);
+	#[storage_mapper("approval")]
+	fn approval(&self, token_id: u64) -> SingleValueMapper<Self::Storage, Address>;
 }
