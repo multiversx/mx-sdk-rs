@@ -32,28 +32,25 @@ pub trait KittyOwnership {
 
 	// endpoints - owner-only
 
+	#[only_owner]
 	#[endpoint(setGeneScienceContractAddress)]
 	fn set_gene_science_contract_address_endpoint(&self, address: Address) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
-
 		self.set_gene_science_contract_address(&address);
 
 		Ok(())
 	}
 
+	#[only_owner]
 	#[endpoint(setKittyAuctionContractAddress)]
 	fn set_kitty_auction_contract_address_endpoint(&self, address: Address) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
-
 		self.set_kitty_auction_contract_address(&address);
 
 		Ok(())
 	}
 
+	#[only_owner]
 	#[endpoint]
 	fn claim(&self) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
-
 		self.send().direct_egld(
 			&self.blockchain().get_caller(),
 			&self
