@@ -14,10 +14,9 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x1300",
-                    "storage": {
-                        "''owner": "address:crypto_bubbles_owner"
-                    },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "storage": {},
+                    "code": "file:../output/crypto-bubbles.wasm",
+                    "owner": "address:crypto_bubbles_owner"
                 }
             }
         },
@@ -81,9 +80,7 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x1300",
-                    "storage": {
-                        "''owner": "address:crypto_bubbles_owner"
-                    },
+                    "storage": {},
                     "code": "file:../output/crypto-bubbles.wasm"
                 }
             }

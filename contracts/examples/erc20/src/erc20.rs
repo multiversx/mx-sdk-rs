@@ -8,11 +8,8 @@ pub trait SimpleErc20Token {
 
 	/// Total number of tokens in existence.
 	#[view(totalSupply)]
-	#[storage_get("total_supply")]
-	fn get_total_supply(&self) -> Self::BigUint;
-
-	#[storage_set("total_supply")]
-	fn set_total_supply(&self, total_supply: &Self::BigUint);
+	#[storage_mapper("total_supply")]
+	fn total_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	/// Gets the balance of the specified address.
 	///
@@ -21,11 +18,8 @@ pub trait SimpleErc20Token {
 	/// * `address` The address to query the the balance of
 	///
 	#[view(balanceOf)]
-	#[storage_get("balance")]
-	fn get_token_balance(&self, address: &Address) -> Self::BigUint;
-
-	#[storage_set("balance")]
-	fn set_token_balance(&self, address: &Address, balance: &Self::BigUint);
+	#[storage_mapper("balance")]
+	fn token_balance(&self, address: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	/// The amount of tokens that an owner allowed to a spender.
 	///
@@ -35,11 +29,12 @@ pub trait SimpleErc20Token {
 	/// * `spender` The address that will spend the funds.
 	///
 	#[view(allowance)]
-	#[storage_get("allowance")]
-	fn get_allowance(&self, owner: &Address, spender: &Address) -> Self::BigUint;
-
-	#[storage_set("allowance")]
-	fn set_allowance(&self, owner: &Address, spender: &Address, allowance: &Self::BigUint);
+	#[storage_mapper("allowance")]
+	fn allowance(
+		&self,
+		owner: &Address,
+		spender: &Address,
+	) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
 	// FUNCTIONALITY
 
@@ -50,12 +45,11 @@ pub trait SimpleErc20Token {
 		let creator = self.blockchain().get_caller();
 
 		// save total supply
-		self.set_total_supply(total_supply);
+		self.total_supply().set(total_supply);
 
 		// deployer initially receives the total supply
-		let mut creator_balance = self.get_token_balance(&creator);
-		creator_balance += total_supply;
-		self.set_token_balance(&creator, &creator_balance);
+		self.token_balance(&creator)
+			.update(|balance| *balance += total_supply);
 	}
 
 	/// This method is private, deduplicates logic from transfer and transferFrom.
@@ -66,21 +60,17 @@ pub trait SimpleErc20Token {
 		amount: Self::BigUint,
 	) -> SCResult<()> {
 		// check if enough funds & decrease sender balance
-		{
-			let mut sender_balance = self.get_token_balance(&sender);
-			if amount > sender_balance {
-				return sc_error!("insufficient funds");
-			}
+		self.token_balance(&sender).update(|balance| {
+			require!(amount <= *balance, "insufficient funds");
 
-			sender_balance -= &amount;
+			*balance -= &amount;
 
-			self.set_token_balance(&sender, &sender_balance);
-		}
+			Ok(())
+		})?;
 
 		// increase recipient balance
-		let mut recipient_balance = self.get_token_balance(&recipient);
-		recipient_balance += &amount; // saved automatically at the end of scope
-		self.set_token_balance(&recipient, &recipient_balance);
+		self.token_balance(&recipient)
+			.update(|balance| *balance += &amount);
 
 		// log operation
 		self.transfer_event(&sender, &recipient, &amount);
@@ -119,17 +109,13 @@ pub trait SimpleErc20Token {
 		// get caller
 		let caller = self.blockchain().get_caller();
 
-		// load allowance
-		let mut allowance = self.get_allowance(&sender, &caller);
+		self.allowance(&sender, &caller).update(|allowance| {
+			require!(amount <= *allowance, "allowance exceeded");
 
-		// amount should not exceed allowance
-		if amount > allowance {
-			return sc_error!("allowance exceeded");
-		}
+			*allowance -= &amount;
 
-		// update allowance
-		allowance -= &amount; // saved automatically at the end of scope
-		self.set_allowance(&sender, &caller, &allowance);
+			Ok(())
+		})?;
 
 		// transfer
 		self.perform_transfer(sender, recipient, amount)
@@ -149,7 +135,7 @@ pub trait SimpleErc20Token {
 		let caller = self.blockchain().get_caller();
 
 		// store allowance
-		self.set_allowance(&caller, &spender, &amount);
+		self.allowance(&caller, &spender).set(&amount);
 
 		// log operation
 		self.approve_event(&caller, &spender, &amount);
