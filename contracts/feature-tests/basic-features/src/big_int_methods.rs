@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait BigIntMethods {
 	#[endpoint]
 	fn sqrt_big_uint(&self, a: Self::BigUint) -> Self::BigUint {

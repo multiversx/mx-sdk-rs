@@ -5,7 +5,7 @@ elrond_wasm::derive_imports!();
 
 pub mod erc1155_user_proxy;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Erc1155 {
 	#[init]
 	fn init(&self) {}

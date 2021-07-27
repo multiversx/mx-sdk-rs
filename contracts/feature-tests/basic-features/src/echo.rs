@@ -7,7 +7,7 @@ use core::num::NonZeroUsize;
 use elrond_wasm::String;
 
 /// Test endpoint argument and result serialization.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait EchoTypes {
 	#[endpoint]
 	fn echo_big_uint(&self, bi: Self::BigUint) -> Self::BigUint {

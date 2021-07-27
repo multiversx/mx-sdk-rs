@@ -9,7 +9,7 @@ pub struct TokenIdPair {
 	second_token_id: TokenIdentifier,
 }
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Factory {
 	#[init]
 	fn init(&self, pair_template_address: Address) {

@@ -22,7 +22,7 @@ const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
 /// - `pong` can only be called after the contract expired (a certain duration has passed since activation).
 /// - `pongAll` can be used to send to all users to `ping`-ed. If it runs low on gas, it will interrupt itself.
 /// It can be continued anytime.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait PingPong {
 	/// Necessary configuration when deploying:
 	/// `ping_amount` - the exact EGLD amounf that needs to be sent when `ping`-ing.

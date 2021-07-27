@@ -8,7 +8,7 @@ pub mod function_selector;
 pub mod utils;
 use crate::utils::{events, owner_endpoints, storage, user_endpoints};
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait BondingCurveModule:
 	storage::StorageModule
 	+ events::EventsModule

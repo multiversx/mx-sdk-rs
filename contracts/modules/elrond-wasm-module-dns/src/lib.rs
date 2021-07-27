@@ -5,7 +5,7 @@ mod dns_proxy;
 elrond_wasm::imports!();
 
 /// The module deals with registering usernames in a DNS contract.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait DnsModule {
 	#[proxy]
 	fn dns_proxy(&self, to: Address) -> dns_proxy::Proxy<Self::SendApi>;

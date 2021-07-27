@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::proxy]
+#[elrond_wasm::proxy]
 pub trait Dns {
 	#[payable("EGLD")]
 	#[endpoint]

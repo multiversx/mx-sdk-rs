@@ -9,7 +9,7 @@ use super::common::{
 	PERCENT_BASE_POINTS,
 };
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait ValidationModule: common::CommonModule {
 	fn require_valid_order_input_amount(
 		&self,

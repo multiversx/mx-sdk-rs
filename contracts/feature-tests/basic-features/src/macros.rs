@@ -3,10 +3,10 @@ elrond_wasm::imports!();
 use elrond_wasm::String;
 
 /// Various macros provided by elrond-wasm.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait Macros {
 	#[view]
-	fn only_owner(&self) -> SCResult<()> {
+	fn only_owner_legacy(&self) -> SCResult<()> {
 		only_owner!(self, "Caller must be owner");
 		Ok(())
 	}

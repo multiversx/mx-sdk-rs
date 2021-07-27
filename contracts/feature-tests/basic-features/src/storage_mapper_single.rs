@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 
 /// Storage mapper test.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait SingleValueMapperFeatures {
 	#[view]
 	#[storage_mapper("my_single_value_mapper")]

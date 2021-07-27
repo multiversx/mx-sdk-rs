@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait UpgradeContractModule {
 	#[endpoint(upgradeChildContract)]
 	fn upgrade_child_contract(

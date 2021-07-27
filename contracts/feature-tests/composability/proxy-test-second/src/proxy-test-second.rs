@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait ProxyTestSecond {
 	#[storage_set("last_payment")]
 	fn set_last_payment(&self, last_payment: &Self::BigUint);

@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait NftStoragePrepay {
 	#[init]
 	fn init(&self, cost_per_byte: Self::BigUint) {

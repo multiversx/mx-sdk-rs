@@ -10,7 +10,7 @@ pub enum Status {
 	Failed,
 }
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Crowdfunding {
 	#[init]
 	fn init(

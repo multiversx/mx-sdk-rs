@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 use crate::types::*;
 
 /// Storage tests: direct load.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait StorageLoadFeatures {
 	#[endpoint]
 	#[storage_get("big_uint")]

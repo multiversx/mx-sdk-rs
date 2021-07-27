@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait SecondContract {
 	#[init]
 	fn init(&self, esdt_token_name: TokenIdentifier) {
