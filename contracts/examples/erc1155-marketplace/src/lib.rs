@@ -103,10 +103,9 @@ pub trait Erc1155Marketplace {
 
 	// endpoints - owner-only
 
+	#[only_owner]
 	#[endpoint]
 	fn claim(&self) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
-
 		let caller = self.blockchain().get_caller();
 		let data = self.data_or_empty_if_sc(&caller, b"claim");
 
@@ -121,9 +120,9 @@ pub trait Erc1155Marketplace {
 		Ok(())
 	}
 
+	#[only_owner]
 	#[endpoint(setCutPercentage)]
 	fn set_percentage_cut_endpoint(&self, new_cut_percentage: u8) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
 		require!(
 			new_cut_percentage > 0 && new_cut_percentage < PERCENTAGE_TOTAL,
 			"Invalid percentage value, should be between 0 and 100"
@@ -134,9 +133,9 @@ pub trait Erc1155Marketplace {
 		Ok(())
 	}
 
+	#[only_owner]
 	#[endpoint(setTokenOwnershipContractAddress)]
 	fn set_token_ownership_contract_address_endpoint(&self, new_address: Address) -> SCResult<()> {
-		only_owner!(self, "Only owner may call this function!");
 		require!(!new_address.is_zero(), "Cannot set to zero address");
 		require!(
 			self.blockchain().is_smart_contract(&new_address),
