@@ -3,7 +3,7 @@ elrond_wasm::derive_imports!();
 
 use super::common::{Order, OrderType};
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait EventsModule {
 	fn emit_order_event(&self, order: Order<Self::BigUint>) {
 		let caller = self.blockchain().get_caller();

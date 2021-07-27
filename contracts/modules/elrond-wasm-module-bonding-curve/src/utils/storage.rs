@@ -4,7 +4,7 @@ elrond_wasm::derive_imports!();
 use super::structs::BondingCurve;
 use super::structs::TokenOwnershipData;
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait StorageModule {
 	#[storage_mapper("token_details")]
 	fn token_details(
