@@ -14,11 +14,6 @@ fn forw_raw_async_echo_go() {
 }
 
 #[test]
-fn forw_raw_contract_deploy_go() {
-	elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_deploy.scen.json");
-}
-
-#[test]
 fn forw_raw_direct_egld_go() {
 	elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_egld.scen.json");
 }
@@ -161,11 +156,6 @@ fn forwarder_contract_deploy_go() {
 }
 
 #[test]
-fn forwarder_contract_deploy_two_go() {
-	elrond_wasm_debug::mandos_go("mandos/forwarder_contract_deploy_two.scen.json");
-}
-
-#[test]
 fn forwarder_contract_upgrade_go() {
 	elrond_wasm_debug::mandos_go("mandos/forwarder_contract_upgrade.scen.json");
 }
@@ -173,6 +163,11 @@ fn forwarder_contract_upgrade_go() {
 #[test]
 fn forwarder_nft_create_go() {
 	elrond_wasm_debug::mandos_go("mandos/forwarder_nft_create.scen.json");
+}
+
+#[test]
+fn forwarder_nft_create_and_send_go() {
+	elrond_wasm_debug::mandos_go("mandos/forwarder_nft_create_and_send.scen.json");
 }
 
 #[test]
@@ -203,6 +198,11 @@ fn forwarder_sync_echo_go() {
 #[test]
 fn forwarder_sync_echo_range_go() {
 	elrond_wasm_debug::mandos_go("mandos/forwarder_sync_echo_range.scen.json");
+}
+
+#[test]
+fn proxy_test_init_go() {
+	elrond_wasm_debug::mandos_go("mandos/proxy_test_init.scen.json");
 }
 
 #[test]
@@ -245,25 +245,25 @@ fn proxy_test_payment_sameshard_callback_go() {
 	elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_sameShard_callback.scen.json");
 }
 
-#[test]
-fn recursive_caller_egld_1_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_1.scen.json");
-}
+// #[test]
+// fn recursive_caller_egld_1_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_1.scen.json");
+// }
 
-#[test]
-fn recursive_caller_egld_2_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_2.scen.json");
-}
+// #[test]
+// fn recursive_caller_egld_2_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_2.scen.json");
+// }
 
-#[test]
-fn recursive_caller_egld_x_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_x.scen.json");
-}
+// #[test]
+// fn recursive_caller_egld_x_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_x.scen.json");
+// }
 
-#[test]
-fn recursive_caller_esdt_1_go() {
-	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
-}
+// #[test]
+// fn recursive_caller_esdt_1_go() {
+// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
+// }
 
 // #[test]
 // fn recursive_caller_esdt_2_go() {

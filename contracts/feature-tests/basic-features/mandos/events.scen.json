@@ -38,8 +38,10 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "str:event_a",
-                        "topics": [],
+                        "endpoint": "str:logEventA",
+                        "topics": [
+                            "str:event_a"
+                        ],
                         "data": ""
                     }
                 ],
@@ -67,8 +69,10 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "str:event_a",
-                        "topics": [],
+                        "endpoint": "str:logEventA",
+                        "topics": [
+                            "str:event_a"
+                        ],
                         "data": "0x1234abc"
                     }
                 ],
@@ -99,8 +103,9 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "str:event_b",
+                        "endpoint": "str:logEventB",
                         "topics": [
+                            "str:event_b",
                             "0xa1",
                             "``arg2_an_address_______________s3"
                         ],
