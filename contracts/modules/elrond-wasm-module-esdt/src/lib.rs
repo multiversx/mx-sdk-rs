@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 
 /// Standard module for managing a single ESDT.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait EsdtModule {
 	#[storage_mapper("token_id")]
 	fn token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;

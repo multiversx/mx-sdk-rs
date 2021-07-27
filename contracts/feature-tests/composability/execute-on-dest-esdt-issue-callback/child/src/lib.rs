@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 
 const EGLD_DECIMALS: usize = 18;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Child {
 	#[init]
 	fn init(&self) {}

@@ -10,7 +10,7 @@ pub struct CallbackData<BigUint: BigUintApi> {
 	args: Vec<BoxedBytes>,
 }
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait ForwarderAsyncCallModule {
 	#[proxy]
 	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;

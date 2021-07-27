@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 use super::storage;
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait ForwarderSftModule: storage::ForwarderStorageModule {
 	#[payable("EGLD")]
 	#[endpoint]

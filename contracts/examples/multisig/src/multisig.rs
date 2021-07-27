@@ -11,7 +11,7 @@ elrond_wasm::imports!();
 /// Multi-signature smart contract implementation.
 /// Acts like a wallet that needs multiple signers for any action performed.
 /// See the readme file for more detailed documentation.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Multisig {
 	/// Minimum number of signatures needed to perform any action.
 	#[view(getQuorum)]

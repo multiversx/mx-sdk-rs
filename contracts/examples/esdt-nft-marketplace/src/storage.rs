@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 use crate::auction::*;
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait StorageModule {
 	#[view(getMarketplaceCutPercentage)]
 	#[storage_mapper("bidCutPerecentage")]

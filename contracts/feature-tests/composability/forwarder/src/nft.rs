@@ -12,7 +12,7 @@ pub struct Color {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 	#[view]
 	fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> Self::BigUint {

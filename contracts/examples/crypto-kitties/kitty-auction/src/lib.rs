@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 pub mod auction;
 use auction::*;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait KittyAuction {
 	#[init]
 	fn init(

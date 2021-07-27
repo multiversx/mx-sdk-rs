@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 
 /// Storage mapper test.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait MapStorageMapperFeatures {
 	#[storage_mapper("map_storage_mapper")]
 	fn map_storage_mapper(

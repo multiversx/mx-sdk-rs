@@ -1,7 +1,7 @@
 mod user_builtin {
 	elrond_wasm::imports!();
 
-	#[elrond_wasm_derive::proxy]
+	#[elrond_wasm::proxy]
 	pub trait UserBuiltin {
 		#[endpoint(SetUserName)]
 		fn set_user_name(&self, name: &BoxedBytes) -> Self::BigUint;
@@ -11,7 +11,7 @@ mod user_builtin {
 mod dns_mock {
 	elrond_wasm::imports!();
 
-	#[elrond_wasm_derive::contract]
+	#[elrond_wasm::contract]
 	pub trait DnsMock {
 		#[proxy]
 		fn user_builtin_proxy(&self, to: Address) -> super::user_builtin::Proxy<Self::SendApi>;

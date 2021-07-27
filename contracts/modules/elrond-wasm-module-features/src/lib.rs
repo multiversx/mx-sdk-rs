@@ -7,7 +7,7 @@ pub const FEATURE_ON: u8 = 1;
 pub const FEATURE_OFF: u8 = 2;
 
 /// Standard module for managing feature flags.
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait FeaturesModule {
 	#[storage_get("feat:")]
 	fn get_feature_flag(&self, feature_name: FeatureName) -> u8;

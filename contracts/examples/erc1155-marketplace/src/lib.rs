@@ -24,7 +24,7 @@ pub struct AuctionArgument<BigUint: BigUintApi> {
 	pub deadline: u64,
 }
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait Erc1155Marketplace {
 	/// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
 	#[init]

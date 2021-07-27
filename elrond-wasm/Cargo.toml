@@ -15,12 +15,18 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 legacy-nft-transfer = []
+derive = ["elrond-wasm-derive"]
 
 [dependencies]
 wee_alloc = "0.4"
 arrayvec = { version = "0.7.1", default-features = false }
 hashbrown = "0.11.2"
 hex-literal = "0.3.1"
+
+[dependencies.elrond-wasm-derive]
+version = "=0.17.4"
+path = "../elrond-wasm-derive"
+optional = true
 
 [dependencies.elrond-codec]
 version = "0.5.3"

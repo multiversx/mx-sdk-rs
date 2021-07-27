@@ -36,7 +36,7 @@ macro_rules! derive_imports {
 			NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
 			TopEncodeOrDefault,
 		};
-		use elrond_wasm_derive::TypeAbi;
+		use elrond_wasm::derive::TypeAbi;
 	};
 }
 

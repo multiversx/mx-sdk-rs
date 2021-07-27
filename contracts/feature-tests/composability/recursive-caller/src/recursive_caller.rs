@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 
 /// Test contract for investigating async calls.
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait RecursiveCaller {
 	#[proxy]
 	fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
