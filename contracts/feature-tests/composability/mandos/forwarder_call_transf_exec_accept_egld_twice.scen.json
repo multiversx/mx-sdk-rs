@@ -44,8 +44,9 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1000",
@@ -55,8 +56,9 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1000",

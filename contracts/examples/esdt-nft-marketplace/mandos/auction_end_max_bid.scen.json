@@ -50,6 +50,18 @@
                 "address:seller": {
                     "nonce": "1",
                     "balance": "700",
+                    "esdt": {
+                        "str:SFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "10",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {}
                 },
                 "address:first_bidder": {

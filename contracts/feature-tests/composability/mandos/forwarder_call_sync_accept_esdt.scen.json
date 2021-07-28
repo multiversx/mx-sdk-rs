@@ -55,20 +55,32 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKEN",
-                            "str:FungibleESDT",
                             "1000",
-                            "0"
+                            "sc:vault"
                         ],
                         "data": ""
                     },
                     {
-                        "address": "sc:forwarder",
-                        "identifier": "str:accept_funds_sync_result",
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
+                            "str:accept_funds",
+                            "str:TEST-TOKEN",
+                            "str:FungibleESDT",
+                                                "1000",
+                                                "0"
+                                            ],
+                                            "data": ""
+                                        },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_accept_funds",
+                        "topics": [
+                            "str:accept_funds_sync_result",
                             "str:TEST-TOKEN",
                             "str:FungibleESDT",
                             "1000",

@@ -43,8 +43,9 @@
                 "logs": [
                     {
                         "address": "sc:erc20",
-                        "identifier": "str:approve",
+                        "endpoint": "str:approve",
                         "topics": [
+                            "str:approve",
                             "``account_1_____________________s1",
                             "``account_1_____________________s1"
                         ],

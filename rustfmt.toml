@@ -218,7 +218,7 @@
 
 # Use tab characters for indentation, spaces for alignment.
 # Default: false
-  hard_tabs = true
+  # hard_tabs = false
 
 # Break comments to fit on the line.
 # Default: false

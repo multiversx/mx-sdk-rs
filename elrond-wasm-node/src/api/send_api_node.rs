@@ -1,4 +1,4 @@
-use super::{ArwenBigInt, ArwenBigUint};
+use super::{ArwenBigInt, ArwenBigUint, ArwenEllipticCurve};
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
@@ -69,6 +69,17 @@ extern "C" {
 		dataOffset: *const u8,
 	) -> i32;
 
+	fn deployFromSourceContract(
+		gas: i64,
+		valueOffset: *const u8,
+		sourceContractAddressOffset: *const u8,
+		codeMetadataOffset: *const u8,
+		resultAddressOffset: *const u8,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	) -> i32;
+
 	fn upgradeContract(
 		scAddressOffset: *const u8,
 		gas: i64,
@@ -122,6 +133,7 @@ extern "C" {
 impl SendApi for ArwenApiImpl {
 	type AmountType = ArwenBigUint;
 	type ProxyBigInt = ArwenBigInt;
+	type ProxyEllipticCurve = ArwenEllipticCurve;
 	type ProxyStorage = Self;
 
 	#[inline]
@@ -277,6 +289,35 @@ impl SendApi for ArwenApiImpl {
 				code.as_ptr(),
 				code_metadata.as_ptr(),
 				code.len() as i32,
+				new_address.as_mut_ptr(),
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+		if new_address.is_zero() {
+			None
+		} else {
+			Some(new_address)
+		}
+	}
+
+	fn deploy_from_source_contract(
+		&self,
+		gas: u64,
+		amount: &ArwenBigUint,
+		source_contract_address: &Address,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Option<Address> {
+		let mut new_address = Address::zero();
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			let _ = deployFromSourceContract(
+				gas as i64,
+				amount_bytes32_ptr,
+				source_contract_address.as_ptr(),
+				code_metadata.as_ptr(),
 				new_address.as_mut_ptr(),
 				arg_buffer.num_args() as i32,
 				arg_buffer.arg_lengths_bytes_ptr(),

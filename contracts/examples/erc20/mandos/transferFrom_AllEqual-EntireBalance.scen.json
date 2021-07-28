@@ -45,8 +45,9 @@
                 "logs": [
                     {
                         "address": "sc:erc20",
-                        "identifier": "str:transfer",
+                        "endpoint": "str:transferFrom",
                         "topics": [
+                            "str:transfer",
                             "``account_1_____________________s1",
                             "``account_1_____________________s1"
                         ],
