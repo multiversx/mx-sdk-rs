@@ -19,6 +19,9 @@ tutorial/book
 my-arwen.sh
 publish.sh
 
+# Zip output with example wasm binaries
+examples-wasm.zip
+
 tags
 
 # Elrond IDE
