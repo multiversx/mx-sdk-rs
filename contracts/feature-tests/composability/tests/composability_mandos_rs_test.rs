@@ -2,41 +2,41 @@ use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn contract_map() -> ContractMap<TxContext> {
-	let mut contract_map = ContractMap::new();
+    let mut contract_map = ContractMap::new();
 
-	contract_map.register_contract(
-		"file:../forwarder/output/forwarder.wasm",
-		Box::new(|context| Box::new(forwarder::contract_obj(context))),
-	);
+    contract_map.register_contract(
+        "file:../forwarder/output/forwarder.wasm",
+        Box::new(|context| Box::new(forwarder::contract_obj(context))),
+    );
 
-	contract_map.register_contract(
-		"file:../forwarder-raw/output/forwarder-raw.wasm",
-		Box::new(|context| Box::new(forwarder_raw::contract_obj(context))),
-	);
+    contract_map.register_contract(
+        "file:../forwarder-raw/output/forwarder-raw.wasm",
+        Box::new(|context| Box::new(forwarder_raw::contract_obj(context))),
+    );
 
-	contract_map.register_contract(
-		"file:../proxy-test-first/output/proxy-test-first.wasm",
-		Box::new(|context| Box::new(proxy_test_first::contract_obj(context))),
-	);
+    contract_map.register_contract(
+        "file:../proxy-test-first/output/proxy-test-first.wasm",
+        Box::new(|context| Box::new(proxy_test_first::contract_obj(context))),
+    );
 
-	contract_map.register_contract(
-		"file:../proxy-test-second/output/proxy-test-second.wasm",
-		Box::new(|context| Box::new(proxy_test_second::contract_obj(context))),
-	);
+    contract_map.register_contract(
+        "file:../proxy-test-second/output/proxy-test-second.wasm",
+        Box::new(|context| Box::new(proxy_test_second::contract_obj(context))),
+    );
 
-	contract_map.register_contract(
-		"file:../vault/output/vault.wasm",
-		Box::new(|context| Box::new(vault::contract_obj(context))),
-	);
+    contract_map.register_contract(
+        "file:../vault/output/vault.wasm",
+        Box::new(|context| Box::new(vault::contract_obj(context))),
+    );
 
-	contract_map
+    contract_map
 }
 #[test]
 fn forw_raw_async_accept_egld_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/forw_raw_async_accept_egld.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forw_raw_async_accept_egld.scen.json",
+        &contract_map(),
+    );
 }
 
 // #[test]
@@ -49,17 +49,17 @@ fn forw_raw_async_accept_egld_rs() {
 
 #[test]
 fn forw_raw_async_echo_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", &contract_map());
 }
 
 #[test]
 fn forw_raw_direct_egld_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_egld.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_egld.scen.json", &contract_map());
 }
 
 #[test]
 fn forw_raw_direct_esdt_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_esdt.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_esdt.scen.json", &contract_map());
 }
 
 // #[test]
@@ -74,10 +74,10 @@ fn forw_raw_direct_esdt_rs() {
 
 #[test]
 fn forwarder_call_async_accept_egld_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/forwarder_call_async_accept_egld.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_call_async_accept_egld.scen.json",
+        &contract_map(),
+    );
 }
 
 // #[test]
@@ -324,66 +324,66 @@ fn forwarder_call_async_accept_egld_rs() {
 
 #[test]
 fn proxy_test_message_othershard_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_message_otherShard.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_message_otherShard.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_message_othershard_callback_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_message_otherShard_callback.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_message_otherShard_callback.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_message_sameshard_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_message_sameShard.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_message_sameShard.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_message_sameshard_callback_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_message_sameShard_callback.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_message_sameShard_callback.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_payment_othershard_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_payment_otherShard.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_payment_otherShard.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_payment_othershard_callback_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_payment_otherShard_callback.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_payment_otherShard_callback.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_payment_sameshard_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_payment_sameShard.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_payment_sameShard.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]
 fn proxy_test_payment_sameshard_callback_rs() {
-	elrond_wasm_debug::mandos_rs(
-		"mandos/proxy_test_payment_sameShard_callback.scen.json",
-		&contract_map(),
-	);
+    elrond_wasm_debug::mandos_rs(
+        "mandos/proxy_test_payment_sameShard_callback.scen.json",
+        &contract_map(),
+    );
 }
 
 // #[test]
@@ -418,10 +418,10 @@ fn proxy_test_payment_sameshard_callback_rs() {
 
 #[test]
 fn send_egld_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/send_egld.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/send_egld.scen.json", &contract_map());
 }
 
 #[test]
 fn send_esdt_rs() {
-	elrond_wasm_debug::mandos_rs("mandos/send_esdt.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/send_esdt.scen.json", &contract_map());
 }

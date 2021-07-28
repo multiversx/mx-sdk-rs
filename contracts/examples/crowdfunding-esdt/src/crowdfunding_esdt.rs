@@ -5,131 +5,131 @@ elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy)]
 pub enum Status {
-	FundingPeriod,
-	Successful,
-	Failed,
+    FundingPeriod,
+    Successful,
+    Failed,
 }
 
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
-	#[init]
-	fn init(
-		&self,
-		target: Self::BigUint,
-		deadline: u64,
-		token_name: TokenIdentifier,
-	) -> SCResult<()> {
-		require!(target > 0, "Target must be more than 0");
-		self.target().set(&target);
+    #[init]
+    fn init(
+        &self,
+        target: Self::BigUint,
+        deadline: u64,
+        token_name: TokenIdentifier,
+    ) -> SCResult<()> {
+        require!(target > 0, "Target must be more than 0");
+        self.target().set(&target);
 
-		require!(
-			deadline > self.get_current_time(),
-			"Deadline can't be in the past"
-		);
-		self.deadline().set(&deadline);
+        require!(
+            deadline > self.get_current_time(),
+            "Deadline can't be in the past"
+        );
+        self.deadline().set(&deadline);
 
-		require!(
-			token_name.is_egld() || token_name.is_valid_esdt_identifier(),
-			"Invalid token provided"
-		);
-		self.cf_token_name().set(&token_name);
+        require!(
+            token_name.is_egld() || token_name.is_valid_esdt_identifier(),
+            "Invalid token provided"
+        );
+        self.cf_token_name().set(&token_name);
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[endpoint]
-	#[payable("*")]
-	fn fund(
-		&self,
-		#[payment] payment: Self::BigUint,
-		#[payment_token] token: TokenIdentifier,
-	) -> SCResult<()> {
-		require!(
-			self.status() == Status::FundingPeriod,
-			"cannot fund after deadline"
-		);
-		require!(token == self.cf_token_name().get(), "wrong token");
+    #[endpoint]
+    #[payable("*")]
+    fn fund(
+        &self,
+        #[payment] payment: Self::BigUint,
+        #[payment_token] token: TokenIdentifier,
+    ) -> SCResult<()> {
+        require!(
+            self.status() == Status::FundingPeriod,
+            "cannot fund after deadline"
+        );
+        require!(token == self.cf_token_name().get(), "wrong token");
 
-		let caller = self.blockchain().get_caller();
-		self.deposit(&caller).update(|deposit| *deposit += payment);
+        let caller = self.blockchain().get_caller();
+        self.deposit(&caller).update(|deposit| *deposit += payment);
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[view]
-	fn status(&self) -> Status {
-		if self.get_current_time() < self.deadline().get() {
-			Status::FundingPeriod
-		} else if self.get_current_funds() >= self.target().get() {
-			Status::Successful
-		} else {
-			Status::Failed
-		}
-	}
+    #[view]
+    fn status(&self) -> Status {
+        if self.get_current_time() < self.deadline().get() {
+            Status::FundingPeriod
+        } else if self.get_current_funds() >= self.target().get() {
+            Status::Successful
+        } else {
+            Status::Failed
+        }
+    }
 
-	#[view(getCurrentFunds)]
-	fn get_current_funds(&self) -> Self::BigUint {
-		let token = self.cf_token_name().get();
+    #[view(getCurrentFunds)]
+    fn get_current_funds(&self) -> Self::BigUint {
+        let token = self.cf_token_name().get();
 
-		self.blockchain().get_sc_balance(&token, 0)
-	}
+        self.blockchain().get_sc_balance(&token, 0)
+    }
 
-	#[endpoint]
-	fn claim(&self) -> SCResult<()> {
-		match self.status() {
-			Status::FundingPeriod => sc_error!("cannot claim before deadline"),
-			Status::Successful => {
-				let caller = self.blockchain().get_caller();
-				require!(
-					caller == self.blockchain().get_owner_address(),
-					"only owner can claim successful funding"
-				);
+    #[endpoint]
+    fn claim(&self) -> SCResult<()> {
+        match self.status() {
+            Status::FundingPeriod => sc_error!("cannot claim before deadline"),
+            Status::Successful => {
+                let caller = self.blockchain().get_caller();
+                require!(
+                    caller == self.blockchain().get_owner_address(),
+                    "only owner can claim successful funding"
+                );
 
-				let token_name = self.cf_token_name().get();
-				let sc_balance = self.get_current_funds();
+                let token_name = self.cf_token_name().get();
+                let sc_balance = self.get_current_funds();
 
-				self.send()
-					.direct(&caller, &token_name, 0, &sc_balance, &[]);
+                self.send()
+                    .direct(&caller, &token_name, 0, &sc_balance, &[]);
 
-				Ok(())
-			},
-			Status::Failed => {
-				let caller = self.blockchain().get_caller();
-				let deposit = self.deposit(&caller).get();
+                Ok(())
+            },
+            Status::Failed => {
+                let caller = self.blockchain().get_caller();
+                let deposit = self.deposit(&caller).get();
 
-				if deposit > 0 {
-					let token_name = self.cf_token_name().get();
+                if deposit > 0 {
+                    let token_name = self.cf_token_name().get();
 
-					self.deposit(&caller).clear();
-					self.send().direct(&caller, &token_name, 0, &deposit, &[]);
-				}
+                    self.deposit(&caller).clear();
+                    self.send().direct(&caller, &token_name, 0, &deposit, &[]);
+                }
 
-				Ok(())
-			},
-		}
-	}
+                Ok(())
+            },
+        }
+    }
 
-	// private
+    // private
 
-	fn get_current_time(&self) -> u64 {
-		self.blockchain().get_block_timestamp()
-	}
+    fn get_current_time(&self) -> u64 {
+        self.blockchain().get_block_timestamp()
+    }
 
-	// storage
+    // storage
 
-	#[view(getTarget)]
-	#[storage_mapper("target")]
-	fn target(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    #[view(getTarget)]
+    #[storage_mapper("target")]
+    fn target(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
-	#[view(getDeadline)]
-	#[storage_mapper("deadline")]
-	fn deadline(&self) -> SingleValueMapper<Self::Storage, u64>;
+    #[view(getDeadline)]
+    #[storage_mapper("deadline")]
+    fn deadline(&self) -> SingleValueMapper<Self::Storage, u64>;
 
-	#[view(getDeposit)]
-	#[storage_mapper("deposit")]
-	fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    #[view(getDeposit)]
+    #[storage_mapper("deposit")]
+    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
-	#[view(getCrowdfundingTokenName)]
-	#[storage_mapper("tokenName")]
-	fn cf_token_name(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    #[view(getCrowdfundingTokenName)]
+    #[storage_mapper("tokenName")]
+    fn cf_token_name(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
 }
