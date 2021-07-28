@@ -4,7 +4,7 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [elrond-wasm 0.18.0] - 2021-07-28
+## [elrond-wasm 0.18.0, mandos 0.8.0] - 2021-07-28
 
 - New math hooks exposed from Arwen:
 	- `pow`, `log2`, `sqrt`
