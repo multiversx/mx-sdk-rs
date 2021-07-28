@@ -51,9 +51,7 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "''owner": "address:crypto_bubbles_owner"
-                    },
+                    "storage": {},
                     "code": "file:../output/crypto-bubbles.wasm"
                 }
             }

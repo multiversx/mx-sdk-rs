@@ -15,7 +15,6 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x311",
                         "''playerBalance|address:acc2": "0x422"
                     },
@@ -55,16 +54,18 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc1"
                         ],
                         "data": "0x0200"
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000003",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
                             "address:acc1"
                         ],
@@ -95,16 +96,18 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc2"
                         ],
                         "data": "0x150"
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000003",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
                             "address:acc2"
                         ],
@@ -135,16 +138,18 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc2"
                         ],
                         "data": "0x2000"
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000003",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
                             "address:acc2"
                         ],
@@ -168,7 +173,6 @@
                     "nonce": "0",
                     "balance": "0x2450",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x311",
                         "''playerBalance|address:acc2": "0x422"
                     },

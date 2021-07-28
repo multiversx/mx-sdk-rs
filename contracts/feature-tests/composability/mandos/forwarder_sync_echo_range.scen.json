@@ -51,8 +51,10 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "endpoint": "str:echo_arguments_sync_range",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:6"

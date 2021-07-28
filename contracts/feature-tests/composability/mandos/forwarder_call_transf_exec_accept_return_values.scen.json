@@ -39,13 +39,19 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "*", "*", "0", "str:EGLD" ],
+                "out": [
+                    "*",
+                    "*",
+                    "0",
+                    "str:EGLD"
+                ],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
+                            "str:accept_funds",
                             "str:EGLD",
                             "str:FungibleESDT",
                             "1000",

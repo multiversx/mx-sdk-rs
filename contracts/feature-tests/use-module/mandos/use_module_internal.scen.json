@@ -27,7 +27,7 @@
                 "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "6,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,7 +47,7 @@
                 "value": "0",
                 "function": "call_mod_a",
                 "arguments": [],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -67,7 +67,7 @@
                 "value": "0",
                 "function": "call_mod_b",
                 "arguments": [],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {

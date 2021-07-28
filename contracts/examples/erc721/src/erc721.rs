@@ -2,157 +2,131 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait NonFungibleTokens {
-	#[init]
-	fn init(&self, initial_minted: u64) {
-		let owner = self.blockchain().get_caller();
+    #[init]
+    fn init(&self, initial_minted: u64) {
+        let owner = self.blockchain().get_caller();
+        self.perform_mint(initial_minted, &owner);
+    }
 
-		self.set_owner(&owner);
-		self.perform_mint(initial_minted, &owner);
-	}
+    // endpoints
 
-	// endpoints
+    /// Creates new tokens and sets their ownership to the specified account.
+    /// Only the contract owner may call this function.
+    #[only_owner]
+    #[endpoint]
+    fn mint(&self, count: u64, new_token_owner: Address) -> SCResult<()> {
+        self.perform_mint(count, &new_token_owner);
 
-	/// Creates new tokens and sets their ownership to the specified account.
-	/// Only the contract owner may call this function.
-	#[endpoint]
-	fn mint(&self, count: u64, new_token_owner: Address) -> SCResult<()> {
-		require!(
-			self.blockchain().get_caller() == self.get_owner(),
-			"Only owner can mint new tokens!"
-		);
+        Ok(())
+    }
 
-		self.perform_mint(count, &new_token_owner);
+    /// Approves an account to transfer the token on behalf of its owner.<br>
+    /// Only the owner of the token may call this function.
+    #[endpoint]
+    fn approve(&self, token_id: u64, approved_address: Address) -> SCResult<()> {
+        require!(
+            token_id < self.total_minted().get(),
+            "Token does not exist!"
+        );
+        require!(
+            self.blockchain().get_caller() == self.token_owner(token_id).get(),
+            "Only the token owner can approve!"
+        );
 
-		Ok(())
-	}
+        self.approval(token_id).set(&approved_address);
 
-	/// Approves an account to transfer the token on behalf of its owner.<br>
-	/// Only the owner of the token may call this function.
-	#[endpoint]
-	fn approve(&self, token_id: u64, approved_address: Address) -> SCResult<()> {
-		require!(token_id < self.get_total_minted(), "Token does not exist!");
-		require!(
-			self.blockchain().get_caller() == self.get_token_owner(token_id),
-			"Only the token owner can approve!"
-		);
+        Ok(())
+    }
 
-		self.set_approval(token_id, &approved_address);
+    /// Revokes approval for the token.<br>  
+    /// Only the owner of the token may call this function.
+    #[endpoint]
+    fn revoke(&self, token_id: u64) -> SCResult<()> {
+        require!(
+            token_id < self.total_minted().get(),
+            "Token does not exist!"
+        );
+        require!(
+            self.blockchain().get_caller() == self.token_owner(token_id).get(),
+            "Only the token owner can revoke approval!"
+        );
 
-		Ok(())
-	}
+        self.approval(token_id).clear();
 
-	/// Revokes approval for the token.<br>  
-	/// Only the owner of the token may call this function.
-	#[endpoint]
-	fn revoke(&self, token_id: u64) -> SCResult<()> {
-		require!(token_id < self.get_total_minted(), "Token does not exist!");
-		require!(
-			self.blockchain().get_caller() == self.get_token_owner(token_id),
-			"Only the token owner can revoke approval!"
-		);
+        Ok(())
+    }
 
-		if !self.approval_is_empty(token_id) {
-			self.clear_approval(token_id);
-		}
+    /// Transfer ownership of the token to a new account.
+    #[endpoint]
+    fn transfer(&self, token_id: u64, to: Address) -> SCResult<()> {
+        require!(
+            token_id < self.total_minted().get(),
+            "Token does not exist!"
+        );
 
-		Ok(())
-	}
+        let caller = self.blockchain().get_caller();
+        let token_owner = self.token_owner(token_id).get();
 
-	/// Transfer ownership of the token to a new account.
-	#[endpoint]
-	fn transfer(&self, token_id: u64, to: Address) -> SCResult<()> {
-		require!(token_id < self.get_total_minted(), "Token does not exist!");
+        if caller == token_owner {
+            self.perform_transfer(token_id, &token_owner, &to);
 
-		let caller = self.blockchain().get_caller();
-		let token_owner = self.get_token_owner(token_id);
+            return Ok(());
+        } else if !self.approval(token_id).is_empty() {
+            let approved_address = self.approval(token_id).get();
 
-		if caller == token_owner {
-			self.perform_transfer(token_id, &token_owner, &to);
+            if caller == approved_address {
+                self.perform_transfer(token_id, &token_owner, &to);
 
-			return Ok(());
-		} else if !self.approval_is_empty(token_id) {
-			let approved_address = self.get_approval(token_id);
+                return Ok(());
+            }
+        }
 
-			if caller == approved_address {
-				self.perform_transfer(token_id, &token_owner, &to);
+        sc_error!("Only the owner or the approved account may transfer the token!")
+    }
 
-				return Ok(());
-			}
-		}
+    // private methods
 
-		sc_error!("Only the owner or the approved account may transfer the token!")
-	}
+    fn perform_mint(&self, count: u64, new_token_owner: &Address) {
+        let new_owner_current_total = self.token_count(new_token_owner).get();
+        let total_minted = self.total_minted().get();
+        let first_new_id = total_minted;
+        let last_new_id = total_minted + count;
 
-	// private methods
+        for id in first_new_id..last_new_id {
+            self.token_owner(id).set(new_token_owner);
+        }
 
-	fn perform_mint(&self, count: u64, new_token_owner: &Address) {
-		let new_owner_current_total = self.get_token_count(new_token_owner);
-		let total_minted = self.get_total_minted();
-		let first_new_id = total_minted;
-		let last_new_id = total_minted + count;
+        self.total_minted().set(&(total_minted + count));
+        self.token_count(new_token_owner)
+            .set(&(new_owner_current_total + count));
+    }
 
-		for id in first_new_id..last_new_id {
-			self.set_token_owner(id, new_token_owner);
-		}
+    fn perform_transfer(&self, token_id: u64, from: &Address, to: &Address) {
+        self.token_count(from).update(|count| *count -= 1);
+        self.token_count(to).update(|count| *count += 1);
+        self.token_owner(token_id).set(to);
 
-		self.set_total_minted(total_minted + count);
-		self.set_token_count(new_token_owner, new_owner_current_total + count);
-	}
+        // new ownership revokes approvals by previous owner
+        self.approval(token_id).clear();
+    }
 
-	fn perform_transfer(&self, token_id: u64, from: &Address, to: &Address) {
-		let prev_owner_token_count = self.get_token_count(from);
-		let new_owner_token_count = self.get_token_count(to);
+    // storage
 
-		// new ownership revokes approvals by previous owner
-		self.clear_approval(token_id);
+    #[view(totalMinted)]
+    #[storage_mapper("totalMinted")]
+    fn total_minted(&self) -> SingleValueMapper<Self::Storage, u64>;
 
-		self.set_token_count(from, prev_owner_token_count - 1);
-		self.set_token_count(to, new_owner_token_count + 1);
-		self.set_token_owner(token_id, to);
-	}
+    #[view(tokenOwner)]
+    #[storage_mapper("tokenOwner")]
+    fn token_owner(&self, token_id: u64) -> SingleValueMapper<Self::Storage, Address>;
 
-	// storage
+    #[view(tokenCount)]
+    #[storage_mapper("tokenCount")]
+    fn token_count(&self, owner: &Address) -> SingleValueMapper<Self::Storage, u64>;
 
-	#[view(contractOwner)]
-	#[storage_get("owner")]
-	fn get_owner(&self) -> Address;
-
-	#[storage_set("owner")]
-	fn set_owner(&self, owner: &Address);
-
-	#[view(totalMinted)]
-	#[storage_get("totalMinted")]
-	fn get_total_minted(&self) -> u64;
-
-	#[storage_set("totalMinted")]
-	fn set_total_minted(&self, total_minted: u64);
-
-	#[view(tokenOwner)]
-	#[storage_get("tokenOwner")]
-	fn get_token_owner(&self, token_id: u64) -> Address;
-
-	#[storage_set("tokenOwner")]
-	fn set_token_owner(&self, token_id: u64, owner: &Address);
-
-	#[view(tokenCount)]
-	#[storage_get("tokenCount")]
-	fn get_token_count(&self, owner: &Address) -> u64;
-
-	#[storage_set("tokenCount")]
-	fn set_token_count(&self, owner: &Address, token_count: u64);
-
-	#[storage_is_empty("approval")]
-	fn approval_is_empty(&self, token_id: u64) -> bool;
-
-	#[view(approval)]
-	#[storage_get("approval")]
-	fn get_approval(&self, token_id: u64) -> Address;
-
-	#[storage_set("approval")]
-	fn set_approval(&self, token_id: u64, approved_address: &Address);
-
-	#[storage_clear("approval")]
-	fn clear_approval(&self, token_id: u64);
+    #[view(approval)]
+    #[storage_mapper("approval")]
+    fn approval(&self, token_id: u64) -> SingleValueMapper<Self::Storage, Address>;
 }

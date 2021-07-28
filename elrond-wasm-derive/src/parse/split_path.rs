@@ -7,13 +7,13 @@ use syn::token::Colon2;
 /// Returns none if no module is specified.
 /// The method is designed for contexts where explicit module specification is required.
 pub fn split_path_last(
-	path: &syn::Path,
+    path: &syn::Path,
 ) -> Option<(Punctuated<syn::PathSegment, Colon2>, syn::PathSegment)> {
-	if path.segments.len() >= 2 {
-		let mut leading_segments = path.segments.clone();
-		let last_segment = leading_segments.pop().unwrap().into_value();
-		Some((leading_segments, last_segment))
-	} else {
-		None
-	}
+    if path.segments.len() >= 2 {
+        let mut leading_segments = path.segments.clone();
+        let last_segment = leading_segments.pop().unwrap().into_value();
+        Some((leading_segments, last_segment))
+    } else {
+        None
+    }
 }
