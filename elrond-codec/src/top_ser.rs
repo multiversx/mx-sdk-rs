@@ -13,250 +13,250 @@ use crate::TypeInfo;
 /// The trait is used to provide these implementations.
 /// This is currently not a substitute for implementing a proper TopEncode.
 pub trait TopEncodeNoErr: Sized {
-	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O);
+    fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O);
 }
 
 /// Quick encoding of a type that never fails on encoding.
 pub fn top_encode_no_err<T: TopEncodeNoErr>(obj: &T) -> Vec<u8> {
-	let mut bytes = Vec::<u8>::new();
-	obj.top_encode_no_err(&mut bytes);
-	bytes
+    let mut bytes = Vec::<u8>::new();
+    obj.top_encode_no_err(&mut bytes);
+    bytes
 }
 
 pub trait TopEncode: Sized {
-	// !INTERNAL USE ONLY!
-	#[doc(hidden)]
-	const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
+    // !INTERNAL USE ONLY!
+    #[doc(hidden)]
+    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
-	/// Attempt to serialize the value to ouput.
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError>;
+    /// Attempt to serialize the value to ouput.
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError>;
 
-	/// Version of `top_decode` that exits quickly in case of error.
-	/// Its purpose is to create smaller bytecode implementations
-	/// in cases where the application is supposed to exit directly on decode error.
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		match self.top_encode(output) {
-			Ok(v) => v,
-			Err(e) => exit(c, e),
-		}
-	}
+    /// Version of `top_decode` that exits quickly in case of error.
+    /// Its purpose is to create smaller bytecode implementations
+    /// in cases where the application is supposed to exit directly on decode error.
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        match self.top_encode(output) {
+            Ok(v) => v,
+            Err(e) => exit(c, e),
+        }
+    }
 }
 
 pub fn top_encode_from_nested<T, O>(obj: &T, output: O) -> Result<(), EncodeError>
 where
-	O: TopEncodeOutput,
-	T: NestedEncode,
+    O: TopEncodeOutput,
+    T: NestedEncode,
 {
-	let mut bytes = Vec::<u8>::new();
-	obj.dep_encode(&mut bytes)?;
-	output.set_slice_u8(&bytes[..]);
-	Ok(())
+    let mut bytes = Vec::<u8>::new();
+    obj.dep_encode(&mut bytes)?;
+    output.set_slice_u8(&bytes[..]);
+    Ok(())
 }
 
 pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
-	obj: &T,
-	output: O,
-	c: ExitCtx,
-	exit: fn(ExitCtx, EncodeError) -> !,
+    obj: &T,
+    output: O,
+    c: ExitCtx,
+    exit: fn(ExitCtx, EncodeError) -> !,
 ) where
-	O: TopEncodeOutput,
-	T: NestedEncode,
-	ExitCtx: Clone,
+    O: TopEncodeOutput,
+    T: NestedEncode,
+    ExitCtx: Clone,
 {
-	let mut bytes = Vec::<u8>::new();
-	obj.dep_encode_or_exit(&mut bytes, c, exit);
-	output.set_slice_u8(&bytes[..]);
+    let mut bytes = Vec::<u8>::new();
+    obj.dep_encode_or_exit(&mut bytes, c, exit);
+    output.set_slice_u8(&bytes[..]);
 }
 
 macro_rules! top_encode_from_no_err {
-	($type:ty, $type_info:expr) => {
-		impl TopEncode for $type {
-			const TYPE_INFO: TypeInfo = $type_info;
+    ($type:ty, $type_info:expr) => {
+        impl TopEncode for $type {
+            const TYPE_INFO: TypeInfo = $type_info;
 
-			#[inline]
-			fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-				self.top_encode_no_err(output);
-				Ok(())
-			}
+            #[inline]
+            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+                self.top_encode_no_err(output);
+                Ok(())
+            }
 
-			#[inline]
-			fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-				&self,
-				output: O,
-				_: ExitCtx,
-				_: fn(ExitCtx, EncodeError) -> !,
-			) {
-				self.top_encode_no_err(output);
-			}
-		}
-	};
+            #[inline]
+            fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+                &self,
+                output: O,
+                _: ExitCtx,
+                _: fn(ExitCtx, EncodeError) -> !,
+            ) {
+                self.top_encode_no_err(output);
+            }
+        }
+    };
 }
 
 pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
-	let mut bytes = Vec::<u8>::new();
-	obj.top_encode(&mut bytes)?;
-	Ok(bytes)
+    let mut bytes = Vec::<u8>::new();
+    obj.top_encode(&mut bytes)?;
+    Ok(bytes)
 }
 
 impl TopEncodeNoErr for () {
-	#[inline]
-	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
-		output.set_unit();
-	}
+    #[inline]
+    fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
+        output.set_unit();
+    }
 }
 
 top_encode_from_no_err! {(), TypeInfo::Unit}
 
 impl<T: NestedEncode> TopEncode for &[T] {
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		match T::TYPE_INFO {
-			TypeInfo::U8 => {
-				// transmute to &[u8]
-				// save directly, without passing through the buffer
-				let slice: &[u8] =
-					unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
-				output.set_slice_u8(slice);
-			},
-			_ => {
-				// only using `dep_encode_slice_contents` for non-u8,
-				// because it always appends to the buffer,
-				// which is not necessary above
-				let mut buffer = Vec::<u8>::new();
-				dep_encode_slice_contents(self, &mut buffer)?;
-				output.set_slice_u8(&buffer[..]);
-			},
-		}
-		Ok(())
-	}
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        match T::TYPE_INFO {
+            TypeInfo::U8 => {
+                // transmute to &[u8]
+                // save directly, without passing through the buffer
+                let slice: &[u8] =
+                    unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
+                output.set_slice_u8(slice);
+            },
+            _ => {
+                // only using `dep_encode_slice_contents` for non-u8,
+                // because it always appends to the buffer,
+                // which is not necessary above
+                let mut buffer = Vec::<u8>::new();
+                dep_encode_slice_contents(self, &mut buffer)?;
+                output.set_slice_u8(&buffer[..]);
+            },
+        }
+        Ok(())
+    }
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		match T::TYPE_INFO {
-			TypeInfo::U8 => {
-				// transmute to &[u8]
-				// save directly, without passing through the buffer
-				let slice: &[u8] =
-					unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
-				output.set_slice_u8(slice);
-			},
-			_ => {
-				// only using `dep_encode_slice_contents` for non-u8,
-				// because it always appends to the buffer,
-				// which is not necessary above
-				let mut buffer = Vec::<u8>::new();
-				for x in *self {
-					x.dep_encode_or_exit(&mut buffer, c.clone(), exit);
-				}
-				output.set_slice_u8(&buffer[..]);
-			},
-		}
-	}
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        match T::TYPE_INFO {
+            TypeInfo::U8 => {
+                // transmute to &[u8]
+                // save directly, without passing through the buffer
+                let slice: &[u8] =
+                    unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
+                output.set_slice_u8(slice);
+            },
+            _ => {
+                // only using `dep_encode_slice_contents` for non-u8,
+                // because it always appends to the buffer,
+                // which is not necessary above
+                let mut buffer = Vec::<u8>::new();
+                for x in *self {
+                    x.dep_encode_or_exit(&mut buffer, c.clone(), exit);
+                }
+                output.set_slice_u8(&buffer[..]);
+            },
+        }
+    }
 }
 
 impl<T: TopEncode> TopEncode for &T {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		(*self).top_encode(output)
-	}
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        (*self).top_encode(output)
+    }
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		(*self).top_encode_or_exit(output, c, exit);
-	}
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        (*self).top_encode_or_exit(output, c, exit);
+    }
 }
 
 impl TopEncode for &str {
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		output.set_slice_u8(self.as_bytes());
-		Ok(())
-	}
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        output.set_slice_u8(self.as_bytes());
+        Ok(())
+    }
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		_: ExitCtx,
-		_: fn(ExitCtx, EncodeError) -> !,
-	) {
-		output.set_slice_u8(self.as_bytes());
-	}
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        _: ExitCtx,
+        _: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        output.set_slice_u8(self.as_bytes());
+    }
 }
 
 impl<T: NestedEncode> TopEncode for Vec<T> {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.as_slice().top_encode(output)
-	}
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.as_slice().top_encode(output)
+    }
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_slice().top_encode_or_exit(output, c, exit);
-	}
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        self.as_slice().top_encode_or_exit(output, c, exit);
+    }
 }
 
 impl TopEncode for String {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.as_bytes().top_encode(output)
-	}
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.as_bytes().top_encode(output)
+    }
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_bytes().top_encode_or_exit(output, c, exit);
-	}
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        self.as_bytes().top_encode_or_exit(output, c, exit);
+    }
 }
 
 impl TopEncode for Box<str> {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.as_ref().as_bytes().top_encode(output)
-	}
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.as_ref().as_bytes().top_encode(output)
+    }
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_ref().as_bytes().top_encode_or_exit(output, c, exit);
-	}
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        self.as_ref().as_bytes().top_encode_or_exit(output, c, exit);
+    }
 }
 
 macro_rules! encode_num_unsigned {
-	($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
-		impl TopEncodeNoErr for $num_type {
-			#[inline]
-			fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
-				output.set_u64(*self as u64);
-			}
-		}
+    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+        impl TopEncodeNoErr for $num_type {
+            #[inline]
+            fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
+                output.set_u64(*self as u64);
+            }
+        }
 
-		top_encode_from_no_err! {$num_type, $type_info}
-	};
+        top_encode_from_no_err! {$num_type, $type_info}
+    };
 }
 
 encode_num_unsigned! {u64, 64, TypeInfo::U64}
@@ -266,16 +266,16 @@ encode_num_unsigned! {u16, 16, TypeInfo::U16}
 encode_num_unsigned! {u8, 8, TypeInfo::U8}
 
 macro_rules! encode_num_signed {
-	($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
-		impl TopEncodeNoErr for $num_type {
-			#[inline]
-			fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
-				output.set_i64(*self as i64);
-			}
-		}
+    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+        impl TopEncodeNoErr for $num_type {
+            #[inline]
+            fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
+                output.set_i64(*self as i64);
+            }
+        }
 
-		top_encode_from_no_err! {$num_type, $type_info}
-	};
+        top_encode_from_no_err! {$num_type, $type_info}
+    };
 }
 
 encode_num_signed! {i64, 64, TypeInfo::I64}
@@ -285,87 +285,87 @@ encode_num_signed! {i16, 16, TypeInfo::I16}
 encode_num_signed! {i8, 8, TypeInfo::I8}
 
 impl TopEncodeNoErr for bool {
-	fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
-		// only using signed because this one is implemented in Arwen, unsigned is not
-		// TODO: change to set_u64
-		output.set_i64(if *self { 1i64 } else { 0i64 });
-	}
+    fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
+        // only using signed because this one is implemented in Arwen, unsigned is not
+        // TODO: change to set_u64
+        output.set_i64(if *self { 1i64 } else { 0i64 });
+    }
 }
 
 top_encode_from_no_err! {bool, TypeInfo::Bool}
 
 impl<T: NestedEncode> TopEncode for Option<T> {
-	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
-	/// to allow disambiguation between e.g. Some(0) and None.
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		match self {
-			Some(v) => {
-				let mut buffer = Vec::<u8>::new();
-				buffer.push_byte(1u8);
-				v.dep_encode(&mut buffer)?;
-				output.set_slice_u8(&buffer[..]);
-			},
-			None => {
-				output.set_slice_u8(&[]);
-			},
-		}
-		Ok(())
-	}
+    /// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
+    /// to allow disambiguation between e.g. Some(0) and None.
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        match self {
+            Some(v) => {
+                let mut buffer = Vec::<u8>::new();
+                buffer.push_byte(1u8);
+                v.dep_encode(&mut buffer)?;
+                output.set_slice_u8(&buffer[..]);
+            },
+            None => {
+                output.set_slice_u8(&[]);
+            },
+        }
+        Ok(())
+    }
 
-	/// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
-	/// to allow disambiguation between e.g. Some(0) and None.
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		match self {
-			Some(v) => {
-				let mut buffer = Vec::<u8>::new();
-				buffer.push_byte(1u8);
-				v.dep_encode_or_exit(&mut buffer, c, exit);
-				output.set_slice_u8(&buffer[..]);
-			},
-			None => {
-				output.set_slice_u8(&[]);
-			},
-		}
-	}
+    /// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
+    /// to allow disambiguation between e.g. Some(0) and None.
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        match self {
+            Some(v) => {
+                let mut buffer = Vec::<u8>::new();
+                buffer.push_byte(1u8);
+                v.dep_encode_or_exit(&mut buffer, c, exit);
+                output.set_slice_u8(&buffer[..]);
+            },
+            None => {
+                output.set_slice_u8(&[]);
+            },
+        }
+    }
 }
 
 impl<T: TopEncode> TopEncode for Box<T> {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.as_ref().top_encode(output)
-	}
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.as_ref().top_encode(output)
+    }
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_ref().top_encode_or_exit(output, c, exit);
-	}
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        self.as_ref().top_encode_or_exit(output, c, exit);
+    }
 }
 
 impl<T: NestedEncode> TopEncode for Box<[T]> {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.as_ref().top_encode(output)
-	}
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.as_ref().top_encode(output)
+    }
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_ref().top_encode_or_exit(output, c, exit);
-	}
+    #[inline]
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        self.as_ref().top_encode_or_exit(output, c, exit);
+    }
 }
 
 macro_rules! tuple_impls {
@@ -397,171 +397,171 @@ macro_rules! tuple_impls {
 }
 
 tuple_impls! {
-	(0 T0)
-	(0 T0 1 T1)
-	(0 T0 1 T1 2 T2)
-	(0 T0 1 T1 2 T2 3 T3)
-	(0 T0 1 T1 2 T2 3 T3 4 T4)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-	(0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+    (0 T0)
+    (0 T0 1 T1)
+    (0 T0 1 T1 2 T2)
+    (0 T0 1 T1 2 T2 3 T3)
+    (0 T0 1 T1 2 T2 3 T3 4 T4)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
+    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }
 
 impl TopEncode for NonZeroUsize {
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.get().top_encode(output)
-	}
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.get().top_encode(output)
+    }
 
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.get().top_encode_or_exit(output, c, exit);
-	}
+    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+        &self,
+        output: O,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        self.get().top_encode_or_exit(output, c, exit);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
 mod tests {
-	use super::super::test_struct::*;
-	use super::*;
-	use crate::test_util::check_top_encode;
-	use core::fmt::Debug;
+    use super::super::test_struct::*;
+    use super::*;
+    use crate::test_util::check_top_encode;
+    use core::fmt::Debug;
 
-	fn ser_ok<V>(element: V, expected_bytes: &[u8])
-	where
-		V: TopEncode + PartialEq + Debug + 'static,
-	{
-		let bytes = check_top_encode(&element);
-		assert_eq!(bytes.as_slice(), expected_bytes);
-	}
+    fn ser_ok<V>(element: V, expected_bytes: &[u8])
+    where
+        V: TopEncode + PartialEq + Debug + 'static,
+    {
+        let bytes = check_top_encode(&element);
+        assert_eq!(bytes.as_slice(), expected_bytes);
+    }
 
-	#[test]
-	fn test_serialize_top_compacted_numbers() {
-		// unsigned positive
-		ser_ok(5u8, &[5]);
-		ser_ok(5u16, &[5]);
-		ser_ok(5u32, &[5]);
-		ser_ok(5u64, &[5]);
-		ser_ok(5usize, &[5]);
-		// signed positive
-		ser_ok(5i8, &[5]);
-		ser_ok(5i16, &[5]);
-		ser_ok(5i32, &[5]);
-		ser_ok(5i64, &[5]);
-		ser_ok(5isize, &[5]);
-		// signed negative
-		ser_ok(-5i8, &[251]);
-		ser_ok(-5i16, &[251]);
-		ser_ok(-5i32, &[251]);
-		ser_ok(-5i64, &[251]);
-		ser_ok(-5isize, &[251]);
-		// non zero usize
-		ser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
-	}
+    #[test]
+    fn test_serialize_top_compacted_numbers() {
+        // unsigned positive
+        ser_ok(5u8, &[5]);
+        ser_ok(5u16, &[5]);
+        ser_ok(5u32, &[5]);
+        ser_ok(5u64, &[5]);
+        ser_ok(5usize, &[5]);
+        // signed positive
+        ser_ok(5i8, &[5]);
+        ser_ok(5i16, &[5]);
+        ser_ok(5i32, &[5]);
+        ser_ok(5i64, &[5]);
+        ser_ok(5isize, &[5]);
+        // signed negative
+        ser_ok(-5i8, &[251]);
+        ser_ok(-5i16, &[251]);
+        ser_ok(-5i32, &[251]);
+        ser_ok(-5i64, &[251]);
+        ser_ok(-5isize, &[251]);
+        // non zero usize
+        ser_ok(NonZeroUsize::new(5).unwrap(), &[5]);
+    }
 
-	#[test]
-	fn test_serialize_top_compacted_numbers_msb_ok() {
-		ser_ok(127i32, &[127]);
-		ser_ok(128i32, &[0, 128]);
-		ser_ok(255i32, &[0, 255]);
+    #[test]
+    fn test_serialize_top_compacted_numbers_msb_ok() {
+        ser_ok(127i32, &[127]);
+        ser_ok(128i32, &[0, 128]);
+        ser_ok(255i32, &[0, 255]);
 
-		ser_ok(-1i32, &[255]);
-		ser_ok(-128i32, &[128]);
-		ser_ok(-129i32, &[255, 127]);
-		ser_ok(-256i32, &[255, 0]);
-		ser_ok(-257i32, &[254, 255]);
-	}
+        ser_ok(-1i32, &[255]);
+        ser_ok(-128i32, &[128]);
+        ser_ok(-129i32, &[255, 127]);
+        ser_ok(-256i32, &[255, 0]);
+        ser_ok(-257i32, &[254, 255]);
+    }
 
-	#[test]
-	fn test_top_compacted_bool() {
-		ser_ok(true, &[1]);
-		ser_ok(false, &[]);
-	}
+    #[test]
+    fn test_top_compacted_bool() {
+        ser_ok(true, &[1]);
+        ser_ok(false, &[]);
+    }
 
-	#[test]
-	fn test_top_compacted_empty_bytes() {
-		let empty_byte_slice: &[u8] = &[];
-		ser_ok(empty_byte_slice, empty_byte_slice);
-	}
+    #[test]
+    fn test_top_compacted_empty_bytes() {
+        let empty_byte_slice: &[u8] = &[];
+        ser_ok(empty_byte_slice, empty_byte_slice);
+    }
 
-	#[test]
-	fn test_top_compacted_bytes() {
-		ser_ok(&[1u8, 2u8, 3u8][..], &[1u8, 2u8, 3u8]);
-	}
+    #[test]
+    fn test_top_compacted_bytes() {
+        ser_ok(&[1u8, 2u8, 3u8][..], &[1u8, 2u8, 3u8]);
+    }
 
-	#[test]
-	fn test_top_compacted_vec_u8() {
-		let some_vec = [1u8, 2u8, 3u8].to_vec();
-		ser_ok(some_vec, &[1u8, 2u8, 3u8]);
-	}
+    #[test]
+    fn test_top_compacted_vec_u8() {
+        let some_vec = [1u8, 2u8, 3u8].to_vec();
+        ser_ok(some_vec, &[1u8, 2u8, 3u8]);
+    }
 
-	#[test]
-	fn test_top_encode_str() {
-		let s = "abc";
-		ser_ok(s, &[b'a', b'b', b'c']);
-		ser_ok(String::from(s), &[b'a', b'b', b'c']);
-		ser_ok(String::from(s).into_boxed_str(), &[b'a', b'b', b'c']);
-	}
+    #[test]
+    fn test_top_encode_str() {
+        let s = "abc";
+        ser_ok(s, &[b'a', b'b', b'c']);
+        ser_ok(String::from(s), &[b'a', b'b', b'c']);
+        ser_ok(String::from(s).into_boxed_str(), &[b'a', b'b', b'c']);
+    }
 
-	#[test]
-	fn test_top_compacted_vec_i32() {
-		let some_vec = [1i32, 2i32, 3i32].to_vec();
-		let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
-		ser_ok(some_vec, expected);
-	}
+    #[test]
+    fn test_top_compacted_vec_i32() {
+        let some_vec = [1i32, 2i32, 3i32].to_vec();
+        let expected: &[u8] = &[0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3];
+        ser_ok(some_vec, expected);
+    }
 
-	#[test]
-	fn test_struct() {
-		let test = Test {
-			int: 1,
-			seq: [5, 6].to_vec(),
-			another_byte: 7,
-		};
+    #[test]
+    fn test_struct() {
+        let test = Test {
+            int: 1,
+            seq: [5, 6].to_vec(),
+            another_byte: 7,
+        };
 
-		ser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
-	}
+        ser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
+    }
 
-	#[test]
-	fn test_tuple() {
-		ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
-	}
+    #[test]
+    fn test_tuple() {
+        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
+    }
 
-	#[test]
-	fn test_unit() {
-		ser_ok((), &[]);
-	}
+    #[test]
+    fn test_unit() {
+        ser_ok((), &[]);
+    }
 
-	#[test]
-	fn test_enum() {
-		let u = E::Unit;
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-		ser_ok(u, expected);
+    #[test]
+    fn test_enum() {
+        let u = E::Unit;
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
+        ser_ok(u, expected);
 
-		let n = E::Newtype(1);
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-		ser_ok(n, expected);
+        let n = E::Newtype(1);
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
+        ser_ok(n, expected);
 
-		let t = E::Tuple(1, 2);
-		let expected: &[u8] = &[
-			/*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
-			2, /*)*/
-		];
-		ser_ok(t, expected);
+        let t = E::Tuple(1, 2);
+        let expected: &[u8] = &[
+            /*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
+            2, /*)*/
+        ];
+        ser_ok(t, expected);
 
-		let s = E::Struct { a: 1 };
-		let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-		ser_ok(s, expected);
-	}
+        let s = E::Struct { a: 1 };
+        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
+        ser_ok(s, expected);
+    }
 }

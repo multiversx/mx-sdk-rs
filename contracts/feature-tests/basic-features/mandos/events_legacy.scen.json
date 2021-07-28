@@ -38,8 +38,10 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a",
-                        "topics": [],
+                        "endpoint": "str:logLegacyEventA",
+                        "topics": [
+                            "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a"
+                        ],
                         "data": "0"
                     }
                 ],
@@ -67,8 +69,10 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a",
-                        "topics": [],
+                        "endpoint": "str:logLegacyEventA",
+                        "topics": [
+                            "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a"
+                        ],
                         "data": "0x1234abc"
                     }
                 ],
@@ -98,8 +102,9 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "identifier": "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b",
+                        "endpoint": "str:logLegacyEventB",
                         "topics": [
+                            "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b",
                             "0x00000000000000000000000000000000000000000000000000000000000000a1",
                             "``arg2_an_address_______________s3"
                         ],

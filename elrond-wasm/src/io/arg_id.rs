@@ -7,19 +7,19 @@
 pub struct ArgId(&'static [u8]);
 
 impl From<&'static [u8]> for ArgId {
-	#[inline]
-	fn from(static_bytes: &'static [u8]) -> Self {
-		ArgId(static_bytes)
-	}
+    #[inline]
+    fn from(static_bytes: &'static [u8]) -> Self {
+        ArgId(static_bytes)
+    }
 }
 
 impl ArgId {
-	pub fn as_bytes(&self) -> &'static [u8] {
-		self.0
-	}
+    pub fn as_bytes(&self) -> &'static [u8] {
+        self.0
+    }
 
-	#[inline]
-	pub fn empty() -> Self {
-		ArgId::from(&[][..])
-	}
+    #[inline]
+    pub fn empty() -> Self {
+        ArgId::from(&[][..])
+    }
 }

@@ -1,48 +1,54 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait DeployContractModule {
-	#[endpoint(deployContract)]
-	fn deploy_contract(
-		&self,
-		code: BoxedBytes,
-		#[var_args] arguments: VarArgs<BoxedBytes>,
-	) -> SCResult<Address> {
-		let deployed_contract_address = self
-			.deploy(&code, &arguments.into_vec())
-			.ok_or("Deploy failed")?;
+    #[proxy]
+    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
 
-		Ok(deployed_contract_address)
-	}
+    #[endpoint]
+    fn deploy_contract(&self, code: BoxedBytes) -> SCResult<Address> {
+        let deployed_contract_address = self.deploy_vault(&code).ok_or("Deploy failed")?;
 
-	#[endpoint(deployTwoContracts)]
-	fn deploy_two_contracts(
-		&self,
-		code: BoxedBytes,
-		#[var_args] arguments: VarArgs<BoxedBytes>,
-	) -> SCResult<(Address, Address)> {
-		let args_as_vec = arguments.into_vec();
-		let first_deployed_contract_address = self
-			.deploy(&code, &args_as_vec)
-			.ok_or("First deploy failed")?;
+        Ok(deployed_contract_address)
+    }
 
-		let second_deployed_contract_address = self
-			.deploy(&code, &args_as_vec)
-			.ok_or("Second deploy failed")?;
+    #[endpoint(deployFromSource)]
+    fn deploy_from_source(
+        &self,
+        source_contract_address: Address,
+        #[var_args] arguments: VarArgs<BoxedBytes>,
+    ) -> SCResult<Address> {
+        self.send()
+            .deploy_from_source_contract(
+                self.blockchain().get_gas_left(),
+                &Self::BigUint::zero(),
+                &source_contract_address,
+                CodeMetadata::DEFAULT,
+                &arguments.as_slice().into(),
+            )
+            .ok_or("Deploy from source contract failed")
+            .into()
+    }
 
-		Ok((
-			first_deployed_contract_address,
-			second_deployed_contract_address,
-		))
-	}
+    #[endpoint]
+    fn deploy_two_contracts(&self, code: BoxedBytes) -> SCResult<MultiResult2<Address, Address>> {
+        let first_deployed_contract_address =
+            self.deploy_vault(&code).ok_or("First deploy failed")?;
 
-	fn deploy(&self, code: &BoxedBytes, arguments: &[BoxedBytes]) -> Option<Address> {
-		self.send().deploy_contract(
-			self.blockchain().get_gas_left(),
-			&Self::BigUint::zero(),
-			code,
-			CodeMetadata::DEFAULT,
-			&arguments.into(),
-		)
-	}
+        let second_deployed_contract_address =
+            self.deploy_vault(&code).ok_or("Second deploy failed")?;
+
+        Ok((
+            first_deployed_contract_address,
+            second_deployed_contract_address,
+        )
+            .into())
+    }
+
+    #[endpoint]
+    fn deploy_vault(&self, code: &BoxedBytes) -> Option<Address> {
+        self.vault_proxy()
+            .init()
+            .deploy_contract(code, CodeMetadata::DEFAULT)
+    }
 }
