@@ -120,6 +120,18 @@
         },
         "expect": {
             "status": "0",
+            "logs": [
+              {
+                  "address": "sc:crowdfunding",
+                  "endpoint": "str:ESDTTransfer",
+                  "topics": [
+                      "str:CROWD-123456",
+                      "500,000,000,000",
+                      "address:my_address"
+                  ],
+                  "data": ""
+              }
+            ],
             "gas": "*",
             "refund": "*"
         }

@@ -27,8 +27,9 @@
                 "logs": [
                     {
                         "address": "sc:egld-esdt-swap",
-                        "identifier": "str:unwrap-egld",
+                        "endpoint": "str:unwrapEgld",
                         "topics": [
+                            "str:unwrap-egld",
                             "address:user"
                         ],
                         "data": "300"

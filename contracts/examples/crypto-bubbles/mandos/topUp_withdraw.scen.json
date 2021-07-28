@@ -14,9 +14,7 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "''owner": "address:crypto_bubbles_owner"
-                    },
+                    "storage": {},
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
@@ -45,8 +43,9 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:topUp",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc1"
                         ],
                         "data": "0x4000000"
@@ -76,8 +75,9 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000002",
+                        "endpoint": "str:withdraw",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000002",
                             "address:acc1"
                         ],
                         "data": "0x4000000"
@@ -99,9 +99,7 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "''owner": "address:crypto_bubbles_owner"
-                    },
+                    "storage": {},
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {

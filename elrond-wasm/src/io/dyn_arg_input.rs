@@ -20,19 +20,19 @@ use elrond_codec::TopDecodeInput;
 /// - deserializing callback arguments saved to storage, from a call data string
 ///
 pub trait DynArgInput<I: TopDecodeInput>: ErrorApi + Sized {
-	/// Check if there are more arguments that can be loaded.
-	fn has_next(&self) -> bool;
+    /// Check if there are more arguments that can be loaded.
+    fn has_next(&self) -> bool;
 
-	/// Retrieves an input for deserializing an argument.
-	/// If the loader is out of arguments, it will crash by itself with an appropriate error,
-	/// without returning.
-	/// Use if the next argument is optional, use `has_next` beforehand.
-	fn next_arg_input(&mut self) -> I;
+    /// Retrieves an input for deserializing an argument.
+    /// If the loader is out of arguments, it will crash by itself with an appropriate error,
+    /// without returning.
+    /// Use if the next argument is optional, use `has_next` beforehand.
+    fn next_arg_input(&mut self) -> I;
 
-	/// Called after retrieving all arguments to validate that extra arguments were not provided.
-	fn assert_no_more_args(&self) {
-		if self.has_next() {
-			self.signal_error(err_msg::ARG_WRONG_NUMBER);
-		}
-	}
+    /// Called after retrieving all arguments to validate that extra arguments were not provided.
+    fn assert_no_more_args(&self) {
+        if self.has_next() {
+            self.signal_error(err_msg::ARG_WRONG_NUMBER);
+        }
+    }
 }

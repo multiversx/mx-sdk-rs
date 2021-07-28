@@ -11,41 +11,41 @@ use elrond_codec::test_util::{check_top_decode, check_top_encode, check_top_enco
 /// NOT recommended!
 #[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Debug)]
 enum TrickyEnumWithDefault {
-	FirstVariant,
-	SecondVariant,
-	VariantWithFields {
-		int: u16,
-		seq: Vec<u8>,
-		another_byte: u8,
-		uint_32: u32,
-		uint_64: u64,
-	},
+    FirstVariant,
+    SecondVariant,
+    VariantWithFields {
+        int: u16,
+        seq: Vec<u8>,
+        another_byte: u8,
+        uint_32: u32,
+        uint_64: u64,
+    },
 }
 
 impl elrond_codec::EncodeDefault for TrickyEnumWithDefault {
-	fn is_default(&self) -> bool {
-		matches!(self, TrickyEnumWithDefault::SecondVariant)
-	}
+    fn is_default(&self) -> bool {
+        matches!(self, TrickyEnumWithDefault::SecondVariant)
+    }
 }
 
 impl elrond_codec::DecodeDefault for TrickyEnumWithDefault {
-	fn default() -> Self {
-		TrickyEnumWithDefault::SecondVariant
-	}
+    fn default() -> Self {
+        TrickyEnumWithDefault::SecondVariant
+    }
 }
 
 #[test]
 fn tricky_enum_defaults() {
-	// the default
-	check_top_encode_decode(TrickyEnumWithDefault::SecondVariant, &[]);
+    // the default
+    check_top_encode_decode(TrickyEnumWithDefault::SecondVariant, &[]);
 
-	// so this is the tricky bit, FirstVariant also serializes to `&[]`
-	// being variant #0, and because we are serializing fieldless enums as top-level u8.
-	// TODO: perhaps add an edge case to the code generation?
-	// Not sure if worth it, since this is somewhat of an antipattern.
-	assert_eq!(check_top_encode(&TrickyEnumWithDefault::FirstVariant), &[]);
+    // so this is the tricky bit, FirstVariant also serializes to `&[]`
+    // being variant #0, and because we are serializing fieldless enums as top-level u8.
+    // TODO: perhaps add an edge case to the code generation?
+    // Not sure if worth it, since this is somewhat of an antipattern.
+    assert_eq!(check_top_encode(&TrickyEnumWithDefault::FirstVariant), &[]);
 
-	// we can deserialize it from [0], but this is not what gets serialized
-	// unlike the fieldless enum, only precisely one "0" byte allowed
-	assert_eq!(TrickyEnumWithDefault::FirstVariant, check_top_decode(&[0]));
+    // we can deserialize it from [0], but this is not what gets serialized
+    // unlike the fieldless enum, only precisely one "0" byte allowed
+    assert_eq!(TrickyEnumWithDefault::FirstVariant, check_top_decode(&[0]));
 }
