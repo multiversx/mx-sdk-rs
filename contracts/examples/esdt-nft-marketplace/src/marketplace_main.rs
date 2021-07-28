@@ -115,7 +115,6 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             },
             nr_auctioned_tokens: nft_amount,
             auction_type,
-            auction_status: AuctionStatus::Running,
 
             payment_token: EsdtToken {
                 token_type: accepted_payment_token,
@@ -151,6 +150,10 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
         let caller = self.blockchain().get_caller();
         let current_time = self.blockchain().get_block_timestamp();
 
+        require!(
+            auction.auction_type != AuctionType::SftOnePerPayment,
+            "Cannot bid on this type of auction"
+        );
         require!(
             auction.auctioned_token.token_type == nft_type
                 && auction.auctioned_token.nonce == nft_nonce,
@@ -208,7 +211,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
 
     #[endpoint(endAuction)]
     fn end_auction(&self, auction_id: u64) -> SCResult<()> {
-        let mut auction = self.try_get_auction(auction_id)?;
+        let auction = self.try_get_auction(auction_id)?;
         let current_time = self.blockchain().get_block_timestamp();
 
         let deadline_reached = current_time > auction.deadline;
@@ -223,26 +226,19 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             "Auction deadline has not passed nor is the current bid equal to max bid"
         );
         require!(
-            auction.auction_status == AuctionStatus::Running,
-            "Auction already ended"
+            auction.auction_type != AuctionType::SftOnePerPayment,
+            "Cannot end this type of auction"
         );
 
         self.distribute_tokens_after_auction_end(&auction);
-
-        if auction.auction_type == AuctionType::SftOnePerPayment {
-            auction.auction_status = AuctionStatus::SftWaitingForBuyOrOwnerClaim;
-            auction.nr_auctioned_tokens -= &NFT_AMOUNT.into();
-            self.auction_by_id(auction_id).set(&auction);
-        } else {
-            self.auction_by_id(auction_id).clear();
-        }
+        self.auction_by_id(auction_id).clear();
 
         Ok(())
     }
 
     #[payable("*")]
-    #[endpoint(buySftAfterEndAuction)]
-    fn buy_sft_after_end_auction(
+    #[endpoint(buySft)]
+    fn buy_sft(
         &self,
         #[payment_token] payment_token: TokenIdentifier,
         #[payment_nonce] payment_token_nonce: u64,
@@ -252,16 +248,17 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
         nft_nonce: u64,
     ) -> SCResult<()> {
         let mut auction = self.try_get_auction(auction_id)?;
+        let current_time = self.blockchain().get_block_timestamp();
         let caller = self.blockchain().get_caller();
 
+        require!(
+            auction.auction_type == AuctionType::SftOnePerPayment,
+            "Cannot buy SFT for this type of auction"
+        );
         require!(
             auction.auctioned_token.token_type == nft_type
                 && auction.auctioned_token.nonce == nft_nonce,
             "Auction ID does not match the token"
-        );
-        require!(
-            auction.auction_status == AuctionStatus::SftWaitingForBuyOrOwnerClaim,
-            "Cannot buy SFT for this auction"
         );
         require!(
             payment_token == auction.payment_token.token_type
@@ -269,11 +266,16 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             "Wrong token used as payment"
         );
         require!(
-            auction.current_bid == payment_amount,
-            "Wrong amount paid, must pay equal to current winning bid"
+            auction.min_bid == payment_amount,
+            "Wrong amount paid, must pay equal to the selling price"
+        );
+        require!(
+            current_time <= auction.deadline,
+            "Cannot buy SFT after deadline"
         );
 
         auction.current_winner = caller;
+        auction.current_bid = payment_amount;
         self.distribute_tokens_after_auction_end(&auction);
 
         auction.nr_auctioned_tokens -= &NFT_AMOUNT.into();
@@ -296,8 +298,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             "Only the original owner can withdraw"
         );
         require!(
-            auction.current_bid == 0
-                || auction.auction_status == AuctionStatus::SftWaitingForBuyOrOwnerClaim,
+            auction.current_bid == 0 || auction.auction_type == AuctionType::SftOnePerPayment,
             "Can't withdraw, NFT already has bids"
         );
 

@@ -6,7 +6,6 @@ pub struct Auction<BigUint: BigUintApi> {
     pub auctioned_token: EsdtToken,
     pub nr_auctioned_tokens: BigUint,
     pub auction_type: AuctionType,
-    pub auction_status: AuctionStatus,
 
     pub payment_token: EsdtToken,
     pub min_bid: BigUint,
@@ -27,13 +26,6 @@ pub enum AuctionType {
     Nft,
     SftAll,
     SftOnePerPayment,
-}
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq)]
-pub enum AuctionStatus {
-    None,
-    Running,
-    SftWaitingForBuyOrOwnerClaim,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
