@@ -169,7 +169,7 @@ pub trait Erc1155 {
         if !is_receiver_smart_contract {
             let amount = Self::BigUint::from(1u32);
             self.increase_balance(to, type_id, &amount);
-            self.token_owner(type_id, nft_id).set(&to);
+            self.token_owner(type_id, nft_id).set(to);
         } else {
             self.token_owner(type_id, nft_id).set(&Address::zero());
         }
@@ -207,7 +207,7 @@ pub trait Erc1155 {
         }
 
         self.last_valid_type_id().set(&type_id);
-        self.token_type_uri(&type_id).set(&uri);
+        self.token_type_uri(&type_id).set(uri);
 
         type_id
     }

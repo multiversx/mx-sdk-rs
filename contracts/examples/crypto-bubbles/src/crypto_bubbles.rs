@@ -88,7 +88,7 @@ pub trait CryptoBubbles {
         winner: &Address,
         prize: &Self::BigUint,
     ) -> SCResult<()> {
-        self.player_balance(&winner)
+        self.player_balance(winner)
             .update(|balance| *balance += prize);
 
         self.reward_winner_event(game_index, winner, prize);
