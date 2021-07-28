@@ -12,7 +12,7 @@ let crowdfunding = await erdSys.loadWrapper("contracts/examples/crowdfunding-esd
 let someTimeFromNow = await erdSys.currentNonce() + erdjs.minutesToNonce(1);
 
 // Deploy the crowdfunding contract with a target of 2 EGLD
-await crowdfunding.sender(alice).gas(50_000_000).deploy(Egld(2), someTimeFromNow, Egld);
+await crowdfunding.sender(alice).gas(50_000_000).call.deploy(Egld(2), someTimeFromNow, Egld);
 
 // Bob and carol contribute 1.5 EGLD each
 await crowdfunding.sender(bob).gas(10_000_000).value(Egld(1.5)).call.fund();

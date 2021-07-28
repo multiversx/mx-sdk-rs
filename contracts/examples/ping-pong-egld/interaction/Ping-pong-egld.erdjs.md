@@ -8,7 +8,7 @@ let { erdSys, Egld, wallets: { alice, bob, carol, dan } } = await erdjs.setupInt
 
 let pingPong = await erdSys.loadWrapper("contracts/examples/ping-pong-egld");
 
-await pingPong.sender(alice).gas(150_000_000).deploy(Egld(0.5), 2 * 60, null, Egld(1.5));
+await pingPong.sender(alice).gas(150_000_000).call.deploy(Egld(0.5), 2 * 60, null, Egld(1.5));
 
 await pingPong.gas(20_000_000).sender(alice).value(Egld(0.5)).ping("note 1");
 

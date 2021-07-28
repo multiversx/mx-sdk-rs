@@ -20,7 +20,7 @@ await erdSys.sender(alice).value(MyToken(200.0)).send(carol);
 let someTimeFromNow = await erdSys.currentNonce() + erdjs.minutesToNonce(1);
 
 // Deploy the crowdfunding contract
-await crowdfunding.sender(alice).gas(50_000_000).deploy(MyToken(2), someTimeFromNow, MyToken);
+await crowdfunding.sender(alice).gas(50_000_000).call.deploy(MyToken(2), someTimeFromNow, MyToken);
 
 // Bob and carol contribute 1.5 MYTOKEN each
 await crowdfunding.sender(bob).gas(10_000_000).value(MyToken(1.5)).call.fund();
