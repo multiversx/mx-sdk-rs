@@ -41,7 +41,7 @@ pub trait Factory {
 
     #[view(getPair)]
     fn get_pair(&self, token_id_pair: &TokenIdPair) -> Option<Address> {
-        let address = self.pairs().get(&token_id_pair);
+        let address = self.pairs().get(token_id_pair);
 
         if address.is_none() {
             self.pairs().get(&TokenIdPair {
