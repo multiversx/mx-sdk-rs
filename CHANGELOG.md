@@ -9,10 +9,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - New math hooks exposed from Arwen:
 	- `pow`, `log2`, `sqrt`
 	- cryptography: elliptic curves
- - `deploy_contract` now returns `Option<Address>`
+- `deploy_contract` now returns `Option<Address>`
+- `deploy_from_source_contract` API
+- Send API refactored for more consistency and ease of use.
 - High level proxies can be used to deploy contracts.
 - Mandos log syntax updated, to match Arwen.
-- A better `#[only_owner]` annotation, which can be applied directly to endoint methods.
+- A better `#[only_owner]` annotation, which can be applied directly to endoint methods. This annotation also shows up in the ABI.
 - `elrond-wasm-derive` now an optional dependency of `elrond-wasm`. Use `#[elrond_wasm::contract]` instead of `#[elrond_wasm_derive::contract]` now. Same for proxies and modules.
 
 ## [elrond-wasm 0.17.4] - 2021-06-30
