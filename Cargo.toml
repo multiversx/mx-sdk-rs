@@ -76,7 +76,11 @@ members = [
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/abi",
 
+  "contracts/modules/elrond-wasm-module-bonding-curve",
+  "contracts/modules/elrond-wasm-module-dns",
+  "contracts/modules/elrond-wasm-module-esdt",
   "contracts/modules/elrond-wasm-module-features",
+  "contracts/modules/elrond-wasm-module-governance",
   "contracts/modules/elrond-wasm-module-pause",
   "contracts/modules/elrond-wasm-module-users",
 
