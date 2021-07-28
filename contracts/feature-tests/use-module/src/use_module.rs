@@ -17,29 +17,29 @@ use elrond_wasm_module_features::feature_guard;
 /// - PauseModule
 #[elrond_wasm::contract]
 pub trait UseModule:
-	internal_mod_a::InternalModuleA
-	+ internal_mod_b::InternalModuleB
-	+ internal_mod_c::InternalModuleC
-	+ elrond_wasm_module_dns::DnsModule
-	+ elrond_wasm_module_esdt::EsdtModule
-	+ elrond_wasm_module_features::FeaturesModule
-	+ elrond_wasm_module_governance::GovernanceModule
-	+ elrond_wasm_module_governance::governance_configurable::GovernanceConfigurablePropertiesModule
-	+ elrond_wasm_module_pause::PauseModule
+    internal_mod_a::InternalModuleA
+    + internal_mod_b::InternalModuleB
+    + internal_mod_c::InternalModuleC
+    + elrond_wasm_module_dns::DnsModule
+    + elrond_wasm_module_esdt::EsdtModule
+    + elrond_wasm_module_features::FeaturesModule
+    + elrond_wasm_module_governance::GovernanceModule
+    + elrond_wasm_module_governance::governance_configurable::GovernanceConfigurablePropertiesModule
+    + elrond_wasm_module_pause::PauseModule
 {
-	#[init]
-	fn init(&self) {}
+    #[init]
+    fn init(&self) {}
 
-	/// Validates that the "featureName" feature is on.
-	/// Uses the `feature_guard!` macro.
-	#[endpoint(checkFeatureGuard)]
-	fn check_feature_guard(&self) -> SCResult<()> {
-		feature_guard!(self, b"featureName", true);
-		Ok(())
-	}
+    /// Validates that the "featureName" feature is on.
+    /// Uses the `feature_guard!` macro.
+    #[endpoint(checkFeatureGuard)]
+    fn check_feature_guard(&self) -> SCResult<()> {
+        feature_guard!(self, b"featureName", true);
+        Ok(())
+    }
 
-	#[endpoint(checkPause)]
-	fn check_pause(&self) -> SCResult<bool> {
-		Ok(self.is_paused())
-	}
+    #[endpoint(checkPause)]
+    fn check_pause(&self) -> SCResult<bool> {
+        Ok(self.is_paused())
+    }
 }

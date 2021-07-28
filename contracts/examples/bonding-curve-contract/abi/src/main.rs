@@ -1,3 +1,3 @@
 fn main() {
-	elrond_wasm_debug::abi_json::print_abi::<bonding_curve_contract::AbiProvider>();
+    elrond_wasm_debug::abi_json::print_abi::<bonding_curve_contract::AbiProvider>();
 }

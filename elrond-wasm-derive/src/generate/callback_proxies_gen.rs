@@ -3,22 +3,22 @@ use crate::model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, Pu
 
 /// Excludes the `#[call_result]` and the payment args.
 pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::TokenStream> {
-	method_args
-		.iter()
-		.filter_map(|arg| {
-			if arg.metadata.payment.is_payment_arg() || arg.metadata.callback_call_result {
-				None
-			} else {
-				let pat = &arg.pat;
-				let ty = &arg.ty;
-				Some(quote! {#pat : #ty })
-			}
-		})
-		.collect()
+    method_args
+        .iter()
+        .filter_map(|arg| {
+            if arg.metadata.payment.is_payment_arg() || arg.metadata.callback_call_result {
+                None
+            } else {
+                let pat = &arg.pat;
+                let ty = &arg.ty;
+                Some(quote! {#pat : #ty })
+            }
+        })
+        .collect()
 }
 
 pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::TokenStream {
-	let proxy_methods: Vec<proc_macro2::TokenStream> = methods
+    let proxy_methods: Vec<proc_macro2::TokenStream> = methods
 		.iter()
 		.filter_map(|m| {
 			if let PublicRole::Callback(callback) = &m.public_role {
@@ -64,39 +64,39 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 		})
 		.collect();
 
-	let callback_proxy_object_def = snippets::callback_proxy_object_def();
+    let callback_proxy_object_def = snippets::callback_proxy_object_def();
 
-	quote! {
-		#callback_proxy_object_def
+    quote! {
+        #callback_proxy_object_def
 
-		pub trait CallbackProxy: elrond_wasm::api::CallbackProxyObjApi + Sized {
-			#(#proxy_methods)*
-		}
+        pub trait CallbackProxy: elrond_wasm::api::CallbackProxyObjApi + Sized {
+            #(#proxy_methods)*
+        }
 
-		impl<SA> self::CallbackProxy for CallbackProxyObj<SA> where SA: elrond_wasm::api::SendApi + 'static {}
-	}
+        impl<SA> self::CallbackProxy for CallbackProxyObj<SA> where SA: elrond_wasm::api::SendApi + 'static {}
+    }
 }
 
 pub fn generate_callback_proxies(
-	contract: &ContractTrait,
+    contract: &ContractTrait,
 ) -> (
-	proc_macro2::TokenStream,
-	proc_macro2::TokenStream,
-	proc_macro2::TokenStream,
+    proc_macro2::TokenStream,
+    proc_macro2::TokenStream,
+    proc_macro2::TokenStream,
 ) {
-	if contract.callback_count() == 0 {
-		(quote! {}, quote! {}, quote! {})
-	} else {
-		(
-			quote! {
-				fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi>;
-			},
-			quote! {
-				fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi> {
-					<self::CallbackProxyObj::<Self::SendApi> as elrond_wasm::api::CallbackProxyObjApi>::new_cb_proxy_obj(self.send())
-				}
-			},
-			generate_callback_proxies_object(contract.methods.as_slice()),
-		)
-	}
+    if contract.callback_count() == 0 {
+        (quote! {}, quote! {}, quote! {})
+    } else {
+        (
+            quote! {
+                fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi>;
+            },
+            quote! {
+                fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi> {
+                    <self::CallbackProxyObj::<Self::SendApi> as elrond_wasm::api::CallbackProxyObjApi>::new_cb_proxy_obj(self.send())
+                }
+            },
+            generate_callback_proxies_object(contract.methods.as_slice()),
+        )
+    }
 }
