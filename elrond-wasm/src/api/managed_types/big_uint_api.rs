@@ -14,65 +14,65 @@ use alloc::vec::Vec;
 /// Since most values in smart contracts will not be signed, as well as for safety,
 /// most of the functionality if provided for unsigned integers.
 pub trait BigUintApi:
-	Sized
-	+ From<u64>
-	+ From<u32>
-	+ From<usize>
-	+ Clone
-	+ Default
-	+ Add<Output = Self>
-	+ AddAssign
-	+ Sub<Output = Self>
-	+ SubAssign
-	+ Mul<Output = Self>
-	+ MulAssign
-	+ Div<Output = Self>
-	+ DivAssign
-	+ Rem<Output = Self>
-	+ RemAssign
-	+ BitAnd<Output = Self>
-	+ BitAndAssign
-	+ BitOr<Output = Self>
-	+ BitOrAssign
-	+ BitXor<Output = Self>
-	+ BitXorAssign
-	+ Shr<usize, Output = Self>
-	+ ShrAssign<usize>
-	+ Shl<usize, Output = Self>
-	+ ShlAssign<usize>
-	+ PartialEq<Self>
-	+ Eq
-	+ PartialOrd<Self>
-	+ Ord
-	+ PartialEq<u64>
-	+ PartialOrd<u64>
-	+ elrond_codec::NestedEncode
-	+ elrond_codec::TopEncode
-	+ elrond_codec::NestedDecode
-	+ elrond_codec::TopDecode
-	+ abi::TypeAbi
+    Sized
+    + From<u64>
+    + From<u32>
+    + From<usize>
+    + Clone
+    + Default
+    + Add<Output = Self>
+    + AddAssign
+    + Sub<Output = Self>
+    + SubAssign
+    + Mul<Output = Self>
+    + MulAssign
+    + Div<Output = Self>
+    + DivAssign
+    + Rem<Output = Self>
+    + RemAssign
+    + BitAnd<Output = Self>
+    + BitAndAssign
+    + BitOr<Output = Self>
+    + BitOrAssign
+    + BitXor<Output = Self>
+    + BitXorAssign
+    + Shr<usize, Output = Self>
+    + ShrAssign<usize>
+    + Shl<usize, Output = Self>
+    + ShlAssign<usize>
+    + PartialEq<Self>
+    + Eq
+    + PartialOrd<Self>
+    + Ord
+    + PartialEq<u64>
+    + PartialOrd<u64>
+    + elrond_codec::NestedEncode
+    + elrond_codec::TopEncode
+    + elrond_codec::NestedDecode
+    + elrond_codec::TopDecode
+    + abi::TypeAbi
 {
-	fn zero() -> Self {
-		0u64.into()
-	}
+    fn zero() -> Self {
+        0u64.into()
+    }
 
-	fn byte_length(&self) -> i32;
+    fn byte_length(&self) -> i32;
 
-	fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32;
+    fn copy_to_slice_big_endian(&self, slice: &mut [u8]) -> i32;
 
-	fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]);
+    fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]);
 
-	fn to_bytes_be(&self) -> Vec<u8>;
+    fn to_bytes_be(&self) -> Vec<u8>;
 
-	fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
+    fn to_bytes_be_pad_right(&self, nr_bytes: usize) -> Option<Vec<u8>>;
 
-	fn from_bytes_be(bytes: &[u8]) -> Self;
+    fn from_bytes_be(bytes: &[u8]) -> Self;
 
-	fn sqrt(&self) -> Self;
+    fn sqrt(&self) -> Self;
 
-	fn pow(&self, exp: u32) -> Self;
+    fn pow(&self, exp: u32) -> Self;
 
-	fn log2(&self) -> u32;
-	/// Will return `None` if the number is too big to be converted.
-	fn to_u64(&self) -> Option<u64>;
+    fn log2(&self) -> u32;
+    /// Will return `None` if the number is too big to be converted.
+    fn to_u64(&self) -> Option<u64>;
 }

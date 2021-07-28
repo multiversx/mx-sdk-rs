@@ -11,9 +11,9 @@ pub struct EmptyStruct2 {}
 
 #[test]
 fn empty_struct_test() {
-	check_top_encode_decode(EmptyStruct1, &[]);
-	check_dep_encode_decode(EmptyStruct1, &[]);
+    check_top_encode_decode(EmptyStruct1, &[]);
+    check_dep_encode_decode(EmptyStruct1, &[]);
 
-	check_top_encode_decode(EmptyStruct2 {}, &[]);
-	check_dep_encode_decode(EmptyStruct2 {}, &[]);
+    check_top_encode_decode(EmptyStruct2 {}, &[]);
+    check_dep_encode_decode(EmptyStruct2 {}, &[]);
 }

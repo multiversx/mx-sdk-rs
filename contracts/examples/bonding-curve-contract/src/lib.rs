@@ -7,12 +7,12 @@ use elrond_wasm_module_bonding_curve::utils::{events, owner_endpoints, storage, 
 
 #[elrond_wasm::contract]
 pub trait Contract:
-	elrond_wasm_module_bonding_curve::BondingCurveModule
-	+ storage::StorageModule
-	+ events::EventsModule
-	+ user_endpoints::UserEndpointsModule
-	+ owner_endpoints::OwnerEndpointsModule
+    elrond_wasm_module_bonding_curve::BondingCurveModule
+    + storage::StorageModule
+    + events::EventsModule
+    + user_endpoints::UserEndpointsModule
+    + owner_endpoints::OwnerEndpointsModule
 {
-	#[init]
-	fn init(&self) {}
+    #[init]
+    fn init(&self) {}
 }

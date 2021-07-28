@@ -1,81 +1,81 @@
 use super::{
-	arg_regular::*,
-	method_call_gen::{
-		generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
-	},
-	payable_gen::*,
-	util::*,
+    arg_regular::*,
+    method_call_gen::{
+        generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
+    },
+    payable_gen::*,
+    util::*,
 };
 use crate::model::{ContractTrait, Method, PublicRole, Supertrait};
 
 pub fn generate_callback_selector_and_main(
-	contract: &ContractTrait,
+    contract: &ContractTrait,
 ) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
-	let raw_decl = find_raw_callback(&contract.methods);
-	if let Some(raw) = raw_decl {
-		let as_call_method = generate_call_method_body(&raw);
-		let cb_selector_body = quote! {
-			#as_call_method
-			elrond_wasm::types::CallbackSelectorResult::Processed
-		};
-		let cb_main_body = quote! {
-			let _ = self.callback_selector(elrond_wasm::hex_call_data::HexCallDataDeserializer::new(&[]));
-		};
-		(cb_selector_body, cb_main_body)
-	} else {
-		let match_arms: Vec<proc_macro2::TokenStream> = match_arms(contract.methods.as_slice());
-		let module_calls: Vec<proc_macro2::TokenStream> =
-			module_calls(contract.supertraits.as_slice());
-		if match_arms.is_empty() && module_calls.is_empty() {
-			let cb_selector_body = quote! {
-				elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_data_deserializer___)
-			};
-			let cb_main_body = quote! {};
-			(cb_selector_body, cb_main_body)
-		} else {
-			let cb_selector_body = callback_selector_body(match_arms, module_calls);
-			let cb_main_body = quote! {
-				let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.blockchain());
-				let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.get_storage_raw(), &___tx_hash___.as_bytes());
-				elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &___tx_hash___.as_bytes(), &[]); // cleanup
-				let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
-				if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
-					self::EndpointWrappers::callback_selector(self, ___cb_data_deserializer___)	{
-					self.error_api().signal_error(err_msg::CALLBACK_BAD_FUNC);
-				}
-			};
-			(cb_selector_body, cb_main_body)
-		}
-	}
+    let raw_decl = find_raw_callback(&contract.methods);
+    if let Some(raw) = raw_decl {
+        let as_call_method = generate_call_method_body(&raw);
+        let cb_selector_body = quote! {
+            #as_call_method
+            elrond_wasm::types::CallbackSelectorResult::Processed
+        };
+        let cb_main_body = quote! {
+            let _ = self.callback_selector(elrond_wasm::hex_call_data::HexCallDataDeserializer::new(&[]));
+        };
+        (cb_selector_body, cb_main_body)
+    } else {
+        let match_arms: Vec<proc_macro2::TokenStream> = match_arms(contract.methods.as_slice());
+        let module_calls: Vec<proc_macro2::TokenStream> =
+            module_calls(contract.supertraits.as_slice());
+        if match_arms.is_empty() && module_calls.is_empty() {
+            let cb_selector_body = quote! {
+                elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_data_deserializer___)
+            };
+            let cb_main_body = quote! {};
+            (cb_selector_body, cb_main_body)
+        } else {
+            let cb_selector_body = callback_selector_body(match_arms, module_calls);
+            let cb_main_body = quote! {
+                let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.blockchain());
+                let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.get_storage_raw(), &___tx_hash___.as_bytes());
+                elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &___tx_hash___.as_bytes(), &[]); // cleanup
+                let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
+                if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
+                    self::EndpointWrappers::callback_selector(self, ___cb_data_deserializer___)	{
+                    self.error_api().signal_error(err_msg::CALLBACK_BAD_FUNC);
+                }
+            };
+            (cb_selector_body, cb_main_body)
+        }
+    }
 }
 
 fn find_raw_callback(methods: &[Method]) -> Option<Method> {
-	methods
-		.iter()
-		.find(|m| matches!(m.public_role, PublicRole::CallbackRaw))
-		.cloned()
+    methods
+        .iter()
+        .find(|m| matches!(m.public_role, PublicRole::CallbackRaw))
+        .cloned()
 }
 
 fn callback_selector_body(
-	match_arms: Vec<proc_macro2::TokenStream>,
-	module_calls: Vec<proc_macro2::TokenStream>,
+    match_arms: Vec<proc_macro2::TokenStream>,
+    module_calls: Vec<proc_macro2::TokenStream>,
 ) -> proc_macro2::TokenStream {
-	quote! {
-		let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.argument_api());
-		match ___cb_data_deserializer___.get_func_name() {
-			[] => {
-				return elrond_wasm::types::CallbackSelectorResult::Processed;
-			}
-			#(#match_arms)*
-			_ => {},
-		}
-		#(#module_calls)*
-		elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_data_deserializer___)
-	}
+    quote! {
+        let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.argument_api());
+        match ___cb_data_deserializer___.get_func_name() {
+            [] => {
+                return elrond_wasm::types::CallbackSelectorResult::Processed;
+            }
+            #(#match_arms)*
+            _ => {},
+        }
+        #(#module_calls)*
+        elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_data_deserializer___)
+    }
 }
 
 fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
-	methods
+    methods
 		.iter()
 		.filter_map(|m| {
 			if let PublicRole::Callback(callback) = &m.public_role {
@@ -133,7 +133,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
 }
 
 pub fn module_calls(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
-	supertraits
+    supertraits
 		.iter()
 		.map(|supertrait| {
 			let module_path = &supertrait.module_path;
