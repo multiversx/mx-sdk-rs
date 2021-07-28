@@ -2,7 +2,7 @@ use crate::codec_err::{DecodeError, EncodeError};
 use crate::nested_de::NestedDecode;
 use crate::nested_de_input::NestedDecodeInput;
 use crate::nested_ser::{
-	dep_encode_slice_contents, dep_encode_slice_contents_or_exit, NestedEncode,
+    dep_encode_slice_contents, dep_encode_slice_contents_or_exit, NestedEncode,
 };
 use crate::nested_ser_output::NestedEncodeOutput;
 use crate::top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
