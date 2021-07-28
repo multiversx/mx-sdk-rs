@@ -1,7 +1,6 @@
 [package]
 name = "factory-wasm"
 version = "0.0.0"
-authors = [ "you",]
 edition = "2018"
 publish = false
 
@@ -26,6 +25,6 @@ default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.17"
+version = "0.18.0"
 features = [ "wasm-output-mode",]
 path = "../../../../../elrond-wasm-output"

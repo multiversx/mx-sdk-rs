@@ -4,10 +4,16 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-### New math hooks exposed from Arwen:
-- `pow`, `log2`, `sqrt`
-- cryptography: elliptic curves
+## [elrond-wasm 0.18.0] - 2021-07-28
+
+- New math hooks exposed from Arwen:
+	- `pow`, `log2`, `sqrt`
+	- cryptography: elliptic curves
+ - `deploy_contract` now returns `Option<Address>`
+- High level proxies can be used to deploy contracts.
+- Mandos log syntax updated, to match Arwen.
+- A better `#[only_owner]` annotation, which can be applied directly to endoint methods.
+- `elrond-wasm-derive` now an optional dependency of `elrond-wasm`. Use `#[elrond_wasm::contract]` instead of `#[elrond_wasm_derive::contract]` now. Same for proxies and modules.
 
 ## [elrond-wasm 0.17.4] - 2021-06-30
 - conversions from big ints to small int: `BigUint::to_u64`, `BigInt::to_i64`
