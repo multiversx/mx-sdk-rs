@@ -1,5 +1,5 @@
 [package]
-name = "pair-wasm"
+name = "order-book-factory-wasm"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -19,7 +19,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.pair]
+[dependencies.order-book-factory]
 features = [ "wasm-output-mode",]
 default-features = false
 path = ".."
