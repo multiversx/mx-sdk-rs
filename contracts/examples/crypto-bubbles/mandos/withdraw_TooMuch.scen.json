@@ -15,7 +15,6 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
@@ -64,7 +63,6 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"

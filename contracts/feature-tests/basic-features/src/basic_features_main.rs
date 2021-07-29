@@ -23,38 +23,38 @@ pub mod storage_mapper_vec;
 pub mod type_features;
 pub mod types;
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait BasicFeatures:
-	big_int_methods::BigIntMethods
-	+ big_int_operators::BigIntOperators
-	+ elliptic_curve_features::EllipticCurveFeatures
-	+ block_info_features::BlockInfoFeatures
-	+ blockchain_api_features::BlockchainApiFeatures
-	+ crypto_features::CryptoFeatures
-	+ echo::EchoTypes
-	+ event_features::EventFeatures
-	+ macros::Macros
-	+ storage_direct_load::StorageLoadFeatures
-	+ storage_direct_store::StorageStoreFeatures
-	+ storage_mapper_linked_list::LinkedListMapperFeatures
-	+ storage_mapper_map::MapMapperFeatures
-	+ storage_mapper_map_storage::MapStorageMapperFeatures
-	+ storage_mapper_set::SetMapperFeatures
-	+ storage_mapper_single::SingleValueMapperFeatures
-	+ storage_mapper_vec::VecMapperFeatures
-	+ type_features::TypeFeatures
+    big_int_methods::BigIntMethods
+    + big_int_operators::BigIntOperators
+    + elliptic_curve_features::EllipticCurveFeatures
+    + block_info_features::BlockInfoFeatures
+    + blockchain_api_features::BlockchainApiFeatures
+    + crypto_features::CryptoFeatures
+    + echo::EchoTypes
+    + event_features::EventFeatures
+    + macros::Macros
+    + storage_direct_load::StorageLoadFeatures
+    + storage_direct_store::StorageStoreFeatures
+    + storage_mapper_linked_list::LinkedListMapperFeatures
+    + storage_mapper_map::MapMapperFeatures
+    + storage_mapper_map_storage::MapStorageMapperFeatures
+    + storage_mapper_set::SetMapperFeatures
+    + storage_mapper_single::SingleValueMapperFeatures
+    + storage_mapper_vec::VecMapperFeatures
+    + type_features::TypeFeatures
 {
-	#[init]
-	fn init(&self) {}
+    #[init]
+    fn init(&self) {}
 
-	#[endpoint(panicWithMessage)]
-	fn panic_with_message(&self) {
-		panic!("example panic message");
-	}
+    #[endpoint(panicWithMessage)]
+    fn panic_with_message(&self) {
+        panic!("example panic message");
+    }
 
-	/// Operation that has caused issues in the past
-	#[endpoint]
-	fn count_ones(&self, arg: u64) -> u32 {
-		arg.count_ones()
-	}
+    /// Operation that has caused issues in the past
+    #[endpoint]
+    fn count_ones(&self, arg: u64) -> u32 {
+        arg.count_ones()
+    }
 }

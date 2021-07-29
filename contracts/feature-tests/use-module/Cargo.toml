@@ -14,38 +14,40 @@ wasm-output-mode = [
     "elrond-wasm-module-dns/wasm-output-mode",
     "elrond-wasm-module-esdt/wasm-output-mode",
     "elrond-wasm-module-features/wasm-output-mode",
+    "elrond-wasm-module-governance/wasm-output-mode",
     "elrond-wasm-module-pause/wasm-output-mode",
 ]
 
 [dependencies.elrond-wasm-module-dns]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../modules/elrond-wasm-module-dns"
 
 [dependencies.elrond-wasm-module-esdt]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../modules/elrond-wasm-module-esdt"
 
 [dependencies.elrond-wasm-module-features]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../modules/elrond-wasm-module-features"
 
+[dependencies.elrond-wasm-module-governance]
+version = "0.18.0"
+path = "../../modules/elrond-wasm-module-governance"
+
 [dependencies.elrond-wasm-module-pause]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../modules/elrond-wasm-module-pause"
 
 [dependencies.elrond-wasm]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../../elrond-wasm"
-
-[dependencies.elrond-wasm-derive]
-version = "0.17.4"
-path = "../../../elrond-wasm-derive"
+features = ["derive"]
 
 [dependencies.elrond-wasm-node]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.17.4"
+version = "0.18.0"
 path = "../../../elrond-wasm-debug"

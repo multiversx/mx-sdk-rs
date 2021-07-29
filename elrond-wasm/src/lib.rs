@@ -3,6 +3,9 @@
 #![feature(try_trait_v2)]
 #![feature(control_flow_enum)]
 
+#[cfg(feature = "derive")]
+pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
+
 // re-export basic heap types
 extern crate alloc;
 pub use alloc::boxed::Box;

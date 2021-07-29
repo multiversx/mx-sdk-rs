@@ -50,6 +50,16 @@
                     "nonce": "2",
                     "balance": "280",
                     "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:nft_creator",
+                                    "royalties": "2000"
+                                }
+                            ]
+                        },
                         "str:SFT-123456": {
                             "instances": [
                                 {
