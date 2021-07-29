@@ -47,7 +47,7 @@
                 "logs": [
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds",
+                        "endpoint": "str:recursive_send_funds",
                         "topics": [
                             "sc:vault",
                             "str:EGLD",
@@ -57,7 +57,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
                             "str:FungibleESDT",
@@ -68,7 +68,7 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds_callback",
+                        "endpoint": "str:recursive_send_funds_callback",
                         "topics": [
                             "sc:vault",
                             "str:EGLD",
@@ -78,7 +78,7 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds",
+                        "endpoint": "str:recursive_send_funds",
                         "topics": [
                             "sc:vault",
                             "str:EGLD",
@@ -88,7 +88,7 @@
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
                             "str:FungibleESDT",
@@ -99,7 +99,7 @@
                     },
                     {
                         "address": "sc:recursive-caller",
-                        "identifier": "str:recursive_send_funds_callback",
+                        "endpoint": "str:recursive_send_funds_callback",
                         "topics": [
                             "sc:vault",
                             "str:EGLD",

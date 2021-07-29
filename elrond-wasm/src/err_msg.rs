@@ -5,7 +5,7 @@ pub const BAD_TOKEN_PROVIDED: &[u8] = b"bad call value token provided";
 pub const ARG_WRONG_NUMBER: &[u8] = b"wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &[u8] = b"wrong number of arguments provided to async call";
 pub const ARG_ASYNC_RETURN_WRONG_NUMBER: &[u8] =
-	b"wrong number of arguments returned by async call";
+    b"wrong number of arguments returned by async call";
 pub const ARG_CALLBACK_TOO_FEW: &[u8] = b"too few callback arguments provided";
 pub const ARG_CALLBACK_TOO_MANY: &[u8] = b"too many callback arguments provided";
 
@@ -21,13 +21,13 @@ pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slic
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
 
 pub const DESERIALIZATION_INVALID_BYTE: &[u8] =
-	b"call data deserialization error: not a valid byte";
+    b"call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &[u8] =
-	b"call data deserialization error: 32 as_bytes expected";
+    b"call data deserialization error: 32 as_bytes expected";
 pub const DESERIALIZATION_ODD_DIGITS: &[u8] =
-	b"call data deserialization error: odd number of digits in hex representation";
+    b"call data deserialization error: odd number of digits in hex representation";
 pub const DESERIALIZATION_ARG_OUT_OF_RANGE: &[u8] =
-	b"call data deserialization error: argument out of range";
+    b"call data deserialization error: argument out of range";
 
 pub const CALLBACK_BAD_FUNC: &[u8] = b"no callback function with that name exists in contract";
 

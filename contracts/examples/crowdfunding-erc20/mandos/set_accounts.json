@@ -39,12 +39,12 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''owner": "address:crowdfunding_owner",
                         "''target": "1,000,000",
                         "''deadline": "123,456",
                         "''erc20_contract_address": "sc:erc20"
                     },
-                    "code": "file:../output/crowdfunding-erc20.wasm"
+                    "code": "file:../output/crowdfunding-erc20.wasm",
+                    "owner": "address:crowdfunding_owner"
                 }
             }
         }

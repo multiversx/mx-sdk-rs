@@ -102,6 +102,18 @@
         },
         "expect": {
             "status": "0",
+            "logs": [
+              {
+                  "address": "sc:crowdfunding",
+                  "endpoint": "str:ESDTTransfer",
+                  "topics": [
+                      "str:CROWD-123456",
+                      "250,000,000,000",
+                      "address:donor1"
+                  ],
+                  "data": ""
+              }
+            ],
             "gas": "*",
             "refund": "*"
         }
@@ -120,6 +132,18 @@
         },
         "expect": {
             "status": "0",
+            "logs": [
+              {
+                  "address": "sc:crowdfunding",
+                  "endpoint": "str:ESDTTransfer",
+                  "topics": [
+                      "str:CROWD-123456",
+                      "200,000,000,000",
+                      "address:donor2"
+                  ],
+                  "data": ""
+              }
+            ],
             "gas": "*",
             "refund": "*"
         }

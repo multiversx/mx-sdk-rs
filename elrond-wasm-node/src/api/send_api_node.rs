@@ -69,6 +69,17 @@ extern "C" {
 		dataOffset: *const u8,
 	) -> i32;
 
+	fn deployFromSourceContract(
+		gas: i64,
+		valueOffset: *const u8,
+		sourceContractAddressOffset: *const u8,
+		codeMetadataOffset: *const u8,
+		resultAddressOffset: *const u8,
+		numArguments: i32,
+		argumentsLengthOffset: *const u8,
+		dataOffset: *const u8,
+	) -> i32;
+
 	fn upgradeContract(
 		scAddressOffset: *const u8,
 		gas: i64,
@@ -134,6 +145,16 @@ impl SendApi for ArwenApiImpl {
 	fn get_gas_left(&self) -> u64 {
 		BlockchainApi::get_gas_left(self)
 	}
+
+	#[inline]
+	fn get_esdt_token_data(
+		&self,
+		address: &Address,
+		token: &TokenIdentifier,
+		nonce: u64,
+	) -> elrond_wasm::types::EsdtTokenData<ArwenBigUint> {
+		BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+	} 
 
 	fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
 		unsafe {
@@ -258,7 +279,7 @@ impl SendApi for ArwenApiImpl {
 		code: &BoxedBytes,
 		code_metadata: CodeMetadata,
 		arg_buffer: &ArgBuffer,
-	) -> Address {
+	) -> Option<Address> {
 		let mut new_address = Address::zero();
 		unsafe {
 			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
@@ -274,7 +295,40 @@ impl SendApi for ArwenApiImpl {
 				arg_buffer.arg_data_ptr(),
 			);
 		}
-		new_address
+		if new_address.is_zero() {
+			None
+		} else {
+			Some(new_address)
+		}
+	}
+
+	fn deploy_from_source_contract(
+		&self,
+		gas: u64,
+		amount: &ArwenBigUint,
+		source_contract_address: &Address,
+		code_metadata: CodeMetadata,
+		arg_buffer: &ArgBuffer,
+	) -> Option<Address> {
+		let mut new_address = Address::zero();
+		unsafe {
+			let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+			let _ = deployFromSourceContract(
+				gas as i64,
+				amount_bytes32_ptr,
+				source_contract_address.as_ptr(),
+				code_metadata.as_ptr(),
+				new_address.as_mut_ptr(),
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+		}
+		if new_address.is_zero() {
+			None
+		} else {
+			Some(new_address)
+		}
 	}
 
 	fn upgrade_contract(
@@ -427,17 +481,22 @@ impl SendApi for ArwenApiImpl {
 		self.storage_load_boxed_bytes(tx_hash.as_bytes())
 	}
 
-	fn call_local_esdt_built_in_function(&self, gas: u64, function: &[u8], arg_buffer: &ArgBuffer) {
+	fn call_local_esdt_built_in_function(
+		&self,
+		gas: u64,
+		function: &[u8],
+		arg_buffer: &ArgBuffer,
+	) -> Vec<BoxedBytes> {
 		// account-level built-in function, so the destination address is the contract itself
 		let own_address = BlockchainApi::get_sc_address(self);
 
-		let _ = self.execute_on_dest_context_raw(
+		self.execute_on_dest_context_raw(
 			gas,
 			&own_address,
 			&ArwenBigUint::from(0u32),
 			function,
 			arg_buffer,
-		);
+		)
 	}
 }
 

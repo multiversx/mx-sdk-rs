@@ -2,159 +2,140 @@
 
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::contract]
+#[elrond_wasm::contract]
 pub trait CryptoBubbles {
-	/// constructor function
-	/// is called immediately after the contract is created
-	#[init]
-	fn init(&self) {
-		let caller = self.blockchain().get_caller();
-		self.set_owner(&caller);
-	}
+    /// constructor function
+    /// is called immediately after the contract is created
+    #[init]
+    fn init(&self) {}
 
-	/// player adds funds
-	#[payable("EGLD")]
-	#[endpoint(topUp)]
-	fn top_up(&self, #[payment] payment: Self::BigUint) {
-		let caller = self.blockchain().get_caller();
+    /// player adds funds
+    #[payable("EGLD")]
+    #[endpoint(topUp)]
+    fn top_up(&self, #[payment] payment: Self::BigUint) {
+        let caller = self.blockchain().get_caller();
+        self.player_balance(&caller)
+            .update(|balance| *balance += &payment);
 
-		let mut balance = self.get_player_balance(&caller);
-		balance += &payment;
-		self.set_player_balance(&caller, &balance);
+        self.top_up_event(&caller, &payment);
+    }
 
-		self.top_up_event(&caller, &payment);
-	}
+    /// player withdraws funds
+    #[endpoint]
+    fn withdraw(&self, amount: &Self::BigUint) -> SCResult<()> {
+        self.transfer_back_to_player_wallet(&self.blockchain().get_caller(), amount)
+    }
 
-	/// player withdraws funds
-	#[endpoint]
-	fn withdraw(&self, amount: &Self::BigUint) -> SCResult<()> {
-		self._transfer_back_to_player_wallet(&self.blockchain().get_caller(), amount)
-	}
+    /// server calls withdraw on behalf of the player
+    fn transfer_back_to_player_wallet(
+        &self,
+        player: &Address,
+        amount: &Self::BigUint,
+    ) -> SCResult<()> {
+        self.player_balance(player).update(|balance| {
+            require!(
+                amount <= balance,
+                "amount to withdraw must be less or equal to balance"
+            );
 
-	/// server calls withdraw on behalf of the player
-	fn _transfer_back_to_player_wallet(
-		&self,
-		player: &Address,
-		amount: &Self::BigUint,
-	) -> SCResult<()> {
-		let mut balance = self.get_player_balance(player);
+            *balance -= amount;
 
-		require!(
-			amount <= &balance,
-			"amount to withdraw must be less or equal to balance"
-		);
+            Ok(())
+        })?;
 
-		balance -= amount;
-		self.set_player_balance(player, &balance);
+        self.send().direct_egld(player, amount, b"crypto bubbles");
 
-		self.send().direct_egld(player, amount, b"crypto bubbles");
+        self.withdraw_event(player, amount);
 
-		self.withdraw_event(player, amount);
+        Ok(())
+    }
 
-		Ok(())
-	}
+    /// player joins game
+    fn add_player_to_game_state_change(
+        &self,
+        game_index: &Self::BigUint,
+        player: &Address,
+        bet: &Self::BigUint,
+    ) -> SCResult<()> {
+        self.player_balance(player).update(|balance| {
+            require!(bet <= balance, "insufficient funds to join game");
 
-	/// player joins game
-	fn _add_player_to_game_state_change(
-		&self,
-		game_index: &Self::BigUint,
-		player: &Address,
-		bet: &Self::BigUint,
-	) -> SCResult<()> {
-		let mut balance = self.get_player_balance(player);
+            *balance -= bet;
 
-		require!(bet <= &balance, "insufficient funds to join game");
+            Ok(())
+        })?;
 
-		balance -= bet;
-		self.set_player_balance(player, &balance);
+        self.player_joins_game_event(game_index, player, bet);
 
-		self.player_joins_game_event(game_index, player, bet);
+        Ok(())
+    }
 
-		Ok(())
-	}
+    // player tops up + joins a game
+    #[payable("EGLD")]
+    #[endpoint(joinGame)]
+    fn join_game(&self, game_index: Self::BigUint, #[payment] bet: Self::BigUint) -> SCResult<()> {
+        let player = self.blockchain().get_caller();
+        self.top_up(bet.clone());
+        self.add_player_to_game_state_change(&game_index, &player, &bet)
+    }
 
-	// player tops up + joins a game
-	#[payable("EGLD")]
-	#[endpoint(joinGame)]
-	fn join_game(&self, game_index: Self::BigUint, #[payment] bet: Self::BigUint) -> SCResult<()> {
-		let player = self.blockchain().get_caller();
-		self.top_up(self.call_value().egld_value());
-		self._add_player_to_game_state_change(&game_index, &player, &bet)
-	}
+    // owner transfers prize into winner SC account
+    #[only_owner]
+    #[endpoint(rewardWinner)]
+    fn reward_winner(
+        &self,
+        game_index: &Self::BigUint,
+        winner: &Address,
+        prize: &Self::BigUint,
+    ) -> SCResult<()> {
+        self.player_balance(winner)
+            .update(|balance| *balance += prize);
 
-	// owner transfers prize into winner SC account
-	#[endpoint(rewardWinner)]
-	fn reward_winner(
-		&self,
-		game_index: &Self::BigUint,
-		winner: &Address,
-		prize: &Self::BigUint,
-	) -> SCResult<()> {
-		let caller = self.blockchain().get_caller();
-		let owner: Address = self.get_owner();
-		require!(
-			caller == owner,
-			"invalid sender: only contract owner can reward winner"
-		);
+        self.reward_winner_event(game_index, winner, prize);
 
-		let mut balance = self.get_player_balance(winner);
-		balance += prize;
-		self.set_player_balance(winner, &balance);
+        Ok(())
+    }
 
-		self.reward_winner_event(game_index, winner, prize);
+    // owner transfers prize into winner SC account, then transfers funds to player wallet
+    #[endpoint(rewardAndSendToWallet)]
+    fn reward_and_send_to_wallet(
+        &self,
+        game_index: &Self::BigUint,
+        winner: &Address,
+        prize: &Self::BigUint,
+    ) -> SCResult<()> {
+        self.reward_winner(game_index, winner, prize)?;
+        self.transfer_back_to_player_wallet(winner, prize)?;
+        Ok(())
+    }
 
-		Ok(())
-	}
+    // Storage
 
-	// owner transfers prize into winner SC account, then transfers funds to player wallet
-	#[endpoint(rewardAndSendToWallet)]
-	fn reward_and_send_to_wallet(
-		&self,
-		game_index: &Self::BigUint,
-		winner: &Address,
-		prize: &Self::BigUint,
-	) -> SCResult<()> {
-		self.reward_winner(game_index, winner, prize)?;
-		self._transfer_back_to_player_wallet(winner, prize)?;
-		Ok(())
-	}
+    #[view(balanceOf)]
+    #[storage_mapper("playerBalance")]
+    fn player_balance(&self, player: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
-	// Storage
+    // Events
 
-	#[view(balanceOf)]
-	#[storage_get("playerBalance")]
-	fn get_player_balance(&self, player: &Address) -> Self::BigUint;
+    #[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000001")]
+    fn top_up_event(&self, player: &Address, amount: &Self::BigUint);
 
-	#[storage_set("playerBalance")]
-	fn set_player_balance(&self, player: &Address, balance: &Self::BigUint);
+    #[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000002")]
+    fn withdraw_event(&self, player: &Address, amount: &Self::BigUint);
 
-	#[storage_get("owner")]
-	fn get_owner(&self) -> Address;
+    #[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000003")]
+    fn player_joins_game_event(
+        &self,
+        game_index: &Self::BigUint,
+        player: &Address,
+        bet: &Self::BigUint,
+    );
 
-	#[storage_set("owner")]
-	fn set_owner(&self, owner: &Address);
-
-	// Events
-
-	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000001")]
-	fn top_up_event(&self, player: &Address, amount: &Self::BigUint);
-
-	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000002")]
-	fn withdraw_event(&self, player: &Address, amount: &Self::BigUint);
-
-	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000003")]
-	fn player_joins_game_event(
-		&self,
-		game_index: &Self::BigUint,
-		player: &Address,
-		bet: &Self::BigUint,
-	);
-
-	#[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000004")]
-	fn reward_winner_event(
-		&self,
-		game_index: &Self::BigUint,
-		winner: &Address,
-		prize: &Self::BigUint,
-	);
+    #[legacy_event("0x1000000000000000000000000000000000000000000000000000000000000004")]
+    fn reward_winner_event(
+        &self,
+        game_index: &Self::BigUint,
+        winner: &Address,
+        prize: &Self::BigUint,
+    );
 }

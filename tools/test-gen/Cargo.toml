@@ -4,4 +4,8 @@ version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 
+[[bin]]
+name = "test-gen"
+path = "src/test_gen.rs"
+
 [dependencies]

@@ -15,11 +15,11 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x100",
                         "''playerBalance|address:acc2": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles.wasm",
+                    "owner": "address:crypto_bubbles_owner"
                 }
             }
         },
@@ -45,8 +45,9 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000004",
+                        "endpoint": "str:rewardWinner",
                         "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000004",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
                             "address:acc1"
                         ],
@@ -70,7 +71,6 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
                         "''playerBalance|address:acc1": "0x300",
                         "''playerBalance|address:acc2": "0x100"
                     },
