@@ -30,8 +30,8 @@ fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxRe
         result_message: Vec::new(),
         result_values: Vec::new(),
         result_logs: vec![esdt_transfer_event_log(
-            from.clone(),
-            to.clone(),
+            from,
+            to,
             esdt_token_identifier,
             &esdt_value,
         )],
