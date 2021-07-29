@@ -1,5 +1,5 @@
 [package]
-name = "pair"
+name = "order-book-pair"
 version = "0.0.0"
 edition = "2018"
 publish = false
