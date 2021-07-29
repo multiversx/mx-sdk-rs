@@ -270,6 +270,10 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             "Wrong amount paid, must pay equal to the selling price"
         );
         require!(
+            current_time >= auction.start_time,
+            "Cannot buy SFT before start time"
+        );
+        require!(
             current_time <= auction.deadline,
             "Cannot buy SFT after deadline"
         );
