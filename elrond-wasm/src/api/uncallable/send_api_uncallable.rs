@@ -1,6 +1,6 @@
 use super::{BigIntUncallable, BigUintUncallable, EllipticCurveUncallable};
 use crate::api::SendApi;
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
+use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier};
 use alloc::vec::Vec;
 
 impl SendApi for super::UncallableApi {
@@ -59,6 +59,17 @@ impl SendApi for super::UncallableApi {
         _token: &TokenIdentifier,
         _nonce: u64,
         _amount: &BigUintUncallable,
+        _gas_limit: u64,
+        _function: &[u8],
+        _arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+        unreachable!()
+    }
+
+    fn direct_multi_esdt_transfer_execute(
+        &self,
+        _to: &Address,
+        _tokens: &[EsdtTokenPayment<BigUintUncallable>],
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,

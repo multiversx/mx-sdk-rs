@@ -1,4 +1,4 @@
-use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, TokenIdentifier};
+use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, TokenIdentifier};
 use crate::{
     api::{BigUintApi, SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
     BytesArgLoader, DynArg,
@@ -301,6 +301,24 @@ where
                 &self.arg_buffer,
             )
         };
+        if let Err(e) = result {
+            self.api.signal_error(e);
+        }
+    }
+
+    /// Immediately launches a transfer-execute call with multiple transfers in a single call.
+    /// This is similar to an async call, but there is no callback
+    /// and there can be more than one such call per transaction.
+    pub fn esdt_multi_transfer(&self, payments: &[EsdtTokenPayment<SA::AmountType>]) {
+        let gas_limit = self.resolve_gas_limit_with_leftover();
+        let result = self.api.direct_multi_esdt_transfer_execute(
+            &self.to,
+            payments,
+            gas_limit,
+            self.endpoint_name.as_slice(),
+            &self.arg_buffer,
+        );
+
         if let Err(e) = result {
             self.api.signal_error(e);
         }
