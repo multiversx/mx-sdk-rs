@@ -1,11 +1,11 @@
 [package]
-name = "pair-abi"
+name = "factory-abi"
 version = "0.0.0"
 authors = ["you"]
 edition = "2018"
 publish = false
 
-[dependencies.pair]
+[dependencies.order-book-factory]
 path = ".."
 
 [dependencies.elrond-wasm]

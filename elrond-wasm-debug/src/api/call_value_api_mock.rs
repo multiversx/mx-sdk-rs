@@ -48,4 +48,31 @@ impl CallValueApi for TxContext {
         // TODO: Add ESDT token type in mock
         EsdtTokenType::Fungible
     }
+
+    // TODO: Mock multi-transfers
+
+    #[inline]
+    fn esdt_num_transfers(&self) -> usize {
+        0
+    }
+
+    #[inline]
+    fn esdt_value_by_index(&self, _index: usize) -> RustBigUint {
+        0u64.into()
+    }
+
+    #[inline]
+    fn token_by_index(&self, _index: usize) -> TokenIdentifier {
+        TokenIdentifier::egld()
+    }
+
+    #[inline]
+    fn esdt_token_nonce_by_index(&self, _index: usize) -> u64 {
+        0
+    }
+
+    #[inline]
+    fn esdt_token_type_by_index(&self, _index: usize) -> EsdtTokenType {
+        EsdtTokenType::Fungible
+    }
 }

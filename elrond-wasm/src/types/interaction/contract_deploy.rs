@@ -12,6 +12,7 @@ where
     SA: SendApi + 'static,
 {
     api: SA,
+    address: Address, // only used for Upgrade, ignored for Deploy
     payment_amount: SA::AmountType,
     explicit_gas_limit: u64,
     pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
@@ -19,11 +20,16 @@ where
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<SA>(api: SA, payment_amount: SA::AmountType) -> ContractDeploy<SA>
+pub fn new_contract_deploy<SA>(
+    api: SA,
+    address: Address,
+    payment_amount: SA::AmountType,
+) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
     let mut contract_deploy = ContractDeploy::<SA>::new(api);
+    contract_deploy.address = address;
     contract_deploy.payment_amount = payment_amount;
 
     contract_deploy
@@ -36,6 +42,7 @@ where
     pub fn new(api: SA) -> Self {
         ContractDeploy {
             api,
+            address: Address::zero(),
             payment_amount: SA::AmountType::zero(),
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer: ArgBuffer::new(),
@@ -88,6 +95,17 @@ where
             code_metadata,
             &self.arg_buffer,
         )
+    }
+
+    pub fn upgrade_contract(self, code: &BoxedBytes, code_metadata: CodeMetadata) {
+        self.api.upgrade_contract(
+            &self.address,
+            self.resolve_gas_limit(),
+            &self.payment_amount,
+            code,
+            code_metadata,
+            &self.arg_buffer,
+        );
     }
 
     // TODO: deploy contract with code from another contract

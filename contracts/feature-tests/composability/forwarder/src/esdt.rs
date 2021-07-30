@@ -44,6 +44,35 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             .direct(to, &token_id, 0, amount_second_time, data);
     }
 
+    #[endpoint]
+    fn send_esdt_direct_multi_transfer(
+        &self,
+        to: Address,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, Self::BigUint>>,
+    ) {
+        let mut all_token_payments = Vec::new();
+
+        for multi_arg in token_payments.into_vec() {
+            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment {
+                token_name,
+                token_nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid, // not used
+            };
+
+            all_token_payments.push(payment);
+        }
+
+        let _ = self.send().direct_multi_esdt_transfer_execute(
+            &to,
+            &all_token_payments,
+            self.blockchain().get_gas_left(),
+            &[],
+            &ArgBuffer::new(),
+        );
+    }
+
     #[payable("EGLD")]
     #[endpoint]
     fn issue_fungible_token(
