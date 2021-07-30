@@ -77,4 +77,30 @@ pub trait ForwarderTransferExecuteModule {
         )
             .into()
     }
+
+    #[endpoint]
+    fn forward_transf_exec_accept_funds_multi_transfer(
+        &self,
+        to: Address,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, Self::BigUint>>,
+    ) {
+        let mut all_token_payments = Vec::new();
+
+        for multi_arg in token_payments.into_vec() {
+            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment {
+                token_name,
+                token_nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid, // not used
+            };
+
+            all_token_payments.push(payment);
+        }
+
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds(TokenIdentifier::egld(), Self::BigUint::zero())
+            .esdt_multi_transfer(&all_token_payments);
+    }
 }

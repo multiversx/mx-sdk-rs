@@ -49,6 +49,11 @@ fn forwarder_call_async_accept_nft_go() {
 }
 
 #[test]
+fn forwarder_call_async_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_call_async_multi_transfer.scen.json");
+}
+
+#[test]
 fn forwarder_call_async_retrieve_egld_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_async_retrieve_egld.scen.json");
 }
@@ -146,6 +151,11 @@ fn forwarder_call_transf_exec_accept_sft_twice_go() {
 }
 
 #[test]
+fn forwarder_call_transf_exec_multi_transfer_esdt_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_multi_transfer_esdt.scen.json");
+}
+
+#[test]
 fn forwarder_contract_change_owner_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_contract_change_owner.scen.json");
 }
@@ -178,6 +188,11 @@ fn forwarder_nft_transfer_async_go() {
 #[test]
 fn forwarder_nft_transfer_exec_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_nft_transfer_exec.scen.json");
+}
+
+#[test]
+fn forwarder_send_esdt_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_send_esdt_multi_transfer.scen.json");
 }
 
 #[test]
@@ -245,35 +260,15 @@ fn proxy_test_payment_sameshard_callback_go() {
     elrond_wasm_debug::mandos_go("mandos/proxy_test_payment_sameShard_callback.scen.json");
 }
 
-// #[test]
-// fn recursive_caller_egld_1_go() {
-// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_1.scen.json");
-// }
+#[test]
+fn recursive_caller_egld_1_go() {
+    elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_1.scen.json");
+}
 
-// #[test]
-// fn recursive_caller_egld_2_go() {
-// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_2.scen.json");
-// }
-
-// #[test]
-// fn recursive_caller_egld_x_go() {
-// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_x.scen.json");
-// }
-
-// #[test]
-// fn recursive_caller_esdt_1_go() {
-// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
-// }
-
-// #[test]
-// fn recursive_caller_esdt_2_go() {
-// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_2.scen.json");
-// }
-
-// #[test]
-// fn recursive_caller_esdt_x_go() {
-// 	elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_x.scen.json");
-// }
+#[test]
+fn recursive_caller_esdt_1_go() {
+    elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
+}
 
 #[test]
 fn send_egld_go() {

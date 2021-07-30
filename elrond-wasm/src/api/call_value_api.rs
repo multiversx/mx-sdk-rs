@@ -1,6 +1,8 @@
+use elrond_codec::Vec;
+
 use super::{BigUintApi, ErrorApi};
 use crate::err_msg;
-use crate::types::{EsdtTokenType, TokenIdentifier};
+use crate::types::{EsdtTokenPayment, EsdtTokenType, TokenIdentifier};
 
 pub trait CallValueApi: ErrorApi + Sized {
     /// The type of the payment arguments.
@@ -63,5 +65,36 @@ pub trait CallValueApi: ErrorApi + Sized {
         } else {
             (self.esdt_value(), token)
         }
+    }
+
+    fn esdt_num_transfers(&self) -> usize;
+
+    fn esdt_value_by_index(&self, index: usize) -> Self::AmountType;
+
+    fn token_by_index(&self, index: usize) -> TokenIdentifier;
+
+    fn esdt_token_nonce_by_index(&self, index: usize) -> u64;
+
+    fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType;
+
+    fn get_all_esdt_transfers(&self) -> Vec<EsdtTokenPayment<Self::AmountType>> {
+        let num_transfers = self.esdt_num_transfers();
+        let mut transfers = Vec::with_capacity(num_transfers);
+
+        for i in 0..num_transfers {
+            let token_type = self.esdt_token_type_by_index(i);
+            let token_name = self.token_by_index(i);
+            let token_nonce = self.esdt_token_nonce_by_index(i);
+            let amount = self.esdt_value_by_index(i);
+
+            transfers.push(EsdtTokenPayment::<Self::AmountType> {
+                token_type,
+                token_name,
+                token_nonce,
+                amount,
+            });
+        }
+
+        transfers
     }
 }
