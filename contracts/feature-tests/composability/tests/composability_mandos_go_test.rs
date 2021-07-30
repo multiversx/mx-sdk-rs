@@ -266,28 +266,8 @@ fn recursive_caller_egld_1_go() {
 }
 
 #[test]
-fn recursive_caller_egld_2_go() {
-    elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_2.scen.json");
-}
-
-#[test]
-fn recursive_caller_egld_x_go() {
-    elrond_wasm_debug::mandos_go("mandos/recursive_caller_egld_x.scen.json");
-}
-
-#[test]
 fn recursive_caller_esdt_1_go() {
     elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_1.scen.json");
-}
-
-#[test]
-fn recursive_caller_esdt_2_go() {
-    elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_2.scen.json");
-}
-
-#[test]
-fn recursive_caller_esdt_x_go() {
-    elrond_wasm_debug::mandos_go("mandos/recursive_caller_esdt_x.scen.json");
 }
 
 #[test]
