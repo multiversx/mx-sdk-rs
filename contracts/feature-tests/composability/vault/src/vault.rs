@@ -35,6 +35,21 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
+    fn accept_multi_funds_echo(
+        &self,
+    ) -> MultiResultVec<MultiArg3<TokenIdentifier, u64, Self::BigUint>> {
+        let payments = self.call_value().get_all_esdt_transfers();
+        let mut result = Vec::new();
+
+        for payment in payments {
+            result.push((payment.token_name, payment.token_nonce, payment.amount).into());
+        }
+
+        result.into()
+    }
+
+    #[payable("*")]
+    #[endpoint]
     fn accept_funds_echo_payment(
         &self,
         #[payment_token] token_identifier: TokenIdentifier,

@@ -2,12 +2,16 @@ use elrond_codec::{TopDecode, TopEncode};
 
 use super::{BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::{
-    types::{Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, TokenIdentifier, Vec},
+    types::{
+        Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
+        Vec,
+    },
     HexCallDataSerializer,
 };
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
+pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
 
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
@@ -80,6 +84,15 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]>;
 
+    fn direct_multi_esdt_transfer_execute(
+        &self,
+        to: &Address,
+        tokens: &[EsdtTokenPayment<Self::AmountType>],
+        gas_limit: u64,
+        function: &[u8],
+        arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]>;
+
     /// Sends either EGLD, ESDT or NFT to the target address,
     /// depending on the token identifier and nonce
     fn direct(
@@ -122,7 +135,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     /// Performs a simple ESDT/NFT transfer, but via async call.  
     /// As with any async call, this immediately terminates the execution of the current call.  
     /// So only use as the last call in your endpoint.  
-    /// If you want to perform multiple transfers, use `self.send().direct()` instead.  
+    /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
     /// Note that EGLD can NOT be transfered with this function.  
     fn transfer_esdt_via_async_call(
         &self,
@@ -157,6 +170,33 @@ pub trait SendApi: ErrorApi + Clone + Sized {
                 serializer.as_slice(),
             );
         }
+    }
+
+    fn transfer_multiple_esdt_via_async_call(
+        &self,
+        to: &Address,
+        tokens: &[EsdtTokenPayment<Self::AmountType>],
+        data: &[u8],
+    ) -> ! {
+        let mut serializer = HexCallDataSerializer::new(ESDT_MULTI_TRANSFER_STRING);
+        serializer.push_argument_bytes(to.as_bytes());
+        serializer.push_argument_bytes(&tokens.len().to_be_bytes()[..]);
+
+        for token in tokens {
+            serializer.push_argument_bytes(token.token_name.as_esdt_identifier());
+            serializer.push_argument_bytes(&token.token_nonce.to_be_bytes()[..]);
+            serializer.push_argument_bytes(token.amount.to_bytes_be().as_slice());
+        }
+
+        if !data.is_empty() {
+            serializer.push_argument_bytes(data);
+        }
+
+        self.async_call_raw(
+            &self.get_sc_address(),
+            &Self::AmountType::zero(),
+            serializer.as_slice(),
+        );
     }
 
     /// Deploys a new contract in the same shard.

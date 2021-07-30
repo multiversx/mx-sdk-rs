@@ -1,8 +1,11 @@
 use super::{ArwenBigInt, ArwenBigUint, ArwenEllipticCurve};
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
-use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BigUintApi, BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
+
+// Token ID + nonce + amount, as bytes
+const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;
 
 extern "C" {
 	fn transferValue(
@@ -49,6 +52,19 @@ extern "C" {
 		argumentsLengthOffset: *const u8,
 		dataOffset: *const u8,
 	) -> i32;
+
+	fn multiTransferESDTNFTExecute(
+        dstOffset: *const u8,
+        numTokenTransfers: i32,
+        tokenTransfersArgsLengthOffset: *const u8,
+        tokenTransferDataOffset: *const u8,
+        gasLimit: i64,
+        functionOffset: *const u8,
+        functionLength: i32,
+        numArguments: i32,
+        argumentsLengthOffset: *const u8,
+        dataOffset: *const u8,
+    ) -> i32;
 
 	fn asyncCall(
 		dstOffset: *const u8,
@@ -259,6 +275,53 @@ impl SendApi for ArwenApiImpl {
 			}
 		}
 	}
+
+	fn direct_multi_esdt_transfer_execute(
+        &self,
+        to: &Address,
+        tokens: &[elrond_wasm::types::EsdtTokenPayment<ArwenBigUint>],
+        gas_limit: u64,
+        function: &[u8],
+        arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+		unsafe {
+			let nr_transfers = tokens.len();
+			let mut transfer_arg_lengths = Vec::with_capacity(nr_transfers * 3);
+			let mut transfer_args = Vec::with_capacity(nr_transfers * AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH);
+			
+			for token in tokens {
+				let token_id_bytes = token.token_name.as_esdt_identifier();
+				let nonce_bytes = &token.token_nonce.to_be_bytes()[..]; // TODO: Maybe top-encode here instead
+				let amount_bytes = &token.amount.to_bytes_be();
+
+				transfer_arg_lengths.push(token_id_bytes.len() as i32);
+				transfer_arg_lengths.push(nonce_bytes.len() as i32);
+				transfer_arg_lengths.push(amount_bytes.len() as i32);
+
+				transfer_args.extend_from_slice(token_id_bytes);
+				transfer_args.extend_from_slice(nonce_bytes);
+				transfer_args.extend_from_slice(amount_bytes);
+			}
+
+			let result = multiTransferESDTNFTExecute(
+				to.as_ref().as_ptr(),
+				nr_transfers as i32,
+				transfer_arg_lengths.as_ptr() as *const u8,
+				transfer_args.as_ptr(),
+				gas_limit as i64,
+				function.as_ptr(),
+				function.len() as i32,
+				arg_buffer.num_args() as i32,
+				arg_buffer.arg_lengths_bytes_ptr(),
+				arg_buffer.arg_data_ptr(),
+			);
+			if result == 0 {
+				Ok(())
+			} else {
+				Err(b"multiTransferESDTNFTExecute failed")
+			}
+		}
+    }
 
 	fn async_call_raw(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) -> ! {
 		unsafe {
