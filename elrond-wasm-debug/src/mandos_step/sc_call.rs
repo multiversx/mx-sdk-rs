@@ -7,16 +7,16 @@ use crate::{BlockchainMock, ContractMap, TxContext, TxInput};
 pub fn execute(
     state: &mut BlockchainMock,
     contract_map: &ContractMap<TxContext>,
-    tx_id: &String,
-    tx: &Box<TxCall>,
+    tx_id: &str,
+    tx: &TxCall,
     expect: &Option<TxExpect>,
 ) {
     let mut esdt_value = BigUint::zero();
     let mut esdt_token_identifier = Vec::new();
-    tx.esdt_value.as_ref().map(|value| {
+    if let Some(value) = tx.esdt_value.as_ref() {
         esdt_value = value.esdt_value.value.clone();
         esdt_token_identifier = value.esdt_token_name.value.clone();
-    });
+    };
     let tx_input = TxInput {
         from: tx.from.value.into(),
         to: tx.to.value.into(),
@@ -31,11 +31,11 @@ pub fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: execute_helper_functions::generate_tx_hash_dummy(tx_id.as_str()),
+        tx_hash: execute_helper_functions::generate_tx_hash_dummy(tx_id),
     };
     state.increase_nonce(&tx_input.from);
     let tx_result = sc_call_with_async_and_callback(tx_input, state, contract_map).unwrap();
     if let Some(tx_expect) = expect {
-        check_tx_output(tx_id.as_str(), tx_expect, &tx_result);
+        check_tx_output(tx_id, tx_expect, &tx_result);
     }
 }

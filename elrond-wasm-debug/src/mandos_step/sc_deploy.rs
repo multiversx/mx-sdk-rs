@@ -9,8 +9,8 @@ use crate::{
 pub fn execute(
     state: &mut BlockchainMock,
     contract_map: &ContractMap<TxContext>,
-    tx_id: &String,
-    tx: &Box<TxDeploy>,
+    tx_id: &str,
+    tx: &TxDeploy,
     expect: &Option<TxExpect>,
 ) {
     let tx_input = TxInput {
@@ -27,12 +27,12 @@ pub fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
+        tx_hash: generate_tx_hash_dummy(tx_id),
     };
     state.increase_nonce(&tx_input.from);
     let (tx_result, _) = sc_create(tx_input, &tx.contract_code.value, state, contract_map).unwrap();
     if let Some(tx_expect) = expect {
-        check_tx_output(tx_id.as_str(), tx_expect, &tx_result);
+        check_tx_output(tx_id, tx_expect, &tx_result);
     }
 }
 

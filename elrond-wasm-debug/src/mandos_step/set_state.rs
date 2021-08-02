@@ -7,9 +7,9 @@ use crate::{AccountData, BlockInfo as CrateBlockInfo, BlockchainMock};
 pub fn execute(
     state: &mut BlockchainMock,
     accounts: &BTreeMap<AddressKey, Account>,
-    new_addresses: &Vec<NewAddress>,
-    previous_block_info: &Box<Option<BlockInfo>>,
-    current_block_info: &Box<Option<BlockInfo>>,
+    new_addresses: &[NewAddress],
+    previous_block_info: &Option<BlockInfo>,
+    current_block_info: &Option<BlockInfo>,
 ) {
     for (address, account) in accounts.iter() {
         let storage = account
@@ -53,10 +53,10 @@ pub fn execute(
             new_address.new_address.value.into(),
         )
     }
-    if let Some(block_info_obj) = &**previous_block_info {
+    if let Some(block_info_obj) = &*previous_block_info {
         update_block_info(&mut state.previous_block_info, block_info_obj);
     }
-    if let Some(block_info_obj) = &**current_block_info {
+    if let Some(block_info_obj) = &*current_block_info {
         update_block_info(&mut state.current_block_info, block_info_obj);
     }
 }

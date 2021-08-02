@@ -2,7 +2,7 @@ use mandos::TxTransfer;
 
 use crate::BlockchainMock;
 
-pub fn execute(state: &mut BlockchainMock, tx: &Box<TxTransfer>) {
+pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
     let sender_address = &tx.from.value.into();
     state.increase_nonce(sender_address);
     state
