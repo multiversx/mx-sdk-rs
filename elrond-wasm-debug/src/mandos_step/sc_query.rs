@@ -27,7 +27,7 @@ pub fn execute(
         tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
     };
 
-    let (tx_result, opt_async_data) = execute_sc_call(tx_input, state, contract_map).unwrap();
+    let (tx_result, opt_async_data) = sc_call(tx_input, state, contract_map).unwrap();
     if tx_result.result_status == 0 && opt_async_data.is_some() {
         panic!("Can't query a view function that performs an async call");
     }

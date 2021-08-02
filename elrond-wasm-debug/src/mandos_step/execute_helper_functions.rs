@@ -18,7 +18,7 @@ pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
     result.into()
 }
 
-pub fn execute_sc_call(
+pub fn sc_call(
     tx_input: TxInput,
     state: &mut BlockchainMock,
     contract_map: &ContractMap<TxContext>,
@@ -92,27 +92,27 @@ pub fn execute_sc_call(
     Ok((tx_result, tx_output.async_call))
 }
 
-pub fn execute_sc_call_with_async_and_callback(
+pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
     state: &mut BlockchainMock,
     contract_map: &ContractMap<TxContext>,
 ) -> Result<TxResult, BlockchainMockError> {
     let contract_address = tx_input.to.clone();
-    let (mut tx_result, opt_async_data) = execute_sc_call(tx_input, state, contract_map)?;
+    let (mut tx_result, opt_async_data) = sc_call(tx_input, state, contract_map)?;
     if tx_result.result_status == 0 {
         if let Some(async_data) = opt_async_data {
             if state.accounts.contains_key(&async_data.to) {
                 let async_input = async_call_tx_input(&async_data, &contract_address);
 
                 let async_result =
-                    execute_sc_call_with_async_and_callback(async_input, state, contract_map)?;
+                    sc_call_with_async_and_callback(async_input, state, contract_map)?;
 
                 tx_result = merge_results(tx_result, async_result.clone());
 
                 let callback_input =
                     async_callback_tx_input(&async_data, &contract_address, &async_result);
                 let (callback_result, opt_more_async) =
-                    execute_sc_call(callback_input, state, contract_map)?;
+                    sc_call(callback_input, state, contract_map)?;
                 assert!(
                     opt_more_async.is_none(),
                     "successive asyncs currently not supported"
@@ -136,53 +136,6 @@ pub fn execute_sc_call_with_async_and_callback(
         }
     }
     Ok(tx_result)
-}
-
-pub fn execute_sc_create(
-    tx_input: TxInput,
-    contract_path: &[u8],
-    state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
-) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
-    let from = tx_input.from.clone();
-    let to = tx_input.to.clone();
-    let call_value = tx_input.call_value.clone();
-    let blockchain_info = state.create_tx_info(&to);
-
-    state.subtract_tx_payment(&from, &call_value)?;
-    state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
-
-    let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
-    let esdt_value = tx_input.esdt_value.clone();
-    let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
-
-    if esdt_used {
-        state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
-    }
-
-    let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
-    let mut tx_output = execute_tx(tx_context, contract_path, contract_map);
-
-    if tx_output.result.result_status == 0 {
-        let new_address = state.create_account_after_deploy(
-            &tx_input,
-            tx_output.contract_storage,
-            contract_path.to_vec(),
-        );
-        state.send_balance(
-            &new_address,
-            tx_output.send_balance_list.as_slice(),
-            &mut tx_output.result.result_logs,
-        )?;
-    } else {
-        state.increase_balance(&from, &call_value);
-
-        if esdt_used {
-            state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
-        }
-    }
-
-    Ok((tx_output.result, tx_output.async_call))
 }
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
