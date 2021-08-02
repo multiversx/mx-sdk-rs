@@ -6,8 +6,8 @@ use crate::{execute_helper_functions::*, BlockchainMock, ContractMap, TxContext,
 pub fn execute(
     state: &mut BlockchainMock,
     contract_map: &ContractMap<TxContext>,
-    tx_id: &String,
-    tx: &Box<TxQuery>,
+    tx_id: &str,
+    tx: &TxQuery,
     expect: &Option<TxExpect>,
 ) {
     let tx_input = TxInput {
@@ -24,7 +24,7 @@ pub fn execute(
             .collect(),
         gas_limit: u64::MAX,
         gas_price: 0u64,
-        tx_hash: generate_tx_hash_dummy(tx_id.as_str()),
+        tx_hash: generate_tx_hash_dummy(tx_id),
     };
 
     let (tx_result, opt_async_data) = sc_call(tx_input, state, contract_map).unwrap();
@@ -32,6 +32,6 @@ pub fn execute(
         panic!("Can't query a view function that performs an async call");
     }
     if let Some(tx_expect) = expect {
-        check_tx_output(tx_id.as_str(), tx_expect, &tx_result);
+        check_tx_output(tx_id, tx_expect, &tx_result);
     }
 }
