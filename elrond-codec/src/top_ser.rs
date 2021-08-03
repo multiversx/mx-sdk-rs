@@ -368,53 +368,6 @@ impl<T: NestedEncode> TopEncode for Box<[T]> {
     }
 }
 
-macro_rules! tuple_impls {
-    ($(($($n:tt $name:ident)+))+) => {
-        $(
-            impl<$($name),+> TopEncode for ($($name,)+)
-            where
-                $($name: NestedEncode,)+
-            {
-				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-					let mut buffer = Vec::<u8>::new();
-					$(
-                        self.$n.dep_encode(&mut buffer)?;
-                    )+
-					output.set_slice_u8(&buffer[..]);
-					Ok(())
-				}
-
-				fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
-					let mut buffer = Vec::<u8>::new();
-					$(
-                        self.$n.dep_encode_or_exit(&mut buffer, c.clone(), exit);
-                    )+
-					output.set_slice_u8(&buffer[..]);
-				}
-            }
-        )+
-    }
-}
-
-tuple_impls! {
-    (0 T0)
-    (0 T0 1 T1)
-    (0 T0 1 T1 2 T2)
-    (0 T0 1 T1 2 T2 3 T3)
-    (0 T0 1 T1 2 T2 3 T3 4 T4)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-    (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
-}
-
 impl TopEncode for NonZeroUsize {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         self.get().top_encode(output)
