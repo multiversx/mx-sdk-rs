@@ -1,13 +1,13 @@
+use crate::codec_err::EncodeError;
+use crate::nested_ser::{dep_encode_slice_contents, NestedEncode};
+use crate::nested_ser_output::NestedEncodeOutput;
+use crate::top_encode_from_no_err;
+use crate::top_ser_output::TopEncodeOutput;
+use crate::TypeInfo;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
-
-use crate::codec_err::EncodeError;
-use crate::nested_ser::{dep_encode_slice_contents, NestedEncode};
-use crate::nested_ser_output::NestedEncodeOutput;
-use crate::top_ser_output::TopEncodeOutput;
-use crate::TypeInfo;
 
 /// Most types will be encoded without any possibility of error.
 /// The trait is used to provide these implementations.
@@ -71,31 +71,6 @@ pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
     let mut bytes = Vec::<u8>::new();
     obj.dep_encode_or_exit(&mut bytes, c, exit);
     output.set_slice_u8(&bytes[..]);
-}
-
-#[macro_export]
-macro_rules! top_encode_from_no_err {
-    ($type:ty, $type_info:expr) => {
-        impl TopEncode for $type {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            #[inline]
-            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-                self.top_encode_no_err(output);
-                Ok(())
-            }
-
-            #[inline]
-            fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-                &self,
-                output: O,
-                _: ExitCtx,
-                _: fn(ExitCtx, EncodeError) -> !,
-            ) {
-                self.top_encode_no_err(output);
-            }
-        }
-    };
 }
 
 pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {

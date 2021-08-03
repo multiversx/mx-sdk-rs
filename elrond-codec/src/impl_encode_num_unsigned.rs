@@ -34,7 +34,6 @@ macro_rules! encode_num_unsigned {
                 output.set_u64(*self as u64);
             }
         }
-
         top_encode_from_no_err! {$num_type, $type_info}
     };
 }
