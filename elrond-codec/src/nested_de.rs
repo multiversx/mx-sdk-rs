@@ -5,7 +5,6 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::DecodeError;
 use crate::nested_de_input::NestedDecodeInput;
-use crate::num_conv::bytes_to_number;
 use crate::TypeInfo;
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
@@ -173,65 +172,6 @@ impl NestedDecode for Box<str> {
         String::dep_decode_or_exit(input, c, exit).into_boxed_str()
     }
 }
-
-macro_rules! decode_num_unsigned {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
-        impl NestedDecode for $ty {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.read_slice($num_bytes)?;
-                let num = bytes_to_number(bytes, false) as $ty;
-                Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
-                let num = bytes_to_number(bytes, false) as $ty;
-                num
-            }
-        }
-    };
-}
-
-decode_num_unsigned!(u16, 2, TypeInfo::U16);
-decode_num_unsigned!(u32, 4, TypeInfo::U32);
-decode_num_unsigned!(usize, 4, TypeInfo::USIZE);
-decode_num_unsigned!(u64, 8, TypeInfo::U64);
-
-macro_rules! decode_num_signed {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
-        impl NestedDecode for $ty {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.read_slice($num_bytes)?;
-                let num = bytes_to_number(bytes, true) as $ty;
-                Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
-                let num = bytes_to_number(bytes, true) as $ty;
-                num
-            }
-        }
-    };
-}
-
-decode_num_signed!(i8, 1, TypeInfo::I8);
-decode_num_signed!(i16, 2, TypeInfo::I16);
-decode_num_signed!(i32, 4, TypeInfo::I32);
-decode_num_signed!(isize, 4, TypeInfo::ISIZE);
-decode_num_signed!(i64, 8, TypeInfo::I64);
 
 impl NestedDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;

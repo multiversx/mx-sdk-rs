@@ -73,6 +73,7 @@ pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
     output.set_slice_u8(&bytes[..]);
 }
 
+#[macro_export]
 macro_rules! top_encode_from_no_err {
     ($type:ty, $type_info:expr) => {
         impl TopEncode for $type {
@@ -245,44 +246,6 @@ impl TopEncode for Box<str> {
         self.as_ref().as_bytes().top_encode_or_exit(output, c, exit);
     }
 }
-
-macro_rules! encode_num_unsigned {
-    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
-        impl TopEncodeNoErr for $num_type {
-            #[inline]
-            fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
-                output.set_u64(*self as u64);
-            }
-        }
-
-        top_encode_from_no_err! {$num_type, $type_info}
-    };
-}
-
-encode_num_unsigned! {u64, 64, TypeInfo::U64}
-encode_num_unsigned! {u32, 32, TypeInfo::U32}
-encode_num_unsigned! {usize, 32, TypeInfo::USIZE}
-encode_num_unsigned! {u16, 16, TypeInfo::U16}
-encode_num_unsigned! {u8, 8, TypeInfo::U8}
-
-macro_rules! encode_num_signed {
-    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
-        impl TopEncodeNoErr for $num_type {
-            #[inline]
-            fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
-                output.set_i64(*self as i64);
-            }
-        }
-
-        top_encode_from_no_err! {$num_type, $type_info}
-    };
-}
-
-encode_num_signed! {i64, 64, TypeInfo::I64}
-encode_num_signed! {i32, 32, TypeInfo::I32}
-encode_num_signed! {isize, 32, TypeInfo::ISIZE}
-encode_num_signed! {i16, 16, TypeInfo::I16}
-encode_num_signed! {i8, 8, TypeInfo::I8}
 
 impl TopEncodeNoErr for bool {
     fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
