@@ -11,6 +11,7 @@ pub use alloc::vec::Vec;
 mod codec_err;
 mod default_traits;
 mod impl_array;
+mod impl_tuple;
 mod nested_de;
 mod nested_de_input;
 mod nested_ser;
