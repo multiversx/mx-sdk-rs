@@ -7,6 +7,7 @@ mod builtin_func_exec;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
+mod mandos_step;
 mod mock_error;
 mod tx_context;
 
@@ -15,6 +16,7 @@ pub use blockchain_mock::*;
 pub use builtin_func_exec::*;
 pub use contract_map::*;
 pub use display_util::*;
+pub use mandos_step::*;
 pub use mock_error::*;
 pub use tx_context::*;
 
