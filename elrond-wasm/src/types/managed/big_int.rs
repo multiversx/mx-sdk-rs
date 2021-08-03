@@ -4,7 +4,7 @@ use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 
 use alloc::string::String;
 
-use super::ManagedTypeApi;
+use crate::api::ManagedTypeApi;
 
 pub struct BigInt<M: ManagedTypeApi> {
     handle: i32,
