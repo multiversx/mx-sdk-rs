@@ -44,31 +44,6 @@ pub trait NestedEncode: Sized {
     }
 }
 
-#[macro_export]
-macro_rules! dep_encode_from_no_err {
-    ($type:ty, $type_info:expr) => {
-        impl NestedEncode for $type {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            #[inline]
-            fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-                self.dep_encode_no_err(dest);
-                Ok(())
-            }
-
-            #[inline]
-            fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-                &self,
-                dest: &mut O,
-                _: ExitCtx,
-                _: fn(ExitCtx, EncodeError) -> !,
-            ) {
-                self.dep_encode_no_err(dest);
-            }
-        }
-    };
-}
-
 /// Convenience function for getting an object nested-encoded to a Vec<u8> directly.
 pub fn dep_encode_to_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
     let mut bytes = Vec::<u8>::new();
@@ -127,8 +102,6 @@ pub fn dep_encode_slice_contents_or_exit<T, O, ExitCtx>(
 impl NestedEncodeNoErr for () {
     fn dep_encode_no_err<O: NestedEncodeOutput>(&self, _: &mut O) {}
 }
-
-dep_encode_from_no_err! {(), TypeInfo::Unit}
 
 impl<T: NestedEncode> NestedEncode for &[T] {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
@@ -239,30 +212,6 @@ impl NestedEncodeNoErr for u8 {
         dest.push_byte(*self as u8);
     }
 }
-
-dep_encode_from_no_err! {u8, TypeInfo::U8}
-
-// Derive the implementation of the other types by casting.
-macro_rules! encode_num_mimic {
-    ($num_type:ty, $mimic_type:ident, $type_info:expr) => {
-        impl NestedEncodeNoErr for $num_type {
-            #[inline]
-            fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
-                (*self as $mimic_type).dep_encode_no_err(dest)
-            }
-        }
-
-        dep_encode_from_no_err! {$num_type, $type_info}
-    };
-}
-
-encode_num_mimic! {usize, u32, TypeInfo::USIZE}
-encode_num_mimic! {i64, u64, TypeInfo::I64}
-encode_num_mimic! {i32, u32, TypeInfo::I32}
-encode_num_mimic! {isize, u32, TypeInfo::ISIZE}
-encode_num_mimic! {i16, u16, TypeInfo::I16}
-encode_num_mimic! {i8, u8, TypeInfo::I8}
-encode_num_mimic! {bool, u8, TypeInfo::Bool}
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {

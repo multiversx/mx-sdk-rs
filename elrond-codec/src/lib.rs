@@ -13,8 +13,11 @@ mod default_traits;
 mod impl_array;
 mod impl_decode_num_signed;
 mod impl_decode_num_unsigned;
+mod impl_dep_encode_from_no_err;
+mod impl_encode_num_mimic;
 mod impl_encode_num_signed;
 mod impl_encode_num_unsigned;
+mod impl_top_encode_from_no_err;
 mod impl_tuple;
 mod nested_de;
 mod nested_de_input;
@@ -340,10 +343,6 @@ pub mod test_struct {
 pub mod tests {
     use super::test_struct::*;
     use super::*;
-    use crate::impl_decode_num_signed;
-    use crate::impl_decode_num_unsigned;
-    use crate::impl_encode_num_signed;
-    use crate::impl_encode_num_unsigned;
     use crate::test_util::{check_top_decode, check_top_encode, ser_deser_ok};
     use alloc::vec::Vec;
     use core::fmt::Debug;
