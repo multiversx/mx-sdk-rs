@@ -7,3 +7,5 @@ pub use big_int_api_node::*;
 pub use big_uint_api_node::*;
 pub use elliptic_curve_api_node::*;
 pub use managed_buffer_node::*;
+
+impl ManagedTypeApi for ArwenApiImpl {}

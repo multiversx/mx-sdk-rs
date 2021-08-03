@@ -1,61 +1,45 @@
-use crate::abi;
-use alloc::vec::Vec;
-use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
-use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
+use crate::types::BoxedBytes;
 
-// BigInt sign.
-pub enum Sign {
-    Minus,
-    NoSign,
-    Plus,
-}
+use super::Handle;
 
 /// Definition of the BigInt type required by the API.
-pub trait BigIntApi:
-    Sized
-    + From<Self::BigUint>
-    + From<i64>
-    + From<i32>
-    + Clone
-    + Add<Output = Self>
-    + AddAssign
-    + Sub<Output = Self>
-    + SubAssign
-    + Mul<Output = Self>
-    + MulAssign
-    + Div<Output = Self>
-    + DivAssign
-    + Rem<Output = Self>
-    + RemAssign
-    + Neg
-    + PartialEq<Self>
-    + Eq
-    + PartialOrd<Self>
-    + Ord
-    + PartialEq<i64>
-    + PartialOrd<i64>
-    + elrond_codec::NestedEncode
-    + elrond_codec::TopEncode
-    + elrond_codec::NestedDecode
-    + elrond_codec::TopDecode
-    + abi::TypeAbi
-{
-    type BigUint;
+pub trait BigIntApi {
+    fn new(&self, value: i64) -> Handle;
 
-    fn zero() -> Self {
-        0i64.into()
+    fn new_zero(&self) -> Handle {
+        self.new(0)
     }
 
-    fn abs_uint(&self) -> Self::BigUint;
+    fn signed_byte_length(&self, x: Handle) -> Handle;
+    fn get_signed_bytes(&self, reference: Handle) -> BoxedBytes;
+    fn set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
+    fn is_int64(&self, reference: Handle) -> Handle;
+    fn get_int64(&self, reference: Handle) -> i64;
+    fn add(&self, dest: Handle, x: Handle, y: Handle);
+    fn sub(&self, dest: Handle, x: Handle, y: Handle);
+    fn mul(&self, dest: Handle, x: Handle, y: Handle);
+    fn t_div(&self, dest: Handle, x: Handle, y: Handle);
+    fn t_mod(&self, dest: Handle, x: Handle, y: Handle);
+    fn pow(&self, dest: Handle, x: Handle, y: Handle);
+    fn abs(&self, dest: Handle, x: Handle);
+    fn neg(&self, dest: Handle, x: Handle);
+    fn sign(&self, x: Handle) -> i32;
+    fn cmp(&self, x: Handle, y: Handle) -> i32;
 
-    fn sign(&self) -> Sign;
+    // fn zero(&self, ) -> Self {
+    //     0i64.into(&self, )
+    // }
 
-    fn to_signed_bytes_be(&self) -> Vec<u8>;
+    // fn abs_uint(&self, &self) -> Self::BigUint;
 
-    fn from_signed_bytes_be(bytes: &[u8]) -> Self;
+    // fn sign(&self, &self) -> Sign;
 
-    fn pow(&self, exp: u32) -> Self;
+    // fn to_signed_bytes_be(&self, &self) -> Vec<u8>;
 
-    /// Will return `None` if the number is too big or too small to be converted.
-    fn to_i64(&self) -> Option<i64>;
+    // fn from_signed_bytes_be(&self, bytes: &[u8]) -> Self;
+
+    // fn pow(&self, &self, exp: u32) -> Self;
+
+    // /// Will return `None` if the number is too big or too small to be converted.
+    // fn to_i64(&self, &self) -> Option<i64>;
 }

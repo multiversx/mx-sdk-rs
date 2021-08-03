@@ -12,7 +12,11 @@ pub use error_api_uncallable::*;
 pub use send_api_uncallable::*;
 pub use storage_api_uncallable::*;
 
+use super::ManagedTypeApi;
+
 /// Dummy type with no implementation.
 /// Provides context in ABI generators.
 #[derive(Clone)]
 pub struct UncallableApi;
+
+impl ManagedTypeApi for UncallableApi {}

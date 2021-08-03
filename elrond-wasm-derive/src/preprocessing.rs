@@ -3,7 +3,10 @@ use std::{collections::HashMap, iter::FromIterator};
 
 fn substitutions() -> HashMap<String, TokenStream> {
     let mut substitutions = HashMap::<String, TokenStream>::new();
-    substitutions.insert("BigInt".to_string(), quote!(BigUint).into()); // XXX: just for testing
+    substitutions.insert(
+        "BigInt".to_string(),
+        quote!(elrond_wasm::api::BigInt<Self::TypeManager>).into(),
+    );
     substitutions.insert("H".to_string(), quote!(Hodler<i32>).into()); // XXX: just for testing
     substitutions
 }

@@ -1,6 +1,6 @@
 use super::{
-    BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi,
-    EndpointArgumentApi, EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi,
+    BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, EndpointArgumentApi,
+    EndpointFinishApi, ErrorApi, LogApi, ManagedTypeApi, ProxyObjApi, SendApi, StorageReadApi,
     StorageWriteApi,
 };
 use crate::types::Address;
@@ -12,9 +12,9 @@ use crate::types::Address;
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractBase: Sized {
-    type BigUint: BigUintApi + 'static;
+    type TypeManager: ManagedTypeApi + 'static;
 
-    type BigInt: BigIntApi + 'static;
+    type BigUint: BigUintApi + 'static;
 
     type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
@@ -26,8 +26,8 @@ pub trait ContractBase: Sized {
 
     /// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
     type SendApi: SendApi<
+            ProxyTypeManager = Self::TypeManager,
             AmountType = Self::BigUint,
-            ProxyBigInt = Self::BigInt,
             ProxyEllipticCurve = Self::EllipticCurve,
             ProxyStorage = Self::Storage,
         > + Clone

@@ -3,6 +3,7 @@ use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractBase;
 
 impl ContractBase for ArwenApiImpl {
+	type TypeManager = ArwenManagedTypeApi;
 	type EllipticCurve = ArwenEllipticCurve;
 	type BigUint = ArwenBigUint;
 	type BigInt = ArwenBigInt;
