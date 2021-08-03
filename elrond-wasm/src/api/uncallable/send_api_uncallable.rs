@@ -1,6 +1,8 @@
 use super::{BigIntUncallable, BigUintUncallable, EllipticCurveUncallable};
 use crate::api::SendApi;
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier};
+use crate::types::{
+    Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
+};
 use alloc::vec::Vec;
 
 impl SendApi for super::UncallableApi {
