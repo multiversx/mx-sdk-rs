@@ -63,7 +63,6 @@
                             "00-auctioned_token": "nested:str:NFT-123456|u64:1",
                             "01-nr_auctioned_tokens": "biguint:1",
                             "02-auction_type": "u8:1",
-                            "03-auction_status": "u8:1",
                             "04-payment_token": "nested:str:EGLD|u64:0",
                             "05-min_bid": "biguint:100",
                             "06-max_bid": "u8:1|biguint:1000",
