@@ -1,10 +1,9 @@
-use crate::test_util::ser_deser_ok;
-use crate::{
+use elrond_codec::test_util::check_top_encode_decode;
+use elrond_codec::{
     top_decode_from_nested, top_decode_from_nested_or_exit, DecodeError, EncodeError, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput,
 };
-use alloc::vec::Vec;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub struct WrappedArray(pub [u8; 5]);
@@ -74,12 +73,12 @@ impl TopDecode for WrappedArray {
 }
 
 #[test]
-fn test_wrapped_array() {
+fn test_top() {
     let wa = WrappedArray([1, 2, 3, 4, 5]);
-    ser_deser_ok(wa, &[1, 2, 3, 4, 5]);
+    check_top_encode_decode(wa, &[1, 2, 3, 4, 5]);
 
     let mut v: Vec<WrappedArray> = Vec::new();
     v.push(wa);
     v.push(WrappedArray([6, 7, 8, 9, 0]));
-    ser_deser_ok(v, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
+    check_top_encode_decode(v, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
 }

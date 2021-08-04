@@ -1,17 +1,18 @@
 // Some structures with explicit encode/decode, for testing.
+use core::fmt::Debug;
+use elrond_codec::test_util::check_dep_encode_decode;
+use elrond_codec::test_util::check_top_encode_decode;
+use elrond_codec::NestedDecode;
+use elrond_codec::NestedDecodeInput;
+use elrond_codec::NestedEncode;
+use elrond_codec::NestedEncodeOutput;
+use elrond_codec::TopDecodeInput;
+use elrond_codec::TopEncodeOutput;
+use elrond_codec::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
+use elrond_codec::{top_encode_from_nested, top_encode_from_nested_or_exit, TopEncode};
+use elrond_codec::{DecodeError, EncodeError};
 
-use alloc::vec::Vec;
-use crate::codec_err::{DecodeError, EncodeError};
-use crate::nested_de::NestedDecode;
-use crate::nested_de_input::NestedDecodeInput;
-use crate::nested_ser::NestedEncode;
-use crate::nested_ser_output::NestedEncodeOutput;
-use crate::top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
-use crate::top_de_input::TopDecodeInput;
-use crate::top_ser::{top_encode_from_nested, top_encode_from_nested_or_exit, TopEncode};
-use crate::top_ser_output::TopEncodeOutput;
-
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct S {
     pub int: u16,
     pub seq: Vec<u8>,
@@ -91,48 +92,22 @@ impl TopDecode for S {
     }
 }
 
-use super::test_struct::*;
-use crate::{
-    test_util::{check_top_decode, check_top_encode, deser_ok, ser_ok},
-    TopDecode, TopEncode,
-};
-use core::fmt::Debug;
-
-pub fn the_same<V>(element: V)
-where
-    V: TopEncode + TopDecode + PartialEq + Debug + 'static,
-{
-    let serialized_bytes = check_top_encode(&element);
-    let deserialized: V = check_top_decode::<V>(&serialized_bytes[..]);
-    assert_eq!(deserialized, element);
-}
 #[test]
-fn test_encode() {
+fn test_top() {
     let test = S {
         int: 1,
         seq: [5, 6].to_vec(),
         another_byte: 7,
     };
-
-    ser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
+    check_top_encode_decode(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
 }
 
 #[test]
-fn test_decode() {
+fn test_dep() {
     let test = S {
         int: 1,
         seq: [5, 6].to_vec(),
         another_byte: 7,
     };
-    deser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
-}
-
-#[test]
-fn test_encode_decode() {
-    let test = S {
-        int: 1,
-        seq: [5, 6].to_vec(),
-        another_byte: 7,
-    };
-    the_same(test);
+    check_dep_encode_decode(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
 }

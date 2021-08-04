@@ -84,24 +84,8 @@ pub fn check_dep_decode<T: NestedDecode + PartialEq + Debug>(bytes: &[u8]) -> T 
     fast_exit_obj
 }
 
-pub fn ser_ok<V>(element: V, expected_bytes: &[u8])
-where
-    V: NestedEncode + PartialEq + Debug + 'static,
-{
-    let bytes = check_dep_encode(&element);
-    assert_eq!(bytes.as_slice(), expected_bytes);
-}
-
-pub fn deser_ok<V>(element: V, bytes: &[u8])
-where
-    V: NestedDecode + PartialEq + Debug + 'static,
-{
-    let input = bytes.to_vec();
-    let deserialized: V = check_dep_decode::<V>(&input[..]);
-    assert_eq!(deserialized, element);
-}
-
 /// backwards compatibility only, will remove in next major release
+#[deprecated]
 pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
 where
     V: TopEncode + TopDecode + PartialEq + Debug,
