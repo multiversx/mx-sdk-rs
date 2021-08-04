@@ -133,3 +133,33 @@ array_impls!(
 	237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252,
 	253, 254, 255, 256, 384, 512, 768, 1024, 2048, 4096, 8192, 16384, 32768,
 );
+
+#[cfg(test)]
+mod tests {
+    use crate::test_util::check_top_encode;
+
+    use super::*;
+    use alloc::vec::Vec;
+
+    #[test]
+    fn test_array_16384() {
+        let arr = [7i32; 16384];
+        let mut expected_bytes = Vec::<u8>::with_capacity(16384 * 4);
+        for _ in 0..16384 {
+            expected_bytes.push(0);
+            expected_bytes.push(0);
+            expected_bytes.push(0);
+            expected_bytes.push(7);
+        }
+
+        // serialize
+        let serialized_bytes = check_top_encode(&arr);
+        assert_eq!(serialized_bytes, expected_bytes);
+
+        // deserialize
+        let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..]).unwrap();
+        for i in 0..16384 {
+            assert_eq!(deserialized[i], 7i32);
+        }
+    }
+}

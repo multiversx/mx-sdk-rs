@@ -103,3 +103,25 @@ tuple_impls! {
     (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
     (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::test_util::{ser_deser_ok, ser_ok};
+
+    #[test]
+    fn test_encode() {
+        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
+    }
+
+    #[test]
+    fn test_decode() {
+        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
+    }
+
+    #[test]
+    fn test_encode_decode() {
+        let t = (1i8, 2u32, 3i16);
+        let expected: &[u8] = &[1, 0, 0, 0, 2, 0, 3];
+        ser_deser_ok(t, expected);
+    }
+}

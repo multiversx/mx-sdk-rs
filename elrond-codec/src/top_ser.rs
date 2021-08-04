@@ -325,7 +325,6 @@ impl TopEncode for NonZeroUsize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_struct::*;
     use super::*;
     use crate::test_util::check_top_encode;
     use core::fmt::Debug;
@@ -414,45 +413,7 @@ mod tests {
     }
 
     #[test]
-    fn test_struct() {
-        let test = Test {
-            int: 1,
-            seq: [5, 6].to_vec(),
-            another_byte: 7,
-        };
-
-        ser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
-    }
-
-    #[test]
-    fn test_tuple() {
-        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
-    }
-
-    #[test]
     fn test_unit() {
         ser_ok((), &[]);
-    }
-
-    #[test]
-    fn test_enum() {
-        let u = E::Unit;
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-        ser_ok(u, expected);
-
-        let n = E::Newtype(1);
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-        ser_ok(n, expected);
-
-        let t = E::Tuple(1, 2);
-        let expected: &[u8] = &[
-            /*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
-            2, /*)*/
-        ];
-        ser_ok(t, expected);
-
-        let s = E::Struct { a: 1 };
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-        ser_ok(s, expected);
     }
 }
