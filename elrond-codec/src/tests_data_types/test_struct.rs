@@ -14,13 +14,13 @@ pub mod test_struct {
     use crate::top_ser_output::TopEncodeOutput;
 
     #[derive(PartialEq, Debug)]
-    pub struct Test {
+    pub struct S {
         pub int: u16,
         pub seq: Vec<u8>,
         pub another_byte: u8,
     }
 
-    impl NestedEncode for Test {
+    impl NestedEncode for S {
         fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
             self.int.dep_encode(dest)?;
             self.seq.dep_encode(dest)?;
@@ -40,7 +40,7 @@ pub mod test_struct {
         }
     }
 
-    impl TopEncode for Test {
+    impl TopEncode for S {
         #[inline]
         fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
             top_encode_from_nested(self, output)
@@ -57,9 +57,9 @@ pub mod test_struct {
         }
     }
 
-    impl NestedDecode for Test {
+    impl NestedDecode for S {
         fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-            Ok(Test {
+            Ok(S {
                 int: u16::dep_decode(input)?,
                 seq: Vec::<u8>::dep_decode(input)?,
                 another_byte: u8::dep_decode(input)?,
@@ -71,7 +71,7 @@ pub mod test_struct {
             c: ExitCtx,
             exit: fn(ExitCtx, DecodeError) -> !,
         ) -> Self {
-            Test {
+            S {
                 int: u16::dep_decode_or_exit(input, c.clone(), exit),
                 seq: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
                 another_byte: u8::dep_decode_or_exit(input, c.clone(), exit),
@@ -79,7 +79,7 @@ pub mod test_struct {
         }
     }
 
-    impl TopDecode for Test {
+    impl TopDecode for S {
         fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
             top_decode_from_nested(input)
         }
@@ -113,7 +113,7 @@ pub mod tests {
     }
     #[test]
     fn test_encode() {
-        let test = Test {
+        let test = S {
             int: 1,
             seq: [5, 6].to_vec(),
             another_byte: 7,
@@ -124,7 +124,7 @@ pub mod tests {
 
     #[test]
     fn test_decode() {
-        let test = Test {
+        let test = S {
             int: 1,
             seq: [5, 6].to_vec(),
             another_byte: 7,
@@ -134,7 +134,7 @@ pub mod tests {
 
     #[test]
     fn test_encode_decode() {
-        let test = Test {
+        let test = S {
             int: 1,
             seq: [5, 6].to_vec(),
             another_byte: 7,
