@@ -10,14 +10,13 @@ pub use alloc::vec::Vec;
 
 mod codec_err;
 mod default_traits;
-mod macros;
+mod impl_for_types;
 mod nested_de;
 mod nested_de_input;
 mod nested_ser;
 mod nested_ser_output;
 mod num_conv;
 pub mod test_util;
-mod tests_data_types;
 mod top_de;
 mod top_de_input;
 mod top_ser;
