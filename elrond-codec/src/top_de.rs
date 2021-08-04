@@ -308,7 +308,6 @@ impl TopDecode for NonZeroUsize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_struct::*;
     use super::*;
     use crate::test_util::check_top_decode;
     use core::fmt::Debug;
@@ -357,37 +356,5 @@ mod tests {
     fn test_top_decode_str() {
         deser_ok(String::from("abc"), &[b'a', b'b', b'c']);
         deser_ok(String::from("abc").into_boxed_str(), &[b'a', b'b', b'c']);
-    }
-
-    #[test]
-    fn test_struct() {
-        let test = Test {
-            int: 1,
-            seq: [5, 6].to_vec(),
-            another_byte: 7,
-        };
-        deser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
-    }
-
-    #[test]
-    fn test_enum() {
-        let u = E::Unit;
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-        deser_ok(u, expected);
-
-        let n = E::Newtype(1);
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-        deser_ok(n, expected);
-
-        let t = E::Tuple(1, 2);
-        let expected: &[u8] = &[
-            /*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
-            2, /*)*/
-        ];
-        deser_ok(t, expected);
-
-        let s = E::Struct { a: 1 };
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-        deser_ok(s, expected);
     }
 }
