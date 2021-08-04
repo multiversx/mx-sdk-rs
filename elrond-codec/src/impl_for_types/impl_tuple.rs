@@ -106,22 +106,18 @@ tuple_impls! {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_util::{ser_deser_ok, ser_ok};
+    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
     #[test]
-    fn test_encode() {
-        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
-    }
-
-    #[test]
-    fn test_decode() {
-        ser_ok((7u32, -2i16), &[0, 0, 0, 7, 255, 254]);
-    }
-
-    #[test]
-    fn test_encode_decode() {
+    fn test_top() {
         let t = (1i8, 2u32, 3i16);
         let expected: &[u8] = &[1, 0, 0, 0, 2, 0, 3];
-        ser_deser_ok(t, expected);
+        check_top_encode_decode(t, expected);
+    }
+    #[test]
+    fn test_dep() {
+        let t = (1i8, 2u32, 3i16);
+        let expected: &[u8] = &[1, 0, 0, 0, 2, 0, 3];
+        check_dep_encode_decode(t, expected);
     }
 }

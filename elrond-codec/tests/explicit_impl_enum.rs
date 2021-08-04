@@ -1,3 +1,5 @@
+use elrond_codec::test_util::check_dep_encode_decode;
+use elrond_codec::test_util::check_top_encode_decode;
 use elrond_codec::NestedDecode;
 use elrond_codec::NestedDecodeInput;
 use elrond_codec::NestedEncode;
@@ -8,7 +10,6 @@ use elrond_codec::TopEncodeOutput;
 use elrond_codec::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
 use elrond_codec::{top_encode_from_nested, top_encode_from_nested_or_exit, TopEncode};
 use elrond_codec::{DecodeError, EncodeError};
-use elrond_codec::test_util::{deser_ok, ser_ok};
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum E {
@@ -124,43 +125,43 @@ impl TopDecode for E {
 }
 
 #[test]
-fn test_encode() {
+fn test_top() {
     let u = E::Unit;
     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-    ser_ok(u, expected);
+    check_top_encode_decode(u, expected);
 
     let n = E::Newtype(1);
     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-    ser_ok(n, expected);
+    check_top_encode_decode(n, expected);
 
     let t = E::Tuple(1, 2);
     let expected: &[u8] = &[
         /*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2, /*)*/
     ];
-    ser_ok(t, expected);
+    check_top_encode_decode(t, expected);
 
     let s = E::Struct { a: 1 };
     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-    ser_ok(s, expected);
+    check_top_encode_decode(s, expected);
 }
 
 #[test]
-fn test_decode() {
+fn test_dep() {
     let u = E::Unit;
     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-    deser_ok(u, expected);
+    check_dep_encode_decode(u, expected);
 
     let n = E::Newtype(1);
     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-    deser_ok(n, expected);
+    check_dep_encode_decode(n, expected);
 
     let t = E::Tuple(1, 2);
     let expected: &[u8] = &[
         /*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0, 2, /*)*/
     ];
-    deser_ok(t, expected);
+    check_dep_encode_decode(t, expected);
 
     let s = E::Struct { a: 1 };
     let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-    deser_ok(s, expected);
+    check_dep_encode_decode(s, expected);
 }
