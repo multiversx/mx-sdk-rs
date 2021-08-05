@@ -136,7 +136,7 @@ pub trait EsdtNftMarketplace:
         };
         self.auction_by_id(auction_id).set(&auction);
 
-        self.emit_auction_token_event(auction, auction_id);
+        self.emit_auction_token_event(auction, auction_id, current_time);
         Ok(auction_id)
     }
 
@@ -211,7 +211,7 @@ pub trait EsdtNftMarketplace:
         auction.current_winner = caller;
         self.auction_by_id(auction_id).set(&auction);
 
-        self.emit_bid_event(auction, auction_id);
+        self.emit_bid_event(auction, auction_id, current_time);
         Ok(())
     }
 
@@ -239,7 +239,7 @@ pub trait EsdtNftMarketplace:
         self.distribute_tokens_after_auction_end(&auction);
         self.auction_by_id(auction_id).clear();
 
-        self.emit_end_auction(auction, auction_id);
+        self.emit_end_auction_event(auction, auction_id, current_time);
         Ok(())
     }
 
@@ -296,6 +296,7 @@ pub trait EsdtNftMarketplace:
             self.auction_by_id(auction_id).set(&auction);
         }
 
+        self.emit_buy_sft_event(auction, auction_id, current_time);
         Ok(())
     }
 
@@ -303,6 +304,7 @@ pub trait EsdtNftMarketplace:
     fn withdraw(&self, auction_id: u64) -> SCResult<()> {
         let auction = self.try_get_auction(auction_id)?;
         let caller = self.blockchain().get_caller();
+        let current_time = self.blockchain().get_block_timestamp();
 
         require!(
             auction.original_owner == caller,
@@ -320,6 +322,7 @@ pub trait EsdtNftMarketplace:
         let nft_amount = &auction.nr_auctioned_tokens;
         self.transfer_esdt(&caller, nft_type, nft_nonce, nft_amount, b"returned token");
 
+        self.emit_withdraw_event(auction, auction_id, current_time);
         Ok(())
     }
 
