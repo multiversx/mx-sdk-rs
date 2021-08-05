@@ -1,9 +1,9 @@
-use elrond_wasm::storage::mappers::{MapMapper, StorageClearable, StorageMapper};
+use elrond_wasm::storage::mappers::{SafeMapMapper, StorageClearable, StorageMapper};
 use elrond_wasm::types::BoxedBytes;
 use elrond_wasm_debug::TxContext;
 
-fn create_map() -> MapMapper<TxContext, u64, u64> {
-    MapMapper::new(TxContext::dummy(), BoxedBytes::from_concat(&[b"my_map"]))
+fn create_map() -> SafeMapMapper<TxContext, u64, u64> {
+    SafeMapMapper::new(TxContext::dummy(), BoxedBytes::from_concat(&[b"my_map"]))
 }
 
 #[test]
