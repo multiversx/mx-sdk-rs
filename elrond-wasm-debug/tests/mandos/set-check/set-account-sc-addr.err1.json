@@ -1,0 +1,13 @@
+{
+    "comment": "verifies a setState validation error",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:not-a-sc-address": {
+                    "code": "str:some-code"
+                }
+            }
+        }
+    ]
+}
