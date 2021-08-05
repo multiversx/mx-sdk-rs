@@ -85,6 +85,7 @@ pub fn check_dep_decode<T: NestedDecode + PartialEq + Debug>(bytes: &[u8]) -> T 
 }
 
 /// backwards compatibility only, will remove in next major release
+#[deprecated]
 pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
 where
     V: TopEncode + TopDecode + PartialEq + Debug,

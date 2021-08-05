@@ -213,12 +213,12 @@ impl TypeAbi for Address {
 mod address_tests {
     use super::*;
     use alloc::vec::Vec;
-    use elrond_codec::test_util::{check_top_encode, ser_deser_ok};
+    use elrond_codec::test_util::{check_top_encode, check_top_encode_decode};
 
     #[test]
     fn test_address() {
         let addr = Address::from([4u8; 32]);
-        ser_deser_ok(addr, &[4u8; 32]);
+        check_top_encode_decode(addr, &[4u8; 32]);
     }
 
     #[test]
@@ -227,7 +227,7 @@ mod address_tests {
         let mut expected: Vec<u8> = Vec::new();
         expected.push(1u8);
         expected.extend_from_slice(&[4u8; 32]);
-        ser_deser_ok(Some(addr), expected.as_slice());
+        check_top_encode_decode(Some(addr), expected.as_slice());
     }
 
     #[test]
