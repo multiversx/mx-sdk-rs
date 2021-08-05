@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.18.1] - 2021-08-5
+- Added "safe" storage mappers, which serialize keys using nested encoding instead of top. The old respective mappers only kept for backwards compatibility, are now deprecated.
+
 ## [elrond-wasm 0.18.0, mandos 0.8.0] - 2021-07-28
 
 - New math hooks exposed from Arwen:
