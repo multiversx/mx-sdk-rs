@@ -453,7 +453,7 @@ pub trait Erc1155 {
     fn get_balance_mapper(
         &self,
         owner: &Address,
-    ) -> MapMapper<Self::Storage, Self::BigUint, Self::BigUint>;
+    ) -> SafeMapMapper<Self::Storage, Self::BigUint, Self::BigUint>;
 
     // token owner
     // for non-fungible
