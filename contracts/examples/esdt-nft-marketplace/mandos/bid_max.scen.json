@@ -18,7 +18,7 @@
                     "str:NFT-123456",
                     "1"
                 ],
-                "gasLimit": "11,000,000",
+                "gasLimit": "12,000,000",
                 "gasPrice": "0"
             },
             "expect": {
