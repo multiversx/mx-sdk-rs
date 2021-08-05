@@ -122,8 +122,7 @@ impl<T: NestedDecode, const N: usize> TopDecode for [T; N] {
                 exit(c, DecodeError::ARRAY_DECODE_ERROR);
             }
             let raw = Box::into_raw(bs);
-            let array_box = unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) };
-            array_box
+            unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) }
         } else {
             Box::new(Self::top_decode_or_exit(input, c, exit))
         }
