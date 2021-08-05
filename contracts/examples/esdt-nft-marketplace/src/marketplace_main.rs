@@ -5,6 +5,7 @@ elrond_wasm::imports!();
 pub mod auction;
 use auction::*;
 
+mod events;
 mod storage;
 mod views;
 
@@ -12,7 +13,9 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 const NFT_AMOUNT: u32 = 1; // Token has to be unique to be considered NFT
 
 #[elrond_wasm::contract]
-pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
+pub trait EsdtNftMarketplace:
+    storage::StorageModule + views::ViewsModule + events::EventsModule
+{
     #[init]
     fn init(&self, bid_cut_percentage: u64) -> SCResult<()> {
         self.try_set_bid_cut_percentage(bid_cut_percentage)
@@ -108,7 +111,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             AuctionType::Nft
         };
 
-        self.auction_by_id(auction_id).set(&Auction {
+        let auction = Auction {
             auctioned_token: EsdtToken {
                 token_type: nft_type,
                 nonce: nft_nonce,
@@ -130,8 +133,10 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             current_winner: Address::zero(),
             marketplace_cut_percentage,
             creator_royalties_percentage,
-        });
+        };
+        self.auction_by_id(auction_id).set(&auction);
 
+        self.emit_auction_token_event(auction, auction_id, current_time);
         Ok(auction_id)
     }
 
@@ -206,6 +211,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
         auction.current_winner = caller;
         self.auction_by_id(auction_id).set(&auction);
 
+        self.emit_bid_event(auction, auction_id, current_time);
         Ok(())
     }
 
@@ -233,6 +239,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
         self.distribute_tokens_after_auction_end(&auction);
         self.auction_by_id(auction_id).clear();
 
+        self.emit_end_auction_event(auction, auction_id, current_time);
         Ok(())
     }
 
@@ -289,6 +296,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
             self.auction_by_id(auction_id).set(&auction);
         }
 
+        self.emit_buy_sft_event(auction, auction_id, current_time);
         Ok(())
     }
 
@@ -296,6 +304,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
     fn withdraw(&self, auction_id: u64) -> SCResult<()> {
         let auction = self.try_get_auction(auction_id)?;
         let caller = self.blockchain().get_caller();
+        let current_time = self.blockchain().get_block_timestamp();
 
         require!(
             auction.original_owner == caller,
@@ -313,6 +322,7 @@ pub trait EsdtNftMarketplace: storage::StorageModule + views::ViewsModule {
         let nft_amount = &auction.nr_auctioned_tokens;
         self.transfer_esdt(&caller, nft_type, nft_nonce, nft_amount, b"returned token");
 
+        self.emit_withdraw_event(auction, auction_id, current_time);
         Ok(())
     }
 
