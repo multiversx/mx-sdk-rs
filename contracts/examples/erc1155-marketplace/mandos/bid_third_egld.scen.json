@@ -65,8 +65,8 @@
                         "str:isFungible|u32:1|u8:1": "false",
                         "str:tokenTypeUri|u32:1|u8:1": "str:https://token-cdn-domain/{id}.json",
                         "str:lastValidTokenIdForType|u32:1|u8:1": "5",
-                        "str:balanceOf|address:creator|str:.mapped|u8:1": "4",
-                        "str:balanceOf|sc:marketplace_contract|str:.mapped|u8:1": "1",
+                        "str:balanceOf|address:creator|str:.mapped|u32:1": "4",
+                        "str:balanceOf|sc:marketplace_contract|str:.mapped|u32:1": "1",
 
                         "str:lastValidTypeId": "1",
 
@@ -78,12 +78,12 @@
 
                         "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:creator|str:.value|u32:1": "1",
-                        "str:balanceOf|address:creator|str:.node_id|u8:1": "1",
+                        "str:balanceOf|address:creator|str:.node_id|u32:1": "1",
                         "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1",
 
                         "str:balanceOf|sc:marketplace_contract|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|sc:marketplace_contract|str:.value|u32:1": "1",
-                        "str:balanceOf|sc:marketplace_contract|str:.node_id|u8:1": "1",
+                        "str:balanceOf|sc:marketplace_contract|str:.node_id|u32:1": "1",
                         "str:balanceOf|sc:marketplace_contract|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../../erc1155/output/erc1155.wasm"
