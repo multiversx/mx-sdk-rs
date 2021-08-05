@@ -1,91 +1,74 @@
-use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
+use super::{set_mapper, SafeSetMapper, StorageClearable, StorageMapper};
 use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
-use crate::storage::{storage_get, storage_set};
+use crate::storage;
 use crate::types::BoxedBytes;
+use alloc::vec::Vec;
 use core::marker::PhantomData;
-use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
+use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
+const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
-#[deprecated]
-pub struct MapMapper<SA, K, V>
+pub struct SafeMapStorageMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     api: SA,
     main_key: BoxedBytes,
-    keys_set: SetMapper<SA, K>,
+    keys_set: SafeSetMapper<SA, K>,
     _phantom: core::marker::PhantomData<V>,
 }
 
-impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V>
+impl<SA, K, V> StorageMapper<SA> for SafeMapStorageMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode,
-    V: TopEncode + TopDecode,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    V: StorageMapper<SA> + StorageClearable,
 {
     fn new(api: SA, main_key: BoxedBytes) -> Self {
-        MapMapper {
+        Self {
             api: api.clone(),
             main_key: main_key.clone(),
-            keys_set: SetMapper::<SA, K>::new(api, main_key),
+            keys_set: SafeSetMapper::<SA, K>::new(api, main_key),
             _phantom: PhantomData,
         }
     }
 }
 
-impl<SA, K, V> StorageClearable for MapMapper<SA, K, V>
+impl<SA, K, V> StorageClearable for SafeMapStorageMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode,
-    V: TopEncode + TopDecode,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    V: StorageMapper<SA> + StorageClearable,
 {
     fn clear(&mut self) {
-        for key in self.keys_set.iter() {
-            self.clear_mapped_value(&key);
+        for mut value in self.values() {
+            value.clear();
         }
         self.keys_set.clear();
     }
 }
 
-impl<SA, K, V> MapMapper<SA, K, V>
+impl<SA, K, V> SafeMapStorageMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode,
-    V: TopEncode + TopDecode,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    V: StorageMapper<SA> + StorageClearable,
 {
-    fn build_named_key(&self, name: &[u8], key: &K) -> BoxedBytes {
-        let bytes = top_encode_to_vec(&key).unwrap();
-        BoxedBytes::from_concat(&[self.main_key.as_slice(), name, &bytes])
+    fn build_named_key(&self, name: &[u8], key: &K) -> Vec<u8> {
+        let mut bytes = self.main_key.as_slice().to_vec();
+        bytes.extend_from_slice(name);
+        if let Result::Err(encode_error) = key.dep_encode(&mut bytes) {
+            self.api.signal_error(encode_error.message_bytes());
+        }
+        bytes
     }
 
-    fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(
-            self.api.clone(),
-            self.build_named_key(MAPPED_VALUE_IDENTIFIER, key)
-                .as_slice(),
-        )
-    }
-
-    fn set_mapped_value(&self, key: &K, value: &V) {
-        storage_set(
-            self.api.clone(),
-            self.build_named_key(MAPPED_VALUE_IDENTIFIER, key)
-                .as_slice(),
-            &value,
-        );
-    }
-
-    fn clear_mapped_value(&self, key: &K) {
-        storage_set(
-            self.api.clone(),
-            self.build_named_key(MAPPED_VALUE_IDENTIFIER, key)
-                .as_slice(),
-            &BoxedBytes::empty(),
-        );
+    fn get_mapped_storage_value(&self, key: &K) -> V {
+        let key = self.build_named_key(MAPPED_STORAGE_VALUE_IDENTIFIER, key);
+        <V as storage::mappers::StorageMapper<SA>>::new(self.api.clone(), key.into())
     }
 
     /// Returns `true` if the map contains no elements.
@@ -103,8 +86,16 @@ where
         self.keys_set.contains(k)
     }
 
+    /// Gets a reference to the value in the entry.
+    pub fn get(&self, k: &K) -> Option<V> {
+        if self.keys_set.contains(k) {
+            return Some(self.get_mapped_storage_value(k));
+        }
+        None
+    }
+
     /// Gets the given key's corresponding entry in the map for in-place manipulation.
-    pub fn entry(&mut self, key: K) -> Entry<'_, SA, K, V> {
+    pub fn entry(&mut self, key: K) -> Entry<SA, K, V> {
         if self.contains_key(&key) {
             Entry::Occupied(OccupiedEntry {
                 key,
@@ -120,30 +111,26 @@ where
         }
     }
 
-    /// Gets a reference to the value in the entry.
-    pub fn get(&self, k: &K) -> Option<V> {
-        if self.keys_set.contains(k) {
-            return Some(self.get_mapped_value(k));
-        }
-        None
+    /// Adds a default value for the key, if it is not already present.
+    ///
+    /// If the map did not have this key present, `true` is returned.
+    ///
+    /// If the map did have this value present, `false` is returned.
+    pub fn insert_default(&mut self, k: K) -> bool {
+        self.keys_set.insert(k)
     }
 
-    /// Sets the value of the entry, and returns the entry's old value.
-    pub fn insert(&mut self, k: K, v: V) -> Option<V> {
-        let old_value = self.get(&k);
-        self.set_mapped_value(&k, &v);
-        self.keys_set.insert(k);
-        old_value
-    }
-
-    /// Takes the value out of the entry, and returns it.
-    pub fn remove(&mut self, k: &K) -> Option<V> {
+    /// Removes the entry from the map.
+    ///
+    /// If the entry was removed, `true` is returned.
+    ///
+    /// If the map didn't contain an entry with this key, `false` is returned.
+    pub fn remove(&mut self, k: &K) -> bool {
         if self.keys_set.remove(k) {
-            let value = self.get_mapped_value(k);
-            self.clear_mapped_value(k);
-            return Some(value);
+            self.get_mapped_storage_value(k).clear();
+            return true;
         }
-        None
+        false
     }
 
     /// An iterator visiting all keys in arbitrary order.
@@ -168,20 +155,20 @@ where
 pub struct Iter<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     key_iter: Keys<'a, SA, K>,
-    hash_map: &'a MapMapper<SA, K, V>,
+    hash_map: &'a SafeMapStorageMapper<SA, K, V>,
 }
 
 impl<'a, SA, K, V> Iter<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
-    fn new(hash_map: &'a MapMapper<SA, K, V>) -> Iter<'a, SA, K, V> {
+    fn new(hash_map: &'a SafeMapStorageMapper<SA, K, V>) -> Iter<'a, SA, K, V> {
         Iter {
             key_iter: hash_map.keys(),
             hash_map,
@@ -192,8 +179,8 @@ where
 impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     type Item = (K, V);
 
@@ -210,20 +197,20 @@ where
 pub struct Values<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     key_iter: Keys<'a, SA, K>,
-    hash_map: &'a MapMapper<SA, K, V>,
+    hash_map: &'a SafeMapStorageMapper<SA, K, V>,
 }
 
 impl<'a, SA, K, V> Values<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
-    fn new(hash_map: &'a MapMapper<SA, K, V>) -> Values<'a, SA, K, V> {
+    fn new(hash_map: &'a SafeMapStorageMapper<SA, K, V>) -> Values<'a, SA, K, V> {
         Values {
             key_iter: hash_map.keys(),
             hash_map,
@@ -234,8 +221,8 @@ where
 impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     type Item = V;
 
@@ -252,8 +239,8 @@ where
 pub enum Entry<'a, SA, K: 'a, V: 'a>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     /// A vacant entry.
     Vacant(VacantEntry<'a, SA, K, V>),
@@ -262,31 +249,31 @@ where
     Occupied(OccupiedEntry<'a, SA, K, V>),
 }
 
-/// A view into a vacant entry in a `MapMapper`.
+/// A view into a vacant entry in a `SafeMapStorageMapper`.
 /// It is part of the [`Entry`] enum.
 pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     pub(super) key: K,
-    pub(super) map: &'a mut MapMapper<SA, K, V>,
+    pub(super) map: &'a mut SafeMapStorageMapper<SA, K, V>,
 
     // Be invariant in `K` and `V`
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
 }
 
-/// A view into an occupied entry in a `MapMapper`.
+/// A view into an occupied entry in a `SafeMapStorageMapper`.
 /// It is part of the [`Entry`] enum.
 pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     pub(super) key: K,
-    pub(super) map: &'a mut MapMapper<SA, K, V>,
+    pub(super) map: &'a mut SafeMapStorageMapper<SA, K, V>,
 
     // Be invariant in `K` and `V`
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
@@ -295,40 +282,15 @@ where
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + Clone + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     /// Ensures a value is in the entry by inserting the default if empty, and returns
     /// an `OccupiedEntry`.
-    pub fn or_insert(self, default: V) -> OccupiedEntry<'a, SA, K, V> {
+    pub fn or_insert_default(self) -> OccupiedEntry<'a, SA, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
-            Entry::Vacant(entry) => entry.insert(default),
-        }
-    }
-
-    /// Ensures a value is in the entry by inserting the result of the default function if empty,
-    /// and returns an `OccupiedEntry`.
-    pub fn or_insert_with<F: FnOnce() -> V>(self, default: F) -> OccupiedEntry<'a, SA, K, V> {
-        match self {
-            Entry::Occupied(entry) => entry,
-            Entry::Vacant(entry) => entry.insert(default()),
-        }
-    }
-
-    /// Ensures a value is in the entry by inserting, if empty, the result of the default function.
-    /// This method allows for generating key-derived values for insertion by providing the default
-    /// function a reference to the key that was moved during the `.entry(key)` method call.
-    ///
-    /// The reference to the moved key is provided so that cloning or copying the key is
-    /// unnecessary, unlike with `.or_insert_with(|| ... )`.
-    pub fn or_insert_with_key<F: FnOnce(&K) -> V>(self, default: F) -> OccupiedEntry<'a, SA, K, V> {
-        match self {
-            Entry::Occupied(entry) => entry,
-            Entry::Vacant(entry) => {
-                let value = default(entry.key());
-                entry.insert(value)
-            },
+            Entry::Vacant(entry) => entry.insert_default(),
         }
     }
 
@@ -356,18 +318,18 @@ where
     }
 }
 
-impl<'a, SA, K, V: Default> Entry<'a, SA, K, V>
+impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + Clone + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     /// Ensures a value is in the entry by inserting the default value if empty,
     /// and returns an `OccupiedEntry`.
     pub fn or_default(self) -> OccupiedEntry<'a, SA, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
-            Entry::Vacant(entry) => entry.insert(Default::default()),
+            Entry::Vacant(entry) => entry.insert_default(),
         }
     }
 }
@@ -375,8 +337,8 @@ where
 impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + Clone + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     /// Gets a reference to the key that would be used when inserting a value
     /// through the VacantEntry.
@@ -386,8 +348,8 @@ where
 
     /// Sets the value of the entry with the `VacantEntry`'s key,
     /// and returns an `OccupiedEntry`.
-    pub fn insert(self, value: V) -> OccupiedEntry<'a, SA, K, V> {
-        self.map.insert(self.key.clone(), value);
+    pub fn insert_default(self) -> OccupiedEntry<'a, SA, K, V> {
+        self.map.insert_default(self.key.clone());
         OccupiedEntry {
             key: self.key,
             map: self.map,
@@ -399,18 +361,12 @@ where
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + Clone + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: StorageMapper<SA> + StorageClearable,
 {
     /// Gets a reference to the key in the entry.
     pub fn key(&self) -> &K {
         &self.key
-    }
-
-    /// Take ownership of the key and value from the map.
-    pub fn remove_entry(self) -> (K, V) {
-        let value = self.map.remove(&self.key).unwrap();
-        (self.key, value)
     }
 
     /// Gets the value in the entry.
@@ -423,19 +379,11 @@ where
     /// Propagates the return value of the given function.
     pub fn update<R, F: FnOnce(&mut V) -> R>(&mut self, f: F) -> R {
         let mut value = self.get();
-        let result = f(&mut value);
-        self.map.insert(self.key.clone(), value);
-        result
+        f(&mut value)
     }
 
-    /// Sets the value of the entry with the `OccupiedEntry`'s key,
-    /// and returns the entry's old value.
-    pub fn insert(self, value: V) -> V {
-        self.map.insert(self.key, value).unwrap()
-    }
-
-    /// Takes the value of the entry out of the map, and returns it.
-    pub fn remove(self) -> V {
-        self.map.remove(&self.key).unwrap()
+    /// Removes the entry from the map.
+    pub fn remove(self) {
+        self.map.remove(&self.key);
     }
 }
