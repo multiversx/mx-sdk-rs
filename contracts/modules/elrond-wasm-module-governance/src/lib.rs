@@ -462,10 +462,11 @@ pub trait GovernanceModule:
     fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, Self::BigUint>;
+    fn votes(&self, proposal_id: usize) -> SafeMapMapper<Self::Storage, Address, Self::BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, Self::BigUint>;
+    fn downvotes(&self, proposal_id: usize)
+        -> SafeMapMapper<Self::Storage, Address, Self::BigUint>;
 
     /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]

@@ -416,7 +416,7 @@ pub trait Erc1155Marketplace {
     #[storage_mapper("claimableFunds")]
     fn get_claimable_funds_mapper(
         &self,
-    ) -> MapMapper<Self::Storage, TokenIdentifier, Self::BigUint>;
+    ) -> SafeMapMapper<Self::Storage, TokenIdentifier, Self::BigUint>;
 
     // auction properties for each token
 
