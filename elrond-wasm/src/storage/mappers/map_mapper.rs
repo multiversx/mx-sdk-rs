@@ -8,6 +8,7 @@ use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
+#[deprecated]
 pub struct MapMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,

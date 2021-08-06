@@ -37,7 +37,7 @@ mod elrond_codec_tests {
     use elrond_wasm::elrond_codec::test_util::{check_top_decode, check_top_encode};
     use elrond_wasm::elrond_codec::*;
 
-    pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
+    pub fn check_top_encode_decode<V>(element: V, expected_bytes: &[u8])
     where
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
@@ -52,12 +52,12 @@ mod elrond_codec_tests {
 
     #[test]
     fn test_big_int_serialization() {
-        ser_deser_ok(RustBigInt::from(5), &[5u8]);
-        ser_deser_ok(RustBigInt::from(-5), &[251u8]);
+        check_top_encode_decode(RustBigInt::from(5), &[5u8]);
+        check_top_encode_decode(RustBigInt::from(-5), &[251u8]);
     }
 
     #[test]
     fn test_big_uint_serialization() {
-        ser_deser_ok(RustBigUint::from(5u32), &[5u8]);
+        check_top_encode_decode(RustBigUint::from(5u32), &[5u8]);
     }
 }

@@ -6,7 +6,7 @@ pub trait MapStorageMapperFeatures {
     #[storage_mapper("map_storage_mapper")]
     fn map_storage_mapper(
         &self,
-    ) -> MapStorageMapper<Self::Storage, u32, MapMapper<Self::Storage, u32, u32>>;
+    ) -> SafeMapStorageMapper<Self::Storage, u32, SafeMapMapper<Self::Storage, u32, u32>>;
 
     #[view]
     fn map_storage_mapper_view(&self) -> MultiResultVec<u32> {
