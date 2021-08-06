@@ -75,6 +75,17 @@ pub trait ProxyTestFirst {
     }
 
     #[payable("EGLD")]
+    #[endpoint(upgradeSecondContract)]
+    fn upgrade_second_contract(&self, #[payment] payment: Self::BigUint, code: BoxedBytes) {
+        let other_contract = self.get_other_contract();
+
+        self.message_me_proxy()
+            .contract(other_contract)
+            .init(payment, 456)
+            .upgrade_contract(&code, CodeMetadata::DEFAULT);
+    }
+
+    #[payable("EGLD")]
     #[endpoint(forwardToOtherContract)]
     fn forward_to_other_contract(
         &self,
