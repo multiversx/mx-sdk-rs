@@ -1,13 +1,9 @@
-use crate::codec_err::{DecodeError, EncodeError};
-use crate::nested_de::NestedDecode;
-use crate::nested_de_input::NestedDecodeInput;
-use crate::nested_ser::NestedEncodeNoErr;
-use crate::nested_ser_output::NestedEncodeOutput;
-use crate::top_de::TopDecode;
-use crate::top_de_input::TopDecodeInput;
-use crate::top_ser::{TopEncode, TopEncodeNoErr};
-use crate::top_ser_output::TopEncodeOutput;
-use crate::{top_encode_from_no_err, TypeInfo};
+use crate::{
+    dep_encode_from_no_err, nested_ser::NestedEncodeNoErr, top_encode_from_no_err,
+    top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TypeInfo,
+};
 
 impl TopEncodeNoErr for () {
     #[inline]
@@ -36,6 +32,8 @@ impl TopDecode for () {
 impl NestedEncodeNoErr for () {
     fn dep_encode_no_err<O: NestedEncodeOutput>(&self, _: &mut O) {}
 }
+
+dep_encode_from_no_err! {(), TypeInfo::Unit}
 
 impl NestedDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;

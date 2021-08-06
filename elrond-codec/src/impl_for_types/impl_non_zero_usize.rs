@@ -85,3 +85,19 @@ impl NestedDecode for NonZeroUsize {
         }
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use core::num::NonZeroUsize;
+
+    #[test]
+    fn test_top() {
+        check_top_encode_decode(NonZeroUsize::new(5).unwrap(), &[5]);
+    }
+
+    #[test]
+    fn test_dep() {
+        check_dep_encode_decode(NonZeroUsize::new(5).unwrap(), &[0, 0, 0, 5]);
+    }
+}

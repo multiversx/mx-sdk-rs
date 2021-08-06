@@ -46,10 +46,3 @@ pub fn dep_encode_to_vec<T: NestedEncode>(obj: &T) -> Result<Vec<u8>, EncodeErro
     obj.dep_encode(&mut bytes)?;
     Ok(bytes)
 }
-
-// No reversing needed for u8, because it is a single byte.
-impl NestedEncodeNoErr for u8 {
-    fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
-        dest.push_byte(*self as u8);
-    }
-}
