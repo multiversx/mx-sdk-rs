@@ -7,6 +7,7 @@ mod builtin_func_exec;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
+mod mandos_step;
 mod mock_error;
 mod tx_context;
 
@@ -15,6 +16,7 @@ pub use blockchain_mock::*;
 pub use builtin_func_exec::*;
 pub use contract_map::*;
 pub use display_util::*;
+pub use mandos_step::*;
 pub use mock_error::*;
 pub use tx_context::*;
 
@@ -35,7 +37,7 @@ mod elrond_codec_tests {
     use elrond_wasm::elrond_codec::test_util::{check_top_decode, check_top_encode};
     use elrond_wasm::elrond_codec::*;
 
-    pub fn ser_deser_ok<V>(element: V, expected_bytes: &[u8])
+    pub fn check_top_encode_decode<V>(element: V, expected_bytes: &[u8])
     where
         V: TopEncode + TopDecode + PartialEq + Debug + 'static,
     {
@@ -50,12 +52,12 @@ mod elrond_codec_tests {
 
     #[test]
     fn test_big_int_serialization() {
-        ser_deser_ok(RustBigInt::from(5), &[5u8]);
-        ser_deser_ok(RustBigInt::from(-5), &[251u8]);
+        check_top_encode_decode(RustBigInt::from(5), &[5u8]);
+        check_top_encode_decode(RustBigInt::from(-5), &[251u8]);
     }
 
     #[test]
     fn test_big_uint_serialization() {
-        ser_deser_ok(RustBigUint::from(5u32), &[5u8]);
+        check_top_encode_decode(RustBigUint::from(5u32), &[5u8]);
     }
 }

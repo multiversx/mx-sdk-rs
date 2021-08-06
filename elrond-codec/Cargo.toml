@@ -24,3 +24,7 @@ optional = true
 [dependencies]
 wee_alloc = "0.4"
 arrayvec = { version = "0.7.1", default-features = false }
+
+[dev-dependencies.elrond-codec-derive]
+path = "../elrond-codec-derive"
+version = "=0.5.3"

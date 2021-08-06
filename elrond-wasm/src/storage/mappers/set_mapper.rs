@@ -11,6 +11,7 @@ use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
+#[deprecated]
 pub struct SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,

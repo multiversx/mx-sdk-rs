@@ -117,6 +117,33 @@ pub trait ForwarderAsyncCallModule {
             .async_call()
     }
 
+    #[endpoint]
+    fn multi_transfer_via_async(
+        &self,
+        to: Address,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, Self::BigUint>>,
+    ) {
+        let mut all_token_payments = Vec::new();
+
+        for multi_arg in token_payments.into_vec() {
+            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment {
+                token_name,
+                token_nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid, // not used
+            };
+
+            all_token_payments.push(payment);
+        }
+
+        self.send().transfer_multiple_esdt_via_async_call(
+            &to,
+            &all_token_payments,
+            b"accept_multi_funds_echo",
+        );
+    }
+
     #[view]
     #[storage_mapper("callback_data")]
     fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::BigUint>>;
