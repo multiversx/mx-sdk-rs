@@ -1,9 +1,7 @@
 use crate::codec_err::{DecodeError, EncodeError};
 use crate::nested_de::NestedDecode;
 use crate::nested_de_input::NestedDecodeInput;
-use crate::nested_ser::{
-    dep_encode_slice_contents, dep_encode_slice_contents_or_exit, NestedEncode,
-};
+use crate::nested_ser::NestedEncode;
 use crate::nested_ser_output::NestedEncodeOutput;
 use crate::top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
 use crate::top_de_input::TopDecodeInput;
@@ -16,7 +14,7 @@ use arrayvec::ArrayVec;
 impl<T: NestedEncode, const N: usize> NestedEncode for [T; N] {
     #[inline]
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        dep_encode_slice_contents(&self[..], dest)
+        super::impl_slice::dep_encode_slice_contents(&self[..], dest)
     }
 
     #[inline]
@@ -26,7 +24,7 @@ impl<T: NestedEncode, const N: usize> NestedEncode for [T; N] {
         c: ExitCtx,
         exit: fn(ExitCtx, EncodeError) -> !,
     ) {
-        dep_encode_slice_contents_or_exit(&self[..], dest, c, exit);
+        super::impl_slice::dep_encode_slice_contents_or_exit(&self[..], dest, c, exit);
     }
 }
 
