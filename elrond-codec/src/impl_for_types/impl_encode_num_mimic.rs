@@ -4,6 +4,7 @@ use crate::nested_ser::NestedEncode;
 use crate::nested_ser::NestedEncodeNoErr;
 use crate::nested_ser_output::NestedEncodeOutput;
 use crate::TypeInfo;
+
 // Derive the implementation of the other types by casting.
 #[macro_export]
 macro_rules! encode_num_mimic {
@@ -25,4 +26,3 @@ encode_num_mimic! {i32, u32, TypeInfo::I32}
 encode_num_mimic! {isize, u32, TypeInfo::ISIZE}
 encode_num_mimic! {i16, u16, TypeInfo::I16}
 encode_num_mimic! {i8, u8, TypeInfo::I8}
-encode_num_mimic! {bool, u8, TypeInfo::Bool}
