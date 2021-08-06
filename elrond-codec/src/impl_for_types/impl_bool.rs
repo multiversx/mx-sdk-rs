@@ -7,7 +7,7 @@ use crate::top_de::TopDecode;
 use crate::top_de_input::TopDecodeInput;
 use crate::top_ser::{TopEncode, TopEncodeNoErr};
 use crate::top_ser_output::TopEncodeOutput;
-use crate::{dep_encode_from_no_err, encode_num_mimic, top_encode_from_no_err, TypeInfo};
+use crate::{dep_encode_from_no_err, dep_encode_num_mimic, top_encode_from_no_err, TypeInfo};
 
 impl TopEncodeNoErr for bool {
     fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
@@ -43,7 +43,7 @@ impl TopDecode for bool {
     }
 }
 
-encode_num_mimic! {bool, u8, TypeInfo::Bool}
+dep_encode_num_mimic! {bool, u8, TypeInfo::Bool}
 
 impl NestedDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;

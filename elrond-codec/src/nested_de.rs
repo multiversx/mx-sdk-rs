@@ -54,19 +54,3 @@ pub fn dep_decode_from_byte_slice_or_exit<D: NestedDecode, ExitCtx: Clone>(
     }
     result
 }
-
-impl NestedDecode for u8 {
-    const TYPE_INFO: TypeInfo = TypeInfo::U8;
-
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_byte()
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        input.read_byte_or_exit(c, exit)
-    }
-}
