@@ -5,7 +5,6 @@ use core::num::NonZeroUsize;
 
 use crate::codec_err::DecodeError;
 use crate::nested_de_input::NestedDecodeInput;
-use crate::num_conv::bytes_to_number;
 use crate::TypeInfo;
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
@@ -174,65 +173,6 @@ impl NestedDecode for Box<str> {
     }
 }
 
-macro_rules! decode_num_unsigned {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
-        impl NestedDecode for $ty {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.read_slice($num_bytes)?;
-                let num = bytes_to_number(bytes, false) as $ty;
-                Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
-                let num = bytes_to_number(bytes, false) as $ty;
-                num
-            }
-        }
-    };
-}
-
-decode_num_unsigned!(u16, 2, TypeInfo::U16);
-decode_num_unsigned!(u32, 4, TypeInfo::U32);
-decode_num_unsigned!(usize, 4, TypeInfo::USIZE);
-decode_num_unsigned!(u64, 8, TypeInfo::U64);
-
-macro_rules! decode_num_signed {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
-        impl NestedDecode for $ty {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.read_slice($num_bytes)?;
-                let num = bytes_to_number(bytes, true) as $ty;
-                Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
-                let num = bytes_to_number(bytes, true) as $ty;
-                num
-            }
-        }
-    };
-}
-
-decode_num_signed!(i8, 1, TypeInfo::I8);
-decode_num_signed!(i16, 2, TypeInfo::I16);
-decode_num_signed!(i32, 4, TypeInfo::I32);
-decode_num_signed!(isize, 4, TypeInfo::ISIZE);
-decode_num_signed!(i64, 8, TypeInfo::I64);
-
 impl NestedDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
@@ -293,52 +233,6 @@ impl<T: NestedDecode> NestedDecode for Box<T> {
     }
 }
 
-macro_rules! tuple_impls {
-    ($($len:expr => ($($n:tt $name:ident)+))+) => {
-        $(
-            impl<$($name),+> NestedDecode for ($($name,)+)
-            where
-                $($name: NestedDecode,)+
-            {
-                fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                    Ok((
-                        $(
-                            $name::dep_decode(input)?,
-                        )+
-                    ))
-                }
-
-                fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
-                    (
-                        $(
-                            $name::dep_decode_or_exit(input, c.clone(), exit),
-                        )+
-                    )
-                }
-            }
-        )+
-    }
-}
-
-tuple_impls! {
-    1 => (0 T0)
-    2 => (0 T0 1 T1)
-    3 => (0 T0 1 T1 2 T2)
-    4 => (0 T0 1 T1 2 T2 3 T3)
-    5 => (0 T0 1 T1 2 T2 3 T3 4 T4)
-    6 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-    7 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-    8 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-    9 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-    10 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-    11 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-    12 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-    13 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-    14 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-    15 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-    16 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
-}
-
 impl NestedDecode for NonZeroUsize {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         if let Some(nz) = NonZeroUsize::new(usize::dep_decode(input)?) {
@@ -358,87 +252,5 @@ impl NestedDecode for NonZeroUsize {
         } else {
             exit(c, DecodeError::INVALID_VALUE)
         }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-#[cfg(test)]
-mod tests {
-    use super::super::test_struct::*;
-    use super::*;
-    use crate::test_util::check_dep_decode;
-    use core::fmt::Debug;
-
-    fn deser_ok<V>(element: V, bytes: &[u8])
-    where
-        V: NestedDecode + PartialEq + Debug + 'static,
-    {
-        let input = bytes.to_vec();
-        let deserialized: V = check_dep_decode::<V>(&input[..]);
-        assert_eq!(deserialized, element);
-    }
-
-    #[test]
-    fn test_dep_decode_numbers() {
-        // unsigned positive
-        deser_ok(5u8, &[5]);
-        deser_ok(5u16, &[0, 5]);
-        deser_ok(5u32, &[0, 0, 0, 5]);
-        deser_ok(5usize, &[0, 0, 0, 5]);
-        deser_ok(5u64, &[0, 0, 0, 0, 0, 0, 0, 5]);
-        // signed positive
-        deser_ok(5i8, &[5]);
-        deser_ok(5i16, &[0, 5]);
-        deser_ok(5i32, &[0, 0, 0, 5]);
-        deser_ok(5isize, &[0, 0, 0, 5]);
-        deser_ok(5i64, &[0, 0, 0, 0, 0, 0, 0, 5]);
-        // signed negative
-        deser_ok(-5i8, &[251]);
-        deser_ok(-5i16, &[255, 251]);
-        deser_ok(-5i32, &[255, 255, 255, 251]);
-        deser_ok(-5isize, &[255, 255, 255, 251]);
-        deser_ok(-5i64, &[255, 255, 255, 255, 255, 255, 255, 251]);
-        // non zero usize
-        deser_ok(NonZeroUsize::new(5).unwrap(), &[0, 0, 0, 5]);
-    }
-
-    #[test]
-	#[rustfmt::skip]
-	fn test_dep_decode_str() {
-		deser_ok(String::from("abc"), &[0, 0, 0, 3, b'a', b'b', b'c']);
-		deser_ok(String::from("abc").into_boxed_str(), &[0, 0, 0, 3, b'a', b'b', b'c']);
-	}
-
-    #[test]
-    fn test_struct() {
-        let test = Test {
-            int: 1,
-            seq: [5, 6].to_vec(),
-            another_byte: 7,
-        };
-        deser_ok(test, &[0, 1, 0, 0, 0, 2, 5, 6, 7]);
-    }
-
-    #[test]
-    fn test_enum() {
-        let u = E::Unit;
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 0];
-        deser_ok(u, expected);
-
-        let n = E::Newtype(1);
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 1, /*data*/ 0, 0, 0, 1];
-        deser_ok(n, expected);
-
-        let t = E::Tuple(1, 2);
-        let expected: &[u8] = &[
-            /*variant index*/ 0, 0, 0, 2, /*(*/ 0, 0, 0, 1, /*,*/ 0, 0, 0,
-            2, /*)*/
-        ];
-        deser_ok(t, expected);
-
-        let s = E::Struct { a: 1 };
-        let expected: &[u8] = &[/*variant index*/ 0, 0, 0, 3, /*data*/ 0, 0, 0, 1];
-        deser_ok(s, expected);
     }
 }

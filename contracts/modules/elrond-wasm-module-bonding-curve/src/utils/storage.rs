@@ -19,7 +19,7 @@ pub trait StorageModule {
     ) -> SingleValueMapper<Self::Storage, BondingCurve<Self::BigUint>>;
 
     #[storage_mapper("owned_tokens")]
-    fn owned_tokens(&self, owner: &Address) -> SetMapper<Self::Storage, TokenIdentifier>;
+    fn owned_tokens(&self, owner: &Address) -> SafeSetMapper<Self::Storage, TokenIdentifier>;
 
     #[storage_mapper("nonce_amount")]
     fn nonce_amount(
