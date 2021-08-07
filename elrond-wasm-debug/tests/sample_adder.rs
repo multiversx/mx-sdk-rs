@@ -306,11 +306,11 @@ mod sample_adder {
     {
         fn get_sum(&self) -> Self::BigInt {
             let key: &'static [u8] = b"sum";
-            elrond_wasm::storage_get(self.get_storage_raw(), &key[..])
+            elrond_wasm::storage_get_old(self.get_storage_raw(), &key[..])
         }
         fn set_sum(&self, sum: &Self::BigInt) {
             let key: &'static [u8] = b"sum";
-            elrond_wasm::storage_set(self.get_storage_raw(), &key[..], &sum);
+            elrond_wasm::storage_set_old(self.get_storage_raw(), &key[..], &sum);
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi> {

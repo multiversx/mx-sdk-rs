@@ -23,6 +23,7 @@ pub mod hex_call_data;
 pub mod io;
 pub mod log_util;
 mod macros;
+pub mod managed_codec;
 pub mod non_zero_util;
 pub mod storage;
 pub mod types;

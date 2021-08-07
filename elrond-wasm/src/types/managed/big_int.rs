@@ -4,10 +4,12 @@ use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 
 use alloc::string::String;
 
-use crate::api::ManagedTypeApi;
+use crate::api::{Handle, ManagedTypeApi};
+
+use super::ManagedBuffer;
 
 pub struct BigInt<M: ManagedTypeApi> {
-    handle: i32,
+    handle: Handle,
     api: M,
 }
 
@@ -16,6 +18,15 @@ pub enum Sign {
     Minus,
     NoSign,
     Plus,
+}
+
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
+	fn from(item: ManagedBuffer<M>) -> Self {
+		BigInt {
+			handle: item.api.managed_buffer_to_big_int_signed(item.handle),
+            api: item.api.clone(),
+		}
+	}
 }
 
 // impl<M: ManagedTypeApi> From<ArwenBigUint> for BigInt<M> {
@@ -191,7 +202,8 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     }
 }
 
-// use crate::elrond_codec::*;
+use crate::elrond_codec::*;
+use crate::managed_codec::*;
 
 // impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
 //     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
@@ -253,37 +265,15 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
 // 	}
 // }
 
-// impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
-// 	const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
-// 	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-// 		// since can_use_handle is provided constantly,
-// 		// the compiler is smart enough to only ever expand one of the if branches
-// 		let (can_use_handle, handle) = input.try_get_big_int_handle();
-// 		if can_use_handle {
-// 			Ok(BigInt { handle })
-// 		} else {
-// 			Ok(BigInt<M>::from_signed_bytes_be(
-// 				&*input.into_boxed_slice_u8(),
-// 			))
-// 		}
-// 	}
-
-// 	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-// 		input: I,
-// 		_: ExitCtx,
-// 		_: fn(ExitCtx, DecodeError) -> !,
-// 	) -> Self {
-// 		// since can_use_handle is provided constantly,
-// 		// the compiler is smart enough to only ever expand one of the if branches
-// 		let (can_use_handle, handle) = input.try_get_big_int_handle();
-// 		if can_use_handle {
-// 			BigInt { handle }
-// 		} else {
-// 			BigInt<M>::from_signed_bytes_be(&*input.into_boxed_slice_u8())
-// 		}
-// 	}
-// }
+impl<M: ManagedTypeApi> ManagedTopDecode<M> for BigInt<M> {
+	fn top_decode_or_exit<I: ManagedTopDecodeInput<M>, ExitCtx: Clone>(
+		input: I,
+		_: ExitCtx,
+		_: fn(ExitCtx, DecodeError) -> !,
+	) -> Self {
+		input.get_managed_buffer().into()
+	}
+}
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
     fn type_name() -> String {

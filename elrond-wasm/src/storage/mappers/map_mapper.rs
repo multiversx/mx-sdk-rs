@@ -1,6 +1,6 @@
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get_old, storage_set_old};
 use crate::types::BoxedBytes;
 use core::marker::PhantomData;
 use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
@@ -63,7 +63,7 @@ where
     }
 
     fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(
+        storage_get_old(
             self.api.clone(),
             self.build_named_key(MAPPED_VALUE_IDENTIFIER, key)
                 .as_slice(),
@@ -71,7 +71,7 @@ where
     }
 
     fn set_mapped_value(&self, key: &K, value: &V) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_named_key(MAPPED_VALUE_IDENTIFIER, key)
                 .as_slice(),
@@ -80,7 +80,7 @@ where
     }
 
     fn clear_mapped_value(&self, key: &K) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_named_key(MAPPED_VALUE_IDENTIFIER, key)
                 .as_slice(),

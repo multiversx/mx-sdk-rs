@@ -2,7 +2,7 @@ use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get_old, storage_set_old};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
 use core::marker::PhantomData;
@@ -114,14 +114,14 @@ where
     }
 
     fn get_info(&self) -> LinkedListMapperInfo {
-        storage_get(
+        storage_get_old(
             self.api.clone(),
             self.build_name_key(INFO_IDENTIFIER).as_slice(),
         )
     }
 
     fn set_info(&mut self, value: LinkedListMapperInfo) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_name_key(INFO_IDENTIFIER).as_slice(),
             &value,
@@ -129,7 +129,7 @@ where
     }
 
     fn get_node(&self, node_id: u32) -> Node {
-        storage_get(
+        storage_get_old(
             self.api.clone(),
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_slice(),
@@ -137,7 +137,7 @@ where
     }
 
     fn set_node(&mut self, node_id: u32, item: Node) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_slice(),
@@ -146,7 +146,7 @@ where
     }
 
     fn clear_node(&mut self, node_id: u32) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_slice(),
@@ -155,7 +155,7 @@ where
     }
 
     fn get_value(&self, node_id: u32) -> T {
-        storage_get(
+        storage_get_old(
             self.api.clone(),
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_slice(),
@@ -170,7 +170,7 @@ where
     }
 
     fn set_value(&mut self, node_id: u32, value: &T) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_slice(),
@@ -179,7 +179,7 @@ where
     }
 
     fn clear_value(&mut self, node_id: u32) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_slice(),

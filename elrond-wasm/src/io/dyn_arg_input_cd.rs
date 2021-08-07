@@ -1,20 +1,20 @@
-use crate::api::ErrorApi;
+use crate::api::{ErrorApi, ManagedTypeApi};
 use crate::hex_call_data::*;
 use crate::*;
 
-pub struct CallDataArgLoader<'a, SE>
+pub struct CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     deser: HexCallDataDeserializer<'a>,
-    signal_error: SE,
+    signal_error: A,
 }
 
-impl<'a, SE> CallDataArgLoader<'a, SE>
+impl<'a, A> CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-    pub fn new(deser: HexCallDataDeserializer<'a>, signal_error: SE) -> Self {
+    pub fn new(deser: HexCallDataDeserializer<'a>, signal_error: A) -> Self {
         CallDataArgLoader {
             deser,
             signal_error,
@@ -22,9 +22,9 @@ where
     }
 }
 
-impl<'a, SE> ErrorApi for CallDataArgLoader<'a, SE>
+impl<'a, A> ErrorApi for CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn signal_error(&self, message: &[u8]) -> ! {
@@ -32,9 +32,9 @@ where
     }
 }
 
-impl<'a, SE> DynArgInput<Vec<u8>> for CallDataArgLoader<'a, SE>
+impl<'a, A> DynArgInput<A, Vec<u8>> for CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn has_next(&self) -> bool {

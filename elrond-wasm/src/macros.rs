@@ -19,7 +19,7 @@ macro_rules! imports {
         use elrond_wasm::esdt::*;
         use elrond_wasm::io::*;
         use elrond_wasm::non_zero_util::*;
-        use elrond_wasm::storage::mappers::*;
+        // use elrond_wasm::storage::mappers::*;
         use elrond_wasm::types::*;
         use elrond_wasm::types::{SCResult::Err, SCResult::Ok};
         use elrond_wasm::{non_zero_usize, only_owner, require, sc_error};

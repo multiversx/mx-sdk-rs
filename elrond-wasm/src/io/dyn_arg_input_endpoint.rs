@@ -1,10 +1,10 @@
-use crate::api::{EndpointArgumentApi, ErrorApi};
+use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
 use crate::err_msg;
 use crate::{ArgDecodeInput, DynArgInput};
 
 pub struct EndpointDynArgLoader<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: EndpointArgumentApi + ManagedTypeApi + 'static,
 {
     api: AA,
     current_index: i32,
@@ -13,7 +13,7 @@ where
 
 impl<AA> EndpointDynArgLoader<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: EndpointArgumentApi + ManagedTypeApi + 'static,
 {
     pub fn new(api: AA) -> Self {
         let num_arguments = api.get_num_arguments();
@@ -27,7 +27,7 @@ where
 
 impl<AA> ErrorApi for EndpointDynArgLoader<AA>
 where
-    AA: EndpointArgumentApi + ErrorApi + 'static,
+    AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
     fn signal_error(&self, message: &[u8]) -> ! {
@@ -35,9 +35,9 @@ where
     }
 }
 
-impl<AA> DynArgInput<ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
+impl<AA> DynArgInput<AA, ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
 where
-    AA: EndpointArgumentApi + Clone + 'static,
+    AA: EndpointArgumentApi + ManagedTypeApi + Clone + 'static,
 {
     fn has_next(&self) -> bool {
         self.current_index < self.num_arguments

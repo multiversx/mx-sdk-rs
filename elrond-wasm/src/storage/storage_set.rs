@@ -1,8 +1,59 @@
-use crate::api::{ErrorApi, StorageWriteApi};
+use crate::api::{ErrorApi, ManagedTypeApi, StorageWriteApi};
+use crate::managed_codec::{ManagedTopEncode, ManagedTopEncodeOutput};
+use crate::types::ManagedBuffer;
 use crate::*;
 use elrond_codec::*;
 
-struct StorageSetOutput<'k, SWA>
+struct StorageSetManagedOutput<A>
+where
+    A: ManagedTypeApi + StorageWriteApi + ErrorApi + 'static,
+{
+    api: A,
+    key: ManagedBuffer<A>,
+}
+
+impl<A> StorageSetManagedOutput<A>
+where
+    A: ManagedTypeApi + StorageWriteApi + ErrorApi + 'static,
+{
+    #[inline]
+    fn new(api: A, base_key: &[u8]) -> Self {
+        StorageSetManagedOutput {
+            api: api.clone(),
+            key: ManagedBuffer::new_from_bytes(api, base_key),
+        }
+    }
+}
+
+impl<A> ManagedTopEncodeOutput<A> for StorageSetManagedOutput<A>
+where
+    A: ManagedTypeApi + StorageWriteApi + ErrorApi + 'static,
+{
+    fn get_api(&self) -> A {
+        self.api.clone()
+    }
+
+    fn set_managed_buffer(&self, value: &ManagedBuffer<A>) {
+        self.api
+            .storage_store_managed_buffer_raw(self.key.handle, value.handle);
+    }
+}
+
+pub fn storage_set<A, T>(api: A, key: &[u8], value: &T)
+where
+    T: ManagedTopEncode<A>,
+    A: ManagedTypeApi + StorageWriteApi + ErrorApi + 'static,
+{
+    value.top_encode_or_exit(
+        StorageSetManagedOutput::new(api.clone(), key),
+        api,
+        storage_set_exit,
+    );
+}
+
+// -------------------------------------------------------------------------------------------------
+
+struct StorageSetOutputLegacy<'k, SWA>
 where
     SWA: StorageWriteApi + ErrorApi + 'static,
 {
@@ -10,17 +61,17 @@ where
     key: &'k [u8],
 }
 
-impl<'k, SWA> StorageSetOutput<'k, SWA>
+impl<'k, SWA> StorageSetOutputLegacy<'k, SWA>
 where
     SWA: StorageWriteApi + ErrorApi + 'static,
 {
     #[inline]
     fn new(api: SWA, key: &'k [u8]) -> Self {
-        StorageSetOutput { api, key }
+        StorageSetOutputLegacy { api, key }
     }
 }
 
-impl<'k, SWA> TopEncodeOutput for StorageSetOutput<'k, SWA>
+impl<'k, SWA> TopEncodeOutput for StorageSetOutputLegacy<'k, SWA>
 where
     SWA: StorageWriteApi + ErrorApi + 'static,
 {
@@ -45,13 +96,13 @@ where
 }
 
 // #[inline]
-pub fn storage_set<SWA, T>(api: SWA, key: &[u8], value: &T)
+pub fn storage_set_old<SWA, T>(api: SWA, key: &[u8], value: &T)
 where
     T: TopEncode,
     SWA: StorageWriteApi + ErrorApi + Clone + 'static,
 {
     value.top_encode_or_exit(
-        StorageSetOutput::new(api.clone(), key),
+        StorageSetOutputLegacy::new(api.clone(), key),
         api,
         storage_set_exit,
     );

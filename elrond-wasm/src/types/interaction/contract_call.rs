@@ -1,9 +1,9 @@
+use crate::hex_call_data::HexCallDataSerializer;
 use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, TokenIdentifier};
 use crate::{
     api::{BigUintApi, SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
-    BytesArgLoader, DynArg,
+    DynArg,
 };
-use crate::{hex_call_data::HexCallDataSerializer, ArgId};
 use core::marker::PhantomData;
 
 /// Using max u64 to represent maximum possible gas,
@@ -192,13 +192,13 @@ where
 impl<SA, R> ContractCall<SA, R>
 where
     SA: SendApi + 'static,
-    R: DynArg,
+    R: DynArg<SA::ProxyTypeManager>,
 {
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context(mut self) -> R {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = self.api.execute_on_dest_context_raw(
+        let _raw_result = self.api.execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.payment_amount,
@@ -206,8 +206,9 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = BytesArgLoader::new(raw_result.as_slice(), self.api);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        // let mut loader = BytesArgLoader::new(raw_result.as_slice(), self.api);
+        // R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        panic!("temporarily unsupported")
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
@@ -222,7 +223,7 @@ where
         F: FnOnce(usize, usize) -> (usize, usize),
     {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = self.api.execute_on_dest_context_raw_custom_result_range(
+        let _raw_result = self.api.execute_on_dest_context_raw_custom_result_range(
             self.resolve_gas_limit(),
             &self.to,
             &self.payment_amount,
@@ -231,8 +232,9 @@ where
             range_closure,
         );
 
-        let mut loader = BytesArgLoader::new(raw_result.as_slice(), self.api);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        // let mut loader = BytesArgLoader::new(raw_result.as_slice(), self.api);
+        // R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        panic!("temporarily unsupported")
     }
 }
 

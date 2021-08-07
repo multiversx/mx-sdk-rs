@@ -1,6 +1,6 @@
-use crate::api::ManagedTypeApi;
+use crate::api::{Handle, ManagedTypeApi};
 
 pub struct BigUint<M: ManagedTypeApi> {
-    pub handle: i32,
+    pub handle: Handle,
     pub api: M,
 }

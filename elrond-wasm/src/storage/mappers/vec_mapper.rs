@@ -2,7 +2,7 @@ use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get_old, storage_set_old};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
 use core::{marker::PhantomData, usize};
@@ -72,12 +72,12 @@ where
     }
 
     fn save_count(&self, new_len: usize) {
-        storage_set(self.api.clone(), self.len_key().as_slice(), &new_len);
+        storage_set_old(self.api.clone(), self.len_key().as_slice(), &new_len);
     }
 
     /// Number of items managed by the mapper.
     pub fn len(&self) -> usize {
-        storage_get(self.api.clone(), self.len_key().as_slice())
+        storage_get_old(self.api.clone(), self.len_key().as_slice())
     }
 
     /// True if no items present in the mapper.
@@ -90,7 +90,7 @@ where
     pub fn push(&mut self, item: &T) -> usize {
         let mut len = self.len();
         len += 1;
-        storage_set(self.api.clone(), self.item_key(len).as_slice(), item);
+        storage_set_old(self.api.clone(), self.item_key(len).as_slice(), item);
         self.save_count(len);
         len
     }
@@ -102,7 +102,7 @@ where
         let mut len = self.len();
         for item in items {
             len += 1;
-            storage_set(self.api.clone(), self.item_key(len).as_slice(), item);
+            storage_set_old(self.api.clone(), self.item_key(len).as_slice(), item);
         }
         self.save_count(len);
         len
@@ -121,7 +121,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return the zero-value.
     pub fn get_unchecked(&self, index: usize) -> T {
-        storage_get(self.api.clone(), self.item_key(index).as_slice())
+        storage_get_old(self.api.clone(), self.item_key(index).as_slice())
     }
 
     /// Get item at index from storage.
@@ -163,7 +163,7 @@ where
 
     /// Keeping `set_unchecked` private on purpose, so developers don't write out of index limits by accident.
     fn set_unchecked(&self, index: usize, item: &T) {
-        storage_set(self.api.clone(), self.item_key(index).as_slice(), item);
+        storage_set_old(self.api.clone(), self.item_key(index).as_slice(), item);
     }
 
     /// Clears item at index from storage.

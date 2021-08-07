@@ -86,7 +86,7 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
     /// TODO: move to the storage API, once BigUint gets refactored
     #[inline]
     fn get_cumulated_validator_rewards(&self) -> Self::BalanceType {
-        storage::storage_get(self.clone(), storage::protected_keys::ELROND_REWARD_KEY)
+        storage::storage_get_old(self.clone(), storage::protected_keys::ELROND_REWARD_KEY)
     }
 
     /// Retrieves local roles for the token, by reading protected storage.
@@ -99,7 +99,7 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
             token_id.as_esdt_identifier(),
         ]
         .concat();
-        let raw_storage = storage::storage_get::<Self, BoxedBytes>(self.clone(), &key);
+        let raw_storage = storage::storage_get_old::<Self, BoxedBytes>(self.clone(), &key);
         let raw_storage_bytes = raw_storage.as_slice();
         let mut current_index = 0;
 

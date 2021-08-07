@@ -1,10 +1,56 @@
-use crate::api::{ErrorApi, StorageReadApi};
+use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::err_msg;
-use crate::types::BoxedBytes;
+use crate::managed_codec::{ManagedTopDecode, ManagedTopDecodeInput};
+use crate::types::{BoxedBytes, ManagedBuffer};
 use alloc::boxed::Box;
 use elrond_codec::*;
 
-struct StorageGetInput<'k, SRA>
+struct StorageGetManagedInput<A>
+where
+    A: ManagedTypeApi + StorageReadApi + ErrorApi + 'static,
+{
+    api: A,
+    key: ManagedBuffer<A>,
+}
+
+impl<A> StorageGetManagedInput<A>
+where
+    A: ManagedTypeApi + StorageReadApi + ErrorApi + 'static,
+{
+    #[inline]
+    fn new(api: A, base_key: &[u8]) -> Self {
+        StorageGetManagedInput {
+            api: api.clone(),
+            key: ManagedBuffer::new_from_bytes(api, base_key),
+        }
+    }
+}
+
+impl<A> ManagedTopDecodeInput<A> for StorageGetManagedInput<A>
+where
+    A: ManagedTypeApi + StorageReadApi + ErrorApi + 'static,
+{
+    fn get_managed_buffer(&self) -> ManagedBuffer<A> {
+        ManagedBuffer::new_from_raw_handle(
+            self.api.clone(),
+            self.api.storage_load_managed_buffer_raw(self.key.handle),
+        )
+    }
+}
+
+pub fn storage_get<A, T>(api: A, key: &[u8]) -> T
+where
+    T: ManagedTopDecode<A>,
+    A: ManagedTypeApi + StorageReadApi + ErrorApi + 'static,
+{
+    T::top_decode_or_exit(
+        StorageGetManagedInput::new(api.clone(), key),
+        api,
+        storage_get_exit,
+    )
+}
+
+struct StorageGetInputLegacy<'k, SRA>
 where
     SRA: StorageReadApi + ErrorApi + 'static,
 {
@@ -12,17 +58,17 @@ where
     key: &'k [u8],
 }
 
-impl<'k, SRA> StorageGetInput<'k, SRA>
+impl<'k, SRA> StorageGetInputLegacy<'k, SRA>
 where
     SRA: StorageReadApi + ErrorApi + 'static,
 {
     #[inline]
     fn new(api: SRA, key: &'k [u8]) -> Self {
-        StorageGetInput { api, key }
+        StorageGetInputLegacy { api, key }
     }
 }
 
-impl<'k, SRA> TopDecodeInput for StorageGetInput<'k, SRA>
+impl<'k, SRA> TopDecodeInput for StorageGetInputLegacy<'k, SRA>
 where
     SRA: StorageReadApi + ErrorApi + 'static,
 {
@@ -49,13 +95,13 @@ where
     // TODO: there is currently no API hook for storage of signed big ints
 }
 
-pub fn storage_get<SRA, T>(api: SRA, key: &[u8]) -> T
+pub fn storage_get_old<SRA, T>(api: SRA, key: &[u8]) -> T
 where
     T: TopDecode,
     SRA: StorageReadApi + ErrorApi + Clone + 'static,
 {
     T::top_decode_or_exit(
-        StorageGetInput::new(api.clone(), key),
+        StorageGetInputLegacy::new(api.clone(), key),
         api,
         storage_get_exit,
     )

@@ -39,7 +39,7 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
             quote! {
                 #msig {
                     #key_snippet
-                    elrond_wasm::storage_get(self.get_storage_raw(), &key[..])
+                    elrond_wasm::storage_get_old(self.get_storage_raw(), &key[..])
                 }
             }
         },
@@ -61,7 +61,7 @@ pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage_set(self.get_storage_raw(), &key[..], & #pat);
+            elrond_wasm::storage_set_old(self.get_storage_raw(), &key[..], & #pat);
         }
     }
 }

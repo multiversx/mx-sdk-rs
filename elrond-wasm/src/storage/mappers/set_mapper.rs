@@ -3,7 +3,7 @@ use super::{LinkedListMapper, StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get_old, storage_set_old};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
 use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
@@ -60,7 +60,7 @@ where
     }
 
     fn get_node_id(&self, value: &T) -> u32 {
-        storage_get(
+        storage_get_old(
             self.api.clone(),
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
                 .as_slice(),
@@ -68,7 +68,7 @@ where
     }
 
     fn set_node_id(&self, value: &T, node_id: u32) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
                 .as_slice(),
@@ -77,7 +77,7 @@ where
     }
 
     fn clear_node_id(&self, value: &T) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
                 .as_slice(),

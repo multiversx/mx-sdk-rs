@@ -1,39 +1,40 @@
+use crate::api::ManagedTypeApi;
 use crate::*;
 use crate::{api::ErrorApi, types::BoxedBytes};
 
-pub struct BytesArgLoader<'a, SE>
+pub struct BytesArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     bytes: &'a [BoxedBytes],
-    signal_error: SE,
+    api: A,
 }
 
-impl<'a, SE> BytesArgLoader<'a, SE>
+impl<'a, A> BytesArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-    pub fn new(bytes: &'a [BoxedBytes], signal_error: SE) -> Self {
+    pub fn new(bytes: &'a [BoxedBytes], api: A) -> Self {
         BytesArgLoader {
             bytes,
-            signal_error,
+            api,
         }
     }
 }
 
-impl<'a, SE> ErrorApi for BytesArgLoader<'a, SE>
+impl<'a, A> ErrorApi for BytesArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn signal_error(&self, message: &[u8]) -> ! {
-        self.signal_error.signal_error(message)
+        self.api.signal_error(message)
     }
 }
 
-impl<'a, SE> DynArgInput<&'a [u8]> for BytesArgLoader<'a, SE>
+impl<'a, A> DynArgInput<A, &'a [u8]> for BytesArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ErrorApi,
 {
     #[inline]
     fn has_next(&self) -> bool {

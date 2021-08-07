@@ -2,7 +2,7 @@ use super::StorageMapper;
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get_old, storage_set_old};
 use crate::types::BoxedBytes;
 use core::marker::PhantomData;
 use elrond_codec::{TopDecode, TopEncode};
@@ -39,7 +39,7 @@ where
 {
     /// Retrieves current value from storage.
     pub fn get(&self) -> T {
-        storage_get(self.api.clone(), self.key.as_slice())
+        storage_get_old(self.api.clone(), self.key.as_slice())
     }
 
     /// Returns whether the storage managed by this mapper is empty.
@@ -49,7 +49,7 @@ where
 
     /// Saves argument to storage.
     pub fn set(&self, new_value: &T) {
-        storage_set(self.api.clone(), self.key.as_slice(), new_value);
+        storage_set_old(self.api.clone(), self.key.as_slice(), new_value);
     }
 
     /// Saves argument to storage only if the storage is empty.

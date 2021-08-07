@@ -2,7 +2,7 @@ use super::StorageMapper;
 use crate::abi::{TypeAbi, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get_old, storage_set_old};
 use crate::types::{Address, BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
 
@@ -52,11 +52,11 @@ where
     /// Yields the user id for a given address.
     /// Will return 0 if the address is not known to the contract.
     pub fn get_user_id(&self, address: &Address) -> usize {
-        storage_get(self.api.clone(), self.get_user_id_key(address).as_slice())
+        storage_get_old(self.api.clone(), self.get_user_id_key(address).as_slice())
     }
 
     fn set_user_id(&self, address: &Address, id: usize) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.get_user_id_key(address).as_slice(),
             &id,
@@ -78,7 +78,7 @@ where
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_len is currently called twice
         if self.api.storage_load_len(key.as_slice()) > 0 {
-            Some(storage_get(self.api.clone(), key.as_slice()))
+            Some(storage_get_old(self.api.clone(), key.as_slice()))
         } else {
             None
         }
@@ -88,7 +88,7 @@ where
     /// Will cause a deserialization error if the id is invalid.
     pub fn get_user_address_unchecked(&self, id: usize) -> Address {
         let key = self.get_user_address_key(id);
-        storage_get(self.api.clone(), key.as_slice())
+        storage_get_old(self.api.clone(), key.as_slice())
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -97,14 +97,14 @@ where
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_len is currently called twice
         if self.api.storage_load_len(key.as_slice()) > 0 {
-            storage_get(self.api.clone(), key.as_slice())
+            storage_get_old(self.api.clone(), key.as_slice())
         } else {
             Address::zero()
         }
     }
 
     fn set_user_address(&self, id: usize, address: &Address) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.get_user_address_key(id).as_slice(),
             address,
@@ -117,11 +117,11 @@ where
 
     /// Number of users.
     pub fn get_user_count(&self) -> usize {
-        storage_get(self.api.clone(), self.get_user_count_key().as_slice())
+        storage_get_old(self.api.clone(), self.get_user_count_key().as_slice())
     }
 
     fn set_user_count(&self, user_count: usize) {
-        storage_set(
+        storage_set_old(
             self.api.clone(),
             self.get_user_count_key().as_slice(),
             &user_count,
