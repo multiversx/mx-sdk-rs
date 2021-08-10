@@ -3,9 +3,9 @@ mod big_uint_api_uncallable;
 mod elliptic_curve_api_uncallable;
 mod error_api_uncallable;
 mod managed_buffer_api_uncallable;
+mod managed_type_api_uncallable;
 mod send_api_uncallable;
 mod storage_api_uncallable;
-mod managed_type_api_uncallable;
 
 pub use big_uint_api_uncallable::*;
 pub use elliptic_curve_api_uncallable::*;
@@ -14,5 +14,3 @@ pub use elliptic_curve_api_uncallable::*;
 /// Provides context in ABI generators.
 #[derive(Clone)]
 pub struct UncallableApi;
-
-

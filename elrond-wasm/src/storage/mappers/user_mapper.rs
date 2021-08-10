@@ -1,6 +1,6 @@
 use super::StorageMapper;
 use crate::abi::{TypeAbi, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::{Address, BoxedBytes, MultiResultVec};
@@ -188,7 +188,7 @@ where
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let addr_vec = self.get_all_addresses();
         MultiResultVec::<Address>::from(addr_vec).finish(api);

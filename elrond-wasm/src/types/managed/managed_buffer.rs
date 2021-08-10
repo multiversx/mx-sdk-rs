@@ -26,12 +26,9 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
-    // pub(crate) fn new_from_raw_handle(api: M, handle: Handle) -> Self {
-    //     ManagedBuffer {
-    //         handle,
-    //         api,
-    //     }
-    // }
+    pub(crate) fn new_from_raw_handle(api: M, handle: Handle) -> Self {
+        ManagedBuffer { handle, api }
+    }
 
     pub fn len(&self) -> usize {
         self.api.len(self.handle)
@@ -47,7 +44,8 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
         // TODO: Arwen specialized API
-        self.api.extend_from_slice(self.handle, other.to_boxed_bytes().as_slice());
+        self.api
+            .extend_from_slice(self.handle, other.to_boxed_bytes().as_slice());
     }
 
     pub fn to_boxed_bytes(&self) -> BoxedBytes {

@@ -5,6 +5,7 @@ use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use alloc::string::String;
 
 use crate::api::ManagedTypeApi;
+use crate::types::BoxedBytes;
 
 use super::ManagedBuffer;
 
@@ -21,12 +22,25 @@ pub enum Sign {
 }
 
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
-	fn from(item: ManagedBuffer<M>) -> Self {
-		BigInt {
-			handle: item.api.managed_buffer_to_big_int_signed(item.handle),
+    fn from(item: ManagedBuffer<M>) -> Self {
+        BigInt {
+            handle: item.api.managed_buffer_to_big_int_signed(item.handle),
             api: item.api.clone(),
-		}
-	}
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> BigInt<M> {
+    pub fn to_signed_bytes_buffer(&self) -> ManagedBuffer<M> {
+        ManagedBuffer {
+            handle: self.api.big_int_to_managed_buffer_signed(self.handle),
+            api: self.api.clone(),
+        }
+    }
+
+    pub fn to_signed_bytes(&self) -> BoxedBytes {
+        self.api.get_signed_bytes(self.handle)
+    }
 }
 
 // impl<M: ManagedTypeApi> From<ArwenBigUint> for BigInt<M> {
@@ -231,7 +245,9 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
 
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        
+        if !output.set_specialized(&self.to_signed_bytes_buffer()) {
+            output.set_slice_u8(self.to_signed_bytes().as_slice());
+        }
         Ok(())
     }
 }
@@ -257,15 +273,15 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
 // }
 
 impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
-	const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.custom_cast::<ManagedBuffer<M>>() {
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
             Ok(managed_buffer.into())
         } else {
             Err(DecodeError::UNSUPPORTED_OPERATION)
         }
-	}
+    }
 }
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {

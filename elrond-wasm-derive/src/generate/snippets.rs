@@ -64,6 +64,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
@@ -119,6 +120,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
@@ -136,6 +138,7 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static
         {
@@ -150,6 +153,7 @@ pub fn impl_private_api() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
@@ -178,6 +182,7 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {

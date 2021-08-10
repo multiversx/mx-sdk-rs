@@ -8,10 +8,22 @@ pub trait TryStaticCast: Clone + 'static {
         TypeId::of::<Self>() == TypeId::of::<U>()
     }
 
-    fn try_cast<U: TryStaticCast>(&self) -> Option<U> {
+    #[inline]
+    fn try_cast<U: TryStaticCast>(self) -> Option<U> {
+        if Self::type_eq::<U>() {
+            let trans: U = unsafe { core::mem::transmute_copy(&self) };
+            core::mem::forget(self);
+            Some(trans)
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    fn try_cast_ref<'a, U: TryStaticCast>(&'a self) -> Option<&'a U> {
         if Self::type_eq::<U>() {
             let trans = unsafe { core::mem::transmute::<&Self, &U>(self) };
-            Some(trans.clone())
+            Some(trans)
         } else {
             None
         }
@@ -49,14 +61,20 @@ mod test {
     #[test]
     fn test_try_static_cast_simple() {
         let obj = SimpleType1(5);
-        assert_eq!(obj.try_cast::<SimpleType1>(), Some(obj.clone()));
-        assert_eq!(obj.try_cast::<SimpleType2>(), None);
+        assert_eq!(obj.clone().try_cast::<SimpleType1>(), Some(obj.clone()));
+        assert_eq!(obj.clone().try_cast::<SimpleType2>(), None);
+
+        assert_eq!(obj.try_cast_ref::<SimpleType1>(), Some(&obj));
+        assert_eq!(obj.try_cast_ref::<SimpleType2>(), None);
     }
 
     #[test]
     fn test_try_static_cast_with_generics() {
         let obj = GenericType::new(100, SimpleType1(5));
-        assert_eq!(obj.try_cast::<GenericType<SimpleType1>>(), Some(obj.clone()));
+        assert_eq!(
+            obj.clone().try_cast::<GenericType<SimpleType1>>(),
+            Some(obj.clone())
+        );
         assert_eq!(obj.try_cast::<GenericType<SimpleType2>>(), None);
     }
 }
