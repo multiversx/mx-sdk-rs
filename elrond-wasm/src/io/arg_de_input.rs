@@ -1,6 +1,6 @@
 use crate::api::EndpointArgumentApi;
 use crate::Box;
-use elrond_codec::TopDecodeInput;
+use elrond_codec::{TopDecodeInput, TryStaticCast};
 
 /// Adapter from the API to the TopDecodeInput trait.
 /// Allows objects to be deserialized directly from the API as arguments.
@@ -47,6 +47,10 @@ where
 
     fn into_i64(self) -> i64 {
         self.api.get_argument_i64(self.arg_index)
+    }
+
+    fn custom_cast<T: TryStaticCast>(self) -> Option<T> {
+        None
     }
 
     #[inline]
