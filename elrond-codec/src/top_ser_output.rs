@@ -1,4 +1,4 @@
-use crate::num_conv::top_encode_number_to_output;
+use crate::{TryStaticCast, num_conv::top_encode_number_to_output};
 use alloc::vec::Vec;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
@@ -33,6 +33,8 @@ pub trait TopEncodeOutput: Sized {
     fn set_unit(self) {
         self.set_slice_u8(&[]);
     }
+
+    // fn set_custom_cast<T: TryStaticCast>
 
     /// Unless you're developing elrond-wasm, please ignore.
     ///

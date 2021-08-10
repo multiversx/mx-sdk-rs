@@ -1,5 +1,6 @@
 use crate::num_conv::bytes_to_number;
 use crate::transmute::vec_into_boxed_slice;
+use crate::TryStaticCast;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
@@ -27,6 +28,10 @@ pub trait TopDecodeInput: Sized {
     /// Consumes the input object in the process.
     fn into_i64(self) -> i64 {
         bytes_to_number(&*self.into_boxed_slice_u8(), true) as i64
+    }
+
+    fn custom_cast<T: TryStaticCast>(self) -> Option<T> {
+        None
     }
 
     /// Unless you're developing elrond-wasm, please ignore.
