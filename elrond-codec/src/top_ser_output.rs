@@ -34,7 +34,9 @@ pub trait TopEncodeOutput: Sized {
         self.set_slice_u8(&[]);
     }
 
-    // fn set_custom_cast<T: TryStaticCast>
+    fn set_specialized<T: TryStaticCast>(&self, _value: &T) -> bool {
+        false
+    }
 
     /// Unless you're developing elrond-wasm, please ignore.
     ///

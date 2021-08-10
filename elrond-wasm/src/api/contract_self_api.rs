@@ -77,9 +77,9 @@ pub trait ContractBase: Sized {
 }
 
 pub trait ContractPrivateApi {
-    type ArgumentApi: EndpointArgumentApi + Clone + 'static;
+    type ArgumentApi: ManagedTypeApi + EndpointArgumentApi + Clone + 'static;
 
-    type FinishApi: EndpointFinishApi + ErrorApi + Clone + 'static;
+    type FinishApi: ManagedTypeApi + EndpointFinishApi + ErrorApi + Clone + 'static;
 
     fn argument_api(&self) -> Self::ArgumentApi;
 

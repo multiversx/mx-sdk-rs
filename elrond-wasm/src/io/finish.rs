@@ -1,17 +1,20 @@
-use crate::api::{EndpointFinishApi, ErrorApi};
+use elrond_codec::TryStaticCast;
+
+use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
 use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
+use crate::types::ManagedBuffer;
 use crate::Vec;
 
 struct ApiOutputAdapter<FA>
 where
-    FA: EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
     api: FA,
 }
 
 impl<FA> ApiOutputAdapter<FA>
 where
-    FA: EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
     #[inline]
     fn new(api: FA) -> Self {
@@ -21,7 +24,7 @@ where
 
 impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
-    FA: EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.finish_slice_u8(bytes);
@@ -38,6 +41,15 @@ where
     #[inline]
     fn set_unit(self) {
         // nothing: no result produced
+    }
+
+    fn set_specialized<T: TryStaticCast>(&self, value: &T) -> bool {
+        if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
+            self.api.finish_managed_buffer_raw(managed_buffer.handle);
+            true
+        } else {
+            false
+        }
     }
 
     #[inline]
@@ -59,7 +71,7 @@ pub trait EndpointResult: Sized {
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static;
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static;
 }
 
 /// All serializable objects can be used as smart contract function result.
@@ -71,7 +83,7 @@ where
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         self.top_encode_or_exit(ApiOutputAdapter::new(api.clone()), api, finish_exit);
     }
@@ -80,7 +92,7 @@ where
 #[inline(always)]
 fn finish_exit<FA>(api: FA, en_err: EncodeError) -> !
 where
-    FA: EndpointFinishApi + ErrorApi + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
 {
     api.signal_error(en_err.message_bytes())
 }

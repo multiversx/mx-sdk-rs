@@ -30,7 +30,7 @@ pub trait TopDecodeInput: Sized {
         bytes_to_number(&*self.into_boxed_slice_u8(), true) as i64
     }
 
-    fn custom_cast<T: TryStaticCast>(self) -> Option<T> {
+    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
         None
     }
 

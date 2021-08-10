@@ -1,5 +1,6 @@
-use crate::api::EndpointArgumentApi;
+use crate::api::ManagedTypeApi;
 use crate::Box;
+use crate::{api::EndpointArgumentApi, types::ManagedBuffer};
 use elrond_codec::{TopDecodeInput, TryStaticCast};
 
 /// Adapter from the API to the TopDecodeInput trait.
@@ -13,7 +14,7 @@ use elrond_codec::{TopDecodeInput, TryStaticCast};
 /// it means that this structures translates to a single glorified i32 in wasm.
 pub struct ArgDecodeInput<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi,
 {
     api: AA,
     arg_index: i32,
@@ -21,17 +22,22 @@ where
 
 impl<AA> ArgDecodeInput<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi,
 {
     #[inline]
     pub fn new(api: AA, arg_index: i32) -> Self {
         ArgDecodeInput { api, arg_index }
     }
+
+    fn into_managed_buffer(&self) -> ManagedBuffer<AA> {
+        let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
+        ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
+    }
 }
 
 impl<AA> TopDecodeInput for ArgDecodeInput<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi,
 {
     fn byte_len(&self) -> usize {
         self.api.get_argument_len(self.arg_index)
@@ -49,8 +55,12 @@ where
         self.api.get_argument_i64(self.arg_index)
     }
 
-    fn custom_cast<T: TryStaticCast>(self) -> Option<T> {
-        None
+    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
+        if T::type_eq::<ManagedBuffer<AA>>() {
+            self.into_managed_buffer().try_cast()
+        } else {
+            None
+        }
     }
 
     #[inline]

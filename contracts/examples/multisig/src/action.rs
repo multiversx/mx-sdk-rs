@@ -68,7 +68,7 @@ where
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         match self {
             PerformActionResult::Nothing => (),
