@@ -17,7 +17,7 @@ pub trait ContractAbiProvider {
     /// The generated ABI generation code uses the same types as the contract to provide `TypeAbi`s to endpoints.
     /// It sometimes references the contract storage manager type in with storage mappers,
     /// as for example in `SingleValueMapper<Self::Storage, i32>`.
-    type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// The generated ABI generation code uses the same types as the contract to provide `TypeAbi`s to endpoints.
     /// It is referenced by contract calls in general,

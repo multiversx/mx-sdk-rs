@@ -19,7 +19,7 @@ pub trait ContractBase: Sized {
     type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
     /// Abstracts the lower-level storage functionality.
-    type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// Abstracts the call value handling at the beginning of a function call.
     type CallValue: CallValueApi<AmountType = Self::BigUint> + ErrorApi + Clone + 'static;
