@@ -1,5 +1,4 @@
-use alloc::string::String;
-use elrond_wasm::api::ManagedBufferApi;
+use elrond_wasm::api::{Handle, ManagedBufferApi};
 use elrond_wasm::types::BoxedBytes;
 
 // extern int32_t	mBufferNew(void* context);
@@ -25,61 +24,41 @@ extern "C" {
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
     fn mBufferGetBytes(mBufferHandle: i32, resultOffset: *mut u8) -> i32;
     fn mBufferExtendFromSlice(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
-    fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
-    fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
-    fn mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
-    fn mBufferFromBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
-    fn mBufferStorageStore(keyOffset: *const u8, keyLength: i32, mBufferHandle: i32) -> i32;
-    fn mBufferStorageLoad(keyOffset: *const u8, keyLength: i32, mBufferHandle: i32) -> i32;
-    fn mBufferGetArgument(argId: i32, mBufferHandle: i32) -> i32;
-    fn mBufferFinish(mBufferHandle: i32) -> i32;
 }
 
-pub struct ArwenManagedBuffer {
-    pub handle: i32, // TODO: fix visibility
-}
-
-impl elrond_wasm::abi::TypeAbi for ArwenManagedBuffer {
-    fn type_name() -> String {
-        String::from("bytes")
+impl ManagedBufferApi for crate::ArwenApiImpl {
+    fn new_empty(&self) -> Handle {
+        unsafe { mBufferNew() }
     }
-}
 
-/// A raw bytes buffer managed by Arwen.
-impl ManagedBufferApi for ArwenManagedBuffer {
-    fn new_empty() -> Self {
+    fn new_from_bytes(&self, bytes: &[u8]) -> Handle {
+        unsafe { mBufferNewFromBytes(bytes.as_ptr(), bytes.len() as i32) }
+    }
+
+    fn len(&self, handle: Handle) -> usize {
+        unsafe { mBufferGetLength(handle as i32) as usize }
+    }
+
+    fn overwrite(&self, handle: Handle, bytes: &[u8]) {
         unsafe {
-            ArwenManagedBuffer {
-                handle: mBufferNew(),
+            let _ = mBufferSetBytes(handle as i32, bytes.as_ptr(), bytes.len() as i32);
+        }
+    }
+
+    fn extend_from_slice(&self, handle: Handle, bytes: &[u8]) {
+        unsafe {
+            let _ = mBufferExtendFromSlice(handle as i32, bytes.as_ptr(), bytes.len() as i32);
+        }
+    }
+
+    fn to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
+        unsafe {
+            let len = mBufferGetLength(handle);
+            let mut res = BoxedBytes::allocate(len as usize);
+            if len > 0 {
+                let _ = mBufferGetBytes(handle, res.as_mut_ptr());
             }
+            res
         }
-    }
-
-    fn new_from_bytes(bytes: &[u8]) -> Self {
-        unsafe {
-            ArwenManagedBuffer {
-                handle: mBufferNewFromBytes(bytes.as_ptr(), bytes.len() as i32),
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        unsafe { mBufferGetLength(self.handle as i32) as usize }
-    }
-
-    fn overwrite(&mut self, bytes: &[u8]) {
-        unsafe {
-            mBufferSetBytes(self.handle as i32, bytes.as_ptr(), bytes.len() as i32);
-        }
-    }
-
-    fn extend_from_slice(&mut self, bytes: &[u8]) {
-        unsafe {
-            mBufferExtendFromSlice(self.handle as i32, bytes.as_ptr(), bytes.len() as i32);
-        }
-    }
-
-    fn to_boxed_bytes(&self) -> BoxedBytes {
-        panic!()
     }
 }
