@@ -1,11 +1,5 @@
-use core::cmp::Ordering;
-use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
-use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
-
-use alloc::string::String;
-use alloc::vec::Vec;
-
-use elrond_wasm::api::{BigIntApi, Handle, Sign};
+use elrond_wasm::api::{BigIntApi, Handle};
+use elrond_wasm::types::BoxedBytes;
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
@@ -31,16 +25,16 @@ extern "C" {
 }
 
 macro_rules! binary_op_wrapper {
-	($method_name, $hook_name) => {
-		fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
-			unsafe {
-				$hook_name(dest, x, y);
-			}
-		}
-	};
+    ($method_name:ident, $hook_name:ident) => {
+        fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
+            unsafe {
+                $hook_name(dest, x, y);
+            }
+        }
+    };
 }
 
-impl BigIntApi for ArwenApiImpl {
+impl BigIntApi for crate::ArwenApiImpl {
     fn new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
     }
@@ -49,17 +43,17 @@ impl BigIntApi for ArwenApiImpl {
         unsafe { bigIntSignedByteLength(x) }
     }
 
-    fn get_signed_bytes(&self, reference: Handle) -> BoxedBytes {
+    fn get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
         unsafe {
-            let byte_len = bigIntSignedByteLength(self.handle);
-            let mut vec = vec![0u8; byte_len as usize];
-            bigIntGetSignedBytes(self.handle, vec.as_mut_ptr());
-            vec
+            let byte_len = bigIntSignedByteLength(handle);
+            let mut bb = BoxedBytes::allocate(byte_len as usize);
+            bigIntGetSignedBytes(handle, bb.as_mut_ptr());
+            bb
         }
     }
 
     fn set_signed_bytes(&self, destination: Handle, bytes: &[u8]) {
-        unsafe { bigIntSetSignedBytes(destination, bytes) }
+        unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
     fn is_int64(&self, reference: Handle) -> Handle {
@@ -70,12 +64,12 @@ impl BigIntApi for ArwenApiImpl {
         unsafe { bigIntGetInt64(reference) }
     }
 
-	binary_op_wrapper!{add, bigIntAdd}
-	binary_op_wrapper!{sub, bigIntSub}
-	binary_op_wrapper!{mul, bigIntMul}
-	binary_op_wrapper!{t_div, bigIntTDiv}
-	binary_op_wrapper!{t_mod, bigIntTMod}
-	binary_op_wrapper!{pow, bigIntPow}
+    binary_op_wrapper! {add, bigIntAdd}
+    binary_op_wrapper! {sub, bigIntSub}
+    binary_op_wrapper! {mul, bigIntMul}
+    binary_op_wrapper! {t_div, bigIntTDiv}
+    binary_op_wrapper! {t_mod, bigIntTMod}
+    binary_op_wrapper! {pow, bigIntPow}
 
     fn abs(&self, dest: Handle, x: Handle) {
         unsafe {

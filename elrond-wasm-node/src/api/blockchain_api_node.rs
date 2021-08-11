@@ -1,5 +1,4 @@
 use super::ArwenBigUint;
-use crate::ArwenApiImpl;
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
     Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
@@ -90,7 +89,7 @@ extern "C" {
     ) -> i32;
 }
 
-impl BlockchainApi for ArwenApiImpl {
+impl BlockchainApi for crate::ArwenApiImpl {
     type BalanceType = ArwenBigUint;
 
     #[inline]
