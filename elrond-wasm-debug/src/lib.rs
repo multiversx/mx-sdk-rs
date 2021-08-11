@@ -10,6 +10,9 @@ mod execute_mandos;
 mod mandos_step;
 mod mock_error;
 mod tx_context;
+mod tx_input;
+mod tx_log;
+mod tx_output;
 
 pub use async_data::*;
 pub use blockchain_mock::*;
@@ -19,6 +22,9 @@ pub use display_util::*;
 pub use mandos_step::*;
 pub use mock_error::*;
 pub use tx_context::*;
+pub use tx_input::*;
+pub use tx_log::*;
+pub use tx_output::*;
 
 pub use arwen_mandos_runner::mandos_go;
 pub use execute_mandos::mandos_rs;
