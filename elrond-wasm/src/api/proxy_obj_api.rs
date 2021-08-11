@@ -16,7 +16,7 @@ pub trait ProxyObjApi {
     /// as for example in `SingleValueMapper<Self::Storage, i32>`.
     /// In order for the proxy code to compile, it is necessary to specify this type here too
     /// (even though it is not required by the trait's methods per se).
-    type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     type SendApi: SendApi<AmountType = Self::BigUint, ProxyTypeManager = Self::TypeManager>
         + Clone

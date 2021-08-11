@@ -21,7 +21,7 @@ const COUNT_SUFFIX: &[u8] = b"_count";
 /// It also doesn't allow removing users. Once in, their ids are reserved forever.
 pub struct UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     api: SA,
     main_key: BoxedBytes,
@@ -29,7 +29,7 @@ where
 
 impl<SA> StorageMapper<SA> for UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     fn new(api: SA, main_key: BoxedBytes) -> Self {
         UserMapper { api, main_key }
@@ -38,7 +38,7 @@ where
 
 impl<SA> UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     fn get_user_id_key(&self, address: &Address) -> BoxedBytes {
         // TODO: build this more elegantly from elrond-codec
@@ -182,7 +182,7 @@ where
 /// and lists all users addresses.
 impl<SA> EndpointResult for UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     type DecodeAs = MultiResultVec<Address>;
 
@@ -198,7 +198,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA> TypeAbi for UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     fn type_name() -> TypeName {
         crate::types::MultiResultVec::<Address>::type_name()

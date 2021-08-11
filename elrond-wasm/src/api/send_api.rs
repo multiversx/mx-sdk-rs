@@ -28,7 +28,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     type ProxyEllipticCurve: EllipticCurveApi<BigUint = Self::AmountType> + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
-    type ProxyStorage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type ProxyStorage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// Required for ESDTNFTTransfer.
     /// Same as the implementation from BlockchainApi.
