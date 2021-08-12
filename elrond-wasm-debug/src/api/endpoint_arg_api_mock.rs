@@ -53,8 +53,13 @@ impl EndpointArgumentApi for TxContext {
             .insert_new_handle(result)
     }
 
-    fn get_argument_managed_buffer_raw(&self, _arg_id: i32) -> Handle {
-        panic!()
+    fn get_argument_managed_buffer_raw(&self, arg_index: i32) -> Handle {
+        let arg_bytes = self.get_argument_boxed_bytes(arg_index);
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output
+            .managed_types
+            .managed_buffer_map
+            .insert_new_handle(arg_bytes.as_slice().into())
     }
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {

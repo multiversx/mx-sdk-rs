@@ -23,7 +23,7 @@ impl elrond_wasm::api::ManagedTypeApi for crate::ArwenApiImpl {
     fn big_int_to_managed_buffer_signed(&self, big_int_handle: Handle) -> Handle {
         unsafe {
             let buffer_handle = mBufferNew();
-            mBufferToBigIntSigned(buffer_handle, big_int_handle);
+            mBufferFromBigIntSigned(buffer_handle, big_int_handle);
             buffer_handle
         }
     }
