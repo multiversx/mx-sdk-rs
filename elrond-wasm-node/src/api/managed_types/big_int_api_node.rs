@@ -1,4 +1,6 @@
-use elrond_wasm::api::{BigIntApi, Handle};
+use core::cmp::Ordering;
+
+use elrond_wasm::api::{BigIntApi, Handle, Sign};
 use elrond_wasm::types::BoxedBytes;
 
 extern "C" {
@@ -56,8 +58,8 @@ impl BigIntApi for crate::ArwenApiImpl {
         unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
-    fn is_int64(&self, reference: Handle) -> Handle {
-        unsafe { bigIntIsInt64(reference) }
+    fn is_int64(&self, reference: Handle) -> bool {
+        unsafe { bigIntIsInt64(reference) > 0 }
     }
 
     fn get_int64(&self, reference: Handle) -> i64 {
@@ -83,11 +85,17 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
-    fn sign(&self, x: Handle) -> i32 {
-        unsafe { bigIntSign(x) }
+    fn sign(&self, x: Handle) -> Sign {
+        unsafe {
+            match bigIntSign(x).cmp(&0) {
+                Ordering::Greater => Sign::Plus,
+                Ordering::Equal => Sign::NoSign,
+                Ordering::Less => Sign::Minus,
+            }
+        }
     }
 
-    fn cmp(&self, x: Handle, y: Handle) -> i32 {
-        unsafe { bigIntCmp(x, y) }
+    fn cmp(&self, x: Handle, y: Handle) -> Ordering {
+        unsafe { bigIntCmp(x, y).cmp(&0) }
     }
 }
