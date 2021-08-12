@@ -1,6 +1,6 @@
 use crate::{TxContext, TxPanic};
 use alloc::vec::Vec;
-use elrond_wasm::api::{StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BigIntApi, Handle, StorageReadApi, StorageWriteApi};
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
@@ -19,6 +19,10 @@ impl StorageReadApi for TxContext {
 
     fn storage_load_big_uint_raw(&self, _key: &[u8]) -> i32 {
         panic!("cannot call storage_load_big_uint_raw in debug mode");
+    }
+
+    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle) -> Handle {
+        unreachable!()
     }
 
     fn storage_load_u64(&self, key: &[u8]) -> u64 {
@@ -64,8 +68,12 @@ impl StorageWriteApi for TxContext {
             .insert(key.to_vec(), value.to_vec());
     }
 
-    fn storage_store_big_uint_raw(&self, _key: &[u8], _handle: i32) {
-        panic!("cannot call storage_store_big_uint_raw in debug mode");
+    fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
+        self.storage_store_slice_u8(key, self.get_signed_bytes(handle).as_slice());
+    }
+
+    fn storage_store_managed_buffer_raw(&self, _key_handle: Handle, _value_handle: Handle) {
+        unreachable!()
     }
 
     fn storage_store_u64(&self, key: &[u8], value: u64) {

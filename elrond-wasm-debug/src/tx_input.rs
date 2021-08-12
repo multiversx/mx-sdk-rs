@@ -1,12 +1,7 @@
-use crate::async_data::*;
-use crate::blockchain_mock::*;
 use crate::display_util::*;
-use alloc::rc::Rc;
 use alloc::vec::Vec;
-use core::cell::RefCell;
-use elrond_wasm::types::{Address, TokenIdentifier, H256};
+use elrond_wasm::types::{Address, H256};
 use num_bigint::BigUint;
-use std::collections::HashMap;
 use std::fmt;
 
 #[derive(Clone, Debug)]
