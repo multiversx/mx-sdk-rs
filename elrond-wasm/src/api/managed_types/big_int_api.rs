@@ -1,6 +1,15 @@
+use core::cmp::Ordering;
+
 use crate::types::BoxedBytes;
 
 use super::Handle;
+
+/// Only used for sending sign information from the API.
+pub enum Sign {
+    Minus,
+    NoSign,
+    Plus,
+}
 
 /// Definition of the BigInt type required by the API.
 pub trait BigIntApi {
@@ -13,7 +22,7 @@ pub trait BigIntApi {
     fn signed_byte_length(&self, x: Handle) -> Handle;
     fn get_signed_bytes(&self, reference: Handle) -> BoxedBytes;
     fn set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
-    fn is_int64(&self, reference: Handle) -> Handle;
+    fn is_int64(&self, reference: Handle) -> bool;
     fn get_int64(&self, reference: Handle) -> i64;
     fn add(&self, dest: Handle, x: Handle, y: Handle);
     fn sub(&self, dest: Handle, x: Handle, y: Handle);
@@ -23,8 +32,8 @@ pub trait BigIntApi {
     fn pow(&self, dest: Handle, x: Handle, y: Handle);
     fn abs(&self, dest: Handle, x: Handle);
     fn neg(&self, dest: Handle, x: Handle);
-    fn sign(&self, x: Handle) -> i32;
-    fn cmp(&self, x: Handle, y: Handle) -> i32;
+    fn sign(&self, x: Handle) -> Sign;
+    fn cmp(&self, x: Handle, y: Handle) -> Ordering;
 
     // fn zero(&self, ) -> Self {
     //     0i64.into(&self, )

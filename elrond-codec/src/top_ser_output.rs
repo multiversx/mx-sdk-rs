@@ -1,4 +1,4 @@
-use crate::{TryStaticCast, num_conv::top_encode_number_to_output};
+use crate::{num_conv::top_encode_number_to_output, TryStaticCast};
 use alloc::vec::Vec;
 
 /// Specifies objects that can receive the result of a TopEncode computation.

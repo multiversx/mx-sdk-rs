@@ -1,6 +1,6 @@
 use crate::api::{ErrorApi, ManagedTypeApi, StorageWriteApi};
-use crate::*;
 use crate::types::ManagedBuffer;
+use crate::*;
 use elrond_codec::*;
 
 struct StorageSetOutput<'k, SWA>
@@ -40,7 +40,8 @@ where
     fn set_specialized<T: TryStaticCast>(&self, value: &T) -> bool {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<SWA>>() {
             let key_handle = self.api.new_from_bytes(self.key);
-            self.api.storage_store_managed_buffer_raw(key_handle, managed_buffer.handle);
+            self.api
+                .storage_store_managed_buffer_raw(key_handle, managed_buffer.handle);
             true
         } else {
             false

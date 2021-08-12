@@ -158,8 +158,7 @@ binary_assign_operator! {RemAssign, rem_assign, t_mod}
 impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        let arwen_cmp = self.api.cmp(self.handle, other.handle);
-        arwen_cmp == 0
+        self.api.cmp(self.handle, other.handle).is_eq()
     }
 }
 
@@ -175,14 +174,17 @@ impl<M: ManagedTypeApi> PartialOrd for BigInt<M> {
 impl<M: ManagedTypeApi> Ord for BigInt<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        let arwen_cmp = self.api.cmp(self.handle, other.handle);
-        arwen_cmp.cmp(&0)
+        self.api.cmp(self.handle, other.handle)
     }
 }
 
-fn arwen_cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> i32 {
+fn cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> Ordering {
     if other == 0 {
-        bi.api.sign(bi.handle)
+        match bi.api.sign(bi.handle) {
+            crate::api::Sign::Plus => Ordering::Greater,
+            crate::api::Sign::NoSign => Ordering::Equal,
+            crate::api::Sign::Minus => Ordering::Less,
+        }
     } else {
         bi.api.cmp(bi.handle, bi.api.new(other))
     }
@@ -191,15 +193,14 @@ fn arwen_cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> i32 {
 impl<M: ManagedTypeApi> PartialEq<i64> for BigInt<M> {
     #[inline]
     fn eq(&self, other: &i64) -> bool {
-        arwen_cmp_i64(self, *other) == 0
+        cmp_i64(self, *other).is_eq()
     }
 }
 
 impl<M: ManagedTypeApi> PartialOrd<i64> for BigInt<M> {
     #[inline]
     fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        let arwen_cmp = arwen_cmp_i64(self, *other);
-        Some(arwen_cmp.cmp(&0))
+        Some(cmp_i64(self, *other))
     }
 }
 
@@ -300,11 +301,10 @@ impl<M: ManagedTypeApi> BigInt<M> {
     // }
 
     pub fn sign(&self) -> Sign {
-        let s = self.api.sign(self.handle);
-        match s.cmp(&0) {
-            Ordering::Greater => Sign::Plus,
-            Ordering::Equal => Sign::NoSign,
-            Ordering::Less => Sign::Minus,
+        match self.api.sign(self.handle) {
+            crate::api::Sign::Plus => Sign::Plus,
+            crate::api::Sign::NoSign => Sign::NoSign,
+            crate::api::Sign::Minus => Sign::Minus,
         }
     }
 
@@ -327,7 +327,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     pub fn to_i64(&self) -> Option<i64> {
         let is_i64_result = self.api.is_int64(self.handle);
-        if is_i64_result > 0 {
+        if is_i64_result {
             Some(self.api.get_int64(self.handle))
         } else {
             None

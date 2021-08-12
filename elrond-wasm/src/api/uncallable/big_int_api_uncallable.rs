@@ -1,4 +1,6 @@
-use crate::api::{BigIntApi, Handle};
+use core::cmp::Ordering;
+
+use crate::api::{BigIntApi, Handle, Sign};
 use crate::types::BoxedBytes;
 
 impl BigIntApi for super::UncallableApi {
@@ -18,7 +20,7 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn is_int64(&self, _reference: Handle) -> Handle {
+    fn is_int64(&self, _reference: Handle) -> bool {
         unreachable!()
     }
 
@@ -58,11 +60,11 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn sign(&self, _x: Handle) -> i32 {
+    fn sign(&self, _x: Handle) -> Sign {
         unreachable!()
     }
 
-    fn cmp(&self, _x: Handle, _y: Handle) -> i32 {
+    fn cmp(&self, _x: Handle, _y: Handle) -> Ordering {
         unreachable!()
     }
 }

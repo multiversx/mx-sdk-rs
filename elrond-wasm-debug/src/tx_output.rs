@@ -1,11 +1,8 @@
-use crate::TxLog;
 use crate::async_data::*;
-use crate::blockchain_mock::*;
-use crate::display_util::*;
-use alloc::rc::Rc;
+use crate::TxLog;
+use crate::TxManagedTypes;
 use alloc::vec::Vec;
-use core::cell::RefCell;
-use elrond_wasm::types::{Address, TokenIdentifier, H256};
+use elrond_wasm::types::{Address, TokenIdentifier};
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::fmt;
@@ -14,7 +11,6 @@ pub struct TxPanic {
     pub status: u64,
     pub message: Vec<u8>,
 }
-
 
 #[derive(Clone, Debug)]
 pub struct TxResult {
@@ -63,6 +59,7 @@ pub struct SendBalance {
 #[derive(Debug)]
 pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
+    pub managed_types: TxManagedTypes, // TODO: move to root TxContext and reorg everything
     pub result: TxResult,
     pub send_balance_list: Vec<SendBalance>,
     pub async_call: Option<AsyncCallTxData>,
@@ -72,6 +69,7 @@ impl Default for TxOutput {
     fn default() -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
+            managed_types: TxManagedTypes::new(),
             result: TxResult::empty(),
             send_balance_list: Vec::new(),
             async_call: None,
@@ -83,6 +81,7 @@ impl TxOutput {
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
+            managed_types: TxManagedTypes::new(),
             result: TxResult {
                 result_status: panic_obj.status,
                 result_message: panic_obj.message.clone(),
@@ -97,6 +96,7 @@ impl TxOutput {
     pub fn from_panic_string(_: &str) -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
+            managed_types: TxManagedTypes::new(),
             result: TxResult {
                 result_status: 4,
                 result_message: b"panic occurred".to_vec(),
