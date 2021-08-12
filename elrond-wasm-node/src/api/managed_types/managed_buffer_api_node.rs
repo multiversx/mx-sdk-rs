@@ -27,31 +27,31 @@ extern "C" {
 }
 
 impl ManagedBufferApi for crate::ArwenApiImpl {
-    fn new_empty(&self) -> Handle {
+    fn mb_new_empty(&self) -> Handle {
         unsafe { mBufferNew() }
     }
 
-    fn new_from_bytes(&self, bytes: &[u8]) -> Handle {
+    fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle {
         unsafe { mBufferNewFromBytes(bytes.as_ptr(), bytes.len() as i32) }
     }
 
-    fn len(&self, handle: Handle) -> usize {
+    fn mb_len(&self, handle: Handle) -> usize {
         unsafe { mBufferGetLength(handle as i32) as usize }
     }
 
-    fn overwrite(&self, handle: Handle, bytes: &[u8]) {
+    fn mb_overwrite(&self, handle: Handle, bytes: &[u8]) {
         unsafe {
             let _ = mBufferSetBytes(handle as i32, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
-    fn extend_from_slice(&self, handle: Handle, bytes: &[u8]) {
+    fn mb_append_slice(&self, handle: Handle, bytes: &[u8]) {
         unsafe {
             let _ = mBufferExtendFromSlice(handle as i32, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
-    fn to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
         unsafe {
             let len = mBufferGetLength(handle);
             let mut res = BoxedBytes::allocate(len as usize);

@@ -4,27 +4,27 @@ use crate::{
 };
 
 impl ManagedBufferApi for super::UncallableApi {
-    fn new_empty(&self) -> Handle {
+    fn mb_new_empty(&self) -> Handle {
         unreachable!()
     }
 
-    fn new_from_bytes(&self, _bytes: &[u8]) -> Handle {
+    fn mb_new_from_bytes(&self, _bytes: &[u8]) -> Handle {
         unreachable!()
     }
 
-    fn len(&self, _handle: Handle) -> usize {
+    fn mb_len(&self, _handle: Handle) -> usize {
         unreachable!()
     }
 
-    fn overwrite(&self, _handle: Handle, _value: &[u8]) {
+    fn mb_overwrite(&self, _handle: Handle, _value: &[u8]) {
         unreachable!()
     }
 
-    fn extend_from_slice(&self, _handle: Handle, _slice: &[u8]) {
+    fn mb_append_slice(&self, _handle: Handle, _slice: &[u8]) {
         unreachable!()
     }
 
-    fn to_boxed_bytes(&self, _handle: Handle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, _handle: Handle) -> BoxedBytes {
         unreachable!()
     }
 }

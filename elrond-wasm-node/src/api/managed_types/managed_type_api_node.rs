@@ -12,7 +12,7 @@ extern "C" {
 }
 
 impl elrond_wasm::api::ManagedTypeApi for crate::ArwenApiImpl {
-    fn managed_buffer_to_big_int_signed(&self, buffer_handle: Handle) -> Handle {
+    fn mb_to_big_int_signed(&self, buffer_handle: Handle) -> Handle {
         unsafe {
             let big_int_handle = bigIntNew(0);
             mBufferToBigIntSigned(buffer_handle, big_int_handle);
@@ -20,7 +20,7 @@ impl elrond_wasm::api::ManagedTypeApi for crate::ArwenApiImpl {
         }
     }
 
-    fn big_int_to_managed_buffer_signed(&self, big_int_handle: Handle) -> Handle {
+    fn mb_from_big_int_signed(&self, big_int_handle: Handle) -> Handle {
         unsafe {
             let buffer_handle = mBufferNew();
             mBufferFromBigIntSigned(buffer_handle, big_int_handle);

@@ -39,7 +39,7 @@ where
 
     fn set_specialized<T: TryStaticCast>(&self, value: &T) -> bool {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<SWA>>() {
-            let key_handle = self.api.new_from_bytes(self.key);
+            let key_handle = self.api.mb_new_from_bytes(self.key);
             self.api
                 .storage_store_managed_buffer_raw(key_handle, managed_buffer.handle);
             true
