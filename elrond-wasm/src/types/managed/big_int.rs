@@ -24,7 +24,7 @@ pub enum Sign {
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     fn from(item: ManagedBuffer<M>) -> Self {
         BigInt {
-            handle: item.api.managed_buffer_to_big_int_signed(item.handle),
+            handle: item.api.mb_to_big_int_signed(item.handle),
             api: item.api.clone(),
         }
     }
@@ -33,7 +33,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 impl<M: ManagedTypeApi> BigInt<M> {
     pub fn to_signed_bytes_buffer(&self) -> ManagedBuffer<M> {
         ManagedBuffer {
-            handle: self.api.big_int_to_managed_buffer_signed(self.handle),
+            handle: self.api.mb_from_big_int_signed(self.handle),
             api: self.api.clone(),
         }
     }

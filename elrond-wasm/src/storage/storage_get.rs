@@ -22,7 +22,7 @@ where
     }
 
     fn into_managed_buffer(&self) -> ManagedBuffer<SRA> {
-        let key_handle = self.api.new_from_bytes(self.key);
+        let key_handle = self.api.mb_new_from_bytes(self.key);
         let mbuf_handle = self.api.storage_load_managed_buffer_raw(key_handle);
         ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
     }

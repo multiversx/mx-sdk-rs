@@ -22,9 +22,9 @@ impl StorageReadApi for TxContext {
     }
 
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle {
-        let key_bytes = self.to_boxed_bytes(key_handle);
+        let key_bytes = self.mb_to_boxed_bytes(key_handle);
         let bytes = self.storage_load_vec_u8(key_bytes.as_slice());
-        self.new_from_bytes(bytes.as_slice())
+        self.mb_new_from_bytes(bytes.as_slice())
     }
 
     fn storage_load_u64(&self, key: &[u8]) -> u64 {
@@ -75,8 +75,8 @@ impl StorageWriteApi for TxContext {
     }
 
     fn storage_store_managed_buffer_raw(&self, key_handle: Handle, value_handle: Handle) {
-        let key_bytes = self.to_boxed_bytes(key_handle);
-        let value_bytes = self.to_boxed_bytes(value_handle);
+        let key_bytes = self.mb_to_boxed_bytes(key_handle);
+        let value_bytes = self.mb_to_boxed_bytes(value_handle);
         self.storage_store_slice_u8(key_bytes.as_slice(), value_bytes.as_slice());
     }
 

@@ -27,7 +27,7 @@ impl EndpointFinishApi for TxContext {
     }
 
     fn finish_managed_buffer_raw(&self, handle: Handle) {
-        let bytes = self.to_boxed_bytes(handle);
+        let bytes = self.mb_to_boxed_bytes(handle);
         self.finish_slice_u8(bytes.as_slice());
     }
 
