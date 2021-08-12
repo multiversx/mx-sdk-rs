@@ -55,7 +55,7 @@ fn impl_auto_impl(module_path: &ModulePath) -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
-				+ elrond_wasm::api::ManagedTypeApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static
         {
@@ -97,7 +97,7 @@ fn impl_endpoint_wrappers(module_path: &ModulePath) -> proc_macro2::TokenStream 
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
-				+ elrond_wasm::api::ManagedTypeApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {

@@ -5,7 +5,8 @@ use std::collections::HashMap;
 use crate::{
     address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, execute_tx,
     merge_results, try_execute_builtin_function, verbose_hex, AccountData, AsyncCallTxData,
-    BlockchainMock, BlockchainMockError, ContractMap, TxContext, TxInput, TxOutput, TxResult,
+    BlockchainMock, BlockchainMockError, ContractMap, TxContext, TxInput, TxManagedTypes, TxOutput,
+    TxResult,
 };
 pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
     let bytes = tx_id.as_bytes();
@@ -58,6 +59,7 @@ pub fn sc_call(
         tx_input,
         TxOutput {
             contract_storage: contract_account.storage.clone(),
+            managed_types: TxManagedTypes::new(),
             result: TxResult::empty(),
             send_balance_list: Vec::new(),
             async_call: None,
