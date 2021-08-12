@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 #[derive(Debug)]
 pub struct Account {
     pub comment: Option<String>,
-    pub nonce: U64Value,
-    pub balance: BigUintValue,
+    pub nonce: Option<U64Value>,
+    pub balance: Option<BigUintValue>,
     pub esdt: Option<BTreeMap<BytesKey, BigUintValue>>,
     pub username: Option<BytesValue>,
     pub storage: BTreeMap<BytesKey, BytesValue>,
@@ -17,8 +17,10 @@ impl InterpretableFrom<AccountRaw> for Account {
     fn interpret_from(from: AccountRaw, context: &InterpreterContext) -> Self {
         Account {
             comment: from.comment,
-            nonce: U64Value::interpret_from(from.nonce, context),
-            balance: BigUintValue::interpret_from(from.balance, context),
+            nonce: from.nonce.map(|n| U64Value::interpret_from(n, context)),
+            balance: from
+                .balance
+                .map(|b| BigUintValue::interpret_from(b, context)),
             esdt: from.esdt.map(|tree| {
                 tree.into_iter()
                     .map(|(k, v)| {
