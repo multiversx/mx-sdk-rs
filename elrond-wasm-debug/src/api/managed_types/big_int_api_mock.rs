@@ -49,16 +49,10 @@ impl BigIntApi for TxContext {
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
 
-    fn is_int64(&self, handle: Handle) -> bool {
+    fn bi_to_i64(&self, handle: Handle) -> Option<i64> {
         let tx_output = self.tx_output_cell.borrow();
         let bi = tx_output.managed_types.big_int_map.get(handle);
-        big_int_to_i64(bi).is_some()
-    }
-
-    fn get_int64(&self, handle: Handle) -> i64 {
-        let tx_output = self.tx_output_cell.borrow();
-        let bi = tx_output.managed_types.big_int_map.get(handle);
-        big_int_to_i64(bi).unwrap()
+        big_int_to_i64(bi)
     }
 
     binary_op_method! {add, add}

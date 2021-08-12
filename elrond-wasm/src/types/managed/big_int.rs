@@ -326,12 +326,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     // }
 
     pub fn to_i64(&self) -> Option<i64> {
-        let is_i64_result = self.api.is_int64(self.handle);
-        if is_i64_result {
-            Some(self.api.get_int64(self.handle))
-        } else {
-            None
-        }
+        self.api.bi_to_i64(self.handle)
     }
 
     pub fn pow(&self, exp: u32) -> Self {
