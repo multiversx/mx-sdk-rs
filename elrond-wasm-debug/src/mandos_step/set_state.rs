@@ -27,8 +27,16 @@ pub fn execute(
         };
         state.add_account(AccountData {
             address: address.value.into(),
-            nonce: account.nonce.value,
-            balance: account.balance.value.clone(),
+            nonce: account
+                .nonce
+                .as_ref()
+                .map(|nonce| nonce.value.into())
+                .unwrap_or_default(),
+            balance: account
+                .balance
+                .as_ref()
+                .map(|balance| balance.value.clone().into())
+                .unwrap_or_default(),
             esdt,
             username: account
                 .username
