@@ -22,8 +22,7 @@ pub trait BigIntApi {
     fn signed_byte_length(&self, x: Handle) -> Handle;
     fn get_signed_bytes(&self, reference: Handle) -> BoxedBytes;
     fn set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
-    fn is_int64(&self, reference: Handle) -> bool;
-    fn get_int64(&self, reference: Handle) -> i64;
+    fn bi_to_i64(&self, reference: Handle) -> Option<i64>;
     fn add(&self, dest: Handle, x: Handle, y: Handle);
     fn sub(&self, dest: Handle, x: Handle, y: Handle);
     fn mul(&self, dest: Handle, x: Handle, y: Handle);

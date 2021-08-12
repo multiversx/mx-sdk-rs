@@ -58,12 +58,15 @@ impl BigIntApi for crate::ArwenApiImpl {
         unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
-    fn is_int64(&self, reference: Handle) -> bool {
-        unsafe { bigIntIsInt64(reference) > 0 }
-    }
-
-    fn get_int64(&self, reference: Handle) -> i64 {
-        unsafe { bigIntGetInt64(reference) }
+    fn bi_to_i64(&self, reference: Handle) -> Option<i64> {
+        unsafe {
+            let is_i64_result = bigIntIsInt64(reference);
+            if is_i64_result > 0 {
+                Some(bigIntGetInt64(reference))
+            } else {
+                None
+            }
+        }
     }
 
     binary_op_wrapper! {add, bigIntAdd}

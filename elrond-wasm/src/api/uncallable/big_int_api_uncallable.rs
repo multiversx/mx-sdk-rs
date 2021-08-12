@@ -20,11 +20,7 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn is_int64(&self, _reference: Handle) -> bool {
-        unreachable!()
-    }
-
-    fn get_int64(&self, _reference: Handle) -> i64 {
+    fn bi_to_i64(&self, _reference: Handle) -> Option<i64> {
         unreachable!()
     }
 
