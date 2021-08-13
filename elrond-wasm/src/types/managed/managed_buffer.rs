@@ -39,13 +39,13 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     pub fn append_bytes(&mut self, slice: &[u8]) {
-        self.api.mb_append_slice(self.handle, slice);
+        self.api.mb_append_bytes(self.handle, slice);
     }
 
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
         // TODO: Arwen specialized API
         self.api
-            .mb_append_slice(self.handle, other.to_boxed_bytes().as_slice());
+            .mb_append_bytes(self.handle, other.to_boxed_bytes().as_slice());
     }
 
     pub fn to_boxed_bytes(&self) -> BoxedBytes {

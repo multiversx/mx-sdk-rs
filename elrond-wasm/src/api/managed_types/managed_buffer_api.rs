@@ -12,7 +12,9 @@ pub trait ManagedBufferApi {
 
     fn mb_overwrite(&self, handle: Handle, value: &[u8]);
 
-    fn mb_append_slice(&self, handle: Handle, slice: &[u8]);
+    fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle);
+
+    fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]);
 
     fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes;
 }

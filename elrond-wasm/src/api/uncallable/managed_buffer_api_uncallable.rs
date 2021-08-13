@@ -20,7 +20,11 @@ impl ManagedBufferApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn mb_append_slice(&self, _handle: Handle, _slice: &[u8]) {
+    fn mb_append(&self, _accumulator_handle: Handle, _data_handle: Handle) {
+        unreachable!()
+    }
+
+    fn mb_append_bytes(&self, _accumulator_handle: Handle, _bytes: &[u8]) {
         unreachable!()
     }
 
