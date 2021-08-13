@@ -37,15 +37,15 @@ macro_rules! binary_op_wrapper {
 }
 
 impl BigIntApi for crate::ArwenApiImpl {
-    fn new(&self, value: i64) -> Handle {
+    fn bi_new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
     }
 
-    fn signed_byte_length(&self, x: Handle) -> Handle {
+    fn bi_signed_byte_length(&self, x: Handle) -> Handle {
         unsafe { bigIntSignedByteLength(x) }
     }
 
-    fn get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
         unsafe {
             let byte_len = bigIntSignedByteLength(handle);
             let mut bb = BoxedBytes::allocate(byte_len as usize);
@@ -54,7 +54,7 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
-    fn set_signed_bytes(&self, destination: Handle, bytes: &[u8]) {
+    fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]) {
         unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
@@ -69,26 +69,26 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
-    binary_op_wrapper! {add, bigIntAdd}
-    binary_op_wrapper! {sub, bigIntSub}
-    binary_op_wrapper! {mul, bigIntMul}
-    binary_op_wrapper! {t_div, bigIntTDiv}
-    binary_op_wrapper! {t_mod, bigIntTMod}
-    binary_op_wrapper! {pow, bigIntPow}
+    binary_op_wrapper! {bi_add, bigIntAdd}
+    binary_op_wrapper! {bi_sub, bigIntSub}
+    binary_op_wrapper! {bi_mul, bigIntMul}
+    binary_op_wrapper! {bi_t_div, bigIntTDiv}
+    binary_op_wrapper! {bi_t_mod, bigIntTMod}
+    binary_op_wrapper! {bi_pow, bigIntPow}
 
-    fn abs(&self, dest: Handle, x: Handle) {
+    fn bi_abs(&self, dest: Handle, x: Handle) {
         unsafe {
             bigIntAbs(dest, x);
         }
     }
 
-    fn neg(&self, dest: Handle, x: Handle) {
+    fn bi_neg(&self, dest: Handle, x: Handle) {
         unsafe {
             bigIntNeg(dest, x);
         }
     }
 
-    fn sign(&self, x: Handle) -> Sign {
+    fn bi_sign(&self, x: Handle) -> Sign {
         unsafe {
             match bigIntSign(x).cmp(&0) {
                 Ordering::Greater => Sign::Plus,
@@ -98,7 +98,7 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
-    fn cmp(&self, x: Handle, y: Handle) -> Ordering {
+    fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
         unsafe { bigIntCmp(x, y).cmp(&0) }
     }
 }

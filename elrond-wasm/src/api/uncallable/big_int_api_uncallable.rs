@@ -4,19 +4,19 @@ use crate::api::{BigIntApi, Handle, Sign};
 use crate::types::BoxedBytes;
 
 impl BigIntApi for super::UncallableApi {
-    fn new(&self, _value: i64) -> Handle {
+    fn bi_new(&self, _value: i64) -> Handle {
         unreachable!()
     }
 
-    fn signed_byte_length(&self, _x: Handle) -> Handle {
+    fn bi_signed_byte_length(&self, _x: Handle) -> Handle {
         unreachable!()
     }
 
-    fn get_signed_bytes(&self, _reference: Handle) -> BoxedBytes {
+    fn bi_get_signed_bytes(&self, _reference: Handle) -> BoxedBytes {
         unreachable!()
     }
 
-    fn set_signed_bytes(&self, _destination: Handle, _bytes: &[u8]) {
+    fn bi_set_signed_bytes(&self, _destination: Handle, _bytes: &[u8]) {
         unreachable!()
     }
 
@@ -24,43 +24,43 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn add(&self, _dest: Handle, _x: Handle, _y: Handle) {
+    fn bi_add(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
-    fn sub(&self, _dest: Handle, _x: Handle, _y: Handle) {
+    fn bi_sub(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
-    fn mul(&self, _dest: Handle, _x: Handle, _y: Handle) {
+    fn bi_mul(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
-    fn t_div(&self, _dest: Handle, _x: Handle, _y: Handle) {
+    fn bi_t_div(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
-    fn t_mod(&self, _dest: Handle, _x: Handle, _y: Handle) {
+    fn bi_t_mod(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
-    fn pow(&self, _dest: Handle, _x: Handle, _y: Handle) {
+    fn bi_pow(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
-    fn abs(&self, _dest: Handle, _x: Handle) {
+    fn bi_abs(&self, _dest: Handle, _x: Handle) {
         unreachable!()
     }
 
-    fn neg(&self, _dest: Handle, _x: Handle) {
+    fn bi_neg(&self, _dest: Handle, _x: Handle) {
         unreachable!()
     }
 
-    fn sign(&self, _x: Handle) -> Sign {
+    fn bi_sign(&self, _x: Handle) -> Sign {
         unreachable!()
     }
 
-    fn cmp(&self, _x: Handle, _y: Handle) -> Ordering {
+    fn bi_cmp(&self, _x: Handle, _y: Handle) -> Ordering {
         unreachable!()
     }
 }

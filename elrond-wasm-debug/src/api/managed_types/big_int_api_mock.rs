@@ -23,7 +23,7 @@ macro_rules! binary_op_method {
 }
 
 impl BigIntApi for TxContext {
-    fn new(&self, value: i64) -> Handle {
+    fn bi_new(&self, value: i64) -> Handle {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output
             .managed_types
@@ -31,19 +31,19 @@ impl BigIntApi for TxContext {
             .insert_new_handle(BigInt::from(value))
     }
 
-    fn signed_byte_length(&self, handle: Handle) -> i32 {
+    fn bi_signed_byte_length(&self, handle: Handle) -> i32 {
         let tx_output = self.tx_output_cell.borrow();
         let bi = tx_output.managed_types.big_int_map.get(handle);
         bi.to_signed_bytes_be().len() as i32
     }
 
-    fn get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
         let tx_output = self.tx_output_cell.borrow();
         let bi = tx_output.managed_types.big_int_map.get(handle);
         bi.to_signed_bytes_be().into()
     }
 
-    fn set_signed_bytes(&self, dest: Handle, bytes: &[u8]) {
+    fn bi_set_signed_bytes(&self, dest: Handle, bytes: &[u8]) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         let result = BigInt::from_signed_bytes_le(bytes);
         tx_output.managed_types.big_int_map.insert(dest, result);
@@ -55,13 +55,13 @@ impl BigIntApi for TxContext {
         big_int_to_i64(bi)
     }
 
-    binary_op_method! {add, add}
-    binary_op_method! {sub, sub}
-    binary_op_method! {mul, mul}
-    binary_op_method! {t_div, div}
-    binary_op_method! {t_mod, rem}
+    binary_op_method! {bi_add, add}
+    binary_op_method! {bi_sub, sub}
+    binary_op_method! {bi_mul, mul}
+    binary_op_method! {bi_t_div, div}
+    binary_op_method! {bi_t_mod, rem}
 
-    fn pow(&self, dest: Handle, x: Handle, y: Handle) {
+    fn bi_pow(&self, dest: Handle, x: Handle, y: Handle) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
         let bi_y = tx_output.managed_types.big_int_map.get(y);
@@ -70,21 +70,21 @@ impl BigIntApi for TxContext {
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
 
-    fn abs(&self, dest: Handle, x: Handle) {
+    fn bi_abs(&self, dest: Handle, x: Handle) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
         let result = bi_x.abs();
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
 
-    fn neg(&self, dest: Handle, x: Handle) {
+    fn bi_neg(&self, dest: Handle, x: Handle) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
         let result = bi_x.neg();
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
 
-    fn sign(&self, x: Handle) -> elrond_wasm::api::Sign {
+    fn bi_sign(&self, x: Handle) -> elrond_wasm::api::Sign {
         let tx_output = self.tx_output_cell.borrow();
         let bi = tx_output.managed_types.big_int_map.get(x);
         match bi.sign() {
@@ -94,7 +94,7 @@ impl BigIntApi for TxContext {
         }
     }
 
-    fn cmp(&self, x: Handle, y: Handle) -> Ordering {
+    fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
         let tx_output = self.tx_output_cell.borrow();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
         let bi_y = tx_output.managed_types.big_int_map.get(y);
