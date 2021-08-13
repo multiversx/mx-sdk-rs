@@ -162,8 +162,18 @@ impl From<&Vec<u8>> for BoxedBytes {
 
 /// This allows us to use a mutable BoxedBytes as top encode output.
 impl TopEncodeOutput for &mut BoxedBytes {
+    type NestedBuffer = Vec<u8>;
+
     fn set_slice_u8(self, bytes: &[u8]) {
         *self = BoxedBytes::from(bytes);
+    }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer {
+        Vec::<u8>::new()
+    }
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
+        self.set_slice_u8(nb.as_slice());
     }
 }
 

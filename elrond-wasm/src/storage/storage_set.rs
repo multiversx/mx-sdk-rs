@@ -19,12 +19,20 @@ where
     fn new(api: SWA, key: &'k [u8]) -> Self {
         StorageSetOutput { api, key }
     }
+
+    fn set_managed_buffer(&self, managed_buffer: &ManagedBuffer<SWA>) {
+        let key_handle = self.api.mb_new_from_bytes(self.key);
+        self.api
+            .storage_store_managed_buffer_raw(key_handle, managed_buffer.handle);
+    }
 }
 
 impl<'k, SWA> TopEncodeOutput for StorageSetOutput<'k, SWA>
 where
     SWA: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
+    type NestedBuffer = ManagedBuffer<SWA>;
+
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.storage_store_slice_u8(self.key, bytes)
     }
@@ -39,13 +47,19 @@ where
 
     fn set_specialized<T: TryStaticCast>(&self, value: &T) -> bool {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<SWA>>() {
-            let key_handle = self.api.mb_new_from_bytes(self.key);
-            self.api
-                .storage_store_managed_buffer_raw(key_handle, managed_buffer.handle);
+            self.set_managed_buffer(managed_buffer);
             true
         } else {
             false
         }
+    }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer {
+        ManagedBuffer::new_empty(self.api.clone())
+    }
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
+        self.set_managed_buffer(&nb);
     }
 
     #[inline]

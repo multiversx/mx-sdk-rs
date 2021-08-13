@@ -1,4 +1,4 @@
-use elrond_codec::TryStaticCast;
+use elrond_codec::{NestedEncodeOutput, TryStaticCast};
 
 use crate::{
     api::{Handle, ManagedTypeApi},
@@ -38,14 +38,12 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.api.mb_overwrite(self.handle, value);
     }
 
-    pub fn append_bytes(&mut self, slice: &[u8]) {
-        self.api.mb_append_bytes(self.handle, slice);
+    pub fn append(&mut self, other: &ManagedBuffer<M>) {
+        self.api.mb_append(self.handle, other.handle);
     }
 
-    pub fn append(&mut self, other: &ManagedBuffer<M>) {
-        // TODO: Arwen specialized API
-        self.api
-            .mb_append_bytes(self.handle, other.to_boxed_bytes().as_slice());
+    pub fn append_bytes(&mut self, slice: &[u8]) {
+        self.api.mb_append_bytes(self.handle, slice);
     }
 
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
@@ -64,3 +62,18 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
+
+impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
+    fn write(&mut self, bytes: &[u8]) {
+        self.append_bytes(bytes);
+    }
+
+    fn push_specialized<T: TryStaticCast>(&mut self, value: &T) -> bool {
+        if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
+            self.append(managed_buffer);
+            true
+        } else {
+            false
+        }
+    }
+}

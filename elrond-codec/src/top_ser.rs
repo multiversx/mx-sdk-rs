@@ -47,9 +47,9 @@ where
     O: TopEncodeOutput,
     T: NestedEncode,
 {
-    let mut bytes = Vec::<u8>::new();
-    obj.dep_encode(&mut bytes)?;
-    output.set_slice_u8(&bytes[..]);
+    let mut nested_buffer = output.start_nested_encode();
+    obj.dep_encode(&mut nested_buffer)?;
+    output.finalize_nested_encode(nested_buffer);
     Ok(())
 }
 
@@ -63,9 +63,9 @@ pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
     T: NestedEncode,
     ExitCtx: Clone,
 {
-    let mut bytes = Vec::<u8>::new();
-    obj.dep_encode_or_exit(&mut bytes, c, exit);
-    output.set_slice_u8(&bytes[..]);
+    let mut nested_buffer = output.start_nested_encode();
+    obj.dep_encode_or_exit(&mut nested_buffer, c, exit);
+    output.finalize_nested_encode(nested_buffer);
 }
 
 pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
