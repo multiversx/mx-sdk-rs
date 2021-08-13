@@ -1,29 +1,15 @@
 use elrond_wasm::api::{Handle, ManagedBufferApi};
 use elrond_wasm::types::BoxedBytes;
 
-// extern int32_t	mBufferNew(void* context);
-// extern int32_t 	mBufferNewFromBytes(int32_t dataOffset, int32_t dataLength);
-// extern int32_t	mBufferSetBytes(mBufferHandle: i32, int32_t dataOffset, int32_t dataLength);
-// extern int32_t 	mBufferGetLength(mBufferHandle: i32);
-// extern int32_t	mBufferGetBytes(mBufferHandle: i32, int32_t resultOffset);
-// extern int32_t	mBufferExtendFromSlice(mBufferHandle: i32, int32_t dataOffset, int32_t dataLength);
-// extern int32_t	mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32);
-// extern int32_t 	mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32);
-// extern int32_t	mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32);
-// extern int32_t	mBufferFromBigIntSigned(mBufferHandle: i32, bigIntHandle: i32);
-// extern int32_t	mBufferStorageStore(int32_t keyOffset, int32_t keyLength,mBufferHandle: i32);
-// extern int32_t	mBufferStorageLoad(int32_t keyOffset, int32_t keyLength, mBufferHandle: i32);
-// extern int32_t	mBufferGetArgument(int32_t id, mBufferHandle: i32);
-// extern int32_t	mBufferFinish(mBufferHandle: i32);
-
-#[allow(dead_code)]
+// #[allow(dead_code)]
 extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferNewFromBytes(byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
     fn mBufferGetBytes(mBufferHandle: i32, resultOffset: *mut u8) -> i32;
-    fn mBufferExtendFromSlice(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
+    fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
+    fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
 }
 
 impl ManagedBufferApi for crate::ArwenApiImpl {
@@ -45,9 +31,19 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         }
     }
 
-    fn mb_append_slice(&self, handle: Handle, bytes: &[u8]) {
+    fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {
         unsafe {
-            let _ = mBufferExtendFromSlice(handle as i32, bytes.as_ptr(), bytes.len() as i32);
+            let _ = mBufferAppend(accumulator_handle as i32, data_handle as i32);
+        }
+    }
+
+    fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]) {
+        unsafe {
+            let _ = mBufferAppendBytes(
+                accumulator_handle as i32,
+                bytes.as_ptr(),
+                bytes.len() as i32,
+            );
         }
     }
 

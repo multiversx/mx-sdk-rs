@@ -36,10 +36,27 @@ impl ManagedBufferApi for TxContext {
             .insert(handle, value.into());
     }
 
-    fn mb_append_slice(&self, handle: Handle, slice: &[u8]) {
+    fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
-        let data = tx_output.managed_types.managed_buffer_map.get_mut(handle);
-        data.extend_from_slice(slice);
+        let mut data = tx_output
+            .managed_types
+            .managed_buffer_map
+            .get(data_handle)
+            .clone();
+        let accumulator = tx_output
+            .managed_types
+            .managed_buffer_map
+            .get_mut(accumulator_handle);
+        accumulator.append(&mut data);
+    }
+
+    fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]) {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let accumulator = tx_output
+            .managed_types
+            .managed_buffer_map
+            .get_mut(accumulator_handle);
+        accumulator.extend_from_slice(bytes);
     }
 
     fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
