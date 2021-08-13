@@ -221,26 +221,6 @@ use crate::elrond_codec::*;
 
 // use super::ManagedBuffer;
 
-// impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
-//     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
-//     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-//         // TODO: vector allocation can be avoided by writing directly to dest
-//         self.to_signed_bytes_be().as_slice().dep_encode(dest)
-//     }
-
-//     fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-//         &self,
-//         dest: &mut O,
-//         c: ExitCtx,
-//         exit: fn(ExitCtx, EncodeError) -> !,
-//     ) {
-//         self.to_signed_bytes_be()
-//             .as_slice()
-//             .dep_encode_or_exit(dest, c, exit);
-//     }
-// }
-
 impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
@@ -250,6 +230,28 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
             output.set_slice_u8(self.to_signed_bytes().as_slice());
         }
         Ok(())
+    }
+}
+
+impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
+    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        if !dest.push_specialized(&self.to_signed_bytes_buffer()) {
+            dest.write(self.to_signed_bytes().as_slice());
+        }
+        Ok(())
+    }
+
+    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+        &self,
+        dest: &mut O,
+        _c: ExitCtx,
+        _exit: fn(ExitCtx, EncodeError) -> !,
+    ) {
+        if !dest.push_specialized(&self.to_signed_bytes_buffer()) {
+            dest.write(self.to_signed_bytes().as_slice());
+        }
     }
 }
 

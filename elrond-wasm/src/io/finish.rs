@@ -26,6 +26,8 @@ impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
+    type NestedBuffer = ManagedBuffer<FA>;
+
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.finish_slice_u8(bytes);
     }
@@ -50,6 +52,14 @@ where
         } else {
             false
         }
+    }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer {
+        ManagedBuffer::new_empty(self.api.clone())
+    }
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
+        self.api.finish_managed_buffer_raw(nb.handle);
     }
 
     #[inline]

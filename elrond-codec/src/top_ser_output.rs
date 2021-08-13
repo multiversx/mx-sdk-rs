@@ -1,4 +1,4 @@
-use crate::{num_conv::top_encode_number_to_output, TryStaticCast};
+use crate::{num_conv::top_encode_number_to_output, NestedEncodeOutput, TryStaticCast};
 use alloc::vec::Vec;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
@@ -12,6 +12,9 @@ use alloc::vec::Vec;
 /// - `#[storage_set(...)]`
 /// - Serialize async call.
 pub trait TopEncodeOutput: Sized {
+    /// Type of `NestedEncodeOutput` that can be spawned to gather serializations of children.
+    type NestedBuffer: NestedEncodeOutput;
+
     fn set_slice_u8(self, bytes: &[u8]);
 
     fn set_u64(self, value: u64) {
@@ -34,9 +37,14 @@ pub trait TopEncodeOutput: Sized {
         self.set_slice_u8(&[]);
     }
 
+    #[inline]
     fn set_specialized<T: TryStaticCast>(&self, _value: &T) -> bool {
         false
     }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer;
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer);
 
     /// Unless you're developing elrond-wasm, please ignore.
     ///
@@ -78,7 +86,17 @@ pub trait TopEncodeOutput: Sized {
 }
 
 impl TopEncodeOutput for &mut Vec<u8> {
+    type NestedBuffer = Vec<u8>;
+
     fn set_slice_u8(self, bytes: &[u8]) {
         self.extend_from_slice(bytes);
+    }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer {
+        Vec::<u8>::new()
+    }
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
+        *self = nb;
     }
 }
