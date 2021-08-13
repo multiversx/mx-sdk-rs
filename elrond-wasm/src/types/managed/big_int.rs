@@ -39,7 +39,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     pub fn to_signed_bytes(&self) -> BoxedBytes {
-        self.api.get_signed_bytes(self.handle)
+        self.api.bi_get_signed_bytes(self.handle)
     }
 }
 
@@ -87,8 +87,8 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
-        let clone_handle = self.api.new_zero();
-        self.api.add(clone_handle, clone_handle, self.handle);
+        let clone_handle = self.api.bi_new_zero();
+        self.api.bi_add(clone_handle, clone_handle, self.handle);
         BigInt {
             handle: clone_handle,
             api: self.api.clone(),
@@ -114,7 +114,7 @@ macro_rules! binary_operator {
             type Output = BigInt<M>;
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
-                let result = self.api.new_zero();
+                let result = self.api.bi_new_zero();
                 self.api.$api_func(result, self.handle, other.handle);
                 BigInt {
                     handle: result,
@@ -125,11 +125,11 @@ macro_rules! binary_operator {
     };
 }
 
-binary_operator! {Add, add, add}
-binary_operator! {Sub, sub, sub}
-binary_operator! {Mul, mul, mul}
-binary_operator! {Div, div, t_div}
-binary_operator! {Rem, rem, t_mod}
+binary_operator! {Add, add, bi_add}
+binary_operator! {Sub, sub, bi_sub}
+binary_operator! {Mul, mul, bi_mul}
+binary_operator! {Div, div, bi_t_div}
+binary_operator! {Rem, rem, bi_t_mod}
 
 macro_rules! binary_assign_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
@@ -149,16 +149,16 @@ macro_rules! binary_assign_operator {
     };
 }
 
-binary_assign_operator! {AddAssign, add_assign, add}
-binary_assign_operator! {SubAssign, sub_assign, sub}
-binary_assign_operator! {MulAssign, mul_assign, mul}
-binary_assign_operator! {DivAssign, div_assign, t_div}
-binary_assign_operator! {RemAssign, rem_assign, t_mod}
+binary_assign_operator! {AddAssign, add_assign, bi_add}
+binary_assign_operator! {SubAssign, sub_assign, bi_sub}
+binary_assign_operator! {MulAssign, mul_assign, bi_mul}
+binary_assign_operator! {DivAssign, div_assign, bi_t_div}
+binary_assign_operator! {RemAssign, rem_assign, bi_t_mod}
 
 impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.api.cmp(self.handle, other.handle).is_eq()
+        self.api.bi_cmp(self.handle, other.handle).is_eq()
     }
 }
 
@@ -174,19 +174,19 @@ impl<M: ManagedTypeApi> PartialOrd for BigInt<M> {
 impl<M: ManagedTypeApi> Ord for BigInt<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        self.api.cmp(self.handle, other.handle)
+        self.api.bi_cmp(self.handle, other.handle)
     }
 }
 
 fn cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> Ordering {
     if other == 0 {
-        match bi.api.sign(bi.handle) {
+        match bi.api.bi_sign(bi.handle) {
             crate::api::Sign::Plus => Ordering::Greater,
             crate::api::Sign::NoSign => Ordering::Equal,
             crate::api::Sign::Minus => Ordering::Less,
         }
     } else {
-        bi.api.cmp(bi.handle, bi.api.new(other))
+        bi.api.bi_cmp(bi.handle, bi.api.bi_new(other))
     }
 }
 
@@ -208,8 +208,8 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     type Output = BigInt<M>;
 
     fn neg(self) -> Self::Output {
-        let result = self.api.new_zero();
-        self.api.neg(result, self.handle);
+        let result = self.api.bi_new_zero();
+        self.api.bi_neg(result, self.handle);
         BigInt {
             handle: result,
             api: self.api.clone(),
@@ -301,7 +301,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     // }
 
     pub fn sign(&self) -> Sign {
-        match self.api.sign(self.handle) {
+        match self.api.bi_sign(self.handle) {
             crate::api::Sign::Plus => Sign::Plus,
             crate::api::Sign::NoSign => Sign::NoSign,
             crate::api::Sign::Minus => Sign::Minus,
@@ -330,9 +330,9 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     pub fn pow(&self, exp: u32) -> Self {
-        let handle = self.api.new_zero();
-        let exp_handle = self.api.new(exp as i64);
-        self.api.pow(handle, self.handle, exp_handle);
+        let handle = self.api.bi_new_zero();
+        let exp_handle = self.api.bi_new(exp as i64);
+        self.api.bi_pow(handle, self.handle, exp_handle);
         BigInt {
             handle,
             api: self.api.clone(),
