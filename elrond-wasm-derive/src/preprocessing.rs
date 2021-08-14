@@ -7,7 +7,10 @@ fn substitutions() -> HashMap<String, TokenStream> {
         "BigInt".to_string(),
         quote!(elrond_wasm::types::BigInt<Self::TypeManager>).into(),
     );
-    substitutions.insert("H".to_string(), quote!(Hodler<i32>).into()); // XXX: just for testing
+    substitutions.insert(
+        "ManagedBuffer".to_string(),
+        quote!(elrond_wasm::types::ManagedBuffer<Self::TypeManager>).into(),
+    );
     substitutions
 }
 

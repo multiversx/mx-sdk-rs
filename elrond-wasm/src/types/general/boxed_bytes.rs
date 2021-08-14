@@ -67,6 +67,11 @@ impl BoxedBytes {
         &*self.0
     }
 
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> &mut [u8] {
+        &mut *self.0
+    }
+
     /// Create new instance by concatenating several byte slices.
     pub fn from_concat(slices: &[&[u8]]) -> Self {
         let mut result_len = 0usize;

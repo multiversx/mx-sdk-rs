@@ -11,7 +11,7 @@ pub trait StorageStoreFeatures {
 
     #[endpoint]
     #[storage_set("big_int")]
-    fn store_big_int(&self, bi: Self::BigInt);
+    fn store_big_int(&self, bi: BigInt);
 
     #[endpoint]
     #[storage_set("usize")]
