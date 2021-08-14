@@ -19,10 +19,10 @@ pub trait BigIntApi {
         self.bi_new(0)
     }
 
-    fn bi_signed_byte_length(&self, x: Handle) -> Handle;
-    fn bi_get_signed_bytes(&self, reference: Handle) -> BoxedBytes;
+    fn bi_signed_byte_length(&self, handle: Handle) -> Handle;
+    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes;
     fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
-    fn bi_to_i64(&self, reference: Handle) -> Option<i64>;
+    fn bi_to_i64(&self, handle: Handle) -> Option<i64>;
     fn bi_add(&self, dest: Handle, x: Handle, y: Handle);
     fn bi_sub(&self, dest: Handle, x: Handle, y: Handle);
     fn bi_mul(&self, dest: Handle, x: Handle, y: Handle);

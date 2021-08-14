@@ -63,6 +63,11 @@ impl BoxedBytes {
     }
 
     #[inline]
+    pub fn into_vec(self) -> Vec<u8> {
+        self.0.into_vec()
+    }
+
+    #[inline]
     pub fn as_slice(&self) -> &[u8] {
         &*self.0
     }

@@ -5,8 +5,8 @@ use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use elrond_wasm::api::{BigIntApi, Handle};
 use elrond_wasm::types::BoxedBytes;
 use num_bigint::BigInt;
-use num_traits::pow;
 use num_traits::sign::Signed;
+use num_traits::{pow, Zero};
 
 use super::big_int_util::big_int_to_i64;
 
@@ -32,20 +32,22 @@ impl BigIntApi for TxContext {
     }
 
     fn bi_signed_byte_length(&self, handle: Handle) -> i32 {
-        let tx_output = self.tx_output_cell.borrow();
-        let bi = tx_output.managed_types.big_int_map.get(handle);
-        bi.to_signed_bytes_be().len() as i32
+        self.bi_get_signed_bytes(handle).len() as i32
     }
 
     fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
         let tx_output = self.tx_output_cell.borrow();
         let bi = tx_output.managed_types.big_int_map.get(handle);
-        bi.to_signed_bytes_be().into()
+        if bi.is_zero() {
+            BoxedBytes::empty()
+        } else {
+            bi.to_signed_bytes_be().into()
+        }
     }
 
     fn bi_set_signed_bytes(&self, dest: Handle, bytes: &[u8]) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
-        let result = BigInt::from_signed_bytes_le(bytes);
+        let result = BigInt::from_signed_bytes_be(bytes);
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
 

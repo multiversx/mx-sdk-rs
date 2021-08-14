@@ -5,6 +5,26 @@ use elrond_wasm::{
 
 use crate::TxContext;
 
+impl TxContext {
+    fn mb_get_slice(
+        &self,
+        source_handle: Handle,
+        starting_position: usize,
+        slice_len: usize,
+    ) -> Option<Vec<u8>> {
+        let tx_output = self.tx_output_cell.borrow();
+        let all_bytes = tx_output
+            .managed_types
+            .managed_buffer_map
+            .get(source_handle);
+        if starting_position + slice_len <= all_bytes.len() {
+            Some(all_bytes[starting_position..starting_position + slice_len].to_vec())
+        } else {
+            None
+        }
+    }
+}
+
 impl ManagedBufferApi for TxContext {
     fn mb_new_empty(&self) -> Handle {
         let mut tx_output = self.tx_output_cell.borrow_mut();
@@ -36,21 +56,37 @@ impl ManagedBufferApi for TxContext {
 
     fn mb_load_slice(
         &self,
-        _source_handle: Handle,
-        _starting_position: usize,
-        _dest_slice: &mut [u8],
+        source_handle: Handle,
+        starting_position: usize,
+        dest_slice: &mut [u8],
     ) -> bool {
-        unreachable!()
+        let opt_slice = self.mb_get_slice(source_handle, starting_position, dest_slice.len());
+        if let Some(slice) = opt_slice {
+            dest_slice.copy_from_slice(slice.as_slice());
+            true
+        } else {
+            false
+        }
     }
 
     fn mb_copy_slice(
         &self,
-        _source_handle: Handle,
-        _starting_pos: usize,
-        _slice_len: usize,
-        _dest_handle: Handle,
+        source_handle: Handle,
+        starting_position: usize,
+        slice_len: usize,
+        dest_handle: Handle,
     ) -> bool {
-        unreachable!()
+        let opt_slice = self.mb_get_slice(source_handle, starting_position, slice_len);
+        if let Some(slice) = opt_slice {
+            let mut tx_output = self.tx_output_cell.borrow_mut();
+            tx_output
+                .managed_types
+                .managed_buffer_map
+                .insert(dest_handle, slice);
+            true
+        } else {
+            false
+        }
     }
 
     fn mb_overwrite(&self, handle: Handle, value: &[u8]) {
