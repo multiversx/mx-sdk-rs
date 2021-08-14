@@ -219,8 +219,6 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
 
 use crate::elrond_codec::*;
 
-// use super::ManagedBuffer;
-
 impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 

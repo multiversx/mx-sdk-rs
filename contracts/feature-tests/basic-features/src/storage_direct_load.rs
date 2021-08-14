@@ -11,7 +11,7 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("big_int")]
-    fn load_big_int(&self) -> Self::BigInt;
+    fn load_big_int(&self) -> BigInt;
 
     #[endpoint]
     #[storage_get("u64")]

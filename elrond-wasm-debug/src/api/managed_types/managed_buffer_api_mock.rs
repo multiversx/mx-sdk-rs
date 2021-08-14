@@ -28,6 +28,31 @@ impl ManagedBufferApi for TxContext {
         data.len()
     }
 
+    fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
+        let tx_output = self.tx_output_cell.borrow();
+        let data = tx_output.managed_types.managed_buffer_map.get(handle);
+        data.into()
+    }
+
+    fn mb_load_slice(
+        &self,
+        _source_handle: Handle,
+        _starting_position: usize,
+        _dest_slice: &mut [u8],
+    ) -> bool {
+        unreachable!()
+    }
+
+    fn mb_copy_slice(
+        &self,
+        _source_handle: Handle,
+        _starting_pos: usize,
+        _slice_len: usize,
+        _dest_handle: Handle,
+    ) -> bool {
+        unreachable!()
+    }
+
     fn mb_overwrite(&self, handle: Handle, value: &[u8]) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output
@@ -57,11 +82,5 @@ impl ManagedBufferApi for TxContext {
             .managed_buffer_map
             .get_mut(accumulator_handle);
         accumulator.extend_from_slice(bytes);
-    }
-
-    fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
-        let tx_output = self.tx_output_cell.borrow();
-        let data = tx_output.managed_types.managed_buffer_map.get(handle);
-        data.into()
     }
 }

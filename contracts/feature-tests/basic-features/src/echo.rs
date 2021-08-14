@@ -15,7 +15,7 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_big_int(&self, bi: Self::BigInt) -> Self::BigInt {
+    fn echo_big_int(&self, bi: BigInt) -> BigInt {
         bi
     }
 

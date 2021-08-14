@@ -5,11 +5,11 @@ elrond_wasm::imports!();
 #[allow(clippy::redundant_clone)]
 pub trait BigIntOperators {
     #[endpoint]
-    fn add_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn add_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn add_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
@@ -21,11 +21,11 @@ pub trait BigIntOperators {
         a + b
     }
     #[endpoint]
-    fn sub_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn sub_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a - b
     }
     #[endpoint]
-    fn sub_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn sub_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a - b
     }
     #[endpoint]
@@ -37,11 +37,11 @@ pub trait BigIntOperators {
         a - b
     }
     #[endpoint]
-    fn mul_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn mul_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a * b
     }
     #[endpoint]
-    fn mul_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn mul_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a * b
     }
     #[endpoint]
@@ -53,11 +53,11 @@ pub trait BigIntOperators {
         a * b
     }
     #[endpoint]
-    fn div_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn div_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a / b
     }
     #[endpoint]
-    fn div_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn div_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a / b
     }
     #[endpoint]
@@ -69,11 +69,11 @@ pub trait BigIntOperators {
         a / b
     }
     #[endpoint]
-    fn rem_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn rem_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a % b
     }
     #[endpoint]
-    fn rem_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn rem_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a % b
     }
     #[endpoint]
@@ -87,13 +87,13 @@ pub trait BigIntOperators {
 
     // assign version of all operators above
     #[endpoint]
-    fn add_assign_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn add_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r += b;
         r
     }
     #[endpoint]
-    fn add_assign_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn add_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         let mut r = a.clone();
         r += b;
         r
@@ -111,13 +111,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn sub_assign_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn sub_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r -= b;
         r
     }
     #[endpoint]
-    fn sub_assign_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn sub_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         let mut r = a.clone();
         r -= b;
         r
@@ -135,13 +135,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn mul_assign_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn mul_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r *= b;
         r
     }
     #[endpoint]
-    fn mul_assign_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn mul_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         let mut r = a.clone();
         r *= b;
         r
@@ -159,13 +159,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn div_assign_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn div_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r /= b;
         r
     }
     #[endpoint]
-    fn div_assign_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn div_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         let mut r = a.clone();
         r /= b;
         r
@@ -183,13 +183,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn rem_assign_big_int(&self, a: Self::BigInt, b: Self::BigInt) -> Self::BigInt {
+    fn rem_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r %= b;
         r
     }
     #[endpoint]
-    fn rem_assign_big_int_ref(&self, a: &Self::BigInt, b: &Self::BigInt) -> Self::BigInt {
+    fn rem_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         let mut r = a.clone();
         r %= b;
         r
