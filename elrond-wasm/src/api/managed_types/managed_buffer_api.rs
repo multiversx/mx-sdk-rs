@@ -22,7 +22,7 @@ pub trait ManagedBufferApi {
     fn mb_copy_slice(
         &self,
         source_handle: Handle,
-        starting_pos: usize,
+        starting_position: usize,
         slice_len: usize,
         dest_handle: Handle,
     ) -> bool;
