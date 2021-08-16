@@ -1,11 +1,11 @@
 use alloc::vec::Vec;
-use elrond_wasm::types::BoxedBytes;
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Rem, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 use elrond_wasm::api::BigUintApi;
+use elrond_wasm::types::BoxedBytes;
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::pow;
 use std::fmt;

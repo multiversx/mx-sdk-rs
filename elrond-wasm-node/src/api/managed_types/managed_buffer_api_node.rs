@@ -1,4 +1,4 @@
-use elrond_wasm::api::{Handle, ManagedBufferApi};
+use elrond_wasm::api::{Handle, ManagedBufferApi, InvalidSliceError};
 use elrond_wasm::types::BoxedBytes;
 
 // #[allow(dead_code)]

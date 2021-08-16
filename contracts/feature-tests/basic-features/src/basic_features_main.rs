@@ -9,6 +9,7 @@ pub mod block_info_features;
 pub mod blockchain_api_features;
 pub mod crypto_features;
 pub mod echo;
+pub mod echo_managed;
 pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macros;
@@ -33,6 +34,7 @@ pub trait BasicFeatures:
     + blockchain_api_features::BlockchainApiFeatures
     + crypto_features::CryptoFeatures
     + echo::EchoTypes
+    + echo_managed::EchoManagedTypes
     + event_features::EventFeatures
     + macros::Macros
     + managed_buffer_features::ManagedBufferFeatures
