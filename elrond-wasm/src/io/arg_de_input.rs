@@ -30,7 +30,7 @@ where
         ArgDecodeInput { api, arg_index }
     }
 
-    fn into_managed_buffer(&self) -> ManagedBuffer<AA> {
+    fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
         let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
         ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
     }
@@ -60,14 +60,14 @@ where
 
     fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
         if T::type_eq::<ManagedBuffer<AA>>() {
-            self.into_managed_buffer().try_cast()
+            self.to_managed_buffer().try_cast()
         } else {
             None
         }
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBufferNestedDecodeInput::new(self.into_managed_buffer())
+        ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }
 
     #[inline]

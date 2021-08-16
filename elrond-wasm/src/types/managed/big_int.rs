@@ -228,7 +228,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
         self.api.bi_neg(result, self.handle);
         BigInt {
             handle: result,
-            api: self.api.clone(),
+            api: self.api,
         }
     }
 }

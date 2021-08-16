@@ -288,7 +288,7 @@ impl NestedDecode for RustBigUint {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let bytes = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
+        let bytes = BoxedBytes::dep_decode_or_exit(input, c, exit);
         RustBigUint::from_bytes_be(bytes.as_slice())
     }
 }

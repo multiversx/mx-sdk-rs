@@ -18,7 +18,15 @@ impl<V> HandleMap<V> {
             map: HashMap::new(),
         }
     }
+}
 
+impl<V> Default for HandleMap<V> {
+    fn default() -> Self {
+        HandleMap::new()
+    }
+}
+
+impl<V> HandleMap<V> {
     pub fn insert_new_handle(&mut self, value: V) -> Handle {
         let new_handle = self.next_handle;
         self.map.insert(new_handle, value);

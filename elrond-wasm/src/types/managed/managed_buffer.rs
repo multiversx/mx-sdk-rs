@@ -19,14 +19,14 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn new_empty(api: M) -> Self {
         ManagedBuffer {
             handle: api.mb_new_empty(),
-            api: api.clone(),
+            api,
         }
     }
 
     pub fn new_from_bytes(api: M, bytes: &[u8]) -> Self {
         ManagedBuffer {
             handle: api.mb_new_from_bytes(bytes),
-            api: api.clone(),
+            api,
         }
     }
 
@@ -36,6 +36,10 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     pub fn len(&self) -> usize {
         self.api.mb_len(self.handle)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
