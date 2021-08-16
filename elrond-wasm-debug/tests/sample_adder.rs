@@ -803,7 +803,6 @@ fn test_add() {
     use elrond_wasm::api::ContractBase;
     use elrond_wasm_debug::TxContext;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
-    // use module_1::{VersionModule, EndpointWrappers};
 
     let tx_context = TxContext::dummy();
 
