@@ -9,6 +9,7 @@ use elrond_codec::{TopDecode, TopEncode};
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
+#[deprecated]
 pub struct MapStorageMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
