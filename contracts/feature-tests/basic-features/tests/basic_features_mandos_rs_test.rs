@@ -291,7 +291,7 @@ fn storage_mapper_vec_rs() {
 
 #[test]
 fn storage_opt_addr_rs() {
-    elrond_wasm_debug::mandos_rs("/home/andreim/elrond/smartcontract/elrond-wasm-rs/contracts/feature-tests/basic-features/mandos/storage_opt_addr.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/storage_opt_addr.scen.json", &contract_map());
 }
 
 #[test]
