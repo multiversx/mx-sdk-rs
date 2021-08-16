@@ -29,6 +29,15 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                 expected_account.username,
                 std::str::from_utf8(account.username.as_slice()).unwrap()
             );
+            let default_value = &Vec::new();
+            let actual_code = account.contract_path.as_ref().unwrap_or(default_value);
+            assert!(
+                expected_account.code.check(&actual_code),
+                "bad account code. Address: {}. Want: {}. Have: {}",
+                expected_address,
+                expected_account.code,
+                std::str::from_utf8(actual_code.as_slice()).unwrap()
+            );
 
             if let CheckStorage::Equal(eq) = &expected_account.storage {
                 let default_value = &Vec::new();
