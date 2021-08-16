@@ -35,11 +35,13 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
             let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
             Ok(cast_vec)
         } else {
-            let bytes = input.into_boxed_slice_u8();
-            let mut_slice = &mut &*bytes;
             let mut result: Vec<T> = Vec::new();
-            while !mut_slice.is_empty() {
-                result.push(T::dep_decode(mut_slice)?);
+            let mut nested_buffer = input.into_nested_buffer();
+            while !nested_buffer.is_depleted() {
+                result.push(T::dep_decode(&mut nested_buffer)?);
+            }
+            if !nested_buffer.is_depleted() {
+                return Err(DecodeError::INPUT_TOO_LONG);
             }
             Ok(result)
         }
@@ -56,11 +58,13 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
             let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
             cast_vec
         } else {
-            let bytes = input.into_boxed_slice_u8();
-            let mut_slice = &mut &*bytes;
             let mut result: Vec<T> = Vec::new();
-            while !mut_slice.is_empty() {
-                result.push(T::dep_decode_or_exit(mut_slice, c.clone(), exit));
+            let mut nested_buffer = input.into_nested_buffer();
+            while !nested_buffer.is_depleted() {
+                result.push(T::dep_decode_or_exit(&mut nested_buffer, c.clone(), exit));
+            }
+            if !nested_buffer.is_depleted() {
+                exit(c, DecodeError::INPUT_TOO_LONG);
             }
             result
         }

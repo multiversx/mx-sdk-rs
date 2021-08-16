@@ -49,8 +49,13 @@ fn echo_async_result_empty_go() {
 }
 
 #[test]
-fn echo_big_int_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_big_int.scen.json");
+fn echo_big_int_nested_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_big_int_nested.scen.json");
+}
+
+#[test]
+fn echo_big_int_top_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_big_int_top.scen.json");
 }
 
 #[test]

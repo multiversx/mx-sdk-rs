@@ -1,4 +1,5 @@
 pub use crate::codec_err::DecodeError;
+use crate::TryStaticCast;
 
 /// Trait that allows deserializing objects from a buffer.
 pub trait NestedDecodeInput {
@@ -21,6 +22,20 @@ pub trait NestedDecodeInput {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     );
+
+    #[inline]
+    fn read_specialized<T: TryStaticCast>(&mut self) -> Result<Option<T>, DecodeError> {
+        Ok(None)
+    }
+
+    #[inline]
+    fn read_specialized_or_exit<T: TryStaticCast, ExitCtx: Clone>(
+        &mut self,
+        _c: ExitCtx,
+        _exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Option<T> {
+        None
+    }
 
     /// Read a single byte from the input.
     fn read_byte(&mut self) -> Result<u8, DecodeError> {

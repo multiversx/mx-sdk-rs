@@ -141,6 +141,16 @@ pub fn sc_call_with_async_and_callback(
 }
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
+    let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
+    assert!(
+        tx_expect.status.check(tx_result.result_status),
+        "result code mismatch. Tx id: {}. Want: {}. Have: {}. Message: {}",
+        tx_id,
+        tx_expect.status,
+        tx_result.result_status,
+        have_str,
+    );
+
     assert_eq!(
         tx_expect.out.len(),
         tx_result.result_values.len(),
@@ -159,16 +169,6 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
             verbose_hex(actual_value.as_slice())
         );
     }
-
-    let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
-    assert!(
-        tx_expect.status.check(tx_result.result_status),
-        "result code mismatch. Tx id: {}. Want: {}. Have: {}. Message: {}",
-        tx_id,
-        tx_expect.status,
-        tx_result.result_status,
-        have_str,
-    );
 
     assert!(
         tx_expect.message.check(&tx_result.result_message),

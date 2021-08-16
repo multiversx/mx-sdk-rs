@@ -61,8 +61,13 @@ fn echo_async_result_empty_rs() {
 }
 
 #[test]
-fn echo_big_int_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_big_int.scen.json", &contract_map());
+fn echo_big_int_nested_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_big_int_nested.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_big_int_top_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_big_int_top.scen.json", &contract_map());
 }
 
 #[test]
@@ -286,7 +291,7 @@ fn storage_mapper_vec_rs() {
 
 #[test]
 fn storage_opt_addr_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_opt_addr.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("/home/andreim/elrond/smartcontract/elrond-wasm-rs/contracts/feature-tests/basic-features/mandos/storage_opt_addr.scen.json", &contract_map());
 }
 
 #[test]

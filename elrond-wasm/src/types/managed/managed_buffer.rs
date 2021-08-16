@@ -103,6 +103,8 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
 
     fn push_specialized<T: TryStaticCast>(&mut self, value: &T) -> bool {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
+            let mb_len = managed_buffer.len() as u32;
+            self.append_bytes(&mb_len.to_be_bytes()[..]);
             self.append(managed_buffer);
             true
         } else {
@@ -151,25 +153,29 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
     }
 }
 
-// impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
-// 	const TYPE_INFO: TypeInfo = TypeInfo::ManagedBuffer;
+impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        if let Some(managed_buffer) = input.read_specialized::<ManagedBuffer<M>>()? {
+            Ok(managed_buffer)
+        } else {
+            Err(DecodeError::UNSUPPORTED_OPERATION)
+        }
+    }
 
-// 	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-// 		let size = usize::dep_decode(input)?;
-// 		let bytes = input.read_slice(size)?;
-// 		Ok(ManagedBuffer<M>::from_signed_bytes_be(bytes))
-// 	}
-
-// 	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-// 		input: &mut I,
-// 		c: ExitCtx,
-// 		exit: fn(ExitCtx, DecodeError) -> !,
-// 	) -> Self {
-// 		let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-// 		let bytes = input.read_slice_or_exit(size, c, exit);
-// 		ManagedBuffer<M>::from_signed_bytes_be(bytes)
-// 	}
-// }
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+        input: &mut I,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Self {
+        if let Some(managed_buffer) =
+            input.read_specialized_or_exit::<ManagedBuffer<M>, ExitCtx>(c.clone(), exit)
+        {
+            managed_buffer
+        } else {
+            exit(c, DecodeError::UNSUPPORTED_OPERATION)
+        }
+    }
+}
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> String {

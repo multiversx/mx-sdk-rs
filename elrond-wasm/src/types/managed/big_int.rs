@@ -253,25 +253,29 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
     }
 }
 
-// impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
-// 	const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        if let Some(managed_buffer) = input.read_specialized::<ManagedBuffer<M>>()? {
+            Ok(managed_buffer.into())
+        } else {
+            Err(DecodeError::UNSUPPORTED_OPERATION)
+        }
+    }
 
-// 	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-// 		let size = usize::dep_decode(input)?;
-// 		let bytes = input.read_slice(size)?;
-// 		Ok(BigInt<M>::from_signed_bytes_be(bytes))
-// 	}
-
-// 	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-// 		input: &mut I,
-// 		c: ExitCtx,
-// 		exit: fn(ExitCtx, DecodeError) -> !,
-// 	) -> Self {
-// 		let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-// 		let bytes = input.read_slice_or_exit(size, c, exit);
-// 		BigInt<M>::from_signed_bytes_be(bytes)
-// 	}
-// }
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+        input: &mut I,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Self {
+        if let Some(managed_buffer) =
+            input.read_specialized_or_exit::<ManagedBuffer<M>, ExitCtx>(c.clone(), exit)
+        {
+            managed_buffer.into()
+        } else {
+            exit(c, DecodeError::UNSUPPORTED_OPERATION)
+        }
+    }
+}
 
 impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
