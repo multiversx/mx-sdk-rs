@@ -70,6 +70,7 @@
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:BASIC-FEATURES-TOKEN",
+                            "",
                             "100",
                             "address:an_account"
                         ],
@@ -104,6 +105,7 @@
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:BASIC-FEATURES-TOKEN",
+                            "",
                             "100",
                             "address:an_account"
                         ],
