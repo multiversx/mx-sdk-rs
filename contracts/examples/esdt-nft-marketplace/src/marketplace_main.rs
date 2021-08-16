@@ -136,7 +136,7 @@ pub trait EsdtNftMarketplace:
         };
         self.auction_by_id(auction_id).set(&auction);
 
-        self.emit_auction_token_event(auction_id, auction);
+        self.emit_auction_token_event(auction_id, auction, current_time);
 
         Ok(auction_id)
     }
