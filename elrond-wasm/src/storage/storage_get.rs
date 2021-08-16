@@ -21,7 +21,7 @@ where
         StorageGetInput { api, key }
     }
 
-    fn into_managed_buffer(&self) -> ManagedBuffer<SRA> {
+    fn to_managed_buffer(&self) -> ManagedBuffer<SRA> {
         let key_handle = self.api.mb_new_from_bytes(self.key);
         let mbuf_handle = self.api.storage_load_managed_buffer_raw(key_handle);
         ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
@@ -52,14 +52,14 @@ where
 
     fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
         if T::type_eq::<ManagedBuffer<SRA>>() {
-            self.into_managed_buffer().try_cast()
+            self.to_managed_buffer().try_cast()
         } else {
             None
         }
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBufferNestedDecodeInput::new(self.into_managed_buffer())
+        ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }
 
     fn try_get_big_uint_handle(&self) -> (bool, i32) {

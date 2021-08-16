@@ -20,7 +20,7 @@ pub trait TryStaticCast: Clone + 'static {
     }
 
     #[inline]
-    fn try_cast_ref<'a, U: TryStaticCast>(&'a self) -> Option<&'a U> {
+    fn try_cast_ref<U: TryStaticCast>(&self) -> Option<&U> {
         if Self::type_eq::<U>() {
             let trans = unsafe { core::mem::transmute::<&Self, &U>(self) };
             Some(trans)
