@@ -1,7 +1,6 @@
 use alloc::string::String;
 
 use crate::api::InvalidSliceError;
-// use elrond_codec::{NestedEncodeOutput, TryStaticCast};
 use crate::elrond_codec::*;
 
 use crate::{
