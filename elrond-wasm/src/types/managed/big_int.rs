@@ -9,6 +9,7 @@ use crate::types::BoxedBytes;
 
 use super::ManagedBuffer;
 
+#[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
     handle: i32,
     api: M,
@@ -21,69 +22,64 @@ pub enum Sign {
     Plus,
 }
 
-impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
-    fn from(item: ManagedBuffer<M>) -> Self {
-        BigInt {
-            handle: item.api.mb_to_big_int_signed(item.handle),
-            api: item.api.clone(),
-        }
+impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigInt<M> {
+    fn from(item: &ManagedBuffer<M>) -> Self {
+        BigInt::from_signed_bytes_be_buffer(item)
     }
 }
 
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
+    fn from(item: ManagedBuffer<M>) -> Self {
+        BigInt::from_signed_bytes_be_buffer(&item)
+    }
+}
+
+/// More conversions here.
 impl<M: ManagedTypeApi> BigInt<M> {
-    pub fn to_signed_bytes_buffer(&self) -> ManagedBuffer<M> {
+    pub fn from_i64(value: i64, api: M) -> Self {
+        BigInt {
+            handle: api.bi_new(value),
+            api,
+        }
+    }
+
+    pub fn from_i32(value: i32, api: M) -> Self {
+        BigInt {
+            handle: api.bi_new(value as i64),
+            api,
+        }
+    }
+
+    pub fn to_i64(&self) -> Option<i64> {
+        self.api.bi_to_i64(self.handle)
+    }
+
+    pub fn from_signed_bytes_be(bytes: &[u8], api: M) -> Self {
+        let handle = api.bi_new(0);
+        api.bi_set_signed_bytes(handle, bytes);
+        BigInt { handle, api }
+    }
+
+    pub fn to_signed_bytes_be(&self) -> BoxedBytes {
+        self.api.bi_get_signed_bytes(self.handle)
+    }
+
+    pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
+        BigInt {
+            handle: managed_buffer
+                .api
+                .mb_to_big_int_signed(managed_buffer.handle),
+            api: managed_buffer.api.clone(),
+        }
+    }
+
+    pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
         ManagedBuffer {
             handle: self.api.mb_from_big_int_signed(self.handle),
             api: self.api.clone(),
         }
     }
-
-    pub fn to_signed_bytes(&self) -> BoxedBytes {
-        self.api.bi_get_signed_bytes(self.handle)
-    }
 }
-
-// impl<M: ManagedTypeApi> From<ArwenBigUint> for BigInt<M> {
-// 	#[inline]
-// 	fn from(item: ArwenBigUint) -> Self {
-// 		BigInt {
-// 			handle: item.handle,
-// 		}
-// 	}
-// }
-
-// impl<M: ManagedTypeApi> From<i64> for BigInt<M> {
-//     fn from(item: i64) -> Self {
-//         unsafe {
-//             BigInt {
-//                 handle: bigIntNew(item),
-//                 api: self.api.clone(),
-//             }
-//         }
-//     }
-// }
-
-// impl<M: ManagedTypeApi> From<i32> for BigInt<M> {
-//     fn from(item: i32) -> Self {
-//         unsafe {
-//             BigInt {
-//                 handle: bigIntNew(item.into()),
-//                 api: self.api.clone(),
-//             }
-//         }
-//     }
-// }
-
-// impl<M: ManagedTypeApi> BigInt {
-//     pub fn from_i64(value: i64) -> BigInt {
-//         unsafe {
-//             BigInt {
-//                 handle: bigIntNew(value),
-//                 api: self.api.clone(),
-//             }
-//         }
-//     }
-// }
 
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
@@ -92,6 +88,26 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
         BigInt {
             handle: clone_handle,
             api: self.api.clone(),
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> BigInt<M> {
+    // TODO: convert BigUint after new implementation
+    pub fn abs_uint(&self) -> Self {
+        let result = self.api.bi_new_zero();
+        self.api.bi_abs(result, self.handle);
+        BigInt {
+            handle: result,
+            api: self.api.clone(),
+        }
+    }
+
+    pub fn sign(&self) -> Sign {
+        match self.api.bi_sign(self.handle) {
+            crate::api::Sign::Plus => Sign::Plus,
+            crate::api::Sign::NoSign => Sign::NoSign,
+            crate::api::Sign::Minus => Sign::Minus,
         }
     }
 }
@@ -224,8 +240,8 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
 
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        if !output.set_specialized(&self.to_signed_bytes_buffer()) {
-            output.set_slice_u8(self.to_signed_bytes().as_slice());
+        if !output.set_specialized(&self.to_signed_bytes_be_buffer()) {
+            output.set_slice_u8(self.to_signed_bytes_be().as_slice());
         }
         Ok(())
     }
@@ -235,8 +251,8 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if !dest.push_specialized(&self.to_signed_bytes_buffer()) {
-            dest.write(self.to_signed_bytes().as_slice());
+        if !dest.push_specialized(&self.to_signed_bytes_be_buffer()) {
+            dest.write(self.to_signed_bytes_be().as_slice());
         }
         Ok(())
     }
@@ -247,8 +263,8 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
         _c: ExitCtx,
         _exit: fn(ExitCtx, EncodeError) -> !,
     ) {
-        if !dest.push_specialized(&self.to_signed_bytes_buffer()) {
-            dest.write(self.to_signed_bytes().as_slice());
+        if !dest.push_specialized(&self.to_signed_bytes_be_buffer()) {
+            dest.write(self.to_signed_bytes_be().as_slice());
         }
     }
 }
@@ -256,7 +272,7 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
 impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         if let Some(managed_buffer) = input.read_specialized::<ManagedBuffer<M>>()? {
-            Ok(managed_buffer.into())
+            Ok(BigInt::from_signed_bytes_be_buffer(&managed_buffer))
         } else {
             Err(DecodeError::UNSUPPORTED_OPERATION)
         }
@@ -270,7 +286,7 @@ impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
         if let Some(managed_buffer) =
             input.read_specialized_or_exit::<ManagedBuffer<M>, ExitCtx>(c.clone(), exit)
         {
-            managed_buffer.into()
+            BigInt::from_signed_bytes_be_buffer(&managed_buffer)
         } else {
             exit(c, DecodeError::UNSUPPORTED_OPERATION)
         }
@@ -296,43 +312,6 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
-    // fn abs_uint(&self) -> ArwenBigUint {
-    //     unsafe {
-    //         let result = self.api.new_zero();
-    //         bigIntAbs(result, self.handle);
-    //         ArwenBigUint { handle: result }
-    //     }
-    // }
-
-    pub fn sign(&self) -> Sign {
-        match self.api.bi_sign(self.handle) {
-            crate::api::Sign::Plus => Sign::Plus,
-            crate::api::Sign::NoSign => Sign::NoSign,
-            crate::api::Sign::Minus => Sign::Minus,
-        }
-    }
-
-    // fn to_signed_bytes_be(&self) -> Vec<u8> {
-    // 	unsafe {
-    // 		let byte_len = bigIntSignedByteLength(self.handle);
-    // 		let mut vec = vec![0u8; byte_len as usize];
-    // 		bigIntGetSignedBytes(self.handle, vec.as_mut_ptr());
-    // 		vec
-    // 	}
-    // }
-
-    // fn from_signed_bytes_be(bytes: &[u8]) -> Self {
-    // 	unsafe {
-    // 		let handle = self.api.new_zero();
-    // 		bigIntSetSignedBytes(handle, bytes.as_ptr(), bytes.len() as i32);
-    // 		BigInt { handle }
-    // 	}
-    // }
-
-    pub fn to_i64(&self) -> Option<i64> {
-        self.api.bi_to_i64(self.handle)
-    }
-
     pub fn pow(&self, exp: u32) -> Self {
         let handle = self.api.bi_new_zero();
         let exp_handle = self.api.bi_new(exp as i64);
