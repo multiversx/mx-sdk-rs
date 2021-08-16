@@ -2,6 +2,10 @@ use crate::types::BoxedBytes;
 
 use super::Handle;
 
+/// Returned if load/copy slice could not be performed.
+/// No further data needed.
+pub struct InvalidSliceError;
+
 /// A raw bytes buffer managed by Arwen.
 pub trait ManagedBufferApi {
     fn mb_new_empty(&self) -> Handle;
@@ -12,20 +16,22 @@ pub trait ManagedBufferApi {
 
     fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes;
 
+    /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
     fn mb_load_slice(
         &self,
         source_handle: Handle,
         starting_position: usize,
         dest_slice: &mut [u8],
-    ) -> bool;
+    ) -> Result<(), InvalidSliceError>;
 
+    /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
     fn mb_copy_slice(
         &self,
         source_handle: Handle,
         starting_position: usize,
         slice_len: usize,
         dest_handle: Handle,
-    ) -> bool;
+    ) -> Result<(), InvalidSliceError>;
 
     fn mb_overwrite(&self, handle: Handle, value: &[u8]);
 

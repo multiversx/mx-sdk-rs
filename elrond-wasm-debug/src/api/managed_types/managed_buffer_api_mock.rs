@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{Handle, ManagedBufferApi},
+    api::{Handle, InvalidSliceError, ManagedBufferApi},
     types::BoxedBytes,
 };
 
@@ -59,13 +59,13 @@ impl ManagedBufferApi for TxContext {
         source_handle: Handle,
         starting_position: usize,
         dest_slice: &mut [u8],
-    ) -> bool {
+    ) -> Result<(), InvalidSliceError> {
         let opt_slice = self.mb_get_slice(source_handle, starting_position, dest_slice.len());
         if let Some(slice) = opt_slice {
             dest_slice.copy_from_slice(slice.as_slice());
-            true
+            Ok(())
         } else {
-            false
+            Err(InvalidSliceError)
         }
     }
 
@@ -75,7 +75,7 @@ impl ManagedBufferApi for TxContext {
         starting_position: usize,
         slice_len: usize,
         dest_handle: Handle,
-    ) -> bool {
+    ) -> Result<(), InvalidSliceError> {
         let opt_slice = self.mb_get_slice(source_handle, starting_position, slice_len);
         if let Some(slice) = opt_slice {
             let mut tx_output = self.tx_output_cell.borrow_mut();
@@ -83,9 +83,9 @@ impl ManagedBufferApi for TxContext {
                 .managed_types
                 .managed_buffer_map
                 .insert(dest_handle, slice);
-            true
+            Ok(())
         } else {
-            false
+            Err(InvalidSliceError)
         }
     }
 

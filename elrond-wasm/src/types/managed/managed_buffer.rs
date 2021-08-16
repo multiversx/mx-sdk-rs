@@ -1,5 +1,6 @@
 use alloc::string::String;
 
+use crate::api::InvalidSliceError;
 // use elrond_codec::{NestedEncodeOutput, TryStaticCast};
 use crate::elrond_codec::*;
 
@@ -41,7 +42,12 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.api.mb_to_boxed_bytes(self.handle)
     }
 
-    pub fn load_slice(&self, starting_position: usize, dest_slice: &mut [u8]) -> bool {
+    /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
+    pub fn load_slice(
+        &self,
+        starting_position: usize,
+        dest_slice: &mut [u8],
+    ) -> Result<(), InvalidSliceError> {
         self.api
             .mb_load_slice(self.handle, starting_position, dest_slice)
     }
@@ -52,10 +58,10 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
         let result_handle = self.api.mb_new_empty();
-        if self
-            .api
-            .mb_copy_slice(self.handle, starting_position, slice_len, result_handle)
-        {
+        let err_result =
+            self.api
+                .mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
+        if err_result.is_ok() {
             Some(ManagedBuffer::new_from_raw_handle(
                 self.api.clone(),
                 result_handle,
