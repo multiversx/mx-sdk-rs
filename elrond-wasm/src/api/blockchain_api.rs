@@ -22,7 +22,7 @@ pub trait BlockchainApi:
 
     fn check_caller_is_owner(&self) {
         if self.get_owner_address() != self.get_caller() {
-            self.signal_error(b"Endpoint can olny be called by owner");
+            self.signal_error(b"Endpoint can only be called by owner");
         }
     }
 
