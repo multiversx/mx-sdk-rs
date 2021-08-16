@@ -89,9 +89,12 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         let size = usize::dep_decode(input)?;
         match T::TYPE_INFO {
             TypeInfo::U8 => {
-                let bytes = input.read_slice(size)?;
-                let bytes_copy = bytes.to_vec(); // copy is needed because result might outlive input
-                let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_copy) };
+                let mut vec_u8: Vec<u8> = Vec::with_capacity(size);
+                unsafe {
+                    vec_u8.set_len(size);
+                    input.read_into(vec_u8.as_mut_slice())?;
+                }
+                let cast_vec: Vec<T> = unsafe { core::mem::transmute(vec_u8) };
                 Ok(cast_vec)
             },
             _ => {
@@ -112,9 +115,12 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         let size = usize::dep_decode_or_exit(input, c.clone(), exit);
         match T::TYPE_INFO {
             TypeInfo::U8 => {
-                let bytes = input.read_slice_or_exit(size, c, exit);
-                let bytes_copy = bytes.to_vec(); // copy is needed because result might outlive input
-                let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_copy) };
+                let mut vec_u8: Vec<u8> = Vec::with_capacity(size);
+                unsafe {
+                    vec_u8.set_len(size);
+                    input.read_into_or_exit(vec_u8.as_mut_slice(), c, exit);
+                }
+                let cast_vec: Vec<T> = unsafe { core::mem::transmute(vec_u8) };
                 cast_vec
             },
             _ => {

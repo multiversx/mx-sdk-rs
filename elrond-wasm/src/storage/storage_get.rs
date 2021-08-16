@@ -1,6 +1,6 @@
 use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::err_msg;
-use crate::types::{BoxedBytes, ManagedBuffer};
+use crate::types::{BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput};
 use alloc::boxed::Box;
 use elrond_codec::*;
 
@@ -32,6 +32,8 @@ impl<'k, SRA> TopDecodeInput for StorageGetInput<'k, SRA>
 where
     SRA: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
+    type NestedBuffer = ManagedBufferNestedDecodeInput<SRA>;
+
     fn byte_len(&self) -> usize {
         self.api.storage_load_len(self.key)
     }
@@ -56,11 +58,13 @@ where
         }
     }
 
+    fn into_nested_buffer(self) -> Self::NestedBuffer {
+        ManagedBufferNestedDecodeInput::new(self.into_managed_buffer())
+    }
+
     fn try_get_big_uint_handle(&self) -> (bool, i32) {
         (true, self.api.storage_load_big_uint_raw(self.key))
     }
-
-    // TODO: there is currently no API hook for storage of signed big ints
 }
 
 pub fn storage_get<SRA, T>(api: SRA, key: &[u8]) -> T

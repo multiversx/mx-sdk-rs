@@ -228,8 +228,11 @@ impl TopEncode for BoxedBytes {
 impl NestedDecode for BoxedBytes {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
-        let byte_slice = input.read_slice(size)?;
-        Ok(byte_slice.into())
+        unsafe {
+            let mut result = BoxedBytes::allocate(size);
+            input.read_into(result.as_mut_slice())?;
+            Ok(result)
+        }
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -238,8 +241,11 @@ impl NestedDecode for BoxedBytes {
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
         let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        let byte_slice = input.read_slice_or_exit(size, c, exit);
-        byte_slice.into()
+        unsafe {
+            let mut result = BoxedBytes::allocate(size);
+            input.read_into_or_exit(result.as_mut_slice(), c, exit);
+            result
+        }
     }
 }
 

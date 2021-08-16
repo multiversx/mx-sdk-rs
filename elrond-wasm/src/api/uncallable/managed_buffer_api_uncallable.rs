@@ -1,5 +1,5 @@
 use crate::{
-    api::{Handle, ManagedBufferApi},
+    api::{Handle, InvalidSliceError, ManagedBufferApi},
     types::BoxedBytes,
 };
 
@@ -25,7 +25,7 @@ impl ManagedBufferApi for super::UncallableApi {
         _source_handle: Handle,
         _starting_position: usize,
         _dest_slice: &mut [u8],
-    ) -> bool {
+    ) -> Result<(), InvalidSliceError> {
         unreachable!()
     }
 
@@ -35,7 +35,7 @@ impl ManagedBufferApi for super::UncallableApi {
         _starting_pos: usize,
         _slice_len: usize,
         _dest_handle: Handle,
-    ) -> bool {
+    ) -> Result<(), InvalidSliceError> {
         unreachable!()
     }
 

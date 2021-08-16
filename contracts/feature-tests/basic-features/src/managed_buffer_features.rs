@@ -31,7 +31,7 @@ pub trait ManagedBufferFeatures {
         slice_len: usize,
     ) -> OptionalResult<BoxedBytes> {
         let mut result = BoxedBytes::zeros(slice_len);
-        if mb.load_slice(starting_position, result.as_mut_slice()) {
+        if mb.load_slice(starting_position, result.as_mut_slice()).is_ok() {
             OptionalResult::Some(result)
         } else {
             OptionalResult::None

@@ -53,7 +53,7 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         source_handle: Handle,
         starting_position: usize,
         dest_slice: &mut [u8],
-    ) -> bool {
+    ) -> Result<(), InvalidSliceError> {
         unsafe {
             let err = mBufferGetByteSlice(
                 source_handle,
@@ -61,7 +61,11 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
                 dest_slice.len() as i32,
                 dest_slice.as_mut_ptr(),
             );
-            err == 0
+            if err == 0 {
+                Ok(())
+            } else {
+                Err(InvalidSliceError)
+            }
         }
     }
 
@@ -71,7 +75,7 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         starting_pos: usize,
         slice_len: usize,
         dest_handle: Handle,
-    ) -> bool {
+    ) -> Result<(), InvalidSliceError> {
         unsafe {
             let err = mBufferCopyByteSlice(
                 source_handle,
@@ -79,7 +83,11 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
                 slice_len as i32,
                 dest_handle,
             );
-            err == 0
+            if err == 0 {
+                Ok(())
+            } else {
+                Err(InvalidSliceError)
+            }
         }
     }
 
