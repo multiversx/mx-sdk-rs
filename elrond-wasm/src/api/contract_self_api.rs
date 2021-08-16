@@ -54,6 +54,9 @@ pub trait ContractBase: Sized {
     /// Gateway to the functionality related to sending transactions from the current contract.
     fn send(&self) -> Self::SendApi;
 
+    /// Managed types API. Required to create new instances of managed types.
+    fn type_manager(&self) -> Self::TypeManager;
+
     /// Gateway blockchain info related to the current transaction and to accounts.
     fn blockchain(&self) -> Self::BlockchainApi;
 
