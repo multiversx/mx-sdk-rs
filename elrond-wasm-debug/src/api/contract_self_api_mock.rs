@@ -25,6 +25,10 @@ impl elrond_wasm::api::ContractBase for TxContext {
         self.clone()
     }
 
+    fn type_manager(&self) -> Self::TypeManager {
+        self.clone()
+    }
+
     fn blockchain(&self) -> Self::BlockchainApi {
         self.clone()
     }

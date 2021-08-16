@@ -92,6 +92,10 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
                 self.api.send()
             }
             #[inline]
+            fn type_manager(&self) -> Self::TypeManager {
+                self.api.type_manager()
+            }
+            #[inline]
             fn blockchain(&self) -> Self::BlockchainApi {
                 self.api.blockchain()
             }

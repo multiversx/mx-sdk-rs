@@ -30,6 +30,11 @@ impl ContractBase for ArwenApiImpl {
     }
 
     #[inline]
+    fn type_manager(&self) -> Self::TypeManager {
+        self.clone()
+    }
+
+    #[inline]
     fn blockchain(&self) -> Self::BlockchainApi {
         self.clone()
     }
