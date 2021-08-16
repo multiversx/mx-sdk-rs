@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{BigUintApi, EndpointFinishApi, SendApi},
+    api::{BigUintApi, EndpointFinishApi, ManagedTypeApi, SendApi},
     io::EndpointResult,
     types::{Address, AsyncCall, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
 };
