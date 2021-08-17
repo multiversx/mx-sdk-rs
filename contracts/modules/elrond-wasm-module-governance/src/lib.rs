@@ -24,7 +24,7 @@ pub trait GovernanceModule:
         &self,
         #[payment_token] payment_token: TokenIdentifier,
         #[payment_nonce] payment_nonce: u64,
-        #[payment_amount] payment_amount: Self::BigUint,
+        #[payment_amount] payment_amount: BigUint,
     ) {
         let caller = self.blockchain().get_caller();
 
@@ -61,9 +61,9 @@ pub trait GovernanceModule:
     #[endpoint]
     fn propose(
         &self,
-        #[payment_amount] payment_amount: Self::BigUint,
+        #[payment_amount] payment_amount: BigUint,
         description: BoxedBytes,
-        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::BigUint>>,
+        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<BigUint>>,
     ) -> SCResult<usize> {
         self.require_payment_token_governance_token()?;
         require!(
@@ -132,11 +132,7 @@ pub trait GovernanceModule:
 
     #[payable("*")]
     #[endpoint]
-    fn vote(
-        &self,
-        #[payment_amount] payment_amount: Self::BigUint,
-        proposal_id: usize,
-    ) -> SCResult<()> {
+    fn vote(&self, #[payment_amount] payment_amount: BigUint, proposal_id: usize) -> SCResult<()> {
         self.require_payment_token_governance_token()?;
         self.require_valid_proposal_id(proposal_id)?;
         require!(
@@ -162,7 +158,7 @@ pub trait GovernanceModule:
     #[endpoint]
     fn downvote(
         &self,
-        #[payment_amount] payment_amount: Self::BigUint,
+        #[payment_amount] payment_amount: BigUint,
         proposal_id: usize,
     ) -> SCResult<()> {
         self.require_payment_token_governance_token()?;
@@ -342,7 +338,7 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::BigUint>> {
+    ) -> MultiResultVec<GovernanceActionAsMultiArg<BigUint>> {
         if !self.proposal_exists(proposal_id) {
             return Vec::new().into();
         }
@@ -383,7 +379,7 @@ pub trait GovernanceModule:
         self.is_valid_proposal_id(proposal_id) && !self.proposals().item_is_empty(proposal_id)
     }
 
-    fn total_gas_needed(&self, actions: &[GovernanceAction<Self::BigUint>]) -> u64 {
+    fn total_gas_needed(&self, actions: &[GovernanceAction<BigUint>]) -> u64 {
         let mut total = 0;
         for action in actions {
             total += action.gas_limit;
@@ -412,7 +408,7 @@ pub trait GovernanceModule:
         #[indexed] proposer: &Address,
         #[indexed] start_block: u64,
         #[indexed] description: &BoxedBytes,
-        actions: &[GovernanceAction<Self::BigUint>],
+        actions: &[GovernanceAction<BigUint>],
     );
 
     #[event("voteCast")]
@@ -420,7 +416,7 @@ pub trait GovernanceModule:
         &self,
         #[indexed] voter: &Address,
         #[indexed] proposal_id: usize,
-        nr_votes: &Self::BigUint,
+        nr_votes: &BigUint,
     );
 
     #[event("downvoteCast")]
@@ -428,7 +424,7 @@ pub trait GovernanceModule:
         &self,
         #[indexed] downvoter: &Address,
         #[indexed] proposal_id: usize,
-        nr_downvotes: &Self::BigUint,
+        nr_downvotes: &BigUint,
     );
 
     #[event("proposalCanceled")]
@@ -446,13 +442,13 @@ pub trait GovernanceModule:
         #[indexed] address: &Address,
         #[indexed] token_id: &TokenIdentifier,
         #[indexed] token_nonce: u64,
-        amount: &Self::BigUint,
+        amount: &BigUint,
     );
 
     // storage - general
 
     #[storage_mapper("governance:proposals")]
-    fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<Self::BigUint>>;
+    fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<BigUint>>;
 
     /// Not stored under "proposals", as that would require deserializing the whole struct
     #[storage_mapper("governance:proposalStartBlock")]
@@ -462,22 +458,18 @@ pub trait GovernanceModule:
     fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> SafeMapMapper<Self::Storage, Address, Self::BigUint>;
+    fn votes(&self, proposal_id: usize) -> SafeMapMapper<Self::Storage, Address, BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize)
-        -> SafeMapMapper<Self::Storage, Address, Self::BigUint>;
+    fn downvotes(&self, proposal_id: usize) -> SafeMapMapper<Self::Storage, Address, BigUint>;
 
     /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]
-    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, BigUint>;
 
     /// Could be calculated by iterating over the "downvotes" mapper, but that costs a lot of gas
     #[view(getTotalDownvotes)]
     #[storage_mapper("governance:totalDownvotes")]
-    fn total_downvotes(
-        &self,
-        proposal_id: usize,
-    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, BigUint>;
 }

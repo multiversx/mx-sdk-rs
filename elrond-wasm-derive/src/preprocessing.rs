@@ -8,6 +8,10 @@ fn substitutions() -> HashMap<String, TokenStream> {
         quote!(elrond_wasm::types::BigInt<Self::TypeManager>).into(),
     );
     substitutions.insert(
+        "BigUint".to_string(),
+        quote!(Self::BigUint).into(), // temporary, until the BigUint API is redesigned
+    );
+    substitutions.insert(
         "ManagedBuffer".to_string(),
         quote!(elrond_wasm::types::ManagedBuffer<Self::TypeManager>).into(),
     );

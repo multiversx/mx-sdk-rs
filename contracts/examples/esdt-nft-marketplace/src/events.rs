@@ -7,7 +7,7 @@ use super::auction::{Auction, AuctionType, EsdtToken};
 pub trait EventsModule {
     fn emit_auction_token_event(
         self,
-        auction: Auction<Self::BigUint>,
+        auction: Auction<BigUint>,
         auction_id: u64,
         current_time: u64,
     ) {
@@ -21,7 +21,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_bid_event(self, auction: Auction<Self::BigUint>, auction_id: u64, current_time: u64) {
+    fn emit_bid_event(self, auction: Auction<BigUint>, auction_id: u64, current_time: u64) {
         self.bid_event(
             &auction.original_owner,
             auction_id,
@@ -32,12 +32,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_end_auction_event(
-        self,
-        auction: Auction<Self::BigUint>,
-        auction_id: u64,
-        current_time: u64,
-    ) {
+    fn emit_end_auction_event(self, auction: Auction<BigUint>, auction_id: u64, current_time: u64) {
         self.end_auction_event(
             &auction.original_owner,
             auction_id,
@@ -48,12 +43,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_buy_sft_event(
-        self,
-        auction: Auction<Self::BigUint>,
-        auction_id: u64,
-        current_time: u64,
-    ) {
+    fn emit_buy_sft_event(self, auction: Auction<BigUint>, auction_id: u64, current_time: u64) {
         self.buy_sft_event(
             &auction.original_owner,
             auction_id,
@@ -64,12 +54,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_withdraw_event(
-        self,
-        auction: Auction<Self::BigUint>,
-        auction_id: u64,
-        current_time: u64,
-    ) {
+    fn emit_withdraw_event(self, auction: Auction<BigUint>, auction_id: u64, current_time: u64) {
         self.withdraw_event(
             &auction.original_owner,
             auction_id,
@@ -88,7 +73,7 @@ pub trait EventsModule {
         #[indexed] auction_token: &EsdtToken,
         #[indexed] auction_type: &AuctionType,
         #[indexed] current_time: u64,
-        auction: &Auction<Self::BigUint>,
+        auction: &Auction<BigUint>,
     );
 
     #[event("bid_event")]
@@ -99,7 +84,7 @@ pub trait EventsModule {
         #[indexed] auction_token: &EsdtToken,
         #[indexed] auction_type: &AuctionType,
         #[indexed] current_time: u64,
-        auction: &Auction<Self::BigUint>,
+        auction: &Auction<BigUint>,
     );
 
     #[event("end_auction_event")]
@@ -110,7 +95,7 @@ pub trait EventsModule {
         #[indexed] auction_token: &EsdtToken,
         #[indexed] auction_type: &AuctionType,
         #[indexed] current_time: u64,
-        auction: &Auction<Self::BigUint>,
+        auction: &Auction<BigUint>,
     );
 
     #[event("buy_sft_event")]
@@ -121,7 +106,7 @@ pub trait EventsModule {
         #[indexed] auction_token: &EsdtToken,
         #[indexed] auction_type: &AuctionType,
         #[indexed] current_time: u64,
-        auction: &Auction<Self::BigUint>,
+        auction: &Auction<BigUint>,
     );
 
     #[event("withdraw_event")]
@@ -132,6 +117,6 @@ pub trait EventsModule {
         #[indexed] auction_token: &EsdtToken,
         #[indexed] auction_type: &AuctionType,
         #[indexed] current_time: u64,
-        auction: &Auction<Self::BigUint>,
+        auction: &Auction<BigUint>,
     );
 }

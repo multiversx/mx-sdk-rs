@@ -23,7 +23,7 @@ pub trait Vault {
     fn accept_funds(
         &self,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
     ) {
         let nonce = self.call_value().esdt_token_nonce();
         let token_type = self.call_value().esdt_token_type();
@@ -35,9 +35,7 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn accept_multi_funds_echo(
-        &self,
-    ) -> MultiResultVec<MultiArg3<TokenIdentifier, u64, Self::BigUint>> {
+    fn accept_multi_funds_echo(&self) -> MultiResultVec<MultiArg3<TokenIdentifier, u64, BigUint>> {
         let payments = self.call_value().get_all_esdt_transfers();
         let mut result = Vec::new();
 
@@ -53,9 +51,9 @@ pub trait Vault {
     fn accept_funds_echo_payment(
         &self,
         #[payment_token] token_identifier: TokenIdentifier,
-        #[payment_amount] token_payment: Self::BigUint,
+        #[payment_amount] token_payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64>> {
+    ) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, BigUint, u64>> {
         let token_type = self.call_value().esdt_token_type();
 
         self.accept_funds_event(
@@ -82,7 +80,7 @@ pub trait Vault {
     fn reject_funds(
         &self,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> SCResult<()> {
         self.reject_funds_event(&token, &payment);
         sc_error!("reject_funds")
@@ -93,7 +91,7 @@ pub trait Vault {
         &self,
         token: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
         #[var_args] return_message: OptionalArg<BoxedBytes>,
     ) {
         self.retrieve_funds_event(&token, nonce, &amount);
@@ -117,23 +115,19 @@ pub trait Vault {
         &self,
         #[indexed] token_identifier: &TokenIdentifier,
         #[indexed] token_type: &[u8],
-        #[indexed] token_payment: &Self::BigUint,
+        #[indexed] token_payment: &BigUint,
         #[indexed] token_nonce: u64,
     );
 
     #[event("reject_funds")]
-    fn reject_funds_event(
-        &self,
-        #[indexed] token: &TokenIdentifier,
-        #[indexed] payment: &Self::BigUint,
-    );
+    fn reject_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint);
 
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
         &self,
         #[indexed] token: &TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] amount: &Self::BigUint,
+        #[indexed] amount: &BigUint,
     );
 
     #[endpoint]

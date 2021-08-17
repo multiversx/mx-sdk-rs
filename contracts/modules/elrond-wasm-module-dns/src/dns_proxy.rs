@@ -4,5 +4,5 @@ elrond_wasm::imports!();
 pub trait Dns {
     #[payable("EGLD")]
     #[endpoint]
-    fn register(&self, name: BoxedBytes, #[payment] payment: Self::BigUint);
+    fn register(&self, name: BoxedBytes, #[payment] payment: BigUint);
 }

@@ -16,7 +16,7 @@ pub trait DnsModule {
         &self,
         dns_address: Address,
         name: BoxedBytes,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         only_owner!(self, "only owner can call dnsRegister");
 
