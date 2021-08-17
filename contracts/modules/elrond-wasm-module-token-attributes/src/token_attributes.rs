@@ -23,16 +23,16 @@ pub trait TokenAttributesModule {
         token_nonce: u64,
         attributes: &T,
     ) -> SCResult<()> {
-        let has_mapping = !self.token_attributes_mapping(&token_id).is_empty();
+        let has_mapping = !self.token_attributes_mapping(token_id).is_empty();
 
         let mapping = if has_mapping {
-            self.token_attributes_mapping(&token_id).get()
+            self.token_attributes_mapping(token_id).get()
         } else {
             let mut counter = self.token_attributes_counter().get();
             require!(counter < u8::MAX, COUNTER_OVERFLOW_ERROR_MESSAGE);
 
             counter += 1;
-            self.token_attributes_mapping(&token_id).set(&counter);
+            self.token_attributes_mapping(token_id).set(&counter);
             self.token_attributes_counter().set(&counter);
             counter
         };
@@ -55,10 +55,10 @@ pub trait TokenAttributesModule {
         token_nonce: u64,
         attributes: &T,
     ) -> SCResult<()> {
-        let has_mapping = !self.token_attributes_mapping(&token_id).is_empty();
+        let has_mapping = !self.token_attributes_mapping(token_id).is_empty();
         require!(has_mapping, UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
 
-        let mapping = self.token_attributes_mapping(&token_id).get();
+        let mapping = self.token_attributes_mapping(token_id).get();
         let has_value = !self.token_attributes(mapping, token_nonce).is_empty();
         require!(has_value, VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
 
@@ -71,10 +71,10 @@ pub trait TokenAttributesModule {
     }
 
     fn token_attributes_clear(&self, token_id: &TokenIdentifier, token_nonce: u64) -> SCResult<()> {
-        let has_mapping = !self.token_attributes_mapping(&token_id).is_empty();
+        let has_mapping = !self.token_attributes_mapping(token_id).is_empty();
         require!(has_mapping, UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
 
-        let mapping = self.token_attributes_mapping(&token_id).get();
+        let mapping = self.token_attributes_mapping(token_id).get();
         let has_value = !self.token_attributes(mapping, token_nonce).is_empty();
         require!(has_value, VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
 
@@ -84,8 +84,8 @@ pub trait TokenAttributesModule {
     }
 
     fn token_attributes_is_empty(&self, token_id: &TokenIdentifier, token_nonce: u64) -> bool {
-        let has_mapping = !self.token_attributes_mapping(&token_id).is_empty();
-        let mapping = self.token_attributes_mapping(&token_id).get();
+        let has_mapping = !self.token_attributes_mapping(token_id).is_empty();
+        let mapping = self.token_attributes_mapping(token_id).get();
 
         !has_mapping || self.token_attributes(mapping, token_nonce).is_empty()
     }
@@ -95,10 +95,10 @@ pub trait TokenAttributesModule {
         token_id: &TokenIdentifier,
         token_nonce: u64,
     ) -> SCResult<T> {
-        let has_mapping = !self.token_attributes_mapping(&token_id).is_empty();
+        let has_mapping = !self.token_attributes_mapping(token_id).is_empty();
         require!(has_mapping, UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
 
-        let mapping = self.token_attributes_mapping(&token_id).get();
+        let mapping = self.token_attributes_mapping(token_id).get();
         let has_value = !self.token_attributes(mapping, token_nonce).is_empty();
         require!(has_value, VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
 
