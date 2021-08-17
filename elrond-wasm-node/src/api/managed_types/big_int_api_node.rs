@@ -1,10 +1,17 @@
 use core::cmp::Ordering;
 
+use crate::error_hook;
+
 use elrond_wasm::api::{BigIntApi, Handle, Sign};
+use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
+
+    fn bigIntUnsignedByteLength(x: i32) -> i32;
+    fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
+    fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
 
     fn bigIntSignedByteLength(x: i32) -> i32;
     fn bigIntGetSignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
@@ -19,11 +26,14 @@ extern "C" {
     fn bigIntTDiv(dest: i32, x: i32, y: i32);
     fn bigIntTMod(dest: i32, x: i32, y: i32);
 
-    fn bigIntPow(dest: i32, x: i32, y: i32);
     fn bigIntAbs(dest: i32, x: i32);
     fn bigIntNeg(dest: i32, x: i32);
     fn bigIntSign(x: i32) -> i32;
     fn bigIntCmp(x: i32, y: i32) -> i32;
+
+    fn bigIntSqrt(dest: i32, x: i32);
+    fn bigIntPow(dest: i32, x: i32, y: i32);
+    fn bigIntLog2(x: i32) -> i32;
 
     fn bigIntAnd(dest: i32, x: i32, y: i32);
     fn bigIntOr(dest: i32, x: i32, y: i32);
@@ -42,9 +52,36 @@ macro_rules! binary_op_wrapper {
     };
 }
 
+macro_rules! unary_op_wrapper {
+    ($method_name:ident, $hook_name:ident) => {
+        fn $method_name(&self, dest: Handle, x: Handle) {
+            unsafe {
+                $hook_name(dest, x);
+            }
+        }
+    };
+}
+
 impl BigIntApi for crate::ArwenApiImpl {
     fn bi_new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
+    }
+
+    fn bi_unsigned_byte_length(&self, x: Handle) -> Handle {
+        unsafe { bigIntUnsignedByteLength(x) }
+    }
+
+    fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes {
+        unsafe {
+            let byte_len = bigIntUnsignedByteLength(handle);
+            let mut bb = BoxedBytes::allocate(byte_len as usize);
+            bigIntGetUnsignedBytes(handle, bb.as_mut_ptr());
+            bb
+        }
+    }
+
+    fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]) {
+        unsafe { bigIntSetUnsignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
     fn bi_signed_byte_length(&self, x: Handle) -> Handle {
@@ -77,22 +114,22 @@ impl BigIntApi for crate::ArwenApiImpl {
 
     binary_op_wrapper! {bi_add, bigIntAdd}
     binary_op_wrapper! {bi_sub, bigIntSub}
+
+    fn bi_sub_unsigned(&self, dest: Handle, x: Handle, y: Handle) {
+        unsafe {
+            bigIntSub(dest, x, y);
+            if bigIntSign(dest) < 0 {
+                error_hook::signal_error(err_msg::BIG_UINT_SUB_NEGATIVE)
+            }
+        }
+    }
+
     binary_op_wrapper! {bi_mul, bigIntMul}
     binary_op_wrapper! {bi_t_div, bigIntTDiv}
     binary_op_wrapper! {bi_t_mod, bigIntTMod}
-    binary_op_wrapper! {bi_pow, bigIntPow}
 
-    fn bi_abs(&self, dest: Handle, x: Handle) {
-        unsafe {
-            bigIntAbs(dest, x);
-        }
-    }
-
-    fn bi_neg(&self, dest: Handle, x: Handle) {
-        unsafe {
-            bigIntNeg(dest, x);
-        }
-    }
+    unary_op_wrapper! {bi_abs, bigIntAbs}
+    unary_op_wrapper! {bi_neg, bigIntNeg}
 
     fn bi_sign(&self, x: Handle) -> Sign {
         unsafe {
@@ -107,6 +144,10 @@ impl BigIntApi for crate::ArwenApiImpl {
     fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
         unsafe { bigIntCmp(x, y).cmp(&0) }
     }
+
+    unary_op_wrapper! {bi_sqrt, bigIntSqrt}
+    binary_op_wrapper! {bi_pow, bigIntPow}
+    unary_op_wrapper! {bi_log2, bigIntLog2}
 
     binary_op_wrapper! {bi_and, bigIntAnd}
     binary_op_wrapper! {bi_or, bigIntOr}
