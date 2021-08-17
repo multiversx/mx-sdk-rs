@@ -12,7 +12,7 @@ pub trait SendTxRepeat {
     fn repeat(
         &self,
         to: Address,
-        amount: Self::BigUint,
+        amount: BigUint,
         times: usize,
         #[var_args] opt_data: OptionalArg<Vec<u8>>,
     ) {

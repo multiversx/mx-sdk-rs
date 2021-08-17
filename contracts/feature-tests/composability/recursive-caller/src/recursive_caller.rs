@@ -19,7 +19,7 @@ pub trait RecursiveCaller {
         &self,
         to: &Address,
         token_identifier: &TokenIdentifier,
-        amount: &Self::BigUint,
+        amount: &BigUint,
         counter: u32,
     ) -> AsyncCall<Self::SendApi> {
         self.recursive_send_funds_event(to, token_identifier, amount, counter);
@@ -41,7 +41,7 @@ pub trait RecursiveCaller {
         &self,
         to: &Address,
         token_identifier: &TokenIdentifier,
-        amount: &Self::BigUint,
+        amount: &BigUint,
         counter: u32,
     ) -> OptionalResult<AsyncCall<Self::SendApi>> {
         self.recursive_send_funds_callback_event(to, token_identifier, amount, counter);
@@ -63,7 +63,7 @@ pub trait RecursiveCaller {
         &self,
         #[indexed] to: &Address,
         #[indexed] token_identifier: &TokenIdentifier,
-        #[indexed] amount: &Self::BigUint,
+        #[indexed] amount: &BigUint,
         counter: u32,
     );
 
@@ -72,7 +72,7 @@ pub trait RecursiveCaller {
         &self,
         #[indexed] to: &Address,
         #[indexed] token_identifier: &TokenIdentifier,
-        #[indexed] amount: &Self::BigUint,
+        #[indexed] amount: &BigUint,
         counter: u32,
     );
 }

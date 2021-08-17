@@ -21,7 +21,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
@@ -37,7 +37,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         let half_payment = payment / 2u32.into();
         self.vault_proxy()
@@ -52,7 +52,7 @@ pub trait ForwarderAsyncCallModule {
         to: Address,
         token: TokenIdentifier,
         token_nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to)
@@ -66,7 +66,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         #[payment_token] token: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
     ) {
         self.retrieve_funds_callback_event(&token, nonce, &payment);
 
@@ -84,7 +84,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         #[indexed] token: &TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] payment: &Self::BigUint,
+        #[indexed] payment: &BigUint,
     );
 
     #[endpoint]
@@ -92,7 +92,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: &Address,
         token_identifier: &TokenIdentifier,
-        amount: &Self::BigUint,
+        amount: &BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to.clone())
@@ -109,7 +109,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: &Address,
         token_identifier: &TokenIdentifier,
-        cb_amount: &Self::BigUint,
+        cb_amount: &BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to.clone())
@@ -121,7 +121,7 @@ pub trait ForwarderAsyncCallModule {
     fn multi_transfer_via_async(
         &self,
         to: Address,
-        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, Self::BigUint>>,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = Vec::new();
 
@@ -146,14 +146,13 @@ pub trait ForwarderAsyncCallModule {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::BigUint>>;
+    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<BigUint>>;
 
     #[view]
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult5<BoxedBytes, TokenIdentifier, u64, Self::BigUint, MultiResultVec<BoxedBytes>>
-    {
+    ) -> MultiResult5<BoxedBytes, TokenIdentifier, u64, BigUint, MultiResultVec<BoxedBytes>> {
         let cb_data = self.callback_data().get(index);
         (
             cb_data.callback_name,

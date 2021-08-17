@@ -11,10 +11,7 @@ use super::common::{
 
 #[elrond_wasm::module]
 pub trait ValidationModule: common::CommonModule {
-    fn require_valid_order_input_amount(
-        &self,
-        params: &OrderInputParams<Self::BigUint>,
-    ) -> SCResult<()> {
+    fn require_valid_order_input_amount(&self, params: &OrderInputParams<BigUint>) -> SCResult<()> {
         require!(params.amount != 0, "Amout cannot be zero");
         require!(
             self.calculate_fee_amount(
@@ -28,7 +25,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_match_provider(
         &self,
-        params: &OrderInputParams<Self::BigUint>,
+        params: &OrderInputParams<BigUint>,
     ) -> SCResult<()> {
         require!(
             params.match_provider.is_none()
@@ -40,7 +37,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_fee_config(
         &self,
-        params: &OrderInputParams<Self::BigUint>,
+        params: &OrderInputParams<BigUint>,
     ) -> SCResult<()> {
         match params.fee_config.clone() {
             FeeConfig::Fixed(amount) => {
@@ -61,7 +58,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_deal_config(
         &self,
-        params: &OrderInputParams<Self::BigUint>,
+        params: &OrderInputParams<BigUint>,
     ) -> SCResult<()> {
         require!(
             params.deal_config.match_provider_percent < PERCENT_BASE_POINTS,
@@ -70,10 +67,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(())
     }
 
-    fn require_valid_order_input_params(
-        &self,
-        params: &OrderInputParams<Self::BigUint>,
-    ) -> SCResult<()> {
+    fn require_valid_order_input_params(&self, params: &OrderInputParams<BigUint>) -> SCResult<()> {
         self.require_valid_order_input_amount(params)?;
         self.require_valid_order_input_match_provider(params)?;
         self.require_valid_order_input_fee_config(params)?;
@@ -81,7 +75,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(())
     }
 
-    fn require_valid_buy_payment(&self) -> SCResult<Payment<Self::BigUint>> {
+    fn require_valid_buy_payment(&self) -> SCResult<Payment<BigUint>> {
         self.require_fungible_input()?;
         let second_token_id = self.second_token_id().get();
         let (amount, token_id) = self.call_value().payment_token_pair();
@@ -93,7 +87,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(Payment { token_id, amount })
     }
 
-    fn require_valid_sell_payment(&self) -> SCResult<Payment<Self::BigUint>> {
+    fn require_valid_sell_payment(&self) -> SCResult<Payment<BigUint>> {
         self.require_fungible_input()?;
         let first_token_id = self.first_token_id().get();
         let (amount, token_id) = self.call_value().payment_token_pair();
@@ -131,10 +125,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(())
     }
 
-    fn require_match_provider_empty_or_caller(
-        &self,
-        orders: &[Order<Self::BigUint>],
-    ) -> SCResult<()> {
+    fn require_match_provider_empty_or_caller(&self, orders: &[Order<BigUint>]) -> SCResult<()> {
         let caller = &self.blockchain().get_caller();
 
         for order in orders.iter() {

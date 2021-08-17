@@ -13,12 +13,7 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(
-        &self,
-        target: Self::BigUint,
-        deadline: u64,
-        token_name: TokenIdentifier,
-    ) -> SCResult<()> {
+    fn init(&self, target: BigUint, deadline: u64, token_name: TokenIdentifier) -> SCResult<()> {
         require!(target > 0, "Target must be more than 0");
         self.target().set(&target);
 
@@ -41,7 +36,7 @@ pub trait Crowdfunding {
     #[payable("*")]
     fn fund(
         &self,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
     ) -> SCResult<()> {
         require!(
@@ -68,7 +63,7 @@ pub trait Crowdfunding {
     }
 
     #[view(getCurrentFunds)]
-    fn get_current_funds(&self) -> Self::BigUint {
+    fn get_current_funds(&self) -> BigUint {
         let token = self.cf_token_name().get();
 
         self.blockchain().get_sc_balance(&token, 0)
@@ -119,7 +114,7 @@ pub trait Crowdfunding {
 
     #[view(getTarget)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn target(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
@@ -127,7 +122,7 @@ pub trait Crowdfunding {
 
     #[view(getDeposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(getCrowdfundingTokenName)]
     #[storage_mapper("tokenName")]

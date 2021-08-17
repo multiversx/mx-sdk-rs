@@ -23,7 +23,7 @@ pub trait Parent {
             .send()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
-                &Self::BigUint::zero(),
+                &BigUint::zero(),
                 &code,
                 CodeMetadata::DEFAULT,
                 &ArgBuffer::new(),
@@ -40,8 +40,8 @@ pub trait Parent {
         &self,
         token_display_name: BoxedBytes,
         token_ticker: BoxedBytes,
-        initial_supply: Self::BigUint,
-        #[payment] issue_cost: Self::BigUint,
+        initial_supply: BigUint,
+        #[payment] issue_cost: BigUint,
     ) {
         let child_contract_adress = self.child_contract_address().get();
         self.child_proxy(child_contract_adress)
