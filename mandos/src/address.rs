@@ -32,6 +32,8 @@ impl InterpretableFrom<String> for AddressKey {
         let mut value = [0u8; 32];
         if bytes.len() == 32 {
             value.copy_from_slice(&bytes[..]);
+        } else {
+            panic!("account address is not 32 bytes in length");
         }
         AddressKey {
             value,
@@ -58,6 +60,8 @@ impl InterpretableFrom<ValueSubTree> for AddressValue {
         let mut value = [0u8; 32];
         if bytes.len() == 32 {
             value.copy_from_slice(&bytes[..]);
+        } else {
+            panic!("account address is not 32 bytes in length");
         }
         AddressValue {
             value,
