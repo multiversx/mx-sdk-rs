@@ -136,7 +136,8 @@ pub trait EsdtNftMarketplace:
         };
         self.auction_by_id(auction_id).set(&auction);
 
-        self.emit_auction_token_event(auction, auction_id, current_time);
+        self.emit_auction_token_event(auction_id, auction, current_time);
+
         Ok(auction_id)
     }
 
@@ -211,7 +212,8 @@ pub trait EsdtNftMarketplace:
         auction.current_winner = caller;
         self.auction_by_id(auction_id).set(&auction);
 
-        self.emit_bid_event(auction, auction_id, current_time);
+        self.emit_bid_event(auction_id, auction, current_time);
+
         Ok(())
     }
 
@@ -239,7 +241,8 @@ pub trait EsdtNftMarketplace:
         self.distribute_tokens_after_auction_end(&auction);
         self.auction_by_id(auction_id).clear();
 
-        self.emit_end_auction_event(auction, auction_id, current_time);
+        self.emit_end_auction_event(auction_id, auction, current_time);
+
         Ok(())
     }
 
@@ -296,7 +299,8 @@ pub trait EsdtNftMarketplace:
             self.auction_by_id(auction_id).set(&auction);
         }
 
-        self.emit_buy_sft_event(auction, auction_id, current_time);
+        self.emit_buy_sft_event(auction_id, auction, current_time);
+
         Ok(())
     }
 
@@ -322,7 +326,8 @@ pub trait EsdtNftMarketplace:
         let nft_amount = &auction.nr_auctioned_tokens;
         self.transfer_esdt(&caller, nft_type, nft_nonce, nft_amount, b"returned token");
 
-        self.emit_withdraw_event(auction, auction_id, current_time);
+        self.emit_withdraw_event(auction_id, auction, current_time);
+
         Ok(())
     }
 
