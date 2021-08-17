@@ -68,6 +68,7 @@
                         "topics": [
                             "str:NFT-0001",
                             "5",
+                            "01",
                             "sc:forwarder"
                         ],
                         "data": ""
