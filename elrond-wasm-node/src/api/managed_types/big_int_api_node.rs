@@ -24,6 +24,12 @@ extern "C" {
     fn bigIntNeg(dest: i32, x: i32);
     fn bigIntSign(x: i32) -> i32;
     fn bigIntCmp(x: i32, y: i32) -> i32;
+
+    fn bigIntAnd(dest: i32, x: i32, y: i32);
+    fn bigIntOr(dest: i32, x: i32, y: i32);
+    fn bigIntXor(dest: i32, x: i32, y: i32);
+    fn bigIntShr(dest: i32, x: i32, bits: i32);
+    fn bigIntShl(dest: i32, x: i32, bits: i32);
 }
 
 macro_rules! binary_op_wrapper {
@@ -100,5 +106,21 @@ impl BigIntApi for crate::ArwenApiImpl {
 
     fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
         unsafe { bigIntCmp(x, y).cmp(&0) }
+    }
+
+    binary_op_wrapper! {bi_and, bigIntAnd}
+    binary_op_wrapper! {bi_or, bigIntOr}
+    binary_op_wrapper! {bi_xor, bigIntXor}
+
+    fn bi_shr(&self, dest: Handle, x: Handle, bits: usize) {
+        unsafe {
+            bigIntShr(dest, x, bits as i32);
+        }
+    }
+
+    fn bi_shl(&self, dest: Handle, x: Handle, bits: usize) {
+        unsafe {
+            bigIntShl(dest, x, bits as i32);
+        }
     }
 }

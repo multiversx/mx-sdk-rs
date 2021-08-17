@@ -1,5 +1,7 @@
 mod big_int;
+mod big_int_operators;
 mod big_uint;
+mod big_uint_operators;
 mod managed_buffer;
 mod managed_buffer_nested_de_input;
 

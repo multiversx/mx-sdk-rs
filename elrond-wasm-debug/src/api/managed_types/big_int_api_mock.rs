@@ -2,6 +2,7 @@ use crate::TxContext;
 
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
+use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 use elrond_wasm::api::{BigIntApi, Handle};
 use elrond_wasm::types::BoxedBytes;
 use num_bigint::BigInt;
@@ -10,12 +11,33 @@ use num_traits::{pow, Zero};
 
 use super::big_int_util::big_int_to_i64;
 
+fn assert_positive(bi: &BigInt) {
+    assert!(
+        bi.sign() == num_bigint::Sign::Minus,
+        "bitwise operations only allowed on positive integers"
+    );
+}
+
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
             let mut tx_output = self.tx_output_cell.borrow_mut();
             let bi_x = tx_output.managed_types.big_int_map.get(x);
             let bi_y = tx_output.managed_types.big_int_map.get(y);
+            let result = bi_x.$rust_op_name(bi_y);
+            tx_output.managed_types.big_int_map.insert(dest, result);
+        }
+    };
+}
+
+macro_rules! binary_bitwise_op_method {
+    ($method_name:ident, $rust_op_name:ident) => {
+        fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
+            let mut tx_output = self.tx_output_cell.borrow_mut();
+            let bi_x = tx_output.managed_types.big_int_map.get(x);
+            assert_positive(&bi_x);
+            let bi_y = tx_output.managed_types.big_int_map.get(y);
+            assert_positive(&bi_y);
             let result = bi_x.$rust_op_name(bi_y);
             tx_output.managed_types.big_int_map.insert(dest, result);
         }
@@ -101,5 +123,25 @@ impl BigIntApi for TxContext {
         let bi_x = tx_output.managed_types.big_int_map.get(x);
         let bi_y = tx_output.managed_types.big_int_map.get(y);
         bi_x.cmp(bi_y)
+    }
+
+    binary_bitwise_op_method! {bi_and, bitand}
+    binary_bitwise_op_method! {bi_or, bitor}
+    binary_bitwise_op_method! {bi_xor, bitxor}
+
+    fn bi_shr(&self, dest: Handle, x: Handle, bits: usize) {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let bi_x = tx_output.managed_types.big_int_map.get(x);
+        assert_positive(&bi_x);
+        let result = bi_x.shr(bits);
+        tx_output.managed_types.big_int_map.insert(dest, result);
+    }
+
+    fn bi_shl(&self, dest: Handle, x: Handle, bits: usize) {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let bi_x = tx_output.managed_types.big_int_map.get(x);
+        assert_positive(&bi_x);
+        let result = bi_x.shl(bits);
+        tx_output.managed_types.big_int_map.insert(dest, result);
     }
 }
