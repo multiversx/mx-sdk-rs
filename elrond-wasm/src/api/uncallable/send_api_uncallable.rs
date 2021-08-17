@@ -1,4 +1,4 @@
-use super::{BigIntUncallable, BigUintUncallable, EllipticCurveUncallable};
+use super::{BigUintUncallable, EllipticCurveUncallable};
 use crate::api::SendApi;
 use crate::types::{
     Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
@@ -6,8 +6,8 @@ use crate::types::{
 use alloc::vec::Vec;
 
 impl SendApi for super::UncallableApi {
+    type ProxyTypeManager = super::UncallableApi;
     type AmountType = BigUintUncallable;
-    type ProxyBigInt = BigIntUncallable;
     type ProxyEllipticCurve = EllipticCurveUncallable;
     type ProxyStorage = Self;
 

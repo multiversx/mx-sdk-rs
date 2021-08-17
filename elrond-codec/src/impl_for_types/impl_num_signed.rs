@@ -36,8 +36,9 @@ macro_rules! dep_decode_num_signed {
             const TYPE_INFO: TypeInfo = $type_info;
 
             fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                let bytes = input.read_slice($num_bytes)?;
-                let num = bytes_to_number(bytes, true) as $ty;
+                let mut bytes = [0u8; $num_bytes];
+                input.read_into(&mut bytes[..])?;
+                let num = bytes_to_number(&bytes[..], true) as $ty;
                 Ok(num)
             }
 
@@ -46,8 +47,9 @@ macro_rules! dep_decode_num_signed {
                 c: ExitCtx,
                 exit: fn(ExitCtx, DecodeError) -> !,
             ) -> Self {
-                let bytes = input.read_slice_or_exit($num_bytes, c, exit);
-                let num = bytes_to_number(bytes, true) as $ty;
+                let mut bytes = [0u8; $num_bytes];
+                input.read_into_or_exit(&mut bytes[..], c, exit);
+                let num = bytes_to_number(&bytes[..], true) as $ty;
                 num
             }
         }

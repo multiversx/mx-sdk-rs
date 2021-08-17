@@ -23,12 +23,12 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn pow_big_int(&self, a: Self::BigInt, b: u32) -> Self::BigInt {
+    fn pow_big_int(&self, a: BigInt, b: u32) -> BigInt {
         a.pow(b)
     }
 
     #[endpoint]
-    fn pow_big_int_ref(&self, a: &Self::BigInt, b: u32) -> Self::BigInt {
+    fn pow_big_int_ref(&self, a: &BigInt, b: u32) -> BigInt {
         a.pow(b)
     }
 
@@ -48,7 +48,7 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn big_int_to_i64(&self, bi: &Self::BigInt) -> OptionalResult<i64> {
+    fn big_int_to_i64(&self, bi: &BigInt) -> OptionalResult<i64> {
         bi.to_i64().into()
     }
 }

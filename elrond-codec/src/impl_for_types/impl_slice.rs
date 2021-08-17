@@ -72,9 +72,9 @@ impl<T: NestedEncode> TopEncode for &[T] {
                 // only using `dep_encode_slice_contents` for non-u8,
                 // because it always appends to the buffer,
                 // which is not necessary above
-                let mut buffer = Vec::<u8>::new();
+                let mut buffer = output.start_nested_encode();
                 dep_encode_slice_contents(self, &mut buffer)?;
-                output.set_slice_u8(&buffer[..]);
+                output.finalize_nested_encode(buffer);
             },
         }
         Ok(())
@@ -98,11 +98,11 @@ impl<T: NestedEncode> TopEncode for &[T] {
                 // only using `dep_encode_slice_contents` for non-u8,
                 // because it always appends to the buffer,
                 // which is not necessary above
-                let mut buffer = Vec::<u8>::new();
+                let mut buffer = output.start_nested_encode();
                 for x in *self {
                     x.dep_encode_or_exit(&mut buffer, c.clone(), exit);
                 }
-                output.set_slice_u8(&buffer[..]);
+                output.finalize_nested_encode(buffer);
             },
         }
     }
