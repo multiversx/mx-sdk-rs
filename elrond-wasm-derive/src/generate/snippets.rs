@@ -70,7 +70,6 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
         {
             type TypeManager = A::TypeManager;
             type BigUint = A::BigUint;
-            type EllipticCurve = A::EllipticCurve;
             type Storage = A::Storage;
             type CallValue = A::CallValue;
             type SendApi = A::SendApi;
@@ -219,7 +218,6 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         {
             type TypeManager = SA::ProxyTypeManager;
             type BigUint = SA::AmountType;
-            type EllipticCurve = SA::ProxyEllipticCurve;
             type Storage = SA::ProxyStorage;
             type SendApi = SA;
 
@@ -280,7 +278,6 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         {
             type TypeManager = SA::ProxyTypeManager;
             type BigUint = SA::AmountType;
-            type EllipticCurve = SA::ProxyEllipticCurve;
             type Storage = SA::ProxyStorage;
             type SendApi = SA;
             type ErrorApi = SA;

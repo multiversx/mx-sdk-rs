@@ -137,7 +137,6 @@ mod module_1 {
     impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
         type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
         type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
-        type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
         type Storage = elrond_wasm::api::uncallable::UncallableApi;
         type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
@@ -417,7 +416,6 @@ mod sample_adder {
     {
         type BigUint = A::BigUint;
         type TypeManager = A::TypeManager;
-        type EllipticCurve = A::EllipticCurve;
         type Storage = A::Storage;
         type CallValue = A::CallValue;
         type SendApi = A::SendApi;
@@ -607,7 +605,6 @@ mod sample_adder {
     impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
         type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
         type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
-        type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
         type Storage = elrond_wasm::api::uncallable::UncallableApi;
         type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
@@ -702,7 +699,6 @@ mod sample_adder {
     {
         type BigUint = SA::AmountType;
         type TypeManager = SA::ProxyTypeManager;
-        type EllipticCurve = SA::ProxyEllipticCurve;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
 
@@ -768,7 +764,6 @@ mod sample_adder {
     {
         type BigUint = SA::AmountType;
         type TypeManager = SA::ProxyTypeManager;
-        type EllipticCurve = SA::ProxyEllipticCurve;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
         type ErrorApi = SA;

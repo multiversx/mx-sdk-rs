@@ -1,8 +1,6 @@
 use elrond_codec::{TopDecode, TopEncode};
 
-use super::{
-    BigUintApi, EllipticCurveApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi,
-};
+use super::{BigUintApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::{
     types::{
         Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
@@ -24,8 +22,6 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     /// The type of the payment arguments.
     /// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
     type AmountType: BigUintApi + 'static;
-
-    type ProxyEllipticCurve: EllipticCurveApi<BigUint = Self::AmountType> + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
     type ProxyStorage: StorageReadApi

@@ -1,11 +1,21 @@
-use super::ArwenBigUint;
-use crate::String;
-use elrond_wasm::api::EllipticCurveApi;
+use elrond_wasm::api::{EllipticCurveApi, Handle};
 use elrond_wasm::types::BoxedBytes;
-use elrond_wasm::*;
 
 extern "C" {
-    fn bigIntNew(value: i64) -> i32;
+    fn createEC(dataOffset: i32, dataLength: i32) -> i32;
+
+    fn ellipticCurveGetValues(
+        ecHandle: i32,
+        fieldOrderHandle: i32,
+        basePointOrderHandle: i32,
+        eqConstantHandle: i32,
+        xBasePointHandle: i32,
+        yBasePointHandle: i32,
+    ) -> i32;
+
+    fn getCurveLengthEC(ecHandle: i32) -> i32;
+
+    fn getPrivKeyByteLengthEC(ecHandle: i32) -> i32;
 
     fn addEC(
         xResultHandle: i32,
@@ -77,354 +87,213 @@ extern "C" {
         resultOffset: *mut u8,
     ) -> i32;
 
-    fn ellipticCurveGetValues(
-        ecHandle: i32,
-        fieldOrderHandle: i32,
-        basePointOrderHandle: i32,
-        eqConstantHandle: i32,
-        xBasePointHandle: i32,
-        yBasePointHandle: i32,
-    ) -> i32;
-
-    fn getCurveLengthEC(ecHandle: i32) -> i32;
-
-    fn getPrivKeyByteLengthEC(ecHandle: i32) -> i32;
-
-    fn createEC(dataOffset: i32, dataLength: i32) -> i32;
 }
 
-type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
-
-pub struct ArwenEllipticCurve {
-    pub handle: i32,
-}
-
-impl elrond_wasm::abi::TypeAbi for ArwenEllipticCurve {
-    fn type_name() -> String {
-        String::from("EllipticCurve")
+impl EllipticCurveApi for crate::ArwenApiImpl {
+    fn ec_create(&self, name: &[u8]) -> Handle {
+        unsafe { createEC(name.as_ptr() as i32, name.len() as i32) }
     }
-}
 
-impl EllipticCurveApi for ArwenEllipticCurve {
-    type BigUint = ArwenBigUint;
-
-    fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
+    fn ec_get_values(
+        &self,
+        ec_handle: Handle,
+        field_order_handle: Handle,
+        base_point_order_handle: Handle,
+        eq_constant_handle: Handle,
+        x_base_point_handle: Handle,
+        y_base_point_handle: Handle,
+    ) {
         unsafe {
-            let field_order_handle = bigIntNew(0);
-            let base_point_order_handle = bigIntNew(0);
-            let eq_constant_handle = bigIntNew(0);
-            let x_base_point_handle = bigIntNew(0);
-            let y_base_point_handle = bigIntNew(0);
-            let _handle = ellipticCurveGetValues(
-                self.handle,
+            let _ = ellipticCurveGetValues(
+                ec_handle,
                 field_order_handle,
                 base_point_order_handle,
                 eq_constant_handle,
                 x_base_point_handle,
                 y_base_point_handle,
             );
-            (
-                ArwenBigUint {
-                    handle: field_order_handle,
-                },
-                ArwenBigUint {
-                    handle: base_point_order_handle,
-                },
-                ArwenBigUint {
-                    handle: eq_constant_handle,
-                },
-                ArwenBigUint {
-                    handle: x_base_point_handle,
-                },
-                ArwenBigUint {
-                    handle: y_base_point_handle,
-                },
-                self.get_ec_length(),
-            )
         }
     }
 
-    fn create_ec(curve: &str) -> Self {
-        unsafe {
-            let curve_as_slice = curve.as_bytes();
-            let data: BoxedBytes = BoxedBytes::from(curve_as_slice);
-            let handle = createEC(data.as_ptr() as i32, data.len() as i32);
-            ArwenEllipticCurve { handle }
-        }
+    fn ec_curve_length(&self, ec_handle: Handle) -> u32 {
+        unsafe { getCurveLengthEC(ec_handle) as u32 }
     }
 
-    fn get_ec_length(&self) -> u32 {
-        unsafe { getCurveLengthEC(self.handle) as u32 }
+    fn ec_private_key_byte_length(&self, ec_handle: Handle) -> u32 {
+        unsafe { getPrivKeyByteLengthEC(ec_handle) as u32 }
     }
 
-    fn get_priv_key_byte_length(&self) -> u32 {
-        unsafe { getPrivKeyByteLengthEC(self.handle) as u32 }
-    }
-
-    fn add_ec(
+    fn ec_add(
         &self,
-        x_first_point: Self::BigUint,
-        y_first_point: Self::BigUint,
-        x_second_point: Self::BigUint,
-        y_second_point: Self::BigUint,
-    ) -> (Self::BigUint, Self::BigUint) {
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_first_point: Handle,
+        y_first_point: Handle,
+        x_second_point: Handle,
+        y_second_point: Handle,
+    ) {
         unsafe {
-            let x_result_handle = bigIntNew(0);
-            let y_result_handle = bigIntNew(0);
             addEC(
                 x_result_handle,
                 y_result_handle,
-                self.handle,
-                x_first_point.handle,
-                y_first_point.handle,
-                x_second_point.handle,
-                y_second_point.handle,
+                ec_handle,
+                x_first_point,
+                y_first_point,
+                x_second_point,
+                y_second_point,
             );
-            (
-                ArwenBigUint {
-                    handle: x_result_handle,
-                },
-                ArwenBigUint {
-                    handle: y_result_handle,
-                },
-            )
         }
     }
 
-    fn double_ec(
+    fn ec_double(
         &self,
-        x_point: Self::BigUint,
-        y_point: Self::BigUint,
-    ) -> (Self::BigUint, Self::BigUint) {
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+    ) {
         unsafe {
-            let x_result_handle = bigIntNew(0);
-            let y_result_handle = bigIntNew(0);
             doubleEC(
                 x_result_handle,
                 y_result_handle,
-                self.handle,
-                x_point.handle,
-                y_point.handle,
+                ec_handle,
+                x_point_handle,
+                y_point_handle,
             );
-            (
-                ArwenBigUint {
-                    handle: x_result_handle,
-                },
-                ArwenBigUint {
-                    handle: y_result_handle,
-                },
-            )
         }
     }
 
-    fn is_on_curve_ec(&self, x_point: Self::BigUint, y_point: Self::BigUint) -> bool {
-        unsafe { isOnCurveEC(self.handle, x_point.handle, y_point.handle) == 1 }
+    fn ec_is_on_curve(
+        &self,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+    ) -> bool {
+        unsafe { isOnCurveEC(ec_handle, x_point_handle, y_point_handle) > 0 }
     }
 
-    fn scalar_mult(
+    fn ec_scalar_mult(
         &self,
-        x_point: Self::BigUint,
-        y_point: Self::BigUint,
-        data: BoxedBytes,
-    ) -> (Self::BigUint, Self::BigUint) {
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+        data: &[u8],
+    ) {
         unsafe {
-            let x_result_handle = bigIntNew(0);
-            let y_result_handle = bigIntNew(0);
             scalarMultEC(
                 x_result_handle,
                 y_result_handle,
-                self.handle,
-                x_point.handle,
-                y_point.handle,
+                ec_handle,
+                x_point_handle,
+                y_point_handle,
                 data.as_ptr(),
                 data.len() as i32,
             );
-            (
-                ArwenBigUint {
-                    handle: x_result_handle,
-                },
-                ArwenBigUint {
-                    handle: y_result_handle,
-                },
-            )
         }
     }
 
-    fn scalar_base_mult(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+    fn ec_scalar_base_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    ) {
         unsafe {
-            let x_result_handle = bigIntNew(0);
-            let y_result_handle = bigIntNew(0);
             scalarBaseMultEC(
                 x_result_handle,
                 y_result_handle,
-                self.handle,
+                ec_handle,
                 data.as_ptr(),
                 data.len() as i32,
             );
-            (
-                ArwenBigUint {
-                    handle: x_result_handle,
-                },
-                ArwenBigUint {
-                    handle: y_result_handle,
-                },
-            )
         }
     }
 
-    fn marshal_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
+    fn ec_marshal(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+    ) -> BoxedBytes {
         unsafe {
-            let byte_length = (getCurveLengthEC(self.handle) + 7) / 8;
+            let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
             let mut result = BoxedBytes::allocate(1 + 2 * byte_length as usize);
-            marshalEC(
-                x_pair.handle,
-                y_pair.handle,
-                self.handle,
-                result.as_mut_ptr(),
-            );
+            marshalEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
             result
         }
     }
 
-    fn marshal_compressed_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes {
+    fn ec_marshal_compressed(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+    ) -> BoxedBytes {
         unsafe {
-            let byte_length = (getCurveLengthEC(self.handle) + 7) / 8;
+            let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
             let mut result = BoxedBytes::allocate(1 + byte_length as usize);
-            marshalCompressedEC(
-                x_pair.handle,
-                y_pair.handle,
-                self.handle,
-                result.as_mut_ptr(),
-            );
+            marshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
             result
         }
     }
 
-    fn unmarshal_ec(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+    fn ec_unmarshal(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    ) {
         unsafe {
-            let x_pair_handle = bigIntNew(0);
-            let y_pair_handle = bigIntNew(0);
             unmarshalEC(
-                x_pair_handle,
-                y_pair_handle,
-                self.handle,
+                x_result_handle,
+                y_result_handle,
+                ec_handle,
                 data.as_ptr(),
                 data.len() as i32,
             );
-            (
-                ArwenBigUint {
-                    handle: x_pair_handle,
-                },
-                ArwenBigUint {
-                    handle: y_pair_handle,
-                },
-            )
         }
     }
 
-    fn unmarshal_compressed_ec(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
+    fn ec_unmarshal_compressed(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    ) {
         unsafe {
-            let x_pair_handle = bigIntNew(0);
-            let y_pair_handle = bigIntNew(0);
             unmarshalCompressedEC(
-                x_pair_handle,
-                y_pair_handle,
-                self.handle,
+                x_result_handle,
+                y_result_handle,
+                ec_handle,
                 data.as_ptr(),
                 data.len() as i32,
             );
-            (
-                ArwenBigUint {
-                    handle: x_pair_handle,
-                },
-                ArwenBigUint {
-                    handle: y_pair_handle,
-                },
-            )
         }
     }
 
-    fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
+    fn ec_generate_key(
+        &self,
+        x_pub_key_handle: Handle,
+        y_pub_key_handle: Handle,
+        ec_handle: Handle,
+    ) -> BoxedBytes {
         unsafe {
-            let x_pub_key_handle = bigIntNew(0);
-            let y_pub_key_handle = bigIntNew(0);
-            let priv_key_length = getPrivKeyByteLengthEC(self.handle);
+            let priv_key_length = getPrivKeyByteLengthEC(ec_handle);
             let mut private_key = BoxedBytes::allocate(priv_key_length as usize);
             generateKeyEC(
                 x_pub_key_handle,
                 y_pub_key_handle,
-                self.handle,
+                ec_handle,
                 private_key.as_mut_ptr(),
             );
-            (
-                ArwenBigUint {
-                    handle: x_pub_key_handle,
-                },
-                ArwenBigUint {
-                    handle: y_pub_key_handle,
-                },
-                private_key,
-            )
+            private_key
         }
-    }
-
-    fn from_bitsize_ec(bitsize: u32) -> Option<Self> {
-        match bitsize {
-            224 => Some(Self::create_ec("p224")),
-            256 => Some(Self::create_ec("p256")),
-            384 => Some(Self::create_ec("p384")),
-            521 => Some(Self::create_ec("p521")),
-            _ => None,
-        }
-    }
-}
-
-use elrond_codec::*;
-
-impl NestedEncode for ArwenEllipticCurve {
-    fn dep_encode<O: NestedEncodeOutput>(
-        &self,
-        dest: &mut O,
-    ) -> core::result::Result<(), EncodeError> {
-        let (field_order, base_point_order, eq_constant, x_base_point, y_base_point, size_of_field) =
-            self.get_values();
-        NestedEncode::dep_encode(&field_order, dest)?;
-        NestedEncode::dep_encode(&base_point_order, dest)?;
-        NestedEncode::dep_encode(&eq_constant, dest)?;
-        NestedEncode::dep_encode(&x_base_point, dest)?;
-        NestedEncode::dep_encode(&y_base_point, dest)?;
-        NestedEncode::dep_encode(&size_of_field, dest)?;
-        Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        let (field_order, base_point_order, eq_constant, x_base_point, y_base_point, size_of_field) =
-            self.get_values();
-        NestedEncode::dep_encode_or_exit(&field_order, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&base_point_order, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&eq_constant, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&x_base_point, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&y_base_point, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&size_of_field, dest, c, exit);
-    }
-}
-
-impl TopEncode for ArwenEllipticCurve {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        top_encode_from_nested(self, output)
-    }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        top_encode_from_nested_or_exit(self, output, c, exit);
     }
 }

@@ -1,10 +1,9 @@
-use super::{ArwenBigUint, ArwenEllipticCurve};
+use super::{ArwenBigUint};
 use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractBase;
 
 impl ContractBase for ArwenApiImpl {
     type TypeManager = Self;
-    type EllipticCurve = ArwenEllipticCurve;
     type BigUint = ArwenBigUint;
     type Storage = Self;
     type CallValue = Self;
