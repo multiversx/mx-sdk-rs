@@ -7,7 +7,7 @@ use crate::types::*;
 pub trait StorageLoadFeatures {
     #[endpoint]
     #[storage_get("big_uint")]
-    fn load_big_uint(&self) -> Self::BigUint;
+    fn load_big_uint(&self) -> BigUint;
 
     #[endpoint]
     #[storage_get("big_int")]
@@ -67,11 +67,11 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("map1")]
-    fn load_map1(&self, addr: Address) -> Self::BigUint;
+    fn load_map1(&self, addr: Address) -> BigUint;
 
     #[endpoint]
     #[storage_get("map2")]
-    fn load_map2(&self, addr1: &Address, addr2: &Address) -> Self::BigUint;
+    fn load_map2(&self, addr1: &Address, addr2: &Address) -> BigUint;
 
     #[endpoint]
     #[storage_get("map3")]

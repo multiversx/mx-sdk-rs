@@ -28,7 +28,7 @@ pub trait Lottery {
     fn start(
         &self,
         lottery_name: BoxedBytes,
-        ticket_price: Self::BigUint,
+        ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -51,7 +51,7 @@ pub trait Lottery {
     fn create_lottery_pool(
         &self,
         lottery_name: BoxedBytes,
-        ticket_price: Self::BigUint,
+        ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -73,7 +73,7 @@ pub trait Lottery {
     fn start_lottery(
         &self,
         lottery_name: BoxedBytes,
-        ticket_price: Self::BigUint,
+        ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -128,7 +128,7 @@ pub trait Lottery {
             prize_distribution,
             whitelist,
             current_ticket_number: 0u32,
-            prize_pool: Self::BigUint::zero(),
+            prize_pool: BigUint::zero(),
             queued_tickets: 0u32,
         };
 
@@ -141,7 +141,7 @@ pub trait Lottery {
     fn buy_ticket(
         &self,
         lottery_name: BoxedBytes,
-        token_amount: Self::BigUint,
+        token_amount: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is currently inactive."),
@@ -202,7 +202,7 @@ pub trait Lottery {
     fn update_after_buy_ticket(
         &self,
         lottery_name: &BoxedBytes,
-        token_amount: Self::BigUint,
+        token_amount: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         let info = self.get_lottery_info(lottery_name);
         let caller = self.blockchain().get_caller();
@@ -245,7 +245,7 @@ pub trait Lottery {
         self.set_lottery_info(lottery_name, &info);
     }
 
-    fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: Self::BigUint) {
+    fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: BigUint) {
         let mut info = self.get_lottery_info(lottery_name);
         info.prize_pool -= value;
 
@@ -283,13 +283,12 @@ pub trait Lottery {
         let winning_ticket_id = self.get_random_winning_ticket_id(&prev_winners, total_tickets);
 
         let winner_address = self.get_ticket_holder(lottery_name, winning_ticket_id);
-        let prize: Self::BigUint;
+        let prize: BigUint;
 
         if current_winning_ticket_index != 0 {
-            prize =
-                Self::BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
-                    * info.prize_pool.clone()
-                    / Self::BigUint::from(PERCENTAGE_TOTAL as u32);
+            prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
+                * info.prize_pool.clone()
+                / BigUint::from(PERCENTAGE_TOTAL as u32);
         } else {
             prize = info.prize_pool.clone();
         }
@@ -399,15 +398,11 @@ pub trait Lottery {
     // storage
 
     #[storage_set("lotteryInfo")]
-    fn set_lottery_info(
-        &self,
-        lottery_name: &BoxedBytes,
-        lottery_info: &LotteryInfo<Self::BigUint>,
-    );
+    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<BigUint>);
 
     #[view(lotteryInfo)]
     #[storage_get("lotteryInfo")]
-    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::BigUint>;
+    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<BigUint>;
 
     #[storage_is_empty("lotteryInfo")]
     fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;

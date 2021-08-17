@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait EchoManagedTypes {
     #[endpoint]
-    fn echo_big_uint(&self, bi: Self::BigUint) -> Self::BigUint {
+    fn echo_big_uint(&self, bi: BigUint) -> BigUint {
         bi
     }
 
