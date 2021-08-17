@@ -1,4 +1,4 @@
-use super::{ArwenBigUint, ArwenEllipticCurve};
+use super::{ArwenBigUint};
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BigUintApi, BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
@@ -149,7 +149,6 @@ extern "C" {
 impl SendApi for ArwenApiImpl {
     type AmountType = ArwenBigUint;
     type ProxyTypeManager = Self;
-    type ProxyEllipticCurve = ArwenEllipticCurve;
     type ProxyStorage = Self;
 
     #[inline]

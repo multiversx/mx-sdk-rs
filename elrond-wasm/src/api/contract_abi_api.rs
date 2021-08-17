@@ -1,4 +1,4 @@
-use super::{EllipticCurveApi, ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
+use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
 use crate::abi::{ContractAbi, TypeAbi};
 
 /// Required by contract ABI generators.
@@ -12,8 +12,6 @@ pub trait ContractAbiProvider {
     /// This associated type allows `Self::BigUint` to also make sense in the ABI context.
     type BigUint: TypeAbi;
 
-    type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
-
     /// The generated ABI generation code uses the same types as the contract to provide `TypeAbi`s to endpoints.
     /// It sometimes references the contract storage manager type in with storage mappers,
     /// as for example in `SingleValueMapper<Self::Storage, i32>`.
@@ -22,11 +20,8 @@ pub trait ContractAbiProvider {
     /// The generated ABI generation code uses the same types as the contract to provide `TypeAbi`s to endpoints.
     /// It is referenced by contract calls in general,
     /// as for example in `AsyncCall<Self::Send>`.
-    type SendApi: SendApi<
-            ProxyTypeManager = Self::TypeManager,
-            AmountType = Self::BigUint,
-            ProxyEllipticCurve = Self::EllipticCurve,
-        > + Clone
+    type SendApi: SendApi<ProxyTypeManager = Self::TypeManager, AmountType = Self::BigUint>
+        + Clone
         + 'static;
 
     /// Associated function that provides the contract or module ABI.

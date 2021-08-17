@@ -125,7 +125,6 @@ pub fn generate_abi_provider(
         impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
             type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
             type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
-            type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
             type Storage = elrond_wasm::api::uncallable::UncallableApi;
             type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 

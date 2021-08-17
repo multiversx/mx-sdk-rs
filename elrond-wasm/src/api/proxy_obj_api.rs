@@ -1,15 +1,10 @@
-use super::{
-    BigUintApi, EllipticCurveApi, ErrorApi, ManagedTypeApi, SendApi, StorageReadApi,
-    StorageWriteApi,
-};
+use super::{BigUintApi, ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
 use crate::types::{Address, TokenIdentifier};
 
 pub trait ProxyObjApi {
     type TypeManager: ManagedTypeApi + 'static;
 
     type BigUint: BigUintApi + 'static;
-
-    type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
     /// The code generator produces the same types in the proxy, as for the main contract.
     /// Sometimes endpoints return types that contain a `Self::Storage` type argument,
@@ -41,8 +36,6 @@ pub trait CallbackProxyObjApi {
     type TypeManager: ManagedTypeApi + 'static;
 
     type BigUint: BigUintApi + 'static;
-
-    type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
     /// The code generator produces the same types in the proxy, as for the main contract.
     /// Sometimes endpoints return types that contain a `Self::Storage` type argument,

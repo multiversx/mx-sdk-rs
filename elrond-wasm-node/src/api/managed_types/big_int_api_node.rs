@@ -147,7 +147,10 @@ impl BigIntApi for crate::ArwenApiImpl {
 
     unary_op_wrapper! {bi_sqrt, bigIntSqrt}
     binary_op_wrapper! {bi_pow, bigIntPow}
-    unary_op_wrapper! {bi_log2, bigIntLog2}
+
+    fn bi_log2(&self, x: Handle) -> u32 {
+        unsafe { bigIntLog2(x) as u32 }
+    }
 
     binary_op_wrapper! {bi_and, bigIntAnd}
     binary_op_wrapper! {bi_or, bigIntOr}
