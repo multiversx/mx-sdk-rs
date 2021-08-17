@@ -3,6 +3,7 @@ elrond_wasm::derive_imports!();
 
 use super::auction::{Auction, AuctionType};
 
+#[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait EventsModule {
     fn emit_auction_token_event(
