@@ -7,8 +7,6 @@ use crate::top_de::TopDecode;
 use crate::top_de_input::TopDecodeInput;
 use crate::top_ser::TopEncode;
 use crate::top_ser_output::TopEncodeOutput;
-use crate::{dep_decode_from_byte_slice, dep_decode_from_byte_slice_or_exit};
-use alloc::vec::Vec;
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
@@ -70,10 +68,10 @@ impl<T: NestedEncode> TopEncode for Option<T> {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         match self {
             Some(v) => {
-                let mut buffer = Vec::<u8>::new();
+                let mut buffer = output.start_nested_encode();
                 buffer.push_byte(1u8);
                 v.dep_encode(&mut buffer)?;
-                output.set_slice_u8(&buffer[..]);
+                output.finalize_nested_encode(buffer);
             },
             None => {
                 output.set_slice_u8(&[]);
@@ -92,10 +90,10 @@ impl<T: NestedEncode> TopEncode for Option<T> {
     ) {
         match self {
             Some(v) => {
-                let mut buffer = Vec::<u8>::new();
+                let mut buffer = output.start_nested_encode();
                 buffer.push_byte(1u8);
                 v.dep_encode_or_exit(&mut buffer, c, exit);
-                output.set_slice_u8(&buffer[..]);
+                output.finalize_nested_encode(buffer);
             },
             None => {
                 output.set_slice_u8(&[]);
@@ -106,12 +104,21 @@ impl<T: NestedEncode> TopEncode for Option<T> {
 
 impl<T: NestedDecode> TopDecode for Option<T> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let bytes = input.into_boxed_slice_u8();
-        if bytes.is_empty() {
+        let mut buffer = input.into_nested_buffer();
+        if buffer.is_depleted() {
             Ok(None)
         } else {
-            let item = dep_decode_from_byte_slice::<T>(&bytes[1..])?;
-            Ok(Some(item))
+            let first_byte = buffer.read_byte()?;
+            if first_byte == 1 {
+                let item = T::dep_decode(&mut buffer)?;
+                if buffer.is_depleted() {
+                    Ok(Some(item))
+                } else {
+                    Err(DecodeError::INPUT_TOO_LONG)
+                }
+            } else {
+                Err(DecodeError::INVALID_VALUE)
+            }
         }
     }
 
@@ -120,12 +127,21 @@ impl<T: NestedDecode> TopDecode for Option<T> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let bytes = input.into_boxed_slice_u8();
-        if bytes.is_empty() {
+        let mut buffer = input.into_nested_buffer();
+        if buffer.is_depleted() {
             None
         } else {
-            let item = dep_decode_from_byte_slice_or_exit(&bytes[1..], c, exit);
-            Some(item)
+            let first_byte = buffer.read_byte_or_exit(c.clone(), exit);
+            if first_byte == 1 {
+                let item = T::dep_decode_or_exit(&mut buffer, c.clone(), exit);
+                if buffer.is_depleted() {
+                    Some(item)
+                } else {
+                    exit(c, DecodeError::INPUT_TOO_LONG)
+                }
+            } else {
+                exit(c, DecodeError::INVALID_VALUE)
+            }
         }
     }
 }

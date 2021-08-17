@@ -28,29 +28,3 @@ pub trait NestedDecode: Sized {
         }
     }
 }
-
-/// Convenience method, to avoid having to specify type when calling `dep_decode`.
-/// Especially useful in the macros.
-/// Also checks that the entire slice was used.
-/// The input doesn't need to be mutable because we are not changing the underlying data.
-pub fn dep_decode_from_byte_slice<D: NestedDecode>(input: &[u8]) -> Result<D, DecodeError> {
-    let mut_slice = &mut &*input;
-    let result = D::dep_decode(mut_slice);
-    if !mut_slice.is_empty() {
-        return Err(DecodeError::INPUT_TOO_LONG);
-    }
-    result
-}
-
-pub fn dep_decode_from_byte_slice_or_exit<D: NestedDecode, ExitCtx: Clone>(
-    input: &[u8],
-    c: ExitCtx,
-    exit: fn(ExitCtx, DecodeError) -> !,
-) -> D {
-    let mut_slice = &mut &*input;
-    let result = D::dep_decode_or_exit(mut_slice, c.clone(), exit);
-    if !mut_slice.is_empty() {
-        exit(c, DecodeError::INPUT_TOO_LONG);
-    }
-    result
-}

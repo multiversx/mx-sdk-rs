@@ -12,6 +12,7 @@ use alloc::vec::Vec;
 
 use elrond_wasm::api::BigUintApi;
 use elrond_wasm::err_msg;
+use elrond_wasm::types::BoxedBytes;
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
@@ -315,9 +316,8 @@ impl NestedDecode for ArwenBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
-        let bytes = input.read_slice(size)?;
-        Ok(ArwenBigUint::from_bytes_be(bytes))
+        let bytes = BoxedBytes::dep_decode(input)?;
+        Ok(ArwenBigUint::from_bytes_be(bytes.as_slice()))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -325,9 +325,8 @@ impl NestedDecode for ArwenBigUint {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        let bytes = input.read_slice_or_exit(size, c, exit);
-        ArwenBigUint::from_bytes_be(bytes)
+        let bytes = BoxedBytes::dep_decode_or_exit(input, c.clone(), exit);
+        ArwenBigUint::from_bytes_be(bytes.as_slice())
     }
 }
 

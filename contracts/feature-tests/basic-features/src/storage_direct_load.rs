@@ -11,7 +11,7 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("big_int")]
-    fn load_big_int(&self) -> Self::BigInt;
+    fn load_big_int(&self) -> BigInt;
 
     #[endpoint]
     #[storage_get("u64")]
@@ -38,11 +38,11 @@ pub trait StorageLoadFeatures {
     fn load_addr(&self) -> Address;
 
     #[storage_get("opt_addr")]
-    fn _get_opt_addr(&self) -> Option<Address>;
+    fn get_opt_addr(&self) -> Option<Address>;
 
     #[endpoint]
     fn load_opt_addr(&self) -> OptionalResult<Address> {
-        self._get_opt_addr().into()
+        self.get_opt_addr().into()
     }
 
     #[view]

@@ -1,12 +1,13 @@
 use super::{
-    BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, SendApi, StorageReadApi, StorageWriteApi,
+    BigUintApi, EllipticCurveApi, ErrorApi, ManagedTypeApi, SendApi, StorageReadApi,
+    StorageWriteApi,
 };
 use crate::types::{Address, TokenIdentifier};
 
 pub trait ProxyObjApi {
-    type BigUint: BigUintApi + 'static;
+    type TypeManager: ManagedTypeApi + 'static;
 
-    type BigInt: BigIntApi + 'static;
+    type BigUint: BigUintApi + 'static;
 
     type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
@@ -15,9 +16,11 @@ pub trait ProxyObjApi {
     /// as for example in `SingleValueMapper<Self::Storage, i32>`.
     /// In order for the proxy code to compile, it is necessary to specify this type here too
     /// (even though it is not required by the trait's methods per se).
-    type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
-    type SendApi: SendApi<AmountType = Self::BigUint, ProxyBigInt = Self::BigInt> + Clone + 'static;
+    type SendApi: SendApi<AmountType = Self::BigUint, ProxyTypeManager = Self::TypeManager>
+        + Clone
+        + 'static;
 
     // type ContractCall<R>;
 
@@ -35,9 +38,9 @@ pub trait ProxyObjApi {
 }
 
 pub trait CallbackProxyObjApi {
-    type BigUint: BigUintApi + 'static;
+    type TypeManager: ManagedTypeApi + 'static;
 
-    type BigInt: BigIntApi + 'static;
+    type BigUint: BigUintApi + 'static;
 
     type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
@@ -48,7 +51,9 @@ pub trait CallbackProxyObjApi {
     /// (even though it is not required by the trait's methods per se).
     type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
-    type SendApi: SendApi<AmountType = Self::BigUint, ProxyBigInt = Self::BigInt> + Clone + 'static;
+    type SendApi: SendApi<AmountType = Self::BigUint, ProxyTypeManager = Self::TypeManager>
+        + Clone
+        + 'static;
 
     type ErrorApi: ErrorApi + Clone + 'static;
 

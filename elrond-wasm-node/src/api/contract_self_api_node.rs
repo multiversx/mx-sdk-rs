@@ -1,11 +1,11 @@
-use super::{ArwenBigInt, ArwenBigUint, ArwenEllipticCurve};
+use super::{ArwenBigUint, ArwenEllipticCurve};
 use crate::ArwenApiImpl;
 use elrond_wasm::api::ContractBase;
 
 impl ContractBase for ArwenApiImpl {
+    type TypeManager = Self;
     type EllipticCurve = ArwenEllipticCurve;
     type BigUint = ArwenBigUint;
-    type BigInt = ArwenBigInt;
     type Storage = Self;
     type CallValue = Self;
     type SendApi = Self;
@@ -26,6 +26,11 @@ impl ContractBase for ArwenApiImpl {
 
     #[inline]
     fn send(&self) -> Self::SendApi {
+        self.clone()
+    }
+
+    #[inline]
+    fn type_manager(&self) -> Self::TypeManager {
         self.clone()
     }
 

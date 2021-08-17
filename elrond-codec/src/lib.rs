@@ -8,11 +8,15 @@ pub use elrond_codec_derive;
 /// Reexport needed by derive.
 pub use alloc::vec::Vec;
 
+// TODO: group into smaller sub-modules
+
 mod codec_err;
 mod default_traits;
 mod impl_for_types;
 mod nested_de;
 mod nested_de_input;
+mod nested_de_input_owned;
+mod nested_de_input_slice;
 mod nested_ser;
 mod nested_ser_output;
 mod num_conv;
@@ -22,13 +26,17 @@ mod top_de_input;
 mod top_ser;
 mod top_ser_output;
 mod transmute;
+mod try_static_cast;
 
 pub use crate::nested_de_input::NestedDecodeInput;
 pub use crate::nested_ser_output::NestedEncodeOutput;
 pub use crate::num_conv::{bytes_to_number, top_encode_number_to_output, using_encoded_number};
+pub use crate::try_static_cast::TryStaticCast;
 pub use codec_err::{DecodeError, EncodeError};
 pub use default_traits::{DecodeDefault, EncodeDefault};
-pub use nested_de::{dep_decode_from_byte_slice, dep_decode_from_byte_slice_or_exit, NestedDecode};
+pub use nested_de::NestedDecode;
+pub use nested_de_input_owned::OwnedBytesNestedDecodeInput;
+pub use nested_de_input_slice::{dep_decode_from_byte_slice, dep_decode_from_byte_slice_or_exit};
 pub use nested_ser::{dep_encode_to_vec, NestedEncode, NestedEncodeNoErr};
 pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
 pub use top_de_input::TopDecodeInput;

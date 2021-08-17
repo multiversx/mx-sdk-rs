@@ -1,6 +1,8 @@
-use crate::api::EndpointArgumentApi;
+use crate::api::ManagedTypeApi;
+use crate::types::ManagedBufferNestedDecodeInput;
 use crate::Box;
-use elrond_codec::TopDecodeInput;
+use crate::{api::EndpointArgumentApi, types::ManagedBuffer};
+use elrond_codec::{TopDecodeInput, TryStaticCast};
 
 /// Adapter from the API to the TopDecodeInput trait.
 /// Allows objects to be deserialized directly from the API as arguments.
@@ -13,7 +15,7 @@ use elrond_codec::TopDecodeInput;
 /// it means that this structures translates to a single glorified i32 in wasm.
 pub struct ArgDecodeInput<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi,
 {
     api: AA,
     arg_index: i32,
@@ -21,18 +23,25 @@ where
 
 impl<AA> ArgDecodeInput<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi,
 {
     #[inline]
     pub fn new(api: AA, arg_index: i32) -> Self {
         ArgDecodeInput { api, arg_index }
     }
+
+    fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
+        let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
+        ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
+    }
 }
 
 impl<AA> TopDecodeInput for ArgDecodeInput<AA>
 where
-    AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi,
 {
+    type NestedBuffer = ManagedBufferNestedDecodeInput<AA>;
+
     fn byte_len(&self) -> usize {
         self.api.get_argument_len(self.arg_index)
     }
@@ -47,6 +56,18 @@ where
 
     fn into_i64(self) -> i64 {
         self.api.get_argument_i64(self.arg_index)
+    }
+
+    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
+        if T::type_eq::<ManagedBuffer<AA>>() {
+            self.to_managed_buffer().try_cast()
+        } else {
+            None
+        }
+    }
+
+    fn into_nested_buffer(self) -> Self::NestedBuffer {
+        ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }
 
     #[inline]
