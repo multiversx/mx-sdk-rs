@@ -108,6 +108,7 @@
                   "endpoint": "str:ESDTTransfer",
                   "topics": [
                       "str:CROWD-123456",
+                      "",
                       "250,000,000,000",
                       "address:donor1"
                   ],
@@ -138,6 +139,7 @@
                   "endpoint": "str:ESDTTransfer",
                   "topics": [
                       "str:CROWD-123456",
+                      "",
                       "200,000,000,000",
                       "address:donor2"
                   ],

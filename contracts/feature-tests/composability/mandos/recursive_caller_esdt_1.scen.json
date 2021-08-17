@@ -65,6 +65,7 @@
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:REC-TOKEN",
+                            "",
                             "1",
                             "sc:vault"
                         ],
