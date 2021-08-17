@@ -1,0 +1,101 @@
+{
+    "name": "get token attributes",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "set_token_attributes.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getTokenAttributesWithoutBigUint",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "u64:10|u8:20|nested:str:ALICE-abcdef"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getTokenAttributesWithoutBigUint",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was not previously set fot this token ID and token nonce",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getTokenAttributesWithBigUint",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "biguint:10|biguint:15"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getTokenAttributesWithBigUint",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Unknown token id. No attributes were set for this token ID",
+                "gas": "*"
+            }
+        }
+    ]
+}

@@ -1,0 +1,34 @@
+[package]
+name = "elrond-wasm-module-token-attributes"
+version = "0.18.1"
+edition = "2018"
+
+authors = [ "catalin-neagu <catalin.neagu@elrond.com>",]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://elrond.com/"
+documentation = "https://docs.elrond.com/"
+description = "Elrond WebAssembly smart contract module that provides a contract pause flag"
+keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
+
+[lib]
+path = "src/token_attributes.rs"
+
+[features]
+wasm-output-mode = ["elrond-wasm-node"]
+
+[dependencies.elrond-wasm]
+version = "0.18.1"
+path = "../../../elrond-wasm"
+features = ["derive"]
+
+[dependencies.elrond-wasm-node]
+version = "0.18.1"
+path = "../../../elrond-wasm-node"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.18.1"
+path = "../../../elrond-wasm-debug"

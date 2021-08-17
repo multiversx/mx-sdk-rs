@@ -1,0 +1,124 @@
+{
+    "name": "set token attributes",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "setTokenAttributesWithoutBigUint",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1",
+                    "u64:10|u8:20|nested:str:ALICE-abcdef"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "setTokenAttributesWithoutBigUint",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1",
+                    "u64:10|u8:20|nested:str:ALICE-abcdef"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was already set for this token ID and token nonce",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "setTokenAttributesWithBigUint",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1",
+                    "biguint:10|biguint:15"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "setTokenAttributesWithBigUint",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1",
+                    "biguint:10|biguint:15"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was already set for this token ID and token nonce",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "5",
+                    "balance": "1000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:TA|u8:1|u64:1": "u64:10|u8:20|nested:str:ALICE-abcdef",
+                        "str:TA|u8:2|u64:1": "biguint:10|biguint:15",
+                        "str:TokenAttributes:counter": "2",
+                        "str:TokenAttributes:mapping|nested:str:BOB-abcdef": "2",
+                        "str:TokenAttributes:mapping|nested:str:ALICE-abcdef": "1"
+                    },
+                    "code": "file:../../output/use-module.wasm"
+                }
+            }
+        }
+    ]
+}

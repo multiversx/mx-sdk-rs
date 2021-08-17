@@ -16,6 +16,7 @@ wasm-output-mode = [
     "elrond-wasm-module-features/wasm-output-mode",
     "elrond-wasm-module-governance/wasm-output-mode",
     "elrond-wasm-module-pause/wasm-output-mode",
+    "elrond-wasm-module-token-attributes/wasm-output-mode"
 ]
 
 [dependencies.elrond-wasm-module-dns]
@@ -37,6 +38,10 @@ path = "../../modules/elrond-wasm-module-governance"
 [dependencies.elrond-wasm-module-pause]
 version = "0.18.1"
 path = "../../modules/elrond-wasm-module-pause"
+
+[dependencies.elrond-wasm-module-token-attributes]
+version = "0.18.1"
+path = "../../modules/elrond-wasm-module-token-attributes"
 
 [dependencies.elrond-wasm]
 version = "0.18.1"

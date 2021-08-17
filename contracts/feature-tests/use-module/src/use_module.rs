@@ -3,8 +3,10 @@
 mod internal_mod_a;
 mod internal_mod_b;
 mod internal_mod_c;
+mod token_attributes_tester;
 
 elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
 
 use elrond_wasm_module_features::feature_guard;
 
@@ -15,6 +17,7 @@ use elrond_wasm_module_features::feature_guard;
 /// - EsdtModule
 /// - GovernanceModule
 /// - PauseModule
+/// - TokenAttributesModule
 #[elrond_wasm::contract]
 pub trait UseModule:
     internal_mod_a::InternalModuleA
@@ -26,6 +29,8 @@ pub trait UseModule:
     + elrond_wasm_module_governance::GovernanceModule
     + elrond_wasm_module_governance::governance_configurable::GovernanceConfigurablePropertiesModule
     + elrond_wasm_module_pause::PauseModule
+    + token_attributes_tester::TokenAttributesTester
+    + elrond_wasm_module_token_attributes::TokenAttributesModule
 {
     #[init]
     fn init(&self) {}

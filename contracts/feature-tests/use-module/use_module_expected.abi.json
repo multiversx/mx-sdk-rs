@@ -6,7 +6,8 @@
         "- FeaturesModule",
         "- EsdtModule",
         "- GovernanceModule",
-        "- PauseModule"
+        "- PauseModule",
+        "- TokenAttributesModule"
     ],
     "name": "UseModule",
     "constructor": {
@@ -481,6 +482,146 @@
             "name": "unpause",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "setTokenAttributesWithBigUint",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "attributes",
+                    "type": "StructWithBigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setTokenAttributesWithoutBigUint",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "attributes",
+                    "type": "StructWithoutBigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "updateTokenAttributesWithBigUint",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "attributes",
+                    "type": "StructWithBigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "updateTokenAttributesWithoutBigUint",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "attributes",
+                    "type": "StructWithoutBigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "clearTokenAttributes",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "isEmptyTokenAttributes",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "getTokenAttributesWithBigUint",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "StructWithBigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTokenAttributesWithoutBigUint",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "StructWithoutBigUint"
+                }
+            ]
         }
     ],
     "types": {
@@ -510,6 +651,36 @@
                 {
                     "name": "Queued",
                     "discriminant": 5
+                }
+            ]
+        },
+        "StructWithBigUint": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "internal_field_biguint1",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "internal_field_biguint2",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "StructWithoutBigUint": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "internal_field_u64",
+                    "type": "u64"
+                },
+                {
+                    "name": "internal_field_u8",
+                    "type": "u8"
+                },
+                {
+                    "name": "internal_field_token_id",
+                    "type": "TokenIdentifier"
                 }
             ]
         }

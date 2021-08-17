@@ -1,0 +1,105 @@
+{
+    "name": "is_empty token attributes",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "set_token_attributes.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "is_empty-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "isEmptyTokenAttributes",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "is_empty-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "isEmptyTokenAttributes",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "is_empty-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "isEmptyTokenAttributes",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "is_empty-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "isEmptyTokenAttributes",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        }
+    ]
+}
