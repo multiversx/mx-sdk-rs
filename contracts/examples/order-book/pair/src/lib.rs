@@ -27,7 +27,7 @@ pub trait Pair:
 
     #[payable("*")]
     #[endpoint(createBuyOrder)]
-    fn create_buy_order_endpoint(&self, params: OrderInputParams<Self::BigUint>) -> SCResult<()> {
+    fn create_buy_order_endpoint(&self, params: OrderInputParams<BigUint>) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
         self.require_valid_order_input_params(&params)?;
         let payment = self.require_valid_buy_payment()?;
@@ -37,7 +37,7 @@ pub trait Pair:
 
     #[payable("*")]
     #[endpoint(createSellOrder)]
-    fn create_sell_order_endpoint(&self, params: OrderInputParams<Self::BigUint>) -> SCResult<()> {
+    fn create_sell_order_endpoint(&self, params: OrderInputParams<BigUint>) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
         self.require_valid_order_input_params(&params)?;
         let payment = self.require_valid_sell_payment()?;

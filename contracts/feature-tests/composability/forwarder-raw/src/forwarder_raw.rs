@@ -17,7 +17,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> SendToken<Self::SendApi> {
         SendToken {
             api: self.send(),
@@ -34,7 +34,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) {
         let _ = self.send().direct(&to, &token, 0, &payment, &[]);
     }
@@ -43,7 +43,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         payment_token: TokenIdentifier,
-        payment_amount: Self::BigUint,
+        payment_amount: BigUint,
         endpoint_name: BoxedBytes,
         args: VarArgs<BoxedBytes>,
     ) -> ContractCall<Self::SendApi, ()> {
@@ -61,7 +61,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) -> AsyncCall<Self::SendApi> {
@@ -75,7 +75,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) -> AsyncCall<Self::SendApi> {
@@ -88,7 +88,7 @@ pub trait ForwarderRaw {
     fn forward_transf_exec_egld(
         &self,
         to: Address,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
@@ -103,7 +103,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
@@ -118,7 +118,7 @@ pub trait ForwarderRaw {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
@@ -131,13 +131,13 @@ pub trait ForwarderRaw {
     #[storage_mapper("callback_data")]
     fn callback_data(
         &self,
-    ) -> VecMapper<Self::Storage, (TokenIdentifier, Self::BigUint, Vec<BoxedBytes>)>;
+    ) -> VecMapper<Self::Storage, (TokenIdentifier, BigUint, Vec<BoxedBytes>)>;
 
     #[view]
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult3<TokenIdentifier, Self::BigUint, MultiResultVec<BoxedBytes>> {
+    ) -> MultiResult3<TokenIdentifier, BigUint, MultiResultVec<BoxedBytes>> {
         let (token, payment, args) = self.callback_data().get(index);
         (token, payment, args.into()).into()
     }
@@ -151,7 +151,7 @@ pub trait ForwarderRaw {
     fn callback_raw(
         &self,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
         let args_vec = args.into_vec();
@@ -164,7 +164,7 @@ pub trait ForwarderRaw {
     fn callback_raw_event(
         &self,
         #[indexed] token: &TokenIdentifier,
-        #[indexed] payment: &Self::BigUint,
+        #[indexed] payment: &BigUint,
         arguments: Vec<BoxedBytes>,
     );
 
@@ -175,7 +175,7 @@ pub trait ForwarderRaw {
     fn call_execute_on_dest_context(
         &self,
         to: Address,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
@@ -196,7 +196,7 @@ pub trait ForwarderRaw {
     fn call_execute_on_dest_context_twice(
         &self,
         to: Address,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
@@ -236,7 +236,7 @@ pub trait ForwarderRaw {
             .send()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
-                &Self::BigUint::zero(),
+                &BigUint::zero(),
                 &code,
                 CodeMetadata::DEFAULT,
                 &arguments.as_slice().into(),

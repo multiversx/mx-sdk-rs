@@ -11,7 +11,7 @@ pub trait KittyOwnership {
     #[init]
     fn init(
         &self,
-        birth_fee: Self::BigUint,
+        birth_fee: BigUint,
         #[var_args] opt_gene_science_contract_address: OptionalArg<Address>,
         #[var_args] opt_kitty_auction_contract_address: OptionalArg<Address>,
     ) {
@@ -306,7 +306,7 @@ pub trait KittyOwnership {
     #[endpoint(breedWith)]
     fn breed_with(
         &self,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
         matron_id: u32,
         sire_id: u32,
     ) -> SCResult<()> {
@@ -635,10 +635,10 @@ pub trait KittyOwnership {
 
     #[view(birthFee)]
     #[storage_get("birthFee")]
-    fn get_birth_fee(&self) -> Self::BigUint;
+    fn get_birth_fee(&self) -> BigUint;
 
     #[storage_set("birthFee")]
-    fn set_birth_fee(&self, fee: Self::BigUint);
+    fn set_birth_fee(&self, fee: BigUint);
 
     // storage - Kitties
 

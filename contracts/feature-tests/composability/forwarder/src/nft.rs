@@ -15,7 +15,7 @@ pub struct Color {
 #[elrond_wasm::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[view]
-    fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> Self::BigUint {
+    fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain().get_esdt_balance(
             &self.blockchain().get_sc_address(),
             token_identifier,
@@ -29,11 +29,11 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         &self,
         //#[payment_token] payment_token: TokenIdentifier,
         //#[payment_nonce] payment_nonce: u64,
-        //#[payment_amount] payment_amount: Self::BigUint,
+        //#[payment_amount] payment_amount: BigUint,
         nft_id: TokenIdentifier,
         nft_nonce: u64,
-        nft_amount: Self::BigUint,
-    ) -> Self::BigUint {
+        nft_amount: BigUint,
+    ) -> BigUint {
         let (payment_amount, payment_token) = self.call_value().payment_token_pair();
         let payment_nonce = self.call_value().esdt_token_nonce();
 
@@ -52,7 +52,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[endpoint]
     fn nft_issue(
         &self,
-        #[payment] issue_cost: Self::BigUint,
+        #[payment] issue_cost: BigUint,
         token_display_name: BoxedBytes,
         token_ticker: BoxedBytes,
     ) -> AsyncCall<Self::SendApi> {
@@ -104,9 +104,9 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     fn nft_create(
         &self,
         token_identifier: TokenIdentifier,
-        amount: Self::BigUint,
+        amount: BigUint,
         name: BoxedBytes,
-        royalties: Self::BigUint,
+        royalties: BigUint,
         hash: BoxedBytes,
         color: Color,
         uri: BoxedBytes,
@@ -127,18 +127,13 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn nft_add_quantity(
-        &self,
-        token_identifier: TokenIdentifier,
-        nonce: u64,
-        amount: Self::BigUint,
-    ) {
+    fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
         self.send()
             .esdt_local_mint(&token_identifier, nonce, &amount);
     }
 
     #[endpoint]
-    fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: Self::BigUint) {
+    fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
         self.send()
             .esdt_local_burn(&token_identifier, nonce, &amount);
     }
@@ -149,7 +144,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         to: Address,
         token_identifier: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
         data: BoxedBytes,
     ) {
         self.send().transfer_esdt_via_async_call(
@@ -167,7 +162,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         to: Address,
         token_identifier: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
         function: BoxedBytes,
         #[var_args] arguments: VarArgs<BoxedBytes>,
     ) {
@@ -192,9 +187,9 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         &self,
         to: Address,
         token_identifier: TokenIdentifier,
-        amount: Self::BigUint,
+        amount: BigUint,
         name: BoxedBytes,
-        royalties: Self::BigUint,
+        royalties: BigUint,
         hash: BoxedBytes,
         color: Color,
         uri: BoxedBytes,
@@ -225,7 +220,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         &self,
         #[indexed] token_id: &TokenIdentifier,
         #[indexed] token_nonce: u64,
-        #[indexed] amount: &Self::BigUint,
+        #[indexed] amount: &BigUint,
     );
 
     #[event("send")]
@@ -234,6 +229,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         #[indexed] to: &Address,
         #[indexed] token_id: &TokenIdentifier,
         #[indexed] token_nonce: u64,
-        #[indexed] amount: &Self::BigUint,
+        #[indexed] amount: &BigUint,
     );
 }

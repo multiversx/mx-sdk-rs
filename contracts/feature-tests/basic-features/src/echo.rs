@@ -131,10 +131,7 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_varags_big_uint(
-        &self,
-        #[var_args] m: VarArgs<Self::BigUint>,
-    ) -> MultiResultVec<Self::BigUint> {
+    fn echo_varags_big_uint(&self, #[var_args] m: VarArgs<BigUint>) -> MultiResultVec<BigUint> {
         m.into_vec().into()
     }
 

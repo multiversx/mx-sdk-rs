@@ -7,8 +7,8 @@ pub trait Erc1155UserProxy {
         &self,
         operator: Address,
         from: Address,
-        type_id: Self::BigUint,
-        value: Self::BigUint,
+        type_id: BigUint,
+        value: BigUint,
         data: &[u8],
     ) -> SCResult<()>;
 
@@ -17,8 +17,8 @@ pub trait Erc1155UserProxy {
         &self,
         operator: Address,
         from: Address,
-        type_ids: Vec<Self::BigUint>,
-        values: Vec<Self::BigUint>,
+        type_ids: Vec<BigUint>,
+        values: Vec<BigUint>,
         data: &[u8],
     ) -> SCResult<()>;
 }
