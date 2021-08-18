@@ -30,12 +30,12 @@ pub fn execute(
             nonce: account
                 .nonce
                 .as_ref()
-                .map(|nonce| nonce.value.into())
+                .map(|nonce| nonce.value)
                 .unwrap_or_default(),
             balance: account
                 .balance
                 .as_ref()
-                .map(|balance| balance.value.clone().into())
+                .map(|balance| balance.value.clone())
                 .unwrap_or_default(),
             esdt,
             username: account
