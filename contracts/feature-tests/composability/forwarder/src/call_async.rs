@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct CallbackData<BigUint: BigUintApi> {
+pub struct CallbackData<M: ManagedTypeApi> {
     callback_name: BoxedBytes,
     token_identifier: TokenIdentifier,
     token_nonce: u64,

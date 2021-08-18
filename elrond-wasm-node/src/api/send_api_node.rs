@@ -1,8 +1,8 @@
-use super::{ArwenBigUint};
+use crate::api::managed_types::unsafe_buffer_load_be_pad_right;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
-use elrond_wasm::api::{BigUintApi, BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
+use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::types::{Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, TokenIdentifier};
 
 // Token ID + nonce + amount, as bytes
 const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;
@@ -147,9 +147,13 @@ extern "C" {
 }
 
 impl SendApi for ArwenApiImpl {
-    type AmountType = ArwenBigUint;
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
+
+    #[inline]
+    fn type_manager(&self) -> Self::ProxyTypeManager {
+        self.clone()
+    }
 
     #[inline]
     fn get_sc_address(&self) -> Address {
@@ -167,13 +171,13 @@ impl SendApi for ArwenApiImpl {
         address: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> elrond_wasm::types::EsdtTokenData<ArwenBigUint> {
+    ) -> elrond_wasm::types::EsdtTokenData<Self::ProxyTypeManager> {
         BlockchainApi::get_esdt_token_data(self, address, token, nonce)
     }
 
-    fn direct_egld(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) {
+    fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, data: &[u8]) {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = transferValue(
                 to.as_ref().as_ptr(),
                 amount_bytes32_ptr,
@@ -186,13 +190,13 @@ impl SendApi for ArwenApiImpl {
     fn direct_egld_execute(
         &self,
         to: &Address,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferValueExecute(
                 to.as_ref().as_ptr(),
                 amount_bytes32_ptr,
@@ -215,13 +219,13 @@ impl SendApi for ArwenApiImpl {
         &self,
         to: &Address,
         token: &TokenIdentifier,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferESDTExecute(
                 to.as_ref().as_ptr(),
                 token.as_ptr(),
@@ -247,13 +251,13 @@ impl SendApi for ArwenApiImpl {
         to: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferESDTNFTExecute(
                 to.as_ref().as_ptr(),
                 token.as_ptr(),
@@ -278,7 +282,7 @@ impl SendApi for ArwenApiImpl {
     fn direct_multi_esdt_transfer_execute(
         &self,
         to: &Address,
-        tokens: &[elrond_wasm::types::EsdtTokenPayment<ArwenBigUint>],
+        tokens: &[elrond_wasm::types::EsdtTokenPayment<Self::ProxyTypeManager>],
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
@@ -300,7 +304,7 @@ impl SendApi for ArwenApiImpl {
 
                 transfer_args.extend_from_slice(token_id_bytes);
                 transfer_args.extend_from_slice(nonce_bytes);
-                transfer_args.extend_from_slice(amount_bytes);
+                transfer_args.extend_from_slice(amount_bytes.as_slice());
             }
 
             let result = multiTransferESDTNFTExecute(
@@ -323,9 +327,14 @@ impl SendApi for ArwenApiImpl {
         }
     }
 
-    fn async_call_raw(&self, to: &Address, amount: &ArwenBigUint, data: &[u8]) -> ! {
+    fn async_call_raw(
+        &self,
+        to: &Address,
+        amount: &BigUint<Self::ProxyTypeManager>,
+        data: &[u8],
+    ) -> ! {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             asyncCall(
                 to.as_ref().as_ptr(),
                 amount_bytes32_ptr,
@@ -338,14 +347,14 @@ impl SendApi for ArwenApiImpl {
     fn deploy_contract(
         &self,
         gas: u64,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         code: &BoxedBytes,
         code_metadata: CodeMetadata,
         arg_buffer: &ArgBuffer,
     ) -> Option<Address> {
         let mut new_address = Address::zero();
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = createContract(
                 gas as i64,
                 amount_bytes32_ptr,
@@ -368,14 +377,14 @@ impl SendApi for ArwenApiImpl {
     fn deploy_from_source_contract(
         &self,
         gas: u64,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         source_contract_address: &Address,
         code_metadata: CodeMetadata,
         arg_buffer: &ArgBuffer,
     ) -> Option<Address> {
         let mut new_address = Address::zero();
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = deployFromSourceContract(
                 gas as i64,
                 amount_bytes32_ptr,
@@ -398,13 +407,13 @@ impl SendApi for ArwenApiImpl {
         &self,
         sc_address: &Address,
         gas: u64,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         code: &BoxedBytes,
         code_metadata: CodeMetadata,
         arg_buffer: &ArgBuffer,
     ) {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             upgradeContract(
                 sc_address.as_ref().as_ptr(),
                 gas as i64,
@@ -423,14 +432,14 @@ impl SendApi for ArwenApiImpl {
         &self,
         gas: u64,
         address: &Address,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes> {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = executeOnDestContext(
                 gas as i64,
                 address.as_ref().as_ptr(),
@@ -451,7 +460,7 @@ impl SendApi for ArwenApiImpl {
         &self,
         gas: u64,
         address: &Address,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
         range_closure: F,
@@ -462,7 +471,7 @@ impl SendApi for ArwenApiImpl {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = executeOnDestContext(
                 gas as i64,
                 address.as_ref().as_ptr(),
@@ -487,14 +496,14 @@ impl SendApi for ArwenApiImpl {
         &self,
         gas: u64,
         address: &Address,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes> {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = executeOnDestContextByCaller(
                 gas as i64,
                 address.as_ref().as_ptr(),
@@ -515,12 +524,12 @@ impl SendApi for ArwenApiImpl {
         &self,
         gas: u64,
         address: &Address,
-        amount: &ArwenBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) {
         unsafe {
-            let amount_bytes32_ptr = amount.unsafe_buffer_load_be_pad_right(32);
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = executeOnSameContext(
                 gas as i64,
                 address.as_ref().as_ptr(),
@@ -556,7 +565,7 @@ impl SendApi for ArwenApiImpl {
         self.execute_on_dest_context_raw(
             gas,
             &own_address,
-            &ArwenBigUint::from(0u32),
+            &BigUint::from_u32(0u32, self.clone()),
             function,
             arg_buffer,
         )

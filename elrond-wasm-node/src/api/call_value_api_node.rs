@@ -1,7 +1,6 @@
-use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{BoxedBytes, EsdtTokenType, TokenIdentifier};
+use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, TokenIdentifier};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
@@ -29,7 +28,12 @@ extern "C" {
 }
 
 impl CallValueApi for ArwenApiImpl {
-    type AmountType = ArwenBigUint;
+    type TypeManager = Self;
+
+    #[inline]
+    fn type_manager(&self) -> Self::TypeManager {
+        self.clone()
+    }
 
     #[inline]
     fn check_not_payable(&self) {
@@ -38,19 +42,19 @@ impl CallValueApi for ArwenApiImpl {
         }
     }
 
-    fn egld_value(&self) -> ArwenBigUint {
+    fn egld_value(&self) -> BigUint<Self::TypeManager> {
         unsafe {
-            let result = bigIntNew(0);
-            bigIntGetCallValue(result);
-            ArwenBigUint { handle: result }
+            let value_handle = bigIntNew(0);
+            bigIntGetCallValue(value_handle);
+            BigUint::from_raw_handle(value_handle, self.type_manager())
         }
     }
 
-    fn esdt_value(&self) -> ArwenBigUint {
+    fn esdt_value(&self) -> BigUint<Self::TypeManager> {
         unsafe {
-            let result = bigIntNew(0);
-            bigIntGetESDTCallValue(result);
-            ArwenBigUint { handle: result }
+            let value_handle = bigIntNew(0);
+            bigIntGetESDTCallValue(value_handle);
+            BigUint::from_raw_handle(value_handle, self.type_manager())
         }
     }
 
@@ -78,11 +82,11 @@ impl CallValueApi for ArwenApiImpl {
         unsafe { getNumESDTTransfers() as usize }
     }
 
-    fn esdt_value_by_index(&self, index: usize) -> ArwenBigUint {
+    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self::TypeManager> {
         unsafe {
-            let result = bigIntNew(0);
-            bigIntGetESDTCallValueByIndex(result, index as i32);
-            ArwenBigUint { handle: result }
+            let value_handle = bigIntNew(0);
+            bigIntGetESDTCallValueByIndex(value_handle, index as i32);
+            BigUint::from_raw_handle(value_handle, self.type_manager())
         }
     }
 

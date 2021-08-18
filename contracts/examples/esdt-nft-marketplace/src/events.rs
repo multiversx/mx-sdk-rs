@@ -41,12 +41,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_end_auction_event(
-        self,
-        auction_id: u64,
-        auction: Auction<BigUint>,
-        end_time: u64,
-    ) {
+    fn emit_end_auction_event(self, auction_id: u64, auction: Auction<BigUint>, end_time: u64) {
         self.end_auction_event(
             auction_id,
             &auction.auctioned_token.token_type,
@@ -67,12 +62,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_withdraw_event(
-        self,
-        auction_id: u64,
-        auction: Auction<BigUint>,
-        withdraw_time: u64,
-    ) {
+    fn emit_withdraw_event(self, auction_id: u64, auction: Auction<BigUint>, withdraw_time: u64) {
         self.withdraw_event(
             auction_id,
             &auction.auctioned_token.token_type,

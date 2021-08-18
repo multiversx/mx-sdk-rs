@@ -26,7 +26,6 @@ pub fn contract_implementation(
     let endpoints = generate_wasm_endpoints(contract);
     let function_selector_body = generate_function_selector_body(contract);
     let (callback_selector_body, callback_body) = generate_callback_selector_and_main(contract);
-    let where_self_big_int = snippets::where_self_big_int();
 
     let (callbacks_def, callbacks_impl, callback_proxies_obj) = generate_callback_proxies(contract);
 
@@ -40,7 +39,7 @@ pub fn contract_implementation(
         elrond_wasm::api::ContractBase
         + Sized
         #(#supertraits_main)*
-        #where_self_big_int
+        where
         {
             #(#method_impls)*
 
@@ -54,7 +53,7 @@ pub fn contract_implementation(
         pub trait AutoImpl: elrond_wasm::api::ContractBase {}
 
         impl<C> #trait_name_ident for C
-        #where_self_big_int
+        where
         C: AutoImpl #(#supertraits_main)*
         {
             #(#auto_impls)*
@@ -70,7 +69,6 @@ pub fn contract_implementation(
             elrond_wasm::api::ContractPrivateApi
             + #trait_name_ident
             #(#endpoint_wrapper_supertrait_decl)*
-        #where_self_big_int
         {
             #(#call_methods)*
 

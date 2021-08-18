@@ -6,7 +6,7 @@ use crate::curves::curve_function::CurveFunction;
 use crate::utils::structs::CurveArguments;
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct LinearFunction<BigUint: BigUintApi> {
+pub struct LinearFunction<M: ManagedTypeApi> {
     pub initial_price: BigUint,
     pub linear_coefficient: BigUint,
 }
@@ -35,7 +35,7 @@ where
         )
     }
 }
-fn sum_interval<BigUint: BigUintApi>(n: &BigUint, x: &BigUint) -> BigUint
+fn sum_interval<M: ManagedTypeApi>(n: &BigUint, x: &BigUint) -> BigUint
 where
     for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
     for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,

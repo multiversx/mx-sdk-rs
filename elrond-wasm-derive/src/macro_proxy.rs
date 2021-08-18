@@ -1,4 +1,3 @@
-use super::generate::snippets;
 use crate::generate::contract_gen::*;
 use crate::generate::proxy_gen;
 use crate::generate::supertrait_gen;
@@ -31,7 +30,6 @@ pub fn proxy_implementation(
 ) -> proc_macro2::TokenStream {
     let trait_name_ident = contract.trait_name.clone();
     let method_impls = extract_method_impls(contract);
-    let where_self_big_int = snippets::where_self_big_int();
 
     // this definition is common to release and debug mode
     let supertraits_main = supertrait_gen::main_supertrait_decl(contract.supertraits.as_slice());
@@ -40,7 +38,7 @@ pub fn proxy_implementation(
         ContractBase
         + Sized
         #(#supertraits_main)*
-        #where_self_big_int
+        where
         {
             #(#method_impls)*
         }

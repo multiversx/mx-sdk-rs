@@ -14,19 +14,19 @@ pub enum OrderType {
 }
 
 #[derive(Clone)]
-pub struct Payment<BigUint: BigUintApi> {
+pub struct Payment<M: ManagedTypeApi> {
     pub token_id: TokenIdentifier,
     pub amount: BigUint,
 }
 
 #[derive(Clone)]
-pub struct Transfer<BigUint: BigUintApi> {
+pub struct Transfer<M: ManagedTypeApi> {
     pub to: Address,
     pub payment: Payment<BigUint>,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Copy)]
-pub enum FeeConfig<BigUint: BigUintApi> {
+pub enum FeeConfig<M: ManagedTypeApi> {
     Fixed(BigUint),
     Percent(u64),
 }
@@ -37,7 +37,7 @@ pub struct DealConfig {
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
-pub struct OrderInputParams<BigUint: BigUintApi> {
+pub struct OrderInputParams<M: ManagedTypeApi> {
     pub amount: BigUint,
     pub match_provider: Option<Address>,
     pub fee_config: FeeConfig<BigUint>,
@@ -45,7 +45,7 @@ pub struct OrderInputParams<BigUint: BigUintApi> {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct Order<BigUint: BigUintApi> {
+pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: Address,
     pub match_provider: Option<Address>,
@@ -57,7 +57,7 @@ pub struct Order<BigUint: BigUintApi> {
     pub order_type: OrderType,
 }
 
-impl<BigUint: BigUintApi> FeeConfig<BigUint> {
+impl<M: ManagedTypeApi> FeeConfig<BigUint> {
     pub fn is_fixed(&self) -> bool {
         matches!(*self, FeeConfig::Fixed(_))
     }
@@ -67,13 +67,13 @@ impl<BigUint: BigUintApi> FeeConfig<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> Payment<BigUint> {
+impl<M: ManagedTypeApi> Payment<BigUint> {
     pub fn new() -> Self {
         Default::default()
     }
 }
 
-impl<BigUint: BigUintApi> Default for Payment<BigUint> {
+impl<M: ManagedTypeApi> Default for Payment<BigUint> {
     fn default() -> Self {
         Payment {
             token_id: TokenIdentifier::egld(),
@@ -96,13 +96,13 @@ impl Default for DealConfig {
     }
 }
 
-impl<BigUint: BigUintApi> Order<BigUint> {
+impl<M: ManagedTypeApi> Order<BigUint> {
     pub fn new() -> Self {
         Default::default()
     }
 }
 
-impl<BigUint: BigUintApi> Default for Order<BigUint> {
+impl<M: ManagedTypeApi> Default for Order<BigUint> {
     fn default() -> Self {
         Order {
             id: 0,
