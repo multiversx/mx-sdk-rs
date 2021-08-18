@@ -81,7 +81,7 @@ fn set_check_balance_rs() {
 #[should_panic]
 fn set_check_code_err_rs() {
     elrond_wasm_debug::mandos_rs(
-        "/home/alin/code/elrond-wasm-rs/elrond-wasm-debug/tests/mandos/set-check/set-check-code.err.json",
+        "tests/mandos/set-check/set-check-code.err.json",
         &contract_map(),
     );
 }
@@ -89,7 +89,7 @@ fn set_check_code_err_rs() {
 #[test]
 fn set_check_code() {
     elrond_wasm_debug::mandos_rs(
-        "/home/alin/code/elrond-wasm-rs/elrond-wasm-debug/tests/mandos/set-check/set-check-code.scen.json",
+        "tests/mandos/set-check/set-check-code.scen.json",
         &contract_map(),
     );
 }
