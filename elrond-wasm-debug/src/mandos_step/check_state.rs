@@ -32,7 +32,7 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
             let default_value = &Vec::new();
             let actual_code = account.contract_path.as_ref().unwrap_or(default_value);
             assert!(
-                expected_account.code.check(&actual_code),
+                expected_account.code.check(actual_code),
                 "bad account code. Address: {}. Want: {}. Have: {}",
                 expected_address,
                 expected_account.code,

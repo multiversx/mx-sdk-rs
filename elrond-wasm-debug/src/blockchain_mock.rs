@@ -198,12 +198,11 @@ impl BlockchainMock {
     }
 
     pub fn check_account_has_code(&self, account: &AccountData) -> bool {
-        account
+        !account
             .contract_path
             .as_ref()
             .unwrap_or(&Vec::<u8>::new())
-            .len()
-            > 0
+            .is_empty()
     }
 
     pub fn subtract_tx_payment(
