@@ -48,7 +48,7 @@ where
         token_nonce: u64,
         attributes: &T,
     ) {
-        let has_mapping = !self.is_empty_mapping_value(token_id);
+        let has_mapping = self.has_mapping_value(token_id);
 
         let mapping = if has_mapping {
             self.get_mapping_value(token_id)
@@ -64,7 +64,7 @@ where
             counter
         };
 
-        let has_value = !self.is_empty_token_attributes_value(mapping, token_nonce);
+        let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if has_value {
             self.api.signal_error(VALUE_ALREADY_SET_ERROR_MESSAGE);
         }
