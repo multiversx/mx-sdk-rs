@@ -19,7 +19,7 @@ const VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE: &[u8] =
     b"A value was not previously set fot this token ID and token nonce";
 
 const COUNTER_OVERFLOW_ERROR_MESSAGE: &[u8] =
-    b"Counter overflow. This module can hold evidence for maximum (u8::MAX - 1) different token IDs";
+    b"Counter overflow. This module can hold evidence for maximum u8::MAX different token IDs";
 
 pub struct TokenAttributesMapper<SA>
 where
@@ -69,9 +69,7 @@ where
             self.api.signal_error(VALUE_ALREADY_SET_ERROR_MESSAGE);
         }
 
-        let mut value = Vec::<u8>::new();
-        attributes.top_encode(&mut value).unwrap();
-        self.set_token_attributes_value(mapping, token_nonce, value);
+        self.set_token_attributes_value(mapping, token_nonce, attributes);
     }
 
     ///Use carefully. Update should be used mainly when backed up by the protocol.
@@ -81,44 +79,44 @@ where
         token_nonce: u64,
         attributes: &T,
     ) {
-        let has_mapping = !self.is_empty_mapping_value(token_id);
+        let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
             self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
         }
 
         let mapping = self.get_mapping_value(token_id);
-        let has_value = !self.is_empty_token_attributes_value(mapping, token_nonce);
+        let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
             self.api
                 .signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
         }
 
-        let mut value = Vec::<u8>::new();
-        attributes.top_encode(&mut value).unwrap();
-        self.set_token_attributes_value(mapping, token_nonce, value)
+        self.set_token_attributes_value(mapping, token_nonce, attributes);
     }
 
     pub fn clear(&self, token_id: &TokenIdentifier, token_nonce: u64) {
-        let has_mapping = !self.is_empty_mapping_value(token_id);
+        let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            return;
         }
 
         let mapping = self.get_mapping_value(token_id);
-        let has_value = !self.is_empty_token_attributes_value(mapping, token_nonce);
+        let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
-            self.api
-                .signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            return;
         }
 
         self.clear_token_attributes_value(mapping, token_nonce);
     }
 
     pub fn is_empty(&self, token_id: &TokenIdentifier, token_nonce: u64) -> bool {
-        let has_mapping = self.is_empty_mapping_value(token_id);
-        let mapping = self.get_mapping_value(token_id);
+        let has_mapping = self.has_mapping_value(token_id);
+        if !has_mapping {
+            return true;
+        }
 
-        !has_mapping || self.is_empty_token_attributes_value(mapping, token_nonce)
+        let mapping = self.get_mapping_value(token_id);
+        self.is_empty_token_attributes_value(mapping, token_nonce)
     }
 
     pub fn get<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
@@ -126,20 +124,27 @@ where
         token_id: &TokenIdentifier,
         token_nonce: u64,
     ) -> T {
-        let has_mapping = !self.is_empty_mapping_value(token_id);
+        let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
             self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
         }
 
         let mapping = self.get_mapping_value(token_id);
-        let has_value = !self.is_empty_token_attributes_value(mapping, token_nonce);
+        let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
             self.api
                 .signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
         }
 
-        let value = self.get_token_attributes_value(mapping, token_nonce);
-        T::top_decode(value).unwrap()
+        self.get_token_attributes_value(mapping, token_nonce)
+    }
+
+    fn has_mapping_value(&self, token_id: &TokenIdentifier) -> bool {
+        !self.is_empty_mapping_value(token_id)
+    }
+
+    fn has_token_attributes_value(&self, mapping: u8, token_nonce: u64) -> bool {
+        !self.is_empty_token_attributes_value(mapping, token_nonce)
     }
 
     fn build_key_token_id_counter(&self) -> Vec<u8> {
@@ -204,7 +209,11 @@ where
             == 0
     }
 
-    fn get_token_attributes_value(&self, mapping: u8, token_nonce: u64) -> Vec<u8> {
+    fn get_token_attributes_value<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
+        &self,
+        mapping: u8,
+        token_nonce: u64,
+    ) -> T {
         storage_get(
             self.api.clone(),
             self.build_key_token_attr_value(mapping, token_nonce)
@@ -212,12 +221,17 @@ where
         )
     }
 
-    fn set_token_attributes_value(&self, mapping: u8, token_nonce: u64, value: Vec<u8>) {
+    fn set_token_attributes_value<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
+        &self,
+        mapping: u8,
+        token_nonce: u64,
+        value: &T,
+    ) {
         storage_set(
             self.api.clone(),
             self.build_key_token_attr_value(mapping, token_nonce)
                 .as_slice(),
-            &value,
+            value,
         );
     }
 
