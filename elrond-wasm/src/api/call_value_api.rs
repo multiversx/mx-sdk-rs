@@ -1,23 +1,23 @@
 use elrond_codec::Vec;
 
-use super::{BigUintApi, ErrorApi};
+use super::{ErrorApi, ManagedTypeApi};
 use crate::err_msg;
-use crate::types::{EsdtTokenPayment, EsdtTokenType, TokenIdentifier};
+use crate::types::{BigUint, EsdtTokenPayment, EsdtTokenType, TokenIdentifier};
 
 pub trait CallValueApi: ErrorApi + Sized {
-    /// The type of the payment arguments.
-    /// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
-    type AmountType: BigUintApi + 'static;
+    type TypeManager: ManagedTypeApi + 'static;
+
+    fn type_manager(&self) -> Self::TypeManager;
 
     fn check_not_payable(&self);
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn egld_value(&self) -> Self::AmountType;
+    fn egld_value(&self) -> BigUint<Self::TypeManager>;
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn esdt_value(&self) -> Self::AmountType;
+    fn esdt_value(&self) -> BigUint<Self::TypeManager>;
 
     /// Returns the call value token identifier of the current call.
     /// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
@@ -37,7 +37,7 @@ pub trait CallValueApi: ErrorApi + Sized {
     /// Will return the EGLD call value,
     /// but also fail with an error if ESDT is sent.
     /// Especially used in the auto-generated call value processing.
-    fn require_egld(&self) -> Self::AmountType {
+    fn require_egld(&self) -> BigUint<Self::TypeManager> {
         if !self.token().is_egld() {
             self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
         }
@@ -47,7 +47,7 @@ pub trait CallValueApi: ErrorApi + Sized {
     /// Will return the ESDT call value,
     /// but also fail with an error if EGLD or the wrong ESDT token is sent.
     /// Especially used in the auto-generated call value processing.
-    fn require_esdt(&self, token: &[u8]) -> Self::AmountType {
+    fn require_esdt(&self, token: &[u8]) -> BigUint<Self::TypeManager> {
         if self.token() != token {
             self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
         }
@@ -58,7 +58,7 @@ pub trait CallValueApi: ErrorApi + Sized {
     /// Especially used in the `#[payable("*")] auto-generated snippets.
     /// The method might seem redundant, but there is such a hook in Arwen
     /// that might be used in this scenario in the future.
-    fn payment_token_pair(&self) -> (Self::AmountType, TokenIdentifier) {
+    fn payment_token_pair(&self) -> (BigUint<Self::TypeManager>, TokenIdentifier) {
         let token = self.token();
         if token.is_egld() {
             (self.egld_value(), token)
@@ -69,7 +69,7 @@ pub trait CallValueApi: ErrorApi + Sized {
 
     fn esdt_num_transfers(&self) -> usize;
 
-    fn esdt_value_by_index(&self, index: usize) -> Self::AmountType;
+    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self::TypeManager>;
 
     fn token_by_index(&self, index: usize) -> TokenIdentifier;
 
@@ -77,7 +77,7 @@ pub trait CallValueApi: ErrorApi + Sized {
 
     fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType;
 
-    fn get_all_esdt_transfers(&self) -> Vec<EsdtTokenPayment<Self::AmountType>> {
+    fn get_all_esdt_transfers(&self) -> Vec<EsdtTokenPayment<Self::TypeManager>> {
         let num_transfers = self.esdt_num_transfers();
         let mut transfers = Vec::with_capacity(num_transfers);
 
@@ -87,7 +87,7 @@ pub trait CallValueApi: ErrorApi + Sized {
             let token_nonce = self.esdt_token_nonce_by_index(i);
             let amount = self.esdt_value_by_index(i);
 
-            transfers.push(EsdtTokenPayment::<Self::AmountType> {
+            transfers.push(EsdtTokenPayment::<Self::TypeManager> {
                 token_type,
                 token_name,
                 token_nonce,

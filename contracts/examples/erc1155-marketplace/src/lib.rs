@@ -6,7 +6,7 @@ elrond_wasm::derive_imports!();
 const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct Auction<BigUint: BigUintApi> {
+pub struct Auction<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier,
     pub min_bid: BigUint,
     pub max_bid: BigUint,
@@ -17,7 +17,7 @@ pub struct Auction<BigUint: BigUintApi> {
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct AuctionArgument<BigUint: BigUintApi> {
+pub struct AuctionArgument<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier,
     pub min_bid: BigUint,
     pub max_bid: BigUint,

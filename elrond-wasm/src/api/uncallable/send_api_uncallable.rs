@@ -1,14 +1,16 @@
-use super::BigUintUncallable;
 use crate::api::SendApi;
 use crate::types::{
-    Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
+    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
 };
 use alloc::vec::Vec;
 
 impl SendApi for super::UncallableApi {
-    type ProxyTypeManager = super::UncallableApi;
-    type AmountType = BigUintUncallable;
+    type ProxyTypeManager = Self;
     type ProxyStorage = Self;
+
+    fn type_manager(&self) -> Self::ProxyTypeManager {
+        unreachable!()
+    }
 
     fn get_sc_address(&self) -> Address {
         unreachable!()
@@ -23,18 +25,18 @@ impl SendApi for super::UncallableApi {
         _address: &Address,
         _token: &TokenIdentifier,
         _nonce: u64,
-    ) -> crate::types::EsdtTokenData<Self::AmountType> {
+    ) -> crate::types::EsdtTokenData<Self::ProxyTypeManager> {
         unreachable!()
     }
 
-    fn direct_egld(&self, _to: &Address, _amount: &BigUintUncallable, _data: &[u8]) {
+    fn direct_egld(&self, _to: &Address, _amount: &BigUint<Self::ProxyTypeManager>, _data: &[u8]) {
         unreachable!()
     }
 
     fn direct_egld_execute(
         &self,
         _to: &Address,
-        _amount: &BigUintUncallable,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -46,7 +48,7 @@ impl SendApi for super::UncallableApi {
         &self,
         _to: &Address,
         _token: &TokenIdentifier,
-        _amount: &BigUintUncallable,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _gas: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -59,7 +61,7 @@ impl SendApi for super::UncallableApi {
         _to: &Address,
         _token: &TokenIdentifier,
         _nonce: u64,
-        _amount: &BigUintUncallable,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -70,7 +72,7 @@ impl SendApi for super::UncallableApi {
     fn direct_multi_esdt_transfer_execute(
         &self,
         _to: &Address,
-        _tokens: &[EsdtTokenPayment<BigUintUncallable>],
+        _tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -78,14 +80,19 @@ impl SendApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn async_call_raw(&self, _to: &Address, _amount: &BigUintUncallable, _data: &[u8]) -> ! {
+    fn async_call_raw(
+        &self,
+        _to: &Address,
+        _amount: &BigUint<Self::ProxyTypeManager>,
+        _data: &[u8],
+    ) -> ! {
         unreachable!()
     }
 
     fn deploy_contract(
         &self,
         _gas: u64,
-        _amount: &BigUintUncallable,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _code: &BoxedBytes,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
@@ -96,7 +103,7 @@ impl SendApi for super::UncallableApi {
     fn deploy_from_source_contract(
         &self,
         _gas: u64,
-        _amount: &BigUintUncallable,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _source_contract_address: &Address,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
@@ -108,7 +115,7 @@ impl SendApi for super::UncallableApi {
         &self,
         _sc_address: &Address,
         _gas: u64,
-        _amount: &BigUintUncallable,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _code: &BoxedBytes,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
@@ -120,7 +127,7 @@ impl SendApi for super::UncallableApi {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &BigUintUncallable,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes> {
@@ -131,7 +138,7 @@ impl SendApi for super::UncallableApi {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &BigUintUncallable,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
         _range_closure: F,
@@ -146,7 +153,7 @@ impl SendApi for super::UncallableApi {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &BigUintUncallable,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes> {
@@ -157,7 +164,7 @@ impl SendApi for super::UncallableApi {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &BigUintUncallable,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) {
@@ -185,12 +192,12 @@ impl SendApi for super::UncallableApi {
         &self,
         _nft_id: &TokenIdentifier,
         _nft_nonce: u64,
-        _nft_amount: &Self::AmountType,
+        _nft_amount: &BigUint<Self::ProxyTypeManager>,
         _buyer: &Address,
         _payment_token: &TokenIdentifier,
         _payment_nonce: u64,
-        _payment_amount: &Self::AmountType,
-    ) -> Self::AmountType {
+        _payment_amount: &BigUint<Self::ProxyTypeManager>,
+    ) -> BigUint<Self::ProxyTypeManager> {
         unreachable!()
     }
 }

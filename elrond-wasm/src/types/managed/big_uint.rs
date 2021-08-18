@@ -25,6 +25,13 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
 
 /// More conversions here.
 impl<M: ManagedTypeApi> BigUint<M> {
+    pub fn zero(api: M) -> Self {
+        BigUint {
+            handle: api.bi_new_zero(),
+            api,
+        }
+    }
+
     pub fn from_u64(value: u64, api: M) -> Self {
         BigUint {
             handle: api.bi_new(value as i64),
@@ -37,6 +44,19 @@ impl<M: ManagedTypeApi> BigUint<M> {
             handle: api.bi_new(value as i64),
             api,
         }
+    }
+
+    #[doc(hidden)]
+    pub fn from_raw_handle(raw_handle: Handle, api: M) -> Self {
+        BigUint {
+            handle: raw_handle,
+            api,
+        }
+    }
+
+    #[doc(hidden)]
+    pub fn get_raw_handle(&self) -> Handle {
+        self.handle
     }
 
     pub fn to_u64(&self) -> Option<u64> {

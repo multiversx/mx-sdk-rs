@@ -1,10 +1,8 @@
-use super::{BigUintApi, ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
-use crate::types::{Address, TokenIdentifier};
+use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
+use crate::types::{Address, BigUint, TokenIdentifier};
 
 pub trait ProxyObjApi {
     type TypeManager: ManagedTypeApi + 'static;
-
-    type BigUint: BigUintApi + 'static;
 
     /// The code generator produces the same types in the proxy, as for the main contract.
     /// Sometimes endpoints return types that contain a `Self::Storage` type argument,
@@ -13,9 +11,7 @@ pub trait ProxyObjApi {
     /// (even though it is not required by the trait's methods per se).
     type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
-    type SendApi: SendApi<AmountType = Self::BigUint, ProxyTypeManager = Self::TypeManager>
-        + Clone
-        + 'static;
+    type SendApi: SendApi<ProxyTypeManager = Self::TypeManager> + Clone + 'static;
 
     // type ContractCall<R>;
 
@@ -25,17 +21,27 @@ pub trait ProxyObjApi {
     /// Not taken into account for deploys.
     fn contract(self, address: Address) -> Self;
 
-    fn with_token_transfer(self, token: TokenIdentifier, payment: Self::BigUint) -> Self;
+    fn with_token_transfer(
+        self,
+        token: TokenIdentifier,
+        payment: BigUint<Self::TypeManager>,
+    ) -> Self;
 
     fn with_nft_nonce(self, nonce: u64) -> Self;
 
-    fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint, u64);
+    fn into_fields(
+        self,
+    ) -> (
+        Self::SendApi,
+        Address,
+        TokenIdentifier,
+        BigUint<Self::TypeManager>,
+        u64,
+    );
 }
 
 pub trait CallbackProxyObjApi {
     type TypeManager: ManagedTypeApi + 'static;
-
-    type BigUint: BigUintApi + 'static;
 
     /// The code generator produces the same types in the proxy, as for the main contract.
     /// Sometimes endpoints return types that contain a `Self::Storage` type argument,
@@ -44,9 +50,7 @@ pub trait CallbackProxyObjApi {
     /// (even though it is not required by the trait's methods per se).
     type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
 
-    type SendApi: SendApi<AmountType = Self::BigUint, ProxyTypeManager = Self::TypeManager>
-        + Clone
-        + 'static;
+    type SendApi: SendApi<ProxyTypeManager = Self::TypeManager> + Clone + 'static;
 
     type ErrorApi: ErrorApi + Clone + 'static;
 
