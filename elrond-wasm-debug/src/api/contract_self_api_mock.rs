@@ -1,8 +1,6 @@
-use super::RustBigUint;
 use crate::TxContext;
 
 impl elrond_wasm::api::ContractBase for TxContext {
-    type BigUint = RustBigUint;
     type TypeManager = Self;
     type Storage = Self;
     type CallValue = Self;

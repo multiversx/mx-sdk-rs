@@ -1,6 +1,6 @@
 use super::{
-    BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
-    ErrorApi, LogApi, ManagedTypeApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
+    BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
+    LogApi, ManagedTypeApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
 };
 use crate::types::Address;
 
@@ -13,25 +13,19 @@ use crate::types::Address;
 pub trait ContractBase: Sized {
     type TypeManager: ManagedTypeApi + 'static;
 
-    type BigUint: BigUintApi + 'static;
-
     /// Abstracts the lower-level storage functionality.
     type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// Abstracts the call value handling at the beginning of a function call.
-    type CallValue: CallValueApi<AmountType = Self::BigUint> + ErrorApi + Clone + 'static;
+    type CallValue: CallValueApi<TypeManager = Self::TypeManager> + ErrorApi + Clone + 'static;
 
     /// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
-    type SendApi: SendApi<
-            ProxyTypeManager = Self::TypeManager,
-            AmountType = Self::BigUint,
-            ProxyStorage = Self::Storage,
-        > + Clone
+    type SendApi: SendApi<ProxyTypeManager = Self::TypeManager, ProxyStorage = Self::Storage>
         + 'static;
 
-    type BlockchainApi: BlockchainApi<BalanceType = Self::BigUint> + Clone + 'static;
+    type BlockchainApi: BlockchainApi<Storage = Self::Storage> + Clone + 'static;
 
-    type CryptoApi: CryptoApi<BigUint = Self::BigUint> + Clone + 'static;
+    type CryptoApi: CryptoApi + Clone + 'static;
 
     type LogApi: LogApi + ErrorApi + Clone + 'static;
 

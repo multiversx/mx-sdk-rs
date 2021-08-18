@@ -1,11 +1,14 @@
-use super::RustBigUint;
 use crate::{TxContext, TxPanic};
 use elrond_wasm::api::CallValueApi;
 use elrond_wasm::err_msg;
-use elrond_wasm::types::{EsdtTokenType, TokenIdentifier};
+use elrond_wasm::types::{BigUint, EsdtTokenType, TokenIdentifier};
 
 impl CallValueApi for TxContext {
-    type AmountType = RustBigUint;
+    type TypeManager = Self;
+
+    fn type_manager(&self) -> Self::TypeManager {
+        self.clone()
+    }
 
     fn check_not_payable(&self) {
         if self.egld_value() > 0 {
@@ -23,13 +26,13 @@ impl CallValueApi for TxContext {
     }
 
     #[inline]
-    fn egld_value(&self) -> RustBigUint {
-        self.tx_input_box.call_value.clone().into()
+    fn egld_value(&self) -> BigUint<Self::TypeManager> {
+        self.insert_new_big_uint(self.tx_input_box.call_value.clone())
     }
 
     #[inline]
-    fn esdt_value(&self) -> RustBigUint {
-        self.tx_input_box.esdt_value.clone().into()
+    fn esdt_value(&self) -> BigUint<Self::TypeManager> {
+        self.insert_new_big_uint(self.tx_input_box.esdt_value.clone())
     }
 
     #[inline]
@@ -57,8 +60,8 @@ impl CallValueApi for TxContext {
     }
 
     #[inline]
-    fn esdt_value_by_index(&self, _index: usize) -> RustBigUint {
-        0u64.into()
+    fn esdt_value_by_index(&self, _index: usize) -> BigUint<Self::TypeManager> {
+        self.insert_new_big_uint_zero()
     }
 
     #[inline]

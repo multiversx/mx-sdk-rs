@@ -1,29 +1,29 @@
-use crate::{abi::TypeAbi, api::BigUintApi};
+use crate::{abi::TypeAbi, api::ManagedTypeApi, types::BigUint};
 use alloc::string::String;
 use elrond_codec::*;
 
 use super::{Address, BoxedBytes, EsdtTokenType};
 
-pub struct EsdtTokenData<BigUint: BigUintApi> {
+pub struct EsdtTokenData<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
-    pub amount: BigUint,
+    pub amount: BigUint<M>,
     pub frozen: bool,
     pub hash: BoxedBytes,
     pub name: BoxedBytes,
     pub attributes: BoxedBytes,
     pub creator: Address,
-    pub royalties: BigUint,
+    pub royalties: BigUint<M>,
     pub uris: Vec<BoxedBytes>,
 }
 
-impl<BigUint: BigUintApi> EsdtTokenData<BigUint> {
+impl<M: ManagedTypeApi> EsdtTokenData<M> {
     pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         T::top_decode(self.attributes.clone().as_slice())
     }
 }
 
 #[allow(clippy::redundant_clone)]
-impl<BigUint: BigUintApi> NestedEncode for EsdtTokenData<BigUint> {
+impl<M: ManagedTypeApi> NestedEncode for EsdtTokenData<M> {
     #[inline]
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.token_type.dep_encode(dest)?;
@@ -58,7 +58,7 @@ impl<BigUint: BigUintApi> NestedEncode for EsdtTokenData<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> TopEncode for EsdtTokenData<BigUint> {
+impl<M: ManagedTypeApi> TopEncode for EsdtTokenData<M> {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         top_encode_from_nested(self, output)
@@ -76,16 +76,16 @@ impl<BigUint: BigUintApi> TopEncode for EsdtTokenData<BigUint> {
 }
 
 #[allow(clippy::redundant_clone)]
-impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
+impl<M: ManagedTypeApi> NestedDecode for EsdtTokenData<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let token_type = EsdtTokenType::dep_decode(input)?;
-        let amount = BigUint::dep_decode(input)?;
+        let amount = BigUint::<M>::dep_decode(input)?;
         let frozen = bool::dep_decode(input)?;
         let hash = BoxedBytes::dep_decode(input)?;
         let name = BoxedBytes::dep_decode(input)?;
         let attributes = BoxedBytes::dep_decode(input)?;
         let creator = Address::dep_decode(input)?;
-        let royalties = BigUint::dep_decode(input)?;
+        let royalties = BigUint::<M>::dep_decode(input)?;
         let uris = Vec::<BoxedBytes>::dep_decode(input)?;
 
         Ok(Self {
@@ -130,7 +130,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenData<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> TopDecode for EsdtTokenData<BigUint> {
+impl<M: ManagedTypeApi> TopDecode for EsdtTokenData<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         top_decode_from_nested(input)
     }
@@ -144,7 +144,7 @@ impl<BigUint: BigUintApi> TopDecode for EsdtTokenData<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> TypeAbi for EsdtTokenData<BigUint> {
+impl<M: ManagedTypeApi> TypeAbi for EsdtTokenData<M> {
     fn type_name() -> String {
         "EsdtTokenData".into()
     }

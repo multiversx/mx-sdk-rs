@@ -1,6 +1,5 @@
 elrond_wasm::derive_imports!();
 
-use elrond_wasm::api::BigUintApi;
 use elrond_wasm::types::Address;
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
@@ -10,7 +9,7 @@ pub enum AuctionType {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct Auction<BigUint: BigUintApi> {
+pub struct Auction<M: ManagedTypeApi> {
     pub auction_type: AuctionType,
     pub starting_price: BigUint,
     pub ending_price: BigUint,
@@ -20,7 +19,7 @@ pub struct Auction<BigUint: BigUintApi> {
     pub current_winner: Address,
 }
 
-impl<BigUint: BigUintApi> Auction<BigUint> {
+impl<M: ManagedTypeApi> Auction<BigUint> {
     pub fn new(
         auction_type: AuctionType,
         starting_price: &BigUint,

@@ -1,6 +1,8 @@
-use super::{BigUintApi, ErrorApi, ManagedTypeApi, StorageReadApi};
+use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::storage;
-use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, TokenIdentifier, Vec, H256};
+use crate::types::{
+    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, TokenIdentifier, Vec, H256,
+};
 use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
@@ -9,12 +11,10 @@ use alloc::boxed::Box;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait BlockchainApi:
-    StorageReadApi + ManagedTypeApi + ErrorApi + Clone + Sized + 'static
-{
-    /// The type of the token balances.
-    /// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
-    type BalanceType: BigUintApi + 'static;
+pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
+    type Storage: StorageReadApi + ManagedTypeApi + 'static;
+
+    fn storage_manager(&self) -> Self::Storage;
 
     fn get_sc_address(&self) -> Address;
 
@@ -32,9 +32,9 @@ pub trait BlockchainApi:
 
     fn get_caller(&self) -> Address;
 
-    fn get_balance(&self, address: &Address) -> Self::BalanceType;
+    fn get_balance(&self, address: &Address) -> BigUint<Self::Storage>;
 
-    fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> Self::BalanceType {
+    fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> BigUint<Self::Storage> {
         let sc_address = self.get_sc_address();
 
         if token.is_egld() {
@@ -75,20 +75,23 @@ pub trait BlockchainApi:
         address: &Address,
         token_id: &TokenIdentifier,
         nonce: u64,
-    ) -> Self::BalanceType;
+    ) -> BigUint<Self::Storage>;
 
     fn get_esdt_token_data(
         &self,
         address: &Address,
         token_id: &TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenData<Self::BalanceType>;
+    ) -> EsdtTokenData<Self::Storage>;
 
     /// Retrieves validator rewards, as set by the protocol.
     /// TODO: move to the storage API, once BigUint gets refactored
     #[inline]
-    fn get_cumulated_validator_rewards(&self) -> Self::BalanceType {
-        storage::storage_get(self.clone(), storage::protected_keys::ELROND_REWARD_KEY)
+    fn get_cumulated_validator_rewards(&self) -> BigUint<Self::Storage> {
+        storage::storage_get(
+            self.storage_manager(),
+            storage::protected_keys::ELROND_REWARD_KEY,
+        )
     }
 
     /// Retrieves local roles for the token, by reading protected storage.
@@ -101,7 +104,8 @@ pub trait BlockchainApi:
             token_id.as_esdt_identifier(),
         ]
         .concat();
-        let raw_storage = storage::storage_get::<Self, BoxedBytes>(self.clone(), &key);
+        let raw_storage =
+            storage::storage_get::<Self::Storage, BoxedBytes>(self.storage_manager(), &key);
         let raw_storage_bytes = raw_storage.as_slice();
         let mut current_index = 0;
 

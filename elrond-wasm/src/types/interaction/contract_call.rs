@@ -1,6 +1,8 @@
-use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, TokenIdentifier};
+use crate::types::{
+    Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, EsdtTokenPayment, TokenIdentifier,
+};
 use crate::{
-    api::{BigUintApi, SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
+    api::{SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
     BytesArgLoader, DynArg,
 };
 use crate::{hex_call_data::HexCallDataSerializer, ArgId};
@@ -24,7 +26,7 @@ where
     api: SA,
     to: Address,
     payment_token: TokenIdentifier,
-    payment_amount: SA::AmountType,
+    payment_amount: BigUint<SA::ProxyTypeManager>,
     payment_nonce: u64,
     endpoint_name: BoxedBytes,
     explicit_gas_limit: u64,
@@ -38,7 +40,7 @@ pub fn new_contract_call<SA, R>(
     api: SA,
     to: Address,
     payment_token: TokenIdentifier,
-    payment_amount: SA::AmountType,
+    payment_amount: BigUint<SA::ProxyTypeManager>,
     payment_nonce: u64,
     endpoint_name: BoxedBytes,
 ) -> ContractCall<SA, R>
@@ -57,11 +59,12 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA, to: Address, endpoint_name: BoxedBytes) -> Self {
+        let zero = BigUint::zero(api.type_manager());
         ContractCall {
             api,
             to,
             payment_token: TokenIdentifier::egld(),
-            payment_amount: SA::AmountType::zero(),
+            payment_amount: zero,
             payment_nonce: 0,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             endpoint_name,
@@ -73,7 +76,7 @@ where
     pub fn with_token_transfer(
         mut self,
         payment_token: TokenIdentifier,
-        payment_amount: SA::AmountType,
+        payment_amount: BigUint<SA::ProxyTypeManager>,
     ) -> Self {
         self.payment_token = payment_token;
         self.payment_amount = payment_amount;
@@ -111,11 +114,12 @@ where
             new_arg_buffer.push_argument_bytes(self.payment_amount.to_bytes_be().as_slice());
             new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 
+            let zero = BigUint::zero(self.api.type_manager());
             ContractCall {
                 api: self.api,
                 to: self.to,
                 payment_token: TokenIdentifier::egld(),
-                payment_amount: SA::AmountType::zero(),
+                payment_amount: zero,
                 payment_nonce: 0,
                 explicit_gas_limit: self.explicit_gas_limit,
                 endpoint_name: BoxedBytes::from(ESDT_TRANSFER_STRING),
@@ -140,11 +144,12 @@ where
 
             let recipient_addr = Self::nft_transfer_recipient_address(&self.api, self.to);
 
+            let zero = BigUint::zero(self.api.type_manager());
             ContractCall {
                 api: self.api,
                 to: recipient_addr,
                 payment_token: TokenIdentifier::egld(),
-                payment_amount: SA::AmountType::zero(),
+                payment_amount: zero,
                 payment_nonce: 0,
                 explicit_gas_limit: self.explicit_gas_limit,
                 endpoint_name: BoxedBytes::from(ESDT_NFT_TRANSFER_STRING),
@@ -309,7 +314,7 @@ where
     /// Immediately launches a transfer-execute call with multiple transfers in a single call.
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
-    pub fn esdt_multi_transfer(&self, payments: &[EsdtTokenPayment<SA::AmountType>]) {
+    pub fn esdt_multi_transfer(&self, payments: &[EsdtTokenPayment<SA::ProxyTypeManager>]) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
         let result = self.api.direct_multi_esdt_transfer_execute(
             &self.to,
