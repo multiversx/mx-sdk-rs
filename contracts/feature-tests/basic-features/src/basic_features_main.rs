@@ -21,6 +21,7 @@ pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
+pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_vec;
 pub mod type_features;
 pub mod types;
@@ -46,6 +47,7 @@ pub trait BasicFeatures:
     + storage_mapper_set::SetMapperFeatures
     + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
+    + storage_mapper_token_attributes::TokenAttributesMapperFeatures
     + type_features::TypeFeatures
 {
     #[init]
