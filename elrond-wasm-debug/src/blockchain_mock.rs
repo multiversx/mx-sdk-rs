@@ -13,6 +13,7 @@ use std::fmt;
 use std::fmt::Write;
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
+const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 pub type AccountEsdt = HashMap<Vec<u8>, BigUint>;
@@ -135,6 +136,11 @@ impl BlockchainMock {
         self.accounts.insert(acct.address.clone(), acct);
     }
 
+    pub fn validate_and_add_account(&mut self, acct: AccountData) {
+        self.validate_account(&acct);
+        self.add_account(acct);
+    }
+
     pub fn print_accounts(&self) {
         let mut accounts_buf = String::new();
         for (address, account) in &self.accounts {
@@ -165,19 +171,34 @@ impl BlockchainMock {
             .cloned()
     }
 
-    pub fn get_contract_path(&self, contract_address: &Address) -> Vec<u8> {
-        if let Some(account) = self.accounts.get(contract_address) {
-            if let Some(contract_path) = &account.contract_path {
-                contract_path.clone()
-            } else {
-                panic!("Recipient account is not a smart contract");
-            }
-        } else {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(contract_address.as_ref()).unwrap()
-            );
+    pub fn validate_account(&self, account: &AccountData) {
+        let is_sc = self.is_smart_contract_address(&account.address);
+        let has_code = self.check_account_has_code(account);
+
+        if is_sc && !has_code {
+            panic!("Account has a smart contract address but no code");
         }
+
+        if !is_sc && has_code {
+            panic!("Account has no smart contract address but has code");
+        }
+    }
+
+    pub fn is_smart_contract_address(&self, address: &Address) -> bool {
+        address
+            .as_bytes()
+            .iter()
+            .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
+            .all(|item| item == &0u8)
+    }
+
+    pub fn check_account_has_code(&self, account: &AccountData) -> bool {
+        account
+            .contract_path
+            .as_ref()
+            .unwrap_or(&Vec::<u8>::new())
+            .len()
+            > 0
     }
 
     pub fn subtract_tx_payment(
