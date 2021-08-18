@@ -7,6 +7,7 @@ mod mapper;
 mod set_mapper;
 mod set_mapper_safe;
 mod single_value_mapper;
+mod token_attributes_mapper;
 mod user_mapper;
 mod vec_mapper;
 
@@ -20,5 +21,6 @@ pub use mapper::StorageMapper;
 pub use set_mapper::SetMapper;
 pub use set_mapper_safe::SafeSetMapper;
 pub use single_value_mapper::SingleValueMapper;
+pub use token_attributes_mapper::TokenAttributesMapper;
 pub use user_mapper::UserMapper;
 pub use vec_mapper::VecMapper;
