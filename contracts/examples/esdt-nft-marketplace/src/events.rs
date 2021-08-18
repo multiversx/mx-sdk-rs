@@ -13,9 +13,9 @@ pub trait EventsModule {
         creation_time: u64,
     ) {
         self.auction_token_event(
-            auction_id,
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
+            auction_id,
             &auction.nr_auctioned_tokens,
             &auction.original_owner,
             creation_time,
@@ -32,25 +32,20 @@ pub trait EventsModule {
 
     fn emit_bid_event(self, auction_id: u64, auction: Auction<BigUint>, bid_time: u64) {
         self.bid_event(
-            auction_id,
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
+            auction_id,
             &auction.current_winner,
             bid_time,
             &auction.current_bid,
         );
     }
 
-    fn emit_end_auction_event(
-        self,
-        auction_id: u64,
-        auction: Auction<BigUint>,
-        end_time: u64,
-    ) {
+    fn emit_end_auction_event(self, auction_id: u64, auction: Auction<BigUint>, end_time: u64) {
         self.end_auction_event(
-            auction_id,
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
+            auction_id,
             &auction.current_winner,
             end_time,
             &auction.current_bid,
@@ -59,24 +54,19 @@ pub trait EventsModule {
 
     fn emit_buy_sft_event(self, auction_id: u64, auction: Auction<BigUint>, buy_time: u64) {
         self.buy_sft_event(
-            auction_id,
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
+            auction_id,
             &auction.current_winner,
             buy_time,
         );
     }
 
-    fn emit_withdraw_event(
-        self,
-        auction_id: u64,
-        auction: Auction<BigUint>,
-        withdraw_time: u64,
-    ) {
+    fn emit_withdraw_event(self, auction_id: u64, auction: Auction<BigUint>, withdraw_time: u64) {
         self.withdraw_event(
-            auction_id,
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
+            auction_id,
             &auction.original_owner,
             withdraw_time,
         );
@@ -85,9 +75,9 @@ pub trait EventsModule {
     #[event("auction_token_event")]
     fn auction_token_event(
         &self,
-        #[indexed] auction_id: u64,
         #[indexed] auction_token_id: &TokenIdentifier,
         #[indexed] auctioned_token_nonce: u64,
+        #[indexed] auction_id: u64,
         #[indexed] auctioned_token_amount: &BigUint,
         #[indexed] seller: &Address,
         #[indexed] creation_time: u64,
@@ -104,9 +94,9 @@ pub trait EventsModule {
     #[event("bid_event")]
     fn bid_event(
         &self,
-        #[indexed] auction_id: u64,
         #[indexed] auction_token_id: &TokenIdentifier,
         #[indexed] auctioned_token_nonce: u64,
+        #[indexed] auction_id: u64,
         #[indexed] bidder: &Address,
         #[indexed] bid_time: u64,
         #[indexed] bid_amount: &BigUint,
@@ -115,9 +105,9 @@ pub trait EventsModule {
     #[event("end_auction_event")]
     fn end_auction_event(
         &self,
-        #[indexed] auction_id: u64,
         #[indexed] auction_token_id: &TokenIdentifier,
         #[indexed] auctioned_token_nonce: u64,
+        #[indexed] auction_id: u64,
         #[indexed] auction_winner: &Address,
         #[indexed] end_time: u64,
         #[indexed] winning_bid_amount: &BigUint,
@@ -126,9 +116,9 @@ pub trait EventsModule {
     #[event("buy_sft_event")]
     fn buy_sft_event(
         &self,
-        #[indexed] auction_id: u64,
         #[indexed] auction_token_id: &TokenIdentifier,
         #[indexed] auctioned_token_nonce: u64,
+        #[indexed] auction_id: u64,
         #[indexed] buyer: &Address,
         #[indexed] buy_time: u64,
     );
@@ -136,9 +126,9 @@ pub trait EventsModule {
     #[event("withdraw_event")]
     fn withdraw_event(
         &self,
-        #[indexed] auction_id: u64,
         #[indexed] auction_token_id: &TokenIdentifier,
         #[indexed] auctioned_token_nonce: u64,
+        #[indexed] auction_id: u64,
         #[indexed] seller: &Address,
         #[indexed] withdraw_time: u64,
     );
