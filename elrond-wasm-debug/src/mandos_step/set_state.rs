@@ -25,7 +25,7 @@ pub fn execute(
         } else {
             HashMap::new()
         };
-        state.add_account(AccountData {
+        state.validate_and_add_account(AccountData {
             address: address.value.into(),
             nonce: account
                 .nonce
@@ -55,6 +55,10 @@ pub fn execute(
         });
     }
     for new_address in new_addresses.iter() {
+        assert!(
+            state.is_smart_contract_address(&new_address.new_address.value.into()),
+            "field should have SC format"
+        );
         state.put_new_address(
             new_address.creator_address.value.into(),
             new_address.creator_nonce.value,
