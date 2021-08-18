@@ -10,16 +10,6 @@ use elrond_wasm::String;
 #[elrond_wasm::module]
 pub trait EchoTypes {
     #[endpoint]
-    fn echo_big_uint(&self, bi: Self::BigUint) -> Self::BigUint {
-        bi
-    }
-
-    #[endpoint]
-    fn echo_big_int(&self, bi: Self::BigInt) -> Self::BigInt {
-        bi
-    }
-
-    #[endpoint]
     fn echo_u64(&self, i: u64) -> u64 {
         i
     }
@@ -141,10 +131,7 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_varags_big_uint(
-        &self,
-        #[var_args] m: VarArgs<Self::BigUint>,
-    ) -> MultiResultVec<Self::BigUint> {
+    fn echo_varags_big_uint(&self, #[var_args] m: VarArgs<BigUint>) -> MultiResultVec<BigUint> {
         m.into_vec().into()
     }
 

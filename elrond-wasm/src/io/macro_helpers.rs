@@ -1,4 +1,4 @@
-use crate::api::{EndpointArgumentApi, ErrorApi};
+use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
 use crate::*;
 use elrond_codec::*;
 
@@ -6,7 +6,7 @@ use elrond_codec::*;
 pub fn load_single_arg<AA, T>(api: AA, index: i32, arg_id: ArgId) -> T
 where
     T: TopDecode,
-    AA: EndpointArgumentApi + ErrorApi + Clone + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
     T::top_decode_or_exit(
         ArgDecodeInput::new(api.clone(), index),
@@ -18,7 +18,7 @@ where
 #[inline(always)]
 fn load_single_arg_exit<AA>(ctx: (AA, ArgId), de_err: DecodeError) -> !
 where
-    AA: EndpointArgumentApi + ErrorApi + 'static,
+    AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
     let (api, arg_id) = ctx;
     signal_arg_de_error(&api, arg_id, de_err)

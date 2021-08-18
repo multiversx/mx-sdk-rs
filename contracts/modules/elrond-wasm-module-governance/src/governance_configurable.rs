@@ -11,8 +11,8 @@ pub trait GovernanceConfigurablePropertiesModule {
     fn init_governance_module(
         &self,
         governance_token_id: TokenIdentifier,
-        quorum: Self::BigUint,
-        min_token_balance_for_proposal: Self::BigUint,
+        quorum: BigUint,
+        min_token_balance_for_proposal: BigUint,
         max_actions_per_proposal: usize,
         voting_delay_in_blocks: u64,
         voting_period_in_blocks: u64,
@@ -43,7 +43,7 @@ pub trait GovernanceConfigurablePropertiesModule {
     // i.e. only by proposing and executing an action with the SC as dest and the respective func name
 
     #[endpoint(changeQuorum)]
-    fn change_quorum(&self, new_value: Self::BigUint) -> SCResult<()> {
+    fn change_quorum(&self, new_value: BigUint) -> SCResult<()> {
         self.require_caller_self()?;
 
         self.try_change_quorum(new_value)?;
@@ -52,7 +52,7 @@ pub trait GovernanceConfigurablePropertiesModule {
     }
 
     #[endpoint(changeMinTokenBalanceForProposing)]
-    fn change_min_token_balance_for_proposing(&self, new_value: Self::BigUint) -> SCResult<()> {
+    fn change_min_token_balance_for_proposing(&self, new_value: BigUint) -> SCResult<()> {
         self.require_caller_self()?;
 
         self.try_change_min_token_balance_for_proposing(new_value)?;
@@ -110,7 +110,7 @@ pub trait GovernanceConfigurablePropertiesModule {
         Ok(())
     }
 
-    fn try_change_quorum(&self, new_value: Self::BigUint) -> SCResult<()> {
+    fn try_change_quorum(&self, new_value: BigUint) -> SCResult<()> {
         require!(new_value != 0, "Quorum can't be set to 0");
 
         self.quorum().set(&new_value);
@@ -118,7 +118,7 @@ pub trait GovernanceConfigurablePropertiesModule {
         Ok(())
     }
 
-    fn try_change_min_token_balance_for_proposing(&self, new_value: Self::BigUint) -> SCResult<()> {
+    fn try_change_min_token_balance_for_proposing(&self, new_value: BigUint) -> SCResult<()> {
         require!(
             new_value != 0,
             "Min token balance for proposing can't be set to 0"
@@ -177,11 +177,11 @@ pub trait GovernanceConfigurablePropertiesModule {
 
     #[view(getQuorum)]
     #[storage_mapper("governance:quorum")]
-    fn quorum(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn quorum(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(getMinTokenBalanceForProposing)]
     #[storage_mapper("governance:minTokenBalanceForProposing")]
-    fn min_token_balance_for_proposing(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn min_token_balance_for_proposing(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(getMaxActionsPerProposal)]
     #[storage_mapper("governance:maxActionsPerProposal")]

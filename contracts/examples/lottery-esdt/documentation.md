@@ -19,7 +19,7 @@ Once the SC has been deployed, anyone can start a lottery, using the following f
 ```
 start(lottery_name: Vec<u8>,
         esdt_token_name: Vec<u8>,
-        ticket_price: Self::BigUint, 
+        ticket_price: BigUint, 
         opt_total_tickets: Option<u32>, 
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -79,7 +79,7 @@ The functions described above only give very basic information about a lottery. 
 ```
 #[view(lotteryInfo)]
 #[storage_get_mut("lotteryInfo")]
-fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<Self::BigUint>)
+fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigUint>)
 ```
 
 *LotteryInfo* is a struct, with its definition as follows:
@@ -94,7 +94,7 @@ pub struct LotteryInfo<BigUint:BigUintApi> {
     pub prize_distribution: Vec<u8>,
     pub whitelist: Vec<Address>,
     pub current_ticket_number: u32,
-    pub prize_pool: Self::BigUint
+    pub prize_pool: BigUint
 }
 ```
 

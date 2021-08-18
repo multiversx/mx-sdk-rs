@@ -59,6 +59,7 @@
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKEN",
+                            "",
                             "1000",
                             "sc:vault"
                         ],
@@ -71,11 +72,11 @@
                             "str:accept_funds",
                             "str:TEST-TOKEN",
                             "str:FungibleESDT",
-                                                "1000",
-                                                "0"
-                                            ],
-                                            "data": ""
-                                        },
+                            "1000",
+                            "0"
+                        ],
+                        "data": ""
+                    },
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:forward_sync_accept_funds",

@@ -1,5 +1,7 @@
 use alloc::vec::Vec;
 
+use crate::TryStaticCast;
+
 /// Trait that allows appending bytes.
 /// Used especially by the NestedEncode trait to output data.
 ///
@@ -13,6 +15,10 @@ pub trait NestedEncodeOutput {
     /// Write a single byte to the output.
     fn push_byte(&mut self, byte: u8) {
         self.write(&[byte]);
+    }
+
+    fn push_specialized<T: TryStaticCast>(&mut self, _value: &T) -> bool {
+        false
     }
 }
 
