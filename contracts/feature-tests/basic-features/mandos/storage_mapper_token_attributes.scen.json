@@ -477,8 +477,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "4",
-                "message": "str:A value was not previously set fot this token ID and token nonce",
+                "status": "0",
+                "message": "*",
                 "gas": "*"
             }
         },
@@ -522,8 +522,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "4",
-                "message": "str:Unknown token id. No attributes were set for this token ID",
+                "status": "0",
+                "message": "*",
                 "gas": "*"
             }
         },
