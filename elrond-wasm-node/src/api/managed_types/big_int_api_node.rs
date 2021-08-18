@@ -1,5 +1,6 @@
 use core::cmp::Ordering;
 
+use crate::api::unsafe_buffer;
 use crate::error_hook;
 
 use elrond_wasm::api::{BigIntApi, Handle, Sign};
@@ -167,4 +168,22 @@ impl BigIntApi for crate::ArwenApiImpl {
             bigIntShl(dest, x, bits as i32);
         }
     }
+}
+
+pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(
+    bi_handle: Handle,
+    nr_bytes: usize,
+) -> *const u8 {
+    let byte_len = bigIntUnsignedByteLength(bi_handle) as usize;
+    if byte_len > nr_bytes {
+        error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE);
+    }
+    unsafe_buffer::clear_buffer();
+    if byte_len > 0 {
+        bigIntGetUnsignedBytes(
+            bi_handle,
+            unsafe_buffer::buffer_ptr().add(nr_bytes - byte_len),
+        );
+    }
+    unsafe_buffer::buffer_ptr()
 }

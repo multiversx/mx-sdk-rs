@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::utils::structs::CurveArguments;
-pub trait CurveFunction<BigUint: BigUintApi>
+pub trait CurveFunction<M: ManagedTypeApi>
 where
     for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
     for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,

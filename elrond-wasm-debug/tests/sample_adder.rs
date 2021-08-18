@@ -135,7 +135,6 @@ mod module_1 {
     pub struct AbiProvider {}
 
     impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-        type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
         type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
         type Storage = elrond_wasm::api::uncallable::UncallableApi;
         type SendApi = elrond_wasm::api::uncallable::UncallableApi;
@@ -414,7 +413,6 @@ mod sample_adder {
             + Clone
             + 'static,
     {
-        type BigUint = A::BigUint;
         type TypeManager = A::TypeManager;
         type Storage = A::Storage;
         type CallValue = A::CallValue;
@@ -603,7 +601,6 @@ mod sample_adder {
     pub struct AbiProvider {}
 
     impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-        type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
         type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
         type Storage = elrond_wasm::api::uncallable::UncallableApi;
         type SendApi = elrond_wasm::api::uncallable::UncallableApi;
@@ -689,7 +686,7 @@ mod sample_adder {
         pub api: SA,
         pub address: Address,
         pub payment_token: elrond_wasm::types::TokenIdentifier,
-        pub payment_amount: SA::AmountType,
+        pub payment_amount: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
         pub payment_nonce: u64,
     }
 
@@ -697,7 +694,6 @@ mod sample_adder {
     where
         SA: elrond_wasm::api::SendApi + 'static,
     {
-        type BigUint = SA::AmountType;
         type TypeManager = SA::ProxyTypeManager;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
@@ -762,7 +758,6 @@ mod sample_adder {
     where
         SA: elrond_wasm::api::SendApi + 'static,
     {
-        type BigUint = SA::AmountType;
         type TypeManager = SA::ProxyTypeManager;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;

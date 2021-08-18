@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct CurveArguments<BigUint: BigUintApi> {
+pub struct CurveArguments<M: ManagedTypeApi> {
     pub available_supply: BigUint,
     pub balance: BigUint,
 }
@@ -21,7 +21,7 @@ where
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct BondingCurve<BigUint: BigUintApi> {
+pub struct BondingCurve<M: ManagedTypeApi> {
     pub curve: FunctionSelector<BigUint>,
     pub arguments: CurveArguments<BigUint>,
     pub sell_availability: bool,

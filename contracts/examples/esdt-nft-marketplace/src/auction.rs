@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, TypeAbi)]
-pub struct Auction<BigUint: BigUintApi> {
+pub struct Auction<M: ManagedTypeApi> {
     pub auctioned_token: EsdtToken,
     pub nr_auctioned_tokens: BigUint,
     pub auction_type: AuctionType,
@@ -34,7 +34,7 @@ pub struct EsdtToken {
     pub nonce: u64,
 }
 
-pub struct BidSplitAmounts<BigUint: BigUintApi> {
+pub struct BidSplitAmounts<M: ManagedTypeApi> {
     pub creator: BigUint,
     pub marketplace: BigUint,
     pub seller: BigUint,

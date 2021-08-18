@@ -19,6 +19,5 @@ pub use endpoint_arg_api_node::*;
 pub use endpoint_finish_api_node::*;
 pub use error_api_node::*;
 pub use log_api_node::*;
-pub use managed_types::*;
 pub use send_api_node::*;
 pub use storage_api_node::*;

@@ -1,7 +1,6 @@
-use super::ArwenBigUint;
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
-    Address, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
+    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
 };
 
 extern "C" {
@@ -90,7 +89,12 @@ extern "C" {
 }
 
 impl BlockchainApi for crate::ArwenApiImpl {
-    type BalanceType = ArwenBigUint;
+    type Storage = Self;
+
+    #[inline]
+    fn storage_manager(&self) -> Self::Storage {
+        self.clone()
+    }
 
     #[inline]
     fn get_sc_address(&self) -> Address {
@@ -129,11 +133,11 @@ impl BlockchainApi for crate::ArwenApiImpl {
         }
     }
 
-    fn get_balance(&self, address: &Address) -> ArwenBigUint {
+    fn get_balance(&self, address: &Address) -> BigUint<Self::Storage> {
         unsafe {
-            let result = bigIntNew(0);
-            bigIntGetExternalBalance(address.as_ref().as_ptr(), result);
-            ArwenBigUint { handle: result }
+            let balance_handle = bigIntNew(0);
+            bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
+            BigUint::from_raw_handle(balance_handle, self.storage_manager())
         }
     }
 
@@ -226,18 +230,18 @@ impl BlockchainApi for crate::ArwenApiImpl {
         address: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> ArwenBigUint {
+    ) -> BigUint<Self::Storage> {
         unsafe {
-            let result = bigIntNew(0);
+            let balance_handle = bigIntNew(0);
             bigIntGetESDTExternalBalance(
                 address.as_ref().as_ptr(),
                 token.as_ptr(),
                 token.len() as i32,
                 nonce as i64,
-                result,
+                balance_handle,
             );
 
-            ArwenBigUint { handle: result }
+            BigUint::from_raw_handle(balance_handle, self.storage_manager())
         }
     }
 
@@ -247,9 +251,9 @@ impl BlockchainApi for crate::ArwenApiImpl {
         address: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenData<ArwenBigUint> {
+    ) -> EsdtTokenData<Self::Storage> {
         unsafe {
-            let value = bigIntNew(0);
+            let value_handle = bigIntNew(0);
             let mut properties = [0u8; 2]; // always 2 bytes
             let mut hash = BoxedBytes::allocate(128);
 
@@ -281,20 +285,20 @@ impl BlockchainApi for crate::ArwenApiImpl {
             let mut uris_buffer = BoxedBytes::allocate(uris_len);
 
             let mut creator = Address::zero();
-            let royalties = bigIntNew(0);
+            let royalties_handle = bigIntNew(0);
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
                 token.as_ptr(),
                 token.len() as i32,
                 nonce as i64,
-                value,
+                value_handle,
                 properties.as_mut_ptr(),
                 hash.as_mut_ptr(),
                 name_buffer.as_mut_ptr(),
                 attr_buffer.as_mut_ptr(),
                 creator.as_mut_ptr(),
-                royalties,
+                royalties_handle,
                 uris_buffer.as_mut_ptr(),
             );
 
@@ -315,13 +319,13 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
             EsdtTokenData {
                 token_type,
-                amount: ArwenBigUint { handle: value },
+                amount: BigUint::from_raw_handle(value_handle, self.storage_manager()),
                 frozen,
                 hash,
                 name: name_buffer,
                 attributes: attr_buffer,
                 creator,
-                royalties: ArwenBigUint { handle: royalties },
+                royalties: BigUint::from_raw_handle(royalties_handle, self.storage_manager()),
                 uris: [uris_buffer].to_vec(),
             }
         }
