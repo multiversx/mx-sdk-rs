@@ -40,7 +40,7 @@ pub trait Multisig {
     fn num_proposers(&self) -> SingleValueMapper<Self::Storage, usize>;
 
     #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Self::Storage, Action<Self::BigUint>>;
+    fn action_mapper(&self) -> VecMapper<Self::Storage, Action<BigUint>>;
 
     /// The index of the last proposed action.
     /// 0 means that no action was ever proposed yet.
@@ -51,7 +51,7 @@ pub trait Multisig {
 
     /// Serialized action data of an action with index.
     #[view(getActionData)]
-    fn get_action_data(&self, action_id: usize) -> Action<Self::BigUint> {
+    fn get_action_data(&self, action_id: usize) -> Action<BigUint> {
         self.action_mapper().get(action_id)
     }
 
@@ -86,7 +86,7 @@ pub trait Multisig {
     #[endpoint]
     fn deposit(&self) {}
 
-    fn propose_action(&self, action: Action<Self::BigUint>) -> SCResult<usize> {
+    fn propose_action(&self, action: Action<BigUint>) -> SCResult<usize> {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.get_user_id_to_role(caller_id);
@@ -111,7 +111,7 @@ pub trait Multisig {
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::BigUint>> {
+    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<BigUint>> {
         let mut result = Vec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
@@ -157,7 +157,7 @@ pub trait Multisig {
     fn propose_send_egld(
         &self,
         to: Address,
-        amount: Self::BigUint,
+        amount: BigUint,
         #[var_args] opt_data: OptionalArg<BoxedBytes>,
     ) -> SCResult<usize> {
         let data = match opt_data {
@@ -170,7 +170,7 @@ pub trait Multisig {
     #[endpoint(proposeSCDeploy)]
     fn propose_sc_deploy(
         &self,
-        amount: Self::BigUint,
+        amount: BigUint,
         code: BoxedBytes,
         upgradeable: bool,
         payable: bool,
@@ -201,7 +201,7 @@ pub trait Multisig {
     fn propose_sc_call(
         &self,
         to: Address,
-        egld_payment: Self::BigUint,
+        egld_payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] arguments: VarArgs<BoxedBytes>,
     ) -> SCResult<usize> {

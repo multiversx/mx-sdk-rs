@@ -15,8 +15,8 @@ pub trait Child {
         &self,
         token_display_name: BoxedBytes,
         token_ticker: BoxedBytes,
-        initial_supply: Self::BigUint,
-        #[payment] issue_cost: Self::BigUint,
+        initial_supply: BigUint,
+        #[payment] issue_cost: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
             .issue_fungible(
@@ -46,7 +46,7 @@ pub trait Child {
     fn esdt_issue_callback(
         &self,
         #[payment_token] token_identifier: TokenIdentifier,
-        #[payment] _amount: Self::BigUint,
+        #[payment] _amount: BigUint,
         #[call_result] _result: AsyncCallResult<()>,
     ) {
         self.wrapped_egld_token_identifier().set(&token_identifier);

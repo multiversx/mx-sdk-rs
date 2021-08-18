@@ -13,7 +13,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
     fn get_auctioned_token(
         &self,
         auction_id: u64,
-    ) -> OptionalResult<MultiResult3<TokenIdentifier, u64, Self::BigUint>> {
+    ) -> OptionalResult<MultiResult3<TokenIdentifier, u64, BigUint>> {
         if self.does_auction_exist(auction_id) {
             let auction = self.auction_by_id(auction_id).get();
 
@@ -54,10 +54,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
     }
 
     #[view(getMinMaxBid)]
-    fn get_min_max_bid(
-        &self,
-        auction_id: u64,
-    ) -> OptionalResult<MultiResult2<Self::BigUint, Self::BigUint>> {
+    fn get_min_max_bid(&self, auction_id: u64) -> OptionalResult<MultiResult2<BigUint, BigUint>> {
         if self.does_auction_exist(auction_id) {
             let auction = self.auction_by_id(auction_id).get();
 
@@ -95,7 +92,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(&self, auction_id: u64) -> OptionalResult<Self::BigUint> {
+    fn get_current_winning_bid(&self, auction_id: u64) -> OptionalResult<BigUint> {
         if self.does_auction_exist(auction_id) {
             OptionalResult::Some(self.auction_by_id(auction_id).get().current_bid)
         } else {
@@ -113,7 +110,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
     }
 
     #[view(getFullAuctionData)]
-    fn get_full_auction_data(&self, auction_id: u64) -> OptionalResult<Auction<Self::BigUint>> {
+    fn get_full_auction_data(&self, auction_id: u64) -> OptionalResult<Auction<BigUint>> {
         if self.does_auction_exist(auction_id) {
             OptionalResult::Some(self.auction_by_id(auction_id).get())
         } else {

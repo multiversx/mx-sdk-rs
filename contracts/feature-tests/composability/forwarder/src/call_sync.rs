@@ -74,12 +74,12 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        let result: MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64> = self
+        let result: MultiResult4<TokenIdentifier, BoxedBytes, BigUint, u64> = self
             .vault_proxy()
             .contract(to)
             .accept_funds_echo_payment(token, payment, token_nonce)
@@ -100,7 +100,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         #[indexed] token_identifier: &TokenIdentifier,
         #[indexed] token_type: &[u8],
-        #[indexed] token_payment: &Self::BigUint,
+        #[indexed] token_payment: &BigUint,
         #[indexed] token_nonce: u64,
     );
 
@@ -110,7 +110,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) -> usize {
         let _ = self
@@ -132,7 +132,7 @@ pub trait ForwarderSyncCallModule {
         to: Address,
         token: TokenIdentifier,
         token_nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) {
         self.vault_proxy()
             .contract(to)

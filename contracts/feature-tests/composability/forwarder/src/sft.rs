@@ -8,7 +8,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
     #[endpoint]
     fn sft_issue(
         &self,
-        #[payment] issue_cost: Self::BigUint,
+        #[payment] issue_cost: BigUint,
         token_display_name: BoxedBytes,
         token_ticker: BoxedBytes,
     ) -> AsyncCall<Self::SendApi> {

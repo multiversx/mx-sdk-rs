@@ -10,8 +10,8 @@ pub trait KittyAuction {
     #[init]
     fn init(
         &self,
-        gen_zero_kitty_starting_price: Self::BigUint,
-        gen_zero_kitty_ending_price: Self::BigUint,
+        gen_zero_kitty_starting_price: BigUint,
+        gen_zero_kitty_ending_price: BigUint,
         gen_zero_kitty_auction_duration: u64,
         #[var_args] opt_kitty_ownership_contract_address: OptionalArg<Address>,
     ) {
@@ -62,7 +62,7 @@ pub trait KittyAuction {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, kitty_id: u32) -> SCResult<Auction<Self::BigUint>> {
+    fn get_auction_status(&self, kitty_id: u32) -> SCResult<Auction<BigUint>> {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -72,7 +72,7 @@ pub trait KittyAuction {
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(&self, kitty_id: u32) -> SCResult<Self::BigUint> {
+    fn get_current_winning_bid(&self, kitty_id: u32) -> SCResult<BigUint> {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -87,8 +87,8 @@ pub trait KittyAuction {
     fn create_sale_auction(
         &self,
         kitty_id: u32,
-        starting_price: Self::BigUint,
-        ending_price: Self::BigUint,
+        starting_price: BigUint,
+        ending_price: BigUint,
         duration: u64,
     ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
         let deadline = self.blockchain().get_block_timestamp() + duration;
@@ -120,8 +120,8 @@ pub trait KittyAuction {
     fn create_siring_auction(
         &self,
         kitty_id: u32,
-        starting_price: Self::BigUint,
-        ending_price: Self::BigUint,
+        starting_price: BigUint,
+        ending_price: BigUint,
         duration: u64,
     ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
         let deadline = self.blockchain().get_block_timestamp() + duration;
@@ -151,7 +151,7 @@ pub trait KittyAuction {
 
     #[payable("EGLD")]
     #[endpoint]
-    fn bid(&self, kitty_id: u32, #[payment] payment: Self::BigUint) -> SCResult<()> {
+    fn bid(&self, kitty_id: u32, #[payment] payment: BigUint) -> SCResult<()> {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -231,8 +231,8 @@ pub trait KittyAuction {
         &self,
         auction_type: AuctionType,
         kitty_id: u32,
-        starting_price: Self::BigUint,
-        ending_price: Self::BigUint,
+        starting_price: BigUint,
+        ending_price: BigUint,
         deadline: u64,
     ) -> OptionalResult<AsyncCall<Self::SendApi>> {
         let caller = self.blockchain().get_caller();
@@ -332,8 +332,8 @@ pub trait KittyAuction {
         #[call_result] result: AsyncCallResult<()>,
         auction_type: AuctionType,
         cb_kitty_id: u32,
-        starting_price: Self::BigUint,
-        ending_price: Self::BigUint,
+        starting_price: BigUint,
+        ending_price: BigUint,
         deadline: u64,
         kitty_owner: Address,
     ) {
@@ -434,10 +434,10 @@ pub trait KittyAuction {
     // gen zero kitty
 
     #[storage_mapper("genZeroKittyStartingPrice")]
-    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[storage_mapper("genZeroKittyEndingPrice")]
-    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[storage_mapper("genZeroKittyAuctionDuration")]
     fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<Self::Storage, u64>;
@@ -445,5 +445,5 @@ pub trait KittyAuction {
     // auction
 
     #[storage_mapper("auction")]
-    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Self::Storage, Auction<Self::BigUint>>;
+    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
 }

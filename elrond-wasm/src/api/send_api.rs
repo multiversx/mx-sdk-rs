@@ -1,6 +1,8 @@
 use elrond_codec::{TopDecode, TopEncode};
 
-use super::{BigIntApi, BigUintApi, EllipticCurveApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use super::{
+    BigUintApi, EllipticCurveApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi,
+};
 use crate::{
     types::{
         Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
@@ -17,17 +19,21 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ErrorApi + Clone + Sized {
+    type ProxyTypeManager: ManagedTypeApi + 'static;
+
     /// The type of the payment arguments.
     /// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
     type AmountType: BigUintApi + 'static;
 
-    /// Not used by `SendApi`, but forwarded to the proxy traits.
-    type ProxyBigInt: BigIntApi + 'static;
-
     type ProxyEllipticCurve: EllipticCurveApi<BigUint = Self::AmountType> + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
-    type ProxyStorage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type ProxyStorage: StorageReadApi
+        + StorageWriteApi
+        + ManagedTypeApi
+        + ErrorApi
+        + Clone
+        + 'static;
 
     /// Required for ESDTNFTTransfer.
     /// Same as the implementation from BlockchainApi.
