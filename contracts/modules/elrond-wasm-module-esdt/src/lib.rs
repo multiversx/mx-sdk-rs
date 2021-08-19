@@ -15,12 +15,12 @@ pub trait EsdtModule {
         token_display_name: BoxedBytes,
         token_ticker: BoxedBytes,
         num_decimals: usize,
-        #[payment] issue_cost: Self::BigUint,
+        #[payment] issue_cost: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         only_owner!(self, "only owner can issue token");
         require!(self.token_id().is_empty(), "Token already issued");
 
-        let initial_supply = Self::BigUint::from(1u32);
+        let initial_supply = BigUint::from(1u32);
 
         Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
             .issue_fungible(
@@ -82,7 +82,7 @@ pub trait EsdtModule {
         }
     }
 
-    fn mint(&self, amount: &Self::BigUint) -> SCResult<()> {
+    fn mint(&self, amount: &BigUint) -> SCResult<()> {
         let token_id = self.token_id().get();
 
         self.require_local_roles_set(&token_id)?;
@@ -91,7 +91,7 @@ pub trait EsdtModule {
         Ok(())
     }
 
-    fn burn(&self, amount: &Self::BigUint) -> SCResult<()> {
+    fn burn(&self, amount: &BigUint) -> SCResult<()> {
         let token_id = self.token_id().get();
 
         self.require_local_roles_set(&token_id)?;

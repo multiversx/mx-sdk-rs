@@ -8,16 +8,16 @@ elrond_wasm::imports!();
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]
-    fn sum(&self) -> SingleValueMapper<Self::Storage, Self::BigInt>;
+    fn sum(&self) -> SingleValueMapper<Self::Storage, BigInt>;
 
     #[init]
-    fn init(&self, initial_value: Self::BigInt) {
+    fn init(&self, initial_value: BigInt) {
         self.sum().set(&initial_value);
     }
 
     /// Add desired amount to the storage variable.
     #[endpoint]
-    fn add(&self, value: Self::BigInt) -> SCResult<()> {
+    fn add(&self, value: BigInt) -> SCResult<()> {
         self.sum().update(|sum| *sum += value);
 
         Ok(())

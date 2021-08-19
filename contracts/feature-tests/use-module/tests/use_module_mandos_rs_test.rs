@@ -4,7 +4,7 @@ mod user_builtin {
     #[elrond_wasm::proxy]
     pub trait UserBuiltin {
         #[endpoint(SetUserName)]
-        fn set_user_name(&self, name: &BoxedBytes) -> Self::BigUint;
+        fn set_user_name(&self, name: &BoxedBytes) -> BigUint;
     }
 }
 
@@ -21,7 +21,7 @@ mod dns_mock {
         fn register(
             &self,
             name: BoxedBytes,
-            #[payment] _payment: Self::BigUint,
+            #[payment] _payment: BigUint,
         ) -> AsyncCall<Self::SendApi> {
             let address = self.blockchain().get_caller();
             self.user_builtin_proxy(address)

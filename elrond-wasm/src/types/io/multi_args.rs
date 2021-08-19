@@ -1,7 +1,8 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
+use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
 use crate::types::{ArgBuffer, SCError};
-use crate::{api::EndpointFinishApi, EndpointResult};
+use crate::EndpointResult;
 use alloc::string::String;
 use alloc::vec::Vec;
 use elrond_codec::TopDecodeInput;
@@ -40,7 +41,7 @@ macro_rules! multi_arg_impls {
                 #[inline]
 				fn finish<FA>(&self, api: FA)
                 where
-                    FA: EndpointFinishApi + Clone + 'static,
+                    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
                 {
                     $(
                         (self.0).$n.finish(api.clone());

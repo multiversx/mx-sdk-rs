@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct TokenIdPair {
     first_token_id: TokenIdentifier,
     second_token_id: TokenIdentifier,
@@ -28,7 +28,7 @@ pub trait Factory {
             .send()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
-                &Self::BigUint::zero(),
+                &BigUint::zero(),
                 &self.pair_template_address().get(),
                 CodeMetadata::DEFAULT,
                 &arguments,
@@ -57,5 +57,5 @@ pub trait Factory {
     fn pair_template_address(&self) -> SingleValueMapper<Self::Storage, Address>;
 
     #[storage_mapper("pairs")]
-    fn pairs(&self) -> MapMapper<Self::Storage, TokenIdPair, Address>;
+    fn pairs(&self) -> SafeMapMapper<Self::Storage, TokenIdPair, Address>;
 }

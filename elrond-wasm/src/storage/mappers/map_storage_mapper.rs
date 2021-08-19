@@ -1,5 +1,5 @@
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
-use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::storage;
 use crate::types::BoxedBytes;
 use alloc::vec::Vec;
@@ -9,9 +9,10 @@ use elrond_codec::{TopDecode, TopEncode};
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
+#[deprecated]
 pub struct MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -23,7 +24,7 @@ where
 
 impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -39,7 +40,7 @@ where
 
 impl<SA, K, V> StorageClearable for MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -59,7 +60,7 @@ pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Vec<u8> {
 
 impl<SA, K, V> MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -158,7 +159,7 @@ where
 
 pub struct Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -168,7 +169,7 @@ where
 
 impl<'a, SA, K, V> Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -182,7 +183,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -200,7 +201,7 @@ where
 
 pub struct Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -210,7 +211,7 @@ where
 
 impl<'a, SA, K, V> Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -224,7 +225,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -242,7 +243,7 @@ where
 
 pub enum Entry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -257,7 +258,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -272,7 +273,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -285,7 +286,7 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -324,7 +325,7 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -340,7 +341,7 @@ where
 
 impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -364,7 +365,7 @@ where
 
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {

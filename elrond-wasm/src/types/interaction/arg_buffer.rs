@@ -94,8 +94,18 @@ impl Clone for ArgBuffer {
 }
 
 impl TopEncodeOutput for &mut ArgBuffer {
+    type NestedBuffer = Vec<u8>;
+
     fn set_slice_u8(self, bytes: &[u8]) {
         self.arg_lengths.push(bytes.len());
         self.arg_data.extend_from_slice(bytes);
+    }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer {
+        Vec::<u8>::new()
+    }
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
+        self.set_slice_u8(nb.as_slice());
     }
 }

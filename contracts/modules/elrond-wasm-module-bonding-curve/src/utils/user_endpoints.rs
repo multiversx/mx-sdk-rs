@@ -11,7 +11,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(sellToken)]
     fn sell_token(
         &self,
-        #[payment_amount] sell_amount: Self::BigUint,
+        #[payment_amount] sell_amount: BigUint,
         #[payment_nonce] nonce: u64,
         #[payment_token] offered_token: TokenIdentifier,
     ) -> SCResult<()> {
@@ -56,9 +56,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(buyToken)]
     fn buy_token(
         &self,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_token] offered_token: TokenIdentifier,
-        requested_amount: Self::BigUint,
+        requested_amount: BigUint,
         requested_token: TokenIdentifier,
         #[var_args] requested_nonce: OptionalArg<u64>,
     ) -> SCResult<()> {
@@ -126,7 +126,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         caller: &Address,
         token: TokenIdentifier,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> SCResult<()> {
         let mut nonces = self.token_details(&token).get().token_nonces;
         let mut total_amount = amount;
@@ -134,7 +134,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             let nonce = *nonces.first().ok_or("Requested nonce does not exist")?;
             let available_amount = self.nonce_amount(&token, nonce).get();
 
-            let amount_to_send: Self::BigUint;
+            let amount_to_send: BigUint;
             if available_amount <= total_amount {
                 amount_to_send = available_amount.clone();
                 total_amount -= amount_to_send.clone();
@@ -144,7 +144,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&token, nonce)
                     .update(|val| *val -= total_amount.clone());
                 amount_to_send = total_amount.clone();
-                total_amount = Self::BigUint::from(0u64);
+                total_amount = BigUint::from(0u64);
             }
             self.send()
                 .direct(caller, &token, nonce, &amount_to_send, b"buying");
@@ -158,11 +158,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     }
 
     #[view]
-    fn get_buy_price(
-        &self,
-        amount: Self::BigUint,
-        identifier: TokenIdentifier,
-    ) -> SCResult<Self::BigUint> {
+    fn get_buy_price(&self, amount: BigUint, identifier: TokenIdentifier) -> SCResult<BigUint> {
         self.check_token_exists(&identifier)?;
 
         let bonding_curve = self.bonding_curve(&identifier).get();
@@ -170,11 +166,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     }
 
     #[view]
-    fn get_sell_price(
-        &self,
-        amount: Self::BigUint,
-        identifier: TokenIdentifier,
-    ) -> SCResult<Self::BigUint> {
+    fn get_sell_price(&self, amount: BigUint, identifier: TokenIdentifier) -> SCResult<BigUint> {
         self.check_token_exists(&identifier)?;
 
         let bonding_curve = self.bonding_curve(&identifier).get();
@@ -194,7 +186,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn get_token_availability(
         &self,
         identifier: TokenIdentifier,
-    ) -> MultiResultVec<MultiResult2<u64, Self::BigUint>> {
+    ) -> MultiResultVec<MultiResult2<u64, BigUint>> {
         let token_nonces = self.token_details(&identifier).get().token_nonces;
         let mut availability = Vec::new();
 
@@ -210,7 +202,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn check_owned_return_payment_token(
         &self,
         issued_token: &TokenIdentifier,
-        amount: &Self::BigUint,
+        amount: &BigUint,
     ) -> SCResult<TokenIdentifier> {
         self.check_token_exists(issued_token)?;
 
@@ -220,10 +212,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             bonding_curve.curve != FunctionSelector::None,
             "The token price was not set yet!"
         );
-        require!(
-            amount > &Self::BigUint::zero(),
-            "Must pay more than 0 tokens!"
-        );
+        require!(amount > &BigUint::zero(), "Must pay more than 0 tokens!");
         Ok(bonding_curve.payment_token)
     }
 
@@ -244,20 +233,20 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_buy_price(
         &self,
-        function_selector: &FunctionSelector<Self::BigUint>,
-        amount: Self::BigUint,
-        arguments: CurveArguments<Self::BigUint>,
-    ) -> SCResult<Self::BigUint> {
+        function_selector: &FunctionSelector<BigUint>,
+        amount: BigUint,
+        arguments: CurveArguments<BigUint>,
+    ) -> SCResult<BigUint> {
         let token_start = arguments.first_token_available();
         function_selector.calculate_price(&token_start, &amount, &arguments)
     }
 
     fn compute_sell_price(
         &self,
-        function_selector: &FunctionSelector<Self::BigUint>,
-        amount: Self::BigUint,
-        arguments: CurveArguments<Self::BigUint>,
-    ) -> SCResult<Self::BigUint> {
+        function_selector: &FunctionSelector<BigUint>,
+        amount: BigUint,
+        arguments: CurveArguments<BigUint>,
+    ) -> SCResult<BigUint> {
         let token_start = &arguments.first_token_available() - &amount;
         function_selector.calculate_price(&token_start, &amount, &arguments)
     }

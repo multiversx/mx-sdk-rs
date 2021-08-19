@@ -36,7 +36,7 @@ pub trait Forwarder:
     fn send_egld(
         &self,
         to: &Address,
-        amount: &Self::BigUint,
+        amount: &BigUint,
         #[var_args] opt_data: OptionalArg<BoxedBytes>,
     ) {
         let data = match &opt_data {

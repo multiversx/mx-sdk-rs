@@ -1,9 +1,9 @@
-use super::{EllipticCurveMock, RustBigInt, RustBigUint};
+use super::{EllipticCurveMock, RustBigUint};
 use crate::TxContext;
 
 impl elrond_wasm::api::ContractBase for TxContext {
     type BigUint = RustBigUint;
-    type BigInt = RustBigInt;
+    type TypeManager = Self;
     type Storage = Self;
     type CallValue = Self;
     type SendApi = Self;
@@ -22,6 +22,10 @@ impl elrond_wasm::api::ContractBase for TxContext {
     }
 
     fn send(&self) -> Self::SendApi {
+        self.clone()
+    }
+
+    fn type_manager(&self) -> Self::TypeManager {
         self.clone()
     }
 

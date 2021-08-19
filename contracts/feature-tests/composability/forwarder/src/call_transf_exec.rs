@@ -13,7 +13,7 @@ pub trait ForwarderTransferExecuteModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) {
         self.vault_proxy()
@@ -47,10 +47,10 @@ pub trait ForwarderTransferExecuteModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) {
-        let half_payment = payment / Self::BigUint::from(2u32);
+        let half_payment = payment / BigUint::from(2u32);
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.vault_proxy()
@@ -76,9 +76,9 @@ pub trait ForwarderTransferExecuteModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> MultiResult4<u64, u64, Self::BigUint, TokenIdentifier> {
+    ) -> MultiResult4<u64, u64, BigUint, TokenIdentifier> {
         let gas_left_before = self.blockchain().get_gas_left();
 
         self.vault_proxy()
@@ -89,20 +89,14 @@ pub trait ForwarderTransferExecuteModule {
 
         let gas_left_after = self.blockchain().get_gas_left();
 
-        (
-            gas_left_before,
-            gas_left_after,
-            Self::BigUint::zero(),
-            token,
-        )
-            .into()
+        (gas_left_before, gas_left_after, BigUint::zero(), token).into()
     }
 
     #[endpoint]
     fn forward_transf_exec_accept_funds_multi_transfer(
         &self,
         to: Address,
-        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, Self::BigUint>>,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = Vec::new();
 
@@ -120,7 +114,7 @@ pub trait ForwarderTransferExecuteModule {
 
         self.vault_proxy()
             .contract(to)
-            .accept_funds(TokenIdentifier::egld(), Self::BigUint::zero())
+            .accept_funds(TokenIdentifier::egld(), BigUint::zero())
             .esdt_multi_transfer(&all_token_payments);
     }
 }
