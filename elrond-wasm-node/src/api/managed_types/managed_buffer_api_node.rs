@@ -2,6 +2,8 @@ use elrond_wasm::api::{Handle, InvalidSliceError, ManagedBufferApi};
 use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
 
+use crate::error_hook;
+
 // #[allow(dead_code)]
 extern "C" {
     fn mBufferNew() -> i32;
@@ -98,11 +100,10 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
             if byte_len > destination.len() {
                 error_hook::signal_error(err_msg::VALUE_EXCEEDS_SLICE)
             }
-            if len > 0 {
+            if byte_len > 0 {
                 let start_index = destination.len() - byte_len;
-                let _ = mBufferGetBytes(handle, res.as_mut_ptr().add(start_index));
+                let _ = mBufferGetBytes(handle, destination.as_mut_ptr().add(start_index));
             }
-            res
         }
     }
 
