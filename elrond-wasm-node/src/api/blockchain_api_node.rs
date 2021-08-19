@@ -90,9 +90,15 @@ extern "C" {
 
 impl BlockchainApi for crate::ArwenApiImpl {
     type Storage = Self;
+    type TypeManager = Self;
 
     #[inline]
     fn storage_manager(&self) -> Self::Storage {
+        self.clone()
+    }
+
+    #[inline]
+    fn type_manager(&self) -> Self::TypeManager {
         self.clone()
     }
 
