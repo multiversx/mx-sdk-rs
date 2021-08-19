@@ -62,7 +62,7 @@ pub trait KittyAuction {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, kitty_id: u32) -> SCResult<Auction<BigUint>> {
+    fn get_auction_status(&self, kitty_id: u32) -> SCResult<Auction<Self::TypeManager>> {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -445,5 +445,8 @@ pub trait KittyAuction {
     // auction
 
     #[storage_mapper("auction")]
-    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
+    fn auction(
+        &self,
+        kitty_id: u32,
+    ) -> SingleValueMapper<Self::Storage, Auction<Self::TypeManager>>;
 }

@@ -15,8 +15,8 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
         BigUint::zero(self.api.clone())
     }
 
-    pub fn big_uint_from(&self, value: u64) -> BigUint<M> {
-        BigUint::from_u64(value, self.api.clone())
+    pub fn big_uint_from<T: Into<u64>>(&self, value: T) -> BigUint<M> {
+        BigUint::from_u64(value.into(), self.api.clone())
     }
 
     pub fn managed_buffer_empty(&self) -> ManagedBuffer<M> {

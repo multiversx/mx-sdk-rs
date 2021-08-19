@@ -6,7 +6,7 @@ use super::auction::{Auction, AuctionType};
 #[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait EventsModule {
-    fn emit_auction_token_event(self, auction_id: u64, auction: Auction<BigUint>) {
+    fn emit_auction_token_event(self, auction_id: u64, auction: Auction<Self::TypeManager>) {
         self.auction_token_event(
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
@@ -14,7 +14,9 @@ pub trait EventsModule {
             &auction.nr_auctioned_tokens,
             &auction.original_owner,
             &auction.min_bid,
-            &auction.max_bid.unwrap_or_default(),
+            &auction
+                .max_bid
+                .unwrap_or_else(|| self.types().big_uint_zero()),
             auction.start_time,
             auction.deadline,
             auction.payment_token.token_type,
@@ -24,7 +26,7 @@ pub trait EventsModule {
         )
     }
 
-    fn emit_bid_event(self, auction_id: u64, auction: Auction<BigUint>) {
+    fn emit_bid_event(self, auction_id: u64, auction: Auction<Self::TypeManager>) {
         self.bid_event(
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
@@ -34,7 +36,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_end_auction_event(self, auction_id: u64, auction: Auction<BigUint>) {
+    fn emit_end_auction_event(self, auction_id: u64, auction: Auction<Self::TypeManager>) {
         self.end_auction_event(
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
@@ -44,7 +46,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_buy_sft_event(self, auction_id: u64, auction: Auction<BigUint>) {
+    fn emit_buy_sft_event(self, auction_id: u64, auction: Auction<Self::TypeManager>) {
         self.buy_sft_event(
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,
@@ -53,7 +55,7 @@ pub trait EventsModule {
         );
     }
 
-    fn emit_withdraw_event(self, auction_id: u64, auction: Auction<BigUint>) {
+    fn emit_withdraw_event(self, auction_id: u64, auction: Auction<Self::TypeManager>) {
         self.withdraw_event(
             &auction.auctioned_token.token_type,
             auction.auctioned_token.nonce,

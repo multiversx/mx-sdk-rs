@@ -128,7 +128,7 @@ pub trait Lottery {
             prize_distribution,
             whitelist,
             current_ticket_number: 0u32,
-            prize_pool: BigUint::zero(),
+            prize_pool: self.types().big_uint_zero(),
             queued_tickets: 0u32,
         };
 
@@ -286,9 +286,11 @@ pub trait Lottery {
         let prize: BigUint;
 
         if current_winning_ticket_index != 0 {
-            prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
-                * info.prize_pool.clone()
-                / BigUint::from(PERCENTAGE_TOTAL as u32);
+            prize = self
+                .types()
+                .big_uint_from(info.prize_distribution[current_winning_ticket_index] as u32)
+                * &info.prize_pool
+                / PERCENTAGE_TOTAL as u32;
         } else {
             prize = info.prize_pool.clone();
         }
@@ -398,11 +400,15 @@ pub trait Lottery {
     // storage
 
     #[storage_set("lotteryInfo")]
-    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<BigUint>);
+    fn set_lottery_info(
+        &self,
+        lottery_name: &BoxedBytes,
+        lottery_info: &LotteryInfo<Self::TypeManager>,
+    );
 
     #[view(lotteryInfo)]
     #[storage_get("lotteryInfo")]
-    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<BigUint>;
+    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::TypeManager>;
 
     #[storage_is_empty("lotteryInfo")]
     fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;

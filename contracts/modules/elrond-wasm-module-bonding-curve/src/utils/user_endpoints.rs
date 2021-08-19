@@ -144,11 +144,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&token, nonce)
                     .update(|val| *val -= total_amount.clone());
                 amount_to_send = total_amount.clone();
-                total_amount = BigUint::from(0u64);
+                total_amount = self.types().big_uint_zero();
             }
             self.send()
                 .direct(caller, &token, nonce, &amount_to_send, b"buying");
-            if total_amount == 0u64 {
+            if total_amount == 0 {
                 break;
             }
         }
@@ -209,10 +209,13 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let bonding_curve = self.bonding_curve(issued_token).get();
 
         require!(
-            bonding_curve.curve != FunctionSelector::None,
+            bonding_curve.curve.is_none(),
             "The token price was not set yet!"
         );
-        require!(amount > &BigUint::zero(), "Must pay more than 0 tokens!");
+        require!(
+            amount > &self.types().big_uint_zero(),
+            "Must pay more than 0 tokens!"
+        );
         Ok(bonding_curve.payment_token)
     }
 
@@ -233,9 +236,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_buy_price(
         &self,
-        function_selector: &FunctionSelector<BigUint>,
+        function_selector: &FunctionSelector<Self::TypeManager>,
         amount: BigUint,
-        arguments: CurveArguments<BigUint>,
+        arguments: CurveArguments<Self::TypeManager>,
     ) -> SCResult<BigUint> {
         let token_start = arguments.first_token_available();
         function_selector.calculate_price(&token_start, &amount, &arguments)
@@ -243,9 +246,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_sell_price(
         &self,
-        function_selector: &FunctionSelector<BigUint>,
+        function_selector: &FunctionSelector<Self::TypeManager>,
         amount: BigUint,
-        arguments: CurveArguments<BigUint>,
+        arguments: CurveArguments<Self::TypeManager>,
     ) -> SCResult<BigUint> {
         let token_start = &arguments.first_token_available() - &amount;
         function_selector.calculate_price(&token_start, &amount, &arguments)

@@ -30,7 +30,7 @@ pub trait ForwarderTransferExecuteModule {
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) {
-        let half_payment = payment / BigUint::from(2u32);
+        let half_payment = payment / 2u32;
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.vault_proxy()
@@ -69,7 +69,13 @@ pub trait ForwarderTransferExecuteModule {
 
         let gas_left_after = self.blockchain().get_gas_left();
 
-        (gas_left_before, gas_left_after, BigUint::zero(), token).into()
+        (
+            gas_left_before,
+            gas_left_after,
+            self.types().big_uint_zero(),
+            token,
+        )
+            .into()
     }
 
     #[endpoint]
@@ -94,7 +100,7 @@ pub trait ForwarderTransferExecuteModule {
 
         self.vault_proxy()
             .contract(to)
-            .accept_funds(TokenIdentifier::egld(), BigUint::zero())
+            .accept_funds(TokenIdentifier::egld(), self.types().big_uint_zero())
             .esdt_multi_transfer(&all_token_payments);
     }
 }

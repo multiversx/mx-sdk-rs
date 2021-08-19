@@ -79,7 +79,7 @@ pub trait ForwarderRaw {
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) -> AsyncCall<Self::SendApi> {
-        let half_payment = payment / 2u32.into();
+        let half_payment = payment / 2u32;
         self.forward_async_call(to, token, half_payment, endpoint_name, args)
     }
 
@@ -201,7 +201,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
-        let half_payment = payment / 2u32.into();
+        let half_payment = payment / 2u32;
         let arg_buffer = ArgBuffer::from(args.into_vec().as_slice());
 
         let result = self.send().execute_on_dest_context_raw(
@@ -236,7 +236,7 @@ pub trait ForwarderRaw {
             .send()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
-                &BigUint::zero(),
+                &self.types().big_uint_zero(),
                 &code,
                 CodeMetadata::DEFAULT,
                 &arguments.as_slice().into(),

@@ -1,11 +1,12 @@
 use elrond_wasm::{
-    types::{Address, BoxedBytes, MultiArg7, TokenIdentifier},
+    api::ManagedTypeApi,
+    types::{Address, BigUint, BoxedBytes, MultiArg7, TokenIdentifier},
     Vec,
 };
 
 elrond_wasm::derive_imports!();
 
-pub type GovernanceActionAsMultiArg<M: ManagedTypeApi> =
+pub type GovernanceActionAsMultiArg<M> =
     MultiArg7<u64, Address, TokenIdentifier, u64, BigUint<M>, BoxedBytes, Vec<BoxedBytes>>;
 
 #[derive(TypeAbi, TopEncode, TopDecode, PartialEq)]
@@ -24,7 +25,7 @@ pub struct GovernanceAction<M: ManagedTypeApi> {
     pub dest_address: Address,
     pub token_id: TokenIdentifier,
     pub token_nonce: u64,
-    pub amount: BigUint,
+    pub amount: BigUint<M>,
     pub function_name: BoxedBytes,
     pub arguments: Vec<BoxedBytes>,
 }
@@ -47,6 +48,6 @@ impl<M: ManagedTypeApi> GovernanceAction<M> {
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct GovernanceProposal<M: ManagedTypeApi> {
     pub proposer: Address,
-    pub actions: Vec<GovernanceAction<BigUint>>,
+    pub actions: Vec<GovernanceAction<M>>,
     pub description: BoxedBytes,
 }

@@ -1,4 +1,8 @@
-use elrond_wasm::{api::{EndpointFinishApi, ManagedTypeApi, SendApi}, io::EndpointResult, types::{Address, AsyncCall, BigUint, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec}};
+use elrond_wasm::{
+    api::{EndpointFinishApi, ManagedTypeApi, SendApi},
+    io::EndpointResult,
+    types::{Address, AsyncCall, BigUint, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
+};
 
 elrond_wasm::derive_imports!();
 

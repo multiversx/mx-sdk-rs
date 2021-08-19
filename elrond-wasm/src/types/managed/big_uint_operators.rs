@@ -10,7 +10,7 @@ use super::BigUint;
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<Self> for BigUint<M> {
             type Output = BigUint<M>;
 
             fn $method(self, other: BigUint<M>) -> BigUint<M> {
@@ -28,6 +28,72 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 let result = self.api.bi_new_zero();
                 self.api.$api_func(result, self.handle, other.handle);
+                BigUint {
+                    handle: result,
+                    api: self.api.clone(),
+                }
+            }
+        }
+
+        impl<'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
+                self.api.$api_func(self.handle, self.handle, other.handle);
+                BigUint {
+                    handle: self.handle,
+                    api: self.api.clone(),
+                }
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<u32> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: u32) -> BigUint<M> {
+                let other_handle = self.api.bi_new(other as i64);
+                self.api.$api_func(self.handle, self.handle, other_handle);
+                BigUint {
+                    handle: self.handle,
+                    api: self.api.clone(),
+                }
+            }
+        }
+
+        impl<'a, M: ManagedTypeApi> $trait<u32> for &'a BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: u32) -> BigUint<M> {
+                let other_handle = self.api.bi_new(other as i64);
+                let result = self.api.bi_new_zero();
+                self.api.$api_func(result, self.handle, other_handle);
+                BigUint {
+                    handle: result,
+                    api: self.api.clone(),
+                }
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<u64> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: u64) -> BigUint<M> {
+                let other_handle = self.api.bi_new(other as i64);
+                self.api.$api_func(self.handle, self.handle, other_handle);
+                BigUint {
+                    handle: self.handle,
+                    api: self.api.clone(),
+                }
+            }
+        }
+
+        impl<'a, M: ManagedTypeApi> $trait<u64> for &'a BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: u64) -> BigUint<M> {
+                let other_handle = self.api.bi_new(other as i64);
+                let result = self.api.bi_new_zero();
+                self.api.$api_func(result, self.handle, other_handle);
                 BigUint {
                     handle: result,
                     api: self.api.clone(),
@@ -59,6 +125,20 @@ macro_rules! binary_assign_operator {
             #[inline]
             fn $method(&mut self, other: &BigUint<M>) {
                 self.api.$api_func(self.handle, self.handle, other.handle);
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<u32> for BigUint<M> {
+            fn $method(&mut self, other: u32) {
+                let other_handle = self.api.bi_new(other as i64);
+                self.api.$api_func(self.handle, self.handle, other_handle);
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<u64> for BigUint<M> {
+            fn $method(&mut self, other: u64) {
+                let other_handle = self.api.bi_new(other as i64);
+                self.api.$api_func(self.handle, self.handle, other_handle);
             }
         }
     };
@@ -152,16 +232,25 @@ fn cmp_i64<M: ManagedTypeApi>(bi: &BigUint<M>, other: i64) -> Ordering {
     }
 }
 
-impl<M: ManagedTypeApi> PartialEq<i64> for BigUint<M> {
-    #[inline]
-    fn eq(&self, other: &i64) -> bool {
-        cmp_i64(self, *other).is_eq()
-    }
+macro_rules! partial_eq_and_ord {
+    ($small_int_type:ident) => {
+        impl<M: ManagedTypeApi> PartialEq<$small_int_type> for BigUint<M> {
+            #[inline]
+            fn eq(&self, other: &$small_int_type) -> bool {
+                cmp_i64(self, *other as i64).is_eq()
+            }
+        }
+
+        impl<M: ManagedTypeApi> PartialOrd<$small_int_type> for BigUint<M> {
+            #[inline]
+            fn partial_cmp(&self, other: &$small_int_type) -> Option<Ordering> {
+                Some(cmp_i64(self, *other as i64))
+            }
+        }
+    };
 }
 
-impl<M: ManagedTypeApi> PartialOrd<i64> for BigUint<M> {
-    #[inline]
-    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        Some(cmp_i64(self, *other))
-    }
-}
+partial_eq_and_ord! {i32}
+partial_eq_and_ord! {i64}
+partial_eq_and_ord! {u32}
+partial_eq_and_ord! {u64}

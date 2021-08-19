@@ -58,7 +58,15 @@ pub trait ViewsModule: crate::storage::StorageModule {
         if self.does_auction_exist(auction_id) {
             let auction = self.auction_by_id(auction_id).get();
 
-            OptionalResult::Some((auction.min_bid, auction.max_bid.unwrap_or_default()).into())
+            OptionalResult::Some(
+                (
+                    auction.min_bid,
+                    auction
+                        .max_bid
+                        .unwrap_or_else(|| self.types().big_uint_zero()),
+                )
+                    .into(),
+            )
         } else {
             OptionalResult::None
         }
@@ -110,7 +118,7 @@ pub trait ViewsModule: crate::storage::StorageModule {
     }
 
     #[view(getFullAuctionData)]
-    fn get_full_auction_data(&self, auction_id: u64) -> OptionalResult<Auction<BigUint>> {
+    fn get_full_auction_data(&self, auction_id: u64) -> OptionalResult<Auction<Self::TypeManager>> {
         if self.does_auction_exist(auction_id) {
             OptionalResult::Some(self.auction_by_id(auction_id).get())
         } else {

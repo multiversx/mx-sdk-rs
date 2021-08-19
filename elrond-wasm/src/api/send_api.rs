@@ -440,7 +440,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
         self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
 
-        if royalties_amount > 0 {
+        if royalties_amount > 0u32 {
             self.direct(
                 &nft_token_data.creator,
                 payment_token,

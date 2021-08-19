@@ -9,7 +9,10 @@ pub trait StorageModule {
     fn bid_cut_percentage(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[storage_mapper("auctionById")]
-    fn auction_by_id(&self, auction_id: u64) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
+    fn auction_by_id(
+        &self,
+        auction_id: u64,
+    ) -> SingleValueMapper<Self::Storage, Auction<Self::TypeManager>>;
 
     #[view(getLastValidAuctionId)]
     #[storage_mapper("lastValidAuctionId")]
