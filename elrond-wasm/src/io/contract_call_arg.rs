@@ -33,8 +33,18 @@ impl<'c> ContractCallArgOutput<'c> {
 }
 
 impl<'c> TopEncodeOutput for ContractCallArgOutput<'c> {
+    type NestedBuffer = Vec<u8>;
+
     fn set_slice_u8(self, bytes: &[u8]) {
         self.arg_buffer.push_argument_bytes(bytes);
+    }
+
+    fn start_nested_encode(&self) -> Self::NestedBuffer {
+        Vec::<u8>::new()
+    }
+
+    fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
+        self.set_slice_u8(nb.as_slice());
     }
 }
 

@@ -25,13 +25,13 @@ pub trait Lottery {
         &self,
         lottery_name: BoxedBytes,
         token_name: TokenIdentifier,
-        ticket_price: Self::BigUint,
+        ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<Address>>,
-        #[var_args] opt_burn_percentage: OptionalArg<Self::BigUint>,
+        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
     ) -> SCResult<()> {
         self.start_lottery(
             lottery_name,
@@ -52,13 +52,13 @@ pub trait Lottery {
         &self,
         lottery_name: BoxedBytes,
         token_name: TokenIdentifier,
-        ticket_price: Self::BigUint,
+        ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<Address>>,
-        #[var_args] opt_burn_percentage: OptionalArg<Self::BigUint>,
+        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
     ) -> SCResult<()> {
         self.start_lottery(
             lottery_name,
@@ -78,13 +78,13 @@ pub trait Lottery {
         &self,
         lottery_name: BoxedBytes,
         token_name: TokenIdentifier,
-        ticket_price: Self::BigUint,
+        ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<Address>>,
-        #[var_args] opt_burn_percentage: OptionalArg<Self::BigUint>,
+        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
     ) -> SCResult<()> {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
@@ -139,7 +139,7 @@ pub trait Lottery {
                 );
 
                 require!(
-                    burn_percentage < Self::BigUint::from(PERCENTAGE_TOTAL),
+                    burn_percentage < BigUint::from(PERCENTAGE_TOTAL),
                     "Invalid burn percentage!"
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
@@ -156,7 +156,7 @@ pub trait Lottery {
             max_entries_per_user,
             prize_distribution,
             whitelist,
-            prize_pool: Self::BigUint::zero(),
+            prize_pool: BigUint::zero(),
         };
 
         self.lottery_info(&lottery_name).set(&info);
@@ -170,7 +170,7 @@ pub trait Lottery {
         &self,
         lottery_name: BoxedBytes,
         #[payment_token] token_name: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> SCResult<()> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is currently inactive."),
@@ -213,7 +213,7 @@ pub trait Lottery {
         &self,
         lottery_name: &BoxedBytes,
         token_name: &TokenIdentifier,
-        payment: &Self::BigUint,
+        payment: &BigUint,
     ) -> SCResult<()> {
         let mut info = self.lottery_info(lottery_name).get();
         let caller = self.blockchain().get_caller();
@@ -288,7 +288,7 @@ pub trait Lottery {
             let winner_address = self.ticket_holders(lottery_name).get(winning_ticket_id);
             let prize = self.calculate_percentage_of(
                 &total_prize,
-                &Self::BigUint::from(info.prize_distribution[i] as u32),
+                &BigUint::from(info.prize_distribution[i] as u32),
             );
 
             self.send().direct(
@@ -350,12 +350,8 @@ pub trait Lottery {
         rand_numbers
     }
 
-    fn calculate_percentage_of(
-        &self,
-        value: &Self::BigUint,
-        percentage: &Self::BigUint,
-    ) -> Self::BigUint {
-        value * percentage / Self::BigUint::from(PERCENTAGE_TOTAL)
+    fn calculate_percentage_of(&self, value: &BigUint, percentage: &BigUint) -> BigUint {
+        value * percentage / BigUint::from(PERCENTAGE_TOTAL)
     }
 
     // storage
@@ -365,7 +361,7 @@ pub trait Lottery {
     fn lottery_info(
         &self,
         lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::BigUint>>;
+    ) -> SingleValueMapper<Self::Storage, LotteryInfo<BigUint>>;
 
     #[storage_mapper("ticketHolder")]
     fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<Self::Storage, Address>;
@@ -381,5 +377,5 @@ pub trait Lottery {
     fn burn_percentage_for_lottery(
         &self,
         lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    ) -> SingleValueMapper<Self::Storage, BigUint>;
 }

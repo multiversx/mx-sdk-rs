@@ -171,10 +171,11 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
         #msig {
-            let (___api___, _, _, ___payment___, _) =
+            let (___api___, ___address___, _, ___payment___, _) =
                 self.into_fields();
             let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy(
                 ___api___.clone(),
+                ___address___,
                 #payment_expr,
             );
             #(#arg_push_snippets)*

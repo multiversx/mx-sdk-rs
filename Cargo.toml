@@ -4,6 +4,7 @@ members = [
   "elrond-wasm-debug",
   "elrond-wasm-derive",
   "mandos",
+  "elrond-codec",
   "elrond-codec-derive",
 
   "contracts/benchmarks/str-repeat",
@@ -34,8 +35,6 @@ members = [
   "contracts/examples/erc1155-marketplace/abi",
   "contracts/examples/erc1155-user-mock",
   "contracts/examples/erc1155-user-mock/abi",
-  "contracts/examples/esdt-nft-marketplace",
-  "contracts/examples/esdt-nft-marketplace/abi",
   "contracts/examples/factorial",
   "contracts/examples/factorial/abi",
   "contracts/examples/lottery-erc20",

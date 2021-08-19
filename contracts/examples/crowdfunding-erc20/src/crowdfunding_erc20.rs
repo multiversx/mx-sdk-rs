@@ -13,14 +13,14 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: Self::BigUint, deadline: u64, erc20_contract_address: Address) {
+    fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: Address) {
         self.erc20_contract_address().set(&erc20_contract_address);
         self.target().set(&target);
         self.deadline().set(&deadline);
     }
 
     #[endpoint]
-    fn fund(&self, token_amount: Self::BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
         require!(
             self.blockchain().get_block_nonce() <= self.deadline().get(),
             "cannot fund after deadline"
@@ -100,7 +100,7 @@ pub trait Crowdfunding {
         &self,
         #[call_result] result: AsyncCallResult<()>,
         cb_sender: Address,
-        cb_amount: Self::BigUint,
+        cb_amount: BigUint,
     ) -> OptionalResult<AsyncCall<Self::SendApi>> {
         match result {
             AsyncCallResult::Ok(()) => {
@@ -133,7 +133,7 @@ pub trait Crowdfunding {
 
     #[view(get_target)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn target(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(get_deadline)]
     #[storage_mapper("deadline")]
@@ -141,7 +141,7 @@ pub trait Crowdfunding {
 
     #[view(get_deposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(get_erc20_contract_address)]
     #[storage_mapper("erc20_contract_address")]
@@ -149,5 +149,5 @@ pub trait Crowdfunding {
 
     #[view(get_total_balance)]
     #[storage_mapper("erc20_balance")]
-    fn total_balance(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn total_balance(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 }

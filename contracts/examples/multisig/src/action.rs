@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{BigUintApi, EndpointFinishApi, SendApi},
+    api::{BigUintApi, EndpointFinishApi, ManagedTypeApi, SendApi},
     io::EndpointResult,
     types::{Address, AsyncCall, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
 };
@@ -68,7 +68,7 @@ where
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         match self {
             PerformActionResult::Nothing => (),
