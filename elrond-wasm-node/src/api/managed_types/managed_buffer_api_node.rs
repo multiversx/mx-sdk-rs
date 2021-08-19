@@ -1,4 +1,5 @@
 use elrond_wasm::api::{Handle, InvalidSliceError, ManagedBufferApi};
+use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
 
 // #[allow(dead_code)]
@@ -88,6 +89,20 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
             } else {
                 Err(InvalidSliceError)
             }
+        }
+    }
+
+    fn mb_copy_to_slice_pad_right(&self, handle: Handle, destination: &mut [u8]) {
+        unsafe {
+            let byte_len = mBufferGetLength(handle) as usize;
+            if byte_len > destination.len() {
+                error_hook::signal_error(err_msg::VALUE_EXCEEDS_SLICE)
+            }
+            if len > 0 {
+                let start_index = destination.len() - byte_len;
+                let _ = mBufferGetBytes(handle, res.as_mut_ptr().add(start_index));
+            }
+            res
         }
     }
 

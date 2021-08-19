@@ -89,6 +89,12 @@ impl ManagedBufferApi for TxContext {
         }
     }
 
+    fn mb_copy_to_slice_pad_right(&self, handle: Handle, destination: &mut [u8]) {
+        let bytes = self.mb_to_boxed_bytes(handle);
+        let offset = 32 - bytes.len();
+        destination[offset..].clone_from_slice(bytes.as_slice());
+    }
+
     fn mb_overwrite(&self, handle: Handle, value: &[u8]) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output
