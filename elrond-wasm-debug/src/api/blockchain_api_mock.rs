@@ -3,8 +3,13 @@ use elrond_wasm::types::{Address, BigUint, EsdtTokenData, TokenIdentifier, H256}
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
     type Storage = Self;
+    type TypeManager = Self;
 
     fn storage_manager(&self) -> Self::Storage {
+        self.clone()
+    }
+
+    fn type_manager(&self) -> Self::TypeManager {
         self.clone()
     }
 

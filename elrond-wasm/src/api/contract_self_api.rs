@@ -1,6 +1,7 @@
 use super::{
     BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
-    LogApi, ManagedTypeApi, ProxyObjApi, SendApi, StorageReadApi, StorageWriteApi,
+    LogApi, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi, StorageReadApi,
+    StorageWriteApi,
 };
 use crate::types::Address;
 
@@ -23,7 +24,9 @@ pub trait ContractBase: Sized {
     type SendApi: SendApi<ProxyTypeManager = Self::TypeManager, ProxyStorage = Self::Storage>
         + 'static;
 
-    type BlockchainApi: BlockchainApi<Storage = Self::Storage> + Clone + 'static;
+    type BlockchainApi: BlockchainApi<Storage = Self::Storage, TypeManager = Self::TypeManager>
+        + Clone
+        + 'static;
 
     type CryptoApi: CryptoApi + Clone + 'static;
 
@@ -46,6 +49,11 @@ pub trait ContractBase: Sized {
 
     /// Managed types API. Required to create new instances of managed types.
     fn type_manager(&self) -> Self::TypeManager;
+
+    /// Helps create new instances of managed types
+    fn types(&self) -> ManagedTypeHelper<Self::TypeManager> {
+        ManagedTypeHelper::new(self.type_manager())
+    }
 
     /// Gateway blockchain info related to the current transaction and to accounts.
     fn blockchain(&self) -> Self::BlockchainApi;

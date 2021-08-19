@@ -11,6 +11,12 @@ pub struct BigUint<M: ManagedTypeApi> {
     pub(super) api: M,
 }
 
+impl<M: ManagedTypeApi> BigUint<M> {
+    pub fn type_manager(&self) -> M {
+        self.api.clone()
+    }
+}
+
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
     fn from(item: &ManagedBuffer<M>) -> Self {
         BigUint::from_bytes_be_buffer(item)
@@ -87,6 +93,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
             handle: self.api.mb_from_big_int_unsigned(self.handle),
             api: self.api.clone(),
         }
+    }
+
+    pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
+        let mb_handle = self.api.mb_from_big_int_unsigned(self.handle);
+        self.api
+            .mb_copy_to_slice_pad_right(mb_handle, &mut target[..]);
     }
 }
 

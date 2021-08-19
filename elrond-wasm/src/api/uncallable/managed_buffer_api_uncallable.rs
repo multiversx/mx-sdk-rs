@@ -39,6 +39,10 @@ impl ManagedBufferApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn mb_copy_to_slice_pad_right(&self, _handle: Handle, _destination: &mut [u8]) {
+        unreachable!()
+    }
+
     fn mb_overwrite(&self, _handle: Handle, _value: &[u8]) {
         unreachable!()
     }

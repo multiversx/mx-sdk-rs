@@ -2,8 +2,8 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct TokenAttributesStruct<BigUint: BigUintApi> {
-    field_biguint: BigUint,
+pub struct TokenAttributesStruct<M: ManagedTypeApi> {
+    field_biguint: BigUint<M>,
     field_u64: u64,
     field_vec_u32: Vec<u32>,
 }
@@ -18,7 +18,7 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-        attributes: &TokenAttributesStruct<BigUint>,
+        attributes: &TokenAttributesStruct<Self::TypeManager>,
     ) {
         self.token_attributes()
             .set(token_id, token_nonce, attributes)
@@ -29,7 +29,7 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-        attributes: &TokenAttributesStruct<BigUint>,
+        attributes: &TokenAttributesStruct<Self::TypeManager>,
     ) {
         self.token_attributes()
             .update(token_id, token_nonce, attributes)
@@ -40,7 +40,7 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-    ) -> TokenAttributesStruct<BigUint> {
+    ) -> TokenAttributesStruct<Self::TypeManager> {
         self.token_attributes().get(token_id, token_nonce)
     }
 

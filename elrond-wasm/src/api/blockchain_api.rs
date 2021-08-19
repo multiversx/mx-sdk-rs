@@ -14,7 +14,11 @@ use alloc::boxed::Box;
 pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     type Storage: StorageReadApi + ManagedTypeApi + 'static;
 
+    type TypeManager: ManagedTypeApi + 'static;
+
     fn storage_manager(&self) -> Self::Storage;
+
+    fn type_manager(&self) -> Self::TypeManager;
 
     fn get_sc_address(&self) -> Address;
 
@@ -32,9 +36,9 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn get_caller(&self) -> Address;
 
-    fn get_balance(&self, address: &Address) -> BigUint<Self::Storage>;
+    fn get_balance(&self, address: &Address) -> BigUint<Self::TypeManager>;
 
-    fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> BigUint<Self::Storage> {
+    fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> BigUint<Self::TypeManager> {
         let sc_address = self.get_sc_address();
 
         if token.is_egld() {
@@ -75,19 +79,19 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
         address: &Address,
         token_id: &TokenIdentifier,
         nonce: u64,
-    ) -> BigUint<Self::Storage>;
+    ) -> BigUint<Self::TypeManager>;
 
     fn get_esdt_token_data(
         &self,
         address: &Address,
         token_id: &TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenData<Self::Storage>;
+    ) -> EsdtTokenData<Self::TypeManager>;
 
     /// Retrieves validator rewards, as set by the protocol.
     /// TODO: move to the storage API, once BigUint gets refactored
     #[inline]
-    fn get_cumulated_validator_rewards(&self) -> BigUint<Self::Storage> {
+    fn get_cumulated_validator_rewards(&self) -> BigUint<Self::TypeManager> {
         storage::storage_get(
             self.storage_manager(),
             storage::protected_keys::ELROND_REWARD_KEY,

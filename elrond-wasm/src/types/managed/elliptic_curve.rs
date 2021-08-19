@@ -1,11 +1,14 @@
 use alloc::string::String;
 
+use crate::abi::TypeAbi;
 use crate::api::{Handle, ManagedTypeApi};
+use elrond_codec::*;
 
-use super::ManagedBuffer;
 use crate::types::BoxedBytes;
 
-pub type EllipticCurveComponents<M: ManagedTypeApi> = (
+use super::BigUint;
+
+pub type EllipticCurveComponents<M> = (
     BigUint<M>,
     BigUint<M>,
     BigUint<M>,
@@ -20,272 +23,236 @@ pub struct EllipticCurve<M: ManagedTypeApi> {
     pub(super) api: M,
 }
 
-impl<M: ManagedTypeApi> EllipticCurveApi for EllipticCurve<M> {
-    fn create_ec(name: &str, api: M) -> Self {
-        unsafe {
-            let curve_as_slice = curve.as_bytes();
-            let data: BoxedBytes = BoxedBytes::from(curve_as_slice);
-            let handle = api.create_ec(name.as_bytes());
-            EllipticCurve { handle, api }
+impl<M: ManagedTypeApi> EllipticCurve<M> {
+    pub fn from_name(name: &str, api: M) -> Self {
+        let handle = api.ec_create(name.as_bytes());
+        EllipticCurve { handle, api }
+    }
+
+    pub fn from_bitsize(bitsize: u32, api: M) -> Option<Self> {
+        match bitsize {
+            224 => Some(Self::from_name("p224", api)),
+            256 => Some(Self::from_name("p256", api)),
+            384 => Some(Self::from_name("p384", api)),
+            521 => Some(Self::from_name("p521", api)),
+            _ => None,
         }
     }
 
-    fn get_values(&self) -> EllipticCurveComponents<BigUint<M>> {
-        unsafe {
-            let field_order_handle = self.api.bi_new_zero();
-            let base_point_order_handle = self.api.bi_new_zero();
-            let eq_constant_handle = self.api.bi_new_zero();
-            let x_base_point_handle = self.api.bi_new_zero();
-            let y_base_point_handle = self.api.bi_new_zero();
-            self.api.ec_get_values(
-                self.handle,
-                field_order_handle,
-                base_point_order_handle,
-                eq_constant_handle,
-                x_base_point_handle,
-                y_base_point_handle,
-            );
-            (
-                BigUint {
-                    handle: field_order_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: base_point_order_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: eq_constant_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: x_base_point_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_base_point_handle,
-                    api: self.api.clone(),
-                },
-                self.api.get_ec_length(),
-            )
-        }
+    pub fn get_values(&self) -> EllipticCurveComponents<M> {
+        let field_order_handle = self.api.bi_new_zero();
+        let base_point_order_handle = self.api.bi_new_zero();
+        let eq_constant_handle = self.api.bi_new_zero();
+        let x_base_point_handle = self.api.bi_new_zero();
+        let y_base_point_handle = self.api.bi_new_zero();
+        self.api.ec_get_values(
+            self.handle,
+            field_order_handle,
+            base_point_order_handle,
+            eq_constant_handle,
+            x_base_point_handle,
+            y_base_point_handle,
+        );
+        (
+            BigUint {
+                handle: field_order_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: base_point_order_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: eq_constant_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: x_base_point_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_base_point_handle,
+                api: self.api.clone(),
+            },
+            self.api.ec_curve_length(self.handle),
+        )
     }
 
-    fn get_ec_length(&self) -> u32 {
-        self.api.get_ec_length(self.handle)
+    pub fn get_curve_length(&self) -> u32 {
+        self.api.ec_curve_length(self.handle)
     }
 
-    fn get_priv_key_byte_length(&self) -> u32 {
+    pub fn get_priv_key_byte_length(&self) -> u32 {
         self.api.ec_private_key_byte_length(self.handle)
     }
 
-    fn add_ec(
+    pub fn add(
         &self,
         x_first_point: BigUint<M>,
         y_first_point: BigUint<M>,
         x_second_point: BigUint<M>,
         y_second_point: BigUint<M>,
     ) -> (BigUint<M>, BigUint<M>) {
-        unsafe {
-            let x_result_handle = self.api.bi_new_zero();
-            let y_result_handle = self.api.bi_new_zero();
-            self.api.add_ec(
-                x_result_handle,
-                y_result_handle,
-                self.handle,
-                x_first_point.handle,
-                y_first_point.handle,
-                x_second_point.handle,
-                y_second_point.handle,
-            );
-            (
-                BigUint {
-                    handle: x_result_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_result_handle,
-                    api: self.api.clone(),
-                },
-            )
-        }
+        let x_result_handle = self.api.bi_new_zero();
+        let y_result_handle = self.api.bi_new_zero();
+        self.api.ec_add(
+            x_result_handle,
+            y_result_handle,
+            self.handle,
+            x_first_point.handle,
+            y_first_point.handle,
+            x_second_point.handle,
+            y_second_point.handle,
+        );
+        (
+            BigUint {
+                handle: x_result_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_result_handle,
+                api: self.api.clone(),
+            },
+        )
     }
 
-    fn double_ec(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> (BigUint<M>, BigUint<M>) {
-        unsafe {
-            let x_result_handle = self.api.bi_new_zero();
-            let y_result_handle = self.api.bi_new_zero();
-            self.api.ec_double(
-                x_result_handle,
-                y_result_handle,
-                self.handle,
-                x_point.handle,
-                y_point.handle,
-            );
-            (
-                BigUint {
-                    handle: x_result_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_result_handle,
-                    api: self.api.clone(),
-                },
-            )
-        }
+    pub fn double(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> (BigUint<M>, BigUint<M>) {
+        let x_result_handle = self.api.bi_new_zero();
+        let y_result_handle = self.api.bi_new_zero();
+        self.api.ec_double(
+            x_result_handle,
+            y_result_handle,
+            self.handle,
+            x_point.handle,
+            y_point.handle,
+        );
+        (
+            BigUint {
+                handle: x_result_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_result_handle,
+                api: self.api.clone(),
+            },
+        )
     }
 
-    fn is_on_curve_ec(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> bool {
-        self.api.ec_is_on_curve(self.handle, x_point.handle, y_point.handle)
+    pub fn is_on_curve(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> bool {
+        self.api
+            .ec_is_on_curve(self.handle, x_point.handle, y_point.handle)
     }
 
-    fn scalar_mult(
+    pub fn scalar_mult(
         &self,
         x_point: BigUint<M>,
         y_point: BigUint<M>,
         data: &[u8],
     ) -> (BigUint<M>, BigUint<M>) {
-        unsafe {
-            let x_result_handle = self.api.bi_new_zero();
-            let y_result_handle = self.api.bi_new_zero();
-            self.api.ec_scalar_mult(
-                x_result_handle,
-                y_result_handle,
-                self.handle,
-                x_point.handle,
-                y_point.handle,
-                data.as_ptr(),
-                data.len() as i32,
-            );
-            (
-                BigUint {
-                    handle: x_result_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_result_handle,
-                    api: self.api.clone(),
-                },
-            )
-        }
+        let x_result_handle = self.api.bi_new_zero();
+        let y_result_handle = self.api.bi_new_zero();
+        self.api.ec_scalar_mult(
+            x_result_handle,
+            y_result_handle,
+            self.handle,
+            x_point.handle,
+            y_point.handle,
+            data,
+        );
+        (
+            BigUint {
+                handle: x_result_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_result_handle,
+                api: self.api.clone(),
+            },
+        )
     }
 
-    fn scalar_base_mult(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
-        unsafe {
-            let x_result_handle = self.api.bi_new_zero();
-            let y_result_handle = self.api.bi_new_zero();
-            self.api.ec_scalar_base_mult(
-                x_result_handle,
-                y_result_handle,
-                self.handle,
-                data,
-            );
-            (
-                BigUint {
-                    handle: x_result_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_result_handle,
-                    api: self.api.clone(),
-                },
-            )
-        }
+    pub fn scalar_base_mult(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+        let x_result_handle = self.api.bi_new_zero();
+        let y_result_handle = self.api.bi_new_zero();
+        self.api
+            .ec_scalar_base_mult(x_result_handle, y_result_handle, self.handle, data);
+        (
+            BigUint {
+                handle: x_result_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_result_handle,
+                api: self.api.clone(),
+            },
+        )
     }
 
-    fn marshal_ec(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
-        self.api.ec_marshal(self.handle, x_pair.handle, y_pair.handle)
+    pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+        self.api
+            .ec_marshal(self.handle, x_pair.handle, y_pair.handle)
     }
 
-    fn marshal_compressed_ec(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
-        self.api.ec_marshal_compressed(self.handle, x_pair.handle, y_pair.handle)
+    pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+        self.api
+            .ec_marshal_compressed(self.handle, x_pair.handle, y_pair.handle)
     }
 
-    fn unmarshal_ec(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
-        unsafe {
-            let x_pair_handle = self.api.bi_new_zero();
-            let y_pair_handle = self.api.bi_new_zero();
-            self.api.ec_unmarshal(
-                x_pair_handle,
-                y_pair_handle,
-                self.handle,
-                data,
-            );
-            (
-                BigUint {
-                    handle: x_pair_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_pair_handle,
-                    api: self.api.clone(),
-                },
-            )
-        }
+    pub fn unmarshal(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+        let x_pair_handle = self.api.bi_new_zero();
+        let y_pair_handle = self.api.bi_new_zero();
+        self.api
+            .ec_unmarshal(x_pair_handle, y_pair_handle, self.handle, data);
+        (
+            BigUint {
+                handle: x_pair_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_pair_handle,
+                api: self.api.clone(),
+            },
+        )
     }
 
-    fn unmarshal_compressed_ec(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
-        unsafe {
-            let x_pair_handle = self.api.bi_new_zero();
-            let y_pair_handle = self.api.bi_new_zero();
-            self.api.ec_unmarshal_compressed(
-                x_pair_handle,
-                y_pair_handle,
-                self.handle,
-                data.as_ptr(),
-                data.len() as i32,
-            );
-            (
-                BigUint {
-                    handle: x_pair_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_pair_handle,
-                    api: self.api.clone(),
-                },
-            )
-        }
+    pub fn unmarshal_compressed(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+        let x_pair_handle = self.api.bi_new_zero();
+        let y_pair_handle = self.api.bi_new_zero();
+        self.api
+            .ec_unmarshal_compressed(x_pair_handle, y_pair_handle, self.handle, data);
+        (
+            BigUint {
+                handle: x_pair_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_pair_handle,
+                api: self.api.clone(),
+            },
+        )
     }
 
-    fn generate_key_ec(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
-        unsafe {
-            let x_pub_key_handle = self.api.bi_new_zero();
-            let y_pub_key_handle = self.api.bi_new_zero();
-            let private_key = self.api.generate_key(
-                x_pub_key_handle,
-                y_pub_key_handle,
-                self.handle,
-                private_key.as_mut_ptr(),
-            );
-            (
-                BigUint {
-                    handle: x_pub_key_handle,
-                    api: self.api.clone(),
-                },
-                BigUint {
-                    handle: y_pub_key_handle,
-                    api: self.api.clone(),
-                },
-                private_key,
-            )
-        }
-    }
-
-    fn from_bitsize_ec(bitsize: u32) -> Option<Self> {
-        match bitsize {
-            224 => Some(Self::create_ec("p224")),
-            256 => Some(Self::create_ec("p256")),
-            384 => Some(Self::create_ec("p384")),
-            521 => Some(Self::create_ec("p521")),
-            _ => None,
-        }
+    pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
+        let x_pub_key_handle = self.api.bi_new_zero();
+        let y_pub_key_handle = self.api.bi_new_zero();
+        let private_key = self
+            .api
+            .ec_generate_key(x_pub_key_handle, y_pub_key_handle, self.handle);
+        (
+            BigUint {
+                handle: x_pub_key_handle,
+                api: self.api.clone(),
+            },
+            BigUint {
+                handle: y_pub_key_handle,
+                api: self.api.clone(),
+            },
+            private_key,
+        )
     }
 }
 
-use elrond_codec::*;
-
-impl NestedEncode for EllipticCurve<M> {
+impl<M: ManagedTypeApi> NestedEncode for EllipticCurve<M> {
     fn dep_encode<O: NestedEncodeOutput>(
         &self,
         dest: &mut O,
@@ -318,7 +285,7 @@ impl NestedEncode for EllipticCurve<M> {
     }
 }
 
-impl TopEncode for EllipticCurve<M> {
+impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         top_encode_from_nested(self, output)
     }
@@ -333,7 +300,7 @@ impl TopEncode for EllipticCurve<M> {
     }
 }
 
-impl<M: ManagedTypeApi> elrond_wasm::abi::TypeAbi for EllipticCurve<M> {
+impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
     fn type_name() -> String {
         String::from("EllipticCurve")
     }
