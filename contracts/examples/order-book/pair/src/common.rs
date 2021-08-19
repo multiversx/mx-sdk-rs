@@ -16,31 +16,31 @@ pub enum OrderType {
 #[derive(Clone)]
 pub struct Payment<M: ManagedTypeApi> {
     pub token_id: TokenIdentifier,
-    pub amount: BigUint,
+    pub amount: BigUint<M>,
 }
 
 #[derive(Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
     pub to: Address,
-    pub payment: Payment<BigUint>,
+    pub payment: Payment<M>,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Copy)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub enum FeeConfig<M: ManagedTypeApi> {
-    Fixed(BigUint),
+    Fixed(BigUint<M>),
     Percent(u64),
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Copy)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct DealConfig {
     pub match_provider_percent: u64,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
-    pub amount: BigUint,
+    pub amount: BigUint<M>,
     pub match_provider: Option<Address>,
-    pub fee_config: FeeConfig<BigUint>,
+    pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
 }
 
@@ -49,36 +49,21 @@ pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: Address,
     pub match_provider: Option<Address>,
-    pub input_amount: BigUint,
-    pub output_amount: BigUint,
-    pub fee_config: FeeConfig<BigUint>,
+    pub input_amount: BigUint<M>,
+    pub output_amount: BigUint<M>,
+    pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
     pub create_epoch: u64,
     pub order_type: OrderType,
 }
 
-impl<M: ManagedTypeApi> FeeConfig<BigUint> {
+impl<M: ManagedTypeApi> FeeConfig<M> {
     pub fn is_fixed(&self) -> bool {
         matches!(*self, FeeConfig::Fixed(_))
     }
 
     pub fn is_percent(&self) -> bool {
         matches!(*self, FeeConfig::Percent(_))
-    }
-}
-
-impl<M: ManagedTypeApi> Payment<BigUint> {
-    pub fn new() -> Self {
-        Default::default()
-    }
-}
-
-impl<M: ManagedTypeApi> Default for Payment<BigUint> {
-    fn default() -> Self {
-        Payment {
-            token_id: TokenIdentifier::egld(),
-            amount: BigUint::zero(),
-        }
     }
 }
 
@@ -96,37 +81,15 @@ impl Default for DealConfig {
     }
 }
 
-impl<M: ManagedTypeApi> Order<BigUint> {
-    pub fn new() -> Self {
-        Default::default()
-    }
-}
-
-impl<M: ManagedTypeApi> Default for Order<BigUint> {
-    fn default() -> Self {
-        Order {
-            id: 0,
-            creator: Address::zero(),
-            match_provider: Option::None,
-            input_amount: BigUint::zero(),
-            output_amount: BigUint::zero(),
-            fee_config: FeeConfig::Percent(0),
-            deal_config: DealConfig::new(),
-            create_epoch: 0,
-            order_type: OrderType::Buy,
-        }
-    }
-}
-
 #[elrond_wasm::module]
 pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<BigUint>,
-        params: OrderInputParams<BigUint>,
+        payment: Payment<Self::TypeManager>,
+        params: OrderInputParams<Self::TypeManager>,
         order_type: OrderType,
-    ) -> Order<BigUint> {
+    ) -> Order<Self::TypeManager> {
         Order {
             id,
             creator: self.blockchain().get_caller(),
@@ -144,19 +107,21 @@ pub trait CommonModule {
         &(part * value) / total
     }
 
-    fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<BigUint>) -> BigUint {
+    fn calculate_fee_amount(
+        &self,
+        amount: &BigUint,
+        fee_config: &FeeConfig<Self::TypeManager>,
+    ) -> BigUint {
         match fee_config.clone() {
             FeeConfig::Fixed(fee_amount) => fee_amount,
-            FeeConfig::Percent(fee_percent) => {
-                amount * &fee_percent.into() / PERCENT_BASE_POINTS.into()
-            },
+            FeeConfig::Percent(fee_percent) => amount * fee_percent / PERCENT_BASE_POINTS,
         }
     }
 
     fn calculate_amount_after_fee(
         &self,
         amount: &BigUint,
-        fee_config: &FeeConfig<BigUint>,
+        fee_config: &FeeConfig<Self::TypeManager>,
     ) -> BigUint {
         amount - &self.calculate_fee_amount(amount, fee_config)
     }

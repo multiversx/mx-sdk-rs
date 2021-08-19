@@ -16,7 +16,7 @@ pub trait StorageModule {
     fn bonding_curve(
         &self,
         token: &TokenIdentifier,
-    ) -> SingleValueMapper<Self::Storage, BondingCurve<BigUint>>;
+    ) -> SingleValueMapper<Self::Storage, BondingCurve<Self::TypeManager>>;
 
     #[storage_mapper("owned_tokens")]
     fn owned_tokens(&self, owner: &Address) -> SafeSetMapper<Self::Storage, TokenIdentifier>;

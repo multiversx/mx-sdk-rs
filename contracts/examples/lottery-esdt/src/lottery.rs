@@ -139,7 +139,7 @@ pub trait Lottery {
                 );
 
                 require!(
-                    burn_percentage < BigUint::from(PERCENTAGE_TOTAL),
+                    burn_percentage < PERCENTAGE_TOTAL,
                     "Invalid burn percentage!"
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
@@ -156,7 +156,7 @@ pub trait Lottery {
             max_entries_per_user,
             prize_distribution,
             whitelist,
-            prize_pool: BigUint::zero(),
+            prize_pool: self.types().big_uint_zero(),
         };
 
         self.lottery_info(&lottery_name).set(&info);
@@ -288,7 +288,7 @@ pub trait Lottery {
             let winner_address = self.ticket_holders(lottery_name).get(winning_ticket_id);
             let prize = self.calculate_percentage_of(
                 &total_prize,
-                &BigUint::from(info.prize_distribution[i] as u32),
+                &self.types().big_uint_from(info.prize_distribution[i]),
             );
 
             self.send().direct(
@@ -351,7 +351,7 @@ pub trait Lottery {
     }
 
     fn calculate_percentage_of(&self, value: &BigUint, percentage: &BigUint) -> BigUint {
-        value * percentage / BigUint::from(PERCENTAGE_TOTAL)
+        value * percentage / PERCENTAGE_TOTAL
     }
 
     // storage
@@ -361,7 +361,7 @@ pub trait Lottery {
     fn lottery_info(
         &self,
         lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, LotteryInfo<BigUint>>;
+    ) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::TypeManager>>;
 
     #[storage_mapper("ticketHolder")]
     fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<Self::Storage, Address>;

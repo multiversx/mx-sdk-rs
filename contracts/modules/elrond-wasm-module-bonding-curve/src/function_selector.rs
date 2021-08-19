@@ -7,33 +7,25 @@ use crate::{
 };
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub enum FunctionSelector<BigUint>
-where
-    BigUint: BigUintApi,
-{
-    Linear(LinearFunction<BigUint>),
-    CustomExample(BigUint),
+pub enum FunctionSelector<M: ManagedTypeApi> {
+    Linear(LinearFunction<M>),
+    CustomExample(BigUint<M>),
     None,
 }
 
-impl<BigUint> CurveFunction<BigUint> for FunctionSelector<BigUint>
-where
-    for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Mul<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Div<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: core::ops::AddAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::SubAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::MulAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::DivAssign<&'b BigUint>,
-    BigUint: BigUintApi,
-{
+impl<M: ManagedTypeApi> FunctionSelector<M> {
+    pub fn is_none(&self) -> bool {
+        matches!(self, FunctionSelector::None)
+    }
+}
+
+impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
     fn calculate_price(
         &self,
-        token_start: &BigUint,
-        amount: &BigUint,
-        arguments: &CurveArguments<BigUint>,
-    ) -> SCResult<BigUint> {
+        token_start: &BigUint<M>,
+        amount: &BigUint<M>,
+        arguments: &CurveArguments<M>,
+    ) -> SCResult<BigUint<M>> {
         match &self {
             FunctionSelector::Linear(linear_function) => {
                 CurveFunction::calculate_price(linear_function, token_start, amount, arguments)
@@ -41,9 +33,7 @@ where
 
             FunctionSelector::CustomExample(initial_cost) => {
                 let sum = token_start + amount;
-                let price = &(&sum * &sum * sum / BigUint::from(3u64))
-                    + &arguments.balance
-                    + initial_cost.clone();
+                let price = &(&sum * &sum * sum / 3u32) + &arguments.balance + initial_cost.clone();
                 Ok(price)
             },
             FunctionSelector::None => Err("Bonding Curve function is not assiged".into()),

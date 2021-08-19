@@ -16,7 +16,7 @@ pub trait UpgradeContractModule {
         self.send().upgrade_contract(
             child_sc_address,
             self.blockchain().get_gas_left(),
-            &BigUint::zero(),
+            &self.types().big_uint_zero(),
             new_code,
             CodeMetadata::DEFAULT,
             &arguments.into(),

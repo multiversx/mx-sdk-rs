@@ -7,45 +7,25 @@ use crate::utils::structs::CurveArguments;
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
 pub struct LinearFunction<M: ManagedTypeApi> {
-    pub initial_price: BigUint,
-    pub linear_coefficient: BigUint,
+    pub initial_price: BigUint<M>,
+    pub linear_coefficient: BigUint<M>,
 }
 
-impl<BigUint> CurveFunction<BigUint> for LinearFunction<BigUint>
-where
-    for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Mul<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Div<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: core::ops::AddAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::SubAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::MulAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::DivAssign<&'b BigUint>,
-    BigUint: BigUintApi,
-{
+impl<M: ManagedTypeApi> CurveFunction<M> for LinearFunction<M> {
     fn calculate_price(
         &self,
-        token_start: &BigUint,
-        amount: &BigUint,
-        _arguments: &CurveArguments<BigUint>,
-    ) -> SCResult<BigUint> {
+        token_start: &BigUint<M>,
+        amount: &BigUint<M>,
+        _arguments: &CurveArguments<M>,
+    ) -> SCResult<BigUint<M>> {
         Ok(
             &self.linear_coefficient * &sum_interval(amount, token_start)
                 + &self.initial_price * amount,
         )
     }
 }
-fn sum_interval<M: ManagedTypeApi>(n: &BigUint, x: &BigUint) -> BigUint
-where
-    for<'a, 'b> &'a BigUint: core::ops::Add<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Mul<&'b BigUint, Output = BigUint>,
-    for<'a, 'b> &'a BigUint: core::ops::Div<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: core::ops::AddAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::SubAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::MulAssign<&'b BigUint>,
-    for<'b> BigUint: core::ops::DivAssign<&'b BigUint>,
-    BigUint: BigUintApi,
-{
-    x * n + &(n - &BigUint::from(1u64)) * n / BigUint::from(2u64)
+fn sum_interval<M: ManagedTypeApi>(n: &BigUint<M>, x: &BigUint<M>) -> BigUint<M> {
+    let one = BigUint::from_u32(1, n.type_manager());
+    let two = BigUint::from_u32(2, n.type_manager());
+    x * n + &(n - &one) * n / two
 }

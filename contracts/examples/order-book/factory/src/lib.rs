@@ -28,7 +28,7 @@ pub trait Factory {
             .send()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
-                &BigUint::zero(),
+                &self.types().big_uint_zero(),
                 &self.pair_template_address().get(),
                 CodeMetadata::DEFAULT,
                 &arguments,
