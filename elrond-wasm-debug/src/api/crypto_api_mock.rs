@@ -22,6 +22,10 @@ impl CryptoApi for TxContext {
         hash.into()
     }
 
+    fn ripemd160(&self, _data: &[u8]) -> Box<[u8; 20]> {
+        panic!("ripemd160 not implemented yet!")
+    }
+
     fn verify_bls(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
         panic!("verify_bls not implemented yet!")
     }
