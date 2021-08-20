@@ -102,9 +102,9 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_with_fees(
         &self,
         #[payment_token] token_id: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         to: Address,
-        percentage_fees: Self::BigUint,
+        percentage_fees: BigUint,
     ) {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
         let amount_to_send = payment - fees;
