@@ -2,12 +2,15 @@ use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::H256;
+use elrond_wasm::Box;
 
 extern "C" {
 
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+
+    fn ripemd160(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
     fn verifyBLS(
         keyOffset: *const u8,
@@ -49,6 +52,14 @@ impl CryptoApi for ArwenApiImpl {
             let mut res = H256::zero();
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
+        }
+    }
+
+    fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
+        unsafe {
+            let mut res = [0u8; 20];
+            ripemd160(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
+            Box::new(res)
         }
     }
 
