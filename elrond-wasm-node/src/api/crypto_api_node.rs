@@ -2,7 +2,7 @@ use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::{BoxedBytes, MessageHashType, H256};
-use elrond_wasm::{Box, Vec};
+use elrond_wasm::Box;
 
 extern "C" {
 
@@ -149,18 +149,17 @@ impl CryptoApi for ArwenApiImpl {
                 sig_length += 1;
             }
 
-            let mut sig_output = Vec::new();
-            sig_output.resize(sig_length, 0u8);
+            let mut sig_output = BoxedBytes::allocate(sig_length);
 
             encodeSecp256k1DerSignature(
                 r.as_ptr(),
                 r.len() as i32,
                 s.as_ptr(),
                 s.len() as i32,
-                sig_output.as_mut_slice().as_mut_ptr(),
+                sig_output.as_mut_ptr(),
             );
 
-            BoxedBytes::from(sig_output.as_slice())
+            sig_output
         }
     }
 }
