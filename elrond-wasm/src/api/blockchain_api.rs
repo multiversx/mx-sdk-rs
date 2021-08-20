@@ -1,4 +1,4 @@
-use super::{BigUintApi, ErrorApi, StorageReadApi};
+use super::{BigUintApi, ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::storage;
 use crate::types::{Address, BoxedBytes, EsdtLocalRole, EsdtTokenData, TokenIdentifier, Vec, H256};
 use alloc::boxed::Box;
@@ -9,7 +9,9 @@ use alloc::boxed::Box;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
+pub trait BlockchainApi:
+    StorageReadApi + ManagedTypeApi + ErrorApi + Clone + Sized + 'static
+{
     /// The type of the token balances.
     /// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
     type BalanceType: BigUintApi + 'static;
@@ -20,7 +22,7 @@ pub trait BlockchainApi: StorageReadApi + ErrorApi + Clone + Sized + 'static {
 
     fn check_caller_is_owner(&self) {
         if self.get_owner_address() != self.get_caller() {
-            self.signal_error(b"Endpoint can olny be called by owner");
+            self.signal_error(b"Endpoint can only be called by owner");
         }
     }
 

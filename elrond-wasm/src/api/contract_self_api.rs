@@ -1,6 +1,6 @@
 use super::{
-    BigIntApi, BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi,
-    EndpointArgumentApi, EndpointFinishApi, ErrorApi, LogApi, ProxyObjApi, SendApi, StorageReadApi,
+    BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, EndpointArgumentApi,
+    EndpointFinishApi, ErrorApi, LogApi, ManagedTypeApi, ProxyObjApi, SendApi, StorageReadApi,
     StorageWriteApi,
 };
 use crate::types::Address;
@@ -12,22 +12,22 @@ use crate::types::Address;
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractBase: Sized {
-    type BigUint: BigUintApi + 'static;
+    type TypeManager: ManagedTypeApi + 'static;
 
-    type BigInt: BigIntApi + 'static;
+    type BigUint: BigUintApi + 'static;
 
     type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
 
     /// Abstracts the lower-level storage functionality.
-    type Storage: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static;
+    type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// Abstracts the call value handling at the beginning of a function call.
     type CallValue: CallValueApi<AmountType = Self::BigUint> + ErrorApi + Clone + 'static;
 
     /// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
     type SendApi: SendApi<
+            ProxyTypeManager = Self::TypeManager,
             AmountType = Self::BigUint,
-            ProxyBigInt = Self::BigInt,
             ProxyEllipticCurve = Self::EllipticCurve,
             ProxyStorage = Self::Storage,
         > + Clone
@@ -54,6 +54,9 @@ pub trait ContractBase: Sized {
     /// Gateway to the functionality related to sending transactions from the current contract.
     fn send(&self) -> Self::SendApi;
 
+    /// Managed types API. Required to create new instances of managed types.
+    fn type_manager(&self) -> Self::TypeManager;
+
     /// Gateway blockchain info related to the current transaction and to accounts.
     fn blockchain(&self) -> Self::BlockchainApi;
 
@@ -77,9 +80,9 @@ pub trait ContractBase: Sized {
 }
 
 pub trait ContractPrivateApi {
-    type ArgumentApi: EndpointArgumentApi + Clone + 'static;
+    type ArgumentApi: ManagedTypeApi + EndpointArgumentApi + Clone + 'static;
 
-    type FinishApi: EndpointFinishApi + ErrorApi + Clone + 'static;
+    type FinishApi: ManagedTypeApi + EndpointFinishApi + ErrorApi + Clone + 'static;
 
     fn argument_api(&self) -> Self::ArgumentApi;
 

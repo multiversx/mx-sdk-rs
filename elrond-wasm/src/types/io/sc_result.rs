@@ -1,6 +1,6 @@
 use super::sc_error::SCError;
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::EndpointFinishApi;
+use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::EndpointResult;
 use crate::*;
 use core::convert;
@@ -102,7 +102,7 @@ where
     #[inline]
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         match self {
             SCResult::Ok(t) => {

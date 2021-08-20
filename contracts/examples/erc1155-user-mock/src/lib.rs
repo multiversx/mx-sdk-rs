@@ -12,8 +12,8 @@ pub trait Erc1155UserMock {
         &self,
         _operator: Address,
         _from: Address,
-        _type_id: Self::BigUint,
-        _value: Self::BigUint,
+        _type_id: BigUint,
+        _value: BigUint,
         _data: &[u8],
     ) -> SCResult<()> {
         Ok(())
@@ -24,8 +24,8 @@ pub trait Erc1155UserMock {
         &self,
         _operator: Address,
         _from: Address,
-        _type_ids: Vec<Self::BigUint>,
-        _values: Vec<Self::BigUint>,
+        _type_ids: Vec<BigUint>,
+        _values: Vec<BigUint>,
         _data: &[u8],
     ) -> SCResult<()> {
         Ok(())

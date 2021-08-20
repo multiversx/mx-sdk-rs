@@ -1,8 +1,10 @@
-use super::{EllipticCurveMock, RustBigInt, RustBigUint};
+use super::{EllipticCurveMock, RustBigUint};
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
 use elrond_wasm::api::{BlockchainApi, ContractBase, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata, TokenIdentifier};
+use elrond_wasm::types::{
+    Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
+};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -51,7 +53,7 @@ impl TxContext {
 
 impl SendApi for TxContext {
     type AmountType = RustBigUint;
-    type ProxyBigInt = RustBigInt;
+    type ProxyTypeManager = Self;
     type ProxyEllipticCurve = EllipticCurveMock;
     type ProxyStorage = Self;
 
@@ -135,6 +137,17 @@ impl SendApi for TxContext {
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         panic!("direct_esdt_nft_execute not implemented yet");
+    }
+
+    fn direct_multi_esdt_transfer_execute(
+        &self,
+        _to: &Address,
+        _tokens: &[EsdtTokenPayment<RustBigUint>],
+        _gas_limit: u64,
+        _function: &[u8],
+        _arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+        panic!("direct_multi_esdt_transfer_execute not implemented yet");
     }
 
     fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) -> ! {

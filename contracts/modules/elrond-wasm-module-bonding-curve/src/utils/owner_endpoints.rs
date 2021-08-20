@@ -47,7 +47,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_bonding_curve(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::BigUint>,
+        function: FunctionSelector<BigUint>,
         sell_availability: bool,
     ) -> SCResult<()> {
         require!(
@@ -73,7 +73,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     #[payable("*")]
     fn deposit(
         &self,
-        #[payment] amount: Self::BigUint,
+        #[payment] amount: BigUint,
         #[payment_token] identifier: TokenIdentifier,
         #[payment_nonce] nonce: u64,
         #[var_args] payment_token: OptionalArg<TokenIdentifier>,
@@ -139,13 +139,13 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_curve_storage(
         &self,
         identifier: &TokenIdentifier,
-        amount: Self::BigUint,
+        amount: BigUint,
         payment: TokenIdentifier,
     ) {
         let mut curve = FunctionSelector::None;
         let mut arguments;
         let payment_token;
-        let payment_amount: Self::BigUint;
+        let payment_amount: BigUint;
         let sell_availability: bool;
 
         if self.bonding_curve(identifier).is_empty() {
@@ -154,7 +154,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 balance: amount,
             };
             payment_token = payment;
-            payment_amount = Self::BigUint::zero();
+            payment_amount = BigUint::zero();
             sell_availability = false;
         } else {
             let bonding_curve = self.bonding_curve(identifier).get();

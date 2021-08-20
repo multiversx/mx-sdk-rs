@@ -1,6 +1,6 @@
 use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::{BoxedBytes, MultiResultVec};
@@ -60,7 +60,7 @@ impl LinkedListMapperInfo {
 /// in constant time.
 pub struct LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
     api: SA,
@@ -70,7 +70,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
     fn new(api: SA, main_key: BoxedBytes) -> Self {
@@ -84,7 +84,7 @@ where
 
 impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
     fn clear(&mut self) {
@@ -102,7 +102,7 @@ where
 
 impl<SA, T> LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> BoxedBytes {
@@ -415,7 +415,7 @@ where
 /// documentation for more.
 pub struct Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
     node_id: u32,
@@ -424,7 +424,7 @@ where
 
 impl<'a, SA, T> Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
     fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
@@ -437,7 +437,7 @@ where
 
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -456,14 +456,14 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let v: Vec<T> = self.iter().collect();
         MultiResultVec::<T>::from(v).finish(api);
@@ -473,7 +473,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

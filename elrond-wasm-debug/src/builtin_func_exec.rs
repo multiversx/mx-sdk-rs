@@ -30,8 +30,8 @@ fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxRe
         result_message: Vec::new(),
         result_values: Vec::new(),
         result_logs: vec![esdt_transfer_event_log(
-            from.clone(),
-            to.clone(),
+            from,
+            to,
             esdt_token_identifier,
             &esdt_value,
         )],
@@ -44,10 +44,16 @@ pub fn esdt_transfer_event_log(
     esdt_token_identifier: Vec<u8>,
     esdt_value: &BigUint,
 ) -> TxLog {
+    let nonce_topic = Vec::<u8>::new();
     TxLog {
         address: from,
         endpoint: b"ESDTTransfer".to_vec(),
-        topics: vec![esdt_token_identifier, esdt_value.to_bytes_be(), to.to_vec()],
+        topics: vec![
+            esdt_token_identifier,
+            nonce_topic,
+            esdt_value.to_bytes_be(),
+            to.to_vec(),
+        ],
         data: vec![],
     }
 }

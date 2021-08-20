@@ -1,9 +1,10 @@
-use crate::abi;
-use alloc::vec::Vec;
-use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
-use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
+use core::cmp::Ordering;
 
-// BigInt sign.
+use crate::types::BoxedBytes;
+
+use super::Handle;
+
+/// Only used for sending sign information from the API.
 pub enum Sign {
     Minus,
     NoSign,
@@ -11,51 +12,25 @@ pub enum Sign {
 }
 
 /// Definition of the BigInt type required by the API.
-pub trait BigIntApi:
-    Sized
-    + From<Self::BigUint>
-    + From<i64>
-    + From<i32>
-    + Clone
-    + Add<Output = Self>
-    + AddAssign
-    + Sub<Output = Self>
-    + SubAssign
-    + Mul<Output = Self>
-    + MulAssign
-    + Div<Output = Self>
-    + DivAssign
-    + Rem<Output = Self>
-    + RemAssign
-    + Neg
-    + PartialEq<Self>
-    + Eq
-    + PartialOrd<Self>
-    + Ord
-    + PartialEq<i64>
-    + PartialOrd<i64>
-    + elrond_codec::NestedEncode
-    + elrond_codec::TopEncode
-    + elrond_codec::NestedDecode
-    + elrond_codec::TopDecode
-    + abi::TypeAbi
-{
-    type BigUint;
+pub trait BigIntApi {
+    fn bi_new(&self, value: i64) -> Handle;
 
-    fn zero() -> Self {
-        0i64.into()
+    fn bi_new_zero(&self) -> Handle {
+        self.bi_new(0)
     }
 
-    fn abs_uint(&self) -> Self::BigUint;
-
-    fn sign(&self) -> Sign;
-
-    fn to_signed_bytes_be(&self) -> Vec<u8>;
-
-    fn from_signed_bytes_be(bytes: &[u8]) -> Self;
-
-    fn pow(&self, exp: u32) -> Self;
-
-    /// Will return `None` if the number is too big or too small to be converted.
-    fn to_i64(&self) -> Option<i64>;
+    fn bi_signed_byte_length(&self, handle: Handle) -> Handle;
+    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes;
+    fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
+    fn bi_to_i64(&self, handle: Handle) -> Option<i64>;
+    fn bi_add(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_sub(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_mul(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_t_div(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_t_mod(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_pow(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_abs(&self, dest: Handle, x: Handle);
+    fn bi_neg(&self, dest: Handle, x: Handle);
+    fn bi_sign(&self, x: Handle) -> Sign;
+    fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering;
 }

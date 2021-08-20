@@ -1,5 +1,5 @@
 use super::{set_mapper, SafeSetMapper, StorageClearable, StorageMapper};
-use crate::api::{ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::storage::{storage_get, storage_set};
 use crate::types::BoxedBytes;
 use core::marker::PhantomData;
@@ -10,7 +10,7 @@ type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
 pub struct SafeMapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -22,7 +22,7 @@ where
 
 impl<SA, K, V> StorageMapper<SA> for SafeMapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -38,7 +38,7 @@ where
 
 impl<SA, K, V> StorageClearable for SafeMapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -52,7 +52,7 @@ where
 
 impl<SA, K, V> SafeMapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -170,7 +170,7 @@ where
 
 pub struct Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -180,7 +180,7 @@ where
 
 impl<'a, SA, K, V> Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -194,7 +194,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -212,7 +212,7 @@ where
 
 pub struct Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -222,7 +222,7 @@ where
 
 impl<'a, SA, K, V> Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -236,7 +236,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -254,7 +254,7 @@ where
 
 pub enum Entry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -269,7 +269,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -284,7 +284,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -297,7 +297,7 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -361,7 +361,7 @@ where
 
 impl<'a, SA, K, V: Default> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -377,7 +377,7 @@ where
 
 impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -401,7 +401,7 @@ where
 
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: TopEncode + TopDecode + 'static,
 {
