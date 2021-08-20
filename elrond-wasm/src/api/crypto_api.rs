@@ -1,5 +1,6 @@
 use super::BigUintApi;
 use crate::types::H256;
+use alloc::boxed::Box;
 
 pub trait CryptoApi {
     /// Numeric type used in some of the Arwen hooks.
@@ -8,6 +9,8 @@ pub trait CryptoApi {
     fn sha256(&self, data: &[u8]) -> H256;
 
     fn keccak256(&self, data: &[u8]) -> H256;
+
+    fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]>;
 
     fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool;
 
