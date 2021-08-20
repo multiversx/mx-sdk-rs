@@ -13,6 +13,11 @@ pub trait CryptoFeatures {
         self.crypto().keccak256(&input)
     }
 
+    #[endpoint(computeRipemd160)]
+    fn compute_ripemd160(&self, input: Vec<u8>) -> Box<[u8; 20]> {
+        self.crypto().ripemd160(&input)
+    }
+
     #[endpoint]
     fn verify_bls_signature(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         self.crypto().verify_bls(key, message, signature)
