@@ -1,5 +1,5 @@
 use crate::{num_conv::top_encode_number_to_output, NestedEncodeOutput, TryStaticCast};
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec::Vec};
 
 /// Specifies objects that can receive the result of a TopEncode computation.
 
@@ -16,6 +16,11 @@ pub trait TopEncodeOutput: Sized {
     type NestedBuffer: NestedEncodeOutput;
 
     fn set_slice_u8(self, bytes: &[u8]);
+
+    #[inline]
+    fn set_boxed_bytes(self, bytes: Box<[u8]>) {
+        self.set_slice_u8(&*bytes);
+    }
 
     fn set_u64(self, value: u64) {
         let mut buffer = Vec::<u8>::with_capacity(8);
@@ -38,8 +43,12 @@ pub trait TopEncodeOutput: Sized {
     }
 
     #[inline]
-    fn set_specialized<T: TryStaticCast>(&self, _value: &T) -> bool {
-        false
+    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(
+        self,
+        _value: &T,
+        else_bytes: F,
+    ) {
+        self.set_boxed_bytes(else_bytes());
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer;
