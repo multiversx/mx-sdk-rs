@@ -1,6 +1,7 @@
-use crate::types::{BigUint, EllipticCurve, ManagedBuffer};
-
-use super::ManagedTypeApi;
+use crate::{
+    api::ManagedTypeApi,
+    types::{BigUint, EllipticCurve, ManagedBuffer},
+};
 
 pub struct ManagedTypeHelper<M: ManagedTypeApi> {
     api: M,

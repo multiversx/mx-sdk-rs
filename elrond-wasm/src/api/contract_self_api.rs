@@ -1,7 +1,7 @@
 use super::{
     BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
-    LogApi, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi, StorageReadApi,
-    StorageWriteApi,
+    LogApi, ManagedSerializer, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi,
+    StorageReadApi, StorageWriteApi,
 };
 use crate::types::Address;
 
@@ -12,7 +12,7 @@ use crate::types::Address;
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractBase: Sized {
-    type TypeManager: ManagedTypeApi + 'static;
+    type TypeManager: ManagedTypeApi + ErrorApi + 'static;
 
     /// Abstracts the lower-level storage functionality.
     type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
@@ -60,6 +60,12 @@ pub trait ContractBase: Sized {
 
     /// Stateless crypto functions provided by the Arwen VM.
     fn crypto(&self) -> Self::CryptoApi;
+
+    /// Component that provides contract developers access
+    /// to highly optimized manual serialization and deserialization.
+    fn serializer(&self) -> ManagedSerializer<Self::TypeManager> {
+        ManagedSerializer::new(self.type_manager())
+    }
 
     /// Gateway into the lower-level event log functionality.
     /// Gets called in auto-generated

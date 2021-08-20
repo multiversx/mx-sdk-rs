@@ -145,9 +145,7 @@ impl<M: ManagedTypeApi> TopEncode for BigUint<M> {
 
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        if !output.set_specialized(&self.to_bytes_be_buffer()) {
-            output.set_slice_u8(self.to_bytes_be().as_slice());
-        }
+        output.set_specialized(&self.to_bytes_be_buffer(), || self.to_bytes_be().into_box());
         Ok(())
     }
 }

@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 use elrond_codec::TryStaticCast;
 
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
@@ -45,12 +46,12 @@ where
         // nothing: no result produced
     }
 
-    fn set_specialized<T: TryStaticCast>(&self, value: &T) -> bool {
+    #[inline]
+    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(self, value: &T, else_bytes: F) {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             self.api.finish_managed_buffer_raw(managed_buffer.handle);
-            true
         } else {
-            false
+            self.set_boxed_bytes(else_bytes());
         }
     }
 
