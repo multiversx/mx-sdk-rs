@@ -1,6 +1,6 @@
 use super::StorageMapper;
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::BoxedBytes;
@@ -10,7 +10,7 @@ use elrond_codec::{TopDecode, TopEncode};
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
     api: SA,
@@ -20,7 +20,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
     fn new(api: SA, key: BoxedBytes) -> Self {
@@ -34,7 +34,7 @@ where
 
 impl<SA, T> SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
     /// Retrieves current value from storage.
@@ -82,14 +82,14 @@ where
 
 impl<SA, T> EndpointResult for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = T::DecodeAs;
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         self.get().finish(api);
     }
@@ -97,7 +97,7 @@ where
 
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

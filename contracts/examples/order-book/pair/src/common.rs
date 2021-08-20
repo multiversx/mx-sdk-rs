@@ -123,10 +123,10 @@ pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<Self::BigUint>,
-        params: OrderInputParams<Self::BigUint>,
+        payment: Payment<BigUint>,
+        params: OrderInputParams<BigUint>,
         order_type: OrderType,
-    ) -> Order<Self::BigUint> {
+    ) -> Order<BigUint> {
         Order {
             id,
             creator: self.blockchain().get_caller(),
@@ -140,20 +140,11 @@ pub trait CommonModule {
         }
     }
 
-    fn rule_of_three(
-        &self,
-        part: &Self::BigUint,
-        total: &Self::BigUint,
-        value: &Self::BigUint,
-    ) -> Self::BigUint {
+    fn rule_of_three(&self, part: &BigUint, total: &BigUint, value: &BigUint) -> BigUint {
         &(part * value) / total
     }
 
-    fn calculate_fee_amount(
-        &self,
-        amount: &Self::BigUint,
-        fee_config: &FeeConfig<Self::BigUint>,
-    ) -> Self::BigUint {
+    fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<BigUint>) -> BigUint {
         match fee_config.clone() {
             FeeConfig::Fixed(fee_amount) => fee_amount,
             FeeConfig::Percent(fee_percent) => {
@@ -164,9 +155,9 @@ pub trait CommonModule {
 
     fn calculate_amount_after_fee(
         &self,
-        amount: &Self::BigUint,
-        fee_config: &FeeConfig<Self::BigUint>,
-    ) -> Self::BigUint {
+        amount: &BigUint,
+        fee_config: &FeeConfig<BigUint>,
+    ) -> BigUint {
         amount - &self.calculate_fee_amount(amount, fee_config)
     }
 

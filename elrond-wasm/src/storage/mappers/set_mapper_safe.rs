@@ -1,7 +1,7 @@
 pub use super::linked_list_mapper::Iter;
 use super::{LinkedListMapper, StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
+use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_set};
 use crate::types::{BoxedBytes, MultiResultVec};
@@ -13,7 +13,7 @@ const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
 pub struct SafeSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     api: SA,
@@ -23,7 +23,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for SafeSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn new(api: SA, main_key: BoxedBytes) -> Self {
@@ -37,7 +37,7 @@ where
 
 impl<SA, T> StorageClearable for SafeSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
@@ -50,7 +50,7 @@ where
 
 impl<SA, T> SafeSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn build_named_value_key(&self, name: &[u8], value: &T) -> Vec<u8> {
@@ -144,14 +144,14 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for SafeSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let v: Vec<T> = self.iter().collect();
         MultiResultVec::<T>::from(v).finish(api);
@@ -161,7 +161,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for SafeSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

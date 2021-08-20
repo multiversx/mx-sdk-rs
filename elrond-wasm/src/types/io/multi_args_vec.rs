@@ -1,7 +1,8 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
+use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
 use crate::types::{ArgBuffer, SCError};
-use crate::{api::EndpointFinishApi, EndpointResult};
+use crate::EndpointResult;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
@@ -106,7 +107,7 @@ where
     #[inline]
     fn finish<FA>(&self, api: FA)
     where
-        FA: EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         for elem in self.0.iter() {
             elem.finish(api.clone());

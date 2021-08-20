@@ -10,6 +10,8 @@ pub struct CallbackData<BigUint: BigUintApi> {
     args: Vec<BoxedBytes>,
 }
 
+const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+
 #[elrond_wasm::module]
 pub trait ForwarderAsyncCallModule {
     #[proxy]
@@ -21,7 +23,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
@@ -37,12 +39,30 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         let half_payment = payment / 2u32.into();
         self.vault_proxy()
             .contract(to)
             .accept_funds(token, half_payment)
+            .async_call()
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn forward_async_accept_funds_with_fees(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_amount] payment: BigUint,
+        to: Address,
+        percentage_fees: BigUint,
+    ) -> AsyncCall<Self::SendApi> {
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let amount_to_send = payment - fees;
+
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds(token_id, amount_to_send)
             .async_call()
     }
 
@@ -52,7 +72,7 @@ pub trait ForwarderAsyncCallModule {
         to: Address,
         token: TokenIdentifier,
         token_nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to)
@@ -66,7 +86,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         #[payment_token] token: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
     ) {
         self.retrieve_funds_callback_event(&token, nonce, &payment);
 
@@ -84,7 +104,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         #[indexed] token: &TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] payment: &Self::BigUint,
+        #[indexed] payment: &BigUint,
     );
 
     #[endpoint]
@@ -92,7 +112,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: &Address,
         token_identifier: &TokenIdentifier,
-        amount: &Self::BigUint,
+        amount: &BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to.clone())
@@ -109,7 +129,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: &Address,
         token_identifier: &TokenIdentifier,
-        cb_amount: &Self::BigUint,
+        cb_amount: &BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to.clone())
@@ -117,16 +137,42 @@ pub trait ForwarderAsyncCallModule {
             .async_call()
     }
 
+    #[endpoint]
+    fn multi_transfer_via_async(
+        &self,
+        to: Address,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut all_token_payments = Vec::new();
+
+        for multi_arg in token_payments.into_vec() {
+            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment {
+                token_name,
+                token_nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid, // not used
+            };
+
+            all_token_payments.push(payment);
+        }
+
+        self.send().transfer_multiple_esdt_via_async_call(
+            &to,
+            &all_token_payments,
+            b"accept_multi_funds_echo",
+        );
+    }
+
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::BigUint>>;
+    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<BigUint>>;
 
     #[view]
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult5<BoxedBytes, TokenIdentifier, u64, Self::BigUint, MultiResultVec<BoxedBytes>>
-    {
+    ) -> MultiResult5<BoxedBytes, TokenIdentifier, u64, BigUint, MultiResultVec<BoxedBytes>> {
         let cb_data = self.callback_data().get(index);
         (
             cb_data.callback_name,

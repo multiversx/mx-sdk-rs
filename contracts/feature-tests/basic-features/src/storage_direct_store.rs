@@ -7,11 +7,11 @@ use crate::types::*;
 pub trait StorageStoreFeatures {
     #[endpoint]
     #[storage_set("big_uint")]
-    fn store_big_uint(&self, bi: Self::BigUint);
+    fn store_big_uint(&self, bi: BigUint);
 
     #[endpoint]
     #[storage_set("big_int")]
-    fn store_big_int(&self, bi: Self::BigInt);
+    fn store_big_int(&self, bi: BigInt);
 
     #[endpoint]
     #[storage_set("usize")]
@@ -42,11 +42,11 @@ pub trait StorageStoreFeatures {
     fn store_addr(&self, arg: Address);
 
     #[storage_set("opt_addr")]
-    fn _set_opt_addr(&self, opt_addr: Option<Address>);
+    fn set_opt_addr(&self, opt_addr: Option<Address>);
 
     #[endpoint]
     fn store_opt_addr(&self, #[var_args] opt_addr: OptionalArg<Address>) {
-        self._set_opt_addr(opt_addr.into_option());
+        self.set_opt_addr(opt_addr.into_option());
     }
 
     #[endpoint]
@@ -59,18 +59,18 @@ pub trait StorageStoreFeatures {
 
     #[endpoint]
     #[storage_set("map1")]
-    fn store_map1(&self, addr: Address, bi: Self::BigUint);
+    fn store_map1(&self, addr: Address, bi: BigUint);
 
     #[endpoint]
     #[storage_set("map2")]
-    fn store_map2(&self, addr1: &Address, addr2: &Address, bi: &Self::BigUint);
+    fn store_map2(&self, addr1: &Address, addr2: &Address, bi: &BigUint);
 
     #[endpoint]
     #[storage_set("map3")]
     fn store_map3(&self, x: usize, b: bool);
 
     #[storage_set("slice1")]
-    fn store_slice1(&self, slice: &[Self::BigUint]);
+    fn store_slice1(&self, slice: &[BigUint]);
 
     #[endpoint]
     #[storage_set("ELRONDi64")]
@@ -78,7 +78,7 @@ pub trait StorageStoreFeatures {
 
     #[endpoint]
     #[storage_set("ELRONDBigUint")]
-    fn store_reserved_big_uint(&self, i: Self::BigUint);
+    fn store_reserved_big_uint(&self, i: BigUint);
 
     #[endpoint]
     #[storage_set("ELRONDreserved")]

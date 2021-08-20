@@ -5,14 +5,14 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait NftStoragePrepay {
     #[init]
-    fn init(&self, cost_per_byte: Self::BigUint) {
+    fn init(&self, cost_per_byte: BigUint) {
         self.cost_per_byte().set(&cost_per_byte);
     }
 
     // endpoints - owner-only
 
     #[endpoint(setCostPerByte)]
-    fn set_cost_per_byte(&self, cost_per_byte: Self::BigUint) -> SCResult<()> {
+    fn set_cost_per_byte(&self, cost_per_byte: BigUint) -> SCResult<()> {
         only_owner!(self, "Only owner may call this function");
 
         self.cost_per_byte().set(&cost_per_byte);
@@ -21,7 +21,7 @@ pub trait NftStoragePrepay {
     }
 
     #[endpoint(reserveFunds)]
-    fn reserve_funds(&self, address: Address, file_size: Self::BigUint) -> SCResult<()> {
+    fn reserve_funds(&self, address: Address, file_size: BigUint) -> SCResult<()> {
         only_owner!(self, "Only owner may call this function");
 
         let storage_cost = self.get_cost_for_size(file_size);
@@ -58,14 +58,14 @@ pub trait NftStoragePrepay {
 
     #[payable("EGLD")]
     #[endpoint(depositPaymentForStorage)]
-    fn deposit_payment_for_storage(&self, #[payment] payment: Self::BigUint) {
+    fn deposit_payment_for_storage(&self, #[payment] payment: BigUint) {
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
     }
 
     /// defaults to max amount
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<Self::BigUint>) -> SCResult<()> {
+    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<BigUint>) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let mut user_deposit = self.deposit(&caller).get();
         let amount = match opt_amount {
@@ -86,14 +86,14 @@ pub trait NftStoragePrepay {
     // views
 
     #[view(getCostForSize)]
-    fn get_cost_for_size(&self, file_size: Self::BigUint) -> Self::BigUint {
+    fn get_cost_for_size(&self, file_size: BigUint) -> BigUint {
         let cost_per_byte = self.cost_per_byte().get();
 
         file_size * cost_per_byte
     }
 
     #[view(getDepositAmount)]
-    fn get_deposit_amount(&self) -> Self::BigUint {
+    fn get_deposit_amount(&self) -> BigUint {
         let caller = self.blockchain().get_caller();
 
         self.deposit(&caller).get()
@@ -103,11 +103,11 @@ pub trait NftStoragePrepay {
 
     #[view(getCostPerByte)]
     #[storage_mapper("costPerByte")]
-    fn cost_per_byte(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn cost_per_byte(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[storage_mapper("deposit")]
-    fn deposit(&self, address: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn deposit(&self, address: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[storage_mapper("totalReserved")]
-    fn total_reserved(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn total_reserved(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 }

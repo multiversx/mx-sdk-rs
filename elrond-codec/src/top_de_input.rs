@@ -1,11 +1,14 @@
 use crate::num_conv::bytes_to_number;
 use crate::transmute::vec_into_boxed_slice;
+use crate::{NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast};
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 /// Trait that abstracts away an underlying API for a top-level object deserializer.
 /// The underlying API can provide pre-parsed i64/u64 or pre-bundled boxed slices.
 pub trait TopDecodeInput: Sized {
+    type NestedBuffer: NestedDecodeInput;
+
     /// Length of the underlying data, in bytes.
     fn byte_len(&self) -> usize;
 
@@ -28,6 +31,12 @@ pub trait TopDecodeInput: Sized {
     fn into_i64(self) -> i64 {
         bytes_to_number(&*self.into_boxed_slice_u8(), true) as i64
     }
+
+    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
+        None
+    }
+
+    fn into_nested_buffer(self) -> Self::NestedBuffer;
 
     /// Unless you're developing elrond-wasm, please ignore.
     ///
@@ -64,6 +73,8 @@ pub trait TopDecodeInput: Sized {
 }
 
 impl TopDecodeInput for Box<[u8]> {
+    type NestedBuffer = OwnedBytesNestedDecodeInput;
+
     fn byte_len(&self) -> usize {
         self.len()
     }
@@ -71,9 +82,15 @@ impl TopDecodeInput for Box<[u8]> {
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         self
     }
+
+    fn into_nested_buffer(self) -> Self::NestedBuffer {
+        OwnedBytesNestedDecodeInput::new(self)
+    }
 }
 
 impl TopDecodeInput for Vec<u8> {
+    type NestedBuffer = OwnedBytesNestedDecodeInput;
+
     fn byte_len(&self) -> usize {
         self.len()
     }
@@ -81,14 +98,24 @@ impl TopDecodeInput for Vec<u8> {
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         vec_into_boxed_slice(self)
     }
+
+    fn into_nested_buffer(self) -> Self::NestedBuffer {
+        OwnedBytesNestedDecodeInput::new(self.into_boxed_slice())
+    }
 }
 
 impl<'a> TopDecodeInput for &'a [u8] {
+    type NestedBuffer = &'a [u8];
+
     fn byte_len(&self) -> usize {
         self.len()
     }
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         Box::from(self)
+    }
+
+    fn into_nested_buffer(self) -> Self::NestedBuffer {
+        self
     }
 }

@@ -42,9 +42,9 @@ pub trait Erc1155Marketplace {
         &self,
         _operator: Address,
         from: Address,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
-        args: AuctionArgument<Self::BigUint>,
+        type_id: BigUint,
+        nft_id: BigUint,
+        args: AuctionArgument<BigUint>,
     ) -> SCResult<()> {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -71,9 +71,9 @@ pub trait Erc1155Marketplace {
         &self,
         _operator: Address,
         from: Address,
-        type_ids: Vec<Self::BigUint>,
-        nft_ids: Vec<Self::BigUint>,
-        args: AuctionArgument<Self::BigUint>,
+        type_ids: Vec<BigUint>,
+        nft_ids: Vec<BigUint>,
+        args: AuctionArgument<BigUint>,
     ) -> SCResult<()> {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -153,10 +153,10 @@ pub trait Erc1155Marketplace {
     #[endpoint]
     fn bid(
         &self,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
+        type_id: BigUint,
+        nft_id: BigUint,
         #[payment_token] payment_token: TokenIdentifier,
-        #[payment] payment: Self::BigUint,
+        #[payment] payment: BigUint,
     ) -> SCResult<()> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
@@ -213,11 +213,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[endpoint(endAuction)]
-    fn end_auction(
-        &self,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -261,16 +257,12 @@ pub trait Erc1155Marketplace {
     // views
 
     #[view(isUpForAuction)]
-    fn is_up_for_auction(&self, type_id: &Self::BigUint, nft_id: &Self::BigUint) -> bool {
+    fn is_up_for_auction(&self, type_id: &BigUint, nft_id: &BigUint) -> bool {
         !self.auction_for_token(type_id, nft_id).is_empty()
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(
-        &self,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
-    ) -> SCResult<Auction<Self::BigUint>> {
+    fn get_auction_status(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<Auction<BigUint>> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -280,11 +272,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(
-        &self,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
-    ) -> SCResult<Self::BigUint> {
+    fn get_current_winning_bid(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<BigUint> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -294,11 +282,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getCurrentWinner)]
-    fn get_current_winner(
-        &self,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
-    ) -> SCResult<Address> {
+    fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<Address> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -315,12 +299,12 @@ pub trait Erc1155Marketplace {
     #[allow(clippy::too_many_arguments)]
     fn try_create_auction(
         &self,
-        type_id: &Self::BigUint,
-        nft_id: &Self::BigUint,
+        type_id: &BigUint,
+        nft_id: &BigUint,
         original_owner: &Address,
         token: &TokenIdentifier,
-        min_bid: &Self::BigUint,
-        max_bid: &Self::BigUint,
+        min_bid: &BigUint,
+        max_bid: &BigUint,
         deadline: u64,
     ) -> SCResult<()> {
         require!(
@@ -342,7 +326,7 @@ pub trait Erc1155Marketplace {
             max_bid: max_bid.clone(),
             deadline,
             original_owner: original_owner.clone(),
-            current_bid: Self::BigUint::zero(),
+            current_bid: BigUint::zero(),
             current_winner: Address::zero(),
         });
 
@@ -351,8 +335,8 @@ pub trait Erc1155Marketplace {
 
     fn async_transfer_token(
         &self,
-        type_id: Self::BigUint,
-        nft_id: Self::BigUint,
+        type_id: BigUint,
+        nft_id: BigUint,
         to: Address,
     ) -> AsyncCall<Self::SendApi> {
         let sc_own_address = self.blockchain().get_sc_address();
@@ -363,26 +347,20 @@ pub trait Erc1155Marketplace {
             .async_call()
     }
 
-    fn calculate_cut_amount(
-        &self,
-        total_amount: &Self::BigUint,
-        cut_percentage: u8,
-    ) -> Self::BigUint {
+    fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {
         &(total_amount * &(cut_percentage as u32).into()) / &(PERCENTAGE_TOTAL as u32).into()
     }
 
-    fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &Self::BigUint) {
+    fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
         let mut mapper = self.get_claimable_funds_mapper();
-        let mut total = mapper
-            .get(token_identifier)
-            .unwrap_or_else(Self::BigUint::zero);
+        let mut total = mapper.get(token_identifier).unwrap_or_else(BigUint::zero);
         total += amount;
         mapper.insert(token_identifier.clone(), total);
     }
 
     fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
-        mapper.insert(token_identifier.clone(), Self::BigUint::zero());
+        mapper.insert(token_identifier.clone(), BigUint::zero());
     }
 
     fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
@@ -414,16 +392,14 @@ pub trait Erc1155Marketplace {
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(
-        &self,
-    ) -> SafeMapMapper<Self::Storage, TokenIdentifier, Self::BigUint>;
+    fn get_claimable_funds_mapper(&self) -> SafeMapMapper<Self::Storage, TokenIdentifier, BigUint>;
 
     // auction properties for each token
 
     #[storage_mapper("auctionForToken")]
     fn auction_for_token(
         &self,
-        type_id: &Self::BigUint,
-        nft_id: &Self::BigUint,
-    ) -> SingleValueMapper<Self::Storage, Auction<Self::BigUint>>;
+        type_id: &BigUint,
+        nft_id: &BigUint,
+    ) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
 }

@@ -9,7 +9,7 @@ pub trait SimpleErc20Token {
     /// Total number of tokens in existence.
     #[view(totalSupply)]
     #[storage_mapper("total_supply")]
-    fn total_supply(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn total_supply(&self) -> SingleValueMapper<Self::Storage, BigUint>;
 
     /// Gets the balance of the specified address.
     ///
@@ -19,7 +19,7 @@ pub trait SimpleErc20Token {
     ///
     #[view(balanceOf)]
     #[storage_mapper("balance")]
-    fn token_balance(&self, address: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn token_balance(&self, address: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
 
     /// The amount of tokens that an owner allowed to a spender.
     ///
@@ -34,14 +34,14 @@ pub trait SimpleErc20Token {
         &self,
         owner: &Address,
         spender: &Address,
-    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    ) -> SingleValueMapper<Self::Storage, BigUint>;
 
     // FUNCTIONALITY
 
     /// Constructor, is called immediately after the contract is created
     /// Will set the fixed global token supply and give all the supply to the creator.
     #[init]
-    fn init(&self, total_supply: &Self::BigUint) {
+    fn init(&self, total_supply: &BigUint) {
         let creator = self.blockchain().get_caller();
 
         // save total supply
@@ -57,7 +57,7 @@ pub trait SimpleErc20Token {
         &self,
         sender: Address,
         recipient: Address,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> SCResult<()> {
         // check if enough funds & decrease sender balance
         self.token_balance(&sender).update(|balance| {
@@ -85,7 +85,7 @@ pub trait SimpleErc20Token {
     /// * `to` The address to transfer to.
     ///
     #[endpoint]
-    fn transfer(&self, to: Address, amount: Self::BigUint) -> SCResult<()> {
+    fn transfer(&self, to: Address, amount: BigUint) -> SCResult<()> {
         // the sender is the caller
         let sender = self.blockchain().get_caller();
         self.perform_transfer(sender, to, amount)
@@ -100,12 +100,7 @@ pub trait SimpleErc20Token {
     /// * `amount` the amount of tokens to be transferred.
     ///
     #[endpoint(transferFrom)]
-    fn transfer_from(
-        &self,
-        sender: Address,
-        recipient: Address,
-        amount: Self::BigUint,
-    ) -> SCResult<()> {
+    fn transfer_from(&self, sender: Address, recipient: Address, amount: BigUint) -> SCResult<()> {
         // get caller
         let caller = self.blockchain().get_caller();
 
@@ -130,7 +125,7 @@ pub trait SimpleErc20Token {
     /// * `amount` The amount of tokens to be spent.
     ///
     #[endpoint]
-    fn approve(&self, spender: Address, amount: Self::BigUint) -> SCResult<()> {
+    fn approve(&self, spender: Address, amount: BigUint) -> SCResult<()> {
         // sender is the caller
         let caller = self.blockchain().get_caller();
 
@@ -149,7 +144,7 @@ pub trait SimpleErc20Token {
         &self,
         #[indexed] sender: &Address,
         #[indexed] recipient: &Address,
-        amount: &Self::BigUint,
+        amount: &BigUint,
     );
 
     #[event("approve")]
@@ -157,6 +152,6 @@ pub trait SimpleErc20Token {
         &self,
         #[indexed] sender: &Address,
         #[indexed] recipient: &Address,
-        amount: &Self::BigUint,
+        amount: &BigUint,
     );
 }

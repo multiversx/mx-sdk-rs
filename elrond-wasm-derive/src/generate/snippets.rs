@@ -20,17 +20,6 @@ pub fn where_self_big_int() -> proc_macro2::TokenStream {
             for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
             for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
             for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
-            Self::BigInt: elrond_wasm::api::BigIntApi,
-            for<'a, 'b> &'a Self::BigInt: core::ops::Add<&'b Self::BigInt, Output = Self::BigInt>,
-            for<'a, 'b> &'a Self::BigInt: core::ops::Sub<&'b Self::BigInt, Output = Self::BigInt>,
-            for<'a, 'b> &'a Self::BigInt: core::ops::Mul<&'b Self::BigInt, Output = Self::BigInt>,
-            for<'a, 'b> &'a Self::BigInt: core::ops::Div<&'b Self::BigInt, Output = Self::BigInt>,
-            for<'a, 'b> &'a Self::BigInt: core::ops::Rem<&'b Self::BigInt, Output = Self::BigInt>,
-            for<'b> Self::BigInt: core::ops::AddAssign<&'b Self::BigInt>,
-            for<'b> Self::BigInt: core::ops::SubAssign<&'b Self::BigInt>,
-            for<'b> Self::BigInt: core::ops::MulAssign<&'b Self::BigInt>,
-            for<'b> Self::BigInt: core::ops::DivAssign<&'b Self::BigInt>,
-            for<'b> Self::BigInt: core::ops::RemAssign<&'b Self::BigInt>,
     }
 }
 
@@ -56,17 +45,6 @@ pub fn where_api_big_int() -> proc_macro2::TokenStream {
             for<'b> A::BigUint: core::ops::BitXorAssign<&'b A::BigUint>,
             for<'a> &'a A::BigUint: core::ops::Shr<usize, Output = A::BigUint>,
             for<'a> &'a A::BigUint: core::ops::Shl<usize, Output = A::BigUint>,
-            A::BigInt: elrond_wasm::api::BigIntApi,
-            for<'a, 'b> &'a A::BigInt: core::ops::Add<&'b A::BigInt, Output = A::BigInt>,
-            for<'a, 'b> &'a A::BigInt: core::ops::Sub<&'b A::BigInt, Output = A::BigInt>,
-            for<'a, 'b> &'a A::BigInt: core::ops::Mul<&'b A::BigInt, Output = A::BigInt>,
-            for<'a, 'b> &'a A::BigInt: core::ops::Div<&'b A::BigInt, Output = A::BigInt>,
-            for<'a, 'b> &'a A::BigInt: core::ops::Rem<&'b A::BigInt, Output = A::BigInt>,
-            for<'b> A::BigInt: core::ops::AddAssign<&'b A::BigInt>,
-            for<'b> A::BigInt: core::ops::SubAssign<&'b A::BigInt>,
-            for<'b> A::BigInt: core::ops::MulAssign<&'b A::BigInt>,
-            for<'b> A::BigInt: core::ops::DivAssign<&'b A::BigInt>,
-            for<'b> A::BigInt: core::ops::RemAssign<&'b A::BigInt>,
     }
 }
 
@@ -86,11 +64,12 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
+            type TypeManager = A::TypeManager;
             type BigUint = A::BigUint;
-            type BigInt = A::BigInt;
             type EllipticCurve = A::EllipticCurve;
             type Storage = A::Storage;
             type CallValue = A::CallValue;
@@ -111,6 +90,10 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
             #[inline]
             fn send(&self) -> Self::SendApi {
                 self.api.send()
+            }
+            #[inline]
+            fn type_manager(&self) -> Self::TypeManager {
+                self.api.type_manager()
             }
             #[inline]
             fn blockchain(&self) -> Self::BlockchainApi {
@@ -141,6 +124,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
@@ -158,6 +142,7 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static
         {
@@ -172,6 +157,7 @@ pub fn impl_private_api() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
@@ -200,6 +186,7 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::ErrorApi
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
                 + Clone
                 + 'static,
         {
@@ -230,8 +217,8 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         where
             SA: elrond_wasm::api::SendApi + 'static,
         {
+            type TypeManager = SA::ProxyTypeManager;
             type BigUint = SA::AmountType;
-            type BigInt = SA::ProxyBigInt;
             type EllipticCurve = SA::ProxyEllipticCurve;
             type Storage = SA::ProxyStorage;
             type SendApi = SA;
@@ -291,8 +278,8 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         where
             SA: elrond_wasm::api::SendApi + 'static,
         {
+            type TypeManager = SA::ProxyTypeManager;
             type BigUint = SA::AmountType;
-            type BigInt = SA::ProxyBigInt;
             type EllipticCurve = SA::ProxyEllipticCurve;
             type Storage = SA::ProxyStorage;
             type SendApi = SA;

@@ -5,6 +5,7 @@ use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 use elrond_wasm::api::BigUintApi;
+use elrond_wasm::types::BoxedBytes;
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::pow;
 use std::fmt;
@@ -278,9 +279,8 @@ impl NestedDecode for RustBigUint {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
-        let bytes = input.read_slice(size)?;
-        Ok(RustBigUint::from_bytes_be(bytes))
+        let bytes = BoxedBytes::dep_decode(input)?;
+        Ok(RustBigUint::from_bytes_be(bytes.as_slice()))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -288,9 +288,8 @@ impl NestedDecode for RustBigUint {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        let bytes = input.read_slice_or_exit(size, c, exit);
-        RustBigUint::from_bytes_be(bytes)
+        let bytes = BoxedBytes::dep_decode_or_exit(input, c, exit);
+        RustBigUint::from_bytes_be(bytes.as_slice())
     }
 }
 

@@ -20,8 +20,8 @@ pub trait OrdersModule:
 {
     fn create_order(
         &self,
-        payment: Payment<Self::BigUint>,
-        params: OrderInputParams<Self::BigUint>,
+        payment: Payment<BigUint>,
+        params: OrderInputParams<BigUint>,
         order_type: OrderType,
     ) -> SCResult<()> {
         let caller = &self.blockchain().get_caller();
@@ -130,7 +130,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::BigUint>> {
+    ) -> SCResult<Order<BigUint>> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -180,7 +180,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::BigUint>> {
+    ) -> SCResult<Order<BigUint>> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -208,7 +208,7 @@ pub trait OrdersModule:
         Ok(order)
     }
 
-    fn load_orders(&self, order_ids: &[u64]) -> Vec<Order<Self::BigUint>> {
+    fn load_orders(&self, order_ids: &[u64]) -> Vec<Order<BigUint>> {
         order_ids
             .iter()
             .filter(|&x| !self.orders(*x).is_empty())
@@ -216,10 +216,7 @@ pub trait OrdersModule:
             .collect()
     }
 
-    fn create_transfers(
-        &self,
-        orders: &[Order<Self::BigUint>],
-    ) -> SCResult<Vec<Transfer<Self::BigUint>>> {
+    fn create_transfers(&self, orders: &[Order<BigUint>]) -> SCResult<Vec<Transfer<BigUint>>> {
         let mut transfers = Vec::new();
         let first_token_id = self.first_token_id().get();
         let second_token_id = self.second_token_id().get();
@@ -262,9 +259,9 @@ pub trait OrdersModule:
 
     fn get_orders_with_type(
         &self,
-        orders: &[Order<Self::BigUint>],
+        orders: &[Order<BigUint>],
         order_type: OrderType,
-    ) -> Vec<Order<Self::BigUint>> {
+    ) -> Vec<Order<BigUint>> {
         orders
             .iter()
             .filter(|&x| x.order_type == order_type)
@@ -272,9 +269,9 @@ pub trait OrdersModule:
             .collect()
     }
 
-    fn get_orders_sum_up(&self, orders: &[Order<Self::BigUint>]) -> (Self::BigUint, Self::BigUint) {
-        let mut amount_paid = Self::BigUint::zero();
-        let mut amount_requested = Self::BigUint::zero();
+    fn get_orders_sum_up(&self, orders: &[Order<BigUint>]) -> (BigUint, BigUint) {
+        let mut amount_paid = BigUint::zero();
+        let mut amount_requested = BigUint::zero();
 
         orders.iter().for_each(|x| {
             amount_paid += &x.input_amount;
@@ -286,18 +283,18 @@ pub trait OrdersModule:
 
     fn calculate_transfers(
         &self,
-        orders: Vec<Order<Self::BigUint>>,
-        total_paid: Self::BigUint,
+        orders: Vec<Order<BigUint>>,
+        total_paid: BigUint,
         token_requested: TokenIdentifier,
-        leftover: Self::BigUint,
-    ) -> Vec<Transfer<Self::BigUint>> {
+        leftover: BigUint,
+    ) -> Vec<Transfer<BigUint>> {
         let mut transfers = Vec::new();
 
         let mut match_provider_transfer = Transfer {
             to: self.blockchain().get_caller(),
             payment: Payment {
                 token_id: token_requested.clone(),
-                amount: Self::BigUint::zero(),
+                amount: BigUint::zero(),
             },
         };
 
@@ -330,7 +327,7 @@ pub trait OrdersModule:
         transfers
     }
 
-    fn execute_transfers(&self, transfers: Vec<Transfer<Self::BigUint>>) {
+    fn execute_transfers(&self, transfers: Vec<Transfer<BigUint>>) {
         for transfer in transfers {
             if transfer.payment.amount > 0 {
                 self.send().direct(
@@ -372,7 +369,7 @@ pub trait OrdersModule:
 
     #[view(getOrderById)]
     #[storage_mapper("orders")]
-    fn orders(&self, id: u64) -> SingleValueMapper<Self::Storage, Order<Self::BigUint>>;
+    fn orders(&self, id: u64) -> SingleValueMapper<Self::Storage, Order<BigUint>>;
 
     #[storage_mapper("address_order_ids")]
     fn address_order_ids(&self, address: &Address) -> SingleValueMapper<Self::Storage, Vec<u64>>;

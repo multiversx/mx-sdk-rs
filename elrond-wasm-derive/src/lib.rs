@@ -15,6 +15,7 @@ mod macro_module;
 mod macro_proxy;
 mod model;
 mod parse;
+mod preprocessing;
 mod type_abi_derive;
 mod validate;
 

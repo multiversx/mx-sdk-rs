@@ -44,7 +44,7 @@
                     "5",
                     "1"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -68,6 +68,7 @@
                         "topics": [
                             "str:NFT-0001",
                             "5",
+                            "01",
                             "sc:forwarder"
                         ],
                         "data": ""

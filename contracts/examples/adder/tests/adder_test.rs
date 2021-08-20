@@ -1,17 +1,23 @@
 use adder::*;
-use elrond_wasm_debug::api::RustBigInt;
+use elrond_wasm::{api::ContractBase, types::BigInt};
 use elrond_wasm_debug::TxContext;
 
 #[test]
 fn test_add() {
     let adder = adder::contract_obj(TxContext::dummy());
 
-    adder.init(RustBigInt::from(5));
-    assert_eq!(RustBigInt::from(5), adder.sum().get());
+    adder.init(BigInt::from_i64(5, adder.type_manager()));
+    assert_eq!(BigInt::from_i64(5, adder.type_manager()), adder.sum().get());
 
-    let _ = adder.add(RustBigInt::from(7));
-    assert_eq!(RustBigInt::from(12), adder.sum().get());
+    let _ = adder.add(BigInt::from_i64(7, adder.type_manager()));
+    assert_eq!(
+        BigInt::from_i64(12, adder.type_manager()),
+        adder.sum().get()
+    );
 
-    let _ = adder.add(RustBigInt::from(1));
-    assert_eq!(RustBigInt::from(13), adder.sum().get());
+    let _ = adder.add(BigInt::from_i64(1, adder.type_manager()));
+    assert_eq!(
+        BigInt::from_i64(13, adder.type_manager()),
+        adder.sum().get()
+    );
 }

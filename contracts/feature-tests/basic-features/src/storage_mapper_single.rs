@@ -5,17 +5,17 @@ elrond_wasm::imports!();
 pub trait SingleValueMapperFeatures {
     #[view]
     #[storage_mapper("my_single_value_mapper")]
-    fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, Self::BigInt>;
+    fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
 
     #[endpoint]
-    fn my_single_value_mapper_increment_1(&self, amount: Self::BigInt) {
+    fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
         let my_single_value_mapper = self.map_my_single_value_mapper();
         my_single_value_mapper.set(&(my_single_value_mapper.get() + amount));
     }
 
     /// Same as my_single_value_mapper_increment_1, but expressed more compactly.
     #[endpoint]
-    fn my_single_value_mapper_increment_2(&self, amount: &Self::BigInt) {
+    fn my_single_value_mapper_increment_2(&self, amount: &BigInt) {
         self.map_my_single_value_mapper()
             .update(|value| *value += amount);
     }
@@ -24,7 +24,7 @@ pub trait SingleValueMapperFeatures {
     // For example, when subtracting from a balance, we must first check that we have enough funds
     // The closure can return a Result, which can be propagated (either directly, or via sc_try!)
     #[endpoint]
-    fn my_single_value_mapper_subtract_with_require(&self, amount: &Self::BigInt) -> SCResult<()> {
+    fn my_single_value_mapper_subtract_with_require(&self, amount: &BigInt) -> SCResult<()> {
         self.map_my_single_value_mapper().update(|value| {
             require!(*value >= *amount, "not enough funds");
             *value -= amount;
@@ -33,7 +33,7 @@ pub trait SingleValueMapperFeatures {
     }
 
     #[endpoint]
-    fn my_single_value_mapper_set_if_empty(&self, value: Self::BigInt) {
+    fn my_single_value_mapper_set_if_empty(&self, value: BigInt) {
         self.map_my_single_value_mapper().set_if_empty(&value);
     }
 

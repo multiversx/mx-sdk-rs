@@ -1,5 +1,7 @@
 elrond_wasm::imports!();
 
+const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+
 #[elrond_wasm::module]
 pub trait ForwarderSyncCallModule {
     #[proxy]
@@ -74,12 +76,12 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        let result: MultiResult4<TokenIdentifier, BoxedBytes, Self::BigUint, u64> = self
+        let result: MultiResult4<TokenIdentifier, BoxedBytes, BigUint, u64> = self
             .vault_proxy()
             .contract(to)
             .accept_funds_echo_payment(token, payment, token_nonce)
@@ -95,12 +97,30 @@ pub trait ForwarderSyncCallModule {
         );
     }
 
+    #[payable("*")]
+    #[endpoint]
+    fn forward_sync_accept_funds_with_fees(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_amount] payment: BigUint,
+        to: Address,
+        percentage_fees: BigUint,
+    ) {
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let amount_to_send = payment - fees;
+
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds(token_id, amount_to_send)
+            .execute_on_dest_context();
+    }
+
     #[event("accept_funds_sync_result")]
     fn accept_funds_sync_result_event(
         &self,
         #[indexed] token_identifier: &TokenIdentifier,
         #[indexed] token_type: &[u8],
-        #[indexed] token_payment: &Self::BigUint,
+        #[indexed] token_payment: &BigUint,
         #[indexed] token_nonce: u64,
     );
 
@@ -110,7 +130,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: Address,
         #[payment_token] token: TokenIdentifier,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) -> usize {
         let _ = self
@@ -132,7 +152,7 @@ pub trait ForwarderSyncCallModule {
         to: Address,
         token: TokenIdentifier,
         token_nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) {
         self.vault_proxy()
             .contract(to)
