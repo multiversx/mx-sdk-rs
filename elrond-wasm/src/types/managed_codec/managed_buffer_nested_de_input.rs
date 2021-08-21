@@ -1,8 +1,6 @@
 use elrond_codec::{DecodeError, NestedDecode, NestedDecodeInput, TryStaticCast};
 
-use crate::api::ManagedTypeApi;
-
-use super::ManagedBuffer;
+use crate::{api::ManagedTypeApi, types::ManagedBuffer};
 
 /// Nested decode buffer based on a managed buffer.
 /// Uses the load/copy slice API to extract pieces of the managed buffer for deserialization.

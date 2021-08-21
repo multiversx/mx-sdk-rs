@@ -1,9 +1,7 @@
 use alloc::boxed::Box;
 use elrond_codec::{TopEncodeOutput, TryStaticCast};
 
-use crate::api::ManagedTypeApi;
-
-use super::ManagedBuffer;
+use crate::{api::ManagedTypeApi, types::ManagedBuffer};
 
 impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
     type NestedBuffer = ManagedBuffer<M>;

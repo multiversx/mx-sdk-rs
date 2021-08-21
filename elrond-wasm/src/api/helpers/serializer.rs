@@ -2,7 +2,7 @@ use elrond_codec::{DecodeError, EncodeError, TopDecode, TopEncode};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    types::ManagedBuffer,
+    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput},
 };
 
 pub struct ManagedSerializer<M>
@@ -26,8 +26,20 @@ where
         result
     }
 
+    pub fn top_encode_to_boxed_bytes<T: TopEncode>(&self, value: &T) -> BoxedBytes {
+        let mut result = BoxedBytes::empty();
+        value.top_encode_or_exit(&mut result, self.api.clone(), top_encode_exit);
+        result
+    }
+
     pub fn top_decode_from_managed_buffer<T: TopDecode>(&self, buffer: &ManagedBuffer<M>) -> T {
         T::top_decode_or_exit(buffer, self.api.clone(), top_decode_exit)
+    }
+
+    pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
+        let managed_input =
+            ManagedBytesTopDecodeInput::new(BoxedBytes::from(slice), self.api.clone());
+        T::top_decode_or_exit(managed_input, self.api.clone(), top_decode_exit)
     }
 }
 
