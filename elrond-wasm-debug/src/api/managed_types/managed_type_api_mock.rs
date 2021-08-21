@@ -25,7 +25,7 @@ impl ManagedTypeApi for TxContext {
     }
 
     fn mb_from_big_int_unsigned(&self, big_int_handle: Handle) -> Handle {
-        let bi_bytes = self.bi_get_signed_bytes(big_int_handle);
+        let bi_bytes = self.bi_get_unsigned_bytes(big_int_handle);
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output
             .managed_types

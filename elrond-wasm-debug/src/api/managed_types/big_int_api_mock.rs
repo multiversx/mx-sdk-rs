@@ -164,7 +164,7 @@ impl BigIntApi for TxContext {
     fn bi_log2(&self, x: Handle) -> u32 {
         let tx_output = self.tx_output_cell.borrow();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
-        bi_x.bits() as u32
+        bi_x.bits() as u32 - 1
     }
 
     binary_bitwise_op_method! {bi_and, bitand}
