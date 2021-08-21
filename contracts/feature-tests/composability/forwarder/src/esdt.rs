@@ -2,6 +2,8 @@ elrond_wasm::imports!();
 
 use super::storage;
 
+const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+
 #[elrond_wasm::module]
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
@@ -23,6 +25,21 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             OptionalArg::None => &[],
         };
         self.send().direct(to, &token_id, 0, amount, data);
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn send_esdt_with_fees(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_amount] payment: BigUint,
+        to: Address,
+        percentage_fees: BigUint,
+    ) {
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
+        let amount_to_send = payment - fees;
+
+        self.send().direct(&to, &token_id, 0, &amount_to_send, &[]);
     }
 
     #[endpoint]
