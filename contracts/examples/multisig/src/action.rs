@@ -81,12 +81,13 @@ where
 
 #[cfg(test)]
 mod test {
+    use elrond_wasm_debug::TxContext;
+
     use super::Action;
-    use elrond_wasm_debug::api::RustBigUint;
 
     #[test]
     fn test_is_pending() {
-        assert!(!Action::<RustBigUint>::Nothing.is_pending());
-        assert!(Action::<RustBigUint>::ChangeQuorum(5).is_pending());
+        assert!(!Action::<TxContext>::Nothing.is_pending());
+        assert!(Action::<TxContext>::ChangeQuorum(5).is_pending());
     }
 }
