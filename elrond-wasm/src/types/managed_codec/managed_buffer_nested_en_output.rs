@@ -1,8 +1,6 @@
 use elrond_codec::{NestedEncodeOutput, TryStaticCast};
 
-use crate::api::ManagedTypeApi;
-
-use super::ManagedBuffer;
+use crate::{api::ManagedTypeApi, types::ManagedBuffer};
 
 impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
     fn write(&mut self, bytes: &[u8]) {

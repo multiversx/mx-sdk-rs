@@ -1,9 +1,9 @@
 use alloc::boxed::Box;
 use elrond_codec::{TopDecodeInput, TryStaticCast};
 
-use crate::api::ManagedTypeApi;
+use crate::{api::ManagedTypeApi, types::ManagedBuffer};
 
-use super::{ManagedBuffer, ManagedBufferNestedDecodeInput};
+use super::ManagedBufferNestedDecodeInput;
 
 impl<M> TopDecodeInput for &ManagedBuffer<M>
 where
