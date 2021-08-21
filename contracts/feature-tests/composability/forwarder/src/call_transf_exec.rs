@@ -1,5 +1,7 @@
 elrond_wasm::imports!();
 
+const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+
 #[elrond_wasm::module]
 pub trait ForwarderTransferExecuteModule {
     #[proxy]
@@ -18,6 +20,24 @@ pub trait ForwarderTransferExecuteModule {
             .contract(to)
             .accept_funds(token, payment)
             .with_nft_nonce(token_nonce)
+            .transfer_execute();
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn forward_transf_execu_accept_funds_with_fees(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_amount] payment: BigUint,
+        to: Address,
+        percentage_fees: BigUint,
+    ) {
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
+        let amount_to_send = payment - fees;
+
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds(token_id, amount_to_send)
             .transfer_execute();
     }
 
