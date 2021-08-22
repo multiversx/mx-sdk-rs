@@ -128,4 +128,23 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
             );
         }
     }
+
+    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
+        // TODO: might be worth adding a new hook to Arwen for this
+        unsafe {
+            let len1 = mBufferGetLength(handle1 as i32) as usize;
+            let len2 = mBufferGetLength(handle2 as i32) as usize;
+            if len1 != len2 {
+                return false;
+            }
+            if len1 == 0 {
+                return true;
+            }
+            let bytes1 = BoxedBytes::allocate(len1);
+            let bytes2 = BoxedBytes::allocate(len2);
+            let _ = mBufferGetBytes(handle1, bytes1.as_mut_ptr());
+            let _ = mBufferGetBytes(handle1, bytes2.as_mut_ptr());
+            bytes1 == bytes2
+        }
+    }
 }

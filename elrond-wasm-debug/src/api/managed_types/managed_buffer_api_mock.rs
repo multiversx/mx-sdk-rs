@@ -125,4 +125,11 @@ impl ManagedBufferApi for TxContext {
             .get_mut(accumulator_handle);
         accumulator.extend_from_slice(bytes);
     }
+
+    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
+        let tx_output = self.tx_output_cell.borrow();
+        let bytes1 = tx_output.managed_types.managed_buffer_map.get(handle1);
+        let bytes2 = tx_output.managed_types.managed_buffer_map.get(handle2);
+        bytes1 == bytes2
+    }
 }

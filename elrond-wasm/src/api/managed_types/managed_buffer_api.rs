@@ -40,4 +40,6 @@ pub trait ManagedBufferApi {
     fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle);
 
     fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]);
+
+    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool;
 }
