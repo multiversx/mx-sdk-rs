@@ -42,7 +42,7 @@ pub trait EllipticCurveFeatures {
     }
 
     #[endpoint]
-    fn compute_add(
+    fn compute_ec_add(
         &self,
         curve_bitsize: u32,
         x_first_point: BigUint,
@@ -59,7 +59,7 @@ pub trait EllipticCurveFeatures {
     }
 
     #[endpoint]
-    fn compute_double(
+    fn compute_ec_double(
         &self,
         curve_bitsize: u32,
         x_point: BigUint,
