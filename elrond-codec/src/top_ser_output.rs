@@ -18,6 +18,7 @@ pub trait TopEncodeOutput: Sized {
     fn set_slice_u8(self, bytes: &[u8]);
 
     #[inline]
+    #[allow(clippy::boxed_local)]
     fn set_boxed_bytes(self, bytes: Box<[u8]>) {
         self.set_slice_u8(&*bytes);
     }

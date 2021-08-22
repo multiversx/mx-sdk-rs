@@ -174,7 +174,7 @@ impl BigIntApi for TxContext {
     fn bi_shr(&self, dest: Handle, x: Handle, bits: usize) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
-        assert_positive(&bi_x);
+        assert_positive(bi_x);
         let result = bi_x.shr(bits);
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
@@ -182,7 +182,7 @@ impl BigIntApi for TxContext {
     fn bi_shl(&self, dest: Handle, x: Handle, bits: usize) {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         let bi_x = tx_output.managed_types.big_int_map.get(x);
-        assert_positive(&bi_x);
+        assert_positive(bi_x);
         let result = bi_x.shl(bits);
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
