@@ -86,9 +86,13 @@ pub trait ContractBase: Sized {
 pub trait ContractPrivateApi {
     type ArgumentApi: ManagedTypeApi + EndpointArgumentApi + Clone + 'static;
 
+    type CallbackClosureArgumentApi: ManagedTypeApi + ErrorApi + Clone + 'static;
+
     type FinishApi: ManagedTypeApi + EndpointFinishApi + ErrorApi + Clone + 'static;
 
     fn argument_api(&self) -> Self::ArgumentApi;
+
+    fn callback_closure_arg_api(&self) -> Self::CallbackClosureArgumentApi;
 
     fn finish_api(&self) -> Self::FinishApi;
 }
