@@ -1,9 +1,11 @@
-use alloc::string::String;
-
+use super::ManagedBuffer;
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
-
-use super::ManagedBuffer;
+use alloc::string::String;
+use elrond_codec::{
+    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+};
 
 #[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
@@ -107,8 +109,6 @@ impl<M: ManagedTypeApi> BigInt<M> {
         }
     }
 }
-
-use crate::elrond_codec::*;
 
 impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
