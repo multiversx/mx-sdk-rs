@@ -154,20 +154,21 @@ impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if !dest.push_specialized(&self.to_bytes_be_buffer()) {
-            dest.write(self.to_bytes_be().as_slice());
+        if dest.push_specialized(&self.to_bytes_be_buffer()) {
+            Ok(())
+        } else {
+            self.to_bytes_be().as_slice().dep_encode(dest)
         }
-        Ok(())
     }
 
     fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
         &self,
         dest: &mut O,
-        _c: ExitCtx,
-        _exit: fn(ExitCtx, EncodeError) -> !,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
     ) {
         if !dest.push_specialized(&self.to_bytes_be_buffer()) {
-            dest.write(self.to_bytes_be().as_slice());
+            self.to_bytes_be().as_slice().dep_encode_or_exit(dest, c, exit);
         }
     }
 }
