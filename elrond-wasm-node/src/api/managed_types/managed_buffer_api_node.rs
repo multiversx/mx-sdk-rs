@@ -140,10 +140,10 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
             if len1 == 0 {
                 return true;
             }
-            let bytes1 = BoxedBytes::allocate(len1);
-            let bytes2 = BoxedBytes::allocate(len2);
+            let mut bytes1 = BoxedBytes::allocate(len1);
+            let mut bytes2 = BoxedBytes::allocate(len2);
             let _ = mBufferGetBytes(handle1, bytes1.as_mut_ptr());
-            let _ = mBufferGetBytes(handle1, bytes2.as_mut_ptr());
+            let _ = mBufferGetBytes(handle2, bytes2.as_mut_ptr());
             bytes1 == bytes2
         }
     }
