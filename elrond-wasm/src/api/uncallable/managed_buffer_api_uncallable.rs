@@ -54,4 +54,8 @@ impl ManagedBufferApi for super::UncallableApi {
     fn mb_append_bytes(&self, _accumulator_handle: Handle, _bytes: &[u8]) {
         unreachable!()
     }
+
+    fn mb_eq(&self, _handle1: Handle, _handle2: Handle) -> bool {
+        unreachable!()
+    }
 }

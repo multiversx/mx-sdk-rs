@@ -10,6 +10,7 @@ use elrond_codec::{
 };
 
 /// A byte buffer managed by an external API.
+#[derive(Debug)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     pub(crate) api: M,
@@ -98,6 +99,15 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     }
 }
 
+impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.api.mb_eq(self.handle, other.handle)
+    }
+}
+
+impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
+
 impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
@@ -110,20 +120,21 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if !dest.push_specialized(self) {
-            dest.write(self.to_boxed_bytes().as_slice());
+        if dest.push_specialized(self) {
+            Ok(())
+        } else {
+            self.to_boxed_bytes().dep_encode(dest)
         }
-        Ok(())
     }
 
     fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
         &self,
         dest: &mut O,
-        _c: ExitCtx,
-        _exit: fn(ExitCtx, EncodeError) -> !,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
     ) {
         if !dest.push_specialized(self) {
-            dest.write(self.to_boxed_bytes().as_slice());
+            self.to_boxed_bytes().dep_encode_or_exit(dest, c, exit);
         }
     }
 }

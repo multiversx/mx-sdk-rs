@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use elrond_wasm::{
     elrond_codec::{TopDecode, TopEncode},
-    types::{BigInt, BigUint},
+    types::{BigInt, BigUint, ManagedBuffer},
 };
 use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode, TxContext};
 
@@ -17,7 +17,6 @@ where
     let deserialized: V = check_managed_top_decode::<V>(api, serialized_bytes.as_slice());
     assert_eq!(deserialized, element);
 }
-
 
 #[test]
 fn test_big_uint_serialization() {
@@ -37,7 +36,6 @@ fn test_big_uint_vec_serialization() {
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);
 }
 
-
 #[test]
 fn test_big_int_serialization() {
     let api = TxContext::dummy();
@@ -55,4 +53,30 @@ fn test_big_int_vec_serialization() {
     ];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);
+}
+
+#[test]
+fn test_man_buf_serialization() {
+    let api = TxContext::dummy();
+
+    check_managed_top_encode_decode(
+        api.clone(),
+        ManagedBuffer::new_from_bytes(api.clone(), &b"abc"[..]),
+        &b"abc"[..],
+    );
+}
+
+#[test]
+fn test_man_buf_vec_serialization() {
+    let api = TxContext::dummy();
+    let v = vec![
+        ManagedBuffer::new_from_bytes(api.clone(), &b"abc"[..]),
+        ManagedBuffer::new_from_bytes(api.clone(), &b"de"[..]),
+    ];
+
+    check_managed_top_encode_decode(
+        api,
+        v,
+        &[0, 0, 0, 3, b'a', b'b', b'c', 0, 0, 0, 2, b'd', b'e'],
+    );
 }
