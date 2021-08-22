@@ -211,7 +211,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = BytesArgLoader::new(raw_result.as_slice(), self.api);
+        let mut loader = BytesArgLoader::new(raw_result, self.api.type_manager());
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 
@@ -236,7 +236,7 @@ where
             range_closure,
         );
 
-        let mut loader = BytesArgLoader::new(raw_result.as_slice(), self.api);
+        let mut loader = BytesArgLoader::new(raw_result, self.api.type_manager());
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 }

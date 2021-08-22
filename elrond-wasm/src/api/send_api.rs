@@ -17,7 +17,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ErrorApi + Clone + Sized {
-    type ProxyTypeManager: ManagedTypeApi + 'static;
+    type ProxyTypeManager: ManagedTypeApi + ErrorApi + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
     type ProxyStorage: StorageReadApi
