@@ -20,6 +20,7 @@ pub trait EllipticCurveApi {
 
     fn ec_private_key_byte_length(&self, ec_handle: Handle) -> u32;
 
+    #[allow(clippy::too_many_arguments)]
     fn ec_add(
         &self,
         x_result_handle: Handle,

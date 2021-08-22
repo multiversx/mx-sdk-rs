@@ -14,6 +14,7 @@ pub struct BigInt<M: ManagedTypeApi> {
 }
 
 // BigInt sign.
+#[allow(clippy::enum_variant_names)]
 pub enum Sign {
     Minus,
     NoSign,
