@@ -4,7 +4,7 @@ use elrond_codec_derive::*;
 use elrond_codec::test_util::{check_dep_encode_decode, check_top_decode, check_top_encode_decode};
 
 // to test, run the following command in elrond-codec folder:
-// cargo expand --test enum_derive_test > enum_expanded.rs
+// cargo expand --test derive_enum_test > enum_expanded.rs
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
 enum DayOfWeek {
