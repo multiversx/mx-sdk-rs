@@ -108,10 +108,16 @@ pub fn impl_private_api() -> proc_macro2::TokenStream {
                 + 'static,
         {
             type ArgumentApi = A;
+            type CallbackClosureArgumentApi = A;
             type FinishApi = A;
 
             #[inline]
             fn argument_api(&self) -> Self::ArgumentApi {
+                self.api.clone()
+            }
+
+            #[inline]
+            fn callback_closure_arg_api(&self) -> Self::CallbackClosureArgumentApi {
                 self.api.clone()
             }
 

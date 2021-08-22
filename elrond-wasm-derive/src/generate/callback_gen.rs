@@ -116,7 +116,10 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
 					#callback_name_literal =>
 					{
 						#payable_snippet
-						let mut ___cb_closure_loader___ = CallDataArgLoader::new(___cb_data_deserializer___, self.error_api());
+						let mut ___cb_closure_loader___ = CallDataArgLoader::new(
+							___cb_data_deserializer___,
+							self.callback_closure_arg_api(),
+						);
 						#(#arg_init_snippets)*
 						___cb_closure_loader___.assert_no_more_args();
 						#call_result_assert_no_more_args
