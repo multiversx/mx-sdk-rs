@@ -1,11 +1,17 @@
 {
     "name": "test external steps resolution",
-    "comment": "tests mandos validatorReward, no SC",
+    "comment": "simple EGLD transfer, no SC",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:A": {
+                    "nonce": "0",
+                    "balance": "150",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -14,10 +20,11 @@
             }
         },
         {
-            "step": "validatorReward",
+            "step": "transfer",
             "txId": "1",
             "tx": {
-                "to": "address:A",
+                "from": "address:A",
+                "to": "address:B",
                 "value": "100"
             }
         },
@@ -25,20 +32,25 @@
             "step": "checkState",
             "accounts": {
                 "address:A": {
+                    "nonce": "1",
+                    "balance": "50",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
                     "nonce": "0",
                     "balance": "100",
-                    "storage": {
-                        "str:ELRONDreward": "100"
-                    },
+                    "storage": {},
                     "code": ""
                 }
             }
         },
         {
-            "step": "validatorReward",
+            "step": "transfer",
             "txId": "2",
             "tx": {
-                "to": "address:A",
+                "from": "address:A",
+                "to": "address:B",
                 "value": "50"
             }
         },
@@ -46,11 +58,15 @@
             "step": "checkState",
             "accounts": {
                 "address:A": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
                     "nonce": "0",
                     "balance": "150",
-                    "storage": {
-                        "str:ELRONDreward": "150"
-                    },
+                    "storage": {},
                     "code": ""
                 }
             }
