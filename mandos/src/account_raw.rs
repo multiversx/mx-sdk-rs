@@ -9,8 +9,13 @@ pub struct AccountRaw {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
 
-    pub nonce: ValueSubTree,
-    pub balance: ValueSubTree,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nonce: Option<ValueSubTree>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub balance: Option<ValueSubTree>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

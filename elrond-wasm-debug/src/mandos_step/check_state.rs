@@ -29,10 +29,19 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                 expected_account.username,
                 std::str::from_utf8(account.username.as_slice()).unwrap()
             );
+            let default_value = &Vec::new();
+            let actual_code = account.contract_path.as_ref().unwrap_or(default_value);
+            assert!(
+                expected_account.code.check(actual_code),
+                "bad account code. Address: {}. Want: {}. Have: {}",
+                expected_address,
+                expected_account.code,
+                std::str::from_utf8(actual_code.as_slice()).unwrap()
+            );
 
             if let CheckStorage::Equal(eq) = &expected_account.storage {
                 let default_value = &Vec::new();
-                for (expected_key, expected_value) in eq.iter() {
+                for (expected_key, expected_value) in eq.storages.iter() {
                     let actual_value = account
                         .storage
                         .get(&expected_key.value)
@@ -50,16 +59,21 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                 let default_check_value = CheckValue::Equal(BytesValue::empty());
                 for (actual_key, actual_value) in account.storage.iter() {
                     let expected_value = eq
+                        .storages
                         .get(&actual_key.clone().into())
                         .unwrap_or(&default_check_value);
-                    assert!(
-                        expected_value.check(actual_value),
-                        "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
-                        expected_address,
-                        verbose_hex(actual_key),
-                        expected_value,
-                        verbose_hex(actual_value)
-                    );
+                    if expected_value.to_string() == default_check_value.to_string()
+                        && !eq.other_storages_allowed
+                    {
+                        assert!(
+                            expected_value.check(actual_value),
+                            "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
+                            expected_address,
+                            verbose_hex(actual_key),
+                            expected_value,
+                            verbose_hex(actual_value)
+                        );
+                    }
                 }
             }
 

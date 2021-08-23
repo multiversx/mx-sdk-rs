@@ -2,67 +2,6 @@ use super::*;
 use std::collections::BTreeMap;
 
 #[derive(Debug)]
-pub enum CheckStorage {
-    Star,
-    Equal(BTreeMap<BytesKey, CheckValue<BytesValue>>),
-}
-
-impl InterpretableFrom<CheckStorageRaw> for CheckStorage {
-    fn interpret_from(from: CheckStorageRaw, context: &InterpreterContext) -> Self {
-        match from {
-            CheckStorageRaw::Star => CheckStorage::Star,
-            CheckStorageRaw::Equal(m) => CheckStorage::Equal(
-                m.into_iter()
-                    .map(|(k, v)| {
-                        (
-                            BytesKey::interpret_from(k, context),
-                            CheckValue::<BytesValue>::interpret_from(v, context),
-                        )
-                    })
-                    .collect(),
-            ),
-        }
-    }
-}
-
-impl CheckStorage {
-    pub fn is_star(&self) -> bool {
-        matches!(self, CheckStorage::Star)
-    }
-}
-
-#[derive(Debug)]
-pub enum CheckEsdt {
-    Star,
-    Equal(BTreeMap<BytesKey, CheckValue<BigUintValue>>),
-}
-
-impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
-    fn interpret_from(from: CheckEsdtRaw, context: &InterpreterContext) -> Self {
-        match from {
-            CheckEsdtRaw::Unspecified => CheckEsdt::Equal(BTreeMap::new()),
-            CheckEsdtRaw::Star => CheckEsdt::Star,
-            CheckEsdtRaw::Equal(m) => CheckEsdt::Equal(
-                m.into_iter()
-                    .map(|(k, v)| {
-                        (
-                            BytesKey::interpret_from(k, context),
-                            CheckValue::<BigUintValue>::interpret_from(v, context),
-                        )
-                    })
-                    .collect(),
-            ),
-        }
-    }
-}
-
-impl CheckEsdt {
-    pub fn is_star(&self) -> bool {
-        matches!(self, CheckEsdt::Star)
-    }
-}
-
-#[derive(Debug)]
 pub struct CheckAccount {
     pub comment: Option<String>,
     pub nonce: CheckValue<U64Value>,
