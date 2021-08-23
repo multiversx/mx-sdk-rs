@@ -10,6 +10,8 @@ pub struct CallbackData<BigUint: BigUintApi> {
     args: Vec<BoxedBytes>,
 }
 
+const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+
 #[elrond_wasm::module]
 pub trait ForwarderAsyncCallModule {
     #[proxy]
@@ -43,6 +45,24 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds(token, half_payment)
+            .async_call()
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn forward_async_accept_funds_with_fees(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_amount] payment: BigUint,
+        to: Address,
+        percentage_fees: BigUint,
+    ) -> AsyncCall<Self::SendApi> {
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let amount_to_send = payment - fees;
+
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds(token_id, amount_to_send)
             .async_call()
     }
 
