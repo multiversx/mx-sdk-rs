@@ -25,10 +25,18 @@ pub fn execute(
         } else {
             HashMap::new()
         };
-        state.add_account(AccountData {
+        state.validate_and_add_account(AccountData {
             address: address.value.into(),
-            nonce: account.nonce.value,
-            balance: account.balance.value.clone(),
+            nonce: account
+                .nonce
+                .as_ref()
+                .map(|nonce| nonce.value)
+                .unwrap_or_default(),
+            balance: account
+                .balance
+                .as_ref()
+                .map(|balance| balance.value.clone())
+                .unwrap_or_default(),
             esdt,
             username: account
                 .username
@@ -47,6 +55,10 @@ pub fn execute(
         });
     }
     for new_address in new_addresses.iter() {
+        assert!(
+            state.is_smart_contract_address(&new_address.new_address.value.into()),
+            "field should have SC format"
+        );
         state.put_new_address(
             new_address.creator_address.value.into(),
             new_address.creator_nonce.value,

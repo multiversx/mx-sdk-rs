@@ -1,0 +1,28 @@
+{
+    "comment": "verifies that setState and checkState are consistent",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:the-address": {
+                    "storage": {
+                        "str:key-a": "str:value-a",
+                        "str:key-b": "str:value-b",
+                        "str:key-c": "str:value-c"
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:the-address": {
+                    "storage": {
+                        "str:key-a": "str:value-a",
+                        "str:key-b": "str:value-b"
+                    }
+                }
+            }
+        }
+    ]
+}
