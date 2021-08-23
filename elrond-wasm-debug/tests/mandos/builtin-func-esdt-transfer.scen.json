@@ -1,5 +1,5 @@
 {
-    "name": "test external steps resolution",
+    "comment": "direct builtin function call",
     "steps": [
         {
             "step": "setState",
@@ -19,12 +19,20 @@
             }
         },
         {
-            "step": "transfer",
+            "step": "scCall",
             "txId": "1",
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "value": "100"
+                "function": "ESDTTransfer",
+                "arguments": [ "100" ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
