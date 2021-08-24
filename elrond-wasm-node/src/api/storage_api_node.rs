@@ -54,6 +54,7 @@ impl StorageReadApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
         unsafe {
             let handle = bigIntNew(0);
@@ -62,6 +63,7 @@ impl StorageReadApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle {
         unsafe {
             let value_handle = mBufferNew();
