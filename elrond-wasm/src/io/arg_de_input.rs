@@ -30,6 +30,7 @@ where
         ArgDecodeInput { api, arg_index }
     }
 
+    #[inline]
     fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
         let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
         ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
@@ -42,22 +43,27 @@ where
 {
     type NestedBuffer = ManagedBufferNestedDecodeInput<AA>;
 
+    #[inline]
     fn byte_len(&self) -> usize {
         self.api.get_argument_len(self.arg_index)
     }
 
+    #[inline]
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         self.api.get_argument_boxed_bytes(self.arg_index).into_box()
     }
 
+    #[inline]
     fn into_u64(self) -> u64 {
         self.api.get_argument_u64(self.arg_index)
     }
 
+    #[inline]
     fn into_i64(self) -> i64 {
         self.api.get_argument_i64(self.arg_index)
     }
 
+    #[inline]
     fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
         if T::type_eq::<ManagedBuffer<AA>>() {
             self.to_managed_buffer().try_cast()
@@ -66,6 +72,7 @@ where
         }
     }
 
+    #[inline]
     fn into_nested_buffer(self) -> Self::NestedBuffer {
         ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }

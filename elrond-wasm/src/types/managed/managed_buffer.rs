@@ -17,6 +17,7 @@ pub struct ManagedBuffer<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
+    #[inline]
     pub fn new_empty(api: M) -> Self {
         ManagedBuffer {
             handle: api.mb_new_empty(),
@@ -24,6 +25,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
+    #[inline]
     pub fn new_from_bytes(api: M, bytes: &[u8]) -> Self {
         ManagedBuffer {
             handle: api.mb_new_from_bytes(bytes),
@@ -31,18 +33,22 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
+    #[inline]
     pub(crate) fn new_from_raw_handle(api: M, handle: Handle) -> Self {
         ManagedBuffer { handle, api }
     }
 
+    #[inline]
     pub fn len(&self) -> usize {
         self.api.mb_len(self.handle)
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
+    #[inline]
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
         self.api.mb_to_boxed_bytes(self.handle)
     }

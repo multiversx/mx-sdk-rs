@@ -69,6 +69,7 @@ impl EndpointArgumentApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn get_argument_big_uint_raw(&self, arg_id: i32) -> i32 {
         unsafe {
             let handle = bigIntNew(0);
@@ -77,6 +78,7 @@ impl EndpointArgumentApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn get_argument_big_int_raw(&self, arg_id: i32) -> i32 {
         unsafe {
             let handle = bigIntNew(0);
@@ -85,6 +87,7 @@ impl EndpointArgumentApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn get_argument_managed_buffer_raw(&self, arg_id: i32) -> Handle {
         unsafe {
             let handle = mBufferNew();

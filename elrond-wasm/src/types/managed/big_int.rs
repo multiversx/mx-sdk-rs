@@ -22,12 +22,14 @@ pub enum Sign {
 }
 
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigInt<M> {
+    #[inline]
     fn from(item: &ManagedBuffer<M>) -> Self {
         BigInt::from_signed_bytes_be_buffer(item)
     }
 }
 
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
+    #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {
         BigInt::from_signed_bytes_be_buffer(&item)
     }
@@ -35,6 +37,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 
 /// More conversions here.
 impl<M: ManagedTypeApi> BigInt<M> {
+    #[inline]
     pub fn from_i64(value: i64, api: M) -> Self {
         BigInt {
             handle: api.bi_new(value),
@@ -42,6 +45,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         }
     }
 
+    #[inline]
     pub fn from_i32(value: i32, api: M) -> Self {
         BigInt {
             handle: api.bi_new(value as i64),
@@ -49,20 +53,24 @@ impl<M: ManagedTypeApi> BigInt<M> {
         }
     }
 
+    #[inline]
     pub fn to_i64(&self) -> Option<i64> {
         self.api.bi_to_i64(self.handle)
     }
 
+    #[inline]
     pub fn from_signed_bytes_be(bytes: &[u8], api: M) -> Self {
         let handle = api.bi_new(0);
         api.bi_set_signed_bytes(handle, bytes);
         BigInt { handle, api }
     }
 
+    #[inline]
     pub fn to_signed_bytes_be(&self) -> BoxedBytes {
         self.api.bi_get_signed_bytes(self.handle)
     }
 
+    #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
         BigInt {
             handle: managed_buffer
@@ -72,6 +80,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         }
     }
 
+    #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
         ManagedBuffer {
             handle: self.api.mb_from_big_int_signed(self.handle),
@@ -173,9 +182,10 @@ impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
 impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
+    #[inline]
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
-            Ok(managed_buffer.into())
+            Ok(BigInt::from_signed_bytes_be_buffer(&managed_buffer))
         } else {
             Err(DecodeError::UNSUPPORTED_OPERATION)
         }
