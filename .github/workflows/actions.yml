@@ -17,7 +17,7 @@ jobs:
           default: true
           toolchain: nightly
       - name: Install erdpy and arwentools
-        run : |
+        run: |
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
@@ -49,10 +49,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: nightly
-            components: clippy
-            default: true
+          toolchain: nightly
+          components: clippy
+          default: true
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args:
