@@ -159,4 +159,25 @@ pub trait ForwarderSyncCallModule {
             .retrieve_funds(token, token_nonce, amount, OptionalArg::None)
             .execute_on_dest_context()
     }
+
+    #[endpoint]
+    fn forward_sync_accept_funds_multi_transfer(
+        &self,
+        to: Address,
+        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut all_token_payments = Vec::new();
+
+        for multi_arg in token_payments.into_vec() {
+            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment::from(token_name, token_nonce, amount);
+            all_token_payments.push(payment);
+        }
+
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds_multi_transfer()
+            .with_multi_token_transfer(self.call_value().get_all_esdt_transfers())
+            .execute_on_dest_context();
+    }
 }
