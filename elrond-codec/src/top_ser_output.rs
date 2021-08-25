@@ -48,11 +48,7 @@ pub trait TopEncodeOutput: Sized {
     /// The alternative serialization, `else_serialization` is only called when necessary and
     /// is normally compiled out via monomorphization.
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(
-        self,
-        _value: &T,
-        else_serialization: F,
-    ) {
+    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(self, _value: &T, else_serialization: F) {
         else_serialization(self);
     }
 

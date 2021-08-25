@@ -1,9 +1,9 @@
 use alloc::boxed::Box;
-use elrond_codec::{TopDecodeInput, TryStaticCast};
+use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BoxedBytes, ManagedBuffer},
+    types::{BigInt, BigUint, BoxedBytes, ManagedBuffer},
 };
 
 use super::ManagedBytesNestedDecodeInput;
@@ -33,12 +33,25 @@ where
         self.bytes.into_box()
     }
 
-    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
-        if T::type_eq::<ManagedBuffer<M>>() {
-            let mb = ManagedBuffer::new_from_bytes(self.api, self.bytes.as_slice());
-            mb.try_cast()
+    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<T, DecodeError>,
+    {
+        if let Some(result) = try_execute_then_cast(|| {
+            ManagedBuffer::new_from_bytes(self.api.clone(), self.bytes.as_slice())
+        }) {
+            Ok(result)
+        } else if let Some(result) = try_execute_then_cast(|| {
+            BigUint::from_bytes_be(self.api.clone(), self.bytes.as_slice())
+        }) {
+            Ok(result)
+        } else if let Some(result) = try_execute_then_cast(|| {
+            BigInt::from_signed_bytes_be(self.api.clone(), self.bytes.as_slice())
+        }) {
+            Ok(result)
         } else {
-            None
+            else_deser(self)
         }
     }
 

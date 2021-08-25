@@ -1,6 +1,6 @@
 use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::err_msg;
-use crate::types::{BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput};
+use crate::types::{BigInt, BigUint, BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput};
 use alloc::boxed::Box;
 use elrond_codec::*;
 
@@ -26,6 +26,15 @@ where
         let mbuf_handle = self.api.storage_load_managed_buffer_raw(key_handle);
         ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
     }
+
+    fn to_big_uint(&self) -> BigUint<SRA> {
+        let bu_handle = self.api.storage_load_big_uint_raw(self.key);
+        BigUint::from_raw_handle(bu_handle, self.api.clone())
+    }
+
+    fn to_big_int(&self) -> BigInt<SRA> {
+        BigInt::from_signed_bytes_be_buffer(&self.to_managed_buffer())
+    }
 }
 
 impl<'k, SRA> TopDecodeInput for StorageGetInput<'k, SRA>
@@ -50,11 +59,19 @@ where
         self.api.storage_load_i64(self.key)
     }
 
-    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
-        if T::type_eq::<ManagedBuffer<SRA>>() {
-            self.to_managed_buffer().try_cast()
+    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<T, DecodeError>,
+    {
+        if let Some(result) = try_execute_then_cast(|| self.to_managed_buffer()) {
+            Ok(result)
+        } else if let Some(result) = try_execute_then_cast(|| self.to_big_uint()) {
+            Ok(result)
+        } else if let Some(result) = try_execute_then_cast(|| self.to_big_int()) {
+            Ok(result)
         } else {
-            None
+            else_deser(self)
         }
     }
 

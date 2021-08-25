@@ -2,7 +2,10 @@ use super::ManagedBuffer;
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
-use elrond_codec::{DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, TypeInfo};
+use elrond_codec::{
+    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, TypeInfo,
+};
 
 #[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
@@ -16,6 +19,16 @@ pub enum Sign {
     Minus,
     NoSign,
     Plus,
+}
+
+impl<M: ManagedTypeApi> BigInt<M> {
+    #[doc(hidden)]
+    pub fn from_raw_handle(raw_handle: Handle, api: M) -> Self {
+        BigInt {
+            handle: raw_handle,
+            api,
+        }
+    }
 }
 
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigInt<M> {
@@ -56,7 +69,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn from_signed_bytes_be(bytes: &[u8], api: M) -> Self {
+    pub fn from_signed_bytes_be(api: M, bytes: &[u8]) -> Self {
         let handle = api.bi_new(0);
         api.bi_set_signed_bytes(handle, bytes);
         BigInt { handle, api }
@@ -183,11 +196,7 @@ impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
 
     #[inline]
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
-            Ok(BigInt::from_signed_bytes_be_buffer(&managed_buffer))
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 
