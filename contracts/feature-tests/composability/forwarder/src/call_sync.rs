@@ -177,7 +177,7 @@ pub trait ForwarderSyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds_multi_transfer()
-            .with_multi_token_transfer(self.call_value().get_all_esdt_transfers())
+            .with_multi_token_transfer(all_token_payments)
             .execute_on_dest_context();
     }
 }

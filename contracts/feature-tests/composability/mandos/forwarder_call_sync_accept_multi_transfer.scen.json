@@ -51,7 +51,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "function": "multi_transfer_via_async",
+                "function": "forward_sync_accept_funds_multi_transfer",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",
@@ -74,23 +74,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:FWD-TOKEN",
-                    "0",
-                    "100",
-                    "str:FWD-TOKEN",
-                    "0",
-                    "200",
-                    "str:NFT-123",
-                    "1",
-                    "1",
-                    "str:SFT-456",
-                    "3",
-                    "3",
-                    "str:SFT-456",
-                    "3",
-                    "4"
-                ],
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -128,7 +112,9 @@
                             ]
                         }
                     },
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds_multi_transfer": "1"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {

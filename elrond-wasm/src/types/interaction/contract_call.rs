@@ -184,10 +184,11 @@ where
             new_arg_buffer.push_argument_bytes(payment.amount.to_bytes_be().as_slice());
         }
         new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
+        let recipient_addr = self.api.get_sc_address();
 
         ContractCall {
             api: self.api,
-            to: self.to,
+            to: recipient_addr,
             payments: vec![EsdtTokenPayment::default()],
             explicit_gas_limit: self.explicit_gas_limit,
             endpoint_name: BoxedBytes::from(ESDT_MULTI_TRANSFER_STRING),
