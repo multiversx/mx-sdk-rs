@@ -125,7 +125,7 @@ impl<BigUint: BigUintApi> EsdtTokenPayment<BigUint> {
         let token_type = if amount != 0 && token_name.is_valid_esdt_identifier() {
             if token_nonce == 0 {
                 EsdtTokenType::Fungible
-            } else if amount == BigUint::from(1u64) {
+            } else if amount == 1u64 {
                 EsdtTokenType::NonFungible
             } else {
                 EsdtTokenType::SemiFungible
