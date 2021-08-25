@@ -119,7 +119,9 @@ impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_specialized(self, || self.to_boxed_bytes().into_box());
+        output.set_specialized(self, |else_output| {
+            else_output.set_slice_u8(self.to_boxed_bytes().as_slice());
+        });
         Ok(())
     }
 }

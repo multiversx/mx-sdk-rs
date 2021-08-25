@@ -43,13 +43,17 @@ pub trait TopEncodeOutput: Sized {
         self.set_slice_u8(&[]);
     }
 
+    /// Allows special handling of special types.
+    /// Also requires an alternative serialization, in case the special handling is not covered.
+    /// The alternative serialization, `else_serialization` is only called when necessary and
+    /// is normally compiled out via monomorphization.
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(
+    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(
         self,
         _value: &T,
-        else_bytes: F,
+        else_serialization: F,
     ) {
-        self.set_boxed_bytes(else_bytes());
+        else_serialization(self);
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer;
