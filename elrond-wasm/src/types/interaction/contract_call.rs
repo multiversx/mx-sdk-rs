@@ -1,10 +1,34 @@
-use crate::types::{Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, TokenIdentifier};
+use crate::types::{
+    Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, EsdtTokenType, TokenIdentifier,
+    Vec,
+};
 use crate::{
-    api::{BigUintApi, SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
+    api::{
+        BigUintApi, SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING,
+        ESDT_TRANSFER_STRING,
+    },
     BytesArgLoader, DynArg,
 };
 use crate::{hex_call_data::HexCallDataSerializer, ArgId};
 use core::marker::PhantomData;
+
+struct EsdtTokenPaymentVec<SA: SendApi> {
+    vec: Vec<EsdtTokenPayment<SA::AmountType>>,
+}
+
+impl<SA: SendApi> Default for EsdtTokenPaymentVec<SA> {
+    fn default() -> Self {
+        let mut vec = Vec::new();
+        vec.push(EsdtTokenPayment::default());
+        EsdtTokenPaymentVec { vec }
+    }
+}
+
+impl<SA: SendApi> EsdtTokenPaymentVec<SA> {
+    fn default_vec() -> Vec<EsdtTokenPayment<SA::AmountType>> {
+        EsdtTokenPaymentVec::<SA>::default().vec
+    }
+}
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -23,9 +47,7 @@ where
 {
     api: SA,
     to: Address,
-    payment_token: TokenIdentifier,
-    payment_amount: SA::AmountType,
-    payment_nonce: u64,
+    payments: Vec<EsdtTokenPayment<SA::AmountType>>,
     endpoint_name: BoxedBytes,
     explicit_gas_limit: u64,
     pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
@@ -46,9 +68,7 @@ where
     SA: SendApi + 'static,
 {
     let mut contract_call = ContractCall::<SA, R>::new(api, to, endpoint_name);
-    contract_call.payment_token = payment_token;
-    contract_call.payment_amount = payment_amount;
-    contract_call.payment_nonce = payment_nonce;
+    contract_call.payments = EsdtTokenPaymentVec::<SA>::default_vec();
     contract_call
 }
 
@@ -60,9 +80,7 @@ where
         ContractCall {
             api,
             to,
-            payment_token: TokenIdentifier::egld(),
-            payment_amount: SA::AmountType::zero(),
-            payment_nonce: 0,
+            payments: EsdtTokenPaymentVec::<SA>::default_vec(),
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             endpoint_name,
             arg_buffer: ArgBuffer::new(),
@@ -75,13 +93,25 @@ where
         payment_token: TokenIdentifier,
         payment_amount: SA::AmountType,
     ) -> Self {
-        self.payment_token = payment_token;
-        self.payment_amount = payment_amount;
+        self.payments[0].token_name = payment_token;
+        self.payments[0].amount = payment_amount;
         self
     }
 
     pub fn with_nft_nonce(mut self, payment_nonce: u64) -> Self {
-        self.payment_nonce = payment_nonce;
+        self.payments[0].token_nonce = payment_nonce;
+        self
+    }
+
+    pub fn with_multi_token_transfer(
+        mut self,
+        payments: Vec<EsdtTokenPayment<SA::AmountType>>,
+    ) -> Self {
+        if payments.len() == 0 {
+            self.api.signal_error(b"Payments len should not be 0");
+        }
+
+        self.payments = payments;
         self
     }
 
@@ -102,21 +132,27 @@ where
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
     /// Async calls require this step, but not `transfer_esdt_execute`.
     fn convert_to_esdt_transfer_call(self) -> Self {
-        if self.payment_token.is_egld() {
+        if self.payments.len() == 1 {
+            self.convert_to_single_transfer_esdt_call()
+        } else {
+            self.convert_to_multi_transfer_esdt_call()
+        }
+    }
+
+    fn convert_to_single_transfer_esdt_call(self) -> Self {
+        if self.payments[0].token_name.is_egld() {
             self
-        } else if self.payment_nonce == 0 {
+        } else if self.payments[0].token_nonce == 0 {
             // fungible ESDT
             let mut new_arg_buffer = ArgBuffer::new();
-            new_arg_buffer.push_argument_bytes(self.payment_token.as_esdt_identifier());
-            new_arg_buffer.push_argument_bytes(self.payment_amount.to_bytes_be().as_slice());
+            new_arg_buffer.push_argument_bytes(self.payments[0].token_name.as_esdt_identifier());
+            new_arg_buffer.push_argument_bytes(self.payments[0].amount.to_bytes_be().as_slice());
             new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 
             ContractCall {
                 api: self.api,
                 to: self.to,
-                payment_token: TokenIdentifier::egld(),
-                payment_amount: SA::AmountType::zero(),
-                payment_nonce: 0,
+                payments: EsdtTokenPaymentVec::<SA>::default_vec(),
                 explicit_gas_limit: self.explicit_gas_limit,
                 endpoint_name: BoxedBytes::from(ESDT_TRANSFER_STRING),
                 arg_buffer: new_arg_buffer.concat(self.arg_buffer),
@@ -130,11 +166,11 @@ where
             // arg2 - quantity to transfer
             // arg3 - destination address
             let mut new_arg_buffer = ArgBuffer::new();
-            new_arg_buffer.push_argument_bytes(self.payment_token.as_esdt_identifier());
+            new_arg_buffer.push_argument_bytes(self.payments[0].token_name.as_esdt_identifier());
             new_arg_buffer.push_argument_bytes(
-                elrond_codec::top_encode_no_err(&self.payment_nonce).as_slice(),
+                elrond_codec::top_encode_no_err(&self.payments[0].token_nonce).as_slice(),
             );
-            new_arg_buffer.push_argument_bytes(self.payment_amount.to_bytes_be().as_slice());
+            new_arg_buffer.push_argument_bytes(self.payments[0].amount.to_bytes_be().as_slice());
             new_arg_buffer.push_argument_bytes(self.to.as_bytes());
             new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 
@@ -143,14 +179,35 @@ where
             ContractCall {
                 api: self.api,
                 to: recipient_addr,
-                payment_token: TokenIdentifier::egld(),
-                payment_amount: SA::AmountType::zero(),
-                payment_nonce: 0,
+                payments: EsdtTokenPaymentVec::<SA>::default_vec(),
                 explicit_gas_limit: self.explicit_gas_limit,
                 endpoint_name: BoxedBytes::from(ESDT_NFT_TRANSFER_STRING),
                 arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                 _return_type: PhantomData,
             }
+        }
+    }
+
+    fn convert_to_multi_transfer_esdt_call(self) -> Self {
+        let mut new_arg_buffer = ArgBuffer::new();
+        new_arg_buffer.push_argument_bytes(self.to.as_bytes());
+        new_arg_buffer.push_argument_bytes(&self.payments.len().to_be_bytes()[..]);
+
+        for payment in self.payments.iter() {
+            new_arg_buffer.push_argument_bytes(payment.token_name.as_esdt_identifier());
+            new_arg_buffer.push_argument_bytes(&payment.token_nonce.to_be_bytes()[..]);
+            new_arg_buffer.push_argument_bytes(payment.amount.to_bytes_be().as_slice());
+        }
+        new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
+
+        ContractCall {
+            api: self.api,
+            to: self.to,
+            payments: EsdtTokenPaymentVec::<SA>::default_vec(),
+            explicit_gas_limit: self.explicit_gas_limit,
+            endpoint_name: BoxedBytes::from(ESDT_MULTI_TRANSFER_STRING),
+            arg_buffer: new_arg_buffer.concat(self.arg_buffer),
+            _return_type: PhantomData,
         }
     }
 
@@ -179,7 +236,7 @@ where
         AsyncCall {
             api: self.api,
             to: self.to,
-            egld_payment: self.payment_amount,
+            egld_payment: self.payments[0].amount.clone(),
             hex_data: HexCallDataSerializer::from_arg_buffer(
                 self.endpoint_name.as_slice(),
                 &self.arg_buffer,
@@ -201,7 +258,7 @@ where
         let raw_result = self.api.execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
-            &self.payment_amount,
+            &self.payments[0].amount,
             self.endpoint_name.as_slice(),
             &self.arg_buffer,
         );
@@ -225,7 +282,7 @@ where
         let raw_result = self.api.execute_on_dest_context_raw_custom_result_range(
             self.resolve_gas_limit(),
             &self.to,
-            &self.payment_amount,
+            &self.payments[0].amount,
             self.endpoint_name.as_slice(),
             &self.arg_buffer,
             range_closure,
@@ -248,7 +305,7 @@ where
         let _ = self.api.execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
-            &self.payment_amount,
+            &self.payments[0].amount,
             self.endpoint_name.as_slice(),
             &self.arg_buffer,
         );
@@ -270,21 +327,29 @@ where
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
     pub fn transfer_execute(self) {
+        if self.payments.len() == 1 {
+            self.single_transfer_execute()
+        } else {
+            self.multi_transfer_execute()
+        }
+    }
+
+    fn single_transfer_execute(&self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let result = if self.payment_token.is_egld() {
+        let result = if self.payments[0].token_name.is_egld() {
             self.api.direct_egld_execute(
                 &self.to,
-                &self.payment_amount,
+                &self.payments[0].amount,
                 gas_limit,
                 self.endpoint_name.as_slice(),
                 &self.arg_buffer,
             )
-        } else if self.payment_nonce == 0 {
+        } else if self.payments[0].token_nonce == 0 {
             // fungible ESDT
             self.api.direct_esdt_execute(
                 &self.to,
-                &self.payment_token,
-                &self.payment_amount,
+                &self.payments[0].token_name,
+                &self.payments[0].amount,
                 gas_limit,
                 self.endpoint_name.as_slice(),
                 &self.arg_buffer,
@@ -293,9 +358,9 @@ where
             // non-fungible/semi-fungible ESDT
             self.api.direct_esdt_nft_execute(
                 &self.to,
-                &self.payment_token,
-                self.payment_nonce,
-                &self.payment_amount,
+                &self.payments[0].token_name,
+                self.payments[0].token_nonce,
+                &self.payments[0].amount,
                 gas_limit,
                 self.endpoint_name.as_slice(),
                 &self.arg_buffer,
@@ -306,14 +371,11 @@ where
         }
     }
 
-    /// Immediately launches a transfer-execute call with multiple transfers in a single call.
-    /// This is similar to an async call, but there is no callback
-    /// and there can be more than one such call per transaction.
-    pub fn esdt_multi_transfer(&self, payments: &[EsdtTokenPayment<SA::AmountType>]) {
+    fn multi_transfer_execute(&self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
         let result = self.api.direct_multi_esdt_transfer_execute(
             &self.to,
-            payments,
+            &self.payments,
             gas_limit,
             self.endpoint_name.as_slice(),
             &self.arg_buffer,

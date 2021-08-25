@@ -108,3 +108,14 @@ impl<BigUint: BigUintApi> TypeAbi for EsdtTokenPayment<BigUint> {
         "EsdtTokenPayment".into()
     }
 }
+
+impl<BigUint: BigUintApi> Default for EsdtTokenPayment<BigUint> {
+    fn default() -> Self {
+        EsdtTokenPayment {
+            token_type: EsdtTokenType::Invalid,
+            token_name: TokenIdentifier::egld(),
+            token_nonce: 0,
+            amount: BigUint::zero(),
+        }
+    }
+}

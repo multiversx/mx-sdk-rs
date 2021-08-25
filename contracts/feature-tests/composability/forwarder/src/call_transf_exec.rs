@@ -115,6 +115,7 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds(TokenIdentifier::egld(), BigUint::zero())
-            .esdt_multi_transfer(&all_token_payments);
+            .with_multi_token_transfer(all_token_payments)
+            .transfer_execute()
     }
 }
