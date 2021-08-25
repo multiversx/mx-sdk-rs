@@ -119,3 +119,26 @@ impl<BigUint: BigUintApi> Default for EsdtTokenPayment<BigUint> {
         }
     }
 }
+
+impl<BigUint: BigUintApi> EsdtTokenPayment<BigUint> {
+    pub fn from(token_name: TokenIdentifier, token_nonce: u64, amount: BigUint) -> Self {
+        let token_type = if amount != 0 && token_name.is_valid_esdt_identifier() {
+            if token_nonce == 0 {
+                EsdtTokenType::Fungible
+            } else if amount == BigUint::from(1u64) {
+                EsdtTokenType::NonFungible
+            } else {
+                EsdtTokenType::SemiFungible
+            }
+        } else {
+            EsdtTokenType::Invalid
+        };
+
+        EsdtTokenPayment {
+            token_type,
+            token_name,
+            token_nonce,
+            amount,
+        }
+    }
+}
