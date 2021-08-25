@@ -1,6 +1,5 @@
 use crate::types::{
-    Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, EsdtTokenType, TokenIdentifier,
-    Vec,
+    Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, TokenIdentifier, Vec,
 };
 use crate::{
     api::{
@@ -69,6 +68,9 @@ where
 {
     let mut contract_call = ContractCall::<SA, R>::new(api, to, endpoint_name);
     contract_call.payments = EsdtTokenPaymentVec::<SA>::default_vec();
+    contract_call.payments[0].token_name = payment_token;
+    contract_call.payments[0].token_nonce = payment_nonce;
+    contract_call.payments[0].amount = payment_amount;
     contract_call
 }
 
