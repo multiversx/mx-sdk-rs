@@ -1,6 +1,9 @@
 use elrond_codec::{TopEncodeOutput, TryStaticCast};
 
-use crate::{api::ManagedTypeApi, types::{BigInt, BigUint, ManagedBuffer}};
+use crate::{
+    api::ManagedTypeApi,
+    types::{BigInt, BigUint, ManagedBuffer},
+};
 
 impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
     type NestedBuffer = ManagedBuffer<M>;
@@ -10,7 +13,7 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
     }
 
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce(Self) >(self, value: &T, else_serialization: F) {
+    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(self, value: &T, else_serialization: F) {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
             *self = managed_buffer.clone();
         } else if let Some(big_uint) = value.try_cast_ref::<BigUint<M>>() {

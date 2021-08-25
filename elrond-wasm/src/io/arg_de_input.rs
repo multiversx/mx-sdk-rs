@@ -1,8 +1,8 @@
 use crate::api::ManagedTypeApi;
-use crate::types::ManagedBufferNestedDecodeInput;
+use crate::types::{BigInt, BigUint, ManagedBufferNestedDecodeInput};
 use crate::Box;
 use crate::{api::EndpointArgumentApi, types::ManagedBuffer};
-use elrond_codec::{TopDecodeInput, TryStaticCast};
+use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
 
 /// Adapter from the API to the TopDecodeInput trait.
 /// Allows objects to be deserialized directly from the API as arguments.
@@ -35,6 +35,18 @@ where
         let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
         ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
     }
+
+    #[inline]
+    fn to_big_int(&self) -> BigInt<AA> {
+        let bi_handle = self.api.get_argument_big_int_raw(self.arg_index);
+        BigInt::from_raw_handle(bi_handle, self.api.clone())
+    }
+
+    #[inline]
+    fn to_big_uint(&self) -> BigUint<AA> {
+        let bi_handle = self.api.get_argument_big_uint_raw(self.arg_index);
+        BigUint::from_raw_handle(bi_handle, self.api.clone())
+    }
 }
 
 impl<AA> TopDecodeInput for ArgDecodeInput<AA>
@@ -64,11 +76,19 @@ where
     }
 
     #[inline]
-    fn into_specialized<T: TryStaticCast>(self) -> Option<T> {
-        if T::type_eq::<ManagedBuffer<AA>>() {
-            self.to_managed_buffer().try_cast()
+    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<T, DecodeError>,
+    {
+        if let Some(result) = try_execute_then_cast(|| self.to_managed_buffer()) {
+            Ok(result)
+        } else if let Some(result) = try_execute_then_cast(|| self.to_big_uint()) {
+            Ok(result)
+        } else if let Some(result) = try_execute_then_cast(|| self.to_big_int()) {
+            Ok(result)
         } else {
-            None
+            else_deser(self)
         }
     }
 

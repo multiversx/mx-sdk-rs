@@ -149,11 +149,7 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
-            Ok(managed_buffer)
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 

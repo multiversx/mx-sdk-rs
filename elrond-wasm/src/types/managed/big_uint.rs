@@ -2,7 +2,10 @@ use super::ManagedBuffer;
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
-use elrond_codec::{DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, TypeInfo};
+use elrond_codec::{
+    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, TypeInfo,
+};
 
 #[derive(Debug)]
 pub struct BigUint<M: ManagedTypeApi> {
@@ -11,6 +14,19 @@ pub struct BigUint<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
+    #[doc(hidden)]
+    pub fn from_raw_handle(raw_handle: Handle, api: M) -> Self {
+        BigUint {
+            handle: raw_handle,
+            api,
+        }
+    }
+
+    #[doc(hidden)]
+    pub fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
     pub fn type_manager(&self) -> M {
         self.api.clone()
     }
@@ -51,24 +67,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
-    #[doc(hidden)]
-    pub fn from_raw_handle(raw_handle: Handle, api: M) -> Self {
-        BigUint {
-            handle: raw_handle,
-            api,
-        }
-    }
-
-    #[doc(hidden)]
-    pub fn get_raw_handle(&self) -> Handle {
-        self.handle
-    }
-
     pub fn to_u64(&self) -> Option<u64> {
         self.api.bi_to_i64(self.handle).map(|bi| bi as u64)
     }
 
-    pub fn from_bytes_be(bytes: &[u8], api: M) -> Self {
+    pub fn from_bytes_be(api: M, bytes: &[u8]) -> Self {
         let handle = api.bi_new(0);
         api.bi_set_unsigned_bytes(handle, bytes);
         BigUint { handle, api }
@@ -204,11 +207,7 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
-            Ok(managed_buffer.into())
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 
