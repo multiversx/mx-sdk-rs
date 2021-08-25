@@ -1,5 +1,8 @@
+use alloc::vec;
+
 use crate::types::{
-    Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, TokenIdentifier, Vec,
+    Address, ArgBuffer, AsyncCall, BoxedBytes, EsdtTokenPayment, EsdtTokenType, TokenIdentifier,
+    Vec,
 };
 use crate::{
     api::{
@@ -10,24 +13,6 @@ use crate::{
 };
 use crate::{hex_call_data::HexCallDataSerializer, ArgId};
 use core::marker::PhantomData;
-
-struct EsdtTokenPaymentVec<SA: SendApi> {
-    vec: Vec<EsdtTokenPayment<SA::AmountType>>,
-}
-
-impl<SA: SendApi> Default for EsdtTokenPaymentVec<SA> {
-    fn default() -> Self {
-        let mut vec = Vec::new();
-        vec.push(EsdtTokenPayment::default());
-        EsdtTokenPaymentVec { vec }
-    }
-}
-
-impl<SA: SendApi> EsdtTokenPaymentVec<SA> {
-    fn default_vec() -> Vec<EsdtTokenPayment<SA::AmountType>> {
-        EsdtTokenPaymentVec::<SA>::default().vec
-    }
-}
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -67,10 +52,13 @@ where
     SA: SendApi + 'static,
 {
     let mut contract_call = ContractCall::<SA, R>::new(api, to, endpoint_name);
-    contract_call.payments = EsdtTokenPaymentVec::<SA>::default_vec();
-    contract_call.payments[0].token_name = payment_token;
-    contract_call.payments[0].token_nonce = payment_nonce;
-    contract_call.payments[0].amount = payment_amount;
+    let payment = EsdtTokenPayment {
+        token_type: EsdtTokenType::Invalid,
+        token_name: payment_token,
+        token_nonce: payment_nonce,
+        amount: payment_amount,
+    };
+    contract_call.payments = vec![payment];
     contract_call
 }
 
@@ -82,7 +70,7 @@ where
         ContractCall {
             api,
             to,
-            payments: EsdtTokenPaymentVec::<SA>::default_vec(),
+            payments: vec![EsdtTokenPayment::default()],
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             endpoint_name,
             arg_buffer: ArgBuffer::new(),
@@ -109,8 +97,8 @@ where
         mut self,
         payments: Vec<EsdtTokenPayment<SA::AmountType>>,
     ) -> Self {
-        if payments.len() == 0 {
-            self.api.signal_error(b"Payments len should not be 0");
+        if payments.is_empty() {
+            self.api.signal_error(b"Payment vec should not be empty");
         }
 
         self.payments = payments;
@@ -154,7 +142,7 @@ where
             ContractCall {
                 api: self.api,
                 to: self.to,
-                payments: EsdtTokenPaymentVec::<SA>::default_vec(),
+                payments: vec![EsdtTokenPayment::default()],
                 explicit_gas_limit: self.explicit_gas_limit,
                 endpoint_name: BoxedBytes::from(ESDT_TRANSFER_STRING),
                 arg_buffer: new_arg_buffer.concat(self.arg_buffer),
@@ -181,7 +169,7 @@ where
             ContractCall {
                 api: self.api,
                 to: recipient_addr,
-                payments: EsdtTokenPaymentVec::<SA>::default_vec(),
+                payments: vec![EsdtTokenPayment::default()],
                 explicit_gas_limit: self.explicit_gas_limit,
                 endpoint_name: BoxedBytes::from(ESDT_NFT_TRANSFER_STRING),
                 arg_buffer: new_arg_buffer.concat(self.arg_buffer),
@@ -205,7 +193,7 @@ where
         ContractCall {
             api: self.api,
             to: self.to,
-            payments: EsdtTokenPaymentVec::<SA>::default_vec(),
+            payments: vec![EsdtTokenPayment::default()],
             explicit_gas_limit: self.explicit_gas_limit,
             endpoint_name: BoxedBytes::from(ESDT_MULTI_TRANSFER_STRING),
             arg_buffer: new_arg_buffer.concat(self.arg_buffer),
