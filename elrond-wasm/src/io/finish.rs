@@ -1,9 +1,8 @@
-use alloc::boxed::Box;
 use elrond_codec::TryStaticCast;
 
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
 use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
-use crate::types::ManagedBuffer;
+use crate::types::{BigInt, BigUint, ManagedBuffer};
 use crate::Vec;
 
 struct ApiOutputAdapter<FA>
@@ -47,11 +46,15 @@ where
     }
 
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(self, value: &T, else_bytes: F) {
+    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(self, value: &T, else_serialization: F) {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             self.api.finish_managed_buffer_raw(managed_buffer.handle);
+        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
+            self.api.finish_big_uint_raw(big_uint.handle);
+        } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
+            self.api.finish_big_int_raw(big_int.handle);
         } else {
-            self.set_boxed_bytes(else_bytes());
+            else_serialization(self);
         }
     }
 

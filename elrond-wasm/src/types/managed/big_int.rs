@@ -2,15 +2,12 @@ use super::ManagedBuffer;
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
-use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
-};
+use elrond_codec::{DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, TypeInfo};
 
 #[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
-    pub(super) handle: Handle,
-    pub(super) api: M,
+    pub(crate) handle: Handle,
+    pub(crate) api: M,
 }
 
 // BigInt sign.
@@ -120,13 +117,15 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 }
 
+impl<M: ManagedTypeApi> TryStaticCast for BigInt<M> {}
+
 impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_specialized(&self.to_signed_bytes_be_buffer(), || {
-            self.to_signed_bytes_be().into_box()
+        output.set_specialized(self, |else_output| {
+            else_output.set_slice_u8(self.to_signed_bytes_be().as_slice());
         });
         Ok(())
     }
