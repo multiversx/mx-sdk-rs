@@ -102,19 +102,14 @@ pub trait ForwarderTransferExecuteModule {
 
         for multi_arg in token_payments.into_vec() {
             let (token_name, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment {
-                token_name,
-                token_nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid, // not used
-            };
+            let payment = EsdtTokenPayment::from(token_name, token_nonce, amount);
 
             all_token_payments.push(payment);
         }
 
         self.vault_proxy()
             .contract(to)
-            .accept_funds(TokenIdentifier::egld(), BigUint::zero())
+            .accept_funds_multi_transfer()
             .with_multi_token_transfer(all_token_payments)
             .transfer_execute()
     }

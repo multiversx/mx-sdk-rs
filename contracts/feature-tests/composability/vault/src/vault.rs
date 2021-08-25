@@ -47,7 +47,8 @@ pub trait Vault {
             );
         }
 
-        self.call_counts(b"accept_funds").update(|c| *c += 1);
+        self.call_counts(b"accept_funds_multi_transfer")
+            .update(|c| *c += 1);
     }
 
     #[payable("*")]
