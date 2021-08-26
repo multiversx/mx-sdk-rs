@@ -1,18 +1,18 @@
-use crate::{abi::TypeAbi, api::BigUintApi};
+use crate::{abi::TypeAbi, api::ManagedTypeApi, types::BigUint};
 use alloc::string::String;
 use elrond_codec::*;
 
 use super::{EsdtTokenType, TokenIdentifier};
 
-pub struct EsdtTokenPayment<BigUint: BigUintApi> {
+pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
     pub token_name: TokenIdentifier,
     pub token_nonce: u64,
-    pub amount: BigUint,
+    pub amount: BigUint<M>,
 }
 
 #[allow(clippy::redundant_clone)]
-impl<BigUint: BigUintApi> NestedEncode for EsdtTokenPayment<BigUint> {
+impl<M: ManagedTypeApi> NestedEncode for EsdtTokenPayment<M> {
     #[inline]
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.token_type.dep_encode(dest)?;
@@ -37,7 +37,7 @@ impl<BigUint: BigUintApi> NestedEncode for EsdtTokenPayment<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> TopEncode for EsdtTokenPayment<BigUint> {
+impl<M: ManagedTypeApi> TopEncode for EsdtTokenPayment<M> {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         top_encode_from_nested(self, output)
@@ -55,7 +55,7 @@ impl<BigUint: BigUintApi> TopEncode for EsdtTokenPayment<BigUint> {
 }
 
 #[allow(clippy::redundant_clone)]
-impl<BigUint: BigUintApi> NestedDecode for EsdtTokenPayment<BigUint> {
+impl<M: ManagedTypeApi> NestedDecode for EsdtTokenPayment<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let token_type = EsdtTokenType::dep_decode(input)?;
         let token_name = TokenIdentifier::dep_decode(input)?;
@@ -89,7 +89,7 @@ impl<BigUint: BigUintApi> NestedDecode for EsdtTokenPayment<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> TopDecode for EsdtTokenPayment<BigUint> {
+impl<M: ManagedTypeApi> TopDecode for EsdtTokenPayment<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         top_decode_from_nested(input)
     }
@@ -103,25 +103,23 @@ impl<BigUint: BigUintApi> TopDecode for EsdtTokenPayment<BigUint> {
     }
 }
 
-impl<BigUint: BigUintApi> TypeAbi for EsdtTokenPayment<BigUint> {
+impl<M: ManagedTypeApi> TypeAbi for EsdtTokenPayment<M> {
     fn type_name() -> String {
         "EsdtTokenPayment".into()
     }
 }
 
-impl<BigUint: BigUintApi> Default for EsdtTokenPayment<BigUint> {
-    fn default() -> Self {
+impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+    pub fn no_payment(api: M) -> Self {
         EsdtTokenPayment {
             token_type: EsdtTokenType::Invalid,
             token_name: TokenIdentifier::egld(),
             token_nonce: 0,
-            amount: BigUint::zero(),
+            amount: BigUint::zero(api),
         }
     }
-}
 
-impl<BigUint: BigUintApi> EsdtTokenPayment<BigUint> {
-    pub fn from(token_name: TokenIdentifier, token_nonce: u64, amount: BigUint) -> Self {
+    pub fn from(token_name: TokenIdentifier, token_nonce: u64, amount: BigUint<M>) -> Self {
         let token_type = if amount != 0 && token_name.is_valid_esdt_identifier() {
             if token_nonce == 0 {
                 EsdtTokenType::Fungible

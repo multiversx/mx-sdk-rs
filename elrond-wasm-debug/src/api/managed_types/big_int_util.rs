@@ -1,8 +1,39 @@
 use std::cmp::Ordering;
 
-use num_bigint::{BigInt, Sign};
+use num_bigint::Sign;
+use num_traits::Zero;
 
-pub fn big_int_to_i64(bi: &BigInt) -> Option<i64> {
+use crate::TxContext;
+
+impl TxContext {
+    pub fn insert_new_big_uint(
+        &self,
+        value: num_bigint::BigUint,
+    ) -> elrond_wasm::types::BigUint<Self> {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let handle = tx_output
+            .managed_types
+            .big_int_map
+            .insert_new_handle(value.into());
+        elrond_wasm::types::BigUint::from_raw_handle(handle, self.clone())
+    }
+
+    pub fn insert_new_big_uint_zero(&self) -> elrond_wasm::types::BigUint<Self> {
+        self.insert_new_big_uint(num_bigint::BigUint::zero())
+    }
+
+    pub fn big_uint_value(&self, bu: &elrond_wasm::types::BigUint<Self>) -> num_bigint::BigUint {
+        let tx_output = self.tx_output_cell.borrow();
+        tx_output
+            .managed_types
+            .big_int_map
+            .get(bu.get_raw_handle())
+            .magnitude()
+            .clone()
+    }
+}
+
+pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {
     let (sign, digits) = bi.to_u64_digits();
     match sign {
         Sign::NoSign => Some(0),

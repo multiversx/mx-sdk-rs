@@ -2,11 +2,11 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct CallbackData<BigUint: BigUintApi> {
+pub struct CallbackData<M: ManagedTypeApi> {
     callback_name: BoxedBytes,
     token_identifier: TokenIdentifier,
     token_nonce: u64,
-    token_amount: BigUint,
+    token_amount: BigUint<M>,
     args: Vec<BoxedBytes>,
 }
 
@@ -41,7 +41,7 @@ pub trait ForwarderAsyncCallModule {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
     ) -> AsyncCall<Self::SendApi> {
-        let half_payment = payment / 2u32.into();
+        let half_payment = payment / 2u32;
         self.vault_proxy()
             .contract(to)
             .accept_funds(token, half_payment)
@@ -57,7 +57,7 @@ pub trait ForwarderAsyncCallModule {
         to: Address,
         percentage_fees: BigUint,
     ) -> AsyncCall<Self::SendApi> {
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         self.vault_proxy()
@@ -166,7 +166,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<BigUint>>;
+    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::TypeManager>>;
 
     #[view]
     fn callback_data_at_index(

@@ -47,7 +47,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_bonding_curve(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<BigUint>,
+        function: FunctionSelector<Self::TypeManager>,
         sell_availability: bool,
     ) -> SCResult<()> {
         require!(
@@ -154,7 +154,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 balance: amount,
             };
             payment_token = payment;
-            payment_amount = BigUint::zero();
+            payment_amount = self.types().big_uint_zero();
             sell_availability = false;
         } else {
             let bonding_curve = self.bonding_curve(identifier).get();

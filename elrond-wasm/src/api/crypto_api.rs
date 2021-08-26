@@ -1,11 +1,7 @@
-use super::BigUintApi;
-use crate::types::{BoxedBytes, H256, MessageHashType};
+use crate::types::{BoxedBytes, MessageHashType, H256};
 use alloc::boxed::Box;
 
 pub trait CryptoApi {
-    /// Numeric type used in some of the Arwen hooks.
-    type BigUint: BigUintApi + 'static;
-
     fn sha256(&self, data: &[u8]) -> H256;
 
     fn keccak256(&self, data: &[u8]) -> H256;

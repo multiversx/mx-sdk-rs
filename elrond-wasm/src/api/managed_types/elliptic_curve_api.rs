@@ -1,56 +1,105 @@
-use crate::abi;
 use crate::types::BoxedBytes;
 
-type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
+use super::Handle;
 
-/// Definition of the EllipticCurve type required by the API
-pub trait EllipticCurveApi:
-    Sized + elrond_codec::NestedEncode + elrond_codec::TopEncode + abi::TypeAbi
-{
-    type BigUint;
+/// Wrapper around the EllipticCurve functionality provided by Arwen.
+pub trait EllipticCurveApi {
+    fn ec_create(&self, name: &[u8]) -> Handle;
 
-    fn get_values(&self) -> EllipticCurveComponents<Self::BigUint>;
-
-    fn create_ec(curve: &str) -> Self;
-
-    fn get_ec_length(&self) -> u32;
-
-    fn get_priv_key_byte_length(&self) -> u32;
-
-    fn add_ec(
+    fn ec_get_values(
         &self,
-        x_first_point: Self::BigUint,
-        y_first_point: Self::BigUint,
-        x_second_point: Self::BigUint,
-        y_second_point: Self::BigUint,
-    ) -> (Self::BigUint, Self::BigUint);
+        ec_handle: Handle,
+        field_order_handle: Handle,
+        base_point_order_handle: Handle,
+        eq_constant_handle: Handle,
+        x_base_point_handle: Handle,
+        y_base_point_handle: Handle,
+    );
 
-    fn double_ec(
+    fn ec_curve_length(&self, ec_handle: Handle) -> u32;
+
+    fn ec_private_key_byte_length(&self, ec_handle: Handle) -> u32;
+
+    #[allow(clippy::too_many_arguments)]
+    fn ec_add(
         &self,
-        x_point: Self::BigUint,
-        y_point: Self::BigUint,
-    ) -> (Self::BigUint, Self::BigUint);
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_first_point: Handle,
+        y_first_point: Handle,
+        x_second_point: Handle,
+        y_second_point: Handle,
+    );
 
-    fn is_on_curve_ec(&self, x_point: Self::BigUint, y_point: Self::BigUint) -> bool;
-
-    fn scalar_mult(
+    fn ec_double(
         &self,
-        x_point: Self::BigUint,
-        y_point: Self::BigUint,
-        data: BoxedBytes,
-    ) -> (Self::BigUint, Self::BigUint);
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+    );
 
-    fn scalar_base_mult(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint);
+    fn ec_is_on_curve(
+        &self,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+    ) -> bool;
 
-    fn marshal_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes;
+    fn ec_scalar_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+        data: &[u8],
+    );
 
-    fn marshal_compressed_ec(&self, x_pair: Self::BigUint, y_pair: Self::BigUint) -> BoxedBytes;
+    fn ec_scalar_base_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    );
 
-    fn unmarshal_ec(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint);
+    fn ec_marshal(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+    ) -> BoxedBytes;
 
-    fn unmarshal_compressed_ec(&self, data: BoxedBytes) -> (Self::BigUint, Self::BigUint);
+    fn ec_marshal_compressed(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+    ) -> BoxedBytes;
 
-    fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes);
+    fn ec_unmarshal(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    );
 
-    fn from_bitsize_ec(bitsize: u32) -> Option<Self>;
+    fn ec_unmarshal_compressed(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    );
+
+    fn ec_generate_key(
+        &self,
+        x_pub_key_handle: Handle,
+        y_pub_key_handle: Handle,
+        ec_handle: Handle,
+    ) -> BoxedBytes;
 }

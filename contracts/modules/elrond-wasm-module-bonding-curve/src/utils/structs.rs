@@ -4,29 +4,24 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct CurveArguments<BigUint: BigUintApi> {
-    pub available_supply: BigUint,
-    pub balance: BigUint,
+pub struct CurveArguments<M: ManagedTypeApi> {
+    pub available_supply: BigUint<M>,
+    pub balance: BigUint<M>,
 }
 
-impl<BigUint> CurveArguments<BigUint>
-where
-    for<'a, 'b> &'a BigUint: core::ops::Sub<&'b BigUint, Output = BigUint>,
-    for<'b> BigUint: core::ops::SubAssign<&'b BigUint>,
-    BigUint: BigUintApi,
-{
-    pub fn first_token_available(&self) -> BigUint {
+impl<M: ManagedTypeApi> CurveArguments<M> {
+    pub fn first_token_available(&self) -> BigUint<M> {
         &self.available_supply - &self.balance
     }
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct BondingCurve<BigUint: BigUintApi> {
-    pub curve: FunctionSelector<BigUint>,
-    pub arguments: CurveArguments<BigUint>,
+pub struct BondingCurve<M: ManagedTypeApi> {
+    pub curve: FunctionSelector<M>,
+    pub arguments: CurveArguments<M>,
     pub sell_availability: bool,
     pub payment_token: TokenIdentifier,
-    pub payment_amount: BigUint,
+    pub payment_amount: BigUint<M>,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]

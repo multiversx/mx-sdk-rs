@@ -50,4 +50,9 @@ pub trait ManagedBufferFeatures {
     ) -> OptionalResult<ManagedBuffer> {
         mb.copy_slice(starting_position, slice_len).into()
     }
+
+    #[endpoint]
+    fn mbuffer_eq(&self, mb1: ManagedBuffer, mb2: ManagedBuffer) -> bool {
+        mb1 == mb2
+    }
 }

@@ -36,7 +36,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         to: Address,
         percentage_fees: BigUint,
     ) {
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         self.send().direct(&to, &token_id, 0, &amount_to_send, &[]);

@@ -21,7 +21,7 @@ pub trait DeployContractModule {
         self.send()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
-                &BigUint::zero(),
+                &self.types().big_uint_zero(),
                 &source_contract_address,
                 CodeMetadata::DEFAULT,
                 &arguments.as_slice().into(),

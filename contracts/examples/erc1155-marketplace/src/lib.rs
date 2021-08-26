@@ -6,21 +6,21 @@ elrond_wasm::derive_imports!();
 const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct Auction<BigUint: BigUintApi> {
+pub struct Auction<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier,
-    pub min_bid: BigUint,
-    pub max_bid: BigUint,
+    pub min_bid: BigUint<M>,
+    pub max_bid: BigUint<M>,
     pub deadline: u64,
     pub original_owner: Address,
-    pub current_bid: BigUint,
+    pub current_bid: BigUint<M>,
     pub current_winner: Address,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct AuctionArgument<BigUint: BigUintApi> {
+pub struct AuctionArgument<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier,
-    pub min_bid: BigUint,
-    pub max_bid: BigUint,
+    pub min_bid: BigUint<M>,
+    pub max_bid: BigUint<M>,
     pub deadline: u64,
 }
 
@@ -44,7 +44,7 @@ pub trait Erc1155Marketplace {
         from: Address,
         type_id: BigUint,
         nft_id: BigUint,
-        args: AuctionArgument<BigUint>,
+        args: AuctionArgument<Self::TypeManager>,
     ) -> SCResult<()> {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -73,7 +73,7 @@ pub trait Erc1155Marketplace {
         from: Address,
         type_ids: Vec<BigUint>,
         nft_ids: Vec<BigUint>,
-        args: AuctionArgument<BigUint>,
+        args: AuctionArgument<Self::TypeManager>,
     ) -> SCResult<()> {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -262,7 +262,11 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<Auction<BigUint>> {
+    fn get_auction_status(
+        &self,
+        type_id: BigUint,
+        nft_id: BigUint,
+    ) -> SCResult<Auction<Self::TypeManager>> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -326,7 +330,7 @@ pub trait Erc1155Marketplace {
             max_bid: max_bid.clone(),
             deadline,
             original_owner: original_owner.clone(),
-            current_bid: BigUint::zero(),
+            current_bid: self.types().big_uint_zero(),
             current_winner: Address::zero(),
         });
 
@@ -348,19 +352,21 @@ pub trait Erc1155Marketplace {
     }
 
     fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {
-        &(total_amount * &(cut_percentage as u32).into()) / &(PERCENTAGE_TOTAL as u32).into()
+        total_amount * cut_percentage as u32 / PERCENTAGE_TOTAL as u32
     }
 
     fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
         let mut mapper = self.get_claimable_funds_mapper();
-        let mut total = mapper.get(token_identifier).unwrap_or_else(BigUint::zero);
+        let mut total = mapper
+            .get(token_identifier)
+            .unwrap_or_else(|| self.types().big_uint_zero());
         total += amount;
         mapper.insert(token_identifier.clone(), total);
     }
 
     fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
-        mapper.insert(token_identifier.clone(), BigUint::zero());
+        mapper.insert(token_identifier.clone(), self.types().big_uint_zero());
     }
 
     fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
@@ -401,5 +407,5 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: &BigUint,
         nft_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, Auction<BigUint>>;
+    ) -> SingleValueMapper<Self::Storage, Auction<Self::TypeManager>>;
 }

@@ -556,7 +556,7 @@
                 "from": "address:an_account",
                 "to": "sc:features_contract",
                 "value": "0",
-                "function": "compute_add_ec",
+                "function": "compute_ec_add",
                 "arguments": [
                     "256",
                     "0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
@@ -582,7 +582,7 @@
                 "from": "address:an_account",
                 "to": "sc:features_contract",
                 "value": "0",
-                "function": "compute_add_ec",
+                "function": "compute_ec_add",
                 "arguments": [
                     "256",
                     "0x0",
@@ -608,7 +608,7 @@
                 "from": "address:an_account",
                 "to": "sc:features_contract",
                 "value": "0",
-                "function": "compute_add_ec",
+                "function": "compute_ec_add",
                 "arguments": [
                     "256",
                     "0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
@@ -637,7 +637,7 @@
                 "from": "address:an_account",
                 "to": "sc:features_contract",
                 "value": "0",
-                "function": "compute_double_ec",
+                "function": "compute_ec_double",
                 "arguments": [
                     "521",
                     "0x2",
@@ -661,7 +661,7 @@
                 "from": "address:an_account",
                 "to": "sc:features_contract",
                 "value": "0",
-                "function": "compute_double_ec",
+                "function": "compute_ec_double",
                 "arguments": [
                     "521",
                     "0xc6858e06b70404e9cd9e3ecb662395b4429c648139053fb521f828af606b4d3dbaa14b5e77efe75928fe1dc127a2ffa8de3348b3c1856a429bf97e7e31c2e5bd66",

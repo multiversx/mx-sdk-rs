@@ -20,7 +20,7 @@ pub trait EsdtModule {
         only_owner!(self, "only owner can issue token");
         require!(self.token_id().is_empty(), "Token already issued");
 
-        let initial_supply = BigUint::from(1u32);
+        let initial_supply = self.types().big_uint_from(1u32);
 
         Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
             .issue_fungible(
@@ -74,7 +74,7 @@ pub trait EsdtModule {
                 // return payment to initial caller
                 let initial_caller = self.blockchain().get_owner_address();
                 let egld_returned = self.call_value().egld_value();
-                if egld_returned > 0 {
+                if egld_returned > 0u32 {
                     self.send()
                         .direct_egld(&initial_caller, &egld_returned, &[]);
                 }

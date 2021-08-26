@@ -45,12 +45,12 @@ where
         self.api.storage_store_i64(self.key, value);
     }
 
-    fn set_specialized<T: TryStaticCast>(&self, value: &T) -> bool {
+    #[inline]
+    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(self, value: &T, else_bytes: F) {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<SWA>>() {
             self.set_managed_buffer(managed_buffer);
-            true
         } else {
-            false
+            self.set_boxed_bytes(else_bytes());
         }
     }
 

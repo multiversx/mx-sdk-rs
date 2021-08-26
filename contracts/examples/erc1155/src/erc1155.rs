@@ -76,7 +76,7 @@ pub trait Erc1155 {
                 self.peform_async_call_single_transfer(from, to, type_id, nft_id, data),
             )
         } else {
-            let amount = BigUint::from(1u32);
+            let amount = self.types().big_uint_from(1u32);
             self.increase_balance(&to, &type_id, &amount);
             self.token_owner(&type_id, &nft_id).set(&to);
 
@@ -167,7 +167,7 @@ pub trait Erc1155 {
     ) -> SCResult<()> {
         self.try_reserve_non_fungible(from, type_id, nft_id)?;
         if !is_receiver_smart_contract {
-            let amount = BigUint::from(1u32);
+            let amount = self.types().big_uint_from(1u32);
             self.increase_balance(to, type_id, &amount);
             self.token_owner(type_id, nft_id).set(to);
         } else {
@@ -191,7 +191,7 @@ pub trait Erc1155 {
         initial_supply: BigUint,
         is_fungible: bool,
     ) -> BigUint {
-        let big_uint_one = BigUint::from(1u32);
+        let big_uint_one = self.types().big_uint_from(1u32);
 
         let creator = self.blockchain().get_caller();
         let type_id = &self.last_valid_type_id().get() + &big_uint_one;
@@ -225,7 +225,7 @@ pub trait Erc1155 {
 
         if !self.is_fungible(&type_id).get() {
             let last_valid_id = self.last_valid_nft_id_for_type(&type_id).get();
-            let id_first = &last_valid_id + &BigUint::from(1u32);
+            let id_first = &last_valid_id + 1u32;
             let id_last = last_valid_id + amount;
 
             self.set_owner_for_range(&type_id, &id_first, &id_last, &creator);
@@ -261,7 +261,7 @@ pub trait Erc1155 {
     fn balance_of(&self, owner: &Address, type_id: &BigUint) -> BigUint {
         self.get_balance_mapper(owner)
             .get(type_id)
-            .unwrap_or_else(BigUint::zero)
+            .unwrap_or_else(|| self.types().big_uint_zero())
     }
 
     // returns balance for each (owner, id) pair
@@ -340,7 +340,7 @@ pub trait Erc1155 {
             "_from_ is not the owner of the token"
         );
 
-        let amount = BigUint::from(1u32);
+        let amount = self.types().big_uint_from(1u32);
         self.decrease_balance(owner, type_id, &amount);
         self.token_owner(type_id, nft_id).set(&Address::zero());
 
@@ -355,7 +355,7 @@ pub trait Erc1155 {
         end: &BigUint,
         owner: &Address,
     ) {
-        let big_uint_one = BigUint::from(1u32);
+        let big_uint_one = self.types().big_uint_from(1u32);
         let mut nft_id = start.clone();
 
         while &nft_id <= end {
@@ -428,7 +428,7 @@ pub trait Erc1155 {
             AsyncCallResult::Ok(()) => to,
             AsyncCallResult::Err(_) => from,
         };
-        let biguint_one = BigUint::from(1u32);
+        let biguint_one = self.types().big_uint_from(1u32);
 
         for (type_id, value) in type_ids.iter().zip(values.iter()) {
             if self.is_fungible(type_id).get() {

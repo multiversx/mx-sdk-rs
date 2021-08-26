@@ -16,27 +16,7 @@ mod module_1 {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT TRAIT /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub trait VersionModule: elrond_wasm::api::ContractBase + Sized
-    where
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
-    {
+    pub trait VersionModule: elrond_wasm::api::ContractBase + Sized {
         fn version(&self) -> BigInt<Self::TypeManager>;
 
         fn some_async(&self) -> AsyncCall<Self::SendApi>;
@@ -52,24 +32,6 @@ mod module_1 {
     impl<C> VersionModule for C
     where
         C: AutoImpl,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
     {
         fn version(&self) -> BigInt<Self::TypeManager> {
             BigInt::from_i64(100, self.type_manager())
@@ -82,27 +44,7 @@ mod module_1 {
         fn callback(&self) {}
     }
 
-    pub trait EndpointWrappers: VersionModule + elrond_wasm::api::ContractPrivateApi
-    where
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
-    {
+    pub trait EndpointWrappers: VersionModule + elrond_wasm::api::ContractPrivateApi {
         #[inline]
         fn call_version(&self) {
             self.call_value().check_not_payable();
@@ -135,9 +77,7 @@ mod module_1 {
     pub struct AbiProvider {}
 
     impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-        type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
         type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
-        type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
         type Storage = elrond_wasm::api::uncallable::UncallableApi;
         type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
@@ -188,25 +128,6 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     pub trait Adder:
         super::module_1::VersionModule + elrond_wasm::api::ContractBase + Sized
-    where
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
     {
         fn init(&self, initial_value: &BigInt<Self::TypeManager>) {
             self.set_sum(initial_value);
@@ -236,24 +157,6 @@ mod sample_adder {
     impl<C> Adder for C
     where
         C: AutoImpl + super::module_1::AutoImpl,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
     {
         fn get_sum(&self) -> BigInt<Self::TypeManager> {
             let key: &'static [u8] = b"sum";
@@ -271,25 +174,6 @@ mod sample_adder {
 
     pub trait EndpointWrappers:
         Adder + elrond_wasm::api::ContractPrivateApi + super::module_1::EndpointWrappers
-    where
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
     {
         #[inline]
         fn call_get_sum(&self) {
@@ -415,9 +299,7 @@ mod sample_adder {
             + Clone
             + 'static,
     {
-        type BigUint = A::BigUint;
         type TypeManager = A::TypeManager;
-        type EllipticCurve = A::EllipticCurve;
         type Storage = A::Storage;
         type CallValue = A::CallValue;
         type SendApi = A::SendApi;
@@ -493,10 +375,16 @@ mod sample_adder {
             + 'static,
     {
         type ArgumentApi = A;
+        type CallbackClosureArgumentApi = A;
         type FinishApi = A;
 
         #[inline]
         fn argument_api(&self) -> Self::ArgumentApi {
+            self.api.clone()
+        }
+
+        #[inline]
+        fn callback_closure_arg_api(&self) -> Self::CallbackClosureArgumentApi {
             self.api.clone()
         }
 
@@ -506,63 +394,25 @@ mod sample_adder {
         }
     }
 
-    impl<A> super::module_1::EndpointWrappers for ContractObj<A>
-    where
+    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where
         A: elrond_wasm::api::ContractBase
             + elrond_wasm::api::ErrorApi
             + elrond_wasm::api::EndpointArgumentApi
             + elrond_wasm::api::EndpointFinishApi
             + elrond_wasm::api::ManagedTypeApi
             + Clone
-            + 'static,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
+            + 'static
     {
     }
 
-    impl<A> EndpointWrappers for ContractObj<A>
-    where
+    impl<A> EndpointWrappers for ContractObj<A> where
         A: elrond_wasm::api::ContractBase
             + elrond_wasm::api::ErrorApi
             + elrond_wasm::api::EndpointArgumentApi
             + elrond_wasm::api::EndpointFinishApi
             + elrond_wasm::api::ManagedTypeApi
             + Clone
-            + 'static,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Add<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Sub<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Mul<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Div<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::Rem<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::AddAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::SubAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::MulAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::DivAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::RemAssign<&'b Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitAnd<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitOr<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'a, 'b> &'a Self::BigUint: core::ops::BitXor<&'b Self::BigUint, Output = Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitAndAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitOrAssign<&'b Self::BigUint>,
-        for<'b> Self::BigUint: core::ops::BitXorAssign<&'b Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shr<usize, Output = Self::BigUint>,
-        for<'a> &'a Self::BigUint: core::ops::Shl<usize, Output = Self::BigUint>,
+            + 'static
     {
     }
 
@@ -575,24 +425,6 @@ mod sample_adder {
             + elrond_wasm::api::ManagedTypeApi
             + Clone
             + 'static,
-        for<'a, 'b> &'a A::BigUint: core::ops::Add<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Sub<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Mul<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Div<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Rem<&'b A::BigUint, Output = A::BigUint>,
-        for<'b> A::BigUint: core::ops::AddAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::SubAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::MulAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::DivAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::RemAssign<&'b A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::BitAnd<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::BitOr<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::BitXor<&'b A::BigUint, Output = A::BigUint>,
-        for<'b> A::BigUint: core::ops::BitAndAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::BitOrAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::BitXorAssign<&'b A::BigUint>,
-        for<'a> &'a A::BigUint: core::ops::Shr<usize, Output = A::BigUint>,
-        for<'a> &'a A::BigUint: core::ops::Shl<usize, Output = A::BigUint>,
     {
         fn call(&self, fn_name: &[u8]) -> bool {
             EndpointWrappers::call(self, fn_name)
@@ -605,9 +437,7 @@ mod sample_adder {
     pub struct AbiProvider {}
 
     impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-        type BigUint = elrond_wasm::api::uncallable::BigUintUncallable;
         type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
-        type EllipticCurve = elrond_wasm::api::uncallable::EllipticCurveUncallable;
         type Storage = elrond_wasm::api::uncallable::UncallableApi;
         type SendApi = elrond_wasm::api::uncallable::UncallableApi;
 
@@ -663,24 +493,6 @@ mod sample_adder {
             + elrond_wasm::api::EndpointFinishApi
             + Clone
             + 'static,
-        for<'a, 'b> &'a A::BigUint: core::ops::Add<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Sub<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Mul<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Div<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::Rem<&'b A::BigUint, Output = A::BigUint>,
-        for<'b> A::BigUint: core::ops::AddAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::SubAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::MulAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::DivAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::RemAssign<&'b A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::BitAnd<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::BitOr<&'b A::BigUint, Output = A::BigUint>,
-        for<'a, 'b> &'a A::BigUint: core::ops::BitXor<&'b A::BigUint, Output = A::BigUint>,
-        for<'b> A::BigUint: core::ops::BitAndAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::BitOrAssign<&'b A::BigUint>,
-        for<'b> A::BigUint: core::ops::BitXorAssign<&'b A::BigUint>,
-        for<'a> &'a A::BigUint: core::ops::Shr<usize, Output = A::BigUint>,
-        for<'a> &'a A::BigUint: core::ops::Shl<usize, Output = A::BigUint>,
     {
         ContractObj { api }
     }
@@ -692,7 +504,7 @@ mod sample_adder {
         pub api: SA,
         pub address: Address,
         pub payment_token: elrond_wasm::types::TokenIdentifier,
-        pub payment_amount: SA::AmountType,
+        pub payment_amount: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
         pub payment_nonce: u64,
     }
 
@@ -700,18 +512,17 @@ mod sample_adder {
     where
         SA: elrond_wasm::api::SendApi + 'static,
     {
-        type BigUint = SA::AmountType;
         type TypeManager = SA::ProxyTypeManager;
-        type EllipticCurve = SA::ProxyEllipticCurve;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
 
         fn new_proxy_obj(api: SA) -> Self {
+            let zero = elrond_wasm::types::BigUint::zero(api.type_manager());
             Proxy {
                 api,
                 address: Address::zero(),
                 payment_token: elrond_wasm::types::TokenIdentifier::egld(),
-                payment_amount: Self::BigUint::zero(),
+                payment_amount: zero,
                 payment_nonce: 0,
             }
         }
@@ -721,7 +532,11 @@ mod sample_adder {
             self
         }
 
-        fn with_token_transfer(mut self, token: TokenIdentifier, payment: Self::BigUint) -> Self {
+        fn with_token_transfer(
+            mut self,
+            token: TokenIdentifier,
+            payment: BigUint<Self::TypeManager>,
+        ) -> Self {
             self.payment_token = token;
             self.payment_amount = payment;
             self
@@ -734,7 +549,15 @@ mod sample_adder {
         }
 
         #[inline]
-        fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, Self::BigUint, u64) {
+        fn into_fields(
+            self,
+        ) -> (
+            Self::SendApi,
+            Address,
+            TokenIdentifier,
+            BigUint<Self::TypeManager>,
+            u64,
+        ) {
             (
                 self.api,
                 self.address,
@@ -766,9 +589,7 @@ mod sample_adder {
     where
         SA: elrond_wasm::api::SendApi + 'static,
     {
-        type BigUint = SA::AmountType;
         type TypeManager = SA::ProxyTypeManager;
-        type EllipticCurve = SA::ProxyEllipticCurve;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
         type ErrorApi = SA;

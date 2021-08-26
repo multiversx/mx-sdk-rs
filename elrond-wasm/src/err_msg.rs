@@ -17,6 +17,7 @@ pub const ARG_DECODE_ERROR_2: &[u8] = b"): ";
 pub const STORAGE_VALUE_OUT_OF_RANGE: &[u8] = b"storage value out of range";
 pub const STORAGE_DECODE_ERROR: &[u8] = b"storage decode error: ";
 
+pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
 

@@ -10,8 +10,8 @@ macro_rules! imports {
         use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
         use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
         use elrond_wasm::api::{
-            BigIntApi, BigUintApi, BlockchainApi, CallValueApi, ContractBase, CryptoApi,
-            EllipticCurveApi, ProxyObjApi, SendApi,
+            BigIntApi, BlockchainApi, CallValueApi, ContractBase, CryptoApi, EllipticCurveApi,
+            ManagedTypeApi, ProxyObjApi, SendApi,
         };
         use elrond_wasm::api::{ErrorApi, LogApi}; // TODO: remove at some point, they shouldn't be public
         use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
@@ -73,10 +73,7 @@ macro_rules! sc_try {
 /// # use elrond_wasm::*;
 /// # use elrond_wasm::api::BlockchainApi;
 /// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractBase
-/// # where
-/// #   BigInt: elrond_wasm::api::BigIntApi + 'static,
-/// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
+/// # pub trait ExampleContract: elrond_wasm::api::ContractBase
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     require!(self.blockchain().get_caller() == self.blockchain().get_owner_address(), "Caller must be owner");
@@ -101,10 +98,7 @@ macro_rules! require {
 /// # use elrond_wasm::*;
 /// # use elrond_wasm::api::BlockchainApi;
 /// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract<BigInt, BigUint>: elrond_wasm::api::ContractBase
-/// # where
-/// #   BigInt: elrond_wasm::api::BigIntApi + 'static,
-/// #   BigUint: elrond_wasm::api::BigUintApi + 'static,
+/// # pub trait ExampleContract: elrond_wasm::api::ContractBase
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     only_owner!(self, "Caller must be owner");

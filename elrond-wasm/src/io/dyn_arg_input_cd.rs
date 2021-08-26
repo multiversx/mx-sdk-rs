@@ -1,49 +1,48 @@
-use crate::api::ErrorApi;
-use crate::hex_call_data::*;
-use crate::*;
+use crate::api::{ErrorApi, ManagedTypeApi};
+use crate::types::ManagedBytesTopDecodeInput;
+use crate::{err_msg, DynArgInput, HexCallDataDeserializer};
 
-pub struct CallDataArgLoader<'a, SE>
+pub struct CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     deser: HexCallDataDeserializer<'a>,
-    signal_error: SE,
+    api: A,
 }
 
-impl<'a, SE> CallDataArgLoader<'a, SE>
+impl<'a, A> CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-    pub fn new(deser: HexCallDataDeserializer<'a>, signal_error: SE) -> Self {
-        CallDataArgLoader {
-            deser,
-            signal_error,
-        }
+    pub fn new(deser: HexCallDataDeserializer<'a>, api: A) -> Self {
+        CallDataArgLoader { deser, api }
     }
 }
 
-impl<'a, SE> ErrorApi for CallDataArgLoader<'a, SE>
+impl<'a, A> ErrorApi for CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn signal_error(&self, message: &[u8]) -> ! {
-        self.signal_error.signal_error(message)
+        self.api.signal_error(message)
     }
 }
 
-impl<'a, SE> DynArgInput<Vec<u8>> for CallDataArgLoader<'a, SE>
+impl<'a, A> DynArgInput<ManagedBytesTopDecodeInput<A>> for CallDataArgLoader<'a, A>
 where
-    SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn has_next(&self) -> bool {
         self.deser.has_next()
     }
 
-    fn next_arg_input(&mut self) -> Vec<u8> {
+    fn next_arg_input(&mut self) -> ManagedBytesTopDecodeInput<A> {
         match self.deser.next_argument() {
-            Ok(Some(arg_bytes)) => arg_bytes,
+            Ok(Some(arg_bytes)) => {
+                ManagedBytesTopDecodeInput::new(arg_bytes.into(), self.api.clone())
+            },
             Ok(None) => self.signal_error(err_msg::ARG_WRONG_NUMBER),
             Err(sc_err) => self.signal_error(sc_err.as_bytes()),
         }

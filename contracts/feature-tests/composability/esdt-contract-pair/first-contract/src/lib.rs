@@ -53,7 +53,7 @@ pub trait FirstContract {
 
         self.call_esdt_second_contract(
             &expected_token_name,
-            &(esdt_value / BigUint::from(2u32)),
+            &(esdt_value / 2u32),
             &self.get_second_contract_address(),
             SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
             &[],
@@ -152,7 +152,7 @@ pub trait FirstContract {
         }
 
         self.send()
-            .async_call_raw(to, &BigUint::zero(), serializer.as_slice());
+            .async_call_raw(to, &self.types().big_uint_zero(), serializer.as_slice());
     }
 
     // storage

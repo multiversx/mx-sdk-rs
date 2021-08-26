@@ -1,124 +1,134 @@
-use core::panic;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::{
+    api::{EllipticCurveApi, Handle},
+    types::BoxedBytes,
+};
 
-type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
+use crate::TxContext;
 
-use super::RustBigUint;
-pub struct EllipticCurveMock;
-
-use elrond_wasm::elrond_codec::*;
-
-impl NestedEncode for EllipticCurveMock {
-    fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
-        panic!("not implemented")
+impl EllipticCurveApi for TxContext {
+    fn ec_create(&self, _name: &[u8]) -> Handle {
+        panic!("ec_create not implemented")
     }
 
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+    fn ec_get_values(
         &self,
-        _dest: &mut O,
-        _c: ExitCtx,
-        _exit: fn(ExitCtx, EncodeError) -> !,
+        _ec_handle: Handle,
+        _field_order_handle: Handle,
+        _base_point_order_handle: Handle,
+        _eq_constant_handle: Handle,
+        _x_base_point_handle: Handle,
+        _y_base_point_handle: Handle,
     ) {
-        panic!("not implemented")
-    }
-}
-
-impl TopEncode for EllipticCurveMock {
-    fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
-        panic!("not implemented")
+        panic!("ec_get_values not implemented")
     }
 
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
+    fn ec_curve_length(&self, _ec_handle: Handle) -> u32 {
+        panic!("ec_curve_length not implemented")
+    }
+
+    fn ec_private_key_byte_length(&self, _ec_handle: Handle) -> u32 {
+        panic!("ec_private_key_byte_length not implemented")
+    }
+
+    fn ec_add(
         &self,
-        _output: O,
-        _c: ExitCtx,
-        _exit: fn(ExitCtx, EncodeError) -> !,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _x_first_point: Handle,
+        _y_first_point: Handle,
+        _x_second_point: Handle,
+        _y_second_point: Handle,
     ) {
-        panic!("not implemented")
-    }
-}
-
-impl elrond_wasm::abi::TypeAbi for EllipticCurveMock {
-    fn type_name() -> String {
-        String::from("EllipticCurve")
-    }
-}
-
-impl elrond_wasm::api::EllipticCurveApi for EllipticCurveMock {
-    type BigUint = RustBigUint;
-
-    fn get_values(&self) -> EllipticCurveComponents<Self::BigUint> {
-        panic!("elliptic curve get_values not implemented yet!")
+        panic!("ec_add not implemented")
     }
 
-    fn create_ec(_curve: &str) -> Self {
-        panic!("create_ec not implemented yet!")
-    }
-
-    fn get_ec_length(&self) -> u32 {
-        panic!("get_ec_length not implemented yet!")
-    }
-
-    fn get_priv_key_byte_length(&self) -> u32 {
-        panic!("get_ec_byte_length not implemented yet!")
-    }
-
-    fn add_ec(
+    fn ec_double(
         &self,
-        _x_first_point: Self::BigUint,
-        _y_first_point: Self::BigUint,
-        _x_second_point: Self::BigUint,
-        _y_second_point: Self::BigUint,
-    ) -> (Self::BigUint, Self::BigUint) {
-        panic!("add_ec not implemented yet!")
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _x_point_handle: Handle,
+        _y_point_handle: Handle,
+    ) {
+        panic!("ec_double not implemented")
     }
 
-    fn double_ec(
+    fn ec_is_on_curve(
         &self,
-        _x_point: Self::BigUint,
-        _y_point: Self::BigUint,
-    ) -> (Self::BigUint, Self::BigUint) {
-        panic!("double_ec not implemented yet!")
+        _ec_handle: Handle,
+        _x_point_handle: Handle,
+        _y_point_handle: Handle,
+    ) -> bool {
+        panic!("ec_is_on_curve not implemented")
     }
 
-    fn is_on_curve_ec(&self, _x_point: Self::BigUint, _y_point: Self::BigUint) -> bool {
-        panic!("is_on_curve_ec not implemented yet!")
-    }
-
-    fn scalar_mult(
+    fn ec_scalar_mult(
         &self,
-        _x_point: Self::BigUint,
-        _y_point: Self::BigUint,
-        _data: BoxedBytes,
-    ) -> (Self::BigUint, Self::BigUint) {
-        panic!("scalar_mult not implemented yet")
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _x_point_handle: Handle,
+        _y_point_handle: Handle,
+        _data: &[u8],
+    ) {
+        panic!("ec_scalar_mult not implemented")
     }
 
-    fn scalar_base_mult(&self, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        panic!("scalar_base_mult not implemented yet!")
+    fn ec_scalar_base_mult(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _data: &[u8],
+    ) {
+        panic!("ec_scalar_base_mult not implemented")
     }
 
-    fn marshal_ec(&self, _x_pair: Self::BigUint, _y_pair: Self::BigUint) -> BoxedBytes {
-        panic!("marshal_ec not implemented yet!")
+    fn ec_marshal(
+        &self,
+        _ec_handle: Handle,
+        _x_pair_handle: Handle,
+        _y_pair_handle: Handle,
+    ) -> BoxedBytes {
+        panic!("ec_marshal not implemented")
     }
 
-    fn marshal_compressed_ec(&self, _x_pair: Self::BigUint, _y_pair: Self::BigUint) -> BoxedBytes {
-        panic!("marshal_compressed_ec not implemented yet!")
+    fn ec_marshal_compressed(
+        &self,
+        _ec_handle: Handle,
+        _x_pair_handle: Handle,
+        _y_pair_handle: Handle,
+    ) -> BoxedBytes {
+        panic!("ec_marshal_compressed not implemented")
     }
 
-    fn unmarshal_ec(&self, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        panic!("unmarshal_ec not implemented yet!")
+    fn ec_unmarshal(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _data: &[u8],
+    ) {
+        panic!("ec_unmarshal not implemented")
     }
 
-    fn unmarshal_compressed_ec(&self, _data: BoxedBytes) -> (Self::BigUint, Self::BigUint) {
-        panic!("unmarshal_compressed_ec not implemented yet!")
+    fn ec_unmarshal_compressed(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _data: &[u8],
+    ) {
+        panic!("ec_unmarshal_compressed not implemented")
     }
 
-    fn generate_key_ec(&self) -> (Self::BigUint, Self::BigUint, BoxedBytes) {
-        panic!("generate_key_ec not implemented yet!")
-    }
-
-    fn from_bitsize_ec(_bitsize: u32) -> Option<Self> {
-        panic!("from_bitsize_ec not impplemented yet!")
+    fn ec_generate_key(
+        &self,
+        _x_pub_key_handle: Handle,
+        _y_pub_key_handle: Handle,
+        _ec_handle: Handle,
+    ) -> BoxedBytes {
+        panic!("ec_generate_key not implemented")
     }
 }

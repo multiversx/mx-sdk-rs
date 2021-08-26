@@ -1,7 +1,7 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::SendApi;
 use crate::io::EndpointResult;
-use crate::types::{Address, BoxedBytes};
+use crate::types::{Address, BigUint, BoxedBytes};
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -11,7 +11,7 @@ where
 {
     pub api: SA,
     pub to: Address,
-    pub amount: SA::AmountType,
+    pub amount: BigUint<SA::ProxyTypeManager>,
     pub data: BoxedBytes,
 }
 

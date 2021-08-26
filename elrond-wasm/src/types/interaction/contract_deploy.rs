@@ -1,5 +1,5 @@
-use crate::api::{BigUintApi, SendApi};
-use crate::types::{Address, ArgBuffer, BoxedBytes, CodeMetadata};
+use crate::api::SendApi;
+use crate::types::{Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata};
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -13,7 +13,7 @@ where
 {
     api: SA,
     address: Address, // only used for Upgrade, ignored for Deploy
-    payment_amount: SA::AmountType,
+    payment_amount: BigUint<SA::ProxyTypeManager>,
     explicit_gas_limit: u64,
     pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
 }
@@ -23,7 +23,7 @@ where
 pub fn new_contract_deploy<SA>(
     api: SA,
     address: Address,
-    payment_amount: SA::AmountType,
+    payment_amount: BigUint<SA::ProxyTypeManager>,
 ) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
@@ -40,16 +40,17 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA) -> Self {
+        let zero = BigUint::zero(api.type_manager());
         ContractDeploy {
             api,
             address: Address::zero(),
-            payment_amount: SA::AmountType::zero(),
+            payment_amount: zero,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer: ArgBuffer::new(),
         }
     }
 
-    pub fn with_egld_transfer(mut self, payment_amount: SA::AmountType) -> Self {
+    pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA::ProxyTypeManager>) -> Self {
         self.payment_amount = payment_amount;
         self
     }

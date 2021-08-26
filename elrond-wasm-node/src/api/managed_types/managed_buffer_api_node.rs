@@ -1,5 +1,8 @@
-use elrond_wasm::api::{Handle, ManagedBufferApi, InvalidSliceError};
+use elrond_wasm::api::{Handle, InvalidSliceError, ManagedBufferApi};
+use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
+
+use crate::error_hook;
 
 // #[allow(dead_code)]
 extern "C" {
@@ -91,6 +94,19 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         }
     }
 
+    fn mb_copy_to_slice_pad_right(&self, handle: Handle, destination: &mut [u8]) {
+        unsafe {
+            let byte_len = mBufferGetLength(handle) as usize;
+            if byte_len > destination.len() {
+                error_hook::signal_error(err_msg::VALUE_EXCEEDS_SLICE)
+            }
+            if byte_len > 0 {
+                let start_index = destination.len() - byte_len;
+                let _ = mBufferGetBytes(handle, destination.as_mut_ptr().add(start_index));
+            }
+        }
+    }
+
     fn mb_overwrite(&self, handle: Handle, bytes: &[u8]) {
         unsafe {
             let _ = mBufferSetBytes(handle as i32, bytes.as_ptr(), bytes.len() as i32);
@@ -110,6 +126,25 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
                 bytes.as_ptr(),
                 bytes.len() as i32,
             );
+        }
+    }
+
+    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
+        // TODO: might be worth adding a new hook to Arwen for this
+        unsafe {
+            let len1 = mBufferGetLength(handle1 as i32) as usize;
+            let len2 = mBufferGetLength(handle2 as i32) as usize;
+            if len1 != len2 {
+                return false;
+            }
+            if len1 == 0 {
+                return true;
+            }
+            let mut bytes1 = BoxedBytes::allocate(len1);
+            let mut bytes2 = BoxedBytes::allocate(len2);
+            let _ = mBufferGetBytes(handle1, bytes1.as_mut_ptr());
+            let _ = mBufferGetBytes(handle2, bytes2.as_mut_ptr());
+            bytes1 == bytes2
         }
     }
 }

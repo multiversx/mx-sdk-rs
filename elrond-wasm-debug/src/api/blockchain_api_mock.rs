@@ -1,12 +1,17 @@
-use super::managed_types::RustBigUint;
 use crate::TxContext;
-use elrond_wasm::{
-    api::BigUintApi,
-    types::{Address, EsdtTokenData, TokenIdentifier, H256},
-};
+use elrond_wasm::types::{Address, BigUint, EsdtTokenData, TokenIdentifier, H256};
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
-    type BalanceType = RustBigUint;
+    type Storage = Self;
+    type TypeManager = Self;
+
+    fn storage_manager(&self) -> Self::Storage {
+        self.clone()
+    }
+
+    fn type_manager(&self) -> Self::TypeManager {
+        self.clone()
+    }
 
     fn get_sc_address(&self) -> Address {
         self.tx_input_box.to.clone()
@@ -41,11 +46,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.tx_input_box.from.clone()
     }
 
-    fn get_balance(&self, address: &Address) -> RustBigUint {
+    fn get_balance(&self, address: &Address) -> BigUint<Self::Storage> {
         if address != &self.get_sc_address() {
             panic!("get balance not yet implemented for accounts other than the contract itself");
         }
-        self.blockchain_info_box.contract_balance.clone().into()
+        self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
     }
 
     fn get_tx_hash(&self) -> H256 {
@@ -113,7 +118,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         address: &Address,
         token: &TokenIdentifier,
         _nonce: u64,
-    ) -> RustBigUint {
+    ) -> BigUint<Self::TypeManager> {
         if address != &self.get_sc_address() {
             panic!(
                 "get_esdt_balance not yet implemented for accounts other than the contract itself"
@@ -125,8 +130,8 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .contract_esdt
             .get(&token.as_esdt_identifier().to_vec())
         {
-            Some(value) => value.clone().into(),
-            None => RustBigUint::zero(),
+            Some(value) => self.insert_new_big_uint(value.clone()),
+            None => BigUint::zero(self.storage_manager()),
         }
     }
 
@@ -135,7 +140,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         _address: &Address,
         _token: &TokenIdentifier,
         _nonce: u64,
-    ) -> EsdtTokenData<RustBigUint> {
+    ) -> EsdtTokenData<Self::Storage> {
         panic!("get_esdt_token_data not yet implemented")
     }
 }

@@ -1,12 +1,16 @@
-use elrond_wasm::api::PanickingErrorApi;
-use elrond_wasm::types::*;
-use elrond_wasm::*;
+use elrond_wasm::{
+    load_dyn_arg,
+    types::{AsyncCallResult, BigUint, MultiArg2, OptionalArg, VarArgs},
+    ArgId, CallDataArgLoader, DynArgInput, HexCallDataDeserializer,
+};
+use elrond_wasm_debug::TxContext;
 
 #[test]
 fn test_simple_args() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let arg1: i32 = load_dyn_arg(&mut cd_loader, ArgId::empty());
     assert_eq!(arg1, 0x1111i32);
 
@@ -17,10 +21,23 @@ fn test_simple_args() {
 }
 
 #[test]
+fn test_simple_managed_arg() {
+    let api = TxContext::dummy();
+    let input: &[u8] = b"some_other_func@05";
+    let de = HexCallDataDeserializer::new(input);
+    let mut cd_loader = CallDataArgLoader::new(de, api.clone());
+    let arg1: BigUint<TxContext> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    assert_eq!(arg1, BigUint::from_u32(5u32, api));
+
+    cd_loader.assert_no_more_args();
+}
+
+#[test]
 fn test_simple_vec_arg() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"some_other_func@000000020000000300000006";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let arg1: Vec<usize> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     assert_eq!(arg1, [2usize, 3usize, 6usize].to_vec());
 
@@ -29,9 +46,10 @@ fn test_simple_vec_arg() {
 
 #[test]
 fn test_var_args() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let var_arg: VarArgs<i32> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     let arg_vec = var_arg.into_vec();
     assert_eq!(arg_vec.len(), 2);
@@ -41,9 +59,10 @@ fn test_var_args() {
 
 #[test]
 fn test_multi_arg_2() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let tuple_arg: MultiArg2<i32, i32> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     let tuple = tuple_arg.into_tuple();
     assert_eq!(tuple.0, 0x1111i32);
@@ -52,9 +71,10 @@ fn test_multi_arg_2() {
 
 #[test]
 fn test_var_multi_arg_2() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let tuple_arg: VarArgs<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     let tuple_vec = tuple_arg.into_vec();
     assert_eq!(tuple_vec.len(), 1);
@@ -66,9 +86,10 @@ fn test_var_multi_arg_2() {
 
 #[test]
 fn test_opt_multi_arg_2() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let opt_tuple_arg: OptionalArg<MultiArg2<i32, i32>> =
         load_dyn_arg(&mut cd_loader, ArgId::empty());
     match opt_tuple_arg {
@@ -85,9 +106,10 @@ fn test_opt_multi_arg_2() {
 
 #[test]
 fn test_async_call_result_ok() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@@1111@2222";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let acr: AsyncCallResult<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     match acr {
         AsyncCallResult::Ok(tuple_arg) => {
@@ -103,9 +125,10 @@ fn test_async_call_result_ok() {
 
 #[test]
 fn test_async_call_result_ok2() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@00";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let acr: AsyncCallResult<VarArgs<MultiArg2<i32, i32>>> =
         load_dyn_arg(&mut cd_loader, ArgId::empty());
     match acr {
@@ -120,9 +143,10 @@ fn test_async_call_result_ok2() {
 
 #[test]
 fn test_async_call_result_err() {
+    let api = TxContext::dummy();
     let input: &[u8] = b"func@0123@1111";
     let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, PanickingErrorApi);
+    let mut cd_loader = CallDataArgLoader::new(de, api);
     let acr: AsyncCallResult<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     match acr {
         AsyncCallResult::Ok(_) => {

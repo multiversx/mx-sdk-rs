@@ -1,14 +1,16 @@
-use alloc::string::String;
-
 use crate::api::InvalidSliceError;
-use crate::elrond_codec::*;
-
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::BoxedBytes,
 };
+use alloc::string::String;
+use elrond_codec::{
+    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+};
 
 /// A byte buffer managed by an external API.
+#[derive(Debug)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     pub(crate) api: M,
@@ -97,51 +99,42 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
-
-impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
-    fn write(&mut self, bytes: &[u8]) {
-        self.append_bytes(bytes);
-    }
-
-    fn push_specialized<T: TryStaticCast>(&mut self, value: &T) -> bool {
-        if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
-            let mb_len = managed_buffer.len() as u32;
-            self.append_bytes(&mb_len.to_be_bytes()[..]);
-            self.append(managed_buffer);
-            true
-        } else {
-            false
-        }
+impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.api.mb_eq(self.handle, other.handle)
     }
 }
+
+impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
+
+impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        if !output.set_specialized(self) {
-            output.set_slice_u8(self.to_boxed_bytes().as_slice());
-        }
+        output.set_specialized(self, || self.to_boxed_bytes().into_box());
         Ok(())
     }
 }
 
 impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if !dest.push_specialized(self) {
-            dest.write(self.to_boxed_bytes().as_slice());
+        if dest.push_specialized(self) {
+            Ok(())
+        } else {
+            self.to_boxed_bytes().dep_encode(dest)
         }
-        Ok(())
     }
 
     fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
         &self,
         dest: &mut O,
-        _c: ExitCtx,
-        _exit: fn(ExitCtx, EncodeError) -> !,
+        c: ExitCtx,
+        exit: fn(ExitCtx, EncodeError) -> !,
     ) {
         if !dest.push_specialized(self) {
-            dest.write(self.to_boxed_bytes().as_slice());
+            self.to_boxed_bytes().dep_encode_or_exit(dest, c, exit);
         }
     }
 }

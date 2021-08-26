@@ -1,13 +1,13 @@
 use elrond_wasm::{
-    api::{BigUintApi, EndpointFinishApi, ManagedTypeApi, SendApi},
+    api::{EndpointFinishApi, ManagedTypeApi, SendApi},
     io::EndpointResult,
-    types::{Address, AsyncCall, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
+    types::{Address, AsyncCall, BigUint, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
 };
 
 elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub enum Action<BigUint: BigUintApi> {
+pub enum Action<M: ManagedTypeApi> {
     Nothing,
     AddBoardMember(Address),
     AddProposer(Address),
@@ -15,24 +15,24 @@ pub enum Action<BigUint: BigUintApi> {
     ChangeQuorum(usize),
     SendEgld {
         to: Address,
-        amount: BigUint,
+        amount: BigUint<M>,
         data: BoxedBytes,
     },
     SCDeploy {
-        amount: BigUint,
+        amount: BigUint<M>,
         code: BoxedBytes,
         code_metadata: CodeMetadata,
         arguments: Vec<BoxedBytes>,
     },
     SCCall {
         to: Address,
-        egld_payment: BigUint,
+        egld_payment: BigUint<M>,
         endpoint_name: BoxedBytes,
         arguments: Vec<BoxedBytes>,
     },
 }
 
-impl<BigUint: BigUintApi> Action<BigUint> {
+impl<M: ManagedTypeApi> Action<M> {
     /// Only pending actions are kept in storage,
     /// both executed and discarded actions are removed (converted to `Nothing`).
     /// So this is equivalent to `action != Action::Nothing`.
@@ -43,9 +43,9 @@ impl<BigUint: BigUintApi> Action<BigUint> {
 
 /// Not used internally, just to retrieve results via endpoint.
 #[derive(TopEncode, TypeAbi)]
-pub struct ActionFullInfo<BigUint: BigUintApi> {
+pub struct ActionFullInfo<M: ManagedTypeApi> {
     pub action_id: usize,
-    pub action_data: Action<BigUint>,
+    pub action_data: Action<M>,
     pub signers: Vec<Address>,
 }
 
@@ -81,12 +81,13 @@ where
 
 #[cfg(test)]
 mod test {
+    use elrond_wasm_debug::TxContext;
+
     use super::Action;
-    use elrond_wasm_debug::api::RustBigUint;
 
     #[test]
     fn test_is_pending() {
-        assert!(!Action::<RustBigUint>::Nothing.is_pending());
-        assert!(Action::<RustBigUint>::ChangeQuorum(5).is_pending());
+        assert!(!Action::<TxContext>::Nothing.is_pending());
+        assert!(Action::<TxContext>::ChangeQuorum(5).is_pending());
     }
 }
