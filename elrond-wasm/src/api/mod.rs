@@ -26,5 +26,7 @@ pub use error_api::*;
 pub use log_api::*;
 pub use managed_types::*;
 pub use proxy_obj_api::*;
-pub use send_api::{SendApi, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING};
+pub use send_api::{
+    SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING,
+};
 pub use storage_api::*;
