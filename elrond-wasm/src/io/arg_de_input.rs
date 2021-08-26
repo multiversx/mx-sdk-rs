@@ -39,13 +39,13 @@ where
     #[inline]
     fn to_big_int(&self) -> BigInt<AA> {
         let bi_handle = self.api.get_argument_big_int_raw(self.arg_index);
-        BigInt::from_raw_handle(bi_handle, self.api.clone())
+        BigInt::from_raw_handle(self.api.clone(), bi_handle)
     }
 
     #[inline]
     fn to_big_uint(&self) -> BigUint<AA> {
         let bi_handle = self.api.get_argument_big_uint_raw(self.arg_index);
-        BigUint::from_raw_handle(bi_handle, self.api.clone())
+        BigUint::from_raw_handle(self.api.clone(), bi_handle)
     }
 }
 

@@ -38,7 +38,7 @@ where
 
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
         let managed_input =
-            ManagedBytesTopDecodeInput::new(BoxedBytes::from(slice), self.api.clone());
+            ManagedBytesTopDecodeInput::new(self.api.clone(), BoxedBytes::from(slice));
         T::top_decode_or_exit(managed_input, self.api.clone(), top_decode_exit)
     }
 }

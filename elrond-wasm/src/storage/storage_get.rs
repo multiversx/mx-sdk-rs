@@ -29,7 +29,7 @@ where
 
     fn to_big_uint(&self) -> BigUint<SRA> {
         let bu_handle = self.api.storage_load_big_uint_raw(self.key);
-        BigUint::from_raw_handle(bu_handle, self.api.clone())
+        BigUint::from_raw_handle(self.api.clone(), bu_handle)
     }
 
     fn to_big_int(&self) -> BigInt<SRA> {

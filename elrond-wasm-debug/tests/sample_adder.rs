@@ -34,7 +34,7 @@ mod module_1 {
         C: AutoImpl,
     {
         fn version(&self) -> BigInt<Self::TypeManager> {
-            BigInt::from_i64(100, self.type_manager())
+            BigInt::from_i64(self.type_manager(), 100)
         }
 
         fn some_async(&self) -> AsyncCall<Self::SendApi> {
@@ -629,19 +629,19 @@ fn test_add() {
 
     let adder = sample_adder::contract_obj(tx_context.clone());
 
-    adder.init(&BigInt::from_i64(5, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(5, adder.type_manager()), adder.get_sum());
+    adder.init(&BigInt::from_i64(adder.type_manager(), 5));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 5), adder.get_sum());
 
-    let _ = adder.add(BigInt::from_i64(7, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(12, adder.type_manager()), adder.get_sum());
+    let _ = adder.add(BigInt::from_i64(adder.type_manager(), 7));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 12), adder.get_sum());
 
-    let _ = adder.add(BigInt::from_i64(-1, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(11, adder.type_manager()), adder.get_sum());
+    let _ = adder.add(BigInt::from_i64(adder.type_manager(), -1));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 11), adder.get_sum());
 
-    assert_eq!(BigInt::from_i64(100, adder.type_manager()), adder.version());
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 100), adder.version());
 
     let _ = adder.add_version();
-    assert_eq!(BigInt::from_i64(111, adder.type_manager()), adder.get_sum());
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 111), adder.get_sum());
 
     assert!(!adder.call(b"invalid_endpoint"));
 

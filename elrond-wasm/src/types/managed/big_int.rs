@@ -23,7 +23,7 @@ pub enum Sign {
 
 impl<M: ManagedTypeApi> BigInt<M> {
     #[doc(hidden)]
-    pub fn from_raw_handle(raw_handle: Handle, api: M) -> Self {
+    pub fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
         BigInt {
             handle: raw_handle,
             api,
@@ -48,7 +48,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 /// More conversions here.
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
-    pub fn from_i64(value: i64, api: M) -> Self {
+    pub fn from_i64(api: M, value: i64) -> Self {
         BigInt {
             handle: api.bi_new(value),
             api,
@@ -56,7 +56,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn from_i32(value: i32, api: M) -> Self {
+    pub fn from_i32(api: M, value: i32) -> Self {
         BigInt {
             handle: api.bi_new(value as i64),
             api,
