@@ -1,6 +1,11 @@
-use elrond_codec::{DecodeError, NestedDecode, NestedDecodeInput, TryStaticCast};
+use elrond_codec::{
+    try_execute_then_cast, DecodeError, NestedDecode, NestedDecodeInput, TryStaticCast,
+};
 
-use crate::{api::ManagedTypeApi, types::ManagedBuffer};
+use crate::{
+    api::ManagedTypeApi,
+    types::{BigInt, BigUint, ManagedBuffer},
+};
 
 /// Nested decode buffer based on a managed buffer.
 /// Uses the load/copy slice API to extract pieces of the managed buffer for deserialization.
@@ -47,6 +52,32 @@ impl<M: ManagedTypeApi> ManagedBufferNestedDecodeInput<M> {
             exit(c, DecodeError::INPUT_TOO_SHORT)
         }
     }
+
+    fn read_big_uint(&mut self) -> Result<BigUint<M>, DecodeError> {
+        Ok(BigUint::from_bytes_be_buffer(&self.read_managed_buffer()?))
+    }
+
+    fn read_big_uint_or_exit<ExitCtx: Clone>(
+        &mut self,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> BigUint<M> {
+        BigUint::from_bytes_be_buffer(&self.read_managed_buffer_or_exit(c, exit))
+    }
+
+    fn read_big_int(&mut self) -> Result<BigInt<M>, DecodeError> {
+        Ok(BigInt::from_signed_bytes_be_buffer(
+            &self.read_managed_buffer()?,
+        ))
+    }
+
+    fn read_big_int_or_exit<ExitCtx: Clone>(
+        &mut self,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> BigInt<M> {
+        BigInt::from_signed_bytes_be_buffer(&self.read_managed_buffer_or_exit(c, exit))
+    }
 }
 
 impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBufferNestedDecodeInput<M> {
@@ -78,26 +109,48 @@ impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBufferNestedDecodeInput<M> 
     }
 
     #[inline]
-    fn read_specialized<T: TryStaticCast>(&mut self) -> Result<Option<T>, DecodeError> {
-        if T::type_eq::<ManagedBuffer<M>>() {
-            let managed_buffer = self.read_managed_buffer()?;
-            Ok(managed_buffer.try_cast())
+    fn read_specialized<T, F>(&mut self, else_deser: F) -> Result<T, DecodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(&mut Self) -> Result<T, DecodeError>,
+    {
+        if let Some(result) = try_execute_then_cast(|| self.read_managed_buffer()) {
+            result
+        } else if let Some(result) = try_execute_then_cast(|| self.read_big_uint()) {
+            result
+        } else if let Some(result) = try_execute_then_cast(|| self.read_big_int()) {
+            result
         } else {
-            Ok(None)
+            else_deser(self)
         }
     }
 
     #[inline]
-    fn read_specialized_or_exit<T: TryStaticCast, ExitCtx: Clone>(
+    fn read_specialized_or_exit<T, ExitCtx, F>(
         &mut self,
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Option<T> {
-        if T::type_eq::<ManagedBuffer<M>>() {
-            let managed_buffer = self.read_managed_buffer_or_exit(c, exit);
-            managed_buffer.try_cast()
+        else_deser: F,
+    ) -> T
+    where
+        T: TryStaticCast,
+        F: FnOnce(&mut Self, ExitCtx) -> T,
+        ExitCtx: Clone,
+    {
+        if let Some(result) =
+            try_execute_then_cast(|| self.read_managed_buffer_or_exit(c.clone(), exit))
+        {
+            result
+        } else if let Some(result) =
+            try_execute_then_cast(|| self.read_big_uint_or_exit(c.clone(), exit))
+        {
+            result
+        } else if let Some(result) =
+            try_execute_then_cast(|| self.read_big_int_or_exit(c.clone(), exit))
+        {
+            result
         } else {
-            None
+            else_deser(self, c)
         }
     }
 }
