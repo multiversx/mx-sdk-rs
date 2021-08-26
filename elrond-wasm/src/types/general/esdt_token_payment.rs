@@ -108,3 +108,35 @@ impl<M: ManagedTypeApi> TypeAbi for EsdtTokenPayment<M> {
         "EsdtTokenPayment".into()
     }
 }
+
+impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+    pub fn no_payment(api: M) -> Self {
+        EsdtTokenPayment {
+            token_type: EsdtTokenType::Invalid,
+            token_name: TokenIdentifier::egld(),
+            token_nonce: 0,
+            amount: BigUint::zero(api),
+        }
+    }
+
+    pub fn from(token_name: TokenIdentifier, token_nonce: u64, amount: BigUint<M>) -> Self {
+        let token_type = if amount != 0 && token_name.is_valid_esdt_identifier() {
+            if token_nonce == 0 {
+                EsdtTokenType::Fungible
+            } else if amount == 1u64 {
+                EsdtTokenType::NonFungible
+            } else {
+                EsdtTokenType::SemiFungible
+            }
+        } else {
+            EsdtTokenType::Invalid
+        };
+
+        EsdtTokenPayment {
+            token_type,
+            token_name,
+            token_nonce,
+            amount,
+        }
+    }
+}
