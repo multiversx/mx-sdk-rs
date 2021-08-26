@@ -29,11 +29,11 @@ where
     {
         if let Some(result) = try_execute_then_cast(|| self.clone()) {
             Ok(result)
-        } else if let Some(result) = try_execute_then_cast(|| BigUint::from_bytes_be_buffer(&self))
+        } else if let Some(result) = try_execute_then_cast(|| BigUint::from_bytes_be_buffer(self))
         {
             Ok(result)
         } else if let Some(result) =
-            try_execute_then_cast(|| BigInt::from_signed_bytes_be_buffer(&self))
+            try_execute_then_cast(|| BigInt::from_signed_bytes_be_buffer(self))
         {
             Ok(result)
         } else {
