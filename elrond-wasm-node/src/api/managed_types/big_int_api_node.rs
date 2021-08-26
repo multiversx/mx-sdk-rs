@@ -70,8 +70,8 @@ impl BigIntApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn bi_unsigned_byte_length(&self, x: Handle) -> Handle {
-        unsafe { bigIntUnsignedByteLength(x) }
+    fn bi_unsigned_byte_length(&self, x: Handle) -> usize {
+        unsafe { bigIntUnsignedByteLength(x) as usize }
     }
 
     fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes {
@@ -89,8 +89,8 @@ impl BigIntApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn bi_signed_byte_length(&self, x: Handle) -> Handle {
-        unsafe { bigIntSignedByteLength(x) }
+    fn bi_signed_byte_length(&self, x: Handle) -> usize {
+        unsafe { bigIntSignedByteLength(x) as usize }
     }
 
     fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
