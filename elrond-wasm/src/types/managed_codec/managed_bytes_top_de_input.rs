@@ -14,7 +14,7 @@ pub struct ManagedBytesTopDecodeInput<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedBytesTopDecodeInput<M> {
-    pub fn new(bytes: BoxedBytes, api: M) -> Self {
+    pub fn new(api: M, bytes: BoxedBytes) -> Self {
         ManagedBytesTopDecodeInput { bytes, api }
     }
 }
@@ -56,6 +56,6 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBytesNestedDecodeInput::new(self.bytes.into_box(), self.api)
+        ManagedBytesNestedDecodeInput::new(self.api, self.bytes.into_box())
     }
 }

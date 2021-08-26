@@ -15,7 +15,7 @@ impl TxContext {
             .managed_types
             .big_int_map
             .insert_new_handle(value.into());
-        elrond_wasm::types::BigUint::from_raw_handle(handle, self.clone())
+        elrond_wasm::types::BigUint::from_raw_handle(self.clone(), handle)
     }
 
     pub fn insert_new_big_uint_zero(&self) -> elrond_wasm::types::BigUint<Self> {

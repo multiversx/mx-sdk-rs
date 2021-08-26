@@ -565,7 +565,7 @@ impl SendApi for ArwenApiImpl {
         self.execute_on_dest_context_raw(
             gas,
             &own_address,
-            &BigUint::from_u32(0u32, self.clone()),
+            &BigUint::zero(self.clone()),
             function,
             arg_buffer,
         )

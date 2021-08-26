@@ -25,7 +25,7 @@ impl<M: ManagedTypeApi> CurveFunction<M> for LinearFunction<M> {
     }
 }
 fn sum_interval<M: ManagedTypeApi>(n: &BigUint<M>, x: &BigUint<M>) -> BigUint<M> {
-    let one = BigUint::from_u32(1, n.type_manager());
-    let two = BigUint::from_u32(2, n.type_manager());
+    let one = BigUint::from_u32(n.type_manager(), 1);
+    let two = BigUint::from_u32(n.type_manager(), 2);
     x * n + &(n - &one) * n / two
 }

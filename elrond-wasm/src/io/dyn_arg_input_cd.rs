@@ -41,7 +41,7 @@ where
     fn next_arg_input(&mut self) -> ManagedBytesTopDecodeInput<A> {
         match self.deser.next_argument() {
             Ok(Some(arg_bytes)) => {
-                ManagedBytesTopDecodeInput::new(arg_bytes.into(), self.api.clone())
+                ManagedBytesTopDecodeInput::new(self.api.clone(), arg_bytes.into())
             },
             Ok(None) => self.signal_error(err_msg::ARG_WRONG_NUMBER),
             Err(sc_err) => self.signal_error(sc_err.as_bytes()),

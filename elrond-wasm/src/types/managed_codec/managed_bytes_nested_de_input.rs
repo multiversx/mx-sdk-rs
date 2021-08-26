@@ -14,7 +14,7 @@ pub struct ManagedBytesNestedDecodeInput<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
-    pub fn new(bytes: Box<[u8]>, api: M) -> Self {
+    pub fn new(api: M, bytes: Box<[u8]>) -> Self {
         ManagedBytesNestedDecodeInput {
             bytes_input: OwnedBytesNestedDecodeInput::new(bytes),
             api,

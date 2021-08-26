@@ -15,7 +15,7 @@ pub struct BigUint<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> BigUint<M> {
     #[doc(hidden)]
-    pub fn from_raw_handle(raw_handle: Handle, api: M) -> Self {
+    pub fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
         BigUint {
             handle: raw_handle,
             api,
@@ -53,14 +53,14 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
-    pub fn from_u64(value: u64, api: M) -> Self {
+    pub fn from_u64(api: M, value: u64) -> Self {
         BigUint {
             handle: api.bi_new(value as i64),
             api,
         }
     }
 
-    pub fn from_u32(value: u32, api: M) -> Self {
+    pub fn from_u32(api: M, value: u32) -> Self {
         BigUint {
             handle: api.bi_new(value as i64),
             api,

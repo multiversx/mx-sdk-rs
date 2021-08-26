@@ -21,7 +21,7 @@ impl<A> BytesArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    pub fn new(bytes_vec: Vec<BoxedBytes>, api: A) -> Self {
+    pub fn new(api: A, bytes_vec: Vec<BoxedBytes>) -> Self {
         BytesArgLoader {
             bytes_vec,
             next_index: 0,
@@ -60,6 +60,6 @@ where
         let boxed_bytes =
             core::mem::replace(&mut self.bytes_vec[self.next_index], BoxedBytes::empty());
         self.next_index += 1;
-        ManagedBytesTopDecodeInput::new(boxed_bytes, self.api.clone())
+        ManagedBytesTopDecodeInput::new(self.api.clone(), boxed_bytes)
     }
 }
