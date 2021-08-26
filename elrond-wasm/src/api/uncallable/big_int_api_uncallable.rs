@@ -8,7 +8,7 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn bi_unsigned_byte_length(&self, _x: Handle) -> Handle {
+    fn bi_unsigned_byte_length(&self, _x: Handle) -> usize {
         unreachable!()
     }
 
@@ -20,7 +20,7 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn bi_signed_byte_length(&self, _x: Handle) -> Handle {
+    fn bi_signed_byte_length(&self, _x: Handle) -> usize {
         unreachable!()
     }
 

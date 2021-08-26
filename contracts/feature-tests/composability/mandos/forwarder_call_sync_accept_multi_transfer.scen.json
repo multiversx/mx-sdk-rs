@@ -51,7 +51,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "function": "forward_transf_exec_accept_funds_multi_transfer",
+                "function": "forward_sync_accept_funds_multi_transfer",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",
@@ -59,9 +59,18 @@
                     "100",
                     "str:FWD-TOKEN",
                     "0",
-                    "200"
+                    "200",
+                    "str:NFT-123",
+                    "1",
+                    "1",
+                    "str:SFT-456",
+                    "3",
+                    "3",
+                    "str:SFT-456",
+                    "3",
+                    "4"
                 ],
-                "gasLimit": "1,400,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -85,7 +94,23 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:FWD-TOKEN": "300"
+                        "str:FWD-TOKEN": "300",
+                        "str:NFT-123": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:SFT-456": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "7"
+                                }
+                            ]
+                        }
                     },
                     "storage": {
                         "str:call_counts|nested:str:accept_funds_multi_transfer": "1"
@@ -97,106 +122,11 @@
                     "balance": "0",
                     "esdt": {
                         "str:FWD-TOKEN": "700",
-                        "str:NFT-123": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1"
-                                }
-                            ]
-                        },
                         "str:SFT-456": {
                             "instances": [
                                 {
                                     "nonce": "3",
-                                    "balance": "10"
-                                }
-                            ]
-                        }
-                    },
-                    "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
-                }
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "1",
-            "comment": "send all types",
-            "tx": {
-                "from": "address:a_user",
-                "to": "sc:forwarder",
-                "value": "0",
-                "function": "forward_transf_exec_accept_funds_multi_transfer",
-                "arguments": [
-                    "sc:vault",
-                    "str:FWD-TOKEN",
-                    "0",
-                    "500",
-                    "str:NFT-123",
-                    "1",
-                    "1",
-                    "str:SFT-456",
-                    "3",
-                    "6"
-                ],
-                "gasLimit": "1,400,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "0",
-                "message": "",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "address:a_user": {
-                    "nonce": "*",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
-                },
-                "sc:vault": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:FWD-TOKEN": "800",
-                        "str:NFT-123": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1"
-                                }
-                            ]
-                        },
-                        "str:SFT-456": {
-                            "instances": [
-                                {
-                                    "nonce": "3",
-                                    "balance": "6"
-                                }
-                            ]
-                        }
-                    },
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds_multi_transfer": "2"
-                    },
-                    "code": "file:../vault/output/vault.wasm"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:FWD-TOKEN": "200",
-                        "str:SFT-456": {
-                            "instances": [
-                                {
-                                    "nonce": "3",
-                                    "balance": "4"
+                                    "balance": "3"
                                 }
                             ]
                         }

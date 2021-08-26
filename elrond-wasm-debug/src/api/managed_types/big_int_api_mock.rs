@@ -65,8 +65,8 @@ impl BigIntApi for TxContext {
             .insert_new_handle(BigInt::from(value))
     }
 
-    fn bi_unsigned_byte_length(&self, handle: Handle) -> i32 {
-        self.bi_get_unsigned_bytes(handle).len() as i32
+    fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {
+        self.bi_get_unsigned_bytes(handle).len()
     }
 
     fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes {
@@ -86,8 +86,8 @@ impl BigIntApi for TxContext {
         tx_output.managed_types.big_int_map.insert(dest, result);
     }
 
-    fn bi_signed_byte_length(&self, handle: Handle) -> i32 {
-        self.bi_get_signed_bytes(handle).len() as i32
+    fn bi_signed_byte_length(&self, handle: Handle) -> usize {
+        self.bi_get_signed_bytes(handle).len()
     }
 
     fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
