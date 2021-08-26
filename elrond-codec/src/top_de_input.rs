@@ -58,39 +58,6 @@ pub trait TopDecodeInput: Sized {
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer;
-
-    /// Unless you're developing elrond-wasm, please ignore.
-    ///
-    /// Shortcut for sending a BigInt managed by the API to the API directly via its handle.
-    ///
-    /// - ArwenBigInt + finish API
-    /// - ArwenBigInt + set storage
-    /// Not used for:
-    /// - RustBigInt
-    /// - async call
-    #[doc(hidden)]
-    #[inline]
-    fn try_get_big_int_handle(&self) -> (bool, i32) {
-        (false, -1)
-    }
-
-    /// Unless you're developing elrond-wasm, please ignore.
-    ///
-    /// Shortcut for sending a BigUint managed by the API to the API directly via its handle.
-    ///
-    /// Used for:
-    /// - ArwenBigUint + finish API
-    /// - ArwenBigUint + set storage
-    /// Not used for:
-    /// - RustBigUint
-    /// - async call
-    /// - anything else
-    ///
-    #[doc(hidden)]
-    #[inline]
-    fn try_get_big_uint_handle(&self) -> (bool, i32) {
-        (false, -1)
-    }
 }
 
 impl TopDecodeInput for Box<[u8]> {
