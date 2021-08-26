@@ -4,7 +4,7 @@ use crate::types::BoxedBytes;
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, TypeInfo,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[derive(Debug)]
@@ -133,8 +133,6 @@ impl<M: ManagedTypeApi> BigInt<M> {
 impl<M: ManagedTypeApi> TryStaticCast for BigInt<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_specialized(self, |else_output| {
@@ -145,8 +143,6 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         dest.push_specialized(self, |else_output| {
             self.to_signed_bytes_be().dep_encode(else_output)
@@ -169,8 +165,6 @@ impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
     #[inline]
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))

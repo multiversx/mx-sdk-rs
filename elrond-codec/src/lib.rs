@@ -66,7 +66,5 @@ pub enum TypeInfo {
     U64,
     I64,
     Bool,
-    BigUint,
-    BigInt,
     Unit,
 }
