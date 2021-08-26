@@ -139,8 +139,8 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_specialized(self, |else_output| {
             else_output.set_slice_u8(self.to_signed_bytes_be().as_slice());
-        });
-        Ok(())
+            Ok(())
+        })
     }
 }
 
@@ -148,22 +148,9 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
 
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if dest.push_specialized(&self.to_signed_bytes_be_buffer()) {
-            Ok(())
-        } else {
-            self.to_signed_bytes_be().dep_encode(dest)
-        }
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        if !dest.push_specialized(&self.to_signed_bytes_be_buffer()) {
-            self.to_signed_bytes_be().dep_encode_or_exit(dest, c, exit);
-        }
+        dest.push_specialized(self, |else_output| {
+            self.to_signed_bytes_be().dep_encode(else_output)
+        })
     }
 }
 

@@ -46,6 +46,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
 
 /// More conversions here.
 impl<M: ManagedTypeApi> BigUint<M> {
+    #[inline]
     pub fn zero(api: M) -> Self {
         BigUint {
             handle: api.bi_new_zero(),
@@ -53,6 +54,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[inline]
     pub fn from_u64(api: M, value: u64) -> Self {
         BigUint {
             handle: api.bi_new(value as i64),
@@ -60,6 +62,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[inline]
     pub fn from_u32(api: M, value: u32) -> Self {
         BigUint {
             handle: api.bi_new(value as i64),
@@ -67,20 +70,24 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[inline]
     pub fn to_u64(&self) -> Option<u64> {
         self.api.bi_to_i64(self.handle).map(|bi| bi as u64)
     }
 
+    #[inline]
     pub fn from_bytes_be(api: M, bytes: &[u8]) -> Self {
         let handle = api.bi_new(0);
         api.bi_set_unsigned_bytes(handle, bytes);
         BigUint { handle, api }
     }
 
+    #[inline]
     pub fn to_bytes_be(&self) -> BoxedBytes {
         self.api.bi_get_unsigned_bytes(self.handle)
     }
 
+    #[inline]
     pub fn from_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
         BigUint {
             handle: managed_buffer
@@ -90,6 +97,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[inline]
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
         ManagedBuffer {
             handle: self.api.mb_from_big_int_unsigned(self.handle),
@@ -105,6 +113,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
+    #[inline]
     pub fn sqrt(&self) -> Self {
         let handle = self.api.bi_new_zero();
         self.api.bi_sqrt(handle, self.handle);
@@ -124,6 +133,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[inline]
     pub fn log2(&self) -> u32 {
         self.api.bi_log2(self.handle)
     }
@@ -149,8 +159,8 @@ impl<M: ManagedTypeApi> TopEncode for BigUint<M> {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_specialized(self, |else_output| {
             else_output.set_slice_u8(self.to_bytes_be().as_slice());
-        });
-        Ok(())
+            Ok(())
+        })
     }
 }
 
@@ -158,24 +168,9 @@ impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
     const TYPE_INFO: TypeInfo = TypeInfo::BigUint;
 
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if dest.push_specialized(&self.to_bytes_be_buffer()) {
-            Ok(())
-        } else {
-            self.to_bytes_be().as_slice().dep_encode(dest)
-        }
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        if !dest.push_specialized(&self.to_bytes_be_buffer()) {
-            self.to_bytes_be()
-                .as_slice()
-                .dep_encode_or_exit(dest, c, exit);
-        }
+        dest.push_specialized(self, |else_output| {
+            self.to_bytes_be().as_slice().dep_encode(else_output)
+        })
     }
 }
 
