@@ -11,6 +11,15 @@ pub struct Color {
     b: u8,
 }
 
+#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone)]
+pub struct ComplexAttributes<M: ManagedTypeApi> {
+    pub biguint: BigUint<M>,
+    pub vec_u8: Vec<u8>,
+    pub token_id: TokenIdentifier,
+    pub boolean: bool,
+    pub boxed_bytes: BoxedBytes,
+}
+
 #[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
@@ -124,6 +133,58 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         self.create_event(&token_identifier, token_nonce, &amount);
 
         token_nonce
+    }
+
+    #[endpoint]
+    fn nft_decode_complex_attributes(
+        &self,
+        token_identifier: TokenIdentifier,
+        amount: BigUint,
+        name: BoxedBytes,
+        royalties: BigUint,
+        hash: BoxedBytes,
+        uri: BoxedBytes,
+        #[var_args] attrs_arg: MultiArg5<BigUint, Vec<u8>, TokenIdentifier, bool, BoxedBytes>,
+    ) -> SCResult<()> {
+        let attrs_pieces = attrs_arg.into_tuple();
+        let orig_attr = ComplexAttributes {
+            biguint: attrs_pieces.0,
+            vec_u8: attrs_pieces.1,
+            token_id: attrs_pieces.2,
+            boolean: attrs_pieces.3,
+            boxed_bytes: attrs_pieces.4,
+        };
+
+        let token_nonce = self
+            .send()
+            .esdt_nft_create::<ComplexAttributes<Self::TypeManager>>(
+                &token_identifier,
+                &amount,
+                &name,
+                &royalties,
+                &hash,
+                &orig_attr,
+                &[uri],
+            );
+
+        let token_info = self.blockchain().get_esdt_token_data(
+            &self.blockchain().get_sc_address(),
+            &token_identifier,
+            token_nonce,
+        );
+
+        let decoded_attr =
+            token_info.decode_attributes::<ComplexAttributes<Self::TypeManager>>()?;
+
+        require!(
+            orig_attr.biguint == decoded_attr.biguint
+                && orig_attr.vec_u8 == decoded_attr.vec_u8
+                && orig_attr.token_id == decoded_attr.token_id
+                && orig_attr.boolean == decoded_attr.boolean
+                && orig_attr.boxed_bytes == decoded_attr.boxed_bytes,
+            "orig_attr != decoded_attr"
+        );
+        Ok(())
     }
 
     #[endpoint]
