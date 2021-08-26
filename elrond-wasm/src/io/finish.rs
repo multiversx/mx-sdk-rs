@@ -46,15 +46,22 @@ where
     }
 
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(self, value: &T, else_serialization: F) {
+    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<(), EncodeError>,
+    {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             self.api.finish_managed_buffer_raw(managed_buffer.handle);
+            Ok(())
         } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
             self.api.finish_big_uint_raw(big_uint.handle);
+            Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
             self.api.finish_big_int_raw(big_int.handle);
+            Ok(())
         } else {
-            else_serialization(self);
+            else_serialization(self)
         }
     }
 

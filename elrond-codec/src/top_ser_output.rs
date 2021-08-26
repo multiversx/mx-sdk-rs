@@ -1,4 +1,6 @@
-use crate::{num_conv::top_encode_number_to_output, NestedEncodeOutput, TryStaticCast};
+use crate::{
+    num_conv::top_encode_number_to_output, EncodeError, NestedEncodeOutput, TryStaticCast,
+};
 use alloc::{boxed::Box, vec::Vec};
 
 /// Specifies objects that can receive the result of a TopEncode computation.
@@ -48,8 +50,12 @@ pub trait TopEncodeOutput: Sized {
     /// The alternative serialization, `else_serialization` is only called when necessary and
     /// is normally compiled out via monomorphization.
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce(Self)>(self, _value: &T, else_serialization: F) {
-        else_serialization(self);
+    fn set_specialized<T, F>(self, _value: &T, else_serialization: F) -> Result<(), EncodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<(), EncodeError>,
+    {
+        else_serialization(self)
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer;

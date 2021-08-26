@@ -93,6 +93,13 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn append_bytes(&mut self, slice: &[u8]) {
         self.api.mb_append_bytes(self.handle, slice);
     }
+
+    /// Utility function: helps serialize lengths (or any other value of type usize) easier.
+    #[inline(never)]
+    pub fn append_u32_be(&mut self, item: u32) {
+        self.api
+            .mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
+    }
 }
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
@@ -121,29 +128,16 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
         output.set_specialized(self, |else_output| {
             else_output.set_slice_u8(self.to_boxed_bytes().as_slice());
-        });
-        Ok(())
+            Ok(())
+        })
     }
 }
 
 impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if dest.push_specialized(self) {
-            Ok(())
-        } else {
-            self.to_boxed_bytes().dep_encode(dest)
-        }
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        if !dest.push_specialized(self) {
-            self.to_boxed_bytes().dep_encode_or_exit(dest, c, exit);
-        }
+        dest.push_specialized(self, |else_output| {
+            self.to_boxed_bytes().dep_encode(else_output)
+        })
     }
 }
 
