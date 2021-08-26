@@ -19,11 +19,11 @@ pub trait BigIntApi {
         self.bi_new(0)
     }
 
-    fn bi_unsigned_byte_length(&self, handle: Handle) -> Handle;
+    fn bi_unsigned_byte_length(&self, handle: Handle) -> usize;
     fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes;
     fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]);
 
-    fn bi_signed_byte_length(&self, handle: Handle) -> Handle;
+    fn bi_signed_byte_length(&self, handle: Handle) -> usize;
     fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes;
     fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
 

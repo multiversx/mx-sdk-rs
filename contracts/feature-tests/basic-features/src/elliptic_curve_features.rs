@@ -1,7 +1,5 @@
 elrond_wasm::imports!();
 
-// type EllipticCurveComponents<BigUint> = (BigUint, BigUint, BigUint, BigUint, BigUint, u32);
-
 /// All elliptic curve functions provided by Arwen exposed here
 #[elrond_wasm::module]
 pub trait EllipticCurveFeatures {

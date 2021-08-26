@@ -236,7 +236,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
         address: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> BigUint<Self::Storage> {
+    ) -> BigUint<Self::TypeManager> {
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetESDTExternalBalance(
