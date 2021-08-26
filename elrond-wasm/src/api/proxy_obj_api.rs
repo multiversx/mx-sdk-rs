@@ -13,8 +13,6 @@ pub trait ProxyObjApi {
 
     type SendApi: SendApi<ProxyTypeManager = Self::TypeManager> + Clone + 'static;
 
-    // type ContractCall<R>;
-
     fn new_proxy_obj(api: Self::SendApi) -> Self;
 
     /// Specify the target contract to call.

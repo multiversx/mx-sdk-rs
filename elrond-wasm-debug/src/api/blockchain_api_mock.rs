@@ -118,7 +118,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         address: &Address,
         token: &TokenIdentifier,
         _nonce: u64,
-    ) -> BigUint<Self::Storage> {
+    ) -> BigUint<Self::TypeManager> {
         if address != &self.get_sc_address() {
             panic!(
                 "get_esdt_balance not yet implemented for accounts other than the contract itself"
