@@ -149,11 +149,7 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.read_specialized::<ManagedBuffer<M>>()? {
-            Ok(managed_buffer)
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.read_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -161,13 +157,7 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        if let Some(managed_buffer) =
-            input.read_specialized_or_exit::<ManagedBuffer<M>, ExitCtx>(c.clone(), exit)
-        {
-            managed_buffer
-        } else {
-            exit(c, DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.read_specialized_or_exit(c, exit, |_, c| exit(c, DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 
