@@ -42,8 +42,14 @@ pub trait GovernanceModule:
 
         let caller = self.blockchain().get_caller();
         let governance_token_id = self.governance_token_id().get();
-        let nr_votes_tokens = self.votes(proposal_id).get(&caller).unwrap_or_default();
-        let nr_downvotes_tokens = self.downvotes(proposal_id).get(&caller).unwrap_or_default();
+        let nr_votes_tokens = self
+            .votes(proposal_id)
+            .get(&caller)
+            .unwrap_or_else(|| self.types().big_uint_zero());
+        let nr_downvotes_tokens = self
+            .downvotes(proposal_id)
+            .get(&caller)
+            .unwrap_or_else(|| self.types().big_uint_zero());
         let total_tokens = nr_votes_tokens + nr_downvotes_tokens;
 
         if total_tokens > 0 {
@@ -63,7 +69,7 @@ pub trait GovernanceModule:
         &self,
         #[payment_amount] payment_amount: BigUint,
         description: BoxedBytes,
-        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<BigUint>>,
+        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::TypeManager>>,
     ) -> SCResult<usize> {
         self.require_payment_token_governance_token()?;
         require!(
@@ -338,7 +344,7 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiResultVec<GovernanceActionAsMultiArg<BigUint>> {
+    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::TypeManager>> {
         if !self.proposal_exists(proposal_id) {
             return Vec::new().into();
         }
@@ -379,7 +385,7 @@ pub trait GovernanceModule:
         self.is_valid_proposal_id(proposal_id) && !self.proposals().item_is_empty(proposal_id)
     }
 
-    fn total_gas_needed(&self, actions: &[GovernanceAction<BigUint>]) -> u64 {
+    fn total_gas_needed(&self, actions: &[GovernanceAction<Self::TypeManager>]) -> u64 {
         let mut total = 0;
         for action in actions {
             total += action.gas_limit;
@@ -408,7 +414,7 @@ pub trait GovernanceModule:
         #[indexed] proposer: &Address,
         #[indexed] start_block: u64,
         #[indexed] description: &BoxedBytes,
-        actions: &[GovernanceAction<BigUint>],
+        actions: &[GovernanceAction<Self::TypeManager>],
     );
 
     #[event("voteCast")]
@@ -448,7 +454,7 @@ pub trait GovernanceModule:
     // storage - general
 
     #[storage_mapper("governance:proposals")]
-    fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<BigUint>>;
+    fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<Self::TypeManager>>;
 
     /// Not stored under "proposals", as that would require deserializing the whole struct
     #[storage_mapper("governance:proposalStartBlock")]

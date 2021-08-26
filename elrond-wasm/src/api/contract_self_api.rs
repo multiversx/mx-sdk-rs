@@ -1,7 +1,7 @@
 use super::{
-    BigUintApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, EndpointArgumentApi,
-    EndpointFinishApi, ErrorApi, LogApi, ManagedTypeApi, ProxyObjApi, SendApi, StorageReadApi,
-    StorageWriteApi,
+    BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
+    LogApi, ManagedSerializer, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi,
+    StorageReadApi, StorageWriteApi,
 };
 use crate::types::Address;
 
@@ -12,30 +12,23 @@ use crate::types::Address;
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait ContractBase: Sized {
-    type TypeManager: ManagedTypeApi + 'static;
-
-    type BigUint: BigUintApi + 'static;
-
-    type EllipticCurve: EllipticCurveApi<BigUint = Self::BigUint> + 'static;
+    type TypeManager: ManagedTypeApi + ErrorApi + 'static;
 
     /// Abstracts the lower-level storage functionality.
     type Storage: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// Abstracts the call value handling at the beginning of a function call.
-    type CallValue: CallValueApi<AmountType = Self::BigUint> + ErrorApi + Clone + 'static;
+    type CallValue: CallValueApi<TypeManager = Self::TypeManager> + ErrorApi + Clone + 'static;
 
     /// Abstracts the sending of EGLD & ESDT transactions, as well as async calls.
-    type SendApi: SendApi<
-            ProxyTypeManager = Self::TypeManager,
-            AmountType = Self::BigUint,
-            ProxyEllipticCurve = Self::EllipticCurve,
-            ProxyStorage = Self::Storage,
-        > + Clone
+    type SendApi: SendApi<ProxyTypeManager = Self::TypeManager, ProxyStorage = Self::Storage>
         + 'static;
 
-    type BlockchainApi: BlockchainApi<BalanceType = Self::BigUint> + Clone + 'static;
+    type BlockchainApi: BlockchainApi<Storage = Self::Storage, TypeManager = Self::TypeManager>
+        + Clone
+        + 'static;
 
-    type CryptoApi: CryptoApi<BigUint = Self::BigUint> + Clone + 'static;
+    type CryptoApi: CryptoApi + Clone + 'static;
 
     type LogApi: LogApi + ErrorApi + Clone + 'static;
 
@@ -57,11 +50,22 @@ pub trait ContractBase: Sized {
     /// Managed types API. Required to create new instances of managed types.
     fn type_manager(&self) -> Self::TypeManager;
 
+    /// Helps create new instances of managed types
+    fn types(&self) -> ManagedTypeHelper<Self::TypeManager> {
+        ManagedTypeHelper::new(self.type_manager())
+    }
+
     /// Gateway blockchain info related to the current transaction and to accounts.
     fn blockchain(&self) -> Self::BlockchainApi;
 
     /// Stateless crypto functions provided by the Arwen VM.
     fn crypto(&self) -> Self::CryptoApi;
+
+    /// Component that provides contract developers access
+    /// to highly optimized manual serialization and deserialization.
+    fn serializer(&self) -> ManagedSerializer<Self::TypeManager> {
+        ManagedSerializer::new(self.type_manager())
+    }
 
     /// Gateway into the lower-level event log functionality.
     /// Gets called in auto-generated
@@ -82,9 +86,13 @@ pub trait ContractBase: Sized {
 pub trait ContractPrivateApi {
     type ArgumentApi: ManagedTypeApi + EndpointArgumentApi + Clone + 'static;
 
+    type CallbackClosureArgumentApi: ManagedTypeApi + ErrorApi + Clone + 'static;
+
     type FinishApi: ManagedTypeApi + EndpointFinishApi + ErrorApi + Clone + 'static;
 
     fn argument_api(&self) -> Self::ArgumentApi;
+
+    fn callback_closure_arg_api(&self) -> Self::CallbackClosureArgumentApi;
 
     fn finish_api(&self) -> Self::FinishApi;
 }

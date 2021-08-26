@@ -32,7 +32,7 @@ pub trait ForwarderTransferExecuteModule {
         to: Address,
         percentage_fees: BigUint,
     ) {
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         self.vault_proxy()
@@ -50,7 +50,7 @@ pub trait ForwarderTransferExecuteModule {
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) {
-        let half_payment = payment / BigUint::from(2u32);
+        let half_payment = payment / 2u32;
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.vault_proxy()
@@ -89,7 +89,13 @@ pub trait ForwarderTransferExecuteModule {
 
         let gas_left_after = self.blockchain().get_gas_left();
 
-        (gas_left_before, gas_left_after, BigUint::zero(), token).into()
+        (
+            gas_left_before,
+            gas_left_after,
+            self.types().big_uint_zero(),
+            token,
+        )
+            .into()
     }
 
     #[endpoint]

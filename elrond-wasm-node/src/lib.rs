@@ -4,7 +4,6 @@
 pub mod api;
 pub mod error_hook;
 
-#[macro_use]
 extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::string::String;

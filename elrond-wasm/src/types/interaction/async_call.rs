@@ -2,7 +2,7 @@ use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::SendApi;
 use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::EndpointResult;
-use crate::types::{Address, CallbackCall};
+use crate::types::{Address, BigUint, CallbackCall};
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -13,7 +13,7 @@ where
 {
     pub(crate) api: SA,
     pub(crate) to: Address,
-    pub(crate) egld_payment: SA::AmountType,
+    pub(crate) egld_payment: BigUint<SA::ProxyTypeManager>,
     pub(crate) hex_data: HexCallDataSerializer,
     pub(crate) callback_data: HexCallDataSerializer,
 }

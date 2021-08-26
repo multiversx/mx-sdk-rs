@@ -2,8 +2,10 @@ use super::properties::*;
 use hex_literal::hex;
 
 use crate::{
-    api::{BigUintApi, SendApi},
-    types::{Address, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, TokenIdentifier},
+    api::SendApi,
+    types::{
+        Address, BigUint, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, TokenIdentifier,
+    },
 };
 
 /// Address of the system smart contract that manages ESDT.
@@ -48,10 +50,10 @@ where
     /// which causes it to issue a new fungible ESDT token.
     pub fn issue_fungible(
         self,
-        issue_cost: SA::AmountType,
+        issue_cost: BigUint<SA::ProxyTypeManager>,
         token_display_name: &BoxedBytes,
         token_ticker: &BoxedBytes,
-        initial_supply: &SA::AmountType,
+        initial_supply: &BigUint<SA::ProxyTypeManager>,
         properties: FungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
         self.issue(
@@ -68,17 +70,18 @@ where
     /// which causes it to issue a new non-fungible ESDT token.
     pub fn issue_non_fungible(
         self,
-        issue_cost: SA::AmountType,
+        issue_cost: BigUint<SA::ProxyTypeManager>,
         token_display_name: &BoxedBytes,
         token_ticker: &BoxedBytes,
         properties: NonFungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
+        let zero = BigUint::zero(self.api.type_manager());
         self.issue(
             issue_cost,
             EsdtTokenType::NonFungible,
             token_display_name,
             token_ticker,
-            &SA::AmountType::zero(),
+            &zero,
             TokenProperties {
                 num_decimals: 0,
                 can_freeze: properties.can_freeze,
@@ -97,17 +100,18 @@ where
     /// which causes it to issue a new semi-fungible ESDT token.
     pub fn issue_semi_fungible(
         self,
-        issue_cost: SA::AmountType,
+        issue_cost: BigUint<SA::ProxyTypeManager>,
         token_display_name: &BoxedBytes,
         token_ticker: &BoxedBytes,
         properties: SemiFungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
+        let zero = BigUint::zero(self.api.type_manager());
         self.issue(
             issue_cost,
             EsdtTokenType::SemiFungible,
             token_display_name,
             token_ticker,
-            &SA::AmountType::zero(),
+            &zero,
             TokenProperties {
                 num_decimals: 0,
                 can_freeze: properties.can_freeze,
@@ -125,11 +129,11 @@ where
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
-        issue_cost: SA::AmountType,
+        issue_cost: BigUint<SA::ProxyTypeManager>,
         token_type: EsdtTokenType,
         token_display_name: &BoxedBytes,
         token_ticker: &BoxedBytes,
-        initial_supply: &SA::AmountType,
+        initial_supply: &BigUint<SA::ProxyTypeManager>,
         properties: TokenProperties,
     ) -> ContractCall<SA, ()> {
         let endpoint_name = match token_type {
@@ -150,7 +154,7 @@ where
         contract_call.push_argument_raw_bytes(token_ticker.as_slice());
 
         if token_type == EsdtTokenType::Fungible {
-            contract_call.push_argument_raw_bytes(&initial_supply.to_bytes_be());
+            contract_call.push_argument_raw_bytes(initial_supply.to_bytes_be().as_slice());
             contract_call.push_argument_raw_bytes(&properties.num_decimals.to_be_bytes());
         }
 
@@ -188,12 +192,12 @@ where
     pub fn mint(
         self,
         token_identifier: &TokenIdentifier,
-        amount: &SA::AmountType,
+        amount: &BigUint<SA::ProxyTypeManager>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"mint");
 
         contract_call.push_argument_raw_bytes(token_identifier.as_esdt_identifier());
-        contract_call.push_argument_raw_bytes(&amount.to_bytes_be());
+        contract_call.push_argument_raw_bytes(amount.to_bytes_be().as_slice());
 
         contract_call
     }
@@ -203,12 +207,12 @@ where
     pub fn burn(
         self,
         token_identifier: &TokenIdentifier,
-        amount: &SA::AmountType,
+        amount: &BigUint<SA::ProxyTypeManager>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"ESDTBurn");
 
         contract_call.push_argument_raw_bytes(token_identifier.as_esdt_identifier());
-        contract_call.push_argument_raw_bytes(&amount.to_bytes_be());
+        contract_call.push_argument_raw_bytes(amount.to_bytes_be().as_slice());
 
         contract_call
     }

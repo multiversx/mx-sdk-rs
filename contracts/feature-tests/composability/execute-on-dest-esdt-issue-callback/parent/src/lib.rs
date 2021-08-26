@@ -23,7 +23,7 @@ pub trait Parent {
             .send()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
-                &BigUint::zero(),
+                &self.types().big_uint_zero(),
                 &code,
                 CodeMetadata::DEFAULT,
                 &ArgBuffer::new(),

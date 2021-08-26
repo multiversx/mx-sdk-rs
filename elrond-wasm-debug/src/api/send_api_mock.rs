@@ -1,15 +1,14 @@
-use super::{EllipticCurveMock, RustBigUint};
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
 use elrond_wasm::api::{BlockchainApi, ContractBase, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{
-    Address, ArgBuffer, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
+    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
 };
-use num_bigint::BigUint;
+// use num_bigint::BigUint;
 use num_traits::Zero;
 
 impl TxContext {
-    fn get_available_egld_balance(&self) -> BigUint {
+    fn get_available_egld_balance(&self) -> num_bigint::BigUint {
         // start with the pre-existing balance
         let mut available_balance = self.blockchain_info_box.contract_balance.clone();
 
@@ -25,13 +24,13 @@ impl TxContext {
         available_balance
     }
 
-    fn get_available_esdt_balance(&self, token_name: &[u8]) -> BigUint {
+    fn get_available_esdt_balance(&self, token_name: &[u8]) -> num_bigint::BigUint {
         // start with the pre-existing balance
         let mut available_balance = self
             .blockchain_info_box
             .contract_esdt
             .get(token_name)
-            .unwrap_or(&BigUint::zero())
+            .unwrap_or(&num_bigint::BigUint::zero())
             .clone();
 
         // add amount received (if the same token)
@@ -52,10 +51,12 @@ impl TxContext {
 }
 
 impl SendApi for TxContext {
-    type AmountType = RustBigUint;
     type ProxyTypeManager = Self;
-    type ProxyEllipticCurve = EllipticCurveMock;
     type ProxyStorage = Self;
+
+    fn type_manager(&self) -> Self::ProxyTypeManager {
+        self.clone()
+    }
 
     fn get_sc_address(&self) -> Address {
         BlockchainApi::get_sc_address(self)
@@ -70,12 +71,13 @@ impl SendApi for TxContext {
         address: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> elrond_wasm::types::EsdtTokenData<Self::AmountType> {
+    ) -> elrond_wasm::types::EsdtTokenData<Self::ProxyTypeManager> {
         BlockchainApi::get_esdt_token_data(self, address, token, nonce)
     }
 
-    fn direct_egld(&self, to: &Address, amount: &RustBigUint, _data: &[u8]) {
-        if amount.value() > self.get_available_egld_balance() {
+    fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, _data: &[u8]) {
+        let amount_value = self.big_uint_value(amount);
+        if amount_value > self.get_available_egld_balance() {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: b"failed transfer (insufficient funds)".to_vec(),
@@ -86,14 +88,14 @@ impl SendApi for TxContext {
         tx_output.send_balance_list.push(SendBalance {
             recipient: to.clone(),
             token: TokenIdentifier::egld(),
-            amount: amount.value(),
+            amount: amount_value,
         });
     }
 
     fn direct_egld_execute(
         &self,
         _to: &Address,
-        _amount: &RustBigUint,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -105,12 +107,13 @@ impl SendApi for TxContext {
         &self,
         to: &Address,
         token: &TokenIdentifier,
-        amount: &RustBigUint,
+        amount: &BigUint<Self::ProxyTypeManager>,
         _gas: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
-        if amount.value() > self.get_available_esdt_balance(token.as_esdt_identifier()) {
+        let amount_value = self.big_uint_value(amount);
+        if amount_value > self.get_available_esdt_balance(token.as_esdt_identifier()) {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: b"insufficient funds".to_vec(),
@@ -121,7 +124,7 @@ impl SendApi for TxContext {
         tx_output.send_balance_list.push(SendBalance {
             recipient: to.clone(),
             token: token.clone(),
-            amount: amount.value(),
+            amount: amount_value,
         });
         Ok(())
     }
@@ -131,7 +134,7 @@ impl SendApi for TxContext {
         _to: &Address,
         _token: &TokenIdentifier,
         _nonce: u64,
-        _amount: &RustBigUint,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -142,7 +145,7 @@ impl SendApi for TxContext {
     fn direct_multi_esdt_transfer_execute(
         &self,
         _to: &Address,
-        _tokens: &[EsdtTokenPayment<RustBigUint>],
+        _tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
         _gas_limit: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
@@ -150,12 +153,18 @@ impl SendApi for TxContext {
         panic!("direct_multi_esdt_transfer_execute not implemented yet");
     }
 
-    fn async_call_raw(&self, to: &Address, amount: &RustBigUint, data: &[u8]) -> ! {
+    fn async_call_raw(
+        &self,
+        to: &Address,
+        amount: &BigUint<Self::ProxyTypeManager>,
+        data: &[u8],
+    ) -> ! {
+        let amount_value = self.big_uint_value(amount);
         // the cell is no longer needed, since we end in a panic
         let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
         tx_output.async_call = Some(AsyncCallTxData {
             to: to.clone(),
-            call_value: amount.value(),
+            call_value: amount_value,
             call_data: data.to_vec(),
             tx_hash: self.blockchain().get_tx_hash(),
         });
@@ -165,7 +174,7 @@ impl SendApi for TxContext {
     fn deploy_contract(
         &self,
         _gas: u64,
-        _amount: &RustBigUint,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _code: &BoxedBytes,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
@@ -176,7 +185,7 @@ impl SendApi for TxContext {
     fn deploy_from_source_contract(
         &self,
         _gas: u64,
-        _amount: &RustBigUint,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _source_contract_address: &Address,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
@@ -188,7 +197,7 @@ impl SendApi for TxContext {
         &self,
         _sc_address: &Address,
         _gas: u64,
-        _amount: &RustBigUint,
+        _amount: &BigUint<Self::ProxyTypeManager>,
         _code: &BoxedBytes,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
@@ -200,7 +209,7 @@ impl SendApi for TxContext {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &RustBigUint,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes> {
@@ -211,7 +220,7 @@ impl SendApi for TxContext {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &RustBigUint,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
         _range_closure: F,
@@ -226,7 +235,7 @@ impl SendApi for TxContext {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &RustBigUint,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes> {
@@ -237,7 +246,7 @@ impl SendApi for TxContext {
         &self,
         _gas: u64,
         _address: &Address,
-        _value: &RustBigUint,
+        _value: &BigUint<Self::ProxyTypeManager>,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) {

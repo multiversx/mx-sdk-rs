@@ -1,4 +1,3 @@
-use super::ArwenBigUint;
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CryptoApi;
 use elrond_wasm::types::{BoxedBytes, MessageHashType, H256};
@@ -54,8 +53,6 @@ extern "C" {
 }
 
 impl CryptoApi for ArwenApiImpl {
-    type BigUint = ArwenBigUint;
-
     fn sha256(&self, data: &[u8]) -> H256 {
         unsafe {
             let mut res = H256::zero();

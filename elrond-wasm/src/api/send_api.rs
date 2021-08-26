@@ -1,12 +1,10 @@
 use elrond_codec::{TopDecode, TopEncode};
 
-use super::{
-    BigUintApi, EllipticCurveApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi,
-};
+use super::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::{
     types::{
-        Address, ArgBuffer, AsyncCall, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
-        Vec,
+        Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
+        TokenIdentifier, Vec,
     },
     HexCallDataSerializer,
 };
@@ -19,13 +17,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ErrorApi + Clone + Sized {
-    type ProxyTypeManager: ManagedTypeApi + 'static;
-
-    /// The type of the payment arguments.
-    /// Not named `BigUint` to avoid name collisions in types that implement multiple API traits.
-    type AmountType: BigUintApi + 'static;
-
-    type ProxyEllipticCurve: EllipticCurveApi<BigUint = Self::AmountType> + 'static;
+    type ProxyTypeManager: ManagedTypeApi + ErrorApi + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
     type ProxyStorage: StorageReadApi
@@ -34,6 +26,8 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         + ErrorApi
         + Clone
         + 'static;
+
+    fn type_manager(&self) -> Self::ProxyTypeManager;
 
     /// Required for ESDTNFTTransfer.
     /// Same as the implementation from BlockchainApi.
@@ -50,17 +44,17 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         address: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> crate::types::EsdtTokenData<Self::AmountType>;
+    ) -> crate::types::EsdtTokenData<Self::ProxyTypeManager>;
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
-    fn direct_egld(&self, to: &Address, amount: &Self::AmountType, data: &[u8]);
+    fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, data: &[u8]);
 
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
     fn direct_egld_execute(
         &self,
         to: &Address,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
@@ -71,7 +65,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         to: &Address,
         token: &TokenIdentifier,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
@@ -84,7 +78,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         to: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
@@ -93,7 +87,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     fn direct_multi_esdt_transfer_execute(
         &self,
         to: &Address,
-        tokens: &[EsdtTokenPayment<Self::AmountType>],
+        tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
         gas_limit: u64,
         function: &[u8],
         arg_buffer: &ArgBuffer,
@@ -106,7 +100,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         to: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         data: &[u8],
     ) {
         if token.is_egld() {
@@ -125,7 +119,12 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     ///
     /// The data is expected to be of the form `functionName@<arg1-hex>@<arg2-hex>@...`.
     /// Use a `HexCallDataSerializer` to prepare this field.
-    fn async_call_raw(&self, to: &Address, amount: &Self::AmountType, data: &[u8]) -> !;
+    fn async_call_raw(
+        &self,
+        to: &Address,
+        amount: &BigUint<Self::ProxyTypeManager>,
+        data: &[u8],
+    ) -> !;
 
     /// Sends an asynchronous call to another contract, with either EGLD or ESDT value.
     /// The `token` argument decides which one it will be.
@@ -148,7 +147,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         to: &Address,
         token: &TokenIdentifier,
         nonce: u64,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         data: &[u8],
     ) -> ! {
         if nonce == 0 {
@@ -159,7 +158,11 @@ pub trait SendApi: ErrorApi + Clone + Sized {
                 serializer.push_argument_bytes(data);
             }
 
-            self.async_call_raw(to, &Self::AmountType::zero(), serializer.as_slice())
+            self.async_call_raw(
+                to,
+                &BigUint::zero(self.type_manager()),
+                serializer.as_slice(),
+            )
         } else {
             let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
             serializer.push_argument_bytes(token.as_esdt_identifier());
@@ -172,7 +175,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
             self.async_call_raw(
                 &self.get_sc_address(),
-                &Self::AmountType::zero(),
+                &BigUint::zero(self.type_manager()),
                 serializer.as_slice(),
             );
         }
@@ -181,7 +184,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     fn transfer_multiple_esdt_via_async_call(
         &self,
         to: &Address,
-        tokens: &[EsdtTokenPayment<Self::AmountType>],
+        tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
         data: &[u8],
     ) -> ! {
         let mut serializer = HexCallDataSerializer::new(ESDT_MULTI_TRANSFER_STRING);
@@ -200,7 +203,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
 
         self.async_call_raw(
             &self.get_sc_address(),
-            &Self::AmountType::zero(),
+            &BigUint::zero(self.type_manager()),
             serializer.as_slice(),
         );
     }
@@ -212,7 +215,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     fn deploy_contract(
         &self,
         gas: u64,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         code: &BoxedBytes,
         code_metadata: CodeMetadata,
         arg_buffer: &ArgBuffer,
@@ -224,7 +227,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     fn deploy_from_source_contract(
         &self,
         gas: u64,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         source_contract_address: &Address,
         code_metadata: CodeMetadata,
         arg_buffer: &ArgBuffer,
@@ -237,7 +240,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         sc_address: &Address,
         gas: u64,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         code: &BoxedBytes,
         code_metadata: CodeMetadata,
         arg_buffer: &ArgBuffer,
@@ -250,7 +253,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         let _ = self.execute_on_dest_context_raw(
             self.get_gas_left(),
             child_sc_address,
-            &Self::AmountType::zero(),
+            &BigUint::zero(self.type_manager()),
             b"ChangeOwnerAddress",
             &arg_buffer,
         );
@@ -261,7 +264,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         gas: u64,
         address: &Address,
-        value: &Self::AmountType,
+        value: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes>;
@@ -277,7 +280,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         gas: u64,
         address: &Address,
-        value: &Self::AmountType,
+        value: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
         range_closure: F,
@@ -289,7 +292,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         gas: u64,
         address: &Address,
-        value: &Self::AmountType,
+        value: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     ) -> Vec<BoxedBytes>;
@@ -298,7 +301,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         gas: u64,
         address: &Address,
-        value: &Self::AmountType,
+        value: &BigUint<Self::ProxyTypeManager>,
         function: &[u8],
         arg_buffer: &ArgBuffer,
     );
@@ -324,7 +327,12 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     /// or this will fail with "action is not allowed"
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     /// This function cannot be used for NFTs.
-    fn esdt_local_mint(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType) {
+    fn esdt_local_mint(
+        &self,
+        token: &TokenIdentifier,
+        nonce: u64,
+        amount: &BigUint<Self::ProxyTypeManager>,
+    ) {
         let mut arg_buffer = ArgBuffer::new();
         let func_name: &[u8];
 
@@ -345,7 +353,12 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed"
-    fn esdt_local_burn(&self, token: &TokenIdentifier, nonce: u64, amount: &Self::AmountType) {
+    fn esdt_local_burn(
+        &self,
+        token: &TokenIdentifier,
+        nonce: u64,
+        amount: &BigUint<Self::ProxyTypeManager>,
+    ) {
         let mut arg_buffer = ArgBuffer::new();
         let func_name: &[u8];
 
@@ -372,9 +385,9 @@ pub trait SendApi: ErrorApi + Clone + Sized {
     fn esdt_nft_create<T: elrond_codec::TopEncode>(
         &self,
         token: &TokenIdentifier,
-        amount: &Self::AmountType,
+        amount: &BigUint<Self::ProxyTypeManager>,
         name: &BoxedBytes,
-        royalties: &Self::AmountType,
+        royalties: &BigUint<Self::ProxyTypeManager>,
         hash: &BoxedBytes,
         attributes: &T,
         uris: &[BoxedBytes],
@@ -415,19 +428,19 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         &self,
         nft_id: &TokenIdentifier,
         nft_nonce: u64,
-        nft_amount: &Self::AmountType,
+        nft_amount: &BigUint<Self::ProxyTypeManager>,
         buyer: &Address,
         payment_token: &TokenIdentifier,
         payment_nonce: u64,
-        payment_amount: &Self::AmountType,
-    ) -> Self::AmountType {
+        payment_amount: &BigUint<Self::ProxyTypeManager>,
+    ) -> BigUint<Self::ProxyTypeManager> {
         let nft_token_data = self.get_esdt_token_data(&self.get_sc_address(), nft_id, nft_nonce);
-        let royalties_amount =
-            payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL.into();
+        let royalties_amount = payment_amount.clone() * nft_token_data.royalties
+            / BigUint::from_u64(PERCENTAGE_TOTAL, self.type_manager());
 
         self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
 
-        if royalties_amount > 0 {
+        if royalties_amount > 0u32 {
             self.direct(
                 &nft_token_data.creator,
                 payment_token,

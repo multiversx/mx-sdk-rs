@@ -106,7 +106,7 @@ pub trait ForwarderSyncCallModule {
         to: Address,
         percentage_fees: BigUint,
     ) {
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL.into();
+        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         self.vault_proxy()

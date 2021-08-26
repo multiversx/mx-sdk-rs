@@ -8,7 +8,19 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn bi_signed_byte_length(&self, _x: Handle) -> Handle {
+    fn bi_unsigned_byte_length(&self, _x: Handle) -> usize {
+        unreachable!()
+    }
+
+    fn bi_get_unsigned_bytes(&self, _reference: Handle) -> BoxedBytes {
+        unreachable!()
+    }
+
+    fn bi_set_unsigned_bytes(&self, _destination: Handle, _bytes: &[u8]) {
+        unreachable!()
+    }
+
+    fn bi_signed_byte_length(&self, _x: Handle) -> usize {
         unreachable!()
     }
 
@@ -32,6 +44,10 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn bi_sub_unsigned(&self, _dest: Handle, _x: Handle, _y: Handle) {
+        unreachable!()
+    }
+
     fn bi_mul(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
@@ -41,10 +57,6 @@ impl BigIntApi for super::UncallableApi {
     }
 
     fn bi_t_mod(&self, _dest: Handle, _x: Handle, _y: Handle) {
-        unreachable!()
-    }
-
-    fn bi_pow(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }
 
@@ -61,6 +73,38 @@ impl BigIntApi for super::UncallableApi {
     }
 
     fn bi_cmp(&self, _x: Handle, _y: Handle) -> Ordering {
+        unreachable!()
+    }
+
+    fn bi_sqrt(&self, _dest: Handle, _x: Handle) {
+        unreachable!()
+    }
+
+    fn bi_pow(&self, _dest: Handle, _x: Handle, _y: Handle) {
+        unreachable!()
+    }
+
+    fn bi_log2(&self, _x: Handle) -> u32 {
+        unreachable!()
+    }
+
+    fn bi_and(&self, _dest: Handle, _x: Handle, _y: Handle) {
+        unreachable!()
+    }
+
+    fn bi_or(&self, _dest: Handle, _x: Handle, _y: Handle) {
+        unreachable!()
+    }
+
+    fn bi_xor(&self, _dest: Handle, _x: Handle, _y: Handle) {
+        unreachable!()
+    }
+
+    fn bi_shr(&self, _dest: Handle, _x: Handle, _bits: usize) {
+        unreachable!()
+    }
+
+    fn bi_shl(&self, _dest: Handle, _x: Handle, _bits: usize) {
         unreachable!()
     }
 }

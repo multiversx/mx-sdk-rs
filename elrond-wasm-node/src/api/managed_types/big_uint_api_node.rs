@@ -10,7 +10,7 @@ use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use elrond_wasm::api::BigUintApi;
+
 use elrond_wasm::err_msg;
 use elrond_wasm::types::BoxedBytes;
 
@@ -449,18 +449,5 @@ impl BigUintApi for ArwenBigUint {
 }
 
 impl ArwenBigUint {
-    pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(&self, nr_bytes: usize) -> *const u8 {
-        let byte_len = bigIntUnsignedByteLength(self.handle) as usize;
-        if byte_len > nr_bytes {
-            error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE);
-        }
-        unsafe_buffer::clear_buffer();
-        if byte_len > 0 {
-            bigIntGetUnsignedBytes(
-                self.handle,
-                unsafe_buffer::buffer_ptr().add(nr_bytes - byte_len),
-            );
-        }
-        unsafe_buffer::buffer_ptr()
-    }
+    
 }

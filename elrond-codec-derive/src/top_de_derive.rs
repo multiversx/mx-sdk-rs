@@ -80,27 +80,25 @@ fn top_decode_method_bodies(
         syn::Data::Struct(data_struct) => {
             let field_dep_decode_snippets =
                 fields_decl_syntax(&data_struct.fields, |index, field| {
-                    dep_decode_snippet(index, field)
+                    dep_decode_snippet(index, field, &quote! {&mut nested_buffer})
                 });
             let field_dep_encode_or_exit_snippets =
                 fields_decl_syntax(&data_struct.fields, |index, field| {
-                    dep_decode_or_exit_snippet(index, field)
+                    dep_decode_or_exit_snippet(index, field, &quote! {&mut nested_buffer})
                 });
 
             let top_decode_body = quote! {
-                let bytes = top_input.into_boxed_slice_u8();
-                let input = &mut &*bytes;
+                let mut nested_buffer = top_input.into_nested_buffer();
                 let result = #name #field_dep_decode_snippets ;
-                if !input.is_empty() {
+                if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                     return core::result::Result::Err(elrond_codec::DecodeError::INPUT_TOO_LONG);
                 }
                 core::result::Result::Ok(result)
             };
             let top_decode_or_exit_body = quote! {
-                let bytes = top_input.into_boxed_slice_u8();
-                let input = &mut &*bytes;
+                let mut nested_buffer = top_input.into_nested_buffer();
                 let result = #name #field_dep_encode_or_exit_snippets ;
-                if !input.is_empty() {
+                if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                     exit(c, elrond_codec::DecodeError::INPUT_TOO_LONG);
                 }
                 result
@@ -131,30 +129,32 @@ fn top_decode_method_bodies(
                 };
                 (top_decode_body, top_decode_or_exit_body)
             } else {
-                let variant_dep_decode_snippets = variant_dep_decode_snippets(name, data_enum);
-                let variant_dep_decode_or_exit_snippets =
-                    variant_dep_decode_or_exit_snippets(name, data_enum);
+                let variant_dep_decode_snippets =
+                    variant_dep_decode_snippets(name, data_enum, &quote! {&mut nested_buffer});
+                let variant_dep_decode_or_exit_snippets = variant_dep_decode_or_exit_snippets(
+                    name,
+                    data_enum,
+                    &quote! {&mut nested_buffer},
+                );
 
                 let top_decode_body = quote! {
-                    let bytes = top_input.into_boxed_slice_u8();
-                    let input = &mut &*bytes;
-                    let result = match <u8 as elrond_codec::NestedDecode>::dep_decode(input)? {
+                    let mut nested_buffer = top_input.into_nested_buffer();
+                    let result = match <u8 as elrond_codec::NestedDecode>::dep_decode(&mut nested_buffer)? {
                         #(#variant_dep_decode_snippets)*
                         _ => core::result::Result::Err(elrond_codec::DecodeError::INVALID_VALUE),
                     };
-                    if !input.is_empty() {
+                    if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                         return core::result::Result::Err(elrond_codec::DecodeError::INPUT_TOO_LONG);
                     }
                     result
                 };
                 let top_decode_or_exit_body = quote! {
-                    let bytes = top_input.into_boxed_slice_u8();
-                    let input = &mut &*bytes;
-                    let result = match <u8 as elrond_codec::NestedDecode>::dep_decode_or_exit(input, c.clone(), exit) {
+                    let mut nested_buffer = top_input.into_nested_buffer();
+                    let result = match <u8 as elrond_codec::NestedDecode>::dep_decode_or_exit(&mut nested_buffer, c.clone(), exit) {
                         #(#variant_dep_decode_or_exit_snippets)*
                         _ => exit(c, elrond_codec::DecodeError::INVALID_VALUE),
                     };
-                    if !input.is_empty() {
+                    if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                         exit(c, elrond_codec::DecodeError::INPUT_TOO_LONG);
                     }
                     result

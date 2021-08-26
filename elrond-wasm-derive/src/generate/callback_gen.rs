@@ -76,60 +76,63 @@ fn callback_selector_body(
 
 fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
     methods
-		.iter()
-		.filter_map(|m| {
-			if let PublicRole::Callback(callback) = &m.public_role {
-				let payable_snippet = generate_payable_snippet(m);
-				let mut has_call_result = false;
-				let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
-					.method_args
-					.iter()
-					.map(|arg| {
-						if arg.metadata.payment.is_payment_arg() {
-							quote! {}
-						} else if arg.metadata.callback_call_result {
-							has_call_result = true;
+        .iter()
+        .filter_map(|m| {
+            if let PublicRole::Callback(callback) = &m.public_role {
+                let payable_snippet = generate_payable_snippet(m);
+                let mut has_call_result = false;
+                let arg_init_snippets: Vec<proc_macro2::TokenStream> = m
+                    .method_args
+                    .iter()
+                    .map(|arg| {
+                        if arg.metadata.payment.is_payment_arg() {
+                            quote! {}
+                        } else if arg.metadata.callback_call_result {
+                            has_call_result = true;
 
-							// Should be an AsyncCallResult argument that wraps what comes from the async call.
-							// But in principle, one can express it it any way.
-							generate_load_dyn_arg(arg, &quote! { &mut ___call_result_loader___ })
-						} else {
-							// callback args, loaded from storage via the tx hash
-							generate_load_dyn_arg(arg, &quote! { &mut ___cb_closure_loader___ })
-						}
-					})
-					.collect();
+                            // Should be an AsyncCallResult argument that wraps what comes from the async call.
+                            // But in principle, one can express it it any way.
+                            generate_load_dyn_arg(arg, &quote! { &mut ___call_result_loader___ })
+                        } else {
+                            // callback args, loaded from storage via the tx hash
+                            generate_load_dyn_arg(arg, &quote! { &mut ___cb_closure_loader___ })
+                        }
+                    })
+                    .collect();
 
-				let callback_name_str = &callback.callback_name.to_string();
-				let callback_name_literal = array_literal(callback_name_str.as_bytes());
-				let call = generate_call_to_method_expr(m);
-				let call_result_assert_no_more_args = if has_call_result {
-					quote! {
-						___call_result_loader___.assert_no_more_args();
-					}
-				} else {
-					quote! {}
-				};
-				let body_with_result = generate_body_with_result(&m.return_type, &call);
+                let callback_name_str = &callback.callback_name.to_string();
+                let callback_name_literal = array_literal(callback_name_str.as_bytes());
+                let call = generate_call_to_method_expr(m);
+                let call_result_assert_no_more_args = if has_call_result {
+                    quote! {
+                        ___call_result_loader___.assert_no_more_args();
+                    }
+                } else {
+                    quote! {}
+                };
+                let body_with_result = generate_body_with_result(&m.return_type, &call);
 
-				let match_arm = quote! {
-					#callback_name_literal =>
-					{
-						#payable_snippet
-						let mut ___cb_closure_loader___ = CallDataArgLoader::new(___cb_data_deserializer___, self.error_api());
-						#(#arg_init_snippets)*
-						___cb_closure_loader___.assert_no_more_args();
-						#call_result_assert_no_more_args
-						#body_with_result ;
-						return elrond_wasm::types::CallbackSelectorResult::Processed;
-					},
-				};
-				Some(match_arm)
-			} else {
-				None
-			}
-		})
-		.collect()
+                let match_arm = quote! {
+                    #callback_name_literal =>
+                    {
+                        #payable_snippet
+                        let mut ___cb_closure_loader___ = CallDataArgLoader::new(
+                            ___cb_data_deserializer___,
+                            self.callback_closure_arg_api(),
+                        );
+                        #(#arg_init_snippets)*
+                        ___cb_closure_loader___.assert_no_more_args();
+                        #call_result_assert_no_more_args
+                        #body_with_result ;
+                        return elrond_wasm::types::CallbackSelectorResult::Processed;
+                    },
+                };
+                Some(match_arm)
+            } else {
+                None
+            }
+        })
+        .collect()
 }
 
 pub fn module_calls(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
