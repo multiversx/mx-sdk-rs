@@ -78,10 +78,6 @@ where
     fn into_nested_buffer(self) -> Self::NestedBuffer {
         ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }
-
-    fn try_get_big_uint_handle(&self) -> (bool, i32) {
-        (true, self.api.storage_load_big_uint_raw(self.key))
-    }
 }
 
 pub fn storage_get<SRA, T>(api: SRA, key: &[u8]) -> T

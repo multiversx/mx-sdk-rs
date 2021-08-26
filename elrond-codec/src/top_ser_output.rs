@@ -61,44 +61,6 @@ pub trait TopEncodeOutput: Sized {
     fn start_nested_encode(&self) -> Self::NestedBuffer;
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer);
-
-    /// Unless you're developing elrond-wasm, please ignore.
-    ///
-    /// Shortcut for sending a BigInt managed by the API to the API directly via its handle.
-    ///
-    /// - ArwenBigInt + finish API
-    /// - ArwenBigInt + set storage
-    /// Not used for:
-    /// - RustBigInt
-    /// - async call
-    ///
-    /// Note: The byte representation is required as a lambda, so it is computed lazily.
-    /// It should not be computed whenever the handle is present.
-    #[doc(hidden)]
-    #[inline]
-    fn set_big_int_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, _handle: i32, else_bytes: F) {
-        self.set_slice_u8(else_bytes().as_slice());
-    }
-
-    /// Unless you're developing elrond-wasm, please ignore.
-    ///
-    /// Shortcut for sending a BigUint managed by the API to the API directly via its handle.
-    ///
-    /// Used for:
-    /// - ArwenBigUint + finish API
-    /// - ArwenBigUint + set storage
-    /// Not used for:
-    /// - RustBigUint
-    /// - async call
-    /// - anything else
-    ///
-    /// Note: The byte representation is required as a lambda, so it is computed lazily.
-    /// It should not be computed whenever the handle is present.
-    #[doc(hidden)]
-    #[inline]
-    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, _handle: i32, else_bytes: F) {
-        self.set_slice_u8(else_bytes().as_slice());
-    }
 }
 
 impl TopEncodeOutput for &mut Vec<u8> {

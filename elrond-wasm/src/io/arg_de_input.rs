@@ -96,14 +96,4 @@ where
     fn into_nested_buffer(self) -> Self::NestedBuffer {
         ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }
-
-    #[inline]
-    fn try_get_big_uint_handle(&self) -> (bool, i32) {
-        (true, self.api.get_argument_big_uint_raw(self.arg_index))
-    }
-
-    #[inline]
-    fn try_get_big_int_handle(&self) -> (bool, i32) {
-        (true, self.api.get_argument_big_int_raw(self.arg_index))
-    }
 }

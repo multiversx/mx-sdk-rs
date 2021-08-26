@@ -72,17 +72,6 @@ where
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
         self.set_managed_buffer(&nb);
     }
-
-    #[inline]
-    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(
-        self,
-        handle: i32,
-        _else_serialization: F,
-    ) {
-        self.api.storage_store_big_uint_raw(self.key, handle);
-    }
-
-    // TODO: there is currently no API hook for storage of signed big ints
 }
 
 // #[inline]

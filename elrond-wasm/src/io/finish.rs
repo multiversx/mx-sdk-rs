@@ -3,7 +3,6 @@ use elrond_codec::TryStaticCast;
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
 use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
 use crate::types::{BigInt, BigUint, ManagedBuffer};
-use crate::Vec;
 
 struct ApiOutputAdapter<FA>
 where
@@ -71,16 +70,6 @@ where
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
         self.api.finish_managed_buffer_raw(nb.handle);
-    }
-
-    #[inline]
-    fn set_big_int_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
-        self.api.finish_big_int_raw(handle);
-    }
-
-    #[inline]
-    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
-        self.api.finish_big_uint_raw(handle);
     }
 }
 
