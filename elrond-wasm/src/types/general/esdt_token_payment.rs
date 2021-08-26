@@ -4,6 +4,7 @@ use elrond_codec::*;
 
 use super::{EsdtTokenType, TokenIdentifier};
 
+#[derive(Clone)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
     pub token_name: TokenIdentifier,

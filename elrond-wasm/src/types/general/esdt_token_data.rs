@@ -1,4 +1,4 @@
-use crate::{abi::TypeAbi, api::ManagedTypeApi, types::BigUint};
+use crate::{abi::TypeAbi, api::ManagedTypeApi, types::{BigUint, ManagedBytesTopDecodeInput}};
 use alloc::string::String;
 use elrond_codec::*;
 
@@ -17,8 +17,14 @@ pub struct EsdtTokenData<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenData<M> {
+    fn type_manager(&self) -> M {
+        self.amount.type_manager()
+    }
+
     pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
-        T::top_decode(self.attributes.clone().as_slice())
+        let managed_input =
+            ManagedBytesTopDecodeInput::new(self.type_manager(), self.attributes.clone());
+        T::top_decode(managed_input)
     }
 }
 

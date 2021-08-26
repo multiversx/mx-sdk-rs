@@ -176,6 +176,11 @@ fn forwarder_nft_create_go() {
 }
 
 #[test]
+fn forwarder_nft_decode_complex_attributes_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_nft_decode_complex_attributes.scen.json");
+}
+
+#[test]
 fn forwarder_nft_create_and_send_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_nft_create_and_send.scen.json");
 }
