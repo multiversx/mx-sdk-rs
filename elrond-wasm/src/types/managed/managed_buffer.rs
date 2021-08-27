@@ -39,6 +39,16 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     #[inline]
+    pub fn type_manager(&self) -> M {
+        self.api.clone()
+    }
+
+    #[doc(hidden)]
+    pub fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
+    #[inline]
     pub fn len(&self) -> usize {
         self.api.mb_len(self.handle)
     }

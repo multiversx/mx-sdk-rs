@@ -450,8 +450,7 @@ pub trait Erc1155 {
     // map for address -> type_id -> amount
 
     #[storage_mapper("balanceOf")]
-    fn get_balance_mapper(&self, owner: &Address)
-        -> SafeMapMapper<Self::Storage, BigUint, BigUint>;
+    fn get_balance_mapper(&self, owner: &Address) -> MapMapper<Self::Storage, BigUint, BigUint>;
 
     // token owner
     // for non-fungible

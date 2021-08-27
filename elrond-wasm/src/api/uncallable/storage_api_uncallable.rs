@@ -18,6 +18,10 @@ impl StorageReadApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn storage_load_managed_buffer_len(&self, _key_handle: Handle) -> usize {
+        unreachable!()
+    }
+
     fn storage_load_u64(&self, _key: &[u8]) -> u64 {
         unreachable!()
     }
@@ -37,6 +41,10 @@ impl StorageWriteApi for super::UncallableApi {
     }
 
     fn storage_store_managed_buffer_raw(&self, _key_handle: Handle, _value_handle: Handle) {
+        unreachable!()
+    }
+
+    fn storage_store_managed_buffer_clear(&self, _key_handle: Handle) {
         unreachable!()
     }
 
