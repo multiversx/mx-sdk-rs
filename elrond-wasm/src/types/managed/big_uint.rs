@@ -27,6 +27,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         self.handle
     }
 
+    #[inline]
     pub fn type_manager(&self) -> M {
         self.api.clone()
     }
