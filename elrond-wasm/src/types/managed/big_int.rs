@@ -4,13 +4,13 @@ use crate::types::BoxedBytes;
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
-    pub(super) handle: Handle,
-    pub(super) api: M,
+    pub(crate) handle: Handle,
+    pub(crate) api: M,
 }
 
 // BigInt sign.
@@ -21,13 +21,25 @@ pub enum Sign {
     Plus,
 }
 
+impl<M: ManagedTypeApi> BigInt<M> {
+    #[doc(hidden)]
+    pub fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+        BigInt {
+            handle: raw_handle,
+            api,
+        }
+    }
+}
+
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigInt<M> {
+    #[inline]
     fn from(item: &ManagedBuffer<M>) -> Self {
         BigInt::from_signed_bytes_be_buffer(item)
     }
 }
 
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
+    #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {
         BigInt::from_signed_bytes_be_buffer(&item)
     }
@@ -35,34 +47,40 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 
 /// More conversions here.
 impl<M: ManagedTypeApi> BigInt<M> {
-    pub fn from_i64(value: i64, api: M) -> Self {
+    #[inline]
+    pub fn from_i64(api: M, value: i64) -> Self {
         BigInt {
             handle: api.bi_new(value),
             api,
         }
     }
 
-    pub fn from_i32(value: i32, api: M) -> Self {
+    #[inline]
+    pub fn from_i32(api: M, value: i32) -> Self {
         BigInt {
             handle: api.bi_new(value as i64),
             api,
         }
     }
 
+    #[inline]
     pub fn to_i64(&self) -> Option<i64> {
         self.api.bi_to_i64(self.handle)
     }
 
-    pub fn from_signed_bytes_be(bytes: &[u8], api: M) -> Self {
+    #[inline]
+    pub fn from_signed_bytes_be(api: M, bytes: &[u8]) -> Self {
         let handle = api.bi_new(0);
         api.bi_set_signed_bytes(handle, bytes);
         BigInt { handle, api }
     }
 
+    #[inline]
     pub fn to_signed_bytes_be(&self) -> BoxedBytes {
         self.api.bi_get_signed_bytes(self.handle)
     }
 
+    #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
         BigInt {
             handle: managed_buffer
@@ -72,6 +90,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         }
     }
 
+    #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
         ManagedBuffer {
             handle: self.api.mb_from_big_int_signed(self.handle),
@@ -111,48 +130,29 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
+impl<M: ManagedTypeApi> TryStaticCast for BigInt<M> {}
 
+impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_specialized(&self.to_signed_bytes_be_buffer(), || {
-            self.to_signed_bytes_be().into_box()
-        });
-        Ok(())
+        output.set_specialized(self, |else_output| {
+            else_output.set_slice_u8(self.to_signed_bytes_be().as_slice());
+            Ok(())
+        })
     }
 }
 
 impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if dest.push_specialized(&self.to_signed_bytes_be_buffer()) {
-            Ok(())
-        } else {
-            self.to_signed_bytes_be().dep_encode(dest)
-        }
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        if !dest.push_specialized(&self.to_signed_bytes_be_buffer()) {
-            self.to_signed_bytes_be().dep_encode_or_exit(dest, c, exit);
-        }
+        dest.push_specialized(self, |else_output| {
+            self.to_signed_bytes_be().dep_encode(else_output)
+        })
     }
 }
 
 impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.read_specialized::<ManagedBuffer<M>>()? {
-            Ok(BigInt::from_signed_bytes_be_buffer(&managed_buffer))
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.read_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -160,25 +160,14 @@ impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        if let Some(managed_buffer) =
-            input.read_specialized_or_exit::<ManagedBuffer<M>, ExitCtx>(c.clone(), exit)
-        {
-            BigInt::from_signed_bytes_be_buffer(&managed_buffer)
-        } else {
-            exit(c, DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.read_specialized_or_exit(c, exit, |_, c| exit(c, DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
-    const TYPE_INFO: TypeInfo = TypeInfo::BigInt;
-
+    #[inline]
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
-            Ok(managed_buffer.into())
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 

@@ -64,10 +64,12 @@ macro_rules! unary_op_wrapper {
 }
 
 impl BigIntApi for crate::ArwenApiImpl {
+    #[inline]
     fn bi_new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
     }
 
+    #[inline]
     fn bi_unsigned_byte_length(&self, x: Handle) -> usize {
         unsafe { bigIntUnsignedByteLength(x) as usize }
     }
@@ -81,10 +83,12 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]) {
         unsafe { bigIntSetUnsignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
+    #[inline]
     fn bi_signed_byte_length(&self, x: Handle) -> usize {
         unsafe { bigIntSignedByteLength(x) as usize }
     }
@@ -98,6 +102,7 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]) {
         unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
@@ -142,6 +147,7 @@ impl BigIntApi for crate::ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
         unsafe { bigIntCmp(x, y).cmp(&0) }
     }

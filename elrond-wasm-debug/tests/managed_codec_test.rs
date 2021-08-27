@@ -22,15 +22,15 @@ where
 fn test_big_uint_serialization() {
     let api = TxContext::dummy();
 
-    check_managed_top_encode_decode(api.clone(), BigUint::from_u32(5u32, api.clone()), &[5u8]);
+    check_managed_top_encode_decode(api.clone(), BigUint::from_u32(api.clone(), 5u32), &[5u8]);
 }
 
 #[test]
 fn test_big_uint_vec_serialization() {
     let api = TxContext::dummy();
     let v = vec![
-        BigUint::from_u32(5u32, api.clone()),
-        BigUint::from_u32(6u32, api.clone()),
+        BigUint::from_u32(api.clone(), 5u32),
+        BigUint::from_u32(api.clone(), 6u32),
     ];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);
@@ -40,16 +40,16 @@ fn test_big_uint_vec_serialization() {
 fn test_big_int_serialization() {
     let api = TxContext::dummy();
 
-    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(5, api.clone()), &[5u8]);
-    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(-5, api), &[251u8]);
+    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api.clone(), 5), &[5u8]);
+    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api, -5), &[251u8]);
 }
 
 #[test]
 fn test_big_int_vec_serialization() {
     let api = TxContext::dummy();
     let v = vec![
-        BigInt::from_i32(5, api.clone()),
-        BigInt::from_i32(6, api.clone()),
+        BigInt::from_i32(api.clone(), 5),
+        BigInt::from_i32(api.clone(), 6),
     ];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);

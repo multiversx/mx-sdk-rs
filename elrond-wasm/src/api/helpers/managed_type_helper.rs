@@ -17,7 +17,7 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     pub fn big_uint_from<T: Into<u64>>(&self, value: T) -> BigUint<M> {
-        BigUint::from_u64(value.into(), self.api.clone())
+        BigUint::from_u64(self.api.clone(), value.into())
     }
 
     pub fn managed_buffer_empty(&self) -> ManagedBuffer<M> {
@@ -29,10 +29,10 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     pub fn elliptic_curve(&self, name: &str) -> EllipticCurve<M> {
-        EllipticCurve::from_name(name, self.api.clone())
+        EllipticCurve::from_name(self.api.clone(), name)
     }
 
     pub fn elliptic_curve_from_bitsize(&self, bitsize: u32) -> Option<EllipticCurve<M>> {
-        EllipticCurve::from_bitsize(bitsize, self.api.clone())
+        EllipticCurve::from_bitsize(self.api.clone(), bitsize)
     }
 }

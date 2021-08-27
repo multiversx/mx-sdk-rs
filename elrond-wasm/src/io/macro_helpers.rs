@@ -2,7 +2,7 @@ use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
 use crate::*;
 use elrond_codec::*;
 
-#[inline]
+#[inline(always)]
 pub fn load_single_arg<AA, T>(api: AA, index: i32, arg_id: ArgId) -> T
 where
     T: TopDecode,

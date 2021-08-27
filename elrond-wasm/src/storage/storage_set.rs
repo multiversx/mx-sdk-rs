@@ -1,5 +1,5 @@
 use crate::api::{ErrorApi, ManagedTypeApi, StorageWriteApi};
-use crate::types::ManagedBuffer;
+use crate::types::{BigInt, BigUint, ManagedBuffer};
 use crate::*;
 use elrond_codec::*;
 
@@ -46,11 +46,22 @@ where
     }
 
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(self, value: &T, else_bytes: F) {
+    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<(), EncodeError>,
+    {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<SWA>>() {
             self.set_managed_buffer(managed_buffer);
+            Ok(())
+        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<SWA>>() {
+            self.set_managed_buffer(&big_uint.to_bytes_be_buffer());
+            Ok(())
+        } else if let Some(big_int) = value.try_cast_ref::<BigInt<SWA>>() {
+            self.set_managed_buffer(&big_int.to_signed_bytes_be_buffer());
+            Ok(())
         } else {
-            self.set_boxed_bytes(else_bytes());
+            else_serialization(self)
         }
     }
 
@@ -61,13 +72,6 @@ where
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
         self.set_managed_buffer(&nb);
     }
-
-    #[inline]
-    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
-        self.api.storage_store_big_uint_raw(self.key, handle);
-    }
-
-    // TODO: there is currently no API hook for storage of signed big ints
 }
 
 // #[inline]

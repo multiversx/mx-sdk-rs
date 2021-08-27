@@ -30,6 +30,31 @@ pub trait TryStaticCast: Clone + 'static {
     }
 }
 
+fn type_eq<T, U>() -> bool
+where
+    T: 'static,
+    U: 'static,
+{
+    TypeId::of::<T>() == TypeId::of::<U>()
+}
+
+#[inline]
+pub fn try_execute_then_cast<T, R, F>(f: F) -> Option<R>
+where
+    T: 'static,
+    R: 'static,
+    F: FnOnce() -> T,
+{
+    if type_eq::<T, R>() {
+        let result: T = f();
+        let transmuted_result: R = unsafe { core::mem::transmute_copy(&result) };
+        core::mem::forget(result);
+        Some(transmuted_result)
+    } else {
+        None
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::TryStaticCast;

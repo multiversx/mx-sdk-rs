@@ -435,8 +435,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         payment_amount: &BigUint<Self::ProxyTypeManager>,
     ) -> BigUint<Self::ProxyTypeManager> {
         let nft_token_data = self.get_esdt_token_data(&self.get_sc_address(), nft_id, nft_nonce);
-        let royalties_amount = payment_amount.clone() * nft_token_data.royalties
-            / BigUint::from_u64(PERCENTAGE_TOTAL, self.type_manager());
+        let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
         self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
 
