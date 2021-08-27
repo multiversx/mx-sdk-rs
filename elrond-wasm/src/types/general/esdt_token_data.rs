@@ -23,7 +23,7 @@ impl<M: ManagedTypeApi> EsdtTokenData<M> {
 
     pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         let managed_input =
-            ManagedBytesTopDecodeInput::new(self.attributes.clone(), self.type_manager());
+            ManagedBytesTopDecodeInput::new(self.type_manager(), self.attributes.clone());
         T::top_decode(managed_input)
     }
 }

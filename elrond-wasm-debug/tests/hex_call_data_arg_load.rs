@@ -27,7 +27,7 @@ fn test_simple_managed_arg() {
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api.clone());
     let arg1: BigUint<TxContext> = load_dyn_arg(&mut cd_loader, ArgId::empty());
-    assert_eq!(arg1, BigUint::from_u32(5u32, api));
+    assert_eq!(arg1, BigUint::from_u32(api, 5u32));
 
     cd_loader.assert_no_more_args();
 }

@@ -28,6 +28,7 @@ pub trait TopDecode: Sized {
     /// Version of `top_decode` that exits quickly in case of error.
     /// Its purpose is to create smaller implementations
     /// in cases where the application is supposed to exit directly on decode error.
+    #[inline]
     fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
         input: I,
         c: ExitCtx,

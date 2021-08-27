@@ -19,10 +19,9 @@ impl EndpointFinishApi for TxContext {
     }
 
     fn finish_big_uint_raw(&self, handle: Handle) {
+        let bu_bytes = self.bi_get_unsigned_bytes(handle);
         let mut tx_output = self.tx_output_cell.borrow_mut();
-        let bi = tx_output.managed_types.big_int_map.get(handle);
-        let (_, bytes) = bi.to_bytes_be();
-        tx_output.result.result_values.push(bytes);
+        tx_output.result.result_values.push(bu_bytes.into_vec());
     }
 
     fn finish_managed_buffer_raw(&self, handle: Handle) {

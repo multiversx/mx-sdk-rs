@@ -1,7 +1,7 @@
 use crate::{TxContext, TxPanic};
 use alloc::vec::Vec;
 use elrond_wasm::api::{BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageWriteApi};
-use num_bigint::{BigInt, BigUint};
+use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::ToPrimitive;
 
 impl StorageReadApi for TxContext {
@@ -17,8 +17,11 @@ impl StorageReadApi for TxContext {
         }
     }
 
-    fn storage_load_big_uint_raw(&self, _key: &[u8]) -> Handle {
-        panic!("cannot call storage_load_big_uint_raw in debug mode");
+    fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {
+        let bytes = self.storage_load_vec_u8(key);
+        let bi = BigInt::from_bytes_be(Sign::Plus, bytes.as_slice());
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        tx_output.managed_types.big_int_map.insert_new_handle(bi)
     }
 
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle {
