@@ -1,5 +1,5 @@
 use crate::api::{ErrorApi, ManagedTypeApi};
-use crate::types::{BoxedBytes, ManagedBuffer};
+use crate::types::{BoxedBytes, ManagedBuffer, ManagedType};
 use crate::*;
 use elrond_codec::*;
 

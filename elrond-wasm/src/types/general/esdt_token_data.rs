@@ -1,7 +1,7 @@
 use crate::{
     abi::TypeAbi,
     api::ManagedTypeApi,
-    types::{BigUint, ManagedBytesTopDecodeInput},
+    types::{BigUint, ManagedBytesTopDecodeInput, ManagedType},
 };
 use alloc::string::String;
 use elrond_codec::*;

@@ -1,5 +1,5 @@
 use crate::api::ManagedTypeApi;
-use crate::types::{BigInt, BigUint, ManagedBufferNestedDecodeInput};
+use crate::types::{BigInt, BigUint, ManagedBufferNestedDecodeInput, ManagedType};
 use crate::Box;
 use crate::{api::EndpointArgumentApi, types::ManagedBuffer};
 use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
@@ -33,7 +33,7 @@ where
     #[inline]
     fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
         let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
-        ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
+        ManagedBuffer::from_raw_handle(self.api.clone(), mbuf_handle)
     }
 
     #[inline]

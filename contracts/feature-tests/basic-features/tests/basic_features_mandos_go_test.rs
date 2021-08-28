@@ -29,8 +29,18 @@ fn count_ones_go() {
 }
 
 #[test]
+fn crypto_elliptic_curves_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
+}
+
+#[test]
 fn crypto_keccak256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
+}
+
+#[test]
+fn crypto_ripemd160_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
 }
 
 #[test]
@@ -164,6 +174,46 @@ fn get_esdt_local_roles_go() {
 }
 
 #[test]
+fn log2_func_go() {
+    elrond_wasm_debug::mandos_go("mandos/log2_func.scen.json");
+}
+
+#[test]
+fn managed_buffer_concat_1_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
+}
+
+#[test]
+fn managed_buffer_concat_2_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_2.scen.json");
+}
+
+#[test]
+fn managed_buffer_eq_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_eq.scen.json");
+}
+
+#[test]
+fn managed_buffer_overwrite_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_overwrite.scen.json");
+}
+
+#[test]
+fn managed_buffer_slice_1_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_1.scen.json");
+}
+
+#[test]
+fn managed_buffer_slice_2_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_2.scen.json");
+}
+
+#[test]
+fn managed_vec_push_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_vec_push.scen.json");
+}
+
+#[test]
 fn only_owner_go() {
     elrond_wasm_debug::mandos_go("mandos/only_owner.scen.json");
 }
@@ -179,6 +229,11 @@ fn panic_go() {
 }
 
 #[test]
+fn pow_func_go() {
+    elrond_wasm_debug::mandos_go("mandos/pow_func.scen.json");
+}
+
+#[test]
 fn return_codes_go() {
     elrond_wasm_debug::mandos_go("mandos/return_codes.scen.json");
 }
@@ -191,6 +246,11 @@ fn sc_properties_go() {
 #[test]
 fn sc_result_go() {
     elrond_wasm_debug::mandos_go("mandos/sc_result.scen.json");
+}
+
+#[test]
+fn sqrt_go() {
+    elrond_wasm_debug::mandos_go("mandos/sqrt.scen.json");
 }
 
 #[test]
@@ -269,6 +329,11 @@ fn storage_mapper_single_value_go() {
 }
 
 #[test]
+fn storage_mapper_token_attributes_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_token_attributes.scen.json");
+}
+
+#[test]
 fn storage_mapper_vec_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_vec.scen.json");
 }
@@ -306,19 +371,4 @@ fn storage_usize_bad_go() {
 #[test]
 fn storage_vec_u8_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_vec_u8.scen.json");
-}
-
-#[test]
-fn sqrt() {
-    elrond_wasm_debug::mandos_go("mandos/sqrt.scen.json");
-}
-
-#[test]
-fn log2() {
-    elrond_wasm_debug::mandos_go("mandos/log2_func.scen.json");
-}
-
-#[test]
-fn pow() {
-    elrond_wasm_debug::mandos_go("mandos/pow_func.scen.json");
 }
