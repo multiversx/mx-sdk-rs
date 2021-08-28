@@ -279,7 +279,7 @@ mod sample_adder {
             elrond_wasm::io::serialize_contract_call_arg(
                 amount,
                 ___contract_call___.get_mut_arg_buffer(),
-                ___api___.clone(),
+                ___api___.error_api(),
             );
             ___contract_call___
         }
@@ -598,23 +598,24 @@ mod sample_adder {
         type TypeManager = SA::ProxyTypeManager;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
-        type ErrorApi = SA;
+        type ErrorApi = SA::ErrorApi;
+
         fn new_cb_proxy_obj(api: SA) -> Self {
             CallbackProxyObj { api }
         }
-        fn into_api(self) -> Self::ErrorApi {
-            self.api
+        fn cb_error_api(self) -> Self::ErrorApi {
+            self.api.error_api()
         }
     }
 
     pub trait CallbackProxy: elrond_wasm::api::CallbackProxyObjApi + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackCall {
-            let ___api___ = self.into_api();
+            let ___api___ = self.cb_error_api();
             let mut ___closure_arg_buffer___ = elrond_wasm::types::ArgBuffer::new();
             elrond_wasm::io::serialize_contract_call_arg(
                 caller,
                 &mut ___closure_arg_buffer___,
-                ___api___.clone(),
+                ___api___,
             );
             elrond_wasm::types::CallbackCall::from_arg_buffer(
                 &b"my_callback"[..],

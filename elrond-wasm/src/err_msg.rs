@@ -21,7 +21,9 @@ pub const STORAGE_KEY_ENCODE_ERROR: &[u8] = b"storage key encode error: ";
 pub const FINISH_ENCODE_ERROR: &[u8] = b"endpoint result encode error: ";
 pub const SERIALIZER_DECODE_ERROR: &[u8] = b"serializer decode error: ";
 pub const SERIALIZER_ENCODE_ERROR: &[u8] = b"serializer encode error: ";
+pub const LOG_TOPIC_ENCODE_ERROR: &[u8] = b"log topic encode error: ";
 pub const LOG_DATA_ENCODE_ERROR: &[u8] = b"log data encode error: ";
+pub const CONTRACT_CALL_ENCODE_ERROR: &[u8] = b"contract call encode error: ";
 
 pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";

@@ -149,9 +149,15 @@ extern "C" {
 impl SendApi for ArwenApiImpl {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
+    type ErrorApi = Self;
 
     #[inline]
     fn type_manager(&self) -> Self::ProxyTypeManager {
+        self.clone()
+    }
+
+    #[inline]
+    fn error_api(&self) -> Self::ErrorApi {
         self.clone()
     }
 
