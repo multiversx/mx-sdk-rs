@@ -1,4 +1,4 @@
-use super::ManagedBuffer;
+use super::{ManagedBuffer, ManagedType};
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
@@ -21,13 +21,23 @@ pub enum Sign {
     Plus,
 }
 
-impl<M: ManagedTypeApi> BigInt<M> {
+impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     #[doc(hidden)]
-    pub fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
         BigInt {
             handle: raw_handle,
             api,
         }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
+    #[inline]
+    fn type_manager(&self) -> M {
+        self.api.clone()
     }
 }
 

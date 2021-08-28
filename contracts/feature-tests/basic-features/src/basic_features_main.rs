@@ -15,6 +15,7 @@ pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macros;
 pub mod managed_buffer_features;
+pub mod managed_vec_features;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_linked_list;
@@ -41,6 +42,7 @@ pub trait BasicFeatures:
     + event_features::EventFeatures
     + macros::Macros
     + managed_buffer_features::ManagedBufferFeatures
+    + managed_vec_features::ManagedVecFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
     + storage_mapper_linked_list::LinkedListMapperFeatures

@@ -3,7 +3,7 @@ use elrond_codec::{DecodeError, EncodeError, TopDecode, TopEncode};
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     err_msg,
-    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput},
+    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
 };
 
 pub struct ManagedSerializer<M>

@@ -1,3 +1,4 @@
+use super::ManagedType;
 use crate::api::InvalidSliceError;
 use crate::{
     api::{Handle, ManagedTypeApi},
@@ -16,6 +17,23 @@ pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) api: M,
 }
 
+impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
+    #[inline]
+    fn from_raw_handle(api: M, handle: Handle) -> Self {
+        ManagedBuffer { handle, api }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
+    #[inline]
+    fn type_manager(&self) -> M {
+        self.api.clone()
+    }
+}
+
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn new_empty(api: M) -> Self {
@@ -31,21 +49,6 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             handle: api.mb_new_from_bytes(bytes),
             api,
         }
-    }
-
-    #[inline]
-    pub(crate) fn new_from_raw_handle(api: M, handle: Handle) -> Self {
-        ManagedBuffer { handle, api }
-    }
-
-    #[inline]
-    pub fn type_manager(&self) -> M {
-        self.api.clone()
-    }
-
-    #[doc(hidden)]
-    pub fn get_raw_handle(&self) -> Handle {
-        self.handle
     }
 
     #[inline]
@@ -83,7 +86,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             self.api
                 .mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
         if err_result.is_ok() {
-            Some(ManagedBuffer::new_from_raw_handle(
+            Some(ManagedBuffer::from_raw_handle(
                 self.api.clone(),
                 result_handle,
             ))

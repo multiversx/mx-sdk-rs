@@ -6,7 +6,7 @@ use elrond_codec::*;
 
 use crate::types::BoxedBytes;
 
-use super::BigUint;
+use super::{BigUint, ManagedType};
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -21,6 +21,26 @@ pub type EllipticCurveComponents<M> = (
 pub struct EllipticCurve<M: ManagedTypeApi> {
     pub(super) handle: Handle,
     pub(super) api: M,
+}
+
+impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
+    #[doc(hidden)]
+    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+        EllipticCurve {
+            handle: raw_handle,
+            api,
+        }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
+    #[inline]
+    fn type_manager(&self) -> M {
+        self.api.clone()
+    }
 }
 
 impl<M: ManagedTypeApi> EllipticCurve<M> {

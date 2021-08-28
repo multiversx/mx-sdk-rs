@@ -1,4 +1,4 @@
-use super::ManagedBuffer;
+use super::{ManagedBuffer, ManagedType};
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
@@ -13,9 +13,9 @@ pub struct BigUint<M: ManagedTypeApi> {
     pub(crate) api: M,
 }
 
-impl<M: ManagedTypeApi> BigUint<M> {
+impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     #[doc(hidden)]
-    pub fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
         BigUint {
             handle: raw_handle,
             api,
@@ -23,12 +23,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 
     #[doc(hidden)]
-    pub fn get_raw_handle(&self) -> Handle {
+    fn get_raw_handle(&self) -> Handle {
         self.handle
     }
 
     #[inline]
-    pub fn type_manager(&self) -> M {
+    fn type_manager(&self) -> M {
         self.api.clone()
     }
 }
