@@ -7,6 +7,7 @@ pub mod big_int_methods;
 pub mod big_int_operators;
 pub mod block_info_features;
 pub mod blockchain_api_features;
+pub mod codec_err_test;
 pub mod crypto_features;
 pub mod echo;
 pub mod echo_managed;
@@ -33,6 +34,7 @@ pub trait BasicFeatures:
     + elliptic_curve_features::EllipticCurveFeatures
     + block_info_features::BlockInfoFeatures
     + blockchain_api_features::BlockchainApiFeatures
+    + codec_err_test::CodecErrorTest
     + crypto_features::CryptoFeatures
     + echo::EchoTypes
     + echo_managed::EchoManagedTypes

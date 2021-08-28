@@ -59,7 +59,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 
             match &arg.metadata.payment {
                 ArgPaymentMetadata::NotPayment => {
-                    arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.clone() })
+                    arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.error_api() })
                 },
                 ArgPaymentMetadata::PaymentAmount => {
                     payment_count += 1;
@@ -135,7 +135,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
 
             match &arg.metadata.payment {
                 ArgPaymentMetadata::NotPayment => {
-                    arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.clone() })
+                    arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.error_api() })
                 },
                 ArgPaymentMetadata::PaymentAmount => {
                     payment_count += 1;

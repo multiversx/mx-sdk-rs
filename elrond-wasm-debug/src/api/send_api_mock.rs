@@ -53,8 +53,13 @@ impl TxContext {
 impl SendApi for TxContext {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
+    type ErrorApi = Self;
 
     fn type_manager(&self) -> Self::ProxyTypeManager {
+        self.clone()
+    }
+
+    fn error_api(&self) -> Self::ErrorApi {
         self.clone()
     }
 

@@ -16,7 +16,7 @@ pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApi: ErrorApi + Clone + Sized {
+pub trait SendApi: Clone + Sized {
     type ProxyTypeManager: ManagedTypeApi + ErrorApi + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
@@ -27,7 +27,11 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         + Clone
         + 'static;
 
+    type ErrorApi: ErrorApi + ManagedTypeApi + Clone + 'static;
+
     fn type_manager(&self) -> Self::ProxyTypeManager;
+
+    fn error_api(&self) -> Self::ErrorApi;
 
     /// Required for ESDTNFTTransfer.
     /// Same as the implementation from BlockchainApi.
