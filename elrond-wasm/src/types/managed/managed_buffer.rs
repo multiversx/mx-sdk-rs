@@ -114,9 +114,10 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
-        // TODO: Optimize!!!
+        let clone_handle = self.api.mb_new_empty();
+        self.api.mb_append(clone_handle, self.handle);
         ManagedBuffer {
-            handle: self.api.mb_new_from_bytes(self.to_boxed_bytes().as_slice()),
+            handle: clone_handle,
             api: self.api.clone(),
         }
     }

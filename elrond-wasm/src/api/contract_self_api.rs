@@ -30,7 +30,7 @@ pub trait ContractBase: Sized {
 
     type CryptoApi: CryptoApi + Clone + 'static;
 
-    type LogApi: LogApi + ErrorApi + Clone + 'static;
+    type LogApi: LogApi + ErrorApi + ManagedTypeApi + Clone + 'static;
 
     type ErrorApi: ErrorApi + Clone + 'static;
 

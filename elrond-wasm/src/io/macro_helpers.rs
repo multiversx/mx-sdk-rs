@@ -21,7 +21,7 @@ where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
     let (api, arg_id) = ctx;
-    signal_arg_de_error(&api, arg_id, de_err)
+    signal_arg_de_error(api, arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.
