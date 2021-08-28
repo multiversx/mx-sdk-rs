@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -22,59 +23,48 @@
             "txId": "1",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "managed_vec_push",
+                "function": "echo_managed_address",
                 "arguments": [
-                    "biguint:1",
-                    "2"
+                    "address:a1"
                 ]
             },
             "expect": {
-                "out": [ "biguint:1|biguint:2" ]
+                "out": [
+                    "address:a1"
+                ],
+                "status": ""
             }
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "txId": "address-eq",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "managed_vec_push",
+                "function": "managed_address_eq",
                 "arguments": [
-                    "",
-                    "2"
+                    "address:a1",
+                    "address:a1"
                 ]
             },
             "expect": {
-                "out": [ "biguint:2" ]
+                "out": [ "true" ],
+                "status": ""
             }
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "txId": "address-not-eq",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "managed_vec_push",
+                "function": "managed_address_eq",
                 "arguments": [
-                    "biguint:1",
-                    ""
+                    "address:a1",
+                    "address:a2"
                 ]
             },
             "expect": {
-                "out": [ "biguint:1|biguint:0" ]
-            }
-        },
-        {
-            "step": "scQuery",
-            "txId": "4",
-            "tx": {
-                "to": "sc:basic-features",
-                "function": "managed_vec_push",
-                "arguments": [
-                    "",
-                    ""
-                ]
-            },
-            "expect": {
-                "out": [ "biguint:0" ]
+                "out": [ "false" ],
+                "status": ""
             }
         }
     ]
