@@ -107,5 +107,8 @@ fn storage_set_exit<A>(api: A, encode_err: EncodeError) -> !
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    api.signal_error(encode_err.message_bytes())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::STORAGE_ENCODE_ERROR);
+    message_buffer.append_bytes(encode_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

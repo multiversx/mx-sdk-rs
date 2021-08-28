@@ -1,6 +1,6 @@
 use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::err_msg;
-use crate::types::{BigInt, BigUint, BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput};
+use crate::types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput};
 use alloc::boxed::Box;
 use elrond_codec::*;
 
@@ -114,7 +114,8 @@ fn storage_get_exit<A>(api: A, de_err: DecodeError) -> !
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    let decode_err_message =
-        BoxedBytes::from_concat(&[err_msg::STORAGE_DECODE_ERROR, de_err.message_bytes()][..]);
-    api.signal_error(decode_err_message.as_slice())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::STORAGE_DECODE_ERROR);
+    message_buffer.append_bytes(de_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }
