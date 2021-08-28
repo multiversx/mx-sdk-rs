@@ -5,7 +5,7 @@ use crate::{
     api::{Handle, ManagedTypeApi},
 };
 
-use super::{BigInt, BigUint, ManagedBuffer, ManagedType};
+use super::{BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedType};
 
 /// Types that implement this trait can fir inside a `ManagedVec`.
 pub trait ManagedVecItem<M: ManagedTypeApi>: NestedDecode + NestedEncode + TypeAbi {
@@ -67,3 +67,4 @@ macro_rules! impl_managed_type {
 impl_managed_type! {ManagedBuffer}
 impl_managed_type! {BigUint}
 impl_managed_type! {BigInt}
+impl_managed_type! {ManagedAddress}
