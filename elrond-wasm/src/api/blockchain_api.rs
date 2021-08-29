@@ -21,20 +21,26 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn type_manager(&self) -> Self::TypeManager;
 
+    fn get_caller(&self) -> Address;
+
+    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::from_address(self.type_manager(), self.get_caller())
+    }
+
     fn get_sc_address(&self) -> Address;
 
     fn get_sc_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::new_from_bytes(self.type_manager(), self.get_sc_address().as_array())
+        ManagedAddress::from_address(self.type_manager(), self.get_sc_address())
     }
 
     fn get_owner_address(&self) -> Address;
 
     fn get_owner_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::new_from_bytes(self.type_manager(), self.get_owner_address().as_array())
+        ManagedAddress::from_address(self.type_manager(), self.get_owner_address())
     }
 
     fn check_caller_is_owner(&self) {
-        if self.get_owner_address() != self.get_caller() {
+        if self.get_owner_address_managed() != self.get_caller_managed() {
             self.signal_error(b"Endpoint can only be called by owner");
         }
     }
@@ -42,12 +48,6 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     fn get_shard_of_address(&self, address: &Address) -> u32;
 
     fn is_smart_contract(&self, address: &Address) -> bool;
-
-    fn get_caller(&self) -> Address;
-
-    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::new_from_bytes(self.type_manager(), self.get_caller().as_array())
-    }
 
     fn get_balance(&self, address: &Address) -> BigUint<Self::TypeManager>;
 

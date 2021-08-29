@@ -67,6 +67,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
+    #[inline]
     pub fn load_slice(
         &self,
         starting_position: usize,
