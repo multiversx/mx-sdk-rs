@@ -97,9 +97,5 @@ fn test_vec_of_man_address_serialization() {
         ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]),
     ];
 
-    check_managed_top_encode_decode(
-        api,
-        v,
-        &[7u8; 64],
-    );
+    check_managed_top_encode_decode(api, v, &[7u8; 64]);
 }
