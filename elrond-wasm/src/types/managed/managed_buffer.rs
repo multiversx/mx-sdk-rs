@@ -43,7 +43,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn new_from_bytes(api: M, bytes: &[u8]) -> Self {
         ManagedBuffer {
             handle: api.mb_new_from_bytes(bytes),
@@ -95,14 +95,17 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
+    #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
         self.api.mb_overwrite(self.handle, value);
     }
 
+    #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
         self.api.mb_append(self.handle, other.handle);
     }
 
+    #[inline(always)]
     pub fn append_bytes(&mut self, slice: &[u8]) {
         self.api.mb_append_bytes(self.handle, slice);
     }

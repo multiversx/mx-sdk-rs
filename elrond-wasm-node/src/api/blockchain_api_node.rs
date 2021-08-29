@@ -1,12 +1,26 @@
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
-    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedType, TokenIdentifier,
-    H256,
+    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedType,
+    TokenIdentifier, H256,
 };
 
 extern "C" {
+    // managed buffer API
+    fn mBufferNew() -> i32;
+
+    // address utils
     fn getSCAddress(resultOffset: *mut u8);
+    #[cfg(feature = "managed-ei")]
+    fn managedSCAddress(resultHandle: i32);
+
     fn getOwnerAddress(resultOffset: *mut u8);
+    #[cfg(feature = "managed-ei")]
+    fn managedOwnerAddress(resultHandle: i32);
+
+    fn getCaller(resultOffset: *mut u8);
+    #[cfg(feature = "managed-ei")]
+    fn managedCaller(resultHandle: i32);
+
     fn getShardOfAddress(address_ptr: *const u8) -> i32;
     fn isSmartContract(address_ptr: *const u8) -> i32;
 
@@ -17,8 +31,6 @@ extern "C" {
     /// Currently not used.
     #[allow(dead_code)]
     fn getFunction(functionOffset: *const u8) -> i32;
-
-    fn getCaller(resultOffset: *mut u8);
 
     fn getGasLeft() -> i64;
     fn getBlockTimestamp() -> i64;
@@ -113,11 +125,31 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
+    #[cfg(feature = "managed-ei")]
+    fn get_sc_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        unsafe {
+            let handle = mBufferNew();
+            managedSCAddress(handle);
+            ManagedAddress::from_raw_handle(self.type_manager(), handle)
+        }
+    }
+
+    #[inline]
     fn get_owner_address(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getOwnerAddress(res.as_mut_ptr());
             res
+        }
+    }
+
+    #[inline]
+    #[cfg(feature = "managed-ei")]
+    fn get_owner_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        unsafe {
+            let handle = mBufferNew();
+            managedOwnerAddress(handle);
+            ManagedAddress::from_raw_handle(self.type_manager(), handle)
         }
     }
 
@@ -137,6 +169,16 @@ impl BlockchainApi for crate::ArwenApiImpl {
             let mut res = Address::zero();
             getCaller(res.as_mut_ptr());
             res
+        }
+    }
+
+    #[inline]
+    #[cfg(feature = "managed-ei")]
+    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        unsafe {
+            let handle = mBufferNew();
+            managedCaller(handle);
+            ManagedAddress::from_raw_handle(self.type_manager(), handle)
         }
     }
 
