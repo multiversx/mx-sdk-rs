@@ -1,8 +1,8 @@
 use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::storage::{self, StorageKey};
 use crate::types::{
-    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedType, TokenIdentifier, Vec,
-    H256,
+    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress, ManagedType,
+    TokenIdentifier, Vec, H256,
 };
 use alloc::boxed::Box;
 
@@ -23,7 +23,15 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn get_sc_address(&self) -> Address;
 
+    fn get_sc_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::new_from_bytes(self.type_manager(), self.get_sc_address().as_array())
+    }
+
     fn get_owner_address(&self) -> Address;
+
+    fn get_owner_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::new_from_bytes(self.type_manager(), self.get_owner_address().as_array())
+    }
 
     fn check_caller_is_owner(&self) {
         if self.get_owner_address() != self.get_caller() {
@@ -36,6 +44,10 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     fn is_smart_contract(&self, address: &Address) -> bool;
 
     fn get_caller(&self) -> Address;
+
+    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::new_from_bytes(self.type_manager(), self.get_caller().as_array())
+    }
 
     fn get_balance(&self, address: &Address) -> BigUint<Self::TypeManager>;
 

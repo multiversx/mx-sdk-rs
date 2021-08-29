@@ -11,7 +11,7 @@ use elrond_codec::{
 
 pub type ManagedAddress<M> = ManagedByteArray<M, 32>;
 
-const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";
+const DECODE_ERROR_BAD_LENGTH: &[u8] = b"bad array length";
 
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
