@@ -53,6 +53,10 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
     }
 
+    fn get_state_root_hash(&self) -> H256 {
+        panic!("get_state_root_hash not yet implemented")
+    }
+
     fn get_tx_hash(&self) -> H256 {
         self.tx_input_box.tx_hash.clone()
     }
