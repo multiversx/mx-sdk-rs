@@ -2,8 +2,7 @@ use super::StorageMapper;
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
-use crate::types::BoxedBytes;
+use crate::storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey};
 use core::marker::PhantomData;
 use elrond_codec::{TopDecode, TopEncode};
 
@@ -14,7 +13,7 @@ where
     T: TopEncode + TopDecode + 'static,
 {
     api: SA,
-    key: BoxedBytes,
+    key: StorageKey<SA>,
     _phantom: core::marker::PhantomData<T>,
 }
 
@@ -23,10 +22,10 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
-    fn new(api: SA, key: BoxedBytes) -> Self {
+    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
             api,
-            key,
+            key: base_key,
             _phantom: PhantomData,
         }
     }
@@ -39,7 +38,7 @@ where
 {
     /// Retrieves current value from storage.
     pub fn get(&self) -> T {
-        storage_get(self.api.clone(), self.key.as_slice())
+        storage_get(self.api.clone(), &self.key)
     }
 
     /// Returns whether the storage managed by this mapper is empty.
@@ -49,7 +48,7 @@ where
 
     /// Saves argument to storage.
     pub fn set(&self, new_value: &T) {
-        storage_set(self.api.clone(), self.key.as_slice(), new_value);
+        storage_set(self.api.clone(), &self.key, new_value);
     }
 
     /// Saves argument to storage only if the storage is empty.
@@ -62,7 +61,7 @@ where
 
     /// Clears the storage for this mapper.
     pub fn clear(&self) {
-        self.api.storage_store_slice_u8(self.key.as_slice(), &[]);
+        storage_clear(self.api.clone(), &self.key);
     }
 
     /// Syntactic sugar, to more compactly express a get, update and set in one line.
@@ -76,7 +75,7 @@ where
     }
 
     pub fn raw_byte_length(&self) -> usize {
-        self.api.storage_load_len(self.key.as_slice())
+        storage_get_len(self.api.clone(), &self.key)
     }
 }
 

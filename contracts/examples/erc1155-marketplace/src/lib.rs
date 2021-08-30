@@ -398,7 +398,7 @@ pub trait Erc1155Marketplace {
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> SafeMapMapper<Self::Storage, TokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<Self::Storage, TokenIdentifier, BigUint>;
 
     // auction properties for each token
 
