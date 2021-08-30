@@ -7,7 +7,11 @@ use crate::{
 
 use super::{BigInt, BigUint, ManagedBuffer, ManagedType};
 
-/// Types that implement this trait can fir inside a `ManagedVec`.
+/// Types that implement this trait can be items inside a `ManagedVec`.
+/// All these types need a payload, i.e a representation that gets stored
+/// in the underlying managed buffer.
+/// Not all data needs to be stored as payload, for instance for most managed types
+/// the payload is just the handle, whereas the mai ndata is kept by the VM.
 pub trait ManagedVecItem<M: ManagedTypeApi>: NestedDecode + NestedEncode + TypeAbi {
     /// Size of the data stored in the underlying `ManagedBuffer`.
     const PAYLOAD_SIZE: usize;
