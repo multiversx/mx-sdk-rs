@@ -1,8 +1,8 @@
 use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::storage::{self, StorageKey};
 use crate::types::{
-    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress, ManagedType,
-    TokenIdentifier, Vec, H256,
+    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress, ManagedByteArray,
+    ManagedType, TokenIdentifier, Vec, H256,
 };
 use alloc::boxed::Box;
 
@@ -61,7 +61,18 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
         }
     }
 
+    fn get_state_root_hash(&self) -> H256;
+
+    #[inline]
+    fn get_state_root_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+        ManagedByteArray::new_from_bytes(self.type_manager(), self.get_state_root_hash().as_array())
+    }
+
     fn get_tx_hash(&self) -> H256;
+
+    fn get_tx_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+        ManagedByteArray::new_from_bytes(self.type_manager(), self.get_tx_hash().as_array())
+    }
 
     fn get_gas_left(&self) -> u64;
 
@@ -75,6 +86,10 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn get_block_random_seed(&self) -> Box<[u8; 48]>;
 
+    fn get_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
+        ManagedByteArray::new_from_bytes(self.type_manager(), &*self.get_block_random_seed())
+    }
+
     fn get_prev_block_timestamp(&self) -> u64;
 
     fn get_prev_block_nonce(&self) -> u64;
@@ -84,6 +99,10 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     fn get_prev_block_epoch(&self) -> u64;
 
     fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
+
+    fn get_prev_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
+        ManagedByteArray::new_from_bytes(self.type_manager(), &*self.get_prev_block_random_seed())
+    }
 
     fn get_current_esdt_nft_nonce(&self, address: &Address, token_id: &TokenIdentifier) -> u64;
 

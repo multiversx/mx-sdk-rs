@@ -1,7 +1,7 @@
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
-    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedType,
-    TokenIdentifier, H256,
+    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedAddress,
+    ManagedByteArray, ManagedType, TokenIdentifier, H256,
 };
 
 extern "C" {
@@ -47,6 +47,12 @@ extern "C" {
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
     fn getOriginalTxHash(resultOffset: *const u8);
+
+    // Managed versions of the above
+    fn managedGetPrevBlockRandomSeed(resultHandle: i32);
+    fn managedGetBlockRandomSeed(resultHandle: i32);
+    fn managedGetStateRootHash(resultHandle: i32);
+    fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
     fn bigIntNew(value: i64) -> i32;
@@ -191,11 +197,38 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
+    fn get_state_root_hash(&self) -> H256 {
+        unsafe {
+            let mut res = H256::zero();
+            getOriginalTxHash(res.as_mut_ptr());
+            res
+        }
+    }
+
+    #[inline]
+    fn get_state_root_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedGetStateRootHash(result_handle);
+            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+        }
+    }
+
+    #[inline]
     fn get_tx_hash(&self) -> H256 {
         unsafe {
             let mut res = H256::zero();
             getOriginalTxHash(res.as_mut_ptr());
             res
+        }
+    }
+
+    #[inline]
+    fn get_tx_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedGetOriginalTxHash(result_handle);
+            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 
@@ -234,6 +267,15 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
+    fn get_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedGetBlockRandomSeed(result_handle);
+            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+        }
+    }
+
+    #[inline]
     fn get_prev_block_timestamp(&self) -> u64 {
         unsafe { getPrevBlockTimestamp() as u64 }
     }
@@ -259,6 +301,15 @@ impl BlockchainApi for crate::ArwenApiImpl {
             let mut res = [0u8; 48];
             getPrevBlockRandomSeed(res.as_mut_ptr());
             Box::new(res)
+        }
+    }
+
+    #[inline]
+    fn get_prev_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedGetPrevBlockRandomSeed(result_handle);
+            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 
