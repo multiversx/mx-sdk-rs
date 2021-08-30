@@ -19,6 +19,11 @@ fn boxed_bytes_zeros_go() {
 }
 
 #[test]
+fn codec_err_go() {
+    elrond_wasm_debug::mandos_go("mandos/codec_err.scen.json");
+}
+
+#[test]
 fn count_ones_go() {
     elrond_wasm_debug::mandos_go("mandos/count_ones.scen.json");
 }

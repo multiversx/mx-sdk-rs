@@ -31,6 +31,11 @@ fn boxed_bytes_zeros_rs() {
 }
 
 #[test]
+fn codec_err_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/codec_err.scen.json", &contract_map());
+}
+
+#[test]
 fn count_ones_rs() {
     elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", &contract_map());
 }

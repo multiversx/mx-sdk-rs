@@ -19,20 +19,17 @@ where
     }
 }
 
-impl<'a, A> ErrorApi for CallDataArgLoader<'a, A>
-where
-    A: ManagedTypeApi + ErrorApi,
-{
-    #[inline]
-    fn signal_error(&self, message: &[u8]) -> ! {
-        self.api.signal_error(message)
-    }
-}
-
 impl<'a, A> DynArgInput<ManagedBytesTopDecodeInput<A>> for CallDataArgLoader<'a, A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
+    type ErrorApi = A;
+
+    #[inline]
+    fn error_api(&self) -> Self::ErrorApi {
+        self.api.clone()
+    }
+
     #[inline]
     fn has_next(&self) -> bool {
         self.deser.has_next()
@@ -43,8 +40,8 @@ where
             Ok(Some(arg_bytes)) => {
                 ManagedBytesTopDecodeInput::new(self.api.clone(), arg_bytes.into())
             },
-            Ok(None) => self.signal_error(err_msg::ARG_WRONG_NUMBER),
-            Err(sc_err) => self.signal_error(sc_err.as_bytes()),
+            Ok(None) => self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER),
+            Err(sc_err) => self.error_api().signal_error(sc_err.as_bytes()),
         }
     }
 }

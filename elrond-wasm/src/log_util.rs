@@ -1,11 +1,15 @@
 use elrond_codec::{EncodeError, TopEncode};
 
-use crate::{api::ErrorApi, types::BoxedBytes};
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    err_msg,
+    types::{BoxedBytes, ManagedBuffer},
+};
 
 pub fn serialize_log_data<T, EA>(data: T, api: EA) -> BoxedBytes
 where
     T: TopEncode,
-    EA: ErrorApi + Clone + 'static,
+    EA: ErrorApi + ManagedTypeApi + Clone + 'static,
 {
     let mut result = BoxedBytes::empty();
     data.top_encode_or_exit(&mut result, api, serialize_log_data_exit);
@@ -15,7 +19,10 @@ where
 #[inline(always)]
 fn serialize_log_data_exit<EA>(api: EA, encode_err: EncodeError) -> !
 where
-    EA: ErrorApi + 'static,
+    EA: ErrorApi + ManagedTypeApi + 'static,
 {
-    api.signal_error(encode_err.message_bytes())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::LOG_DATA_ENCODE_ERROR);
+    message_buffer.append_bytes(encode_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }
