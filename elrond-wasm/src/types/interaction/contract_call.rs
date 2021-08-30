@@ -1,4 +1,4 @@
-use crate::api::ESDT_MULTI_TRANSFER_STRING;
+use crate::api::{ErrorApi, ESDT_MULTI_TRANSFER_STRING};
 use crate::types::{
     Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, EsdtTokenPayment, TokenIdentifier,
 };
@@ -365,7 +365,7 @@ where
         };
 
         if let Err(e) = result {
-            self.api.signal_error(e);
+            self.api.error_api().signal_error(e);
         }
     }
 
@@ -380,7 +380,7 @@ where
         );
 
         if let Err(e) = result {
-            self.api.signal_error(e);
+            self.api.error_api().signal_error(e);
         }
     }
 }

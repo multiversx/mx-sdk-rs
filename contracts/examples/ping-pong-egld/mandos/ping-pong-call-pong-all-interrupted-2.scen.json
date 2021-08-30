@@ -22,7 +22,7 @@
                 "value": "0",
                 "function": "pongAll",
                 "arguments": [],
-                "gasLimit": "9,000,000",
+                "gasLimit": "8,000,000",
                 "gasPrice": "0"
             },
             "expect": {

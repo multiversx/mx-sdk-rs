@@ -30,20 +30,17 @@ where
     }
 }
 
-impl<A> ErrorApi for BytesArgLoader<A>
-where
-    A: ManagedTypeApi + ErrorApi,
-{
-    #[inline]
-    fn signal_error(&self, message: &[u8]) -> ! {
-        self.api.signal_error(message)
-    }
-}
-
 impl<A> DynArgInput<ManagedBytesTopDecodeInput<A>> for BytesArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
+    type ErrorApi = A;
+
+    #[inline]
+    fn error_api(&self) -> Self::ErrorApi {
+        self.api.clone()
+    }
+
     #[inline]
     fn has_next(&self) -> bool {
         self.next_index < self.bytes_vec.len()
@@ -51,7 +48,7 @@ where
 
     fn next_arg_input(&mut self) -> ManagedBytesTopDecodeInput<A> {
         if !self.has_next() {
-            self.signal_error(err_msg::ARG_WRONG_NUMBER);
+            self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER);
         }
 
         // consume from the vector, get owned bytes

@@ -50,9 +50,9 @@ pub trait CallbackProxyObjApi {
 
     type SendApi: SendApi<ProxyTypeManager = Self::TypeManager> + Clone + 'static;
 
-    type ErrorApi: ErrorApi + Clone + 'static;
+    type ErrorApi: ManagedTypeApi + ErrorApi + Clone + 'static;
 
-    fn new_cb_proxy_obj(api: Self::ErrorApi) -> Self;
+    fn new_cb_proxy_obj(api: Self::SendApi) -> Self;
 
-    fn into_api(self) -> Self::ErrorApi;
+    fn cb_error_api(self) -> Self::ErrorApi;
 }

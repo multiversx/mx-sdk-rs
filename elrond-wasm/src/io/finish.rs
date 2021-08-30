@@ -2,6 +2,7 @@ use elrond_codec::TryStaticCast;
 
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
 use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
+use crate::err_msg;
 use crate::types::{BigInt, BigUint, ManagedBuffer};
 
 struct ApiOutputAdapter<FA>
@@ -100,9 +101,12 @@ where
 }
 
 #[inline(always)]
-fn finish_exit<FA>(api: FA, en_err: EncodeError) -> !
+fn finish_exit<FA>(api: FA, encode_err: EncodeError) -> !
 where
     FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
 {
-    api.signal_error(en_err.message_bytes())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::FINISH_ENCODE_ERROR);
+    message_buffer.append_bytes(encode_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }
