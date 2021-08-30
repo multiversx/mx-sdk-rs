@@ -30,6 +30,12 @@ impl StorageReadApi for TxContext {
         self.mb_new_from_bytes(bytes.as_slice())
     }
 
+    fn storage_load_managed_buffer_len(&self, key_handle: Handle) -> usize {
+        let key_bytes = self.mb_to_boxed_bytes(key_handle);
+        let bytes = self.storage_load_vec_u8(key_bytes.as_slice());
+        bytes.len()
+    }
+
     fn storage_load_u64(&self, key: &[u8]) -> u64 {
         let value = self.storage_load_vec_u8(key);
         let bu = BigUint::from_bytes_be(value.as_slice());
@@ -81,6 +87,11 @@ impl StorageWriteApi for TxContext {
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         let value_bytes = self.mb_to_boxed_bytes(value_handle);
         self.storage_store_slice_u8(key_bytes.as_slice(), value_bytes.as_slice());
+    }
+
+    fn storage_store_managed_buffer_clear(&self, key_handle: Handle) {
+        let key_bytes = self.mb_to_boxed_bytes(key_handle);
+        self.storage_store_slice_u8(key_bytes.as_slice(), &[]);
     }
 
     fn storage_store_u64(&self, key: &[u8], value: u64) {

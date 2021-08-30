@@ -1,13 +1,13 @@
+use elrond_codec::{TopDecode, TopEncode};
+
 use super::StorageMapper;
 use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
-use crate::storage::{storage_get, storage_set};
-use crate::types::BoxedBytes;
+use crate::storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey};
 use crate::types::TokenIdentifier;
-use alloc::vec::Vec;
-use elrond_codec::NestedEncode;
 
 const MAPPING_SUFFIX: &[u8] = b".mapping";
 const COUNTER_SUFFIX: &[u8] = b".counter";
+const ATTR_SUFFIX: &[u8] = b".attr";
 
 const VALUE_ALREADY_SET_ERROR_MESSAGE: &[u8] =
     b"A value was already set for this token ID and token nonce";
@@ -26,15 +26,15 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     api: SA,
-    main_key: BoxedBytes,
+    base_key: StorageKey<SA>,
 }
 
 impl<SA> StorageMapper<SA> for TokenAttributesMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    fn new(api: SA, main_key: BoxedBytes) -> Self {
-        TokenAttributesMapper { api, main_key }
+    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+        TokenAttributesMapper { api, base_key }
     }
 }
 
@@ -42,7 +42,7 @@ impl<SA> TokenAttributesMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    pub fn set<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
+    pub fn set<T: TopEncode + TopDecode>(
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
@@ -73,7 +73,7 @@ where
     }
 
     ///Use carefully. Update should be used mainly when backed up by the protocol.
-    pub fn update<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
+    pub fn update<T: TopEncode + TopDecode>(
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
@@ -119,11 +119,7 @@ where
         self.is_empty_token_attributes_value(mapping, token_nonce)
     }
 
-    pub fn get<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
-        &self,
-        token_id: &TokenIdentifier,
-        token_nonce: u64,
-    ) -> T {
+    pub fn get<T: TopEncode + TopDecode>(&self, token_id: &TokenIdentifier, token_nonce: u64) -> T {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
             self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
@@ -147,81 +143,63 @@ where
         !self.is_empty_token_attributes_value(mapping, token_nonce)
     }
 
-    fn build_key_token_id_counter(&self) -> Vec<u8> {
-        let mut bytes = self.main_key.as_slice().to_vec();
-        bytes.extend_from_slice(COUNTER_SUFFIX);
-        bytes
+    fn build_key_token_id_counter(&self) -> StorageKey<SA> {
+        let mut key = self.base_key.clone();
+        key.append_bytes(COUNTER_SUFFIX);
+        key
     }
 
-    fn build_key_token_id_mapping(&self, token_id: &TokenIdentifier) -> Vec<u8> {
-        let mut bytes = self.main_key.as_slice().to_vec();
-        bytes.extend_from_slice(MAPPING_SUFFIX);
-        if let Result::Err(encode_error) = token_id.dep_encode(&mut bytes) {
-            self.api.signal_error(encode_error.message_bytes());
-        }
-        bytes
+    fn build_key_token_id_mapping(&self, token_id: &TokenIdentifier) -> StorageKey<SA> {
+        let mut key = self.base_key.clone();
+        key.append_bytes(MAPPING_SUFFIX);
+        key.append_item(token_id);
+        key
     }
 
-    fn build_key_token_attr_value(&self, mapping: u8, token_nonce: u64) -> Vec<u8> {
-        let mut bytes = self.main_key.as_slice().to_vec();
-        if let Result::Err(encode_error) = mapping.dep_encode(&mut bytes) {
-            self.api.signal_error(encode_error.message_bytes());
-        }
-        if let Result::Err(encode_error) = token_nonce.dep_encode(&mut bytes) {
-            self.api.signal_error(encode_error.message_bytes());
-        }
-        bytes
+    fn build_key_token_attr_value(&self, mapping: u8, token_nonce: u64) -> StorageKey<SA> {
+        let mut key = self.base_key.clone();
+        key.append_bytes(ATTR_SUFFIX);
+        key.append_item(&mapping);
+        key.append_item(&token_nonce);
+        key
     }
 
     fn get_counter_value(&self) -> u8 {
-        storage_get(
-            self.api.clone(),
-            self.build_key_token_id_counter().as_slice(),
-        )
+        storage_get(self.api.clone(), &self.build_key_token_id_counter())
     }
 
     fn set_counter_value(&self, value: u8) {
-        storage_set(
-            self.api.clone(),
-            self.build_key_token_id_counter().as_slice(),
-            &value,
-        );
+        storage_set(self.api.clone(), &self.build_key_token_id_counter(), &value);
     }
 
     fn get_mapping_value(&self, token_id: &TokenIdentifier) -> u8 {
-        storage_get(
-            self.api.clone(),
-            self.build_key_token_id_mapping(token_id).as_slice(),
-        )
+        storage_get(self.api.clone(), &self.build_key_token_id_mapping(token_id))
     }
 
     fn set_mapping_value(&self, token_id: &TokenIdentifier, value: u8) {
         storage_set(
             self.api.clone(),
-            self.build_key_token_id_mapping(token_id).as_slice(),
+            &self.build_key_token_id_mapping(token_id),
             &value,
         );
     }
 
     fn is_empty_mapping_value(&self, token_id: &TokenIdentifier) -> bool {
-        self.api
-            .storage_load_len(self.build_key_token_id_mapping(token_id).as_slice())
-            == 0
+        storage_get_len(self.api.clone(), &self.build_key_token_id_mapping(token_id)) == 0
     }
 
-    fn get_token_attributes_value<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
+    fn get_token_attributes_value<T: TopEncode + TopDecode>(
         &self,
         mapping: u8,
         token_nonce: u64,
     ) -> T {
         storage_get(
             self.api.clone(),
-            self.build_key_token_attr_value(mapping, token_nonce)
-                .as_slice(),
+            &self.build_key_token_attr_value(mapping, token_nonce),
         )
     }
 
-    fn set_token_attributes_value<T: elrond_codec::TopEncode + elrond_codec::TopDecode>(
+    fn set_token_attributes_value<T: TopEncode + TopDecode>(
         &self,
         mapping: u8,
         token_nonce: u64,
@@ -229,25 +207,22 @@ where
     ) {
         storage_set(
             self.api.clone(),
-            self.build_key_token_attr_value(mapping, token_nonce)
-                .as_slice(),
+            &self.build_key_token_attr_value(mapping, token_nonce),
             value,
         );
     }
 
     fn is_empty_token_attributes_value(&self, mapping: u8, token_nonce: u64) -> bool {
-        self.api.storage_load_len(
-            self.build_key_token_attr_value(mapping, token_nonce)
-                .as_slice(),
+        storage_get_len(
+            self.api.clone(),
+            &self.build_key_token_attr_value(mapping, token_nonce),
         ) == 0
     }
 
     fn clear_token_attributes_value(&self, mapping: u8, token_nonce: u64) {
-        storage_set(
+        storage_clear(
             self.api.clone(),
-            self.build_key_token_attr_value(mapping, token_nonce)
-                .as_slice(),
-            &BoxedBytes::empty(),
+            &self.build_key_token_attr_value(mapping, token_nonce),
         );
     }
 }

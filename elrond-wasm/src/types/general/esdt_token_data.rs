@@ -1,4 +1,8 @@
-use crate::{abi::TypeAbi, api::ManagedTypeApi, types::{BigUint, ManagedBytesTopDecodeInput}};
+use crate::{
+    abi::TypeAbi,
+    api::ManagedTypeApi,
+    types::{BigUint, ManagedBytesTopDecodeInput},
+};
 use alloc::string::String;
 use elrond_codec::*;
 

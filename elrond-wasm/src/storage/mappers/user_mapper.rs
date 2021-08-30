@@ -2,8 +2,8 @@ use super::StorageMapper;
 use crate::abi::{TypeAbi, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
-use crate::types::{Address, BoxedBytes, MultiResultVec};
+use crate::storage::{storage_get, storage_get_len, storage_set, StorageKey};
+use crate::types::{Address, MultiResultVec};
 use alloc::vec::Vec;
 
 const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";
@@ -24,15 +24,15 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     api: SA,
-    main_key: BoxedBytes,
+    base_key: StorageKey<SA>,
 }
 
 impl<SA> StorageMapper<SA> for UserMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    fn new(api: SA, main_key: BoxedBytes) -> Self {
-        UserMapper { api, main_key }
+    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+        UserMapper { api, base_key }
     }
 }
 
@@ -40,45 +40,43 @@ impl<SA> UserMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    fn get_user_id_key(&self, address: &Address) -> BoxedBytes {
-        // TODO: build this more elegantly from elrond-codec
-        BoxedBytes::from_concat(&[
-            self.main_key.as_slice(),
-            ADDRESS_TO_ID_SUFFIX,
-            address.as_bytes(),
-        ])
+    fn get_user_id_key(&self, address: &Address) -> StorageKey<SA> {
+        let mut user_id_key = self.base_key.clone();
+        user_id_key.append_bytes(ADDRESS_TO_ID_SUFFIX);
+        user_id_key.append_item(address);
+        user_id_key
+    }
+
+    fn get_user_address_key(&self, id: usize) -> StorageKey<SA> {
+        let mut user_address_key = self.base_key.clone();
+        user_address_key.append_bytes(ID_TO_ADDRESS_SUFFIX);
+        user_address_key.append_item(&id);
+        user_address_key
+    }
+
+    fn get_user_count_key(&self) -> StorageKey<SA> {
+        let mut user_count_key = self.base_key.clone();
+        user_count_key.append_bytes(COUNT_SUFFIX);
+        user_count_key
     }
 
     /// Yields the user id for a given address.
     /// Will return 0 if the address is not known to the contract.
     pub fn get_user_id(&self, address: &Address) -> usize {
-        storage_get(self.api.clone(), self.get_user_id_key(address).as_slice())
+        storage_get(self.api.clone(), &self.get_user_id_key(address))
     }
 
     fn set_user_id(&self, address: &Address, id: usize) {
-        storage_set(
-            self.api.clone(),
-            self.get_user_id_key(address).as_slice(),
-            &id,
-        );
-    }
-
-    fn get_user_address_key(&self, id: usize) -> BoxedBytes {
-        // TODO: build this more elegantly from elrond-codec
-        let id_bytes = (id as u32).to_be_bytes();
-        BoxedBytes::from_concat(&[
-            self.main_key.as_slice(),
-            ID_TO_ADDRESS_SUFFIX,
-            &id_bytes[..],
-        ])
+        storage_set(self.api.clone(), &self.get_user_id_key(address), &id);
     }
 
     /// Yields the user address for a given id, if the id is valid.
     pub fn get_user_address(&self, id: usize) -> Option<Address> {
         let key = self.get_user_address_key(id);
-        // TODO: optimize, storage_load_len is currently called twice
-        if self.api.storage_load_len(key.as_slice()) > 0 {
-            Some(storage_get(self.api.clone(), key.as_slice()))
+        // TODO: optimize, storage_load_managed_buffer_len is currently called twice
+
+        if storage_get_len(self.api.clone(), &key) > 0 {
+            Some(storage_get(self.api.clone(), &key))
         } else {
             None
         }
@@ -87,45 +85,32 @@ where
     /// Yields the user address for a given id.
     /// Will cause a deserialization error if the id is invalid.
     pub fn get_user_address_unchecked(&self, id: usize) -> Address {
-        let key = self.get_user_address_key(id);
-        storage_get(self.api.clone(), key.as_slice())
+        storage_get(self.api.clone(), &self.get_user_address_key(id))
     }
 
     /// Yields the user address for a given id, if the id is valid.
     /// Otherwise returns the zero address (0x000...)
     pub fn get_user_address_or_zero(&self, id: usize) -> Address {
         let key = self.get_user_address_key(id);
-        // TODO: optimize, storage_load_len is currently called twice
-        if self.api.storage_load_len(key.as_slice()) > 0 {
-            storage_get(self.api.clone(), key.as_slice())
+        // TODO: optimize, storage_load_managed_buffer_len is currently called twice
+        if storage_get_len(self.api.clone(), &key) > 0 {
+            storage_get(self.api.clone(), &key)
         } else {
             Address::zero()
         }
     }
 
     fn set_user_address(&self, id: usize, address: &Address) {
-        storage_set(
-            self.api.clone(),
-            self.get_user_address_key(id).as_slice(),
-            address,
-        );
-    }
-
-    fn get_user_count_key(&self) -> BoxedBytes {
-        BoxedBytes::from_concat(&[self.main_key.as_slice(), COUNT_SUFFIX])
+        storage_set(self.api.clone(), &self.get_user_address_key(id), address);
     }
 
     /// Number of users.
     pub fn get_user_count(&self) -> usize {
-        storage_get(self.api.clone(), self.get_user_count_key().as_slice())
+        storage_get(self.api.clone(), &self.get_user_count_key())
     }
 
     fn set_user_count(&self, user_count: usize) {
-        storage_set(
-            self.api.clone(),
-            self.get_user_count_key().as_slice(),
-            &user_count,
-        );
+        storage_set(self.api.clone(), &self.get_user_count_key(), &user_count);
     }
 
     /// Yields the user id for a given address, or creates a new user id if there isn't one.
