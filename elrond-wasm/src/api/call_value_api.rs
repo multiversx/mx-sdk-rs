@@ -1,8 +1,6 @@
-use elrond_codec::Vec;
-
 use super::{ErrorApi, ManagedTypeApi};
 use crate::err_msg;
-use crate::types::{BigUint, EsdtTokenPayment, EsdtTokenType, TokenIdentifier};
+use crate::types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier};
 
 pub trait CallValueApi: ErrorApi + Sized {
     type TypeManager: ManagedTypeApi + 'static;
@@ -77,9 +75,11 @@ pub trait CallValueApi: ErrorApi + Sized {
 
     fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType;
 
-    fn get_all_esdt_transfers(&self) -> Vec<EsdtTokenPayment<Self::TypeManager>> {
+    fn get_all_esdt_transfers(
+        &self,
+    ) -> ManagedVec<Self::TypeManager, EsdtTokenPayment<Self::TypeManager>> {
         let num_transfers = self.esdt_num_transfers();
-        let mut transfers = Vec::with_capacity(num_transfers);
+        let mut transfers = ManagedVec::new_empty(self.type_manager());
 
         for i in 0..num_transfers {
             let token_type = self.esdt_token_type_by_index(i);
