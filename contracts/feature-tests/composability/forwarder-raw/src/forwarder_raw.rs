@@ -93,9 +93,15 @@ pub trait ForwarderRaw {
         endpoint_name: BoxedBytes,
         #[var_args] args: VarArgs<BoxedBytes>,
     ) {
-        self.forward_contract_call(to, TokenIdentifier::egld(), payment, endpoint_name, args)
-            .with_gas_limit(self.blockchain().get_gas_left() / 2)
-            .transfer_execute();
+        self.forward_contract_call(
+            to,
+            self.types().token_identifier_egld(),
+            payment,
+            endpoint_name,
+            args,
+        )
+        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .transfer_execute();
     }
 
     #[endpoint]

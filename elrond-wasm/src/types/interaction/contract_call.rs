@@ -40,7 +40,7 @@ where
 pub fn new_contract_call<SA, R>(
     api: SA,
     to: Address,
-    payment_token: TokenIdentifier,
+    payment_token: TokenIdentifier<SA::ProxyTypeManager>,
     payment_amount: BigUint<SA::ProxyTypeManager>,
     payment_nonce: u64,
     endpoint_name: BoxedBytes,
@@ -73,7 +73,7 @@ where
 
     pub fn with_token_transfer(
         mut self,
-        payment_token: TokenIdentifier,
+        payment_token: TokenIdentifier<SA::ProxyTypeManager>,
         payment_amount: BigUint<SA::ProxyTypeManager>,
     ) -> Self {
         self.payments[0].token_name = payment_token;
@@ -135,7 +135,7 @@ where
 
             // fungible ESDT
             let mut new_arg_buffer = ArgBuffer::new();
-            new_arg_buffer.push_argument_bytes(payment.token_name.as_esdt_identifier());
+            new_arg_buffer.push_argument_bytes(payment.token_name.to_esdt_identifier().as_slice());
             new_arg_buffer.push_argument_bytes(payment.amount.to_bytes_be().as_slice());
             new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
 
@@ -158,7 +158,7 @@ where
             // arg2 - quantity to transfer
             // arg3 - destination address
             let mut new_arg_buffer = ArgBuffer::new();
-            new_arg_buffer.push_argument_bytes(payment.token_name.as_esdt_identifier());
+            new_arg_buffer.push_argument_bytes(payment.token_name.to_esdt_identifier().as_slice());
             new_arg_buffer.push_argument_bytes(
                 elrond_codec::top_encode_no_err(&payment.token_nonce).as_slice(),
             );
@@ -188,7 +188,7 @@ where
         new_arg_buffer.push_argument_bytes(&self.payments.len().to_be_bytes()[..]);
 
         for payment in self.payments.iter() {
-            new_arg_buffer.push_argument_bytes(payment.token_name.as_esdt_identifier());
+            new_arg_buffer.push_argument_bytes(payment.token_name.to_esdt_identifier().as_slice());
             new_arg_buffer.push_argument_bytes(&payment.token_nonce.to_be_bytes()[..]);
             new_arg_buffer.push_argument_bytes(payment.amount.to_bytes_be().as_slice());
         }

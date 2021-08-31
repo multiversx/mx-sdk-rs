@@ -12,7 +12,7 @@ use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, T
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
-    pub token_name: TokenIdentifier,
+    pub token_name: TokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
 }
@@ -27,13 +27,13 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     pub fn no_payment(api: M) -> Self {
         EsdtTokenPayment {
             token_type: EsdtTokenType::Invalid,
-            token_name: TokenIdentifier::egld(),
+            token_name: TokenIdentifier::egld(api.clone()),
             token_nonce: 0,
             amount: BigUint::zero(api),
         }
     }
 
-    pub fn from(token_name: TokenIdentifier, token_nonce: u64, amount: BigUint<M>) -> Self {
+    pub fn from(token_name: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
         let token_type = if amount != 0 && token_name.is_valid_esdt_identifier() {
             if token_nonce == 0 {
                 EsdtTokenType::Fungible
@@ -85,7 +85,7 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
 
         EsdtTokenPayment {
             token_type,
-            token_name: TokenIdentifier::from(token_name_buf.to_boxed_bytes()),
+            token_name: TokenIdentifier::from(token_name_buf),
             token_nonce,
             amount,
         }
@@ -94,10 +94,11 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
         let mut arr: [u8; 16] = [0u8; 16];
 
-        let api = self.amount.type_manager();
-        let token_name_buf = ManagedBuffer::new_from_bytes(api, self.token_name.as_slice());
-
-        let token_id_handle_raw = token_name_buf.get_raw_handle().to_be_bytes();
+        let token_id_handle_raw = self
+            .token_name
+            .as_managed_buffer()
+            .get_raw_handle()
+            .to_be_bytes();
         arr[0..4].copy_from_slice(&token_id_handle_raw[..]);
 
         let nonce_raw = self.token_nonce.to_be_bytes();
