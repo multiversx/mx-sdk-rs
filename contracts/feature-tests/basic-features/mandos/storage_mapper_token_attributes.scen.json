@@ -124,8 +124,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:TokenAttributes|u8:1|u64:1": "biguint:10|u64:20|u32:2|u32:1|u32:2",
-                        "str:TokenAttributes|u8:2|u64:1": "biguint:20|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.attr|u8:1|u64:1": "biguint:10|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.attr|u8:2|u64:1": "biguint:20|u64:20|u32:2|u32:1|u32:2",
                         "str:TokenAttributes.counter": "2",
                         "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
                         "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
@@ -427,8 +427,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:TokenAttributes|u8:1|u64:1": "biguint:30|u64:20|u32:2|u32:1|u32:2",
-                        "str:TokenAttributes|u8:2|u64:1": "biguint:40|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.attr|u8:1|u64:1": "biguint:30|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.attr|u8:2|u64:1": "biguint:40|u64:20|u32:2|u32:1|u32:2",
                         "str:TokenAttributes.counter": "2",
                         "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
                         "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
