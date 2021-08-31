@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use elrond_wasm::{
     elrond_codec::{TopDecode, TopEncode},
-    types::{BigInt, BigUint, ManagedAddress, ManagedBuffer},
+    types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer},
 };
 use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode, TxContext};
 
@@ -94,8 +94,11 @@ fn test_vec_of_man_address_serialization() {
     let api = TxContext::dummy();
     let v = vec![
         ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]),
-        ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]),
+        ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]),
+        ManagedAddress::new_from_bytes(api.clone(), &[9u8; 32]),
     ];
 
-    check_managed_top_encode_decode(api, v, &[7u8; 64]);
+    let expected = BoxedBytes::from_concat(&[&[7u8; 32], &[8u8; 32], &[9u8; 32]]);
+
+    check_managed_top_encode_decode(api, v, expected.as_slice());
 }
