@@ -1,5 +1,5 @@
 use crate::TxContext;
-use elrond_wasm::types::{Address, BigUint, EsdtTokenData, TokenIdentifier, H256};
+use elrond_wasm::types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256};
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
     type Storage = Self;
@@ -119,11 +119,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     // TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
     fn get_esdt_balance(
         &self,
-        address: &Address,
+        address: &ManagedAddress<Self::TypeManager>,
         token: &TokenIdentifier,
         _nonce: u64,
     ) -> BigUint<Self::TypeManager> {
-        if address != &self.get_sc_address() {
+        if address != &self.get_sc_address_managed() {
             panic!(
                 "get_esdt_balance not yet implemented for accounts other than the contract itself"
             );
@@ -141,7 +141,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
 
     fn get_esdt_token_data(
         &self,
-        _address: &Address,
+        _address: &ManagedAddress<Self::TypeManager>,
         _token: &TokenIdentifier,
         _nonce: u64,
     ) -> EsdtTokenData<Self::Storage> {

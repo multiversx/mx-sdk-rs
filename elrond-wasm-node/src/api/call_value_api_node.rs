@@ -1,11 +1,14 @@
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier};
+use elrond_wasm::types::{
+    BigUint, BoxedBytes, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier,
+};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
+    #[cfg(feature = "managed-ei")]
     fn mBufferNew() -> i32;
 
     fn checkNoPayment();

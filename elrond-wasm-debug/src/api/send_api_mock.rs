@@ -1,6 +1,6 @@
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
-use elrond_wasm::api::{BlockchainApi, ContractBase, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{
     Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
 };
@@ -54,6 +54,7 @@ impl SendApi for TxContext {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
     type ErrorApi = Self;
+    type BlockchainApi = Self;
 
     fn type_manager(&self) -> Self::ProxyTypeManager {
         self.clone()
@@ -63,21 +64,8 @@ impl SendApi for TxContext {
         self.clone()
     }
 
-    fn get_sc_address(&self) -> Address {
-        BlockchainApi::get_sc_address(self)
-    }
-
-    fn get_gas_left(&self) -> u64 {
-        BlockchainApi::get_gas_left(self)
-    }
-
-    fn get_esdt_token_data(
-        &self,
-        address: &Address,
-        token: &TokenIdentifier,
-        nonce: u64,
-    ) -> elrond_wasm::types::EsdtTokenData<Self::ProxyTypeManager> {
-        BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+    fn blockchain(&self) -> Self::BlockchainApi {
+        self.clone()
     }
 
     fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, _data: &[u8]) {
@@ -171,7 +159,7 @@ impl SendApi for TxContext {
             to: to.clone(),
             call_value: amount_value,
             call_data: data.to_vec(),
-            tx_hash: self.blockchain().get_tx_hash(),
+            tx_hash: self.get_tx_hash(),
         });
         std::panic::panic_any(tx_output)
     }
@@ -259,12 +247,12 @@ impl SendApi for TxContext {
     }
 
     fn storage_store_tx_hash_key(&self, data: &[u8]) {
-        let tx_hash = self.blockchain().get_tx_hash();
+        let tx_hash = self.get_tx_hash();
         self.storage_store_slice_u8(tx_hash.as_bytes(), data);
     }
 
     fn storage_load_tx_hash_key(&self) -> BoxedBytes {
-        let tx_hash = self.blockchain().get_tx_hash();
+        let tx_hash = self.get_tx_hash();
         self.storage_load_boxed_bytes(tx_hash.as_bytes())
     }
 

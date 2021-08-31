@@ -52,12 +52,10 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     fn get_balance(&self, address: &Address) -> BigUint<Self::TypeManager>;
 
     fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> BigUint<Self::TypeManager> {
-        let sc_address = self.get_sc_address();
-
         if token.is_egld() {
-            self.get_balance(&sc_address)
+            self.get_balance(&self.get_sc_address())
         } else {
-            self.get_esdt_balance(&sc_address, token, nonce)
+            self.get_esdt_balance(&self.get_sc_address_managed(), token, nonce)
         }
     }
 
@@ -108,14 +106,14 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn get_esdt_balance(
         &self,
-        address: &Address,
+        address: &ManagedAddress<Self::TypeManager>,
         token_id: &TokenIdentifier,
         nonce: u64,
     ) -> BigUint<Self::TypeManager>;
 
     fn get_esdt_token_data(
         &self,
-        address: &Address,
+        address: &ManagedAddress<Self::TypeManager>,
         token_id: &TokenIdentifier,
         nonce: u64,
     ) -> EsdtTokenData<Self::TypeManager>;

@@ -1,4 +1,4 @@
-use crate::api::{ErrorApi, ESDT_MULTI_TRANSFER_STRING};
+use crate::api::{BlockchainApi, ErrorApi, ESDT_MULTI_TRANSFER_STRING};
 use crate::types::{
     Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, EsdtTokenPayment, TokenIdentifier,
 };
@@ -193,7 +193,7 @@ where
             new_arg_buffer.push_argument_bytes(payment.amount.to_bytes_be().as_slice());
         }
         new_arg_buffer.push_argument_bytes(self.endpoint_name.as_slice());
-        let recipient_addr = self.api.get_sc_address();
+        let recipient_addr = self.api.blockchain().get_sc_address();
 
         ContractCall {
             api: self.api,
@@ -209,7 +209,7 @@ where
     /// nft transfer is sent to self, sender = receiver
     #[cfg(not(feature = "legacy-nft-transfer"))]
     fn nft_transfer_recipient_address(api: &SA, _to: Address) -> Address {
-        api.get_sc_address()
+        api.blockchain().get_sc_address()
     }
 
     /// legacy nft transfer is sent to the actual intended destination
@@ -220,7 +220,7 @@ where
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            self.api.get_gas_left()
+            self.api.blockchain().get_gas_left()
         } else {
             self.explicit_gas_limit
         }
@@ -308,7 +308,7 @@ where
 
     fn resolve_gas_limit_with_leftover(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            let mut gas_left = self.api.get_gas_left();
+            let mut gas_left = self.api.blockchain().get_gas_left();
             if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
                 gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
             }
