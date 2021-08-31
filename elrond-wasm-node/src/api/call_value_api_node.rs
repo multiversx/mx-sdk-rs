@@ -124,7 +124,7 @@ impl CallValueApi for ArwenApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetMultiESDTCallValue(result_handle);
-            ManagedVec::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedVec::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 }

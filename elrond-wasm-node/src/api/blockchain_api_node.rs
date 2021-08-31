@@ -227,11 +227,11 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_state_root_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+    fn get_state_root_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetStateRootHash(result_handle);
-            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 
@@ -246,11 +246,11 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_tx_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+    fn get_tx_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetOriginalTxHash(result_handle);
-            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 
@@ -290,11 +290,11 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
+    fn get_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetBlockRandomSeed(result_handle);
-            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 
@@ -335,7 +335,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);
-            ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 
@@ -480,7 +480,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
         token: &TokenIdentifier<Self::TypeManager>,
         nonce: u64,
     ) -> EsdtTokenData<Self::Storage> {
-        let managed_token_id = token.into_managed_buffer();
+        let managed_token_id = token.as_managed_buffer();
         unsafe {
             let value_handle = bigIntNew(0);
             let properties_handle = mBufferNew();
