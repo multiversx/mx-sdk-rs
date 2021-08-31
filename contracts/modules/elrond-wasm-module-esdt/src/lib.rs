@@ -106,7 +106,7 @@ pub trait EsdtModule {
     }
 
     fn require_local_roles_set(&self, token_id: &TokenIdentifier) -> SCResult<()> {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
+        let roles = self.blockchain().get_esdt_local_roles(token_id);
         require!(
             roles.contains(&EsdtLocalRole::Mint) && roles.contains(&EsdtLocalRole::Burn),
             "Must set local roles first"

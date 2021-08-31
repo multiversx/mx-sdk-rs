@@ -27,6 +27,7 @@ pub trait ProxyObjApi {
 
     fn with_nft_nonce(self, nonce: u64) -> Self;
 
+    #[allow(clippy::type_complexity)]
     fn into_fields(
         self,
     ) -> (
