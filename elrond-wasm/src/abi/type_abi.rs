@@ -232,7 +232,7 @@ impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
     fn type_name() -> String {
         let mut repr = String::from("array");
         repr.push_str(N.to_string().as_str());
-        repr.push_str("<");
+        repr.push('<');
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr
