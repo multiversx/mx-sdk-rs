@@ -7,6 +7,7 @@ use crate::types::TokenIdentifier;
 
 const MAPPING_SUFFIX: &[u8] = b".mapping";
 const COUNTER_SUFFIX: &[u8] = b".counter";
+const ATTR_SUFFIX: &[u8] = b".attr";
 
 const VALUE_ALREADY_SET_ERROR_MESSAGE: &[u8] =
     b"A value was already set for this token ID and token nonce";
@@ -157,8 +158,7 @@ where
 
     fn build_key_token_attr_value(&self, mapping: u8, token_nonce: u64) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
-        // TODO: NAME ABSOLUTELY REQUIRED!!!!!!!!!!
-        // DANGER OF OVERLAP BETWEEN KEYS
+        key.append_bytes(ATTR_SUFFIX);
         key.append_item(&mapping);
         key.append_item(&token_nonce);
         key
