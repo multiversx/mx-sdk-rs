@@ -1,7 +1,7 @@
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
     Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
-    ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier, H256,
+    ManagedType, ManagedVec, TokenIdentifier, H256,
 };
 
 #[allow(unused)]
@@ -50,9 +50,13 @@ extern "C" {
     fn getOriginalTxHash(resultOffset: *const u8);
 
     // Managed versions of the above
+    #[cfg(feature = "managed-ei")]
     fn managedGetPrevBlockRandomSeed(resultHandle: i32);
+    #[cfg(feature = "managed-ei")]
     fn managedGetBlockRandomSeed(resultHandle: i32);
+    #[cfg(feature = "managed-ei")]
     fn managedGetStateRootHash(resultHandle: i32);
+    #[cfg(feature = "managed-ei")]
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
@@ -222,6 +226,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
+    #[cfg(feature = "managed-ei")]
     fn get_state_root_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
         unsafe {
             let result_handle = mBufferNew();
@@ -240,6 +245,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
+    #[cfg(feature = "managed-ei")]
     fn get_tx_hash_managed(&self) -> ManagedByteArray<Self::TypeManager, 32> {
         unsafe {
             let result_handle = mBufferNew();
@@ -283,6 +289,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
+    #[cfg(feature = "managed-ei")]
     fn get_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
         unsafe {
             let result_handle = mBufferNew();
@@ -321,7 +328,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_prev_block_random_seed_managed(&self) -> ManagedByteArray<Self::TypeManager, 48> {
+    #[cfg(feature = "managed-ei")]
+    fn get_prev_block_random_seed_managed(
+        &self,
+    ) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);
