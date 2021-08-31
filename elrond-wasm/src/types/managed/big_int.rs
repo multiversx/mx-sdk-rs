@@ -154,7 +154,7 @@ impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
 
 impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        dest.push_specialized(self, |else_output| {
+        dest.push_specialized((), self, |else_output| {
             self.to_signed_bytes_be().dep_encode(else_output)
         })
     }
@@ -162,7 +162,7 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
 
 impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -170,7 +170,9 @@ impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        input.read_specialized_or_exit(c, exit, |_, c| exit(c, DecodeError::UNSUPPORTED_OPERATION))
+        input.read_specialized_or_exit((), c, exit, |_, c| {
+            exit(c, DecodeError::UNSUPPORTED_OPERATION)
+        })
     }
 }
 

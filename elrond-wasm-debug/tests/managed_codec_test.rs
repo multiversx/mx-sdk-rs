@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use elrond_wasm::{
     elrond_codec::{TopDecode, TopEncode},
-    types::{BigInt, BigUint, ManagedBuffer},
+    types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer},
 };
 use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode, TxContext};
 
@@ -26,7 +26,7 @@ fn test_big_uint_serialization() {
 }
 
 #[test]
-fn test_big_uint_vec_serialization() {
+fn test_vec_of_big_uint_serialization() {
     let api = TxContext::dummy();
     let v = vec![
         BigUint::from_u32(api.clone(), 5u32),
@@ -45,7 +45,7 @@ fn test_big_int_serialization() {
 }
 
 #[test]
-fn test_big_int_vec_serialization() {
+fn test_vec_of_big_int_serialization() {
     let api = TxContext::dummy();
     let v = vec![
         BigInt::from_i32(api.clone(), 5),
@@ -67,7 +67,7 @@ fn test_man_buf_serialization() {
 }
 
 #[test]
-fn test_man_buf_vec_serialization() {
+fn test_vec_of_man_buf_serialization() {
     let api = TxContext::dummy();
     let v = vec![
         ManagedBuffer::new_from_bytes(api.clone(), &b"abc"[..]),
@@ -79,4 +79,26 @@ fn test_man_buf_vec_serialization() {
         v,
         &[0, 0, 0, 3, b'a', b'b', b'c', 0, 0, 0, 2, b'd', b'e'],
     );
+}
+
+#[test]
+fn test_man_address_serialization() {
+    let api = TxContext::dummy();
+    let v = ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]);
+
+    check_managed_top_encode_decode(api, v, &[7u8; 32]);
+}
+
+#[test]
+fn test_vec_of_man_address_serialization() {
+    let api = TxContext::dummy();
+    let v = vec![
+        ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]),
+        ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]),
+        ManagedAddress::new_from_bytes(api.clone(), &[9u8; 32]),
+    ];
+
+    let expected = BoxedBytes::from_concat(&[&[7u8; 32], &[8u8; 32], &[9u8; 32]]);
+
+    check_managed_top_encode_decode(api, v, expected.as_slice());
 }

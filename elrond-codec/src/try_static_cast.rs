@@ -30,6 +30,8 @@ pub trait TryStaticCast: Clone + 'static {
     }
 }
 
+impl TryStaticCast for () {}
+
 fn type_eq<T, U>() -> bool
 where
     T: 'static,

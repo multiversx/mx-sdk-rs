@@ -55,4 +55,9 @@ pub trait ManagedBufferFeatures {
     fn mbuffer_eq(&self, mb1: ManagedBuffer, mb2: ManagedBuffer) -> bool {
         mb1 == mb2
     }
+
+    #[endpoint]
+    fn managed_address_eq(&self, mb1: ManagedAddress, mb2: ManagedAddress) -> bool {
+        mb1 == mb2
+    }
 }
