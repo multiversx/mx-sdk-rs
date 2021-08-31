@@ -1,9 +1,10 @@
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
-    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedAddress,
-    ManagedByteArray, ManagedType, TokenIdentifier, H256,
+    Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
+    ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier, H256,
 };
 
+#[allow(unused)]
 extern "C" {
     // managed buffer API
     fn mBufferNew() -> i32;
@@ -105,6 +106,21 @@ extern "C" {
         tokenIDLen: i32,
         nonce: i64,
     ) -> i32;
+
+    #[cfg(feature = "managed-ei")]
+    fn managedGetESDTTokenData(
+        addressHandle: i32,
+        tokenIDHandle: i32,
+        nonce: i64,
+        valueHandle: i32,
+        propertiesHandle: i32,
+        hashHandle: i32,
+        nameHandle: i32,
+        attributesHandle: i32,
+        creatorHandle: i32,
+        royaltiesHandle: i32,
+        urisHandle: i32,
+    );
 }
 
 impl BlockchainApi for crate::ArwenApiImpl {
@@ -327,10 +343,11 @@ impl BlockchainApi for crate::ArwenApiImpl {
     #[inline]
     fn get_esdt_balance(
         &self,
-        address: &Address,
+        m_address: &ManagedAddress<Self::TypeManager>,
         token: &TokenIdentifier,
         nonce: u64,
     ) -> BigUint<Self::TypeManager> {
+        let address = m_address.to_address();
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetESDTExternalBalance(
@@ -345,13 +362,15 @@ impl BlockchainApi for crate::ArwenApiImpl {
         }
     }
 
-    #[inline]
+    #[cfg(not(feature = "managed-ei"))]
     fn get_esdt_token_data(
         &self,
-        address: &Address,
+        m_address: &ManagedAddress<Self::TypeManager>,
         token: &TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenData<Self::Storage> {
+    ) -> EsdtTokenData<Self::TypeManager> {
+        elrond_wasm::types::BoxedBytes;
+        let address = m_address.to_address();
         unsafe {
             let value_handle = bigIntNew(0);
             let mut properties = [0u8; 2]; // always 2 bytes
@@ -363,7 +382,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
-            let mut name_buffer = BoxedBytes::allocate(name_len);
+            let mut name_bytes = BoxedBytes::allocate(name_len);
 
             let attr_len = getESDTNFTAttributeLength(
                 address.as_ref().as_ptr(),
@@ -371,7 +390,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
-            let mut attr_buffer = BoxedBytes::allocate(attr_len);
+            let mut attr_bytes = BoxedBytes::allocate(attr_len);
 
             // Current implementation of the underlying API only provides one URI
             // In the future, this might be extended to multiple URIs per token,
@@ -382,7 +401,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
-            let mut uris_buffer = BoxedBytes::allocate(uris_len);
+            let mut uri_bytes = BoxedBytes::allocate(uris_len);
 
             let mut creator = Address::zero();
             let royalties_handle = bigIntNew(0);
@@ -395,11 +414,11 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 value_handle,
                 properties.as_mut_ptr(),
                 hash.as_mut_ptr(),
-                name_buffer.as_mut_ptr(),
-                attr_buffer.as_mut_ptr(),
+                name_bytes.as_mut_ptr(),
+                attr_bytes.as_mut_ptr(),
                 creator.as_mut_ptr(),
                 royalties_handle,
-                uris_buffer.as_mut_ptr(),
+                uri_bytes.as_mut_ptr(),
             );
 
             // Fungible always have a nonce of 0, so we check nonce to figure out the type
@@ -414,19 +433,88 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 EsdtTokenType::NonFungible
             };
 
-            // Token is frozen is properties is not 0
+            // Token is frozen if properties are not 0
             let frozen = properties[0] == 0 && properties[1] == 0;
+
+            let mut uris_vec = ManagedVec::new_empty(self.type_manager());
+            uris_vec.push(ManagedBuffer::new_from_bytes(
+                self.type_manager(),
+                uri_bytes.as_slice(),
+            ));
 
             EsdtTokenData {
                 token_type,
-                amount: BigUint::from_raw_handle(self.storage_manager(), value_handle),
+                amount: BigUint::from_raw_handle(self.type_manager(), value_handle),
                 frozen,
-                hash,
-                name: name_buffer,
-                attributes: attr_buffer,
-                creator,
-                royalties: BigUint::from_raw_handle(self.storage_manager(), royalties_handle),
-                uris: [uris_buffer].to_vec(),
+                hash: ManagedBuffer::new_from_bytes(self.type_manager(), hash.as_slice()),
+                name: ManagedBuffer::new_from_bytes(self.type_manager(), name_bytes.as_slice()),
+                attributes: ManagedBuffer::new_from_bytes(
+                    self.type_manager(),
+                    attr_bytes.as_slice(),
+                ),
+                creator: ManagedAddress::from_address(self.type_manager(), creator),
+                royalties: BigUint::from_raw_handle(self.type_manager(), royalties_handle),
+                uris: uris_vec,
+            }
+        }
+    }
+
+    #[cfg(feature = "managed-ei")]
+    fn get_esdt_token_data(
+        &self,
+        address: &ManagedAddress<Self::TypeManager>,
+        token: &TokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenData<Self::Storage> {
+        let managed_token_id =
+            ManagedBuffer::new_from_bytes(self.type_manager(), token.as_esdt_identifier());
+        unsafe {
+            let value_handle = bigIntNew(0);
+            let properties_handle = mBufferNew();
+            let hash_handle = mBufferNew();
+            let name_handle = mBufferNew();
+            let attributes_handle = mBufferNew();
+            let creator_handle = mBufferNew();
+            let royalties_handle = bigIntNew(0);
+            let uris_handle = mBufferNew();
+
+            managedGetESDTTokenData(
+                address.get_raw_handle(),
+                managed_token_id.get_raw_handle(),
+                nonce as i64,
+                value_handle,
+                properties_handle,
+                hash_handle,
+                name_handle,
+                attributes_handle,
+                creator_handle,
+                royalties_handle,
+                uris_handle,
+            );
+
+            let token_type = if nonce == 0 {
+                EsdtTokenType::Fungible
+            } else {
+                EsdtTokenType::NonFungible
+            };
+
+            // here we trust Arwen that it always gives us a properties buffer of length 2
+            let properties_buffer =
+                ManagedBuffer::from_raw_handle(self.type_manager(), properties_handle);
+            let mut properties_bytes = [0u8; 2];
+            let _ = properties_buffer.load_slice(0, &mut properties_bytes[..]);
+            let frozen = properties_bytes[0] == 0 && properties_bytes[1] == 0; // token is frozen if properties are not 0
+
+            EsdtTokenData {
+                token_type,
+                amount: BigUint::from_raw_handle(self.type_manager(), value_handle),
+                frozen,
+                hash: ManagedBuffer::from_raw_handle(self.type_manager(), hash_handle),
+                name: ManagedBuffer::from_raw_handle(self.type_manager(), name_handle),
+                attributes: ManagedBuffer::from_raw_handle(self.type_manager(), attributes_handle),
+                creator: ManagedAddress::from_raw_handle(self.type_manager(), creator_handle),
+                royalties: BigUint::from_raw_handle(self.type_manager(), royalties_handle),
+                uris: ManagedVec::from_raw_handle(self.type_manager(), uris_handle),
             }
         }
     }

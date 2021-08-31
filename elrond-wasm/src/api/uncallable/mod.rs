@@ -1,4 +1,5 @@
 mod big_int_api_uncallable;
+mod blockchain_api_uncallable;
 mod elliptic_curve_api_uncallable;
 mod error_api_uncallable;
 mod managed_buffer_api_uncallable;

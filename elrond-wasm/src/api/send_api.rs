@@ -1,6 +1,6 @@
 use elrond_codec::{TopDecode, TopEncode};
 
-use super::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
+use super::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::{
     types::{
         Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
@@ -29,26 +29,16 @@ pub trait SendApi: Clone + Sized {
 
     type ErrorApi: ErrorApi + ManagedTypeApi + Clone + 'static;
 
+    type BlockchainApi: BlockchainApi<Storage = Self::ProxyStorage, TypeManager = Self::ProxyTypeManager>
+        + Clone
+        + 'static;
+
     fn type_manager(&self) -> Self::ProxyTypeManager;
 
     fn error_api(&self) -> Self::ErrorApi;
 
-    /// Required for ESDTNFTTransfer.
-    /// Same as the implementation from BlockchainApi.
-    fn get_sc_address(&self) -> Address;
-
-    /// To be used internally by the SendApi implementation.
-    /// Do not use directly from contracts. It might be removed from this trait at some point or reworked.
-    fn get_gas_left(&self) -> u64;
-
-    /// Used internally for sell_nft.
-    /// Do not use directly from contracts.
-    fn get_esdt_token_data(
-        &self,
-        address: &Address,
-        token: &TokenIdentifier,
-        nonce: u64,
-    ) -> crate::types::EsdtTokenData<Self::ProxyTypeManager>;
+    /// Required by some of the methods.
+    fn blockchain(&self) -> Self::BlockchainApi;
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
@@ -178,7 +168,7 @@ pub trait SendApi: Clone + Sized {
             }
 
             self.async_call_raw(
-                &self.get_sc_address(),
+                &self.blockchain().get_sc_address(),
                 &BigUint::zero(self.type_manager()),
                 serializer.as_slice(),
             );
@@ -206,7 +196,7 @@ pub trait SendApi: Clone + Sized {
         }
 
         self.async_call_raw(
-            &self.get_sc_address(),
+            &self.blockchain().get_sc_address(),
             &BigUint::zero(self.type_manager()),
             serializer.as_slice(),
         );
@@ -255,7 +245,7 @@ pub trait SendApi: Clone + Sized {
         arg_buffer.push_argument_bytes(new_owner.as_bytes());
 
         let _ = self.execute_on_dest_context_raw(
-            self.get_gas_left(),
+            self.blockchain().get_gas_left(),
             child_sc_address,
             &BigUint::zero(self.type_manager()),
             b"ChangeOwnerAddress",
@@ -351,7 +341,11 @@ pub trait SendApi: Clone + Sized {
 
         arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-        let _ = self.call_local_esdt_built_in_function(self.get_gas_left(), func_name, &arg_buffer);
+        let _ = self.call_local_esdt_built_in_function(
+            self.blockchain().get_gas_left(),
+            func_name,
+            &arg_buffer,
+        );
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
@@ -377,7 +371,11 @@ pub trait SendApi: Clone + Sized {
 
         arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-        let _ = self.call_local_esdt_built_in_function(self.get_gas_left(), func_name, &arg_buffer);
+        let _ = self.call_local_esdt_built_in_function(
+            self.blockchain().get_gas_left(),
+            func_name,
+            &arg_buffer,
+        );
     }
 
     /// Creates a new NFT token of a certain type (determined by `token_identifier`).  
@@ -417,7 +415,7 @@ pub trait SendApi: Clone + Sized {
         }
 
         let output = self.call_local_esdt_built_in_function(
-            self.get_gas_left(),
+            self.blockchain().get_gas_left(),
             b"ESDTNFTCreate",
             &arg_buffer,
         );
@@ -438,14 +436,18 @@ pub trait SendApi: Clone + Sized {
         payment_nonce: u64,
         payment_amount: &BigUint<Self::ProxyTypeManager>,
     ) -> BigUint<Self::ProxyTypeManager> {
-        let nft_token_data = self.get_esdt_token_data(&self.get_sc_address(), nft_id, nft_nonce);
+        let nft_token_data = self.blockchain().get_esdt_token_data(
+            &self.blockchain().get_sc_address_managed(),
+            nft_id,
+            nft_nonce,
+        );
         let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
         self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
 
         if royalties_amount > 0u32 {
             self.direct(
-                &nft_token_data.creator,
+                &nft_token_data.creator.to_address(),
                 payment_token,
                 payment_nonce,
                 &royalties_amount,

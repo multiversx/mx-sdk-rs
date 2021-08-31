@@ -8,6 +8,7 @@ impl SendApi for super::UncallableApi {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
     type ErrorApi = Self;
+    type BlockchainApi = Self;
 
     fn type_manager(&self) -> Self::ProxyTypeManager {
         unreachable!()
@@ -17,20 +18,7 @@ impl SendApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn get_sc_address(&self) -> Address {
-        unreachable!()
-    }
-
-    fn get_gas_left(&self) -> u64 {
-        unreachable!()
-    }
-
-    fn get_esdt_token_data(
-        &self,
-        _address: &Address,
-        _token: &TokenIdentifier,
-        _nonce: u64,
-    ) -> crate::types::EsdtTokenData<Self::ProxyTypeManager> {
+    fn blockchain(&self) -> Self::BlockchainApi {
         unreachable!()
     }
 
