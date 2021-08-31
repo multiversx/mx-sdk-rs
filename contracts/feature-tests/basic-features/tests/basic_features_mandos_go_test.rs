@@ -94,6 +94,11 @@ fn echo_i64_go() {
 }
 
 #[test]
+fn echo_managed_bytes_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_managed_bytes.scen.json");
+}
+
+#[test]
 fn echo_nothing_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_nothing.scen.json");
 }
@@ -209,8 +214,13 @@ fn managed_buffer_slice_2_go() {
 }
 
 #[test]
-fn managed_vec_push_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_vec_push.scen.json");
+fn managed_vec_address_push_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_vec_address_push.scen.json");
+}
+
+#[test]
+fn managed_vec_biguint_push_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_vec_biguint_push.scen.json");
 }
 
 #[test]

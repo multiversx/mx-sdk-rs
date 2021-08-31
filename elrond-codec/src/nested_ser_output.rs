@@ -18,13 +18,15 @@ pub trait NestedEncodeOutput {
     }
 
     #[inline]
-    fn push_specialized<T, F>(
+    fn push_specialized<T, C, F>(
         &mut self,
+        _context: C,
         _value: &T,
         else_serialization: F,
     ) -> Result<(), EncodeError>
     where
         T: TryStaticCast,
+        C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<(), EncodeError>,
     {
         else_serialization(self)

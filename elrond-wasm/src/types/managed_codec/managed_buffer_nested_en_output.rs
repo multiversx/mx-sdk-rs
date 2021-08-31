@@ -2,7 +2,7 @@ use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext},
 };
 
 #[inline]
@@ -20,17 +20,24 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
     }
 
     #[inline]
-    fn push_specialized<T, F>(
+    fn push_specialized<T, C, F>(
         &mut self,
+        context: C,
         value: &T,
         else_serialization: F,
     ) -> Result<(), EncodeError>
     where
         T: TryStaticCast,
+        C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<(), EncodeError>,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
-            push_nested_managed_buffer(self, managed_buffer);
+            if context.try_cast_ref::<ManagedBufferSizeContext>().is_some() {
+                // managed buffers originating from fixed-length types don't need to serialize the length
+                self.append(managed_buffer);
+            } else {
+                push_nested_managed_buffer(self, managed_buffer);
+            }
             Ok(())
         } else if let Some(big_uint) = value.try_cast_ref::<BigUint<M>>() {
             push_nested_managed_buffer(self, &big_uint.to_bytes_be_buffer());

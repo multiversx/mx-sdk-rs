@@ -19,6 +19,10 @@ fn substitutions() -> HashMap<String, TokenStream> {
         "EllipticCurve".to_string(),
         quote!(elrond_wasm::types::EllipticCurve<Self::TypeManager>).into(),
     );
+    substitutions.insert(
+        "ManagedAddress".to_string(),
+        quote!(elrond_wasm::types::ManagedAddress<Self::TypeManager>).into(),
+    );
     substitutions
 }
 

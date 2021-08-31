@@ -24,23 +24,26 @@ pub trait NestedDecodeInput {
     );
 
     #[inline]
-    fn read_specialized<T, F>(&mut self, else_deser: F) -> Result<T, DecodeError>
+    fn read_specialized<T, C, F>(&mut self, _context: C, else_deser: F) -> Result<T, DecodeError>
     where
         T: TryStaticCast,
+        C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<T, DecodeError>,
     {
         else_deser(self)
     }
 
     #[inline]
-    fn read_specialized_or_exit<T, ExitCtx, F>(
+    fn read_specialized_or_exit<T, C, ExitCtx, F>(
         &mut self,
+        _context: C,
         c: ExitCtx,
         _exit: fn(ExitCtx, DecodeError) -> !,
         else_deser: F,
     ) -> T
     where
         T: TryStaticCast,
+        C: TryStaticCast,
         F: FnOnce(&mut Self, ExitCtx) -> T,
         ExitCtx: Clone,
     {
