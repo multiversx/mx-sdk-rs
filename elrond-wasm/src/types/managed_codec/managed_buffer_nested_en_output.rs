@@ -32,7 +32,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
         F: FnOnce(&mut Self) -> Result<(), EncodeError>,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
-            if let Some(_) = context.try_cast_ref::<ManagedBufferSizeContext>() {
+            if context.try_cast_ref::<ManagedBufferSizeContext>().is_some() {
                 // managed buffers originating from fixed-length types don't need to serialize the length
                 self.append(managed_buffer);
             } else {
