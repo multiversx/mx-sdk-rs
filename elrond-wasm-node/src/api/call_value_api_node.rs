@@ -1,8 +1,6 @@
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{
-    BigUint, BoxedBytes, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier,
-};
+use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, ManagedType, TokenIdentifier};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
@@ -119,7 +117,10 @@ impl CallValueApi for ArwenApiImpl {
     #[cfg(feature = "managed-ei")]
     fn get_all_esdt_transfers(
         &self,
-    ) -> ManagedVec<Self::TypeManager, EsdtTokenPayment<Self::TypeManager>> {
+    ) -> elrond_wasm::types::ManagedVec<
+        Self::TypeManager,
+        elrond_wasm::types::EsdtTokenPayment<Self::TypeManager>,
+    > {
         unsafe {
             let result_handle = mBufferNew();
             managedGetMultiESDTCallValue(result_handle);
