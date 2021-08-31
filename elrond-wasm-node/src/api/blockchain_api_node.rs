@@ -1,6 +1,7 @@
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
-    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
+    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedType, TokenIdentifier,
+    H256,
 };
 
 extern "C" {

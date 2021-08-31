@@ -1,6 +1,6 @@
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, TokenIdentifier};
+use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, ManagedType, TokenIdentifier};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 

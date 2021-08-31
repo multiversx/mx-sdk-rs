@@ -2,7 +2,9 @@ use crate::api::managed_types::unsafe_buffer_load_be_pad_right;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, TokenIdentifier};
+use elrond_wasm::types::{
+    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedType, TokenIdentifier,
+};
 
 // Token ID + nonce + amount, as bytes
 const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;

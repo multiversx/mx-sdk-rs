@@ -3,7 +3,7 @@ use elrond_codec::TryStaticCast;
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
 use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
 use crate::err_msg;
-use crate::types::{BigInt, BigUint, ManagedBuffer};
+use crate::types::{BigInt, BigUint, ManagedBuffer, ManagedType};
 
 struct ApiOutputAdapter<FA>
 where
