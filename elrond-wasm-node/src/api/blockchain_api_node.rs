@@ -369,7 +369,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
         token: &TokenIdentifier,
         nonce: u64,
     ) -> EsdtTokenData<Self::TypeManager> {
-        elrond_wasm::types::BoxedBytes;
+        use elrond_wasm::types::BoxedBytes;
         let address = m_address.to_address();
         unsafe {
             let value_handle = bigIntNew(0);
