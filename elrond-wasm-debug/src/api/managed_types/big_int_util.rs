@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use elrond_wasm::types::ManagedType;
 use num_bigint::Sign;
 use num_traits::Zero;
 

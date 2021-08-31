@@ -1,6 +1,6 @@
 use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::err_msg;
-use crate::types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput};
+use crate::types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType};
 use alloc::boxed::Box;
 use elrond_codec::*;
 
@@ -27,7 +27,7 @@ where
         let mbuf_handle = self
             .api
             .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle());
-        ManagedBuffer::new_from_raw_handle(self.api.clone(), mbuf_handle)
+        ManagedBuffer::from_raw_handle(self.api.clone(), mbuf_handle)
     }
 
     fn to_big_uint(&self) -> BigUint<A> {

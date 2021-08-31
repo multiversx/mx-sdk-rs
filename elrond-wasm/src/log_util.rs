@@ -3,7 +3,7 @@ use elrond_codec::{EncodeError, TopEncode};
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     err_msg,
-    types::{BoxedBytes, ManagedBuffer},
+    types::{BoxedBytes, ManagedBuffer, ManagedType},
 };
 
 pub fn serialize_log_data<T, EA>(data: T, api: EA) -> BoxedBytes
