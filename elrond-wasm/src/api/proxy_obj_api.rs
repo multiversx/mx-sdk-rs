@@ -21,7 +21,7 @@ pub trait ProxyObjApi {
 
     fn with_token_transfer(
         self,
-        token: TokenIdentifier,
+        token: TokenIdentifier<Self::TypeManager>,
         payment: BigUint<Self::TypeManager>,
     ) -> Self;
 
@@ -32,7 +32,7 @@ pub trait ProxyObjApi {
     ) -> (
         Self::SendApi,
         Address,
-        TokenIdentifier,
+        TokenIdentifier<Self::TypeManager>,
         BigUint<Self::TypeManager>,
         u64,
     );

@@ -7,7 +7,7 @@ use elrond_wasm::{
 elrond_wasm::derive_imports!();
 
 pub type GovernanceActionAsMultiArg<M> =
-    MultiArg7<u64, Address, TokenIdentifier, u64, BigUint<M>, BoxedBytes, Vec<BoxedBytes>>;
+    MultiArg7<u64, Address, TokenIdentifier<M>, u64, BigUint<M>, BoxedBytes, Vec<BoxedBytes>>;
 
 #[derive(TypeAbi, TopEncode, TopDecode, PartialEq)]
 pub enum GovernanceProposalStatus {
@@ -23,7 +23,7 @@ pub enum GovernanceProposalStatus {
 pub struct GovernanceAction<M: ManagedTypeApi> {
     pub gas_limit: u64,
     pub dest_address: Address,
-    pub token_id: TokenIdentifier,
+    pub token_id: TokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
     pub function_name: BoxedBytes,

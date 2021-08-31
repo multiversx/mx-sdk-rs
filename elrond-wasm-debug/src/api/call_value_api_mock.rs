@@ -1,7 +1,7 @@
 use crate::{TxContext, TxPanic};
 use elrond_wasm::api::CallValueApi;
 use elrond_wasm::err_msg;
-use elrond_wasm::types::{BigUint, EsdtTokenType, TokenIdentifier};
+use elrond_wasm::types::{BigUint, EsdtTokenType, ManagedBuffer, TokenIdentifier};
 
 impl CallValueApi for TxContext {
     type TypeManager = Self;
@@ -36,8 +36,12 @@ impl CallValueApi for TxContext {
     }
 
     #[inline]
-    fn token(&self) -> TokenIdentifier {
-        TokenIdentifier::from(self.tx_input_box.esdt_token_identifier.as_slice())
+    fn token(&self) -> TokenIdentifier<Self::TypeManager> {
+        ManagedBuffer::new_from_bytes(
+            self.type_manager(),
+            self.tx_input_box.esdt_token_identifier.as_slice(),
+        )
+        .into()
     }
 
     #[inline]
@@ -65,8 +69,8 @@ impl CallValueApi for TxContext {
     }
 
     #[inline]
-    fn token_by_index(&self, _index: usize) -> TokenIdentifier {
-        TokenIdentifier::egld()
+    fn token_by_index(&self, _index: usize) -> TokenIdentifier<Self::TypeManager> {
+        TokenIdentifier::egld(self.type_manager())
     }
 
     #[inline]

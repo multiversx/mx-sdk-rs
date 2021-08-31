@@ -11,7 +11,7 @@ where
 {
     pub(super) api: SA,
     pub(super) to: Address,
-    pub(super) token_name: BoxedBytes,
+    pub(super) token_identifier: TokenIdentifier<SA::ProxyTypeManager>,
     pub(super) amount: BigUint<SA::ProxyTypeManager>,
     pub(super) data: BoxedBytes,
 }
@@ -26,7 +26,7 @@ where
     fn finish<FA>(&self, _api: FA) {
         self.api.transfer_esdt_via_async_call(
             &self.to,
-            &TokenIdentifier::from(self.token_name.clone()),
+            &self.token_identifier,
             0,
             &self.amount,
             self.data.as_slice(),

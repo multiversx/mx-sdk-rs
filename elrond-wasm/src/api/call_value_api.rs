@@ -22,7 +22,7 @@ pub trait CallValueApi: ErrorApi + Sized {
     ///
     /// A note on implementation: even though the underlying api returns an empty name for EGLD,
     /// but the EGLD TokenIdentifier is serialized as `EGLD`.
-    fn token(&self) -> TokenIdentifier;
+    fn token(&self) -> TokenIdentifier<Self::TypeManager>;
 
     /// Returns the nonce of the received ESDT token.
     /// Will return 0 in case of EGLD or fungible ESDT transfer.
@@ -46,7 +46,7 @@ pub trait CallValueApi: ErrorApi + Sized {
     /// but also fail with an error if EGLD or the wrong ESDT token is sent.
     /// Especially used in the auto-generated call value processing.
     fn require_esdt(&self, token: &[u8]) -> BigUint<Self::TypeManager> {
-        if self.token() != token {
+        if self.token().as_managed_buffer() != token {
             self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
         }
         self.esdt_value()
@@ -56,7 +56,12 @@ pub trait CallValueApi: ErrorApi + Sized {
     /// Especially used in the `#[payable("*")] auto-generated snippets.
     /// The method might seem redundant, but there is such a hook in Arwen
     /// that might be used in this scenario in the future.
-    fn payment_token_pair(&self) -> (BigUint<Self::TypeManager>, TokenIdentifier) {
+    fn payment_token_pair(
+        &self,
+    ) -> (
+        BigUint<Self::TypeManager>,
+        TokenIdentifier<Self::TypeManager>,
+    ) {
         let token = self.token();
         if token.is_egld() {
             (self.egld_value(), token)
@@ -69,7 +74,7 @@ pub trait CallValueApi: ErrorApi + Sized {
 
     fn esdt_value_by_index(&self, index: usize) -> BigUint<Self::TypeManager>;
 
-    fn token_by_index(&self, index: usize) -> TokenIdentifier;
+    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self::TypeManager>;
 
     fn esdt_token_nonce_by_index(&self, index: usize) -> u64;
 

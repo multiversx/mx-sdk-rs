@@ -144,7 +144,7 @@ pub trait FirstContract {
         args: &[BoxedBytes],
     ) {
         let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-        serializer.push_argument_bytes(esdt_token_name.as_esdt_identifier());
+        serializer.push_argument_bytes(esdt_token_name.to_esdt_identifier().as_slice());
         serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
         serializer.push_argument_bytes(func_name);
         for arg in args {

@@ -340,11 +340,15 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_current_esdt_nft_nonce(&self, address: &Address, token: &TokenIdentifier) -> u64 {
+    fn get_current_esdt_nft_nonce(
+        &self,
+        address: &Address,
+        token: &TokenIdentifier<Self::TypeManager>,
+    ) -> u64 {
         unsafe {
             getCurrentESDTNFTNonce(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
             ) as u64
         }
@@ -354,7 +358,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     fn get_esdt_balance(
         &self,
         m_address: &ManagedAddress<Self::TypeManager>,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::TypeManager>,
         nonce: u64,
     ) -> BigUint<Self::TypeManager> {
         let address = m_address.to_address();
@@ -362,7 +366,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
             let balance_handle = bigIntNew(0);
             bigIntGetESDTExternalBalance(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
                 balance_handle,
@@ -376,7 +380,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     fn get_esdt_token_data(
         &self,
         m_address: &ManagedAddress<Self::TypeManager>,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::TypeManager>,
         nonce: u64,
     ) -> EsdtTokenData<Self::TypeManager> {
         use elrond_wasm::types::BoxedBytes;
@@ -388,7 +392,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
             let name_len = getESDTNFTNameLength(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
@@ -396,7 +400,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
             let attr_len = getESDTNFTAttributeLength(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
@@ -407,7 +411,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
             // Hence the EsdtTokenData receives a Vec<BoxedBytes>
             let uris_len = getESDTNFTURILength(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
@@ -418,7 +422,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
                 value_handle,
@@ -434,7 +438,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
             // Fungible always have a nonce of 0, so we check nonce to figure out the type
             let nonce = getCurrentESDTNFTNonce(
                 address.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
             );
             let token_type = if nonce == 0 {
@@ -473,11 +477,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
     fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<Self::TypeManager>,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::TypeManager>,
         nonce: u64,
     ) -> EsdtTokenData<Self::Storage> {
-        let managed_token_id =
-            ManagedBuffer::new_from_bytes(self.type_manager(), token.as_esdt_identifier());
+        let managed_token_id = token.into_managed_buffer();
         unsafe {
             let value_handle = bigIntNew(0);
             let properties_handle = mBufferNew();

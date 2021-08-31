@@ -111,7 +111,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .clone()
     }
 
-    fn get_current_esdt_nft_nonce(&self, _address: &Address, _token: &TokenIdentifier) -> u64 {
+    fn get_current_esdt_nft_nonce(
+        &self,
+        _address: &Address,
+        _token: &TokenIdentifier<Self::TypeManager>,
+    ) -> u64 {
         // TODO: Implement
         0u64
     }
@@ -120,7 +124,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     fn get_esdt_balance(
         &self,
         address: &ManagedAddress<Self::TypeManager>,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::TypeManager>,
         _nonce: u64,
     ) -> BigUint<Self::TypeManager> {
         if address != &self.get_sc_address_managed() {
@@ -132,7 +136,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         match self
             .blockchain_info_box
             .contract_esdt
-            .get(&token.as_esdt_identifier().to_vec())
+            .get(&token.to_esdt_identifier().into_vec())
         {
             Some(value) => self.insert_new_big_uint(value.clone()),
             None => BigUint::zero(self.storage_manager()),
@@ -142,7 +146,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     fn get_esdt_token_data(
         &self,
         _address: &ManagedAddress<Self::TypeManager>,
-        _token: &TokenIdentifier,
+        _token: &TokenIdentifier<Self::TypeManager>,
         _nonce: u64,
     ) -> EsdtTokenData<Self::Storage> {
         panic!("get_esdt_token_data not yet implemented")

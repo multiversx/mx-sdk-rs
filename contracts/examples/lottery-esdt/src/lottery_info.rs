@@ -7,7 +7,7 @@ elrond_wasm::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct LotteryInfo<M: ManagedTypeApi> {
-    pub token_name: TokenIdentifier,
+    pub token_name: TokenIdentifier<M>,
     pub ticket_price: BigUint<M>,
     pub tickets_left: u32,
     pub deadline: u64,
