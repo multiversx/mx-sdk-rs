@@ -1,0 +1,226 @@
+{
+    "name": "forwarder call from init function",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:forwarder-1"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy-forwarder-no-args",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../forwarder/output/forwarder.wasm",
+                "value": "0",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:forwarder-1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy-forwarder-try-deploy-another-sc-from-init-should-fail",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../forwarder/output/forwarder.wasm",
+                "value": "0",
+                "arguments": [
+                    "u8:1|nested:file:../vault/output/vault.wasm"
+                ],
+                "gasLimit": "999,999,999",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Deploy failed",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "2",
+                    "newAddress": "sc:vault"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy-vault",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../vault/output/vault.wasm",
+                "value": "0",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "3",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:forwarder-1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "3",
+                    "newAddress": "sc:forwarder-2"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy-forwarder-try-async-call-from-init",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../forwarder/output/forwarder.wasm",
+                "value": "0",
+                "arguments": [
+                    "u8:2|sc:vault|nested:str:echo_arguments",
+                    "str:some_arg"
+                ],
+                "gasLimit": "999,999,999",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "str:account not found: 0000000000000000666f727761726465722d325f5f5f5f5f5f5f5f5f5f5f5f5f",
+                "out": [
+                    "str:some_arg",
+                    "str:execution failed",
+                    "str:deploy-forwarder-try-async-call-"
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "4",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:forwarder-1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder-2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:call_counts|nested:str:echo_arguments": "1"
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "4",
+                    "newAddress": "sc:forwarder-3"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy-forwarder-try-synchronous-call-from-init",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../forwarder/output/forwarder.wasm",
+                "value": "0",
+                "arguments": [
+                    "u8:3|sc:vault|nested:str:echo_arguments",
+                    "str:some_arg"
+                ],
+                "gasLimit": "999,999,999",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [
+                    "str:some_arg"
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
