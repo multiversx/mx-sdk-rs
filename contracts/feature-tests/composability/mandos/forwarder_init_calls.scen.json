@@ -221,6 +221,42 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "5",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:forwarder-1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder-2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder-3": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:call_counts|nested:str:echo_arguments": "2"
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                }
+            }
         }
     ]
 }
