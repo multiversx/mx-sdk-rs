@@ -8,8 +8,11 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
     fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
-        self.blockchain()
-            .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
+        self.blockchain().get_esdt_balance(
+            &self.blockchain().get_sc_address_managed(),
+            token_identifier,
+            0,
+        )
     }
 
     #[endpoint]

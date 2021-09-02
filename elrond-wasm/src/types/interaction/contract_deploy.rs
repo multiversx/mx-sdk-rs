@@ -1,4 +1,4 @@
-use crate::api::SendApi;
+use crate::api::{BlockchainApi, SendApi};
 use crate::types::{Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata};
 
 /// Using max u64 to represent maximum possible gas,
@@ -71,7 +71,7 @@ where
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            self.api.get_gas_left()
+            self.api.blockchain().get_gas_left()
         } else {
             self.explicit_gas_limit
         }

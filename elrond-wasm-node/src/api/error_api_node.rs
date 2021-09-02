@@ -4,7 +4,7 @@ use elrond_wasm::api::{ErrorApi, Handle};
 
 extern "C" {
     #[cfg(feature = "managed-ei")]
-    fn mBufferSignalError(messageHandle: i32) -> !;
+    fn managedSignalError(messageHandle: i32) -> !;
 }
 
 impl ErrorApi for ArwenApiImpl {
@@ -20,9 +20,9 @@ impl ErrorApi for ArwenApiImpl {
         self.signal_error(message.as_slice())
     }
 
-    #[inline]
+    #[inline(always)]
     #[cfg(feature = "managed-ei")]
     fn signal_error_from_buffer(&self, message_handle: Handle) -> ! {
-        unsafe { mBufferSignalError(message_handle) }
+        unsafe { managedSignalError(message_handle) }
     }
 }

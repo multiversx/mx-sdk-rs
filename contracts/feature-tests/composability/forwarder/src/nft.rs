@@ -26,7 +26,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[view]
     fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain().get_esdt_balance(
-            &self.blockchain().get_sc_address(),
+            &self.blockchain().get_sc_address_managed(),
             token_identifier,
             nonce,
         )
@@ -168,7 +168,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             );
 
         let token_info = self.blockchain().get_esdt_token_data(
-            &self.blockchain().get_sc_address(),
+            &self.blockchain().get_sc_address_managed(),
             &token_identifier,
             token_nonce,
         );

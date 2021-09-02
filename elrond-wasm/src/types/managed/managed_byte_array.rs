@@ -9,14 +9,12 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
-pub type ManagedAddress<M> = ManagedByteArray<M, 32>;
-
-const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";
+const DECODE_ERROR_BAD_LENGTH: &[u8] = b"bad array length";
 
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
 /// or just via handle (e.g. `BigUint<M>`).
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ManagedByteArray<M, const N: usize>
 where
     M: ManagedTypeApi,

@@ -4,8 +4,13 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait BlockchainApiFeatures {
     #[endpoint]
-    fn get_caller(&self) -> Address {
-        self.blockchain().get_caller()
+    fn get_caller(&self) -> ManagedAddress {
+        self.blockchain().get_caller_managed()
+    }
+
+    #[endpoint]
+    fn get_owner_address(&self) -> ManagedAddress {
+        self.blockchain().get_owner_address_managed()
     }
 
     #[endpoint]
@@ -19,8 +24,13 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_owner_address(&self) -> Address {
-        self.blockchain().get_owner_address()
+    fn get_state_root_hash(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+        self.blockchain().get_state_root_hash_managed()
+    }
+
+    #[endpoint]
+    fn get_tx_hash(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+        self.blockchain().get_tx_hash_managed()
     }
 
     #[endpoint]
