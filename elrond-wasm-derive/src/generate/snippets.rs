@@ -234,7 +234,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
             type TypeManager = SA::ProxyTypeManager;
             type Storage = SA::ProxyStorage;
             type SendApi = SA;
-            type ErrorApi = SA;
+            type ErrorApi = SA::ErrorApi;
 
             fn new_cb_proxy_obj(api: SA) -> Self {
                 CallbackProxyObj {
@@ -242,8 +242,8 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
                 }
             }
 
-            fn into_api(self) -> Self::ErrorApi {
-                self.api
+            fn cb_error_api(self) -> Self::ErrorApi {
+                self.api.error_api()
             }
         }
     }

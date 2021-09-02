@@ -1,4 +1,4 @@
-use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
+use crate::api::{EndpointArgumentApi, ManagedTypeApi};
 use crate::err_msg;
 use crate::{ArgDecodeInput, DynArgInput};
 
@@ -25,27 +25,24 @@ where
     }
 }
 
-impl<AA> ErrorApi for EndpointDynArgLoader<AA>
-where
-    AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
-{
-    #[inline]
-    fn signal_error(&self, message: &[u8]) -> ! {
-        self.api.signal_error(message)
-    }
-}
-
 impl<AA> DynArgInput<ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
+    type ErrorApi = AA;
+
+    #[inline]
+    fn error_api(&self) -> Self::ErrorApi {
+        self.api.clone()
+    }
+
     fn has_next(&self) -> bool {
         self.current_index < self.num_arguments
     }
 
     fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
         if self.current_index >= self.num_arguments {
-            self.signal_error(err_msg::ARG_WRONG_NUMBER)
+            self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER)
         } else {
             let arg_input = ArgDecodeInput::new(self.api.clone(), self.current_index);
             self.current_index += 1;

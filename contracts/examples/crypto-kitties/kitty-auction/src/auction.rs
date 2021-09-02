@@ -2,7 +2,7 @@ elrond_wasm::derive_imports!();
 
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{Address, BigUint},
+    types::{Address, BigUint, ManagedType},
 };
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

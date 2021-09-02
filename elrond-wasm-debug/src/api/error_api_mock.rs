@@ -1,5 +1,5 @@
 use crate::{TxContext, TxPanic};
-use elrond_wasm::api::ErrorApi;
+use elrond_wasm::api::{ErrorApi, Handle, ManagedBufferApi};
 
 impl ErrorApi for TxContext {
     fn signal_error(&self, message: &[u8]) -> ! {
@@ -11,5 +11,10 @@ impl ErrorApi for TxContext {
             status: 4,
             message: message.to_vec(),
         })
+    }
+
+    fn signal_error_from_buffer(&self, message_handle: Handle) -> ! {
+        let message = self.mb_to_boxed_bytes(message_handle);
+        self.signal_error(message.as_slice())
     }
 }

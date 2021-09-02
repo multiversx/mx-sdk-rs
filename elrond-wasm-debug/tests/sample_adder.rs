@@ -34,7 +34,7 @@ mod module_1 {
         C: AutoImpl,
     {
         fn version(&self) -> BigInt<Self::TypeManager> {
-            BigInt::from_i64(100, self.type_manager())
+            BigInt::from_i64(self.type_manager(), 100)
         }
 
         fn some_async(&self) -> AsyncCall<Self::SendApi> {
@@ -159,12 +159,18 @@ mod sample_adder {
         C: AutoImpl + super::module_1::AutoImpl,
     {
         fn get_sum(&self) -> BigInt<Self::TypeManager> {
-            let key: &'static [u8] = b"sum";
-            elrond_wasm::storage_get(self.get_storage_raw(), &key[..])
+            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Storage>::new(
+                self.get_storage_raw(),
+                &b"sum"[..],
+            );
+            elrond_wasm::storage_get(self.get_storage_raw(), &___key___)
         }
         fn set_sum(&self, sum: &BigInt<Self::TypeManager>) {
-            let key: &'static [u8] = b"sum";
-            elrond_wasm::storage_set(self.get_storage_raw(), &key[..], &sum);
+            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Storage>::new(
+                self.get_storage_raw(),
+                &b"sum"[..],
+            );
+            elrond_wasm::storage_set(self.get_storage_raw(), &___key___, &sum);
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi> {
@@ -273,7 +279,7 @@ mod sample_adder {
             elrond_wasm::io::serialize_contract_call_arg(
                 amount,
                 ___contract_call___.get_mut_arg_buffer(),
-                ___api___.clone(),
+                ___api___.error_api(),
             );
             ___contract_call___
         }
@@ -592,23 +598,24 @@ mod sample_adder {
         type TypeManager = SA::ProxyTypeManager;
         type Storage = SA::ProxyStorage;
         type SendApi = SA;
-        type ErrorApi = SA;
+        type ErrorApi = SA::ErrorApi;
+
         fn new_cb_proxy_obj(api: SA) -> Self {
             CallbackProxyObj { api }
         }
-        fn into_api(self) -> Self::ErrorApi {
-            self.api
+        fn cb_error_api(self) -> Self::ErrorApi {
+            self.api.error_api()
         }
     }
 
     pub trait CallbackProxy: elrond_wasm::api::CallbackProxyObjApi + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackCall {
-            let ___api___ = self.into_api();
+            let ___api___ = self.cb_error_api();
             let mut ___closure_arg_buffer___ = elrond_wasm::types::ArgBuffer::new();
             elrond_wasm::io::serialize_contract_call_arg(
                 caller,
                 &mut ___closure_arg_buffer___,
-                ___api___.clone(),
+                ___api___,
             );
             elrond_wasm::types::CallbackCall::from_arg_buffer(
                 &b"my_callback"[..],
@@ -629,19 +636,19 @@ fn test_add() {
 
     let adder = sample_adder::contract_obj(tx_context.clone());
 
-    adder.init(&BigInt::from_i64(5, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(5, adder.type_manager()), adder.get_sum());
+    adder.init(&BigInt::from_i64(adder.type_manager(), 5));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 5), adder.get_sum());
 
-    let _ = adder.add(BigInt::from_i64(7, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(12, adder.type_manager()), adder.get_sum());
+    let _ = adder.add(BigInt::from_i64(adder.type_manager(), 7));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 12), adder.get_sum());
 
-    let _ = adder.add(BigInt::from_i64(-1, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(11, adder.type_manager()), adder.get_sum());
+    let _ = adder.add(BigInt::from_i64(adder.type_manager(), -1));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 11), adder.get_sum());
 
-    assert_eq!(BigInt::from_i64(100, adder.type_manager()), adder.version());
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 100), adder.version());
 
     let _ = adder.add_version();
-    assert_eq!(BigInt::from_i64(111, adder.type_manager()), adder.get_sum());
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 111), adder.get_sum());
 
     assert!(!adder.call(b"invalid_endpoint"));
 

@@ -2,7 +2,7 @@ use super::{StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get, storage_set, StorageKey};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
 use core::marker::PhantomData;
@@ -64,7 +64,7 @@ where
     T: TopEncode + TopDecode + 'static,
 {
     api: SA,
-    main_key: BoxedBytes,
+    base_key: StorageKey<SA>,
     _phantom: core::marker::PhantomData<T>,
 }
 
@@ -73,10 +73,10 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
-    fn new(api: SA, main_key: BoxedBytes) -> Self {
+    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         LinkedListMapper {
             api,
-            main_key,
+            base_key,
             _phantom: PhantomData,
         }
     }
@@ -105,25 +105,27 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
-    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> BoxedBytes {
-        BoxedBytes::from_concat(&[self.main_key.as_slice(), name, &node_id.to_be_bytes()])
+    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(&node_id);
+        named_key
     }
 
-    fn build_name_key(&self, name: &[u8]) -> BoxedBytes {
-        BoxedBytes::from_concat(&[self.main_key.as_slice(), name])
+    fn build_name_key(&self, name: &[u8]) -> StorageKey<SA> {
+        let mut name_key = self.base_key.clone();
+        name_key.append_bytes(name);
+        name_key
     }
 
     fn get_info(&self) -> LinkedListMapperInfo {
-        storage_get(
-            self.api.clone(),
-            self.build_name_key(INFO_IDENTIFIER).as_slice(),
-        )
+        storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
     }
 
     fn set_info(&mut self, value: LinkedListMapperInfo) {
         storage_set(
             self.api.clone(),
-            self.build_name_key(INFO_IDENTIFIER).as_slice(),
+            &self.build_name_key(INFO_IDENTIFIER),
             &value,
         );
     }
@@ -131,16 +133,14 @@ where
     fn get_node(&self, node_id: u32) -> Node {
         storage_get(
             self.api.clone(),
-            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-                .as_slice(),
+            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
         )
     }
 
     fn set_node(&mut self, node_id: u32, item: Node) {
         storage_set(
             self.api.clone(),
-            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-                .as_slice(),
+            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
             &item,
         );
     }
@@ -148,8 +148,7 @@ where
     fn clear_node(&mut self, node_id: u32) {
         storage_set(
             self.api.clone(),
-            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-                .as_slice(),
+            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
             &BoxedBytes::empty(),
         );
     }
@@ -157,8 +156,7 @@ where
     fn get_value(&self, node_id: u32) -> T {
         storage_get(
             self.api.clone(),
-            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
-                .as_slice(),
+            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
         )
     }
 
@@ -172,8 +170,7 @@ where
     fn set_value(&mut self, node_id: u32, value: &T) {
         storage_set(
             self.api.clone(),
-            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
-                .as_slice(),
+            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
             value,
         )
     }
@@ -181,8 +178,7 @@ where
     fn clear_value(&mut self, node_id: u32) {
         storage_set(
             self.api.clone(),
-            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
-                .as_slice(),
+            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
             &BoxedBytes::empty(),
         )
     }

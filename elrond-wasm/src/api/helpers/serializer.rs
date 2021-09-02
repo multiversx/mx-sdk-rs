@@ -2,7 +2,8 @@ use elrond_codec::{DecodeError, EncodeError, TopDecode, TopEncode};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput},
+    err_msg,
+    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
 };
 
 pub struct ManagedSerializer<M>
@@ -38,7 +39,7 @@ where
 
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
         let managed_input =
-            ManagedBytesTopDecodeInput::new(BoxedBytes::from(slice), self.api.clone());
+            ManagedBytesTopDecodeInput::new(self.api.clone(), BoxedBytes::from(slice));
         T::top_decode_or_exit(managed_input, self.api.clone(), top_decode_exit)
     }
 }
@@ -48,15 +49,19 @@ fn top_encode_exit<M>(api: M, encode_err: EncodeError) -> !
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    // TODO: error message
-    api.signal_error(encode_err.message_bytes())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::SERIALIZER_ENCODE_ERROR);
+    message_buffer.append_bytes(encode_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 #[inline(always)]
-fn top_decode_exit<M>(api: M, de_err: DecodeError) -> !
+fn top_decode_exit<M>(api: M, decode_err: DecodeError) -> !
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    // TODO: error message
-    api.signal_error(de_err.message_bytes())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::SERIALIZER_DECODE_ERROR);
+    message_buffer.append_bytes(decode_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

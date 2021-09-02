@@ -2,7 +2,7 @@ use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
 use crate::*;
 use elrond_codec::*;
 
-#[inline]
+#[inline(always)]
 pub fn load_single_arg<AA, T>(api: AA, index: i32, arg_id: ArgId) -> T
 where
     T: TopDecode,
@@ -21,7 +21,7 @@ where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
     let (api, arg_id) = ctx;
-    signal_arg_de_error(&api, arg_id, de_err)
+    signal_arg_de_error(api, arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.

@@ -1,6 +1,6 @@
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, TokenIdentifier};
+use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, ManagedType, TokenIdentifier};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
@@ -46,7 +46,7 @@ impl CallValueApi for ArwenApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetCallValue(value_handle);
-            BigUint::from_raw_handle(value_handle, self.type_manager())
+            BigUint::from_raw_handle(self.type_manager(), value_handle)
         }
     }
 
@@ -54,7 +54,7 @@ impl CallValueApi for ArwenApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValue(value_handle);
-            BigUint::from_raw_handle(value_handle, self.type_manager())
+            BigUint::from_raw_handle(self.type_manager(), value_handle)
         }
     }
 
@@ -86,7 +86,7 @@ impl CallValueApi for ArwenApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
-            BigUint::from_raw_handle(value_handle, self.type_manager())
+            BigUint::from_raw_handle(self.type_manager(), value_handle)
         }
     }
 

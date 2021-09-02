@@ -1,4 +1,7 @@
-use crate::*;
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    signal_arg_de_error, ArgId, DynArgInput,
+};
 use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.
@@ -25,17 +28,17 @@ where
             return cast_unit;
         }
 
+        let error_api = loader.error_api();
         let arg_input = loader.next_arg_input();
-        T::top_decode_or_exit(arg_input, &(&*loader, arg_id), dyn_load_exit)
+        T::top_decode_or_exit(arg_input, (error_api, arg_id), dyn_load_exit)
     }
 }
 
 #[inline(always)]
-fn dyn_load_exit<I, D>(ctx: &(&D, ArgId), de_err: DecodeError) -> !
+fn dyn_load_exit<EA>(ctx: (EA, ArgId), de_err: DecodeError) -> !
 where
-    I: TopDecodeInput,
-    D: DynArgInput<I>,
+    EA: ErrorApi + ManagedTypeApi,
 {
-    let (loader, arg_id) = ctx;
-    signal_arg_de_error(*loader, *arg_id, de_err)
+    let (api, arg_id) = ctx;
+    signal_arg_de_error(api, arg_id, de_err)
 }

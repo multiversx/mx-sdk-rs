@@ -6,7 +6,7 @@ use elrond_codec::*;
 
 use crate::types::BoxedBytes;
 
-use super::BigUint;
+use super::{BigUint, ManagedType};
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -23,18 +23,38 @@ pub struct EllipticCurve<M: ManagedTypeApi> {
     pub(super) api: M,
 }
 
+impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
+    #[doc(hidden)]
+    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+        EllipticCurve {
+            handle: raw_handle,
+            api,
+        }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
+    #[inline]
+    fn type_manager(&self) -> M {
+        self.api.clone()
+    }
+}
+
 impl<M: ManagedTypeApi> EllipticCurve<M> {
-    pub fn from_name(name: &str, api: M) -> Self {
+    pub fn from_name(api: M, name: &str) -> Self {
         let handle = api.ec_create(name.as_bytes());
         EllipticCurve { handle, api }
     }
 
-    pub fn from_bitsize(bitsize: u32, api: M) -> Option<Self> {
+    pub fn from_bitsize(api: M, bitsize: u32) -> Option<Self> {
         match bitsize {
-            224 => Some(Self::from_name("p224", api)),
-            256 => Some(Self::from_name("p256", api)),
-            384 => Some(Self::from_name("p384", api)),
-            521 => Some(Self::from_name("p521", api)),
+            224 => Some(Self::from_name(api, "p224")),
+            256 => Some(Self::from_name(api, "p256")),
+            384 => Some(Self::from_name(api, "p384")),
+            521 => Some(Self::from_name(api, "p521")),
             _ => None,
         }
     }

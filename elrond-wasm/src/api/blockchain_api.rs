@@ -1,7 +1,8 @@
 use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
-use crate::storage;
+use crate::storage::{self, StorageKey};
 use crate::types::{
-    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, TokenIdentifier, Vec, H256,
+    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedType, TokenIdentifier, Vec,
+    H256,
 };
 use alloc::boxed::Box;
 
@@ -92,10 +93,10 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     /// TODO: move to the storage API, once BigUint gets refactored
     #[inline]
     fn get_cumulated_validator_rewards(&self) -> BigUint<Self::TypeManager> {
-        storage::storage_get(
-            self.storage_manager(),
-            storage::protected_keys::ELROND_REWARD_KEY,
-        )
+        let raw_handle = self
+            .storage_manager()
+            .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY);
+        BigUint::from_raw_handle(self.type_manager(), raw_handle)
     }
 
     /// Retrieves local roles for the token, by reading protected storage.
@@ -103,11 +104,12 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     fn get_esdt_local_roles(&self, token_id: &TokenIdentifier) -> Vec<EsdtLocalRole> {
         let mut roles = Vec::new();
 
-        let key = [
+        let mut key = StorageKey::new(
+            self.storage_manager(),
             storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
-            token_id.as_esdt_identifier(),
-        ]
-        .concat();
+        );
+        key.append_bytes(token_id.as_esdt_identifier());
+
         let raw_storage =
             storage::storage_get::<Self::Storage, BoxedBytes>(self.storage_manager(), &key);
         let raw_storage_bytes = raw_storage.as_slice();

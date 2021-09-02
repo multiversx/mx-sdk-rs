@@ -3,35 +3,34 @@ use super::{LinkedListMapper, StorageClearable, StorageMapper};
 use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
+use crate::storage::{storage_get, storage_set, StorageKey};
 use crate::types::{BoxedBytes, MultiResultVec};
 use alloc::vec::Vec;
-use elrond_codec::{top_encode_to_vec, TopDecode, TopEncode};
+use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
-#[deprecated]
 pub struct SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     api: SA,
-    main_key: BoxedBytes,
+    base_key: StorageKey<SA>,
     linked_list_mapper: LinkedListMapper<SA, T>,
 }
 
 impl<SA, T> StorageMapper<SA> for SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn new(api: SA, main_key: BoxedBytes) -> Self {
+    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         SetMapper {
             api: api.clone(),
-            main_key: main_key.clone(),
-            linked_list_mapper: LinkedListMapper::<SA, T>::new(api, main_key),
+            base_key: base_key.clone(),
+            linked_list_mapper: LinkedListMapper::<SA, T>::new(api, base_key),
         }
     }
 }
@@ -39,7 +38,7 @@ where
 impl<SA, T> StorageClearable for SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
         for value in self.linked_list_mapper.iter() {
@@ -52,26 +51,26 @@ where
 impl<SA, T> SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn build_named_value_key(&self, name: &[u8], value: &T) -> BoxedBytes {
-        let bytes = top_encode_to_vec(&value).unwrap();
-        BoxedBytes::from_concat(&[self.main_key.as_slice(), name, &bytes])
+    fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(value);
+        named_key
     }
 
     fn get_node_id(&self, value: &T) -> u32 {
         storage_get(
             self.api.clone(),
-            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
-                .as_slice(),
+            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
         )
     }
 
     fn set_node_id(&self, value: &T, node_id: u32) {
         storage_set(
             self.api.clone(),
-            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
-                .as_slice(),
+            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
             &node_id,
         );
     }
@@ -79,8 +78,7 @@ where
     fn clear_node_id(&self, value: &T) {
         storage_set(
             self.api.clone(),
-            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
-                .as_slice(),
+            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
             &BoxedBytes::empty(),
         );
     }
@@ -142,7 +140,7 @@ where
 impl<SA, T> EndpointResult for SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + EndpointResult,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
@@ -159,7 +157,7 @@ where
 impl<SA, T> TypeAbi for SetMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + TypeAbi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
         crate::types::MultiResultVec::<T>::type_name()

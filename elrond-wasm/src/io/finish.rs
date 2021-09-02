@@ -1,10 +1,9 @@
-use alloc::boxed::Box;
 use elrond_codec::TryStaticCast;
 
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi};
 use crate::elrond_codec::{EncodeError, TopEncode, TopEncodeOutput};
-use crate::types::ManagedBuffer;
-use crate::Vec;
+use crate::err_msg;
+use crate::types::{BigInt, BigUint, ManagedBuffer, ManagedType};
 
 struct ApiOutputAdapter<FA>
 where
@@ -47,11 +46,22 @@ where
     }
 
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(self, value: &T, else_bytes: F) {
+    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<(), EncodeError>,
+    {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             self.api.finish_managed_buffer_raw(managed_buffer.handle);
+            Ok(())
+        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
+            self.api.finish_big_uint_raw(big_uint.handle);
+            Ok(())
+        } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
+            self.api.finish_big_int_raw(big_int.handle);
+            Ok(())
         } else {
-            self.set_boxed_bytes(else_bytes());
+            else_serialization(self)
         }
     }
 
@@ -61,16 +71,6 @@ where
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
         self.api.finish_managed_buffer_raw(nb.handle);
-    }
-
-    #[inline]
-    fn set_big_int_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
-        self.api.finish_big_int_raw(handle);
-    }
-
-    #[inline]
-    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, handle: i32, _else_bytes: F) {
-        self.api.finish_big_uint_raw(handle);
     }
 }
 
@@ -101,9 +101,12 @@ where
 }
 
 #[inline(always)]
-fn finish_exit<FA>(api: FA, en_err: EncodeError) -> !
+fn finish_exit<FA>(api: FA, encode_err: EncodeError) -> !
 where
     FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
 {
-    api.signal_error(en_err.message_bytes())
+    let mut message_buffer =
+        ManagedBuffer::new_from_bytes(api.clone(), err_msg::FINISH_ENCODE_ERROR);
+    message_buffer.append_bytes(encode_err.message_bytes());
+    api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }
