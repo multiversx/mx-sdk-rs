@@ -6,7 +6,7 @@ pub struct Account {
     pub comment: Option<String>,
     pub nonce: Option<U64Value>,
     pub balance: Option<BigUintValue>,
-    pub esdt: Option<BTreeMap<BytesKey, BigUintValue>>,
+    pub esdt: Option<BTreeMap<BytesKey, BytesValue>>,
     pub username: Option<BytesValue>,
     pub storage: BTreeMap<BytesKey, BytesValue>,
     pub code: Option<BytesValue>,
@@ -26,7 +26,7 @@ impl InterpretableFrom<AccountRaw> for Account {
                     .map(|(k, v)| {
                         (
                             BytesKey::interpret_from(k, context),
-                            BigUintValue::interpret_from(v, context),
+                            BytesValue::interpret_from(v, context),
                         )
                     })
                     .collect()

@@ -1,0 +1,60 @@
+use crate::esdt_instance::EsdtInstances;
+use crate::key_hex;
+use elrond_wasm::types::Address;
+use std::collections::HashMap;
+use std::fmt::{self, Write};
+
+#[derive(Clone)]
+pub struct EsdtRoles(HashMap<Vec<u8>, Vec<u8>>);
+
+#[derive(Clone)]
+pub struct EsdtData {
+    pub token_identifier: Address,
+    pub instances: EsdtInstances,
+    pub last_nonce: Option<u64>,
+    pub roles: Option<EsdtRoles>,
+}
+
+pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
+
+impl fmt::Display for AccountEsdt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut esdt_buf = String::new();
+        let mut esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
+
+        for key in &esdt_keys {
+            let value = self.0.get(key).unwrap();
+            write!(
+                &mut esdt_buf,
+                "\n\t\t\t{} -> {{
+                    instances: [{}],
+                    last_nonce: {},
+                    roles: [{}],
+                }}",
+                key_hex(key.as_slice()),
+                value.instances,
+                value.last_nonce.unwrap(),
+                value.roles.unwrap()
+            )?;
+        }
+        Ok(())
+    }
+}
+
+impl fmt::Display for EsdtRoles {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut esdt_buf = String::new();
+        let mut esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
+
+        for key in &esdt_keys {
+            let value = self.0.get(key).unwrap();
+            write!(
+                &mut esdt_buf,
+                "\n\t\t\t\t{} -> 0x{}",
+                key_hex(key.as_slice()),
+                hex::encode(value.as_slice())
+            )?;
+        }
+        Ok(())
+    }
+}

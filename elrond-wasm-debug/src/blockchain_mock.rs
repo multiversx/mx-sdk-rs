@@ -1,4 +1,5 @@
 use super::mock_error::BlockchainMockError;
+use crate::account_esdt::AccountEsdt;
 use crate::contract_map::*;
 use crate::display_util::*;
 use crate::esdt_transfer_event_log;
@@ -21,7 +22,6 @@ const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
-pub type AccountEsdt = HashMap<Vec<u8>, BigUint>;
 
 pub struct AccountData {
     pub address: Address,
@@ -36,22 +36,6 @@ pub struct AccountData {
 
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut esdt_buf = String::new();
-        let mut esdt_keys: Vec<Vec<u8>> =
-            self.esdt.clone().iter().map(|(k, _)| k.clone()).collect();
-        esdt_keys.sort();
-
-        for key in &esdt_keys {
-            let value = self.esdt.get(key).unwrap();
-            write!(
-                &mut esdt_buf,
-                "\n\t\t\t\t{} -> 0x{}",
-                key_hex(key.as_slice()),
-                hex::encode(value.to_bytes_be())
-            )
-            .unwrap();
-        }
-
         let mut storage_buf = String::new();
         let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
         storage_keys.sort();
@@ -78,7 +62,7 @@ impl fmt::Display for AccountData {
 	}}",
             self.nonce,
             self.balance,
-            esdt_buf,
+            self.esdt,
             String::from_utf8(self.username.clone()).unwrap(),
             storage_buf
         )
