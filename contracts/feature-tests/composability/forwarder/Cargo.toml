@@ -20,7 +20,6 @@ path = "../vault"
 version = "0.18.2"
 path = "../../../../elrond-wasm"
 features = ["derive"]
-# features = ["legacy-nft-transfer"] # only use on Arwen v1.2.*
 
 [dependencies.elrond-wasm-node]
 version = "0.18.2"

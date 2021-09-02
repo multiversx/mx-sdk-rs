@@ -1,5 +1,5 @@
 use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
-use crate::types::{Address, BigUint, TokenIdentifier};
+use crate::types::{Address, BigUint, ManagedAddress, TokenIdentifier};
 
 pub trait ProxyObjApi {
     type TypeManager: ManagedTypeApi + 'static;
@@ -13,30 +13,15 @@ pub trait ProxyObjApi {
 
     type SendApi: SendApi<ProxyTypeManager = Self::TypeManager> + Clone + 'static;
 
+    #[doc(hidden)]
     fn new_proxy_obj(api: Self::SendApi) -> Self;
 
     /// Specify the target contract to call.
     /// Not taken into account for deploys.
-    fn contract(self, address: Address) -> Self;
+    fn contract(self, address: ManagedAddress<Self::TypeManager>) -> Self;
 
-    fn with_token_transfer(
-        self,
-        token: TokenIdentifier<Self::TypeManager>,
-        payment: BigUint<Self::TypeManager>,
-    ) -> Self;
-
-    fn with_nft_nonce(self, nonce: u64) -> Self;
-
-    #[allow(clippy::type_complexity)]
-    fn into_fields(
-        self,
-    ) -> (
-        Self::SendApi,
-        Address,
-        TokenIdentifier<Self::TypeManager>,
-        BigUint<Self::TypeManager>,
-        u64,
-    );
+    #[doc(hidden)]
+    fn into_fields(self) -> (Self::SendApi, ManagedAddress<Self::TypeManager>);
 }
 
 pub trait CallbackProxyObjApi {

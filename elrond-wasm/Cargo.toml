@@ -14,7 +14,6 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
-legacy-nft-transfer = []
 derive = ["elrond-wasm-derive"]
 
 [dependencies]

@@ -2,7 +2,7 @@ use super::{ManagedBuffer, ManagedType, ManagedVecItem};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    types::{ArgBuffer, ManagedBufferNestedDecodeInput},
+    types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
 use alloc::string::String;
 use core::marker::PhantomData;
@@ -86,12 +86,9 @@ where
         self.byte_len() == 0
     }
 
-    pub fn push(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
-            self.buffer.append_bytes(bytes);
-        });
-    }
-
+    /// Retrieves element at index, if the index is valid.
+    /// Warning! Ownership around this method is murky, managed items are copied without respecting ownership.
+    /// TODO: Find a way to fix it by returning some kind of reference to the item, not the owned type.
     pub fn get(&self, index: usize) -> Option<T> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
@@ -102,6 +99,29 @@ where
             Ok(_) => Some(result),
             Err(_) => None,
         }
+    }
+
+    pub fn push(&mut self, item: T) {
+        item.to_byte_writer(|bytes| {
+            self.buffer.append_bytes(bytes);
+        });
+    }
+
+    pub fn overwrite_with_single_item(&mut self, item: T) {
+        item.to_byte_writer(|bytes| {
+            self.buffer.overwrite(bytes);
+        });
+    }
+
+    /// Appends all the contents of another managed vec at the end of the current one.
+    /// Consumes the other vec in the process.
+    pub fn append_vec(&mut self, item: ManagedVec<M, T>) {
+        self.buffer.append(&item.buffer);
+    }
+
+    /// Removes all items while retaining the handle.
+    pub fn clear(&mut self) {
+        self.buffer.overwrite(&[]);
     }
 }
 
@@ -196,4 +216,18 @@ pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
         arg_buffer.push_argument_bytes(buffer.to_boxed_bytes().as_slice());
     }
     arg_buffer
+}
+
+pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
+    api: M,
+    data: &[BoxedBytes],
+) -> ManagedVec<M, ManagedBuffer<M>> {
+    let mut result = ManagedVec::new_empty(api.clone());
+    for boxed_bytes in data {
+        result.push(ManagedBuffer::new_from_bytes(
+            api.clone(),
+            boxed_bytes.as_slice(),
+        ));
+    }
+    result
 }
