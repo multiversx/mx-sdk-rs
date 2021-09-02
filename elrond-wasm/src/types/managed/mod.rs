@@ -21,6 +21,8 @@ pub use managed_buffer::ManagedBuffer;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
 pub use managed_type_trait::ManagedType;
-pub use managed_vec::{managed_vec_of_buffers_to_arg_buffer, ManagedVec};
+pub use managed_vec::{
+    managed_vec_from_slice_of_boxed_bytes, managed_vec_of_buffers_to_arg_buffer, ManagedVec,
+};
 pub use managed_vec_item::ManagedVecItem;
 pub use managed_vec_iter::ManagedVecIterator;

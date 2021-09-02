@@ -12,6 +12,10 @@ where
         Self::new_from_bytes(api, address.as_array())
     }
 
+    pub fn zero_address(api: M) -> Self {
+        Self::new_from_bytes(api, &[0u8; 32])
+    }
+
     pub fn to_address(&self) -> Address {
         let mut result = Address::zero();
         let _ = self.buffer.load_slice(0, result.as_mut());

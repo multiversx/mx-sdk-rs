@@ -1,7 +1,7 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::SendApi;
 use crate::io::EndpointResult;
-use crate::types::{Address, BigUint, BoxedBytes, TokenIdentifier};
+use crate::types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier};
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -10,10 +10,10 @@ where
     SA: SendApi + 'static,
 {
     pub api: SA,
-    pub to: Address,
+    pub to: ManagedAddress<SA::ProxyTypeManager>,
     pub token: TokenIdentifier<SA::ProxyTypeManager>,
     pub amount: BigUint<SA::ProxyTypeManager>,
-    pub data: BoxedBytes,
+    pub data: ManagedBuffer<SA::ProxyTypeManager>,
 }
 
 impl<SA> EndpointResult for SendToken<SA>
@@ -25,15 +25,14 @@ where
     #[inline]
     fn finish<FA>(&self, _api: FA) {
         if self.token.is_egld() {
-            self.api
-                .direct_egld(&self.to, &self.amount, self.data.as_slice());
+            self.api.direct_egld(&self.to, &self.amount, &self.data);
         } else {
             self.api.transfer_esdt_via_async_call(
                 &self.to,
                 &self.token,
                 0,
                 &self.amount,
-                self.data.as_slice(),
+                &self.data,
             );
         }
     }

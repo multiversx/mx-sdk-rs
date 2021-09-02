@@ -4,8 +4,8 @@ use hex_literal::hex;
 use crate::{
     api::SendApi,
     types::{
-        Address, BigUint, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedType,
-        TokenIdentifier,
+        Address, BigUint, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
 
@@ -13,10 +13,6 @@ use crate::{
 /// Bech32: erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u
 pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
     hex!("000000000000000000010000000000000000000000000000000000000002ffff");
-
-pub fn esdt_system_sc_address() -> Address {
-    Address::from(ESDT_SYSTEM_SC_ADDRESS_ARRAY)
-}
 
 const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
 const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
@@ -137,7 +133,8 @@ where
         initial_supply: &BigUint<SA::ProxyTypeManager>,
         properties: TokenProperties,
     ) -> ContractCall<SA, ()> {
-        let type_manager = issue_cost.type_manager();
+        let type_manager = self.api.type_manager();
+        let esdt_system_sc_address = self.esdt_system_sc_address();
 
         let endpoint_name = match token_type {
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
@@ -148,10 +145,10 @@ where
 
         let mut contract_call = ContractCall::new(
             self.api,
-            esdt_system_sc_address(),
-            BoxedBytes::from(endpoint_name),
+            esdt_system_sc_address,
+            ManagedBuffer::new_from_bytes(type_manager, endpoint_name),
         )
-        .with_token_transfer(TokenIdentifier::egld(type_manager), issue_cost);
+        .with_egld_transfer(issue_cost);
 
         contract_call.push_argument_raw_bytes(token_display_name.as_slice());
         contract_call.push_argument_raw_bytes(token_ticker.as_slice());
@@ -366,8 +363,18 @@ where
         contract_call
     }
 
+    pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA::ProxyTypeManager> {
+        ManagedAddress::new_from_bytes(self.api.type_manager(), &ESDT_SYSTEM_SC_ADDRESS_ARRAY)
+    }
+
     fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
-        ContractCall::new(self.api, esdt_system_sc_address(), endpoint_name.into())
+        let type_manager = self.api.type_manager();
+        let esdt_system_sc_address = self.esdt_system_sc_address();
+        ContractCall::new(
+            self.api,
+            esdt_system_sc_address,
+            ManagedBuffer::new_from_bytes(type_manager, endpoint_name),
+        )
     }
 }
 

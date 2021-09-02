@@ -29,7 +29,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem<M>,
 {
-    fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
         ManagedVecIterator {
             managed_vec,
             byte_index: 0,
