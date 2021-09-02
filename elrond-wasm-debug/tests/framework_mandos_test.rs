@@ -95,7 +95,6 @@ fn set_check_code() {
 }
 
 #[test]
-#[ignore]
 #[should_panic]
 fn set_check_esdt_err_rs() {
     elrond_wasm_debug::mandos_rs(
@@ -105,7 +104,6 @@ fn set_check_esdt_err_rs() {
 }
 
 #[test]
-#[ignore]
 fn set_check_esdt_rs() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/set-check/set-check-esdt.scen.json",
@@ -201,7 +199,6 @@ fn set_check_username_rs() {
 }
 
 #[test]
-#[ignore]
 fn builtin_func_esdt_transfer() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/builtin-func-esdt-transfer.scen.json",
@@ -210,7 +207,6 @@ fn builtin_func_esdt_transfer() {
 }
 
 #[test]
-#[ignore]
 fn esdt_non_zero_balance_check_err_rs() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/esdt-non-zero-balance-check-err.scen.json",
@@ -219,7 +215,6 @@ fn esdt_non_zero_balance_check_err_rs() {
 }
 
 #[test]
-#[ignore]
 fn esdt_zero_balance_check_err_rs() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/esdt-zero-balance-check-err.scen.json",
@@ -228,7 +223,6 @@ fn esdt_zero_balance_check_err_rs() {
 }
 
 #[test]
-#[ignore]
 fn multi_transfer_esdt_rs() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/multi-transfer-esdt.scen.json",
@@ -242,7 +236,6 @@ fn transfer_egld_rs() {
 }
 
 #[test]
-#[ignore]
 fn transfer_esdt_rs() {
     elrond_wasm_debug::mandos_rs("tests/mandos/transfer-esdt.scen.json", &contract_map());
 }
