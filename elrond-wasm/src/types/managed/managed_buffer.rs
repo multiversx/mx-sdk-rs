@@ -1,4 +1,4 @@
-use super::ManagedType;
+use super::{ManagedFrom, ManagedType};
 use crate::api::InvalidSliceError;
 use crate::{
     api::{Handle, ManagedTypeApi},
@@ -50,7 +50,30 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             api,
         }
     }
+}
 
+impl<M> ManagedFrom<M, &[u8]> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: &[u8]) -> Self {
+        Self::new_from_bytes(api, bytes)
+    }
+}
+
+/// Syntactic sugar only.
+impl<M, const N: usize> ManagedFrom<M, &[u8; N]> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: &[u8; N]) -> Self {
+        Self::new_from_bytes(api, bytes)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn len(&self) -> usize {
         self.api.mb_len(self.handle)
