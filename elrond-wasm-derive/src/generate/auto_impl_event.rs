@@ -1,4 +1,4 @@
-use super::arg_str_serialize::arg_serialize_push;
+use super::arg_str_serialize::log_topic_push;
 use super::method_gen;
 use super::util::*;
 use crate::model::{Method, MethodArgument};
@@ -20,7 +20,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     let error_api_getter = quote! { self.log_api_raw() };
     let topic_push_snippets: Vec<proc_macro2::TokenStream> = topic_args
         .iter()
-        .map(|arg| arg_serialize_push(arg, &arg_accumulator, &error_api_getter))
+        .map(|arg| log_topic_push(arg, &arg_accumulator, &error_api_getter))
         .collect();
     let write_log_snippet = if let Some(data_arg) = data_arg {
         let data_pat = &data_arg.pat;

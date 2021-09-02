@@ -42,7 +42,7 @@
                 "arguments": [
                     "sc:vault"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "60,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -67,16 +67,16 @@
                             "str:accept_funds",
                             "str:TEST-TOKEN",
                             "str:FungibleESDT",
-                                                "1000",
-                                                "0"
-                                            ],
-                                            "data": ""
-                                        }
-                                    ],
-                                    "gas": "*",
-                                    "refund": "*"
-                                }
-                            },
+                            "1000",
+                            "0"
+                        ],
+                        "data": ""
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
         {
             "step": "checkState",
             "accounts": {

@@ -1,12 +1,14 @@
-use elrond_wasm::storage::mappers::{SafeSetMapper, StorageClearable, StorageMapper};
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::storage::mappers::{SetMapper, StorageClearable, StorageMapper};
+use elrond_wasm::storage::StorageKey;
 use elrond_wasm_debug::TxContext;
 
-fn create_set() -> SafeSetMapper<TxContext, u64> {
-    SafeSetMapper::new(TxContext::dummy(), BoxedBytes::from_concat(&[b"my_set"]))
+fn create_set() -> SetMapper<TxContext, u64> {
+    let api = TxContext::dummy();
+    let base_key = StorageKey::new(api.clone(), &b"my_set"[..]);
+    SetMapper::new(api, base_key)
 }
 
-fn check_set(set: &SafeSetMapper<TxContext, u64>, expected: Vec<u64>) {
+fn check_set(set: &SetMapper<TxContext, u64>, expected: Vec<u64>) {
     assert_eq!(set.len(), expected.len());
     assert!(set.check_internal_consistency());
     let actual: Vec<u64> = set.iter().collect();

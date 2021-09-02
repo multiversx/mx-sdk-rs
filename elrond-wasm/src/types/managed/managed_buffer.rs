@@ -1,3 +1,4 @@
+use super::ManagedType;
 use crate::api::InvalidSliceError;
 use crate::{
     api::{Handle, ManagedTypeApi},
@@ -16,7 +17,25 @@ pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) api: M,
 }
 
+impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
+    #[inline]
+    fn from_raw_handle(api: M, handle: Handle) -> Self {
+        ManagedBuffer { handle, api }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.handle
+    }
+
+    #[inline]
+    fn type_manager(&self) -> M {
+        self.api.clone()
+    }
+}
+
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
+    #[inline]
     pub fn new_empty(api: M) -> Self {
         ManagedBuffer {
             handle: api.mb_new_empty(),
@@ -24,6 +43,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
+    #[inline]
     pub fn new_from_bytes(api: M, bytes: &[u8]) -> Self {
         ManagedBuffer {
             handle: api.mb_new_from_bytes(bytes),
@@ -31,18 +51,17 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
-    pub(crate) fn new_from_raw_handle(api: M, handle: Handle) -> Self {
-        ManagedBuffer { handle, api }
-    }
-
+    #[inline]
     pub fn len(&self) -> usize {
         self.api.mb_len(self.handle)
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
+    #[inline]
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
         self.api.mb_to_boxed_bytes(self.handle)
     }
@@ -67,7 +86,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             self.api
                 .mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
         if err_result.is_ok() {
-            Some(ManagedBuffer::new_from_raw_handle(
+            Some(ManagedBuffer::from_raw_handle(
                 self.api.clone(),
                 result_handle,
             ))
@@ -87,13 +106,21 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn append_bytes(&mut self, slice: &[u8]) {
         self.api.mb_append_bytes(self.handle, slice);
     }
+
+    /// Utility function: helps serialize lengths (or any other value of type usize) easier.
+    #[inline(never)]
+    pub fn append_u32_be(&mut self, item: u32) {
+        self.api
+            .mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
+    }
 }
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
-        // TODO: Optimize!!!
+        let clone_handle = self.api.mb_new_empty();
+        self.api.mb_append(clone_handle, self.handle);
         ManagedBuffer {
-            handle: self.api.mb_new_from_bytes(self.to_boxed_bytes().as_slice()),
+            handle: clone_handle,
             api: self.api.clone(),
         }
     }
@@ -113,49 +140,30 @@ impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_specialized(self, || self.to_boxed_bytes().into_box());
-        Ok(())
+        output.set_specialized(self, |else_output| {
+            else_output.set_slice_u8(self.to_boxed_bytes().as_slice());
+            Ok(())
+        })
     }
 }
 
 impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if dest.push_specialized(self) {
-            Ok(())
-        } else {
-            self.to_boxed_bytes().dep_encode(dest)
-        }
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        if !dest.push_specialized(self) {
-            self.to_boxed_bytes().dep_encode_or_exit(dest, c, exit);
-        }
+        dest.push_specialized((), self, |else_output| {
+            self.to_boxed_bytes().dep_encode(else_output)
+        })
     }
 }
 
 impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.into_specialized::<ManagedBuffer<M>>() {
-            Ok(managed_buffer)
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 }
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        if let Some(managed_buffer) = input.read_specialized::<ManagedBuffer<M>>()? {
-            Ok(managed_buffer)
-        } else {
-            Err(DecodeError::UNSUPPORTED_OPERATION)
-        }
+        input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -163,13 +171,9 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        if let Some(managed_buffer) =
-            input.read_specialized_or_exit::<ManagedBuffer<M>, ExitCtx>(c.clone(), exit)
-        {
-            managed_buffer
-        } else {
+        input.read_specialized_or_exit((), c, exit, |_, c| {
             exit(c, DecodeError::UNSUPPORTED_OPERATION)
-        }
+        })
     }
 }
 

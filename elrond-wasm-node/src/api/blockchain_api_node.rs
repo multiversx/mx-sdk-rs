@@ -1,6 +1,7 @@
 use elrond_wasm::api::BlockchainApi;
 use elrond_wasm::types::{
-    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, TokenIdentifier, H256,
+    Address, BigUint, Box, BoxedBytes, EsdtTokenData, EsdtTokenType, ManagedType, TokenIdentifier,
+    H256,
 };
 
 extern "C" {
@@ -143,7 +144,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
-            BigUint::from_raw_handle(balance_handle, self.storage_manager())
+            BigUint::from_raw_handle(self.storage_manager(), balance_handle)
         }
     }
 
@@ -247,7 +248,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 balance_handle,
             );
 
-            BigUint::from_raw_handle(balance_handle, self.storage_manager())
+            BigUint::from_raw_handle(self.storage_manager(), balance_handle)
         }
     }
 
@@ -325,13 +326,13 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
             EsdtTokenData {
                 token_type,
-                amount: BigUint::from_raw_handle(value_handle, self.storage_manager()),
+                amount: BigUint::from_raw_handle(self.storage_manager(), value_handle),
                 frozen,
                 hash,
                 name: name_buffer,
                 attributes: attr_buffer,
                 creator,
-                royalties: BigUint::from_raw_handle(royalties_handle, self.storage_manager()),
+                royalties: BigUint::from_raw_handle(self.storage_manager(), royalties_handle),
                 uris: [uris_buffer].to_vec(),
             }
         }

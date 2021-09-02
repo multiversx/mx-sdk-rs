@@ -2,7 +2,9 @@ use crate::api::managed_types::unsafe_buffer_load_be_pad_right;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, TokenIdentifier};
+use elrond_wasm::types::{
+    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedType, TokenIdentifier,
+};
 
 // Token ID + nonce + amount, as bytes
 const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;
@@ -149,9 +151,15 @@ extern "C" {
 impl SendApi for ArwenApiImpl {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
+    type ErrorApi = Self;
 
     #[inline]
     fn type_manager(&self) -> Self::ProxyTypeManager {
+        self.clone()
+    }
+
+    #[inline]
+    fn error_api(&self) -> Self::ErrorApi {
         self.clone()
     }
 
@@ -565,7 +573,7 @@ impl SendApi for ArwenApiImpl {
         self.execute_on_dest_context_raw(
             gas,
             &own_address,
-            &BigUint::from_u32(0u32, self.clone()),
+            &BigUint::zero(self.clone()),
             function,
             arg_buffer,
         )

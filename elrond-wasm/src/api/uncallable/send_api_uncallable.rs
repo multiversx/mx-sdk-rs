@@ -7,8 +7,13 @@ use alloc::vec::Vec;
 impl SendApi for super::UncallableApi {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
+    type ErrorApi = Self;
 
     fn type_manager(&self) -> Self::ProxyTypeManager {
+        unreachable!()
+    }
+
+    fn error_api(&self) -> Self::ErrorApi {
         unreachable!()
     }
 

@@ -5,6 +5,33 @@ pub fn arg_serialize_push(
     arg_accumulator: &proc_macro2::TokenStream,
     error_api_getter: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
+    arg_serialize_call(
+        &quote! {elrond_wasm::io::serialize_contract_call_arg},
+        arg,
+        arg_accumulator,
+        error_api_getter,
+    )
+}
+
+pub fn log_topic_push(
+    arg: &MethodArgument,
+    arg_accumulator: &proc_macro2::TokenStream,
+    error_api_getter: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    arg_serialize_call(
+        &quote! {elrond_wasm::io::serialize_event_topic},
+        arg,
+        arg_accumulator,
+        error_api_getter,
+    )
+}
+
+fn arg_serialize_call(
+    serialize_method: &proc_macro2::TokenStream,
+    arg: &MethodArgument,
+    arg_accumulator: &proc_macro2::TokenStream,
+    error_api_getter: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
     let pat = &arg.pat;
     let var_name = quote! { #pat };
     let arg_ty = &arg.ty;
@@ -14,12 +41,12 @@ pub fn arg_serialize_push(
                 panic!("Mutable references not supported as contract method arguments");
             }
             quote! {
-                elrond_wasm::io::serialize_contract_call_arg(#var_name, #arg_accumulator, #error_api_getter);
+                #serialize_method(#var_name, #arg_accumulator, #error_api_getter);
             }
         },
         _ => {
             quote! {
-                elrond_wasm::io::serialize_contract_call_arg(#var_name, #arg_accumulator, #error_api_getter);
+                #serialize_method(#var_name, #arg_accumulator, #error_api_getter);
             }
         },
     }

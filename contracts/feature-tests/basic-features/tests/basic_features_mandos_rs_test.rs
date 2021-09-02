@@ -9,7 +9,6 @@ fn contract_map() -> ContractMap<TxContext> {
     );
     contract_map
 }
-
 #[test]
 fn big_int_to_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_int_to_i64.scen.json", &contract_map());
@@ -31,24 +30,39 @@ fn boxed_bytes_zeros_rs() {
 }
 
 #[test]
+fn codec_err_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/codec_err.scen.json", &contract_map());
+}
+
+#[test]
 fn count_ones_rs() {
     elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", &contract_map());
 }
 
-#[test]
-fn only_owner_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", &contract_map());
-}
+// #[test]
+// fn crypto_elliptic_curves_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", &contract_map());
+// }
 
 #[test]
 fn crypto_keccak256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", &contract_map());
 }
 
+// #[test]
+// fn crypto_ripemd160_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", &contract_map());
+// }
+
 #[test]
 fn crypto_sha256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", &contract_map());
 }
+
+// #[test]
+// fn crypto_verify_funcs_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_funcs.scen.json", &contract_map());
+// }
 
 #[test]
 fn echo_array_u8_rs() {
@@ -88,6 +102,11 @@ fn echo_i32_rs() {
 #[test]
 fn echo_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_i64.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_managed_bytes_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_managed_bytes.scen.json", &contract_map());
 }
 
 #[test]
@@ -178,8 +197,69 @@ fn get_cumulated_validator_rewards_rs() {
 // }
 
 #[test]
+fn log2_func_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/log2_func.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_buffer_concat_1_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_concat_1.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_buffer_concat_2_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_concat_2.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_buffer_eq_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_eq.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_buffer_overwrite_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_overwrite.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_buffer_slice_1_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_1.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_buffer_slice_2_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_2.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_vec_address_push_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_vec_address_push.scen.json", &contract_map());
+}
+
+#[test]
+fn managed_vec_biguint_push_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_vec_biguint_push.scen.json", &contract_map());
+}
+
+#[test]
+fn only_owner_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", &contract_map());
+}
+
+// Will never run in mandos-rs.
+// #[test]
+// fn out_of_gas_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/out_of_gas.scen.json", &contract_map());
+// }
+
+#[test]
 fn panic_rs() {
     elrond_wasm_debug::mandos_rs("mandos/panic.scen.json", &contract_map());
+}
+
+#[test]
+fn pow_func_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/pow_func.scen.json", &contract_map());
 }
 
 #[test]
@@ -198,6 +278,11 @@ fn sc_properties_rs() {
 #[test]
 fn sc_result_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sc_result.scen.json", &contract_map());
+}
+
+#[test]
+fn sqrt_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/sqrt.scen.json", &contract_map());
 }
 
 #[test]
@@ -264,11 +349,6 @@ fn storage_mapper_map_rs() {
 }
 
 #[test]
-fn storage_mapper_set_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_set.scen.json", &contract_map());
-}
-
-#[test]
 fn storage_mapper_map_storage_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/storage_mapper_map_storage.scen.json",
@@ -277,9 +357,22 @@ fn storage_mapper_map_storage_rs() {
 }
 
 #[test]
+fn storage_mapper_set_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_set.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_mapper_single_value_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/storage_mapper_single_value.scen.json",
+        &contract_map(),
+    );
+}
+
+#[test]
+fn storage_mapper_token_attributes_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/storage_mapper_token_attributes.scen.json",
         &contract_map(),
     );
 }
@@ -322,19 +415,4 @@ fn storage_usize_bad_rs() {
 #[test]
 fn storage_vec_u8_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_vec_u8.scen.json", &contract_map());
-}
-
-#[test]
-fn sqrt() {
-    elrond_wasm_debug::mandos_rs("mandos/sqrt.scen.json", &contract_map());
-}
-
-#[test]
-fn log2() {
-    elrond_wasm_debug::mandos_rs("mandos/log2_func.scen.json", &contract_map());
-}
-
-#[test]
-fn pow() {
-    elrond_wasm_debug::mandos_rs("mandos/pow_func.scen.json", &contract_map());
 }

@@ -1,4 +1,6 @@
-use crate::{num_conv::top_encode_number_to_output, NestedEncodeOutput, TryStaticCast};
+use crate::{
+    num_conv::top_encode_number_to_output, EncodeError, NestedEncodeOutput, TryStaticCast,
+};
 use alloc::{boxed::Box, vec::Vec};
 
 /// Specifies objects that can receive the result of a TopEncode computation.
@@ -43,56 +45,22 @@ pub trait TopEncodeOutput: Sized {
         self.set_slice_u8(&[]);
     }
 
+    /// Allows special handling of special types.
+    /// Also requires an alternative serialization, in case the special handling is not covered.
+    /// The alternative serialization, `else_serialization` is only called when necessary and
+    /// is normally compiled out via monomorphization.
     #[inline]
-    fn set_specialized<T: TryStaticCast, F: FnOnce() -> Box<[u8]>>(
-        self,
-        _value: &T,
-        else_bytes: F,
-    ) {
-        self.set_boxed_bytes(else_bytes());
+    fn set_specialized<T, F>(self, _value: &T, else_serialization: F) -> Result<(), EncodeError>
+    where
+        T: TryStaticCast,
+        F: FnOnce(Self) -> Result<(), EncodeError>,
+    {
+        else_serialization(self)
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer;
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer);
-
-    /// Unless you're developing elrond-wasm, please ignore.
-    ///
-    /// Shortcut for sending a BigInt managed by the API to the API directly via its handle.
-    ///
-    /// - ArwenBigInt + finish API
-    /// - ArwenBigInt + set storage
-    /// Not used for:
-    /// - RustBigInt
-    /// - async call
-    ///
-    /// Note: The byte representation is required as a lambda, so it is computed lazily.
-    /// It should not be computed whenever the handle is present.
-    #[doc(hidden)]
-    #[inline]
-    fn set_big_int_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, _handle: i32, else_bytes: F) {
-        self.set_slice_u8(else_bytes().as_slice());
-    }
-
-    /// Unless you're developing elrond-wasm, please ignore.
-    ///
-    /// Shortcut for sending a BigUint managed by the API to the API directly via its handle.
-    ///
-    /// Used for:
-    /// - ArwenBigUint + finish API
-    /// - ArwenBigUint + set storage
-    /// Not used for:
-    /// - RustBigUint
-    /// - async call
-    /// - anything else
-    ///
-    /// Note: The byte representation is required as a lambda, so it is computed lazily.
-    /// It should not be computed whenever the handle is present.
-    #[doc(hidden)]
-    #[inline]
-    fn set_big_uint_handle_or_bytes<F: FnOnce() -> Vec<u8>>(self, _handle: i32, else_bytes: F) {
-        self.set_slice_u8(else_bytes().as_slice());
-    }
 }
 
 impl TopEncodeOutput for &mut Vec<u8> {

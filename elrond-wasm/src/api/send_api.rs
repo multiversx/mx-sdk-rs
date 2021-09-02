@@ -16,7 +16,7 @@ pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApi: ErrorApi + Clone + Sized {
+pub trait SendApi: Clone + Sized {
     type ProxyTypeManager: ManagedTypeApi + ErrorApi + 'static;
 
     /// Not used by `SendApi`, but forwarded to the proxy traits.
@@ -27,7 +27,11 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         + Clone
         + 'static;
 
+    type ErrorApi: ErrorApi + ManagedTypeApi + Clone + 'static;
+
     fn type_manager(&self) -> Self::ProxyTypeManager;
+
+    fn error_api(&self) -> Self::ErrorApi;
 
     /// Required for ESDTNFTTransfer.
     /// Same as the implementation from BlockchainApi.
@@ -435,8 +439,7 @@ pub trait SendApi: ErrorApi + Clone + Sized {
         payment_amount: &BigUint<Self::ProxyTypeManager>,
     ) -> BigUint<Self::ProxyTypeManager> {
         let nft_token_data = self.get_esdt_token_data(&self.get_sc_address(), nft_id, nft_nonce);
-        let royalties_amount = payment_amount.clone() * nft_token_data.royalties
-            / BigUint::from_u64(PERCENTAGE_TOTAL, self.type_manager());
+        let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
         self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
 

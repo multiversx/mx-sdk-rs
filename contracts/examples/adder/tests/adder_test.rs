@@ -6,18 +6,18 @@ use elrond_wasm_debug::TxContext;
 fn test_add() {
     let adder = adder::contract_obj(TxContext::dummy());
 
-    adder.init(BigInt::from_i64(5, adder.type_manager()));
-    assert_eq!(BigInt::from_i64(5, adder.type_manager()), adder.sum().get());
+    adder.init(BigInt::from_i64(adder.type_manager(), 5));
+    assert_eq!(BigInt::from_i64(adder.type_manager(), 5), adder.sum().get());
 
-    let _ = adder.add(BigInt::from_i64(7, adder.type_manager()));
+    let _ = adder.add(BigInt::from_i64(adder.type_manager(), 7));
     assert_eq!(
-        BigInt::from_i64(12, adder.type_manager()),
+        BigInt::from_i64(adder.type_manager(), 12),
         adder.sum().get()
     );
 
-    let _ = adder.add(BigInt::from_i64(1, adder.type_manager()));
+    let _ = adder.add(BigInt::from_i64(adder.type_manager(), 1));
     assert_eq!(
-        BigInt::from_i64(13, adder.type_manager()),
+        BigInt::from_i64(adder.type_manager(), 13),
         adder.sum().get()
     );
 }

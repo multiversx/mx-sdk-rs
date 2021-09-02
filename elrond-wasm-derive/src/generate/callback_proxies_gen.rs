@@ -49,7 +49,7 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
 				let method_name = &m.name;
 				let proxy_decl = quote! {
 					fn #method_name (self, #(#arg_decl),* ) -> elrond_wasm::types::CallbackCall{
-						let ___api___ = self.into_api();
+						let ___api___ = self.cb_error_api();
 						let mut ___closure_arg_buffer___ = elrond_wasm::types::ArgBuffer::new();
 						#(#arg_push_snippets)*
 						elrond_wasm::types::CallbackCall::from_arg_buffer(#cb_name_literal, &___closure_arg_buffer___)

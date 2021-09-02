@@ -25,6 +25,7 @@ extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
+    fn mBufferGetLength(mBufferHandle: i32) -> i32;
 }
 
 impl StorageReadApi for ArwenApiImpl {
@@ -54,6 +55,7 @@ impl StorageReadApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
         unsafe {
             let handle = bigIntNew(0);
@@ -62,11 +64,22 @@ impl StorageReadApi for ArwenApiImpl {
         }
     }
 
+    #[inline]
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle {
         unsafe {
             let value_handle = mBufferNew();
             mBufferStorageLoad(key_handle, value_handle);
             value_handle
+        }
+    }
+
+    #[inline]
+    fn storage_load_managed_buffer_len(&self, key_handle: Handle) -> usize {
+        unsafe {
+            // TODO: use a temp handle
+            let value_handle = mBufferNew();
+            mBufferStorageLoad(key_handle, value_handle);
+            mBufferGetLength(value_handle) as usize
         }
     }
 
@@ -102,6 +115,13 @@ impl StorageWriteApi for ArwenApiImpl {
 
     fn storage_store_managed_buffer_raw(&self, key_handle: Handle, value_handle: Handle) {
         unsafe {
+            mBufferStorageStore(key_handle, value_handle);
+        }
+    }
+
+    fn storage_store_managed_buffer_clear(&self, key_handle: Handle) {
+        unsafe {
+            let value_handle = mBufferNew();
             mBufferStorageStore(key_handle, value_handle);
         }
     }

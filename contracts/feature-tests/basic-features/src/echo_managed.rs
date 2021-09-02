@@ -18,6 +18,11 @@ pub trait EchoManagedTypes {
         mb
     }
 
+    #[endpoint]
+    fn echo_managed_address(&self, ma: ManagedAddress) -> ManagedAddress {
+        ma
+    }
+
     /// This tests that nested serialization of managed buffers within unmanaged types works.
     #[endpoint]
     fn echo_vec_of_managed_buffer(&self, mb: Vec<ManagedBuffer>) -> Vec<ManagedBuffer> {

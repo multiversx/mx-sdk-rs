@@ -16,6 +16,8 @@ pub trait StorageReadApi {
 
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle;
 
+    fn storage_load_managed_buffer_len(&self, key_handle: Handle) -> usize;
+
     fn storage_load_u64(&self, key: &[u8]) -> u64;
 
     fn storage_load_i64(&self, key: &[u8]) -> i64;
@@ -27,6 +29,8 @@ pub trait StorageWriteApi {
     fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Handle);
 
     fn storage_store_managed_buffer_raw(&self, key_handle: Handle, value_handle: Handle);
+
+    fn storage_store_managed_buffer_clear(&self, key_handle: Handle);
 
     fn storage_store_u64(&self, key: &[u8], value: u64);
 
