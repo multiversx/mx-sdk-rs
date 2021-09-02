@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedType};
+use super::{ManagedBuffer, ManagedFrom, ManagedType};
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
@@ -45,28 +45,36 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
     }
 }
 
+impl<M> ManagedFrom<M, u64> for BigUint<M>
+where
+    M: ManagedTypeApi,
+{
+    fn managed_from(api: M, value: u64) -> Self {
+        BigUint {
+            handle: api.bi_new(value as i64),
+            api,
+        }
+    }
+}
+
+impl<M> ManagedFrom<M, u32> for BigUint<M>
+where
+    M: ManagedTypeApi,
+{
+    fn managed_from(api: M, value: u32) -> Self {
+        BigUint {
+            handle: api.bi_new(value as i64),
+            api,
+        }
+    }
+}
+
 /// More conversions here.
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn zero(api: M) -> Self {
         BigUint {
             handle: api.bi_new_zero(),
-            api,
-        }
-    }
-
-    #[inline]
-    pub fn from_u64(api: M, value: u64) -> Self {
-        BigUint {
-            handle: api.bi_new(value as i64),
-            api,
-        }
-    }
-
-    #[inline]
-    pub fn from_u32(api: M, value: u32) -> Self {
-        BigUint {
-            handle: api.bi_new(value as i64),
             api,
         }
     }
