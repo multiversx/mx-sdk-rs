@@ -152,6 +152,7 @@ impl SendApi for ArwenApiImpl {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
     type ErrorApi = Self;
+    type BlockchainApi = Self;
 
     #[inline]
     fn type_manager(&self) -> Self::ProxyTypeManager {
@@ -164,23 +165,8 @@ impl SendApi for ArwenApiImpl {
     }
 
     #[inline]
-    fn get_sc_address(&self) -> Address {
-        BlockchainApi::get_sc_address(self)
-    }
-
-    #[inline]
-    fn get_gas_left(&self) -> u64 {
-        BlockchainApi::get_gas_left(self)
-    }
-
-    #[inline]
-    fn get_esdt_token_data(
-        &self,
-        address: &Address,
-        token: &TokenIdentifier,
-        nonce: u64,
-    ) -> elrond_wasm::types::EsdtTokenData<Self::ProxyTypeManager> {
-        BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+    fn blockchain(&self) -> Self::BlockchainApi {
+        self.clone()
     }
 
     fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, data: &[u8]) {

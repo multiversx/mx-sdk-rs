@@ -5,13 +5,13 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../output/payable-features.wasm"
                 },
-                "address:an_account": {
+                "address:an-account": {
                     "nonce": "0",
                     "balance": "1,000,000,000,000",
                     "storage": {},
@@ -27,8 +27,8 @@
             "step": "scCall",
             "txId": "payable_token_3.1",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
+                "from": "address:an-account",
+                "to": "sc:payable-features",
                 "value": "0",
                 "function": "payable_token_3",
                 "arguments": [],
@@ -48,8 +48,8 @@
             "step": "scCall",
             "txId": "payable_token_3.2",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
+                "from": "address:an-account",
+                "to": "sc:payable-features",
                 "value": "5",
                 "function": "payable_token_3",
                 "arguments": [],
@@ -69,8 +69,8 @@
             "step": "scCall",
             "txId": "payable_token_3.3",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
+                "from": "address:an-account",
+                "to": "sc:payable-features",
                 "value": "0",
                 "esdt": {
                     "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
@@ -93,8 +93,8 @@
             "step": "scCall",
             "txId": "payable_token_3.4",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
+                "from": "address:an-account",
+                "to": "sc:payable-features",
                 "value": "0",
                 "esdt": {
                     "tokenIdentifier": "str:OTHER-TOKEN",
