@@ -5,12 +5,12 @@ elrond_wasm::imports!();
 pub trait BlockchainApiFeatures {
     #[endpoint]
     fn get_caller(&self) -> ManagedAddress {
-        self.blockchain().get_caller_managed()
+        self.blockchain().get_caller()
     }
 
     #[endpoint]
     fn get_owner_address(&self) -> ManagedAddress {
-        self.blockchain().get_owner_address_managed()
+        self.blockchain().get_owner_address()
     }
 
     #[endpoint]

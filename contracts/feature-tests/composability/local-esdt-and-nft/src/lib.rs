@@ -129,7 +129,7 @@ pub trait LocalEsdtAndEsdtNft {
     #[endpoint(transferNftViaAsyncCall)]
     fn transfer_nft_via_async_call(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
@@ -147,14 +147,14 @@ pub trait LocalEsdtAndEsdtNft {
     #[endpoint]
     fn transfer_nft_and_execute(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
         function: BoxedBytes,
         #[var_args] arguments: VarArgs<BoxedBytes>,
     ) {
-        let mut arg_buffer = ArgBuffer::new();
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         for arg in arguments.into_vec() {
             arg_buffer.push_argument_bytes(arg.as_slice());
         }
@@ -205,7 +205,7 @@ pub trait LocalEsdtAndEsdtNft {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(
         &self,
-        address: Address,
+        address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
@@ -218,7 +218,7 @@ pub trait LocalEsdtAndEsdtNft {
     #[endpoint(unsetLocalRoles)]
     fn unset_local_roles(
         &self,
-        address: Address,
+        address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
@@ -232,17 +232,14 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[view(getFungibleEsdtBalance)]
     fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
-        self.blockchain().get_esdt_balance(
-            &self.blockchain().get_sc_address_managed(),
-            token_identifier,
-            0,
-        )
+        self.blockchain()
+            .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
     }
 
     #[view(getNftBalance)]
     fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain().get_esdt_balance(
-            &self.blockchain().get_sc_address_managed(),
+            &self.blockchain().get_sc_address(),
             token_identifier,
             nonce,
         )
@@ -253,7 +250,7 @@ pub trait LocalEsdtAndEsdtNft {
     #[callback]
     fn esdt_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment] returned_tokens: BigUint,
         #[call_result] result: AsyncCallResult<()>,
@@ -279,7 +276,7 @@ pub trait LocalEsdtAndEsdtNft {
     #[callback]
     fn nft_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[call_result] result: AsyncCallResult<TokenIdentifier>,
     ) {
         match result {

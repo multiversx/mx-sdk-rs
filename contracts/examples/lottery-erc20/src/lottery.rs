@@ -16,7 +16,7 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 #[elrond_wasm::contract]
 pub trait Lottery {
     #[proxy]
-    fn erc20_proxy(&self, to: Address) -> erc20::Proxy<Self::SendApi>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::SendApi>;
 
     #[init]
     fn init(&self, erc20_contract_address: ManagedAddress) {
@@ -205,7 +205,7 @@ pub trait Lottery {
         token_amount: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         let info = self.get_lottery_info(lottery_name);
-        let caller = self.blockchain().get_caller_managed();
+        let caller = self.blockchain().get_caller();
 
         require!(
             info.whitelist.is_empty() || info.whitelist.contains(&caller),
@@ -225,7 +225,7 @@ pub trait Lottery {
         self.reserve_ticket(lottery_name);
 
         let erc20_address = self.get_erc20_contract_address();
-        let lottery_contract_address = self.blockchain().get_sc_address_managed();
+        let lottery_contract_address = self.blockchain().get_sc_address();
         Ok(self
             .erc20_proxy(erc20_address)
             .transfer_from(caller.clone(), lottery_contract_address, token_amount)
@@ -453,7 +453,7 @@ pub trait Lottery {
 
     #[view(erc20ContractManagedAddress)]
     #[storage_get("erc20_contract_address")]
-    fn get_erc20_contract_address(&self) -> Address;
+    fn get_erc20_contract_address(&self) -> ManagedAddress;
 
     // temporary storage between "determine_winner" proxy callbacks
 

@@ -30,7 +30,7 @@ pub trait Lottery {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<ManagedAddress>>,
         #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
     ) -> SCResult<()> {
         self.start_lottery(
@@ -57,7 +57,7 @@ pub trait Lottery {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<ManagedAddress>>,
         #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
     ) -> SCResult<()> {
         self.start_lottery(
@@ -83,7 +83,7 @@ pub trait Lottery {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<ManagedAddress>>,
         #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
     ) -> SCResult<()> {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
@@ -364,13 +364,14 @@ pub trait Lottery {
     ) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::TypeManager>>;
 
     #[storage_mapper("ticketHolder")]
-    fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<Self::Storage, Address>;
+    fn ticket_holders(&self, lottery_name: &BoxedBytes)
+        -> VecMapper<Self::Storage, ManagedAddress>;
 
     #[storage_mapper("numberOfEntriesForUser")]
     fn number_of_entries_for_user(
         &self,
         lottery_name: &BoxedBytes,
-        user: &Address,
+        user: &ManagedAddress,
     ) -> SingleValueMapper<Self::Storage, u32>;
 
     #[storage_mapper("burnPercentageForLottery")]

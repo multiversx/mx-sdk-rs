@@ -16,15 +16,18 @@ pub trait Erc1155 {
     #[endpoint(safeTransferFrom)]
     fn safe_transfer_from(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
     ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
         let caller = self.blockchain().get_caller();
 
-        require!(to != Address::zero(), "Can't transfer to address zero");
+        require!(
+            to != self.types().address_zero(),
+            "Can't transfer to address zero"
+        );
         require!(self.is_valid_type_id(&type_id), "Token id is invalid");
         require!(
             caller == from || self.is_approved(&caller, &from).get(),
@@ -42,8 +45,8 @@ pub trait Erc1155 {
 
     fn safe_transfer_from_fungible(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_id: BigUint,
         amount: BigUint,
         data: &[u8],
@@ -63,8 +66,8 @@ pub trait Erc1155 {
 
     fn safe_transfer_from_non_fungible(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_id: BigUint,
         nft_id: BigUint,
         data: &[u8],
@@ -88,8 +91,8 @@ pub trait Erc1155 {
     #[endpoint(safeBatchTransferFrom)]
     fn safe_batch_transfer_from(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
@@ -101,7 +104,10 @@ pub trait Erc1155 {
             caller == from || self.is_approved(&caller, &from).get(),
             "Caller is not approved to transfer tokens from address"
         );
-        require!(to != Address::zero(), "Can't transfer to address zero");
+        require!(
+            to != self.types().address_zero(),
+            "Can't transfer to address zero"
+        );
         require!(
             !type_ids.is_empty() && !values.is_empty(),
             "No type_ids and/or values provided"
@@ -145,8 +151,8 @@ pub trait Erc1155 {
     fn safe_batch_item_transfer_from_fungible(
         &self,
         is_receiver_smart_contract: bool,
-        from: &Address,
-        to: &Address,
+        from: &ManagedAddress,
+        to: &ManagedAddress,
         type_id: &BigUint,
         amount: &BigUint,
     ) -> SCResult<()> {
@@ -160,8 +166,8 @@ pub trait Erc1155 {
     fn safe_batch_item_transfer_from_non_fungible(
         &self,
         is_receiver_smart_contract: bool,
-        from: &Address,
-        to: &Address,
+        from: &ManagedAddress,
+        to: &ManagedAddress,
         type_id: &BigUint,
         nft_id: &BigUint,
     ) -> SCResult<()> {
@@ -171,13 +177,14 @@ pub trait Erc1155 {
             self.increase_balance(to, type_id, &amount);
             self.token_owner(type_id, nft_id).set(to);
         } else {
-            self.token_owner(type_id, nft_id).set(&Address::zero());
+            self.token_owner(type_id, nft_id)
+                .set(&self.types().address_zero());
         }
         Ok(())
     }
 
     #[endpoint(setApprovalForAll)]
-    fn set_approved_for_all(&self, operator: Address, approved: bool) {
+    fn set_approved_for_all(&self, operator: ManagedAddress, approved: bool) {
         let caller = self.blockchain().get_caller();
 
         self.is_approved(&operator, &caller).set(&approved);
@@ -258,7 +265,7 @@ pub trait Erc1155 {
     // views
 
     #[view(balanceOf)]
-    fn balance_of(&self, owner: &Address, type_id: &BigUint) -> BigUint {
+    fn balance_of(&self, owner: &ManagedAddress, type_id: &BigUint) -> BigUint {
         self.get_balance_mapper(owner)
             .get(type_id)
             .unwrap_or_else(|| self.types().big_uint_zero())
@@ -268,7 +275,7 @@ pub trait Erc1155 {
     #[view(balanceOfBatch)]
     fn balance_of_batch(
         &self,
-        #[var_args] owner_type_id_pairs: VarArgs<MultiArg2<Address, BigUint>>,
+        #[var_args] owner_type_id_pairs: VarArgs<MultiArg2<ManagedAddress, BigUint>>,
     ) -> MultiResultVec<BigUint> {
         let mut batch_balance = Vec::new();
         for multi_arg in owner_type_id_pairs.into_vec() {
@@ -292,26 +299,26 @@ pub trait Erc1155 {
             && nft_id <= &self.last_valid_nft_id_for_type(type_id).get()
     }
 
-    fn increase_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
+    fn increase_balance(&self, owner: &ManagedAddress, type_id: &BigUint, amount: &BigUint) {
         let mut balance = self.balance_of(owner, type_id);
         balance += amount;
         self.set_balance(owner, type_id, &balance);
     }
 
-    fn decrease_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
+    fn decrease_balance(&self, owner: &ManagedAddress, type_id: &BigUint, amount: &BigUint) {
         let mut balance = self.balance_of(owner, type_id);
         balance -= amount;
         self.set_balance(owner, type_id, &balance);
     }
 
-    fn set_balance(&self, owner: &Address, type_id: &BigUint, amount: &BigUint) {
+    fn set_balance(&self, owner: &ManagedAddress, type_id: &BigUint, amount: &BigUint) {
         let mut balance_mapper = self.get_balance_mapper(owner);
         balance_mapper.insert(type_id.clone(), amount.clone());
     }
 
     fn try_reserve_fungible(
         &self,
-        owner: &Address,
+        owner: &ManagedAddress,
         type_id: &BigUint,
         amount: &BigUint,
     ) -> SCResult<()> {
@@ -327,7 +334,7 @@ pub trait Erc1155 {
 
     fn try_reserve_non_fungible(
         &self,
-        owner: &Address,
+        owner: &ManagedAddress,
         type_id: &BigUint,
         nft_id: &BigUint,
     ) -> SCResult<()> {
@@ -342,7 +349,8 @@ pub trait Erc1155 {
 
         let amount = self.types().big_uint_from(1u32);
         self.decrease_balance(owner, type_id, &amount);
-        self.token_owner(type_id, nft_id).set(&Address::zero());
+        self.token_owner(type_id, nft_id)
+            .set(&self.types().address_zero());
 
         Ok(())
     }
@@ -353,7 +361,7 @@ pub trait Erc1155 {
         type_id: &BigUint,
         start: &BigUint,
         end: &BigUint,
-        owner: &Address,
+        owner: &ManagedAddress,
     ) {
         let big_uint_one = self.types().big_uint_from(1u32);
         let mut nft_id = start.clone();
@@ -366,8 +374,8 @@ pub trait Erc1155 {
 
     fn peform_async_call_single_transfer(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
@@ -387,8 +395,8 @@ pub trait Erc1155 {
 
     fn peform_async_call_batch_transfer(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
@@ -417,8 +425,8 @@ pub trait Erc1155 {
     #[callback]
     fn transfer_callback(
         &self,
-        from: Address,
-        to: Address,
+        from: ManagedAddress,
+        to: ManagedAddress,
         type_ids: Vec<BigUint>,
         values: Vec<BigUint>,
         #[call_result] result: AsyncCallResult<()>,
@@ -443,14 +451,20 @@ pub trait Erc1155 {
     // proxy
 
     #[proxy]
-    fn erc1155_user_proxy(&self, sc_address: Address) -> erc1155_user_proxy::Proxy<Self::SendApi>;
+    fn erc1155_user_proxy(
+        &self,
+        sc_address: ManagedAddress,
+    ) -> erc1155_user_proxy::Proxy<Self::SendApi>;
 
     // storage
 
     // map for address -> type_id -> amount
 
     #[storage_mapper("balanceOf")]
-    fn get_balance_mapper(&self, owner: &Address) -> MapMapper<Self::Storage, BigUint, BigUint>;
+    fn get_balance_mapper(
+        &self,
+        owner: &ManagedAddress,
+    ) -> MapMapper<Self::Storage, BigUint, BigUint>;
 
     // token owner
     // for non-fungible
@@ -461,13 +475,16 @@ pub trait Erc1155 {
         &self,
         type_id: &BigUint,
         nft_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, Address>;
+    ) -> SingleValueMapper<Self::Storage, ManagedAddress>;
 
     // token creator
 
     #[view(getTokenTypeCreator)]
     #[storage_mapper("tokenTypeCreator")]
-    fn token_type_creator(&self, type_id: &BigUint) -> SingleValueMapper<Self::Storage, Address>;
+    fn token_type_creator(
+        &self,
+        type_id: &BigUint,
+    ) -> SingleValueMapper<Self::Storage, ManagedAddress>;
 
     // token type uri
 
@@ -498,7 +515,7 @@ pub trait Erc1155 {
     #[storage_mapper("isApproved")]
     fn is_approved(
         &self,
-        operator: &Address,
-        owner: &Address,
+        operator: &ManagedAddress,
+        owner: &ManagedAddress,
     ) -> SingleValueMapper<Self::Storage, bool>;
 }

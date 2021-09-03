@@ -54,7 +54,7 @@ pub trait EventsModule {
     #[event("order")]
     fn order_event(
         &self,
-        #[indexed] caller: Address,
+        #[indexed] caller: ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         order: Order<Self::TypeManager>,
@@ -63,7 +63,7 @@ pub trait EventsModule {
     #[event("cancel_order")]
     fn cancel_order_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         #[indexed] order_id: u64,
@@ -72,20 +72,20 @@ pub trait EventsModule {
     #[event("match_order")]
     fn match_order_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         #[indexed] order_id: u64,
-        #[indexed] order_creator: Address,
+        #[indexed] order_creator: ManagedAddress,
     );
 
     #[event("free_order")]
     fn free_order_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         #[indexed] order_id: u64,
-        #[indexed] order_creator: Address,
+        #[indexed] order_creator: ManagedAddress,
     );
 }
