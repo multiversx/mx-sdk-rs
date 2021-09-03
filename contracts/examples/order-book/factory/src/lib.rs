@@ -24,13 +24,8 @@ pub trait Factory {
         require!(self.get_pair(&token_id_pair).is_none(), "Already has pair");
 
         let mut arguments = ManagedArgBuffer::new_empty(self.type_manager());
-        arguments.push_argument_bytes(token_id_pair.first_token_id.to_esdt_identifier().as_slice());
-        arguments.push_argument_bytes(
-            token_id_pair
-                .second_token_id
-                .to_esdt_identifier()
-                .as_slice(),
-        );
+        arguments.push_arg(&token_id_pair.first_token_id);
+        arguments.push_arg(&token_id_pair.second_token_id);
 
         let pair_address = self
             .send()
