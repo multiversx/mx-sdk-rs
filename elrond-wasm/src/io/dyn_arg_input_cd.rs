@@ -19,10 +19,12 @@ where
     }
 }
 
-impl<'a, A> DynArgInput<ManagedBytesTopDecodeInput<A>> for CallDataArgLoader<'a, A>
+impl<'a, A> DynArgInput for CallDataArgLoader<'a, A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
+    type ItemInput = ManagedBytesTopDecodeInput<A>;
+
     type ErrorApi = A;
 
     #[inline]

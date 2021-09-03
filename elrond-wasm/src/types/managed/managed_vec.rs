@@ -1,10 +1,11 @@
-use super::{ManagedBuffer, ManagedType, ManagedVecItem};
+use super::{ManagedBuffer, ManagedFrom, ManagedType, ManagedVecItem};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
 use alloc::string::String;
+use alloc::vec::Vec;
 use core::marker::PhantomData;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
@@ -68,7 +69,27 @@ where
             _phantom: PhantomData,
         }
     }
+}
 
+impl<M, T> ManagedFrom<M, Vec<T>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    fn managed_from(api: M, v: Vec<T>) -> Self {
+        let mut result = Self::new_empty(api);
+        for item in v.into_iter() {
+            result.push(item);
+        }
+        result
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
     /// Length of the underlying buffer in bytes.
     #[inline]
     pub fn byte_len(&self) -> usize {
@@ -122,6 +143,14 @@ where
     /// Removes all items while retaining the handle.
     pub fn clear(&mut self) {
         self.buffer.overwrite(&[]);
+    }
+
+    pub fn into_vec(self) -> Vec<T> {
+        let mut v = Vec::new();
+        for item in self.into_vec() {
+            v.push(item);
+        }
+        v
     }
 }
 

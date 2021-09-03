@@ -25,7 +25,7 @@ pub trait ProxyObjApi {
 }
 
 pub trait CallbackProxyObjApi {
-    type TypeManager: ManagedTypeApi + 'static;
+    type TypeManager: ManagedTypeApi + ErrorApi + Clone + 'static;
 
     /// The code generator produces the same types in the proxy, as for the main contract.
     /// Sometimes endpoints return types that contain a `Self::Storage` type argument,
@@ -36,9 +36,7 @@ pub trait CallbackProxyObjApi {
 
     type SendApi: SendApi<ProxyTypeManager = Self::TypeManager> + Clone + 'static;
 
-    type ErrorApi: ManagedTypeApi + ErrorApi + Clone + 'static;
-
     fn new_cb_proxy_obj(api: Self::SendApi) -> Self;
 
-    fn cb_error_api(self) -> Self::ErrorApi;
+    fn cb_call_api(self) -> Self::TypeManager;
 }

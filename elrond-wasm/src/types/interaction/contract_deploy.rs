@@ -2,6 +2,7 @@ use crate::api::{BlockchainApi, SendApi};
 use crate::types::{
     Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
 };
+use crate::ContractCallArg;
 
 use super::ManagedArgBuffer;
 
@@ -27,15 +28,12 @@ where
 pub fn new_contract_deploy<SA>(
     api: SA,
     to: ManagedAddress<SA::ProxyTypeManager>,
-    egld_payment: BigUint<SA::ProxyTypeManager>,
 ) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
     let mut contract_deploy = ContractDeploy::<SA>::new(api);
     contract_deploy.to = to;
-    contract_deploy.egld_payment = egld_payment;
-
     contract_deploy
 }
 
@@ -64,6 +62,10 @@ where
     pub fn with_gas_limit(mut self, gas_limit: u64) -> Self {
         self.explicit_gas_limit = gas_limit;
         self
+    }
+
+    pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
+        endpoint_arg.push_dyn_arg(&mut self.arg_buffer);
     }
 
     // pub fn get_mut_arg_buffer(&mut self) -> &mut ArgBuffer {

@@ -2,11 +2,7 @@ use crate::api::managed_types::unsafe_buffer_load_be_pad_right;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{
-    managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
-    EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
-    TokenIdentifier,
-};
+use elrond_wasm::types::{Address, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedInto, ManagedType, ManagedVec, TokenIdentifier, managed_vec_from_slice_of_boxed_bytes};
 use elrond_wasm::HexCallDataSerializer;
 
 // Token ID + nonce + amount, as bytes
@@ -172,14 +168,16 @@ impl SendApi for ArwenApiImpl {
         self.clone()
     }
 
-    fn direct_egld(
+    fn direct_egld<D>(
         &self,
         to: &ManagedAddress<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
-        data: &ManagedBuffer<Self::ProxyTypeManager>,
-    ) {
+        data: D,
+    ) where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
         let to_address = to.to_address();
-        let data_bytes = data.to_boxed_bytes();
+        let data_bytes = data.managed_into(self.clone()).to_boxed_bytes();
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = transferValue(
@@ -608,7 +606,7 @@ impl SendApi for ArwenApiImpl {
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = BlockchainApi::get_sc_address_managed(self);
+        let own_address = BlockchainApi::get_sc_address(self);
 
         self.execute_on_dest_context_raw(
             gas,

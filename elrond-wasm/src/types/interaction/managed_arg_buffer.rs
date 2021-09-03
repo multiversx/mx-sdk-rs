@@ -1,12 +1,12 @@
-use elrond_codec::{EncodeError, TopEncode};
-
+use super::ArgBuffer;
 use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecIterator},
+    types::{ManagedBuffer, ManagedFrom, ManagedInto, ManagedType, ManagedVec, ManagedVecIterator},
+    ContractCallArg, DynArg, DynArgOutput,
 };
-
-use super::ArgBuffer;
+use alloc::vec::Vec;
+use elrond_codec::{EncodeError, TopEncode};
 
 #[derive(Debug)]
 pub struct ManagedArgBuffer<M>
@@ -51,7 +51,36 @@ where
             data: ManagedVec::new_empty(api),
         }
     }
+}
 
+impl<M> ManagedFrom<M, Vec<ManagedBuffer<M>>> for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    fn managed_from(api: M, v: Vec<ManagedBuffer<M>>) -> Self {
+        ManagedArgBuffer {
+            api: api.clone(),
+            data: v.managed_into(api),
+        }
+    }
+}
+
+impl<M> ManagedFrom<M, ManagedVec<M, ManagedBuffer<M>>> for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    fn managed_from(api: M, data: ManagedVec<M, ManagedBuffer<M>>) -> Self {
+        ManagedArgBuffer {
+            api: api.clone(),
+            data: data,
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi + ErrorApi + 'static,
+{
     #[inline]
     pub fn len(&self) -> usize {
         self.data.len()
@@ -62,6 +91,11 @@ where
         self.data.is_empty()
     }
 
+    #[inline]
+    pub fn push_arg_raw(&mut self, raw_arg: ManagedBuffer<M>) {
+        self.data.push(raw_arg);
+    }
+
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
         let mut encoded_buffer = ManagedBuffer::new_empty(self.api.clone());
         arg.top_encode_or_exit(
@@ -70,11 +104,6 @@ where
             managed_arg_buffer_push_exit,
         );
         self.push_arg_raw(encoded_buffer);
-    }
-
-    #[inline]
-    pub fn push_arg_raw(&mut self, raw_arg: ManagedBuffer<M>) {
-        self.data.push(raw_arg);
     }
 
     /// Concatenates 2 ArgBuffer. Consumes both arguments in the process.
@@ -115,5 +144,12 @@ where
 {
     pub fn raw_arg_iter(&'a self) -> ManagedVecIterator<'a, M, ManagedBuffer<M>> {
         ManagedVecIterator::new(&self.data)
+    }
+}
+
+impl<M: ManagedTypeApi> DynArgOutput for ManagedArgBuffer<M> {
+    #[inline]
+    fn push_single_arg<T: TopEncode>(&mut self, arg: T) {
+        self.push_arg(arg)
     }
 }

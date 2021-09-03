@@ -29,7 +29,7 @@ where
             &self.token_identifier,
             0,
             &self.amount,
-            &self.data,
+            self.data.clone(),
         );
     }
 }

@@ -142,7 +142,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_sc_address(&self) -> Address {
+    fn get_sc_address_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getSCAddress(res.as_mut_ptr());
@@ -152,7 +152,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_sc_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+    fn get_sc_address(&self) -> ManagedAddress<Self::TypeManager> {
         unsafe {
             let handle = mBufferNew();
             managedSCAddress(handle);
@@ -161,7 +161,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_owner_address(&self) -> Address {
+    fn get_owner_address_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getOwnerAddress(res.as_mut_ptr());
@@ -171,7 +171,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_owner_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+    fn get_owner_address(&self) -> ManagedAddress<Self::TypeManager> {
         unsafe {
             let handle = mBufferNew();
             managedOwnerAddress(handle);
@@ -190,7 +190,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_caller(&self) -> Address {
+    fn get_caller_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getCaller(res.as_mut_ptr());
@@ -200,7 +200,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
+    fn get_caller(&self) -> ManagedAddress<Self::TypeManager> {
         unsafe {
             let handle = mBufferNew();
             managedCaller(handle);

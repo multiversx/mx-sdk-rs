@@ -19,11 +19,11 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_sc_address(&self) -> Address {
+    fn get_sc_address_legacy(&self) -> Address {
         unreachable!()
     }
 
-    fn get_owner_address(&self) -> Address {
+    fn get_owner_address_legacy(&self) -> Address {
         unreachable!()
     }
 
@@ -35,7 +35,7 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_caller(&self) -> Address {
+    fn get_caller_legacy(&self) -> Address {
         unreachable!()
     }
 
