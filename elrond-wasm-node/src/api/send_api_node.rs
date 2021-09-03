@@ -2,7 +2,11 @@ use crate::api::managed_types::unsafe_buffer_load_be_pad_right;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{Address, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedInto, ManagedType, ManagedVec, TokenIdentifier, managed_vec_from_slice_of_boxed_bytes};
+use elrond_wasm::types::{
+    managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
+    EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedInto, ManagedType,
+    ManagedVec, TokenIdentifier,
+};
 use elrond_wasm::HexCallDataSerializer;
 
 // Token ID + nonce + amount, as bytes

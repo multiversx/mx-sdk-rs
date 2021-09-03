@@ -23,8 +23,8 @@ pub trait LocalEsdtAndEsdtNft {
     fn issue_fungible_token(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
@@ -68,8 +68,8 @@ pub trait LocalEsdtAndEsdtNft {
     fn nft_issue(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
@@ -97,12 +97,15 @@ pub trait LocalEsdtAndEsdtNft {
         &self,
         token_identifier: TokenIdentifier,
         amount: BigUint,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         royalties: BigUint,
-        hash: BoxedBytes,
+        hash: ManagedBuffer,
         color: Color,
-        uri: BoxedBytes,
+        uri: ManagedBuffer,
     ) {
+        let mut uris = ManagedVec::new_empty(self.type_manager());
+        uris.push(uri);
+
         self.send().esdt_nft_create::<Color>(
             &token_identifier,
             &amount,
@@ -110,7 +113,7 @@ pub trait LocalEsdtAndEsdtNft {
             &royalties,
             &hash,
             &color,
-            &[uri],
+            &uris,
         );
     }
 
@@ -133,15 +136,10 @@ pub trait LocalEsdtAndEsdtNft {
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        data: BoxedBytes,
+        data: ManagedBuffer,
     ) {
-        self.send().transfer_esdt_via_async_call(
-            &to,
-            &token_identifier,
-            nonce,
-            &amount,
-            data.as_slice(),
-        );
+        self.send()
+            .transfer_esdt_via_async_call(&to, &token_identifier, nonce, &amount, data);
     }
 
     #[endpoint]
@@ -151,12 +149,12 @@ pub trait LocalEsdtAndEsdtNft {
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        function: BoxedBytes,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
+        function: ManagedBuffer,
+        #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         for arg in arguments.into_vec() {
-            arg_buffer.push_argument_bytes(arg.as_slice());
+            arg_buffer.push_arg_raw(arg);
         }
 
         let _ = self.send().direct_esdt_nft_execute(
@@ -165,7 +163,7 @@ pub trait LocalEsdtAndEsdtNft {
             nonce,
             &amount,
             self.blockchain().get_gas_left(),
-            function.as_slice(),
+            &function,
             &arg_buffer,
         );
     }
@@ -177,8 +175,8 @@ pub trait LocalEsdtAndEsdtNft {
     fn sft_issue(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 

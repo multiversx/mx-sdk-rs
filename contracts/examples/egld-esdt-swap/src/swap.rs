@@ -20,8 +20,8 @@ pub trait EgldEsdtSwap {
     #[endpoint(issueWrappedEgld)]
     fn issue_wrapped_egld(
         &self,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
@@ -32,7 +32,7 @@ pub trait EgldEsdtSwap {
 
         let caller = self.blockchain().get_caller();
 
-        self.issue_started_event(&caller, token_ticker.as_slice(), &initial_supply);
+        self.issue_started_event(&caller, &token_ticker, &initial_supply);
 
         Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
             .issue_fungible(
@@ -220,7 +220,7 @@ pub trait EgldEsdtSwap {
     fn issue_started_event(
         &self,
         #[indexed] caller: &ManagedAddress,
-        #[indexed] token_ticker: &[u8],
+        #[indexed] token_ticker: &ManagedBuffer,
         initial_supply: &BigUint,
     );
 
