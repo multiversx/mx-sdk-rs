@@ -13,7 +13,7 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: Address) {
+    fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: ManagedAddress) {
         self.erc20_contract_address().set(&erc20_contract_address);
         self.target().set(&target);
         self.deadline().set(&deadline);
@@ -26,9 +26,9 @@ pub trait Crowdfunding {
             "cannot fund after deadline"
         );
 
-        let caller = self.blockchain().get_caller_managed();
+        let caller = self.blockchain().get_caller();
         let erc20_address = self.erc20_contract_address().get();
-        let cf_contract_address = self.blockchain().get_sc_address_managed();
+        let cf_contract_address = self.blockchain().get_sc_address();
 
         Ok(self
             .erc20_proxy(erc20_address)
@@ -60,8 +60,8 @@ pub trait Crowdfunding {
         match self.status() {
             Status::FundingPeriod => sc_error!("cannot claim before deadline"),
             Status::Successful => {
-                let caller = self.blockchain().get_caller_managed();
-                if caller != self.blockchain().get_owner_address_managed() {
+                let caller = self.blockchain().get_caller();
+                if caller != self.blockchain().get_owner_address() {
                     return sc_error!("only owner can claim successful funding");
                 }
 
@@ -76,7 +76,7 @@ pub trait Crowdfunding {
                 ))
             },
             Status::Failed => {
-                let caller = self.blockchain().get_caller_managed();
+                let caller = self.blockchain().get_caller();
                 let deposit = self.deposit(&caller).get();
 
                 if deposit > 0 {
@@ -127,7 +127,7 @@ pub trait Crowdfunding {
     // proxy
 
     #[proxy]
-    fn erc20_proxy(&self, to: Address) -> erc20::Proxy<Self::SendApi>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::SendApi>;
 
     // storage
 
@@ -145,7 +145,7 @@ pub trait Crowdfunding {
 
     #[view(get_erc20_contract_address)]
     #[storage_mapper("erc20_contract_address")]
-    fn erc20_contract_address(&self) -> SingleValueMapper<Self::Storage, Address>;
+    fn erc20_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
 
     #[view(get_total_balance)]
     #[storage_mapper("erc20_balance")]

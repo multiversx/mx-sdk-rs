@@ -9,8 +9,8 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
     fn sft_issue(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
@@ -35,7 +35,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
     #[callback]
     fn sft_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[call_result] result: AsyncCallResult<TokenIdentifier>,
     ) {
         match result {

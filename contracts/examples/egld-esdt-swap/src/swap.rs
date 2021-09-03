@@ -59,7 +59,7 @@ pub trait EgldEsdtSwap {
     #[callback]
     fn esdt_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment] returned_tokens: BigUint,
         #[call_result] result: AsyncCallResult<()>,
@@ -105,7 +105,7 @@ pub trait EgldEsdtSwap {
     #[callback]
     fn esdt_mint_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         amount: &BigUint,
         #[call_result] result: AsyncCallResult<()>,
     ) {
@@ -219,7 +219,7 @@ pub trait EgldEsdtSwap {
     #[event("issue-started")]
     fn issue_started_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] token_ticker: &[u8],
         initial_supply: &BigUint,
     );
@@ -227,26 +227,26 @@ pub trait EgldEsdtSwap {
     #[event("issue-success")]
     fn issue_success_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] token_identifier: &TokenIdentifier,
         initial_supply: &BigUint,
     );
 
     #[event("issue-failure")]
-    fn issue_failure_event(&self, #[indexed] caller: &Address, message: &[u8]);
+    fn issue_failure_event(&self, #[indexed] caller: &ManagedAddress, message: &[u8]);
 
     #[event("mint-started")]
-    fn mint_started_event(&self, #[indexed] caller: &Address, amount: &BigUint);
+    fn mint_started_event(&self, #[indexed] caller: &ManagedAddress, amount: &BigUint);
 
     #[event("mint-success")]
-    fn mint_success_event(&self, #[indexed] caller: &Address);
+    fn mint_success_event(&self, #[indexed] caller: &ManagedAddress);
 
     #[event("mint-failure")]
-    fn mint_failure_event(&self, #[indexed] caller: &Address, message: &[u8]);
+    fn mint_failure_event(&self, #[indexed] caller: &ManagedAddress, message: &[u8]);
 
     #[event("wrap-egld")]
-    fn wrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+    fn wrap_egld_event(&self, #[indexed] user: &ManagedAddress, amount: &BigUint);
 
     #[event("unwrap-egld")]
-    fn unwrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+    fn unwrap_egld_event(&self, #[indexed] user: &ManagedAddress, amount: &BigUint);
 }

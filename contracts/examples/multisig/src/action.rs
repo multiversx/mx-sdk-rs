@@ -1,7 +1,10 @@
 use elrond_wasm::{
     api::{EndpointFinishApi, ManagedTypeApi, SendApi},
     io::EndpointResult,
-    types::{Address, AsyncCall, BigUint, BoxedBytes, CodeMetadata, OptionalResult, SendEgld, Vec},
+    types::{
+        AsyncCall, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
+        OptionalResult, SendEgld, Vec,
+    },
 };
 
 elrond_wasm::derive_imports!();
@@ -9,23 +12,23 @@ elrond_wasm::derive_imports!();
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub enum Action<M: ManagedTypeApi> {
     Nothing,
-    AddBoardMember(Address),
-    AddProposer(Address),
-    RemoveUser(Address),
+    AddBoardMember(ManagedAddress<M>),
+    AddProposer(ManagedAddress<M>),
+    RemoveUser(ManagedAddress<M>),
     ChangeQuorum(usize),
     SendEgld {
-        to: Address,
+        to: ManagedAddress<M>,
         amount: BigUint<M>,
         data: BoxedBytes,
     },
     SCDeploy {
         amount: BigUint<M>,
-        code: BoxedBytes,
+        code: ManagedBuffer<M>,
         code_metadata: CodeMetadata,
         arguments: Vec<BoxedBytes>,
     },
     SCCall {
-        to: Address,
+        to: ManagedAddress<M>,
         egld_payment: BigUint<M>,
         endpoint_name: BoxedBytes,
         arguments: Vec<BoxedBytes>,
@@ -46,7 +49,7 @@ impl<M: ManagedTypeApi> Action<M> {
 pub struct ActionFullInfo<M: ManagedTypeApi> {
     pub action_id: usize,
     pub action_data: Action<M>,
-    pub signers: Vec<Address>,
+    pub signers: Vec<ManagedAddress<M>>,
 }
 
 #[derive(TypeAbi)]
@@ -56,7 +59,7 @@ where
 {
     Nothing,
     SendEgld(SendEgld<SA>),
-    DeployResult(Address),
+    DeployResult(ManagedAddress<SA::ProxyTypeManager>),
     AsyncCall(AsyncCall<SA>),
 }
 
@@ -64,7 +67,7 @@ impl<SA> EndpointResult for PerformActionResult<SA>
 where
     SA: SendApi + Clone + 'static,
 {
-    type DecodeAs = OptionalResult<Address>;
+    type DecodeAs = OptionalResult<ManagedAddress<SA::ProxyTypeManager>>;
 
     fn finish<FA>(&self, api: FA)
     where

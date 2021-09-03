@@ -11,7 +11,7 @@ pub trait SendTxRepeat {
     #[endpoint]
     fn repeat(
         &self,
-        to: Address,
+        to: ManagedAddress,
         amount: BigUint,
         times: usize,
         #[var_args] opt_data: OptionalArg<Vec<u8>>,
