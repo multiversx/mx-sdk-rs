@@ -86,9 +86,10 @@ impl SendApi for TxContext {
             });
         }
 
+        let recipient = to.to_address();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
-            recipient: to.to_address(),
+            recipient,
             token_name: BoxedBytes::empty(),
             amount: amount_value,
         });
@@ -122,10 +123,11 @@ impl SendApi for TxContext {
             });
         }
 
+        let recipient = to.to_address();
         let token_name = token.to_esdt_identifier();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
-            recipient: to.to_address(),
+            recipient,
             token_name,
             amount: amount_value,
         });
@@ -164,14 +166,17 @@ impl SendApi for TxContext {
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ! {
         let amount_value = self.big_uint_value(amount);
+        let recipient = to.to_address();
+        let call_data =
+            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
+        let tx_hash = self.get_tx_hash();
         // the cell is no longer needed, since we end in a panic
         let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
-        let call_data = HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer);
         tx_output.async_call = Some(AsyncCallTxData {
-            to: to.to_address(),
+            to: recipient,
             call_value: amount_value,
-            call_data: call_data.into_vec(),
-            tx_hash: self.get_tx_hash(),
+            call_data,
+            tx_hash,
         });
         std::panic::panic_any(tx_output)
     }
