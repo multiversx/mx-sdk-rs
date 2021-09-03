@@ -23,7 +23,8 @@ where
 
     #[inline]
     fn finish<FA>(&self, _api: FA) {
-        self.api.direct_egld(&self.to, &self.amount, &self.data);
+        self.api
+            .direct_egld(&self.to, &self.amount, self.data.clone());
     }
 }
 

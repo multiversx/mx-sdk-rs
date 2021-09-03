@@ -157,10 +157,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             SA: elrond_wasm::api::SendApi + 'static,
         {
             pub api: SA,
-            pub address: Address,
-            pub payment_token: elrond_wasm::types::TokenIdentifier<SA::ProxyTypeManager>,
-            pub payment_amount: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
-            pub payment_nonce: u64,
+            pub address: elrond_wasm::types::ManagedAddress<SA::ProxyTypeManager>,
         }
 
         impl<SA> elrond_wasm::api::ProxyObjApi for Proxy<SA>
@@ -172,56 +169,22 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             type SendApi = SA;
 
             fn new_proxy_obj(api: SA) -> Self {
-                let zero = elrond_wasm::types::BigUint::zero(api.type_manager());
-                let payment_token = elrond_wasm::types::TokenIdentifier::egld(api.type_manager());
-            Proxy {
+                let zero_address = ManagedAddress::zero_address(api.type_manager());
+                Proxy {
                     api,
-                    address: Address::zero(),
-                    payment_token,
-                    payment_amount: zero,
-                    payment_nonce: 0,
+                    address: zero_address,
                 }
             }
 
             #[inline]
-            fn contract(mut self, address: Address) -> Self {
+            fn contract(mut self, address: ManagedAddress<Self::TypeManager>) -> Self {
                 self.address = address;
                 self
             }
 
-            fn with_token_transfer(
-                mut self,
-                token: TokenIdentifier<SA::ProxyTypeManager>,
-                payment: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
-            ) -> Self {
-                self.payment_token = token;
-                self.payment_amount = payment;
-                self
-            }
-
             #[inline]
-            fn with_nft_nonce(mut self, nonce: u64) -> Self {
-                self.payment_nonce = nonce;
-                self
-            }
-
-            #[inline]
-            fn into_fields(
-                self,
-            ) -> (
-                Self::SendApi,
-                Address,
-                TokenIdentifier<SA::ProxyTypeManager>,
-                BigUint<Self::TypeManager>,
-                u64,
-            ) {
-                (
-                    self.api,
-                    self.address,
-                    self.payment_token,
-                    self.payment_amount,
-                    self.payment_nonce,
-                )
+            fn into_fields(self) -> (Self::SendApi, ManagedAddress<Self::TypeManager>) {
+                (self.api, self.address)
             }
         }
     }
@@ -243,7 +206,6 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
             type TypeManager = SA::ProxyTypeManager;
             type Storage = SA::ProxyStorage;
             type SendApi = SA;
-            type ErrorApi = SA::ErrorApi;
 
             fn new_cb_proxy_obj(api: SA) -> Self {
                 CallbackProxyObj {
@@ -251,8 +213,8 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
                 }
             }
 
-            fn cb_error_api(self) -> Self::ErrorApi {
-                self.api.error_api()
+            fn cb_call_api(self) -> Self::TypeManager {
+                self.api.type_manager()
             }
         }
     }

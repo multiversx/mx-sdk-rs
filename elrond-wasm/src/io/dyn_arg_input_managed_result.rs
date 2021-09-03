@@ -31,10 +31,12 @@ where
     }
 }
 
-impl<A> DynArgInput<ManagedBuffer<A>> for ManagedResultArgLoader<A>
+impl<A> DynArgInput for ManagedResultArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
+    type ItemInput = ManagedBuffer<A>;
+
     type ErrorApi = A;
 
     #[inline]

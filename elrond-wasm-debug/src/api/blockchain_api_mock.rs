@@ -13,11 +13,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.clone()
     }
 
-    fn get_sc_address(&self) -> Address {
+    fn get_sc_address_legacy(&self) -> Address {
         self.tx_input_box.to.clone()
     }
 
-    fn get_owner_address(&self) -> Address {
+    fn get_owner_address_legacy(&self) -> Address {
         self.blockchain_info_box
             .contract_owner
             .clone()
@@ -42,12 +42,12 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         */
     }
 
-    fn get_caller(&self) -> Address {
+    fn get_caller_legacy(&self) -> Address {
         self.tx_input_box.from.clone()
     }
 
     fn get_balance(&self, address: &Address) -> BigUint<Self::Storage> {
-        if address != &self.get_sc_address() {
+        if address != &self.get_sc_address_legacy() {
             panic!("get balance not yet implemented for accounts other than the contract itself");
         }
         self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
@@ -127,7 +127,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         token: &TokenIdentifier<Self::TypeManager>,
         _nonce: u64,
     ) -> BigUint<Self::TypeManager> {
-        if address != &self.get_sc_address_managed() {
+        if address != &self.get_sc_address() {
             panic!(
                 "get_esdt_balance not yet implemented for accounts other than the contract itself"
             );

@@ -1,7 +1,7 @@
 use crate::api::SendApi;
 use crate::types::{
     ArgBuffer, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-    ManagedBuffer, ManagedVec, TokenIdentifier,
+    ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
 };
 
 impl SendApi for super::UncallableApi {
@@ -22,12 +22,14 @@ impl SendApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn direct_egld(
+    fn direct_egld<D>(
         &self,
         _to: &ManagedAddress<Self::ProxyTypeManager>,
         _amount: &BigUint<Self::ProxyTypeManager>,
-        _data: &ManagedBuffer<Self::ProxyTypeManager>,
-    ) {
+        _data: D,
+    ) where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
         unreachable!()
     }
 

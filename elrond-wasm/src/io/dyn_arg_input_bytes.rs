@@ -30,10 +30,12 @@ where
     }
 }
 
-impl<A> DynArgInput<ManagedBytesTopDecodeInput<A>> for BytesArgLoader<A>
+impl<A> DynArgInput for BytesArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
+    type ItemInput = ManagedBytesTopDecodeInput<A>;
+
     type ErrorApi = A;
 
     #[inline]

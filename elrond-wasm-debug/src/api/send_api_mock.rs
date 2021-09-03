@@ -3,7 +3,7 @@ use crate::{SendBalance, TxContext, TxOutput, TxPanic};
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{
     BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-    ManagedBuffer, ManagedVec, TokenIdentifier,
+    ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
 };
 use elrond_wasm::HexCallDataSerializer;
 // use num_bigint::BigUint;
@@ -70,12 +70,14 @@ impl SendApi for TxContext {
         self.clone()
     }
 
-    fn direct_egld(
+    fn direct_egld<D>(
         &self,
         to: &ManagedAddress<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
-        _data: &ManagedBuffer<Self::ProxyTypeManager>,
-    ) {
+        _data: D,
+    ) where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
         let amount_value = self.big_uint_value(amount);
         if amount_value > self.get_available_egld_balance() {
             std::panic::panic_any(TxPanic {

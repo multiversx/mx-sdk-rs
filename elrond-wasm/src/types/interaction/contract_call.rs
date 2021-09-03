@@ -8,7 +8,7 @@ use crate::{
         Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, EsdtTokenPayment, ManagedAddress,
         ManagedArgBuffer, ManagedBuffer, ManagedVec, TokenIdentifier,
     },
-    ArgId, BytesArgLoader, DynArg, ManagedResultArgLoader,
+    ArgId, BytesArgLoader, ContractCallArg, DynArg, ManagedResultArgLoader,
 };
 use alloc::vec;
 use alloc::vec::Vec;
@@ -133,6 +133,10 @@ where
         ));
     }
 
+    pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
+        endpoint_arg.push_dyn_arg(&mut self.arg_buffer);
+    }
+
     fn no_payments(
         &self,
     ) -> ManagedVec<SA::ProxyTypeManager, EsdtTokenPayment<SA::ProxyTypeManager>> {
@@ -195,7 +199,7 @@ where
                 new_arg_buffer.push_arg(&self.endpoint_name);
 
                 // nft transfer is sent to self, sender = receiver
-                let recipient_addr = self.api.blockchain().get_sc_address_managed();
+                let recipient_addr = self.api.blockchain().get_sc_address();
                 let zero = BigUint::zero(self.api.type_manager());
                 let endpoint_name = ManagedBuffer::new_from_bytes(
                     self.api.type_manager(),
@@ -234,7 +238,7 @@ where
         new_arg_buffer.push_arg(self.endpoint_name);
 
         // multi transfer is sent to self, sender = receiver
-        let recipient_addr = self.api.blockchain().get_sc_address_managed();
+        let recipient_addr = self.api.blockchain().get_sc_address();
         let zero = BigUint::zero(self.api.type_manager());
         let endpoint_name =
             ManagedBuffer::new_from_bytes(self.api.type_manager(), ESDT_MULTI_TRANSFER_STRING);
@@ -267,7 +271,7 @@ where
             egld_payment: self.egld_payment,
             endpoint_name: self.endpoint_name,
             arg_buffer: self.arg_buffer,
-            callback_data: HexCallDataSerializer::new(&[]),
+            callback_call: None,
         }
     }
 }
