@@ -25,12 +25,12 @@ pub struct BondingCurve<M: ManagedTypeApi> {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
-pub struct TokenOwnershipData {
+pub struct TokenOwnershipData<M: ManagedTypeApi> {
     pub token_nonces: Vec<u64>,
-    pub owner: Address,
+    pub owner: ManagedAddress<M>,
 }
 
-impl TokenOwnershipData {
+impl<M: ManagedTypeApi> TokenOwnershipData<M> {
     pub fn add_nonce(&mut self, nonce: u64) {
         if !self.token_nonces.contains(&nonce) {
             self.token_nonces.push(nonce);

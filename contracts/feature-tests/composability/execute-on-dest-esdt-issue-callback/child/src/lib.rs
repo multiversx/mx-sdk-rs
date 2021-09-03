@@ -13,8 +13,8 @@ pub trait Child {
     #[endpoint(issueWrappedEgld)]
     fn issue_wrapped_egld(
         &self,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
     ) -> AsyncCall<Self::SendApi> {
