@@ -6,14 +6,18 @@ pub trait ChangeOwnerModule {
     fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
 
     #[endpoint(changeOwnerAddress)]
-    fn change_owner(&self, child_sc_address: Address, new_owner: Address) -> Address {
+    fn change_owner(
+        &self,
+        child_sc_address: ManagedAddress,
+        new_owner: ManagedAddress,
+    ) -> ManagedAddress {
         self.send()
             .change_owner_address(&child_sc_address, &new_owner);
 
         self.get_owner_of_vault_contract(child_sc_address)
     }
 
-    fn get_owner_of_vault_contract(&self, address: Address) -> Address {
+    fn get_owner_of_vault_contract(&self, address: ManagedAddress) -> ManagedAddress {
         self.vault_proxy()
             .contract(address)
             .get_owner_address()

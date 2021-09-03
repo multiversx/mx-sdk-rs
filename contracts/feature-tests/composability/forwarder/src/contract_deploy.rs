@@ -6,7 +6,7 @@ pub trait DeployContractModule {
     fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
 
     #[endpoint]
-    fn deploy_contract(&self, code: BoxedBytes) -> SCResult<Address> {
+    fn deploy_contract(&self, code: ManagedBuffer) -> SCResult<ManagedAddress> {
         let deployed_contract_address = self.deploy_vault(&code).ok_or("Deploy failed")?;
 
         Ok(deployed_contract_address)
@@ -15,23 +15,26 @@ pub trait DeployContractModule {
     #[endpoint(deployFromSource)]
     fn deploy_from_source(
         &self,
-        source_contract_address: Address,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) -> SCResult<Address> {
+        source_contract_address: ManagedAddress,
+        #[var_args] arguments: VarArgs<ManagedBuffer>,
+    ) -> SCResult<ManagedAddress> {
         self.send()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),
                 &source_contract_address,
                 CodeMetadata::DEFAULT,
-                &arguments.as_slice().into(),
+                &arguments.into_vec().managed_into(self.type_manager()),
             )
             .ok_or("Deploy from source contract failed")
             .into()
     }
 
     #[endpoint]
-    fn deploy_two_contracts(&self, code: BoxedBytes) -> SCResult<MultiResult2<Address, Address>> {
+    fn deploy_two_contracts(
+        &self,
+        code: ManagedBuffer,
+    ) -> SCResult<MultiResult2<ManagedAddress, ManagedAddress>> {
         let first_deployed_contract_address =
             self.deploy_vault(&code).ok_or("First deploy failed")?;
 
@@ -46,7 +49,7 @@ pub trait DeployContractModule {
     }
 
     #[endpoint]
-    fn deploy_vault(&self, code: &BoxedBytes) -> Option<Address> {
+    fn deploy_vault(&self, code: &ManagedBuffer) -> Option<ManagedAddress> {
         self.vault_proxy()
             .init()
             .deploy_contract(code, CodeMetadata::DEFAULT)

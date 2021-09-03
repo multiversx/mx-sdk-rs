@@ -3,11 +3,11 @@ elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct CallbackData<M: ManagedTypeApi> {
-    callback_name: BoxedBytes,
+    callback_name: ManagedBuffer<M>,
     token_identifier: TokenIdentifier<M>,
     token_nonce: u64,
     token_amount: BigUint<M>,
-    args: Vec<BoxedBytes>,
+    args: ManagedVec<M, ManagedBuffer<M>>,
 }
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
@@ -21,15 +21,14 @@ pub trait ForwarderAsyncCallModule {
     #[payable("*")]
     fn forward_async_accept_funds(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token, payment)
-            .with_nft_nonce(token_nonce)
+            .accept_funds(token, token_nonce, payment)
             .async_call()
     }
 
@@ -37,14 +36,14 @@ pub trait ForwarderAsyncCallModule {
     #[payable("*")]
     fn forward_async_accept_funds_half_payment(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         let half_payment = payment / 2u32;
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token, half_payment)
+            .accept_funds(token, 0, half_payment)
             .async_call()
     }
 
@@ -54,7 +53,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_amount] payment: BigUint,
-        to: Address,
+        to: ManagedAddress,
         percentage_fees: BigUint,
     ) -> AsyncCall<Self::SendApi> {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
@@ -62,14 +61,14 @@ pub trait ForwarderAsyncCallModule {
 
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token_id, amount_to_send)
+            .accept_funds(token_id, 0, amount_to_send)
             .async_call()
     }
 
     #[endpoint]
     fn forward_async_retrieve_funds(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token: TokenIdentifier,
         token_nonce: u64,
         amount: BigUint,
@@ -91,11 +90,11 @@ pub trait ForwarderAsyncCallModule {
         self.retrieve_funds_callback_event(&token, nonce, &payment);
 
         let _ = self.callback_data().push(&CallbackData {
-            callback_name: BoxedBytes::from(&b"retrieve_funds_callback"[..]),
+            callback_name: self.types().managed_buffer_from(b"retrieve_funds_callback"),
             token_identifier: token,
             token_nonce: nonce,
             token_amount: payment,
-            args: Vec::new(),
+            args: ManagedVec::new_empty(self.type_manager()),
         });
     }
 
@@ -110,13 +109,13 @@ pub trait ForwarderAsyncCallModule {
     #[endpoint]
     fn send_funds_twice(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         token_identifier: &TokenIdentifier,
         amount: &BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to.clone())
-            .accept_funds(token_identifier.clone(), amount.clone())
+            .accept_funds(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(
                 self.callbacks()
@@ -127,23 +126,23 @@ pub trait ForwarderAsyncCallModule {
     #[callback]
     fn send_funds_twice_callback(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         token_identifier: &TokenIdentifier,
         cb_amount: &BigUint,
     ) -> AsyncCall<Self::SendApi> {
         self.vault_proxy()
             .contract(to.clone())
-            .accept_funds(token_identifier.clone(), cb_amount.clone())
+            .accept_funds(token_identifier.clone(), 0, cb_amount.clone())
             .async_call()
     }
 
     #[endpoint]
     fn multi_transfer_via_async(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = Vec::new();
+        let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
             let (token_name, token_nonce, amount) = multi_arg.into_tuple();
@@ -172,14 +171,15 @@ pub trait ForwarderAsyncCallModule {
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult5<BoxedBytes, TokenIdentifier, u64, BigUint, MultiResultVec<BoxedBytes>> {
+    ) -> MultiResult5<ManagedBuffer, TokenIdentifier, u64, BigUint, MultiResultVec<ManagedBuffer>>
+    {
         let cb_data = self.callback_data().get(index);
         (
             cb_data.callback_name,
             cb_data.token_identifier,
             cb_data.token_nonce,
             cb_data.token_amount,
-            cb_data.args.into(),
+            cb_data.args.into_vec().into(),
         )
             .into()
     }
