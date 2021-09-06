@@ -1,4 +1,4 @@
-use crate::api::managed_types::unsafe_buffer_load_be_pad_right;
+use crate::api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right;
 use crate::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};

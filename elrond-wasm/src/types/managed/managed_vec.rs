@@ -122,6 +122,13 @@ where
         }
     }
 
+    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
+        let byte_start = start_index * T::PAYLOAD_SIZE;
+        let byte_end = end_index * T::PAYLOAD_SIZE;
+        let opt_buffer = self.buffer.copy_slice(byte_start, byte_end - byte_start);
+        opt_buffer.map(|buffer| ManagedVec::new_from_raw_buffer(buffer))
+    }
+
     pub fn push(&mut self, item: T) {
         item.to_byte_writer(|bytes| {
             self.buffer.append_bytes(bytes);
