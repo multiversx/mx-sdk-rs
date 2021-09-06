@@ -176,6 +176,7 @@ impl BigIntApi for crate::ArwenApiImpl {
     }
 }
 
+#[allow(unused)]
 pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(
     bi_handle: Handle,
     nr_bytes: usize,
