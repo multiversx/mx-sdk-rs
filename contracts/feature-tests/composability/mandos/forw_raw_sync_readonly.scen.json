@@ -43,7 +43,7 @@
             },
             "expect": {
                 "out": [],
-                "status": "4",
+                "status": "0",
                 "message": "*",
                 "gas": "*",
                 "refund": "*"
