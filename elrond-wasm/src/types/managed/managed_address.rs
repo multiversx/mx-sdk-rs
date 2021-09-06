@@ -32,3 +32,13 @@ where
         Self::new_from_bytes(api, address.as_array())
     }
 }
+
+impl<M> ManagedFrom<M, Address> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, address: Address) -> Self {
+        Self::new_from_bytes(api, address.as_array())
+    }
+}

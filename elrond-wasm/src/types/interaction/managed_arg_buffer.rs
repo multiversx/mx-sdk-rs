@@ -53,11 +53,12 @@ where
     }
 }
 
-impl<M> ManagedFrom<M, Vec<ManagedBuffer<M>>> for ManagedArgBuffer<M>
+impl<M, I> ManagedFrom<M, Vec<I>> for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
+    I: ManagedInto<M, ManagedBuffer<M>>,
 {
-    fn managed_from(api: M, v: Vec<ManagedBuffer<M>>) -> Self {
+    fn managed_from(api: M, v: Vec<I>) -> Self {
         ManagedArgBuffer {
             api: api.clone(),
             data: v.managed_into(api),

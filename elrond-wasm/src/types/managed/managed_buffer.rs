@@ -62,6 +62,16 @@ where
     }
 }
 
+impl<M> ManagedFrom<M, BoxedBytes> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: BoxedBytes) -> Self {
+        Self::new_from_bytes(api, bytes.as_slice())
+    }
+}
+
 /// Syntactic sugar only.
 impl<M, const N: usize> ManagedFrom<M, &[u8; N]> for ManagedBuffer<M>
 where

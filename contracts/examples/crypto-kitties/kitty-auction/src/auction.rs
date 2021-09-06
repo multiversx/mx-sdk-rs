@@ -17,9 +17,9 @@ pub struct Auction<M: ManagedTypeApi> {
     pub starting_price: BigUint<M>,
     pub ending_price: BigUint<M>,
     pub deadline: u64,
-    pub kitty_owner: ManagedAddress,
+    pub kitty_owner: ManagedAddress<M>,
     pub current_bid: BigUint<M>,
-    pub current_winner: ManagedAddress,
+    pub current_winner: ManagedAddress<M>,
 }
 
 impl<M: ManagedTypeApi> Auction<M> {
@@ -28,7 +28,7 @@ impl<M: ManagedTypeApi> Auction<M> {
         starting_price: &BigUint<M>,
         ending_price: &BigUint<M>,
         deadline: u64,
-        kitty_owner: &ManagedAddress,
+        kitty_owner: &ManagedAddress<M>,
     ) -> Self {
         let type_manager = starting_price.type_manager();
         Auction {
@@ -37,8 +37,8 @@ impl<M: ManagedTypeApi> Auction<M> {
             ending_price: ending_price.clone(),
             deadline,
             kitty_owner: kitty_owner.clone(),
-            current_bid: BigUint::zero(type_manager),
-            current_winner: self.types().address_zero(),
+            current_bid: BigUint::zero(type_manager.clone()),
+            current_winner: ManagedAddress::zero_address(type_manager),
         }
     }
 }
