@@ -1,8 +1,8 @@
 use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
 use crate::storage::{self, StorageKey};
 use crate::types::{
-    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress, ManagedByteArray,
-    ManagedType, TokenIdentifier, Vec, H256,
+    Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress, ManagedBuffer,
+    ManagedByteArray, ManagedType, TokenIdentifier, Vec, H256,
 };
 use alloc::boxed::Box;
 
@@ -51,7 +51,11 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn get_balance(&self, address: &Address) -> BigUint<Self::TypeManager>;
 
-    fn get_sc_balance(&self, token: &TokenIdentifier, nonce: u64) -> BigUint<Self::TypeManager> {
+    fn get_sc_balance(
+        &self,
+        token: &TokenIdentifier<Self::TypeManager>,
+        nonce: u64,
+    ) -> BigUint<Self::TypeManager> {
         if token.is_egld() {
             self.get_balance(&self.get_sc_address())
         } else {
@@ -102,19 +106,23 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
         ManagedByteArray::new_from_bytes(self.type_manager(), &*self.get_prev_block_random_seed())
     }
 
-    fn get_current_esdt_nft_nonce(&self, address: &Address, token_id: &TokenIdentifier) -> u64;
+    fn get_current_esdt_nft_nonce(
+        &self,
+        address: &Address,
+        token_id: &TokenIdentifier<Self::TypeManager>,
+    ) -> u64;
 
     fn get_esdt_balance(
         &self,
         address: &ManagedAddress<Self::TypeManager>,
-        token_id: &TokenIdentifier,
+        token_id: &TokenIdentifier<Self::TypeManager>,
         nonce: u64,
     ) -> BigUint<Self::TypeManager>;
 
     fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<Self::TypeManager>,
-        token_id: &TokenIdentifier,
+        token_id: &TokenIdentifier<Self::TypeManager>,
         nonce: u64,
     ) -> EsdtTokenData<Self::TypeManager>;
 
@@ -130,15 +138,23 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     /// Retrieves local roles for the token, by reading protected storage.
     #[inline]
-    fn get_esdt_local_roles(&self, token_id: &TokenIdentifier) -> Vec<EsdtLocalRole> {
+    fn get_esdt_local_roles(
+        &self,
+        token_id: &TokenIdentifier<Self::TypeManager>,
+    ) -> Vec<EsdtLocalRole> {
         let mut roles = Vec::new();
 
         let mut key = StorageKey::new(
             self.storage_manager(),
             storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
         );
-        key.append_bytes(token_id.as_esdt_identifier());
-
+        // TODO: little hack to reconcile the fact that we declared 2 different APIs
+        // theoretically unsafe
+        // in practice it is always the same API
+        // will be refactored out when the APIs get reorganized
+        let with_changed_api =
+            ManagedBuffer::from_raw_handle(self.storage_manager(), token_id.get_raw_handle());
+        key.append_managed_buffer(&with_changed_api);
         let raw_storage =
             storage::storage_get::<Self::Storage, BoxedBytes>(self.storage_manager(), &key);
         let raw_storage_bytes = raw_storage.as_slice();

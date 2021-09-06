@@ -15,7 +15,7 @@ pub enum OrderType {
 
 #[derive(Clone)]
 pub struct Payment<M: ManagedTypeApi> {
-    pub token_id: TokenIdentifier,
+    pub token_id: TokenIdentifier<M>,
     pub amount: BigUint<M>,
 }
 
