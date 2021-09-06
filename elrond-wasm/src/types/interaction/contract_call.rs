@@ -321,6 +321,19 @@ where
         let mut loader = ManagedResultArgLoader::new(self.api.type_manager(), raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
+
+    pub fn execute_on_dest_context_readonly(mut self) -> R {
+        self = self.convert_to_esdt_transfer_call();
+        let raw_result = self.api.execute_on_dest_context_readonly_raw(
+            self.resolve_gas_limit(),
+            &self.to,
+            &self.endpoint_name,
+            &self.arg_buffer,
+        );
+
+        let mut loader = ManagedResultArgLoader::new(self.api.type_manager(), raw_result);
+        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+    }
 }
 
 impl<SA, R> ContractCall<SA, R>
@@ -333,6 +346,17 @@ where
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
         let _ = self.api.execute_on_dest_context_raw(
+            self.resolve_gas_limit(),
+            &self.to,
+            &self.egld_payment,
+            &self.endpoint_name,
+            &self.arg_buffer,
+        );
+    }
+
+    pub fn execute_on_same_context(mut self) {
+        self = self.convert_to_esdt_transfer_call();
+        let _ = self.api.execute_on_same_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,

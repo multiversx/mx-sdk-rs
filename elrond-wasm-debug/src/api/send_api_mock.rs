@@ -263,6 +263,16 @@ impl SendApi for TxContext {
         panic!("execute_on_same_context_raw not implemented yet!");
     }
 
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        _gas: u64,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        panic!("execute_on_dest_context_readonly_raw not implemented yet!");
+    }
+
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ProxyTypeManager>) {
         let tx_hash = self.get_tx_hash();
         self.storage_store_slice_u8(tx_hash.as_bytes(), data.to_boxed_bytes().as_slice());

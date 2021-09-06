@@ -172,6 +172,16 @@ impl SendApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        unreachable!()
+    }
+
     fn storage_store_tx_hash_key(&self, _data: &ManagedBuffer<Self::ProxyTypeManager>) {
         unreachable!()
     }
