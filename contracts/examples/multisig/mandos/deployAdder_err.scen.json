@@ -108,8 +108,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "5",
-                "message": "str:not enough gas",
+                "status": "10",
+                "message": "str:error signalled by smartcontract",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
