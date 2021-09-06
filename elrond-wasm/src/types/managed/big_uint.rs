@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedFrom, ManagedType};
+use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType};
 use crate::api::{Handle, ManagedTypeApi};
 use crate::types::BoxedBytes;
 use alloc::string::String;
@@ -66,6 +66,13 @@ where
             handle: api.bi_new(value as i64),
             api,
         }
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedDefault<M> for BigUint<M> {
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::zero(api)
     }
 }
 
