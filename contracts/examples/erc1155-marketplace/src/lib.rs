@@ -11,9 +11,9 @@ pub struct Auction<M: ManagedTypeApi> {
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
-    pub original_owner: ManagedAddress,
+    pub original_owner: ManagedAddress<M>,
     pub current_bid: BigUint<M>,
-    pub current_winner: ManagedAddress,
+    pub current_winner: ManagedAddress<M>,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
@@ -139,9 +139,13 @@ pub trait Erc1155Marketplace {
         &self,
         new_address: ManagedAddress,
     ) -> SCResult<()> {
-        require!(!new_address.is_zero(), "Cannot set to zero address");
         require!(
-            self.blockchain().is_smart_contract(&new_address),
+            new_address != self.types().address_zero(),
+            "Cannot set to zero address"
+        );
+        require!(
+            self.blockchain()
+                .is_smart_contract(&new_address.to_address()),
             "The provided address is not a smart contract"
         );
 
@@ -373,7 +377,7 @@ pub trait Erc1155Marketplace {
     }
 
     fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(dest) {
+        if self.blockchain().is_smart_contract(&dest.to_address()) {
             &[]
         } else {
             data

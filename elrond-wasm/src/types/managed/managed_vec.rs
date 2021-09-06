@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, ManagedVecItem};
+use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -71,15 +71,16 @@ where
     }
 }
 
-impl<M, T> ManagedFrom<M, Vec<T>> for ManagedVec<M, T>
+impl<M, T, I> ManagedFrom<M, Vec<I>> for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M>,
+    I: ManagedInto<M, T>,
 {
-    fn managed_from(api: M, v: Vec<T>) -> Self {
-        let mut result = Self::new_empty(api);
+    fn managed_from(api: M, v: Vec<I>) -> Self {
+        let mut result = Self::new_empty(api.clone());
         for item in v.into_iter() {
-            result.push(item);
+            result.push(item.managed_into(api.clone()));
         }
         result
     }

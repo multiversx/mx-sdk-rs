@@ -59,7 +59,7 @@ pub trait Multisig {
     fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Self::Storage, Vec<usize>>;
 
     #[init]
-    fn init(&self, quorum: usize, #[var_args] board: VarArgs<ManagedAddress>) -> SCResult<()> {
+    fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
         require!(
             !board.is_empty(),
             "board cannot be empty on init, no-one would be able to propose"
@@ -88,7 +88,7 @@ pub trait Multisig {
 
     fn propose_action(&self, action: Action<Self::TypeManager>) -> SCResult<usize> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_propose(),
@@ -217,7 +217,7 @@ pub trait Multisig {
     /// Does not check whether or not the user is still a board member and the signature valid.
     #[view]
     fn signed(&self, user: ManagedAddress, action_id: usize) -> bool {
-        let user_id = self.user_mapper().get_user_id(&user);
+        let user_id = self.user_mapper().get_user_id(&user.to_address());
         if user_id == 0 {
             false
         } else {
@@ -232,7 +232,7 @@ pub trait Multisig {
     /// `2` = can propose and sign.
     #[view(userRole)]
     fn user_role(&self, user: ManagedAddress) -> UserRole {
-        let user_id = self.user_mapper().get_user_id(&user);
+        let user_id = self.user_mapper().get_user_id(&user.to_address());
         if user_id == 0 {
             UserRole::None
         } else {
@@ -258,7 +258,7 @@ pub trait Multisig {
         for user_id in 1..=num_users {
             if self.get_user_id_to_role(user_id) == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
-                    result.push(address);
+                    result.push(address.managed_into(self.type_manager()));
                 }
             }
         }
@@ -274,7 +274,7 @@ pub trait Multisig {
         );
 
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can sign");
 
@@ -297,7 +297,7 @@ pub trait Multisig {
         );
 
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can un-sign");
 
@@ -322,7 +322,9 @@ pub trait Multisig {
     /// - convert between board member and proposer
     /// Will keep the board size and proposer count in sync.
     fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
-        let user_id = self.user_mapper().get_or_create_user(&user_address);
+        let user_id = self
+            .user_mapper()
+            .get_or_create_user(&user_address.to_address());
         let old_role = if user_id == 0 {
             UserRole::None
         } else {
@@ -363,7 +365,11 @@ pub trait Multisig {
         self.action_signer_ids(action_id)
             .get()
             .iter()
-            .map(|signer_id| self.user_mapper().get_user_address_unchecked(*signer_id))
+            .map(|signer_id| {
+                self.user_mapper()
+                    .get_user_address_unchecked(*signer_id)
+                    .managed_into(self.type_manager())
+            })
             .collect()
     }
 
@@ -406,7 +412,7 @@ pub trait Multisig {
         action_id: usize,
     ) -> SCResult<PerformActionResult<Self::SendApi>> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_perform_action(),
@@ -470,7 +476,7 @@ pub trait Multisig {
                 api: self.send(),
                 to,
                 amount,
-                data,
+                data: data.as_slice().managed_into(self.type_manager()),
             })),
             Action::SCDeploy {
                 amount,
@@ -479,10 +485,7 @@ pub trait Multisig {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
-                for arg in arguments {
-                    arg_buffer.push_argument_bytes(arg.as_slice());
-                }
+                let arg_buffer = arguments.managed_into(self.type_manager());
                 let new_address = self
                     .send()
                     .deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer)
@@ -495,9 +498,12 @@ pub trait Multisig {
                 endpoint_name,
                 arguments,
             } => {
-                let mut contract_call_raw =
-                    ContractCall::<Self::SendApi, ()>::new(self.send(), to, endpoint_name)
-                        .with_egld_transfer(egld_payment);
+                let mut contract_call_raw = ContractCall::<Self::SendApi, ()>::new(
+                    self.send(),
+                    to,
+                    endpoint_name.managed_into(self.type_manager()),
+                )
+                .with_egld_transfer(egld_payment);
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
                 }
@@ -519,7 +525,7 @@ pub trait Multisig {
     #[endpoint(discardAction)]
     fn discard_action(&self, action_id: usize) -> SCResult<()> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_discard_action(),

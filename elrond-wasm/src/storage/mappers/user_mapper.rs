@@ -3,7 +3,7 @@ use crate::abi::{TypeAbi, TypeName};
 use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::io::EndpointResult;
 use crate::storage::{storage_get, storage_get_len, storage_set, StorageKey};
-use crate::types::{ManagedAddress, MultiResultVec};
+use crate::types::{Address, MultiResultVec};
 use alloc::vec::Vec;
 
 const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";
@@ -40,7 +40,7 @@ impl<SA> UserMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    fn get_user_id_key(&self, address: &ManagedAddress<SA>) -> StorageKey<SA> {
+    fn get_user_id_key(&self, address: &Address) -> StorageKey<SA> {
         let mut user_id_key = self.base_key.clone();
         user_id_key.append_bytes(ADDRESS_TO_ID_SUFFIX);
         user_id_key.append_item(address);
@@ -62,16 +62,16 @@ where
 
     /// Yields the user id for a given address.
     /// Will return 0 if the address is not known to the contract.
-    pub fn get_user_id(&self, address: &ManagedAddress<SA>) -> usize {
+    pub fn get_user_id(&self, address: &Address) -> usize {
         storage_get(self.api.clone(), &self.get_user_id_key(address))
     }
 
-    fn set_user_id(&self, address: &ManagedAddress<SA>, id: usize) {
+    fn set_user_id(&self, address: &Address, id: usize) {
         storage_set(self.api.clone(), &self.get_user_id_key(address), &id);
     }
 
     /// Yields the user address for a given id, if the id is valid.
-    pub fn get_user_address(&self, id: usize) -> Option<ManagedAddress<SA>> {
+    pub fn get_user_address(&self, id: usize) -> Option<Address> {
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
 
@@ -84,23 +84,23 @@ where
 
     /// Yields the user address for a given id.
     /// Will cause a deserialization error if the id is invalid.
-    pub fn get_user_address_unchecked(&self, id: usize) -> ManagedAddress<SA> {
+    pub fn get_user_address_unchecked(&self, id: usize) -> Address {
         storage_get(self.api.clone(), &self.get_user_address_key(id))
     }
 
     /// Yields the user address for a given id, if the id is valid.
     /// Otherwise returns the zero address (0x000...)
-    pub fn get_user_address_or_zero(&self, id: usize) -> ManagedAddress<SA> {
+    pub fn get_user_address_or_zero(&self, id: usize) -> Address {
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
         if storage_get_len(self.api.clone(), &key) > 0 {
             storage_get(self.api.clone(), &key)
         } else {
-            ManagedAddress::zero_address(self.api.clone())
+            Address::zero()
         }
     }
 
-    fn set_user_address(&self, id: usize, address: &ManagedAddress<SA>) {
+    fn set_user_address(&self, id: usize, address: &Address) {
         storage_set(self.api.clone(), &self.get_user_address_key(id), address);
     }
 
@@ -115,7 +115,7 @@ where
 
     /// Yields the user id for a given address, or creates a new user id if there isn't one.
     /// Will safely keep the user count in sync.
-    pub fn get_or_create_user(&self, address: &ManagedAddress<SA>) -> usize {
+    pub fn get_or_create_user(&self, address: &Address) -> usize {
         let mut user_id = self.get_user_id(address);
         if user_id == 0 {
             let mut user_count = self.get_user_count();
@@ -132,7 +132,7 @@ where
     /// Calls a lambda function for each, with the new user id and whether of nor the user was already present.
     pub fn get_or_create_users<F: FnMut(usize, bool)>(
         &self,
-        addresses: &[ManagedAddress<SA>],
+        addresses: &[Address],
         mut user_id_lambda: F,
     ) {
         let mut user_count = self.get_user_count();
@@ -153,7 +153,7 @@ where
 
     /// Loads all addresses from storage and places them in a Vec.
     /// Can easily consume a lot of gas.
-    pub fn get_all_addresses(&self) -> Vec<ManagedAddress<SA>> {
+    pub fn get_all_addresses(&self) -> Vec<Address> {
         let user_count = self.get_user_count();
         let mut result = Vec::with_capacity(user_count);
         for i in 1..=user_count {
@@ -163,20 +163,20 @@ where
     }
 }
 
-/// Behaves like a MultiResultVec<ManagedAddress<SA>> when an endpoint result,
+/// Behaves like a MultiResultVec<Address> when an endpoint result,
 /// and lists all users addresses.
 impl<SA> EndpointResult for UserMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
+    type DecodeAs = MultiResultVec<Address>;
 
     fn finish<FA>(&self, api: FA)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let addr_vec = self.get_all_addresses();
-        MultiResultVec::<ManagedAddress<SA>>::from(addr_vec).finish(api);
+        MultiResultVec::<Address>::from(addr_vec).finish(api);
     }
 }
 
@@ -186,7 +186,7 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()
+        crate::types::MultiResultVec::<Address>::type_name()
     }
 
     fn is_multi_arg_or_result() -> bool {

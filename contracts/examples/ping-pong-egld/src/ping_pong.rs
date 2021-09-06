@@ -108,8 +108,11 @@ pub trait PingPong {
             UserStatus::Registered => {
                 self.user_status(user_id).set(&UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
-                    self.send()
-                        .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
+                    self.send().direct_egld(
+                        &user_address.managed_into(self.type_manager()),
+                        &self.ping_amount().get(),
+                        b"pong",
+                    );
                     Ok(())
                 } else {
                     sc_error!("unknown user")
