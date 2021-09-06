@@ -230,6 +230,45 @@ pub trait ForwarderRaw {
         self.execute_on_dest_context_result(result);
     }
 
+    #[endpoint]
+    #[payable("EGLD")]
+    fn call_execute_on_dest_context_by_caller(
+        &self,
+        to: ManagedAddress,
+        #[payment] payment: BigUint,
+        endpoint_name: ManagedBuffer,
+        #[var_args] args: VarArgs<ManagedBuffer>,
+    ) {
+        let half_gas = self.blockchain().get_gas_left() / 2;
+        let result = self.send().execute_on_dest_context_by_caller_raw(
+            half_gas,
+            &to,
+            &payment,
+            &endpoint_name,
+            &args.into_vec().managed_into(self.type_manager()),
+        );
+
+        self.execute_on_dest_context_result(result);
+    }
+
+    #[endpoint]
+    fn call_execute_on_dest_context_readonly(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        #[var_args] args: VarArgs<ManagedBuffer>,
+    ) {
+        let half_gas = self.blockchain().get_gas_left() / 2;
+        let result = self.send().execute_on_dest_context_readonly_raw(
+            half_gas,
+            &to,
+            &endpoint_name,
+            &args.into_vec().managed_into(self.type_manager()),
+        );
+
+        self.execute_on_dest_context_result(result);
+    }
+
     #[event("execute_on_dest_context_result")]
     fn execute_on_dest_context_result(&self, result: ManagedVec<Self::TypeManager, ManagedBuffer>);
 

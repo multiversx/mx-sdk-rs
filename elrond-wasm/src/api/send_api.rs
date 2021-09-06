@@ -341,6 +341,14 @@ pub trait SendApi: Clone + Sized {
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     );
 
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
+
     /// Used to store data between async call and callback.
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ProxyTypeManager>);
 

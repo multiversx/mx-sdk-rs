@@ -49,13 +49,6 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     ) -> i32;
-    fn managedDelegateExecution(
-        gas: i64,
-        addressHandle: i32,
-        functionHandle: i32,
-        argumentsHandle: i32,
-        resultHandle: i32,
-    ) -> i32;
     fn managedExecuteReadOnly(
         gas: i64,
         addressHandle: i32,
@@ -449,6 +442,28 @@ impl SendApi for ArwenApiImpl {
             );
 
             // TODO: return result?
+        }
+    }
+
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        gas: u64,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        unsafe {
+            let result_handle = mBufferNew();
+
+            let _ = managedExecuteReadOnly(
+                gas as i64,
+                to.get_raw_handle(),
+                endpoint_name.get_raw_handle(),
+                arg_buffer.get_raw_handle(),
+                result_handle,
+            );
+
+            ManagedVec::from_raw_handle(self.clone(), result_handle)
         }
     }
 

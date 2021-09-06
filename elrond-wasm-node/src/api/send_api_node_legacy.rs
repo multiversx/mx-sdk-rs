@@ -590,6 +590,30 @@ impl SendApi for ArwenApiImpl {
         }
     }
 
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        gas: u64,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) {
+        unsafe {
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let function = endpoint_name.to_boxed_bytes();
+            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let to_address = to.to_address();
+            let _ = executeReadonly(
+                gas as i64,
+                to_address.as_ptr(),
+                function.as_ptr(),
+                function.len() as i32,
+                legacy_arg_buffer.num_args() as i32,
+                legacy_arg_buffer.arg_lengths_bytes_ptr(),
+                legacy_arg_buffer.arg_data_ptr(),
+            );
+        }
+    }
+
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ProxyTypeManager>) {
         let tx_hash = self.get_tx_hash_managed();
         self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());

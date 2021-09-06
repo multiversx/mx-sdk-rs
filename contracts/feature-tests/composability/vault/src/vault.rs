@@ -19,6 +19,11 @@ pub trait Vault {
         Ok(args.into_vec().into())
     }
 
+    #[endpoint]
+    fn echo_caller(&self) -> ManagedAddress {
+        self.blockchain().get_caller()
+    }
+
     #[payable("*")]
     #[endpoint]
     fn accept_funds(
