@@ -4,7 +4,6 @@ use elrond_wasm::types::{
     BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
     ManagedInto, ManagedType, ManagedVec, TokenIdentifier,
 };
-use elrond_wasm::HexCallDataSerializer;
 
 #[allow(unused)]
 extern "C" {
@@ -100,7 +99,12 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     );
-    fn managedAsyncCall(dstHandle: i32, valueHandle: i32, dataHandle: i32) -> !;
+    fn managedAsyncCall(
+        dstHandle: i32,
+        valueHandle: i32,
+        functionHandle: i32,
+        argumentsHandle: i32,
+    ) -> !;
 
     /// Allows us to filter results from nested sync call
     fn getNumReturnData() -> i32;
@@ -240,15 +244,12 @@ impl SendApi for ArwenApiImpl {
         endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ! {
-        // TODO: find a solution for this conversion
-        let call_data =
-            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
-        let call_data_buffer = ManagedBuffer::new_from_bytes(self.clone(), call_data.as_slice());
         unsafe {
             managedAsyncCall(
                 to.get_raw_handle(),
                 amount.get_raw_handle(),
-                call_data_buffer.get_raw_handle(),
+                endpoint_name.get_raw_handle(),
+                arg_buffer.get_raw_handle(),
             )
         }
     }
