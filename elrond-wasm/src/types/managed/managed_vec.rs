@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedFrom, ManagedType, ManagedVecItem};
+use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, ManagedVecItem};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -82,6 +82,17 @@ where
             result.push(item);
         }
         result
+    }
+}
+
+impl<M, T> ManagedDefault<M> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::new_empty(api)
     }
 }
 

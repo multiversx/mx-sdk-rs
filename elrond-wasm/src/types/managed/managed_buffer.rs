@@ -1,4 +1,4 @@
-use super::{ManagedFrom, ManagedType};
+use super::{ManagedDefault, ManagedFrom, ManagedType};
 use crate::api::InvalidSliceError;
 use crate::{
     api::{Handle, ManagedTypeApi},
@@ -70,6 +70,13 @@ where
     #[inline]
     fn managed_from(api: M, bytes: &[u8; N]) -> Self {
         Self::new_from_bytes(api, bytes)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedDefault<M> for ManagedBuffer<M> {
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::new_empty(api)
     }
 }
 

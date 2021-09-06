@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedType};
+use super::{ManagedBuffer, ManagedDefault, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -41,6 +41,16 @@ where
     #[inline]
     fn type_manager(&self) -> M {
         self.buffer.type_manager()
+    }
+}
+
+impl<M, const N: usize> ManagedDefault<M> for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::new_from_bytes(api, &[0u8; N])
     }
 }
 
