@@ -42,9 +42,9 @@ impl<SA> TokenAttributesMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    pub fn set<T: TopEncode + TopDecode>(
+    pub fn set<T: TopEncode + TopDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &TokenIdentifier<M>,
         token_nonce: u64,
         attributes: &T,
     ) {
@@ -73,9 +73,9 @@ where
     }
 
     ///Use carefully. Update should be used mainly when backed up by the protocol.
-    pub fn update<T: TopEncode + TopDecode>(
+    pub fn update<T: TopEncode + TopDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &TokenIdentifier<M>,
         token_nonce: u64,
         attributes: &T,
     ) {
@@ -94,7 +94,7 @@ where
         self.set_token_attributes_value(mapping, token_nonce, attributes);
     }
 
-    pub fn clear(&self, token_id: &TokenIdentifier, token_nonce: u64) {
+    pub fn clear<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, token_nonce: u64) {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
             return;
@@ -109,7 +109,11 @@ where
         self.clear_token_attributes_value(mapping, token_nonce);
     }
 
-    pub fn is_empty(&self, token_id: &TokenIdentifier, token_nonce: u64) -> bool {
+    pub fn is_empty<M: ManagedTypeApi>(
+        &self,
+        token_id: &TokenIdentifier<M>,
+        token_nonce: u64,
+    ) -> bool {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
             return true;
@@ -119,7 +123,11 @@ where
         self.is_empty_token_attributes_value(mapping, token_nonce)
     }
 
-    pub fn get<T: TopEncode + TopDecode>(&self, token_id: &TokenIdentifier, token_nonce: u64) -> T {
+    pub fn get<T: TopEncode + TopDecode, M: ManagedTypeApi>(
+        &self,
+        token_id: &TokenIdentifier<M>,
+        token_nonce: u64,
+    ) -> T {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
             self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
@@ -135,7 +143,7 @@ where
         self.get_token_attributes_value(mapping, token_nonce)
     }
 
-    fn has_mapping_value(&self, token_id: &TokenIdentifier) -> bool {
+    fn has_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
         !self.is_empty_mapping_value(token_id)
     }
 
@@ -149,7 +157,10 @@ where
         key
     }
 
-    fn build_key_token_id_mapping(&self, token_id: &TokenIdentifier) -> StorageKey<SA> {
+    fn build_key_token_id_mapping<M: ManagedTypeApi>(
+        &self,
+        token_id: &TokenIdentifier<M>,
+    ) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(MAPPING_SUFFIX);
         key.append_item(token_id);
@@ -172,11 +183,11 @@ where
         storage_set(self.api.clone(), &self.build_key_token_id_counter(), &value);
     }
 
-    fn get_mapping_value(&self, token_id: &TokenIdentifier) -> u8 {
+    fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> u8 {
         storage_get(self.api.clone(), &self.build_key_token_id_mapping(token_id))
     }
 
-    fn set_mapping_value(&self, token_id: &TokenIdentifier, value: u8) {
+    fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, value: u8) {
         storage_set(
             self.api.clone(),
             &self.build_key_token_id_mapping(token_id),
@@ -184,7 +195,7 @@ where
         );
     }
 
-    fn is_empty_mapping_value(&self, token_id: &TokenIdentifier) -> bool {
+    fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
         storage_get_len(self.api.clone(), &self.build_key_token_id_mapping(token_id)) == 0
     }
 

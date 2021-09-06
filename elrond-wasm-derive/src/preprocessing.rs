@@ -23,6 +23,10 @@ fn substitutions() -> HashMap<String, TokenStream> {
         "ManagedAddress".to_string(),
         quote!(elrond_wasm::types::ManagedAddress<Self::TypeManager>).into(),
     );
+    substitutions.insert(
+        "TokenIdentifier".to_string(),
+        quote!(elrond_wasm::types::TokenIdentifier<Self::TypeManager>).into(),
+    );
     substitutions
 }
 

@@ -15,7 +15,7 @@ pub struct Color {
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: Vec<u8>,
-    pub token_id: TokenIdentifier,
+    pub token_id: TokenIdentifier<M>,
     pub boolean: bool,
     pub boxed_bytes: BoxedBytes,
 }

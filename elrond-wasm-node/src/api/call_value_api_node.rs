@@ -1,6 +1,6 @@
 use crate::ArwenApiImpl;
 use elrond_wasm::api::CallValueApi;
-use elrond_wasm::types::{BigUint, BoxedBytes, EsdtTokenType, ManagedType, TokenIdentifier};
+use elrond_wasm::types::{BigUint, EsdtTokenType, ManagedType, TokenIdentifier};
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
@@ -62,14 +62,14 @@ impl CallValueApi for ArwenApiImpl {
         }
     }
 
-    fn token(&self) -> TokenIdentifier {
+    fn token(&self) -> TokenIdentifier<Self::TypeManager> {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
             if name_len == 0 {
-                TokenIdentifier::egld()
+                TokenIdentifier::egld(self.clone())
             } else {
-                BoxedBytes::from(&name_buffer[..name_len as usize]).into()
+                TokenIdentifier::from_esdt_bytes(self.clone(), &name_buffer[..name_len as usize])
             }
         }
     }
@@ -94,14 +94,14 @@ impl CallValueApi for ArwenApiImpl {
         }
     }
 
-    fn token_by_index(&self, index: usize) -> TokenIdentifier {
+    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self::TypeManager> {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenNameByIndex(name_buffer.as_mut_ptr(), index as i32);
             if name_len == 0 {
-                TokenIdentifier::egld()
+                TokenIdentifier::egld(self.clone())
             } else {
-                BoxedBytes::from(&name_buffer[..name_len as usize]).into()
+                TokenIdentifier::from_esdt_bytes(self.clone(), &name_buffer[..name_len as usize])
             }
         }
     }
@@ -124,7 +124,7 @@ impl CallValueApi for ArwenApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetMultiESDTCallValue(result_handle);
-            ManagedVec::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedVec::from_raw_handle(self.type_manager(), result_handle)
         }
     }
 }

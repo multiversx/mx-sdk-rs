@@ -139,6 +139,26 @@ impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
 
+impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M> {
+    #[allow(clippy::op_ref)] // clippy is wrong here, it is not needless
+    fn eq(&self, other: &&[u8; N]) -> bool {
+        if self.len() != N {
+            return false;
+        }
+        let mut self_bytes = [0u8; N];
+        let _ = self.api.mb_load_slice(self.handle, 0, &mut self_bytes[..]);
+        &self_bytes[..] == &other[..]
+    }
+}
+
+impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
+    fn eq(&self, other: &[u8]) -> bool {
+        // TODO: push this to the api and optiize by using a temporary handle
+        let other_mb = ManagedBuffer::new_from_bytes(self.api.clone(), other);
+        self == &other_mb
+    }
+}
+
 impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
