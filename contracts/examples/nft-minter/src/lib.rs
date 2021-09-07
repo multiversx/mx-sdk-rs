@@ -16,7 +16,7 @@ pub trait NftMinter: nft_module::NftModule {
     fn init(&self) {}
 
     #[only_owner]
-    #[endpoint]
+    #[endpoint(createNft)]
     fn create_nft(
         &self,
         name: BoxedBytes,
