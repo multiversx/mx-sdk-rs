@@ -1,0 +1,26 @@
+[package]
+name = "nft-minter"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+wasm-output-mode = ["elrond-wasm-node"]
+
+[dependencies.elrond-wasm]
+version = "0.18.2"
+path = "../../../elrond-wasm"
+features = ["derive"]
+
+[dependencies.elrond-wasm-node]
+version = "0.18.2"
+path = "../../../elrond-wasm-node"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.18.2"
+path = "../../../elrond-wasm-debug"
