@@ -21,7 +21,6 @@ pub trait NftMinter: nft_module::NftModule {
         &self,
         name: BoxedBytes,
         royalties: BigUint,
-        attributes: ExampleAttributes,
         uri: BoxedBytes,
         selling_price: BigUint,
         #[var_args] opt_token_used_as_payment: OptionalArg<TokenIdentifier>,
@@ -39,6 +38,9 @@ pub trait NftMinter: nft_module::NftModule {
                 .unwrap_or_default()
         };
 
+        let attributes = ExampleAttributes {
+            creation_timestamp: self.blockchain().get_block_timestamp(),
+        };
         self.create_nft_with_attributes(
             name,
             royalties,
