@@ -62,7 +62,6 @@ where
         to: ManagedAddress<SA::ProxyTypeManager>,
         endpoint_name: ManagedBuffer<SA::ProxyTypeManager>,
     ) -> Self {
-        let payments = vec![EsdtTokenPayment::no_payment(api.type_manager())];
         let arg_buffer = ManagedArgBuffer::new_empty(api.type_manager());
         let egld_payment = BigUint::zero(api.type_manager());
         let payments = ManagedVec::new_empty(api.type_manager());
@@ -381,51 +380,58 @@ where
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
     pub fn transfer_execute(self) {
-        if self.payments.len() == 1 {
+        let payments_len = self.payments.len();
+
+        if payments_len == 0 {
+            self.no_payment_transfer_execute()
+        } else if payments_len == 1 {
             self.single_transfer_execute()
         } else {
             self.multi_transfer_execute()
         }
     }
 
+    fn no_payment_transfer_execute(&self) {
+        let gas_limit = self.resolve_gas_limit_with_leftover();
+
+        self.api.direct_egld_execute(
+            &self.to,
+            &BigUint::zero(self.api.type_manager()),
+            gas_limit,
+            &self.endpoint_name,
+            &self.arg_buffer,
+        );
+    }
+
     fn single_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        if let Some(payment) = &self.payments.get(0) {
-            if payment.token_name.is_egld() {
-                self.api.direct_egld_execute(
-                    &self.to,
-                    &payment.amount,
-                    gas_limit,
-                    &self.endpoint_name,
-                    &self.arg_buffer,
-                );
-            } else if payment.token_nonce == 0 {
-                // fungible ESDT
-                self.api.direct_esdt_execute(
-                    &self.to,
-                    &payment.token_name,
-                    &payment.amount,
-                    gas_limit,
-                    &self.endpoint_name,
-                    &self.arg_buffer,
-                );
-            } else {
-                // non-fungible/semi-fungible ESDT
-                self.api.direct_esdt_nft_execute(
-                    &self.to,
-                    &payment.token_name,
-                    payment.token_nonce,
-                    &payment.amount,
-                    gas_limit,
-                    &self.endpoint_name,
-                    &self.arg_buffer,
-                );
-            }
-        } else {
-            // no payment
+        let payment = &self.payments.get(0).unwrap();
+
+        if payment.token_name.is_egld() {
             self.api.direct_egld_execute(
                 &self.to,
-                &BigUint::zero(self.api.type_manager()),
+                &payment.amount,
+                gas_limit,
+                &self.endpoint_name,
+                &self.arg_buffer,
+            );
+        } else if payment.token_nonce == 0 {
+            // fungible ESDT
+            self.api.direct_esdt_execute(
+                &self.to,
+                &payment.token_name,
+                &payment.amount,
+                gas_limit,
+                &self.endpoint_name,
+                &self.arg_buffer,
+            );
+        } else {
+            // non-fungible/semi-fungible ESDT
+            self.api.direct_esdt_nft_execute(
+                &self.to,
+                &payment.token_name,
+                payment.token_nonce,
+                &payment.amount,
                 gas_limit,
                 &self.endpoint_name,
                 &self.arg_buffer,
