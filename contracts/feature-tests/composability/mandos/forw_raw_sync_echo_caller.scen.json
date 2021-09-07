@@ -51,11 +51,10 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "sc:forwarder"
-                            ]
-                        }
+                        "data": [
+                            "nested:sc:forwarder"
+                        ]
+                        
                     }
                 ],
                 "gas": "*",
@@ -90,11 +89,9 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "sc:forwarder"
-                            ]
-                        }
+                        "data": [
+                            "nested:sc:forwarder"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -102,11 +99,9 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "sc:forwarder"
-                            ]
-                        }
+                        "data": [
+                            "nested:sc:forwarder"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -130,7 +125,7 @@
             },
             "expect": {
                 "out": [
-                    "address:an_user"
+                    "address:a_user"
                 ],
                 "status": "0",
                 "logs": [
@@ -140,11 +135,9 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "address:an_user"
-                            ]
-                        }
+                        "data": [
+                            "nested:address:a_user"
+                        ]
                     }
                 ],
                 "gas": "*",

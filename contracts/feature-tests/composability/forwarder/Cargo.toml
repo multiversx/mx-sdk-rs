@@ -12,6 +12,13 @@ path = "src/forwarder_main.rs"
 wasm-output-mode = [
     "elrond-wasm-node",
 ]
+wasm-output-mode-managed-ei = [
+    "wasm-output-mode",
+    "elrond-wasm-node/managed-ei"
+]
+wasm-output-mode-unmanaged-ei = [
+    "wasm-output-mode",
+]
 
 [dependencies.vault]
 path = "../vault"
@@ -24,6 +31,7 @@ features = ["derive"]
 [dependencies.elrond-wasm-node]
 version = "0.18.2"
 path = "../../../../elrond-wasm-node"
+default-features = false
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
