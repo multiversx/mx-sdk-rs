@@ -104,19 +104,15 @@ pub trait NftModule {
         );
 
         let owner = self.blockchain().get_owner_address();
-        self.send().direct(
-            &owner,
-            &payment_token,
-            payment_nonce,
-            &payment_amount,
-            &[],
-        );
+        self.send()
+            .direct(&owner, &payment_token, payment_nonce, &payment_amount, &[]);
 
         Ok(())
     }
 
     // views
 
+    #[allow(clippy::type_complexity)]
     #[view(getNftPrice)]
     fn get_nft_price(
         &self,
@@ -153,6 +149,7 @@ pub trait NftModule {
 
     // private
 
+    #[allow(clippy::too_many_arguments)]
     fn create_nft_with_attributes<T: TopEncode>(
         &self,
         name: BoxedBytes,

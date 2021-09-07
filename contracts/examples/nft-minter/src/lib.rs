@@ -15,6 +15,7 @@ pub trait NftMinter: nft_module::NftModule {
     #[init]
     fn init(&self) {}
 
+    #[allow(clippy::too_many_arguments)]
     #[only_owner]
     #[endpoint(createNft)]
     fn create_nft(
