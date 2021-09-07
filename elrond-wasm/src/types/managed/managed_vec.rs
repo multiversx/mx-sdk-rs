@@ -138,7 +138,7 @@ where
         let byte_start = start_index * T::PAYLOAD_SIZE;
         let byte_end = end_index * T::PAYLOAD_SIZE;
         let opt_buffer = self.buffer.copy_slice(byte_start, byte_end - byte_start);
-        opt_buffer.map(|buffer| ManagedVec::new_from_raw_buffer(buffer))
+        opt_buffer.map(ManagedVec::new_from_raw_buffer)
     }
 
     pub fn push(&mut self, item: T) {

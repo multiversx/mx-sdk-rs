@@ -71,10 +71,7 @@ where
     M: ManagedTypeApi,
 {
     fn managed_from(api: M, data: ManagedVec<M, ManagedBuffer<M>>) -> Self {
-        ManagedArgBuffer {
-            api: api.clone(),
-            data: data,
-        }
+        ManagedArgBuffer { api, data }
     }
 }
 

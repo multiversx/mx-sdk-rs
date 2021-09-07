@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(clippy::type_complexity)]
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
