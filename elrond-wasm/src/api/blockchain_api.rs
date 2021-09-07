@@ -24,19 +24,19 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
     fn get_caller_legacy(&self) -> Address;
 
     fn get_caller(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::from_address(self.type_manager(), self.get_caller_legacy())
+        ManagedAddress::from_address(self.type_manager(), &self.get_caller_legacy())
     }
 
     fn get_sc_address_legacy(&self) -> Address;
 
     fn get_sc_address(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::from_address(self.type_manager(), self.get_sc_address_legacy())
+        ManagedAddress::from_address(self.type_manager(), &self.get_sc_address_legacy())
     }
 
     fn get_owner_address_legacy(&self) -> Address;
 
     fn get_owner_address(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::from_address(self.type_manager(), self.get_owner_address_legacy())
+        ManagedAddress::from_address(self.type_manager(), &self.get_owner_address_legacy())
     }
 
     fn check_caller_is_owner(&self) {
