@@ -509,7 +509,7 @@ mod sample_adder {
     {
         pub api: SA,
         pub address: Address,
-        pub payment_token: elrond_wasm::types::TokenIdentifier,
+        pub payment_token: elrond_wasm::types::TokenIdentifier<SA::ProxyTypeManager>,
         pub payment_amount: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
         pub payment_nonce: u64,
     }
@@ -524,10 +524,11 @@ mod sample_adder {
 
         fn new_proxy_obj(api: SA) -> Self {
             let zero = elrond_wasm::types::BigUint::zero(api.type_manager());
+            let payment_token = elrond_wasm::types::TokenIdentifier::egld(api.type_manager());
             Proxy {
                 api,
                 address: Address::zero(),
-                payment_token: elrond_wasm::types::TokenIdentifier::egld(),
+                payment_token,
                 payment_amount: zero,
                 payment_nonce: 0,
             }
@@ -540,7 +541,7 @@ mod sample_adder {
 
         fn with_token_transfer(
             mut self,
-            token: TokenIdentifier,
+            token: TokenIdentifier<SA::ProxyTypeManager>,
             payment: BigUint<Self::TypeManager>,
         ) -> Self {
             self.payment_token = token;
@@ -560,7 +561,7 @@ mod sample_adder {
         ) -> (
             Self::SendApi,
             Address,
-            TokenIdentifier,
+            TokenIdentifier<SA::ProxyTypeManager>,
             BigUint<Self::TypeManager>,
             u64,
         ) {

@@ -43,7 +43,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn new_from_bytes(api: M, bytes: &[u8]) -> Self {
         ManagedBuffer {
             handle: api.mb_new_from_bytes(bytes),
@@ -67,6 +67,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
+    #[inline]
     pub fn load_slice(
         &self,
         starting_position: usize,
@@ -95,14 +96,17 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
+    #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
         self.api.mb_overwrite(self.handle, value);
     }
 
+    #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
         self.api.mb_append(self.handle, other.handle);
     }
 
+    #[inline(always)]
     pub fn append_bytes(&mut self, slice: &[u8]) {
         self.api.mb_append_bytes(self.handle, slice);
     }
@@ -134,6 +138,26 @@ impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
+
+impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M> {
+    #[allow(clippy::op_ref)] // clippy is wrong here, it is not needless
+    fn eq(&self, other: &&[u8; N]) -> bool {
+        if self.len() != N {
+            return false;
+        }
+        let mut self_bytes = [0u8; N];
+        let _ = self.api.mb_load_slice(self.handle, 0, &mut self_bytes[..]);
+        &self_bytes[..] == &other[..]
+    }
+}
+
+impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
+    fn eq(&self, other: &[u8]) -> bool {
+        // TODO: push this to the api and optiize by using a temporary handle
+        let other_mb = ManagedBuffer::new_from_bytes(self.api.clone(), other);
+        self == &other_mb
+    }
+}
 
 impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 

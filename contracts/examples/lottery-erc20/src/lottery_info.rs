@@ -1,6 +1,6 @@
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{Address, BigUint, Vec},
+    types::{BigUint, ManagedAddress, Vec},
 };
 elrond_wasm::derive_imports!();
 
@@ -11,7 +11,7 @@ pub struct LotteryInfo<M: ManagedTypeApi> {
     pub deadline: u64,
     pub max_entries_per_user: u32,
     pub prize_distribution: Vec<u8>,
-    pub whitelist: Vec<Address>,
+    pub whitelist: Vec<ManagedAddress<M>>,
     pub current_ticket_number: u32,
     pub prize_pool: BigUint<M>,
     pub queued_tickets: u32,

@@ -2,7 +2,8 @@ use crate::async_data::*;
 use crate::TxLog;
 use crate::TxManagedTypes;
 use alloc::vec::Vec;
-use elrond_wasm::types::{Address, TokenIdentifier};
+use elrond_wasm::types::Address;
+use elrond_wasm::types::BoxedBytes;
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::fmt;
@@ -52,7 +53,7 @@ impl TxResult {
 #[derive(Debug)]
 pub struct SendBalance {
     pub recipient: Address,
-    pub token: TokenIdentifier,
+    pub token_name: BoxedBytes,
     pub amount: BigUint,
 }
 

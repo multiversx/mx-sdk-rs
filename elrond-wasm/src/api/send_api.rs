@@ -1,6 +1,6 @@
 use elrond_codec::{TopDecode, TopEncode};
 
-use super::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
+use super::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::{
     types::{
         Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
@@ -29,26 +29,16 @@ pub trait SendApi: Clone + Sized {
 
     type ErrorApi: ErrorApi + ManagedTypeApi + Clone + 'static;
 
+    type BlockchainApi: BlockchainApi<Storage = Self::ProxyStorage, TypeManager = Self::ProxyTypeManager>
+        + Clone
+        + 'static;
+
     fn type_manager(&self) -> Self::ProxyTypeManager;
 
     fn error_api(&self) -> Self::ErrorApi;
 
-    /// Required for ESDTNFTTransfer.
-    /// Same as the implementation from BlockchainApi.
-    fn get_sc_address(&self) -> Address;
-
-    /// To be used internally by the SendApi implementation.
-    /// Do not use directly from contracts. It might be removed from this trait at some point or reworked.
-    fn get_gas_left(&self) -> u64;
-
-    /// Used internally for sell_nft.
-    /// Do not use directly from contracts.
-    fn get_esdt_token_data(
-        &self,
-        address: &Address,
-        token: &TokenIdentifier,
-        nonce: u64,
-    ) -> crate::types::EsdtTokenData<Self::ProxyTypeManager>;
+    /// Required by some of the methods.
+    fn blockchain(&self) -> Self::BlockchainApi;
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
@@ -68,7 +58,7 @@ pub trait SendApi: Clone + Sized {
     fn direct_esdt_execute(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
@@ -80,7 +70,7 @@ pub trait SendApi: Clone + Sized {
     fn direct_esdt_nft_execute(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
@@ -102,7 +92,7 @@ pub trait SendApi: Clone + Sized {
     fn direct(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
         data: &[u8],
@@ -149,14 +139,14 @@ pub trait SendApi: Clone + Sized {
     fn transfer_esdt_via_async_call(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
         data: &[u8],
     ) -> ! {
         if nonce == 0 {
             let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-            serializer.push_argument_bytes(token.as_esdt_identifier());
+            serializer.push_argument_bytes(token.to_esdt_identifier().as_slice());
             serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
             if !data.is_empty() {
                 serializer.push_argument_bytes(data);
@@ -169,7 +159,7 @@ pub trait SendApi: Clone + Sized {
             )
         } else {
             let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
-            serializer.push_argument_bytes(token.as_esdt_identifier());
+            serializer.push_argument_bytes(token.to_esdt_identifier().as_slice());
             serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
             serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
             serializer.push_argument_bytes(to.as_bytes());
@@ -178,7 +168,7 @@ pub trait SendApi: Clone + Sized {
             }
 
             self.async_call_raw(
-                &self.get_sc_address(),
+                &self.blockchain().get_sc_address(),
                 &BigUint::zero(self.type_manager()),
                 serializer.as_slice(),
             );
@@ -196,7 +186,7 @@ pub trait SendApi: Clone + Sized {
         serializer.push_argument_bytes(&tokens.len().to_be_bytes()[..]);
 
         for token in tokens {
-            serializer.push_argument_bytes(token.token_name.as_esdt_identifier());
+            serializer.push_argument_bytes(token.token_name.to_esdt_identifier().as_slice());
             serializer.push_argument_bytes(&token.token_nonce.to_be_bytes()[..]);
             serializer.push_argument_bytes(token.amount.to_bytes_be().as_slice());
         }
@@ -206,7 +196,7 @@ pub trait SendApi: Clone + Sized {
         }
 
         self.async_call_raw(
-            &self.get_sc_address(),
+            &self.blockchain().get_sc_address(),
             &BigUint::zero(self.type_manager()),
             serializer.as_slice(),
         );
@@ -255,7 +245,7 @@ pub trait SendApi: Clone + Sized {
         arg_buffer.push_argument_bytes(new_owner.as_bytes());
 
         let _ = self.execute_on_dest_context_raw(
-            self.get_gas_left(),
+            self.blockchain().get_gas_left(),
             child_sc_address,
             &BigUint::zero(self.type_manager()),
             b"ChangeOwnerAddress",
@@ -333,14 +323,14 @@ pub trait SendApi: Clone + Sized {
     /// This function cannot be used for NFTs.
     fn esdt_local_mint(
         &self,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
     ) {
         let mut arg_buffer = ArgBuffer::new();
         let func_name: &[u8];
 
-        arg_buffer.push_argument_bytes(token.as_esdt_identifier());
+        arg_buffer.push_argument_bytes(token.to_esdt_identifier().as_slice());
 
         if nonce == 0 {
             func_name = b"ESDTLocalMint";
@@ -351,7 +341,11 @@ pub trait SendApi: Clone + Sized {
 
         arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-        let _ = self.call_local_esdt_built_in_function(self.get_gas_left(), func_name, &arg_buffer);
+        let _ = self.call_local_esdt_built_in_function(
+            self.blockchain().get_gas_left(),
+            func_name,
+            &arg_buffer,
+        );
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
@@ -359,14 +353,14 @@ pub trait SendApi: Clone + Sized {
     /// or this will fail with "action is not allowed"
     fn esdt_local_burn(
         &self,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
     ) {
         let mut arg_buffer = ArgBuffer::new();
         let func_name: &[u8];
 
-        arg_buffer.push_argument_bytes(token.as_esdt_identifier());
+        arg_buffer.push_argument_bytes(token.to_esdt_identifier().as_slice());
 
         if nonce == 0 {
             func_name = b"ESDTLocalBurn";
@@ -377,7 +371,11 @@ pub trait SendApi: Clone + Sized {
 
         arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
 
-        let _ = self.call_local_esdt_built_in_function(self.get_gas_left(), func_name, &arg_buffer);
+        let _ = self.call_local_esdt_built_in_function(
+            self.blockchain().get_gas_left(),
+            func_name,
+            &arg_buffer,
+        );
     }
 
     /// Creates a new NFT token of a certain type (determined by `token_identifier`).  
@@ -388,7 +386,7 @@ pub trait SendApi: Clone + Sized {
     #[allow(clippy::too_many_arguments)]
     fn esdt_nft_create<T: elrond_codec::TopEncode>(
         &self,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         name: &BoxedBytes,
         royalties: &BigUint<Self::ProxyTypeManager>,
@@ -397,7 +395,7 @@ pub trait SendApi: Clone + Sized {
         uris: &[BoxedBytes],
     ) -> u64 {
         let mut arg_buffer = ArgBuffer::new();
-        arg_buffer.push_argument_bytes(token.as_esdt_identifier());
+        arg_buffer.push_argument_bytes(token.to_esdt_identifier().as_slice());
         arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
         arg_buffer.push_argument_bytes(name.as_slice());
         arg_buffer.push_argument_bytes(royalties.to_bytes_be().as_slice());
@@ -417,7 +415,7 @@ pub trait SendApi: Clone + Sized {
         }
 
         let output = self.call_local_esdt_built_in_function(
-            self.get_gas_left(),
+            self.blockchain().get_gas_left(),
             b"ESDTNFTCreate",
             &arg_buffer,
         );
@@ -430,22 +428,26 @@ pub trait SendApi: Clone + Sized {
     #[allow(clippy::too_many_arguments)]
     fn sell_nft(
         &self,
-        nft_id: &TokenIdentifier,
+        nft_id: &TokenIdentifier<Self::ProxyTypeManager>,
         nft_nonce: u64,
         nft_amount: &BigUint<Self::ProxyTypeManager>,
         buyer: &Address,
-        payment_token: &TokenIdentifier,
+        payment_token: &TokenIdentifier<Self::ProxyTypeManager>,
         payment_nonce: u64,
         payment_amount: &BigUint<Self::ProxyTypeManager>,
     ) -> BigUint<Self::ProxyTypeManager> {
-        let nft_token_data = self.get_esdt_token_data(&self.get_sc_address(), nft_id, nft_nonce);
+        let nft_token_data = self.blockchain().get_esdt_token_data(
+            &self.blockchain().get_sc_address_managed(),
+            nft_id,
+            nft_nonce,
+        );
         let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
         self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
 
         if royalties_amount > 0u32 {
             self.direct(
-                &nft_token_data.creator,
+                &nft_token_data.creator.to_address(),
                 payment_token,
                 payment_nonce,
                 &royalties_amount,

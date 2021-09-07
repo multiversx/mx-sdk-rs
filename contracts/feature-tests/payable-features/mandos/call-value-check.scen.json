@@ -1,6 +1,4 @@
 {
-    "name": "payable",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -13,76 +11,37 @@
                 },
                 "address:an-account": {
                     "nonce": "0",
-                    "balance": "1,000,000,000,000",
-                    "storage": {},
+                    "balance": "10000",
                     "esdt": {
-                        "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
-                        "str:OTHER-TOKEN": "1,000,000,000,000"
+                        "str:TOK-123": "1000",
+                        "str:OTHERTOK-123": "500",
+                        "str:SFT-123": {
+                            "nonce": "5",
+                            "balance": "20"
+                        }
                     },
+                    "storage": {},
                     "code": ""
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_1.1",
+            "txId": "call-value-egld",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
-                "function": "payable_token_1",
+                "value": "100",
+                "function": "echo_call_value",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "payable_token_1.2",
-            "tx": {
-                "from": "address:an-account",
-                "to": "sc:payable-features",
-                "value": "5",
-                "function": "payable_token_1",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "payable_token_1.3",
-            "tx": {
-                "from": "address:an-account",
-                "to": "sc:payable-features",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
-                    "value": "100"
-                },
-                "function": "payable_token_1",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [ "100", "str:PAYABLE-FEATURES-TOKEN" ],
+                "out": [
+                    "100",
+                    ""
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -91,24 +50,68 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_token_1.4",
+            "txId": "call-value-single-esdt",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
                 "value": "0",
                 "esdt": {
-                    "tokenIdentifier": "str:OTHER-TOKEN",
+                    "tokenIdentifier": "str:TOK-123",
                     "value": "100"
                 },
-                "function": "payable_token_1",
-                "arguments": [],
+                "function": "echo_call_value",
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:bad call value token provided",
+                "out": [
+                    "0",
+                    [
+                        "u8:0|nested:str:TOK-123|u64:0|biguint:100"
+                    ]
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call-value-multi-esdt",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "value": "0",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:TOK-123",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:OTHERTOK-123",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:SFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "function": "echo_call_value",
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0",
+                    [
+                        "u8:0|nested:str:TOK-123|u64:0|biguint:100",
+                        "u8:0|nested:str:OTHERTOK-123|u64:0|biguint:400",
+                        "u8:2|nested:str:SFT-123|u64:5|biguint:10"
+                    ]
+                ],
+                "status": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

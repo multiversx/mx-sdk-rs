@@ -233,11 +233,11 @@ impl BlockchainMock {
         result_logs: &mut Vec<TxLog>,
     ) -> Result<(), BlockchainMockError> {
         for send_balance in send_balance_list {
-            if send_balance.token.is_egld() {
+            if send_balance.token_name.is_empty() {
                 self.subtract_tx_payment(contract_address, &send_balance.amount)?;
                 self.increase_balance(&send_balance.recipient, &send_balance.amount);
             } else {
-                let esdt_token_identifier = send_balance.token.as_esdt_identifier();
+                let esdt_token_identifier = send_balance.token_name.as_slice();
                 self.substract_esdt_balance(
                     contract_address,
                     esdt_token_identifier,

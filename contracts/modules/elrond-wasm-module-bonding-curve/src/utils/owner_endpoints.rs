@@ -79,7 +79,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         #[var_args] payment_token: OptionalArg<TokenIdentifier>,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
-        let mut set_payment = TokenIdentifier::egld();
+        let mut set_payment = self.types().token_identifier_egld();
         if self.bonding_curve(&identifier).is_empty() {
             set_payment = payment_token
                 .into_option()

@@ -13,19 +13,6 @@ pub fn arg_serialize_push(
     )
 }
 
-pub fn log_topic_push(
-    arg: &MethodArgument,
-    arg_accumulator: &proc_macro2::TokenStream,
-    error_api_getter: &proc_macro2::TokenStream,
-) -> proc_macro2::TokenStream {
-    arg_serialize_call(
-        &quote! {elrond_wasm::io::serialize_event_topic},
-        arg,
-        arg_accumulator,
-        error_api_getter,
-    )
-}
-
 fn arg_serialize_call(
     serialize_method: &proc_macro2::TokenStream,
     arg: &MethodArgument,

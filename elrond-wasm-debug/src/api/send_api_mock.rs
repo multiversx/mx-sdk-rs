@@ -1,6 +1,6 @@
 use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
-use elrond_wasm::api::{BlockchainApi, ContractBase, SendApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{
     Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
 };
@@ -41,7 +41,7 @@ impl TxContext {
 
         // already sent
         for send_balance in &tx_output.send_balance_list {
-            if send_balance.token == token_name {
+            if send_balance.token_name.as_slice() == token_name {
                 available_balance -= &send_balance.amount;
             }
         }
@@ -54,6 +54,7 @@ impl SendApi for TxContext {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
     type ErrorApi = Self;
+    type BlockchainApi = Self;
 
     fn type_manager(&self) -> Self::ProxyTypeManager {
         self.clone()
@@ -63,21 +64,8 @@ impl SendApi for TxContext {
         self.clone()
     }
 
-    fn get_sc_address(&self) -> Address {
-        BlockchainApi::get_sc_address(self)
-    }
-
-    fn get_gas_left(&self) -> u64 {
-        BlockchainApi::get_gas_left(self)
-    }
-
-    fn get_esdt_token_data(
-        &self,
-        address: &Address,
-        token: &TokenIdentifier,
-        nonce: u64,
-    ) -> elrond_wasm::types::EsdtTokenData<Self::ProxyTypeManager> {
-        BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+    fn blockchain(&self) -> Self::BlockchainApi {
+        self.clone()
     }
 
     fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, _data: &[u8]) {
@@ -92,7 +80,7 @@ impl SendApi for TxContext {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
             recipient: to.clone(),
-            token: TokenIdentifier::egld(),
+            token_name: BoxedBytes::empty(),
             amount: amount_value,
         });
     }
@@ -111,24 +99,25 @@ impl SendApi for TxContext {
     fn direct_esdt_execute(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         _gas: u64,
         _function: &[u8],
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         let amount_value = self.big_uint_value(amount);
-        if amount_value > self.get_available_esdt_balance(token.as_esdt_identifier()) {
+        if amount_value > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice()) {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: b"insufficient funds".to_vec(),
             });
         }
 
+        let token_name = token.to_esdt_identifier();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
             recipient: to.clone(),
-            token: token.clone(),
+            token_name,
             amount: amount_value,
         });
         Ok(())
@@ -137,7 +126,7 @@ impl SendApi for TxContext {
     fn direct_esdt_nft_execute(
         &self,
         _to: &Address,
-        _token: &TokenIdentifier,
+        _token: &TokenIdentifier<Self::ProxyTypeManager>,
         _nonce: u64,
         _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
@@ -171,7 +160,7 @@ impl SendApi for TxContext {
             to: to.clone(),
             call_value: amount_value,
             call_data: data.to_vec(),
-            tx_hash: self.blockchain().get_tx_hash(),
+            tx_hash: self.get_tx_hash(),
         });
         std::panic::panic_any(tx_output)
     }
@@ -259,12 +248,12 @@ impl SendApi for TxContext {
     }
 
     fn storage_store_tx_hash_key(&self, data: &[u8]) {
-        let tx_hash = self.blockchain().get_tx_hash();
+        let tx_hash = self.get_tx_hash();
         self.storage_store_slice_u8(tx_hash.as_bytes(), data);
     }
 
     fn storage_load_tx_hash_key(&self) -> BoxedBytes {
-        let tx_hash = self.blockchain().get_tx_hash();
+        let tx_hash = self.get_tx_hash();
         self.storage_load_boxed_bytes(tx_hash.as_bytes())
     }
 

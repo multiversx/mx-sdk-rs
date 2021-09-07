@@ -26,9 +26,9 @@ pub trait Crowdfunding {
             "cannot fund after deadline"
         );
 
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_managed();
         let erc20_address = self.erc20_contract_address().get();
-        let cf_contract_address = self.blockchain().get_sc_address();
+        let cf_contract_address = self.blockchain().get_sc_address_managed();
 
         Ok(self
             .erc20_proxy(erc20_address)
@@ -46,7 +46,7 @@ pub trait Crowdfunding {
             Status::FundingPeriod
         } else if self
             .blockchain()
-            .get_sc_balance(&TokenIdentifier::egld(), 0)
+            .get_sc_balance(&self.types().token_identifier_egld(), 0)
             >= self.target().get()
         {
             Status::Successful
@@ -60,8 +60,8 @@ pub trait Crowdfunding {
         match self.status() {
             Status::FundingPeriod => sc_error!("cannot claim before deadline"),
             Status::Successful => {
-                let caller = self.blockchain().get_caller();
-                if caller != self.blockchain().get_owner_address() {
+                let caller = self.blockchain().get_caller_managed();
+                if caller != self.blockchain().get_owner_address_managed() {
                     return sc_error!("only owner can claim successful funding");
                 }
 
@@ -76,7 +76,7 @@ pub trait Crowdfunding {
                 ))
             },
             Status::Failed => {
-                let caller = self.blockchain().get_caller();
+                let caller = self.blockchain().get_caller_managed();
                 let deposit = self.deposit(&caller).get();
 
                 if deposit > 0 {
@@ -99,7 +99,7 @@ pub trait Crowdfunding {
     fn transfer_from_callback(
         &self,
         #[call_result] result: AsyncCallResult<()>,
-        cb_sender: Address,
+        cb_sender: ManagedAddress,
         cb_amount: BigUint,
     ) -> OptionalResult<AsyncCall<Self::SendApi>> {
         match result {
@@ -141,7 +141,7 @@ pub trait Crowdfunding {
 
     #[view(get_deposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<Self::Storage, BigUint>;
 
     #[view(get_erc20_contract_address)]
     #[storage_mapper("erc20_contract_address")]

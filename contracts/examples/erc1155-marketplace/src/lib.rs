@@ -7,7 +7,7 @@ const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier,
+    pub token_identifier: TokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
@@ -18,7 +18,7 @@ pub struct Auction<M: ManagedTypeApi> {
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct AuctionArgument<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier,
+    pub token_identifier: TokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,

@@ -22,6 +22,8 @@ extern "C" {
         sliceLength: i32,
         destinationHandle: i32,
     ) -> i32;
+    #[cfg(feature = "managed-ei")]
+    fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
@@ -136,6 +138,7 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         }
     }
 
+    #[cfg(not(feature = "managed-ei"))]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         // TODO: might be worth adding a new hook to Arwen for this
         unsafe {
@@ -153,5 +156,10 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
             let _ = mBufferGetBytes(handle2, bytes2.as_mut_ptr());
             bytes1 == bytes2
         }
+    }
+
+    #[cfg(feature = "managed-ei")]
+    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
+        unsafe { mBufferEq(handle1, handle2) > 0 }
     }
 }

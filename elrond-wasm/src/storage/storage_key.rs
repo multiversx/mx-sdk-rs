@@ -23,7 +23,12 @@ where
 
     #[inline]
     pub fn append_bytes(&mut self, bytes: &[u8]) {
-        self.buffer.append_bytes(bytes)
+        self.buffer.append_bytes(bytes);
+    }
+
+    #[inline]
+    pub fn append_managed_buffer(&mut self, buffer: &ManagedBuffer<A>) {
+        self.buffer.append(buffer);
     }
 
     pub fn append_item<T>(&mut self, item: &T)

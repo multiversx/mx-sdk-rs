@@ -227,7 +227,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         if given_token != accepted_token {
             return Err(SCError::from(BoxedBytes::from_concat(&[
                 b"Only ",
-                accepted_token.as_esdt_identifier(),
+                accepted_token.to_esdt_identifier().as_slice(),
                 b" tokens accepted",
             ])));
         }

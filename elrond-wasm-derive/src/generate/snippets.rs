@@ -158,7 +158,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         {
             pub api: SA,
             pub address: Address,
-            pub payment_token: elrond_wasm::types::TokenIdentifier,
+            pub payment_token: elrond_wasm::types::TokenIdentifier<SA::ProxyTypeManager>,
             pub payment_amount: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
             pub payment_nonce: u64,
         }
@@ -173,10 +173,11 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 
             fn new_proxy_obj(api: SA) -> Self {
                 let zero = elrond_wasm::types::BigUint::zero(api.type_manager());
-                Proxy {
+                let payment_token = elrond_wasm::types::TokenIdentifier::egld(api.type_manager());
+            Proxy {
                     api,
                     address: Address::zero(),
-                    payment_token: elrond_wasm::types::TokenIdentifier::egld(),
+                    payment_token,
                     payment_amount: zero,
                     payment_nonce: 0,
                 }
@@ -190,7 +191,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 
             fn with_token_transfer(
                 mut self,
-                token: TokenIdentifier,
+                token: TokenIdentifier<SA::ProxyTypeManager>,
                 payment: elrond_wasm::types::BigUint<SA::ProxyTypeManager>,
             ) -> Self {
                 self.payment_token = token;
@@ -205,7 +206,15 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             }
 
             #[inline]
-            fn into_fields(self) -> (Self::SendApi, Address, TokenIdentifier, elrond_wasm::types::BigUint<SA::ProxyTypeManager>, u64) {
+            fn into_fields(
+                self,
+            ) -> (
+                Self::SendApi,
+                Address,
+                TokenIdentifier<SA::ProxyTypeManager>,
+                BigUint<Self::TypeManager>,
+                u64,
+            ) {
                 (
                     self.api,
                     self.address,

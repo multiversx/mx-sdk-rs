@@ -108,6 +108,11 @@ impl Address {
     }
 
     #[inline]
+    pub fn as_array(&self) -> &[u8; 32] {
+        self.0.as_array()
+    }
+
+    #[inline]
     pub fn copy_to_array(&self, target: &mut [u8; 32]) {
         self.0.copy_to_array(target)
     }

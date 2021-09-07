@@ -11,7 +11,7 @@ where
 {
     pub api: SA,
     pub to: Address,
-    pub token: TokenIdentifier,
+    pub token: TokenIdentifier<SA::ProxyTypeManager>,
     pub amount: BigUint<SA::ProxyTypeManager>,
     pub data: BoxedBytes,
 }

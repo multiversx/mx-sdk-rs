@@ -19,7 +19,7 @@ pub trait Lottery {
     fn erc20_proxy(&self, to: Address) -> erc20::Proxy<Self::SendApi>;
 
     #[init]
-    fn init(&self, erc20_contract_address: Address) {
+    fn init(&self, erc20_contract_address: ManagedAddress) {
         self.set_erc20_contract_address(&erc20_contract_address);
     }
 
@@ -33,7 +33,7 @@ pub trait Lottery {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<ManagedAddress>>,
     ) -> SCResult<()> {
         self.start_lottery(
             lottery_name,
@@ -56,7 +56,7 @@ pub trait Lottery {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<ManagedAddress>>,
     ) -> SCResult<()> {
         self.start_lottery(
             lottery_name,
@@ -78,7 +78,7 @@ pub trait Lottery {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<ManagedAddress>>,
     ) -> SCResult<()> {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
@@ -205,7 +205,7 @@ pub trait Lottery {
         token_amount: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         let info = self.get_lottery_info(lottery_name);
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_managed();
 
         require!(
             info.whitelist.is_empty() || info.whitelist.contains(&caller),
@@ -225,7 +225,7 @@ pub trait Lottery {
         self.reserve_ticket(lottery_name);
 
         let erc20_address = self.get_erc20_contract_address();
-        let lottery_contract_address = self.blockchain().get_sc_address();
+        let lottery_contract_address = self.blockchain().get_sc_address_managed();
         Ok(self
             .erc20_proxy(erc20_address)
             .transfer_from(caller.clone(), lottery_contract_address, token_amount)
@@ -353,7 +353,7 @@ pub trait Lottery {
         &self,
         #[call_result] result: AsyncCallResult<()>,
         cb_lottery_name: &BoxedBytes,
-        cb_sender: &Address,
+        cb_sender: &ManagedAddress,
     ) {
         let mut info = self.get_lottery_info(cb_lottery_name);
 
@@ -417,10 +417,15 @@ pub trait Lottery {
     fn clear_lottery_info(&self, lottery_name: &BoxedBytes);
 
     #[storage_set("ticketHolder")]
-    fn set_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32, ticket_holder: &Address);
+    fn set_ticket_holder(
+        &self,
+        lottery_name: &BoxedBytes,
+        ticket_id: u32,
+        ticket_holder: &ManagedAddress,
+    );
 
     #[storage_get("ticketHolder")]
-    fn get_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32) -> Address;
+    fn get_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32) -> ManagedAddress;
 
     #[storage_clear("ticketHolder")]
     fn clear_ticket_holder(&self, lottery_name: &BoxedBytes, ticket_id: u32);
@@ -429,20 +434,24 @@ pub trait Lottery {
     fn set_number_of_entries_for_user(
         &self,
         lottery_name: &BoxedBytes,
-        user: &Address,
+        user: &ManagedAddress,
         nr_entries: u32,
     );
 
     #[storage_get("numberOfEntriesForUser")]
-    fn get_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address) -> u32;
+    fn get_number_of_entries_for_user(
+        &self,
+        lottery_name: &BoxedBytes,
+        user: &ManagedAddress,
+    ) -> u32;
 
     #[storage_clear("numberOfEntriesForUser")]
-    fn clear_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &Address);
+    fn clear_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &ManagedAddress);
 
     #[storage_set("erc20_contract_address")]
-    fn set_erc20_contract_address(&self, address: &Address);
+    fn set_erc20_contract_address(&self, address: &ManagedAddress);
 
-    #[view(erc20ContractAddress)]
+    #[view(erc20ContractManagedAddress)]
     #[storage_get("erc20_contract_address")]
     fn get_erc20_contract_address(&self) -> Address;
 
