@@ -21,18 +21,19 @@ pub trait ProxyObjApi {
 
     fn with_token_transfer(
         self,
-        token: TokenIdentifier,
+        token: TokenIdentifier<Self::TypeManager>,
         payment: BigUint<Self::TypeManager>,
     ) -> Self;
 
     fn with_nft_nonce(self, nonce: u64) -> Self;
 
+    #[allow(clippy::type_complexity)]
     fn into_fields(
         self,
     ) -> (
         Self::SendApi,
         Address,
-        TokenIdentifier,
+        TokenIdentifier<Self::TypeManager>,
         BigUint<Self::TypeManager>,
         u64,
     );

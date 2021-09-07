@@ -113,6 +113,11 @@ impl H256 {
     }
 
     #[inline]
+    pub fn as_array(&self) -> &[u8; 32] {
+        self.0.as_ref()
+    }
+
+    #[inline]
     pub fn copy_to_array(&self, target: &mut [u8; 32]) {
         target.copy_from_slice(&self.0[..]);
     }

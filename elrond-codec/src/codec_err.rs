@@ -8,13 +8,6 @@ impl From<&'static [u8]> for EncodeError {
     }
 }
 
-impl From<&'static str> for EncodeError {
-    #[inline]
-    fn from(message: &'static str) -> Self {
-        EncodeError(message.as_bytes())
-    }
-}
-
 impl EncodeError {
     #[inline]
     pub fn message_bytes(&self) -> &'static [u8] {
@@ -31,13 +24,6 @@ impl From<&'static [u8]> for DecodeError {
     #[inline]
     fn from(message_bytes: &'static [u8]) -> Self {
         DecodeError(message_bytes)
-    }
-}
-
-impl From<&'static str> for DecodeError {
-    #[inline]
-    fn from(message: &'static str) -> Self {
-        DecodeError(message.as_bytes())
     }
 }
 

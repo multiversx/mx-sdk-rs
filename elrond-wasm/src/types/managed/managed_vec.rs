@@ -2,7 +2,7 @@ use super::{ManagedBuffer, ManagedType, ManagedVecItem};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    types::ManagedBufferNestedDecodeInput,
+    types::{ArgBuffer, ManagedBufferNestedDecodeInput},
 };
 use alloc::string::String;
 use core::marker::PhantomData;
@@ -185,4 +185,15 @@ where
     fn type_name() -> String {
         <&[T] as TypeAbi>::type_name()
     }
+}
+
+/// For compatibility with the older Arwen EI.
+pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
+    managed_vec: &ManagedVec<M, ManagedBuffer<M>>,
+) -> ArgBuffer {
+    let mut arg_buffer = ArgBuffer::new();
+    for buffer in managed_vec {
+        arg_buffer.push_argument_bytes(buffer.to_boxed_bytes().as_slice());
+    }
+    arg_buffer
 }

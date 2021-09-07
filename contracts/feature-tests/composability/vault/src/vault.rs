@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(clippy::type_complexity)]
 
 elrond_wasm::imports!();
 
@@ -38,7 +39,7 @@ pub trait Vault {
     fn accept_funds_multi_transfer(&self) {
         let payments = self.call_value().get_all_esdt_transfers();
 
-        for payment in payments {
+        for payment in payments.into_iter() {
             self.accept_funds_event(
                 &payment.token_name,
                 payment.token_type.as_type_name(),
@@ -57,7 +58,7 @@ pub trait Vault {
         let payments = self.call_value().get_all_esdt_transfers();
         let mut result = Vec::new();
 
-        for payment in payments {
+        for payment in payments.into_iter() {
             result.push((payment.token_name, payment.token_nonce, payment.amount).into());
         }
 

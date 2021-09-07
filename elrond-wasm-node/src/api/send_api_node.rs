@@ -152,6 +152,7 @@ impl SendApi for ArwenApiImpl {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
     type ErrorApi = Self;
+    type BlockchainApi = Self;
 
     #[inline]
     fn type_manager(&self) -> Self::ProxyTypeManager {
@@ -164,23 +165,8 @@ impl SendApi for ArwenApiImpl {
     }
 
     #[inline]
-    fn get_sc_address(&self) -> Address {
-        BlockchainApi::get_sc_address(self)
-    }
-
-    #[inline]
-    fn get_gas_left(&self) -> u64 {
-        BlockchainApi::get_gas_left(self)
-    }
-
-    #[inline]
-    fn get_esdt_token_data(
-        &self,
-        address: &Address,
-        token: &TokenIdentifier,
-        nonce: u64,
-    ) -> elrond_wasm::types::EsdtTokenData<Self::ProxyTypeManager> {
-        BlockchainApi::get_esdt_token_data(self, address, token, nonce)
+    fn blockchain(&self) -> Self::BlockchainApi {
+        self.clone()
     }
 
     fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, data: &[u8]) {
@@ -226,7 +212,7 @@ impl SendApi for ArwenApiImpl {
     fn direct_esdt_execute(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
         function: &[u8],
@@ -236,7 +222,7 @@ impl SendApi for ArwenApiImpl {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferESDTExecute(
                 to.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 amount_bytes32_ptr,
                 gas_limit as i64,
@@ -257,7 +243,7 @@ impl SendApi for ArwenApiImpl {
     fn direct_esdt_nft_execute(
         &self,
         to: &Address,
-        token: &TokenIdentifier,
+        token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
@@ -268,7 +254,7 @@ impl SendApi for ArwenApiImpl {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferESDTNFTExecute(
                 to.as_ref().as_ptr(),
-                token.as_ptr(),
+                token.to_esdt_identifier().as_ptr(),
                 token.len() as i32,
                 amount_bytes32_ptr,
                 nonce as i64,
@@ -302,7 +288,7 @@ impl SendApi for ArwenApiImpl {
                 Vec::with_capacity(nr_transfers * AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH);
 
             for token in tokens {
-                let token_id_bytes = token.token_name.as_esdt_identifier();
+                let token_id_bytes = token.token_name.to_esdt_identifier();
                 let nonce_bytes = &token.token_nonce.to_be_bytes()[..]; // TODO: Maybe top-encode here instead
                 let amount_bytes = &token.amount.to_bytes_be();
 
@@ -310,7 +296,7 @@ impl SendApi for ArwenApiImpl {
                 transfer_arg_lengths.push(nonce_bytes.len() as i32);
                 transfer_arg_lengths.push(amount_bytes.len() as i32);
 
-                transfer_args.extend_from_slice(token_id_bytes);
+                transfer_args.extend_from_slice(token_id_bytes.as_slice());
                 transfer_args.extend_from_slice(nonce_bytes);
                 transfer_args.extend_from_slice(amount_bytes.as_slice());
             }

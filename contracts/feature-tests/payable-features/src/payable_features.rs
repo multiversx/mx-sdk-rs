@@ -9,16 +9,13 @@ elrond_wasm::imports!();
 pub trait PayableFeatures {
     #[view]
     #[payable("*")]
-    fn check_call_value(
+    fn echo_call_value(
         &self,
-    ) -> MultiResult5<BigUint, BigUint, TokenIdentifier, BigUint, TokenIdentifier> {
-        let (pair_call_value, pair_token_name) = self.call_value().payment_token_pair();
+    ) -> MultiResult2<BigUint, ManagedVec<Self::TypeManager, EsdtTokenPayment<Self::TypeManager>>>
+    {
         (
             self.call_value().egld_value(),
-            self.call_value().esdt_value(),
-            self.call_value().token(),
-            pair_call_value,
-            pair_token_name,
+            self.call_value().get_all_esdt_transfers(),
         )
             .into()
     }

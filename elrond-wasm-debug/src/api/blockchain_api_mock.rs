@@ -1,5 +1,5 @@
 use crate::TxContext;
-use elrond_wasm::types::{Address, BigUint, EsdtTokenData, TokenIdentifier, H256};
+use elrond_wasm::types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256};
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
     type Storage = Self;
@@ -51,6 +51,10 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             panic!("get balance not yet implemented for accounts other than the contract itself");
         }
         self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
+    }
+
+    fn get_state_root_hash(&self) -> H256 {
+        panic!("get_state_root_hash not yet implemented")
     }
 
     fn get_tx_hash(&self) -> H256 {
@@ -107,7 +111,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .clone()
     }
 
-    fn get_current_esdt_nft_nonce(&self, _address: &Address, _token: &TokenIdentifier) -> u64 {
+    fn get_current_esdt_nft_nonce(
+        &self,
+        _address: &Address,
+        _token: &TokenIdentifier<Self::TypeManager>,
+    ) -> u64 {
         // TODO: Implement
         0u64
     }
@@ -115,11 +123,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     // TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
     fn get_esdt_balance(
         &self,
-        address: &Address,
-        token: &TokenIdentifier,
+        address: &ManagedAddress<Self::TypeManager>,
+        token: &TokenIdentifier<Self::TypeManager>,
         _nonce: u64,
     ) -> BigUint<Self::TypeManager> {
-        if address != &self.get_sc_address() {
+        if address != &self.get_sc_address_managed() {
             panic!(
                 "get_esdt_balance not yet implemented for accounts other than the contract itself"
             );
@@ -128,7 +136,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         match self
             .blockchain_info_box
             .contract_esdt
-            .get(&token.as_esdt_identifier().to_vec())
+            .get(&token.to_esdt_identifier().into_vec())
         {
             Some(value) => self.insert_new_big_uint(value.clone()),
             None => BigUint::zero(self.storage_manager()),
@@ -137,8 +145,8 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
 
     fn get_esdt_token_data(
         &self,
-        _address: &Address,
-        _token: &TokenIdentifier,
+        _address: &ManagedAddress<Self::TypeManager>,
+        _token: &TokenIdentifier<Self::TypeManager>,
         _nonce: u64,
     ) -> EsdtTokenData<Self::Storage> {
         panic!("get_esdt_token_data not yet implemented")

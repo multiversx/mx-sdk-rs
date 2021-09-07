@@ -17,20 +17,6 @@ where
     }
 }
 
-pub fn serialize_event_topic<I, A>(arg: I, arg_buffer: &mut ArgBuffer, error_api: A)
-where
-    I: ContractCallArg,
-    A: ErrorApi + ManagedTypeApi,
-{
-    // TODO: convert to fast exit
-    if let Result::Err(sc_err) = arg.push_async_arg(arg_buffer) {
-        let mut message_buffer =
-            ManagedBuffer::new_from_bytes(error_api.clone(), err_msg::LOG_TOPIC_ENCODE_ERROR);
-        message_buffer.append_bytes(sc_err.as_bytes());
-        error_api.signal_error_from_buffer(message_buffer.get_raw_handle());
-    }
-}
-
 /// Trait that specifies how arguments are serialized in contract calls.
 ///
 /// TODO: unite with DynArg trait when reorganizing argument handling.

@@ -8,6 +8,7 @@ impl SendApi for super::UncallableApi {
     type ProxyTypeManager = Self;
     type ProxyStorage = Self;
     type ErrorApi = Self;
+    type BlockchainApi = Self;
 
     fn type_manager(&self) -> Self::ProxyTypeManager {
         unreachable!()
@@ -17,20 +18,7 @@ impl SendApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn get_sc_address(&self) -> Address {
-        unreachable!()
-    }
-
-    fn get_gas_left(&self) -> u64 {
-        unreachable!()
-    }
-
-    fn get_esdt_token_data(
-        &self,
-        _address: &Address,
-        _token: &TokenIdentifier,
-        _nonce: u64,
-    ) -> crate::types::EsdtTokenData<Self::ProxyTypeManager> {
+    fn blockchain(&self) -> Self::BlockchainApi {
         unreachable!()
     }
 
@@ -52,7 +40,7 @@ impl SendApi for super::UncallableApi {
     fn direct_esdt_execute(
         &self,
         _to: &Address,
-        _token: &TokenIdentifier,
+        _token: &TokenIdentifier<Self::ProxyTypeManager>,
         _amount: &BigUint<Self::ProxyTypeManager>,
         _gas: u64,
         _function: &[u8],
@@ -64,7 +52,7 @@ impl SendApi for super::UncallableApi {
     fn direct_esdt_nft_execute(
         &self,
         _to: &Address,
-        _token: &TokenIdentifier,
+        _token: &TokenIdentifier<Self::ProxyTypeManager>,
         _nonce: u64,
         _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
@@ -195,11 +183,11 @@ impl SendApi for super::UncallableApi {
 
     fn sell_nft(
         &self,
-        _nft_id: &TokenIdentifier,
+        _nft_id: &TokenIdentifier<Self::ProxyTypeManager>,
         _nft_nonce: u64,
         _nft_amount: &BigUint<Self::ProxyTypeManager>,
         _buyer: &Address,
-        _payment_token: &TokenIdentifier,
+        _payment_token: &TokenIdentifier<Self::ProxyTypeManager>,
         _payment_nonce: u64,
         _payment_amount: &BigUint<Self::ProxyTypeManager>,
     ) -> BigUint<Self::ProxyTypeManager> {

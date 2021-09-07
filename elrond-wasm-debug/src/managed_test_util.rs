@@ -52,3 +52,17 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
 
     from_mb
 }
+
+/// Uses the managed types api to test encoding both ways.
+pub fn check_managed_top_encode_decode<V>(api: TxContext, element: V, expected_bytes: &[u8])
+where
+    V: TopEncode + TopDecode + PartialEq + Debug + 'static,
+{
+    // serialize
+    let serialized_bytes = check_managed_top_encode(api.clone(), &element);
+    assert_eq!(serialized_bytes.as_slice(), expected_bytes);
+
+    // deserialize
+    let deserialized: V = check_managed_top_decode::<V>(api, serialized_bytes.as_slice());
+    assert_eq!(deserialized, element);
+}

@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EllipticCurve, ManagedBuffer},
+    types::{BigUint, EllipticCurve, ManagedBuffer, TokenIdentifier},
 };
 
 pub struct ManagedTypeHelper<M: ManagedTypeApi> {
@@ -34,5 +34,9 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
 
     pub fn elliptic_curve_from_bitsize(&self, bitsize: u32) -> Option<EllipticCurve<M>> {
         EllipticCurve::from_bitsize(self.api.clone(), bitsize)
+    }
+
+    pub fn token_identifier_egld(&self) -> TokenIdentifier<M> {
+        TokenIdentifier::egld(self.api.clone())
     }
 }
