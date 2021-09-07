@@ -173,9 +173,9 @@ pub trait SendApi: Clone + Sized {
     {
         let data_buf: ManagedBuffer<Self::ProxyTypeManager> =
             data.managed_into(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(token);
         if nonce == 0 {
-            let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
-            arg_buffer.push_arg(token.as_managed_buffer());
             arg_buffer.push_arg(amount);
             if !data_buf.is_empty() {
                 arg_buffer.push_arg_raw(data_buf);
@@ -188,8 +188,6 @@ pub trait SendApi: Clone + Sized {
                 &arg_buffer,
             )
         } else {
-            let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
-            arg_buffer.push_arg(token);
             arg_buffer.push_arg(nonce);
             arg_buffer.push_arg(amount);
             arg_buffer.push_arg(to);

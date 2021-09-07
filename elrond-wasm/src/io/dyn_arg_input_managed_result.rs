@@ -21,13 +21,12 @@ where
 {
     pub fn new(api: A, data: ManagedVec<A, ManagedBuffer<A>>) -> Self {
         let data_len = data.len();
-        let mut result = ManagedResultArgLoader {
+        ManagedResultArgLoader {
             data,
             data_len,
             next_index: 0,
             api,
-        };
-        result
+        }
     }
 }
 
