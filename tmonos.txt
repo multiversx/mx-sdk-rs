@@ -1,0 +1,47 @@
+ Apprx. Bloat Bytes │ Apprx. Bloat % │ Bytes │ %      │ Monomorphizations
+────────────────────┼────────────────┼───────┼────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────
+                326 ┊          0.35% ┊   414 ┊  0.45% ┊ elrond_wasm::io::macro_helpers::load_single_arg
+                    ┊                ┊    88 ┊  0.09% ┊     elrond_wasm::io::macro_helpers::load_single_arg::hfb3ee3ec9eacd8a4
+                    ┊                ┊    67 ┊  0.07% ┊     elrond_wasm::io::macro_helpers::load_single_arg::h79436e7a8056037f
+                    ┊                ┊    65 ┊  0.07% ┊     elrond_wasm::io::macro_helpers::load_single_arg::h3cf37f1b9a1506ef
+                    ┊                ┊    61 ┊  0.07% ┊     elrond_wasm::io::macro_helpers::load_single_arg::h444ebeeabb435ad6
+                    ┊                ┊    57 ┊  0.06% ┊     elrond_wasm::io::macro_helpers::load_single_arg::h4321fee09915145c
+                    ┊                ┊    50 ┊  0.05% ┊     elrond_wasm::io::macro_helpers::load_single_arg::h2baac28041667c43
+                    ┊                ┊    26 ┊  0.03% ┊     elrond_wasm::io::macro_helpers::load_single_arg::hf8185f5460cdbb92
+                324 ┊          0.35% ┊   751 ┊  0.81% ┊ elrond_codec::top_de::top_decode_from_nested_or_exit
+                    ┊                ┊   427 ┊  0.46% ┊     elrond_codec::top_de::top_decode_from_nested_or_exit::h3d4f509bc30d0d23
+                    ┊                ┊   324 ┊  0.35% ┊     elrond_codec::top_de::top_decode_from_nested_or_exit::h49cf1071dba52893
+                194 ┊          0.21% ┊   288 ┊  0.31% ┊ <T as elrond_wasm::io::dyn_arg::DynArg<I,D>>::dyn_load
+                    ┊                ┊    94 ┊  0.10% ┊     <T as elrond_wasm::io::dyn_arg::DynArg<I,D>>::dyn_load::h55b8099f2e3657e6
+                    ┊                ┊    71 ┊  0.08% ┊     <T as elrond_wasm::io::dyn_arg::DynArg<I,D>>::dyn_load::h1a55e2786ff23dec
+                    ┊                ┊    63 ┊  0.07% ┊     <T as elrond_wasm::io::dyn_arg::DynArg<I,D>>::dyn_load::ha58de575d6168654
+                    ┊                ┊    60 ┊  0.06% ┊     <T as elrond_wasm::io::dyn_arg::DynArg<I,D>>::dyn_load::h67cded8debd31e87
+                132 ┊          0.14% ┊   264 ┊  0.28% ┊ elrond_wasm::io::signal_error::SignalError::signal_arg_de_error
+                    ┊                ┊   132 ┊  0.14% ┊     elrond_wasm::io::signal_error::SignalError::signal_arg_de_error::hbec1d4480fe21881
+                    ┊                ┊   132 ┊  0.14% ┊     elrond_wasm::io::signal_error::SignalError::signal_arg_de_error::hcfb013c98b5e5f7e
+                112 ┊          0.12% ┊   283 ┊  0.31% ┊ <&[u8] as elrond_codec::nested_de_input::NestedDecodeInput>::read_slice_or_exit
+                    ┊                ┊   171 ┊  0.18% ┊     <&[u8] as elrond_codec::nested_de_input::NestedDecodeInput>::read_slice_or_exit::h329ec3db003e7ab6
+                    ┊                ┊   112 ┊  0.12% ┊     <&[u8] as elrond_codec::nested_de_input::NestedDecodeInput>::read_slice_or_exit::hdf847dcb13a40132
+                 77 ┊          0.08% ┊   103 ┊  0.11% ┊ core::ptr::drop_in_place
+                    ┊                ┊    26 ┊  0.03% ┊     core::ptr::drop_in_place::hf9a7babd16573831
+                    ┊                ┊    23 ┊  0.02% ┊     core::ptr::drop_in_place::h10a65a351b6ae998
+                    ┊                ┊    22 ┊  0.02% ┊     core::ptr::drop_in_place::h1de9786d6f9438f8
+                    ┊                ┊    16 ┊  0.02% ┊     core::ptr::drop_in_place::hefeb7c6665d929f5
+                    ┊                ┊     4 ┊  0.00% ┊     core::ptr::drop_in_place::h0200b96f86cedf64
+                    ┊                ┊     4 ┊  0.00% ┊     core::ptr::drop_in_place::h679ddd57c08bf0f0
+                    ┊                ┊     4 ┊  0.00% ┊     core::ptr::drop_in_place::hb4f973bc9930f3cd
+                    ┊                ┊     4 ┊  0.00% ┊     core::ptr::drop_in_place::hb73ddcb5fcbb253e
+                 72 ┊          0.08% ┊   148 ┊  0.16% ┊ <u32 as elrond_codec::nested_de::NestedDecode>::dep_decode_or_exit
+                    ┊                ┊    76 ┊  0.08% ┊     <u32 as elrond_codec::nested_de::NestedDecode>::dep_decode_or_exit::hfb0de13c8b65edd2
+                    ┊                ┊    72 ┊  0.08% ┊     <u32 as elrond_codec::nested_de::NestedDecode>::dep_decode_or_exit::hef1b7111f94320d4
+                 72 ┊          0.08% ┊   148 ┊  0.16% ┊ <usize as elrond_codec::nested_de::NestedDecode>::dep_decode_or_exit
+                    ┊                ┊    76 ┊  0.08% ┊     <usize as elrond_codec::nested_de::NestedDecode>::dep_decode_or_exit::hca3a73f475a789aa
+                    ┊                ┊    72 ┊  0.08% ┊     <usize as elrond_codec::nested_de::NestedDecode>::dep_decode_or_exit::h0f333014d37882e5
+                 66 ┊          0.07% ┊   132 ┊  0.14% ┊ <core::ops::range::Range<usize> as core::slice::SliceIndex<[T]>>::index_mut
+                    ┊                ┊    66 ┊  0.07% ┊     <core::ops::range::Range<usize> as core::slice::SliceIndex<[T]>>::index_mut::h165e0d9f53c8ec83
+                    ┊                ┊    66 ┊  0.07% ┊     <core::ops::range::Range<usize> as core::slice::SliceIndex<[T]>>::index_mut::h9b0aee2474f35335
+                 63 ┊          0.07% ┊   126 ┊  0.14% ┊ core::slice::<impl core::ops::index::Index<I> for [T]>::index
+                    ┊                ┊    63 ┊  0.07% ┊     core::slice::<impl core::ops::index::Index<I> for [T]>::index::h27a9683dbf4e664b
+                    ┊                ┊    63 ┊  0.07% ┊     core::slice::<impl core::ops::index::Index<I> for [T]>::index::h83403e081f20bb3e
+                238 ┊          0.26% ┊ 11340 ┊ 12.24% ┊ ... and 195 more.
+               1676 ┊          1.81% ┊ 13997 ┊ 15.10% ┊ Σ [238 Total Rows]

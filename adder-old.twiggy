@@ -1,0 +1,54 @@
+ Shallow Bytes │ Shallow % │ Item
+───────────────┼───────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+         14909 ┊    30.49% ┊ custom section '.debug_str'
+          5975 ┊    12.22% ┊ custom section '.debug_info'
+          5975 ┊    12.22% ┊ custom section '.debug_line'
+          4860 ┊     9.94% ┊ "function names" subsection
+          4704 ┊     9.62% ┊ custom section '.debug_pubnames'
+          1680 ┊     3.44% ┊ custom section '.debug_ranges'
+           950 ┊     1.94% ┊ <&T as core::fmt::Display>::fmt::h67ec6315566da26c
+           864 ┊     1.77% ┊ core::fmt::write::h8b996d8af01475c9
+           795 ┊     1.63% ┊ core::fmt::Formatter::pad_integral::hfd6532b3a41ee584
+           737 ┊     1.51% ┊ data[0]
+           595 ┊     1.22% ┊ custom section '.debug_abbrev'
+           480 ┊     0.98% ┊ wee_alloc::alloc_first_fit::h3a2a2c5b4ceb0973
+           367 ┊     0.75% ┊ core::fmt::num::imp::<impl core::fmt::Display for u32>::fmt::hd7239ff7b4d279a9
+           360 ┊     0.74% ┊ <&mut W as core::fmt::Write>::write_char::he59ee1f1a0249d32
+           352 ┊     0.72% ┊ custom section '.debug_aranges'
+           312 ┊     0.64% ┊ rust_begin_unwind
+           312 ┊     0.64% ┊ alloc::vec::Vec<T>::extend_from_slice::h36723b84bcb78dac
+           217 ┊     0.44% ┊ <wee_alloc::WeeAlloc as core::alloc::global::GlobalAlloc>::alloc::hdbf7cbd83665d2ea
+           212 ┊     0.43% ┊ <wee_alloc::WeeAlloc as core::alloc::global::GlobalAlloc>::dealloc::h7ce560d2eb78e4e4
+           207 ┊     0.42% ┊ wee_alloc::WeeAlloc::dealloc_impl::{{closure}}::h2158518bd685554a
+           198 ┊     0.40% ┊ alloc::vec::Vec<T>::reserve::h2fd983333748ff46
+           193 ┊     0.39% ┊ <adder::AdderImpl<T,BigInt,BigUint> as adder::Adder<T,BigInt,BigUint>>::get_mut_sum::h7d3316ff914947a6
+           168 ┊     0.34% ┊ <wee_alloc::size_classes::SizeClassAllocPolicy as wee_alloc::AllocPolicy>::new_cell_for_free_list::hd28b199366de9573
+           162 ┊     0.33% ┊ core::ptr::drop_in_place::hce3eaeb9aad1c38a
+           150 ┊     0.31% ┊ core::option::expect_none_failed::h807851172125790d
+           134 ┊     0.27% ┊ wee_alloc::alloc_with_refill::h910b6ded376cfe7e
+           132 ┊     0.27% ┊ core::panicking::panic_bounds_check::ha440f41d0e4eca5f
+           132 ┊     0.27% ┊ wee_alloc::neighbors::Neighbors<T>::remove::h047ec0cb998ff94e
+           123 ┊     0.25% ┊ <&T as core::fmt::Debug>::fmt::h38205109c026f18f
+           118 ┊     0.24% ┊ <&mut W as core::fmt::Write>::write_fmt::hc009d8ca82a628f3
+           117 ┊     0.24% ┊ <wee_alloc::LargeAllocPolicy as wee_alloc::AllocPolicy>::new_cell_for_free_list::h1313183b8eff36f4
+           116 ┊     0.24% ┊ init
+           110 ┊     0.22% ┊ alloc::raw_vec::RawVec<T,A>::allocate_in::hf2af9277ee7777bd
+           107 ┊     0.22% ┊ add
+           103 ┊     0.21% ┊ <elrond_wasm_node::big_int::ArwenBigInt as elrond_wasm::BigIntApi<elrond_wasm_node::big_uint::ArwenBigUint>>::to_signed_bytes_be::h854dfa48ea6f9552
+            94 ┊     0.19% ┊ core::panicking::panic::h94c4b8c5a269b671
+            94 ┊     0.19% ┊ core::fmt::Formatter::pad_integral::write_prefix::h62d78e01f6fe44a9
+            86 ┊     0.18% ┊ getSum
+            75 ┊     0.15% ┊ custom section 'producers'
+            62 ┊     0.13% ┊ <&mut W as core::fmt::Write>::write_str::h7ac46a9cfbbb7f4a
+            60 ┊     0.12% ┊ <alloc::alloc::Global as core::alloc::AllocRef>::alloc::h26d410152fbc817d
+            59 ┊     0.12% ┊ __rg_realloc
+            56 ┊     0.11% ┊ memcpy
+            54 ┊     0.11% ┊ <elrond_wasm_node::ext::ArwenApiImpl as elrond_wasm::ContractIOApi<elrond_wasm_node::big_int::ArwenBigInt,elrond_wasm_node::big_uint::ArwenBigUint>>::check_not_payable::h4ad2d80aeb7f426c
+            54 ┊     0.11% ┊ custom section '.debug_pubtypes'
+            46 ┊     0.09% ┊ core::ptr::drop_in_place::he3ce77be04cb2eb6
+            46 ┊     0.09% ┊ memset
+            42 ┊     0.09% ┊ core::ptr::drop_in_place::h6a03e3822dd3d310
+            37 ┊     0.08% ┊ __rg_alloc_zeroed
+            35 ┊     0.07% ┊ <core::fmt::Error as core::fmt::Debug>::fmt::h536e68023cc4bae3
+          1068 ┊     2.18% ┊ ... and 87 more.
+         48894 ┊   100.00% ┊ Σ [137 Total Rows]
