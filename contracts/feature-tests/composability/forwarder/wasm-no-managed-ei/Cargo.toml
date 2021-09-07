@@ -1,5 +1,5 @@
 [package]
-name = "forwarder-raw-wasm"
+name = "forwarder-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -15,9 +15,9 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.forwarder-raw]
+[dependencies.forwarder]
 path = ".."
-features=["wasm-output-mode-managed-ei"]
+features=["wasm-output-mode-unmanaged-ei"]
 
 [dependencies.elrond-wasm-output]
 version = "0.18.2"

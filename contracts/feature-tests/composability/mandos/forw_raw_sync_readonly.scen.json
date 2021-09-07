@@ -42,9 +42,11 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "4",
-                "message": "*",
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "",
                 "gas": "*",
                 "refund": "*"
             }
