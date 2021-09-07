@@ -103,6 +103,15 @@ pub trait NftModule {
             &[],
         );
 
+        let owner = self.blockchain().get_owner_address();
+        self.send().direct(
+            &owner,
+            &payment_token,
+            payment_nonce,
+            &payment_amount,
+            &[],
+        );
+
         Ok(())
     }
 
