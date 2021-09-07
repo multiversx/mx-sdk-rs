@@ -55,7 +55,7 @@
             "inputs": [
                 {
                     "name": "dns_address",
-                    "type": "array32<u8>"
+                    "type": "Address"
                 },
                 {
                     "name": "name",
@@ -93,7 +93,7 @@
             "inputs": [
                 {
                     "name": "opt_dest_address",
-                    "type": "optional<array32<u8>>",
+                    "type": "optional<Address>",
                     "multi_arg": true
                 }
             ],
@@ -143,7 +143,7 @@
                 },
                 {
                     "name": "actions",
-                    "type": "variadic<multi<u64,array32<u8>,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
                     "multi_arg": true
                 }
             ],
@@ -233,7 +233,7 @@
             ],
             "outputs": [
                 {
-                    "type": "optional<array32<u8>>",
+                    "type": "optional<Address>",
                     "multi_result": true
                 }
             ]
@@ -263,7 +263,7 @@
             ],
             "outputs": [
                 {
-                    "type": "variadic<multi<u64,array32<u8>,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
                     "multi_result": true
                 }
             ]
