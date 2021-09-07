@@ -380,14 +380,10 @@ where
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
     pub fn transfer_execute(self) {
-        let payments_len = self.payments.len();
-
-        if payments_len == 0 {
-            self.no_payment_transfer_execute()
-        } else if payments_len == 1 {
-            self.single_transfer_execute()
-        } else {
-            self.multi_transfer_execute()
+        match self.payments.len() {
+            0 => self.no_payment_transfer_execute(),
+            1 => self.single_transfer_execute(),
+            _ => self.multi_transfer_execute(),
         }
     }
 
