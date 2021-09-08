@@ -326,7 +326,7 @@ pub trait SendApi: Clone + Sized {
         value: &BigUint<Self::ProxyTypeManager>,
         endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    );
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     fn execute_on_dest_context_readonly_raw(
         &self,
