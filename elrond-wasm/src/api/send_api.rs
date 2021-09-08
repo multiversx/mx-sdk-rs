@@ -144,17 +144,6 @@ pub trait SendApi: Clone + Sized {
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> !;
 
-    // /// Sends an asynchronous call to another contract, with either EGLD or ESDT value.
-    // /// The `token` argument decides which one it will be.
-    // /// Calling this method immediately terminates tx execution.
-    // fn async_call(&self, async_call: AsyncCall<Self>) -> ! {
-    //     self.async_call_raw(
-    //         &async_call.to,
-    //         &async_call.egld_payment,
-    //         async_call.hex_data.as_slice(),
-    //     )
-    // }
-
     /// Performs a simple ESDT/NFT transfer, but via async call.  
     /// As with any async call, this immediately terminates the execution of the current call.  
     /// So only use as the last call in your endpoint.  
