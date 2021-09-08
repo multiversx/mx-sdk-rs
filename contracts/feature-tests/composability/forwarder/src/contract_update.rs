@@ -25,10 +25,10 @@ pub trait UpgradeContractModule {
         child_sc_address: ManagedAddress,
         new_code: ManagedBuffer,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) {
+    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
         self.vault_proxy(child_sc_address)
             .init(opt_arg)
-            .upgrade_contract(&new_code, CodeMetadata::DEFAULT);
+            .upgrade_contract(&new_code, CodeMetadata::UPGRADEABLE)
     }
 
     fn upgrade(
