@@ -84,6 +84,15 @@ pub trait AbiTester {
     }
 
     #[endpoint]
+    fn managed_address_vs_byte_array(
+        &self,
+        address: ManagedAddress,
+        byte_array: ManagedByteArray<Self::TypeManager, 32>,
+    ) -> MultiResult2<ManagedAddress, ManagedByteArray<Self::TypeManager, 32>> {
+        (address, byte_array).into()
+    }
+
+    #[endpoint]
     fn esdt_local_role(&self) -> EsdtLocalRole {
         EsdtLocalRole::None
     }

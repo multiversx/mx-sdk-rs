@@ -1,6 +1,6 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::{EndpointFinishApi, ManagedTypeApi};
-use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
+use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput};
 use crate::types::{ArgBuffer, SCError};
 use crate::EndpointResult;
 use alloc::string::String;
@@ -19,10 +19,9 @@ macro_rules! multi_arg_impls {
             where
                 $($name: DynArg,)+
             {
-                fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
+                fn dyn_load<I>(loader: &mut I, arg_id: ArgId) -> Self
                 where
-                    I: TopDecodeInput,
-                    D: DynArgInput<I>,
+                    I: DynArgInput,
                 {
                     $marg_struct((
                         $(
@@ -54,11 +53,10 @@ macro_rules! multi_arg_impls {
                 $($name: ContractCallArg,)+
             {
                 #[inline]
-                fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+                fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
                     $(
-                        (self.0).$n.push_async_arg(serializer)?;
+                        (self.0).$n.push_dyn_arg(output);
                     )+
-                    Ok(())
                 }
             }
 
@@ -66,8 +64,8 @@ macro_rules! multi_arg_impls {
             where
                 $($name: ContractCallArg,)+
             {
-                fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
-                    (&self).push_async_arg(serializer)
+                fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+                    (&self).push_dyn_arg(output)
                 }
             }
 

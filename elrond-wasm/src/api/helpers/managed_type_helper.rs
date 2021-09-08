@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EllipticCurve, ManagedBuffer, TokenIdentifier},
+    types::{BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedFrom, TokenIdentifier},
 };
 
 pub struct ManagedTypeHelper<M: ManagedTypeApi> {
@@ -17,7 +17,7 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     pub fn big_uint_from<T: Into<u64>>(&self, value: T) -> BigUint<M> {
-        BigUint::from_u64(self.api.clone(), value.into())
+        BigUint::managed_from(self.api.clone(), value.into())
     }
 
     pub fn managed_buffer_empty(&self) -> ManagedBuffer<M> {
@@ -38,5 +38,13 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
 
     pub fn token_identifier_egld(&self) -> TokenIdentifier<M> {
         TokenIdentifier::egld(self.api.clone())
+    }
+
+    pub fn address_zero(&self) -> ManagedAddress<M> {
+        ManagedAddress::zero_address(self.api.clone())
+    }
+
+    pub fn address_const(&self, bytes: &'static [u8; 32]) -> ManagedAddress<M> {
+        ManagedAddress::new_from_bytes(self.api.clone(), bytes)
     }
 }

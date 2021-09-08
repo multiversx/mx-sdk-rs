@@ -7,7 +7,7 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(
         &self,
-        address: Address,
+        address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
@@ -20,7 +20,7 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
     #[endpoint(unsetLocalRoles)]
     fn unset_local_roles(
         &self,
-        address: Address,
+        address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {

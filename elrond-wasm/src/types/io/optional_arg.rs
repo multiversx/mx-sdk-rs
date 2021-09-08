@@ -1,6 +1,6 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::api::{EndpointFinishApi, ManagedTypeApi};
-use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
+use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput};
 use crate::types::{ArgBuffer, SCError};
 use crate::EndpointResult;
 use alloc::string::String;
@@ -47,11 +47,7 @@ impl<T> DynArg for OptionalArg<T>
 where
     T: DynArg,
 {
-    fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
-    where
-        I: TopDecodeInput,
-        D: DynArgInput<I>,
-    {
+    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         if loader.has_next() {
             OptionalArg::Some(T::dyn_load(loader, arg_id))
         } else {
@@ -82,11 +78,10 @@ where
     T: ContractCallArg,
 {
     #[inline]
-    fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         if let OptionalArg::Some(t) = self {
-            t.push_async_arg(serializer)?;
+            t.push_dyn_arg(output);
         }
-        Ok(())
     }
 }
 
@@ -94,8 +89,8 @@ impl<T> ContractCallArg for OptionalArg<T>
 where
     T: ContractCallArg,
 {
-    fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
-        (&self).push_async_arg(serializer)
+    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+        (&self).push_dyn_arg(output)
     }
 }
 

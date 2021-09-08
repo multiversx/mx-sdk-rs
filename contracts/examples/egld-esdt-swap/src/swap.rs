@@ -20,8 +20,8 @@ pub trait EgldEsdtSwap {
     #[endpoint(issueWrappedEgld)]
     fn issue_wrapped_egld(
         &self,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
@@ -32,7 +32,7 @@ pub trait EgldEsdtSwap {
 
         let caller = self.blockchain().get_caller();
 
-        self.issue_started_event(&caller, token_ticker.as_slice(), &initial_supply);
+        self.issue_started_event(&caller, &token_ticker, &initial_supply);
 
         Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
             .issue_fungible(
@@ -59,7 +59,7 @@ pub trait EgldEsdtSwap {
     #[callback]
     fn esdt_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment] returned_tokens: BigUint,
         #[call_result] result: AsyncCallResult<()>,
@@ -105,7 +105,7 @@ pub trait EgldEsdtSwap {
     #[callback]
     fn esdt_mint_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         amount: &BigUint,
         #[call_result] result: AsyncCallResult<()>,
     ) {
@@ -219,34 +219,34 @@ pub trait EgldEsdtSwap {
     #[event("issue-started")]
     fn issue_started_event(
         &self,
-        #[indexed] caller: &Address,
-        #[indexed] token_ticker: &[u8],
+        #[indexed] caller: &ManagedAddress,
+        #[indexed] token_ticker: &ManagedBuffer,
         initial_supply: &BigUint,
     );
 
     #[event("issue-success")]
     fn issue_success_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] token_identifier: &TokenIdentifier,
         initial_supply: &BigUint,
     );
 
     #[event("issue-failure")]
-    fn issue_failure_event(&self, #[indexed] caller: &Address, message: &[u8]);
+    fn issue_failure_event(&self, #[indexed] caller: &ManagedAddress, message: &[u8]);
 
     #[event("mint-started")]
-    fn mint_started_event(&self, #[indexed] caller: &Address, amount: &BigUint);
+    fn mint_started_event(&self, #[indexed] caller: &ManagedAddress, amount: &BigUint);
 
     #[event("mint-success")]
-    fn mint_success_event(&self, #[indexed] caller: &Address);
+    fn mint_success_event(&self, #[indexed] caller: &ManagedAddress);
 
     #[event("mint-failure")]
-    fn mint_failure_event(&self, #[indexed] caller: &Address, message: &[u8]);
+    fn mint_failure_event(&self, #[indexed] caller: &ManagedAddress, message: &[u8]);
 
     #[event("wrap-egld")]
-    fn wrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+    fn wrap_egld_event(&self, #[indexed] user: &ManagedAddress, amount: &BigUint);
 
     #[event("unwrap-egld")]
-    fn unwrap_egld_event(&self, #[indexed] user: &Address, amount: &BigUint);
+    fn unwrap_egld_event(&self, #[indexed] user: &ManagedAddress, amount: &BigUint);
 }
