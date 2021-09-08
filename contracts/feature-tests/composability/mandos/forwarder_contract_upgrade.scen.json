@@ -60,8 +60,18 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument"
+                    "str:some_argument",
+                    "nested:str:some_argument"
                 ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "+": {}
             }
         }
     ]

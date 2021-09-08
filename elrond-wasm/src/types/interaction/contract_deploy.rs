@@ -141,6 +141,4 @@ where
             &self.arg_buffer,
         )
     }
-
-    // TODO: deploy contract with code from another contract
 }
