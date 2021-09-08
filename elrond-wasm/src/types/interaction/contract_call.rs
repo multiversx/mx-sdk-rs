@@ -35,7 +35,7 @@ where
     payments: ManagedVec<SA::ProxyTypeManager, EsdtTokenPayment<SA::ProxyTypeManager>>,
     endpoint_name: ManagedBuffer<SA::ProxyTypeManager>,
     explicit_gas_limit: u64,
-    pub arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>, // TODO: make private?
+    arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>,
     _return_type: PhantomData<R>,
 }
 
@@ -113,10 +113,6 @@ where
         self.explicit_gas_limit = gas_limit;
         self
     }
-
-    // pub fn get_mut_arg_buffer(&mut self) -> &mut ArgBuffer {
-    //     &mut self.arg_buffer
-    // }
 
     /// Provided for cases where we build the contract call by hand.
     pub fn push_arg_managed_buffer(&mut self, m_buffer: ManagedBuffer<SA::ProxyTypeManager>) {
