@@ -645,7 +645,7 @@ impl SendApi for ArwenApiImpl {
     fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        function_name: &ManagedBuffer<Self::ProxyTypeManager>,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         // account-level built-in function, so the destination address is the contract itself
@@ -655,7 +655,7 @@ impl SendApi for ArwenApiImpl {
             gas,
             &own_address,
             &BigUint::zero(self.clone()),
-            endpoint_name,
+            function_name,
             arg_buffer,
         )
     }
