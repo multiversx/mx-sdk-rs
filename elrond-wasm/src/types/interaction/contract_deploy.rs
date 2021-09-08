@@ -20,7 +20,7 @@ where
     to: ManagedAddress<SA::ProxyTypeManager>, // only used for Upgrade, ignored for Deploy
     egld_payment: BigUint<SA::ProxyTypeManager>,
     explicit_gas_limit: u64,
-    pub arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>, // TODO: make private?
+    arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
