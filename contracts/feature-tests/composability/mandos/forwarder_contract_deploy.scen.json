@@ -34,7 +34,7 @@
                 {
                     "creatorAddress": "sc:forwarder",
                     "creatorNonce": "3",
-                    "newAddress": "sc:child-from-source-with-arg"
+                    "newAddress": "sc:child-src-with-arg"
                 }
             ]
         },
@@ -61,6 +61,19 @@
                 ],
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "owner": "sc:forwarder",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "+": {}
             }
         },
         {
@@ -93,7 +106,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:child": {
+                "sc:child-with-arg": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -147,7 +160,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "function": "deployFromSource",
+                "function": "deploy_vault_from_source",
                 "arguments": [
                     "sc:child",
                     "str:some_argument"
@@ -160,7 +173,8 @@
                 "message": "",
                 "out": [
                     "str:some_argument",
-                    "sc:child-from-source-with-arg"
+                    "sc:child-src-with-arg",
+                    "nested:str:some_argument"
                 ],
                 "gas": "*",
                 "refund": "*"
