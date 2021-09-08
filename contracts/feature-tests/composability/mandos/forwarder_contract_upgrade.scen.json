@@ -49,7 +49,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "function": "upgradeChildContract",
+                "function": "upgradeVault",
                 "arguments": [
                     "sc:child",
                     "file:../vault/output/vault.wasm",
