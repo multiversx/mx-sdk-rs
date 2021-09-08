@@ -124,7 +124,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn send_bought_tokens(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         token: TokenIdentifier,
         amount: BigUint,
     ) -> SCResult<()> {

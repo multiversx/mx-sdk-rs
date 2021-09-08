@@ -239,9 +239,11 @@ pub trait GovernanceModule:
             .with_gas_limit(action.gas_limit);
 
             if action.amount > 0 {
-                contract_call = contract_call
-                    .with_token_transfer(action.token_id, action.amount)
-                    .with_nft_nonce(action.token_nonce);
+                contract_call = contract_call.add_token_transfer(
+                    action.token_id,
+                    action.token_nonce,
+                    action.amount,
+                );
             }
 
             for arg in action.arguments {
@@ -323,7 +325,7 @@ pub trait GovernanceModule:
     }
 
     #[view(getProposer)]
-    fn get_proposer(&self, proposal_id: usize) -> OptionalArg<Address> {
+    fn get_proposer(&self, proposal_id: usize) -> OptionalArg<ManagedAddress> {
         if !self.proposal_exists(proposal_id) {
             OptionalArg::None
         } else {
@@ -411,7 +413,7 @@ pub trait GovernanceModule:
     fn proposal_created_event(
         &self,
         #[indexed] proposal_id: usize,
-        #[indexed] proposer: &Address,
+        #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
         #[indexed] description: &BoxedBytes,
         actions: &[GovernanceAction<Self::TypeManager>],
@@ -420,7 +422,7 @@ pub trait GovernanceModule:
     #[event("voteCast")]
     fn vote_cast_event(
         &self,
-        #[indexed] voter: &Address,
+        #[indexed] voter: &ManagedAddress,
         #[indexed] proposal_id: usize,
         nr_votes: &BigUint,
     );
@@ -428,7 +430,7 @@ pub trait GovernanceModule:
     #[event("downvoteCast")]
     fn downvote_cast_event(
         &self,
-        #[indexed] downvoter: &Address,
+        #[indexed] downvoter: &ManagedAddress,
         #[indexed] proposal_id: usize,
         nr_downvotes: &BigUint,
     );
@@ -445,7 +447,7 @@ pub trait GovernanceModule:
     #[event("userDeposit")]
     fn user_deposit_event(
         &self,
-        #[indexed] address: &Address,
+        #[indexed] address: &ManagedAddress,
         #[indexed] token_id: &TokenIdentifier,
         #[indexed] token_nonce: u64,
         amount: &BigUint,
@@ -464,10 +466,10 @@ pub trait GovernanceModule:
     fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, BigUint>;
+    fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, ManagedAddress, BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, BigUint>;
+    fn downvotes(&self, proposal_id: usize) -> MapMapper<Self::Storage, ManagedAddress, BigUint>;
 
     /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]

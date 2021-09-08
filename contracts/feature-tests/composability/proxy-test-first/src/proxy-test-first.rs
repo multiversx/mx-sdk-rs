@@ -32,7 +32,7 @@ mod message_me_proxy {
         fn init(&self, #[payment] payment: BigUint, init_arg: i32);
 
         #[endpoint(messageMe)]
-        fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &Address);
+        fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
     }
 }
 
@@ -45,16 +45,16 @@ pub trait ProxyTestFirst {
     fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::SendApi>;
 
     #[storage_get("other_contract")]
-    fn get_other_contract(&self) -> Address;
+    fn get_other_contract(&self) -> ManagedAddress;
 
     #[storage_set("other_contract")]
-    fn set_other_contract(&self, other_contract: &Address);
+    fn set_other_contract(&self, other_contract: &ManagedAddress);
 
     #[storage_set("callback_info")]
     fn set_callback_info(&self, callback_info: i64);
 
     #[init]
-    fn init(&self, other_contract_addr: &Address) {
+    fn init(&self, other_contract_addr: &ManagedAddress) {
         self.set_other_contract(other_contract_addr);
     }
 
@@ -63,7 +63,7 @@ pub trait ProxyTestFirst {
     fn deploy_second_contract(
         &self,
         #[payment] payment: BigUint,
-        code: BoxedBytes,
+        code: ManagedBuffer,
     ) -> SCResult<()> {
         let address = self
             .message_me_proxy()
@@ -76,7 +76,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(upgradeSecondContract)]
-    fn upgrade_second_contract(&self, #[payment] payment: BigUint, code: BoxedBytes) {
+    fn upgrade_second_contract(&self, #[payment] payment: BigUint, code: ManagedBuffer) {
         let other_contract = self.get_other_contract();
 
         self.message_me_proxy()
@@ -118,7 +118,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &self.types().big_uint_from(2u32),
                 [3u8; 3].to_vec(),
-                &HARDCODED_ADDRESS.into(),
+                &self.types().address_const(&HARDCODED_ADDRESS),
             )
             .async_call()
     }
@@ -132,7 +132,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &self.types().big_uint_from(2u32),
                 [3u8; 3].to_vec(),
-                &HARDCODED_ADDRESS.into(),
+                &self.types().address_const(&HARDCODED_ADDRESS),
             )
             .async_call()
             .with_callback(self.callbacks().message_callback())

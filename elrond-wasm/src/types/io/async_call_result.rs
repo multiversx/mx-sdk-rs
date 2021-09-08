@@ -1,5 +1,6 @@
 use crate::io::{ArgId, DynArg, DynArgInput};
 use crate::types::BoxedBytes;
+use crate::DynArgOutput;
 use crate::{abi::TypeAbi, types::ArgBuffer, ContractCallArg};
 use alloc::string::String;
 use elrond_codec::TopDecodeInput;
@@ -32,11 +33,7 @@ impl<T> DynArg for AsyncCallResult<T>
 where
     T: DynArg,
 {
-    fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
-    where
-        I: TopDecodeInput,
-        D: DynArgInput<I>,
-    {
+    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let err_code = u32::dyn_load(loader, arg_id);
         if err_code == 0 {
             let arg = T::dyn_load(loader, arg_id);
@@ -59,18 +56,17 @@ impl<T> ContractCallArg for &AsyncCallResult<T>
 where
     T: ContractCallArg,
 {
-    fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         match self {
             AsyncCallResult::Ok(result) => {
-                0u32.push_async_arg(serializer)?;
-                result.push_async_arg(serializer)?;
+                0u32.push_dyn_arg(output);
+                result.push_dyn_arg(output);
             },
             AsyncCallResult::Err(error_message) => {
-                error_message.err_code.push_async_arg(serializer)?;
-                error_message.err_msg.push_async_arg(serializer)?;
+                error_message.err_code.push_dyn_arg(output);
+                error_message.err_msg.push_dyn_arg(output);
             },
         }
-        Ok(())
     }
 }
 
@@ -78,8 +74,8 @@ impl<T> ContractCallArg for AsyncCallResult<T>
 where
     T: ContractCallArg,
 {
-    fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
-        (&self).push_async_arg(serializer)
+    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+        (&self).push_dyn_arg(output)
     }
 }
 

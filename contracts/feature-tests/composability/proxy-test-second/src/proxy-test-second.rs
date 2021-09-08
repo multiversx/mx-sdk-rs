@@ -23,7 +23,7 @@ pub trait ProxyTestSecond {
     fn set_message_me_3(&self, s3: &BoxedBytes);
 
     #[storage_set("message_me_4")]
-    fn set_message_me_4(&self, s4: &Address);
+    fn set_message_me_4(&self, s4: &ManagedAddress);
 
     #[init]
     #[payable("EGLD")]
@@ -47,7 +47,7 @@ pub trait ProxyTestSecond {
     }
 
     #[endpoint(messageMe)]
-    fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: &BoxedBytes, arg4: &Address) {
+    fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: &BoxedBytes, arg4: &ManagedAddress) {
         self.set_message_me_1(arg1);
         self.set_message_me_2(arg2);
         self.set_message_me_3(arg3);

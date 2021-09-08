@@ -2,8 +2,6 @@
 
 elrond_wasm::imports!();
 
-use elrond_wasm::HexCallDataSerializer;
-
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 const SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT: &[u8] = b"acceptEsdtPayment";
 const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &[u8] = b"rejectEsdtPayment";
@@ -11,7 +9,7 @@ const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &[u8] = b"rejectEsdtPayment";
 #[elrond_wasm::contract]
 pub trait FirstContract {
     #[init]
-    fn init(&self, esdt_token_name: TokenIdentifier, second_contract_address: Address) {
+    fn init(&self, esdt_token_name: TokenIdentifier, second_contract_address: ManagedAddress) {
         self.set_contract_esdt_token_name(&esdt_token_name);
         self.set_second_contract_address(&second_contract_address);
     }
@@ -32,8 +30,10 @@ pub trait FirstContract {
             &expected_token_name,
             &esdt_value,
             &self.get_second_contract_address(),
-            SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
-            &[],
+            &self
+                .types()
+                .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
+            &ManagedVec::new_empty(self.type_manager()),
         );
 
         Ok(())
@@ -55,8 +55,10 @@ pub trait FirstContract {
             &expected_token_name,
             &(esdt_value / 2u32),
             &self.get_second_contract_address(),
-            SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
-            &[],
+            &self
+                .types()
+                .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
+            &ManagedVec::new_empty(self.type_manager()),
         );
 
         Ok(())
@@ -78,8 +80,10 @@ pub trait FirstContract {
             &expected_token_name,
             &esdt_value,
             &self.get_second_contract_address(),
-            SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
-            &[],
+            &self
+                .types()
+                .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
+            &ManagedVec::new_empty(self.type_manager()),
         );
 
         Ok(())
@@ -103,8 +107,10 @@ pub trait FirstContract {
             &expected_token_name,
             &esdt_value,
             self.blockchain().get_gas_left(),
-            SECOND_CONTRACT_REJECT_ESDT_PAYMENT,
-            &ArgBuffer::new(),
+            &self
+                .types()
+                .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
+            &ManagedArgBuffer::new_empty(self.type_manager()),
         );
 
         Ok(())
@@ -128,8 +134,10 @@ pub trait FirstContract {
             &expected_token_name,
             &esdt_value,
             self.blockchain().get_gas_left(),
-            SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT,
-            &ArgBuffer::new(),
+            &self
+                .types()
+                .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
+            &ManagedArgBuffer::new_empty(self.type_manager()),
         );
 
         Ok(())
@@ -139,20 +147,24 @@ pub trait FirstContract {
         &self,
         esdt_token_name: &TokenIdentifier,
         amount: &BigUint,
-        to: &Address,
-        func_name: &[u8],
-        args: &[BoxedBytes],
+        to: &ManagedAddress,
+        func_name: &ManagedBuffer,
+        args: &ManagedVec<Self::TypeManager, ManagedBuffer>,
     ) {
-        let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-        serializer.push_argument_bytes(esdt_token_name.to_esdt_identifier().as_slice());
-        serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-        serializer.push_argument_bytes(func_name);
-        for arg in args {
-            serializer.push_argument_bytes(arg.as_slice());
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(esdt_token_name);
+        arg_buffer.push_arg(amount);
+        arg_buffer.push_arg(func_name);
+        for arg in args.into_iter() {
+            arg_buffer.push_arg_raw(arg);
         }
 
-        self.send()
-            .async_call_raw(to, &self.types().big_uint_zero(), serializer.as_slice());
+        self.send().async_call_raw(
+            to,
+            &self.types().big_uint_zero(),
+            &self.types().managed_buffer_from(ESDT_TRANSFER_STRING),
+            &arg_buffer,
+        );
     }
 
     // storage
@@ -165,9 +177,9 @@ pub trait FirstContract {
     fn get_contract_esdt_token_name(&self) -> TokenIdentifier;
 
     #[storage_set("secondContractAddress")]
-    fn set_second_contract_address(&self, address: &Address);
+    fn set_second_contract_address(&self, address: &ManagedAddress);
 
     #[view(getSecondContractAddress)]
     #[storage_get("secondContractAddress")]
-    fn get_second_contract_address(&self) -> Address;
+    fn get_second_contract_address(&self) -> ManagedAddress;
 }

@@ -3,7 +3,8 @@ use elrond_codec::{TopDecode, TopEncode};
 use super::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
 use crate::{
     types::{
-        Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
+        managed_vec_from_slice_of_boxed_bytes, ArgBuffer, BigUint, CodeMetadata, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec,
         TokenIdentifier, Vec,
     },
     HexCallDataSerializer,
@@ -42,68 +43,90 @@ pub trait SendApi: Clone + Sized {
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
-    fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, data: &[u8]);
+    fn direct_egld<D>(
+        &self,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
+        amount: &BigUint<Self::ProxyTypeManager>,
+        data: D,
+    ) where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
     fn direct_egld_execute(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]>;
 
     /// Sends ESDT to an address and executes like an async call, but without callback.
     fn direct_esdt_execute(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]>;
 
     /// Sends ESDT NFT to an address and executes like an async call, but without callback.
     #[allow(clippy::too_many_arguments)]
     fn direct_esdt_nft_execute(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
         gas_limit: u64,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]>;
 
     fn direct_multi_esdt_transfer_execute(
         &self,
-        to: &Address,
-        tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
+        to: &ManagedAddress<Self::ProxyTypeManager>,
+        payments: &ManagedVec<Self::ProxyTypeManager, EsdtTokenPayment<Self::ProxyTypeManager>>,
         gas_limit: u64,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]>;
 
     /// Sends either EGLD, ESDT or NFT to the target address,
     /// depending on the token identifier and nonce
-    fn direct(
+    fn direct<D>(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
-        data: &[u8],
-    ) {
+        data: D,
+    ) where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
         if token.is_egld() {
             self.direct_egld(to, amount, data);
         } else if nonce == 0 {
-            let _ = self.direct_esdt_execute(to, token, amount, 0, data, &ArgBuffer::new());
+            let _ = self.direct_esdt_execute(
+                to,
+                token,
+                amount,
+                0,
+                &data.managed_into(self.type_manager()),
+                &ManagedArgBuffer::new_empty(self.type_manager()),
+            );
         } else {
-            let _ =
-                self.direct_esdt_nft_execute(to, token, nonce, amount, 0, data, &ArgBuffer::new());
+            let _ = self.direct_esdt_nft_execute(
+                to,
+                token,
+                nonce,
+                amount,
+                0,
+                &data.managed_into(self.type_manager()),
+                &ManagedArgBuffer::new_empty(self.type_manager()),
+            );
         }
     }
 
@@ -115,90 +138,91 @@ pub trait SendApi: Clone + Sized {
     /// Use a `HexCallDataSerializer` to prepare this field.
     fn async_call_raw(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
-        data: &[u8],
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> !;
-
-    /// Sends an asynchronous call to another contract, with either EGLD or ESDT value.
-    /// The `token` argument decides which one it will be.
-    /// Calling this method immediately terminates tx execution.
-    fn async_call(&self, async_call: AsyncCall<Self>) -> ! {
-        self.async_call_raw(
-            &async_call.to,
-            &async_call.egld_payment,
-            async_call.hex_data.as_slice(),
-        )
-    }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
     /// As with any async call, this immediately terminates the execution of the current call.  
     /// So only use as the last call in your endpoint.  
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
     /// Note that EGLD can NOT be transfered with this function.  
-    fn transfer_esdt_via_async_call(
+    fn transfer_esdt_via_async_call<D>(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         token: &TokenIdentifier<Self::ProxyTypeManager>,
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
-        data: &[u8],
-    ) -> ! {
+        data: D,
+    ) -> !
+    where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
+        let data_buf: ManagedBuffer<Self::ProxyTypeManager> =
+            data.managed_into(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(token);
         if nonce == 0 {
-            let mut serializer = HexCallDataSerializer::new(ESDT_TRANSFER_STRING);
-            serializer.push_argument_bytes(token.to_esdt_identifier().as_slice());
-            serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-            if !data.is_empty() {
-                serializer.push_argument_bytes(data);
+            arg_buffer.push_arg(amount);
+            if !data_buf.is_empty() {
+                arg_buffer.push_arg_raw(data_buf);
             }
 
             self.async_call_raw(
                 to,
                 &BigUint::zero(self.type_manager()),
-                serializer.as_slice(),
+                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_TRANSFER_STRING),
+                &arg_buffer,
             )
         } else {
-            let mut serializer = HexCallDataSerializer::new(ESDT_NFT_TRANSFER_STRING);
-            serializer.push_argument_bytes(token.to_esdt_identifier().as_slice());
-            serializer.push_argument_bytes(&nonce.to_be_bytes()[..]);
-            serializer.push_argument_bytes(amount.to_bytes_be().as_slice());
-            serializer.push_argument_bytes(to.as_bytes());
-            if !data.is_empty() {
-                serializer.push_argument_bytes(data);
+            arg_buffer.push_arg(nonce);
+            arg_buffer.push_arg(amount);
+            arg_buffer.push_arg(to);
+            if !data_buf.is_empty() {
+                arg_buffer.push_arg_raw(data_buf);
             }
 
             self.async_call_raw(
                 &self.blockchain().get_sc_address(),
                 &BigUint::zero(self.type_manager()),
-                serializer.as_slice(),
-            );
+                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_TRANSFER_STRING),
+                &arg_buffer,
+            )
         }
     }
 
-    fn transfer_multiple_esdt_via_async_call(
+    fn transfer_multiple_esdt_via_async_call<D>(
         &self,
-        to: &Address,
-        tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
-        data: &[u8],
-    ) -> ! {
-        let mut serializer = HexCallDataSerializer::new(ESDT_MULTI_TRANSFER_STRING);
-        serializer.push_argument_bytes(to.as_bytes());
-        serializer.push_argument_bytes(&tokens.len().to_be_bytes()[..]);
+        to: &ManagedAddress<Self::ProxyTypeManager>,
+        payments: &ManagedVec<Self::ProxyTypeManager, EsdtTokenPayment<Self::ProxyTypeManager>>,
+        data: D,
+    ) -> !
+    where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(to);
+        arg_buffer.push_arg(payments.len());
 
-        for token in tokens {
-            serializer.push_argument_bytes(token.token_name.to_esdt_identifier().as_slice());
-            serializer.push_argument_bytes(&token.token_nonce.to_be_bytes()[..]);
-            serializer.push_argument_bytes(token.amount.to_bytes_be().as_slice());
+        for payment in payments.into_iter() {
+            // TODO: check that `!token_name.is_egld()` or let Arwen throw the error?
+            arg_buffer.push_arg(payment.token_name);
+            arg_buffer.push_arg(payment.token_nonce);
+            arg_buffer.push_arg(payment.amount);
         }
-
-        if !data.is_empty() {
-            serializer.push_argument_bytes(data);
+        let data_buf: ManagedBuffer<Self::ProxyTypeManager> =
+            data.managed_into(self.type_manager());
+        if !data_buf.is_empty() {
+            arg_buffer.push_arg_raw(data_buf);
         }
 
         self.async_call_raw(
             &self.blockchain().get_sc_address(),
             &BigUint::zero(self.type_manager()),
-            serializer.as_slice(),
+            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_MULTI_TRANSFER_STRING),
+            &arg_buffer,
         );
     }
 
@@ -210,10 +234,10 @@ pub trait SendApi: Clone + Sized {
         &self,
         gas: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
-        code: &BoxedBytes,
+        code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ArgBuffer,
-    ) -> Option<Address>;
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> Option<ManagedAddress<Self::ProxyTypeManager>>;
 
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
@@ -222,33 +246,37 @@ pub trait SendApi: Clone + Sized {
         &self,
         gas: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
-        source_contract_address: &Address,
+        source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ArgBuffer,
-    ) -> Option<Address>;
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> Option<ManagedAddress<Self::ProxyTypeManager>>;
 
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
     /// The child contract's new init function will be called with the provided arguments
     fn upgrade_contract(
         &self,
-        sc_address: &Address,
+        sc_address: &ManagedAddress<Self::ProxyTypeManager>,
         gas: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
-        code: &BoxedBytes,
+        code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ArgBuffer,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     );
 
-    fn change_owner_address(&self, child_sc_address: &Address, new_owner: &Address) {
-        let mut arg_buffer = ArgBuffer::new();
-        arg_buffer.push_argument_bytes(new_owner.as_bytes());
+    fn change_owner_address(
+        &self,
+        child_sc_address: &ManagedAddress<Self::ProxyTypeManager>,
+        new_owner: &ManagedAddress<Self::ProxyTypeManager>,
+    ) {
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(new_owner);
 
         let _ = self.execute_on_dest_context_raw(
             self.blockchain().get_gas_left(),
             child_sc_address,
             &BigUint::zero(self.type_manager()),
-            b"ChangeOwnerAddress",
+            &ManagedBuffer::new_from_bytes(self.type_manager(), b"ChangeOwnerAddress"),
             &arg_buffer,
         );
     }
@@ -257,11 +285,11 @@ pub trait SendApi: Clone + Sized {
     fn execute_on_dest_context_raw(
         &self,
         gas: u64,
-        address: &Address,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
         value: &BigUint<Self::ProxyTypeManager>,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
-    ) -> Vec<BoxedBytes>;
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     /// Same shard, in-line execution of another contract.
     /// Allows the contract to specify which result range to extract as sync call result.
@@ -273,38 +301,46 @@ pub trait SendApi: Clone + Sized {
     fn execute_on_dest_context_raw_custom_result_range<F>(
         &self,
         gas: u64,
-        address: &Address,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
         value: &BigUint<Self::ProxyTypeManager>,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
         range_closure: F,
-    ) -> Vec<BoxedBytes>
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>
     where
         F: FnOnce(usize, usize) -> (usize, usize);
 
     fn execute_on_dest_context_by_caller_raw(
         &self,
         gas: u64,
-        address: &Address,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
         value: &BigUint<Self::ProxyTypeManager>,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
-    ) -> Vec<BoxedBytes>;
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     fn execute_on_same_context_raw(
         &self,
         gas: u64,
-        address: &Address,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
         value: &BigUint<Self::ProxyTypeManager>,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     );
 
-    /// Used to store data between async call and callback.
-    fn storage_store_tx_hash_key(&self, data: &[u8]);
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     /// Used to store data between async call and callback.
-    fn storage_load_tx_hash_key(&self) -> BoxedBytes;
+    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ProxyTypeManager>);
+
+    /// Used to store data between async call and callback.
+    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self::ProxyTypeManager>;
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     /// You should never have to call this function directly.
@@ -312,9 +348,9 @@ pub trait SendApi: Clone + Sized {
     fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        function: &[u8],
-        arg_buffer: &ArgBuffer,
-    ) -> Vec<BoxedBytes>;
+        function_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
     /// Note that the SC must have the ESDTLocalMint or ESDTNftAddQuantity roles set,
@@ -327,23 +363,23 @@ pub trait SendApi: Clone + Sized {
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
     ) {
-        let mut arg_buffer = ArgBuffer::new();
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         let func_name: &[u8];
 
-        arg_buffer.push_argument_bytes(token.to_esdt_identifier().as_slice());
+        arg_buffer.push_arg(token);
 
         if nonce == 0 {
             func_name = b"ESDTLocalMint";
         } else {
             func_name = b"ESDTNFTAddQuantity";
-            arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+            arg_buffer.push_arg(nonce);
         }
 
-        arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
+        arg_buffer.push_arg(amount);
 
         let _ = self.call_local_esdt_built_in_function(
             self.blockchain().get_gas_left(),
-            func_name,
+            &ManagedBuffer::new_from_bytes(self.type_manager(), func_name),
             &arg_buffer,
         );
     }
@@ -357,23 +393,22 @@ pub trait SendApi: Clone + Sized {
         nonce: u64,
         amount: &BigUint<Self::ProxyTypeManager>,
     ) {
-        let mut arg_buffer = ArgBuffer::new();
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         let func_name: &[u8];
 
-        arg_buffer.push_argument_bytes(token.to_esdt_identifier().as_slice());
-
+        arg_buffer.push_arg(token);
         if nonce == 0 {
             func_name = b"ESDTLocalBurn";
         } else {
             func_name = b"ESDTNFTBurn";
-            arg_buffer.push_argument_bytes(&nonce.to_be_bytes()[..]);
+            arg_buffer.push_arg(&nonce);
         }
 
-        arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
+        arg_buffer.push_arg(amount);
 
         let _ = self.call_local_esdt_built_in_function(
             self.blockchain().get_gas_left(),
-            func_name,
+            &ManagedBuffer::new_from_bytes(self.type_manager(), func_name),
             &arg_buffer,
         );
     }
@@ -388,39 +423,37 @@ pub trait SendApi: Clone + Sized {
         &self,
         token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
-        name: &BoxedBytes,
+        name: &ManagedBuffer<Self::ProxyTypeManager>,
         royalties: &BigUint<Self::ProxyTypeManager>,
-        hash: &BoxedBytes,
+        hash: &ManagedBuffer<Self::ProxyTypeManager>,
         attributes: &T,
-        uris: &[BoxedBytes],
+        uris: &ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
     ) -> u64 {
-        let mut arg_buffer = ArgBuffer::new();
-        arg_buffer.push_argument_bytes(token.to_esdt_identifier().as_slice());
-        arg_buffer.push_argument_bytes(amount.to_bytes_be().as_slice());
-        arg_buffer.push_argument_bytes(name.as_slice());
-        arg_buffer.push_argument_bytes(royalties.to_bytes_be().as_slice());
-        arg_buffer.push_argument_bytes(hash.as_slice());
-
-        let mut top_encoded_attributes = Vec::new();
-        let _ = attributes.top_encode(&mut top_encoded_attributes);
-        arg_buffer.push_argument_bytes(top_encoded_attributes.as_slice());
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(token);
+        arg_buffer.push_arg(amount);
+        arg_buffer.push_arg(name);
+        arg_buffer.push_arg(royalties);
+        arg_buffer.push_arg(hash);
+        arg_buffer.push_arg(attributes);
 
         // The API function has the last argument as variadic,
         // so we top-encode each and send as separate argument
         for uri in uris {
-            let mut top_encoded_uri = Vec::new();
-            let _ = uri.top_encode(&mut top_encoded_uri);
-
-            arg_buffer.push_argument_bytes(top_encoded_uri.as_slice());
+            arg_buffer.push_arg(uri);
         }
 
         let output = self.call_local_esdt_built_in_function(
             self.blockchain().get_gas_left(),
-            b"ESDTNFTCreate",
+            &ManagedBuffer::new_from_bytes(self.type_manager(), b"ESDTNFTCreate"),
             &arg_buffer,
         );
 
-        u64::top_decode(output[0].as_slice()).unwrap_or_default()
+        if let Some(first_result_bytes) = output.get(0) {
+            u64::top_decode(&first_result_bytes).unwrap_or_default()
+        } else {
+            0
+        }
     }
 
     /// Sends thr NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
@@ -431,13 +464,13 @@ pub trait SendApi: Clone + Sized {
         nft_id: &TokenIdentifier<Self::ProxyTypeManager>,
         nft_nonce: u64,
         nft_amount: &BigUint<Self::ProxyTypeManager>,
-        buyer: &Address,
+        buyer: &ManagedAddress<Self::ProxyTypeManager>,
         payment_token: &TokenIdentifier<Self::ProxyTypeManager>,
         payment_nonce: u64,
         payment_amount: &BigUint<Self::ProxyTypeManager>,
     ) -> BigUint<Self::ProxyTypeManager> {
         let nft_token_data = self.blockchain().get_esdt_token_data(
-            &self.blockchain().get_sc_address_managed(),
+            &self.blockchain().get_sc_address(),
             nft_id,
             nft_nonce,
         );
@@ -447,7 +480,7 @@ pub trait SendApi: Clone + Sized {
 
         if royalties_amount > 0u32 {
             self.direct(
-                &nft_token_data.creator.to_address(),
+                &nft_token_data.creator,
                 payment_token,
                 payment_nonce,
                 &royalties_amount,

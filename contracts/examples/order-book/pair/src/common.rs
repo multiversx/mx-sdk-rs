@@ -21,7 +21,7 @@ pub struct Payment<M: ManagedTypeApi> {
 
 #[derive(Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
-    pub to: Address,
+    pub to: ManagedAddress<M>,
     pub payment: Payment<M>,
 }
 
@@ -39,7 +39,7 @@ pub struct DealConfig {
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
-    pub match_provider: Option<Address>,
+    pub match_provider: Option<ManagedAddress<M>>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
 }
@@ -47,8 +47,8 @@ pub struct OrderInputParams<M: ManagedTypeApi> {
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
-    pub creator: Address,
-    pub match_provider: Option<Address>,
+    pub creator: ManagedAddress<M>,
+    pub match_provider: Option<ManagedAddress<M>>,
     pub input_amount: BigUint<M>,
     pub output_amount: BigUint<M>,
     pub fee_config: FeeConfig<M>,

@@ -1,7 +1,7 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::SendApi;
 use crate::io::EndpointResult;
-use crate::types::{Address, BigUint, BoxedBytes};
+use crate::types::{BigUint, ManagedAddress, ManagedBuffer};
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -10,9 +10,9 @@ where
     SA: SendApi + 'static,
 {
     pub api: SA,
-    pub to: Address,
+    pub to: ManagedAddress<SA::ProxyTypeManager>,
     pub amount: BigUint<SA::ProxyTypeManager>,
-    pub data: BoxedBytes,
+    pub data: ManagedBuffer<SA::ProxyTypeManager>,
 }
 
 impl<SA> EndpointResult for SendEgld<SA>
@@ -24,7 +24,7 @@ where
     #[inline]
     fn finish<FA>(&self, _api: FA) {
         self.api
-            .direct_egld(&self.to, &self.amount, self.data.as_slice());
+            .direct_egld(&self.to, &self.amount, self.data.clone());
     }
 }
 
