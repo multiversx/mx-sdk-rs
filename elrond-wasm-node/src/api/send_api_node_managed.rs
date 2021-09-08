@@ -254,7 +254,10 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -269,10 +272,11 @@ impl SendApi for ArwenApiImpl {
                 result_handle,
             );
 
-            Some(ManagedAddress::from_raw_handle(
-                self.clone(),
-                new_address_handle,
-            ))
+            let new_managed_address =
+                ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
+            let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
+
+            (new_managed_address, results)
         }
     }
 
@@ -283,7 +287,10 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -297,12 +304,12 @@ impl SendApi for ArwenApiImpl {
                 new_address_handle,
                 result_handle,
             );
-            // TODO: return result
+            
+            let new_managed_address =
+                ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
+            let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
 
-            Some(ManagedAddress::from_raw_handle(
-                self.clone(),
-                new_address_handle,
-            ))
+            (new_managed_address, results)
         }
     }
 
@@ -314,7 +321,7 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let result_handle = mBufferNew();
@@ -328,7 +335,7 @@ impl SendApi for ArwenApiImpl {
                 result_handle,
             );
 
-            // TODO: return result
+            ManagedVec::from_raw_handle(self.clone(), result_handle)
         }
     }
 

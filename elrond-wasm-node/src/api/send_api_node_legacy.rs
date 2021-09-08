@@ -384,7 +384,12 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
+        let num_return_data_before = getNumReturnData();
+
         let mut new_address = Address::zero();
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
@@ -402,11 +407,12 @@ impl SendApi for ArwenApiImpl {
                 legacy_arg_buffer.arg_data_ptr(),
             );
         }
-        if new_address.is_zero() {
-            None
-        } else {
-            Some(ManagedAddress::from_address(self.clone(), new_address))
-        }
+
+        let num_return_data_after = getNumReturnData();
+        let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
+        let results = managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+
+        (new_address, results)
     }
 
     fn deploy_from_source_contract(
@@ -416,7 +422,12 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
+        let num_return_data_before = getNumReturnData();
+
         let mut new_address = Address::zero();
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
@@ -433,11 +444,12 @@ impl SendApi for ArwenApiImpl {
                 legacy_arg_buffer.arg_data_ptr(),
             );
         }
-        if new_address.is_zero() {
-            None
-        } else {
-            Some(ManagedAddress::from_address(self.clone(), new_address))
-        }
+
+        let num_return_data_after = getNumReturnData();
+        let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
+        let results = managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+
+        (new_address, results)
     }
 
     fn upgrade_contract(
@@ -448,7 +460,9 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        let num_return_data_before = getNumReturnData();
+
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
@@ -466,6 +480,11 @@ impl SendApi for ArwenApiImpl {
                 legacy_arg_buffer.arg_data_ptr(),
             );
         }
+
+        let num_return_data_after = getNumReturnData();
+        let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
+
+        managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
     }
 
     fn execute_on_dest_context_raw(
