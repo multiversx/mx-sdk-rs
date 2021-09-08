@@ -428,7 +428,7 @@ impl SendApi for ArwenApiImpl {
         amount: &BigUint<Self::ProxyTypeManager>,
         endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         unsafe {
             let result_handle = mBufferNew();
 
@@ -441,7 +441,7 @@ impl SendApi for ArwenApiImpl {
                 result_handle,
             );
 
-            // TODO: return result?
+            ManagedVec::from_raw_handle(self.clone(), result_handle)
         }
     }
 

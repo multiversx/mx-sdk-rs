@@ -168,7 +168,7 @@ impl SendApi for super::UncallableApi {
         _value: &BigUint<Self::ProxyTypeManager>,
         _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         unreachable!()
     }
 

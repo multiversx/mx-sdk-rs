@@ -259,7 +259,7 @@ impl SendApi for TxContext {
         _value: &BigUint<Self::ProxyTypeManager>,
         _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         panic!("execute_on_same_context_raw not implemented yet!");
     }
 
