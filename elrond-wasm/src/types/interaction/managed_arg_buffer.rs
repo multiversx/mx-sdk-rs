@@ -104,9 +104,9 @@ where
         self.push_arg_raw(encoded_buffer);
     }
 
-    /// Concatenates 2 ArgBuffer. Consumes both arguments in the process.
+    /// Concatenates 2 managed arg buffers. Consumes both arguments in the process.
     #[inline]
-    pub fn concat(mut self, mut other: ManagedArgBuffer<M>) -> Self {
+    pub fn concat(mut self, other: ManagedArgBuffer<M>) -> Self {
         self.data.append_vec(other.data);
         self
     }
