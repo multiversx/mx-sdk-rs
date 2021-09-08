@@ -359,7 +359,7 @@ pub trait SendApi: Clone + Sized {
     fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        function_name: &ManagedBuffer<Self::ProxyTypeManager>,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 

@@ -193,7 +193,7 @@ impl SendApi for super::UncallableApi {
     fn call_local_esdt_built_in_function(
         &self,
         _gas: u64,
-        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _function_name: &ManagedBuffer<Self::ProxyTypeManager>,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         unreachable!()
