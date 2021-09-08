@@ -46,4 +46,13 @@ pub trait EchoManagedTypes {
     fn echo_big_int_option(&self, x: Option<BigInt>) -> Option<BigInt> {
         x
     }
+
+    #[endpoint]
+    fn echo_tuple_into_multiresult(
+        &self,
+        addr: ManagedAddress,
+        vec: ManagedVec<Self::TypeManager, ManagedBuffer>,
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+        (addr, vec).into()
+    }
 }
