@@ -61,7 +61,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:A value was already set for this token ID and token nonce",
+                "message": "str:A value was already set",
                 "gas": "*"
             }
         },
@@ -107,7 +107,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:A value was already set for this token ID and token nonce",
+                "message": "str:A value was already set",
                 "gas": "*"
             }
         },
@@ -126,6 +126,8 @@
                     "storage": {
                         "str:TokenAttributes.attr|u8:1|u64:1": "biguint:10|u64:20|u32:2|u32:1|u32:2",
                         "str:TokenAttributes.attr|u8:2|u64:1": "biguint:20|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.nonce|u8:1|biguint:10|u64:20|u32:2|u32:1|u32:2": "1",
+                        "str:TokenAttributes.nonce|u8:2|biguint:20|u64:20|u32:2|u32:1|u32:2": "1",
                         "str:TokenAttributes.counter": "2",
                         "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
                         "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
@@ -141,7 +143,7 @@
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_get",
+                "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
                     "u64:1"
@@ -165,7 +167,7 @@
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_get",
+                "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
                     "u64:10"
@@ -176,7 +178,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:A value was not previously set fot this token ID and token nonce",
+                "message": "str:A value was not previously set",
                 "gas": "*"
             }
         },
@@ -187,7 +189,7 @@
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_get",
+                "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:BOB-abcdef",
                     "u64:1"
@@ -211,7 +213,7 @@
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_get",
+                "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:BOB2-abcdef",
                     "u64:1"
@@ -222,18 +224,110 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Unknown token id. No attributes were set for this token ID",
+                "message": "str:Unknown token id",
                 "gas": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "is_empty-token-attributes-1",
+            "txId": "get-token-nonce-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_is_empty",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was not previously set",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "biguint:20|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Unknown token id",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "has_attributes-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
                     "u64:1"
@@ -252,12 +346,12 @@
         },
         {
             "step": "scCall",
-            "txId": "is_empty-token-attributes-2",
+            "txId": "has_attributes-token-attributes-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_is_empty",
+                "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
                     "u64:10"
@@ -276,12 +370,12 @@
         },
         {
             "step": "scCall",
-            "txId": "is_empty-token-attributes-3",
+            "txId": "has_attributes-token-attributes-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_is_empty",
+                "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:BOB-abcdef",
                     "u64:1"
@@ -300,12 +394,12 @@
         },
         {
             "step": "scCall",
-            "txId": "is_empty-token-attributes-4",
+            "txId": "has_attributes-token-attributes-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "token_attributes_is_empty",
+                "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:BOB2-abcdef",
                     "u64:1"
@@ -342,7 +436,8 @@
                 "out": [],
                 "status": "0",
                 "message": "*",
-                "gas": "*"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -364,7 +459,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:A value was not previously set fot this token ID and token nonce",
+                "message": "str:A value was not previously set",
                 "gas": "*"
             }
         },
@@ -388,7 +483,8 @@
                 "out": [],
                 "status": "0",
                 "message": "*",
-                "gas": "*"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -410,7 +506,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Unknown token id. No attributes were set for this token ID",
+                "message": "str:Unknown token id",
                 "gas": "*"
             }
         },
@@ -418,7 +514,7 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "16",
+                    "nonce": "20",
                     "balance": "1000",
                     "storage": {},
                     "code": ""
@@ -429,6 +525,8 @@
                     "storage": {
                         "str:TokenAttributes.attr|u8:1|u64:1": "biguint:30|u64:20|u32:2|u32:1|u32:2",
                         "str:TokenAttributes.attr|u8:2|u64:1": "biguint:40|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.nonce|u8:1|biguint:30|u64:20|u32:2|u32:1|u32:2": "1",
+                        "str:TokenAttributes.nonce|u8:2|biguint:40|u64:20|u32:2|u32:1|u32:2": "1",
                         "str:TokenAttributes.counter": "2",
                         "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
                         "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
@@ -531,7 +629,7 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "20",
+                    "nonce": "24",
                     "balance": "1000",
                     "storage": {},
                     "code": ""
