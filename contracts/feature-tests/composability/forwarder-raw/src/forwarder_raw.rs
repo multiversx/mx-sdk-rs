@@ -301,9 +301,8 @@ pub trait ForwarderRaw {
         &self,
         code: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> SCResult<ManagedAddress> {
-        let deployed_contract_address = self
-            .send()
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+        self.send()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),
@@ -311,8 +310,6 @@ pub trait ForwarderRaw {
                 CodeMetadata::DEFAULT,
                 &args.into_vec().managed_into(self.type_manager()),
             )
-            .ok_or("Deploy failed")?;
-
-        Ok(deployed_contract_address)
+            .into()
     }
 }

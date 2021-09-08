@@ -237,7 +237,10 @@ pub trait SendApi: Clone + Sized {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>>;
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    );
 
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
@@ -249,7 +252,10 @@ pub trait SendApi: Clone + Sized {
         source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>>;
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    );
 
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
@@ -262,7 +268,7 @@ pub trait SendApi: Clone + Sized {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    );
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
 
     fn change_owner_address(
         &self,

@@ -64,14 +64,14 @@ pub trait ProxyTestFirst {
         &self,
         #[payment] payment: BigUint,
         code: ManagedBuffer,
-    ) -> SCResult<()> {
-        let address = self
+    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
+        let (address, results) = self
             .message_me_proxy()
             .init(payment, 123)
-            .deploy_contract(&code, CodeMetadata::DEFAULT)
-            .ok_or("Deploy failed")?;
+            .deploy_contract(&code, CodeMetadata::DEFAULT);
         self.set_other_contract(&address);
-        Ok(())
+
+        results
     }
 
     #[payable("EGLD")]

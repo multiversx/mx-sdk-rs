@@ -188,7 +188,10 @@ impl SendApi for TxContext {
         _code: &ManagedBuffer<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         panic!("deploy_contract not yet implemented")
     }
 
@@ -199,7 +202,10 @@ impl SendApi for TxContext {
         _source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         panic!("deploy_from_source_contract not yet implemented")
     }
 
@@ -211,7 +217,7 @@ impl SendApi for TxContext {
         _code: &ManagedBuffer<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         panic!("upgrade_contract not yet implemented")
     }
 

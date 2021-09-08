@@ -24,7 +24,17 @@
                 {
                     "creatorAddress": "sc:forwarder",
                     "creatorNonce": "1",
+                    "newAddress": "sc:child-with-arg"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "2",
                     "newAddress": "sc:child-2"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "3",
+                    "newAddress": "sc:child-from-source-with-arg"
                 }
             ]
         },
@@ -46,7 +56,35 @@
                 "status": "0",
                 "message": "",
                 "out": [
-                    "sc:child"
+                    "sc:child",
+                    ""
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-vault-with-arg",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "deploy_contract",
+                "arguments": [
+                    "file:../vault/output/vault.wasm",
+                    "str:some_argument"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [
+                    "str:some_argument",
+                    "sc:child-with-arg",
+                    "nested:str:some_argument"
                 ],
                 "gas": "*",
                 "refund": "*"
@@ -60,14 +98,14 @@
                     "balance": "0",
                     "storage": {},
                     "owner": "sc:forwarder",
-                    "code":"file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "+": {}
             }
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault",
+            "txId": "deploy-vault-from-source",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -100,6 +138,32 @@
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-vault-from-source-with-arg",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "deployFromSource",
+                "arguments": [
+                    "sc:child",
+                    "str:some_argument"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "out": [
+                    "str:some_argument",
+                    "sc:child-from-source-with-arg"
+                ],
+                "gas": "*",
+                "refund": "*"
             }
         }
     ]
