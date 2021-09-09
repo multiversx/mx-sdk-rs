@@ -12,8 +12,8 @@ pub trait EsdtModule {
     #[endpoint(issueToken)]
     fn issue_token(
         &self,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         num_decimals: usize,
         #[payment] issue_cost: BigUint,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
@@ -48,7 +48,7 @@ pub trait EsdtModule {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(
         &self,
-        #[var_args] opt_dest_address: OptionalArg<Address>,
+        #[var_args] opt_dest_address: OptionalArg<ManagedAddress>,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         only_owner!(self, "only owner can set roles");
 

@@ -82,7 +82,7 @@ pub trait PingPong {
             );
         }
 
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_legacy();
         let user_id = self.user_mapper().get_or_create_user(&caller);
         let user_status = self.user_status(user_id).get();
         match user_status {
@@ -108,8 +108,11 @@ pub trait PingPong {
             UserStatus::Registered => {
                 self.user_status(user_id).set(&UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
-                    self.send()
-                        .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
+                    self.send().direct_egld(
+                        &user_address.managed_into(self.type_manager()),
+                        &self.ping_amount().get(),
+                        b"pong",
+                    );
                     Ok(())
                 } else {
                     sc_error!("unknown user")
@@ -130,7 +133,7 @@ pub trait PingPong {
             "can't withdraw before deadline"
         );
 
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_legacy();
         let user_id = self.user_mapper().get_user_id(&caller);
         self.pong_by_user_id(user_id)
     }

@@ -42,7 +42,7 @@ pub trait SimpleErc20Token {
     /// Will set the fixed global token supply and give all the supply to the creator.
     #[init]
     fn init(&self, total_supply: &BigUint) {
-        let creator = self.blockchain().get_caller_managed();
+        let creator = self.blockchain().get_caller();
 
         // save total supply
         self.total_supply().set(total_supply);
@@ -87,7 +87,7 @@ pub trait SimpleErc20Token {
     #[endpoint]
     fn transfer(&self, to: ManagedAddress, amount: BigUint) -> SCResult<()> {
         // the sender is the caller
-        let sender = self.blockchain().get_caller_managed();
+        let sender = self.blockchain().get_caller();
         self.perform_transfer(sender, to, amount)
     }
 
@@ -107,7 +107,7 @@ pub trait SimpleErc20Token {
         amount: BigUint,
     ) -> SCResult<()> {
         // get caller
-        let caller = self.blockchain().get_caller_managed();
+        let caller = self.blockchain().get_caller();
 
         self.allowance(&sender, &caller).update(|allowance| {
             require!(amount <= *allowance, &b"allowance exceeded"[..]);
@@ -132,7 +132,7 @@ pub trait SimpleErc20Token {
     #[endpoint]
     fn approve(&self, spender: ManagedAddress, amount: BigUint) -> SCResult<()> {
         // sender is the caller
-        let caller = self.blockchain().get_caller_managed();
+        let caller = self.blockchain().get_caller();
 
         // store allowance
         self.allowance(&caller, &spender).set(&amount);

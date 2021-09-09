@@ -21,26 +21,26 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
 
     fn type_manager(&self) -> Self::TypeManager;
 
-    fn get_caller(&self) -> Address;
+    fn get_caller_legacy(&self) -> Address;
 
-    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::from_address(self.type_manager(), self.get_caller())
+    fn get_caller(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::from_address(self.type_manager(), &self.get_caller_legacy())
     }
 
-    fn get_sc_address(&self) -> Address;
+    fn get_sc_address_legacy(&self) -> Address;
 
-    fn get_sc_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::from_address(self.type_manager(), self.get_sc_address())
+    fn get_sc_address(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::from_address(self.type_manager(), &self.get_sc_address_legacy())
     }
 
-    fn get_owner_address(&self) -> Address;
+    fn get_owner_address_legacy(&self) -> Address;
 
-    fn get_owner_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
-        ManagedAddress::from_address(self.type_manager(), self.get_owner_address())
+    fn get_owner_address(&self) -> ManagedAddress<Self::TypeManager> {
+        ManagedAddress::from_address(self.type_manager(), &self.get_owner_address_legacy())
     }
 
     fn check_caller_is_owner(&self) {
-        if self.get_owner_address_managed() != self.get_caller_managed() {
+        if self.get_owner_address() != self.get_caller() {
             self.signal_error(b"Endpoint can only be called by owner");
         }
     }
@@ -57,9 +57,9 @@ pub trait BlockchainApi: ErrorApi + Clone + Sized + 'static {
         nonce: u64,
     ) -> BigUint<Self::TypeManager> {
         if token.is_egld() {
-            self.get_balance(&self.get_sc_address())
+            self.get_balance(&self.get_sc_address_legacy())
         } else {
-            self.get_esdt_balance(&self.get_sc_address_managed(), token, nonce)
+            self.get_esdt_balance(&self.get_sc_address(), token, nonce)
         }
     }
 

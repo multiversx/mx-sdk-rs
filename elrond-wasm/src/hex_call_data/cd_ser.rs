@@ -1,4 +1,7 @@
-use crate::types::ArgBuffer;
+use crate::{
+    api::ManagedTypeApi,
+    types::{ArgBuffer, ManagedArgBuffer, ManagedBuffer},
+};
 use alloc::vec::Vec;
 
 use super::SEPARATOR;
@@ -43,8 +46,23 @@ impl HexCallDataSerializer {
         hex_data
     }
 
+    pub fn from_managed_arg_buffer<M: ManagedTypeApi>(
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Self {
+        let mut hex_data = HexCallDataSerializer::new(endpoint_name.to_boxed_bytes().as_slice());
+        for arg in arg_buffer.raw_arg_iter() {
+            hex_data.push_argument_bytes(arg.to_boxed_bytes().as_slice());
+        }
+        hex_data
+    }
+
     pub fn as_slice(&self) -> &[u8] {
         self.0.as_slice()
+    }
+
+    pub fn into_vec(self) -> Vec<u8> {
+        self.0
     }
 
     fn push_byte(&mut self, byte: u8) {

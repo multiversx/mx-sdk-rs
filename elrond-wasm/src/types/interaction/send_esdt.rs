@@ -1,7 +1,7 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::SendApi;
 use crate::io::EndpointResult;
-use crate::types::{Address, BigUint, BoxedBytes, TokenIdentifier};
+use crate::types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier};
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -10,10 +10,10 @@ where
     SA: SendApi + 'static,
 {
     pub(super) api: SA,
-    pub(super) to: Address,
+    pub(super) to: ManagedAddress<SA::ProxyTypeManager>,
     pub(super) token_identifier: TokenIdentifier<SA::ProxyTypeManager>,
     pub(super) amount: BigUint<SA::ProxyTypeManager>,
-    pub(super) data: BoxedBytes,
+    pub data: ManagedBuffer<SA::ProxyTypeManager>,
 }
 
 impl<SA> EndpointResult for SendEsdt<SA>
@@ -29,7 +29,7 @@ where
             &self.token_identifier,
             0,
             &self.amount,
-            self.data.as_slice(),
+            self.data.clone(),
         );
     }
 }

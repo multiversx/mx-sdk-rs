@@ -2,8 +2,10 @@ use crate::async_data::AsyncCallTxData;
 use crate::{SendBalance, TxContext, TxOutput, TxPanic};
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{
-    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, TokenIdentifier,
+    BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+    ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
 };
+use elrond_wasm::HexCallDataSerializer;
 // use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -68,7 +70,14 @@ impl SendApi for TxContext {
         self.clone()
     }
 
-    fn direct_egld(&self, to: &Address, amount: &BigUint<Self::ProxyTypeManager>, _data: &[u8]) {
+    fn direct_egld<D>(
+        &self,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
+        amount: &BigUint<Self::ProxyTypeManager>,
+        _data: D,
+    ) where
+        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    {
         let amount_value = self.big_uint_value(amount);
         if amount_value > self.get_available_egld_balance() {
             std::panic::panic_any(TxPanic {
@@ -77,9 +86,10 @@ impl SendApi for TxContext {
             });
         }
 
+        let recipient = to.to_address();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
-            recipient: to.clone(),
+            recipient,
             token_name: BoxedBytes::empty(),
             amount: amount_value,
         });
@@ -87,23 +97,23 @@ impl SendApi for TxContext {
 
     fn direct_egld_execute(
         &self,
-        _to: &Address,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
         _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]> {
         panic!("direct_egld_execute not yet implemented")
     }
 
     fn direct_esdt_execute(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         token: &TokenIdentifier<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
         _gas: u64,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]> {
         let amount_value = self.big_uint_value(amount);
         if amount_value > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice()) {
@@ -113,10 +123,11 @@ impl SendApi for TxContext {
             });
         }
 
+        let recipient = to.to_address();
         let token_name = token.to_esdt_identifier();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
-            recipient: to.clone(),
+            recipient,
             token_name,
             amount: amount_value,
         });
@@ -125,42 +136,47 @@ impl SendApi for TxContext {
 
     fn direct_esdt_nft_execute(
         &self,
-        _to: &Address,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
         _token: &TokenIdentifier<Self::ProxyTypeManager>,
         _nonce: u64,
         _amount: &BigUint<Self::ProxyTypeManager>,
         _gas_limit: u64,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]> {
         panic!("direct_esdt_nft_execute not implemented yet");
     }
 
     fn direct_multi_esdt_transfer_execute(
         &self,
-        _to: &Address,
-        _tokens: &[EsdtTokenPayment<Self::ProxyTypeManager>],
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
+        _payments: &ManagedVec<Self::ProxyTypeManager, EsdtTokenPayment<Self::ProxyTypeManager>>,
         _gas_limit: u64,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> Result<(), &'static [u8]> {
         panic!("direct_multi_esdt_transfer_execute not implemented yet");
     }
 
     fn async_call_raw(
         &self,
-        to: &Address,
+        to: &ManagedAddress<Self::ProxyTypeManager>,
         amount: &BigUint<Self::ProxyTypeManager>,
-        data: &[u8],
+        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) -> ! {
         let amount_value = self.big_uint_value(amount);
+        let recipient = to.to_address();
+        let call_data =
+            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
+        let tx_hash = self.get_tx_hash();
         // the cell is no longer needed, since we end in a panic
         let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
         tx_output.async_call = Some(AsyncCallTxData {
-            to: to.clone(),
+            to: recipient,
             call_value: amount_value,
-            call_data: data.to_vec(),
-            tx_hash: self.get_tx_hash(),
+            call_data,
+            tx_hash,
         });
         std::panic::panic_any(tx_output)
     }
@@ -169,10 +185,10 @@ impl SendApi for TxContext {
         &self,
         _gas: u64,
         _amount: &BigUint<Self::ProxyTypeManager>,
-        _code: &BoxedBytes,
+        _code: &ManagedBuffer<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ArgBuffer,
-    ) -> Option<Address> {
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
         panic!("deploy_contract not yet implemented")
     }
 
@@ -180,21 +196,21 @@ impl SendApi for TxContext {
         &self,
         _gas: u64,
         _amount: &BigUint<Self::ProxyTypeManager>,
-        _source_contract_address: &Address,
+        _source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ArgBuffer,
-    ) -> Option<Address> {
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
         panic!("deploy_from_source_contract not yet implemented")
     }
 
     fn upgrade_contract(
         &self,
-        _sc_address: &Address,
+        _sc_address: &ManagedAddress<Self::ProxyTypeManager>,
         _gas: u64,
         _amount: &BigUint<Self::ProxyTypeManager>,
-        _code: &BoxedBytes,
+        _code: &ManagedBuffer<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ArgBuffer,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) {
         panic!("upgrade_contract not yet implemented")
     }
@@ -202,23 +218,23 @@ impl SendApi for TxContext {
     fn execute_on_dest_context_raw(
         &self,
         _gas: u64,
-        _address: &Address,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
         _value: &BigUint<Self::ProxyTypeManager>,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
-    ) -> Vec<BoxedBytes> {
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         panic!("execute_on_dest_context_raw not implemented yet!");
     }
 
     fn execute_on_dest_context_raw_custom_result_range<F>(
         &self,
         _gas: u64,
-        _address: &Address,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
         _value: &BigUint<Self::ProxyTypeManager>,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
         _range_closure: F,
-    ) -> Vec<BoxedBytes>
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>
     where
         F: FnOnce(usize, usize) -> (usize, usize),
     {
@@ -228,41 +244,52 @@ impl SendApi for TxContext {
     fn execute_on_dest_context_by_caller_raw(
         &self,
         _gas: u64,
-        _address: &Address,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
         _value: &BigUint<Self::ProxyTypeManager>,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
-    ) -> Vec<BoxedBytes> {
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         panic!("execute_on_dest_context_by_caller_raw not implemented yet!");
     }
 
     fn execute_on_same_context_raw(
         &self,
         _gas: u64,
-        _address: &Address,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
         _value: &BigUint<Self::ProxyTypeManager>,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
     ) {
         panic!("execute_on_same_context_raw not implemented yet!");
     }
 
-    fn storage_store_tx_hash_key(&self, data: &[u8]) {
-        let tx_hash = self.get_tx_hash();
-        self.storage_store_slice_u8(tx_hash.as_bytes(), data);
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        _gas: u64,
+        _to: &ManagedAddress<Self::ProxyTypeManager>,
+        _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        panic!("execute_on_dest_context_readonly_raw not implemented yet!");
     }
 
-    fn storage_load_tx_hash_key(&self) -> BoxedBytes {
+    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ProxyTypeManager>) {
         let tx_hash = self.get_tx_hash();
-        self.storage_load_boxed_bytes(tx_hash.as_bytes())
+        self.storage_store_slice_u8(tx_hash.as_bytes(), data.to_boxed_bytes().as_slice());
+    }
+
+    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self::ProxyTypeManager> {
+        let tx_hash = self.get_tx_hash();
+        let bytes = self.storage_load_boxed_bytes(tx_hash.as_bytes());
+        ManagedBuffer::new_from_bytes(self.clone(), bytes.as_slice())
     }
 
     fn call_local_esdt_built_in_function(
         &self,
         _gas: u64,
-        _function: &[u8],
-        _arg_buffer: &ArgBuffer,
-    ) -> Vec<BoxedBytes> {
+        _function_name: &ManagedBuffer<Self::ProxyTypeManager>,
+        _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         panic!("call_local_esdt_built_in_function not implemented yet!");
     }
 }

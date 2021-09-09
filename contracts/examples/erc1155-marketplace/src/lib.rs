@@ -11,9 +11,9 @@ pub struct Auction<M: ManagedTypeApi> {
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
-    pub original_owner: Address,
+    pub original_owner: ManagedAddress<M>,
     pub current_bid: BigUint<M>,
-    pub current_winner: Address,
+    pub current_winner: ManagedAddress<M>,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
@@ -28,7 +28,7 @@ pub struct AuctionArgument<M: ManagedTypeApi> {
 pub trait Erc1155Marketplace {
     /// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
     #[init]
-    fn init(&self, token_ownership_contract_address: Address, bid_cut_percentage: u8) {
+    fn init(&self, token_ownership_contract_address: ManagedAddress, bid_cut_percentage: u8) {
         self.token_ownership_contract_address()
             .set(&token_ownership_contract_address);
         self.percentage_cut().set(&bid_cut_percentage);
@@ -40,8 +40,8 @@ pub trait Erc1155Marketplace {
     #[endpoint(onERC1155Received)]
     fn on_erc1155_received(
         &self,
-        _operator: Address,
-        from: Address,
+        _operator: ManagedAddress,
+        from: ManagedAddress,
         type_id: BigUint,
         nft_id: BigUint,
         args: AuctionArgument<Self::TypeManager>,
@@ -69,8 +69,8 @@ pub trait Erc1155Marketplace {
     #[endpoint(onERC1155BatchReceived)]
     fn on_erc1155_batch_received(
         &self,
-        _operator: Address,
-        from: Address,
+        _operator: ManagedAddress,
+        from: ManagedAddress,
         type_ids: Vec<BigUint>,
         nft_ids: Vec<BigUint>,
         args: AuctionArgument<Self::TypeManager>,
@@ -135,10 +135,17 @@ pub trait Erc1155Marketplace {
 
     #[only_owner]
     #[endpoint(setTokenOwnershipContractAddress)]
-    fn set_token_ownership_contract_address_endpoint(&self, new_address: Address) -> SCResult<()> {
-        require!(!new_address.is_zero(), "Cannot set to zero address");
+    fn set_token_ownership_contract_address_endpoint(
+        &self,
+        new_address: ManagedAddress,
+    ) -> SCResult<()> {
         require!(
-            self.blockchain().is_smart_contract(&new_address),
+            new_address != self.types().address_zero(),
+            "Cannot set to zero address"
+        );
+        require!(
+            self.blockchain()
+                .is_smart_contract(&new_address.to_address()),
             "The provided address is not a smart contract"
         );
 
@@ -193,7 +200,7 @@ pub trait Erc1155Marketplace {
         );
 
         // refund losing bid
-        if auction.current_winner != Address::zero() {
+        if auction.current_winner != self.types().address_zero() {
             let data = self.data_or_empty_if_sc(&caller, b"bid refund");
             self.send().direct(
                 &auction.current_winner,
@@ -229,7 +236,7 @@ pub trait Erc1155Marketplace {
 
         self.auction_for_token(&type_id, &nft_id).clear();
 
-        if auction.current_winner != Address::zero() {
+        if auction.current_winner != self.types().address_zero() {
             let percentage_cut = self.percentage_cut().get();
             let cut_amount = self.calculate_cut_amount(&auction.current_bid, percentage_cut);
             let amount_to_send = &auction.current_bid - &cut_amount;
@@ -286,7 +293,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getCurrentWinner)]
-    fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<Address> {
+    fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<ManagedAddress> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -305,7 +312,7 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: &BigUint,
         nft_id: &BigUint,
-        original_owner: &Address,
+        original_owner: &ManagedAddress,
         token: &TokenIdentifier,
         min_bid: &BigUint,
         max_bid: &BigUint,
@@ -331,7 +338,7 @@ pub trait Erc1155Marketplace {
             deadline,
             original_owner: original_owner.clone(),
             current_bid: self.types().big_uint_zero(),
-            current_winner: Address::zero(),
+            current_winner: self.types().address_zero(),
         });
 
         Ok(())
@@ -341,7 +348,7 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: BigUint,
         nft_id: BigUint,
-        to: Address,
+        to: ManagedAddress,
     ) -> AsyncCall<Self::SendApi> {
         let sc_own_address = self.blockchain().get_sc_address();
         let token_ownership_contract_address = self.token_ownership_contract_address().get();
@@ -369,8 +376,8 @@ pub trait Erc1155Marketplace {
         mapper.insert(token_identifier.clone(), self.types().big_uint_zero());
     }
 
-    fn data_or_empty_if_sc(&self, dest: &Address, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(dest) {
+    fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
+        if self.blockchain().is_smart_contract(&dest.to_address()) {
             &[]
         } else {
             data
@@ -380,14 +387,14 @@ pub trait Erc1155Marketplace {
     // proxy
 
     #[proxy]
-    fn erc1155_proxy(&self, to: Address) -> erc1155::Proxy<Self::SendApi>;
+    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::SendApi>;
 
     // storage
 
     // token ownership contract, i.e. the erc1155 SC
 
     #[storage_mapper("tokenOwnershipContractAddress")]
-    fn token_ownership_contract_address(&self) -> SingleValueMapper<Self::Storage, Address>;
+    fn token_ownership_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
 
     // percentage taken from winning bids
 

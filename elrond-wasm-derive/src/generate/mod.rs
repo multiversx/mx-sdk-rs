@@ -1,6 +1,5 @@
 pub mod abi_gen;
 pub mod arg_regular;
-pub mod arg_str_serialize;
 pub mod auto_impl;
 pub mod auto_impl_event;
 pub mod auto_impl_proxy;

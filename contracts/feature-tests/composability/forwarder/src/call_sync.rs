@@ -9,7 +9,7 @@ pub trait ForwarderSyncCallModule {
 
     #[endpoint]
     #[payable("*")]
-    fn echo_arguments_sync(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
+    fn echo_arguments_sync(&self, to: ManagedAddress, #[var_args] args: VarArgs<BoxedBytes>) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self
@@ -26,7 +26,7 @@ pub trait ForwarderSyncCallModule {
     #[payable("*")]
     fn echo_arguments_sync_range(
         &self,
-        to: Address,
+        to: ManagedAddress,
         start: usize,
         end: usize,
         #[var_args] args: VarArgs<BoxedBytes>,
@@ -45,7 +45,7 @@ pub trait ForwarderSyncCallModule {
 
     #[endpoint]
     #[payable("*")]
-    fn echo_arguments_sync_twice(&self, to: Address, #[var_args] args: VarArgs<BoxedBytes>) {
+    fn echo_arguments_sync_twice(&self, to: ManagedAddress, #[var_args] args: VarArgs<BoxedBytes>) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
 
         let result = self
@@ -74,7 +74,7 @@ pub trait ForwarderSyncCallModule {
     #[payable("*")]
     fn forward_sync_accept_funds(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
@@ -103,7 +103,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_amount] payment: BigUint,
-        to: Address,
+        to: ManagedAddress,
         percentage_fees: BigUint,
     ) {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
@@ -111,7 +111,7 @@ pub trait ForwarderSyncCallModule {
 
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token_id, amount_to_send)
+            .accept_funds(token_id, 0, amount_to_send)
             .execute_on_dest_context();
     }
 
@@ -128,7 +128,7 @@ pub trait ForwarderSyncCallModule {
     #[payable("*")]
     fn forward_sync_accept_funds_then_read(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
@@ -136,8 +136,7 @@ pub trait ForwarderSyncCallModule {
         let _ = self
             .vault_proxy()
             .contract(to.clone())
-            .with_nft_nonce(token_nonce)
-            .accept_funds(token, payment)
+            .accept_funds(token, token_nonce, payment)
             .execute_on_dest_context();
 
         self.vault_proxy()
@@ -149,7 +148,7 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     fn forward_sync_retrieve_funds(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token: TokenIdentifier,
         token_nonce: u64,
         amount: BigUint,
@@ -163,10 +162,10 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     fn forward_sync_accept_funds_multi_transfer(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = Vec::new();
+        let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
             let (token_name, token_nonce, amount) = multi_arg.into_tuple();

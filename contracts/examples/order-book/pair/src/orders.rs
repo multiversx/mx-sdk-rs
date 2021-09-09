@@ -126,7 +126,7 @@ pub trait OrdersModule:
     fn free_order(
         &self,
         order_id: u64,
-        caller: &Address,
+        caller: &ManagedAddress,
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
@@ -176,7 +176,7 @@ pub trait OrdersModule:
     fn cancel_order(
         &self,
         order_id: u64,
-        caller: &Address,
+        caller: &ManagedAddress,
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
@@ -357,7 +357,7 @@ pub trait OrdersModule:
     }
 
     #[view(getAddressOrderIds)]
-    fn get_address_order_ids(&self, address: &Address) -> MultiResultVec<u64> {
+    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiResultVec<u64> {
         MultiResultVec::from_iter(
             self.address_order_ids(address)
                 .get()
@@ -377,5 +377,8 @@ pub trait OrdersModule:
     fn orders(&self, id: u64) -> SingleValueMapper<Self::Storage, Order<Self::TypeManager>>;
 
     #[storage_mapper("address_order_ids")]
-    fn address_order_ids(&self, address: &Address) -> SingleValueMapper<Self::Storage, Vec<u64>>;
+    fn address_order_ids(
+        &self,
+        address: &ManagedAddress,
+    ) -> SingleValueMapper<Self::Storage, Vec<u64>>;
 }
