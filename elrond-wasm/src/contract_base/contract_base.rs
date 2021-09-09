@@ -88,12 +88,4 @@ pub trait ContractBase: Sized {
     fn error_api(&self) -> Self::Api {
         self.raw_vm_api()
     }
-
-    fn argument_api(&self) -> Self::Api {
-        self.raw_vm_api()
-    }
-
-    fn finish_api(&self) -> Self::Api {
-        self.raw_vm_api()
-    }
 }
