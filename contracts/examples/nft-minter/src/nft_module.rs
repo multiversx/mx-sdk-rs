@@ -23,8 +23,8 @@ pub trait NftModule {
     fn issue_token(
         &self,
         #[payment] issue_cost: BigUint,
-        token_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
     ) -> SCResult<AsyncCall<Self::SendApi>> {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
@@ -152,10 +152,10 @@ pub trait NftModule {
     #[allow(clippy::too_many_arguments)]
     fn create_nft_with_attributes<T: TopEncode>(
         &self,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         royalties: BigUint,
         attributes: T,
-        uri: BoxedBytes,
+        uri: ManagedBuffer,
         selling_price: BigUint,
         token_used_as_payment: TokenIdentifier,
         token_used_as_payment_nonce: u64,
@@ -170,15 +170,19 @@ pub trait NftModule {
         attributes.top_encode(&mut serialized_attributes)?;
 
         let attributes_hash = self.crypto().sha256(&serialized_attributes);
+        let hash_buffer = self.types().managed_buffer_from(attributes_hash.as_bytes());
+
+        let mut uris = ManagedVec::new_empty(self.type_manager());
+        uris.push(uri);
 
         let nft_nonce = self.send().esdt_nft_create(
             &nft_token_id,
             &self.types().big_uint_from(NFT_AMOUNT),
             &name,
             &royalties,
-            &attributes_hash.as_bytes().into(),
+            &hash_buffer,
             &attributes,
-            &[uri],
+            &uris,
         );
 
         self.price_tag(nft_nonce).set(&PriceTag {
