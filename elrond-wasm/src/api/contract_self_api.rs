@@ -3,7 +3,7 @@ use super::{
     LogApi, ManagedSerializer, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi,
     StorageReadApi, StorageWriteApi,
 };
-use crate::types::Address;
+use crate::types::{Address, ManagedAddress};
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -77,10 +77,6 @@ pub trait ContractBase: Sized {
     /// Please avoid using it directly.
     /// TODO: find a way to hide this API.
     fn error_api(&self) -> Self::ErrorApi;
-
-    fn proxy<P: ProxyObjApi<SendApi = Self::SendApi>>(&self, address: Address) -> P {
-        P::new_proxy_obj(self.send()).contract(address)
-    }
 }
 
 pub trait ContractPrivateApi {

@@ -2,7 +2,7 @@ use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
 use crate::types::{ArgBuffer, SCError};
-use crate::EndpointResult;
+use crate::{DynArgOutput, EndpointResult};
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
@@ -85,11 +85,7 @@ where
     T: DynArg,
 {
     // #[inline(never)]
-    fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
-    where
-        I: TopDecodeInput,
-        D: DynArgInput<I>,
-    {
+    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let mut result_vec: Vec<T> = Vec::new();
         while loader.has_next() {
             result_vec.push(T::dyn_load(loader, arg_id));
@@ -119,11 +115,10 @@ impl<T> ContractCallArg for &MultiArgVec<T>
 where
     T: ContractCallArg,
 {
-    fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
+    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         for elem in self.0.iter() {
-            elem.push_async_arg(serializer)?;
+            elem.push_dyn_arg(output);
         }
-        Ok(())
     }
 }
 
@@ -131,8 +126,8 @@ impl<T> ContractCallArg for MultiArgVec<T>
 where
     T: ContractCallArg,
 {
-    fn push_async_arg(&self, serializer: &mut ArgBuffer) -> Result<(), SCError> {
-        (&self).push_async_arg(serializer)
+    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+        (&self).push_dyn_arg(output)
     }
 }
 

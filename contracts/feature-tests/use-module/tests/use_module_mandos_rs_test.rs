@@ -14,7 +14,10 @@ mod dns_mock {
     #[elrond_wasm::contract]
     pub trait DnsMock {
         #[proxy]
-        fn user_builtin_proxy(&self, to: Address) -> super::user_builtin::Proxy<Self::SendApi>;
+        fn user_builtin_proxy(
+            &self,
+            to: ManagedAddress,
+        ) -> super::user_builtin::Proxy<Self::SendApi>;
 
         #[payable("EGLD")]
         #[endpoint]

@@ -19,14 +19,19 @@ pub trait Vault {
         Ok(args.into_vec().into())
     }
 
+    #[endpoint]
+    fn echo_caller(&self) -> ManagedAddress {
+        self.blockchain().get_caller()
+    }
+
     #[payable("*")]
     #[endpoint]
     fn accept_funds(
         &self,
         #[payment_token] token: TokenIdentifier,
+        #[payment_nonce] nonce: u64,
         #[payment_amount] payment: BigUint,
     ) {
-        let nonce = self.call_value().esdt_token_nonce();
         let token_type = self.call_value().esdt_token_type();
 
         self.accept_funds_event(&token, token_type.as_type_name(), &payment, nonce);
@@ -111,14 +116,14 @@ pub trait Vault {
         token: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        #[var_args] return_message: OptionalArg<BoxedBytes>,
+        #[var_args] return_message: OptionalArg<ManagedBuffer>,
     ) {
         self.retrieve_funds_event(&token, nonce, &amount);
 
         let caller = self.blockchain().get_caller();
-        let data = match &return_message {
-            OptionalArg::Some(data) => data.as_slice(),
-            OptionalArg::None => &[],
+        let data = match return_message {
+            OptionalArg::Some(data) => data,
+            OptionalArg::None => self.types().managed_buffer_empty(),
         };
 
         if token.is_egld() {
@@ -150,7 +155,7 @@ pub trait Vault {
     );
 
     #[endpoint]
-    fn get_owner_address(&self) -> Address {
+    fn get_owner_address(&self) -> ManagedAddress {
         self.blockchain().get_owner_address()
     }
 

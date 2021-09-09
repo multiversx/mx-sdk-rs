@@ -1,5 +1,10 @@
 use crate::api::{BlockchainApi, SendApi};
-use crate::types::{Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata};
+use crate::types::{
+    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
+};
+use crate::ContractCallArg;
+
+use super::ManagedArgBuffer;
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -12,26 +17,23 @@ where
     SA: SendApi + 'static,
 {
     api: SA,
-    address: Address, // only used for Upgrade, ignored for Deploy
-    payment_amount: BigUint<SA::ProxyTypeManager>,
+    to: ManagedAddress<SA::ProxyTypeManager>, // only used for Upgrade, ignored for Deploy
+    egld_payment: BigUint<SA::ProxyTypeManager>,
     explicit_gas_limit: u64,
-    pub arg_buffer: ArgBuffer, // TODO: make private and find a better way to serialize
+    arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
 pub fn new_contract_deploy<SA>(
     api: SA,
-    address: Address,
-    payment_amount: BigUint<SA::ProxyTypeManager>,
+    to: ManagedAddress<SA::ProxyTypeManager>,
 ) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
     let mut contract_deploy = ContractDeploy::<SA>::new(api);
-    contract_deploy.address = address;
-    contract_deploy.payment_amount = payment_amount;
-
+    contract_deploy.to = to;
     contract_deploy
 }
 
@@ -41,17 +43,19 @@ where
 {
     pub fn new(api: SA) -> Self {
         let zero = BigUint::zero(api.type_manager());
+        let zero_address = ManagedAddress::zero_address(api.type_manager());
+        let arg_buffer = ManagedArgBuffer::new_empty(api.type_manager());
         ContractDeploy {
             api,
-            address: Address::zero(),
-            payment_amount: zero,
+            to: zero_address,
+            egld_payment: zero,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-            arg_buffer: ArgBuffer::new(),
+            arg_buffer,
         }
     }
 
     pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA::ProxyTypeManager>) -> Self {
-        self.payment_amount = payment_amount;
+        self.egld_payment = payment_amount;
         self
     }
 
@@ -60,14 +64,18 @@ where
         self
     }
 
-    pub fn get_mut_arg_buffer(&mut self) -> &mut ArgBuffer {
-        &mut self.arg_buffer
+    pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
+        endpoint_arg.push_dyn_arg(&mut self.arg_buffer);
     }
 
-    /// Provided for cases where we build the contract deploy by hand.
-    pub fn push_argument_raw_bytes(&mut self, bytes: &[u8]) {
-        self.arg_buffer.push_argument_bytes(bytes);
-    }
+    // pub fn get_mut_arg_buffer(&mut self) -> &mut ArgBuffer {
+    //     &mut self.arg_buffer
+    // }
+
+    // /// Provided for cases where we build the contract deploy by hand.
+    // pub fn push_argument_raw_bytes(&mut self, bytes: &[u8]) {
+    //     self.arg_buffer.push_argument_bytes(bytes);
+    // }
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
@@ -86,23 +94,27 @@ where
     /// Will return None if the deploy fails.  
     pub fn deploy_contract(
         self,
-        code: &BoxedBytes,
+        code: &ManagedBuffer<SA::ProxyTypeManager>,
         code_metadata: CodeMetadata,
-    ) -> Option<Address> {
+    ) -> Option<ManagedAddress<SA::ProxyTypeManager>> {
         self.api.deploy_contract(
             self.resolve_gas_limit(),
-            &self.payment_amount,
+            &self.egld_payment,
             code,
             code_metadata,
             &self.arg_buffer,
         )
     }
 
-    pub fn upgrade_contract(self, code: &BoxedBytes, code_metadata: CodeMetadata) {
+    pub fn upgrade_contract(
+        self,
+        code: &ManagedBuffer<SA::ProxyTypeManager>,
+        code_metadata: CodeMetadata,
+    ) {
         self.api.upgrade_contract(
-            &self.address,
+            &self.to,
             self.resolve_gas_limit(),
-            &self.payment_amount,
+            &self.egld_payment,
             code,
             code_metadata,
             &self.arg_buffer,

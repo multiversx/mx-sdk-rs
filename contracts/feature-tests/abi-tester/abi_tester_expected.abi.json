@@ -170,6 +170,27 @@
             ]
         },
         {
+            "name": "managed_address_vs_byte_array",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "byte_array",
+                    "type": "array32<u8>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                },
+                {
+                    "type": "array32<u8>"
+                }
+            ]
+        },
+        {
             "name": "esdt_local_role",
             "inputs": [],
             "outputs": [

@@ -9,7 +9,16 @@ publish = false
 path = "src/forwarder_raw.rs"
 
 [features]
-wasm-output-mode = ["elrond-wasm-node"]
+wasm-output-mode = [
+    "elrond-wasm-node",
+]
+wasm-output-mode-managed-ei = [
+    "wasm-output-mode",
+    "elrond-wasm-node/managed-ei"
+]
+wasm-output-mode-unmanaged-ei = [
+    "wasm-output-mode",
+]
 
 [dependencies.elrond-wasm]
 version = "0.18.2"
@@ -19,6 +28,7 @@ features = ["derive"]
 [dependencies.elrond-wasm-node]
 version = "0.18.2"
 path = "../../../../elrond-wasm-node"
+default-features = false
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]

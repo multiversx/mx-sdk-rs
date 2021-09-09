@@ -25,10 +25,12 @@ where
     }
 }
 
-impl<AA> DynArgInput<ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
+impl<AA> DynArgInput for EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
+    type ItemInput = ArgDecodeInput<AA>;
+
     type ErrorApi = AA;
 
     #[inline]

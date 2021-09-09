@@ -142,7 +142,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_sc_address(&self) -> Address {
+    fn get_sc_address_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getSCAddress(res.as_mut_ptr());
@@ -152,7 +152,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_sc_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+    fn get_sc_address(&self) -> ManagedAddress<Self::TypeManager> {
         unsafe {
             let handle = mBufferNew();
             managedSCAddress(handle);
@@ -161,7 +161,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_owner_address(&self) -> Address {
+    fn get_owner_address_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getOwnerAddress(res.as_mut_ptr());
@@ -171,7 +171,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_owner_address_managed(&self) -> ManagedAddress<Self::TypeManager> {
+    fn get_owner_address(&self) -> ManagedAddress<Self::TypeManager> {
         unsafe {
             let handle = mBufferNew();
             managedOwnerAddress(handle);
@@ -190,7 +190,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_caller(&self) -> Address {
+    fn get_caller_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
             getCaller(res.as_mut_ptr());
@@ -200,7 +200,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_caller_managed(&self) -> ManagedAddress<Self::TypeManager> {
+    fn get_caller(&self) -> ManagedAddress<Self::TypeManager> {
         unsafe {
             let handle = mBufferNew();
             managedCaller(handle);
@@ -227,11 +227,16 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_state_root_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 32> {
+    fn get_state_root_hash_managed(
+        &self,
+    ) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetStateRootHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(
+                self.type_manager(),
+                result_handle,
+            )
         }
     }
 
@@ -250,7 +255,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetOriginalTxHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(
+                self.type_manager(),
+                result_handle,
+            )
         }
     }
 
@@ -290,11 +298,16 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(feature = "managed-ei")]
-    fn get_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 48> {
+    fn get_block_random_seed_managed(
+        &self,
+    ) -> elrond_wasm::types::ManagedByteArray<Self::TypeManager, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(
+                self.type_manager(),
+                result_handle,
+            )
         }
     }
 
@@ -335,7 +348,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(
+                self.type_manager(),
+                result_handle,
+            )
         }
     }
 

@@ -12,22 +12,20 @@ pub struct TokenIdPair<M: ManagedTypeApi> {
 #[elrond_wasm::contract]
 pub trait Factory {
     #[init]
-    fn init(&self, pair_template_address: Address) {
+    fn init(&self, pair_template_address: ManagedAddress) {
         self.pair_template_address().set(&pair_template_address);
     }
 
     #[endpoint(createPair)]
-    fn create_pair(&self, token_id_pair: TokenIdPair<Self::TypeManager>) -> SCResult<Address> {
+    fn create_pair(
+        &self,
+        token_id_pair: TokenIdPair<Self::TypeManager>,
+    ) -> SCResult<ManagedAddress> {
         require!(self.get_pair(&token_id_pair).is_none(), "Already has pair");
 
-        let mut arguments: ArgBuffer = ArgBuffer::new();
-        arguments.push_argument_bytes(token_id_pair.first_token_id.to_esdt_identifier().as_slice());
-        arguments.push_argument_bytes(
-            token_id_pair
-                .second_token_id
-                .to_esdt_identifier()
-                .as_slice(),
-        );
+        let mut arguments = ManagedArgBuffer::new_empty(self.type_manager());
+        arguments.push_arg(&token_id_pair.first_token_id);
+        arguments.push_arg(&token_id_pair.second_token_id);
 
         let pair_address = self
             .send()
@@ -45,7 +43,7 @@ pub trait Factory {
     }
 
     #[view(getPair)]
-    fn get_pair(&self, token_id_pair: &TokenIdPair<Self::TypeManager>) -> Option<Address> {
+    fn get_pair(&self, token_id_pair: &TokenIdPair<Self::TypeManager>) -> Option<ManagedAddress> {
         let address = self.pairs().get(token_id_pair);
 
         if address.is_none() {
@@ -59,8 +57,8 @@ pub trait Factory {
     }
 
     #[storage_mapper("pair_template_address")]
-    fn pair_template_address(&self) -> SingleValueMapper<Self::Storage, Address>;
+    fn pair_template_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
 
     #[storage_mapper("pairs")]
-    fn pairs(&self) -> MapMapper<Self::Storage, TokenIdPair<Self::TypeManager>, Address>;
+    fn pairs(&self) -> MapMapper<Self::Storage, TokenIdPair<Self::TypeManager>, ManagedAddress>;
 }
