@@ -11,7 +11,7 @@ use core::fmt::Debug;
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
 pub fn check_managed_top_encode<T: TopEncode>(api: TxContext, obj: &T) -> BoxedBytes {
-    let serializer = ManagedSerializer::new(api.clone());
+    let serializer = ManagedSerializer::new(api);
     let as_mb = serializer.top_encode_to_managed_buffer(obj);
     let as_bb = serializer.top_encode_to_boxed_bytes(obj);
     assert_eq!(as_mb.to_boxed_bytes(), as_bb);
@@ -35,7 +35,7 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
     bytes: &[u8],
 ) -> T {
     let serializer = ManagedSerializer::new(api.clone());
-    let mb = ManagedBuffer::new_from_bytes(api.clone(), bytes);
+    let mb = ManagedBuffer::new_from_bytes(api, bytes);
     let from_mb: T = serializer.top_decode_from_managed_buffer(&mb);
     let from_slice: T = serializer.top_decode_from_byte_slice(bytes);
     assert_eq!(from_mb, from_slice);
