@@ -4,8 +4,8 @@ use hex_literal::hex;
 use crate::{
     api::SendApi,
     types::{
-        Address, BigUint, BoxedBytes, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedType, TokenIdentifier,
+        Address, BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, TokenIdentifier,
     },
 };
 

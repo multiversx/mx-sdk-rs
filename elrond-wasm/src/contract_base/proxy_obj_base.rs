@@ -1,8 +1,5 @@
 // use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
-use crate::{
-    api::VMApi,
-    types::{Address, BigUint, ManagedAddress, TokenIdentifier},
-};
+use crate::{api::VMApi, types::ManagedAddress};
 
 pub trait ProxyObjApi {
     type Api: VMApi;

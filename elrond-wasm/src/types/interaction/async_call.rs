@@ -1,6 +1,5 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::{ManagedTypeApi, SendApi};
-use crate::hex_call_data::HexCallDataSerializer;
 use crate::io::EndpointResult;
 use crate::types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer};
 use alloc::string::String;

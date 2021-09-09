@@ -2,13 +2,11 @@ use crate::{
     api::{BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi},
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        managed_vec_from_slice_of_boxed_bytes, ArgBuffer, BigUint, CodeMetadata, ContractCall,
-        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom,
-        ManagedInto, ManagedVec, TokenIdentifier, Vec,
+        BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedInto, ManagedVec, TokenIdentifier,
     },
-    HexCallDataSerializer,
 };
-use elrond_codec::{TopDecode, TopEncode};
+use elrond_codec::TopDecode;
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";

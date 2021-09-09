@@ -6,15 +6,15 @@ use crate::{
 use super::UncallableApi;
 
 impl LogApi for UncallableApi {
-    fn write_event_log(&self, topics_buffer: &ArgBuffer, data: &[u8]) {
+    fn write_event_log(&self, _topics_buffer: &ArgBuffer, _data: &[u8]) {
         unreachable!()
     }
 
-    fn write_legacy_log(&self, topics: &[[u8; 32]], data: &[u8]) {
+    fn write_legacy_log(&self, _topics: &[[u8; 32]], _data: &[u8]) {
         unreachable!()
     }
 
-    fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
+    fn managed_write_log(&self, _topics_handle: Handle, _data_handle: Handle) {
         unreachable!()
     }
 }

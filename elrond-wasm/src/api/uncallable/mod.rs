@@ -1,5 +1,3 @@
-use super::VMApi;
-
 mod big_int_api_uncallable;
 mod blockchain_api_uncallable;
 mod call_value_api_uncallable;
