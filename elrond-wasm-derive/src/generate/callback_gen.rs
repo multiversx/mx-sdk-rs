@@ -41,7 +41,7 @@ pub fn generate_callback_selector_and_main(
                 let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
                 if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                     self::EndpointWrappers::callback_selector(self, ___cb_data_deserializer___)	{
-                    self.error_api().signal_error(err_msg::CALLBACK_BAD_FUNC);
+                    elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);
                 }
             };
             (cb_selector_body, cb_main_body)

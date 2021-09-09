@@ -18,29 +18,6 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
-    // type ProxyTypeManager: ManagedTypeApi + ErrorApi + 'static;
-
-    // /// Not used by `SendApi`, but forwarded to the proxy traits.
-    // type ProxyStorage: StorageReadApi
-    //     + StorageWriteApi
-    //     + ManagedTypeApi
-    //     + ErrorApi
-    //     + Clone
-    //     + 'static;
-
-    // type ErrorApi: ErrorApi + ManagedTypeApi + Clone + 'static;
-
-    // type BlockchainApi: BlockchainApi<Storage = Self::ProxyStorage, TypeManager = Self>
-    //     + Clone
-    //     + 'static;
-
-    // fn clone(&self) -> Self;
-
-    // fn error_api(&self) -> Self::ErrorApi;
-
-    // /// Required by some of the methods.
-    // fn blockchain(&self) -> Self::BlockchainApi;
-
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
