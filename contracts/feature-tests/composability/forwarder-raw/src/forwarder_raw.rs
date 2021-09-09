@@ -189,7 +189,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             half_gas,
             &to,
             &payment,
@@ -213,7 +213,7 @@ pub trait ForwarderRaw {
         let half_payment = payment / 2u32;
         let arg_buffer = args.into_vec().managed_into(self.type_manager());
 
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -222,7 +222,7 @@ pub trait ForwarderRaw {
         );
         self.execute_on_dest_context_result(result);
 
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -242,7 +242,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_by_caller_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_by_caller_raw(
             half_gas,
             &to,
             &payment,
@@ -261,7 +261,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_readonly_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_readonly_raw(
             half_gas,
             &to,
             &endpoint_name,
@@ -281,7 +281,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) -> SCResult<ManagedAddress> {
         let deployed_contract_address = self
-            .send()
+            .raw_vm_api()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),
