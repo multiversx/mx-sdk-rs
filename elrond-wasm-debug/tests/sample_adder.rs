@@ -154,18 +154,14 @@ mod sample_adder {
         C: AutoImpl + super::module_1::AutoImpl,
     {
         fn get_sum(&self) -> BigInt<Self::Api> {
-            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(
-                self.get_storage_raw(),
-                &b"sum"[..],
-            );
-            elrond_wasm::storage_get(self.get_storage_raw(), &___key___)
+            let mut ___key___ =
+                elrond_wasm::storage::StorageKey::<Self::Api>::new(self.raw_vm_api(), &b"sum"[..]);
+            elrond_wasm::storage_get(self.raw_vm_api(), &___key___)
         }
         fn set_sum(&self, sum: &BigInt<Self::Api>) {
-            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(
-                self.get_storage_raw(),
-                &b"sum"[..],
-            );
-            elrond_wasm::storage_set(self.get_storage_raw(), &___key___, &sum);
+            let mut ___key___ =
+                elrond_wasm::storage::StorageKey::<Self::Api>::new(self.raw_vm_api(), &b"sum"[..]);
+            elrond_wasm::storage_set(self.raw_vm_api(), &___key___, &sum);
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {

@@ -36,8 +36,8 @@ pub fn generate_callback_selector_and_main(
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
                 let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.raw_vm_api());
-                let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.get_storage_raw(), &___tx_hash___.as_bytes());
-                elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &___tx_hash___.as_bytes(), &[]); // cleanup
+                let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.raw_vm_api(), &___tx_hash___.as_bytes());
+                elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.raw_vm_api(), &___tx_hash___.as_bytes(), &[]); // cleanup
                 let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
                 if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                     self::EndpointWrappers::callback_selector(self, ___cb_data_deserializer___)	{

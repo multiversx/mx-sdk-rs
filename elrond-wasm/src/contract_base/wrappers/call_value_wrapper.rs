@@ -1,4 +1,7 @@
-use crate::{api::{CallValueApi, ErrorApi, ManagedTypeApi}, err_msg, types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier}} ;
+use crate::{
+    api::{CallValueApi, ErrorApi, ManagedTypeApi},
+    types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},
+};
 
 pub struct CallValueWrapper<A>
 where
@@ -56,13 +59,8 @@ where
     /// Especially used in the `#[payable("*")] auto-generated snippets.
     /// The method might seem redundant, but there is such a hook in Arwen
     /// that might be used in this scenario in the future.
-    pub fn payment_token_pair(
-        &self,
-    ) -> (
-        BigUint<A>,
-        TokenIdentifier<A>,
-    ) {
-        let token = self.token() ;
+    pub fn payment_token_pair(&self) -> (BigUint<A>, TokenIdentifier<A>) {
+        let token = self.token();
         if token.is_egld() {
             (self.egld_value(), token)
         } else {
@@ -70,9 +68,7 @@ where
         }
     }
 
-    pub fn get_all_esdt_transfers(
-        &self,
-    ) -> ManagedVec<A, EsdtTokenPayment<A>>  {
+    pub fn get_all_esdt_transfers(&self) -> ManagedVec<A, EsdtTokenPayment<A>> {
         self.api.get_all_esdt_transfers()
     }
 }
