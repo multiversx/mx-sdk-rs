@@ -205,7 +205,6 @@ where
     }
 
     /// Retrieves validator rewards, as set by the protocol.
-    /// TODO: move to the storage API, once BigUint gets refactored
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
         let raw_handle = self

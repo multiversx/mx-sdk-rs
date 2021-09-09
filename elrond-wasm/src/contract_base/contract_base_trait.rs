@@ -1,4 +1,4 @@
-use super::{BlockchainWrapper, CryptoWrapper, ManagedSerializer, ManagedTypeHelper, SendWrapper};
+use super::{BlockchainWrapper, CryptoWrapper, ManagedSerializer, ManagedTypeHelper, SendWrapper, CallValueWrapper};
 use crate::api::VMApi;
 
 /// Interface to be used by the actual smart contract code.
@@ -24,8 +24,8 @@ pub trait ContractBase: Sized {
     /// Gateway into the call value retrieval functionality.
     /// The payment annotations should normally be the ones to handle this,
     /// but the developer is also given direct access to the API.
-    fn call_value(&self) -> Self::Api {
-        self.raw_vm_api()
+    fn call_value(&self) -> CallValueWrapper<Self::Api> {
+        CallValueWrapper::new(self.raw_vm_api())
     }
 
     /// Gateway to the functionality related to sending transactions from the current contract.
