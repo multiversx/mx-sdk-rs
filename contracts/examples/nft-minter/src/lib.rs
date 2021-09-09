@@ -20,9 +20,9 @@ pub trait NftMinter: nft_module::NftModule {
     #[endpoint(createNft)]
     fn create_nft(
         &self,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         royalties: BigUint,
-        uri: BoxedBytes,
+        uri: ManagedBuffer,
         selling_price: BigUint,
         #[var_args] opt_token_used_as_payment: OptionalArg<TokenIdentifier>,
         #[var_args] opt_token_used_as_payment_nonce: OptionalArg<u64>,
