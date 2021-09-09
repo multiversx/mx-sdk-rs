@@ -13,6 +13,7 @@ use elrond_codec::{TopDecode, TopEncode};
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
+pub const CHANGE_ADDRESS_BUILTIN_FUNC_NAME: &[u8] = b"ChangeOwnerAddress";
 
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
@@ -179,19 +180,16 @@ where
     /// Only works in the same shard.
     pub fn change_owner_address(
         &self,
-        child_sc_address: &ManagedAddress<A>,
+        child_sc_address: ManagedAddress<A>,
         new_owner: &ManagedAddress<A>,
-    ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
-        arg_buffer.push_arg(new_owner);
-
-        let _ = self.api.execute_on_dest_context_raw(
-            self.api.get_gas_left(),
+    ) -> ContractCall<A, ()> {
+        let mut contract_call = ContractCall::new(
+            self.api.clone(),
             child_sc_address,
-            &BigUint::zero(self.type_manager()),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), b"ChangeOwnerAddress"),
-            &arg_buffer,
+            ManagedBuffer::new_from_bytes(self.type_manager(), CHANGE_ADDRESS_BUILTIN_FUNC_NAME),
         );
+        contract_call.push_endpoint_arg(&new_owner);
+        contract_call
     }
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.

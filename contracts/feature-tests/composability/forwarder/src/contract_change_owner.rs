@@ -11,8 +11,9 @@ pub trait ChangeOwnerModule {
         child_sc_address: ManagedAddress,
         new_owner: ManagedAddress,
     ) -> ManagedAddress {
-        self.send()
-            .change_owner_address(&child_sc_address, &new_owner);
+        let () = self.send()
+            .change_owner_address(child_sc_address.clone(), &new_owner)
+            .execute_on_dest_context();
 
         self.get_owner_of_vault_contract(child_sc_address)
     }
