@@ -33,7 +33,7 @@ fn payable_snippet_for_metadata(
             let token_init = egld_token_init(payment_token_arg);
             let nonce_init = zero_nonce_init(payment_nonce_arg);
             quote! {
-                let #payment_var_name = self.call_value().require_egld();
+                let #payment_var_name = elrond_wasm::api::CallValueApi::require_egld(&self.raw_vm_api());
                 #token_init
                 #nonce_init
             }
@@ -51,7 +51,7 @@ fn payable_snippet_for_metadata(
             };
             let nonce_init = nonce_getter_init(payment_nonce_arg);
             quote! {
-                let #payment_var_name = self.call_value().require_esdt(#token_literal);
+                let #payment_var_name = elrond_wasm::api::CallValueApi::require_esdt(&self.raw_vm_api(), #token_literal);
                 #token_init
                 #nonce_init
             }

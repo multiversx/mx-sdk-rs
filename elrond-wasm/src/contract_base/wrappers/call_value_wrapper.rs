@@ -1,4 +1,4 @@
-use crate::types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier} ;
+use crate::{api::{CallValueApi, ErrorApi, ManagedTypeApi}, err_msg, types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier}} ;
 
 pub struct CallValueWrapper<A>
 where
@@ -52,26 +52,6 @@ where
         self.api.esdt_token_type()
     }
 
-    /// Will return the EGLD call value,
-    /// but also fail with an error if ESDT is sent.
-    /// Especially used in the auto-generated call value processing.
-    pub fn require_egld(&self) -> BigUint<A> {
-        if !self.token().is_egld() {
-            self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
-        }
-        self.egld_value()
-    }
-
-    /// Will return the ESDT call value,
-    /// but also fail with an error if EGLD or the wrong ESDT token is sent.
-    /// Especially used in the auto-generated call value processing.
-    pub fn require_esdt(&self, token: &[u8]) -> BigUint<A> {
-        if self.token().as_managed_buffer() != token {
-            self.signal_error(err_msg::BAD_TOKEN_PROVIDED) ;
-        }
-        self.esdt_value()
-    }
-
     /// Returns both the call value (either EGLD or ESDT) and the token identifier.
     /// Especially used in the `#[payable("*")] auto-generated snippets.
     /// The method might seem redundant, but there is such a hook in Arwen
@@ -88,26 +68,6 @@ where
         } else {
             (self.esdt_value(), token)
         }
-    }
-
-    pub fn esdt_num_transfers(&self) -> usize {
-        self.api.esdt_num_transfers()
-    }
-
-    pub fn esdt_value_by_index(&self, index: usize) -> BigUint<A> {
-        self.api.esdt_value_by_index()
-    }
-
-    pub fn token_by_index(&self, index: usize) -> TokenIdentifier<A> {
-        self.api.token_by_index()
-    }
-
-    pub fn esdt_token_nonce_by_index(&self, index: usize) -> u64 {
-        self.api.esdt_token_nonce_by_index()
-    }
-
-    pub fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType {
-        self.api.esdt_token_type_by_index()
     }
 
     pub fn get_all_esdt_transfers(
