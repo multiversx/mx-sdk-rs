@@ -28,7 +28,7 @@ pub trait Factory {
         arguments.push_arg(&token_id_pair.second_token_id);
 
         let pair_address = self
-            .send()
+            .raw_vm_api()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),

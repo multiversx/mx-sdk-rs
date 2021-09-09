@@ -18,7 +18,7 @@ pub trait DeployContractModule {
         source_contract_address: ManagedAddress,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) -> SCResult<ManagedAddress> {
-        self.send()
+        self.raw_vm_api()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),

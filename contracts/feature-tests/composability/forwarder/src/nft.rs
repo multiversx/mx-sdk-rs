@@ -227,7 +227,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         function: ManagedBuffer,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) {
-        let _ = self.send().direct_esdt_nft_execute(
+        let _ = self.raw_vm_api().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,
