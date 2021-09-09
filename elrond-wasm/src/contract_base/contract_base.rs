@@ -52,6 +52,7 @@ pub trait ContractBase: Sized {
     }
 
     /// Helps create new instances of managed types
+    #[inline]
     fn types(&self) -> ManagedTypeHelper<Self::Api> {
         ManagedTypeHelper::new(self.raw_vm_api())
     }
@@ -70,14 +71,8 @@ pub trait ContractBase: Sized {
 
     /// Component that provides contract developers access
     /// to highly optimized manual serialization and deserialization.
+    #[inline]
     fn serializer(&self) -> ManagedSerializer<Self::Api> {
         ManagedSerializer::new(self.raw_vm_api())
-    }
-
-    /// Currently for some auto-generated code involving callbacks.
-    /// Please avoid using it directly.
-    /// TODO: find a way to hide this API.
-    fn error_api(&self) -> Self::Api {
-        self.raw_vm_api()
     }
 }

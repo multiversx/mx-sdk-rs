@@ -54,11 +54,6 @@ where
         ContractCall::new(self.api.clone(), to, endpoint_name)
     }
 
-    // pub fn error_api(&self) -> A::ErrorApi;
-
-    // /// Required by some of the methods.
-    // pub fn blockchain(&self) -> A::BlockchainApi;
-
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
     pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
