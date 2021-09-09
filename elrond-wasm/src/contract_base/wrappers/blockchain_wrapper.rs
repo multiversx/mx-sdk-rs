@@ -222,7 +222,7 @@ where
             self.api.clone(),
             storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
         );
-        key.append_managed_buffer(&token_id.as_managed_buffer());
+        key.append_managed_buffer(token_id.as_managed_buffer());
         let raw_storage = storage::storage_get::<A, BoxedBytes>(self.api.clone(), &key);
         let raw_storage_bytes = raw_storage.as_slice();
         let mut current_index = 0;
