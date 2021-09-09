@@ -1,7 +1,7 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
-use crate::types::{ArgBuffer, SCError};
+use crate::types::{ArgBuffer, ManagedVec, ManagedVecItem, SCError};
 use crate::{DynArgOutput, EndpointResult};
 use alloc::string::String;
 use alloc::vec::Vec;
