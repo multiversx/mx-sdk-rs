@@ -1,7 +1,7 @@
 // use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
 use crate::api::VMApi;
 
-pub trait CallbackProxyObjApi {
+pub trait CallbackProxyObjBase {
     type Api: VMApi;
 
     fn new_cb_proxy_obj(api: Self::Api) -> Self;

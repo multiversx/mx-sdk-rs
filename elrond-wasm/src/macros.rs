@@ -14,7 +14,7 @@ macro_rules! imports {
             SendApi,
         };
         use elrond_wasm::api::{ErrorApi, LogApi}; // TODO: remove at some point, they shouldn't be public
-        use elrond_wasm::contract_base::{ContractBase, ProxyObjApi};
+        use elrond_wasm::contract_base::{ContractBase, ProxyObjBase};
         use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
         use elrond_wasm::err_msg;
         use elrond_wasm::esdt::*;
