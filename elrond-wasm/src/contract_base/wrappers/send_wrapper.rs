@@ -19,14 +19,14 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 // pub trait SendApi: Clone + Sized {
 
-pub struct SendHelper<A>
+pub struct SendWrapper<A>
 where
     A: SendApi + ManagedTypeApi + StorageReadApi + BlockchainApi,
 {
     pub(crate) api: A,
 }
 
-impl<A> SendHelper<A>
+impl<A> SendWrapper<A>
 where
     A: SendApi + ManagedTypeApi + StorageReadApi + BlockchainApi,
 {
@@ -39,7 +39,7 @@ where
     }
 
     pub(crate) fn new(api: A) -> Self {
-        SendHelper { api }
+        SendWrapper { api }
     }
 
     pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {

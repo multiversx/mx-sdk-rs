@@ -1,18 +1,18 @@
 use crate::types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier} ;
 
-pub struct CallValueHelper<A>
+pub struct CallValueWrapper<A>
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
     pub(crate) api: A,
 }
 
-impl<A> CallValueHelper<A>
+impl<A> CallValueWrapper<A>
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
     pub(crate) fn new(api: A) -> Self {
-        CallValueHelper { api }
+        CallValueWrapper { api }
     }
 
     pub fn check_not_payable(&self) {

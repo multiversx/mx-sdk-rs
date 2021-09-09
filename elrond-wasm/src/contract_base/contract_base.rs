@@ -3,7 +3,10 @@
 //     LogApi, ManagedSerializer, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi,
 //     StorageReadApi, StorageWriteApi,
 // };
-use super::{BlockchainHelper, ManagedSerializer, ManagedTypeHelper, ProxyObjApi, SendHelper};
+use super::{
+    BlockchainWrapper, CryptoWrapper, ManagedSerializer, ManagedTypeHelper, ProxyObjApi,
+    SendWrapper,
+};
 use crate::{
     api::VMApi,
     types::{Address, ManagedAddress},
@@ -38,8 +41,8 @@ pub trait ContractBase: Sized {
 
     /// Gateway to the functionality related to sending transactions from the current contract.
     #[inline]
-    fn send(&self) -> SendHelper<Self::Api> {
-        SendHelper::new(self.raw_vm_api())
+    fn send(&self) -> SendWrapper<Self::Api> {
+        SendWrapper::new(self.raw_vm_api())
     }
 
     /// Managed types API. Required to create new instances of managed types.
@@ -55,14 +58,14 @@ pub trait ContractBase: Sized {
 
     /// Gateway blockchain info related to the current transaction and to accounts.
     #[inline]
-    fn blockchain(&self) -> BlockchainHelper<Self::Api> {
-        BlockchainHelper::new(self.raw_vm_api())
+    fn blockchain(&self) -> BlockchainWrapper<Self::Api> {
+        BlockchainWrapper::new(self.raw_vm_api())
     }
 
     /// Stateless crypto functions provided by the Arwen VM.
     #[inline]
-    fn crypto(&self) -> Self::Api {
-        self.raw_vm_api()
+    fn crypto(&self) -> CryptoWrapper<Self::Api> {
+        CryptoWrapper::new(self.raw_vm_api())
     }
 
     /// Component that provides contract developers access
