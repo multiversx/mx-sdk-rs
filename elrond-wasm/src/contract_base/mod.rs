@@ -8,6 +8,6 @@ mod wrappers;
 pub use callable_contract::CallableContract;
 pub use contract_abi_provider::ContractAbiProvider;
 pub use contract_base_trait::ContractBase;
-pub use proxy_obj_base::ProxyObjApi;
-pub use proxy_obj_callback_base::CallbackProxyObjApi;
+pub use proxy_obj_base::ProxyObjBase;
+pub use proxy_obj_callback_base::CallbackProxyObjBase;
 pub use wrappers::*;

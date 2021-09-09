@@ -78,7 +78,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             pub address: elrond_wasm::types::ManagedAddress<A>,
         }
 
-        impl<A> elrond_wasm::contract_base::ProxyObjApi for Proxy<A>
+        impl<A> elrond_wasm::contract_base::ProxyObjBase for Proxy<A>
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
@@ -114,7 +114,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
             pub api: A,
         }
 
-        impl<A> elrond_wasm::contract_base::CallbackProxyObjApi for CallbackProxyObj<A>
+        impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
         where
             A: elrond_wasm::api::VMApi + 'static,
         {

@@ -7,7 +7,7 @@
 // and maintenance.
 
 use elrond_wasm::{
-    contract_base::{ContractBase, ProxyObjApi},
+    contract_base::{ContractBase, ProxyObjBase},
     types::{BigInt, ManagedAddress},
 };
 
@@ -99,7 +99,7 @@ mod module_1 {
         }
     }
 
-    pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjApi + Sized {
+    pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
         fn version(
             self,
         ) -> ContractCall<Self::Api, <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs>
@@ -165,7 +165,7 @@ mod sample_adder {
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-            <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjApi>::new_cb_proxy_obj(self.raw_vm_api())
+            <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj(self.raw_vm_api())
         }
     }
 
@@ -233,7 +233,7 @@ mod sample_adder {
     }
 
     pub trait ProxyTrait:
-        elrond_wasm::contract_base::ProxyObjApi + super::module_1::ProxyTrait
+        elrond_wasm::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
         fn get_sum(
             self,
@@ -379,7 +379,7 @@ mod sample_adder {
         pub address: elrond_wasm::types::ManagedAddress<A>,
     }
 
-    impl<A> elrond_wasm::contract_base::ProxyObjApi for Proxy<A>
+    impl<A> elrond_wasm::contract_base::ProxyObjBase for Proxy<A>
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
@@ -415,7 +415,7 @@ mod sample_adder {
         pub api: A,
     }
 
-    impl<A> elrond_wasm::contract_base::CallbackProxyObjApi for CallbackProxyObj<A>
+    impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
@@ -429,7 +429,7 @@ mod sample_adder {
         }
     }
 
-    pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjApi + Sized {
+    pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackCall<Self::Api> {
             let mut ___callback_call___ =
                 elrond_wasm::types::new_callback_call(self.cb_call_api(), &b"my_callback"[..]);
