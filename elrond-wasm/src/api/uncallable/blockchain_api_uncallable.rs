@@ -8,17 +8,6 @@ use crate::{
 use super::UncallableApi;
 
 impl BlockchainApi for UncallableApi {
-    type Storage = Self;
-    type TypeManager = Self;
-
-    fn storage_manager(&self) -> Self::Storage {
-        unreachable!()
-    }
-
-    fn type_manager(&self) -> Self::TypeManager {
-        unreachable!()
-    }
-
     fn get_sc_address_legacy(&self) -> Address {
         unreachable!()
     }
@@ -39,7 +28,7 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_balance(&self, _address: &Address) -> BigUint<Self::Storage> {
+    fn get_balance(&self, _address: &Address) -> BigUint<Self> {
         unreachable!()
     }
 
@@ -98,7 +87,7 @@ impl BlockchainApi for UncallableApi {
     fn get_current_esdt_nft_nonce(
         &self,
         _address: &Address,
-        _token: &TokenIdentifier<Self::TypeManager>,
+        _token: &TokenIdentifier<Self>,
     ) -> u64 {
         unreachable!()
     }
@@ -106,19 +95,19 @@ impl BlockchainApi for UncallableApi {
     // TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
     fn get_esdt_balance(
         &self,
-        _address: &ManagedAddress<Self::TypeManager>,
-        _token: &TokenIdentifier<Self::TypeManager>,
+        _address: &ManagedAddress<Self>,
+        _token: &TokenIdentifier<Self>,
         _nonce: u64,
-    ) -> BigUint<Self::TypeManager> {
+    ) -> BigUint<Self> {
         unreachable!()
     }
 
     fn get_esdt_token_data(
         &self,
-        _address: &ManagedAddress<Self::TypeManager>,
-        _token: &TokenIdentifier<Self::TypeManager>,
+        _address: &ManagedAddress<Self>,
+        _token: &TokenIdentifier<Self>,
         _nonce: u64,
-    ) -> EsdtTokenData<Self::Storage> {
+    ) -> EsdtTokenData<Self> {
         unreachable!()
     }
 }

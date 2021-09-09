@@ -27,11 +27,11 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     let data_buffer_snippet = if let Some(data_arg) = data_arg {
         let data_pat = &data_arg.pat;
         quote! {
-            let ___data_buffer___ = elrond_wasm::log_util::serialize_log_data(self.type_manager(), #data_pat);
+            let ___data_buffer___ = elrond_wasm::log_util::serialize_log_data(self.raw_vm_api(), #data_pat);
         }
     } else {
         quote! {
-            let ___data_buffer___ = elrond_wasm::types::ManagedBuffer::new_empty(self.type_manager());
+            let ___data_buffer___ = elrond_wasm::types::ManagedBuffer::new_empty(self.raw_vm_api());
         }
     };
 
@@ -40,7 +40,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     quote! {
         #msig {
             let mut ___topic_accumulator___ = elrond_wasm::log_util::event_topic_accumulator(
-                self.type_manager(),
+                self.raw_vm_api(),
                 #event_identifier_literal,
             );
             #(#topic_push_snippets)*

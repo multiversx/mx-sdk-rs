@@ -231,12 +231,10 @@ pub trait GovernanceModule:
         );
 
         for action in proposal.actions {
-            let mut contract_call = ContractCall::<Self::SendApi, ()>::new(
-                self.send(),
-                action.dest_address,
-                action.function_name,
-            )
-            .with_gas_limit(action.gas_limit);
+            let mut contract_call = self
+                .send()
+                .contract_call::<()>(action.dest_address, action.function_name)
+                .with_gas_limit(action.gas_limit);
 
             if action.amount > 0 {
                 contract_call = contract_call.add_token_transfer(

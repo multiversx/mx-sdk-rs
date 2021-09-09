@@ -35,7 +35,7 @@ pub fn generate_callback_selector_and_main(
         } else {
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
-                let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.blockchain());
+                let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.raw_vm_api());
                 let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.get_storage_raw(), &___tx_hash___.as_bytes());
                 elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &___tx_hash___.as_bytes(), &[]); // cleanup
                 let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
@@ -118,7 +118,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                         #payable_snippet
                         let mut ___cb_closure_loader___ = CallDataArgLoader::new(
                             ___cb_data_deserializer___,
-                            self.callback_closure_arg_api(),
+                            self.raw_vm_api(),
                         );
                         #(#arg_init_snippets)*
                         ___cb_closure_loader___.assert_no_more_args();

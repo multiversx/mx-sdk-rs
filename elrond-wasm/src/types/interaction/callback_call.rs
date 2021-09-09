@@ -16,7 +16,7 @@ pub struct CallbackCall<M: ManagedTypeApi> {
 }
 
 /// Syntactical sugar to help macros to generate code easier.
-/// Unlike calling `ContractCall::<SA, R>::new`, here types can be inferred from the context.
+/// Unlike calling `CallbackCall::<SA, R>::new`, here types can be inferred from the context.
 pub fn new_callback_call<A>(api: A, callback_name_slice: &'static [u8]) -> CallbackCall<A>
 where
     A: ManagedTypeApi + ErrorApi,

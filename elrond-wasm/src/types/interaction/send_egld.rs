@@ -10,9 +10,9 @@ where
     SA: SendApi + 'static,
 {
     pub api: SA,
-    pub to: ManagedAddress<SA::ProxyTypeManager>,
-    pub amount: BigUint<SA::ProxyTypeManager>,
-    pub data: ManagedBuffer<SA::ProxyTypeManager>,
+    pub to: ManagedAddress<SA>,
+    pub amount: BigUint<SA>,
+    pub data: ManagedBuffer<SA>,
 }
 
 impl<SA> EndpointResult for SendEgld<SA>

@@ -1,6 +1,5 @@
 mod blockchain_api_node;
 mod call_value_api_node;
-mod contract_self_api_node;
 mod crypto_api_node;
 mod endpoint_arg_api_node;
 mod endpoint_finish_api_node;
