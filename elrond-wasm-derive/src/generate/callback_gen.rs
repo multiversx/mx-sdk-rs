@@ -61,7 +61,7 @@ fn callback_selector_body(
     module_calls: Vec<proc_macro2::TokenStream>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.argument_api());
+        let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
         match ___cb_data_deserializer___.get_func_name() {
             [] => {
                 return elrond_wasm::types::CallbackSelectorResult::Processed;

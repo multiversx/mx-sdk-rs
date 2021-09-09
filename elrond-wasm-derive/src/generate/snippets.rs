@@ -52,40 +52,6 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
     }
 }
 
-// pub fn impl_private_api() -> proc_macro2::TokenStream {
-//     quote! {
-//         impl<A> elrond_wasm::contract_base::ContractBase for ContractObj<A>
-//         where
-//             A: elrond_wasm::contract_base::ContractBase
-//                 + elrond_wasm::api::ErrorApi
-//                 + elrond_wasm::api::EndpointArgumentApi
-//                 + elrond_wasm::api::EndpointFinishApi
-//                 + elrond_wasm::api::ManagedTypeApi
-//                 + Clone
-//                 + 'static,
-//         {
-//             type ArgumentApi = A;
-//             type CallbackClosureArgumentApi = A;
-//             type FinishApi = A;
-
-//             #[inline]
-//             fn argument_api(&self) -> Self::Api {
-//                 self.api.clone()
-//             }
-
-//             #[inline]
-//             fn callback_closure_arg_api(&self) -> Self::CallbackClosureArgumentApi {
-//                 self.api.clone()
-//             }
-
-//             #[inline]
-//             fn finish_api(&self) -> Self::FinishApi {
-//                 self.api.clone()
-//             }
-//         }
-//     }
-// }
-
 pub fn impl_callable_contract() -> proc_macro2::TokenStream {
     quote! {
         impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>

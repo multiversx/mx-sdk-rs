@@ -179,16 +179,16 @@ mod sample_adder {
         #[inline]
         fn call_get_sum(&self) {
             self.call_value().check_not_payable();
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 0i32);
+            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 0i32);
             let result = self.get_sum();
             elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
         }
         #[inline]
         fn call_init(&self) {
             self.call_value().check_not_payable();
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 1i32);
+            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 1i32);
             let initial_value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                self.argument_api(),
+                self.raw_vm_api(),
                 0i32,
                 ArgId::from(&b"initial_value"[..]),
             );
@@ -197,9 +197,9 @@ mod sample_adder {
         #[inline]
         fn call_add(&self) {
             self.call_value().check_not_payable();
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.argument_api(), 1i32);
+            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 1i32);
             let value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                self.argument_api(),
+                self.raw_vm_api(),
                 0i32,
                 ArgId::from(&b"value"[..]),
             );
@@ -299,36 +299,6 @@ mod sample_adder {
     }
 
     impl<A> AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi + Clone + 'static {}
-
-    // impl<A> elrond_wasm::contract_base::ContractBase for ContractObj<A>
-    // where
-    //     A: elrond_wasm::contract_base::ContractBase
-    //         + elrond_wasm::api::ErrorApi
-    //         + elrond_wasm::api::EndpointArgumentApi
-    //         + elrond_wasm::api::EndpointFinishApi
-    //         + elrond_wasm::api::ManagedTypeApi
-    //         + Clone
-    //         + 'static,
-    // {
-    //     type ArgumentApi = A;
-    //     type CallbackClosureArgumentApi = A;
-    //     type FinishApi = A;
-
-    //     #[inline]
-    //     fn argument_api(&self) -> Self::Api {
-    //         self.api.clone()
-    //     }
-
-    //     #[inline]
-    //     fn callback_closure_arg_api(&self) -> Self::CallbackClosureArgumentApi {
-    //         self.api.clone()
-    //     }
-
-    //     #[inline]
-    //     fn finish_api(&self) -> Self::FinishApi {
-    //         self.api.clone()
-    //     }
-    // }
 
     impl<A> super::module_1::EndpointWrappers for ContractObj<A> where
         A: elrond_wasm::api::VMApi + Clone + 'static
