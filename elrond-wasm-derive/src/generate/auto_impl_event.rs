@@ -45,7 +45,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
             );
             #(#topic_push_snippets)*
             #data_buffer_snippet
-            elrond_wasm::log_util::write_log(self.log_api_raw(), &___topic_accumulator___, &___data_buffer___);
+            elrond_wasm::log_util::write_log(self.raw_vm_api(), &___topic_accumulator___, &___data_buffer___);
         }
     }
 }
@@ -117,7 +117,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
 				quote! {
 					let data_vec = match elrond_wasm::elrond_codec::top_encode_to_vec(&#pat) {
 						Result::Ok(data_vec) => data_vec,
-						Result::Err(encode_err) => self.log_api_raw().signal_error(encode_err.message_bytes()),
+						Result::Err(encode_err) => self.raw_vm_api().signal_error(encode_err.message_bytes()),
 					};
 				}
 			};
@@ -132,7 +132,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
             let mut topics = [[0u8; 32]; #nr_topics];
             topics[0] = #event_id_literal;
             #(#topic_conv_snippets)*
-            self.log_api_raw().write_legacy_log(&topics[..], &data_vec.as_slice());
+            self.raw_vm_api().write_legacy_log(&topics[..], &data_vec.as_slice());
         }
     }
 }

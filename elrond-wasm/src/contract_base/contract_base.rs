@@ -74,14 +74,6 @@ pub trait ContractBase: Sized {
         ManagedSerializer::new(self.raw_vm_api())
     }
 
-    /// Gateway into the lower-level event log functionality.
-    /// Gets called in auto-generated
-    /// Using it directly is not recommended.
-    /// TODO: consider moving to `ContractPrivateApi`.
-    fn log_api_raw(&self) -> Self::Api {
-        self.raw_vm_api()
-    }
-
     /// Currently for some auto-generated code involving callbacks.
     /// Please avoid using it directly.
     /// TODO: find a way to hide this API.
