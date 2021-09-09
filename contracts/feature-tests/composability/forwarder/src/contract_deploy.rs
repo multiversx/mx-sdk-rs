@@ -18,6 +18,8 @@ pub trait DeployContractModule {
         source_contract_address: ManagedAddress,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) -> SCResult<ManagedAddress> {
+        // TODO: use proxies to perform deploy here
+        // raw deploy belongs to forwarder-raw
         self.raw_vm_api()
             .deploy_from_source_contract(
                 self.blockchain().get_gas_left(),
