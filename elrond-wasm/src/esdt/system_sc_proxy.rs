@@ -47,10 +47,10 @@ where
     /// which causes it to issue a new fungible ESDT token.
     pub fn issue_fungible(
         self,
-        issue_cost: BigUint<SA::ProxyTypeManager>,
-        token_display_name: &ManagedBuffer<SA::ProxyTypeManager>,
-        token_ticker: &ManagedBuffer<SA::ProxyTypeManager>,
-        initial_supply: &BigUint<SA::ProxyTypeManager>,
+        issue_cost: BigUint<SA>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
+        initial_supply: &BigUint<SA>,
         properties: FungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
         self.issue(
@@ -67,12 +67,12 @@ where
     /// which causes it to issue a new non-fungible ESDT token.
     pub fn issue_non_fungible(
         self,
-        issue_cost: BigUint<SA::ProxyTypeManager>,
-        token_display_name: &ManagedBuffer<SA::ProxyTypeManager>,
-        token_ticker: &ManagedBuffer<SA::ProxyTypeManager>,
+        issue_cost: BigUint<SA>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
         properties: NonFungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
-        let zero = BigUint::zero(self.api.type_manager());
+        let zero = BigUint::zero(self.api.clone());
         self.issue(
             issue_cost,
             EsdtTokenType::NonFungible,
@@ -97,12 +97,12 @@ where
     /// which causes it to issue a new semi-fungible ESDT token.
     pub fn issue_semi_fungible(
         self,
-        issue_cost: BigUint<SA::ProxyTypeManager>,
-        token_display_name: &ManagedBuffer<SA::ProxyTypeManager>,
-        token_ticker: &ManagedBuffer<SA::ProxyTypeManager>,
+        issue_cost: BigUint<SA>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
         properties: SemiFungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
-        let zero = BigUint::zero(self.api.type_manager());
+        let zero = BigUint::zero(self.api.clone());
         self.issue(
             issue_cost,
             EsdtTokenType::SemiFungible,
@@ -126,14 +126,14 @@ where
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
-        issue_cost: BigUint<SA::ProxyTypeManager>,
+        issue_cost: BigUint<SA>,
         token_type: EsdtTokenType,
-        token_display_name: &ManagedBuffer<SA::ProxyTypeManager>,
-        token_ticker: &ManagedBuffer<SA::ProxyTypeManager>,
-        initial_supply: &BigUint<SA::ProxyTypeManager>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
+        initial_supply: &BigUint<SA>,
         properties: TokenProperties,
     ) -> ContractCall<SA, ()> {
-        let type_manager = self.api.type_manager();
+        let type_manager = self.api.clone();
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
         let endpoint_name = match token_type {
@@ -191,8 +191,8 @@ where
     /// It will fail if the SC is not the owner of the token.
     pub fn mint(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-        amount: &BigUint<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
+        amount: &BigUint<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"mint");
 
@@ -206,8 +206,8 @@ where
     /// which causes it to burn fungible ESDT tokens owned by the SC.
     pub fn burn(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-        amount: &BigUint<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
+        amount: &BigUint<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"ESDTBurn");
 
@@ -219,10 +219,7 @@ where
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
-    pub fn pause(
-        self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-    ) -> ContractCall<SA, ()> {
+    pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"pause");
 
         contract_call.push_endpoint_arg(token_identifier);
@@ -231,10 +228,7 @@ where
     }
 
     /// The reverse operation of `pause`.
-    pub fn unpause(
-        self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-    ) -> ContractCall<SA, ()> {
+    pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"unPause");
 
         contract_call.push_endpoint_arg(token_identifier);
@@ -247,8 +241,8 @@ where
     /// Freezing and unfreezing the tokens of an account are operations designed to help token managers to comply with regulations.
     pub fn freeze(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-        address: &ManagedAddress<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"freeze");
 
@@ -261,8 +255,8 @@ where
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-        address: &ManagedAddress<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"unFreeze");
 
@@ -278,8 +272,8 @@ where
     /// Wiping the tokens of an account is an operation designed to help token managers to comply with regulations.
     pub fn wipe(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
-        address: &ManagedAddress<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"wipe");
 
@@ -295,8 +289,8 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn set_special_roles(
         self,
-        address: &ManagedAddress<SA::ProxyTypeManager>,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
+        address: &ManagedAddress<SA>,
+        token_identifier: &TokenIdentifier<SA>,
         roles: &[EsdtLocalRole],
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"setSpecialRole");
@@ -318,8 +312,8 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn unset_special_roles(
         self,
-        address: &ManagedAddress<SA::ProxyTypeManager>,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
+        address: &ManagedAddress<SA>,
+        token_identifier: &TokenIdentifier<SA>,
         roles: &[EsdtLocalRole],
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"unSetSpecialRole");
@@ -337,7 +331,7 @@ where
 
     pub fn transfer_ownership(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
         new_owner: &Address,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"transferOwnership");
@@ -350,7 +344,7 @@ where
 
     pub fn transfer_nft_create_role(
         self,
-        token_identifier: &TokenIdentifier<SA::ProxyTypeManager>,
+        token_identifier: &TokenIdentifier<SA>,
         old_creator: &Address,
         new_creator: &Address,
     ) -> ContractCall<SA, ()> {
@@ -363,12 +357,12 @@ where
         contract_call
     }
 
-    pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA::ProxyTypeManager> {
-        ManagedAddress::new_from_bytes(self.api.type_manager(), &ESDT_SYSTEM_SC_ADDRESS_ARRAY)
+    pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
+        ManagedAddress::new_from_bytes(self.api.clone(), &ESDT_SYSTEM_SC_ADDRESS_ARRAY)
     }
 
     fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
-        let type_manager = self.api.type_manager();
+        let type_manager = self.api.clone();
         let esdt_system_sc_address = self.esdt_system_sc_address();
         ContractCall::new(
             self.api,

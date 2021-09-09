@@ -22,7 +22,9 @@ pub trait EsdtModule {
 
         let initial_supply = self.types().big_uint_from(1u32);
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -59,7 +61,9 @@ pub trait EsdtModule {
         let token_id = self.token_id().get();
         let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .set_special_roles(&dest_address, &token_id, &roles)
             .async_call())
     }

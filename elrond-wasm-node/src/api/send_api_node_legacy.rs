@@ -162,26 +162,6 @@ extern "C" {
 }
 
 impl SendApi for ArwenApiImpl {
-    type ProxyTypeManager = Self;
-    type ProxyStorage = Self;
-    type ErrorApi = Self;
-    type BlockchainApi = Self;
-
-    #[inline]
-    fn type_manager(&self) -> Self::ProxyTypeManager {
-        self.clone()
-    }
-
-    #[inline]
-    fn error_api(&self) -> Self::ErrorApi {
-        self.clone()
-    }
-
-    #[inline]
-    fn blockchain(&self) -> Self::BlockchainApi {
-        self.clone()
-    }
-
     fn direct_egld<D>(
         &self,
         to: &ManagedAddress<Self::ProxyTypeManager>,

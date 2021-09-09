@@ -10,10 +10,10 @@ where
     SA: SendApi + 'static,
 {
     pub(super) api: SA,
-    pub(super) to: ManagedAddress<SA::ProxyTypeManager>,
-    pub(super) token_identifier: TokenIdentifier<SA::ProxyTypeManager>,
-    pub(super) amount: BigUint<SA::ProxyTypeManager>,
-    pub data: ManagedBuffer<SA::ProxyTypeManager>,
+    pub(super) to: ManagedAddress<SA>,
+    pub(super) token_identifier: TokenIdentifier<SA>,
+    pub(super) amount: BigUint<SA>,
+    pub data: ManagedBuffer<SA>,
 }
 
 impl<SA> EndpointResult for SendEsdt<SA>

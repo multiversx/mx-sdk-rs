@@ -101,7 +101,8 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,

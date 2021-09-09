@@ -16,7 +16,7 @@ fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_m
         })
         .collect();
     quote! {
-        let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Storage>::new(
+        let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(
             self.get_storage_raw(),
             &#id_literal[..],
         );
@@ -69,7 +69,7 @@ pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
             quote! {
                 #msig {
                     #key_snippet
-                    <#ty as elrond_wasm::storage::mappers::StorageMapper<Self::Storage>>::new(
+                    <#ty as elrond_wasm::storage::mappers::StorageMapper<Self::Api>>::new(
                         self.get_storage_raw(),
                         ___key___
                     )
