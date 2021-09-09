@@ -8,6 +8,7 @@ mod log_api_node;
 mod managed_types;
 mod storage_api_node;
 mod unsafe_buffer;
+mod vm_api_node;
 
 #[cfg(feature = "managed-ei")]
 mod send_api_node_managed;
