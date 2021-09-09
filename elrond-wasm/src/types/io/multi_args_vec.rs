@@ -1,12 +1,10 @@
 use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput};
-use crate::types::{ArgBuffer, SCError};
 use crate::{DynArgOutput, EndpointResult};
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
-use elrond_codec::TopDecodeInput;
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.

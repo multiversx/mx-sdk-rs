@@ -1,7 +1,5 @@
-use crate::api::{BlockchainApi, SendApi};
-use crate::types::{
-    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
-};
+use crate::api::SendApi;
+use crate::types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer};
 use crate::ContractCallArg;
 
 use super::ManagedArgBuffer;

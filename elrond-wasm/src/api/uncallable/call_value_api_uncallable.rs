@@ -1,6 +1,6 @@
 use crate::{
     api::CallValueApi,
-    types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},
+    types::{BigUint, EsdtTokenType, TokenIdentifier},
 };
 
 use super::UncallableApi;
@@ -34,19 +34,19 @@ impl CallValueApi for UncallableApi {
         unreachable!()
     }
 
-    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self> {
+    fn esdt_value_by_index(&self, _index: usize) -> BigUint<Self> {
         unreachable!()
     }
 
-    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self> {
+    fn token_by_index(&self, _index: usize) -> TokenIdentifier<Self> {
         unreachable!()
     }
 
-    fn esdt_token_nonce_by_index(&self, index: usize) -> u64 {
+    fn esdt_token_nonce_by_index(&self, _index: usize) -> u64 {
         unreachable!()
     }
 
-    fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType {
+    fn esdt_token_type_by_index(&self, _index: usize) -> EsdtTokenType {
         unreachable!()
     }
 }

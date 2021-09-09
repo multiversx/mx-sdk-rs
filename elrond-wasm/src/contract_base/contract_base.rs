@@ -1,16 +1,5 @@
-// use super::{
-//     BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
-//     LogApi, ManagedSerializer, ManagedTypeApi, ManagedTypeHelper, ProxyObjApi, SendApi,
-//     StorageReadApi, StorageWriteApi,
-// };
-use super::{
-    BlockchainWrapper, CryptoWrapper, ManagedSerializer, ManagedTypeHelper, ProxyObjApi,
-    SendWrapper,
-};
-use crate::{
-    api::VMApi,
-    types::{Address, ManagedAddress},
-};
+use super::{BlockchainWrapper, CryptoWrapper, ManagedSerializer, ManagedTypeHelper, SendWrapper};
+use crate::api::VMApi;
 
 /// Interface to be used by the actual smart contract code.
 ///

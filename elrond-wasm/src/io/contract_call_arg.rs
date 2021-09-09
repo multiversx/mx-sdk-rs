@@ -1,5 +1,3 @@
-use crate::api::ManagedTypeApi;
-use crate::{api::ErrorApi, err_msg};
 use crate::{types::*, DynArgOutput};
 use elrond_codec::{TopEncode, TopEncodeOutput};
 
@@ -17,7 +15,7 @@ struct ContractCallArgOutput<'s> {
 
 impl<'c> ContractCallArgOutput<'c> {
     #[inline]
-    fn new(arg_buffer: &'c mut ArgBuffer) -> Self {
+    pub fn new(arg_buffer: &'c mut ArgBuffer) -> Self {
         ContractCallArgOutput { arg_buffer }
     }
 }

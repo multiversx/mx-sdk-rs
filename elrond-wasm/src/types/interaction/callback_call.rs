@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, SendApi},
+    api::{ErrorApi, ManagedTypeApi},
     hex_call_data::HexCallDataSerializer,
     types::{ManagedBuffer, ManagedType},
     ContractCallArg,

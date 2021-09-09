@@ -1,20 +1,12 @@
-use elrond_codec::{TopDecode, TopEncode};
-
-use super::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
-use crate::{
-    types::{
-        managed_vec_from_slice_of_boxed_bytes, ArgBuffer, BigUint, CodeMetadata, EsdtTokenPayment,
-        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec,
-        TokenIdentifier, Vec,
-    },
-    HexCallDataSerializer,
+use super::{BlockchainApi, ManagedTypeApi};
+use crate::types::{
+    BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+    ManagedInto, ManagedVec, TokenIdentifier,
 };
 
 pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
 pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
-
-const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {

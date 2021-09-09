@@ -3,7 +3,6 @@
 #![feature(try_trait_v2)]
 #![feature(control_flow_enum)]
 #![allow(deprecated)]
-#![allow(unused)] // TODO: temporary
 
 #[cfg(feature = "derive")]
 pub use elrond_wasm_derive::{self as derive, contract, module, proxy};

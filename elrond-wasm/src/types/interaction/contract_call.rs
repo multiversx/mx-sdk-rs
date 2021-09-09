@@ -1,17 +1,11 @@
 use crate::{
-    api::{
-        BlockchainApi, ErrorApi, SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING,
-        ESDT_TRANSFER_STRING,
-    },
-    hex_call_data::HexCallDataSerializer,
+    api::{SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
     types::{
-        Address, ArgBuffer, AsyncCall, BigUint, BoxedBytes, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedVec, TokenIdentifier,
+        AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedVec, TokenIdentifier,
     },
-    ArgId, BytesArgLoader, ContractCallArg, DynArg, ManagedResultArgLoader,
+    ArgId, ContractCallArg, DynArg, ManagedResultArgLoader,
 };
-use alloc::vec;
-use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 /// Using max u64 to represent maximum possible gas,
@@ -376,7 +370,7 @@ where
     fn no_payment_transfer_execute(&self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
-        self.api.direct_egld_execute(
+        let _ = self.api.direct_egld_execute(
             &self.to,
             &BigUint::zero(self.api.clone()),
             gas_limit,
@@ -390,7 +384,7 @@ where
         let payment = &self.payments.get(0).unwrap();
 
         if payment.token_name.is_egld() {
-            self.api.direct_egld_execute(
+            let _ = self.api.direct_egld_execute(
                 &self.to,
                 &payment.amount,
                 gas_limit,
@@ -399,7 +393,7 @@ where
             );
         } else if payment.token_nonce == 0 {
             // fungible ESDT
-            self.api.direct_esdt_execute(
+            let _ = self.api.direct_esdt_execute(
                 &self.to,
                 &payment.token_name,
                 &payment.amount,
@@ -409,7 +403,7 @@ where
             );
         } else {
             // non-fungible/semi-fungible ESDT
-            self.api.direct_esdt_nft_execute(
+            let _ = self.api.direct_esdt_nft_execute(
                 &self.to,
                 &payment.token_name,
                 payment.token_nonce,

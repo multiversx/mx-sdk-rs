@@ -1,7 +1,7 @@
 use crate::api::SendApi;
 use crate::types::{
-    ArgBuffer, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-    ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
+    BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+    ManagedInto, ManagedVec, TokenIdentifier,
 };
 
 impl SendApi for super::UncallableApi {
@@ -61,10 +61,10 @@ impl SendApi for super::UncallableApi {
 
     fn async_call_raw(
         &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        _to: &ManagedAddress<Self>,
+        _amount: &BigUint<Self>,
+        _endpoint_name: &ManagedBuffer<Self>,
+        _arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ! {
         unreachable!()
     }
@@ -153,10 +153,10 @@ impl SendApi for super::UncallableApi {
 
     fn execute_on_dest_context_readonly_raw(
         &self,
-        gas: u64,
-        address: &ManagedAddress<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        _gas: u64,
+        _address: &ManagedAddress<Self>,
+        _endpoint_name: &ManagedBuffer<Self>,
+        _arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unreachable!()
     }
