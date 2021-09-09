@@ -4,19 +4,19 @@ use crate::{
 };
 use alloc::boxed::Box;
 
-pub struct CryptoHelper<A>
+pub struct CryptoWrapper<A>
 where
     A: CryptoApi,
 {
     pub(crate) api: A,
 }
 
-impl<A> CryptoHelper<A>
+impl<A> CryptoWrapper<A>
 where
     A: CryptoApi,
 {
     pub(crate) fn new(api: A) -> Self {
-        CryptoHelper { api }
+        CryptoWrapper { api }
     }
 
     pub fn sha256(&self, data: &[u8]) -> H256 {
