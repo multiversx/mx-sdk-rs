@@ -2,7 +2,7 @@ use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi},
     storage::{self, StorageKey},
     types::{
-        Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress, ManagedBuffer,
+        Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress,
         ManagedByteArray, ManagedType, TokenIdentifier, Vec, H256,
     },
 };
@@ -214,6 +214,7 @@ where
     }
 
     /// Retrieves local roles for the token, by reading protected storage.
+    /// TODO: rewrite using managed types
     pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> Vec<EsdtLocalRole> {
         let mut roles = Vec::new();
 
@@ -221,13 +222,7 @@ where
             self.api.clone(),
             storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
         );
-        // TODO: little hack to reconcile the fact that we declared 2 different APIs
-        // theoretically unsafe
-        // in practice it is always the same API
-        // will be refactored out when the APIs get reorganized
-        let with_changed_api =
-            ManagedBuffer::from_raw_handle(self.api.clone(), token_id.get_raw_handle());
-        key.append_managed_buffer(&with_changed_api);
+        key.append_managed_buffer(&token_id.as_managed_buffer());
         let raw_storage = storage::storage_get::<A, BoxedBytes>(self.api.clone(), &key);
         let raw_storage_bytes = raw_storage.as_slice();
         let mut current_index = 0;
