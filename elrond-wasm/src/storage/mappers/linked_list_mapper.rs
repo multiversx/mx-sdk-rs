@@ -24,12 +24,20 @@ pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode
     pub value: T,
     pub(crate) node_id: u32,
     pub(crate) next_id: u32,
-    pub(crate) previous_id: u32,
+    pub(crate) prev_id: u32,
 }
 
 impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode> LinkedListNode<T> {
     pub fn get_node_id(&self) -> u32 {
         self.node_id
+    }
+
+    pub fn get_next_node_id(&self) -> u32 {
+        self.node_id
+    }
+
+    pub fn get_prev_node_id(&self) -> u32 {
+        self.prev_id
     }
 }
 
@@ -216,7 +224,7 @@ where
             info.back = new_node_id;
         } else {
             let mut next_node = self.get_node(new_node_next_id);
-            next_node.previous_id = new_node_id;
+            next_node.prev_id = new_node_id;
             self.set_node(new_node_next_id, &next_node);
         }
 
@@ -224,7 +232,7 @@ where
             value: element,
             node_id: new_node_id,
             next_id: new_node_next_id,
-            previous_id: node.node_id,
+            prev_id: node.node_id,
         };
         self.set_node(new_node_id, &new_node);
 
@@ -245,23 +253,23 @@ where
         let mut info = self.get_info();
         let new_node_id = info.generate_new_node_id();
 
-        let new_node_previous_id = node.previous_id;
-        node.previous_id = new_node_id;
+        let new_node_prev_id = node.prev_id;
+        node.prev_id = new_node_id;
         self.set_node(node.node_id, node);
 
-        if new_node_previous_id == NULL_ENTRY {
+        if new_node_prev_id == NULL_ENTRY {
             info.front = new_node_id;
         } else {
-            let mut previous_node = self.get_node(new_node_previous_id);
+            let mut previous_node = self.get_node(new_node_prev_id);
             previous_node.next_id = new_node_id;
-            self.set_node(new_node_previous_id, &previous_node);
+            self.set_node(new_node_prev_id, &previous_node);
         }
 
         let new_node = LinkedListNode {
             value: element,
             node_id: new_node_id,
             next_id: node.node_id,
-            previous_id: new_node_previous_id,
+            prev_id: new_node_prev_id,
         };
         self.set_node(new_node_id, &new_node);
 
@@ -288,7 +296,7 @@ where
         let node = LinkedListNode {
             value: element,
             node_id: new_node_id,
-            previous_id: previous,
+            prev_id: previous,
             next_id: NULL_ENTRY,
         };
         self.set_node(new_node_id, &node);
@@ -309,7 +317,7 @@ where
         } else {
             let front = info.front;
             let mut front_node = self.get_node(front);
-            front_node.previous_id = new_node_id;
+            front_node.prev_id = new_node_id;
             next = front;
             self.set_node(front, &front_node);
         }
@@ -317,7 +325,7 @@ where
         let node = LinkedListNode {
             value: element,
             node_id: new_node_id,
-            previous_id: NULL_ENTRY,
+            prev_id: NULL_ENTRY,
             next_id: next,
         };
         self.set_node(new_node_id, &node);
@@ -336,19 +344,19 @@ where
         }
 
         let mut info = self.get_info();
-        if node.previous_id == NULL_ENTRY {
+        if node.prev_id == NULL_ENTRY {
             info.front = node.next_id;
         } else {
-            let mut previous = self.get_node(node.previous_id);
+            let mut previous = self.get_node(node.prev_id);
             previous.next_id = node.next_id;
-            self.set_node(node.previous_id, &previous);
+            self.set_node(node.prev_id, &previous);
         }
 
         if node.next_id == NULL_ENTRY {
-            info.back = node.previous_id;
+            info.back = node.prev_id;
         } else {
             let mut next = self.get_node(node.next_id);
-            next.previous_id = node.previous_id;
+            next.prev_id = node.prev_id;
             self.set_node(node.next_id, &next);
         }
 
@@ -400,7 +408,7 @@ where
                 return false;
             }
 
-            if self.get_node(front).previous_id != NULL_ENTRY {
+            if self.get_node(front).prev_id != NULL_ENTRY {
                 return false;
             }
             if self.get_node(back).next_id != NULL_ENTRY {
@@ -419,7 +427,7 @@ where
             let mut backwards = Vec::new();
             while back != NULL_ENTRY {
                 backwards.push(back);
-                back = self.get_node(back).previous_id;
+                back = self.get_node(back).prev_id;
             }
             if backwards.len() != info.len as usize {
                 return false;
@@ -457,6 +465,13 @@ where
     fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
             node_id: linked_list.get_info().front,
+            linked_list,
+        }
+    }
+
+    fn new_from_node_id(linked_list: &'a LinkedListMapper<SA, T>, node_id: u32) -> Iter<'a, SA, T> {
+        Iter {
+            node_id,
             linked_list,
         }
     }
