@@ -1,5 +1,6 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::SendApi;
+use crate::api::{SendApi, StorageReadApi};
+use crate::contract_base::SendWrapper;
 use crate::io::EndpointResult;
 use crate::types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier};
 use alloc::string::String;
@@ -7,7 +8,7 @@ use alloc::vec::Vec;
 
 pub struct SendToken<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + StorageReadApi + 'static,
 {
     pub api: SA,
     pub to: ManagedAddress<SA>,
@@ -18,7 +19,7 @@ where
 
 impl<SA> EndpointResult for SendToken<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + StorageReadApi + 'static,
 {
     type DecodeAs = ();
 
@@ -28,7 +29,7 @@ where
             self.api
                 .direct_egld(&self.to, &self.amount, self.data.clone());
         } else {
-            self.api.transfer_esdt_via_async_call(
+            SendWrapper::new(self.api.clone()).transfer_esdt_via_async_call(
                 &self.to,
                 &self.token,
                 0,
@@ -41,7 +42,7 @@ where
 
 impl<SA> TypeAbi for SendToken<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + StorageReadApi + 'static,
 {
     fn type_name() -> String {
         "SendToken".into()

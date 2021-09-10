@@ -486,10 +486,13 @@ pub trait Multisig {
             } => {
                 let gas_left = self.blockchain().get_gas_left();
                 let arg_buffer = arguments.managed_into(self.type_manager());
-                let new_address = self
-                    .raw_vm_api()
-                    .deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer)
-                    .ok_or("Contract deployment failed")?;
+                let (new_address, _) = self.raw_vm_api().deploy_contract(
+                    gas_left,
+                    &amount,
+                    &code,
+                    code_metadata,
+                    &arg_buffer,
+                );
                 Ok(PerformActionResult::DeployResult(new_address))
             },
             Action::SCCall {

@@ -24,7 +24,6 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    #[allow(clippy::too_many_arguments)]
     fn start(
         &self,
         lottery_name: BoxedBytes,
@@ -47,7 +46,6 @@ pub trait Lottery {
     }
 
     #[endpoint(createLotteryPool)]
-    #[allow(clippy::too_many_arguments)]
     fn create_lottery_pool(
         &self,
         lottery_name: BoxedBytes,

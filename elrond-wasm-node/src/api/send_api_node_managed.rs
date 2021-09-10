@@ -230,7 +230,10 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>> {
+    ) -> (
+        ManagedAddress<Self>,
+        ManagedVec<Self, ManagedBuffer<Self>>,
+    ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -245,10 +248,11 @@ impl SendApi for ArwenApiImpl {
                 result_handle,
             );
 
-            Some(ManagedAddress::from_raw_handle(
-                self.clone(),
-                new_address_handle,
-            ))
+            let new_managed_address =
+                ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
+            let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
+
+            (new_managed_address, results)
         }
     }
 
@@ -259,7 +263,10 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>> {
+    ) -> (
+        ManagedAddress<Self>,
+        ManagedVec<Self, ManagedBuffer<Self>>,
+    ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -273,12 +280,12 @@ impl SendApi for ArwenApiImpl {
                 new_address_handle,
                 result_handle,
             );
-            // TODO: return result
 
-            Some(ManagedAddress::from_raw_handle(
-                self.clone(),
-                new_address_handle,
-            ))
+            let new_managed_address =
+                ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
+            let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
+
+            (new_managed_address, results)
         }
     }
 
@@ -293,7 +300,7 @@ impl SendApi for ArwenApiImpl {
     ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let result_handle = mBufferNew();
+            let unused_result_handle = mBufferNew();
             managedUpgradeContract(
                 sc_address.get_raw_handle(),
                 gas as i64,
@@ -301,10 +308,11 @@ impl SendApi for ArwenApiImpl {
                 code.get_raw_handle(),
                 code_metadata_handle,
                 arg_buffer.get_raw_handle(),
-                result_handle,
+                unused_result_handle,
             );
 
-            // TODO: return result
+            // Note: the result handle is a mistake in the EI.
+            // The upgrade contract operation is an async call, so no results can be returned.
         }
     }
 
@@ -404,7 +412,7 @@ impl SendApi for ArwenApiImpl {
         amount: &BigUint<Self>,
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) {
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unsafe {
             let result_handle = mBufferNew();
 
@@ -417,7 +425,7 @@ impl SendApi for ArwenApiImpl {
                 result_handle,
             );
 
-            // TODO: return result?
+            ManagedVec::from_raw_handle(self.clone(), result_handle)
         }
     }
 

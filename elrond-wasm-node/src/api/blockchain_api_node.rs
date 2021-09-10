@@ -11,15 +11,15 @@ extern "C" {
 
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedSCAddress(resultHandle: i32);
 
     fn getOwnerAddress(resultOffset: *mut u8);
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedOwnerAddress(resultHandle: i32);
 
     fn getCaller(resultOffset: *mut u8);
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedCaller(resultHandle: i32);
 
     fn getShardOfAddress(address_ptr: *const u8) -> i32;
@@ -50,13 +50,13 @@ extern "C" {
     fn getOriginalTxHash(resultOffset: *const u8);
 
     // Managed versions of the above
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetPrevBlockRandomSeed(resultHandle: i32);
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetBlockRandomSeed(resultHandle: i32);
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetStateRootHash(resultHandle: i32);
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
@@ -111,7 +111,7 @@ extern "C" {
         nonce: i64,
     ) -> i32;
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetESDTTokenData(
         addressHandle: i32,
         tokenIDHandle: i32,
@@ -138,7 +138,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_sc_address(&self) -> ManagedAddress<Self> {
         unsafe {
             let handle = mBufferNew();
@@ -157,7 +157,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_owner_address(&self) -> ManagedAddress<Self> {
         unsafe {
             let handle = mBufferNew();
@@ -186,7 +186,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_caller(&self) -> ManagedAddress<Self> {
         unsafe {
             let handle = mBufferNew();
@@ -213,8 +213,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
-    fn get_state_root_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
+    #[cfg(not(feature = "unmanaged-ei"))]
+    fn get_state_root_hash_managed(
+        &self,
+    ) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetStateRootHash(result_handle);
@@ -232,7 +234,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_tx_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
         unsafe {
             let result_handle = mBufferNew();
@@ -276,8 +278,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
-    fn get_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
+    #[cfg(not(feature = "unmanaged-ei"))]
+    fn get_block_random_seed_managed(
+        &self,
+    ) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetBlockRandomSeed(result_handle);
@@ -315,8 +319,10 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    #[cfg(feature = "managed-ei")]
-    fn get_prev_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
+    #[cfg(not(feature = "unmanaged-ei"))]
+    fn get_prev_block_random_seed_managed(
+        &self,
+    ) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);
@@ -357,7 +363,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
         }
     }
 
-    #[cfg(not(feature = "managed-ei"))]
+    #[cfg(feature = "unmanaged-ei")]
     fn get_esdt_token_data(
         &self,
         m_address: &ManagedAddress<Self>,
@@ -443,15 +449,18 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 frozen,
                 hash: ManagedBuffer::new_from_bytes(self.clone(), hash.as_slice()),
                 name: ManagedBuffer::new_from_bytes(self.clone(), name_bytes.as_slice()),
-                attributes: ManagedBuffer::new_from_bytes(self.clone(), attr_bytes.as_slice()),
-                creator: ManagedAddress::from_address(self.clone(), creator),
+                attributes: ManagedBuffer::new_from_bytes(
+                    self.clone(),
+                    attr_bytes.as_slice(),
+                ),
+                creator: ManagedAddress::from_address(self.clone(), &creator),
                 royalties: BigUint::from_raw_handle(self.clone(), royalties_handle),
                 uris: uris_vec,
             }
         }
     }
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<Self>,

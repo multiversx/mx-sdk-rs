@@ -254,6 +254,27 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
+    #[payable("EGLD")]
+    fn call_execute_on_same_context(
+        &self,
+        to: ManagedAddress,
+        #[payment] payment: BigUint,
+        endpoint_name: ManagedBuffer,
+        #[var_args] args: VarArgs<ManagedBuffer>,
+    ) {
+        let half_gas = self.blockchain().get_gas_left() / 2;
+        let result = self.raw_vm_api().execute_on_same_context_raw(
+            half_gas,
+            &to,
+            &payment,
+            &endpoint_name,
+            &args.into_vec().managed_into(self.type_manager()),
+        );
+
+        self.execute_on_same_context_result(result);
+    }
+
+    #[endpoint]
     fn call_execute_on_dest_context_readonly(
         &self,
         to: ManagedAddress,
@@ -274,14 +295,16 @@ pub trait ForwarderRaw {
     #[event("execute_on_dest_context_result")]
     fn execute_on_dest_context_result(&self, result: ManagedVec<Self::TypeManager, ManagedBuffer>);
 
+    #[event("execute_on_same_context_result")]
+    fn execute_on_same_context_result(&self, result: ManagedVec<Self::TypeManager, ManagedBuffer>);
+
     #[endpoint]
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> SCResult<ManagedAddress> {
-        let deployed_contract_address = self
-            .raw_vm_api()
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+        self.raw_vm_api()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),
@@ -289,8 +312,6 @@ pub trait ForwarderRaw {
                 CodeMetadata::DEFAULT,
                 &args.into_vec().managed_into(self.type_manager()),
             )
-            .ok_or("Deploy failed")?;
-
-        Ok(deployed_contract_address)
+            .into()
     }
 }
