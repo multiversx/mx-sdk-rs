@@ -31,7 +31,7 @@ pub enum FeeConfig<M: ManagedTypeApi> {
     Percent(u64),
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Default)]
 pub struct DealConfig {
     pub match_provider_percent: u64,
 }
@@ -70,14 +70,6 @@ impl<M: ManagedTypeApi> FeeConfig<M> {
 impl DealConfig {
     pub fn new() -> Self {
         Default::default()
-    }
-}
-
-impl Default for DealConfig {
-    fn default() -> Self {
-        DealConfig {
-            match_provider_percent: 0,
-        }
     }
 }
 
