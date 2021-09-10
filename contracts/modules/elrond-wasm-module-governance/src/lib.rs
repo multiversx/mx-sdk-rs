@@ -69,7 +69,7 @@ pub trait GovernanceModule:
         &self,
         #[payment_amount] payment_amount: BigUint,
         description: BoxedBytes,
-        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::TypeManager>>,
+        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> SCResult<usize> {
         self.require_payment_token_governance_token()?;
         require!(
@@ -344,7 +344,7 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::TypeManager>> {
+    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::Api>> {
         if !self.proposal_exists(proposal_id) {
             return Vec::new().into();
         }
@@ -385,7 +385,7 @@ pub trait GovernanceModule:
         self.is_valid_proposal_id(proposal_id) && !self.proposals().item_is_empty(proposal_id)
     }
 
-    fn total_gas_needed(&self, actions: &[GovernanceAction<Self::TypeManager>]) -> u64 {
+    fn total_gas_needed(&self, actions: &[GovernanceAction<Self::Api>]) -> u64 {
         let mut total = 0;
         for action in actions {
             total += action.gas_limit;
@@ -414,7 +414,7 @@ pub trait GovernanceModule:
         #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
         #[indexed] description: &BoxedBytes,
-        actions: &[GovernanceAction<Self::TypeManager>],
+        actions: &[GovernanceAction<Self::Api>],
     );
 
     #[event("voteCast")]
@@ -454,7 +454,7 @@ pub trait GovernanceModule:
     // storage - general
 
     #[storage_mapper("governance:proposals")]
-    fn proposals(&self) -> VecMapper<GovernanceProposal<Self::TypeManager>>;
+    fn proposals(&self) -> VecMapper<GovernanceProposal<Self::Api>>;
 
     /// Not stored under "proposals", as that would require deserializing the whole struct
     #[storage_mapper("governance:proposalStartBlock")]

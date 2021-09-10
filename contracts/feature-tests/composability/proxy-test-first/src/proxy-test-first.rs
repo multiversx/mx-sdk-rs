@@ -64,7 +64,7 @@ pub trait ProxyTestFirst {
         &self,
         #[payment] payment: BigUint,
         code: ManagedBuffer,
-    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
+    ) -> ManagedVec<Self::Api, ManagedBuffer> {
         let (address, results) = self
             .message_me_proxy()
             .init(payment, 123)

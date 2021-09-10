@@ -11,8 +11,6 @@ pub fn substitutions() -> SubstitutionsMap {
     add_managed_types(&mut substitutions);
     add_storage_mappers(&mut substitutions);
 
-    substitutions.add_substitution(quote!(SendApi), quote!(Api));
-    substitutions.add_substitution(quote!(TypeManager), quote!(Api));
     substitutions
 }
 
@@ -51,10 +49,6 @@ fn add_storage_mapper(
     substitutions: &mut SubstitutionsMap,
     mapper_name: &proc_macro2::TokenStream,
 ) {
-    substitutions.add_substitution(
-        quote!(#mapper_name<Self::Storage, ),
-        quote!(#mapper_name<Self::Api, ),
-    );
     substitutions.add_substitution(
         quote!(#mapper_name<Self::Api, ),
         quote!(#mapper_name<Self::Api, ),

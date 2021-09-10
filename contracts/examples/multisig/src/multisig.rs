@@ -40,7 +40,7 @@ pub trait Multisig {
     fn num_proposers(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Action<Self::TypeManager>>;
+    fn action_mapper(&self) -> VecMapper<Action<Self::Api>>;
 
     /// The index of the last proposed action.
     /// 0 means that no action was ever proposed yet.
@@ -51,7 +51,7 @@ pub trait Multisig {
 
     /// Serialized action data of an action with index.
     #[view(getActionData)]
-    fn get_action_data(&self, action_id: usize) -> Action<Self::TypeManager> {
+    fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
         self.action_mapper().get(action_id)
     }
 
@@ -86,7 +86,7 @@ pub trait Multisig {
     #[endpoint]
     fn deposit(&self) {}
 
-    fn propose_action(&self, action: Action<Self::TypeManager>) -> SCResult<usize> {
+    fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
@@ -111,7 +111,7 @@ pub trait Multisig {
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::TypeManager>> {
+    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::Api>> {
         let mut result = Vec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();

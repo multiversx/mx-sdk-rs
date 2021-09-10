@@ -52,7 +52,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_bonding_curve(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::TypeManager>,
+        function: FunctionSelector<Self::Api>,
         sell_availability: bool,
     ) -> SCResult<()> {
         require!(

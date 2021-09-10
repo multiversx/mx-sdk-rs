@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait EllipticCurveFeatures {
     #[endpoint]
-    fn compute_get_values(&self, curve_bitsize: u32) -> EllipticCurveComponents<Self::TypeManager> {
+    fn compute_get_values(&self, curve_bitsize: u32) -> EllipticCurveComponents<Self::Api> {
         match self.types().elliptic_curve_from_bitsize(curve_bitsize) {
             Some(ec) => ec.get_values(),
             None => (
@@ -19,7 +19,7 @@ pub trait EllipticCurveFeatures {
     }
 
     #[endpoint]
-    fn compute_create_ec(&self, curve: &str) -> EllipticCurveComponents<Self::TypeManager> {
+    fn compute_create_ec(&self, curve: &str) -> EllipticCurveComponents<Self::Api> {
         self.types().elliptic_curve(curve).get_values()
     }
 
