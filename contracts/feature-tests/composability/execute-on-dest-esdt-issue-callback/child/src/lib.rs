@@ -57,5 +57,5 @@ pub trait Child {
 
     #[view(getWrappedEgldTokenIdentifier)]
     #[storage_mapper("wrappedEgldTokenIdentifier")]
-    fn wrapped_egld_token_identifier(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn wrapped_egld_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
 }

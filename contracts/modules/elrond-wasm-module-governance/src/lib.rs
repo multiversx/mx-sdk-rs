@@ -454,28 +454,28 @@ pub trait GovernanceModule:
     // storage - general
 
     #[storage_mapper("governance:proposals")]
-    fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<Self::TypeManager>>;
+    fn proposals(&self) -> VecMapper<GovernanceProposal<Self::TypeManager>>;
 
     /// Not stored under "proposals", as that would require deserializing the whole struct
     #[storage_mapper("governance:proposalStartBlock")]
-    fn proposal_start_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
+    fn proposal_start_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
     #[storage_mapper("governance:proposalQueueBlock")]
-    fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
+    fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, ManagedAddress, BigUint>;
+    fn votes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize) -> MapMapper<Self::Storage, ManagedAddress, BigUint>;
+    fn downvotes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
 
     /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]
-    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 
     /// Could be calculated by iterating over the "downvotes" mapper, but that costs a lot of gas
     #[view(getTotalDownvotes)]
     #[storage_mapper("governance:totalDownvotes")]
-    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 }

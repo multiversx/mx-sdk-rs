@@ -315,9 +315,9 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[view(lastIssuedToken)]
     #[storage_mapper("lastIssuedToken")]
-    fn last_issued_token(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn last_issued_token(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(lastErrorMessage)]
     #[storage_mapper("lastErrorMessage")]
-    fn last_error_message(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn last_error_message(&self) -> SingleValueMapper<BoxedBytes>;
 }

@@ -50,5 +50,5 @@ pub trait Parent {
 
     #[view(getChildContractAddress)]
     #[storage_mapper("childContractAddress")]
-    fn child_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn child_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 }

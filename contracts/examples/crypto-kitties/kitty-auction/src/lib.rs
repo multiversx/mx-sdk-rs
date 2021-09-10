@@ -427,24 +427,21 @@ pub trait KittyAuction {
     // general
 
     #[storage_mapper("kittyOwnershipContractAddress")]
-    fn kitty_ownership_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn kitty_ownership_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     // gen zero kitty
 
     #[storage_mapper("genZeroKittyStartingPrice")]
-    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("genZeroKittyEndingPrice")]
-    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("genZeroKittyAuctionDuration")]
-    fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<u64>;
 
     // auction
 
     #[storage_mapper("auction")]
-    fn auction(
-        &self,
-        kitty_id: u32,
-    ) -> SingleValueMapper<Self::Storage, Auction<Self::TypeManager>>;
+    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Auction<Self::TypeManager>>;
 }

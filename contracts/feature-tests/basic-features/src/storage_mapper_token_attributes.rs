@@ -11,7 +11,7 @@ pub struct TokenAttributesStruct<M: ManagedTypeApi> {
 #[elrond_wasm::module]
 pub trait TokenAttributesMapperFeatures {
     #[storage_mapper("TokenAttributes")]
-    fn token_attributes(&self) -> TokenAttributesMapper<Self::Storage>;
+    fn token_attributes(&self) -> TokenAttributesMapper;
 
     #[endpoint]
     fn token_attributes_set(

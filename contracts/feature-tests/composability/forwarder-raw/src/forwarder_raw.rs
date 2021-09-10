@@ -138,9 +138,7 @@ pub trait ForwarderRaw {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(
-        &self,
-    ) -> VecMapper<Self::Storage, (TokenIdentifier, BigUint, Vec<ManagedBuffer>)>;
+    fn callback_data(&self) -> VecMapper<(TokenIdentifier, BigUint, Vec<ManagedBuffer>)>;
 
     #[view]
     fn callback_data_at_index(

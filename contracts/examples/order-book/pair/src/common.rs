@@ -120,9 +120,9 @@ pub trait CommonModule {
 
     #[view(getFirstTokenId)]
     #[storage_mapper("first_token_id")]
-    fn first_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn first_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(getSecondTokenId)]
     #[storage_mapper("second_token_id")]
-    fn second_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn second_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 }

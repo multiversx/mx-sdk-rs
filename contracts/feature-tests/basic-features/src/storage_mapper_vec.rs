@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 pub trait VecMapperFeatures {
     #[view]
     #[storage_mapper("vec_mapper")]
-    fn vec_mapper(&self) -> VecMapper<Self::Storage, u32>;
+    fn vec_mapper(&self) -> VecMapper<u32>;
 
     #[endpoint]
     fn vec_mapper_push(&self, item: u32) {

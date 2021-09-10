@@ -394,18 +394,18 @@ pub trait Erc1155Marketplace {
     // token ownership contract, i.e. the erc1155 SC
 
     #[storage_mapper("tokenOwnershipContractAddress")]
-    fn token_ownership_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_ownership_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     // percentage taken from winning bids
 
     #[view(getPercentageCut)]
     #[storage_mapper("percentageCut")]
-    fn percentage_cut(&self) -> SingleValueMapper<Self::Storage, u8>;
+    fn percentage_cut(&self) -> SingleValueMapper<u8>;
 
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> MapMapper<Self::Storage, TokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<TokenIdentifier, BigUint>;
 
     // auction properties for each token
 
@@ -414,5 +414,5 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: &BigUint,
         nft_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, Auction<Self::TypeManager>>;
+    ) -> SingleValueMapper<Auction<Self::TypeManager>>;
 }
