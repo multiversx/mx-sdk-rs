@@ -114,17 +114,17 @@ pub trait Crowdfunding {
 
     #[view(getTarget)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn target(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
-    fn deadline(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn deadline(&self) -> SingleValueMapper<u64>;
 
     #[view(getDeposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[view(getCrowdfundingTokenName)]
     #[storage_mapper("tokenName")]
-    fn cf_token_name(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn cf_token_name(&self) -> SingleValueMapper<TokenIdentifier>;
 }

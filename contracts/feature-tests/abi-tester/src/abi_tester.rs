@@ -99,7 +99,7 @@ pub trait AbiTester {
 
     #[view]
     #[storage_mapper("sample_storage_mapper")]
-    fn sample_storage_mapper(&self) -> SingleValueMapper<Self::Storage, OnlyShowsUpAsNested10>;
+    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNested10>;
 
     #[endpoint]
     #[payable("EGLD")]

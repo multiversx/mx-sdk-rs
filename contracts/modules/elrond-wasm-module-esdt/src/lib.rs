@@ -6,7 +6,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait EsdtModule {
     #[storage_mapper("token_id")]
-    fn token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[payable("EGLD")]
     #[endpoint(issueToken)]

@@ -462,53 +462,41 @@ pub trait Erc1155 {
     // map for address -> type_id -> amount
 
     #[storage_mapper("balanceOf")]
-    fn get_balance_mapper(
-        &self,
-        owner: &ManagedAddress,
-    ) -> MapMapper<Self::Storage, BigUint, BigUint>;
+    fn get_balance_mapper(&self, owner: &ManagedAddress) -> MapMapper<BigUint, BigUint>;
 
     // token owner
     // for non-fungible
 
     #[view(getTokenOwner)]
     #[storage_mapper("tokenOwner")]
-    fn token_owner(
-        &self,
-        type_id: &BigUint,
-        nft_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_owner(&self, type_id: &BigUint, nft_id: &BigUint)
+        -> SingleValueMapper<ManagedAddress>;
 
     // token creator
 
     #[view(getTokenTypeCreator)]
     #[storage_mapper("tokenTypeCreator")]
-    fn token_type_creator(
-        &self,
-        type_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_type_creator(&self, type_id: &BigUint) -> SingleValueMapper<ManagedAddress>;
 
     // token type uri
 
     #[view(getTokenTypeUri)]
     #[storage_mapper("tokenTypeUri")]
-    fn token_type_uri(&self, type_id: &BigUint) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn token_type_uri(&self, type_id: &BigUint) -> SingleValueMapper<BoxedBytes>;
 
     // check if a token is fungible
 
     #[view(isFungible)]
     #[storage_mapper("isFungible")]
-    fn is_fungible(&self, type_id: &BigUint) -> SingleValueMapper<Self::Storage, bool>;
+    fn is_fungible(&self, type_id: &BigUint) -> SingleValueMapper<bool>;
 
     // last valid id
 
     #[storage_mapper("lastValidTypeId")]
-    fn last_valid_type_id(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn last_valid_type_id(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("lastValidTokenIdForType")]
-    fn last_valid_nft_id_for_type(
-        &self,
-        type_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn last_valid_nft_id_for_type(&self, type_id: &BigUint) -> SingleValueMapper<BigUint>;
 
     // check if an operator is approved. Default is false.
 
@@ -518,5 +506,5 @@ pub trait Erc1155 {
         &self,
         operator: &ManagedAddress,
         owner: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, bool>;
+    ) -> SingleValueMapper<bool>;
 }

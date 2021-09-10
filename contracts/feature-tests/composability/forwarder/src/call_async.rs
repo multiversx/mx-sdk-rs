@@ -165,7 +165,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::TypeManager>>;
+    fn callback_data(&self) -> VecMapper<CallbackData<Self::TypeManager>>;
 
     #[view]
     fn callback_data_at_index(

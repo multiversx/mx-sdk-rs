@@ -16,10 +16,10 @@ pub trait Multisig {
     /// Minimum number of signatures needed to perform any action.
     #[view(getQuorum)]
     #[storage_mapper("quorum")]
-    fn quorum(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn quorum(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("user")]
-    fn user_mapper(&self) -> UserMapper<Self::Storage>;
+    fn user_mapper(&self) -> UserMapper;
 
     #[storage_get("user_role")]
     fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
@@ -31,16 +31,16 @@ pub trait Multisig {
     /// It is kept in sync with the user list by the contract.
     #[view(getNumBoardMembers)]
     #[storage_mapper("num_board_members")]
-    fn num_board_members(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn num_board_members(&self) -> SingleValueMapper<usize>;
 
     /// Denormalized proposer count.
     /// It is kept in sync with the user list by the contract.
     #[view(getNumProposers)]
     #[storage_mapper("num_proposers")]
-    fn num_proposers(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn num_proposers(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Self::Storage, Action<Self::TypeManager>>;
+    fn action_mapper(&self) -> VecMapper<Action<Self::TypeManager>>;
 
     /// The index of the last proposed action.
     /// 0 means that no action was ever proposed yet.
@@ -56,7 +56,7 @@ pub trait Multisig {
     }
 
     #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Self::Storage, Vec<usize>>;
+    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Vec<usize>>;
 
     #[init]
     fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {

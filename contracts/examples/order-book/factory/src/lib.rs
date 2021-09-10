@@ -54,8 +54,8 @@ pub trait Factory {
     }
 
     #[storage_mapper("pair_template_address")]
-    fn pair_template_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn pair_template_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     #[storage_mapper("pairs")]
-    fn pairs(&self) -> MapMapper<Self::Storage, TokenIdPair<Self::TypeManager>, ManagedAddress>;
+    fn pairs(&self) -> MapMapper<TokenIdPair<Self::TypeManager>, ManagedAddress>;
 }

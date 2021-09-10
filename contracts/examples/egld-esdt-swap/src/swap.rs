@@ -212,11 +212,11 @@ pub trait EgldEsdtSwap {
 
     #[view(getWrappedEgldTokenIdentifier)]
     #[storage_mapper("wrapped_egld_token_id")]
-    fn wrapped_egld_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn wrapped_egld_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(getUnusedWrappedEgld)]
     #[storage_mapper("unused_wrapped_egld")]
-    fn unused_wrapped_egld(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn unused_wrapped_egld(&self) -> SingleValueMapper<BigUint>;
 
     // events
 

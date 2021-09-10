@@ -370,15 +370,12 @@ pub trait OrdersModule:
 
     #[view(getOrderIdCounter)]
     #[storage_mapper("order_id_counter")]
-    fn order_id_counter(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn order_id_counter(&self) -> SingleValueMapper<u64>;
 
     #[view(getOrderById)]
     #[storage_mapper("orders")]
-    fn orders(&self, id: u64) -> SingleValueMapper<Self::Storage, Order<Self::TypeManager>>;
+    fn orders(&self, id: u64) -> SingleValueMapper<Order<Self::TypeManager>>;
 
     #[storage_mapper("address_order_ids")]
-    fn address_order_ids(
-        &self,
-        address: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, Vec<u64>>;
+    fn address_order_ids(&self, address: &ManagedAddress) -> SingleValueMapper<Vec<u64>>;
 }

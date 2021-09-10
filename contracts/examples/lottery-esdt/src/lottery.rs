@@ -359,22 +359,18 @@ pub trait Lottery {
     fn lottery_info(
         &self,
         lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::TypeManager>>;
+    ) -> SingleValueMapper<LotteryInfo<Self::TypeManager>>;
 
     #[storage_mapper("ticketHolder")]
-    fn ticket_holders(&self, lottery_name: &BoxedBytes)
-        -> VecMapper<Self::Storage, ManagedAddress>;
+    fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<ManagedAddress>;
 
     #[storage_mapper("numberOfEntriesForUser")]
     fn number_of_entries_for_user(
         &self,
         lottery_name: &BoxedBytes,
         user: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, u32>;
+    ) -> SingleValueMapper<u32>;
 
     #[storage_mapper("burnPercentageForLottery")]
-    fn burn_percentage_for_lottery(
-        &self,
-        lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn burn_percentage_for_lottery(&self, lottery_name: &BoxedBytes) -> SingleValueMapper<BigUint>;
 }
