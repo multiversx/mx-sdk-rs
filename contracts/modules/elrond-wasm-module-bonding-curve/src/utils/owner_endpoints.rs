@@ -38,10 +38,13 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     }
 
     #[callback]
-    fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) -> SCResult<()> {
+    fn change_roles_callback(
+        &self,
+        #[call_result] result: AsyncCallResult<()>,
+    ) -> SCResult<(), ManagedSCError> {
         match result {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(message) => Err(message.err_msg.into()),
+            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into(self.type_manager())),
         }
     }
 

@@ -4,6 +4,8 @@ mod multi_args_vec;
 mod operation_completion_status;
 mod optional_arg;
 mod sc_error;
+mod sc_error_managed;
+mod sc_error_static;
 mod sc_result;
 
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
@@ -12,4 +14,6 @@ pub use multi_args_vec::{MultiArgVec, MultiResultVec, VarArgs};
 pub use operation_completion_status::OperationCompletionStatus;
 pub use optional_arg::{OptionalArg, OptionalResult};
 pub use sc_error::SCError;
+pub use sc_error_managed::ManagedSCError;
+pub use sc_error_static::StaticSCError;
 pub use sc_result::SCResult;
