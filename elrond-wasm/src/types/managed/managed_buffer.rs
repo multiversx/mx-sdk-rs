@@ -1,7 +1,6 @@
 use super::{ManagedDefault, ManagedFrom, ManagedType};
-use crate::api::InvalidSliceError;
 use crate::{
-    api::{Handle, ManagedTypeApi},
+    api::{Handle, InvalidSliceError, ManagedTypeApi},
     types::BoxedBytes,
 };
 use alloc::string::String;

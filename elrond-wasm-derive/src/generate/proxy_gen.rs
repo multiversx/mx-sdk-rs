@@ -1,9 +1,7 @@
-use super::method_gen::*;
-use super::util::*;
-use crate::model::PublicRole;
+use super::{method_gen::*, util::*};
 use crate::{
     generate::{snippets, supertrait_gen},
-    model::{ArgPaymentMetadata, ContractTrait, Method},
+    model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole},
 };
 
 pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream {

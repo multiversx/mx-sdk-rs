@@ -1,6 +1,8 @@
-use elrond_wasm::api::{Handle, InvalidSliceError, ManagedBufferApi};
-use elrond_wasm::err_msg;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::{
+    api::{Handle, InvalidSliceError, ManagedBufferApi},
+    err_msg,
+    types::BoxedBytes,
+};
 
 use crate::error_hook;
 

@@ -1,7 +1,9 @@
-use crate::abi::{TypeAbi, TypeDescriptionContainer};
-use crate::api::{EndpointFinishApi, ManagedTypeApi};
-use crate::io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput};
-use crate::EndpointResult;
+use crate::{
+    abi::{TypeAbi, TypeDescriptionContainer},
+    api::{EndpointFinishApi, ManagedTypeApi},
+    io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput},
+    EndpointResult,
+};
 use alloc::string::String;
 
 /// A smart contract argument or result that can be missing.

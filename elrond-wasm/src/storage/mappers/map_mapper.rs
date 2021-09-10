@@ -1,6 +1,8 @@
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
-use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
-use crate::storage::{storage_clear, storage_get, storage_set, StorageKey};
+use crate::{
+    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    storage::{storage_clear, storage_get, storage_set, StorageKey},
+};
 use core::marker::PhantomData;
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 

@@ -1,7 +1,9 @@
-use elrond_wasm::api::BlockchainApi;
-use elrond_wasm::types::{
-    Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
-    ManagedType, ManagedVec, TokenIdentifier, H256,
+use elrond_wasm::{
+    api::BlockchainApi,
+    types::{
+        Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
+        ManagedType, ManagedVec, TokenIdentifier, H256,
+    },
 };
 
 #[allow(unused)]
@@ -214,9 +216,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_state_root_hash_managed(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
+    fn get_state_root_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetStateRootHash(result_handle);
@@ -279,9 +279,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_block_random_seed_managed(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
+    fn get_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetBlockRandomSeed(result_handle);
@@ -320,9 +318,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_prev_block_random_seed_managed(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
+    fn get_prev_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);
@@ -449,10 +445,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 frozen,
                 hash: ManagedBuffer::new_from_bytes(self.clone(), hash.as_slice()),
                 name: ManagedBuffer::new_from_bytes(self.clone(), name_bytes.as_slice()),
-                attributes: ManagedBuffer::new_from_bytes(
-                    self.clone(),
-                    attr_bytes.as_slice(),
-                ),
+                attributes: ManagedBuffer::new_from_bytes(self.clone(), attr_bytes.as_slice()),
                 creator: ManagedAddress::from_address(self.clone(), &creator),
                 royalties: BigUint::from_raw_handle(self.clone(), royalties_handle),
                 uris: uris_vec,

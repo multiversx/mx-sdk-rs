@@ -5,26 +5,31 @@
 #[macro_export]
 macro_rules! imports {
     () => {
-        use core::ops::{Add, Div, Mul, Rem, Sub};
-        use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
-        use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
-        use core::ops::{BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
-        use elrond_wasm::api::{
-            BigIntApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, ManagedTypeApi,
-            SendApi,
+        use core::ops::{
+            Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+            DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
+            SubAssign,
         };
-        use elrond_wasm::api::{ErrorApi, LogApi}; // TODO: remove at some point, they shouldn't be public
-        use elrond_wasm::contract_base::{ContractBase, ProxyObjBase};
-        use elrond_wasm::elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode};
-        use elrond_wasm::err_msg;
-        use elrond_wasm::esdt::*;
-        use elrond_wasm::io::*;
-        use elrond_wasm::non_zero_util::*;
-        use elrond_wasm::storage::mappers::*;
-        use elrond_wasm::types::*;
-        use elrond_wasm::types::{SCResult::Err, SCResult::Ok};
-        use elrond_wasm::{non_zero_usize, only_owner, require, sc_error};
-        use elrond_wasm::{Box, Vec};
+        use elrond_wasm::{
+            api::{
+                BigIntApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, ErrorApi,
+                LogApi, ManagedTypeApi, SendApi,
+            },
+            contract_base::{ContractBase, ProxyObjBase},
+            elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode},
+            err_msg,
+            esdt::*,
+            io::*,
+            non_zero_usize,
+            non_zero_util::*,
+            only_owner, require, sc_error,
+            storage::mappers::*,
+            types::{
+                SCResult::{Err, Ok},
+                *,
+            },
+            Box, Vec,
+        }; // TODO: remove at some point, they shouldn't be public
     };
 }
 
@@ -32,11 +37,13 @@ macro_rules! imports {
 #[macro_export]
 macro_rules! derive_imports {
     () => {
-        use elrond_wasm::derive::TypeAbi;
-        use elrond_wasm::elrond_codec;
-        use elrond_wasm::elrond_codec::elrond_codec_derive::{
-            NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
-            TopEncodeOrDefault,
+        use elrond_wasm::{
+            derive::TypeAbi,
+            elrond_codec,
+            elrond_codec::elrond_codec_derive::{
+                NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
+                TopEncodeOrDefault,
+            },
         };
     };
 }

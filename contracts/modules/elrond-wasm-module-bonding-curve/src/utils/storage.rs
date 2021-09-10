@@ -1,8 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use super::structs::BondingCurve;
-use super::structs::TokenOwnershipData;
+use super::structs::{BondingCurve, TokenOwnershipData};
 
 #[elrond_wasm::module]
 pub trait StorageModule {

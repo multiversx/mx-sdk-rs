@@ -1,6 +1,8 @@
-use crate::api::SendApi;
-use crate::types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec};
-use crate::ContractCallArg;
+use crate::{
+    api::SendApi,
+    types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
+    ContractCallArg,
+};
 
 use super::ManagedArgBuffer;
 

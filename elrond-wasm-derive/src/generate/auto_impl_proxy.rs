@@ -3,8 +3,7 @@ use crate::{
     model::{AutoImpl, ContractTrait, Method, MethodImpl},
     parse::split_path_last,
 };
-use syn::punctuated::Punctuated;
-use syn::token::Colon2;
+use syn::{punctuated::Punctuated, token::Colon2};
 
 /// Path to a Rust module containing a contract call proxy.
 pub type ProxyModulePath = Punctuated<syn::PathSegment, Colon2>;

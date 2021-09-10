@@ -1,8 +1,10 @@
 use crate::{error_hook, ArwenApiImpl};
-use elrond_wasm::api::{BlockchainApi, Handle, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{
-    BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-    ManagedInto, ManagedType, ManagedVec, TokenIdentifier,
+use elrond_wasm::{
+    api::{BlockchainApi, Handle, SendApi, StorageReadApi, StorageWriteApi},
+    types::{
+        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedInto, ManagedType, ManagedVec, TokenIdentifier,
+    },
 };
 
 #[allow(unused)]
@@ -230,10 +232,7 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (
-        ManagedAddress<Self>,
-        ManagedVec<Self, ManagedBuffer<Self>>,
-    ) {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -263,10 +262,7 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (
-        ManagedAddress<Self>,
-        ManagedVec<Self, ManagedBuffer<Self>>,
-    ) {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();

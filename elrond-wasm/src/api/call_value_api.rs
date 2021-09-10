@@ -1,6 +1,8 @@
 use super::{ErrorApi, ManagedTypeApi};
-use crate::err_msg;
-use crate::types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier};
+use crate::{
+    err_msg,
+    types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},
+};
 
 pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
     fn check_not_payable(&self);

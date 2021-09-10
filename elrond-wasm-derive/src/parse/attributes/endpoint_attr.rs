@@ -1,5 +1,4 @@
-use super::attr_names::*;
-use super::util::*;
+use super::{attr_names::*, util::*};
 
 pub fn is_init(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_INIT)

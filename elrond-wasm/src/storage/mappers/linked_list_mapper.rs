@@ -1,15 +1,17 @@
 use super::{StorageClearable, StorageMapper};
-use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
-use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set, StorageKey};
-use crate::types::{BoxedBytes, MultiResultVec};
+use crate::{
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    io::EndpointResult,
+    storage::{storage_get, storage_set, StorageKey},
+    types::{BoxedBytes, MultiResultVec},
+};
 use alloc::vec::Vec;
 use core::marker::PhantomData;
-use elrond_codec::elrond_codec_derive::{
-    TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
+use elrond_codec::{
+    elrond_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
+    DecodeDefault, EncodeDefault, TopDecode, TopEncode,
 };
-use elrond_codec::{DecodeDefault, EncodeDefault, TopDecode, TopEncode};
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";

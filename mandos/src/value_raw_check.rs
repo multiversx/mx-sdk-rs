@@ -1,6 +1,8 @@
 use super::value_raw::*;
-use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
-use serde::ser::{Serialize, Serializer};
+use serde::{
+    de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor},
+    ser::{Serialize, Serializer},
+};
 use std::fmt;
 
 pub enum CheckBytesValueRaw {

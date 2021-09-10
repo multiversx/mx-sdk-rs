@@ -1,6 +1,4 @@
-use super::context::*;
-use super::functions::*;
-use super::value_raw::*;
+use super::{context::*, functions::*, value_raw::*};
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::identities::Zero;
 

@@ -1,8 +1,8 @@
-use crate::num_conv::bytes_to_number;
-use crate::transmute::vec_into_boxed_slice;
-use crate::{DecodeError, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast};
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use crate::{
+    num_conv::bytes_to_number, transmute::vec_into_boxed_slice, DecodeError, NestedDecodeInput,
+    OwnedBytesNestedDecodeInput, TryStaticCast,
+};
+use alloc::{boxed::Box, vec::Vec};
 
 /// Trait that abstracts away an underlying API for a top-level object deserializer.
 /// The underlying API can provide pre-parsed i64/u64 or pre-bundled boxed slices.
