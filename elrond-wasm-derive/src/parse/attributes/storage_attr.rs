@@ -1,5 +1,4 @@
-use super::attr_names::*;
-use super::util::*;
+use super::{attr_names::*, util::*};
 
 pub struct StorageGetAttribute {
     pub identifier: String,

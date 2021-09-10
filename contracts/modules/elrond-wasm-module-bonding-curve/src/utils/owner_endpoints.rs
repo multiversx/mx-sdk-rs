@@ -1,9 +1,13 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::function_selector::FunctionSelector;
-use crate::utils::structs::{BondingCurve, TokenOwnershipData};
-use crate::utils::{events, storage};
+use crate::{
+    function_selector::FunctionSelector,
+    utils::{
+        events, storage,
+        structs::{BondingCurve, TokenOwnershipData},
+    },
+};
 
 use super::structs::CurveArguments;
 

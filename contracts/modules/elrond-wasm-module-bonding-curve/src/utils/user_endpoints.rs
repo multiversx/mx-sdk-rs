@@ -1,9 +1,11 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::curves::curve_function::CurveFunction;
-use crate::function_selector::FunctionSelector;
-use crate::utils::{events, storage, structs::CurveArguments};
+use crate::{
+    curves::curve_function::CurveFunction,
+    function_selector::FunctionSelector,
+    utils::{events, storage, structs::CurveArguments},
+};
 
 #[elrond_wasm::module]
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {

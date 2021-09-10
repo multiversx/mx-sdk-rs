@@ -1,10 +1,11 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{SendApi, StorageReadApi};
-use crate::contract_base::SendWrapper;
-use crate::io::EndpointResult;
-use crate::types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{SendApi, StorageReadApi},
+    contract_base::SendWrapper,
+    io::EndpointResult,
+    types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},
+};
+use alloc::{string::String, vec::Vec};
 
 pub struct SendEsdt<SA>
 where

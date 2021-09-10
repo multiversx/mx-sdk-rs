@@ -1,7 +1,9 @@
-use elrond_wasm::derive::TypeAbi;
-use elrond_wasm::elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+use elrond_wasm::{
+    derive::TypeAbi,
+    elrond_codec::{
+        DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    },
 };
 
 /// Helper type to explore encode/decode errors.

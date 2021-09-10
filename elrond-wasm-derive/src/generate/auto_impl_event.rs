@@ -1,5 +1,4 @@
-use super::method_gen;
-use super::util::*;
+use super::{method_gen, util::*};
 use crate::model::{Method, MethodArgument};
 
 pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::TokenStream {

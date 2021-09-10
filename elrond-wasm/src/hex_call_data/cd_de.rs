@@ -1,6 +1,5 @@
 use super::SEPARATOR;
-use crate::err_msg;
-use crate::types::StaticSCError;
+use crate::{err_msg, types::StaticSCError};
 use alloc::vec::Vec;
 
 fn hex_digit_to_half_byte(digit: u8) -> Option<u8> {

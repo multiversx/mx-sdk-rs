@@ -1,14 +1,12 @@
 use super::generate::{abi_gen, snippets};
-use crate::generate::callback_gen::*;
-use crate::generate::callback_proxies_gen::*;
-use crate::generate::contract_gen::*;
-use crate::generate::function_selector::generate_function_selector_body;
-use crate::generate::proxy_gen;
-use crate::generate::supertrait_gen;
-use crate::generate::{
-    auto_impl::generate_auto_impls, auto_impl_proxy::generate_all_proxy_trait_imports,
+use crate::{
+    generate::{
+        auto_impl::generate_auto_impls, auto_impl_proxy::generate_all_proxy_trait_imports,
+        callback_gen::*, callback_proxies_gen::*, contract_gen::*,
+        function_selector::generate_function_selector_body, proxy_gen, supertrait_gen,
+    },
+    model::ContractTrait,
 };
-use crate::model::ContractTrait;
 
 /// Provides the implementation for both modules and contracts.
 /// TODO: not a great pattern to have the `is_contract_main` flag, reorganize the code and get rid of it.

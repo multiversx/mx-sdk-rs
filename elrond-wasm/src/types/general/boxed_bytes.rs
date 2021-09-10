@@ -1,8 +1,10 @@
 use crate::abi::TypeAbi;
-use alloc::alloc::{alloc, alloc_zeroed, realloc, Layout};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use alloc::{
+    alloc::{alloc, alloc_zeroed, realloc, Layout},
+    boxed::Box,
+    string::String,
+    vec::Vec,
+};
 use elrond_codec::*;
 
 /// Simple wrapper around a boxed byte slice,
