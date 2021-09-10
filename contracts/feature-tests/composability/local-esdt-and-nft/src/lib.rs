@@ -29,7 +29,8 @@ pub trait LocalEsdtAndEsdtNft {
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -73,7 +74,8 @@ pub trait LocalEsdtAndEsdtNft {
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_non_fungible(
                 issue_cost,
                 &token_display_name,
@@ -157,7 +159,7 @@ pub trait LocalEsdtAndEsdtNft {
             arg_buffer.push_arg_raw(arg);
         }
 
-        let _ = self.send().direct_esdt_nft_execute(
+        let _ = self.raw_vm_api().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,
@@ -180,7 +182,8 @@ pub trait LocalEsdtAndEsdtNft {
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_semi_fungible(
                 issue_cost,
                 &token_display_name,
@@ -207,7 +210,8 @@ pub trait LocalEsdtAndEsdtNft {
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
@@ -220,7 +224,8 @@ pub trait LocalEsdtAndEsdtNft {
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())

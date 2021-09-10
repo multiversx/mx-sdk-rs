@@ -20,7 +20,6 @@ pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub boxed_bytes: ManagedBuffer<M>,
 }
 
-#[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[view]
@@ -67,7 +66,8 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     ) -> AsyncCall<Self::SendApi> {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_non_fungible(
                 issue_cost,
                 &token_display_name,
@@ -109,7 +109,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    #[allow(clippy::too_many_arguments)]
     fn nft_create(
         &self,
         token_identifier: TokenIdentifier,
@@ -226,7 +225,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         function: ManagedBuffer,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) {
-        let _ = self.send().direct_esdt_nft_execute(
+        let _ = self.raw_vm_api().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,

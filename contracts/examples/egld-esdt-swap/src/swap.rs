@@ -34,7 +34,9 @@ pub trait EgldEsdtSwap {
 
         self.issue_started_event(&caller, &token_ticker, &initial_supply);
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -96,7 +98,9 @@ pub trait EgldEsdtSwap {
         let caller = self.blockchain().get_caller();
         self.mint_started_event(&caller, &amount);
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .mint(&wrapped_egld_token_id, &amount)
             .async_call()
             .with_callback(self.callbacks().esdt_mint_callback(&caller, &amount)))

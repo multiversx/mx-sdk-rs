@@ -90,7 +90,7 @@ fn generate_abi_method_body(
 			.map(|supertrait| {
 				let module_path = &supertrait.module_path;
 				quote! {
-					contract_abi.coalesce(<#module_path AbiProvider as elrond_wasm::api::ContractAbiProvider>::abi());
+					contract_abi.coalesce(<#module_path AbiProvider as elrond_wasm::contract_base::ContractAbiProvider>::abi());
 				}
 			})
 			.collect()
@@ -122,10 +122,8 @@ pub fn generate_abi_provider(
     quote! {
         pub struct AbiProvider {}
 
-        impl elrond_wasm::api::ContractAbiProvider for AbiProvider {
-            type TypeManager = elrond_wasm::api::uncallable::UncallableApi;
-            type Storage = elrond_wasm::api::uncallable::UncallableApi;
-            type SendApi = elrond_wasm::api::uncallable::UncallableApi;
+        impl elrond_wasm::contract_base::ContractAbiProvider for AbiProvider {
+            type Api = elrond_wasm::api::uncallable::UncallableApi;
 
             fn abi() -> elrond_wasm::abi::ContractAbi {
                 #abi_body

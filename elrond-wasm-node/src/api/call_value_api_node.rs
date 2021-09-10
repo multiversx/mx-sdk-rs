@@ -6,7 +6,7 @@ const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn mBufferNew() -> i32;
 
     fn checkNoPayment();
@@ -23,7 +23,7 @@ extern "C" {
     fn getESDTTokenNameByIndex(resultOffset: *const u8, index: i32) -> i32;
     fn getESDTTokenNonceByIndex(index: i32) -> i64;
     fn getESDTTokenTypeByIndex(index: i32) -> i32;
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetMultiESDTCallValue(resultHandle: i32);
 
     /// TODO: decide if it is worth using or not
@@ -32,13 +32,6 @@ extern "C" {
 }
 
 impl CallValueApi for ArwenApiImpl {
-    type TypeManager = Self;
-
-    #[inline]
-    fn type_manager(&self) -> Self::TypeManager {
-        self.clone()
-    }
-
     #[inline]
     fn check_not_payable(&self) {
         unsafe {
@@ -46,23 +39,23 @@ impl CallValueApi for ArwenApiImpl {
         }
     }
 
-    fn egld_value(&self) -> BigUint<Self::TypeManager> {
+    fn egld_value(&self) -> BigUint<Self> {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetCallValue(value_handle);
-            BigUint::from_raw_handle(self.type_manager(), value_handle)
+            BigUint::from_raw_handle(self.clone(), value_handle)
         }
     }
 
-    fn esdt_value(&self) -> BigUint<Self::TypeManager> {
+    fn esdt_value(&self) -> BigUint<Self> {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValue(value_handle);
-            BigUint::from_raw_handle(self.type_manager(), value_handle)
+            BigUint::from_raw_handle(self.clone(), value_handle)
         }
     }
 
-    fn token(&self) -> TokenIdentifier<Self::TypeManager> {
+    fn token(&self) -> TokenIdentifier<Self> {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
@@ -86,15 +79,15 @@ impl CallValueApi for ArwenApiImpl {
         unsafe { getNumESDTTransfers() as usize }
     }
 
-    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self::TypeManager> {
+    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self> {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
-            BigUint::from_raw_handle(self.type_manager(), value_handle)
+            BigUint::from_raw_handle(self.clone(), value_handle)
         }
     }
 
-    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self::TypeManager> {
+    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self> {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenNameByIndex(name_buffer.as_mut_ptr(), index as i32);
@@ -114,17 +107,14 @@ impl CallValueApi for ArwenApiImpl {
         unsafe { (getESDTTokenTypeByIndex(index as i32) as u8).into() }
     }
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_all_esdt_transfers(
         &self,
-    ) -> elrond_wasm::types::ManagedVec<
-        Self::TypeManager,
-        elrond_wasm::types::EsdtTokenPayment<Self::TypeManager>,
-    > {
+    ) -> elrond_wasm::types::ManagedVec<Self, elrond_wasm::types::EsdtTokenPayment<Self>> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetMultiESDTCallValue(result_handle);
-            elrond_wasm::types::ManagedVec::from_raw_handle(self.type_manager(), result_handle)
+            elrond_wasm::types::ManagedVec::from_raw_handle(self.clone(), result_handle)
         }
     }
 }
