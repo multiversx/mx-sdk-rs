@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.19.0, elrond-codec 0.6.0, mandos 0.9.0] - 2021-09-10
+- Managed APIs used everywhere
+
 ## [elrond-wasm 0.18.2] - 2021-08-20
 - Crypto API: `ripemd160` function, custom secp256k1 signature verification (`verify_custom_secp256k1`) and signature generation (`encode_secp256k1_der_signature`).
 
