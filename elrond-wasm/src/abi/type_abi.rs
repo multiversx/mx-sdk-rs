@@ -1,7 +1,9 @@
 use super::*;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{
+    boxed::Box,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 pub trait TypeAbi {
     fn type_name() -> String {

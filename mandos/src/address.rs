@@ -1,6 +1,5 @@
 use super::*;
-use std::cmp::Ordering;
-use std::fmt;
+use std::{cmp::Ordering, fmt};
 
 #[derive(Debug, Eq)]
 pub struct AddressKey {

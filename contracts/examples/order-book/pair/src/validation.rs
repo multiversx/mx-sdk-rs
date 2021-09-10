@@ -3,10 +3,12 @@ elrond_wasm::derive_imports!();
 
 use crate::common::FeeConfig;
 
-use super::common;
-use super::common::{
-    Order, OrderInputParams, Payment, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
-    PERCENT_BASE_POINTS,
+use super::{
+    common,
+    common::{
+        Order, OrderInputParams, Payment, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
+        PERCENT_BASE_POINTS,
+    },
 };
 
 #[elrond_wasm::module]

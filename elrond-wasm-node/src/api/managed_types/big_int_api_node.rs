@@ -1,11 +1,12 @@
 use core::cmp::Ordering;
 
-use crate::api::unsafe_buffer;
-use crate::error_hook;
+use crate::{api::unsafe_buffer, error_hook};
 
-use elrond_wasm::api::{BigIntApi, Handle, Sign};
-use elrond_wasm::err_msg;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::{
+    api::{BigIntApi, Handle, Sign},
+    err_msg,
+    types::BoxedBytes,
+};
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;

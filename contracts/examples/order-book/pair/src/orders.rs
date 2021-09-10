@@ -1,12 +1,9 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::common::FEE_PENALTY_INCREASE_EPOCHS;
-use crate::common::FEE_PENALTY_INCREASE_PERCENT;
+use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 
-use super::common;
-use super::events;
-use super::validation;
+use super::{common, events, validation};
 
 use super::common::{
     Order, OrderInputParams, OrderType, Payment, Transfer, FREE_ORDER_FROM_STORAGE_MIN_PENALTIES,

@@ -1,5 +1,4 @@
-use super::method_gen;
-use super::util::*;
+use super::{method_gen, util::*};
 use crate::model::{Method, MethodArgument};
 
 fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_macro2::TokenStream {

@@ -1,13 +1,15 @@
-use crate::codec_err::{DecodeError, EncodeError};
-use crate::nested_de::NestedDecode;
-use crate::nested_de_input::NestedDecodeInput;
-use crate::nested_ser::NestedEncode;
-use crate::nested_ser_output::NestedEncodeOutput;
-use crate::top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
-use crate::top_de_input::TopDecodeInput;
-use crate::top_ser::TopEncode;
-use crate::top_ser_output::TopEncodeOutput;
-use crate::TypeInfo;
+use crate::{
+    codec_err::{DecodeError, EncodeError},
+    nested_de::NestedDecode,
+    nested_de_input::NestedDecodeInput,
+    nested_ser::NestedEncode,
+    nested_ser_output::NestedEncodeOutput,
+    top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode},
+    top_de_input::TopDecodeInput,
+    top_ser::TopEncode,
+    top_ser_output::TopEncodeOutput,
+    TypeInfo,
+};
 use alloc::boxed::Box;
 use arrayvec::ArrayVec;
 

@@ -1,5 +1,9 @@
-use crate::api::{EndpointFinishApi, ManagedTypeApi};
-use crate::{abi::TypeAbi, types::BoxedBytes, EndpointResult};
+use crate::{
+    abi::TypeAbi,
+    api::{EndpointFinishApi, ManagedTypeApi},
+    types::BoxedBytes,
+    EndpointResult,
+};
 use alloc::string::String;
 
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.

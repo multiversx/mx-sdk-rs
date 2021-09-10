@@ -1,10 +1,10 @@
-use crate::generate::contract_gen::*;
-use crate::generate::proxy_gen;
-use crate::generate::supertrait_gen;
-use crate::model::ContractTrait;
-use crate::parse::parse_contract_trait;
-use crate::preprocessing::trait_preprocessing;
-use crate::validate::validate_contract;
+use crate::{
+    generate::{contract_gen::*, proxy_gen, supertrait_gen},
+    model::ContractTrait,
+    parse::parse_contract_trait,
+    preprocessing::trait_preprocessing,
+    validate::validate_contract,
+};
 
 pub fn process_proxy(
     args: proc_macro::TokenStream,

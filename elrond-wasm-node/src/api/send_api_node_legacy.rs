@@ -1,13 +1,14 @@
-use crate::api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right;
-use crate::ArwenApiImpl;
+use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, ArwenApiImpl};
 use alloc::vec::Vec;
-use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
-use elrond_wasm::types::{
-    managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
-    EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom, ManagedInto,
-    ManagedType, ManagedVec, TokenIdentifier,
+use elrond_wasm::{
+    api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
+    types::{
+        managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
+        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom,
+        ManagedInto, ManagedType, ManagedVec, TokenIdentifier,
+    },
+    HexCallDataSerializer,
 };
-use elrond_wasm::HexCallDataSerializer;
 
 // Token ID + nonce + amount, as bytes
 const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;

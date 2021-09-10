@@ -1,9 +1,10 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{ManagedTypeApi, SendApi};
-use crate::io::EndpointResult;
-use crate::types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{ManagedTypeApi, SendApi},
+    io::EndpointResult,
+    types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
 #[must_use]
 pub struct AsyncCall<SA>

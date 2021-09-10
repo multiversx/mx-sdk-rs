@@ -1,7 +1,9 @@
-use crate::io::{ArgId, DynArg, DynArgInput};
-use crate::types::BoxedBytes;
-use crate::DynArgOutput;
-use crate::{abi::TypeAbi, ContractCallArg};
+use crate::{
+    abi::TypeAbi,
+    io::{ArgId, DynArg, DynArgInput},
+    types::BoxedBytes,
+    ContractCallArg, DynArgOutput,
+};
 use alloc::string::String;
 
 pub struct AsyncCallError {

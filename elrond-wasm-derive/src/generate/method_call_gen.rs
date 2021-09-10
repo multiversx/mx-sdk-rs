@@ -1,8 +1,6 @@
-use super::arg_regular::*;
-use super::method_gen::generate_arg_call_name;
-use super::only_owner_gen::*;
-use super::payable_gen::*;
-use super::util::*;
+use super::{
+    arg_regular::*, method_gen::generate_arg_call_name, only_owner_gen::*, payable_gen::*, util::*,
+};
 use crate::model::Method;
 
 pub fn generate_call_to_method_expr(m: &Method) -> proc_macro2::TokenStream {
