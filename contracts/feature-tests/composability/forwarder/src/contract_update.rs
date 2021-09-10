@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait UpgradeContractModule {
     #[proxy]
-    fn vault_proxy(&self, sc_address: ManagedAddress) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self, sc_address: ManagedAddress) -> vault::Proxy<Self::Api>;
 
     #[endpoint(upgradeChildContract)]
     fn upgrade_child_contract(
@@ -15,7 +15,7 @@ pub trait UpgradeContractModule {
         self.upgrade(
             &child_sc_address,
             &new_code,
-            arguments.into_vec().managed_into(self.type_manager()),
+            arguments.into_vec().managed_into(),
         );
     }
 
@@ -35,7 +35,7 @@ pub trait UpgradeContractModule {
         &self,
         child_sc_address: &ManagedAddress,
         new_code: &ManagedBuffer,
-        arguments: ManagedVec<Self::TypeManager, ManagedBuffer>,
+        arguments: ManagedVec<Self::Api, ManagedBuffer>,
     ) {
         // TODO: use proxies to perform upgrade here
         // raw upgrade belongs to forwarder-raw
@@ -45,7 +45,7 @@ pub trait UpgradeContractModule {
             &self.types().big_uint_zero(),
             new_code,
             CodeMetadata::UPGRADEABLE,
-            &arguments.managed_into(self.type_manager()),
+            &arguments.managed_into(),
         );
     }
 }

@@ -231,9 +231,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_buy_price(
         &self,
-        function_selector: &FunctionSelector<Self::TypeManager>,
+        function_selector: &FunctionSelector<Self::Api>,
         amount: BigUint,
-        arguments: CurveArguments<Self::TypeManager>,
+        arguments: CurveArguments<Self::Api>,
     ) -> SCResult<BigUint> {
         let token_start = arguments.first_token_available();
         function_selector.calculate_price(&token_start, &amount, &arguments)
@@ -241,9 +241,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_sell_price(
         &self,
-        function_selector: &FunctionSelector<Self::TypeManager>,
+        function_selector: &FunctionSelector<Self::Api>,
         amount: BigUint,
-        arguments: CurveArguments<Self::TypeManager>,
+        arguments: CurveArguments<Self::Api>,
     ) -> SCResult<BigUint> {
         let token_start = &arguments.first_token_available() - &amount;
         function_selector.calculate_price(&token_start, &amount, &arguments)

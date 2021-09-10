@@ -39,10 +39,10 @@ mod message_me_proxy {
 #[elrond_wasm::contract]
 pub trait ProxyTestFirst {
     #[proxy]
-    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::SendApi>;
+    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::Api>;
 
     #[proxy]
-    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::SendApi>;
+    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::Api>;
 
     #[storage_get("other_contract")]
     fn get_other_contract(&self) -> ManagedAddress;
@@ -64,7 +64,7 @@ pub trait ProxyTestFirst {
         &self,
         #[payment] payment: BigUint,
         code: ManagedBuffer,
-    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
+    ) -> ManagedVec<Self::Api, ManagedBuffer> {
         let (address, results) = self
             .message_me_proxy()
             .init(payment, 123)
@@ -87,7 +87,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContract)]
-    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall<Self::SendApi> {
+    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
@@ -97,10 +97,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContractWithCallback)]
-    fn forward_to_other_contract_with_callback(
-        &self,
-        #[payment] payment: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    fn forward_to_other_contract_with_callback(&self, #[payment] payment: BigUint) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
@@ -110,7 +107,7 @@ pub trait ProxyTestFirst {
     }
 
     #[endpoint(messageOtherContract)]
-    fn message_other_contract(&self) -> AsyncCall<Self::SendApi> {
+    fn message_other_contract(&self) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)
@@ -124,7 +121,7 @@ pub trait ProxyTestFirst {
     }
 
     #[endpoint(messageOtherContractWithCallback)]
-    fn message_other_contract_with_callback(&self) -> AsyncCall<Self::SendApi> {
+    fn message_other_contract_with_callback(&self) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)

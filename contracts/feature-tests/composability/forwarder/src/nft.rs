@@ -63,7 +63,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -158,17 +158,15 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 
         let mut uris = ManagedVec::new_empty(self.type_manager());
         uris.push(uri);
-        let token_nonce = self
-            .send()
-            .esdt_nft_create::<ComplexAttributes<Self::TypeManager>>(
-                &token_identifier,
-                &amount,
-                &name,
-                &royalties,
-                &hash,
-                &orig_attr,
-                &uris,
-            );
+        let token_nonce = self.send().esdt_nft_create::<ComplexAttributes<Self::Api>>(
+            &token_identifier,
+            &amount,
+            &name,
+            &royalties,
+            &hash,
+            &orig_attr,
+            &uris,
+        );
 
         let token_info = self.blockchain().get_esdt_token_data(
             &self.blockchain().get_sc_address(),
@@ -176,8 +174,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             token_nonce,
         );
 
-        let decoded_attr =
-            token_info.decode_attributes::<ComplexAttributes<Self::TypeManager>>()?;
+        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<Self::Api>>()?;
 
         require!(
             orig_attr.biguint == decoded_attr.biguint
@@ -232,7 +229,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             &amount,
             self.blockchain().get_gas_left(),
             &function,
-            &arguments.into_vec().managed_into(self.type_manager()),
+            &arguments.into_vec().managed_into(),
         );
     }
 

@@ -8,7 +8,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait DnsModule {
     #[proxy]
-    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::SendApi>;
+    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::Api>;
 
     #[payable("EGLD")]
     #[endpoint(dnsRegister)]
@@ -17,7 +17,7 @@ pub trait DnsModule {
         dns_address: ManagedAddress,
         name: BoxedBytes,
         #[payment] payment: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         only_owner!(self, "only owner can call dnsRegister");
 
         Ok(self

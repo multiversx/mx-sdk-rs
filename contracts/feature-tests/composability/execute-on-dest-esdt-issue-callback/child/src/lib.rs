@@ -17,7 +17,7 @@ pub trait Child {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
@@ -57,5 +57,5 @@ pub trait Child {
 
     #[view(getWrappedEgldTokenIdentifier)]
     #[storage_mapper("wrappedEgldTokenIdentifier")]
-    fn wrapped_egld_token_identifier(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn wrapped_egld_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
 }

@@ -26,7 +26,7 @@ pub trait LocalEsdtAndEsdtNft {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -71,7 +71,7 @@ pub trait LocalEsdtAndEsdtNft {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -179,7 +179,7 @@ pub trait LocalEsdtAndEsdtNft {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -209,7 +209,7 @@ pub trait LocalEsdtAndEsdtNft {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
@@ -223,7 +223,7 @@ pub trait LocalEsdtAndEsdtNft {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())
@@ -315,9 +315,9 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[view(lastIssuedToken)]
     #[storage_mapper("lastIssuedToken")]
-    fn last_issued_token(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn last_issued_token(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(lastErrorMessage)]
     #[storage_mapper("lastErrorMessage")]
-    fn last_error_message(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn last_error_message(&self) -> SingleValueMapper<BoxedBytes>;
 }

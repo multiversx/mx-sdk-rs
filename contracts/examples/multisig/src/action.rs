@@ -60,7 +60,7 @@ where
     Nothing,
     SendEgld(SendEgld<SA>),
     DeployResult(ManagedAddress<SA>),
-    AsyncCall(AsyncCall<SA>),
+    SendAsyncCall(AsyncCall<SA>),
 }
 
 impl<SA> EndpointResult for PerformActionResult<SA>
@@ -77,7 +77,7 @@ where
             PerformActionResult::Nothing => (),
             PerformActionResult::SendEgld(send_egld) => send_egld.finish(api),
             PerformActionResult::DeployResult(address) => address.finish(api),
-            PerformActionResult::AsyncCall(async_call) => async_call.finish(api),
+            PerformActionResult::SendAsyncCall(async_call) => async_call.finish(api),
         }
     }
 }

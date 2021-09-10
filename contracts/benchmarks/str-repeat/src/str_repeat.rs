@@ -24,5 +24,5 @@ pub trait StrRepeat {
 
     #[view(getByteArray)]
     #[storage_mapper("byteArray")]
-    fn byte_array(&self) -> SingleValueMapper<Self::Storage, Vec<u8>>;
+    fn byte_array(&self) -> SingleValueMapper<Vec<u8>>;
 }

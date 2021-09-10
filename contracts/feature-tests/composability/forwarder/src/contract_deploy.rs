@@ -3,14 +3,14 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait DeployContractModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[endpoint]
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.deploy_vault(&code, opt_arg)
     }
 
@@ -27,7 +27,7 @@ pub trait DeployContractModule {
             &self.types().big_uint_zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
-            &arguments.into_vec().managed_into(self.type_manager()),
+            &arguments.into_vec().managed_into(),
         );
 
         address
@@ -55,7 +55,7 @@ pub trait DeployContractModule {
         &self,
         code: &ManagedBuffer,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_contract(code, CodeMetadata::DEFAULT)
@@ -67,7 +67,7 @@ pub trait DeployContractModule {
         &self,
         source_address: ManagedAddress,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_from_source(&source_address, CodeMetadata::DEFAULT)

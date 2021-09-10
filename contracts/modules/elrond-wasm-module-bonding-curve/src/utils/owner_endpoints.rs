@@ -15,7 +15,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
@@ -29,7 +29,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())
@@ -44,7 +44,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     ) -> SCResult<(), ManagedSCError> {
         match result {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into(self.type_manager())),
+            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into()),
         }
     }
 
@@ -52,7 +52,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_bonding_curve(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::TypeManager>,
+        function: FunctionSelector<Self::Api>,
         sell_availability: bool,
     ) -> SCResult<()> {
         require!(

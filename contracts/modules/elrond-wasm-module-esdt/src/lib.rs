@@ -6,7 +6,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait EsdtModule {
     #[storage_mapper("token_id")]
-    fn token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[payable("EGLD")]
     #[endpoint(issueToken)]
@@ -16,7 +16,7 @@ pub trait EsdtModule {
         token_ticker: ManagedBuffer,
         num_decimals: usize,
         #[payment] issue_cost: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         only_owner!(self, "only owner can issue token");
         require!(self.token_id().is_empty(), "Token already issued");
 
@@ -51,7 +51,7 @@ pub trait EsdtModule {
     fn set_local_roles(
         &self,
         #[var_args] opt_dest_address: OptionalArg<ManagedAddress>,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         only_owner!(self, "only owner can set roles");
 
         let dest_address = match opt_dest_address {
