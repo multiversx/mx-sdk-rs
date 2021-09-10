@@ -12,7 +12,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "esdt": {
                         "str:FWD-TOKEN": "1000",
                         "str:NFT-123": {
@@ -80,7 +80,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "esdt": {
                         "str:FWD-TOKEN": "700",
                         "str:NFT-123": {
@@ -167,7 +167,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "esdt": {
                         "str:FWD-TOKEN": "200",
                         "str:SFT-456": {
@@ -182,6 +182,32 @@
                     "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "EGLD-test",
+            "comment": "send all types",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "send_esdt_direct_multi_transfer",
+                "arguments": [
+                    "address:a_user",
+                    "str:EGLD",
+                    "0",
+                    "1000"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:insufficient funds",
+                "gas": "*",
+                "refund": "*"
             }
         }
     ]
