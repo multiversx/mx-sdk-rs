@@ -15,19 +15,18 @@ pub trait FeaturesModule {
     #[storage_set("feat:")]
     fn set_feature_flag(&self, feature_name: FeatureName, value: u8);
 
-    fn check_feature_on(&self, feature_name: &'static [u8], default: bool) -> SCResult<()> {
+    fn check_feature_on(&self, feature_name: &'static [u8], default: bool) {
         let flag = self.get_feature_flag(FeatureName(feature_name));
         let value = match flag {
             FEATURE_NOT_SET => default,
             FEATURE_ON => true,
             _ => false,
         };
-        if value {
-            Ok(())
-        } else {
-            let mut msg = feature_name.to_vec();
-            msg.extend_from_slice(&b" currently disabled"[..]);
-            SCResult::Err(msg.into())
+        if !value {
+            let mut err = self.error().new_error();
+            err.append_bytes(feature_name);
+            err.append_bytes(&b" currently disabled"[..]);
+            err.exit_now()
         }
     }
 
@@ -68,13 +67,4 @@ impl<'a> NestedEncode for FeatureName<'a> {
     ) {
         dest.write(self.0);
     }
-}
-
-/// Expands to a snippet that returns with error if a feature is not enabled.
-/// Also receives a default, which is the feature value if unset.
-#[macro_export]
-macro_rules! feature_guard {
-    ($feature_module: expr, $feature_name:expr, $default:expr) => {
-        $feature_module.check_feature_on(&$feature_name[..], $default)?;
-    };
 }

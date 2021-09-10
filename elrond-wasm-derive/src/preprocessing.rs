@@ -30,6 +30,10 @@ fn substitutions() -> HashMap<String, TokenStream> {
         "TokenIdentifier".to_string(),
         quote!(elrond_wasm::types::TokenIdentifier<Self::Api>).into(),
     );
+    substitutions.insert(
+        "ManagedSCError".to_string(),
+        quote!(elrond_wasm::types::ManagedSCError<Self::Api>).into(),
+    );
     substitutions
 }
 
