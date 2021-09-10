@@ -39,11 +39,8 @@ pub trait CryptoBubbles {
             Ok(())
         })?;
 
-        self.send().direct_egld(
-            &player.managed_into(self.type_manager()),
-            amount,
-            b"crypto bubbles",
-        );
+        self.send()
+            .direct_egld(&player.managed_into(), amount, b"crypto bubbles");
 
         self.withdraw_event(player, amount);
 

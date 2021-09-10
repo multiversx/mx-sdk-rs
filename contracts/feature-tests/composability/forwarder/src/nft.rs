@@ -232,7 +232,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             &amount,
             self.blockchain().get_gas_left(),
             &function,
-            &arguments.into_vec().managed_into(self.type_manager()),
+            &arguments.into_vec().managed_into(),
         );
     }
 

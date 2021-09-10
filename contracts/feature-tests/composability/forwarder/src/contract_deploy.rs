@@ -27,7 +27,7 @@ pub trait DeployContractModule {
             &self.types().big_uint_zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
-            &arguments.into_vec().managed_into(self.type_manager()),
+            &arguments.into_vec().managed_into(),
         );
 
         address

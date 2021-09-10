@@ -258,7 +258,7 @@ pub trait Multisig {
         for user_id in 1..=num_users {
             if self.get_user_id_to_role(user_id) == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
-                    result.push(address.managed_into(self.type_manager()));
+                    result.push(address.managed_into());
                 }
             }
         }
@@ -368,7 +368,7 @@ pub trait Multisig {
             .map(|signer_id| {
                 self.user_mapper()
                     .get_user_address_unchecked(*signer_id)
-                    .managed_into(self.type_manager())
+                    .managed_into()
             })
             .collect()
     }
@@ -476,7 +476,7 @@ pub trait Multisig {
                 api: self.raw_vm_api(),
                 to,
                 amount,
-                data: data.as_slice().managed_into(self.type_manager()),
+                data: data.as_slice().managed_into(),
             })),
             Action::SCDeploy {
                 amount,
@@ -485,7 +485,7 @@ pub trait Multisig {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into(self.type_manager());
+                let arg_buffer = arguments.managed_into();
                 let (new_address, _) = self.raw_vm_api().deploy_contract(
                     gas_left,
                     &amount,
@@ -503,7 +503,7 @@ pub trait Multisig {
             } => {
                 let mut contract_call_raw = self
                     .send()
-                    .contract_call::<()>(to, endpoint_name.managed_into(self.type_manager()))
+                    .contract_call::<()>(to, endpoint_name.managed_into())
                     .with_egld_transfer(egld_payment);
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());

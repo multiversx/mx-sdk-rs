@@ -44,7 +44,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     ) -> SCResult<(), ManagedSCError> {
         match result {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into(self.type_manager())),
+            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into()),
         }
     }
 
