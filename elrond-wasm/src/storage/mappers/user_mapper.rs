@@ -1,9 +1,11 @@
 use super::StorageMapper;
-use crate::abi::{TypeAbi, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
-use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_get_len, storage_set, StorageKey};
-use crate::types::{Address, MultiResultVec};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    io::EndpointResult,
+    storage::{storage_get, storage_get_len, storage_set, StorageKey},
+    types::{Address, MultiResultVec},
+};
 use alloc::vec::Vec;
 
 const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";

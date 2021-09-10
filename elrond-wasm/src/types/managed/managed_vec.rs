@@ -4,8 +4,7 @@ use crate::{
     api::{Handle, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
-use alloc::string::String;
-use alloc::vec::Vec;
+use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,

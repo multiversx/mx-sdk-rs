@@ -1,6 +1,8 @@
 use crate::ArwenApiImpl;
-use elrond_wasm::api::{Handle, LogApi};
-use elrond_wasm::types::ArgBuffer;
+use elrond_wasm::{
+    api::{Handle, LogApi},
+    types::ArgBuffer,
+};
 
 extern "C" {
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);

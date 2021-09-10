@@ -1,5 +1,7 @@
-use elrond_wasm::storage::mappers::{LinkedListMapper, StorageClearable, StorageMapper};
-use elrond_wasm::storage::StorageKey;
+use elrond_wasm::storage::{
+    mappers::{LinkedListMapper, StorageClearable, StorageMapper},
+    StorageKey,
+};
 use elrond_wasm_debug::TxContext;
 
 fn create_list() -> LinkedListMapper<TxContext, u64> {

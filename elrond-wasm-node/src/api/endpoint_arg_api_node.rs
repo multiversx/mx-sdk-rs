@@ -1,9 +1,10 @@
-use crate::error_hook;
-use crate::ArwenApiImpl;
+use crate::{error_hook, ArwenApiImpl};
 use alloc::vec::Vec;
-use elrond_wasm::api::{EndpointArgumentApi, Handle};
-use elrond_wasm::err_msg;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::{
+    api::{EndpointArgumentApi, Handle},
+    err_msg,
+    types::BoxedBytes,
+};
 
 extern "C" {
     fn getNumArguments() -> i32;

@@ -1,7 +1,9 @@
 use crate::{TxContext, TxPanic};
-use elrond_wasm::api::CallValueApi;
-use elrond_wasm::err_msg;
-use elrond_wasm::types::{BigUint, EsdtTokenType, ManagedBuffer, TokenIdentifier};
+use elrond_wasm::{
+    api::CallValueApi,
+    err_msg,
+    types::{BigUint, EsdtTokenType, ManagedBuffer, TokenIdentifier},
+};
 
 impl CallValueApi for TxContext {
     fn check_not_payable(&self) {

@@ -1,7 +1,9 @@
-use crate::api::SendApi;
-use crate::types::{
-    BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-    ManagedInto, ManagedVec, TokenIdentifier,
+use crate::{
+    api::SendApi,
+    types::{
+        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedInto, ManagedVec, TokenIdentifier,
+    },
 };
 
 impl SendApi for super::UncallableApi {

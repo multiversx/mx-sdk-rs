@@ -1,8 +1,6 @@
 use crate::CheckBytesValueRaw;
 
-use super::context::*;
-use super::value::*;
-use super::value_raw::*;
+use super::{context::*, value::*, value_raw::*};
 use num_bigint::BigUint;
 use std::fmt;
 

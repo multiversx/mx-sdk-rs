@@ -10,9 +10,7 @@ pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
 extern crate alloc;
-pub use alloc::boxed::Box;
-pub use alloc::string::String;
-pub use alloc::vec::Vec;
+pub use alloc::{boxed::Box, string::String, vec::Vec};
 
 pub use elrond_codec;
 

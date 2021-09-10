@@ -1,7 +1,6 @@
 use super::*;
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::contract_base::CallableContract;
 use std::collections::HashMap;
 

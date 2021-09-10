@@ -28,10 +28,12 @@ mod top_ser_output;
 mod transmute;
 mod try_static_cast;
 
-pub use crate::nested_de_input::NestedDecodeInput;
-pub use crate::nested_ser_output::NestedEncodeOutput;
-pub use crate::num_conv::{bytes_to_number, top_encode_number_to_output, using_encoded_number};
-pub use crate::try_static_cast::{try_execute_then_cast, TryStaticCast};
+pub use crate::{
+    nested_de_input::NestedDecodeInput,
+    nested_ser_output::NestedEncodeOutput,
+    num_conv::{bytes_to_number, top_encode_number_to_output, using_encoded_number},
+    try_static_cast::{try_execute_then_cast, TryStaticCast},
+};
 pub use codec_err::{DecodeError, EncodeError};
 pub use default_traits::{DecodeDefault, EncodeDefault};
 pub use nested_de::NestedDecode;

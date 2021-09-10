@@ -1,9 +1,10 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::SendApi;
-use crate::io::EndpointResult;
-use crate::types::{BigUint, ManagedAddress, ManagedBuffer};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::SendApi,
+    io::EndpointResult,
+    types::{BigUint, ManagedAddress, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
 pub struct SendEgld<SA>
 where

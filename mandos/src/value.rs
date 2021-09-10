@@ -1,10 +1,10 @@
-use super::context::*;
-use super::value_interpreter::*;
-use super::value_raw::*;
+use super::{context::*, value_interpreter::*, value_raw::*};
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
-use std::cmp::{Ord, Ordering};
-use std::fmt;
+use std::{
+    cmp::{Ord, Ordering},
+    fmt,
+};
 
 pub trait InterpretableFrom<T> {
     fn interpret_from(from: T, context: &InterpreterContext) -> Self;

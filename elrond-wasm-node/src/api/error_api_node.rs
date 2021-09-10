@@ -1,5 +1,4 @@
-use crate::error_hook;
-use crate::ArwenApiImpl;
+use crate::{error_hook, ArwenApiImpl};
 use elrond_wasm::api::{ErrorApi, Handle};
 
 extern "C" {

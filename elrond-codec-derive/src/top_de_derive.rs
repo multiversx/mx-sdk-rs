@@ -1,8 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
 
-use crate::nested_de_derive::*;
-use crate::util::*;
+use crate::{nested_de_derive::*, util::*};
 
 fn fieldless_enum_match_arm_result_ok(
     name: &syn::Ident,

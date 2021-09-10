@@ -1,7 +1,9 @@
 use super::ArgId;
-use crate::api::{ErrorApi, ManagedTypeApi};
-use crate::err_msg;
-use crate::types::{ManagedBuffer, ManagedType};
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    err_msg,
+    types::{ManagedBuffer, ManagedType},
+};
 use elrond_codec::DecodeError;
 
 pub fn signal_arg_de_error<EA>(api: EA, arg_id: ArgId, decode_err: DecodeError) -> !
