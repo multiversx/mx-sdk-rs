@@ -11,12 +11,12 @@ pub trait UpgradeContractModule {
         child_sc_address: ManagedAddress,
         new_code: ManagedBuffer,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
-    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
+    ) {
         self.upgrade(
             &child_sc_address,
             &new_code,
             arguments.into_vec().managed_into(self.type_manager()),
-        )
+        );
     }
 
     #[endpoint(upgradeVault)]
@@ -25,10 +25,10 @@ pub trait UpgradeContractModule {
         child_sc_address: ManagedAddress,
         new_code: ManagedBuffer,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
+    ) {
         self.vault_proxy(child_sc_address)
             .init(opt_arg)
-            .upgrade_contract(&new_code, CodeMetadata::UPGRADEABLE)
+            .upgrade_contract(&new_code, CodeMetadata::UPGRADEABLE);
     }
 
     fn upgrade(
@@ -36,7 +36,7 @@ pub trait UpgradeContractModule {
         child_sc_address: &ManagedAddress,
         new_code: &ManagedBuffer,
         arguments: ManagedVec<Self::TypeManager, ManagedBuffer>,
-    ) -> ManagedVec<Self::TypeManager, ManagedBuffer> {
+    ) {
         self.send().upgrade_contract(
             child_sc_address,
             self.blockchain().get_gas_left(),
@@ -44,6 +44,6 @@ pub trait UpgradeContractModule {
             new_code,
             CodeMetadata::UPGRADEABLE,
             &arguments.managed_into(self.type_manager()),
-        )
+        );
     }
 }

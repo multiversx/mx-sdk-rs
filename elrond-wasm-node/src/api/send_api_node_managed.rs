@@ -304,7 +304,7 @@ impl SendApi for ArwenApiImpl {
                 new_address_handle,
                 result_handle,
             );
-            
+
             let new_managed_address =
                 ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
             let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
@@ -321,10 +321,10 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+    ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let result_handle = mBufferNew();
+            let unused_result_handle = mBufferNew();
             managedUpgradeContract(
                 sc_address.get_raw_handle(),
                 gas as i64,
@@ -332,10 +332,11 @@ impl SendApi for ArwenApiImpl {
                 code.get_raw_handle(),
                 code_metadata_handle,
                 arg_buffer.get_raw_handle(),
-                result_handle,
+                unused_result_handle,
             );
 
-            ManagedVec::from_raw_handle(self.clone(), result_handle)
+            // Note: the result handle is a mistake in the EI.
+            // The upgrade contract operation is an async call, so no results can be returned.
         }
     }
 

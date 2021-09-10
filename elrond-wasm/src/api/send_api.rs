@@ -268,7 +268,7 @@ pub trait SendApi: Clone + Sized {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>;
+    );
 
     fn change_owner_address(
         &self,
