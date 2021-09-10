@@ -1,3 +1,4 @@
+mod linked_list_mapper;
 mod map_mapper;
 mod map_storage_mapper;
 mod mapper;
@@ -8,6 +9,8 @@ mod token_attributes_mapper;
 mod user_mapper;
 mod vec_mapper;
 
+pub use linked_list_mapper::LinkedListMapper;
+pub use linked_list_mapper::LinkedListNode;
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
 pub use mapper::StorageClearable;

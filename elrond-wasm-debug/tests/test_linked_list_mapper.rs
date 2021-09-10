@@ -1,11 +1,11 @@
-use elrond_wasm::storage::mappers::{QueueMapper, StorageClearable, StorageMapper};
+use elrond_wasm::storage::mappers::{LinkedListMapper, StorageClearable, StorageMapper};
 use elrond_wasm::storage::StorageKey;
 use elrond_wasm_debug::TxContext;
 
-fn create_list() -> QueueMapper<TxContext, u64> {
+fn create_list() -> LinkedListMapper<TxContext, u64> {
     let api = TxContext::dummy();
     let base_key = StorageKey::new(api.clone(), &b"my_list"[..]);
-    QueueMapper::new(api, base_key)
+    LinkedListMapper::new(api, base_key)
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn test_list_simple() {
     list.push_back(44);
     assert_eq!(list.len(), 3);
     assert!(list.check_internal_consistency());
-    assert_eq!(list.front(), Some(42));
+    assert_eq!(list.front().unwrap().value, 42);
     let mut it = list.iter();
     assert_eq!(it.next(), Some(42));
     assert_eq!(it.next(), Some(43));
@@ -31,7 +31,7 @@ fn test_list_simple() {
     assert!(list.check_internal_consistency());
 }
 
-fn check_list(list: &QueueMapper<TxContext, u64>, expected: Vec<u64>) {
+fn check_list(list: &LinkedListMapper<TxContext, u64>, expected: Vec<u64>) {
     assert_eq!(list.len(), expected.len());
     let vec: Vec<u64> = list.iter().collect();
     assert_eq!(vec, expected);
@@ -79,7 +79,9 @@ fn test_list_pop() {
 fn test_list_iter_processing() {
     let mut list = create_list();
     let range = 40..45;
-    range.for_each(|value| list.push_back(value));
+    range.for_each(|value| {
+        let _ = list.push_back(value);
+    });
     let processed: Vec<u64> = list.iter().map(|val| val + 10).collect();
     let expected: Vec<u64> = (50..55).collect();
     assert_eq!(processed, expected);
