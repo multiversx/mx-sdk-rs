@@ -473,7 +473,7 @@ pub trait Multisig {
                 Ok(PerformActionResult::Nothing)
             },
             Action::SendEgld { to, amount, data } => Ok(PerformActionResult::SendEgld(SendEgld {
-                api: self.send(),
+                api: self.raw_vm_api(),
                 to,
                 amount,
                 data: data.as_slice().managed_into(self.type_manager()),
@@ -486,7 +486,7 @@ pub trait Multisig {
             } => {
                 let gas_left = self.blockchain().get_gas_left();
                 let arg_buffer = arguments.managed_into(self.type_manager());
-                let (new_address, _) = self.send().deploy_contract(
+                let (new_address, _) = self.raw_vm_api().deploy_contract(
                     gas_left,
                     &amount,
                     &code,
@@ -501,12 +501,10 @@ pub trait Multisig {
                 endpoint_name,
                 arguments,
             } => {
-                let mut contract_call_raw = ContractCall::<Self::SendApi, ()>::new(
-                    self.send(),
-                    to,
-                    endpoint_name.managed_into(self.type_manager()),
-                )
-                .with_egld_transfer(egld_payment);
+                let mut contract_call_raw = self
+                    .send()
+                    .contract_call::<()>(to, endpoint_name.managed_into(self.type_manager()))
+                    .with_egld_transfer(egld_payment);
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
                 }

@@ -1,8 +1,5 @@
-use crate::api::{BlockchainApi, SendApi};
-use crate::types::{
-    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
-    ManagedVec,
-};
+use crate::api::SendApi;
+use crate::types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec};
 use crate::ContractCallArg;
 
 use super::ManagedArgBuffer;
@@ -18,18 +15,15 @@ where
     SA: SendApi + 'static,
 {
     api: SA,
-    to: ManagedAddress<SA::ProxyTypeManager>, // only used for Upgrade, ignored for Deploy
-    egld_payment: BigUint<SA::ProxyTypeManager>,
+    to: ManagedAddress<SA>, // only used for Upgrade, ignored for Deploy
+    egld_payment: BigUint<SA>,
     explicit_gas_limit: u64,
-    arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>,
+    arg_buffer: ManagedArgBuffer<SA>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<SA>(
-    api: SA,
-    to: ManagedAddress<SA::ProxyTypeManager>,
-) -> ContractDeploy<SA>
+pub fn new_contract_deploy<SA>(api: SA, to: ManagedAddress<SA>) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
@@ -43,9 +37,9 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA) -> Self {
-        let zero = BigUint::zero(api.type_manager());
-        let zero_address = ManagedAddress::zero_address(api.type_manager());
-        let arg_buffer = ManagedArgBuffer::new_empty(api.type_manager());
+        let zero = BigUint::zero(api.clone());
+        let zero_address = ManagedAddress::zero_address(api.clone());
+        let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
         ContractDeploy {
             api,
             to: zero_address,
@@ -55,7 +49,7 @@ where
         }
     }
 
-    pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA::ProxyTypeManager>) -> Self {
+    pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA>) -> Self {
         self.egld_payment = payment_amount;
         self
     }
@@ -80,7 +74,7 @@ where
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            self.api.blockchain().get_gas_left()
+            self.api.get_gas_left()
         } else {
             self.explicit_gas_limit
         }
@@ -95,12 +89,9 @@ where
     /// Will return None if the deploy fails.  
     pub fn deploy_contract(
         self,
-        code: &ManagedBuffer<SA::ProxyTypeManager>,
+        code: &ManagedBuffer<SA>,
         code_metadata: CodeMetadata,
-    ) -> (
-        ManagedAddress<SA::ProxyTypeManager>,
-        ManagedVec<SA::ProxyTypeManager, ManagedBuffer<SA::ProxyTypeManager>>,
-    ) {
+    ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
         self.api.deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
@@ -112,12 +103,9 @@ where
 
     pub fn deploy_from_source(
         self,
-        source_address: &ManagedAddress<SA::ProxyTypeManager>,
+        source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
-    ) -> (
-        ManagedAddress<SA::ProxyTypeManager>,
-        ManagedVec<SA::ProxyTypeManager, ManagedBuffer<SA::ProxyTypeManager>>,
-    ) {
+    ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
         self.api.deploy_from_source_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
@@ -127,11 +115,7 @@ where
         )
     }
 
-    pub fn upgrade_contract(
-        self,
-        code: &ManagedBuffer<SA::ProxyTypeManager>,
-        code_metadata: CodeMetadata,
-    ) {
+    pub fn upgrade_contract(self, code: &ManagedBuffer<SA>, code_metadata: CodeMetadata) {
         self.api.upgrade_contract(
             &self.to,
             self.resolve_gas_limit(),

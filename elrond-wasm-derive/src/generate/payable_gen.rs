@@ -22,7 +22,7 @@ fn payable_snippet_for_metadata(
             let token_init = egld_token_init(payment_token_arg);
             let nonce_init = zero_nonce_init(payment_nonce_arg);
             quote! {
-                self.call_value().check_not_payable();
+                elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
                 #amount_init
                 #token_init
                 #nonce_init
@@ -33,7 +33,7 @@ fn payable_snippet_for_metadata(
             let token_init = egld_token_init(payment_token_arg);
             let nonce_init = zero_nonce_init(payment_nonce_arg);
             quote! {
-                let #payment_var_name = self.call_value().require_egld();
+                let #payment_var_name = elrond_wasm::api::CallValueApi::require_egld(&self.raw_vm_api());
                 #token_init
                 #nonce_init
             }
@@ -44,14 +44,14 @@ fn payable_snippet_for_metadata(
             let token_init = if let Some(arg) = payment_token_arg {
                 let pat = &arg.pat;
                 quote! {
-                    let #pat = TokenIdentifier::from_esdt_bytes(self.type_manager(), #token_literal);
+                    let #pat = TokenIdentifier::from_esdt_bytes(self.raw_vm_api(), #token_literal);
                 }
             } else {
                 quote! {}
             };
             let nonce_init = nonce_getter_init(payment_nonce_arg);
             quote! {
-                let #payment_var_name = self.call_value().require_esdt(#token_literal);
+                let #payment_var_name = elrond_wasm::api::CallValueApi::require_esdt(&self.raw_vm_api(), #token_literal);
                 #token_init
                 #nonce_init
             }
@@ -64,7 +64,7 @@ fn payable_snippet_for_metadata(
                 let payment_var_name = var_name_or_underscore(payment_amount_arg);
                 let token_var_name = var_name_or_underscore(payment_token_arg);
                 quote! {
-                    let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
+                    let (#payment_var_name, #token_var_name) = elrond_wasm::api::CallValueApi::payment_token_pair(&self.raw_vm_api());
                     #nonce_init
                 }
             }
@@ -87,7 +87,7 @@ fn egld_token_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream
     if let Some(arg) = opt_arg {
         let pat = &arg.pat;
         quote! {
-            let #pat = TokenIdentifier::egld(self.type_manager());
+            let #pat = TokenIdentifier::egld(self.raw_vm_api());
         }
     } else {
         quote! {}

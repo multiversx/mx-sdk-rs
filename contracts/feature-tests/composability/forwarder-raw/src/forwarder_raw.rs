@@ -21,7 +21,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
     ) -> SendToken<Self::SendApi> {
         SendToken {
-            api: self.send(),
+            api: self.raw_vm_api(),
             to,
             token,
             amount: payment,
@@ -48,7 +48,9 @@ pub trait ForwarderRaw {
         endpoint_name: ManagedBuffer,
         args: VarArgs<ManagedBuffer>,
     ) -> ContractCall<Self::SendApi, ()> {
-        let mut contract_call = ContractCall::new(self.send(), to, endpoint_name)
+        let mut contract_call = self
+            .send()
+            .contract_call(to, endpoint_name)
             .add_token_transfer(payment_token, 0, payment_amount);
         for arg in args.into_vec() {
             contract_call.push_endpoint_arg(arg);
@@ -187,7 +189,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             half_gas,
             &to,
             &payment,
@@ -211,7 +213,7 @@ pub trait ForwarderRaw {
         let half_payment = payment / 2u32;
         let arg_buffer = args.into_vec().managed_into(self.type_manager());
 
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -220,7 +222,7 @@ pub trait ForwarderRaw {
         );
         self.execute_on_dest_context_result(result);
 
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -240,7 +242,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_by_caller_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_by_caller_raw(
             half_gas,
             &to,
             &payment,
@@ -261,7 +263,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_same_context_raw(
+        let result = self.raw_vm_api().execute_on_same_context_raw(
             half_gas,
             &to,
             &payment,
@@ -280,7 +282,7 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_readonly_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_readonly_raw(
             half_gas,
             &to,
             &endpoint_name,
@@ -302,7 +304,7 @@ pub trait ForwarderRaw {
         code: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
-        self.send()
+        self.raw_vm_api()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),

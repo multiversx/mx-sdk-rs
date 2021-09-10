@@ -3,29 +3,32 @@ use std::{collections::HashMap, iter::FromIterator};
 
 fn substitutions() -> HashMap<String, TokenStream> {
     let mut substitutions = HashMap::<String, TokenStream>::new();
+    substitutions.insert("SendApi".to_string(), quote!(Api).into());
+    substitutions.insert("TypeManager".to_string(), quote!(Api).into());
+    substitutions.insert("Storage".to_string(), quote!(Api).into());
     substitutions.insert(
         "BigInt".to_string(),
-        quote!(elrond_wasm::types::BigInt<Self::TypeManager>).into(),
+        quote!(elrond_wasm::types::BigInt<Self::Api>).into(),
     );
     substitutions.insert(
         "BigUint".to_string(),
-        quote!(elrond_wasm::types::BigUint<Self::TypeManager>).into(),
+        quote!(elrond_wasm::types::BigUint<Self::Api>).into(),
     );
     substitutions.insert(
         "ManagedBuffer".to_string(),
-        quote!(elrond_wasm::types::ManagedBuffer<Self::TypeManager>).into(),
+        quote!(elrond_wasm::types::ManagedBuffer<Self::Api>).into(),
     );
     substitutions.insert(
         "EllipticCurve".to_string(),
-        quote!(elrond_wasm::types::EllipticCurve<Self::TypeManager>).into(),
+        quote!(elrond_wasm::types::EllipticCurve<Self::Api>).into(),
     );
     substitutions.insert(
         "ManagedAddress".to_string(),
-        quote!(elrond_wasm::types::ManagedAddress<Self::TypeManager>).into(),
+        quote!(elrond_wasm::types::ManagedAddress<Self::Api>).into(),
     );
     substitutions.insert(
         "TokenIdentifier".to_string(),
-        quote!(elrond_wasm::types::TokenIdentifier<Self::TypeManager>).into(),
+        quote!(elrond_wasm::types::TokenIdentifier<Self::Api>).into(),
     );
     substitutions
 }

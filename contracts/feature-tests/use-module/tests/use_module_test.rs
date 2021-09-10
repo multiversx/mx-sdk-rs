@@ -1,4 +1,4 @@
-use elrond_wasm::api::CallableContract;
+use elrond_wasm::contract_base::CallableContract;
 use elrond_wasm_debug::*;
 
 #[test]
