@@ -225,7 +225,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         given_token: &TokenIdentifier,
     ) -> SCResult<()> {
         if given_token != accepted_token {
-            return Err(SCError::from(BoxedBytes::from_concat(&[
+            return Err(StaticSCError::from(BoxedBytes::from_concat(&[
                 b"Only ",
                 accepted_token.to_esdt_identifier().as_slice(),
                 b" tokens accepted",
