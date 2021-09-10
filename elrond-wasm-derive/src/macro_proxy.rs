@@ -35,7 +35,7 @@ pub fn proxy_implementation(
     let supertraits_main = supertrait_gen::main_supertrait_decl(contract.supertraits.as_slice());
     let main_definition = quote! {
         pub trait #trait_name_ident:
-        ContractBase
+        elrond_wasm::contract_base::ContractBase
         + Sized
         #(#supertraits_main)*
         where

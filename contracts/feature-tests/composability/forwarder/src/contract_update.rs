@@ -37,7 +37,9 @@ pub trait UpgradeContractModule {
         new_code: &ManagedBuffer,
         arguments: ManagedVec<Self::TypeManager, ManagedBuffer>,
     ) {
-        self.send().upgrade_contract(
+        // TODO: use proxies to perform upgrade here
+        // raw upgrade belongs to forwarder-raw
+        self.raw_vm_api().upgrade_contract(
             child_sc_address,
             self.blockchain().get_gas_left(),
             &self.types().big_uint_zero(),

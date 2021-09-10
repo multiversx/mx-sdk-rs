@@ -2,17 +2,6 @@ use crate::TxContext;
 use elrond_wasm::types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256};
 
 impl elrond_wasm::api::BlockchainApi for TxContext {
-    type Storage = Self;
-    type TypeManager = Self;
-
-    fn storage_manager(&self) -> Self::Storage {
-        self.clone()
-    }
-
-    fn type_manager(&self) -> Self::TypeManager {
-        self.clone()
-    }
-
     fn get_sc_address_legacy(&self) -> Address {
         self.tx_input_box.to.clone()
     }
@@ -46,7 +35,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.tx_input_box.from.clone()
     }
 
-    fn get_balance(&self, address: &Address) -> BigUint<Self::Storage> {
+    fn get_balance(&self, address: &Address) -> BigUint<Self> {
         if address != &self.get_sc_address_legacy() {
             panic!("get balance not yet implemented for accounts other than the contract itself");
         }
@@ -114,7 +103,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     fn get_current_esdt_nft_nonce(
         &self,
         _address: &Address,
-        _token: &TokenIdentifier<Self::TypeManager>,
+        _token: &TokenIdentifier<Self>,
     ) -> u64 {
         // TODO: Implement
         0u64
@@ -123,10 +112,10 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     // TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
     fn get_esdt_balance(
         &self,
-        address: &ManagedAddress<Self::TypeManager>,
-        token: &TokenIdentifier<Self::TypeManager>,
+        address: &ManagedAddress<Self>,
+        token: &TokenIdentifier<Self>,
         _nonce: u64,
-    ) -> BigUint<Self::TypeManager> {
+    ) -> BigUint<Self> {
         if address != &self.get_sc_address() {
             panic!(
                 "get_esdt_balance not yet implemented for accounts other than the contract itself"
@@ -139,16 +128,16 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .get(&token.to_esdt_identifier().into_vec())
         {
             Some(value) => self.insert_new_big_uint(value.clone()),
-            None => BigUint::zero(self.storage_manager()),
+            None => BigUint::zero(self.clone()),
         }
     }
 
     fn get_esdt_token_data(
         &self,
-        _address: &ManagedAddress<Self::TypeManager>,
-        _token: &TokenIdentifier<Self::TypeManager>,
+        _address: &ManagedAddress<Self>,
+        _token: &TokenIdentifier<Self>,
         _nonce: u64,
-    ) -> EsdtTokenData<Self::Storage> {
+    ) -> EsdtTokenData<Self> {
         panic!("get_esdt_token_data not yet implemented")
     }
 }

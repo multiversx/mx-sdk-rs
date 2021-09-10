@@ -47,7 +47,7 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_funds_multi_transfer(&self) {
-        let payments = self.call_value().get_all_esdt_transfers();
+        let payments = self.call_value().all_esdt_transfers();
 
         for payment in payments.into_iter() {
             self.accept_funds_event(
@@ -65,7 +65,7 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_multi_funds_echo(&self) -> MultiResultVec<MultiArg3<TokenIdentifier, u64, BigUint>> {
-        let payments = self.call_value().get_all_esdt_transfers();
+        let payments = self.call_value().all_esdt_transfers();
         let mut result = Vec::new();
 
         for payment in payments.into_iter() {

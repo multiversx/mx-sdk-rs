@@ -4,7 +4,6 @@
 #![feature(control_flow_enum)]
 #![allow(clippy::type_complexity)]
 #![allow(deprecated)]
-#![allow(unused)] // TODO: temporary
 
 #[cfg(feature = "derive")]
 pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
@@ -19,6 +18,7 @@ pub use elrond_codec;
 
 pub mod abi;
 pub mod api;
+pub mod contract_base;
 pub mod err_msg;
 pub mod esdt;
 pub mod hex_call_data;

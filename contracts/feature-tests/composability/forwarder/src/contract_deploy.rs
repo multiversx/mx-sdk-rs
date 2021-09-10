@@ -20,7 +20,9 @@ pub trait DeployContractModule {
         source_contract_address: ManagedAddress,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) -> ManagedAddress {
-        let (address, _) = self.send().deploy_from_source_contract(
+        // TODO: use proxies to perform deploy here
+        // raw deploy belongs to forwarder-raw
+        let (address, _) = self.raw_vm_api().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
             &self.types().big_uint_zero(),
             &source_contract_address,

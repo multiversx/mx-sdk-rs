@@ -18,7 +18,8 @@ pub trait Child {
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
     ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
