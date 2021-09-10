@@ -194,7 +194,7 @@ pub trait ForwarderRaw {
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -211,7 +211,7 @@ pub trait ForwarderRaw {
     ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
         let half_payment = payment / 2u32;
-        let arg_buffer = args.into_vec().managed_into(self.type_manager());
+        let arg_buffer = args.into_vec().managed_into();
 
         let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
@@ -247,7 +247,7 @@ pub trait ForwarderRaw {
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -268,7 +268,7 @@ pub trait ForwarderRaw {
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_same_context_result(result);
@@ -286,7 +286,7 @@ pub trait ForwarderRaw {
             half_gas,
             &to,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -310,7 +310,7 @@ pub trait ForwarderRaw {
                 &self.types().big_uint_zero(),
                 &code,
                 CodeMetadata::DEFAULT,
-                &args.into_vec().managed_into(self.type_manager()),
+                &args.into_vec().managed_into(),
             )
             .into()
     }

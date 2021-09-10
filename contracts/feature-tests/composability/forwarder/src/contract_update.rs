@@ -15,7 +15,7 @@ pub trait UpgradeContractModule {
         self.upgrade(
             &child_sc_address,
             &new_code,
-            arguments.into_vec().managed_into(self.type_manager()),
+            arguments.into_vec().managed_into(),
         );
     }
 
@@ -45,7 +45,7 @@ pub trait UpgradeContractModule {
             &self.types().big_uint_zero(),
             new_code,
             CodeMetadata::UPGRADEABLE,
-            &arguments.managed_into(self.type_manager()),
+            &arguments.managed_into(),
         );
     }
 }
