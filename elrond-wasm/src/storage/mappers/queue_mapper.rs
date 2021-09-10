@@ -23,20 +23,20 @@ pub struct Node {
 }
 
 #[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
-pub struct LinkedListMapperInfo {
+pub struct QueueMapperInfo {
     pub len: u32,
     pub front: u32,
     pub back: u32,
     pub new: u32,
 }
 
-impl EncodeDefault for LinkedListMapperInfo {
+impl EncodeDefault for QueueMapperInfo {
     fn is_default(&self) -> bool {
         self.len == 0
     }
 }
 
-impl DecodeDefault for LinkedListMapperInfo {
+impl DecodeDefault for QueueMapperInfo {
     fn default() -> Self {
         Self {
             len: 0,
@@ -47,7 +47,7 @@ impl DecodeDefault for LinkedListMapperInfo {
     }
 }
 
-impl LinkedListMapperInfo {
+impl QueueMapperInfo {
     pub fn generate_new_node_id(&mut self) -> u32 {
         self.new += 1;
         self.new
@@ -56,9 +56,9 @@ impl LinkedListMapperInfo {
 
 /// A doubly-linked list with owned nodes.
 ///
-/// The `LinkedListMapper` allows pushing and popping elements at either end
+/// The `QueueMapper` allows pushing and popping elements at either end
 /// in constant time.
-pub struct LinkedListMapper<SA, T>
+pub struct QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
@@ -68,13 +68,13 @@ where
     _phantom: core::marker::PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
-        LinkedListMapper {
+        QueueMapper {
             api,
             base_key,
             _phantom: PhantomData,
@@ -82,7 +82,7 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
+impl<SA, T> StorageClearable for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
@@ -96,11 +96,11 @@ where
             self.clear_value(node_id);
             node_id = node.next;
         }
-        self.set_info(LinkedListMapperInfo::default());
+        self.set_info(QueueMapperInfo::default());
     }
 }
 
-impl<SA, T> LinkedListMapper<SA, T>
+impl<SA, T> QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
@@ -118,11 +118,11 @@ where
         name_key
     }
 
-    fn get_info(&self) -> LinkedListMapperInfo {
+    fn get_info(&self) -> QueueMapperInfo {
         storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
     }
 
-    fn set_info(&mut self, value: LinkedListMapperInfo) {
+    fn set_info(&mut self, value: QueueMapperInfo) {
         storage_set(
             self.api.clone(),
             &self.build_name_key(INFO_IDENTIFIER),
@@ -405,9 +405,9 @@ where
     }
 }
 
-/// An iterator over the elements of a `LinkedListMapper`.
+/// An iterator over the elements of a `QueueMapper`.
 ///
-/// This `struct` is created by [`LinkedListMapper::iter()`]. See its
+/// This `struct` is created by [`QueueMapper::iter()`]. See its
 /// documentation for more.
 pub struct Iter<'a, SA, T>
 where
@@ -415,7 +415,7 @@ where
     T: TopEncode + TopDecode + 'static,
 {
     node_id: u32,
-    linked_list: &'a LinkedListMapper<SA, T>,
+    queue: &'a QueueMapper<SA, T>,
 }
 
 impl<'a, SA, T> Iter<'a, SA, T>
@@ -423,10 +423,10 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
-    fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
+    fn new(queue: &'a QueueMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
-            node_id: linked_list.get_info().front,
-            linked_list,
+            node_id: queue.get_info().front,
+            queue,
         }
     }
 }
@@ -444,13 +444,13 @@ where
         if current_node_id == NULL_ENTRY {
             return None;
         }
-        self.node_id = self.linked_list.get_node(current_node_id).next;
-        Some(self.linked_list.get_value(current_node_id))
+        self.node_id = self.queue.get_node(current_node_id).next;
+        Some(self.queue.get_value(current_node_id))
     }
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
+impl<SA, T> EndpointResult for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + EndpointResult,
@@ -467,7 +467,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
+impl<SA, T> TypeAbi for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + TypeAbi,

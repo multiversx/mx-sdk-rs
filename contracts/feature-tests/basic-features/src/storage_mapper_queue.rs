@@ -2,10 +2,10 @@ elrond_wasm::imports!();
 
 /// Storage mapper test.
 #[elrond_wasm::module]
-pub trait LinkedListMapperFeatures {
+pub trait QueueMapperFeatures {
     #[view]
     #[storage_mapper("list_mapper")]
-    fn list_mapper(&self) -> LinkedListMapper<Self::Storage, u32>;
+    fn list_mapper(&self) -> QueueMapper<Self::Storage, u32>;
 
     #[endpoint]
     fn list_mapper_push_back(&self, item: u32) {
