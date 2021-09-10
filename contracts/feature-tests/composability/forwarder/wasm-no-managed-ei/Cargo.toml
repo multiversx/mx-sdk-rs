@@ -17,6 +17,7 @@ panic = "abort"
 
 [dependencies.forwarder]
 path = ".."
+default-features = false
 features=["wasm-output-mode-unmanaged-ei"]
 
 [dependencies.elrond-wasm-output]
