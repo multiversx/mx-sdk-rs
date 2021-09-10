@@ -84,7 +84,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>>;
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
 
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
@@ -96,7 +96,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>>;
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
 
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
@@ -156,7 +156,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         value: &BigUint<Self>,
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
-    );
+    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
 
     fn execute_on_dest_context_readonly_raw(
         &self,
