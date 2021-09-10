@@ -18,20 +18,16 @@ pub trait Parent {
     fn deposit(&self) {}
 
     #[endpoint(deployChildContract)]
-    fn deploy_child_contract(&self, code: ManagedBuffer) -> SCResult<()> {
-        let child_contract_address = self
-            .raw_vm_api()
-            .deploy_contract(
-                self.blockchain().get_gas_left(),
-                &self.types().big_uint_zero(),
-                &code,
-                CodeMetadata::DEFAULT,
-                &ManagedArgBuffer::new_empty(self.type_manager()),
-            )
-            .ok_or("Child contract deployment failed")?;
+    fn deploy_child_contract(&self, code: ManagedBuffer) {
+        let (child_contract_address, _) = self.raw_vm_api().deploy_contract(
+            self.blockchain().get_gas_left(),
+            &self.types().big_uint_zero(),
+            &code,
+            CodeMetadata::DEFAULT,
+            &ManagedArgBuffer::new_empty(self.type_manager()),
+        );
 
         self.child_contract_address().set(&child_contract_address);
-        Ok(())
     }
 
     #[payable("EGLD")]

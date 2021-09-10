@@ -73,86 +73,6 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> !;
 
-    /// Performs a simple ESDT/NFT transfer, but via async call.  
-    /// As with any async call, this immediately terminates the execution of the current call.  
-    /// So only use as the last call in your endpoint.  
-    /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
-    /// Note that EGLD can NOT be transfered with this function.  
-    fn transfer_esdt_via_async_call<D>(
-        &self,
-        to: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
-        nonce: u64,
-        amount: &BigUint<Self>,
-        data: D,
-    ) -> !
-    where
-        D: ManagedInto<Self, ManagedBuffer<Self>>,
-    {
-        let data_buf: ManagedBuffer<Self> = data.managed_into(self.clone());
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.clone());
-        arg_buffer.push_arg(token);
-        if nonce == 0 {
-            arg_buffer.push_arg(amount);
-            if !data_buf.is_empty() {
-                arg_buffer.push_arg_raw(data_buf);
-            }
-
-            self.async_call_raw(
-                to,
-                &BigUint::zero(self.clone()),
-                &ManagedBuffer::new_from_bytes(self.clone(), ESDT_TRANSFER_STRING),
-                &arg_buffer,
-            )
-        } else {
-            arg_buffer.push_arg(nonce);
-            arg_buffer.push_arg(amount);
-            arg_buffer.push_arg(to);
-            if !data_buf.is_empty() {
-                arg_buffer.push_arg_raw(data_buf);
-            }
-
-            self.async_call_raw(
-                &self.get_sc_address(),
-                &BigUint::zero(self.clone()),
-                &ManagedBuffer::new_from_bytes(self.clone(), ESDT_NFT_TRANSFER_STRING),
-                &arg_buffer,
-            )
-        }
-    }
-
-    fn transfer_multiple_esdt_via_async_call<D>(
-        &self,
-        to: &ManagedAddress<Self>,
-        payments: &ManagedVec<Self, EsdtTokenPayment<Self>>,
-        data: D,
-    ) -> !
-    where
-        D: ManagedInto<Self, ManagedBuffer<Self>>,
-    {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.clone());
-        arg_buffer.push_arg(to);
-        arg_buffer.push_arg(payments.len());
-
-        for payment in payments.into_iter() {
-            // TODO: check that `!token_name.is_egld()` or let Arwen throw the error?
-            arg_buffer.push_arg(payment.token_name);
-            arg_buffer.push_arg(payment.token_nonce);
-            arg_buffer.push_arg(payment.amount);
-        }
-        let data_buf: ManagedBuffer<Self> = data.managed_into(self.clone());
-        if !data_buf.is_empty() {
-            arg_buffer.push_arg_raw(data_buf);
-        }
-
-        self.async_call_raw(
-            &self.get_sc_address(),
-            &BigUint::zero(self.clone()),
-            &ManagedBuffer::new_from_bytes(self.clone(), ESDT_MULTI_TRANSFER_STRING),
-            &arg_buffer,
-        );
-    }
-
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
@@ -164,7 +84,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>>;
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
 
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
@@ -176,7 +96,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>>;
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
 
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
@@ -236,7 +156,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         value: &BigUint<Self>,
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
-    );
+    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
 
     fn execute_on_dest_context_readonly_raw(
         &self,

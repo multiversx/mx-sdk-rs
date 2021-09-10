@@ -8,7 +8,12 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait Vault {
     #[init]
-    fn init(&self) {}
+    fn init(
+        &self,
+        #[var_args] opt_arg_to_echo: OptionalArg<ManagedBuffer>,
+    ) -> OptionalResult<ManagedBuffer> {
+        opt_arg_to_echo
+    }
 
     #[endpoint]
     fn echo_arguments(

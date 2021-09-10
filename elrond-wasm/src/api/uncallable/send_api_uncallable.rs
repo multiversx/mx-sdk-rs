@@ -76,7 +76,7 @@ impl SendApi for super::UncallableApi {
         _code: &ManagedBuffer<Self>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>> {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         unreachable!()
     }
 
@@ -87,7 +87,7 @@ impl SendApi for super::UncallableApi {
         _source_contract_address: &ManagedAddress<Self>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Option<ManagedAddress<Self>> {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         unreachable!()
     }
 
@@ -147,7 +147,7 @@ impl SendApi for super::UncallableApi {
         _value: &BigUint<Self>,
         _endpoint_name: &ManagedBuffer<Self>,
         _arg_buffer: &ManagedArgBuffer<Self>,
-    ) {
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unreachable!()
     }
 

@@ -6,7 +6,7 @@ const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn mBufferNew() -> i32;
 
     fn checkNoPayment();
@@ -23,7 +23,7 @@ extern "C" {
     fn getESDTTokenNameByIndex(resultOffset: *const u8, index: i32) -> i32;
     fn getESDTTokenNonceByIndex(index: i32) -> i64;
     fn getESDTTokenTypeByIndex(index: i32) -> i32;
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetMultiESDTCallValue(resultHandle: i32);
 
     /// TODO: decide if it is worth using or not
@@ -107,7 +107,7 @@ impl CallValueApi for ArwenApiImpl {
         unsafe { (getESDTTokenTypeByIndex(index as i32) as u8).into() }
     }
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn get_all_esdt_transfers(
         &self,
     ) -> elrond_wasm::types::ManagedVec<Self, elrond_wasm::types::EsdtTokenPayment<Self>> {
