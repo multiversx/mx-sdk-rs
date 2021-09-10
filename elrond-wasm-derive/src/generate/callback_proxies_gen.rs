@@ -45,6 +45,8 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
                     .collect();
                 let method_name = &m.name;
                 let proxy_decl = quote! {
+                    #[allow(clippy::too_many_arguments)]
+                    #[allow(clippy::type_complexity)]
                     fn #method_name(
                         self,
                         #(#arg_decl),*

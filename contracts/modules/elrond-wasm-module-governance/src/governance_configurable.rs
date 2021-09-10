@@ -1,6 +1,5 @@
 elrond_wasm::imports!();
 
-#[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait GovernanceConfigurablePropertiesModule {
     // endpoints - owner-only

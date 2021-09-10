@@ -97,7 +97,10 @@ impl SendApi for super::UncallableApi {
         _code: &ManagedBuffer<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         unreachable!()
     }
 
@@ -108,7 +111,10 @@ impl SendApi for super::UncallableApi {
         _source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         unreachable!()
     }
 
@@ -168,7 +174,7 @@ impl SendApi for super::UncallableApi {
         _value: &BigUint<Self::ProxyTypeManager>,
         _endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         unreachable!()
     }
 

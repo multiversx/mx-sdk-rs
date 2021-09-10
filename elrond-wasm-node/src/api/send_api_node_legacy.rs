@@ -4,8 +4,8 @@ use alloc::vec::Vec;
 use elrond_wasm::api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi};
 use elrond_wasm::types::{
     managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
-    EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedInto, ManagedType,
-    ManagedVec, TokenIdentifier,
+    EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom, ManagedInto,
+    ManagedType, ManagedVec, TokenIdentifier,
 };
 use elrond_wasm::HexCallDataSerializer;
 
@@ -384,9 +384,14 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         let mut new_address = Address::zero();
         unsafe {
+            let num_return_data_before = getNumReturnData();
+
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
             let code_bytes = code.to_boxed_bytes();
@@ -401,11 +406,16 @@ impl SendApi for ArwenApiImpl {
                 legacy_arg_buffer.arg_lengths_bytes_ptr(),
                 legacy_arg_buffer.arg_data_ptr(),
             );
-        }
-        if new_address.is_zero() {
-            None
-        } else {
-            Some(ManagedAddress::from_address(self.clone(), new_address))
+
+            let num_return_data_after = getNumReturnData();
+            let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
+            let results =
+                managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+
+            (
+                ManagedAddress::managed_from(self.clone(), new_address),
+                results,
+            )
         }
     }
 
@@ -416,9 +426,14 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> Option<ManagedAddress<Self::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<Self::ProxyTypeManager>,
+        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+    ) {
         let mut new_address = Address::zero();
         unsafe {
+            let num_return_data_before = getNumReturnData();
+
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
             let source_contract_address_bytes = source_contract_address.to_address();
@@ -432,11 +447,16 @@ impl SendApi for ArwenApiImpl {
                 legacy_arg_buffer.arg_lengths_bytes_ptr(),
                 legacy_arg_buffer.arg_data_ptr(),
             );
-        }
-        if new_address.is_zero() {
-            None
-        } else {
-            Some(ManagedAddress::from_address(self.clone(), new_address))
+
+            let num_return_data_after = getNumReturnData();
+            let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
+            let results =
+                managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+
+            (
+                ManagedAddress::managed_from(self.clone(), new_address),
+                results,
+            )
         }
     }
 
@@ -581,8 +601,10 @@ impl SendApi for ArwenApiImpl {
         amount: &BigUint<Self::ProxyTypeManager>,
         endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
         arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) {
+    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
         unsafe {
+            let num_return_data_before = getNumReturnData();
+
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let function = endpoint_name.to_boxed_bytes();
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
@@ -597,6 +619,10 @@ impl SendApi for ArwenApiImpl {
                 legacy_arg_buffer.arg_lengths_bytes_ptr(),
                 legacy_arg_buffer.arg_data_ptr(),
             );
+
+            let num_return_data_after = getNumReturnData();
+            let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
+            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
         }
     }
 

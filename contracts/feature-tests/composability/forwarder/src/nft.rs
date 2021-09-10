@@ -20,7 +20,6 @@ pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub boxed_bytes: ManagedBuffer<M>,
 }
 
-#[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[view]
@@ -109,7 +108,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    #[allow(clippy::too_many_arguments)]
     fn nft_create(
         &self,
         token_identifier: TokenIdentifier,

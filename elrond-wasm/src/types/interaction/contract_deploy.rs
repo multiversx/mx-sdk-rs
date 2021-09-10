@@ -1,6 +1,7 @@
 use crate::api::{BlockchainApi, SendApi};
 use crate::types::{
     Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
+    ManagedVec,
 };
 use crate::ContractCallArg;
 
@@ -96,11 +97,31 @@ where
         self,
         code: &ManagedBuffer<SA::ProxyTypeManager>,
         code_metadata: CodeMetadata,
-    ) -> Option<ManagedAddress<SA::ProxyTypeManager>> {
+    ) -> (
+        ManagedAddress<SA::ProxyTypeManager>,
+        ManagedVec<SA::ProxyTypeManager, ManagedBuffer<SA::ProxyTypeManager>>,
+    ) {
         self.api.deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,
+            code_metadata,
+            &self.arg_buffer,
+        )
+    }
+
+    pub fn deploy_from_source(
+        self,
+        source_address: &ManagedAddress<SA::ProxyTypeManager>,
+        code_metadata: CodeMetadata,
+    ) -> (
+        ManagedAddress<SA::ProxyTypeManager>,
+        ManagedVec<SA::ProxyTypeManager, ManagedBuffer<SA::ProxyTypeManager>>,
+    ) {
+        self.api.deploy_from_source_contract(
+            self.resolve_gas_limit(),
+            &self.egld_payment,
+            source_address,
             code_metadata,
             &self.arg_buffer,
         )
@@ -120,6 +141,4 @@ where
             &self.arg_buffer,
         );
     }
-
-    // TODO: deploy contract with code from another contract
 }

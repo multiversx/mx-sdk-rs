@@ -89,7 +89,7 @@ impl Default for BigUintValue {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct U64Value {
     pub value: u64,
     pub original: ValueSubTree,
@@ -102,15 +102,6 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
         U64Value {
             value: bu.to_u64().unwrap(),
             original: from,
-        }
-    }
-}
-
-impl Default for U64Value {
-    fn default() -> Self {
-        Self {
-            value: 0,
-            original: ValueSubTree::default(),
         }
     }
 }

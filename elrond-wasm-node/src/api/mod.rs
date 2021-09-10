@@ -10,8 +10,8 @@ mod managed_types;
 mod storage_api_node;
 mod unsafe_buffer;
 
-#[cfg(feature = "managed-ei")]
+#[cfg(not(feature = "unmanaged-ei"))]
 mod send_api_node_managed;
 
-#[cfg(not(feature = "managed-ei"))]
+#[cfg(feature = "unmanaged-ei")]
 mod send_api_node_legacy;
