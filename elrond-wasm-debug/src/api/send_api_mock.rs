@@ -217,7 +217,7 @@ impl SendApi for TxContext {
         _code: &ManagedBuffer<Self::ProxyTypeManager>,
         _code_metadata: CodeMetadata,
         _arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+    ) {
         panic!("upgrade_contract not yet implemented")
     }
 

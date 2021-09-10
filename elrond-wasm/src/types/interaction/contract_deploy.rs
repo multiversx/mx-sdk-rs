@@ -131,7 +131,7 @@ where
         self,
         code: &ManagedBuffer<SA::ProxyTypeManager>,
         code_metadata: CodeMetadata,
-    ) -> ManagedVec<SA::ProxyTypeManager, ManagedBuffer<SA::ProxyTypeManager>> {
+    ) {
         self.api.upgrade_contract(
             &self.to,
             self.resolve_gas_limit(),
@@ -139,6 +139,6 @@ where
             code,
             code_metadata,
             &self.arg_buffer,
-        )
+        );
     }
 }

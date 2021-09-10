@@ -45,6 +45,7 @@
         {
             "step": "scCall",
             "txId": "upgrade-back-to-vault",
+            "comment": "init results cannot be retrieved directly, since it is an async call, but we can experiment with callbacks in the future",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -52,17 +53,13 @@
                 "function": "upgradeVault",
                 "arguments": [
                     "sc:child",
-                    "file:../vault/output/vault.wasm",
-                    "str:some_argument"
+                    "file:../vault/output/vault.wasm"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:some_argument",
-                    "nested:str:some_argument"
-                ]
+                "out": []
             }
         },
         {
