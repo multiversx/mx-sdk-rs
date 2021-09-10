@@ -148,10 +148,13 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_async_result_empty(&self, #[var_args] a: AsyncCallResult<()>) -> SCResult<()> {
+    fn echo_async_result_empty(
+        &self,
+        #[var_args] a: AsyncCallResult<()>,
+    ) -> SCResult<(), ManagedSCError> {
         match a {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
+            AsyncCallResult::Err(msg) => Err(msg.err_msg.managed_into(self.type_manager())),
         }
     }
 
