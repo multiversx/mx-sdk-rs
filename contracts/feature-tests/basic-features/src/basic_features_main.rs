@@ -18,9 +18,9 @@ pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
-pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
+pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
@@ -45,7 +45,7 @@ pub trait BasicFeatures:
     + managed_vec_features::ManagedVecFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
-    + storage_mapper_linked_list::LinkedListMapperFeatures
+    + storage_mapper_queue::QueueMapperFeatures
     + storage_mapper_map::MapMapperFeatures
     + storage_mapper_map_storage::MapStorageMapperFeatures
     + storage_mapper_set::SetMapperFeatures
