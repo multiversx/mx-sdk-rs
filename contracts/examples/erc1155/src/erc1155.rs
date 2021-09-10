@@ -22,7 +22,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         let caller = self.blockchain().get_caller();
 
         require!(
@@ -51,7 +51,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         amount: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         self.try_reserve_fungible(&from, &type_id, &amount)?;
 
         Ok(if self.blockchain().is_smart_contract(&to.to_address()) {
@@ -72,7 +72,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         nft_id: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         self.try_reserve_non_fungible(&from, &type_id, &nft_id)?;
 
         Ok(if self.blockchain().is_smart_contract(&to.to_address()) {
@@ -97,7 +97,7 @@ pub trait Erc1155 {
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         let caller = self.blockchain().get_caller();
         let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to.to_address());
 
@@ -380,7 +380,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.erc1155_user_proxy(to.clone())
@@ -401,7 +401,7 @@ pub trait Erc1155 {
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.erc1155_user_proxy(to.clone())

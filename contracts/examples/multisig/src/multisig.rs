@@ -508,7 +508,7 @@ pub trait Multisig {
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
                 }
-                Ok(PerformActionResult::AsyncCall(
+                Ok(PerformActionResult::SendAsyncCall(
                     contract_call_raw.async_call(),
                 ))
             },

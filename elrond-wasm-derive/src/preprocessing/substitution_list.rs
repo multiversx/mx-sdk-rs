@@ -35,6 +35,11 @@ pub fn substitutions() -> SubstitutionsMap {
         quote!(ManagedSCError),
         quote!(elrond_wasm::types::ManagedSCError<Self::Api>),
     );
+    substitutions.add_substitution(
+        quote!(AsyncCall),
+        quote!(elrond_wasm::types::AsyncCall<Self::Api>),
+    );
+
     substitutions.add_substitution(quote!(SendApi), quote!(Api));
     substitutions.add_substitution(quote!(TypeManager), quote!(Api));
     substitutions.add_substitution(quote!(Storage), quote!(Api));

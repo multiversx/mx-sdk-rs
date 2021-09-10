@@ -87,7 +87,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContract)]
-    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall<Self::SendApi> {
+    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
@@ -97,10 +97,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContractWithCallback)]
-    fn forward_to_other_contract_with_callback(
-        &self,
-        #[payment] payment: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    fn forward_to_other_contract_with_callback(&self, #[payment] payment: BigUint) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
@@ -110,7 +107,7 @@ pub trait ProxyTestFirst {
     }
 
     #[endpoint(messageOtherContract)]
-    fn message_other_contract(&self) -> AsyncCall<Self::SendApi> {
+    fn message_other_contract(&self) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)
@@ -124,7 +121,7 @@ pub trait ProxyTestFirst {
     }
 
     #[endpoint(messageOtherContractWithCallback)]
-    fn message_other_contract_with_callback(&self) -> AsyncCall<Self::SendApi> {
+    fn message_other_contract_with_callback(&self) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)

@@ -136,11 +136,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn buy_ticket(
-        &self,
-        lottery_name: BoxedBytes,
-        token_amount: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BigUint) -> SCResult<AsyncCall> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is currently inactive."),
             Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
@@ -154,10 +150,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn determine_winner(
-        &self,
-        lottery_name: BoxedBytes,
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    fn determine_winner(&self, lottery_name: BoxedBytes) -> SCResult<OptionalResult<AsyncCall>> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is inactive!"),
             Status::Running => sc_error!("Lottery is still running!"),
@@ -201,7 +194,7 @@ pub trait Lottery {
         &self,
         lottery_name: &BoxedBytes,
         token_amount: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         let info = self.get_lottery_info(lottery_name);
         let caller = self.blockchain().get_caller();
 
@@ -250,10 +243,7 @@ pub trait Lottery {
         self.set_lottery_info(lottery_name, &info);
     }
 
-    fn distribute_prizes(
-        &self,
-        lottery_name: &BoxedBytes,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    fn distribute_prizes(&self, lottery_name: &BoxedBytes) -> OptionalResult<AsyncCall> {
         let info = self.get_lottery_info(lottery_name);
 
         let total_tickets = info.current_ticket_number;
@@ -385,7 +375,7 @@ pub trait Lottery {
         &self,
         #[call_result] result: AsyncCallResult<()>,
         cb_lottery_name: &BoxedBytes,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    ) -> OptionalResult<AsyncCall> {
         match result {
             AsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
             AsyncCallResult::Err(_) => {

@@ -67,7 +67,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .async_call()
     }
@@ -81,7 +81,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let half_payment = payment / 2u32;
         self.forward_async_call(to, token, half_payment, endpoint_name, args)
     }

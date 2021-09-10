@@ -98,7 +98,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.send()
