@@ -1,4 +1,4 @@
-use super::sc_error::SCError;
+use super::sc_error::StaticSCError;
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use crate::api::{EndpointFinishApi, ManagedTypeApi};
 use crate::EndpointResult;
@@ -11,7 +11,7 @@ use core::ops::{ControlFlow, FromResidual, Try};
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SCResult<T> {
     Ok(T),
-    Err(SCError),
+    Err(StaticSCError),
 }
 
 impl<T> SCResult<T> {
@@ -33,7 +33,7 @@ impl<T> SCResult<T> {
     }
 
     #[inline]
-    pub fn err(self) -> Option<SCError> {
+    pub fn err(self) -> Option<StaticSCError> {
         if let SCResult::Err(e) = self {
             Some(e)
         } else {
@@ -46,7 +46,7 @@ impl<T> SCResult<T> {
     /// (`Vec<u8>`, `&[u8]`, `BoxedBytes`, `String`, `&str` are covered).
     pub fn from_result<E>(r: core::result::Result<T, E>) -> Self
     where
-        E: Into<SCError>,
+        E: Into<StaticSCError>,
     {
         match r {
             Ok(t) => SCResult::Ok(t),
@@ -60,7 +60,7 @@ impl<T> SCResult<T> {
 /// <https://github.com/scottmcm/rfcs/blob/do-or-do-not/text/0000-try-trait-v2.md#the-try-trait>
 impl<T> Try for SCResult<T> {
     type Output = T;
-    type Residual = SCError;
+    type Residual = StaticSCError;
 
     fn branch(self) -> ControlFlow<Self::Residual, T> {
         match self {
@@ -74,14 +74,14 @@ impl<T> Try for SCResult<T> {
 }
 
 impl<T> FromResidual for SCResult<T> {
-    fn from_residual(r: SCError) -> Self {
+    fn from_residual(r: StaticSCError) -> Self {
         SCResult::Err(r)
     }
 }
 
 impl<T, E> FromResidual<Result<convert::Infallible, E>> for SCResult<T>
 where
-    E: Into<SCError>,
+    E: Into<StaticSCError>,
 {
     fn from_residual(residual: Result<convert::Infallible, E>) -> Self {
         match residual {
@@ -142,7 +142,7 @@ impl<T> SCResult<T> {
     }
 }
 
-impl<T> From<SCResult<T>> for Result<T, SCError> {
+impl<T> From<SCResult<T>> for Result<T, StaticSCError> {
     fn from(result: SCResult<T>) -> Self {
         match result {
             SCResult::Ok(ok) => Result::Ok(ok),
@@ -153,7 +153,7 @@ impl<T> From<SCResult<T>> for Result<T, SCError> {
 
 impl<T, Err> From<Result<T, Err>> for SCResult<T>
 where
-    Err: Into<SCError>,
+    Err: Into<StaticSCError>,
 {
     fn from(result: Result<T, Err>) -> Self {
         match result {
