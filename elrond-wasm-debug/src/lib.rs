@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 pub mod abi_json;
 pub mod api;
 mod arwen_mandos_runner;

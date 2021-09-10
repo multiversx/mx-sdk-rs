@@ -2,7 +2,7 @@ elrond_wasm::derive_imports!();
 
 use random::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, TypeAbi, Default)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -23,12 +23,6 @@ impl Color {
             / 100) as u8;
 
         Color { r, g, b }
-    }
-}
-
-impl Default for Color {
-    fn default() -> Self {
-        Color { r: 0, g: 0, b: 0 }
     }
 }
 
