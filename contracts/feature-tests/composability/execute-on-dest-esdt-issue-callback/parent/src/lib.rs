@@ -8,7 +8,7 @@ const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 #[elrond_wasm::contract]
 pub trait Parent {
     #[proxy]
-    fn child_proxy(&self, to: ManagedAddress) -> child::Proxy<Self::SendApi>;
+    fn child_proxy(&self, to: ManagedAddress) -> child::Proxy<Self::Api>;
 
     #[init]
     fn init(&self) {}
@@ -50,5 +50,5 @@ pub trait Parent {
 
     #[view(getChildContractAddress)]
     #[storage_mapper("childContractAddress")]
-    fn child_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn child_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 }

@@ -20,8 +20,8 @@ pub trait OrdersModule:
 {
     fn create_order(
         &self,
-        payment: Payment<Self::TypeManager>,
-        params: OrderInputParams<Self::TypeManager>,
+        payment: Payment<Self::Api>,
+        params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) -> SCResult<()> {
         let caller = &self.blockchain().get_caller();
@@ -130,7 +130,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::TypeManager>> {
+    ) -> SCResult<Order<Self::Api>> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -180,7 +180,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::TypeManager>> {
+    ) -> SCResult<Order<Self::Api>> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -208,7 +208,7 @@ pub trait OrdersModule:
         Ok(order)
     }
 
-    fn load_orders(&self, order_ids: &[u64]) -> Vec<Order<Self::TypeManager>> {
+    fn load_orders(&self, order_ids: &[u64]) -> Vec<Order<Self::Api>> {
         order_ids
             .iter()
             .filter(|&x| !self.orders(*x).is_empty())
@@ -216,10 +216,7 @@ pub trait OrdersModule:
             .collect()
     }
 
-    fn create_transfers(
-        &self,
-        orders: &[Order<Self::TypeManager>],
-    ) -> SCResult<Vec<Transfer<Self::TypeManager>>> {
+    fn create_transfers(&self, orders: &[Order<Self::Api>]) -> SCResult<Vec<Transfer<Self::Api>>> {
         let mut transfers = Vec::new();
         let first_token_id = self.first_token_id().get();
         let second_token_id = self.second_token_id().get();
@@ -262,9 +259,9 @@ pub trait OrdersModule:
 
     fn get_orders_with_type(
         &self,
-        orders: &[Order<Self::TypeManager>],
+        orders: &[Order<Self::Api>],
         order_type: OrderType,
-    ) -> Vec<Order<Self::TypeManager>> {
+    ) -> Vec<Order<Self::Api>> {
         orders
             .iter()
             .filter(|&x| x.order_type == order_type)
@@ -272,7 +269,7 @@ pub trait OrdersModule:
             .collect()
     }
 
-    fn get_orders_sum_up(&self, orders: &[Order<Self::TypeManager>]) -> (BigUint, BigUint) {
+    fn get_orders_sum_up(&self, orders: &[Order<Self::Api>]) -> (BigUint, BigUint) {
         let mut amount_paid = self.types().big_uint_zero();
         let mut amount_requested = self.types().big_uint_zero();
 
@@ -286,11 +283,11 @@ pub trait OrdersModule:
 
     fn calculate_transfers(
         &self,
-        orders: Vec<Order<Self::TypeManager>>,
+        orders: Vec<Order<Self::Api>>,
         total_paid: BigUint,
         token_requested: TokenIdentifier,
         leftover: BigUint,
-    ) -> Vec<Transfer<Self::TypeManager>> {
+    ) -> Vec<Transfer<Self::Api>> {
         let mut transfers = Vec::new();
 
         let mut match_provider_transfer = Transfer {
@@ -332,7 +329,7 @@ pub trait OrdersModule:
         transfers
     }
 
-    fn execute_transfers(&self, transfers: Vec<Transfer<Self::TypeManager>>) {
+    fn execute_transfers(&self, transfers: Vec<Transfer<Self::Api>>) {
         for transfer in transfers {
             if transfer.payment.amount > 0 {
                 self.send().direct(
@@ -370,15 +367,12 @@ pub trait OrdersModule:
 
     #[view(getOrderIdCounter)]
     #[storage_mapper("order_id_counter")]
-    fn order_id_counter(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn order_id_counter(&self) -> SingleValueMapper<u64>;
 
     #[view(getOrderById)]
     #[storage_mapper("orders")]
-    fn orders(&self, id: u64) -> SingleValueMapper<Self::Storage, Order<Self::TypeManager>>;
+    fn orders(&self, id: u64) -> SingleValueMapper<Order<Self::Api>>;
 
     #[storage_mapper("address_order_ids")]
-    fn address_order_ids(
-        &self,
-        address: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, Vec<u64>>;
+    fn address_order_ids(&self, address: &ManagedAddress) -> SingleValueMapper<Vec<u64>>;
 }

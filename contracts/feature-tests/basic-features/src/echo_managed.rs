@@ -51,8 +51,8 @@ pub trait EchoManagedTypes {
     fn echo_tuple_into_multiresult(
         &self,
         addr: ManagedAddress,
-        vec: ManagedVec<Self::TypeManager, ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+        vec: ManagedVec<Self::Api, ManagedBuffer>,
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         (addr, vec).into()
     }
 }

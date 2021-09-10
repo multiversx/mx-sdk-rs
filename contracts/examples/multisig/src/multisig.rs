@@ -16,10 +16,10 @@ pub trait Multisig {
     /// Minimum number of signatures needed to perform any action.
     #[view(getQuorum)]
     #[storage_mapper("quorum")]
-    fn quorum(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn quorum(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("user")]
-    fn user_mapper(&self) -> UserMapper<Self::Storage>;
+    fn user_mapper(&self) -> UserMapper;
 
     #[storage_get("user_role")]
     fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
@@ -31,16 +31,16 @@ pub trait Multisig {
     /// It is kept in sync with the user list by the contract.
     #[view(getNumBoardMembers)]
     #[storage_mapper("num_board_members")]
-    fn num_board_members(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn num_board_members(&self) -> SingleValueMapper<usize>;
 
     /// Denormalized proposer count.
     /// It is kept in sync with the user list by the contract.
     #[view(getNumProposers)]
     #[storage_mapper("num_proposers")]
-    fn num_proposers(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn num_proposers(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Self::Storage, Action<Self::TypeManager>>;
+    fn action_mapper(&self) -> VecMapper<Action<Self::Api>>;
 
     /// The index of the last proposed action.
     /// 0 means that no action was ever proposed yet.
@@ -51,12 +51,12 @@ pub trait Multisig {
 
     /// Serialized action data of an action with index.
     #[view(getActionData)]
-    fn get_action_data(&self, action_id: usize) -> Action<Self::TypeManager> {
+    fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
         self.action_mapper().get(action_id)
     }
 
     #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Self::Storage, Vec<usize>>;
+    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Vec<usize>>;
 
     #[init]
     fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
@@ -86,7 +86,7 @@ pub trait Multisig {
     #[endpoint]
     fn deposit(&self) {}
 
-    fn propose_action(&self, action: Action<Self::TypeManager>) -> SCResult<usize> {
+    fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
@@ -111,7 +111,7 @@ pub trait Multisig {
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::TypeManager>> {
+    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::Api>> {
         let mut result = Vec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
@@ -258,7 +258,7 @@ pub trait Multisig {
         for user_id in 1..=num_users {
             if self.get_user_id_to_role(user_id) == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
-                    result.push(address.managed_into(self.type_manager()));
+                    result.push(address.managed_into());
                 }
             }
         }
@@ -368,7 +368,7 @@ pub trait Multisig {
             .map(|signer_id| {
                 self.user_mapper()
                     .get_user_address_unchecked(*signer_id)
-                    .managed_into(self.type_manager())
+                    .managed_into()
             })
             .collect()
     }
@@ -410,7 +410,7 @@ pub trait Multisig {
     fn perform_action_endpoint(
         &self,
         action_id: usize,
-    ) -> SCResult<PerformActionResult<Self::SendApi>> {
+    ) -> SCResult<PerformActionResult<Self::Api>> {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
@@ -426,7 +426,7 @@ pub trait Multisig {
         self.perform_action(action_id)
     }
 
-    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::SendApi>> {
+    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::Api>> {
         let action = self.action_mapper().get(action_id);
 
         // clean up storage
@@ -476,7 +476,7 @@ pub trait Multisig {
                 api: self.raw_vm_api(),
                 to,
                 amount,
-                data: data.as_slice().managed_into(self.type_manager()),
+                data: data.as_slice().managed_into(),
             })),
             Action::SCDeploy {
                 amount,
@@ -485,7 +485,7 @@ pub trait Multisig {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into(self.type_manager());
+                let arg_buffer = arguments.managed_into();
                 let (new_address, _) = self.raw_vm_api().deploy_contract(
                     gas_left,
                     &amount,
@@ -503,12 +503,12 @@ pub trait Multisig {
             } => {
                 let mut contract_call_raw = self
                     .send()
-                    .contract_call::<()>(to, endpoint_name.managed_into(self.type_manager()))
+                    .contract_call::<()>(to, endpoint_name.managed_into())
                     .with_egld_transfer(egld_payment);
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
                 }
-                Ok(PerformActionResult::AsyncCall(
+                Ok(PerformActionResult::SendAsyncCall(
                     contract_call_raw.async_call(),
                 ))
             },
