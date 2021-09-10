@@ -4,12 +4,6 @@ use elrond_wasm::err_msg;
 use elrond_wasm::types::{BigUint, EsdtTokenType, ManagedBuffer, TokenIdentifier};
 
 impl CallValueApi for TxContext {
-    type TypeManager = Self;
-
-    fn type_manager(&self) -> Self::TypeManager {
-        self.clone()
-    }
-
     fn check_not_payable(&self) {
         if self.egld_value() > 0 {
             std::panic::panic_any(TxPanic {
@@ -26,19 +20,19 @@ impl CallValueApi for TxContext {
     }
 
     #[inline]
-    fn egld_value(&self) -> BigUint<Self::TypeManager> {
+    fn egld_value(&self) -> BigUint<Self> {
         self.insert_new_big_uint(self.tx_input_box.call_value.clone())
     }
 
     #[inline]
-    fn esdt_value(&self) -> BigUint<Self::TypeManager> {
+    fn esdt_value(&self) -> BigUint<Self> {
         self.insert_new_big_uint(self.tx_input_box.esdt_value.clone())
     }
 
     #[inline]
-    fn token(&self) -> TokenIdentifier<Self::TypeManager> {
+    fn token(&self) -> TokenIdentifier<Self> {
         ManagedBuffer::new_from_bytes(
-            self.type_manager(),
+            self.clone(),
             self.tx_input_box.esdt_token_identifier.as_slice(),
         )
         .into()
@@ -64,13 +58,13 @@ impl CallValueApi for TxContext {
     }
 
     #[inline]
-    fn esdt_value_by_index(&self, _index: usize) -> BigUint<Self::TypeManager> {
+    fn esdt_value_by_index(&self, _index: usize) -> BigUint<Self> {
         self.insert_new_big_uint_zero()
     }
 
     #[inline]
-    fn token_by_index(&self, _index: usize) -> TokenIdentifier<Self::TypeManager> {
-        TokenIdentifier::egld(self.type_manager())
+    fn token_by_index(&self, _index: usize) -> TokenIdentifier<Self> {
+        TokenIdentifier::egld(self.clone())
     }
 
     #[inline]

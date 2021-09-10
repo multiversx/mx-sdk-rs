@@ -1,9 +1,9 @@
-use elrond_wasm::api::ContractBase;
+use elrond_wasm::contract_base::ContractBase;
 use elrond_wasm_debug::TxContext;
 use factorial::*;
 
 #[test]
-fn test_add() {
+fn test_factorial() {
     let factorial = factorial::contract_obj(TxContext::dummy());
 
     assert_eq!(

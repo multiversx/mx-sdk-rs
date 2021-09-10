@@ -68,12 +68,12 @@ fn substitutions() -> SubstitutionsMap {
     add_substitution(
         &mut substitutions,
         quote!(BigInt),
-        quote!(elrond_wasm::types::BigInt<Self::TypeManager>),
+        quote!(elrond_wasm::types::BigInt<Self::Api>),
     );
     add_substitution(
         &mut substitutions,
         quote!(BigUint),
-        quote!(elrond_wasm::types::BigUint<Self::TypeManager>),
+        quote!(elrond_wasm::types::BigUint<Self::Api>),
     );
     add_substitution(
         &mut substitutions,
@@ -88,23 +88,26 @@ fn substitutions() -> SubstitutionsMap {
     add_substitution(
         &mut substitutions,
         quote!(ManagedBuffer),
-        quote!(elrond_wasm::types::ManagedBuffer<Self::TypeManager>),
+        quote!(elrond_wasm::types::ManagedBuffer<Self::Api>),
     );
     add_substitution(
         &mut substitutions,
         quote!(EllipticCurve),
-        quote!(elrond_wasm::types::EllipticCurve<Self::TypeManager>),
+        quote!(elrond_wasm::types::EllipticCurve<Self::Api>),
     );
     add_substitution(
         &mut substitutions,
         quote!(ManagedAddress),
-        quote!(elrond_wasm::types::ManagedAddress<Self::TypeManager>),
+        quote!(elrond_wasm::types::ManagedAddress<Self::Api>),
     );
     add_substitution(
         &mut substitutions,
         quote!(TokenIdentifier),
-        quote!(elrond_wasm::types::TokenIdentifier<Self::TypeManager>),
+        quote!(elrond_wasm::types::TokenIdentifier<Self::Api>),
     );
+    add_substitution(&mut substitutions, quote!(SendApi), quote!(Api));
+    add_substitution(&mut substitutions, quote!(TypeManager), quote!(Api));
+    add_substitution(&mut substitutions, quote!(Storage), quote!(Api));
     substitutions
 }
 

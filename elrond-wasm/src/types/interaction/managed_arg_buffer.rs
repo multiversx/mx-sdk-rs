@@ -3,7 +3,7 @@ use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     err_msg,
     types::{ManagedBuffer, ManagedFrom, ManagedInto, ManagedType, ManagedVec, ManagedVecIterator},
-    ContractCallArg, DynArg, DynArgOutput,
+    DynArgOutput,
 };
 use alloc::vec::Vec;
 use elrond_codec::{EncodeError, TopEncode};

@@ -11,7 +11,8 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
@@ -24,7 +25,8 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
     ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())

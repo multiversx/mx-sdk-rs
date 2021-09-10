@@ -15,7 +15,7 @@ pub trait PayableFeatures {
     {
         (
             self.call_value().egld_value(),
-            self.call_value().get_all_esdt_transfers(),
+            self.call_value().all_esdt_transfers(),
         )
             .into()
     }

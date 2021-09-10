@@ -47,14 +47,9 @@ pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 
 fn impl_auto_impl(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl<A> #module_path AutoImpl for ContractObj<A> where
-            A: elrond_wasm::api::ContractBase
-                + elrond_wasm::api::ErrorApi
-                + elrond_wasm::api::EndpointArgumentApi
-                + elrond_wasm::api::EndpointFinishApi
-                + elrond_wasm::api::ManagedTypeApi
-                + Clone
-                + 'static
+        impl<A> #module_path AutoImpl for ContractObj<A>
+        where
+            A: elrond_wasm::api::VMApi + Clone + 'static,
         {
         }
     }
@@ -88,13 +83,8 @@ pub fn auto_impl_inheritance(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 fn impl_endpoint_wrappers(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
         impl<A> #module_path EndpointWrappers for ContractObj<A>
-            where A: elrond_wasm::api::ContractBase
-                + elrond_wasm::api::ErrorApi
-                + elrond_wasm::api::EndpointArgumentApi
-                + elrond_wasm::api::EndpointFinishApi
-                + elrond_wasm::api::ManagedTypeApi
-                + Clone
-                + 'static,
+        where
+            A: elrond_wasm::api::VMApi + Clone + 'static,
         {
         }
     }
@@ -144,7 +134,7 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 
 fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl<SA> #module_path ProxyTrait for Proxy<SA> where SA: elrond_wasm::api::SendApi {}
+        impl<A> #module_path ProxyTrait for Proxy<A> where A: elrond_wasm::api::VMApi {}
     }
 }
 

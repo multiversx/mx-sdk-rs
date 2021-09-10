@@ -21,8 +21,11 @@ pub fn generate_sig(m: &Method) -> proc_macro2::TokenStream {
         syn::ReturnType::Default => quote! {},
         syn::ReturnType::Type(_, ty) => quote! { -> #ty },
     };
-    let result =
-        quote! { fn #method_name #generics ( &self , #(#arg_decl),* ) #ret_tok #generics_where };
+    let result = quote! {
+        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
+        fn #method_name #generics ( &self , #(#arg_decl),* ) #ret_tok #generics_where
+    };
     result
 }
 
