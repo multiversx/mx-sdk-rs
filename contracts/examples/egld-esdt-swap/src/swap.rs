@@ -24,7 +24,7 @@ pub trait EgldEsdtSwap {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         require!(
             self.wrapped_egld_token_id().is_empty(),
             "wrapped egld was already issued"
@@ -88,7 +88,7 @@ pub trait EgldEsdtSwap {
 
     #[only_owner]
     #[endpoint(mintWrappedEgld)]
-    fn mint_wrapped_egld(&self, amount: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn mint_wrapped_egld(&self, amount: BigUint) -> SCResult<AsyncCall> {
         require!(
             !self.wrapped_egld_token_id().is_empty(),
             "Wrapped EGLD was not issued yet"

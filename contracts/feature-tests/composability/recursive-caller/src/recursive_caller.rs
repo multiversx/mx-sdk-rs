@@ -21,7 +21,7 @@ pub trait RecursiveCaller {
         token_identifier: &TokenIdentifier,
         amount: &BigUint,
         counter: u32,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.recursive_send_funds_event(to, token_identifier, amount, counter);
 
         self.vault_proxy()
@@ -43,7 +43,7 @@ pub trait RecursiveCaller {
         token_identifier: &TokenIdentifier,
         amount: &BigUint,
         counter: u32,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    ) -> OptionalResult<AsyncCall> {
         self.recursive_send_funds_callback_event(to, token_identifier, amount, counter);
 
         if counter > 1 {

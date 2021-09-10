@@ -20,7 +20,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall> {
         require!(
             self.blockchain().get_block_nonce() <= self.deadline().get(),
             "cannot fund after deadline"
@@ -56,7 +56,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    fn claim(&self) -> SCResult<OptionalResult<AsyncCall>> {
         match self.status() {
             Status::FundingPeriod => sc_error!("cannot claim before deadline"),
             Status::Successful => {
@@ -101,7 +101,7 @@ pub trait Crowdfunding {
         #[call_result] result: AsyncCallResult<()>,
         cb_sender: ManagedAddress,
         cb_amount: BigUint,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    ) -> OptionalResult<AsyncCall> {
         match result {
             AsyncCallResult::Ok(()) => {
                 // transaction started before deadline, ended after -> refund

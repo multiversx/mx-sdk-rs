@@ -220,7 +220,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[endpoint(endAuction)]
-    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -349,7 +349,7 @@ pub trait Erc1155Marketplace {
         type_id: BigUint,
         nft_id: BigUint,
         to: ManagedAddress,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let sc_own_address = self.blockchain().get_sc_address();
         let token_ownership_contract_address = self.token_ownership_contract_address().get();
 

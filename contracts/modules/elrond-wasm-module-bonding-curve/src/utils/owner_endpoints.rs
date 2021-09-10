@@ -15,7 +15,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
@@ -29,7 +29,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())

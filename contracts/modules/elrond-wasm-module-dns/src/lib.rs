@@ -17,7 +17,7 @@ pub trait DnsModule {
         dns_address: ManagedAddress,
         name: BoxedBytes,
         #[payment] payment: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         only_owner!(self, "only owner can call dnsRegister");
 
         Ok(self
