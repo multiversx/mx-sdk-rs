@@ -35,7 +35,7 @@ pub trait UpgradeContractModule {
         &self,
         child_sc_address: &ManagedAddress,
         new_code: &ManagedBuffer,
-        arguments: ManagedVec<Self::TypeManager, ManagedBuffer>,
+        arguments: ManagedVec<Self::Api, ManagedBuffer>,
     ) {
         // TODO: use proxies to perform upgrade here
         // raw upgrade belongs to forwarder-raw

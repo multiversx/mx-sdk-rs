@@ -356,10 +356,7 @@ pub trait Lottery {
 
     #[view(getLotteryInfo)]
     #[storage_mapper("lotteryInfo")]
-    fn lottery_info(
-        &self,
-        lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<LotteryInfo<Self::TypeManager>>;
+    fn lottery_info(&self, lottery_name: &BoxedBytes) -> SingleValueMapper<LotteryInfo<Self::Api>>;
 
     #[storage_mapper("ticketHolder")]
     fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<ManagedAddress>;

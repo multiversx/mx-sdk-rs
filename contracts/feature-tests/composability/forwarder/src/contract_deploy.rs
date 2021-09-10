@@ -10,7 +10,7 @@ pub trait DeployContractModule {
         &self,
         code: ManagedBuffer,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.deploy_vault(&code, opt_arg)
     }
 
@@ -55,7 +55,7 @@ pub trait DeployContractModule {
         &self,
         code: &ManagedBuffer,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_contract(code, CodeMetadata::DEFAULT)
@@ -67,7 +67,7 @@ pub trait DeployContractModule {
         &self,
         source_address: ManagedAddress,
         #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_from_source(&source_address, CodeMetadata::DEFAULT)

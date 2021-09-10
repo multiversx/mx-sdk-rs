@@ -291,17 +291,17 @@ pub trait ForwarderRaw {
     }
 
     #[event("execute_on_dest_context_result")]
-    fn execute_on_dest_context_result(&self, result: ManagedVec<Self::TypeManager, ManagedBuffer>);
+    fn execute_on_dest_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
 
     #[event("execute_on_same_context_result")]
-    fn execute_on_same_context_result(&self, result: ManagedVec<Self::TypeManager, ManagedBuffer>);
+    fn execute_on_same_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
 
     #[endpoint]
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::TypeManager, ManagedBuffer>> {
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.raw_vm_api()
             .deploy_contract(
                 self.blockchain().get_gas_left(),

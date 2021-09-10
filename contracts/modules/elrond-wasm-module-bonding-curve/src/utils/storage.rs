@@ -10,13 +10,10 @@ pub trait StorageModule {
     fn token_details(
         &self,
         token: &TokenIdentifier,
-    ) -> SingleValueMapper<TokenOwnershipData<Self::TypeManager>>;
+    ) -> SingleValueMapper<TokenOwnershipData<Self::Api>>;
 
     #[storage_mapper("bonding_curve")]
-    fn bonding_curve(
-        &self,
-        token: &TokenIdentifier,
-    ) -> SingleValueMapper<BondingCurve<Self::TypeManager>>;
+    fn bonding_curve(&self, token: &TokenIdentifier) -> SingleValueMapper<BondingCurve<Self::Api>>;
 
     #[storage_mapper("owned_tokens")]
     fn owned_tokens(&self, owner: &ManagedAddress) -> SetMapper<TokenIdentifier>;
