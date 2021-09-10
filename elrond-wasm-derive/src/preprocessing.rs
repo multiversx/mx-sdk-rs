@@ -105,6 +105,11 @@ fn substitutions() -> SubstitutionsMap {
         quote!(TokenIdentifier),
         quote!(elrond_wasm::types::TokenIdentifier<Self::Api>),
     );
+    add_substitution(
+        &mut substitutions,
+        quote!(ManagedSCError),
+        quote!(elrond_wasm::types::ManagedSCError<Self::Api>),
+    );
     add_substitution(&mut substitutions, quote!(SendApi), quote!(Api));
     add_substitution(&mut substitutions, quote!(TypeManager), quote!(Api));
     add_substitution(&mut substitutions, quote!(Storage), quote!(Api));

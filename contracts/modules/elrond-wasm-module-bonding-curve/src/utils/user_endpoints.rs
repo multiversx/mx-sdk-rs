@@ -64,7 +64,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     ) -> SCResult<()> {
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount)?;
-        self.check_given_token(&payment_token, &offered_token)?;
+        self.check_given_token(&payment_token, &offered_token);
 
         let calculated_price = self
             .bonding_curve(&requested_token)
@@ -219,19 +219,14 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         Ok(bonding_curve.payment_token)
     }
 
-    fn check_given_token(
-        &self,
-        accepted_token: &TokenIdentifier,
-        given_token: &TokenIdentifier,
-    ) -> SCResult<()> {
+    fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
         if given_token != accepted_token {
-            return Err(SCError::from(BoxedBytes::from_concat(&[
-                b"Only ",
-                accepted_token.to_esdt_identifier().as_slice(),
-                b" tokens accepted",
-            ])));
+            let mut err = self.error().new_error();
+            err.append_bytes(&b"Only"[..]);
+            err.append_bytes(accepted_token.to_esdt_identifier().as_slice());
+            err.append_bytes(&b" tokens accepted"[..]);
+            err.exit_now()
         }
-        Ok(())
     }
 
     fn compute_buy_price(
