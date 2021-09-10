@@ -209,36 +209,7 @@ where
         node: &mut LinkedListNode<T>,
         element: T,
     ) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node.node_id) {
-            return None;
-        }
-
-        let mut info = self.get_info();
-        let new_node_id = info.generate_new_node_id();
-
-        let new_node_next_id = node.next_id;
-        node.next_id = new_node_id;
-        self.set_node(node.node_id, node);
-
-        if new_node_next_id == NULL_ENTRY {
-            info.back = new_node_id;
-        } else {
-            let mut next_node = self.get_node(new_node_next_id);
-            next_node.prev_id = new_node_id;
-            self.set_node(new_node_next_id, &next_node);
-        }
-
-        let new_node = LinkedListNode {
-            value: element,
-            node_id: new_node_id,
-            next_id: new_node_next_id,
-            prev_id: node.node_id,
-        };
-        self.set_node(new_node_id, &new_node);
-
-        info.len += 1;
-        self.set_info(info);
-        Some(new_node)
+        self.push_after_node_id(node.node_id, element)
     }
 
     pub fn push_before(
@@ -246,16 +217,21 @@ where
         node: &mut LinkedListNode<T>,
         element: T,
     ) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node.node_id) {
+        self.push_before_node_id(node.node_id, element)
+    }
+
+    pub fn push_before_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node_id) {
             return None;
         }
 
+        let mut node = self.get_node(node_id);
         let mut info = self.get_info();
         let new_node_id = info.generate_new_node_id();
 
         let new_node_prev_id = node.prev_id;
         node.prev_id = new_node_id;
-        self.set_node(node.node_id, node);
+        self.set_node(node.node_id, &node);
 
         if new_node_prev_id == NULL_ENTRY {
             info.front = new_node_id;
@@ -270,6 +246,40 @@ where
             node_id: new_node_id,
             next_id: node.node_id,
             prev_id: new_node_prev_id,
+        };
+        self.set_node(new_node_id, &new_node);
+
+        info.len += 1;
+        self.set_info(info);
+        Some(new_node)
+    }
+
+    pub fn push_after_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node_id) {
+            return None;
+        }
+
+        let mut node = self.get_node(node_id);
+        let mut info = self.get_info();
+        let new_node_id = info.generate_new_node_id();
+
+        let new_node_next_id = node.next_id;
+        node.next_id = new_node_id;
+        self.set_node(node.node_id, &node);
+
+        if new_node_next_id == NULL_ENTRY {
+            info.back = new_node_id;
+        } else {
+            let mut next_node = self.get_node(new_node_next_id);
+            next_node.prev_id = new_node_id;
+            self.set_node(new_node_next_id, &next_node);
+        }
+
+        let new_node = LinkedListNode {
+            value: element,
+            node_id: new_node_id,
+            next_id: new_node_next_id,
+            prev_id: node.node_id,
         };
         self.set_node(new_node_id, &new_node);
 
