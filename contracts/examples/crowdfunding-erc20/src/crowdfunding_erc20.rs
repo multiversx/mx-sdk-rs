@@ -127,7 +127,7 @@ pub trait Crowdfunding {
     // proxy
 
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::SendApi>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
 
     // storage
 

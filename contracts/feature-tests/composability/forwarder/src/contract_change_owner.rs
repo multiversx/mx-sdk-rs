@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait ChangeOwnerModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[endpoint(changeOwnerAddress)]
     fn change_owner(

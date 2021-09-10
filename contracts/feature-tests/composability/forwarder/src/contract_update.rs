@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait UpgradeContractModule {
     #[proxy]
-    fn vault_proxy(&self, sc_address: ManagedAddress) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self, sc_address: ManagedAddress) -> vault::Proxy<Self::Api>;
 
     #[endpoint(upgradeChildContract)]
     fn upgrade_child_contract(

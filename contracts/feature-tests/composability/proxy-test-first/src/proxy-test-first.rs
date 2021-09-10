@@ -39,10 +39,10 @@ mod message_me_proxy {
 #[elrond_wasm::contract]
 pub trait ProxyTestFirst {
     #[proxy]
-    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::SendApi>;
+    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::Api>;
 
     #[proxy]
-    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::SendApi>;
+    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::Api>;
 
     #[storage_get("other_contract")]
     fn get_other_contract(&self) -> ManagedAddress;
