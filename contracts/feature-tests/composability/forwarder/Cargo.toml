@@ -14,10 +14,10 @@ wasm-output-mode = [
 ]
 wasm-output-mode-managed-ei = [
     "wasm-output-mode",
-    "elrond-wasm-node/managed-ei"
 ]
 wasm-output-mode-unmanaged-ei = [
     "wasm-output-mode",
+    "elrond-wasm-node/unmanaged-ei"
 ]
 
 [dependencies.vault]
@@ -31,7 +31,6 @@ features = ["derive"]
 [dependencies.elrond-wasm-node]
 version = "0.18.2"
 path = "../../../../elrond-wasm-node"
-default-features = false
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]

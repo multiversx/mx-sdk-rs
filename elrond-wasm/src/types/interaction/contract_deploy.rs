@@ -1,5 +1,5 @@
 use crate::api::SendApi;
-use crate::types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer};
+use crate::types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec};
 use crate::ContractCallArg;
 
 use super::ManagedArgBuffer;
@@ -91,11 +91,25 @@ where
         self,
         code: &ManagedBuffer<SA>,
         code_metadata: CodeMetadata,
-    ) -> Option<ManagedAddress<SA>> {
+    ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
         self.api.deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,
+            code_metadata,
+            &self.arg_buffer,
+        )
+    }
+
+    pub fn deploy_from_source(
+        self,
+        source_address: &ManagedAddress<SA>,
+        code_metadata: CodeMetadata,
+    ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
+        self.api.deploy_from_source_contract(
+            self.resolve_gas_limit(),
+            &self.egld_payment,
+            source_address,
             code_metadata,
             &self.arg_buffer,
         )
@@ -111,6 +125,4 @@ where
             &self.arg_buffer,
         );
     }
-
-    // TODO: deploy contract with code from another contract
 }
