@@ -1,6 +1,6 @@
 use super::{
-    BlockchainWrapper, CallValueWrapper, CryptoWrapper, ManagedSerializer, ManagedTypeHelper,
-    SendWrapper,
+    BlockchainWrapper, CallValueWrapper, CryptoWrapper, ErrorHelper, ManagedSerializer,
+    ManagedTypeHelper, SendWrapper,
 };
 use crate::api::VMApi;
 
@@ -59,5 +59,10 @@ pub trait ContractBase: Sized {
     #[inline]
     fn serializer(&self) -> ManagedSerializer<Self::Api> {
         ManagedSerializer::new(self.raw_vm_api())
+    }
+
+    #[inline]
+    fn error(&self) -> ErrorHelper<Self::Api> {
+        ErrorHelper::new_instance(self.raw_vm_api())
     }
 }
