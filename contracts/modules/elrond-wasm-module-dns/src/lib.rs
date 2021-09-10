@@ -8,7 +8,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait DnsModule {
     #[proxy]
-    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::SendApi>;
+    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::Api>;
 
     #[payable("EGLD")]
     #[endpoint(dnsRegister)]

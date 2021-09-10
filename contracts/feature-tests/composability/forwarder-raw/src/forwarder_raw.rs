@@ -19,7 +19,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
-    ) -> SendToken<Self::SendApi> {
+    ) -> SendToken<Self::Api> {
         SendToken {
             api: self.raw_vm_api(),
             to,
@@ -47,7 +47,7 @@ pub trait ForwarderRaw {
         payment_amount: BigUint,
         endpoint_name: ManagedBuffer,
         args: VarArgs<ManagedBuffer>,
-    ) -> ContractCall<Self::SendApi, ()> {
+    ) -> ContractCall<Self::Api, ()> {
         let mut contract_call = self
             .send()
             .contract_call(to, endpoint_name)

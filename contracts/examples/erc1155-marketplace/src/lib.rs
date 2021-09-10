@@ -387,7 +387,7 @@ pub trait Erc1155Marketplace {
     // proxy
 
     #[proxy]
-    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::SendApi>;
+    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::Api>;
 
     // storage
 

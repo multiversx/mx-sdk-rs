@@ -410,7 +410,7 @@ pub trait Multisig {
     fn perform_action_endpoint(
         &self,
         action_id: usize,
-    ) -> SCResult<PerformActionResult<Self::SendApi>> {
+    ) -> SCResult<PerformActionResult<Self::Api>> {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
@@ -426,7 +426,7 @@ pub trait Multisig {
         self.perform_action(action_id)
     }
 
-    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::SendApi>> {
+    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::Api>> {
         let action = self.action_mapper().get(action_id);
 
         // clean up storage

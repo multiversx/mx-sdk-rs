@@ -6,10 +6,10 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait RecursiveCaller {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[proxy]
-    fn self_proxy(&self) -> self::Proxy<Self::SendApi>;
+    fn self_proxy(&self) -> self::Proxy<Self::Api>;
 
     #[init]
     fn init(&self) {}

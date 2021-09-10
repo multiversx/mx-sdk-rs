@@ -16,7 +16,7 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 #[elrond_wasm::contract]
 pub trait Lottery {
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::SendApi>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
 
     #[init]
     fn init(&self, erc20_contract_address: ManagedAddress) {

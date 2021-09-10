@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait DeployContractModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[endpoint]
     fn deploy_contract(
