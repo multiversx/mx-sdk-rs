@@ -1,18 +1,19 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::SendApi;
-use crate::io::EndpointResult;
-use crate::types::{BigUint, ManagedAddress, ManagedBuffer};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::SendApi,
+    io::EndpointResult,
+    types::{BigUint, ManagedAddress, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
 pub struct SendEgld<SA>
 where
     SA: SendApi + 'static,
 {
     pub api: SA,
-    pub to: ManagedAddress<SA::ProxyTypeManager>,
-    pub amount: BigUint<SA::ProxyTypeManager>,
-    pub data: ManagedBuffer<SA::ProxyTypeManager>,
+    pub to: ManagedAddress<SA>,
+    pub amount: BigUint<SA>,
+    pub data: ManagedBuffer<SA>,
 }
 
 impl<SA> EndpointResult for SendEgld<SA>

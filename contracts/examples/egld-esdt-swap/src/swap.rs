@@ -24,7 +24,7 @@ pub trait EgldEsdtSwap {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         require!(
             self.wrapped_egld_token_id().is_empty(),
             "wrapped egld was already issued"
@@ -34,7 +34,9 @@ pub trait EgldEsdtSwap {
 
         self.issue_started_event(&caller, &token_ticker, &initial_supply);
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -86,7 +88,7 @@ pub trait EgldEsdtSwap {
 
     #[only_owner]
     #[endpoint(mintWrappedEgld)]
-    fn mint_wrapped_egld(&self, amount: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn mint_wrapped_egld(&self, amount: BigUint) -> SCResult<AsyncCall> {
         require!(
             !self.wrapped_egld_token_id().is_empty(),
             "Wrapped EGLD was not issued yet"
@@ -96,7 +98,9 @@ pub trait EgldEsdtSwap {
         let caller = self.blockchain().get_caller();
         self.mint_started_event(&caller, &amount);
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .mint(&wrapped_egld_token_id, &amount)
             .async_call()
             .with_callback(self.callbacks().esdt_mint_callback(&caller, &amount)))
@@ -208,11 +212,11 @@ pub trait EgldEsdtSwap {
 
     #[view(getWrappedEgldTokenIdentifier)]
     #[storage_mapper("wrapped_egld_token_id")]
-    fn wrapped_egld_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn wrapped_egld_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(getUnusedWrappedEgld)]
     #[storage_mapper("unused_wrapped_egld")]
-    fn unused_wrapped_egld(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn unused_wrapped_egld(&self) -> SingleValueMapper<BigUint>;
 
     // events
 

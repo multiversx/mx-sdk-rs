@@ -1,9 +1,13 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::function_selector::FunctionSelector;
-use crate::utils::structs::{BondingCurve, TokenOwnershipData};
-use crate::utils::{events, storage};
+use crate::{
+    function_selector::FunctionSelector,
+    utils::{
+        events, storage,
+        structs::{BondingCurve, TokenOwnershipData},
+    },
+};
 
 use super::structs::CurveArguments;
 
@@ -15,8 +19,9 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+    ) -> AsyncCall {
+        self.send()
+            .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
@@ -28,18 +33,22 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+    ) -> AsyncCall {
+        self.send()
+            .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
     }
 
     #[callback]
-    fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) -> SCResult<()> {
+    fn change_roles_callback(
+        &self,
+        #[call_result] result: AsyncCallResult<()>,
+    ) -> SCResult<(), ManagedSCError> {
         match result {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(message) => Err(message.err_msg.into()),
+            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into()),
         }
     }
 
@@ -47,7 +56,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_bonding_curve(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::TypeManager>,
+        function: FunctionSelector<Self::Api>,
         sell_availability: bool,
     ) -> SCResult<()> {
         require!(

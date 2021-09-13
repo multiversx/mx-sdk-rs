@@ -1,5 +1,4 @@
-use core::iter::Iterator;
-use core::num::NonZeroUsize;
+use core::{iter::Iterator, num::NonZeroUsize};
 
 /// This is safe because 1 != 0.
 #[inline]

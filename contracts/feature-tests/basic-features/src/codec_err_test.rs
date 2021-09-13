@@ -64,7 +64,7 @@ pub trait CodecErrorTest {
     }
 
     #[proxy]
-    fn encode_err_proxy(&self) -> encode_err_proxy::Proxy<Self::SendApi>;
+    fn encode_err_proxy(&self) -> encode_err_proxy::Proxy<Self::Api>;
 
     /// Never actually calls any deploy/upgrade, so it is appropriate in this contract.
     /// It just covers contract init serialization errors.

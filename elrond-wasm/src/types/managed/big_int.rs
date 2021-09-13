@@ -1,6 +1,8 @@
 use super::{ManagedBuffer, ManagedDefault, ManagedType};
-use crate::api::{Handle, ManagedTypeApi};
-use crate::types::BoxedBytes;
+use crate::{
+    api::{Handle, ManagedTypeApi},
+    types::BoxedBytes,
+};
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,

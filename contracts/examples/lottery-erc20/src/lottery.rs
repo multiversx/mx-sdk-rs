@@ -16,7 +16,7 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 #[elrond_wasm::contract]
 pub trait Lottery {
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::SendApi>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
 
     #[init]
     fn init(&self, erc20_contract_address: ManagedAddress) {
@@ -24,7 +24,6 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    #[allow(clippy::too_many_arguments)]
     fn start(
         &self,
         lottery_name: BoxedBytes,
@@ -47,7 +46,6 @@ pub trait Lottery {
     }
 
     #[endpoint(createLotteryPool)]
-    #[allow(clippy::too_many_arguments)]
     fn create_lottery_pool(
         &self,
         lottery_name: BoxedBytes,
@@ -138,11 +136,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn buy_ticket(
-        &self,
-        lottery_name: BoxedBytes,
-        token_amount: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BigUint) -> SCResult<AsyncCall> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is currently inactive."),
             Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
@@ -156,10 +150,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn determine_winner(
-        &self,
-        lottery_name: BoxedBytes,
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    fn determine_winner(&self, lottery_name: BoxedBytes) -> SCResult<OptionalResult<AsyncCall>> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is inactive!"),
             Status::Running => sc_error!("Lottery is still running!"),
@@ -203,7 +194,7 @@ pub trait Lottery {
         &self,
         lottery_name: &BoxedBytes,
         token_amount: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         let info = self.get_lottery_info(lottery_name);
         let caller = self.blockchain().get_caller();
 
@@ -252,10 +243,7 @@ pub trait Lottery {
         self.set_lottery_info(lottery_name, &info);
     }
 
-    fn distribute_prizes(
-        &self,
-        lottery_name: &BoxedBytes,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    fn distribute_prizes(&self, lottery_name: &BoxedBytes) -> OptionalResult<AsyncCall> {
         let info = self.get_lottery_info(lottery_name);
 
         let total_tickets = info.current_ticket_number;
@@ -387,7 +375,7 @@ pub trait Lottery {
         &self,
         #[call_result] result: AsyncCallResult<()>,
         cb_lottery_name: &BoxedBytes,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    ) -> OptionalResult<AsyncCall> {
         match result {
             AsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
             AsyncCallResult::Err(_) => {
@@ -400,15 +388,11 @@ pub trait Lottery {
     // storage
 
     #[storage_set("lotteryInfo")]
-    fn set_lottery_info(
-        &self,
-        lottery_name: &BoxedBytes,
-        lottery_info: &LotteryInfo<Self::TypeManager>,
-    );
+    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<Self::Api>);
 
     #[view(lotteryInfo)]
     #[storage_get("lotteryInfo")]
-    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::TypeManager>;
+    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::Api>;
 
     #[storage_is_empty("lotteryInfo")]
     fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;

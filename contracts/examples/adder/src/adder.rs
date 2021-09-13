@@ -8,7 +8,7 @@ elrond_wasm::imports!();
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]
-    fn sum(&self) -> SingleValueMapper<Self::Storage, BigInt>;
+    fn sum(&self) -> SingleValueMapper<BigInt>;
 
     #[init]
     fn init(&self, initial_value: BigInt) {

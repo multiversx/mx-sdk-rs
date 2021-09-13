@@ -1,7 +1,9 @@
 use crate::{TxInput, TxResult};
-use elrond_wasm::elrond_codec::*;
-use elrond_wasm::hex_call_data::HexCallDataDeserializer;
-use elrond_wasm::types::{Address, H256};
+use elrond_wasm::{
+    elrond_codec::*,
+    hex_call_data::HexCallDataDeserializer,
+    types::{Address, H256},
+};
 
 use num_bigint::BigUint;
 

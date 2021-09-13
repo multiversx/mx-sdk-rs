@@ -1,7 +1,9 @@
 use core::cmp::Ordering;
 
-use crate::api::{BigIntApi, Handle, Sign};
-use crate::types::BoxedBytes;
+use crate::{
+    api::{BigIntApi, Handle, Sign},
+    types::BoxedBytes,
+};
 
 impl BigIntApi for super::UncallableApi {
     fn bi_new(&self, _value: i64) -> Handle {

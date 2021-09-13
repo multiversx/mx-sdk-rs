@@ -1,11 +1,10 @@
-use crate::io::{ArgId, DynArg, DynArgInput};
-use crate::types::BoxedBytes;
-use crate::DynArgOutput;
-use crate::{abi::TypeAbi, types::ArgBuffer, ContractCallArg};
+use crate::{
+    abi::TypeAbi,
+    io::{ArgId, DynArg, DynArgInput},
+    types::BoxedBytes,
+    ContractCallArg, DynArgOutput,
+};
 use alloc::string::String;
-use elrond_codec::TopDecodeInput;
-
-use super::SCError;
 
 pub struct AsyncCallError {
     pub err_code: u32,

@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 pub trait SetMapperFeatures {
     #[view]
     #[storage_mapper("set_mapper")]
-    fn set_mapper(&self) -> SetMapper<Self::Storage, u32>;
+    fn set_mapper(&self) -> SetMapper<u32>;
 
     #[endpoint]
     fn set_mapper_insert(&self, item: u32) -> bool {
