@@ -91,8 +91,8 @@ pub trait LinkedListMapperFeatures {
         OptionalResult::from(self.list_mapper().remove_node_by_id(node_id))
     }
 
-    #[endpoint(listMapperIterate)]
-    fn list_mapper_iterate(&self, node_id: u32) -> MultiResultVec<u32> {
+    #[endpoint(listMapperIterateByHand)]
+    fn list_mapper_iterate_by_hand(&self, node_id: u32) -> MultiResultVec<u32> {
         let mut result = Vec::new();
 
         let mut node_opt = self.list_mapper().get_node_by_id(node_id);
@@ -102,6 +102,17 @@ pub trait LinkedListMapperFeatures {
             result.push(node.get_value());
 
             node_opt = self.list_mapper().get_node_by_id(node.get_next_node_id());
+        }
+
+        result.into()
+    }
+
+    #[endpoint(listMapperIterateByIter)]
+    fn list_mapper_iterate_by_iter(&self, node_id: u32) -> MultiResultVec<u32> {
+        let mut result = Vec::new();
+
+        for value in self.list_mapper().iter_from_node_id(node_id) {
+            result.push(value);
         }
 
         result.into()

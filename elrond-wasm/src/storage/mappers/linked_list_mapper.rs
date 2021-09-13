@@ -410,6 +410,10 @@ where
         Iter::new(self)
     }
 
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T> {
+        Iter::new_from_node_id(self, node_id)
+    }
+
     pub fn check_internal_consistency(&self) -> bool {
         let info = self.get_info();
         let mut front = info.front;
