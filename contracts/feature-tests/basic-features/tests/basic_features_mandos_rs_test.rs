@@ -336,6 +336,11 @@ fn storage_map3_rs() {
 }
 
 #[test]
+fn storage_mapper_linked_list_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_linked_list.scen.json", &contract_map());
+}
+
+#[test]
 fn storage_mapper_queue_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_queue.scen.json", &contract_map());
 }

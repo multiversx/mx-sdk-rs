@@ -314,6 +314,11 @@ fn storage_map3_go() {
 }
 
 #[test]
+fn storage_mapper_linked_list_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_linked_list.scen.json");
+}
+
+#[test]
 fn storage_mapper_queue_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_queue.scen.json");
 }
