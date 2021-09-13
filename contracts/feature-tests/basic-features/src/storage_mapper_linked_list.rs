@@ -19,18 +19,28 @@ pub trait LinkedListMapperFeatures {
 
     #[endpoint(listMapperPopFront)]
     fn list_mapper_pop_front(&self) -> OptionalResult<u32> {
-        OptionalResult::from(self.list_mapper().pop_front())
+        let node_op = self.list_mapper().pop_front();
+
+        match node_op {
+            Some(node) => OptionalResult::Some(node.into_value()),
+            None => OptionalResult::None,
+        }
     }
 
     #[endpoint(listMapperPopBack)]
     fn list_mapper_pop_back(&self) -> OptionalResult<u32> {
-        OptionalResult::from(self.list_mapper().pop_back())
+        let node_op = self.list_mapper().pop_back();
+
+        match node_op {
+            Some(node) => OptionalResult::Some(node.into_value()),
+            None => OptionalResult::None,
+        }
     }
 
     #[endpoint(listMapperFront)]
     fn list_mapper_front(&self) -> OptionalResult<u32> {
         if let Some(front) = self.list_mapper().front() {
-            OptionalResult::Some(front.get_value())
+            OptionalResult::Some(front.into_value())
         } else {
             OptionalResult::None
         }
@@ -39,7 +49,7 @@ pub trait LinkedListMapperFeatures {
     #[endpoint(listMapperBack)]
     fn list_mapper_back(&self) -> OptionalResult<u32> {
         if let Some(front) = self.list_mapper().back() {
-            OptionalResult::Some(front.get_value())
+            OptionalResult::Some(front.into_value())
         } else {
             OptionalResult::None
         }
@@ -55,7 +65,7 @@ pub trait LinkedListMapperFeatures {
         let mut node = node_opt.unwrap();
         node_opt = self.list_mapper().push_after(&mut node, element);
         match node_opt {
-            Some(node) => OptionalResult::Some(node.get_value()),
+            Some(node) => OptionalResult::Some(node.into_value()),
             None => OptionalResult::None,
         }
     }
@@ -70,7 +80,7 @@ pub trait LinkedListMapperFeatures {
         let mut node = node_opt.unwrap();
         node_opt = self.list_mapper().push_before(&mut node, element);
         match node_opt {
-            Some(node) => OptionalResult::Some(node.get_value()),
+            Some(node) => OptionalResult::Some(node.into_value()),
             None => OptionalResult::None,
         }
     }
@@ -88,7 +98,12 @@ pub trait LinkedListMapperFeatures {
 
     #[endpoint(listMapperRemoveNodeById)]
     fn list_mapper_remove_node_by_id(&self, node_id: u32) -> OptionalResult<u32> {
-        OptionalResult::from(self.list_mapper().remove_node_by_id(node_id))
+        let node_op = self.list_mapper().remove_node_by_id(node_id);
+
+        match node_op {
+            Some(node) => OptionalResult::Some(node.into_value()),
+            None => OptionalResult::None,
+        }
     }
 
     #[endpoint(listMapperIterateByHand)]
@@ -99,7 +114,7 @@ pub trait LinkedListMapperFeatures {
         while node_opt.is_some() {
             let node = node_opt.unwrap();
 
-            result.push(node.get_value());
+            result.push(node.into_value());
 
             node_opt = self.list_mapper().get_node_by_id(node.get_next_node_id());
         }
