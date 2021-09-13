@@ -22,7 +22,7 @@ fn test_list_simple() {
     list.push_back(44);
     assert_eq!(list.len(), 3);
     assert!(list.check_internal_consistency());
-    assert_eq!(list.front().unwrap().value, 42);
+    assert_eq!(list.front().unwrap().get_value(), 42);
     let mut it = list.iter();
     assert_eq!(it.next(), Some(42));
     assert_eq!(it.next(), Some(43));

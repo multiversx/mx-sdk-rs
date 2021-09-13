@@ -183,7 +183,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:1|u32:123"
+                    "123"
                 ],
                 "status": "",
                 "logs": [],
@@ -205,7 +205,7 @@
             },
             "expect": {
                 "out": [
-                    "1|u32:123"
+                    "123"
                 ],
                 "status": "",
                 "logs": [],
@@ -247,7 +247,7 @@
             },
             "expect": {
                 "out": [
-                    "1|u32:111"
+                    "111"
                 ],
                 "status": "",
                 "logs": [],
@@ -285,9 +285,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    ""
-                ],
+                "out": [],
                 "status": "",
                 "message": "",
                 "logs": [],
@@ -334,7 +332,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:1|u32:6"
+                    "6"
                 ],
                 "status": "",
                 "logs": [],
@@ -359,7 +357,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:1|u32:4"
+                    "4"
                 ],
                 "status": "",
                 "logs": [],
@@ -398,6 +396,33 @@
                 "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "listMapperIterate",
+                "arguments": [
+                    "4"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -474,7 +499,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:1|u32:3"
+                    "3"
                 ],
                 "status": "",
                 "logs": [],
@@ -521,7 +546,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:1|u32:6"
+                    "6"
                 ],
                 "status": "",
                 "logs": [],
@@ -565,7 +590,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:1|u32:4"
+                    "4"
                 ],
                 "status": "",
                 "logs": [],
