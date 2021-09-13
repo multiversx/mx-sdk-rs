@@ -127,7 +127,7 @@ pub trait LinkedListMapperFeatures {
         let mut result = Vec::new();
 
         for value in self.list_mapper().iter_from_node_id(node_id) {
-            result.push(value);
+            result.push(value.into_value());
         }
 
         result.into()
