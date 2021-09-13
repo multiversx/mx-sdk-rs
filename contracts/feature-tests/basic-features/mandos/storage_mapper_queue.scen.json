@@ -26,7 +26,7 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper",
+                "function": "queue_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -46,7 +46,7 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper_insert",
+                "function": "queue_mapper_push_back",
                 "arguments": [
                     "123"
                 ],
@@ -54,9 +54,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "true"
-                ],
+                "out": [],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -70,10 +68,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``set_mapper.node_links|u32:1": "u32:0|u32:0",
-                        "``set_mapper.value|u32:1": "123",
-                        "``set_mapper.node_id|u32:123": "1",
-                        "``set_mapper.info": "u32:1|u32:1|u32:1|u32:1"
+                        "``queue_mapper.node_links|u32:1": "u32:0|u32:0",
+                        "``queue_mapper.value|u32:1": "123",
+                        "``queue_mapper.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -87,12 +84,12 @@
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-first-push-back",
+            "txId": "check-queue-after-first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper",
+                "function": "queue_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -114,7 +111,7 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper_insert",
+                "function": "queue_mapper_push_back",
                 "arguments": [
                     "111"
                 ],
@@ -122,9 +119,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "true"
-                ],
+                "out": [],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -133,12 +128,12 @@
         },
         {
             "step": "scCall",
-            "txId": "check-set-after-second-insert",
+            "txId": "check-queue-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper",
+                "function": "queue_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -161,13 +156,11 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``set_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``set_mapper.node_links|u32:2": "u32:1|u32:0",
-                        "``set_mapper.value|u32:1": "123",
-                        "``set_mapper.value|u32:2": "111",
-                        "``set_mapper.node_id|u32:123": "1",
-                        "``set_mapper.node_id|u32:111": "2",
-                        "``set_mapper.info": "u32:2|u32:1|u32:2|u32:2"
+                        "``queue_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "``queue_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "``queue_mapper.value|u32:1": "123",
+                        "``queue_mapper.value|u32:2": "111",
+                        "``queue_mapper.info": "u32:2|u32:1|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -181,21 +174,19 @@
         },
         {
             "step": "scCall",
-            "txId": "check-contains-after-second-push-back",
+            "txId": "check-front-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper_contains",
-                "arguments": [
-                    "111"
-                ],
+                "function": "queue_mapper_front",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "true"
+                    "123"
                 ],
                 "status": "",
                 "logs": [],
@@ -205,21 +196,19 @@
         },
         {
             "step": "scCall",
-            "txId": "first-remove",
+            "txId": "first-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper_remove",
-                "arguments": [
-                    "123"
-                ],
+                "function": "queue_mapper_pop_front",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "true"
+                    "1|u32:123"
                 ],
                 "status": "",
                 "logs": [],
@@ -234,10 +223,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``set_mapper.node_links|u32:2": "u32:0|u32:0",
-                        "``set_mapper.value|u32:2": "111",
-                        "``set_mapper.node_id|u32:111": "2",
-                        "``set_mapper.info": "u32:1|u32:2|u32:2|u32:2"
+                        "``queue_mapper.node_links|u32:2": "u32:0|u32:0",
+                        "``queue_mapper.value|u32:2": "111",
+                        "``queue_mapper.info": "u32:1|u32:2|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -256,16 +244,14 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "set_mapper_remove",
-                "arguments": [
-                    "111"
-                ],
+                "function": "queue_mapper_pop_front",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "true"
+                    "1|u32:111"
                 ],
                 "status": "",
                 "logs": [],
