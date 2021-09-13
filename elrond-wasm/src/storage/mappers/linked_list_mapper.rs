@@ -525,10 +525,7 @@ where
 
     #[inline]
     fn next(&mut self) -> Option<LinkedListNode<T>> {
-        if self.node_opt.is_none() {
-            return None;
-        }
-
+        self.node_opt.as_ref()?;
         let node = self.node_opt.clone().unwrap();
         self.node_opt = self.linked_list.get_node_by_id(node.next_id);
         Some(node)
