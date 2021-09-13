@@ -492,7 +492,7 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-    node_id: u32,
+    node_opt: Option<LinkedListNode<T>>,
     linked_list: &'a LinkedListMapper<SA, T>,
 }
 
@@ -503,14 +503,14 @@ where
 {
     fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
-            node_id: linked_list.get_info().front,
+            node_opt: linked_list.front(),
             linked_list,
         }
     }
 
     fn new_from_node_id(linked_list: &'a LinkedListMapper<SA, T>, node_id: u32) -> Iter<'a, SA, T> {
         Iter {
-            node_id,
+            node_opt: linked_list.get_node_by_id(node_id),
             linked_list,
         }
     }
@@ -521,19 +521,17 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-    type Item = T;
+    type Item = LinkedListNode<T>;
 
     #[inline]
-    fn next(&mut self) -> Option<T> {
-        let current_node_id = self.node_id;
-
-        if current_node_id == NULL_ENTRY {
+    fn next(&mut self) -> Option<LinkedListNode<T>> {
+        if self.node_opt.is_none() {
             return None;
         }
 
-        let node = self.linked_list.get_node(current_node_id);
-        self.node_id = node.next_id;
-        Some(node.value)
+        let node = self.node_opt.clone().unwrap();
+        self.node_opt = self.linked_list.get_node_by_id(node.next_id);
+        Some(node)
     }
 }
 
@@ -548,7 +546,7 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        let v: Vec<T> = self.iter().collect();
+        let v: Vec<T> = self.iter().map(|x| x.into_value()).collect();
         MultiResultVec::<T>::from(v).finish(api);
     }
 }
