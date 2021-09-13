@@ -183,21 +183,21 @@ where
         )
     }
 
-    /// Returns `true` if the `LinkedList` is empty.
+    /// Returns `true` if the `QueueMapper` is empty.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn is_empty(&self) -> bool {
         self.get_info().len == 0
     }
 
-    /// Returns the length of the `LinkedList`.
+    /// Returns the length of the `QueueMapper`.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn len(&self) -> usize {
         self.get_info().len as usize
     }
 
-    /// Appends an element to the back of a list
+    /// Appends an element to the back of a queue
     /// and returns the node id of the newly added node.
     ///
     /// This operation should compute in *O*(1) time.

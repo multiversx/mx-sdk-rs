@@ -20,20 +20,24 @@ const INFO_IDENTIFIER: &[u8] = b".info";
 const NODE_IDENTIFIER: &[u8] = b".node";
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Copy)]
-pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode> {
-    pub value: T,
+pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> {
+    pub(crate) value: T,
     pub(crate) node_id: u32,
     pub(crate) next_id: u32,
     pub(crate) prev_id: u32,
 }
 
-impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode> LinkedListNode<T> {
+impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> LinkedListNode<T> {
+    pub fn get_value(&self) -> T {
+        self.value.clone()
+    }
+
     pub fn get_node_id(&self) -> u32 {
         self.node_id
     }
 
     pub fn get_next_node_id(&self) -> u32 {
-        self.node_id
+        self.next_id
     }
 
     pub fn get_prev_node_id(&self) -> u32 {
@@ -76,7 +80,7 @@ impl LinkedListInfo {
 pub struct LinkedListMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     api: SA,
     base_key: StorageKey<SA>,
@@ -86,7 +90,7 @@ where
 impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         LinkedListMapper {
@@ -100,7 +104,7 @@ where
 impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn clear(&mut self) {
         let info = self.get_info();
@@ -119,7 +123,7 @@ where
 impl<SA, T> LinkedListMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -209,7 +213,36 @@ where
         node: &mut LinkedListNode<T>,
         element: T,
     ) -> Option<LinkedListNode<T>> {
-        self.push_after_node_id(node.node_id, element)
+        if self.is_empty_node(node.node_id) {
+            return None;
+        }
+
+        let mut info = self.get_info();
+        let new_node_id = info.generate_new_node_id();
+
+        let new_node_next_id = node.next_id;
+        node.next_id = new_node_id;
+        self.set_node(node.node_id, &node);
+
+        if new_node_next_id == NULL_ENTRY {
+            info.back = new_node_id;
+        } else {
+            let mut next_node = self.get_node(new_node_next_id);
+            next_node.prev_id = new_node_id;
+            self.set_node(new_node_next_id, &next_node);
+        }
+
+        let new_node = LinkedListNode {
+            value: element,
+            node_id: new_node_id,
+            next_id: new_node_next_id,
+            prev_id: node.node_id,
+        };
+        self.set_node(new_node_id, &new_node);
+
+        info.len += 1;
+        self.set_info(info);
+        Some(new_node)
     }
 
     pub fn push_before(
@@ -217,15 +250,10 @@ where
         node: &mut LinkedListNode<T>,
         element: T,
     ) -> Option<LinkedListNode<T>> {
-        self.push_before_node_id(node.node_id, element)
-    }
-
-    pub fn push_before_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node_id) {
+        if self.is_empty_node(node.node_id) {
             return None;
         }
 
-        let mut node = self.get_node(node_id);
         let mut info = self.get_info();
         let new_node_id = info.generate_new_node_id();
 
@@ -255,37 +283,21 @@ where
     }
 
     pub fn push_after_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node_id) {
-            return None;
-        }
-
-        let mut node = self.get_node(node_id);
-        let mut info = self.get_info();
-        let new_node_id = info.generate_new_node_id();
-
-        let new_node_next_id = node.next_id;
-        node.next_id = new_node_id;
-        self.set_node(node.node_id, &node);
-
-        if new_node_next_id == NULL_ENTRY {
-            info.back = new_node_id;
+        if !self.is_empty_node(node_id) {
+            let mut node = self.get_node(node_id);
+            self.push_after(&mut node, element)
         } else {
-            let mut next_node = self.get_node(new_node_next_id);
-            next_node.prev_id = new_node_id;
-            self.set_node(new_node_next_id, &next_node);
+            None
         }
+    }
 
-        let new_node = LinkedListNode {
-            value: element,
-            node_id: new_node_id,
-            next_id: new_node_next_id,
-            prev_id: node.node_id,
-        };
-        self.set_node(new_node_id, &new_node);
-
-        info.len += 1;
-        self.set_info(info);
-        Some(new_node)
+    pub fn push_before_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
+        if !self.is_empty_node(node_id) {
+            let mut node = self.get_node(node_id);
+            self.push_before(&mut node, element)
+        } else {
+            None
+        }
     }
 
     pub fn push_back(&mut self, element: T) -> LinkedListNode<T> {
@@ -461,7 +473,7 @@ where
 pub struct Iter<'a, SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     node_id: u32,
     linked_list: &'a LinkedListMapper<SA, T>,
@@ -470,7 +482,7 @@ where
 impl<'a, SA, T> Iter<'a, SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
@@ -490,7 +502,7 @@ where
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     type Item = T;
 
@@ -511,7 +523,7 @@ where
 impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
@@ -527,7 +539,7 @@ where
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     fn type_name() -> TypeName {
         crate::types::MultiResultVec::<T>::type_name()
