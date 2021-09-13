@@ -11,14 +11,14 @@ pub struct TokenAttributesStruct<M: ManagedTypeApi> {
 #[elrond_wasm::module]
 pub trait TokenAttributesMapperFeatures {
     #[storage_mapper("TokenAttributes")]
-    fn token_attributes(&self) -> TokenAttributesMapper<Self::Storage>;
+    fn token_attributes(&self) -> TokenAttributesMapper;
 
     #[endpoint]
     fn token_attributes_set(
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-        attributes: &TokenAttributesStruct<Self::TypeManager>,
+        attributes: &TokenAttributesStruct<Self::Api>,
     ) {
         self.token_attributes()
             .set(token_id, token_nonce, attributes)
@@ -29,7 +29,7 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-        attributes: &TokenAttributesStruct<Self::TypeManager>,
+        attributes: &TokenAttributesStruct<Self::Api>,
     ) {
         self.token_attributes()
             .update(token_id, token_nonce, attributes)
@@ -40,34 +40,25 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-    ) -> TokenAttributesStruct<Self::TypeManager> {
+    ) -> TokenAttributesStruct<Self::Api> {
         self.token_attributes()
-            .get_attributes::<TokenAttributesStruct<Self::TypeManager>, Self::TypeManager>(
-                token_id,
-                token_nonce,
-            )
+            .get_attributes::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, token_nonce)
     }
 
     #[endpoint]
     fn token_attributes_get_nonce(
         &self,
         token_id: &TokenIdentifier,
-        attributes: TokenAttributesStruct<Self::TypeManager>,
+        attributes: TokenAttributesStruct<Self::Api>,
     ) -> u64 {
         self.token_attributes()
-            .get_nonce::<TokenAttributesStruct<Self::TypeManager>, Self::TypeManager>(
-                token_id,
-                &attributes,
-            )
+            .get_nonce::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, &attributes)
     }
 
     #[endpoint]
     fn token_attributes_clear(&self, token_id: &TokenIdentifier, token_nonce: u64) {
         self.token_attributes()
-            .clear::<TokenAttributesStruct<Self::TypeManager>, Self::TypeManager>(
-                token_id,
-                token_nonce,
-            )
+            .clear::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, token_nonce)
     }
 
     #[endpoint]

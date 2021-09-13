@@ -1,9 +1,7 @@
 use super::*;
 
-use elrond_wasm::api::CallableContract;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec::Vec};
+use elrond_wasm::contract_base::CallableContract;
 use std::collections::HashMap;
 
 pub type ContractCallFactory<A> = Box<dyn Fn(TxContext) -> Box<dyn CallableContract<A>>>;

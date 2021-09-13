@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 pub trait QueueMapperFeatures {
     #[view]
     #[storage_mapper("queue_mapper")]
-    fn queue_mapper(&self) -> QueueMapper<Self::Storage, u32>;
+    fn queue_mapper(&self) -> QueueMapper<u32>;
 
     #[endpoint]
     fn queue_mapper_push_back(&self, item: u32) {

@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec::Vec};
 
 #[inline(never)]
 pub fn boxed_slice_into_vec<T>(mut bs: Box<[T]>) -> Vec<T> {

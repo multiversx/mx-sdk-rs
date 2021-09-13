@@ -1,20 +1,24 @@
-use super::sc_error::SCError;
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{EndpointFinishApi, ManagedTypeApi};
-use crate::EndpointResult;
-use crate::*;
-use core::convert;
-use core::ops::{ControlFlow, FromResidual, Try};
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{EndpointFinishApi, ManagedTypeApi},
+    EndpointResult, *,
+};
+use core::{
+    convert,
+    ops::{ControlFlow, FromResidual, Try},
+};
+
+use super::{SCError, StaticSCError};
 
 /// Default way to optionally return an error from a smart contract endpoint.
 #[must_use]
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum SCResult<T> {
+pub enum SCResult<T, E = StaticSCError> {
     Ok(T),
-    Err(SCError),
+    Err(E),
 }
 
-impl<T> SCResult<T> {
+impl<T, E> SCResult<T, E> {
     pub fn is_ok(&self) -> bool {
         matches!(self, SCResult::Ok(_))
     }
@@ -33,7 +37,7 @@ impl<T> SCResult<T> {
     }
 
     #[inline]
-    pub fn err(self) -> Option<SCError> {
+    pub fn err(self) -> Option<E> {
         if let SCResult::Err(e) = self {
             Some(e)
         } else {
@@ -44,9 +48,9 @@ impl<T> SCResult<T> {
     /// Used to convert from a regular Rust result.
     /// Any error type is accepted as long as it can be converted to a SCError
     /// (`Vec<u8>`, `&[u8]`, `BoxedBytes`, `String`, `&str` are covered).
-    pub fn from_result<E>(r: core::result::Result<T, E>) -> Self
+    pub fn from_result<FromErr>(r: core::result::Result<T, FromErr>) -> Self
     where
-        E: Into<SCError>,
+        FromErr: Into<E>,
     {
         match r {
             Ok(t) => SCResult::Ok(t),
@@ -58,9 +62,9 @@ impl<T> SCResult<T> {
 /// Implementing the `Try` trait overloads the `?` operator.
 /// Documentation on the new version of the trait:
 /// <https://github.com/scottmcm/rfcs/blob/do-or-do-not/text/0000-try-trait-v2.md#the-try-trait>
-impl<T> Try for SCResult<T> {
+impl<T, E> Try for SCResult<T, E> {
     type Output = T;
-    type Residual = SCError;
+    type Residual = E;
 
     fn branch(self) -> ControlFlow<Self::Residual, T> {
         match self {
@@ -73,17 +77,17 @@ impl<T> Try for SCResult<T> {
     }
 }
 
-impl<T> FromResidual for SCResult<T> {
-    fn from_residual(r: SCError) -> Self {
+impl<T, E> FromResidual for SCResult<T, E> {
+    fn from_residual(r: E) -> Self {
         SCResult::Err(r)
     }
 }
 
-impl<T, E> FromResidual<Result<convert::Infallible, E>> for SCResult<T>
+impl<T, FromErr> FromResidual<Result<convert::Infallible, FromErr>> for SCResult<T>
 where
-    E: Into<SCError>,
+    FromErr: Into<StaticSCError>,
 {
-    fn from_residual(residual: Result<convert::Infallible, E>) -> Self {
+    fn from_residual(residual: Result<convert::Infallible, FromErr>) -> Self {
         match residual {
             Ok(_) => unreachable!(),
             Err(e) => SCResult::Err(e.into()),
@@ -91,9 +95,10 @@ where
     }
 }
 
-impl<T> EndpointResult for SCResult<T>
+impl<T, E> EndpointResult for SCResult<T, E>
 where
     T: EndpointResult,
+    E: SCError,
 {
     /// Error implies the transaction fails, so if there is a result,
     /// it is of type `T`.
@@ -109,13 +114,13 @@ where
                 t.finish(api);
             },
             SCResult::Err(e) => {
-                api.signal_error(e.as_bytes());
+                e.finish_err(api);
             },
         }
     }
 }
 
-impl<T: TypeAbi> TypeAbi for SCResult<T> {
+impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
     fn type_name() -> String {
         T::type_name()
     }
@@ -142,7 +147,7 @@ impl<T> SCResult<T> {
     }
 }
 
-impl<T> From<SCResult<T>> for Result<T, SCError> {
+impl<T> From<SCResult<T>> for Result<T, StaticSCError> {
     fn from(result: SCResult<T>) -> Self {
         match result {
             SCResult::Ok(ok) => Result::Ok(ok),
@@ -153,7 +158,7 @@ impl<T> From<SCResult<T>> for Result<T, SCError> {
 
 impl<T, Err> From<Result<T, Err>> for SCResult<T>
 where
-    Err: Into<SCError>,
+    Err: Into<StaticSCError>,
 {
     fn from(result: Result<T, Err>) -> Self {
         match result {

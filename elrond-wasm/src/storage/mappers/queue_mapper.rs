@@ -1,15 +1,17 @@
 use super::{StorageClearable, StorageMapper};
-use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi};
-use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set, StorageKey};
-use crate::types::{BoxedBytes, MultiResultVec};
+use crate::{
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    io::EndpointResult,
+    storage::{storage_get, storage_set, StorageKey},
+    types::{BoxedBytes, MultiResultVec},
+};
 use alloc::vec::Vec;
 use core::marker::PhantomData;
-use elrond_codec::elrond_codec_derive::{
-    TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
+use elrond_codec::{
+    elrond_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
+    DecodeDefault, EncodeDefault, TopDecode, TopEncode,
 };
-use elrond_codec::{DecodeDefault, EncodeDefault, TopDecode, TopEncode};
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
@@ -54,7 +56,7 @@ impl QueueMapperInfo {
     }
 }
 
-/// A doubly-linked list with owned nodes.
+/// A queue with owned nodes.
 ///
 /// The `QueueMapper` allows pushing and popping elements at either end
 /// in constant time.
@@ -183,14 +185,14 @@ where
         )
     }
 
-    /// Returns `true` if the `QueueMapper` is empty.
+    /// Returns `true` if the `Queue` is empty.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn is_empty(&self) -> bool {
         self.get_info().len == 0
     }
 
-    /// Returns the length of the `QueueMapper`.
+    /// Returns the length of the `Queue`.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn len(&self) -> usize {
@@ -228,14 +230,14 @@ where
         new_node_id
     }
 
-    /// Appends an element to the back of a list.
+    /// Appends an element to the back of a queue.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn push_back(&mut self, elt: T) {
         let _ = self.push_back_node_id(&elt);
     }
 
-    /// Adds an element first in the list.
+    /// Adds an element first in the queue.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn push_front(&mut self, elt: T) {
@@ -264,19 +266,19 @@ where
         self.set_info(info);
     }
 
-    /// Provides a copy to the front element, or `None` if the list is
+    /// Provides a copy to the front element, or `None` if the queue is
     /// empty.
     pub fn front(&self) -> Option<T> {
         self.get_value_option(self.get_info().front)
     }
 
-    /// Provides a copy to the back element, or `None` if the list is
+    /// Provides a copy to the back element, or `None` if the queue is
     /// empty.
     pub fn back(&self) -> Option<T> {
         self.get_value_option(self.get_info().back)
     }
 
-    /// Removes the last element from a list and returns it, or `None` if
+    /// Removes the last element from a queue and returns it, or `None` if
     /// it is empty.
     ///
     /// This operation should compute in *O*(1) time.
@@ -284,7 +286,7 @@ where
         self.remove_by_node_id(self.get_info().back)
     }
 
-    /// Removes the first element and returns it, or `None` if the list is
+    /// Removes the first element and returns it, or `None` if the queue is
     /// empty.
     ///
     /// This operation should compute in *O*(1) time.
@@ -292,9 +294,9 @@ where
         self.remove_by_node_id(self.get_info().front)
     }
 
-    /// Removes element with the given node id and returns it, or `None` if the list is
+    /// Removes element with the given node id and returns it, or `None` if the queue is
     /// empty.
-    /// Note: has undefined behavior if there's no node with the given node id in the list
+    /// Note: has undefined behavior if there's no node with the given node id in the queue
     ///
     /// This operation should compute in *O*(1) time.
     pub(crate) fn remove_by_node_id(&mut self, node_id: u32) -> Option<T> {
@@ -334,7 +336,7 @@ where
     }
 
     /// Runs several checks in order to verify that both forwards and backwards iteration
-    /// yields the same node entries and that the number of items in the list is correct.
+    /// yields the same node entries and that the number of items in the queue is correct.
     /// Used for unit testing.
     ///
     /// This operation should compute in *O*(n) time.
@@ -343,7 +345,7 @@ where
         let mut front = info.front;
         let mut back = info.back;
         if info.len == 0 {
-            // if the list is empty, both ends should point to null entries
+            // if the queue is empty, both ends should point to null entries
             if front != NULL_ENTRY {
                 return false;
             }
@@ -352,7 +354,7 @@ where
             }
             true
         } else {
-            // if the list is non-empty, both ends should point to non-null entries
+            // if the queue is non-empty, both ends should point to non-null entries
             if front == NULL_ENTRY {
                 return false;
             }

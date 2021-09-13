@@ -9,12 +9,10 @@ mod token_attributes_mapper;
 mod user_mapper;
 mod vec_mapper;
 
-pub use linked_list_mapper::LinkedListMapper;
-pub use linked_list_mapper::LinkedListNode;
+pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
-pub use mapper::StorageClearable;
-pub use mapper::StorageMapper;
+pub use mapper::{StorageClearable, StorageMapper};
 pub use queue_mapper::QueueMapper;
 pub use set_mapper::SetMapper;
 pub use single_value_mapper::SingleValueMapper;

@@ -1,5 +1,5 @@
 {
-    "name": "upgrade Factorial SC to Adder",
+    "name": "upgrade Vault SC to Forwarder, and then back to vault",
     "steps": [
         {
             "step": "setState",
@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-to-adder",
+            "txId": "upgrade-vault-to-forwarder",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -38,6 +38,35 @@
             "accounts": {
                 "sc:child": {
                     "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "+": {}
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "upgrade-back-to-vault",
+            "comment": "init results cannot be retrieved directly, since it is an async call, but we can experiment with callbacks in the future",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "upgradeVault",
+                "arguments": [
+                    "sc:child",
+                    "file:../vault/output/vault.wasm"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": []
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "+": {}
             }

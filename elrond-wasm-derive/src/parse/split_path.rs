@@ -1,5 +1,4 @@
-use syn::punctuated::Punctuated;
-use syn::token::Colon2;
+use syn::{punctuated::Punctuated, token::Colon2};
 
 /// Splits off the last part of a path from the rest.
 /// e.g. `some::module::Item` will be split into `some::module::` and `Item`.

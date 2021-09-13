@@ -1,6 +1,6 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    signal_arg_de_error, ArgId, DynArgInput, DynArgOutput,
+    signal_arg_de_error, ArgId, DynArgInput,
 };
 use elrond_codec::*;
 

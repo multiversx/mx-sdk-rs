@@ -9,7 +9,7 @@ pub trait SimpleErc20Token {
     /// Total number of tokens in existence.
     #[view(totalSupply)]
     #[storage_mapper("total_supply")]
-    fn total_supply(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_supply(&self) -> SingleValueMapper<BigUint>;
 
     /// Gets the balance of the specified address.
     ///
@@ -19,7 +19,7 @@ pub trait SimpleErc20Token {
     ///
     #[view(balanceOf)]
     #[storage_mapper("balance")]
-    fn token_balance(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn token_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     /// The amount of tokens that an owner allowed to a spender.
     ///
@@ -34,7 +34,7 @@ pub trait SimpleErc20Token {
         &self,
         owner: &ManagedAddress,
         spender: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, BigUint>;
+    ) -> SingleValueMapper<BigUint>;
 
     // FUNCTIONALITY
 

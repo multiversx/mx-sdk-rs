@@ -1,8 +1,5 @@
-use crate::blockchain_mock::*;
-use crate::TxInput;
-use crate::TxOutput;
-use alloc::rc::Rc;
-use alloc::vec::Vec;
+use crate::{blockchain_mock::*, TxInput, TxOutput};
+use alloc::{rc::Rc, vec::Vec};
 use core::cell::RefCell;
 use elrond_wasm::types::Address;
 use std::collections::HashMap;

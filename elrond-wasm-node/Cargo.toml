@@ -14,8 +14,7 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [features]
-default = ["managed-ei"]
-managed-ei = []
+unmanaged-ei = []
 
 [dependencies.elrond-wasm]
 version = "0.18.2"

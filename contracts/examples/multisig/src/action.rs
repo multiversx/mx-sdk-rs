@@ -55,19 +55,19 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 #[derive(TypeAbi)]
 pub enum PerformActionResult<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + ManagedTypeApi + 'static,
 {
     Nothing,
     SendEgld(SendEgld<SA>),
-    DeployResult(ManagedAddress<SA::ProxyTypeManager>),
-    AsyncCall(AsyncCall<SA>),
+    DeployResult(ManagedAddress<SA>),
+    SendAsyncCall(AsyncCall<SA>),
 }
 
 impl<SA> EndpointResult for PerformActionResult<SA>
 where
     SA: SendApi + Clone + 'static,
 {
-    type DecodeAs = OptionalResult<ManagedAddress<SA::ProxyTypeManager>>;
+    type DecodeAs = OptionalResult<ManagedAddress<SA>>;
 
     fn finish<FA>(&self, api: FA)
     where
@@ -77,7 +77,7 @@ where
             PerformActionResult::Nothing => (),
             PerformActionResult::SendEgld(send_egld) => send_egld.finish(api),
             PerformActionResult::DeployResult(address) => address.finish(api),
-            PerformActionResult::AsyncCall(async_call) => async_call.finish(api),
+            PerformActionResult::SendAsyncCall(async_call) => async_call.finish(api),
         }
     }
 }
