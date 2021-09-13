@@ -29,8 +29,16 @@ pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode
 }
 
 impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> LinkedListNode<T> {
-    pub fn get_value(&self) -> T {
+    pub fn get_value_cloned(&self) -> T {
         self.value.clone()
+    }
+
+    pub fn get_value_as_ref(&self) -> &T {
+        &self.value
+    }
+
+    pub fn into_value(self) -> T {
+        self.value
     }
 
     pub fn get_node_id(&self) -> u32 {
@@ -201,12 +209,16 @@ where
         self.get_node_by_id(info.back)
     }
 
-    pub fn pop_back(&mut self) -> Option<T> {
-        self.remove_node_by_id(self.get_info().back)
+    pub fn pop_back(&mut self) -> Option<LinkedListNode<T>> {
+        let info = self.get_info();
+
+        self.remove_node_by_id(info.back)
     }
 
-    pub fn pop_front(&mut self) -> Option<T> {
-        self.remove_node_by_id(self.get_info().front)
+    pub fn pop_front(&mut self) -> Option<LinkedListNode<T>> {
+        let info = self.get_info();
+
+        self.remove_node_by_id(info.front)
     }
 
     pub fn push_after(
@@ -223,7 +235,7 @@ where
 
         let new_node_next_id = node.next_id;
         node.next_id = new_node_id;
-        self.set_node(node.node_id, &node);
+        self.set_node(node.node_id, node);
 
         if new_node_next_id == NULL_ENTRY {
             info.back = new_node_id;
@@ -260,7 +272,7 @@ where
 
         let new_node_prev_id = node.prev_id;
         node.prev_id = new_node_id;
-        self.set_node(node.node_id, &node);
+        self.set_node(node.node_id, node);
 
         if new_node_prev_id == NULL_ENTRY {
             info.front = new_node_id;
@@ -388,14 +400,14 @@ where
         self.set_info(info);
     }
 
-    pub fn remove_node_by_id(&mut self, node_id: u32) -> Option<T> {
+    pub fn remove_node_by_id(&mut self, node_id: u32) -> Option<LinkedListNode<T>> {
         if self.is_empty_node(node_id) {
             return None;
         }
 
-        let node = self.get_node(node_id);
+        let node = self.get_node_by_id(node_id).unwrap();
         self.remove_node(&node);
-        Some(node.value)
+        Some(node)
     }
 
     pub fn get_node_by_id(&self, node_id: u32) -> Option<LinkedListNode<T>> {
