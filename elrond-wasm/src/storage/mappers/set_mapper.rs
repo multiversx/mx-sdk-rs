@@ -1,5 +1,5 @@
-pub use super::linked_list_mapper::Iter;
-use super::{LinkedListMapper, StorageClearable, StorageMapper};
+pub use super::queue_mapper::Iter;
+use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -20,7 +20,7 @@ where
 {
     api: SA,
     base_key: StorageKey<SA>,
-    linked_list_mapper: LinkedListMapper<SA, T>,
+    queue_mapper: QueueMapper<SA, T>,
 }
 
 impl<SA, T> StorageMapper<SA> for SetMapper<SA, T>
@@ -32,7 +32,7 @@ where
         SetMapper {
             api: api.clone(),
             base_key: base_key.clone(),
-            linked_list_mapper: LinkedListMapper::<SA, T>::new(api, base_key),
+            queue_mapper: QueueMapper::<SA, T>::new(api, base_key),
         }
     }
 }
@@ -43,10 +43,10 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
-        for value in self.linked_list_mapper.iter() {
+        for value in self.queue_mapper.iter() {
             self.clear_node_id(&value);
         }
-        self.linked_list_mapper.clear();
+        self.queue_mapper.clear();
     }
 }
 
@@ -87,12 +87,12 @@ where
 
     /// Returns `true` if the set contains no elements.
     pub fn is_empty(&self) -> bool {
-        self.linked_list_mapper.is_empty()
+        self.queue_mapper.is_empty()
     }
 
     /// Returns the number of elements in the set.
     pub fn len(&self) -> usize {
-        self.linked_list_mapper.len()
+        self.queue_mapper.len()
     }
 
     /// Returns `true` if the set contains a value.
@@ -109,7 +109,7 @@ where
         if self.contains(&value) {
             return false;
         }
-        let new_node_id = self.linked_list_mapper.push_back_node_id(&value);
+        let new_node_id = self.queue_mapper.push_back_node_id(&value);
         self.set_node_id(&value, new_node_id);
         true
     }
@@ -121,7 +121,7 @@ where
         if node_id == NULL_ENTRY {
             return false;
         }
-        self.linked_list_mapper.remove_by_node_id(node_id);
+        self.queue_mapper.remove_by_node_id(node_id);
         self.clear_node_id(value);
         true
     }
@@ -129,12 +129,12 @@ where
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
     pub fn iter(&self) -> Iter<SA, T> {
-        self.linked_list_mapper.iter()
+        self.queue_mapper.iter()
     }
 
     /// Checks the internal consistency of the collection. Used for unit tests.
     pub fn check_internal_consistency(&self) -> bool {
-        self.linked_list_mapper.check_internal_consistency()
+        self.queue_mapper.check_internal_consistency()
     }
 }
 
