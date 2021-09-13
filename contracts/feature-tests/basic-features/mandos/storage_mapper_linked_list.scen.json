@@ -419,7 +419,34 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "listMapperIterate",
+                "function": "listMapperIterateByHand",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "listMapperIterateByIter",
                 "arguments": [
                     "4"
                 ],
