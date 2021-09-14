@@ -57,7 +57,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:esdtTokenName": "str:cool_token",
+                        "str:esdtTokenIdentifier": "str:cool_token",
                         "str:secondContractAddress": "sc:second_contract"
                     },
                     "code": "*"
@@ -66,7 +66,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:esdtTokenName": "str:cool_token"
+                        "str:esdtTokenIdentifier": "str:cool_token"
                     },
                     "code": "*"
                 },
