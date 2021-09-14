@@ -4,9 +4,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait MapStorageMapperFeatures {
     #[storage_mapper("map_storage_mapper")]
-    fn map_storage_mapper(
-        &self,
-    ) -> MapStorageMapper<Self::Storage, u32, MapMapper<Self::Storage, u32, u32>>;
+    fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;
 
     #[view]
     fn map_storage_mapper_view(&self) -> MultiResultVec<u32> {

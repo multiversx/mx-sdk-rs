@@ -1,6 +1,7 @@
-use crate::api::{EndpointArgumentApi, ManagedTypeApi};
-use crate::err_msg;
-use crate::{ArgDecodeInput, DynArgInput};
+use crate::{
+    api::{EndpointArgumentApi, ManagedTypeApi},
+    err_msg, ArgDecodeInput, DynArgInput,
+};
 
 pub struct EndpointDynArgLoader<AA>
 where

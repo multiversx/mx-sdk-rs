@@ -1,6 +1,4 @@
-use crate::codec_err::EncodeError;
-use crate::nested_ser_output::NestedEncodeOutput;
-use crate::TypeInfo;
+use crate::{codec_err::EncodeError, nested_ser_output::NestedEncodeOutput, TypeInfo};
 use alloc::vec::Vec;
 
 /// Most types will be encoded without any possibility of error.

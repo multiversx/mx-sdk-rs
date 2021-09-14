@@ -15,7 +15,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 #[elrond_wasm::module]
 pub trait ForwarderAsyncCallModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[endpoint]
     #[payable("*")]
@@ -25,7 +25,7 @@ pub trait ForwarderAsyncCallModule {
         #[payment_token] token: TokenIdentifier,
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.vault_proxy()
             .contract(to)
             .accept_funds(token, token_nonce, payment)
@@ -39,7 +39,7 @@ pub trait ForwarderAsyncCallModule {
         to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let half_payment = payment / 2u32;
         self.vault_proxy()
             .contract(to)
@@ -55,7 +55,7 @@ pub trait ForwarderAsyncCallModule {
         #[payment_amount] payment: BigUint,
         to: ManagedAddress,
         percentage_fees: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
@@ -72,7 +72,7 @@ pub trait ForwarderAsyncCallModule {
         token: TokenIdentifier,
         token_nonce: u64,
         amount: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.vault_proxy()
             .contract(to)
             .retrieve_funds(token, token_nonce, amount, OptionalArg::None)
@@ -112,7 +112,7 @@ pub trait ForwarderAsyncCallModule {
         to: &ManagedAddress,
         token_identifier: &TokenIdentifier,
         amount: &BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds(token_identifier.clone(), 0, amount.clone())
@@ -129,7 +129,7 @@ pub trait ForwarderAsyncCallModule {
         to: &ManagedAddress,
         token_identifier: &TokenIdentifier,
         cb_amount: &BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds(token_identifier.clone(), 0, cb_amount.clone())
@@ -145,9 +145,9 @@ pub trait ForwarderAsyncCallModule {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment {
-                token_name,
+                token_identifier,
                 token_nonce,
                 amount,
                 token_type: EsdtTokenType::Invalid, // not used
@@ -165,7 +165,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<Self::Storage, CallbackData<Self::TypeManager>>;
+    fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
 
     #[view]
     fn callback_data_at_index(

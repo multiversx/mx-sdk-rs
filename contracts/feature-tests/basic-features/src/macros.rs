@@ -32,35 +32,36 @@ pub trait Macros {
     }
 
     #[view]
-    fn result_err_from_bytes_1(&self, e: BoxedBytes) -> SCResult<()> {
-        SCResult::Err(e.into())?;
+    fn result_err_from_bytes_1(&self, e: BoxedBytes) -> SCResult<(), ManagedSCError> {
+        SCResult::Err(e.managed_into())?;
         unreachable!()
     }
 
     #[view]
-    fn result_err_from_bytes_2<'a>(&self, e: &'a [u8]) -> SCResult<()> {
-        SCResult::Err(e.into())
+    fn result_err_from_bytes_2<'a>(&self, e: &'a [u8]) -> SCResult<(), ManagedSCError> {
+        SCResult::Err(e.managed_into())
     }
 
     #[view]
-    fn result_err_from_bytes_3(&self, e: Vec<u8>) -> SCResult<()> {
-        SCResult::Err(e.into())
+    fn result_err_from_bytes_3(&self, e: Vec<u8>) -> SCResult<(), ManagedSCError> {
+        SCResult::Err(e.managed_into())
     }
 
     #[view]
-    fn result_err_from_string(&self, e: String) -> SCResult<()> {
-        SCResult::Err(e.into())
+    fn result_err_from_string(&self, e: String) -> SCResult<(), ManagedSCError> {
+        SCResult::Err(e.managed_into())
     }
 
     #[view]
-    fn result_err_from_str<'a>(&self, e: &'a str) -> SCResult<()> {
-        SCResult::Err(e.into())
+    fn result_err_from_str<'a>(&self, e: &'a str) -> SCResult<(), ManagedSCError> {
+        SCResult::Err(e.managed_into())
     }
 
     #[endpoint]
     fn result_echo(&self, arg: Option<String>, test: bool) -> SCResult<String> {
         require!(test, "test argument is false");
-        let unwrapped = SCResult::from_result(arg.ok_or("option argument is none"))?;
+        let unwrapped =
+            SCResult::<String, StaticSCError>::from_result(arg.ok_or("option argument is none"))?;
         Ok(unwrapped)
     }
 

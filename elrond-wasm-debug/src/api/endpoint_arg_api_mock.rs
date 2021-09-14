@@ -1,7 +1,9 @@
 use crate::{TxContext, TxPanic};
 use alloc::vec::Vec;
-use elrond_wasm::api::{EndpointArgumentApi, Handle};
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::{
+    api::{EndpointArgumentApi, Handle},
+    types::BoxedBytes,
+};
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::cast::ToPrimitive;
 

@@ -1,15 +1,10 @@
-use elrond_codec::test_util::check_dep_encode_decode;
-use elrond_codec::test_util::check_top_encode_decode;
-use elrond_codec::NestedDecode;
-use elrond_codec::NestedDecodeInput;
-use elrond_codec::NestedEncode;
-use elrond_codec::NestedEncodeNoErr;
-use elrond_codec::NestedEncodeOutput;
-use elrond_codec::TopDecodeInput;
-use elrond_codec::TopEncodeOutput;
-use elrond_codec::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
-use elrond_codec::{top_encode_from_nested, top_encode_from_nested_or_exit, TopEncode};
-use elrond_codec::{DecodeError, EncodeError};
+use elrond_codec::{
+    test_util::{check_dep_encode_decode, check_top_encode_decode},
+    top_decode_from_nested, top_decode_from_nested_or_exit, top_encode_from_nested,
+    top_encode_from_nested_or_exit, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
+};
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum E {

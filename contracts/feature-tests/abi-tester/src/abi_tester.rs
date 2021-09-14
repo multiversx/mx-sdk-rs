@@ -87,8 +87,8 @@ pub trait AbiTester {
     fn managed_address_vs_byte_array(
         &self,
         address: ManagedAddress,
-        byte_array: ManagedByteArray<Self::TypeManager, 32>,
-    ) -> MultiResult2<ManagedAddress, ManagedByteArray<Self::TypeManager, 32>> {
+        byte_array: ManagedByteArray<Self::Api, 32>,
+    ) -> MultiResult2<ManagedAddress, ManagedByteArray<Self::Api, 32>> {
         (address, byte_array).into()
     }
 
@@ -99,7 +99,7 @@ pub trait AbiTester {
 
     #[view]
     #[storage_mapper("sample_storage_mapper")]
-    fn sample_storage_mapper(&self) -> SingleValueMapper<Self::Storage, OnlyShowsUpAsNested10>;
+    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNested10>;
 
     #[endpoint]
     #[payable("EGLD")]

@@ -1,12 +1,8 @@
-use crate::async_data::*;
-use crate::TxLog;
-use crate::TxManagedTypes;
+use crate::{async_data::*, TxLog, TxManagedTypes};
 use alloc::vec::Vec;
-use elrond_wasm::types::Address;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::types::{Address, BoxedBytes};
 use num_bigint::BigUint;
-use std::collections::HashMap;
-use std::fmt;
+use std::{collections::HashMap, fmt};
 
 pub struct TxPanic {
     pub status: u64,
@@ -53,7 +49,7 @@ impl TxResult {
 #[derive(Debug)]
 pub struct SendBalance {
     pub recipient: Address,
-    pub token_name: BoxedBytes,
+    pub token_identifier: BoxedBytes,
     pub amount: BigUint,
 }
 

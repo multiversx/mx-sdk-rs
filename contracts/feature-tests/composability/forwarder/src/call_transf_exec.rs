@@ -5,7 +5,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 #[elrond_wasm::module]
 pub trait ForwarderTransferExecuteModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[endpoint]
     #[payable("*")]
@@ -103,8 +103,8 @@ pub trait ForwarderTransferExecuteModule {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::from(token_name, token_nonce, amount);
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment::from(token_identifier, token_nonce, amount);
 
             all_token_payments.push(payment);
         }
