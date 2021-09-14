@@ -13,7 +13,12 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, token_name: TokenIdentifier) -> SCResult<()> {
+    fn init(
+        &self,
+        target: BigUint,
+        deadline: u64,
+        token_identifier: TokenIdentifier,
+    ) -> SCResult<()> {
         require!(target > 0, "Target must be more than 0");
         self.target().set(&target);
 
@@ -24,10 +29,10 @@ pub trait Crowdfunding {
         self.deadline().set(&deadline);
 
         require!(
-            token_name.is_egld() || token_name.is_valid_esdt_identifier(),
+            token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
             "Invalid token provided"
         );
-        self.cf_token_name().set(&token_name);
+        self.cf_token_identifier().set(&token_identifier);
 
         Ok(())
     }
@@ -43,7 +48,7 @@ pub trait Crowdfunding {
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"
         );
-        require!(token == self.cf_token_name().get(), "wrong token");
+        require!(token == self.cf_token_identifier().get(), "wrong token");
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
@@ -64,7 +69,7 @@ pub trait Crowdfunding {
 
     #[view(getCurrentFunds)]
     fn get_current_funds(&self) -> BigUint {
-        let token = self.cf_token_name().get();
+        let token = self.cf_token_identifier().get();
 
         self.blockchain().get_sc_balance(&token, 0)
     }
@@ -80,11 +85,11 @@ pub trait Crowdfunding {
                     "only owner can claim successful funding"
                 );
 
-                let token_name = self.cf_token_name().get();
+                let token_identifier = self.cf_token_identifier().get();
                 let sc_balance = self.get_current_funds();
 
                 self.send()
-                    .direct(&caller, &token_name, 0, &sc_balance, &[]);
+                    .direct(&caller, &token_identifier, 0, &sc_balance, &[]);
 
                 Ok(())
             },
@@ -93,10 +98,11 @@ pub trait Crowdfunding {
                 let deposit = self.deposit(&caller).get();
 
                 if deposit > 0 {
-                    let token_name = self.cf_token_name().get();
+                    let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
-                    self.send().direct(&caller, &token_name, 0, &deposit, &[]);
+                    self.send()
+                        .direct(&caller, &token_identifier, 0, &deposit, &[]);
                 }
 
                 Ok(())
@@ -124,7 +130,7 @@ pub trait Crowdfunding {
     #[storage_mapper("deposit")]
     fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
-    #[view(getCrowdfundingTokenName)]
-    #[storage_mapper("tokenName")]
-    fn cf_token_name(&self) -> SingleValueMapper<TokenIdentifier>;
+    #[view(getCrowdfundingTokenIdentifier)]
+    #[storage_mapper("tokenIdentifier")]
+    fn cf_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
 }
