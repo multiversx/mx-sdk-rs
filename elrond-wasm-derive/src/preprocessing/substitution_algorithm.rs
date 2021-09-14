@@ -17,7 +17,12 @@ pub(super) fn perform_substitutions(
             continue;
         }
         if let Some((sub_length, sub)) = substitutions.check_subsequence(tt_iter.clone()) {
-            result.extend(sub.clone().into_iter());
+            let first_token_span = tt_iter.clone().next().unwrap().span();
+            let final_sub = sub.clone().into_iter().map(|mut tt| {
+                tt.set_span(first_token_span);
+                tt
+            });
+            result.extend(final_sub);
             to_skip = sub_length;
             continue;
         }
