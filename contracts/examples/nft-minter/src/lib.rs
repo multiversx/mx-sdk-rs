@@ -10,7 +10,7 @@ pub struct ExampleAttributes {
     pub creation_timestamp: u64,
 }
 
-#[elrond_wasm::derive::contract]
+#[elrond_wasm::contract]
 pub trait NftMinter: nft_module::NftModule {
     #[init]
     fn init(&self) {}
