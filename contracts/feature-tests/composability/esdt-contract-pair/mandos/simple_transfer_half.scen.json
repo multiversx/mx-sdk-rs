@@ -60,7 +60,7 @@
                         "str:cool_token": "250,000"
                     },
                     "storage": {
-                        "str:esdtTokenIdentifier": "str:cool_token",
+                        "str:esdtTokenName": "str:cool_token",
                         "str:secondContractAddress": "sc:second_contract"
                     },
                     "code": "*"
@@ -72,7 +72,7 @@
                         "str:cool_token": "250,000"
                     },
                     "storage": {
-                        "str:esdtTokenIdentifier": "str:cool_token"
+                        "str:esdtTokenName": "str:cool_token"
                     },
                     "code": "*"
                 },

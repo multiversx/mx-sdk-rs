@@ -130,7 +130,7 @@ pub trait Crowdfunding {
     #[storage_mapper("deposit")]
     fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
-    #[view(getCrowdfundingTokenName)]
+    #[view(getCrowdfundingTokenIdentifier)]
     #[storage_mapper("tokenIdentifier")]
     fn cf_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
 }

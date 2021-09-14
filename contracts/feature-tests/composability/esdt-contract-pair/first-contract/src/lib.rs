@@ -188,11 +188,11 @@ pub trait FirstContract {
 
     // storage
 
-    #[storage_set("esdtTokenIdentifier")]
+    #[storage_set("esdtTokenName")]
     fn set_contract_esdt_token_identifier(&self, esdt_token_identifier: &TokenIdentifier);
 
-    #[view(getEsdtTokenIdentifier)]
-    #[storage_get("esdtTokenIdentifier")]
+    #[view(getesdtTokenName)]
+    #[storage_get("esdtTokenName")]
     fn get_contract_esdt_token_identifier(&self) -> TokenIdentifier;
 
     #[storage_set("secondContractAddress")]
