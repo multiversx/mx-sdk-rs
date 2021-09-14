@@ -70,7 +70,7 @@
                     "balance": "0",
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_name": "nested:str:LOTTERY-123456",
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:2",
                             "3-deadline": "u64:123,456",
