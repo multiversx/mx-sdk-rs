@@ -25,10 +25,12 @@ pub trait NftModule {
         #[payment] issue_cost: BigUint,
         token_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .issue_non_fungible(
                 issue_cost,
                 &token_name,
@@ -48,10 +50,12 @@ pub trait NftModule {
 
     #[only_owner]
     #[endpoint(setLocalRoles)]
-    fn set_local_roles(&self) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn set_local_roles(&self) -> SCResult<AsyncCall> {
         self.require_token_issued()?;
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .set_special_roles(
                 &self.blockchain().get_sc_address(),
                 &self.nft_token_id().get(),
@@ -214,11 +218,8 @@ pub trait NftModule {
     // storage
 
     #[storage_mapper("nftTokenId")]
-    fn nft_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn nft_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[storage_mapper("priceTag")]
-    fn price_tag(
-        &self,
-        nft_nonce: u64,
-    ) -> SingleValueMapper<Self::Storage, PriceTag<Self::TypeManager>>;
+    fn price_tag(&self, nft_nonce: u64) -> SingleValueMapper<PriceTag<Self::Api>>;
 }
