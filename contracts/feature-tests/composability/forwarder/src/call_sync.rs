@@ -168,8 +168,8 @@ pub trait ForwarderSyncCallModule {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::from(token_name, token_nonce, amount);
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment::from(token_identifier, token_nonce, amount);
             all_token_payments.push(payment);
         }
 
