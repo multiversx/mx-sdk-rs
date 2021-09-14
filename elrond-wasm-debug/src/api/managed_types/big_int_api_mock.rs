@@ -1,14 +1,16 @@
 use crate::TxContext;
 
-use core::cmp::Ordering;
-use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
-use core::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
-use elrond_wasm::api::{BigIntApi, ErrorApi, Handle};
-use elrond_wasm::err_msg;
-use elrond_wasm::types::BoxedBytes;
+use core::{
+    cmp::Ordering,
+    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
+};
+use elrond_wasm::{
+    api::{BigIntApi, ErrorApi, Handle},
+    err_msg,
+    types::BoxedBytes,
+};
 use num_bigint::BigInt;
-use num_traits::sign::Signed;
-use num_traits::{pow, Zero};
+use num_traits::{pow, sign::Signed, Zero};
 
 use super::big_int_util::big_int_to_i64;
 

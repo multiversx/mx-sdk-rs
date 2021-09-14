@@ -22,7 +22,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         let caller = self.blockchain().get_caller();
 
         require!(
@@ -51,7 +51,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         amount: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         self.try_reserve_fungible(&from, &type_id, &amount)?;
 
         Ok(if self.blockchain().is_smart_contract(&to.to_address()) {
@@ -72,7 +72,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         nft_id: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         self.try_reserve_non_fungible(&from, &type_id, &nft_id)?;
 
         Ok(if self.blockchain().is_smart_contract(&to.to_address()) {
@@ -97,7 +97,7 @@ pub trait Erc1155 {
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    ) -> SCResult<OptionalResult<AsyncCall>> {
         let caller = self.blockchain().get_caller();
         let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to.to_address());
 
@@ -380,7 +380,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.erc1155_user_proxy(to.clone())
@@ -401,7 +401,7 @@ pub trait Erc1155 {
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
         self.erc1155_user_proxy(to.clone())
@@ -455,60 +455,48 @@ pub trait Erc1155 {
     fn erc1155_user_proxy(
         &self,
         sc_address: ManagedAddress,
-    ) -> erc1155_user_proxy::Proxy<Self::SendApi>;
+    ) -> erc1155_user_proxy::Proxy<Self::Api>;
 
     // storage
 
     // map for address -> type_id -> amount
 
     #[storage_mapper("balanceOf")]
-    fn get_balance_mapper(
-        &self,
-        owner: &ManagedAddress,
-    ) -> MapMapper<Self::Storage, BigUint, BigUint>;
+    fn get_balance_mapper(&self, owner: &ManagedAddress) -> MapMapper<BigUint, BigUint>;
 
     // token owner
     // for non-fungible
 
     #[view(getTokenOwner)]
     #[storage_mapper("tokenOwner")]
-    fn token_owner(
-        &self,
-        type_id: &BigUint,
-        nft_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_owner(&self, type_id: &BigUint, nft_id: &BigUint)
+        -> SingleValueMapper<ManagedAddress>;
 
     // token creator
 
     #[view(getTokenTypeCreator)]
     #[storage_mapper("tokenTypeCreator")]
-    fn token_type_creator(
-        &self,
-        type_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_type_creator(&self, type_id: &BigUint) -> SingleValueMapper<ManagedAddress>;
 
     // token type uri
 
     #[view(getTokenTypeUri)]
     #[storage_mapper("tokenTypeUri")]
-    fn token_type_uri(&self, type_id: &BigUint) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn token_type_uri(&self, type_id: &BigUint) -> SingleValueMapper<BoxedBytes>;
 
     // check if a token is fungible
 
     #[view(isFungible)]
     #[storage_mapper("isFungible")]
-    fn is_fungible(&self, type_id: &BigUint) -> SingleValueMapper<Self::Storage, bool>;
+    fn is_fungible(&self, type_id: &BigUint) -> SingleValueMapper<bool>;
 
     // last valid id
 
     #[storage_mapper("lastValidTypeId")]
-    fn last_valid_type_id(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn last_valid_type_id(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("lastValidTokenIdForType")]
-    fn last_valid_nft_id_for_type(
-        &self,
-        type_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn last_valid_nft_id_for_type(&self, type_id: &BigUint) -> SingleValueMapper<BigUint>;
 
     // check if an operator is approved. Default is false.
 
@@ -518,5 +506,5 @@ pub trait Erc1155 {
         &self,
         operator: &ManagedAddress,
         owner: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, bool>;
+    ) -> SingleValueMapper<bool>;
 }

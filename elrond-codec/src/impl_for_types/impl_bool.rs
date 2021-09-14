@@ -1,13 +1,17 @@
-use crate::codec_err::{DecodeError, EncodeError};
-use crate::nested_de::NestedDecode;
-use crate::nested_de_input::NestedDecodeInput;
-use crate::nested_ser::{NestedEncode, NestedEncodeNoErr};
-use crate::nested_ser_output::NestedEncodeOutput;
-use crate::top_de::TopDecode;
-use crate::top_de_input::TopDecodeInput;
-use crate::top_ser::{TopEncode, TopEncodeNoErr};
-use crate::top_ser_output::TopEncodeOutput;
-use crate::{dep_encode_from_no_err, dep_encode_num_mimic, top_encode_from_no_err, TypeInfo};
+use crate::{
+    codec_err::{DecodeError, EncodeError},
+    dep_encode_from_no_err, dep_encode_num_mimic,
+    nested_de::NestedDecode,
+    nested_de_input::NestedDecodeInput,
+    nested_ser::{NestedEncode, NestedEncodeNoErr},
+    nested_ser_output::NestedEncodeOutput,
+    top_de::TopDecode,
+    top_de_input::TopDecodeInput,
+    top_encode_from_no_err,
+    top_ser::{TopEncode, TopEncodeNoErr},
+    top_ser_output::TopEncodeOutput,
+    TypeInfo,
+};
 
 impl TopEncodeNoErr for bool {
     fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {

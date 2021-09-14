@@ -116,17 +116,17 @@ pub trait NonFungibleTokens {
 
     #[view(totalMinted)]
     #[storage_mapper("totalMinted")]
-    fn total_minted(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn total_minted(&self) -> SingleValueMapper<u64>;
 
     #[view(tokenOwner)]
     #[storage_mapper("tokenOwner")]
-    fn token_owner(&self, token_id: u64) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_owner(&self, token_id: u64) -> SingleValueMapper<ManagedAddress>;
 
     #[view(tokenCount)]
     #[storage_mapper("tokenCount")]
-    fn token_count(&self, owner: &ManagedAddress) -> SingleValueMapper<Self::Storage, u64>;
+    fn token_count(&self, owner: &ManagedAddress) -> SingleValueMapper<u64>;
 
     #[view(approval)]
     #[storage_mapper("approval")]
-    fn approval(&self, token_id: u64) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn approval(&self, token_id: u64) -> SingleValueMapper<ManagedAddress>;
 }

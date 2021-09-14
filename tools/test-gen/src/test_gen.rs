@@ -1,6 +1,4 @@
-use std::fs::File;
-use std::io::Write;
-use std::{env, fs};
+use std::{env, fs, fs::File, io::Write};
 
 fn split_file_name(name: String, separator: &str) -> Vec<String> {
     let splitted_name = name.split(separator);

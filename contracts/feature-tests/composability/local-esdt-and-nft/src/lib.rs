@@ -26,10 +26,11 @@ pub trait LocalEsdtAndEsdtNft {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -70,10 +71,11 @@ pub trait LocalEsdtAndEsdtNft {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_non_fungible(
                 issue_cost,
                 &token_display_name,
@@ -157,7 +159,7 @@ pub trait LocalEsdtAndEsdtNft {
             arg_buffer.push_arg_raw(arg);
         }
 
-        let _ = self.send().direct_esdt_nft_execute(
+        let _ = self.raw_vm_api().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,
@@ -177,10 +179,11 @@ pub trait LocalEsdtAndEsdtNft {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_semi_fungible(
                 issue_cost,
                 &token_display_name,
@@ -206,8 +209,9 @@ pub trait LocalEsdtAndEsdtNft {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+    ) -> AsyncCall {
+        self.send()
+            .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
@@ -219,8 +223,9 @@ pub trait LocalEsdtAndEsdtNft {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: VarArgs<EsdtLocalRole>,
-    ) -> AsyncCall<Self::SendApi> {
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+    ) -> AsyncCall {
+        self.send()
+            .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.as_slice())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
@@ -310,9 +315,9 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[view(lastIssuedToken)]
     #[storage_mapper("lastIssuedToken")]
-    fn last_issued_token(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn last_issued_token(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(lastErrorMessage)]
     #[storage_mapper("lastErrorMessage")]
-    fn last_error_message(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn last_error_message(&self) -> SingleValueMapper<BoxedBytes>;
 }

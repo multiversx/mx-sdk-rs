@@ -1,6 +1,5 @@
 elrond_wasm::imports!();
 
-#[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait GovernanceConfigurablePropertiesModule {
     // endpoints - owner-only
@@ -171,31 +170,31 @@ pub trait GovernanceConfigurablePropertiesModule {
 
     #[view(getGovernanceTokenId)]
     #[storage_mapper("governance:governanceTokenId")]
-    fn governance_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn governance_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     // storage - configurable parameters
 
     #[view(getQuorum)]
     #[storage_mapper("governance:quorum")]
-    fn quorum(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn quorum(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getMinTokenBalanceForProposing)]
     #[storage_mapper("governance:minTokenBalanceForProposing")]
-    fn min_token_balance_for_proposing(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn min_token_balance_for_proposing(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getMaxActionsPerProposal)]
     #[storage_mapper("governance:maxActionsPerProposal")]
-    fn max_actions_per_proposal(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn max_actions_per_proposal(&self) -> SingleValueMapper<usize>;
 
     #[view(getVotingDelayInBlocks)]
     #[storage_mapper("governance:votingDelayInBlocks")]
-    fn voting_delay_in_blocks(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn voting_delay_in_blocks(&self) -> SingleValueMapper<u64>;
 
     #[view(getVotingPeriodInBlocks)]
     #[storage_mapper("governance:votingPeriodInBlocks")]
-    fn voting_period_in_blocks(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn voting_period_in_blocks(&self) -> SingleValueMapper<u64>;
 
     #[view(getLockTimeAfterVotingEndsInBlocks)]
     #[storage_mapper("governance:lockTimeAfterVotingEndsInBlocks")]
-    fn lock_time_after_voting_ends_in_blocks(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn lock_time_after_voting_ends_in_blocks(&self) -> SingleValueMapper<u64>;
 }

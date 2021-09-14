@@ -1,9 +1,7 @@
 extern crate mandos;
 use mandos::*;
 
-use std::fs;
-use std::fs::File;
-use std::io::Write;
+use std::{fs, fs::File, io::Write};
 
 use serde::Serialize;
 

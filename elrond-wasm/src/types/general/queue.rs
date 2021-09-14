@@ -1,6 +1,5 @@
 use crate::abi::TypeAbi;
-use alloc::string::String;
-use alloc::vec::Vec;
+use alloc::{string::String, vec::Vec};
 use elrond_codec::*;
 
 /// A simple queue struct that is able to push and pop without moving elements.

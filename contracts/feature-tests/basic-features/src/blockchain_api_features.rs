@@ -24,12 +24,12 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_state_root_hash(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+    fn get_state_root_hash(&self) -> ManagedByteArray<Self::Api, 32> {
         self.blockchain().get_state_root_hash_managed()
     }
 
     #[endpoint]
-    fn get_tx_hash(&self) -> ManagedByteArray<Self::TypeManager, 32> {
+    fn get_tx_hash(&self) -> ManagedByteArray<Self::Api, 32> {
         self.blockchain().get_tx_hash_managed()
     }
 

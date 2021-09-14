@@ -1,5 +1,7 @@
-use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
-use crate::*;
+use crate::{
+    api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi},
+    *,
+};
 use elrond_codec::*;
 
 #[inline(always)]

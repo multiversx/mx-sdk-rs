@@ -39,11 +39,8 @@ pub trait CryptoBubbles {
             Ok(())
         })?;
 
-        self.send().direct_egld(
-            &player.managed_into(self.type_manager()),
-            amount,
-            b"crypto bubbles",
-        );
+        self.send()
+            .direct_egld(&player.managed_into(), amount, b"crypto bubbles");
 
         self.withdraw_event(player, amount);
 
@@ -113,7 +110,7 @@ pub trait CryptoBubbles {
 
     #[view(balanceOf)]
     #[storage_mapper("playerBalance")]
-    fn player_balance(&self, player: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn player_balance(&self, player: &Address) -> SingleValueMapper<BigUint>;
 
     // Events
 

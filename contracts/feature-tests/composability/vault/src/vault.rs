@@ -8,7 +8,12 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait Vault {
     #[init]
-    fn init(&self) {}
+    fn init(
+        &self,
+        #[var_args] opt_arg_to_echo: OptionalArg<ManagedBuffer>,
+    ) -> OptionalResult<ManagedBuffer> {
+        opt_arg_to_echo
+    }
 
     #[endpoint]
     fn echo_arguments(
@@ -42,11 +47,11 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_funds_multi_transfer(&self) {
-        let payments = self.call_value().get_all_esdt_transfers();
+        let payments = self.call_value().all_esdt_transfers();
 
         for payment in payments.into_iter() {
             self.accept_funds_event(
-                &payment.token_name,
+                &payment.token_identifier,
                 payment.token_type.as_type_name(),
                 &payment.amount,
                 payment.token_nonce,
@@ -60,11 +65,18 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_multi_funds_echo(&self) -> MultiResultVec<MultiArg3<TokenIdentifier, u64, BigUint>> {
-        let payments = self.call_value().get_all_esdt_transfers();
+        let payments = self.call_value().all_esdt_transfers();
         let mut result = Vec::new();
 
         for payment in payments.into_iter() {
-            result.push((payment.token_name, payment.token_nonce, payment.amount).into());
+            result.push(
+                (
+                    payment.token_identifier,
+                    payment.token_nonce,
+                    payment.amount,
+                )
+                    .into(),
+            );
         }
 
         result.into()
@@ -163,5 +175,5 @@ pub trait Vault {
     /// this additional counter has the role of showing that storage also gets saved correctly.
     #[view]
     #[storage_mapper("call_counts")]
-    fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<Self::Storage, usize>;
+    fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<usize>;
 }

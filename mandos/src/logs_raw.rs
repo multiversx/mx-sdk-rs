@@ -1,9 +1,11 @@
 use super::*;
 use std::fmt;
 
-use serde::de::{self, Deserializer, SeqAccess, Visitor};
-use serde::ser::{SerializeSeq, Serializer};
-use serde::{Deserialize, Serialize};
+use serde::{
+    de::{self, Deserializer, SeqAccess, Visitor},
+    ser::{SerializeSeq, Serializer},
+    Deserialize, Serialize,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct CheckLogRaw {
