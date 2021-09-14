@@ -82,7 +82,7 @@ pub trait PingPong {
             );
         }
 
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_legacy();
         let user_id = self.user_mapper().get_or_create_user(&caller);
         let user_status = self.user_status(user_id).get();
         match user_status {
@@ -108,8 +108,11 @@ pub trait PingPong {
             UserStatus::Registered => {
                 self.user_status(user_id).set(&UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
-                    self.send()
-                        .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
+                    self.send().direct_egld(
+                        &user_address.managed_into(),
+                        &self.ping_amount().get(),
+                        b"pong",
+                    );
                     Ok(())
                 } else {
                     sc_error!("unknown user")
@@ -130,7 +133,7 @@ pub trait PingPong {
             "can't withdraw before deadline"
         );
 
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_legacy();
         let user_id = self.user_mapper().get_user_id(&caller);
         self.pong_by_user_id(user_id)
     }
@@ -178,25 +181,25 @@ pub trait PingPong {
 
     #[view(getPingAmount)]
     #[storage_mapper("ping_amount")]
-    fn ping_amount(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn ping_amount(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
-    fn deadline(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn deadline(&self) -> SingleValueMapper<u64>;
 
     /// Block timestamp of the block where the contract got activated.
     /// If not specified in the constructor it is the the deploy block timestamp.
     #[view(getActivationTimestamp)]
     #[storage_mapper("activation_timestamp")]
-    fn activation_timestamp(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn activation_timestamp(&self) -> SingleValueMapper<u64>;
 
     /// Optional funding cap.
     #[view(getMaxFunds)]
     #[storage_mapper("max_funds")]
-    fn max_funds(&self) -> SingleValueMapper<Self::Storage, Option<BigUint>>;
+    fn max_funds(&self) -> SingleValueMapper<Option<BigUint>>;
 
     #[storage_mapper("user")]
-    fn user_mapper(&self) -> UserMapper<Self::Storage>;
+    fn user_mapper(&self) -> UserMapper;
 
     /// State of user funds.
     /// 0 - user unknown, never `ping`-ed
@@ -204,11 +207,11 @@ pub trait PingPong {
     /// 2 - `pong`-ed
     #[view(getUserStatus)]
     #[storage_mapper("user_status")]
-    fn user_status(&self, user_id: usize) -> SingleValueMapper<Self::Storage, UserStatus>;
+    fn user_status(&self, user_id: usize) -> SingleValueMapper<UserStatus>;
 
     /// Part of the `pongAll` status, the last user to be processed.
     /// 0 if never called `pongAll` or `pongAll` completed..
     #[view(pongAllLastUser)]
     #[storage_mapper("pong_all_last_user")]
-    fn pong_all_last_user(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn pong_all_last_user(&self) -> SingleValueMapper<usize>;
 }

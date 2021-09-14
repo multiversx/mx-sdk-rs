@@ -297,7 +297,7 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
-                "function": "list_mapper_front",
+                "function": "queue_mapper_front",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -305,7 +305,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:List empty!",
+                "message": "str:Queue empty!",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

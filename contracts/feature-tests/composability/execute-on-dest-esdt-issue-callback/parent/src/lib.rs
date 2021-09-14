@@ -8,7 +8,7 @@ const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 #[elrond_wasm::contract]
 pub trait Parent {
     #[proxy]
-    fn child_proxy(&self, to: Address) -> child::Proxy<Self::SendApi>;
+    fn child_proxy(&self, to: ManagedAddress) -> child::Proxy<Self::Api>;
 
     #[init]
     fn init(&self) {}
@@ -18,28 +18,24 @@ pub trait Parent {
     fn deposit(&self) {}
 
     #[endpoint(deployChildContract)]
-    fn deploy_child_contract(&self, code: BoxedBytes) -> SCResult<()> {
-        let child_contract_address = self
-            .send()
-            .deploy_contract(
-                self.blockchain().get_gas_left(),
-                &self.types().big_uint_zero(),
-                &code,
-                CodeMetadata::DEFAULT,
-                &ArgBuffer::new(),
-            )
-            .ok_or("Child contract deployment failed")?;
+    fn deploy_child_contract(&self, code: ManagedBuffer) {
+        let (child_contract_address, _) = self.raw_vm_api().deploy_contract(
+            self.blockchain().get_gas_left(),
+            &self.types().big_uint_zero(),
+            &code,
+            CodeMetadata::DEFAULT,
+            &ManagedArgBuffer::new_empty(self.type_manager()),
+        );
 
         self.child_contract_address().set(&child_contract_address);
-        Ok(())
     }
 
     #[payable("EGLD")]
     #[endpoint(executeOnDestIssueToken)]
     fn execute_on_dest_issue_token(
         &self,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
     ) {
@@ -54,5 +50,5 @@ pub trait Parent {
 
     #[view(getChildContractAddress)]
     #[storage_mapper("childContractAddress")]
-    fn child_contract_address(&self) -> SingleValueMapper<Self::Storage, Address>;
+    fn child_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 }

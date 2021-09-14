@@ -21,7 +21,7 @@ pub struct Payment<M: ManagedTypeApi> {
 
 #[derive(Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
-    pub to: Address,
+    pub to: ManagedAddress<M>,
     pub payment: Payment<M>,
 }
 
@@ -31,7 +31,7 @@ pub enum FeeConfig<M: ManagedTypeApi> {
     Percent(u64),
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Default)]
 pub struct DealConfig {
     pub match_provider_percent: u64,
 }
@@ -39,7 +39,7 @@ pub struct DealConfig {
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
-    pub match_provider: Option<Address>,
+    pub match_provider: Option<ManagedAddress<M>>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
 }
@@ -47,8 +47,8 @@ pub struct OrderInputParams<M: ManagedTypeApi> {
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
-    pub creator: Address,
-    pub match_provider: Option<Address>,
+    pub creator: ManagedAddress<M>,
+    pub match_provider: Option<ManagedAddress<M>>,
     pub input_amount: BigUint<M>,
     pub output_amount: BigUint<M>,
     pub fee_config: FeeConfig<M>,
@@ -73,23 +73,15 @@ impl DealConfig {
     }
 }
 
-impl Default for DealConfig {
-    fn default() -> Self {
-        DealConfig {
-            match_provider_percent: 0,
-        }
-    }
-}
-
 #[elrond_wasm::module]
 pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<Self::TypeManager>,
-        params: OrderInputParams<Self::TypeManager>,
+        payment: Payment<Self::Api>,
+        params: OrderInputParams<Self::Api>,
         order_type: OrderType,
-    ) -> Order<Self::TypeManager> {
+    ) -> Order<Self::Api> {
         Order {
             id,
             creator: self.blockchain().get_caller(),
@@ -107,11 +99,7 @@ pub trait CommonModule {
         &(part * value) / total
     }
 
-    fn calculate_fee_amount(
-        &self,
-        amount: &BigUint,
-        fee_config: &FeeConfig<Self::TypeManager>,
-    ) -> BigUint {
+    fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<Self::Api>) -> BigUint {
         match fee_config.clone() {
             FeeConfig::Fixed(fee_amount) => fee_amount,
             FeeConfig::Percent(fee_percent) => amount * fee_percent / PERCENT_BASE_POINTS,
@@ -121,16 +109,16 @@ pub trait CommonModule {
     fn calculate_amount_after_fee(
         &self,
         amount: &BigUint,
-        fee_config: &FeeConfig<Self::TypeManager>,
+        fee_config: &FeeConfig<Self::Api>,
     ) -> BigUint {
         amount - &self.calculate_fee_amount(amount, fee_config)
     }
 
     #[view(getFirstTokenId)]
     #[storage_mapper("first_token_id")]
-    fn first_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn first_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(getSecondTokenId)]
     #[storage_mapper("second_token_id")]
-    fn second_token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn second_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 }

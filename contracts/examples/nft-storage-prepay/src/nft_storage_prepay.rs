@@ -21,7 +21,7 @@ pub trait NftStoragePrepay {
     }
 
     #[endpoint(reserveFunds)]
-    fn reserve_funds(&self, address: Address, file_size: BigUint) -> SCResult<()> {
+    fn reserve_funds(&self, address: ManagedAddress, file_size: BigUint) -> SCResult<()> {
         only_owner!(self, "Only owner may call this function");
 
         let storage_cost = self.get_cost_for_size(file_size);
@@ -103,11 +103,11 @@ pub trait NftStoragePrepay {
 
     #[view(getCostPerByte)]
     #[storage_mapper("costPerByte")]
-    fn cost_per_byte(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn cost_per_byte(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("deposit")]
-    fn deposit(&self, address: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn deposit(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("totalReserved")]
-    fn total_reserved(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_reserved(&self) -> SingleValueMapper<BigUint>;
 }

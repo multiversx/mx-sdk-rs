@@ -69,7 +69,7 @@ pub trait GovernanceModule:
         &self,
         #[payment_amount] payment_amount: BigUint,
         description: BoxedBytes,
-        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::TypeManager>>,
+        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> SCResult<usize> {
         self.require_payment_token_governance_token()?;
         require!(
@@ -231,17 +231,17 @@ pub trait GovernanceModule:
         );
 
         for action in proposal.actions {
-            let mut contract_call = ContractCall::<Self::SendApi, ()>::new(
-                self.send(),
-                action.dest_address,
-                action.function_name,
-            )
-            .with_gas_limit(action.gas_limit);
+            let mut contract_call = self
+                .send()
+                .contract_call::<()>(action.dest_address, action.function_name)
+                .with_gas_limit(action.gas_limit);
 
             if action.amount > 0 {
-                contract_call = contract_call
-                    .with_token_transfer(action.token_id, action.amount)
-                    .with_nft_nonce(action.token_nonce);
+                contract_call = contract_call.add_token_transfer(
+                    action.token_id,
+                    action.token_nonce,
+                    action.amount,
+                );
             }
 
             for arg in action.arguments {
@@ -323,7 +323,7 @@ pub trait GovernanceModule:
     }
 
     #[view(getProposer)]
-    fn get_proposer(&self, proposal_id: usize) -> OptionalArg<Address> {
+    fn get_proposer(&self, proposal_id: usize) -> OptionalArg<ManagedAddress> {
         if !self.proposal_exists(proposal_id) {
             OptionalArg::None
         } else {
@@ -344,7 +344,7 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::TypeManager>> {
+    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::Api>> {
         if !self.proposal_exists(proposal_id) {
             return Vec::new().into();
         }
@@ -385,7 +385,7 @@ pub trait GovernanceModule:
         self.is_valid_proposal_id(proposal_id) && !self.proposals().item_is_empty(proposal_id)
     }
 
-    fn total_gas_needed(&self, actions: &[GovernanceAction<Self::TypeManager>]) -> u64 {
+    fn total_gas_needed(&self, actions: &[GovernanceAction<Self::Api>]) -> u64 {
         let mut total = 0;
         for action in actions {
             total += action.gas_limit;
@@ -411,16 +411,16 @@ pub trait GovernanceModule:
     fn proposal_created_event(
         &self,
         #[indexed] proposal_id: usize,
-        #[indexed] proposer: &Address,
+        #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
         #[indexed] description: &BoxedBytes,
-        actions: &[GovernanceAction<Self::TypeManager>],
+        actions: &[GovernanceAction<Self::Api>],
     );
 
     #[event("voteCast")]
     fn vote_cast_event(
         &self,
-        #[indexed] voter: &Address,
+        #[indexed] voter: &ManagedAddress,
         #[indexed] proposal_id: usize,
         nr_votes: &BigUint,
     );
@@ -428,7 +428,7 @@ pub trait GovernanceModule:
     #[event("downvoteCast")]
     fn downvote_cast_event(
         &self,
-        #[indexed] downvoter: &Address,
+        #[indexed] downvoter: &ManagedAddress,
         #[indexed] proposal_id: usize,
         nr_downvotes: &BigUint,
     );
@@ -445,7 +445,7 @@ pub trait GovernanceModule:
     #[event("userDeposit")]
     fn user_deposit_event(
         &self,
-        #[indexed] address: &Address,
+        #[indexed] address: &ManagedAddress,
         #[indexed] token_id: &TokenIdentifier,
         #[indexed] token_nonce: u64,
         amount: &BigUint,
@@ -454,28 +454,28 @@ pub trait GovernanceModule:
     // storage - general
 
     #[storage_mapper("governance:proposals")]
-    fn proposals(&self) -> VecMapper<Self::Storage, GovernanceProposal<Self::TypeManager>>;
+    fn proposals(&self) -> VecMapper<GovernanceProposal<Self::Api>>;
 
     /// Not stored under "proposals", as that would require deserializing the whole struct
     #[storage_mapper("governance:proposalStartBlock")]
-    fn proposal_start_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
+    fn proposal_start_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
     #[storage_mapper("governance:proposalQueueBlock")]
-    fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, u64>;
+    fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, BigUint>;
+    fn votes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize) -> MapMapper<Self::Storage, Address, BigUint>;
+    fn downvotes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
 
     /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]
-    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 
     /// Could be calculated by iterating over the "downvotes" mapper, but that costs a lot of gas
     #[view(getTotalDownvotes)]
     #[storage_mapper("governance:totalDownvotes")]
-    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 }

@@ -1,9 +1,10 @@
 use super::*;
-use serde::de::{self, Deserializer, MapAccess, Visitor};
-use serde::ser::{SerializeMap, Serializer};
-use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
-use std::fmt;
+use serde::{
+    de::{self, Deserializer, MapAccess, Visitor},
+    ser::{SerializeMap, Serializer},
+    Deserialize, Serialize,
+};
+use std::{collections::BTreeMap, fmt};
 
 pub enum CheckEsdtRaw {
     Unspecified,

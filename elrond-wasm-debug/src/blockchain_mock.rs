@@ -1,22 +1,13 @@
 use super::mock_error::BlockchainMockError;
-use crate::account_esdt::AccountEsdt;
-use crate::contract_map::*;
-use crate::display_util::*;
-use crate::esdt_transfer_event_log;
-use crate::tx_context::*;
-use crate::SendBalance;
-use crate::TxInput;
-use crate::TxLog;
-use crate::TxOutput;
-use crate::TxPanic;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use crate::{
+    account_esdt::AccountEsdt, contract_map::*, display_util::*, esdt_transfer_event_log,
+    tx_context::*, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
+};
+use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::collections::HashMap;
-use std::fmt;
-use std::fmt::Write;
+use std::{collections::HashMap, fmt, fmt::Write};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
@@ -233,11 +224,11 @@ impl BlockchainMock {
         result_logs: &mut Vec<TxLog>,
     ) -> Result<(), BlockchainMockError> {
         for send_balance in send_balance_list {
-            if send_balance.token_name.is_empty() {
+            if send_balance.token_identifier.is_empty() {
                 self.subtract_tx_payment(contract_address, &send_balance.amount)?;
                 self.increase_balance(&send_balance.recipient, &send_balance.amount);
             } else {
-                let esdt_token_identifier = send_balance.token_name.as_slice();
+                let esdt_token_identifier = send_balance.token_identifier.as_slice();
                 self.substract_esdt_balance(
                     contract_address,
                     esdt_token_identifier,

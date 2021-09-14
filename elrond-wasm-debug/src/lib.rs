@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 pub mod abi_json;
 pub mod api;
 mod arwen_mandos_runner;
@@ -37,7 +39,6 @@ pub use execute_mandos::mandos_rs;
 
 #[macro_use]
 extern crate alloc;
-pub use alloc::boxed::Box;
-pub use alloc::vec::Vec;
+pub use alloc::{boxed::Box, vec::Vec};
 
 pub use std::collections::HashMap;

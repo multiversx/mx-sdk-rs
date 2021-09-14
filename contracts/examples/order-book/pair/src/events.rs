@@ -5,7 +5,7 @@ use super::common::{Order, OrderType};
 
 #[elrond_wasm::module]
 pub trait EventsModule {
-    fn emit_order_event(&self, order: Order<Self::TypeManager>) {
+    fn emit_order_event(&self, order: Order<Self::Api>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
         let order_type = order.order_type.clone();
@@ -13,7 +13,7 @@ pub trait EventsModule {
         self.order_event(caller, epoch, order_type, order);
     }
 
-    fn emit_cancel_order_events(&self, orders: Vec<Order<Self::TypeManager>>) {
+    fn emit_cancel_order_events(&self, orders: Vec<Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
@@ -25,7 +25,7 @@ pub trait EventsModule {
         }
     }
 
-    fn emit_match_order_events(&self, orders: Vec<Order<Self::TypeManager>>) {
+    fn emit_match_order_events(&self, orders: Vec<Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
@@ -38,7 +38,7 @@ pub trait EventsModule {
         }
     }
 
-    fn emit_free_order_events(&self, orders: Vec<Order<Self::TypeManager>>) {
+    fn emit_free_order_events(&self, orders: Vec<Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
@@ -54,16 +54,16 @@ pub trait EventsModule {
     #[event("order")]
     fn order_event(
         &self,
-        #[indexed] caller: Address,
+        #[indexed] caller: ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
-        order: Order<Self::TypeManager>,
+        order: Order<Self::Api>,
     );
 
     #[event("cancel_order")]
     fn cancel_order_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         #[indexed] order_id: u64,
@@ -72,20 +72,20 @@ pub trait EventsModule {
     #[event("match_order")]
     fn match_order_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         #[indexed] order_id: u64,
-        #[indexed] order_creator: Address,
+        #[indexed] order_creator: ManagedAddress,
     );
 
     #[event("free_order")]
     fn free_order_event(
         &self,
-        #[indexed] caller: &Address,
+        #[indexed] caller: &ManagedAddress,
         #[indexed] epoch: u64,
         #[indexed] order_type: OrderType,
         #[indexed] order_id: u64,
-        #[indexed] order_creator: Address,
+        #[indexed] order_creator: ManagedAddress,
     );
 }

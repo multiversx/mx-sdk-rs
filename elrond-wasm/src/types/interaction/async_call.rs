@@ -1,30 +1,31 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::SendApi;
-use crate::hex_call_data::HexCallDataSerializer;
-use crate::io::EndpointResult;
-use crate::types::{Address, BigUint, CallbackCall};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{ManagedTypeApi, SendApi},
+    io::EndpointResult,
+    types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
 #[must_use]
 pub struct AsyncCall<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + ManagedTypeApi + 'static,
 {
     pub(crate) api: SA,
-    pub(crate) to: Address,
-    pub(crate) egld_payment: BigUint<SA::ProxyTypeManager>,
-    pub(crate) hex_data: HexCallDataSerializer,
-    pub(crate) callback_data: HexCallDataSerializer,
+    pub(crate) to: ManagedAddress<SA>,
+    pub(crate) egld_payment: BigUint<SA>,
+    pub(crate) endpoint_name: ManagedBuffer<SA>,
+    pub(crate) arg_buffer: ManagedArgBuffer<SA>,
+    pub(crate) callback_call: Option<CallbackCall<SA>>,
 }
 
 impl<SA> AsyncCall<SA>
 where
     SA: SendApi + 'static,
 {
-    pub fn with_callback(self, callback: CallbackCall) -> Self {
+    pub fn with_callback(self, callback_call: CallbackCall<SA>) -> Self {
         AsyncCall {
-            callback_data: callback.closure_data,
+            callback_call: Some(callback_call),
             ..self
         }
     }
@@ -39,12 +40,22 @@ where
     #[inline]
     fn finish<FA>(&self, _api: FA) {
         // first, save the callback closure
-        self.api
-            .storage_store_tx_hash_key(self.callback_data.as_slice());
+        if let Some(callback_call) = &self.callback_call {
+            let hex_cd_ser = callback_call.serialize_hex_call_data();
+            self.api
+                .storage_store_tx_hash_key(&ManagedBuffer::new_from_bytes(
+                    self.api.clone(),
+                    hex_cd_ser.as_slice(),
+                ));
+        }
 
         // last, send the async call, which will kill the execution
-        self.api
-            .async_call_raw(&self.to, &self.egld_payment, self.hex_data.as_slice());
+        self.api.async_call_raw(
+            &self.to,
+            &self.egld_payment,
+            &self.endpoint_name,
+            &self.arg_buffer,
+        );
     }
 }
 

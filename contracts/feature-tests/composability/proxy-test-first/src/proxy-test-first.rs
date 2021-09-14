@@ -32,29 +32,29 @@ mod message_me_proxy {
         fn init(&self, #[payment] payment: BigUint, init_arg: i32);
 
         #[endpoint(messageMe)]
-        fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &Address);
+        fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
     }
 }
 
 #[elrond_wasm::contract]
 pub trait ProxyTestFirst {
     #[proxy]
-    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::SendApi>;
+    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::Api>;
 
     #[proxy]
-    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::SendApi>;
+    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::Api>;
 
     #[storage_get("other_contract")]
-    fn get_other_contract(&self) -> Address;
+    fn get_other_contract(&self) -> ManagedAddress;
 
     #[storage_set("other_contract")]
-    fn set_other_contract(&self, other_contract: &Address);
+    fn set_other_contract(&self, other_contract: &ManagedAddress);
 
     #[storage_set("callback_info")]
     fn set_callback_info(&self, callback_info: i64);
 
     #[init]
-    fn init(&self, other_contract_addr: &Address) {
+    fn init(&self, other_contract_addr: &ManagedAddress) {
         self.set_other_contract(other_contract_addr);
     }
 
@@ -63,20 +63,20 @@ pub trait ProxyTestFirst {
     fn deploy_second_contract(
         &self,
         #[payment] payment: BigUint,
-        code: BoxedBytes,
-    ) -> SCResult<()> {
-        let address = self
+        code: ManagedBuffer,
+    ) -> ManagedVec<Self::Api, ManagedBuffer> {
+        let (address, results) = self
             .message_me_proxy()
             .init(payment, 123)
-            .deploy_contract(&code, CodeMetadata::DEFAULT)
-            .ok_or("Deploy failed")?;
+            .deploy_contract(&code, CodeMetadata::DEFAULT);
         self.set_other_contract(&address);
-        Ok(())
+
+        results
     }
 
     #[payable("EGLD")]
     #[endpoint(upgradeSecondContract)]
-    fn upgrade_second_contract(&self, #[payment] payment: BigUint, code: BoxedBytes) {
+    fn upgrade_second_contract(&self, #[payment] payment: BigUint, code: ManagedBuffer) {
         let other_contract = self.get_other_contract();
 
         self.message_me_proxy()
@@ -87,7 +87,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContract)]
-    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall<Self::SendApi> {
+    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
@@ -97,10 +97,7 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContractWithCallback)]
-    fn forward_to_other_contract_with_callback(
-        &self,
-        #[payment] payment: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    fn forward_to_other_contract_with_callback(&self, #[payment] payment: BigUint) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
@@ -110,7 +107,7 @@ pub trait ProxyTestFirst {
     }
 
     #[endpoint(messageOtherContract)]
-    fn message_other_contract(&self) -> AsyncCall<Self::SendApi> {
+    fn message_other_contract(&self) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)
@@ -118,13 +115,13 @@ pub trait ProxyTestFirst {
                 0x01,
                 &self.types().big_uint_from(2u32),
                 [3u8; 3].to_vec(),
-                &HARDCODED_ADDRESS.into(),
+                &self.types().address_const(&HARDCODED_ADDRESS),
             )
             .async_call()
     }
 
     #[endpoint(messageOtherContractWithCallback)]
-    fn message_other_contract_with_callback(&self) -> AsyncCall<Self::SendApi> {
+    fn message_other_contract_with_callback(&self) -> AsyncCall {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)
@@ -132,7 +129,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &self.types().big_uint_from(2u32),
                 [3u8; 3].to_vec(),
-                &HARDCODED_ADDRESS.into(),
+                &self.types().address_const(&HARDCODED_ADDRESS),
             )
             .async_call()
             .with_callback(self.callbacks().message_callback())

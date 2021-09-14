@@ -13,7 +13,7 @@ pub trait CryptoBubbles {
     #[payable("EGLD")]
     #[endpoint(topUp)]
     fn top_up(&self, #[payment] payment: BigUint) {
-        let caller = self.blockchain().get_caller();
+        let caller = self.blockchain().get_caller_legacy();
         self.player_balance(&caller)
             .update(|balance| *balance += &payment);
 
@@ -23,7 +23,7 @@ pub trait CryptoBubbles {
     /// player withdraws funds
     #[endpoint]
     fn withdraw(&self, amount: &BigUint) -> SCResult<()> {
-        self.transfer_back_to_player_wallet(&self.blockchain().get_caller(), amount)
+        self.transfer_back_to_player_wallet(&self.blockchain().get_caller_legacy(), amount)
     }
 
     /// server calls withdraw on behalf of the player
@@ -39,7 +39,8 @@ pub trait CryptoBubbles {
             Ok(())
         })?;
 
-        self.send().direct_egld(player, amount, b"crypto bubbles");
+        self.send()
+            .direct_egld(&player.managed_into(), amount, b"crypto bubbles");
 
         self.withdraw_event(player, amount);
 
@@ -70,7 +71,7 @@ pub trait CryptoBubbles {
     #[payable("EGLD")]
     #[endpoint(joinGame)]
     fn join_game(&self, game_index: BigUint, #[payment] bet: BigUint) -> SCResult<()> {
-        let player = self.blockchain().get_caller();
+        let player = self.blockchain().get_caller_legacy();
         self.top_up(bet.clone());
         self.add_player_to_game_state_change(&game_index, &player, &bet)
     }
@@ -109,7 +110,7 @@ pub trait CryptoBubbles {
 
     #[view(balanceOf)]
     #[storage_mapper("playerBalance")]
-    fn player_balance(&self, player: &Address) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn player_balance(&self, player: &Address) -> SingleValueMapper<BigUint>;
 
     // Events
 

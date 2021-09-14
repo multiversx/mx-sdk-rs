@@ -9,21 +9,30 @@ publish = false
 path = "src/proxy-test-first.rs"
 
 [features]
-wasm-output-mode = ["elrond-wasm-node"]
+wasm-output-mode = [
+    "elrond-wasm-node",
+]
+wasm-output-mode-managed-ei = [
+    "wasm-output-mode",
+]
+wasm-output-mode-unmanaged-ei = [
+    "wasm-output-mode",
+    "elrond-wasm-node/unmanaged-ei"
+]
 
 [dependencies]
 hex-literal = "0.3.1"
 
 [dependencies.elrond-wasm]
-version = "0.18.2"
+version = "0.19.0"
 path = "../../../../elrond-wasm"
 features = ["derive"]
 
 [dependencies.elrond-wasm-node]
-version = "0.18.2"
+version = "0.19.0"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.18.2"
+version = "0.19.0"
 path = "../../../../elrond-wasm-debug"

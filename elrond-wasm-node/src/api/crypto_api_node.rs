@@ -1,7 +1,9 @@
 use crate::ArwenApiImpl;
-use elrond_wasm::api::CryptoApi;
-use elrond_wasm::types::{BoxedBytes, MessageHashType, H256};
-use elrond_wasm::Box;
+use elrond_wasm::{
+    api::CryptoApi,
+    types::{BoxedBytes, MessageHashType, H256},
+    Box,
+};
 
 extern "C" {
 

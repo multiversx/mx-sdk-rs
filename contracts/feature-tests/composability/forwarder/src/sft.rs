@@ -9,12 +9,13 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
     fn sft_issue(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
-    ) -> AsyncCall<Self::SendApi> {
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_semi_fungible(
                 issue_cost,
                 &token_display_name,
@@ -35,7 +36,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
     #[callback]
     fn sft_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[call_result] result: AsyncCallResult<TokenIdentifier>,
     ) {
         match result {

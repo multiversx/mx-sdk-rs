@@ -1,6 +1,7 @@
-use crate::api::{EndpointArgumentApi, ManagedTypeApi};
-use crate::err_msg;
-use crate::{ArgDecodeInput, DynArgInput};
+use crate::{
+    api::{EndpointArgumentApi, ManagedTypeApi},
+    err_msg, ArgDecodeInput, DynArgInput,
+};
 
 pub struct EndpointDynArgLoader<AA>
 where
@@ -25,10 +26,12 @@ where
     }
 }
 
-impl<AA> DynArgInput<ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
+impl<AA> DynArgInput for EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
+    type ItemInput = ArgDecodeInput<AA>;
+
     type ErrorApi = AA;
 
     #[inline]

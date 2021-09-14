@@ -1,5 +1,7 @@
-use crate::api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi};
-use crate::*;
+use crate::{
+    api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi},
+    *,
+};
 use elrond_codec::*;
 
 #[inline(always)]
@@ -26,10 +28,9 @@ where
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.
 #[inline]
-pub fn load_dyn_arg<I, D, T>(loader: &mut D, arg_id: ArgId) -> T
+pub fn load_dyn_arg<I, T>(loader: &mut I, arg_id: ArgId) -> T
 where
-    I: TopDecodeInput,
-    D: DynArgInput<I>,
+    I: DynArgInput,
     T: DynArg,
 {
     T::dyn_load(loader, arg_id)

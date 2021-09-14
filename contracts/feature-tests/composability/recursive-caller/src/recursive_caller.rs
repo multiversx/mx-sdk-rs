@@ -6,10 +6,10 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait RecursiveCaller {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::SendApi>;
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[proxy]
-    fn self_proxy(&self) -> self::Proxy<Self::SendApi>;
+    fn self_proxy(&self) -> self::Proxy<Self::Api>;
 
     #[init]
     fn init(&self) {}
@@ -17,16 +17,16 @@ pub trait RecursiveCaller {
     #[endpoint]
     fn recursive_send_funds(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         token_identifier: &TokenIdentifier,
         amount: &BigUint,
         counter: u32,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.recursive_send_funds_event(to, token_identifier, amount, counter);
 
         self.vault_proxy()
             .contract(to.clone())
-            .accept_funds(token_identifier.clone(), amount.clone())
+            .accept_funds(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(self.callbacks().recursive_send_funds_callback(
                 to,
@@ -39,11 +39,11 @@ pub trait RecursiveCaller {
     #[callback]
     fn recursive_send_funds_callback(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         token_identifier: &TokenIdentifier,
         amount: &BigUint,
         counter: u32,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    ) -> OptionalResult<AsyncCall> {
         self.recursive_send_funds_callback_event(to, token_identifier, amount, counter);
 
         if counter > 1 {
@@ -61,7 +61,7 @@ pub trait RecursiveCaller {
     #[event("recursive_send_funds")]
     fn recursive_send_funds_event(
         &self,
-        #[indexed] to: &Address,
+        #[indexed] to: &ManagedAddress,
         #[indexed] token_identifier: &TokenIdentifier,
         #[indexed] amount: &BigUint,
         counter: u32,
@@ -70,7 +70,7 @@ pub trait RecursiveCaller {
     #[event("recursive_send_funds_callback")]
     fn recursive_send_funds_callback_event(
         &self,
-        #[indexed] to: &Address,
+        #[indexed] to: &ManagedAddress,
         #[indexed] token_identifier: &TokenIdentifier,
         #[indexed] amount: &BigUint,
         counter: u32,

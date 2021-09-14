@@ -12,6 +12,8 @@
 # This should actually automatically be shipped with cargo fmt or rustfmt itself!
 # ----------------------------------------------------------------------------------
 
+imports_granularity="Crate"
+
 # Use verbose output.
 # Default: false
 #   verbose = 
