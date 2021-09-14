@@ -22,7 +22,7 @@ const LEN_SUFFIX: &[u8] = b".len";
 pub struct VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + 'static,
+    T: 'static,
 {
     api: SA,
     base_key: StorageKey<SA>,
@@ -48,20 +48,10 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for VecMapper<SA, T>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
-{
-    fn clear(&mut self) {
-        self.clear();
-    }
-}
-
 impl<SA, T> VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: 'static,
 {
     fn item_key(&self, index: usize) -> StorageKey<SA> {
         let mut item_key = self.base_key.clone();
@@ -83,7 +73,13 @@ where
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
+}
 
+impl<SA, T> VecMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode,
+{
     /// Add one item at the end of the list.
     /// Returns the index of the newly inserted item, which is also equal to the new number of elements.
     pub fn push(&mut self, item: &T) -> usize {
@@ -191,15 +187,45 @@ where
         }
         result
     }
+}
 
+impl<SA, T> StorageClearable for VecMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode,
+{
     /// Deletes all contents form storage and sets count to 0.
     /// Can easily consume a lot of gas.
-    pub fn clear(&mut self) {
+    fn clear(&mut self) {
         let len = self.len();
         for i in 1..=len {
             storage_clear(self.api.clone(), &self.item_key(i));
         }
         self.save_count(0);
+    }
+}
+
+impl<SA, T> VecMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: StorageMapper<SA>,
+{
+    /// Add one nested storage mapper at the end of the list.
+    /// Returns the index of the newly inserted item, which is also equal to the new number of elements.
+    pub fn push_nested(&mut self) -> usize {
+        let mut len = self.len();
+        len += 1;
+        self.save_count(len);
+        len
+    }
+
+    /// Get item at index from storage.
+    /// Index must be valid (1 <= index <= count).
+    pub fn get_nested(&self, index: usize) -> T {
+        if index == 0 || index > self.len() {
+            self.api.signal_error(&b"index out of range"[..]);
+        }
+        T::new(self.api.clone(), self.item_key(index))
     }
 }
 
