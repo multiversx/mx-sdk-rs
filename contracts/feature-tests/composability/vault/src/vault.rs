@@ -51,7 +51,7 @@ pub trait Vault {
 
         for payment in payments.into_iter() {
             self.accept_funds_event(
-                &payment.token_name,
+                &payment.token_identifier,
                 payment.token_type.as_type_name(),
                 &payment.amount,
                 payment.token_nonce,
@@ -69,7 +69,14 @@ pub trait Vault {
         let mut result = Vec::new();
 
         for payment in payments.into_iter() {
-            result.push((payment.token_name, payment.token_nonce, payment.amount).into());
+            result.push(
+                (
+                    payment.token_identifier,
+                    payment.token_nonce,
+                    payment.amount,
+                )
+                    .into(),
+            );
         }
 
         result.into()

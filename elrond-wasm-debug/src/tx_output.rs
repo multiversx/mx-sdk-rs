@@ -49,7 +49,7 @@ impl TxResult {
 #[derive(Debug)]
 pub struct SendBalance {
     pub recipient: Address,
-    pub token_name: BoxedBytes,
+    pub token_identifier: BoxedBytes,
     pub amount: BigUint,
 }
 

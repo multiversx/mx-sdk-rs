@@ -145,9 +145,9 @@ pub trait ForwarderAsyncCallModule {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment {
-                token_name,
+                token_identifier,
                 token_nonce,
                 amount,
                 token_type: EsdtTokenType::Invalid, // not used
