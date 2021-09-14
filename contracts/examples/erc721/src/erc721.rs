@@ -16,7 +16,7 @@ pub trait NonFungibleTokens {
     /// Only the contract owner may call this function.
     #[only_owner]
     #[endpoint]
-    fn mint(&self, count: u64, new_token_owner: Address) -> SCResult<()> {
+    fn mint(&self, count: u64, new_token_owner: ManagedAddress) -> SCResult<()> {
         self.perform_mint(count, &new_token_owner);
 
         Ok(())
@@ -25,7 +25,7 @@ pub trait NonFungibleTokens {
     /// Approves an account to transfer the token on behalf of its owner.<br>
     /// Only the owner of the token may call this function.
     #[endpoint]
-    fn approve(&self, token_id: u64, approved_address: Address) -> SCResult<()> {
+    fn approve(&self, token_id: u64, approved_address: ManagedAddress) -> SCResult<()> {
         require!(
             token_id < self.total_minted().get(),
             "Token does not exist!"
@@ -60,7 +60,7 @@ pub trait NonFungibleTokens {
 
     /// Transfer ownership of the token to a new account.
     #[endpoint]
-    fn transfer(&self, token_id: u64, to: Address) -> SCResult<()> {
+    fn transfer(&self, token_id: u64, to: ManagedAddress) -> SCResult<()> {
         require!(
             token_id < self.total_minted().get(),
             "Token does not exist!"
@@ -88,7 +88,7 @@ pub trait NonFungibleTokens {
 
     // private methods
 
-    fn perform_mint(&self, count: u64, new_token_owner: &Address) {
+    fn perform_mint(&self, count: u64, new_token_owner: &ManagedAddress) {
         let new_owner_current_total = self.token_count(new_token_owner).get();
         let total_minted = self.total_minted().get();
         let first_new_id = total_minted;
@@ -103,7 +103,7 @@ pub trait NonFungibleTokens {
             .set(&(new_owner_current_total + count));
     }
 
-    fn perform_transfer(&self, token_id: u64, from: &Address, to: &Address) {
+    fn perform_transfer(&self, token_id: u64, from: &ManagedAddress, to: &ManagedAddress) {
         self.token_count(from).update(|count| *count -= 1);
         self.token_count(to).update(|count| *count += 1);
         self.token_owner(token_id).set(to);
@@ -116,17 +116,17 @@ pub trait NonFungibleTokens {
 
     #[view(totalMinted)]
     #[storage_mapper("totalMinted")]
-    fn total_minted(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn total_minted(&self) -> SingleValueMapper<u64>;
 
     #[view(tokenOwner)]
     #[storage_mapper("tokenOwner")]
-    fn token_owner(&self, token_id: u64) -> SingleValueMapper<Self::Storage, Address>;
+    fn token_owner(&self, token_id: u64) -> SingleValueMapper<ManagedAddress>;
 
     #[view(tokenCount)]
     #[storage_mapper("tokenCount")]
-    fn token_count(&self, owner: &Address) -> SingleValueMapper<Self::Storage, u64>;
+    fn token_count(&self, owner: &ManagedAddress) -> SingleValueMapper<u64>;
 
     #[view(approval)]
     #[storage_mapper("approval")]
-    fn approval(&self, token_id: u64) -> SingleValueMapper<Self::Storage, Address>;
+    fn approval(&self, token_id: u64) -> SingleValueMapper<ManagedAddress>;
 }

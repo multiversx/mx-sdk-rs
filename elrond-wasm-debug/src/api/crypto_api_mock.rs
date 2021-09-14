@@ -1,6 +1,8 @@
 use crate::TxContext;
-use elrond_wasm::api::CryptoApi;
-use elrond_wasm::types::{BoxedBytes, MessageHashType, H256};
+use elrond_wasm::{
+    api::CryptoApi,
+    types::{BoxedBytes, MessageHashType, H256},
+};
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 

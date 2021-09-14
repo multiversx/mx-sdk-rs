@@ -1,5 +1,4 @@
-use super::attr_names::*;
-use super::util::*;
+use super::{attr_names::*, util::*};
 
 /// unlike the others, this is standard Rust,
 /// all doc comments get automatically transformed into "doc" attributes

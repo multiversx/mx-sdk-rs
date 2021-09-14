@@ -1,6 +1,8 @@
-use super::{ManagedBuffer, ManagedType};
-use crate::api::{Handle, ManagedTypeApi};
-use crate::types::BoxedBytes;
+use super::{ManagedBuffer, ManagedDefault, ManagedType};
+use crate::{
+    api::{Handle, ManagedTypeApi},
+    types::BoxedBytes,
+};
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
@@ -38,6 +40,13 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     #[inline]
     fn type_manager(&self) -> M {
         self.api.clone()
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedDefault<M> for BigInt<M> {
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::from_i64(api, 0)
     }
 }
 

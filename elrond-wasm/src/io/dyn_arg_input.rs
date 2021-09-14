@@ -1,5 +1,7 @@
-use crate::api::{ErrorApi, ManagedTypeApi};
-use crate::err_msg;
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    err_msg,
+};
 use elrond_codec::TopDecodeInput;
 
 /// Abstracts away the loading of multi-arguments.
@@ -19,7 +21,9 @@ use elrond_codec::TopDecodeInput;
 /// - deserializing endpoint arguments directly from the API
 /// - deserializing callback arguments saved to storage, from a call data string
 ///
-pub trait DynArgInput<I: TopDecodeInput> {
+pub trait DynArgInput {
+    type ItemInput: TopDecodeInput;
+
     type ErrorApi: ErrorApi + ManagedTypeApi + Sized;
 
     fn error_api(&self) -> Self::ErrorApi;
@@ -31,7 +35,7 @@ pub trait DynArgInput<I: TopDecodeInput> {
     /// If the loader is out of arguments, it will crash by itself with an appropriate error,
     /// without returning.
     /// Use if the next argument is optional, use `has_next` beforehand.
-    fn next_arg_input(&mut self) -> I;
+    fn next_arg_input(&mut self) -> Self::ItemInput;
 
     /// Called after retrieving all arguments to validate that extra arguments were not provided.
     fn assert_no_more_args(&self) {

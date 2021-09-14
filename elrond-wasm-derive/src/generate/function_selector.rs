@@ -1,5 +1,4 @@
-use super::supertrait_gen;
-use super::util::*;
+use super::{supertrait_gen, util::*};
 use crate::model::{ContractTrait, Method, PublicRole};
 
 fn function_selector_match_arm(m: &Method, endpoint_name: &str) -> proc_macro2::TokenStream {

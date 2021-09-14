@@ -1,6 +1,9 @@
-use crate::api::{ErrorApi, ManagedTypeApi};
-use crate::types::ManagedBytesTopDecodeInput;
-use crate::{err_msg, DynArgInput, HexCallDataDeserializer};
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    err_msg,
+    types::ManagedBytesTopDecodeInput,
+    DynArgInput, HexCallDataDeserializer,
+};
 
 pub struct CallDataArgLoader<'a, A>
 where
@@ -19,10 +22,12 @@ where
     }
 }
 
-impl<'a, A> DynArgInput<ManagedBytesTopDecodeInput<A>> for CallDataArgLoader<'a, A>
+impl<'a, A> DynArgInput for CallDataArgLoader<'a, A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
+    type ItemInput = ManagedBytesTopDecodeInput<A>;
+
     type ErrorApi = A;
 
     #[inline]

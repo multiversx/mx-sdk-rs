@@ -1,19 +1,23 @@
-use elrond_wasm::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer};
+use elrond_wasm::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedFrom};
 use elrond_wasm_debug::{check_managed_top_encode_decode, TxContext};
 
 #[test]
 fn test_big_uint_serialization() {
     let api = TxContext::dummy();
 
-    check_managed_top_encode_decode(api.clone(), BigUint::from_u32(api.clone(), 5u32), &[5u8]);
+    check_managed_top_encode_decode(
+        api.clone(),
+        BigUint::managed_from(api.clone(), 5u32),
+        &[5u8],
+    );
 }
 
 #[test]
 fn test_vec_of_big_uint_serialization() {
     let api = TxContext::dummy();
     let v = vec![
-        BigUint::from_u32(api.clone(), 5u32),
-        BigUint::from_u32(api.clone(), 6u32),
+        BigUint::managed_from(api.clone(), 5u32),
+        BigUint::managed_from(api.clone(), 6u32),
     ];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);

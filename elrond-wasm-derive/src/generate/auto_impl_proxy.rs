@@ -3,8 +3,7 @@ use crate::{
     model::{AutoImpl, ContractTrait, Method, MethodImpl},
     parse::split_path_last,
 };
-use syn::punctuated::Punctuated;
-use syn::token::Colon2;
+use syn::{punctuated::Punctuated, token::Colon2};
 
 /// Path to a Rust module containing a contract call proxy.
 pub type ProxyModulePath = Punctuated<syn::PathSegment, Colon2>;
@@ -59,7 +58,7 @@ pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
 
     quote! {
         #msig {
-            #module_path Proxy::new_proxy_obj(self.send()) #address_snippet
+            #module_path Proxy::new_proxy_obj(self.raw_vm_api()) #address_snippet
         }
     }
 }

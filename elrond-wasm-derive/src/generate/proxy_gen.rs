@@ -1,10 +1,7 @@
-use super::arg_str_serialize::*;
-use super::method_gen::*;
-use super::util::*;
-use crate::model::PublicRole;
+use super::{method_gen::*, util::*};
 use crate::{
     generate::{snippets, supertrait_gen},
-    model::{ArgPaymentMetadata, ContractTrait, Method},
+    model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole},
 };
 
 pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream {
@@ -20,7 +17,7 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
         fn #method_name #generics (
             self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractCall<Self::SendApi, <#ret_tok as elrond_wasm::io::EndpointResult>::DecodeAs>
+        ) -> elrond_wasm::types::ContractCall<Self::Api, <#ret_tok as elrond_wasm::io::EndpointResult>::DecodeAs>
         #generics_where
     };
     result
@@ -35,7 +32,7 @@ pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
         fn #method_name #generics (
             self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractDeploy<Self::SendApi>
+        ) -> elrond_wasm::types::ContractDeploy<Self::Api>
         #generics_where
     };
     result
@@ -44,45 +41,44 @@ pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
     let msig = generate_proxy_endpoint_sig(m);
 
-    let mut payment_count = 0;
-    let mut payment_expr = quote! { ___payment___ };
     let mut token_count = 0;
-    let mut token_expr = quote! { ___token___ };
+    let mut token_expr = quote! { elrond_wasm::types::TokenIdentifier::egld(___api___.clone()) };
     let mut nonce_count = 0;
-    let mut nonce_expr = quote! { ___nonce___ };
+    let mut nonce_expr = quote! { 0u64 };
+    let mut payment_count = 0;
+    let mut payment_expr = quote! { elrond_wasm::types::BigUint::zero(___api___.clone()) };
 
     let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
         .method_args
         .iter()
-        .map(|arg| {
-            let arg_accumulator = quote! { ___contract_call___.get_mut_arg_buffer() };
+        .map(|arg| match &arg.metadata.payment {
+            ArgPaymentMetadata::NotPayment => {
+                let pat = &arg.pat;
+                quote! {
+                    ___contract_call___.push_endpoint_arg(#pat);
+                }
+            },
+            ArgPaymentMetadata::PaymentToken => {
+                token_count += 1;
+                let pat = &arg.pat;
+                token_expr = quote! { #pat };
 
-            match &arg.metadata.payment {
-                ArgPaymentMetadata::NotPayment => {
-                    arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.error_api() })
-                },
-                ArgPaymentMetadata::PaymentAmount => {
-                    payment_count += 1;
-                    let pat = &arg.pat;
-                    payment_expr = quote! { #pat };
+                quote! {}
+            },
+            ArgPaymentMetadata::PaymentNonce => {
+                nonce_count += 1;
+                let pat = &arg.pat;
+                nonce_expr = quote! { #pat };
 
-                    quote! {}
-                },
-                ArgPaymentMetadata::PaymentToken => {
-                    token_count += 1;
-                    let pat = &arg.pat;
-                    token_expr = quote! { #pat };
+                quote! {}
+            },
+            ArgPaymentMetadata::PaymentAmount => {
+                payment_count += 1;
+                let pat = &arg.pat;
+                payment_expr = quote! { #pat };
 
-                    quote! {}
-                },
-                ArgPaymentMetadata::PaymentNonce => {
-                    nonce_count += 1;
-                    let pat = &arg.pat;
-                    nonce_expr = quote! { #pat };
-
-                    quote! {}
-                },
-            }
+                quote! {}
+            },
         })
         .collect();
 
@@ -96,21 +92,27 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         panic!("No more than one payment nonce argument allowed in call proxy");
     }
 
+    let single_payment_snippet = if token_count > 0 || nonce_count > 0 || payment_count > 0 {
+        quote! {
+            ___contract_call___ = ___contract_call___.add_token_transfer(#token_expr, #nonce_expr, #payment_expr);
+        }
+    } else {
+        quote! {}
+    };
+
     let endpoint_name_literal = byte_str_slice_literal(endpoint_name.as_bytes());
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
         #msig {
-            let (___api___, ___address___, ___token___, ___payment___, ___nonce___) =
-                self.into_fields();
+            let (___api___, ___address___) = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___api___.clone(),
                 ___address___,
-                #token_expr,
-                #payment_expr,
-                #nonce_expr,
-                elrond_wasm::types::BoxedBytes::from(#endpoint_name_literal),
+                #endpoint_name_literal,
             );
+            #single_payment_snippet
             #(#arg_push_snippets)*
             ___contract_call___
         }
@@ -123,38 +125,36 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
     let msig = generate_proxy_deploy_sig(init_method);
 
     let mut payment_count = 0;
-    let mut payment_expr = quote! { ___payment___ };
     let mut token_count = 0;
     let mut nonce_count = 0;
 
     let arg_push_snippets: Vec<proc_macro2::TokenStream> = init_method
         .method_args
         .iter()
-        .map(|arg| {
-            let arg_accumulator = quote! { ___contract_deploy___.get_mut_arg_buffer() };
+        .map(|arg| match &arg.metadata.payment {
+            ArgPaymentMetadata::NotPayment => {
+                let pat = &arg.pat;
+                quote! {
+                    ___contract_deploy___.push_endpoint_arg(#pat);
+                }
+            },
+            ArgPaymentMetadata::PaymentToken => {
+                token_count += 1;
 
-            match &arg.metadata.payment {
-                ArgPaymentMetadata::NotPayment => {
-                    arg_serialize_push(arg, &arg_accumulator, &quote! { ___api___.error_api() })
-                },
-                ArgPaymentMetadata::PaymentAmount => {
-                    payment_count += 1;
-                    let pat = &arg.pat;
-                    payment_expr = quote! { #pat };
+                quote! {}
+            },
+            ArgPaymentMetadata::PaymentNonce => {
+                nonce_count += 1;
 
-                    quote! {}
-                },
-                ArgPaymentMetadata::PaymentToken => {
-                    token_count += 1;
-
-                    quote! {}
-                },
-                ArgPaymentMetadata::PaymentNonce => {
-                    nonce_count += 1;
-
-                    quote! {}
-                },
-            }
+                quote! {}
+            },
+            ArgPaymentMetadata::PaymentAmount => {
+                payment_count += 1;
+                let pat = &arg.pat;
+                quote! {
+                    ___contract_deploy___ = ___contract_deploy___.with_egld_transfer(#pat);
+                }
+            },
         })
         .collect();
 
@@ -170,13 +170,13 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
         #msig {
-            let (___api___, ___address___, _, ___payment___, _) =
+            let (___api___, ___address___) =
                 self.into_fields();
             let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy(
                 ___api___.clone(),
                 ___address___,
-                #payment_expr,
             );
             #(#arg_push_snippets)*
             ___contract_deploy___
@@ -207,7 +207,7 @@ pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
     let proxy_methods_impl = generate_method_impl(contract);
     quote! {
         pub trait ProxyTrait:
-            elrond_wasm::api::ProxyObjApi
+            elrond_wasm::contract_base::ProxyObjBase
             + Sized
             #(#proxy_supertrait_decl)*
         {

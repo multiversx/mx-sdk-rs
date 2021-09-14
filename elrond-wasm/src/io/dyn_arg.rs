@@ -6,23 +6,16 @@ use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.
 pub trait DynArg: Sized {
-    fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
-    where
-        I: TopDecodeInput,
-        D: DynArgInput<I>;
+    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self;
 }
 
 /// All top-deserializable types can be endpoint arguments.
 impl<T> DynArg for T
 where
-    T: TopDecode,
+    T: TopEncode + TopDecode,
 {
-    fn dyn_load<I, D>(loader: &mut D, arg_id: ArgId) -> Self
-    where
-        I: TopDecodeInput,
-        D: DynArgInput<I>,
-    {
-        if let TypeInfo::Unit = T::TYPE_INFO {
+    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
+        if let TypeInfo::Unit = <T as TopDecode>::TYPE_INFO {
             // unit type returns without loading anything
             let cast_unit: T = unsafe { core::mem::transmute_copy(&()) };
             return cast_unit;

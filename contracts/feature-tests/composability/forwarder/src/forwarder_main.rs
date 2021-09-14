@@ -36,13 +36,13 @@ pub trait Forwarder:
     #[endpoint]
     fn send_egld(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         amount: &BigUint,
-        #[var_args] opt_data: OptionalArg<BoxedBytes>,
+        #[var_args] opt_data: OptionalArg<ManagedBuffer>,
     ) {
-        let data = match &opt_data {
-            OptionalArg::Some(data) => data.as_slice(),
-            OptionalArg::None => &[],
+        let data = match opt_data {
+            OptionalArg::Some(data) => data,
+            OptionalArg::None => self.types().managed_buffer_empty(),
         };
         self.send().direct_egld(to, amount, data);
     }

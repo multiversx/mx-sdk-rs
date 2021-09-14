@@ -16,10 +16,10 @@ pub trait Multisig {
     /// Minimum number of signatures needed to perform any action.
     #[view(getQuorum)]
     #[storage_mapper("quorum")]
-    fn quorum(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn quorum(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("user")]
-    fn user_mapper(&self) -> UserMapper<Self::Storage>;
+    fn user_mapper(&self) -> UserMapper;
 
     #[storage_get("user_role")]
     fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
@@ -31,16 +31,16 @@ pub trait Multisig {
     /// It is kept in sync with the user list by the contract.
     #[view(getNumBoardMembers)]
     #[storage_mapper("num_board_members")]
-    fn num_board_members(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn num_board_members(&self) -> SingleValueMapper<usize>;
 
     /// Denormalized proposer count.
     /// It is kept in sync with the user list by the contract.
     #[view(getNumProposers)]
     #[storage_mapper("num_proposers")]
-    fn num_proposers(&self) -> SingleValueMapper<Self::Storage, usize>;
+    fn num_proposers(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Self::Storage, Action<Self::TypeManager>>;
+    fn action_mapper(&self) -> VecMapper<Action<Self::Api>>;
 
     /// The index of the last proposed action.
     /// 0 means that no action was ever proposed yet.
@@ -51,12 +51,12 @@ pub trait Multisig {
 
     /// Serialized action data of an action with index.
     #[view(getActionData)]
-    fn get_action_data(&self, action_id: usize) -> Action<Self::TypeManager> {
+    fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
         self.action_mapper().get(action_id)
     }
 
     #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Self::Storage, Vec<usize>>;
+    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Vec<usize>>;
 
     #[init]
     fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
@@ -86,9 +86,9 @@ pub trait Multisig {
     #[endpoint]
     fn deposit(&self) {}
 
-    fn propose_action(&self, action: Action<Self::TypeManager>) -> SCResult<usize> {
+    fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_propose(),
@@ -111,7 +111,7 @@ pub trait Multisig {
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::TypeManager>> {
+    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::Api>> {
         let mut result = Vec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
@@ -131,20 +131,20 @@ pub trait Multisig {
     /// Initiates board member addition process.
     /// Can also be used to promote a proposer to board member.
     #[endpoint(proposeAddBoardMember)]
-    fn propose_add_board_member(&self, board_member_address: Address) -> SCResult<usize> {
+    fn propose_add_board_member(&self, board_member_address: ManagedAddress) -> SCResult<usize> {
         self.propose_action(Action::AddBoardMember(board_member_address))
     }
 
     /// Initiates proposer addition process..
     /// Can also be used to demote a board member to proposer.
     #[endpoint(proposeAddProposer)]
-    fn propose_add_proposer(&self, proposer_address: Address) -> SCResult<usize> {
+    fn propose_add_proposer(&self, proposer_address: ManagedAddress) -> SCResult<usize> {
         self.propose_action(Action::AddProposer(proposer_address))
     }
 
     /// Removes user regardless of whether it is a board member or proposer.
     #[endpoint(proposeRemoveUser)]
-    fn propose_remove_user(&self, user_address: Address) -> SCResult<usize> {
+    fn propose_remove_user(&self, user_address: ManagedAddress) -> SCResult<usize> {
         self.propose_action(Action::RemoveUser(user_address))
     }
 
@@ -156,7 +156,7 @@ pub trait Multisig {
     #[endpoint(proposeSendEgld)]
     fn propose_send_egld(
         &self,
-        to: Address,
+        to: ManagedAddress,
         amount: BigUint,
         #[var_args] opt_data: OptionalArg<BoxedBytes>,
     ) -> SCResult<usize> {
@@ -171,7 +171,7 @@ pub trait Multisig {
     fn propose_sc_deploy(
         &self,
         amount: BigUint,
-        code: BoxedBytes,
+        code: ManagedBuffer,
         upgradeable: bool,
         payable: bool,
         readable: bool,
@@ -200,7 +200,7 @@ pub trait Multisig {
     #[endpoint(proposeSCCall)]
     fn propose_sc_call(
         &self,
-        to: Address,
+        to: ManagedAddress,
         egld_payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] arguments: VarArgs<BoxedBytes>,
@@ -216,8 +216,8 @@ pub trait Multisig {
     /// Returns `true` (`1`) if the user has signed the action.
     /// Does not check whether or not the user is still a board member and the signature valid.
     #[view]
-    fn signed(&self, user: Address, action_id: usize) -> bool {
-        let user_id = self.user_mapper().get_user_id(&user);
+    fn signed(&self, user: ManagedAddress, action_id: usize) -> bool {
+        let user_id = self.user_mapper().get_user_id(&user.to_address());
         if user_id == 0 {
             false
         } else {
@@ -231,8 +231,8 @@ pub trait Multisig {
     /// `1` = can propose, but not sign,
     /// `2` = can propose and sign.
     #[view(userRole)]
-    fn user_role(&self, user: Address) -> UserRole {
-        let user_id = self.user_mapper().get_user_id(&user);
+    fn user_role(&self, user: ManagedAddress) -> UserRole {
+        let user_id = self.user_mapper().get_user_id(&user.to_address());
         if user_id == 0 {
             UserRole::None
         } else {
@@ -242,23 +242,23 @@ pub trait Multisig {
 
     /// Lists all users that can sign actions.
     #[view(getAllBoardMembers)]
-    fn get_all_board_members(&self) -> MultiResultVec<Address> {
+    fn get_all_board_members(&self) -> MultiResultVec<ManagedAddress> {
         self.get_all_users_with_role(UserRole::BoardMember)
     }
 
     /// Lists all proposers that are not board members.
     #[view(getAllProposers)]
-    fn get_all_proposers(&self) -> MultiResultVec<Address> {
+    fn get_all_proposers(&self) -> MultiResultVec<ManagedAddress> {
         self.get_all_users_with_role(UserRole::Proposer)
     }
 
-    fn get_all_users_with_role(&self, role: UserRole) -> MultiResultVec<Address> {
+    fn get_all_users_with_role(&self, role: UserRole) -> MultiResultVec<ManagedAddress> {
         let mut result = Vec::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
             if self.get_user_id_to_role(user_id) == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
-                    result.push(address);
+                    result.push(address.managed_into());
                 }
             }
         }
@@ -274,7 +274,7 @@ pub trait Multisig {
         );
 
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can sign");
 
@@ -297,7 +297,7 @@ pub trait Multisig {
         );
 
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can un-sign");
 
@@ -321,8 +321,10 @@ pub trait Multisig {
     /// - reactivate removed user
     /// - convert between board member and proposer
     /// Will keep the board size and proposer count in sync.
-    fn change_user_role(&self, user_address: Address, new_role: UserRole) {
-        let user_id = self.user_mapper().get_or_create_user(&user_address);
+    fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
+        let user_id = self
+            .user_mapper()
+            .get_or_create_user(&user_address.to_address());
         let old_role = if user_id == 0 {
             UserRole::None
         } else {
@@ -359,11 +361,15 @@ pub trait Multisig {
     /// Does not check if those users are still board members or not,
     /// so the result may contain invalid signers.
     #[view(getActionSigners)]
-    fn get_action_signers(&self, action_id: usize) -> Vec<Address> {
+    fn get_action_signers(&self, action_id: usize) -> Vec<ManagedAddress> {
         self.action_signer_ids(action_id)
             .get()
             .iter()
-            .map(|signer_id| self.user_mapper().get_user_address_unchecked(*signer_id))
+            .map(|signer_id| {
+                self.user_mapper()
+                    .get_user_address_unchecked(*signer_id)
+                    .managed_into()
+            })
             .collect()
     }
 
@@ -404,9 +410,9 @@ pub trait Multisig {
     fn perform_action_endpoint(
         &self,
         action_id: usize,
-    ) -> SCResult<PerformActionResult<Self::SendApi>> {
+    ) -> SCResult<PerformActionResult<Self::Api>> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_perform_action(),
@@ -420,7 +426,7 @@ pub trait Multisig {
         self.perform_action(action_id)
     }
 
-    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::SendApi>> {
+    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::Api>> {
         let action = self.action_mapper().get(action_id);
 
         // clean up storage
@@ -467,10 +473,10 @@ pub trait Multisig {
                 Ok(PerformActionResult::Nothing)
             },
             Action::SendEgld { to, amount, data } => Ok(PerformActionResult::SendEgld(SendEgld {
-                api: self.send(),
+                api: self.raw_vm_api(),
                 to,
                 amount,
-                data,
+                data: data.as_slice().managed_into(),
             })),
             Action::SCDeploy {
                 amount,
@@ -479,14 +485,14 @@ pub trait Multisig {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let mut arg_buffer = ArgBuffer::new();
-                for arg in arguments {
-                    arg_buffer.push_argument_bytes(arg.as_slice());
-                }
-                let new_address = self
-                    .send()
-                    .deploy_contract(gas_left, &amount, &code, code_metadata, &arg_buffer)
-                    .ok_or("Contract deployment failed")?;
+                let arg_buffer = arguments.managed_into();
+                let (new_address, _) = self.raw_vm_api().deploy_contract(
+                    gas_left,
+                    &amount,
+                    &code,
+                    code_metadata,
+                    &arg_buffer,
+                );
                 Ok(PerformActionResult::DeployResult(new_address))
             },
             Action::SCCall {
@@ -495,13 +501,14 @@ pub trait Multisig {
                 endpoint_name,
                 arguments,
             } => {
-                let mut contract_call_raw =
-                    ContractCall::<Self::SendApi, ()>::new(self.send(), to, endpoint_name)
-                        .with_token_transfer(self.types().token_identifier_egld(), egld_payment);
+                let mut contract_call_raw = self
+                    .send()
+                    .contract_call::<()>(to, endpoint_name.managed_into())
+                    .with_egld_transfer(egld_payment);
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
                 }
-                Ok(PerformActionResult::AsyncCall(
+                Ok(PerformActionResult::SendAsyncCall(
                     contract_call_raw.async_call(),
                 ))
             },
@@ -519,7 +526,7 @@ pub trait Multisig {
     #[endpoint(discardAction)]
     fn discard_action(&self, action_id: usize) -> SCResult<()> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_discard_action(),

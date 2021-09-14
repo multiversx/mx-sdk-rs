@@ -17,16 +17,15 @@ pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub vec_u8: Vec<u8>,
     pub token_id: TokenIdentifier<M>,
     pub boolean: bool,
-    pub boxed_bytes: BoxedBytes,
+    pub boxed_bytes: ManagedBuffer<M>,
 }
 
-#[allow(clippy::too_many_arguments)]
 #[elrond_wasm::module]
 pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[view]
     fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain().get_esdt_balance(
-            &self.blockchain().get_sc_address_managed(),
+            &self.blockchain().get_sc_address(),
             token_identifier,
             nonce,
         )
@@ -62,12 +61,13 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     fn nft_issue(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
-    ) -> AsyncCall<Self::SendApi> {
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_non_fungible(
                 issue_cost,
                 &token_display_name,
@@ -88,7 +88,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[callback]
     fn nft_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[call_result] result: AsyncCallResult<TokenIdentifier>,
     ) {
         match result {
@@ -109,17 +109,18 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    #[allow(clippy::too_many_arguments)]
     fn nft_create(
         &self,
         token_identifier: TokenIdentifier,
         amount: BigUint,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         royalties: BigUint,
-        hash: BoxedBytes,
+        hash: ManagedBuffer,
         color: Color,
-        uri: BoxedBytes,
+        uri: ManagedBuffer,
     ) -> u64 {
+        let mut uris = ManagedVec::new_empty(self.type_manager());
+        uris.push(uri);
         let token_nonce = self.send().esdt_nft_create::<Color>(
             &token_identifier,
             &amount,
@@ -127,7 +128,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             &royalties,
             &hash,
             &color,
-            &[uri],
+            &uris,
         );
 
         self.create_event(&token_identifier, token_nonce, &amount);
@@ -140,11 +141,11 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         &self,
         token_identifier: TokenIdentifier,
         amount: BigUint,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         royalties: BigUint,
-        hash: BoxedBytes,
-        uri: BoxedBytes,
-        #[var_args] attrs_arg: MultiArg5<BigUint, Vec<u8>, TokenIdentifier, bool, BoxedBytes>,
+        hash: ManagedBuffer,
+        uri: ManagedBuffer,
+        #[var_args] attrs_arg: MultiArg5<BigUint, Vec<u8>, TokenIdentifier, bool, ManagedBuffer>,
     ) -> SCResult<()> {
         let attrs_pieces = attrs_arg.into_tuple();
         let orig_attr = ComplexAttributes {
@@ -155,26 +156,25 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             boxed_bytes: attrs_pieces.4,
         };
 
-        let token_nonce = self
-            .send()
-            .esdt_nft_create::<ComplexAttributes<Self::TypeManager>>(
-                &token_identifier,
-                &amount,
-                &name,
-                &royalties,
-                &hash,
-                &orig_attr,
-                &[uri],
-            );
+        let mut uris = ManagedVec::new_empty(self.type_manager());
+        uris.push(uri);
+        let token_nonce = self.send().esdt_nft_create::<ComplexAttributes<Self::Api>>(
+            &token_identifier,
+            &amount,
+            &name,
+            &royalties,
+            &hash,
+            &orig_attr,
+            &uris,
+        );
 
         let token_info = self.blockchain().get_esdt_token_data(
-            &self.blockchain().get_sc_address_managed(),
+            &self.blockchain().get_sc_address(),
             &token_identifier,
             token_nonce,
         );
 
-        let decoded_attr =
-            token_info.decode_attributes::<ComplexAttributes<Self::TypeManager>>()?;
+        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<Self::Api>>()?;
 
         require!(
             orig_attr.biguint == decoded_attr.biguint
@@ -202,58 +202,48 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[endpoint]
     fn transfer_nft_via_async_call(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        data: BoxedBytes,
+        data: ManagedBuffer,
     ) {
-        self.send().transfer_esdt_via_async_call(
-            &to,
-            &token_identifier,
-            nonce,
-            &amount,
-            data.as_slice(),
-        );
+        self.send()
+            .transfer_esdt_via_async_call(&to, &token_identifier, nonce, &amount, data);
     }
 
     #[endpoint]
     fn transfer_nft_and_execute(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        function: BoxedBytes,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
+        function: ManagedBuffer,
+        #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) {
-        let mut arg_buffer = ArgBuffer::new();
-        for arg in arguments.into_vec() {
-            arg_buffer.push_argument_bytes(arg.as_slice());
-        }
-
-        let _ = self.send().direct_esdt_nft_execute(
+        let _ = self.raw_vm_api().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,
             &amount,
             self.blockchain().get_gas_left(),
-            function.as_slice(),
-            &arg_buffer,
+            &function,
+            &arguments.into_vec().managed_into(),
         );
     }
 
     #[endpoint]
     fn create_and_send(
         &self,
-        to: Address,
+        to: ManagedAddress,
         token_identifier: TokenIdentifier,
         amount: BigUint,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         royalties: BigUint,
-        hash: BoxedBytes,
+        hash: ManagedBuffer,
         color: Color,
-        uri: BoxedBytes,
+        uri: ManagedBuffer,
     ) {
         let token_nonce = self.nft_create(
             token_identifier.clone(),
@@ -287,7 +277,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[event("send")]
     fn send_event(
         &self,
-        #[indexed] to: &Address,
+        #[indexed] to: &ManagedAddress,
         #[indexed] token_id: &TokenIdentifier,
         #[indexed] token_nonce: u64,
         #[indexed] amount: &BigUint,

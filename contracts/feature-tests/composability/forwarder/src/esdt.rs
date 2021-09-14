@@ -8,24 +8,21 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
     fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
-        self.blockchain().get_esdt_balance(
-            &self.blockchain().get_sc_address_managed(),
-            token_identifier,
-            0,
-        )
+        self.blockchain()
+            .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
     }
 
     #[endpoint]
     fn send_esdt(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         token_id: TokenIdentifier,
         amount: &BigUint,
-        #[var_args] opt_data: OptionalArg<BoxedBytes>,
+        #[var_args] opt_data: OptionalArg<ManagedBuffer>,
     ) {
-        let data = match &opt_data {
-            OptionalArg::Some(data) => data.as_slice(),
-            OptionalArg::None => &[],
+        let data = match opt_data {
+            OptionalArg::Some(data) => data,
+            OptionalArg::None => self.types().managed_buffer_empty(),
         };
         self.send().direct(to, &token_id, 0, amount, data);
     }
@@ -36,7 +33,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_amount] payment: BigUint,
-        to: Address,
+        to: ManagedAddress,
         percentage_fees: BigUint,
     ) {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
@@ -48,18 +45,18 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[endpoint]
     fn send_esdt_twice(
         &self,
-        to: &Address,
+        to: &ManagedAddress,
         token_id: TokenIdentifier,
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
-        #[var_args] opt_data: OptionalArg<BoxedBytes>,
+        #[var_args] opt_data: OptionalArg<ManagedBuffer>,
     ) {
-        let data = match &opt_data {
-            OptionalArg::Some(data) => data.as_slice(),
-            OptionalArg::None => &[],
+        let data = match opt_data {
+            OptionalArg::Some(data) => data,
+            OptionalArg::None => self.types().managed_buffer_empty(),
         };
         self.send()
-            .direct(to, &token_id, 0, amount_first_time, data);
+            .direct(to, &token_id, 0, amount_first_time, data.clone());
         self.send()
             .direct(to, &token_id, 0, amount_second_time, data);
     }
@@ -67,15 +64,15 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[endpoint]
     fn send_esdt_direct_multi_transfer(
         &self,
-        to: Address,
+        to: ManagedAddress,
         #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = Vec::new();
+        let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
         for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment {
-                token_name,
+                token_identifier,
                 token_nonce,
                 amount,
                 token_type: EsdtTokenType::Invalid, // not used
@@ -84,12 +81,12 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             all_token_payments.push(payment);
         }
 
-        let _ = self.send().direct_multi_esdt_transfer_execute(
+        let _ = self.raw_vm_api().direct_multi_esdt_transfer_execute(
             &to,
             &all_token_payments,
             self.blockchain().get_gas_left(),
-            &[],
-            &ArgBuffer::new(),
+            &self.types().managed_buffer_empty(),
+            &ManagedArgBuffer::new_empty(self.type_manager()),
         );
     }
 
@@ -98,13 +95,14 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn issue_fungible_token(
         &self,
         #[payment] issue_cost: BigUint,
-        token_display_name: BoxedBytes,
-        token_ticker: BoxedBytes,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let caller = self.blockchain().get_caller();
 
-        ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        self.send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -129,7 +127,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[callback]
     fn esdt_issue_callback(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment] returned_tokens: BigUint,
         #[call_result] result: AsyncCallResult<()>,

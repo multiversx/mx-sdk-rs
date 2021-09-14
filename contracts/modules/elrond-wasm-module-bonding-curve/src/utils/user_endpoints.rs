@@ -1,9 +1,11 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::curves::curve_function::CurveFunction;
-use crate::function_selector::FunctionSelector;
-use crate::utils::{events, storage, structs::CurveArguments};
+use crate::{
+    curves::curve_function::CurveFunction,
+    function_selector::FunctionSelector,
+    utils::{events, storage, structs::CurveArguments},
+};
 
 #[elrond_wasm::module]
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
@@ -64,7 +66,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     ) -> SCResult<()> {
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount)?;
-        self.check_given_token(&payment_token, &offered_token)?;
+        self.check_given_token(&payment_token, &offered_token);
 
         let calculated_price = self
             .bonding_curve(&requested_token)
@@ -124,7 +126,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn send_bought_tokens(
         &self,
-        caller: &Address,
+        caller: &ManagedAddress,
         token: TokenIdentifier,
         amount: BigUint,
     ) -> SCResult<()> {
@@ -219,26 +221,21 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         Ok(bonding_curve.payment_token)
     }
 
-    fn check_given_token(
-        &self,
-        accepted_token: &TokenIdentifier,
-        given_token: &TokenIdentifier,
-    ) -> SCResult<()> {
+    fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
         if given_token != accepted_token {
-            return Err(SCError::from(BoxedBytes::from_concat(&[
-                b"Only ",
-                accepted_token.to_esdt_identifier().as_slice(),
-                b" tokens accepted",
-            ])));
+            let mut err = self.error().new_error();
+            err.append_bytes(&b"Only"[..]);
+            err.append_bytes(accepted_token.to_esdt_identifier().as_slice());
+            err.append_bytes(&b" tokens accepted"[..]);
+            err.exit_now()
         }
-        Ok(())
     }
 
     fn compute_buy_price(
         &self,
-        function_selector: &FunctionSelector<Self::TypeManager>,
+        function_selector: &FunctionSelector<Self::Api>,
         amount: BigUint,
-        arguments: CurveArguments<Self::TypeManager>,
+        arguments: CurveArguments<Self::Api>,
     ) -> SCResult<BigUint> {
         let token_start = arguments.first_token_available();
         function_selector.calculate_price(&token_start, &amount, &arguments)
@@ -246,9 +243,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_sell_price(
         &self,
-        function_selector: &FunctionSelector<Self::TypeManager>,
+        function_selector: &FunctionSelector<Self::Api>,
         amount: BigUint,
-        arguments: CurveArguments<Self::TypeManager>,
+        arguments: CurveArguments<Self::Api>,
     ) -> SCResult<BigUint> {
         let token_start = &arguments.first_token_available() - &amount;
         function_selector.calculate_price(&token_start, &amount, &arguments)

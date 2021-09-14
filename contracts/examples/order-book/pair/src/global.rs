@@ -36,5 +36,5 @@ pub trait GlobalOperationModule {
     }
 
     #[storage_mapper("global_operation_ongoing")]
-    fn global_op_is_ongoing(&self) -> SingleValueMapper<Self::Storage, bool>;
+    fn global_op_is_ongoing(&self) -> SingleValueMapper<bool>;
 }

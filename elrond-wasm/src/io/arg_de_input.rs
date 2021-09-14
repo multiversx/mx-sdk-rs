@@ -1,7 +1,8 @@
-use crate::api::ManagedTypeApi;
-use crate::types::{BigInt, BigUint, ManagedBufferNestedDecodeInput, ManagedType};
-use crate::Box;
-use crate::{api::EndpointArgumentApi, types::ManagedBuffer};
+use crate::{
+    api::{EndpointArgumentApi, ManagedTypeApi},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
+    Box,
+};
 use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
 
 /// Adapter from the API to the TopDecodeInput trait.

@@ -6,8 +6,6 @@ mod internal_mod_c;
 
 elrond_wasm::imports!();
 
-use elrond_wasm_module_features::feature_guard;
-
 /// Contract that tests that using modules works correctly.
 /// Also provides testing for the most common modules:
 /// - DnsModule
@@ -33,9 +31,8 @@ pub trait UseModule:
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.
     #[endpoint(checkFeatureGuard)]
-    fn check_feature_guard(&self) -> SCResult<()> {
-        feature_guard!(self, b"featureName", true);
-        Ok(())
+    fn check_feature_guard(&self) {
+        self.check_feature_on(b"featureName", true);
     }
 
     #[endpoint(checkPause)]

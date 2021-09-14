@@ -1,7 +1,6 @@
-use super::ManagedType;
-use crate::api::InvalidSliceError;
+use super::{ManagedDefault, ManagedFrom, ManagedType};
 use crate::{
-    api::{Handle, ManagedTypeApi},
+    api::{Handle, InvalidSliceError, ManagedTypeApi},
     types::BoxedBytes,
 };
 use alloc::string::String;
@@ -50,7 +49,47 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             api,
         }
     }
+}
 
+impl<M> ManagedFrom<M, &[u8]> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: &[u8]) -> Self {
+        Self::new_from_bytes(api, bytes)
+    }
+}
+
+impl<M> ManagedFrom<M, BoxedBytes> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: BoxedBytes) -> Self {
+        Self::new_from_bytes(api, bytes.as_slice())
+    }
+}
+
+/// Syntactic sugar only.
+impl<M, const N: usize> ManagedFrom<M, &[u8; N]> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: &[u8; N]) -> Self {
+        Self::new_from_bytes(api, bytes)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedDefault<M> for ManagedBuffer<M> {
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::new_empty(api)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn len(&self) -> usize {
         self.api.mb_len(self.handle)

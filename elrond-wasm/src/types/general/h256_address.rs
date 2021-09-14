@@ -1,9 +1,6 @@
 use super::h256::H256;
-use crate::abi::TypeAbi;
-use crate::types::BoxedBytes;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{abi::TypeAbi, types::BoxedBytes};
+use alloc::{boxed::Box, string::String, vec::Vec};
 use core::fmt::Debug;
 
 /// An Address is just a H256 with a different name.

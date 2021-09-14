@@ -17,7 +17,7 @@ impl<M> ManagedSerializer<M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    pub(crate) fn new(api: M) -> Self {
+    pub fn new(api: M) -> Self {
         ManagedSerializer { api }
     }
 

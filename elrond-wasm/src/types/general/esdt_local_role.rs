@@ -1,5 +1,4 @@
-use crate::abi::TypeAbi;
-use crate::Vec;
+use crate::{abi::TypeAbi, Vec};
 use alloc::string::String;
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 

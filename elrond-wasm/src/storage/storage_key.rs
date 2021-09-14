@@ -1,6 +1,8 @@
-use crate::api::{ErrorApi, ManagedTypeApi};
-use crate::types::{BoxedBytes, ManagedBuffer, ManagedType};
-use crate::*;
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    *,
+};
 use elrond_codec::*;
 
 pub struct StorageKey<A>
