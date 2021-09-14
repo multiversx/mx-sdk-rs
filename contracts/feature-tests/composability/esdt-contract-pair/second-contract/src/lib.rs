@@ -5,18 +5,21 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait SecondContract {
     #[init]
-    fn init(&self, esdt_token_name: TokenIdentifier) {
-        self.set_contract_esdt_token_name(&esdt_token_name);
+    fn init(&self, esdt_token_identifier: TokenIdentifier) {
+        self.set_contract_esdt_token_identifier(&esdt_token_identifier);
     }
 
     #[payable("*")]
     #[endpoint(acceptEsdtPayment)]
     fn accept_esdt_payment(
         &self,
-        #[payment_token] actual_token_name: TokenIdentifier,
+        #[payment_token] actual_token_identifier: TokenIdentifier,
     ) -> SCResult<()> {
-        let expected_token_name = self.get_contract_esdt_token_name();
-        require!(actual_token_name == expected_token_name, "Wrong esdt token");
+        let expected_token_identifier = self.get_contract_esdt_token_identifier();
+        require!(
+            actual_token_identifier == expected_token_identifier,
+            "Wrong esdt token"
+        );
         Ok(())
     }
 
@@ -28,10 +31,10 @@ pub trait SecondContract {
 
     // storage
 
-    #[storage_set("esdtTokenName")]
-    fn set_contract_esdt_token_name(&self, esdt_token_name: &TokenIdentifier);
+    #[storage_set("esdtTokenidentifier")]
+    fn set_contract_esdt_token_identifier(&self, esdt_token_identifier: &TokenIdentifier);
 
-    #[view(getEsdtTokenName)]
-    #[storage_get("esdtTokenName")]
-    fn get_contract_esdt_token_name(&self) -> TokenIdentifier;
+    #[view(getEsdtTokenIdentifier)]
+    #[storage_get("esdtTokenIdentifier")]
+    fn get_contract_esdt_token_identifier(&self) -> TokenIdentifier;
 }

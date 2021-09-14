@@ -191,7 +191,7 @@
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "value": "0x00",
                 "esdtValue": "250,000,000,000",
-                "esdtTokenName": "str:CROWD-123456",
+                "esdtTokenIdentifier": "str:CROWD-123456",
                 "contractCode": "``new contract code here",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
@@ -219,7 +219,7 @@
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                 "value": "1234",
                 "esdtValue": "250,000,000,000",
-                "esdtTokenName": "str:MyToken"
+                "esdtTokenIdentifier": "str:MyToken"
             }
         },
         {
