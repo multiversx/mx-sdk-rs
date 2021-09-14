@@ -5,9 +5,9 @@ pub trait ManagedVecFeatures {
     #[endpoint]
     fn managed_vec_biguint_push(
         &self,
-        mv: ManagedVec<Self::TypeManager, BigUint>,
+        mv: ManagedVec<Self::Api, BigUint>,
         item: BigUint,
-    ) -> ManagedVec<Self::TypeManager, BigUint> {
+    ) -> ManagedVec<Self::Api, BigUint> {
         let mut result = mv;
         result.push(item);
         result
@@ -16,9 +16,9 @@ pub trait ManagedVecFeatures {
     #[endpoint]
     fn managed_vec_address_push(
         &self,
-        mv: ManagedVec<Self::TypeManager, ManagedAddress>,
+        mv: ManagedVec<Self::Api, ManagedAddress>,
         item: ManagedAddress,
-    ) -> ManagedVec<Self::TypeManager, ManagedAddress> {
+    ) -> ManagedVec<Self::Api, ManagedAddress> {
         let mut result = mv;
         result.push(item);
         result

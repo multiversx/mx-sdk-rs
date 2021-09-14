@@ -20,7 +20,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall> {
         require!(
             self.blockchain().get_block_nonce() <= self.deadline().get(),
             "cannot fund after deadline"
@@ -56,7 +56,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<OptionalResult<AsyncCall<Self::SendApi>>> {
+    fn claim(&self) -> SCResult<OptionalResult<AsyncCall>> {
         match self.status() {
             Status::FundingPeriod => sc_error!("cannot claim before deadline"),
             Status::Successful => {
@@ -101,7 +101,7 @@ pub trait Crowdfunding {
         #[call_result] result: AsyncCallResult<()>,
         cb_sender: ManagedAddress,
         cb_amount: BigUint,
-    ) -> OptionalResult<AsyncCall<Self::SendApi>> {
+    ) -> OptionalResult<AsyncCall> {
         match result {
             AsyncCallResult::Ok(()) => {
                 // transaction started before deadline, ended after -> refund
@@ -127,27 +127,27 @@ pub trait Crowdfunding {
     // proxy
 
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::SendApi>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
 
     // storage
 
     #[view(get_target)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn target(&self) -> SingleValueMapper<BigUint>;
 
     #[view(get_deadline)]
     #[storage_mapper("deadline")]
-    fn deadline(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn deadline(&self) -> SingleValueMapper<u64>;
 
     #[view(get_deposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[view(get_erc20_contract_address)]
     #[storage_mapper("erc20_contract_address")]
-    fn erc20_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn erc20_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     #[view(get_total_balance)]
     #[storage_mapper("erc20_balance")]
-    fn total_balance(&self) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn total_balance(&self) -> SingleValueMapper<BigUint>;
 }

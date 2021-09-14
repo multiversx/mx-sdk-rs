@@ -1,10 +1,10 @@
-use super::context::*;
-use super::value_interpreter::*;
-use super::value_raw::*;
+use super::{context::*, value_interpreter::*, value_raw::*};
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
-use std::cmp::{Ord, Ordering};
-use std::fmt;
+use std::{
+    cmp::{Ord, Ordering},
+    fmt,
+};
 
 pub trait InterpretableFrom<T> {
     fn interpret_from(from: T, context: &InterpreterContext) -> Self;
@@ -89,7 +89,7 @@ impl Default for BigUintValue {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct U64Value {
     pub value: u64,
     pub original: ValueSubTree,
@@ -102,15 +102,6 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
         U64Value {
             value: bu.to_u64().unwrap(),
             original: from,
-        }
-    }
-}
-
-impl Default for U64Value {
-    fn default() -> Self {
-        Self {
-            value: 0,
-            original: ValueSubTree::default(),
         }
     }
 }

@@ -35,13 +35,13 @@ pub fn generate_callback_selector_and_main(
         } else {
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
-                let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.blockchain());
-                let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.get_storage_raw(), &___tx_hash___.as_bytes());
-                elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.get_storage_raw(), &___tx_hash___.as_bytes(), &[]); // cleanup
+                let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.raw_vm_api());
+                let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.raw_vm_api(), &___tx_hash___.as_bytes());
+                elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.raw_vm_api(), &___tx_hash___.as_bytes(), &[]); // cleanup
                 let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
                 if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                     self::EndpointWrappers::callback_selector(self, ___cb_data_deserializer___)	{
-                    self.error_api().signal_error(err_msg::CALLBACK_BAD_FUNC);
+                    elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);
                 }
             };
             (cb_selector_body, cb_main_body)
@@ -61,7 +61,7 @@ fn callback_selector_body(
     module_calls: Vec<proc_macro2::TokenStream>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.argument_api());
+        let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
         match ___cb_data_deserializer___.get_func_name() {
             [] => {
                 return elrond_wasm::types::CallbackSelectorResult::Processed;
@@ -118,7 +118,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                         #payable_snippet
                         let mut ___cb_closure_loader___ = CallDataArgLoader::new(
                             ___cb_data_deserializer___,
-                            self.callback_closure_arg_api(),
+                            self.raw_vm_api(),
                         );
                         #(#arg_init_snippets)*
                         ___cb_closure_loader___.assert_no_more_args();

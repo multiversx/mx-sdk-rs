@@ -1,7 +1,7 @@
 use super::contract_impl::contract_implementation;
-use crate::parse::parse_contract_trait;
-use crate::preprocessing::trait_preprocessing;
-use crate::validate::validate_contract;
+use crate::{
+    parse::parse_contract_trait, preprocessing::trait_preprocessing, validate::validate_contract,
+};
 
 pub fn process_module(
     args: proc_macro::TokenStream,

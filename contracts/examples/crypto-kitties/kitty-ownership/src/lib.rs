@@ -350,7 +350,7 @@ pub trait KittyOwnership {
     }
 
     #[endpoint(giveBirth)]
-    fn give_birth(&self, matron_id: u32) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn give_birth(&self, matron_id: u32) -> SCResult<AsyncCall> {
         require!(self._is_valid_id(matron_id), "Invalid kitty id!");
 
         let matron = self.get_kitty_by_id(matron_id);
@@ -616,10 +616,7 @@ pub trait KittyOwnership {
     // proxy
 
     #[proxy]
-    fn kitty_genetic_alg_proxy(
-        &self,
-        to: ManagedAddress,
-    ) -> kitty_genetic_alg::Proxy<Self::SendApi>;
+    fn kitty_genetic_alg_proxy(&self, to: ManagedAddress) -> kitty_genetic_alg::Proxy<Self::Api>;
 
     // storage - General
 

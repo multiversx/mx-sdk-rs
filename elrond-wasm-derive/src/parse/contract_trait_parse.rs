@@ -1,7 +1,7 @@
-use super::attributes::extract_doc;
-use super::method_parse::process_method;
-use super::parse_util::validate_attribute_args;
-use super::supertrait_parse::parse_supertrait;
+use super::{
+    attributes::extract_doc, method_parse::process_method, parse_util::validate_attribute_args,
+    supertrait_parse::parse_supertrait,
+};
 use crate::model::{ContractTrait, Method, Supertrait};
 
 pub fn parse_contract_trait(

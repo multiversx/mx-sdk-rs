@@ -79,7 +79,7 @@ The functions described above only give very basic information about a lottery. 
 ```
 #[view(lotteryInfo)]
 #[storage_get_mut("lotteryInfo")]
-fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<Self::TypeManager>)
+fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<Self::Api>)
 ```
 
 *LotteryInfo* is a struct, with its definition as follows:

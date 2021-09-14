@@ -8,7 +8,7 @@ When setting the bonding curve by a predefined function one mush pay attention b
 Custom functions can be defined by adding the name of it in `FunctionSelector`, followed by defining the behaviour in the implementation of `CurveFunction`, in the `match` contained by the `calculate_price` function.
 
 ```rust
-pub enum FunctionSelector<Self::TypeManager>
+pub enum FunctionSelector<Self::Api>
 {
 	Linear(LinearFunction<M>),
 	CustomExample(BigUint<M>),

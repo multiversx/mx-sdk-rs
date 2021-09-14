@@ -1,29 +1,29 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::SendApi;
-use crate::hex_call_data::HexCallDataSerializer;
-use crate::io::EndpointResult;
-use crate::types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer};
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{ManagedTypeApi, SendApi},
+    io::EndpointResult,
+    types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
 #[must_use]
 pub struct AsyncCall<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + ManagedTypeApi + 'static,
 {
     pub(crate) api: SA,
-    pub(crate) to: ManagedAddress<SA::ProxyTypeManager>,
-    pub(crate) egld_payment: BigUint<SA::ProxyTypeManager>,
-    pub(crate) endpoint_name: ManagedBuffer<SA::ProxyTypeManager>,
-    pub(crate) arg_buffer: ManagedArgBuffer<SA::ProxyTypeManager>,
-    pub(crate) callback_call: Option<CallbackCall<SA::ProxyTypeManager>>,
+    pub(crate) to: ManagedAddress<SA>,
+    pub(crate) egld_payment: BigUint<SA>,
+    pub(crate) endpoint_name: ManagedBuffer<SA>,
+    pub(crate) arg_buffer: ManagedArgBuffer<SA>,
+    pub(crate) callback_call: Option<CallbackCall<SA>>,
 }
 
 impl<SA> AsyncCall<SA>
 where
     SA: SendApi + 'static,
 {
-    pub fn with_callback(self, callback_call: CallbackCall<SA::ProxyTypeManager>) -> Self {
+    pub fn with_callback(self, callback_call: CallbackCall<SA>) -> Self {
         AsyncCall {
             callback_call: Some(callback_call),
             ..self
@@ -44,7 +44,7 @@ where
             let hex_cd_ser = callback_call.serialize_hex_call_data();
             self.api
                 .storage_store_tx_hash_key(&ManagedBuffer::new_from_bytes(
-                    self.api.type_manager(),
+                    self.api.clone(),
                     hex_cd_ser.as_slice(),
                 ));
         }

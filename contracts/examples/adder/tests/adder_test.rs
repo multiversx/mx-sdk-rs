@@ -1,5 +1,5 @@
 use adder::*;
-use elrond_wasm::{api::ContractBase, types::BigInt};
+use elrond_wasm::{contract_base::ContractBase, types::BigInt};
 use elrond_wasm_debug::TxContext;
 
 #[test]

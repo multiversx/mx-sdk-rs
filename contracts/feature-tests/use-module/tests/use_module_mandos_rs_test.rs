@@ -14,18 +14,11 @@ mod dns_mock {
     #[elrond_wasm::contract]
     pub trait DnsMock {
         #[proxy]
-        fn user_builtin_proxy(
-            &self,
-            to: ManagedAddress,
-        ) -> super::user_builtin::Proxy<Self::SendApi>;
+        fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<Self::Api>;
 
         #[payable("EGLD")]
         #[endpoint]
-        fn register(
-            &self,
-            name: BoxedBytes,
-            #[payment] _payment: BigUint,
-        ) -> AsyncCall<Self::SendApi> {
+        fn register(&self, name: BoxedBytes, #[payment] _payment: BigUint) -> AsyncCall {
             let address = self.blockchain().get_caller();
             self.user_builtin_proxy(address)
                 .set_user_name(&name)

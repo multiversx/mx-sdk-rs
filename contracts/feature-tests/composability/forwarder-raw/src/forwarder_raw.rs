@@ -19,9 +19,9 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
-    ) -> SendToken<Self::SendApi> {
+    ) -> SendToken<Self::Api> {
         SendToken {
-            api: self.send(),
+            api: self.raw_vm_api(),
             to,
             token,
             amount: payment,
@@ -47,8 +47,10 @@ pub trait ForwarderRaw {
         payment_amount: BigUint,
         endpoint_name: ManagedBuffer,
         args: VarArgs<ManagedBuffer>,
-    ) -> ContractCall<Self::SendApi, ()> {
-        let mut contract_call = ContractCall::new(self.send(), to, endpoint_name)
+    ) -> ContractCall<Self::Api, ()> {
+        let mut contract_call = self
+            .send()
+            .contract_call(to, endpoint_name)
             .add_token_transfer(payment_token, 0, payment_amount);
         for arg in args.into_vec() {
             contract_call.push_endpoint_arg(arg);
@@ -65,7 +67,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .async_call()
     }
@@ -79,7 +81,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let half_payment = payment / 2u32;
         self.forward_async_call(to, token, half_payment, endpoint_name, args)
     }
@@ -136,9 +138,7 @@ pub trait ForwarderRaw {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(
-        &self,
-    ) -> VecMapper<Self::Storage, (TokenIdentifier, BigUint, Vec<ManagedBuffer>)>;
+    fn callback_data(&self) -> VecMapper<(TokenIdentifier, BigUint, Vec<ManagedBuffer>)>;
 
     #[view]
     fn callback_data_at_index(
@@ -187,12 +187,12 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             half_gas,
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -209,9 +209,9 @@ pub trait ForwarderRaw {
     ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
         let half_payment = payment / 2u32;
-        let arg_buffer = args.into_vec().managed_into(self.type_manager());
+        let arg_buffer = args.into_vec().managed_into();
 
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -220,7 +220,7 @@ pub trait ForwarderRaw {
         );
         self.execute_on_dest_context_result(result);
 
-        let result = self.send().execute_on_dest_context_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -240,15 +240,36 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_by_caller_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_by_caller_raw(
             half_gas,
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_dest_context_result(result);
+    }
+
+    #[endpoint]
+    #[payable("EGLD")]
+    fn call_execute_on_same_context(
+        &self,
+        to: ManagedAddress,
+        #[payment] payment: BigUint,
+        endpoint_name: ManagedBuffer,
+        #[var_args] args: VarArgs<ManagedBuffer>,
+    ) {
+        let half_gas = self.blockchain().get_gas_left() / 2;
+        let result = self.raw_vm_api().execute_on_same_context_raw(
+            half_gas,
+            &to,
+            &payment,
+            &endpoint_name,
+            &args.into_vec().managed_into(),
+        );
+
+        self.execute_on_same_context_result(result);
     }
 
     #[endpoint]
@@ -259,36 +280,36 @@ pub trait ForwarderRaw {
         #[var_args] args: VarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send().execute_on_dest_context_readonly_raw(
+        let result = self.raw_vm_api().execute_on_dest_context_readonly_raw(
             half_gas,
             &to,
             &endpoint_name,
-            &args.into_vec().managed_into(self.type_manager()),
+            &args.into_vec().managed_into(),
         );
 
         self.execute_on_dest_context_result(result);
     }
 
     #[event("execute_on_dest_context_result")]
-    fn execute_on_dest_context_result(&self, result: ManagedVec<Self::TypeManager, ManagedBuffer>);
+    fn execute_on_dest_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
+
+    #[event("execute_on_same_context_result")]
+    fn execute_on_same_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
 
     #[endpoint]
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
         #[var_args] args: VarArgs<ManagedBuffer>,
-    ) -> SCResult<ManagedAddress> {
-        let deployed_contract_address = self
-            .send()
+    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+        self.raw_vm_api()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
                 &self.types().big_uint_zero(),
                 &code,
                 CodeMetadata::DEFAULT,
-                &args.into_vec().managed_into(self.type_manager()),
+                &args.into_vec().managed_into(),
             )
-            .ok_or("Deploy failed")?;
-
-        Ok(deployed_contract_address)
+            .into()
     }
 }
