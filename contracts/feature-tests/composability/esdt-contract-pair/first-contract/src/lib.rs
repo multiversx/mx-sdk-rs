@@ -102,7 +102,7 @@ pub trait FirstContract {
         require!(esdt_value > 0, "no esdt transfered!");
         require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-        let _ = self.send().direct_esdt_execute(
+        let _ = self.raw_vm_api().direct_esdt_execute(
             &second_contract_address,
             &expected_token_name,
             &esdt_value,
@@ -129,7 +129,7 @@ pub trait FirstContract {
         require!(esdt_value > 0, "no esdt transfered!");
         require!(actual_token_name == expected_token_name, "Wrong esdt token");
 
-        let _ = self.send().direct_esdt_execute(
+        let _ = self.raw_vm_api().direct_esdt_execute(
             &second_contract_address,
             &expected_token_name,
             &esdt_value,
@@ -149,7 +149,7 @@ pub trait FirstContract {
         amount: &BigUint,
         to: &ManagedAddress,
         func_name: &ManagedBuffer,
-        args: &ManagedVec<Self::TypeManager, ManagedBuffer>,
+        args: &ManagedVec<Self::Api, ManagedBuffer>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         arg_buffer.push_arg(esdt_token_name);
@@ -159,7 +159,7 @@ pub trait FirstContract {
             arg_buffer.push_arg_raw(arg);
         }
 
-        self.send().async_call_raw(
+        self.raw_vm_api().async_call_raw(
             to,
             &self.types().big_uint_zero(),
             &self.types().managed_buffer_from(ESDT_TRANSFER_STRING),

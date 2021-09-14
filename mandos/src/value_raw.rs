@@ -1,7 +1,8 @@
-use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
-use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
-use std::collections::BTreeMap;
-use std::fmt;
+use serde::{
+    de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor},
+    ser::{Serialize, SerializeMap, SerializeSeq, Serializer},
+};
+use std::{collections::BTreeMap, fmt};
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum ValueSubTree {

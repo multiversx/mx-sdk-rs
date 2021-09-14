@@ -3,17 +3,19 @@ elrond_wasm::derive_imports!();
 
 use crate::common::FeeConfig;
 
-use super::common;
-use super::common::{
-    Order, OrderInputParams, Payment, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
-    PERCENT_BASE_POINTS,
+use super::{
+    common,
+    common::{
+        Order, OrderInputParams, Payment, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
+        PERCENT_BASE_POINTS,
+    },
 };
 
 #[elrond_wasm::module]
 pub trait ValidationModule: common::CommonModule {
     fn require_valid_order_input_amount(
         &self,
-        params: &OrderInputParams<Self::TypeManager>,
+        params: &OrderInputParams<Self::Api>,
     ) -> SCResult<()> {
         require!(params.amount != 0, "Amout cannot be zero");
         require!(
@@ -28,7 +30,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_match_provider(
         &self,
-        params: &OrderInputParams<Self::TypeManager>,
+        params: &OrderInputParams<Self::Api>,
     ) -> SCResult<()> {
         require!(
             params.match_provider.is_none()
@@ -40,7 +42,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_fee_config(
         &self,
-        params: &OrderInputParams<Self::TypeManager>,
+        params: &OrderInputParams<Self::Api>,
     ) -> SCResult<()> {
         match params.fee_config.clone() {
             FeeConfig::Fixed(amount) => {
@@ -61,7 +63,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_deal_config(
         &self,
-        params: &OrderInputParams<Self::TypeManager>,
+        params: &OrderInputParams<Self::Api>,
     ) -> SCResult<()> {
         require!(
             params.deal_config.match_provider_percent < PERCENT_BASE_POINTS,
@@ -72,7 +74,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_valid_order_input_params(
         &self,
-        params: &OrderInputParams<Self::TypeManager>,
+        params: &OrderInputParams<Self::Api>,
     ) -> SCResult<()> {
         self.require_valid_order_input_amount(params)?;
         self.require_valid_order_input_match_provider(params)?;
@@ -81,7 +83,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(())
     }
 
-    fn require_valid_buy_payment(&self) -> SCResult<Payment<Self::TypeManager>> {
+    fn require_valid_buy_payment(&self) -> SCResult<Payment<Self::Api>> {
         self.require_fungible_input()?;
         let second_token_id = self.second_token_id().get();
         let (amount, token_id) = self.call_value().payment_token_pair();
@@ -93,7 +95,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(Payment { token_id, amount })
     }
 
-    fn require_valid_sell_payment(&self) -> SCResult<Payment<Self::TypeManager>> {
+    fn require_valid_sell_payment(&self) -> SCResult<Payment<Self::Api>> {
         self.require_fungible_input()?;
         let first_token_id = self.first_token_id().get();
         let (amount, token_id) = self.call_value().payment_token_pair();
@@ -131,10 +133,7 @@ pub trait ValidationModule: common::CommonModule {
         Ok(())
     }
 
-    fn require_match_provider_empty_or_caller(
-        &self,
-        orders: &[Order<Self::TypeManager>],
-    ) -> SCResult<()> {
+    fn require_match_provider_empty_or_caller(&self, orders: &[Order<Self::Api>]) -> SCResult<()> {
         let caller = &self.blockchain().get_caller();
 
         for order in orders.iter() {

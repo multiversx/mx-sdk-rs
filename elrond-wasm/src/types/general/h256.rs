@@ -1,8 +1,5 @@
-use crate::abi::TypeAbi;
-use crate::types::BoxedBytes;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{abi::TypeAbi, types::BoxedBytes};
+use alloc::{boxed::Box, string::String, vec::Vec};
 use core::fmt::Debug;
 
 const ERR_BAD_H256_LENGTH: &[u8] = b"bad H256 length";

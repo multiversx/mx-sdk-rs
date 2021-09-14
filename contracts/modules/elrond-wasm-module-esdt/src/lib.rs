@@ -6,7 +6,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait EsdtModule {
     #[storage_mapper("token_id")]
-    fn token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[payable("EGLD")]
     #[endpoint(issueToken)]
@@ -16,13 +16,15 @@ pub trait EsdtModule {
         token_ticker: ManagedBuffer,
         num_decimals: usize,
         #[payment] issue_cost: BigUint,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         only_owner!(self, "only owner can issue token");
         require!(self.token_id().is_empty(), "Token already issued");
 
         let initial_supply = self.types().big_uint_from(1u32);
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -49,7 +51,7 @@ pub trait EsdtModule {
     fn set_local_roles(
         &self,
         #[var_args] opt_dest_address: OptionalArg<ManagedAddress>,
-    ) -> SCResult<AsyncCall<Self::SendApi>> {
+    ) -> SCResult<AsyncCall> {
         only_owner!(self, "only owner can set roles");
 
         let dest_address = match opt_dest_address {
@@ -59,7 +61,9 @@ pub trait EsdtModule {
         let token_id = self.token_id().get();
         let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];
 
-        Ok(ESDTSystemSmartContractProxy::new_proxy_obj(self.send())
+        Ok(self
+            .send()
+            .esdt_system_sc_proxy()
             .set_special_roles(&dest_address, &token_id, &roles)
             .async_call())
     }

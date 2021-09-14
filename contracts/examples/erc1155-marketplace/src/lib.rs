@@ -44,7 +44,7 @@ pub trait Erc1155Marketplace {
         from: ManagedAddress,
         type_id: BigUint,
         nft_id: BigUint,
-        args: AuctionArgument<Self::TypeManager>,
+        args: AuctionArgument<Self::Api>,
     ) -> SCResult<()> {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -73,7 +73,7 @@ pub trait Erc1155Marketplace {
         from: ManagedAddress,
         type_ids: Vec<BigUint>,
         nft_ids: Vec<BigUint>,
-        args: AuctionArgument<Self::TypeManager>,
+        args: AuctionArgument<Self::Api>,
     ) -> SCResult<()> {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -220,7 +220,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[endpoint(endAuction)]
-    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall<Self::SendApi>> {
+    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -273,7 +273,7 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: BigUint,
         nft_id: BigUint,
-    ) -> SCResult<Auction<Self::TypeManager>> {
+    ) -> SCResult<Auction<Self::Api>> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -349,7 +349,7 @@ pub trait Erc1155Marketplace {
         type_id: BigUint,
         nft_id: BigUint,
         to: ManagedAddress,
-    ) -> AsyncCall<Self::SendApi> {
+    ) -> AsyncCall {
         let sc_own_address = self.blockchain().get_sc_address();
         let token_ownership_contract_address = self.token_ownership_contract_address().get();
 
@@ -387,25 +387,25 @@ pub trait Erc1155Marketplace {
     // proxy
 
     #[proxy]
-    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::SendApi>;
+    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::Api>;
 
     // storage
 
     // token ownership contract, i.e. the erc1155 SC
 
     #[storage_mapper("tokenOwnershipContractAddress")]
-    fn token_ownership_contract_address(&self) -> SingleValueMapper<Self::Storage, ManagedAddress>;
+    fn token_ownership_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     // percentage taken from winning bids
 
     #[view(getPercentageCut)]
     #[storage_mapper("percentageCut")]
-    fn percentage_cut(&self) -> SingleValueMapper<Self::Storage, u8>;
+    fn percentage_cut(&self) -> SingleValueMapper<u8>;
 
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> MapMapper<Self::Storage, TokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<TokenIdentifier, BigUint>;
 
     // auction properties for each token
 
@@ -414,5 +414,5 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: &BigUint,
         nft_id: &BigUint,
-    ) -> SingleValueMapper<Self::Storage, Auction<Self::TypeManager>>;
+    ) -> SingleValueMapper<Auction<Self::Api>>;
 }

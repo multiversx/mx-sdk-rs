@@ -1,6 +1,8 @@
-use elrond_wasm::api::{Handle, InvalidSliceError, ManagedBufferApi};
-use elrond_wasm::err_msg;
-use elrond_wasm::types::BoxedBytes;
+use elrond_wasm::{
+    api::{Handle, InvalidSliceError, ManagedBufferApi},
+    err_msg,
+    types::BoxedBytes,
+};
 
 use crate::error_hook;
 
@@ -22,7 +24,7 @@ extern "C" {
         sliceLength: i32,
         destinationHandle: i32,
     ) -> i32;
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
@@ -138,7 +140,7 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         }
     }
 
-    #[cfg(not(feature = "managed-ei"))]
+    #[cfg(feature = "unmanaged-ei")]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         // TODO: might be worth adding a new hook to Arwen for this
         unsafe {
@@ -158,7 +160,7 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
         }
     }
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         unsafe { mBufferEq(handle1, handle2) > 0 }
     }

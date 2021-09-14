@@ -1,8 +1,6 @@
 use elrond_wasm_debug::*;
 
-use std::fs;
-use std::fs::File;
-use std::io::Write;
+use std::{fs, fs::File, io::Write};
 
 #[test]
 fn abi_tester_abi_generated_ok() {

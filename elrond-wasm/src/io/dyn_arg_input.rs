@@ -1,5 +1,7 @@
-use crate::api::{ErrorApi, ManagedTypeApi};
-use crate::err_msg;
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    err_msg,
+};
 use elrond_codec::TopDecodeInput;
 
 /// Abstracts away the loading of multi-arguments.

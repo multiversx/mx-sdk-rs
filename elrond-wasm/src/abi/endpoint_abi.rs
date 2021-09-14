@@ -1,6 +1,5 @@
 use super::*;
-use alloc::string::String;
-use alloc::vec::Vec;
+use alloc::{string::String, vec::Vec};
 
 #[derive(Clone, Debug)]
 pub struct InputAbi {

@@ -45,10 +45,12 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
                     .collect();
                 let method_name = &m.name;
                 let proxy_decl = quote! {
+                    #[allow(clippy::too_many_arguments)]
+                    #[allow(clippy::type_complexity)]
                     fn #method_name(
                         self,
                         #(#arg_decl),*
-                    ) -> elrond_wasm::types::CallbackCall<Self::TypeManager> {
+                    ) -> elrond_wasm::types::CallbackCall<Self::Api> {
                         let mut ___callback_call___ =
                             elrond_wasm::types::new_callback_call(self.cb_call_api(), #cb_name_literal);
                         #(#cb_arg_push_snippets)*
@@ -68,11 +70,11 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
     quote! {
         #callback_proxy_object_def
 
-        pub trait CallbackProxy: elrond_wasm::api::CallbackProxyObjApi + Sized {
+        pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
             #(#proxy_methods)*
         }
 
-        impl<SA> self::CallbackProxy for CallbackProxyObj<SA> where SA: elrond_wasm::api::SendApi + 'static {}
+        impl<A> self::CallbackProxy for CallbackProxyObj<A> where A: elrond_wasm::api::VMApi + 'static {}
     }
 }
 
@@ -88,11 +90,11 @@ pub fn generate_callback_proxies(
     } else {
         (
             quote! {
-                fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi>;
+                fn callbacks(&self) -> self::CallbackProxyObj<Self::Api>;
             },
             quote! {
-                fn callbacks(&self) -> self::CallbackProxyObj<Self::SendApi> {
-                    <self::CallbackProxyObj::<Self::SendApi> as elrond_wasm::api::CallbackProxyObjApi>::new_cb_proxy_obj(self.send())
+                fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
+                    <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj(self.raw_vm_api())
                 }
             },
             generate_callback_proxies_object(contract.methods.as_slice()),

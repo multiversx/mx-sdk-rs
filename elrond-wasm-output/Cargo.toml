@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-output"
-version = "0.18.2"
+version = "0.19.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -27,5 +27,5 @@ panic-message = []
 wee_alloc = "0.4"
 
 [dependencies.elrond-wasm-node]
-version = "0.18.2"
+version = "0.19.0"
 path = "../elrond-wasm-node"

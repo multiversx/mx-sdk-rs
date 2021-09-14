@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 pub trait SingleValueMapperFeatures {
     #[view]
     #[storage_mapper("my_single_value_mapper")]
-    fn map_my_single_value_mapper(&self) -> SingleValueMapper<Self::Storage, BigInt>;
+    fn map_my_single_value_mapper(&self) -> SingleValueMapper<BigInt>;
 
     #[endpoint]
     fn my_single_value_mapper_increment_1(&self, amount: BigInt) {

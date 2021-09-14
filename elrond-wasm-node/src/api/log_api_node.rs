@@ -1,6 +1,8 @@
 use crate::ArwenApiImpl;
-use elrond_wasm::api::{Handle, LogApi};
-use elrond_wasm::types::ArgBuffer;
+use elrond_wasm::{
+    api::{Handle, LogApi},
+    types::ArgBuffer,
+};
 
 extern "C" {
     fn writeLog(pointer: *const u8, length: i32, topicPtr: *const u8, numTopics: i32);
@@ -13,7 +15,7 @@ extern "C" {
         dataLength: i32,
     );
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managedWriteLog(topicsHandle: i32, dataHandle: i32);
 }
 
@@ -50,7 +52,7 @@ impl LogApi for ArwenApiImpl {
         }
     }
 
-    #[cfg(not(feature = "managed-ei"))]
+    #[cfg(feature = "unmanaged-ei")]
     fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
         use elrond_wasm::types::{
             managed_vec_of_buffers_to_arg_buffer, ManagedBuffer, ManagedType, ManagedVec,
@@ -61,7 +63,7 @@ impl LogApi for ArwenApiImpl {
         self.write_event_log(&topics_arg_buffer, data.to_boxed_bytes().as_slice());
     }
 
-    #[cfg(feature = "managed-ei")]
+    #[cfg(not(feature = "unmanaged-ei"))]
     fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
         unsafe {
             managedWriteLog(topics_handle, data_handle);

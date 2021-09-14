@@ -1,6 +1,8 @@
-use crate::api::{ErrorApi, ManagedTypeApi, StorageReadApi};
-use crate::err_msg;
-use crate::types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType};
+use crate::{
+    api::{ErrorApi, ManagedTypeApi, StorageReadApi},
+    err_msg,
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
+};
 use alloc::boxed::Box;
 use elrond_codec::*;
 

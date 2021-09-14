@@ -20,7 +20,6 @@ pub trait Lottery {
     fn init(&self) {}
 
     #[endpoint]
-    #[allow(clippy::too_many_arguments)]
     fn start(
         &self,
         lottery_name: BoxedBytes,
@@ -47,7 +46,6 @@ pub trait Lottery {
     }
 
     #[endpoint(createLotteryPool)]
-    #[allow(clippy::too_many_arguments)]
     fn create_lottery_pool(
         &self,
         lottery_name: BoxedBytes,
@@ -358,25 +356,18 @@ pub trait Lottery {
 
     #[view(getLotteryInfo)]
     #[storage_mapper("lotteryInfo")]
-    fn lottery_info(
-        &self,
-        lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, LotteryInfo<Self::TypeManager>>;
+    fn lottery_info(&self, lottery_name: &BoxedBytes) -> SingleValueMapper<LotteryInfo<Self::Api>>;
 
     #[storage_mapper("ticketHolder")]
-    fn ticket_holders(&self, lottery_name: &BoxedBytes)
-        -> VecMapper<Self::Storage, ManagedAddress>;
+    fn ticket_holders(&self, lottery_name: &BoxedBytes) -> VecMapper<ManagedAddress>;
 
     #[storage_mapper("numberOfEntriesForUser")]
     fn number_of_entries_for_user(
         &self,
         lottery_name: &BoxedBytes,
         user: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Storage, u32>;
+    ) -> SingleValueMapper<u32>;
 
     #[storage_mapper("burnPercentageForLottery")]
-    fn burn_percentage_for_lottery(
-        &self,
-        lottery_name: &BoxedBytes,
-    ) -> SingleValueMapper<Self::Storage, BigUint>;
+    fn burn_percentage_for_lottery(&self, lottery_name: &BoxedBytes) -> SingleValueMapper<BigUint>;
 }

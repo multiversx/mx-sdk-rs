@@ -1,9 +1,7 @@
-use super::method_gen::*;
-use super::util::*;
-use crate::model::PublicRole;
+use super::{method_gen::*, util::*};
 use crate::{
     generate::{snippets, supertrait_gen},
-    model::{ArgPaymentMetadata, ContractTrait, Method},
+    model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole},
 };
 
 pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream {
@@ -19,7 +17,7 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
         fn #method_name #generics (
             self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractCall<Self::SendApi, <#ret_tok as elrond_wasm::io::EndpointResult>::DecodeAs>
+        ) -> elrond_wasm::types::ContractCall<Self::Api, <#ret_tok as elrond_wasm::io::EndpointResult>::DecodeAs>
         #generics_where
     };
     result
@@ -34,7 +32,7 @@ pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
         fn #method_name #generics (
             self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractDeploy<Self::SendApi>
+        ) -> elrond_wasm::types::ContractDeploy<Self::Api>
         #generics_where
     };
     result
@@ -44,12 +42,11 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let msig = generate_proxy_endpoint_sig(m);
 
     let mut token_count = 0;
-    let mut token_expr =
-        quote! { elrond_wasm::types::TokenIdentifier::egld(___api___.type_manager()) };
+    let mut token_expr = quote! { elrond_wasm::types::TokenIdentifier::egld(___api___.clone()) };
     let mut nonce_count = 0;
     let mut nonce_expr = quote! { 0u64 };
     let mut payment_count = 0;
-    let mut payment_expr = quote! { elrond_wasm::types::BigUint::zero(___api___.type_manager()) };
+    let mut payment_expr = quote! { elrond_wasm::types::BigUint::zero(___api___.clone()) };
 
     let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
         .method_args
@@ -107,6 +104,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
         #msig {
             let (___api___, ___address___) = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -172,6 +170,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
         #msig {
             let (___api___, ___address___) =
                 self.into_fields();
@@ -208,7 +207,7 @@ pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
     let proxy_methods_impl = generate_method_impl(contract);
     quote! {
         pub trait ProxyTrait:
-            elrond_wasm::api::ProxyObjApi
+            elrond_wasm::contract_base::ProxyObjBase
             + Sized
             #(#proxy_supertrait_decl)*
         {
