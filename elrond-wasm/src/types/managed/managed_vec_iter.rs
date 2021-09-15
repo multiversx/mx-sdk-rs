@@ -36,6 +36,11 @@ where
             byte_limit: managed_vec.byte_len(),
         }
     }
+
+    #[inline]
+    pub(crate) fn type_manager(&self) -> M {
+        self.managed_vec.type_manager()
+    }
 }
 
 impl<'a, M, T> Iterator for ManagedVecIterator<'a, M, T>

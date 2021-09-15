@@ -21,6 +21,15 @@ fn add_managed_type(substitutions: &mut SubstitutionsMap, type_name: &proc_macro
     );
 }
 
+fn add_managed_type_with_generics(
+    substitutions: &mut SubstitutionsMap,
+    alias: &proc_macro2::TokenStream,
+    type_name: &proc_macro2::TokenStream,
+) {
+    substitutions.add_substitution(quote!(#alias<Self::Api, ), quote!(#type_name<Self::Api, ));
+    substitutions.add_substitution(quote!(#alias<), quote!(#type_name<Self::Api, ));
+}
+
 fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(BigInt));
     add_managed_type(substitutions, &quote!(BigUint));
@@ -30,6 +39,17 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(TokenIdentifier));
     add_managed_type(substitutions, &quote!(ManagedSCError));
     add_managed_type(substitutions, &quote!(AsyncCall));
+
+    add_managed_type_with_generics(
+        substitutions,
+        &quote!(ManagedVarArgs),
+        &quote!(ManagedMultiResultVec),
+    );
+    add_managed_type_with_generics(
+        substitutions,
+        &quote!(ManagedMultiResultVec),
+        &quote!(ManagedMultiResultVec),
+    );
 
     substitutions.add_substitution(quote!(BigUint::from), quote!(self.types().big_uint_from));
 }
@@ -49,11 +69,7 @@ fn add_storage_mapper(
     substitutions: &mut SubstitutionsMap,
     mapper_name: &proc_macro2::TokenStream,
 ) {
-    substitutions.add_substitution(
-        quote!(#mapper_name<Self::Api, ),
-        quote!(#mapper_name<Self::Api, ),
-    );
-    substitutions.add_substitution(quote!(#mapper_name<), quote!(#mapper_name<Self::Api, ));
+    add_managed_type_with_generics(substitutions, mapper_name, mapper_name);
 }
 
 fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
