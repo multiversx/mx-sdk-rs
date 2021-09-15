@@ -2,111 +2,131 @@ use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, ManagedVec,
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{EndpointFinishApi, Handle, ManagedTypeApi},
+    types::{ManagedArgBuffer, MultiResultVec},
     ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 use alloc::string::String;
-use core::ops::Deref;
+use core::{marker::PhantomData, ops::Deref};
 use elrond_codec::Vec;
 
-pub struct ManagedMultiResultVec<M, T>(pub ManagedVec<M, T>)
+pub struct ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>;
-
-impl<M, T> Deref for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
 {
-    type Target = ManagedVec<M, T>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
+    pub(super) raw_buffers: ManagedVec<M, ManagedBuffer<M>>,
+    _phantom: PhantomData<T>,
 }
 
-impl<M, T> ManagedType<M> for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
-{
-    #[inline]
-    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
-        Self(ManagedVec::from_raw_handle(api, raw_handle))
-    }
+// impl<M, T> Deref for ManagedMultiResultVec<M, T>
+// where
+//     M: ManagedTypeApi,
+//     T: ManagedVecItem<M>,
+// {
+//     type Target = ManagedVec<M, T>;
 
-    #[doc(hidden)]
-    fn get_raw_handle(&self) -> Handle {
-        self.buffer.handle
-    }
+//     fn deref(&self) -> &Self::Target {
+//         &self.0
+//     }
+// }
 
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.buffer.api.clone()
-    }
-}
+// impl<M, T> ManagedType<M> for ManagedMultiResultVec<M, T>
+// where
+//     M: ManagedTypeApi,
+// {
+//     #[inline]
+//     fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+//         ManagedMultiResultVec {
+//             raw_buffers: Some(ManagedVec::from_raw_handle(api, raw_handle)),
+//             _phantom: PhantomData,
+//         }
+//     }
+
+//     #[doc(hidden)]
+//     fn get_raw_handle(&self) -> Handle {
+//         self.raw_buffers.get_raw_handle()
+//     }
+
+//     #[inline]
+//     fn type_manager(&self) -> M {
+//         self.raw_buffers.type_manager()
+//     }
+// }
+
+// impl<M, T> ManagedMultiResultVec<M, T>
+// where
+//     M: ManagedTypeApi,
+//     T: ManagedVecItem<M>,
+// {
+//     #[inline]
+//     pub(crate) fn new_from_raw_buffer(buffer: ManagedBuffer<M>) -> Self {
+//         Self(ManagedVec::new_from_raw_buffer(buffer))
+//     }
+// }
+
+// impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
+// where
+//     M: ManagedTypeApi,
+//     T: ManagedVecItem<M>,
+// {
+//     #[inline]
+//     fn from(b: ManagedVec<M, T>) -> Self {
+//         Self(b)
+//     }
+// }
+
+// impl<M, T> ManagedDefault<M> for ManagedMultiResultVec<M, T>
+// where
+//     M: ManagedTypeApi,
+//     T: ManagedVecItem<M>,
+// {
+//     #[inline]
+//     fn managed_default(api: M) -> Self {
+//         Self(ManagedVec::managed_default(api))
+//     }
+// }
+
+// impl<M, T> ManagedMultiResultVec<M, T>
+// where
+//     M: ManagedTypeApi,
+//     T: ManagedVecItem<M>,
+// {
+//     /// Length of the underlying buffer in bytes.
+
+//     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
+//         self.0.slice(start_index, end_index).map(Self)
+//     }
+
+//     pub fn append_vec(&mut self, item: ManagedMultiResultVec<M, T>) {
+//         self.0.append_vec(item.0);
+//     }
+// }
 
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
 {
-    #[inline]
-    pub(crate) fn new_from_raw_buffer(buffer: ManagedBuffer<M>) -> Self {
-        Self(ManagedVec::new_from_raw_buffer(buffer))
-    }
-}
-
-impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
-{
-    #[inline]
-    fn from(b: ManagedVec<M, T>) -> Self {
-        Self(b)
-    }
-}
-
-impl<M, T> ManagedDefault<M> for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
-{
-    #[inline]
-    fn managed_default(api: M) -> Self {
-        Self(ManagedVec::managed_default(api))
-    }
-}
-
-impl<M, T> ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
-{
-    /// Length of the underlying buffer in bytes.
-
-    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
-        self.0.slice(start_index, end_index).map(Self)
-    }
-
-    pub fn append_vec(&mut self, item: ManagedMultiResultVec<M, T>) {
-        self.0.append_vec(item.0);
+    pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
+        ManagedArgBuffer::from_raw_handle(
+            self.raw_buffers.type_manager(),
+            self.raw_buffers.get_raw_handle(),
+        )
     }
 }
 
 impl<M, T> DynArg for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: DynArg + ManagedVecItem<M>,
 {
     // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result_vec: Vec<T> = Vec::new();
+        let mut raw_buffers = ManagedVec::new_empty(loader.vm_api_cast::<M>());
         while loader.has_next() {
-            result_vec.push(T::dyn_load(loader, arg_id));
+            raw_buffers.push(ManagedBuffer::dyn_load(loader, arg_id));
         }
-        Self(ManagedVec::managed_from(loader.error_api(), result_vec))
+        ManagedMultiResultVec {
+            raw_buffers,
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -123,7 +143,7 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        for elem in self.0.into_vec().iter() {
+        for elem in self.raw_buffers.into_iter() {
             elem.finish(api.clone());
         }
     }
@@ -135,7 +155,7 @@ where
     T: ContractCallArg + ManagedVecItem<M>,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        for elem in self.0.into_vec().iter() {
+        for elem in self.raw_buffers.into_iter() {
             elem.push_dyn_arg(output);
         }
     }
@@ -151,16 +171,13 @@ where
     }
 }
 
-impl<M, T: TypeAbi> TypeAbi for ManagedMultiResultVec<M, T>
+impl<M, T> TypeAbi for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: TypeAbi,
 {
     fn type_name() -> String {
-        let mut repr = String::from("variadic<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        MultiResultVec::<T>::type_name()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

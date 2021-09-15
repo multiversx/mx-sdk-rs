@@ -39,7 +39,7 @@ where
     type ErrorApi = A;
 
     #[inline]
-    fn error_api(&self) -> Self::ErrorApi {
+    fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
         self.api.clone()
     }
 
@@ -53,7 +53,8 @@ where
             self.next_index += 1;
             buffer
         } else {
-            self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER)
+            self.dyn_arg_vm_api()
+                .signal_error(err_msg::ARG_WRONG_NUMBER)
         }
     }
 }

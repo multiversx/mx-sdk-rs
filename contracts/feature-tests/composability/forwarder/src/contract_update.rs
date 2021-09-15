@@ -10,13 +10,9 @@ pub trait UpgradeContractModule {
         &self,
         child_sc_address: ManagedAddress,
         new_code: ManagedBuffer,
-        #[var_args] arguments: VarArgs<ManagedBuffer>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) {
-        self.upgrade(
-            &child_sc_address,
-            &new_code,
-            arguments.into_vec().managed_into(),
-        );
+        self.upgrade(&child_sc_address, &new_code, arguments.to_arg_buffer());
     }
 
     #[endpoint(upgradeVault)]
@@ -35,7 +31,7 @@ pub trait UpgradeContractModule {
         &self,
         child_sc_address: &ManagedAddress,
         new_code: &ManagedBuffer,
-        arguments: ManagedVec<Self::Api, ManagedBuffer>,
+        arguments: ManagedArgBuffer<Self::Api>,
     ) {
         // TODO: use proxies to perform upgrade here
         // raw upgrade belongs to forwarder-raw
@@ -45,7 +41,7 @@ pub trait UpgradeContractModule {
             &self.types().big_uint_zero(),
             new_code,
             CodeMetadata::UPGRADEABLE,
-            &arguments.managed_into(),
+            &arguments,
         );
     }
 }
