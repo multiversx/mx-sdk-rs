@@ -46,16 +46,12 @@ pub trait ForwarderRaw {
         payment_token: TokenIdentifier,
         payment_amount: BigUint,
         endpoint_name: ManagedBuffer,
-        args: VarArgs<ManagedBuffer>,
+        args: ManagedVarArgs<ManagedBuffer>,
     ) -> ContractCall<Self::Api, ()> {
-        let mut contract_call = self
-            .send()
+        self.send()
             .contract_call(to, endpoint_name)
-            .add_token_transfer(payment_token, 0, payment_amount);
-        for arg in args.into_vec() {
-            contract_call.push_endpoint_arg(arg);
-        }
-        contract_call
+            .add_token_transfer(payment_token, 0, payment_amount)
+            .with_arguments_raw(args.to_arg_buffer())
     }
 
     #[endpoint]
@@ -66,7 +62,7 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) -> AsyncCall {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .async_call()
@@ -80,7 +76,7 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) -> AsyncCall {
         let half_payment = payment / 2u32;
         self.forward_async_call(to, token, half_payment, endpoint_name, args)
@@ -93,7 +89,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         self.forward_contract_call(
             to,
@@ -114,7 +110,7 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .with_gas_limit(self.blockchain().get_gas_left() / 2)
@@ -129,7 +125,7 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .with_gas_limit(self.blockchain().get_gas_left() / 2)
@@ -138,13 +134,19 @@ pub trait ForwarderRaw {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<(TokenIdentifier, BigUint, Vec<ManagedBuffer>)>;
+    fn callback_data(
+        &self,
+    ) -> VecMapper<(
+        TokenIdentifier,
+        BigUint,
+        ManagedVec<Self::Api, ManagedBuffer>,
+    )>;
 
     #[view]
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult3<TokenIdentifier, BigUint, MultiResultVec<ManagedBuffer>> {
+    ) -> MultiResult3<TokenIdentifier, BigUint, ManagedVec<Self::Api, ManagedBuffer>> {
         let (token, payment, args) = self.callback_data().get(index);
         (token, payment, args.into()).into()
     }
@@ -159,12 +161,12 @@ pub trait ForwarderRaw {
         &self,
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
-        let args_vec = args.into_vec();
-        self.callback_raw_event(&token, &payment, args_vec.as_slice().to_vec());
+        let args_as_vec = args.into_vec_of_buffers();
+        self.callback_raw_event(&token, &payment, &args_as_vec);
 
-        let _ = self.callback_data().push(&(token, payment, args_vec));
+        let _ = self.callback_data().push(&(token, payment, args_as_vec));
     }
 
     #[event("callback_raw")]
@@ -172,7 +174,7 @@ pub trait ForwarderRaw {
         &self,
         #[indexed] token: &TokenIdentifier,
         #[indexed] payment: &BigUint,
-        arguments: Vec<ManagedBuffer>,
+        arguments: &ManagedVec<Self::Api, ManagedBuffer>,
     );
 
     // SYNC CALLS
@@ -184,7 +186,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
         let result = self.raw_vm_api().execute_on_dest_context_raw(
@@ -192,7 +194,7 @@ pub trait ForwarderRaw {
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(),
+            &args.to_arg_buffer(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -205,11 +207,11 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
         let half_payment = payment / 2u32;
-        let arg_buffer = args.into_vec().managed_into();
+        let arg_buffer = args.to_arg_buffer();
 
         let result = self.raw_vm_api().execute_on_dest_context_raw(
             one_third_gas,
@@ -237,7 +239,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
         let result = self.raw_vm_api().execute_on_dest_context_by_caller_raw(
@@ -245,7 +247,7 @@ pub trait ForwarderRaw {
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(),
+            &args.to_arg_buffer(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -258,7 +260,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
         let result = self.raw_vm_api().execute_on_same_context_raw(
@@ -266,7 +268,7 @@ pub trait ForwarderRaw {
             &to,
             &payment,
             &endpoint_name,
-            &args.into_vec().managed_into(),
+            &args.to_arg_buffer(),
         );
 
         self.execute_on_same_context_result(result);
@@ -277,14 +279,14 @@ pub trait ForwarderRaw {
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
         let result = self.raw_vm_api().execute_on_dest_context_readonly_raw(
             half_gas,
             &to,
             &endpoint_name,
-            &args.into_vec().managed_into(),
+            &args.to_arg_buffer(),
         );
 
         self.execute_on_dest_context_result(result);
@@ -300,7 +302,7 @@ pub trait ForwarderRaw {
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
-        #[var_args] args: VarArgs<ManagedBuffer>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.raw_vm_api()
             .deploy_contract(
@@ -308,7 +310,7 @@ pub trait ForwarderRaw {
                 &self.types().big_uint_zero(),
                 &code,
                 CodeMetadata::DEFAULT,
-                &args.into_vec().managed_into(),
+                &args.to_arg_buffer(),
             )
             .into()
     }

@@ -91,6 +91,7 @@ where
         self
     }
 
+    #[inline]
     pub fn with_multi_token_transfer(
         mut self,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
@@ -99,8 +100,14 @@ where
         self
     }
 
+    #[inline]
     pub fn with_gas_limit(mut self, gas_limit: u64) -> Self {
         self.explicit_gas_limit = gas_limit;
+        self
+    }
+
+    pub fn with_arguments_raw(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
+        self.arg_buffer = raw_argument_buffer;
         self
     }
 
