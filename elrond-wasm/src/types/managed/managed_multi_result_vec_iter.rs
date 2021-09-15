@@ -1,59 +1,59 @@
 use core::marker::PhantomData;
 
-use elrond_codec::TopDecode;
-
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    contract_base::ManagedSerializer,
+    ArgId, DynArg, DynArgInput, ManagedResultArgLoader,
 };
 
 use super::{ManagedBuffer, ManagedMultiResultVec, ManagedVecIterator};
 
-impl<'a, M, T> IntoIterator for &'a ManagedMultiResultVec<M, T>
+impl<M, T> IntoIterator for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecode,
+    T: DynArg,
 {
     type Item = T;
-    type IntoIter = ManagedMultiResultVecIterator<'a, M, T>;
+    type IntoIter = ManagedMultiResultVecIterator<M, T>;
     fn into_iter(self) -> Self::IntoIter {
         ManagedMultiResultVecIterator::new(self)
     }
 }
 
-pub struct ManagedMultiResultVecIterator<'a, M, T>
+pub struct ManagedMultiResultVecIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecode,
+    T: DynArg,
 {
-    managed_vec_iter: ManagedVecIterator<'a, M, ManagedBuffer<M>>,
+    data_loader: ManagedResultArgLoader<M>,
     _phantom: PhantomData<T>,
 }
 
-impl<'a, M, T> ManagedMultiResultVecIterator<'a, M, T>
+impl<M, T> ManagedMultiResultVecIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecode,
+    T: DynArg,
 {
-    pub(crate) fn new(obj: &'a ManagedMultiResultVec<M, T>) -> Self {
+    pub(crate) fn new(obj: ManagedMultiResultVec<M, T>) -> Self {
         ManagedMultiResultVecIterator {
-            managed_vec_iter: obj.raw_buffers.into_iter(),
+            data_loader: ManagedResultArgLoader::new(obj.raw_buffers),
             _phantom: PhantomData,
         }
     }
 }
 
-impl<'a, M, T> Iterator for ManagedMultiResultVecIterator<'a, M, T>
+impl<M, T> Iterator for ManagedMultiResultVecIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecode,
+    T: DynArg,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        let serializer = ManagedSerializer::new(self.managed_vec_iter.type_manager());
-        self.managed_vec_iter
-            .next()
-            .map(|managed_buffer| serializer.top_decode_from_managed_buffer(&managed_buffer))
+        if self.data_loader.has_next() {
+            let arg_id = ArgId::from(&b"var args"[..]);
+            Some(T::dyn_load(&mut self.data_loader, arg_id))
+        } else {
+            None
+        }
     }
 }

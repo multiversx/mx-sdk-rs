@@ -7,7 +7,6 @@ use crate::{
 };
 use alloc::string::String;
 use core::{marker::PhantomData, ops::Deref};
-use elrond_codec::Vec;
 
 pub struct ManagedMultiResultVec<M, T>
 where
@@ -133,7 +132,7 @@ where
 impl<M, T> EndpointResult for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: EndpointResult + ManagedVecItem<M>,
+    T: EndpointResult,
     <T as EndpointResult>::DecodeAs: ManagedVecItem<M>,
 {
     type DecodeAs = ManagedMultiResultVec<M, T::DecodeAs>;
@@ -152,7 +151,7 @@ where
 impl<M, T> ContractCallArg for &ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ContractCallArg + ManagedVecItem<M>,
+    T: ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         for elem in self.raw_buffers.into_iter() {
@@ -164,7 +163,7 @@ where
 impl<M, T> ContractCallArg for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ContractCallArg + ManagedVecItem<M>,
+    T: ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         (&self).push_dyn_arg(output)
