@@ -1,21 +1,29 @@
-use crate::esdt_instance::EsdtInstances;
-use crate::key_hex;
-use elrond_wasm::types::Address;
-use std::collections::HashMap;
-use std::fmt::{self, Write};
+use crate::{esdt_instance::EsdtInstances, key_hex};
+use std::{
+    collections::HashMap,
+    fmt::{self, Write},
+    ops::Deref,
+};
 
 #[derive(Clone)]
 pub struct EsdtRoles(HashMap<Vec<u8>, Vec<u8>>);
 
 #[derive(Clone)]
 pub struct EsdtData {
-    pub token_identifier: Address,
     pub instances: EsdtInstances,
     pub last_nonce: Option<u64>,
     pub roles: Option<EsdtRoles>,
 }
 
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
+
+impl Deref for AccountEsdt {
+    type Target = HashMap<Vec<u8>, EsdtData>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl fmt::Display for AccountEsdt {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
