@@ -62,16 +62,18 @@ where
 //     }
 // }
 
-// impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
-// where
-//     M: ManagedTypeApi,
-//     T: ManagedVecItem<M>,
-// {
-//     #[inline]
-//     fn from(b: ManagedVec<M, T>) -> Self {
-//         Self(b)
-//     }
-// }
+impl<M> From<ManagedVec<M, ManagedBuffer<M>>> for ManagedMultiResultVec<M, ManagedBuffer<M>>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(v: ManagedVec<M, ManagedBuffer<M>>) -> Self {
+        ManagedMultiResultVec {
+            raw_buffers: v,
+            _phantom: PhantomData,
+        }
+    }
+}
 
 // impl<M, T> ManagedDefault<M> for ManagedMultiResultVec<M, T>
 // where
@@ -112,6 +114,15 @@ where
     }
 }
 
+impl<M> ManagedMultiResultVec<M, ManagedBuffer<M>>
+where
+    M: ManagedTypeApi,
+{
+    pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
+        self.raw_buffers
+    }
+}
+
 impl<M, T> DynArg for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
@@ -133,7 +144,6 @@ impl<M, T> EndpointResult for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
     T: EndpointResult,
-    <T as EndpointResult>::DecodeAs: ManagedVecItem<M>,
 {
     type DecodeAs = ManagedMultiResultVec<M, T::DecodeAs>;
 
