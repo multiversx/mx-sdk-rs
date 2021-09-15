@@ -1,7 +1,10 @@
 use crate::key_hex;
-use num_bigint::BigInt;
-use std::collections::HashMap;
-use std::fmt::{self, Write};
+use num_bigint::BigUint;
+use std::{
+    collections::HashMap,
+    fmt::{self, Write},
+    ops::Deref,
+};
 
 #[derive(Clone)]
 pub struct EsdtUri(HashMap<Vec<u8>, Vec<u8>>);
@@ -10,8 +13,7 @@ pub struct EsdtUri(HashMap<Vec<u8>, Vec<u8>>);
 
 #[derive(Clone)]
 pub struct EsdtInstance {
-    pub nonce: u64,
-    pub value: BigInt,
+    pub value: BigUint,
     pub esdt_type: u32,
     pub name: Option<Vec<u8>>,
     pub creator: Option<Vec<u8>>,
@@ -24,20 +26,55 @@ pub struct EsdtInstance {
 }
 
 #[derive(Clone)]
-pub struct EsdtInstances(HashMap<Vec<u8>, EsdtInstance>);
+pub struct EsdtInstances(HashMap<u64, EsdtInstance>);
+
+impl Deref for EsdtInstances {
+    type Target = HashMap<u64, EsdtInstance>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl EsdtInstances {
+    pub fn add(&self, nonce: u64, value: BigUint) {
+        if self.contains_key(&nonce) {
+            let esdt_balance = &self.get_mut(&nonce).unwrap();
+            esdt_balance.value += value;
+        } else {
+            self.add_new(nonce, value)
+        }
+    }
+
+    pub fn add_new(&self, nonce: u64, value: BigUint) {
+        self.insert(
+            nonce,
+            EsdtInstance {
+                value: value.clone(),
+                esdt_type: 0u32,
+                name: None,
+                creator: None,
+                reserved: None,
+                royalties: None,
+                hash: None,
+                uri: None,
+                properties: None,
+                attributes: None,
+            },
+        );
+    }
+}
 
 impl fmt::Display for EsdtInstances {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut instance_buf = String::new();
-        let mut instance_keys: Vec<Vec<u8>> =
-            self.clone().0.iter().map(|(k, _)| k.clone()).collect();
+        let mut instance_keys: Vec<u64> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
 
         for key in &instance_keys {
             let value = self.0.get(key).unwrap();
             write!(
                 &mut instance_buf,
                 "\n\t\t\t\t{} -> {{
-                    nonce: {},
                     value: {},
                     esdt_type: {},
                     name: {},
@@ -49,8 +86,7 @@ impl fmt::Display for EsdtInstances {
                     properties: {},
                     attributes: {}
                 }}",
-                key_hex(key.as_slice()),
-                value.nonce,
+                key.to_string(),
                 value.value,
                 value.esdt_type,
                 hex::encode(value.name.unwrap().as_slice()),
