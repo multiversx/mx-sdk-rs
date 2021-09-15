@@ -272,7 +272,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(self.api, raw_result);
+        let mut loader = ManagedResultArgLoader::new(raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 
@@ -297,7 +297,7 @@ where
             range_closure,
         );
 
-        let mut loader = ManagedResultArgLoader::new(self.api, raw_result);
+        let mut loader = ManagedResultArgLoader::new(raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 
@@ -310,7 +310,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(self.api, raw_result);
+        let mut loader = ManagedResultArgLoader::new(raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 }
