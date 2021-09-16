@@ -1,13 +1,16 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, ManagedVec, ManagedVecItem};
+use super::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, Handle, ManagedTypeApi},
+    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
+    contract_base::ManagedSerializer,
     types::{ManagedArgBuffer, MultiResultVec},
     ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 use alloc::string::String;
-use core::{marker::PhantomData, ops::Deref};
+use core::marker::PhantomData;
+use elrond_codec::TopDecode;
 
+#[derive(Clone)]
 pub struct ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
@@ -120,6 +123,21 @@ where
 {
     pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
         self.raw_buffers
+    }
+}
+
+impl<M, T> ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: ManagedVecItem<M> + TopDecode,
+{
+    pub fn to_vec(&self) -> ManagedVec<M, T> {
+        let mut result = ManagedVec::new_empty(self.raw_buffers.type_manager());
+        let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
+        for item in self.raw_buffers.into_iter() {
+            result.push(serializer.top_decode_from_managed_buffer(&item));
+        }
+        result
     }
 }
 

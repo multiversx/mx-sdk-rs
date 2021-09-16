@@ -55,7 +55,7 @@ where
         if next_byte_index > self.byte_limit {
             return None;
         }
-        let result = T::from_byte_reader(self.managed_vec.type_manager(), |dest_slice| {
+        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
