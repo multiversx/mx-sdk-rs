@@ -287,18 +287,18 @@ where
     /// The metachain system SC will evaluate the arguments and call “ESDTSetRole@tokenId@listOfRoles” for the given address.
     /// This will be actually a cross shard call.
     /// This function as almost all in case of ESDT can be called only by the owner.
-    pub fn set_special_roles(
+    pub fn set_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
         address: &ManagedAddress<SA>,
         token_identifier: &TokenIdentifier<SA>,
-        roles: &[EsdtLocalRole],
+        roles_iter: RoleIter,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"setSpecialRole");
 
         contract_call.push_endpoint_arg(token_identifier);
         contract_call.push_endpoint_arg(address);
-        for role in roles {
-            if role != &EsdtLocalRole::None {
+        for role in roles_iter {
+            if role != EsdtLocalRole::None {
                 contract_call.push_argument_raw_bytes(role.as_role_name());
             }
         }
@@ -310,18 +310,18 @@ where
     /// The metachain system SC will evaluate the arguments and call “ESDTUnsetRole@tokenId@listOfRoles” for the given address.
     /// This will be actually a cross shard call.
     /// This function as almost all in case of ESDT can be called only by the owner.
-    pub fn unset_special_roles(
+    pub fn unset_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
         address: &ManagedAddress<SA>,
         token_identifier: &TokenIdentifier<SA>,
-        roles: &[EsdtLocalRole],
+        roles_iter: RoleIter,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"unSetSpecialRole");
 
         contract_call.push_endpoint_arg(token_identifier);
         contract_call.push_endpoint_arg(address);
-        for role in roles {
-            if role != &EsdtLocalRole::None {
+        for role in roles_iter {
+            if role != EsdtLocalRole::None {
                 contract_call.push_argument_raw_bytes(role.as_role_name());
             }
         }

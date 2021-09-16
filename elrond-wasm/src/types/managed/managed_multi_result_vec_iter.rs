@@ -5,7 +5,7 @@ use crate::{
     ArgId, DynArg, DynArgInput, ManagedResultArgLoader,
 };
 
-use super::{ManagedBuffer, ManagedMultiResultVec, ManagedVecIterator};
+use super::ManagedMultiResultVec;
 
 impl<M, T> IntoIterator for ManagedMultiResultVec<M, T>
 where

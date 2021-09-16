@@ -220,7 +220,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         nonce: u64,
         amount: BigUint,
         function: ManagedBuffer,
-        #[var_args] arguments: VarArgs<ManagedBuffer>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) {
         let _ = self.raw_vm_api().direct_esdt_nft_execute(
             &to,
@@ -229,7 +229,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             &amount,
             self.blockchain().get_gas_left(),
             &function,
-            &arguments.into_vec().managed_into(),
+            &arguments.to_arg_buffer(),
         );
     }
 

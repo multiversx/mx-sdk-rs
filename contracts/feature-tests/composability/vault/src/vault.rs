@@ -18,10 +18,10 @@ pub trait Vault {
     #[endpoint]
     fn echo_arguments(
         &self,
-        #[var_args] args: VarArgs<BoxedBytes>,
-    ) -> SCResult<MultiResultVec<BoxedBytes>> {
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<ManagedMultiResultVec<ManagedBuffer>> {
         self.call_counts(b"echo_arguments").update(|c| *c += 1);
-        Ok(args.into_vec().into())
+        Ok(args)
     }
 
     #[endpoint]
