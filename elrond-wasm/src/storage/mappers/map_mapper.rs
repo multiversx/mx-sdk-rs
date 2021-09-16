@@ -1,7 +1,7 @@
-use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
+use super::{set_mapper, SetMapper, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
-    storage::{storage_clear, storage_get, storage_set, StorageKey},
+    storage::StorageKey,
 };
 use core::marker::PhantomData;
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -45,7 +45,7 @@ where
 {
     fn clear(&mut self) {
         for key in self.keys_set.iter() {
-            self.clear_mapped_value(&key);
+            self.mapped_value(&key).clear();
         }
         self.keys_set.clear();
     }
@@ -64,26 +64,11 @@ where
         named_key
     }
 
-    fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(
+    fn mapped_value(&self, key: &K) -> SingleValueMapper<SA, V> {
+        SingleValueMapper::new(
             self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
+            self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
         )
-    }
-
-    fn set_mapped_value(&self, key: &K, value: &V) {
-        storage_set(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-            &value,
-        );
-    }
-
-    fn clear_mapped_value(&self, key: &K) {
-        storage_clear(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-        );
     }
 
     /// Returns `true` if the map contains no elements.
@@ -121,7 +106,7 @@ where
     /// Gets a reference to the value in the entry.
     pub fn get(&self, k: &K) -> Option<V> {
         if self.keys_set.contains(k) {
-            return Some(self.get_mapped_value(k));
+            return Some(self.mapped_value(k).get());
         }
         None
     }
@@ -129,7 +114,7 @@ where
     /// Sets the value of the entry, and returns the entry's old value.
     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
         let old_value = self.get(&k);
-        self.set_mapped_value(&k, &v);
+        self.mapped_value(&k).set(&v);
         self.keys_set.insert(k);
         old_value
     }
@@ -137,8 +122,9 @@ where
     /// Takes the value out of the entry, and returns it.
     pub fn remove(&mut self, k: &K) -> Option<V> {
         if self.keys_set.remove(k) {
-            let value = self.get_mapped_value(k);
-            self.clear_mapped_value(k);
+            let mut mapped_value = self.mapped_value(k);
+            let value = mapped_value.get();
+            mapped_value.clear();
             return Some(value);
         }
         None

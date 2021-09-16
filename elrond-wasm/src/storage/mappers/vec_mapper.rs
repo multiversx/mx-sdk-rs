@@ -1,9 +1,9 @@
-use super::{StorageClearable, StorageMapper};
+use super::{AsNested, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     io::EndpointResult,
-    storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
+    storage::StorageKey,
     types::MultiResultVec,
 };
 use alloc::vec::Vec;
@@ -26,7 +26,7 @@ where
 {
     api: SA,
     base_key: StorageKey<SA>,
-    len_key: StorageKey<SA>,
+    len_mapper: SingleValueMapper<SA, usize>,
     _phantom: core::marker::PhantomData<T>,
 }
 
@@ -40,9 +40,9 @@ where
         len_key.append_bytes(LEN_SUFFIX);
 
         VecMapper {
-            api,
+            api: api.clone(),
             base_key,
-            len_key,
+            len_mapper: SingleValueMapper::new(api, len_key),
             _phantom: PhantomData,
         }
     }
@@ -60,13 +60,27 @@ where
         item_key
     }
 
-    fn save_count(&self, new_len: usize) {
-        storage_set(self.api.clone(), &self.len_key, &new_len);
+    fn item(&self, index: usize) -> SingleValueMapper<SA, T> {
+        SingleValueMapper::new(self.api.clone(), self.item_key(index))
+    }
+
+    fn save_count(&mut self, new_len: usize) {
+        self.len_mapper.set(&new_len);
+    }
+
+    fn index_out_of_bounds(&self, index: usize) -> bool {
+        index == 0 || index > self.len()
+    }
+
+    fn check_index(&self, index: usize) {
+        if self.index_out_of_bounds(index) {
+            self.api.signal_error(&b"index out of range"[..]);
+        }
     }
 
     /// Number of items managed by the mapper.
     pub fn len(&self) -> usize {
-        storage_get(self.api.clone(), &self.len_key)
+        self.len_mapper.get()
     }
 
     /// True if no items present in the mapper.
@@ -85,7 +99,7 @@ where
     pub fn push(&mut self, item: &T) -> usize {
         let mut len = self.len();
         len += 1;
-        storage_set(self.api.clone(), &self.item_key(len), item);
+        self.item(len).set(item);
         self.save_count(len);
         len
     }
@@ -97,7 +111,7 @@ where
         let mut len = self.len();
         for item in items {
             len += 1;
-            storage_set(self.api.clone(), &self.item_key(len), item);
+            self.item(len).set(item);
         }
         self.save_count(len);
         len
@@ -106,9 +120,7 @@ where
     /// Get item at index from storage.
     /// Index must be valid (1 <= index <= count).
     pub fn get(&self, index: usize) -> T {
-        if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
-        }
+        self.check_index(index);
         self.get_unchecked(index)
     }
 
@@ -116,7 +128,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return the zero-value.
     pub fn get_unchecked(&self, index: usize) -> T {
-        storage_get(self.api.clone(), &self.item_key(index))
+        self.item(index).get()
     }
 
     /// Get item at index from storage.
@@ -124,7 +136,7 @@ where
     /// else calls lambda given as argument.
     /// The lambda only gets called lazily if the index is not valid.
     pub fn get_or_else<F: FnOnce() -> T>(self, index: usize, or_else: F) -> T {
-        if index == 0 || index > self.len() {
+        if self.index_out_of_bounds(index) {
             or_else()
         } else {
             self.get_unchecked(index)
@@ -135,38 +147,32 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return `true`.
     pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
-        storage_get_len(self.api.clone(), &self.item_key(index)) == 0
+        self.item(index).is_empty()
     }
 
     /// Checks whether or not there is anything ins storage at index.
     /// Index must be valid (1 <= index <= count).
     pub fn item_is_empty(&self, index: usize) -> bool {
-        if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
-        }
+        self.check_index(index);
         self.item_is_empty_unchecked(index)
     }
 
     /// Get item at index from storage.
     /// Index must be valid (1 <= index <= count).
-    pub fn set(&self, index: usize, item: &T) {
-        if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
-        }
+    pub fn set(&mut self, index: usize, item: &T) {
+        self.check_index(index);
         self.set_unchecked(index, item);
     }
 
     /// Keeping `set_unchecked` private on purpose, so developers don't write out of index limits by accident.
-    fn set_unchecked(&self, index: usize, item: &T) {
-        storage_set(self.api.clone(), &self.item_key(index), item);
+    fn set_unchecked(&mut self, index: usize, item: &T) {
+        self.item(index).set(item);
     }
 
     /// Clears item at index from storage.
     /// Index must be valid (1 <= index <= count).
     pub fn clear_entry(&self, index: usize) {
-        if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
-        }
+        self.check_index(index);
         self.clear_entry_unchecked(index)
     }
 
@@ -174,7 +180,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply do nothing.
     pub fn clear_entry_unchecked(&self, index: usize) {
-        storage_clear(self.api.clone(), &self.item_key(index));
+        self.item(index).clear();
     }
 
     /// Loads all items from storage and places them in a Vec.
@@ -192,14 +198,15 @@ where
 impl<SA, T> StorageClearable for VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: AsNested<SA, T>,
+    <T as AsNested<SA, T>>::Nested: StorageMapper<SA> + StorageClearable,
 {
     /// Deletes all contents form storage and sets count to 0.
     /// Can easily consume a lot of gas.
     fn clear(&mut self) {
         let len = self.len();
         for i in 1..=len {
-            storage_clear(self.api.clone(), &self.item_key(i));
+            self.get_nested(i).clear()
         }
         self.save_count(0);
     }
@@ -218,14 +225,19 @@ where
         self.save_count(len);
         len
     }
+}
 
+impl<SA, T> VecMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: AsNested<SA, T>,
+    <T as AsNested<SA, T>>::Nested: StorageMapper<SA>,
+{
     /// Get item at index from storage.
     /// Index must be valid (1 <= index <= count).
-    pub fn get_nested(&self, index: usize) -> T {
-        if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
-        }
-        T::new(self.api.clone(), self.item_key(index))
+    fn get_nested(&self, index: usize) -> <T as AsNested<SA, T>>::Nested {
+        self.check_index(index);
+        self.item(index).into_nested()
     }
 }
 

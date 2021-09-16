@@ -1,10 +1,10 @@
-use super::{StorageClearable, StorageMapper};
+use super::{SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     io::EndpointResult,
-    storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    storage::StorageKey,
+    types::MultiResultVec,
 };
 use alloc::vec::Vec;
 use core::marker::PhantomData;
@@ -14,7 +14,6 @@ use elrond_codec::{
     },
     DecodeDefault, EncodeDefault, NestedDecode, NestedEncode, TopDecode, TopEncode,
 };
-use storage_get::storage_get_len;
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
@@ -116,16 +115,16 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn clear(&mut self) {
-        let info = self.get_info();
+        let info = self.info().get();
         let mut node_id = info.front;
 
         while node_id != NULL_ENTRY {
-            let node = self.get_node(node_id);
-            self.clear_node(node_id);
+            let node = self.node(node_id).get();
+            self.node(node_id).clear();
             node_id = node.next_id;
         }
 
-        self.set_info(LinkedListInfo::default());
+        self.info().set(&LinkedListInfo::default());
     }
 }
 
@@ -147,76 +146,45 @@ where
         name_key
     }
 
-    fn get_info(&self) -> LinkedListInfo {
-        storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
+    fn info(&self) -> SingleValueMapper<SA, LinkedListInfo> {
+        SingleValueMapper::new(self.api.clone(), self.build_name_key(INFO_IDENTIFIER))
     }
 
-    fn set_info(&mut self, value: LinkedListInfo) {
-        storage_set(
+    fn node(&self, node_id: u32) -> SingleValueMapper<SA, LinkedListNode<T>> {
+        SingleValueMapper::new(
             self.api.clone(),
-            &self.build_name_key(INFO_IDENTIFIER),
-            &value,
-        );
-    }
-
-    fn get_node(&self, node_id: u32) -> LinkedListNode<T> {
-        storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
         )
     }
 
-    fn is_empty_node(&self, node_id: u32) -> bool {
-        storage_get_len(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-        ) == 0
-    }
-
-    fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {
-        storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            item,
-        );
-    }
-
-    fn clear_node(&mut self, node_id: u32) {
-        storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
-        );
-    }
-
     pub fn is_empty(&self) -> bool {
-        self.get_info().len == 0
+        self.info().get().len == 0
     }
 
     pub fn len(&self) -> usize {
-        self.get_info().len as usize
+        self.info().get().len as usize
     }
 
     pub fn front(&self) -> Option<LinkedListNode<T>> {
-        let info = self.get_info();
+        let info = self.info().get();
 
         self.get_node_by_id(info.front)
     }
 
     pub fn back(&self) -> Option<LinkedListNode<T>> {
-        let info = self.get_info();
+        let info = self.info().get();
 
         self.get_node_by_id(info.back)
     }
 
     pub fn pop_back(&mut self) -> Option<LinkedListNode<T>> {
-        let info = self.get_info();
+        let info = self.info().get();
 
         self.remove_node_by_id(info.back)
     }
 
     pub fn pop_front(&mut self) -> Option<LinkedListNode<T>> {
-        let info = self.get_info();
+        let info = self.info().get();
 
         self.remove_node_by_id(info.front)
     }
@@ -226,23 +194,23 @@ where
         node: &mut LinkedListNode<T>,
         element: T,
     ) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node.node_id) {
+        if self.node(node.node_id).is_empty() {
             return None;
         }
 
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         let new_node_id = info.generate_new_node_id();
 
         let new_node_next_id = node.next_id;
         node.next_id = new_node_id;
-        self.set_node(node.node_id, node);
+        self.node(node.node_id).set(node);
 
         if new_node_next_id == NULL_ENTRY {
             info.back = new_node_id;
         } else {
-            let mut next_node = self.get_node(new_node_next_id);
+            let mut next_node = self.node(new_node_next_id).get();
             next_node.prev_id = new_node_id;
-            self.set_node(new_node_next_id, &next_node);
+            self.node(new_node_next_id).set(&next_node);
         }
 
         let new_node = LinkedListNode {
@@ -251,10 +219,10 @@ where
             next_id: new_node_next_id,
             prev_id: node.node_id,
         };
-        self.set_node(new_node_id, &new_node);
+        self.node(new_node_id).set(&new_node);
 
         info.len += 1;
-        self.set_info(info);
+        self.info().set(&info);
         Some(new_node)
     }
 
@@ -263,23 +231,23 @@ where
         node: &mut LinkedListNode<T>,
         element: T,
     ) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node.node_id) {
+        if self.node(node.node_id).is_empty() {
             return None;
         }
 
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         let new_node_id = info.generate_new_node_id();
 
         let new_node_prev_id = node.prev_id;
         node.prev_id = new_node_id;
-        self.set_node(node.node_id, node);
+        self.node(node.node_id).set(node);
 
         if new_node_prev_id == NULL_ENTRY {
             info.front = new_node_id;
         } else {
-            let mut previous_node = self.get_node(new_node_prev_id);
+            let mut previous_node = self.node(new_node_prev_id).get();
             previous_node.next_id = new_node_id;
-            self.set_node(new_node_prev_id, &previous_node);
+            self.node(new_node_prev_id).set(&previous_node);
         }
 
         let new_node = LinkedListNode {
@@ -288,16 +256,16 @@ where
             next_id: node.node_id,
             prev_id: new_node_prev_id,
         };
-        self.set_node(new_node_id, &new_node);
+        self.node(new_node_id).set(&new_node);
 
         info.len += 1;
-        self.set_info(info);
+        self.info().set(&info);
         Some(new_node)
     }
 
     pub fn push_after_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
-        if !self.is_empty_node(node_id) {
-            let mut node = self.get_node(node_id);
+        if !self.node(node_id).is_empty() {
+            let mut node = self.node(node_id).get();
             self.push_after(&mut node, element)
         } else {
             None
@@ -305,8 +273,8 @@ where
     }
 
     pub fn push_before_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
-        if !self.is_empty_node(node_id) {
-            let mut node = self.get_node(node_id);
+        if !self.node(node_id).is_empty() {
+            let mut node = self.node(node_id).get();
             self.push_before(&mut node, element)
         } else {
             None
@@ -314,7 +282,7 @@ where
     }
 
     pub fn push_back(&mut self, element: T) -> LinkedListNode<T> {
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         let new_node_id = info.generate_new_node_id();
         let mut previous = NULL_ENTRY;
 
@@ -322,10 +290,10 @@ where
             info.front = new_node_id;
         } else {
             let back = info.back;
-            let mut back_node = self.get_node(back);
+            let mut back_node = self.node(back).get();
             back_node.next_id = new_node_id;
             previous = back;
-            self.set_node(back, &back_node);
+            self.node(back).set(&back_node);
         }
 
         let node = LinkedListNode {
@@ -334,16 +302,16 @@ where
             prev_id: previous,
             next_id: NULL_ENTRY,
         };
-        self.set_node(new_node_id, &node);
+        self.node(new_node_id).set(&node);
 
         info.back = new_node_id;
         info.len += 1;
-        self.set_info(info);
+        self.info().set(&info);
         node
     }
 
     pub fn push_front(&mut self, element: T) -> LinkedListNode<T> {
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         let new_node_id = info.generate_new_node_id();
         let mut next = NULL_ENTRY;
 
@@ -351,10 +319,10 @@ where
             info.back = new_node_id;
         } else {
             let front = info.front;
-            let mut front_node = self.get_node(front);
+            let mut front_node = self.node(front).get();
             front_node.prev_id = new_node_id;
             next = front;
-            self.set_node(front, &front_node);
+            self.node(front).set(&front_node);
         }
 
         let node = LinkedListNode {
@@ -363,45 +331,45 @@ where
             prev_id: NULL_ENTRY,
             next_id: next,
         };
-        self.set_node(new_node_id, &node);
+        self.node(new_node_id).set(&node);
 
         info.front = new_node_id;
         info.len += 1;
-        self.set_info(info);
+        self.info().set(&info);
         node
     }
 
     pub fn remove_node(&mut self, node: &LinkedListNode<T>) {
         let node_id = node.node_id;
 
-        if self.is_empty_node(node_id) {
+        if self.node(node_id).is_empty() {
             return;
         }
 
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         if node.prev_id == NULL_ENTRY {
             info.front = node.next_id;
         } else {
-            let mut previous = self.get_node(node.prev_id);
+            let mut previous = self.node(node.prev_id).get();
             previous.next_id = node.next_id;
-            self.set_node(node.prev_id, &previous);
+            self.node(node.prev_id).set(&previous);
         }
 
         if node.next_id == NULL_ENTRY {
             info.back = node.prev_id;
         } else {
-            let mut next = self.get_node(node.next_id);
+            let mut next = self.node(node.next_id).get();
             next.prev_id = node.prev_id;
-            self.set_node(node.next_id, &next);
+            self.node(node.next_id).set(&next);
         }
 
-        self.clear_node(node_id);
+        self.node(node_id).clear();
         info.len -= 1;
-        self.set_info(info);
+        self.info().set(&info);
     }
 
     pub fn remove_node_by_id(&mut self, node_id: u32) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node_id) {
+        if self.node(node_id).is_empty() {
             return None;
         }
 
@@ -411,11 +379,11 @@ where
     }
 
     pub fn get_node_by_id(&self, node_id: u32) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node_id) {
+        if self.node(node_id).is_empty() {
             return None;
         }
 
-        Some(self.get_node(node_id))
+        Some(self.node(node_id).get())
     }
 
     pub fn iter(&self) -> Iter<SA, T> {
@@ -427,7 +395,7 @@ where
     }
 
     pub fn check_internal_consistency(&self) -> bool {
-        let info = self.get_info();
+        let info = self.info().get();
         let mut front = info.front;
         let mut back = info.back;
 
@@ -447,17 +415,17 @@ where
                 return false;
             }
 
-            if self.get_node(front).prev_id != NULL_ENTRY {
+            if self.node(front).get().prev_id != NULL_ENTRY {
                 return false;
             }
-            if self.get_node(back).next_id != NULL_ENTRY {
+            if self.node(back).get().next_id != NULL_ENTRY {
                 return false;
             }
 
             let mut forwards = Vec::new();
             while front != NULL_ENTRY {
                 forwards.push(front);
-                front = self.get_node(front).next_id;
+                front = self.node(front).get().next_id;
             }
             if forwards.len() != info.len as usize {
                 return false;
@@ -466,7 +434,7 @@ where
             let mut backwards = Vec::new();
             while back != NULL_ENTRY {
                 backwards.push(back);
-                back = self.get_node(back).prev_id;
+                back = self.node(back).get().prev_id;
             }
             if backwards.len() != info.len as usize {
                 return false;

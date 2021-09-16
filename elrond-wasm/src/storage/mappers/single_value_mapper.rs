@@ -1,4 +1,4 @@
-use super::StorageMapper;
+use super::{as_nested::AsNested, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -12,7 +12,7 @@ use elrond_codec::{TopDecode, TopEncode};
 pub struct SingleValueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + 'static,
+    T: 'static,
 {
     api: SA,
     key: StorageKey<SA>,
@@ -22,7 +22,6 @@ where
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
 {
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
@@ -31,6 +30,35 @@ where
             _phantom: PhantomData,
         }
     }
+}
+
+impl<SA, T> StorageClearable for SingleValueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode,
+{
+    /// Clears the storage for this mapper.
+    fn clear(self: &mut SingleValueMapper<SA, T>) {
+        storage_clear(self.api.clone(), &self.key);
+    }
+}
+
+impl<SA, T> SingleValueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: AsNested<SA, T>,
+    <T as AsNested<SA, T>>::Nested: StorageMapper<SA>,
+{
+    pub fn into_nested(self) -> <T as AsNested<SA, T>>::Nested {
+        <T as AsNested<SA, T>>::Nested::new(self.api, self.key)
+    }
+}
+
+impl<SA, T> AsNested<SA, SingleValueMapper<SA, T>> for SingleValueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+{
+    type Nested = Self;
 }
 
 impl<SA, T> SingleValueMapper<SA, T>
@@ -49,27 +77,22 @@ where
     }
 
     /// Saves argument to storage.
-    pub fn set(&self, new_value: &T) {
+    pub fn set(&mut self, new_value: &T) {
         storage_set(self.api.clone(), &self.key, new_value);
     }
 
     /// Saves argument to storage only if the storage is empty.
     /// Does nothing otherwise.
-    pub fn set_if_empty(&self, value: &T) {
+    pub fn set_if_empty(&mut self, value: &T) {
         if self.is_empty() {
             self.set(value);
         }
     }
 
-    /// Clears the storage for this mapper.
-    pub fn clear(&self) {
-        storage_clear(self.api.clone(), &self.key);
-    }
-
     /// Syntactic sugar, to more compactly express a get, update and set in one line.
     /// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
     /// Propagates the return value of the given function.
-    pub fn update<R, F: FnOnce(&mut T) -> R>(&self, f: F) -> R {
+    pub fn update<R, F: FnOnce(&mut T) -> R>(&mut self, f: F) -> R {
         let mut value = self.get();
         let result = f(&mut value);
         self.set(&value);

@@ -1,11 +1,11 @@
 pub use super::queue_mapper::Iter;
-use super::{QueueMapper, StorageClearable, StorageMapper};
+use super::{QueueMapper, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     io::EndpointResult,
-    storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    storage::StorageKey,
+    types::MultiResultVec,
 };
 use alloc::vec::Vec;
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -44,7 +44,7 @@ where
 {
     fn clear(&mut self) {
         for value in self.queue_mapper.iter() {
-            self.clear_node_id(&value);
+            self.node_id(&value).clear();
         }
         self.queue_mapper.clear();
     }
@@ -62,27 +62,11 @@ where
         named_key
     }
 
-    fn get_node_id(&self, value: &T) -> u32 {
-        storage_get(
+    fn node_id(&self, value: &T) -> SingleValueMapper<SA, u32> {
+        SingleValueMapper::new(
             self.api.clone(),
-            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
+            self.build_named_value_key(NODE_ID_IDENTIFIER, value),
         )
-    }
-
-    fn set_node_id(&self, value: &T, node_id: u32) {
-        storage_set(
-            self.api.clone(),
-            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
-            &node_id,
-        );
-    }
-
-    fn clear_node_id(&self, value: &T) {
-        storage_set(
-            self.api.clone(),
-            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
-            &BoxedBytes::empty(),
-        );
     }
 
     /// Returns `true` if the set contains no elements.
@@ -97,7 +81,7 @@ where
 
     /// Returns `true` if the set contains a value.
     pub fn contains(&self, value: &T) -> bool {
-        self.get_node_id(value) != NULL_ENTRY
+        self.node_id(value).get() != NULL_ENTRY
     }
 
     /// Adds a value to the set.
@@ -110,19 +94,19 @@ where
             return false;
         }
         let new_node_id = self.queue_mapper.push_back_node_id(&value);
-        self.set_node_id(&value, new_node_id);
+        self.node_id(&value).set(&new_node_id);
         true
     }
 
     /// Removes a value from the set. Returns whether the value was
     /// present in the set.
     pub fn remove(&mut self, value: &T) -> bool {
-        let node_id = self.get_node_id(value);
+        let node_id = self.node_id(value).get();
         if node_id == NULL_ENTRY {
             return false;
         }
         self.queue_mapper.remove_by_node_id(node_id);
-        self.clear_node_id(value);
+        self.node_id(value).clear();
         true
     }
 

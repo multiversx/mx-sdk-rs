@@ -1,10 +1,10 @@
-use super::{StorageClearable, StorageMapper};
+use super::{AsNested, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     io::EndpointResult,
-    storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    storage::StorageKey,
+    types::MultiResultVec,
 };
 use alloc::vec::Vec;
 use core::marker::PhantomData;
@@ -63,7 +63,7 @@ impl QueueMapperInfo {
 pub struct QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + 'static,
+    T: 'static,
 {
     api: SA,
     base_key: StorageKey<SA>,
@@ -87,25 +87,26 @@ where
 impl<SA, T> StorageClearable for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: AsNested<SA, T>,
+    <T as AsNested<SA, T>>::Nested: StorageMapper<SA> + StorageClearable,
 {
     fn clear(&mut self) {
-        let info = self.get_info();
+        let info = self.info().get();
         let mut node_id = info.front;
         while node_id != NULL_ENTRY {
-            let node = self.get_node(node_id);
-            self.clear_node(node_id);
-            self.clear_value(node_id);
+            let node = self.node(node_id).get();
+            self.node(node_id).clear();
+            self.value(node_id).into_nested().clear();
             node_id = node.next;
         }
-        self.set_info(QueueMapperInfo::default());
+        self.info().set(&QueueMapperInfo::default());
     }
 }
 
 impl<SA, T> QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: 'static,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -120,83 +121,49 @@ where
         name_key
     }
 
-    fn get_info(&self) -> QueueMapperInfo {
-        storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
+    fn info(&self) -> SingleValueMapper<SA, QueueMapperInfo> {
+        SingleValueMapper::new(self.api.clone(), self.build_name_key(INFO_IDENTIFIER))
     }
 
-    fn set_info(&mut self, value: QueueMapperInfo) {
-        storage_set(
+    fn node(&self, node_id: u32) -> SingleValueMapper<SA, Node> {
+        SingleValueMapper::new(
             self.api.clone(),
-            &self.build_name_key(INFO_IDENTIFIER),
-            &value,
-        );
-    }
-
-    fn get_node(&self, node_id: u32) -> Node {
-        storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
         )
     }
 
-    fn set_node(&mut self, node_id: u32, item: Node) {
-        storage_set(
+    fn value(&self, node_id: u32) -> SingleValueMapper<SA, T> {
+        SingleValueMapper::new(
             self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            &item,
-        );
-    }
-
-    fn clear_node(&mut self, node_id: u32) {
-        storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
-        );
-    }
-
-    fn get_value(&self, node_id: u32) -> T {
-        storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
         )
     }
+}
 
+impl<SA, T> QueueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode,
+{
     fn get_value_option(&self, node_id: u32) -> Option<T> {
         if node_id == NULL_ENTRY {
             return None;
         }
-        Some(self.get_value(node_id))
-    }
-
-    fn set_value(&mut self, node_id: u32, value: &T) {
-        storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
-            value,
-        )
-    }
-
-    fn clear_value(&mut self, node_id: u32) {
-        storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
-        )
+        Some(self.value(node_id).get())
     }
 
     /// Returns `true` if the `Queue` is empty.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn is_empty(&self) -> bool {
-        self.get_info().len == 0
+        self.len() == 0
     }
 
     /// Returns the length of the `Queue`.
     ///
     /// This operation should compute in *O*(1) time.
     pub fn len(&self) -> usize {
-        self.get_info().len as usize
+        self.info().get().len as usize
     }
 
     /// Appends an element to the back of a queue
@@ -204,29 +171,26 @@ where
     ///
     /// This operation should compute in *O*(1) time.
     pub(crate) fn push_back_node_id(&mut self, elt: &T) -> u32 {
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         let new_node_id = info.generate_new_node_id();
         let mut previous = NULL_ENTRY;
         if info.len == 0 {
             info.front = new_node_id;
         } else {
             let back = info.back;
-            let mut back_node = self.get_node(back);
+            let mut back_node = self.node(back).get();
             back_node.next = new_node_id;
             previous = back;
-            self.set_node(back, back_node);
+            self.node(back).set(&back_node);
         }
-        self.set_node(
-            new_node_id,
-            Node {
-                previous,
-                next: NULL_ENTRY,
-            },
-        );
+        self.node(new_node_id).set(&Node {
+            previous,
+            next: NULL_ENTRY,
+        });
         info.back = new_node_id;
-        self.set_value(new_node_id, elt);
+        self.value(new_node_id).set(&elt);
         info.len += 1;
-        self.set_info(info);
+        self.info().set(&info);
         new_node_id
     }
 
@@ -241,41 +205,38 @@ where
     ///
     /// This operation should compute in *O*(1) time.
     pub fn push_front(&mut self, elt: T) {
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         let new_node_id = info.generate_new_node_id();
         let mut next = NULL_ENTRY;
         if info.len == 0 {
             info.back = new_node_id;
         } else {
             let front = info.front;
-            let mut front_node = self.get_node(front);
+            let mut front_node = self.node(front).get();
             front_node.previous = new_node_id;
             next = front;
-            self.set_node(front, front_node);
+            self.node(front).set(&front_node);
         }
-        self.set_node(
-            new_node_id,
-            Node {
-                previous: NULL_ENTRY,
-                next,
-            },
-        );
+        self.node(new_node_id).set(&Node {
+            previous: NULL_ENTRY,
+            next,
+        });
         info.front = new_node_id;
-        self.set_value(new_node_id, &elt);
+        self.value(new_node_id).set(&elt);
         info.len += 1;
-        self.set_info(info);
+        self.info().set(&info);
     }
 
     /// Provides a copy to the front element, or `None` if the queue is
     /// empty.
     pub fn front(&self) -> Option<T> {
-        self.get_value_option(self.get_info().front)
+        self.get_value_option(self.info().get().front)
     }
 
     /// Provides a copy to the back element, or `None` if the queue is
     /// empty.
     pub fn back(&self) -> Option<T> {
-        self.get_value_option(self.get_info().back)
+        self.get_value_option(self.info().get().back)
     }
 
     /// Removes the last element from a queue and returns it, or `None` if
@@ -283,7 +244,7 @@ where
     ///
     /// This operation should compute in *O*(1) time.
     pub fn pop_back(&mut self) -> Option<T> {
-        self.remove_by_node_id(self.get_info().back)
+        self.remove_by_node_id(self.info().get().back)
     }
 
     /// Removes the first element and returns it, or `None` if the queue is
@@ -291,7 +252,7 @@ where
     ///
     /// This operation should compute in *O*(1) time.
     pub fn pop_front(&mut self) -> Option<T> {
-        self.remove_by_node_id(self.get_info().front)
+        self.remove_by_node_id(self.info().get().front)
     }
 
     /// Removes element with the given node id and returns it, or `None` if the queue is
@@ -303,30 +264,30 @@ where
         if node_id == NULL_ENTRY {
             return None;
         }
-        let node = self.get_node(node_id);
+        let node = self.node(node_id).get();
 
-        let mut info = self.get_info();
+        let mut info = self.info().get();
         if node.previous == NULL_ENTRY {
             info.front = node.next;
         } else {
-            let mut previous = self.get_node(node.previous);
+            let mut previous = self.node(node.previous).get();
             previous.next = node.next;
-            self.set_node(node.previous, previous);
+            self.node(node.previous).set(&previous);
         }
 
         if node.next == NULL_ENTRY {
             info.back = node.previous;
         } else {
-            let mut next = self.get_node(node.next);
+            let mut next = self.node(node.next).get();
             next.previous = node.previous;
-            self.set_node(node.next, next);
+            self.node(node.next).set(&next);
         }
 
-        self.clear_node(node_id);
-        let removed_value = self.get_value(node_id);
-        self.clear_value(node_id);
+        self.node(node_id).clear();
+        let removed_value = self.value(node_id).get();
+        self.value(node_id).clear();
         info.len -= 1;
-        self.set_info(info);
+        self.info().set(&info);
         Some(removed_value)
     }
 
@@ -341,7 +302,7 @@ where
     ///
     /// This operation should compute in *O*(n) time.
     pub fn check_internal_consistency(&self) -> bool {
-        let info = self.get_info();
+        let info = self.info().get();
         let mut front = info.front;
         let mut back = info.back;
         if info.len == 0 {
@@ -363,10 +324,10 @@ where
             }
 
             // the node before the first and the one after the last should both be null
-            if self.get_node(front).previous != NULL_ENTRY {
+            if self.node(front).get().previous != NULL_ENTRY {
                 return false;
             }
-            if self.get_node(back).next != NULL_ENTRY {
+            if self.node(back).get().next != NULL_ENTRY {
                 return false;
             }
 
@@ -374,7 +335,7 @@ where
             let mut forwards = Vec::new();
             while front != NULL_ENTRY {
                 forwards.push(front);
-                front = self.get_node(front).next;
+                front = self.node(front).get().next;
             }
             if forwards.len() != info.len as usize {
                 return false;
@@ -384,7 +345,7 @@ where
             let mut backwards = Vec::new();
             while back != NULL_ENTRY {
                 backwards.push(back);
-                back = self.get_node(back).previous;
+                back = self.node(back).get().previous;
             }
             if backwards.len() != info.len as usize {
                 return false;
@@ -427,7 +388,7 @@ where
 {
     fn new(queue: &'a QueueMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
-            node_id: queue.get_info().front,
+            node_id: queue.info().get().front,
             queue,
         }
     }
@@ -446,8 +407,8 @@ where
         if current_node_id == NULL_ENTRY {
             return None;
         }
-        self.node_id = self.queue.get_node(current_node_id).next;
-        Some(self.queue.get_value(current_node_id))
+        self.node_id = self.queue.node(current_node_id).get().next;
+        Some(self.queue.value(current_node_id).get())
     }
 }
 

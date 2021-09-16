@@ -9,7 +9,7 @@ pub trait SingleValueMapperFeatures {
 
     #[endpoint]
     fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
-        let my_single_value_mapper = self.map_my_single_value_mapper();
+        let mut my_single_value_mapper = self.map_my_single_value_mapper();
         my_single_value_mapper.set(&(my_single_value_mapper.get() + amount));
     }
 
