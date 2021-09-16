@@ -8,7 +8,7 @@ use crate::{
 };
 use alloc::string::String;
 use core::marker::PhantomData;
-use elrond_codec::{TopDecode, TopEncode};
+use elrond_codec::{try_cast_execute_or_else, TopDecode, TopEncode};
 
 #[derive(Clone)]
 pub struct ManagedMultiResultVec<M, T>
@@ -23,11 +23,17 @@ impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
 {
-    pub fn new_empty(api: M) -> Self {
+    #[inline]
+    fn from_raw_vec(raw_buffers: ManagedVec<M, ManagedBuffer<M>>) -> Self {
         ManagedMultiResultVec {
-            raw_buffers: ManagedVec::new_empty(api),
+            raw_buffers,
             _phantom: PhantomData,
         }
+    }
+
+    #[inline]
+    pub fn new_empty(api: M) -> Self {
+        ManagedMultiResultVec::from_raw_vec(ManagedVec::new_empty(api))
     }
 }
 
@@ -89,16 +95,46 @@ where
 //     }
 // }
 
-impl<M> From<ManagedVec<M, ManagedBuffer<M>>> for ManagedMultiResultVec<M, ManagedBuffer<M>>
+// impl<M> From<ManagedVec<M, ManagedBuffer<M>>> for ManagedMultiResultVec<M, ManagedBuffer<M>>
+// where
+//     M: ManagedTypeApi,
+// {
+//     #[inline]
+//     fn from(v: ManagedVec<M, ManagedBuffer<M>>) -> Self {
+//         ManagedMultiResultVec {
+//             raw_buffers: v,
+//             _phantom: PhantomData,
+//         }
+//     }
+// }
+
+impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
+    T: ManagedVecItem<M> + TopEncode + 'static,
 {
     #[inline]
-    fn from(v: ManagedVec<M, ManagedBuffer<M>>) -> Self {
-        ManagedMultiResultVec {
-            raw_buffers: v,
-            _phantom: PhantomData,
+    fn from(v: ManagedVec<M, T>) -> Self {
+        try_cast_execute_or_else(
+            v,
+            |m_buffer_vec| ManagedMultiResultVec::from_raw_vec(m_buffer_vec),
+            |v| ManagedMultiResultVec::from(&v),
+        )
+    }
+}
+
+impl<M, T> From<&ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M> + TopEncode,
+{
+    #[inline]
+    fn from(v: &ManagedVec<M, T>) -> Self {
+        let mut result = ManagedMultiResultVec::new_empty(v.type_manager());
+        for item in v.into_iter() {
+            result.push(item);
         }
+        result
     }
 }
 
