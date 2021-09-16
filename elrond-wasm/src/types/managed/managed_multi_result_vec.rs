@@ -8,7 +8,7 @@ use crate::{
 };
 use alloc::string::String;
 use core::marker::PhantomData;
-use elrond_codec::TopDecode;
+use elrond_codec::{TopDecode, TopEncode};
 
 #[derive(Clone)]
 pub struct ManagedMultiResultVec<M, T>
@@ -17,6 +17,30 @@ where
 {
     pub(super) raw_buffers: ManagedVec<M, ManagedBuffer<M>>,
     _phantom: PhantomData<T>,
+}
+
+impl<M, T> ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi,
+{
+    pub fn new_empty(api: M) -> Self {
+        ManagedMultiResultVec {
+            raw_buffers: ManagedVec::new_empty(api),
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<M, T> ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncode,
+{
+    pub fn push(&mut self, item: T) {
+        let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
+        self.raw_buffers
+            .push(serializer.top_encode_to_managed_buffer(&item));
+    }
 }
 
 // impl<M, T> Deref for ManagedMultiResultVec<M, T>
