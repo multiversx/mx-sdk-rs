@@ -1,6 +1,6 @@
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-use super::StorageMapper;
+use super::{IntoStorageMapper, StorageMapper};
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
@@ -36,6 +36,13 @@ where
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         TokenAttributesMapper { api, base_key }
     }
+}
+
+impl<SA> IntoStorageMapper<SA> for TokenAttributesMapper<SA>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+{
+    type StorageMapperType = Self;
 }
 
 impl<SA> TokenAttributesMapper<SA>

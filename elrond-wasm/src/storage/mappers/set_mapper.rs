@@ -1,5 +1,5 @@
 pub use super::queue_mapper::Iter;
-use super::{QueueMapper, SingleValueMapper, StorageClearable, StorageMapper};
+use super::{IntoStorageMapper, QueueMapper, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -35,6 +35,14 @@ where
             queue_mapper: QueueMapper::<SA, T>::new(api, base_key),
         }
     }
+}
+
+impl<SA, T> IntoStorageMapper<SA> for SetMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    type StorageMapperType = Self;
 }
 
 impl<SA, T> StorageClearable for SetMapper<SA, T>

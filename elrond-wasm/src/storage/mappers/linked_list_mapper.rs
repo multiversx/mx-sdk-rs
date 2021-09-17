@@ -1,4 +1,4 @@
-use super::{SingleValueMapper, StorageClearable, StorageMapper};
+use super::{IntoStorageMapper, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -107,6 +107,14 @@ where
             _phantom: PhantomData,
         }
     }
+}
+
+impl<SA, T> IntoStorageMapper<SA> for LinkedListMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+{
+    type StorageMapperType = Self;
 }
 
 impl<SA, T> StorageClearable for LinkedListMapper<SA, T>

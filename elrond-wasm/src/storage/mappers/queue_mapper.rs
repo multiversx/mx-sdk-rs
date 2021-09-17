@@ -1,4 +1,4 @@
-use super::{AsNested, SingleValueMapper, StorageClearable, StorageMapper};
+use super::{IntoStorageMapper, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -73,7 +73,7 @@ where
 impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
+    T: 'static,
 {
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         QueueMapper {
@@ -84,11 +84,31 @@ where
     }
 }
 
+impl<SA, T> IntoStorageMapper<SA> for QueueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+{
+    type StorageMapperType = Self;
+}
+
+impl<SA, T> QueueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: IntoStorageMapper<SA>,
+{
+    fn value(&self, node_id: u32) -> T::StorageMapperType {
+        T::item(
+            self.api.clone(),
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
+        )
+    }
+}
+
 impl<SA, T> StorageClearable for QueueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: AsNested<SA, T>,
-    <T as AsNested<SA, T>>::Nested: StorageMapper<SA> + StorageClearable,
+    T: IntoStorageMapper<SA>,
+    T::StorageMapperType: StorageClearable,
 {
     fn clear(&mut self) {
         let info = self.info().get();
@@ -96,7 +116,7 @@ where
         while node_id != NULL_ENTRY {
             let node = self.node(node_id).get();
             self.node(node_id).clear();
-            self.value(node_id).into_nested().clear();
+            self.value(node_id).clear();
             node_id = node.next;
         }
         self.info().set(&QueueMapperInfo::default());
@@ -129,13 +149,6 @@ where
         SingleValueMapper::new(
             self.api.clone(),
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-        )
-    }
-
-    fn value(&self, node_id: u32) -> SingleValueMapper<SA, T> {
-        SingleValueMapper::new(
-            self.api.clone(),
-            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
         )
     }
 }

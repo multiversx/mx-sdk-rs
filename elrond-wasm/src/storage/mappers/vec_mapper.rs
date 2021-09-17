@@ -1,4 +1,4 @@
-use super::{AsNested, SingleValueMapper, StorageClearable, StorageMapper};
+use super::{IntoStorageMapper, SingleValueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -33,7 +33,6 @@ where
 impl<SA, T> StorageMapper<SA> for VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
 {
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
@@ -48,6 +47,13 @@ where
     }
 }
 
+impl<SA, T> IntoStorageMapper<SA> for VecMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+{
+    type StorageMapperType = Self;
+}
+
 impl<SA, T> VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
@@ -58,10 +64,6 @@ where
         item_key.append_bytes(ITEM_SUFFIX);
         item_key.append_item(&index);
         item_key
-    }
-
-    fn item(&self, index: usize) -> SingleValueMapper<SA, T> {
-        SingleValueMapper::new(self.api.clone(), self.item_key(index))
     }
 
     fn save_count(&mut self, new_len: usize) {
@@ -198,8 +200,8 @@ where
 impl<SA, T> StorageClearable for VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: AsNested<SA, T>,
-    <T as AsNested<SA, T>>::Nested: StorageMapper<SA> + StorageClearable,
+    T: IntoStorageMapper<SA>,
+    T::StorageMapperType: StorageClearable,
 {
     /// Deletes all contents form storage and sets count to 0.
     /// Can easily consume a lot of gas.
@@ -230,14 +232,18 @@ where
 impl<SA, T> VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: AsNested<SA, T>,
-    <T as AsNested<SA, T>>::Nested: StorageMapper<SA>,
+    T: IntoStorageMapper<SA>,
+    T::StorageMapperType: StorageMapper<SA>,
 {
+    fn item(&self, index: usize) -> T::StorageMapperType {
+        T::item(self.api.clone(), self.item_key(index))
+    }
+
     /// Get item at index from storage.
     /// Index must be valid (1 <= index <= count).
-    fn get_nested(&self, index: usize) -> <T as AsNested<SA, T>>::Nested {
+    fn get_nested(&self, index: usize) -> T::StorageMapperType {
         self.check_index(index);
-        self.item(index).into_nested()
+        self.item(index) //.into_nested()
     }
 }
 

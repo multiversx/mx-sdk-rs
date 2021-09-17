@@ -1,4 +1,4 @@
-use super::{as_nested::AsNested, StorageClearable, StorageMapper};
+use super::{IntoStorageMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -43,22 +43,11 @@ where
     }
 }
 
-impl<SA, T> SingleValueMapper<SA, T>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: AsNested<SA, T>,
-    <T as AsNested<SA, T>>::Nested: StorageMapper<SA>,
-{
-    pub fn into_nested(self) -> <T as AsNested<SA, T>>::Nested {
-        <T as AsNested<SA, T>>::Nested::new(self.api, self.key)
-    }
-}
-
-impl<SA, T> AsNested<SA, SingleValueMapper<SA, T>> for SingleValueMapper<SA, T>
+impl<SA, T> IntoStorageMapper<SA> for SingleValueMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    type Nested = Self;
+    type StorageMapperType = Self;
 }
 
 impl<SA, T> SingleValueMapper<SA, T>

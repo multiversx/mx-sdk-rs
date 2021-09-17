@@ -1,4 +1,4 @@
-use super::StorageMapper;
+use super::{IntoStorageMapper, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
@@ -36,6 +36,13 @@ where
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         UserMapper { api, base_key }
     }
+}
+
+impl<SA> IntoStorageMapper<SA> for UserMapper<SA>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+{
+    type StorageMapperType = Self;
 }
 
 impl<SA> UserMapper<SA>

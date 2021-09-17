@@ -1,4 +1,4 @@
-mod as_nested;
+mod into_storage_mapper;
 mod linked_list_mapper;
 mod map_mapper;
 mod map_storage_mapper;
@@ -10,7 +10,7 @@ mod token_attributes_mapper;
 mod user_mapper;
 mod vec_mapper;
 
-pub use as_nested::AsNested;
+pub use into_storage_mapper::IntoStorageMapper;
 pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;

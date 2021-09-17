@@ -1,4 +1,4 @@
-use super::{set_mapper, SetMapper, SingleValueMapper, StorageClearable, StorageMapper};
+use super::{set_mapper, IntoStorageMapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage::StorageKey,
@@ -13,7 +13,7 @@ pub struct MapMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    V: 'static,
 {
     api: SA,
     base_key: StorageKey<SA>,
@@ -25,7 +25,6 @@ impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
-    V: TopEncode + TopDecode,
 {
     fn new(api: SA, base_key: StorageKey<SA>) -> Self {
         MapMapper {
@@ -37,11 +36,20 @@ where
     }
 }
 
+impl<SA, K, V> IntoStorageMapper<SA> for MapMapper<SA, K, V>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    type StorageMapperType = Self;
+}
+
 impl<SA, K, V> StorageClearable for MapMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
-    V: TopEncode + TopDecode,
+    V: IntoStorageMapper<SA>,
+    V::StorageMapperType: StorageClearable,
 {
     fn clear(&mut self) {
         for key in self.keys_set.iter() {
@@ -55,7 +63,7 @@ impl<SA, K, V> MapMapper<SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
-    V: TopEncode + TopDecode,
+    V: IntoStorageMapper<SA>,
 {
     fn build_named_key(&self, name: &[u8], key: &K) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -63,14 +71,21 @@ where
         named_key.append_item(key);
         named_key
     }
-
-    fn mapped_value(&self, key: &K) -> SingleValueMapper<SA, V> {
-        SingleValueMapper::new(
+    
+    fn mapped_value(&self, key: &K) -> V::StorageMapperType {
+        V::item(
             self.api.clone(),
             self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
         )
     }
+}
 
+impl<SA, K, V> MapMapper<SA, K, V>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    V: TopEncode + TopDecode,
+{
     /// Returns `true` if the map contains no elements.
     pub fn is_empty(&self) -> bool {
         self.keys_set.is_empty()
