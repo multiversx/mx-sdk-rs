@@ -217,21 +217,6 @@ where
 impl<SA, T> VecMapper<SA, T>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: StorageMapper<SA>,
-{
-    /// Add one nested storage mapper at the end of the list.
-    /// Returns the index of the newly inserted item, which is also equal to the new number of elements.
-    pub fn push_nested(&mut self) -> usize {
-        let mut len = self.len();
-        len += 1;
-        self.save_count(len);
-        len
-    }
-}
-
-impl<SA, T> VecMapper<SA, T>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: IntoStorageMapper<SA>,
     T::StorageMapperType: StorageMapper<SA>,
 {
@@ -239,11 +224,26 @@ where
         T::item(self.api.clone(), self.item_key(index))
     }
 
+    /// Add one nested storage mapper at the end of the list. Returns the inserted mapper.
+    pub fn push_nested(&mut self) -> T::StorageMapperType {
+        let (_, mapper) = self.push_with_index_nested()
+        mapper
+    }
+
+    /// Add one nested storage mapper at the end of the list.
+    /// Returns the index of the newly inserted item and the mapper itself
+    pub fn push_with_index_nested(&mut self) -> (usize, T::StorageMapperType) {
+        let mut len = self.len();
+        len += 1;
+        self.save_count(len);
+        (len, self.item(len))
+    }
+
     /// Get item at index from storage.
     /// Index must be valid (1 <= index <= count).
     fn get_nested(&self, index: usize) -> T::StorageMapperType {
         self.check_index(index);
-        self.item(index) //.into_nested()
+        self.item(index)
     }
 }
 
