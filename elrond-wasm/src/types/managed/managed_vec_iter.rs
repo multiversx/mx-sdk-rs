@@ -36,6 +36,11 @@ where
             byte_limit: managed_vec.byte_len(),
         }
     }
+
+    #[inline]
+    pub(crate) fn type_manager(&self) -> M {
+        self.managed_vec.type_manager()
+    }
 }
 
 impl<'a, M, T> Iterator for ManagedVecIterator<'a, M, T>
@@ -50,7 +55,7 @@ where
         if next_byte_index > self.byte_limit {
             return None;
         }
-        let result = T::from_byte_reader(self.managed_vec.type_manager(), |dest_slice| {
+        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer

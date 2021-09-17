@@ -41,6 +41,20 @@ where
 }
 
 #[inline]
+pub fn try_cast_ref<T, U>(t: &T) -> Option<&U>
+where
+    T: 'static,
+    U: 'static,
+{
+    if type_eq::<T, U>() {
+        let trans = unsafe { core::mem::transmute::<&T, &U>(t) };
+        Some(trans)
+    } else {
+        None
+    }
+}
+
+#[inline]
 pub fn try_execute_then_cast<T, R, F>(f: F) -> Option<R>
 where
     T: 'static,

@@ -64,7 +64,7 @@ pub trait EsdtModule {
         Ok(self
             .send()
             .esdt_system_sc_proxy()
-            .set_special_roles(&dest_address, &token_id, &roles)
+            .set_special_roles(&dest_address, &token_id, (&roles[..]).into_iter().cloned())
             .async_call())
     }
 

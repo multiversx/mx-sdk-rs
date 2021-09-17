@@ -21,9 +21,9 @@ where
             return cast_unit;
         }
 
-        let error_api = loader.error_api();
+        let dyn_arg_vm_api = loader.dyn_arg_vm_api();
         let arg_input = loader.next_arg_input();
-        T::top_decode_or_exit(arg_input, (error_api, arg_id), dyn_load_exit)
+        T::top_decode_or_exit(arg_input, (dyn_arg_vm_api, arg_id), dyn_load_exit)
     }
 }
 
