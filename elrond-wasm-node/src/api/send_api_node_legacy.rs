@@ -165,11 +165,11 @@ extern "C" {
 impl SendApi for ArwenApiImpl {
     fn direct_egld<D>(
         &self,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
         data: D,
     ) where
-        D: ManagedInto<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+        D: ManagedInto<Self, ManagedBuffer<Self>>,
     {
         let to_address = to.to_address();
         let data_bytes = data.managed_into(self.clone()).to_boxed_bytes();
@@ -186,11 +186,11 @@ impl SendApi for ArwenApiImpl {
 
     fn direct_egld_execute(
         &self,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let to_address = to.to_address();
         let function = endpoint_name.to_boxed_bytes();
@@ -217,12 +217,12 @@ impl SendApi for ArwenApiImpl {
 
     fn direct_esdt_execute(
         &self,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        token: &TokenIdentifier<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
+        to: &ManagedAddress<Self>,
+        token: &TokenIdentifier<Self>,
+        amount: &BigUint<Self>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let to_address = to.to_address();
         unsafe {
@@ -251,13 +251,13 @@ impl SendApi for ArwenApiImpl {
 
     fn direct_esdt_nft_execute(
         &self,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        token: &TokenIdentifier<Self::ProxyTypeManager>,
+        to: &ManagedAddress<Self>,
+        token: &TokenIdentifier<Self>,
         nonce: u64,
-        amount: &BigUint<Self::ProxyTypeManager>,
+        amount: &BigUint<Self>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let to_address = to.to_address();
         unsafe {
@@ -287,11 +287,11 @@ impl SendApi for ArwenApiImpl {
 
     fn direct_multi_esdt_transfer_execute(
         &self,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        payments: &ManagedVec<Self::ProxyTypeManager, EsdtTokenPayment<Self::ProxyTypeManager>>,
+        to: &ManagedAddress<Self>,
+        payments: &ManagedVec<Self, EsdtTokenPayment<Self>>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let nr_transfers = payments.len();
@@ -338,10 +338,10 @@ impl SendApi for ArwenApiImpl {
 
     fn async_call_raw(
         &self,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ! {
         unsafe {
             let to_address = to.to_address();
@@ -361,13 +361,13 @@ impl SendApi for ArwenApiImpl {
     fn deploy_contract(
         &self,
         gas: u64,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        code: &ManagedBuffer<Self::ProxyTypeManager>,
+        amount: &BigUint<Self>,
+        code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> (
-        ManagedAddress<Self::ProxyTypeManager>,
-        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+        ManagedAddress<Self>,
+        ManagedVec<Self, ManagedBuffer<Self>>,
     ) {
         let mut new_address = Address::zero();
         unsafe {
@@ -403,13 +403,13 @@ impl SendApi for ArwenApiImpl {
     fn deploy_from_source_contract(
         &self,
         gas: u64,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        source_contract_address: &ManagedAddress<Self::ProxyTypeManager>,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> (
-        ManagedAddress<Self::ProxyTypeManager>,
-        ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>,
+        ManagedAddress<Self>,
+        ManagedVec<Self, ManagedBuffer<Self>>,
     ) {
         let mut new_address = Address::zero();
         unsafe {
@@ -443,12 +443,12 @@ impl SendApi for ArwenApiImpl {
 
     fn upgrade_contract(
         &self,
-        sc_address: &ManagedAddress<Self::ProxyTypeManager>,
+        sc_address: &ManagedAddress<Self>,
         gas: u64,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        code: &ManagedBuffer<Self::ProxyTypeManager>,
+        amount: &BigUint<Self>,
+        code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
@@ -472,11 +472,11 @@ impl SendApi for ArwenApiImpl {
     fn execute_on_dest_context_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
@@ -504,12 +504,12 @@ impl SendApi for ArwenApiImpl {
     fn execute_on_dest_context_raw_custom_result_range<F>(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
         range_closure: F,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>>
+    ) -> ManagedVec<Self, ManagedBuffer<Self>>
     where
         F: FnOnce(usize, usize) -> (usize, usize),
     {
@@ -546,11 +546,11 @@ impl SendApi for ArwenApiImpl {
     fn execute_on_dest_context_by_caller_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
@@ -578,11 +578,11 @@ impl SendApi for ArwenApiImpl {
     fn execute_on_same_context_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        amount: &BigUint<Self::ProxyTypeManager>,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
@@ -610,10 +610,10 @@ impl SendApi for ArwenApiImpl {
     fn execute_on_dest_context_readonly_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self::ProxyTypeManager>,
-        endpoint_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        to: &ManagedAddress<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         unsafe {
             let num_return_data_before = getNumReturnData();
 
@@ -636,12 +636,12 @@ impl SendApi for ArwenApiImpl {
         }
     }
 
-    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ProxyTypeManager>) {
+    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>) {
         let tx_hash = self.get_tx_hash_managed();
         self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
     }
 
-    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self::ProxyTypeManager> {
+    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
         let tx_hash = self.get_tx_hash_managed();
         ManagedBuffer::from_raw_handle(
             self.clone(),
@@ -652,9 +652,9 @@ impl SendApi for ArwenApiImpl {
     fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        function_name: &ManagedBuffer<Self::ProxyTypeManager>,
-        arg_buffer: &ManagedArgBuffer<Self::ProxyTypeManager>,
-    ) -> ManagedVec<Self::ProxyTypeManager, ManagedBuffer<Self::ProxyTypeManager>> {
+        function_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         // account-level built-in function, so the destination address is the contract itself
         let own_address = BlockchainApi::get_sc_address(self);
 
