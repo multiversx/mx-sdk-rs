@@ -300,7 +300,7 @@ impl SendApi for ArwenApiImpl {
                 Vec::with_capacity(nr_transfers * AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH);
 
             for token in payments {
-                let token_id_bytes = token.token_name.to_esdt_identifier();
+                let token_id_bytes = token.token_identifier.to_esdt_identifier();
                 let nonce_bytes = &token.token_nonce.to_be_bytes()[..]; // TODO: Maybe top-encode here instead
                 let amount_bytes = &token.amount.to_bytes_be();
 

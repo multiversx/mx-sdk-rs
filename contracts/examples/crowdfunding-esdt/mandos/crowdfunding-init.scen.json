@@ -26,9 +26,9 @@
         "contractCode": "file:../output/crowdfunding-esdt.wasm",
         "value": "0",
         "arguments": [
-            "500,000,000,000",
-            "123,000",
-            "str:CROWD-123456"
+          "500,000,000,000",
+          "123,000",
+          "str:CROWD-123456"
         ],
         "gasLimit": "5,000,000",
         "gasPrice": "0"
@@ -53,7 +53,7 @@
           "storage": {
             "str:target": "500,000,000,000",
             "str:deadline": "123,000",
-            "str:tokenName": "str:CROWD-123456"
+            "str:tokenIdentifier": "str:CROWD-123456"
           },
           "code": "file:../output/crowdfunding-esdt.wasm"
         }
