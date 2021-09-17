@@ -82,7 +82,7 @@ pub trait PingPong {
             );
         }
 
-        let caller = self.blockchain().get_caller_legacy();
+        let caller = self.blockchain().get_caller();
         let user_id = self.user_mapper().get_or_create_user(&caller);
         let user_status = self.user_status(user_id).get();
         match user_status {
@@ -133,7 +133,7 @@ pub trait PingPong {
             "can't withdraw before deadline"
         );
 
-        let caller = self.blockchain().get_caller_legacy();
+        let caller = self.blockchain().get_caller();
         let user_id = self.user_mapper().get_user_id(&caller);
         self.pong_by_user_id(user_id)
     }
@@ -173,7 +173,7 @@ pub trait PingPong {
     /// Lists the addresses of all users that have `ping`-ed,
     /// in the order they have `ping`-ed
     #[view(getUserAddresses)]
-    fn get_user_addresses(&self) -> MultiResultVec<Address> {
+    fn get_user_addresses(&self) -> ManagedMultiResultVec<ManagedAddress> {
         self.user_mapper().get_all_addresses().into()
     }
 

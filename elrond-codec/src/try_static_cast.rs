@@ -71,6 +71,24 @@ where
     }
 }
 
+#[inline]
+pub fn try_cast_execute_or_else<T, U, R, If, Else>(t: T, exec_if: If, exec_else: Else) -> R
+where
+    T: 'static,
+    U: 'static,
+    R: 'static,
+    If: FnOnce(U) -> R,
+    Else: FnOnce(T) -> R,
+{
+    if type_eq::<T, U>() {
+        let transmuted: U = unsafe { core::mem::transmute_copy(&t) };
+        core::mem::forget(t);
+        exec_if(transmuted)
+    } else {
+        exec_else(t)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::TryStaticCast;
