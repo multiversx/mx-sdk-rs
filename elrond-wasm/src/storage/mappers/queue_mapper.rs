@@ -151,19 +151,6 @@ where
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
         )
     }
-}
-
-impl<SA, T> QueueMapper<SA, T>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode,
-{
-    fn get_value_option(&self, node_id: u32) -> Option<T> {
-        if node_id == NULL_ENTRY {
-            return None;
-        }
-        Some(self.value(node_id).get())
-    }
 
     /// Returns `true` if the `Queue` is empty.
     ///
@@ -177,136 +164,6 @@ where
     /// This operation should compute in *O*(1) time.
     pub fn len(&self) -> usize {
         self.info().get().len as usize
-    }
-
-    /// Appends an element to the back of a queue
-    /// and returns the node id of the newly added node.
-    ///
-    /// This operation should compute in *O*(1) time.
-    pub(crate) fn push_back_node_id(&mut self, elt: &T) -> u32 {
-        let mut info = self.info().get();
-        let new_node_id = info.generate_new_node_id();
-        let mut previous = NULL_ENTRY;
-        if info.len == 0 {
-            info.front = new_node_id;
-        } else {
-            let back = info.back;
-            let mut back_node = self.node(back).get();
-            back_node.next = new_node_id;
-            previous = back;
-            self.node(back).set(&back_node);
-        }
-        self.node(new_node_id).set(&Node {
-            previous,
-            next: NULL_ENTRY,
-        });
-        info.back = new_node_id;
-        self.value(new_node_id).set(elt);
-        info.len += 1;
-        self.info().set(&info);
-        new_node_id
-    }
-
-    /// Appends an element to the back of a queue.
-    ///
-    /// This operation should compute in *O*(1) time.
-    pub fn push_back(&mut self, elt: T) {
-        let _ = self.push_back_node_id(&elt);
-    }
-
-    /// Adds an element first in the queue.
-    ///
-    /// This operation should compute in *O*(1) time.
-    pub fn push_front(&mut self, elt: T) {
-        let mut info = self.info().get();
-        let new_node_id = info.generate_new_node_id();
-        let mut next = NULL_ENTRY;
-        if info.len == 0 {
-            info.back = new_node_id;
-        } else {
-            let front = info.front;
-            let mut front_node = self.node(front).get();
-            front_node.previous = new_node_id;
-            next = front;
-            self.node(front).set(&front_node);
-        }
-        self.node(new_node_id).set(&Node {
-            previous: NULL_ENTRY,
-            next,
-        });
-        info.front = new_node_id;
-        self.value(new_node_id).set(&elt);
-        info.len += 1;
-        self.info().set(&info);
-    }
-
-    /// Provides a copy to the front element, or `None` if the queue is
-    /// empty.
-    pub fn front(&self) -> Option<T> {
-        self.get_value_option(self.info().get().front)
-    }
-
-    /// Provides a copy to the back element, or `None` if the queue is
-    /// empty.
-    pub fn back(&self) -> Option<T> {
-        self.get_value_option(self.info().get().back)
-    }
-
-    /// Removes the last element from a queue and returns it, or `None` if
-    /// it is empty.
-    ///
-    /// This operation should compute in *O*(1) time.
-    pub fn pop_back(&mut self) -> Option<T> {
-        self.remove_by_node_id(self.info().get().back)
-    }
-
-    /// Removes the first element and returns it, or `None` if the queue is
-    /// empty.
-    ///
-    /// This operation should compute in *O*(1) time.
-    pub fn pop_front(&mut self) -> Option<T> {
-        self.remove_by_node_id(self.info().get().front)
-    }
-
-    /// Removes element with the given node id and returns it, or `None` if the queue is
-    /// empty.
-    /// Note: has undefined behavior if there's no node with the given node id in the queue
-    ///
-    /// This operation should compute in *O*(1) time.
-    pub(crate) fn remove_by_node_id(&mut self, node_id: u32) -> Option<T> {
-        if node_id == NULL_ENTRY {
-            return None;
-        }
-        let node = self.node(node_id).get();
-
-        let mut info = self.info().get();
-        if node.previous == NULL_ENTRY {
-            info.front = node.next;
-        } else {
-            let mut previous = self.node(node.previous).get();
-            previous.next = node.next;
-            self.node(node.previous).set(&previous);
-        }
-
-        if node.next == NULL_ENTRY {
-            info.back = node.previous;
-        } else {
-            let mut next = self.node(node.next).get();
-            next.previous = node.previous;
-            self.node(node.next).set(&next);
-        }
-
-        self.node(node_id).clear();
-        let removed_value = self.value(node_id).get();
-        self.value(node_id).clear();
-        info.len -= 1;
-        self.info().set(&info);
-        Some(removed_value)
-    }
-
-    /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, T> {
-        Iter::new(self)
     }
 
     /// Runs several checks in order to verify that both forwards and backwards iteration
@@ -381,6 +238,236 @@ where
     }
 }
 
+impl<SA, T> QueueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode,
+{
+    fn get_value_option(&self, node_id: u32) -> Option<T> {
+        self.get_value_option_nested(node_id)
+            .map(|mapper| mapper.get())
+    }
+
+    /// Appends an element to the back of a queue
+    /// and returns the node id of the newly added node.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub(crate) fn push_back_node_id(&mut self, elt: &T) -> u32 {
+        let (new_node_id, mut mapper) = self.push_back_node_id_nested();
+        mapper.set(elt);
+        new_node_id
+    }
+
+    /// Appends an element to the back of a queue.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn push_back(&mut self, elt: T) {
+        let _ = self.push_back_node_id(&elt);
+    }
+
+    /// Adds an element first in the queue.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn push_front(&mut self, elt: T) {
+        let (_, mut mapper) = self.push_front_node_id_nested();
+        mapper.set(&elt);
+    }
+
+    /// Provides a copy to the front element, or `None` if the queue is
+    /// empty.
+    pub fn front(&self) -> Option<T> {
+        self.get_value_option(self.info().get().front)
+    }
+
+    /// Provides a copy to the back element, or `None` if the queue is
+    /// empty.
+    pub fn back(&self) -> Option<T> {
+        self.get_value_option(self.info().get().back)
+    }
+
+    /// Removes the last element from a queue and returns it, or `None` if
+    /// it is empty.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn pop_back(&mut self) -> Option<T> {
+        self.remove_by_node_id(self.info().get().back)
+    }
+
+    /// Removes the first element and returns it, or `None` if the queue is
+    /// empty.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn pop_front(&mut self) -> Option<T> {
+        self.remove_by_node_id(self.info().get().front)
+    }
+
+    /// Removes element with the given node id and returns it, or `None` if the queue is
+    /// empty.
+    /// Note: has undefined behavior if there's no node with the given node id in the queue
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub(crate) fn remove_by_node_id(&mut self, node_id: u32) -> Option<T> {
+        self.remove_by_node_id_nested(node_id).map(|mut mapper| {
+            let removed_value = mapper.get();
+            mapper.clear();
+            removed_value
+        })
+    }
+
+    /// Provides a forward iterator.
+    pub fn iter(&self) -> Iter<SA, T> {
+        Iter::new(self)
+    }
+}
+
+impl<SA, T> QueueMapper<SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: IntoStorageMapper<SA>,
+    T::StorageMapperType: StorageClearable,
+{
+    fn get_value_option_nested(&self, node_id: u32) -> Option<T::StorageMapperType> {
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+        Some(self.value(node_id))
+    }
+
+    /// Creates an entry to the back of a queue
+    /// Returns the node id and the entry
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub(crate) fn push_back_node_id_nested(&mut self) -> (u32, T::StorageMapperType) {
+        let mut info = self.info().get();
+        let new_node_id = info.generate_new_node_id();
+        let mut previous = NULL_ENTRY;
+        if info.len == 0 {
+            info.front = new_node_id;
+        } else {
+            let back = info.back;
+            let mut back_node = self.node(back).get();
+            back_node.next = new_node_id;
+            previous = back;
+            self.node(back).set(&back_node);
+        }
+        self.node(new_node_id).set(&Node {
+            previous,
+            next: NULL_ENTRY,
+        });
+        info.back = new_node_id;
+        info.len += 1;
+        self.info().set(&info);
+        (new_node_id, self.value(new_node_id))
+    }
+
+    /// Appends an element to the back of a queue.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn push_back_nested(&mut self) -> T::StorageMapperType {
+        let (_, mapper) = self.push_back_node_id_nested();
+        mapper
+    }
+
+    pub(crate) fn push_front_node_id_nested(&mut self) -> (u32, T::StorageMapperType) {
+        let mut info = self.info().get();
+        let new_node_id = info.generate_new_node_id();
+        let mut next = NULL_ENTRY;
+        if info.len == 0 {
+            info.back = new_node_id;
+        } else {
+            let front = info.front;
+            let mut front_node = self.node(front).get();
+            front_node.previous = new_node_id;
+            next = front;
+            self.node(front).set(&front_node);
+        }
+        self.node(new_node_id).set(&Node {
+            previous: NULL_ENTRY,
+            next,
+        });
+        info.front = new_node_id;
+        info.len += 1;
+        self.info().set(&info);
+        (new_node_id, self.value(new_node_id))
+    }
+
+    /// Adds an element first in the queue.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn push_front_nested(&mut self) -> T::StorageMapperType {
+        let (_, mapper) = self.push_front_node_id_nested();
+        mapper
+    }
+
+    /// Provides a copy to the front element, or `None` if the queue is
+    /// empty.
+    pub fn front_nested(&self) -> Option<T::StorageMapperType> {
+        self.get_value_option_nested(self.info().get().front)
+    }
+
+    /// Provides a copy to the back element, or `None` if the queue is
+    /// empty.
+    pub fn back_nested(&self) -> Option<T::StorageMapperType> {
+        self.get_value_option_nested(self.info().get().back)
+    }
+
+    /// Removes the last element from a queue and returns it, or `None` if
+    /// it is empty.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn pop_back_nested(&mut self) {
+        self.remove_by_node_id_nested(self.info().get().back)
+            .map(|mut mapper| mapper.clear());
+    }
+
+    /// Removes the first element and returns it, or `None` if the queue is
+    /// empty.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn pop_front_nested(&mut self) {
+        self.remove_by_node_id_nested(self.info().get().front)
+            .map(|mut mapper| mapper.clear());
+    }
+
+    /// Removes the node information. The caller is responsible to clear the returned mapper.
+    pub(crate) fn remove_by_node_id_nested(
+        &mut self,
+        node_id: u32,
+    ) -> Option<T::StorageMapperType> {
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+        let node = self.node(node_id).get();
+
+        let mut info = self.info().get();
+        if node.previous == NULL_ENTRY {
+            info.front = node.next;
+        } else {
+            let mut previous = self.node(node.previous).get();
+            previous.next = node.next;
+            self.node(node.previous).set(&previous);
+        }
+
+        if node.next == NULL_ENTRY {
+            info.back = node.previous;
+        } else {
+            let mut next = self.node(node.next).get();
+            next.previous = node.previous;
+            self.node(node.next).set(&next);
+        }
+
+        self.node(node_id).clear();
+        info.len -= 1;
+        self.info().set(&info);
+        Some(self.value(node_id))
+    }
+
+    /// Provides a forward iterator which returns the nested storage mappers
+    pub fn iter_nested(&self) -> IterNested<SA, T> {
+        IterNested::new(self)
+    }
+}
+
 /// An iterator over the elements of a `QueueMapper`.
 ///
 /// This `struct` is created by [`QueueMapper::iter()`]. See its
@@ -399,8 +486,8 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
-    fn new(queue: &'a QueueMapper<SA, T>) -> Iter<'a, SA, T> {
-        Iter {
+    fn new(queue: &'a QueueMapper<SA, T>) -> Self {
+        Self {
             node_id: queue.info().get().front,
             queue,
         }
@@ -422,6 +509,50 @@ where
         }
         self.node_id = self.queue.node(current_node_id).get().next;
         Some(self.queue.value(current_node_id).get())
+    }
+}
+
+/// An iterator over the elements of a `QueueMapper`.
+///
+/// This `struct` is created by [`QueueMapper::iter_nested()`]. See its
+/// documentation for more.
+pub struct IterNested<'a, SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: IntoStorageMapper<SA> + 'static,
+{
+    node_id: u32,
+    queue: &'a QueueMapper<SA, T>,
+}
+
+impl<'a, SA, T> IterNested<'a, SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: IntoStorageMapper<SA> + 'static,
+{
+    fn new(queue: &'a QueueMapper<SA, T>) -> Self {
+        Self {
+            node_id: queue.info().get().front,
+            queue,
+        }
+    }
+}
+
+impl<'a, SA, T> Iterator for IterNested<'a, SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: IntoStorageMapper<SA> + 'static,
+{
+    type Item = T::StorageMapperType;
+
+    #[inline]
+    fn next(&mut self) -> Option<T::StorageMapperType> {
+        let current_node_id = self.node_id;
+        if current_node_id == NULL_ENTRY {
+            return None;
+        }
+        self.node_id = self.queue.node(current_node_id).get().next;
+        Some(self.queue.value(current_node_id))
     }
 }
 
