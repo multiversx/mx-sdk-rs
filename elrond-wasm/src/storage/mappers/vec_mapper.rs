@@ -226,7 +226,7 @@ where
 
     /// Add one nested storage mapper at the end of the list. Returns the inserted mapper.
     pub fn push_nested(&mut self) -> T::StorageMapperType {
-        let (_, mapper) = self.push_with_index_nested()
+        let (_, mapper) = self.push_with_index_nested();
         mapper
     }
 
