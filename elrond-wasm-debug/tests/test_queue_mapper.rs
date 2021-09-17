@@ -1,5 +1,7 @@
-use elrond_wasm::storage::mappers::{QueueMapper, StorageClearable, StorageMapper};
-use elrond_wasm::storage::StorageKey;
+use elrond_wasm::storage::{
+    mappers::{QueueMapper, StorageClearable, StorageMapper},
+    StorageKey,
+};
 use elrond_wasm_debug::TxContext;
 
 fn create_queue() -> QueueMapper<TxContext, u64> {
