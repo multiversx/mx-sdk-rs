@@ -55,10 +55,11 @@ where
     T: ManagedVecItem<M> + TopEncode + 'static,
 {
     #[inline]
+    #[rustfmt::skip]
     fn from(v: ManagedVec<M, T>) -> Self {
         try_cast_execute_or_else(
             v,
-            |m_buffer_vec| ManagedMultiResultVec::from_raw_vec(m_buffer_vec),
+            ManagedMultiResultVec::from_raw_vec,
             |v| ManagedMultiResultVec::from(&v),
         )
     }
