@@ -39,7 +39,7 @@ where
     type ErrorApi = A;
 
     #[inline]
-    fn error_api(&self) -> Self::ErrorApi {
+    fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
         self.api.clone()
     }
 
@@ -50,7 +50,8 @@ where
 
     fn next_arg_input(&mut self) -> ManagedBytesTopDecodeInput<A> {
         if !self.has_next() {
-            self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER);
+            self.dyn_arg_vm_api()
+                .signal_error(err_msg::ARG_WRONG_NUMBER);
         }
 
         // consume from the vector, get owned bytes

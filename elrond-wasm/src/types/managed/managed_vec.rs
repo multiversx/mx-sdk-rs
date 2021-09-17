@@ -172,6 +172,20 @@ where
     }
 }
 
+impl<M, T> Clone for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M> + Clone,
+{
+    fn clone(&self) -> Self {
+        let mut result = ManagedVec::new_empty(self.type_manager());
+        for item in self.into_iter() {
+            result.push(item.clone())
+        }
+        result
+    }
+}
+
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,

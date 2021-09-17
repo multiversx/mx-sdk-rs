@@ -9,7 +9,11 @@ pub trait ForwarderSyncCallModule {
 
     #[endpoint]
     #[payable("*")]
-    fn echo_arguments_sync(&self, to: ManagedAddress, #[var_args] args: VarArgs<BoxedBytes>) {
+    fn echo_arguments_sync(
+        &self,
+        to: ManagedAddress,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self
@@ -19,7 +23,7 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(half_gas)
             .execute_on_dest_context();
 
-        self.execute_on_dest_context_result_event(result.as_slice());
+        self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
     }
 
     #[endpoint]
@@ -29,7 +33,7 @@ pub trait ForwarderSyncCallModule {
         to: ManagedAddress,
         start: usize,
         end: usize,
-        #[var_args] args: VarArgs<BoxedBytes>,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
@@ -40,12 +44,16 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(half_gas)
             .execute_on_dest_context_custom_range(|_, _| (start, end));
 
-        self.execute_on_dest_context_result_event(result.as_slice());
+        self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
     }
 
     #[endpoint]
     #[payable("*")]
-    fn echo_arguments_sync_twice(&self, to: ManagedAddress, #[var_args] args: VarArgs<BoxedBytes>) {
+    fn echo_arguments_sync_twice(
+        &self,
+        to: ManagedAddress,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
 
         let result = self
@@ -55,7 +63,7 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(one_third_gas)
             .execute_on_dest_context();
 
-        self.execute_on_dest_context_result_event(result.as_slice());
+        self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
 
         let result = self
             .vault_proxy()
@@ -64,11 +72,11 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(one_third_gas)
             .execute_on_dest_context();
 
-        self.execute_on_dest_context_result_event(result.as_slice());
+        self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
     }
 
     #[event("echo_arguments_sync_result")]
-    fn execute_on_dest_context_result_event(&self, result: &[BoxedBytes]);
+    fn execute_on_dest_context_result_event(&self, result: &ManagedVec<Self::Api, ManagedBuffer>);
 
     #[endpoint]
     #[payable("*")]
@@ -163,11 +171,11 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
-        for multi_arg in token_payments.into_vec() {
+        for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment::from(token_identifier, token_nonce, amount);
             all_token_payments.push(payment);

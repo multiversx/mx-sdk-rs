@@ -35,7 +35,7 @@ where
     type ErrorApi = AA;
 
     #[inline]
-    fn error_api(&self) -> Self::ErrorApi {
+    fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
         self.api.clone()
     }
 
@@ -45,7 +45,8 @@ where
 
     fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
         if self.current_index >= self.num_arguments {
-            self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER)
+            self.dyn_arg_vm_api()
+                .signal_error(err_msg::ARG_WRONG_NUMBER)
         } else {
             let arg_input = ArgDecodeInput::new(self.api.clone(), self.current_index);
             self.current_index += 1;
