@@ -18,7 +18,7 @@ pub fn execute(
         to: Address::zero(),
         call_value: tx.call_value.value.clone(),
         esdt_value: tx.esdt_value.value.clone(),
-        esdt_token_identifier: tx.esdt_token_name.value.clone(),
+        esdt_token_identifier: tx.esdt_token_identifier.value.clone(),
         func_name: b"init".to_vec(),
         args: tx
             .arguments

@@ -27,24 +27,24 @@ impl TxContext {
         available_balance
     }
 
-    fn get_available_esdt_balance(&self, token_name: &[u8]) -> num_bigint::BigUint {
+    fn get_available_esdt_balance(&self, token_identifier: &[u8]) -> num_bigint::BigUint {
         // start with the pre-existing balance
         let mut available_balance = self
             .blockchain_info_box
             .contract_esdt
-            .get(token_name)
+            .get(token_identifier)
             .unwrap_or(&num_bigint::BigUint::zero())
             .clone();
 
         // add amount received (if the same token)
-        if self.tx_input_box.esdt_token_identifier == token_name {
+        if self.tx_input_box.esdt_token_identifier == token_identifier {
             available_balance += &self.tx_input_box.esdt_value;
         }
         let tx_output = self.tx_output_cell.borrow();
 
         // already sent
         for send_balance in &tx_output.send_balance_list {
-            if send_balance.token_name.as_slice() == token_name {
+            if send_balance.token_identifier.as_slice() == token_identifier {
                 available_balance -= &send_balance.amount;
             }
         }
@@ -70,7 +70,7 @@ impl SendApi for TxContext {
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
             recipient,
-            token_name: BoxedBytes::empty(),
+            token_identifier: BoxedBytes::empty(),
             amount: amount_value,
         });
     }
@@ -104,11 +104,11 @@ impl SendApi for TxContext {
         }
 
         let recipient = to.to_address();
-        let token_name = token.to_esdt_identifier();
+        let token_identifier = token.to_esdt_identifier();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
             recipient,
-            token_name,
+            token_identifier,
             amount: amount_value,
         });
         Ok(())

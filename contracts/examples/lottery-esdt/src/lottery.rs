@@ -23,7 +23,7 @@ pub trait Lottery {
     fn start(
         &self,
         lottery_name: BoxedBytes,
-        token_name: TokenIdentifier,
+        token_identifier: TokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
@@ -34,7 +34,7 @@ pub trait Lottery {
     ) -> SCResult<()> {
         self.start_lottery(
             lottery_name,
-            token_name,
+            token_identifier,
             ticket_price,
             opt_total_tickets,
             opt_deadline,
@@ -49,7 +49,7 @@ pub trait Lottery {
     fn create_lottery_pool(
         &self,
         lottery_name: BoxedBytes,
-        token_name: TokenIdentifier,
+        token_identifier: TokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
@@ -60,7 +60,7 @@ pub trait Lottery {
     ) -> SCResult<()> {
         self.start_lottery(
             lottery_name,
-            token_name,
+            token_identifier,
             ticket_price,
             opt_total_tickets,
             opt_deadline,
@@ -75,7 +75,7 @@ pub trait Lottery {
     fn start_lottery(
         &self,
         lottery_name: BoxedBytes,
-        token_name: TokenIdentifier,
+        token_identifier: TokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
@@ -100,7 +100,7 @@ pub trait Lottery {
         );
         require!(!lottery_name.is_empty(), "Can't have empty lottery name!");
         require!(
-            token_name.is_egld() || token_name.is_valid_esdt_identifier(),
+            token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
             "Invalid token name provided!"
         );
         require!(ticket_price > 0, "Ticket price must be higher than 0!");
@@ -128,9 +128,9 @@ pub trait Lottery {
 
         match opt_burn_percentage {
             OptionalArg::Some(burn_percentage) => {
-                require!(!token_name.is_egld(), "EGLD can't be burned!");
+                require!(!token_identifier.is_egld(), "EGLD can't be burned!");
 
-                let roles = self.blockchain().get_esdt_local_roles(&token_name);
+                let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
                 require!(
                     roles.contains(&EsdtLocalRole::Burn),
                     "The contract can't burn the selected token!"
@@ -147,7 +147,7 @@ pub trait Lottery {
         }
 
         let info = LotteryInfo {
-            token_name,
+            token_identifier,
             ticket_price,
             tickets_left: total_tickets,
             deadline,
@@ -167,12 +167,14 @@ pub trait Lottery {
     fn buy_ticket(
         &self,
         lottery_name: BoxedBytes,
-        #[payment_token] token_name: TokenIdentifier,
+        #[payment_token] token_identifier: TokenIdentifier,
         #[payment] payment: BigUint,
     ) -> SCResult<()> {
         match self.status(&lottery_name) {
             Status::Inactive => sc_error!("Lottery is currently inactive."),
-            Status::Running => self.update_after_buy_ticket(&lottery_name, &token_name, &payment),
+            Status::Running => {
+                self.update_after_buy_ticket(&lottery_name, &token_identifier, &payment)
+            },
             Status::Ended => {
                 sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
             },
@@ -210,7 +212,7 @@ pub trait Lottery {
     fn update_after_buy_ticket(
         &self,
         lottery_name: &BoxedBytes,
-        token_name: &TokenIdentifier,
+        token_identifier: &TokenIdentifier,
         payment: &BigUint,
     ) -> SCResult<()> {
         let mut info = self.lottery_info(lottery_name).get();
@@ -221,7 +223,7 @@ pub trait Lottery {
             "You are not allowed to participate in this lottery!"
         );
         require!(
-            token_name == &info.token_name && payment == &info.ticket_price,
+            token_identifier == &info.token_identifier && payment == &info.ticket_price,
             "Wrong ticket fee!"
         );
 
@@ -258,10 +260,12 @@ pub trait Lottery {
 
             // Prevent crashing if the role was unset while the lottery was running
             // The tokens will simply remain locked forever
-            let roles = self.blockchain().get_esdt_local_roles(&info.token_name);
+            let roles = self
+                .blockchain()
+                .get_esdt_local_roles(&info.token_identifier);
             if roles.contains(&EsdtLocalRole::Burn) {
                 self.send()
-                    .esdt_local_burn(&info.token_name, 0, &burn_amount);
+                    .esdt_local_burn(&info.token_identifier, 0, &burn_amount);
             }
 
             info.prize_pool -= burn_amount;
@@ -291,7 +295,7 @@ pub trait Lottery {
 
             self.send().direct(
                 &winner_address,
-                &info.token_name,
+                &info.token_identifier,
                 0,
                 &prize,
                 b"You won the lottery! Congratulations!",
@@ -303,7 +307,7 @@ pub trait Lottery {
         let first_place_winner = self.ticket_holders(lottery_name).get(winning_tickets[0]);
         self.send().direct(
             &first_place_winner,
-            &info.token_name,
+            &info.token_identifier,
             0,
             &info.prize_pool,
             b"You won the lottery, 1st place! Congratulations!",

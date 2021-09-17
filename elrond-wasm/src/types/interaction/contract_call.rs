@@ -136,7 +136,7 @@ where
 
     fn convert_to_single_transfer_esdt_call(mut self) -> Self {
         if let Some(payment) = self.payments.get(0) {
-            if payment.token_name.is_egld() {
+            if payment.token_identifier.is_egld() {
                 self.egld_payment = payment.amount;
                 self.payments.clear();
                 self
@@ -145,7 +145,7 @@ where
 
                 // fungible ESDT
                 let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
-                new_arg_buffer.push_arg(&payment.token_name);
+                new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.endpoint_name);
 
@@ -173,7 +173,7 @@ where
                 // arg2 - quantity to transfer
                 // arg3 - destination address
                 let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
-                new_arg_buffer.push_arg(&payment.token_name);
+                new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.to);
@@ -209,8 +209,8 @@ where
         new_arg_buffer.push_arg(self.payments.len());
 
         for payment in self.payments.into_iter() {
-            // TODO: check that `!token_name.is_egld()` or let Arwen throw the error?
-            new_arg_buffer.push_arg(payment.token_name);
+            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
+            new_arg_buffer.push_arg(payment.token_identifier);
             new_arg_buffer.push_arg(payment.token_nonce);
             new_arg_buffer.push_arg(payment.amount);
         }
@@ -383,7 +383,7 @@ where
         let gas_limit = self.resolve_gas_limit_with_leftover();
         let payment = &self.payments.get(0).unwrap();
 
-        if payment.token_name.is_egld() {
+        if payment.token_identifier.is_egld() {
             let _ = self.api.direct_egld_execute(
                 &self.to,
                 &payment.amount,
@@ -395,7 +395,7 @@ where
             // fungible ESDT
             let _ = self.api.direct_esdt_execute(
                 &self.to,
-                &payment.token_name,
+                &payment.token_identifier,
                 &payment.amount,
                 gas_limit,
                 &self.endpoint_name,
@@ -405,7 +405,7 @@ where
             // non-fungible/semi-fungible ESDT
             let _ = self.api.direct_esdt_nft_execute(
                 &self.to,
-                &payment.token_name,
+                &payment.token_identifier,
                 payment.token_nonce,
                 &payment.amount,
                 gas_limit,

@@ -156,8 +156,8 @@ where
         arg_buffer.push_arg(payments.len());
 
         for payment in payments.into_iter() {
-            // TODO: check that `!token_name.is_egld()` or let Arwen throw the error?
-            arg_buffer.push_arg(payment.token_name);
+            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
+            arg_buffer.push_arg(payment.token_identifier);
             arg_buffer.push_arg(payment.token_nonce);
             arg_buffer.push_arg(payment.amount);
         }
