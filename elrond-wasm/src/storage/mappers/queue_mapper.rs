@@ -188,7 +188,7 @@ where
             next: NULL_ENTRY,
         });
         info.back = new_node_id;
-        self.value(new_node_id).set(&elt);
+        self.value(new_node_id).set(elt);
         info.len += 1;
         self.info().set(&info);
         new_node_id
