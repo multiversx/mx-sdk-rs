@@ -1,4 +1,13 @@
 {
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        }
+    },
     "docs": [
         "Contract that tests that using modules works correctly.",
         "Also provides testing for the most common modules:",
