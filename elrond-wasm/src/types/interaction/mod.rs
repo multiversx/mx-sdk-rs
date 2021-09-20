@@ -11,7 +11,7 @@ mod send_token;
 
 pub use arg_buffer::ArgBuffer;
 pub use async_call::AsyncCall;
-pub use callback_closure::{new_callback_call, CallbackClosure};
+pub use callback_closure::{new_callback_call, CallbackClosure, CallbackClosureMatcher};
 pub use callback_selector_result::CallbackSelectorResult;
 pub use contract_call::{new_contract_call, ContractCall};
 pub use contract_deploy::{new_contract_deploy, ContractDeploy};

@@ -60,7 +60,8 @@ fn callback_selector_body(
 ) -> proc_macro2::TokenStream {
     quote! {
         let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
-        if ___cb_closure___.is_empty() {
+        let ___cb_closure_matcher___ = ___cb_closure___.matcher();
+        if ___cb_closure_matcher___.matches_empty() {
             return elrond_wasm::types::CallbackSelectorResult::Processed;
         }
         #(#match_arms)*
@@ -108,7 +109,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                 let body_with_result = generate_body_with_result(&m.return_type, &call);
 
                 let match_arm = quote! {
-                    else if ___cb_closure___.name_matches(#callback_name_literal) {
+                    else if ___cb_closure_matcher___.name_matches(#callback_name_literal) {
                         #payable_snippet
                         let mut ___cb_arg_loader___ = ___cb_closure___.into_arg_loader();
                         #(#arg_init_snippets)*

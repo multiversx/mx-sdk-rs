@@ -67,16 +67,43 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
         }
     }
 
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.callback_name.is_empty()
-    }
-
-    pub fn name_matches(&self, name_match: &[u8]) -> bool {
-        &self.callback_name == name_match
+    pub fn matcher<'a>(&'a self) -> CallbackClosureMatcher<'a, M> {
+        CallbackClosureMatcher {
+            callback_closure_ref: self,
+            name_len: self.callback_name.len(),
+        }
     }
 
     pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
         ManagedResultArgLoader::new(self.closure_args.data)
+    }
+}
+
+/// Helps the callback macro expansion to perform callback name matching more efficiently.
+/// The current implementation hashes by callback name length,
+/// but in principle further optimizations are possible.
+pub struct CallbackClosureMatcher<'a, M>
+where
+    M: ManagedTypeApi,
+{
+    callback_closure_ref: &'a CallbackClosure<M>,
+    name_len: usize,
+}
+
+impl<'a, M> CallbackClosureMatcher<'a, M>
+where
+    M: ManagedTypeApi,
+{
+    pub fn matches_empty(&self) -> bool {
+        self.name_len == 0
+    }
+
+    pub fn name_matches(&self, name_match: &[u8]) -> bool {
+        if self.name_len != name_match.len() {
+            false
+        } else {
+            // warning: this calls 2 EI hooks, we want to avoid unnecessary calls here
+            &self.callback_closure_ref.callback_name == name_match
+        }
     }
 }
