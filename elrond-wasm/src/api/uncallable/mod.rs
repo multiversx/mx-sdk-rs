@@ -1,3 +1,5 @@
+use elrond_codec::TryStaticCast;
+
 mod big_int_api_uncallable;
 mod blockchain_api_uncallable;
 mod call_value_api_uncallable;
@@ -17,3 +19,5 @@ mod vm_api_uncallable;
 /// Provides context in ABI generators.
 #[derive(Clone)]
 pub struct UncallableApi;
+
+impl TryStaticCast for UncallableApi {}

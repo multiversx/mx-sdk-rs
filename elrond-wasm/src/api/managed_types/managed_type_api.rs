@@ -1,3 +1,5 @@
+use elrond_codec::TryStaticCast;
+
 use crate::api::ErrorApi;
 
 use super::{BigIntApi, EllipticCurveApi, ManagedBufferApi};
@@ -5,7 +7,7 @@ use super::{BigIntApi, EllipticCurveApi, ManagedBufferApi};
 pub type Handle = i32;
 
 pub trait ManagedTypeApi:
-    BigIntApi + EllipticCurveApi + ManagedBufferApi + ErrorApi + Clone + 'static
+    TryStaticCast + BigIntApi + EllipticCurveApi + ManagedBufferApi + ErrorApi + Clone + 'static
 {
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle;
 
