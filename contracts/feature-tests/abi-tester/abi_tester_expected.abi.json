@@ -1,4 +1,13 @@
 {
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        }
+    },
     "docs": [
         "Contract whose sole purpose is to verify that",
         "the ABI generation framework works sa expected.",
