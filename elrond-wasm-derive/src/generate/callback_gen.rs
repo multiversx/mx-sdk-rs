@@ -60,14 +60,10 @@ fn callback_selector_body(
 ) -> proc_macro2::TokenStream {
     quote! {
         let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
-        let ___cb_name___ = ___cb_closure___.cb_name_to_heap();
-        match ___cb_name___.as_slice() {
-            [] => {
-                return elrond_wasm::types::CallbackSelectorResult::Processed;
-            }
-            #(#match_arms)*
-            _ => {},
+        if ___cb_closure___.is_empty() {
+            return elrond_wasm::types::CallbackSelectorResult::Processed;
         }
+        #(#match_arms)*
         #(#module_calls)*
         elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
     }
@@ -100,7 +96,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                     .collect();
 
                 let callback_name_str = &callback.callback_name.to_string();
-                let callback_name_literal = array_literal(callback_name_str.as_bytes());
+                let callback_name_literal = byte_str_literal(callback_name_str.as_bytes());
                 let call = generate_call_to_method_expr(m);
                 let call_result_assert_no_more_args = if has_call_result {
                     quote! {
@@ -112,16 +108,15 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                 let body_with_result = generate_body_with_result(&m.return_type, &call);
 
                 let match_arm = quote! {
-                    #callback_name_literal =>
-                    {
+                    else if ___cb_closure___.name_matches(#callback_name_literal) {
                         #payable_snippet
-                        let mut ___cb_arg_loader___ =  ___cb_closure___.into_arg_loader();
+                        let mut ___cb_arg_loader___ = ___cb_closure___.into_arg_loader();
                         #(#arg_init_snippets)*
                         ___cb_arg_loader___.assert_no_more_args();
                         #call_result_assert_no_more_args
                         #body_with_result ;
                         return elrond_wasm::types::CallbackSelectorResult::Processed;
-                    },
+                    }
                 };
                 Some(match_arm)
             } else {
