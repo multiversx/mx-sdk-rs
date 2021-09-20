@@ -2,7 +2,7 @@ use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage::StorageKey,
     storage_clear, storage_get, storage_get_len, storage_set,
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType},
     ContractCallArg, ManagedResultArgLoader,
 };
 use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
@@ -67,8 +67,13 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
         }
     }
 
-    pub fn cb_name_to_heap(&self) -> BoxedBytes {
-        self.callback_name.to_boxed_bytes()
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.callback_name.is_empty()
+    }
+
+    pub fn name_matches(&self, name_match: &[u8]) -> bool {
+        &self.callback_name == name_match
     }
 
     pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
