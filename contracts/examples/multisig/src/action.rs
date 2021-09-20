@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{EndpointFinishApi, ManagedTypeApi, SendApi},
+    api::{EndpointFinishApi, ManagedTypeApi, SendApi, StorageWriteApi},
     io::EndpointResult,
     types::{
         AsyncCall, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
@@ -55,7 +55,7 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 #[derive(TypeAbi)]
 pub enum PerformActionResult<SA>
 where
-    SA: SendApi + ManagedTypeApi + 'static,
+    SA: SendApi + ManagedTypeApi + StorageWriteApi + 'static,
 {
     Nothing,
     SendEgld(SendEgld<SA>),
@@ -65,7 +65,7 @@ where
 
 impl<SA> EndpointResult for PerformActionResult<SA>
 where
-    SA: SendApi + Clone + 'static,
+    SA: SendApi + StorageWriteApi + Clone + 'static,
 {
     type DecodeAs = OptionalResult<ManagedAddress<SA>>;
 

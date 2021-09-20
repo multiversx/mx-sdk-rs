@@ -19,7 +19,7 @@ pub fn generate_callback_selector_and_main(
             elrond_wasm::types::CallbackSelectorResult::Processed
         };
         let cb_main_body = quote! {
-            let _ = self.callback_selector(elrond_wasm::hex_call_data::HexCallDataDeserializer::new(&[]));
+            let _ = self.callback_selector(elrond_wasm::types::CallbackClosure::new_empty(self.raw_vm_api()));
         };
         (cb_selector_body, cb_main_body)
     } else {
@@ -28,20 +28,18 @@ pub fn generate_callback_selector_and_main(
             module_calls(contract.supertraits.as_slice());
         if match_arms.is_empty() && module_calls.is_empty() {
             let cb_selector_body = quote! {
-                elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_data_deserializer___)
+                elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
             };
             let cb_main_body = quote! {};
             (cb_selector_body, cb_main_body)
         } else {
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
-                let ___tx_hash___ = elrond_wasm::api::BlockchainApi::get_tx_hash(&self.raw_vm_api());
-                let ___cb_data_raw___ = elrond_wasm::api::StorageReadApi::storage_load_boxed_bytes(&self.raw_vm_api(), &___tx_hash___.as_bytes());
-                elrond_wasm::api::StorageWriteApi::storage_store_slice_u8(&self.raw_vm_api(), &___tx_hash___.as_bytes(), &[]); // cleanup
-                let mut ___cb_data_deserializer___ = elrond_wasm::hex_call_data::HexCallDataDeserializer::new(___cb_data_raw___.as_slice());
-                if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
-                    self::EndpointWrappers::callback_selector(self, ___cb_data_deserializer___)	{
-                    elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);
+                if let Some(___cb_closure___) = elrond_wasm::types::CallbackClosure::storage_load_and_clear(self.raw_vm_api()) {
+                    if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
+                        self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
+                        elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);
+                    }
                 }
             };
             (cb_selector_body, cb_main_body)
@@ -62,7 +60,8 @@ fn callback_selector_body(
 ) -> proc_macro2::TokenStream {
     quote! {
         let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
-        match ___cb_data_deserializer___.get_func_name() {
+        let ___cb_name___ = ___cb_closure___.cb_name_to_heap();
+        match ___cb_name___.as_slice() {
             [] => {
                 return elrond_wasm::types::CallbackSelectorResult::Processed;
             }
@@ -70,7 +69,7 @@ fn callback_selector_body(
             _ => {},
         }
         #(#module_calls)*
-        elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_data_deserializer___)
+        elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
     }
 }
 
@@ -95,7 +94,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                             generate_load_dyn_arg(arg, &quote! { &mut ___call_result_loader___ })
                         } else {
                             // callback args, loaded from storage via the tx hash
-                            generate_load_dyn_arg(arg, &quote! { &mut ___cb_closure_loader___ })
+                            generate_load_dyn_arg(arg, &quote! { &mut ___cb_arg_loader___ })
                         }
                     })
                     .collect();
@@ -116,12 +115,9 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                     #callback_name_literal =>
                     {
                         #payable_snippet
-                        let mut ___cb_closure_loader___ = CallDataArgLoader::new(
-                            ___cb_data_deserializer___,
-                            self.raw_vm_api(),
-                        );
+                        let mut ___cb_arg_loader___ =  ___cb_closure___.into_arg_loader();
                         #(#arg_init_snippets)*
-                        ___cb_closure_loader___.assert_no_more_args();
+                        ___cb_arg_loader___.assert_no_more_args();
                         #call_result_assert_no_more_args
                         #body_with_result ;
                         return elrond_wasm::types::CallbackSelectorResult::Processed;
@@ -141,12 +137,12 @@ pub fn module_calls(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream>
 		.map(|supertrait| {
 			let module_path = &supertrait.module_path;
 			quote! {
-				match #module_path EndpointWrappers::callback_selector(self, ___cb_data_deserializer___) {
+				match #module_path EndpointWrappers::callback_selector(self, ___cb_closure___) {
 					elrond_wasm::types::CallbackSelectorResult::Processed => {
 						return elrond_wasm::types::CallbackSelectorResult::Processed;
 					},
-					elrond_wasm::types::CallbackSelectorResult::NotProcessed(recovered_deser) => {
-						___cb_data_deserializer___ = recovered_deser;
+					elrond_wasm::types::CallbackSelectorResult::NotProcessed(recovered_cb_closure) => {
+						___cb_closure___ = recovered_cb_closure;
 					},
 				}
 			}

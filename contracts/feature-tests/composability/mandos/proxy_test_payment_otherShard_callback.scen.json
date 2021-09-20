@@ -55,7 +55,7 @@
                     "balance": "0",
                     "storage": {
                         "``other_contract": "sc:proxy-second",
-                        "``1...............................": "``payCallback"
+                        "``1...............................": "nested:str:payCallback|nested:"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
