@@ -1,9 +1,9 @@
-mod build_abi_json;
+mod build_info_abi_json;
 mod contract_abi_json;
 mod endpoint_abi_json;
 mod type_abi_json;
 
-pub use build_abi_json::{BuildInfoAbiJson, RustcAbiJson};
+pub use build_info_abi_json::{BuildInfoAbiJson, RustcAbiJson};
 pub use contract_abi_json::*;
 use elrond_wasm::contract_base::ContractAbiProvider;
 pub use endpoint_abi_json::*;

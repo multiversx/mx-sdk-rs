@@ -20,7 +20,7 @@ pub struct ContractAbiJson {
 impl From<&ContractAbi> for ContractAbiJson {
     fn from(abi: &ContractAbi) -> Self {
         let mut contract_json = ContractAbiJson {
-            build_info: BuildInfoAbiJson::create(),
+            build_info: BuildInfoAbiJson::from(&abi.build_info),
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             constructor: abi.constructor.as_ref().map(ConstructorAbiJson::from),
