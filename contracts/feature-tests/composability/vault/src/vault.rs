@@ -15,6 +15,12 @@ pub trait Vault {
         opt_arg_to_echo
     }
 
+    #[payable("*")]
+    #[endpoint]
+    fn just_accept_funds(&self) {
+        self.call_counts(b"accept_funds").update(|c| *c += 1);
+    }
+
     #[endpoint]
     fn echo_arguments(
         &self,
