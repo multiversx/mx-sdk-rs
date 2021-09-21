@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 
 #[derive(Debug)]
 pub struct ContractAbi {
+    pub build_info: BuildInfoAbi,
     pub docs: &'static [&'static str],
     pub name: &'static str,
     pub constructor: Option<EndpointAbi>,

@@ -1,4 +1,21 @@
 {
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        },
+        "contractCrate": {
+            "name": "abi-tester",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.19.1"
+        }
+    },
     "docs": [
         "Contract whose sole purpose is to verify that",
         "the ABI generation framework works sa expected.",
