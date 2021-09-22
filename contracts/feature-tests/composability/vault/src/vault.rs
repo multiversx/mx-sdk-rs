@@ -152,6 +152,29 @@ pub trait Vault {
         }
     }
 
+    #[endpoint]
+    fn retrieve_multi_funds_async(
+        &self,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let caller = self.blockchain().get_caller();
+        let mut all_payments = Vec::new();
+        
+        for multi_arg in token_payments.into_iter() {
+            let (token_id, nonce, amount) = multi_arg.into_tuple();
+
+            all_payments.push(EsdtTokenPayment {
+                token_identifier: token_id,
+                token_nonce: nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid
+            });
+        }
+
+        self.send()
+            .transfer_multiple_esdt_via_async_call(&caller, &all_payments.managed_into(self.raw_vm_api()), b"");
+    }
+
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
