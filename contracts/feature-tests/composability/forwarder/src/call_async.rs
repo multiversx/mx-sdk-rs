@@ -110,6 +110,7 @@ pub trait ForwarderAsyncCallModule {
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
+        with_callback: bool,
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.raw_vm_api());
@@ -125,15 +126,18 @@ pub trait ForwarderAsyncCallModule {
             nr_transfers += 1;
         }
 
-        let mut callback_data_serializer =
-            elrond_wasm::HexCallDataSerializer::new(&b"retrive_funds_multi_transfer_callback"[..]);
-        callback_data_serializer.push_argument_bytes(&nr_transfers.to_be_bytes()[..]);
+        if with_callback {
+            let mut callback_data_serializer = elrond_wasm::HexCallDataSerializer::new(
+                &b"retrive_funds_multi_transfer_callback"[..],
+            );
+            callback_data_serializer.push_argument_bytes(&nr_transfers.to_be_bytes()[..]);
 
-        self.raw_vm_api().storage_store_tx_hash_key(
-            &self
-                .types()
-                .managed_buffer_from(callback_data_serializer.as_slice()),
-        );
+            self.raw_vm_api().storage_store_tx_hash_key(
+                &self
+                    .types()
+                    .managed_buffer_from(callback_data_serializer.as_slice()),
+            );
+        }
 
         self.raw_vm_api().async_call_raw(
             &to,
@@ -149,7 +153,7 @@ pub trait ForwarderAsyncCallModule {
     fn retrive_funds_multi_transfer_callback(&self, expected_nr_transfers: usize) -> SCResult<()> {
         let payments = self.call_value().all_esdt_transfers();
 
-        require!(payments.len() > 0, "no payments received!"); 
+        require!(payments.len() > 0, "no payments received!");
         require!(
             payments.len() == expected_nr_transfers,
             "Expected and actual number of transfers do not match"
