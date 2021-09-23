@@ -8,5 +8,5 @@ pub trait ForwarderStorageModule {
 
     #[view(lastErrorMessage)]
     #[storage_mapper("lastErrorMessage")]
-    fn last_error_message(&self) -> SingleValueMapper<BoxedBytes>;
+    fn last_error_message(&self) -> SingleValueMapper<ManagedBuffer>;
 }

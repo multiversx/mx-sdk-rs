@@ -136,17 +136,17 @@ pub trait ProxyTestFirst {
     }
 
     #[callback(payCallback)] // although uncommon, custom callback names are possible
-    fn pay_callback(&self, #[call_result] call_result: AsyncCallResult<i64>) {
+    fn pay_callback(&self, #[call_result] call_result: ManagedAsyncCallResult<i64>) {
         match call_result {
-            AsyncCallResult::Ok(cb_arg) => {
+            ManagedAsyncCallResult::Ok(cb_arg) => {
                 self.set_callback_info(cb_arg);
             },
-            AsyncCallResult::Err(_) => {},
+            ManagedAsyncCallResult::Err(_) => {},
         }
     }
 
     #[callback]
-    fn message_callback(&self, #[call_result] _call_result: AsyncCallResult<()>) {
+    fn message_callback(&self, #[call_result] _call_result: ManagedAsyncCallResult<()>) {
         self.set_callback_info(0x5555);
     }
 }

@@ -105,3 +105,13 @@ where
         Self::new_from_bytes(api, message.as_slice())
     }
 }
+
+impl<M> From<ManagedBuffer<M>> for ManagedSCError<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(message: ManagedBuffer<M>) -> Self {
+        ManagedSCError { buffer: message }
+    }
+}
