@@ -135,12 +135,12 @@ pub trait NftModule {
     // callbacks
 
     #[callback]
-    fn issue_callback(&self, #[call_result] result: AsyncCallResult<TokenIdentifier>) {
+    fn issue_callback(&self, #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>) {
         match result {
-            AsyncCallResult::Ok(token_id) => {
+            ManagedAsyncCallResult::Ok(token_id) => {
                 self.nft_token_id().set(&token_id);
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 let caller = self.blockchain().get_owner_address();
                 let (returned_tokens, token_id) = self.call_value().payment_token_pair();
                 if token_id.is_egld() && returned_tokens > 0 {

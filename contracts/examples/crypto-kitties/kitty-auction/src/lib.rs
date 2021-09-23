@@ -327,7 +327,7 @@ pub trait KittyAuction {
     #[callback]
     fn allow_auctioning_callback(
         &self,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
         auction_type: AuctionType,
         cb_kitty_id: u32,
         starting_price: BigUint,
@@ -336,7 +336,7 @@ pub trait KittyAuction {
         kitty_owner: ManagedAddress,
     ) {
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 let auction = Auction::new(
                     auction_type,
                     &starting_price,
@@ -347,16 +347,20 @@ pub trait KittyAuction {
 
                 self.auction(cb_kitty_id).set(&auction);
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // nothing to revert in case of error
             },
         }
     }
 
     #[callback]
-    fn transfer_callback(&self, #[call_result] result: AsyncCallResult<()>, cb_kitty_id: u32) {
+    fn transfer_callback(
+        &self,
+        #[call_result] result: ManagedAsyncCallResult<()>,
+        cb_kitty_id: u32,
+    ) {
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 let auction = self.auction(cb_kitty_id).get();
                 self.auction(cb_kitty_id).clear();
 
@@ -373,7 +377,7 @@ pub trait KittyAuction {
                     );
                 }
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_ownership contract address is invalid
                 // nothing to revert in case of error
             },
@@ -383,11 +387,11 @@ pub trait KittyAuction {
     #[callback]
     fn approve_siring_callback(
         &self,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
         cb_kitty_id: u32,
     ) -> OptionalResult<AsyncCall> {
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 let auction = self.auction(cb_kitty_id).get();
 
                 // transfer kitty back to its owner
@@ -396,7 +400,7 @@ pub trait KittyAuction {
                 // auction data will be cleared in the transfer callback
                 // winning bid money will be sent as well
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_ownership contract address is invalid
                 // nothing to revert in case of error
                 OptionalResult::None
@@ -405,12 +409,12 @@ pub trait KittyAuction {
     }
 
     #[callback]
-    fn create_gen_zero_kitty_callback(&self, #[call_result] result: AsyncCallResult<u32>) {
+    fn create_gen_zero_kitty_callback(&self, #[call_result] result: ManagedAsyncCallResult<u32>) {
         match result {
-            AsyncCallResult::Ok(kitty_id) => {
+            ManagedAsyncCallResult::Ok(kitty_id) => {
                 self.start_gen_zero_kitty_auction(kitty_id);
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_ownership contract address is invalid
                 // nothing to revert in case of error
             },
