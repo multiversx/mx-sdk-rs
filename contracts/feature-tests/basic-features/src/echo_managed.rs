@@ -55,4 +55,15 @@ pub trait EchoManagedTypes {
     ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         (addr, vec).into()
     }
+
+    #[endpoint]
+    fn echo_managed_async_result_empty(
+        &self,
+        #[var_args] a: ManagedAsyncCallResult<()>,
+    ) -> SCResult<(), ManagedSCError> {
+        match a {
+            ManagedAsyncCallResult::Ok(()) => Ok(()),
+            ManagedAsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
+        }
+    }
 }

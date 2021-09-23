@@ -33,12 +33,12 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
     }
 
     #[callback]
-    fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
+    fn change_roles_callback(&self, #[call_result] result: ManagedAsyncCallResult<()>) {
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 self.last_error_message().clear();
             },
-            AsyncCallResult::Err(message) => {
+            ManagedAsyncCallResult::Err(message) => {
                 self.last_error_message().set(&message.err_msg);
             },
         }
