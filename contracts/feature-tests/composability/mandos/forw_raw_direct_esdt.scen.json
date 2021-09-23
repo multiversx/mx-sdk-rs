@@ -64,9 +64,7 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:callBack",
                         "topics": [
-                            "str:callback_raw",
-                            "str:EGLD",
-                            "0"
+                            "str:callback_raw"
                         ],
                         "data": {
                             "0-status": "biguint:0"
@@ -104,9 +102,6 @@
                     "storage": {
                         "str:callback_data.len": "1",
                         "str:callback_data.item|u32:1": [
-                            "u32:4", "str:EGLD",
-                            "u32:0",
-                            "u32:1",
                             "u32:0"
                         ]
                     },
