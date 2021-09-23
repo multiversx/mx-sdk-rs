@@ -1,5 +1,6 @@
 use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    contract_base::ManagedSerializer,
     storage::StorageKey,
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{ManagedBuffer, ManagedType},
@@ -58,8 +59,10 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     ) -> Option<Self> {
         let tx_hash = api.get_tx_hash_managed();
         let storage_key = StorageKey::from(tx_hash);
-        if storage_get_len(api.clone(), &storage_key) > 0 {
-            let closure = storage_get(api.clone(), &storage_key);
+        let storage_value_raw: ManagedBuffer<A> = storage_get(api.clone(), &storage_key);
+        if storage_value_raw.len() > 0 {
+            let serializer = ManagedSerializer::new(api.clone());
+            let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
             storage_clear(api, &storage_key);
             Some(closure)
         } else {
@@ -67,10 +70,17 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
         }
     }
 
-    pub fn matcher<'a>(&'a self) -> CallbackClosureMatcher<'a, M> {
+    pub fn matcher<const CB_NAME_MAX_LENGTH: usize>(
+        &self,
+    ) -> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
+        let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
+        let name_len = self.callback_name.len();
+        let _ = self
+            .callback_name
+            .load_slice(0, &mut compare_buffer[..name_len]);
         CallbackClosureMatcher {
-            callback_closure_ref: self,
-            name_len: self.callback_name.len(),
+            name_len,
+            compare_buffer,
         }
     }
 
@@ -82,28 +92,22 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
 /// Helps the callback macro expansion to perform callback name matching more efficiently.
 /// The current implementation hashes by callback name length,
 /// but in principle further optimizations are possible.
-pub struct CallbackClosureMatcher<'a, M>
-where
-    M: ManagedTypeApi,
-{
-    callback_closure_ref: &'a CallbackClosure<M>,
+pub struct CallbackClosureMatcher<const CB_NAME_MAX_LENGTH: usize> {
     name_len: usize,
+    compare_buffer: [u8; CB_NAME_MAX_LENGTH],
 }
 
-impl<'a, M> CallbackClosureMatcher<'a, M>
-where
-    M: ManagedTypeApi,
-{
+impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
     pub fn matches_empty(&self) -> bool {
         self.name_len == 0
     }
 
+    #[inline(never)]
     pub fn name_matches(&self, name_match: &[u8]) -> bool {
         if self.name_len != name_match.len() {
             false
         } else {
-            // warning: this calls 2 EI hooks, we want to avoid unnecessary calls here
-            &self.callback_closure_ref.callback_name == name_match
+            &self.compare_buffer[..self.name_len] == name_match
         }
     }
 }
