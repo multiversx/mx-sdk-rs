@@ -39,6 +39,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(TokenIdentifier));
     add_managed_type(substitutions, &quote!(ManagedSCError));
     add_managed_type(substitutions, &quote!(AsyncCall));
+    add_managed_type(substitutions, &quote!(ManagedAsyncCallError));
 
     add_managed_type_with_generics(
         substitutions,
@@ -49,6 +50,11 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
         substitutions,
         &quote!(ManagedMultiResultVec),
         &quote!(ManagedMultiResultVec),
+    );
+    add_managed_type_with_generics(
+        substitutions,
+        &quote!(ManagedAsyncCallResult),
+        &quote!(ManagedAsyncCallResult),
     );
 
     substitutions.add_substitution(quote!(BigUint::from), quote!(self.types().big_uint_from));

@@ -430,12 +430,12 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_ids: Vec<BigUint>,
         values: Vec<BigUint>,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
         // in case of success, transfer to the intended address, otherwise, return tokens to original owner
         let dest_address = match result {
-            AsyncCallResult::Ok(()) => to,
-            AsyncCallResult::Err(_) => from,
+            ManagedAsyncCallResult::Ok(()) => to,
+            ManagedAsyncCallResult::Err(_) => from,
         };
         let biguint_one = self.types().big_uint_from(1u32);
 
