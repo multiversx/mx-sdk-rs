@@ -8,6 +8,10 @@ use super::{
 };
 use crate::model::{ContractTrait, Method, PublicRole, Supertrait};
 
+/// Callback name max length is checked during derive,
+/// so as not to burden the contract at runtime.
+pub const CALLBACK_NAME_MAX_LENGTH: usize = 32;
+
 pub fn generate_callback_selector_and_main(
     contract: &ContractTrait,
 ) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
@@ -60,7 +64,7 @@ fn callback_selector_body(
 ) -> proc_macro2::TokenStream {
     quote! {
         let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
-        let ___cb_closure_matcher___ = ___cb_closure___.matcher();
+        let ___cb_closure_matcher___ = ___cb_closure___.matcher::<#CALLBACK_NAME_MAX_LENGTH>();
         if ___cb_closure_matcher___.matches_empty() {
             return elrond_wasm::types::CallbackSelectorResult::Processed;
         }
@@ -97,6 +101,12 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                     .collect();
 
                 let callback_name_str = &callback.callback_name.to_string();
+                assert!(
+                    callback_name_str.len() <= CALLBACK_NAME_MAX_LENGTH,
+                    "Callback name `{}` is too long, it cannot exceed {} characters",
+                    callback_name_str,
+                    CALLBACK_NAME_MAX_LENGTH
+                );
                 let callback_name_literal = byte_str_literal(callback_name_str.as_bytes());
                 let call = generate_call_to_method_expr(m);
                 let call_result_assert_no_more_args = if has_call_result {
