@@ -140,6 +140,11 @@ fn echo_string_rs() {
 }
 
 #[test]
+fn echo_token_identifier_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_token_identifier.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_u64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_u64.scen.json", &contract_map());
 }
