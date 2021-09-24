@@ -1,0 +1,79 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "echo_managed_vec_of_managed_vec",
+            "comment": "ManagedVec nested decode still missing, but implemented in another branch. TODO: expand example after merge",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "echo_managed_vec_of_managed_vec",
+                "arguments": [
+                    []
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    []
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "echo_managed_vec_of_token_identifier",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "echo_managed_vec_of_token_identifier",
+                "arguments": [
+                    [
+                        "nested:str:TOKENA-1234",
+                        "nested:str:EGLD",
+                        "nested:str:TOKENB-1234"
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    [
+                        "nested:str:TOKENA-1234",
+                        "nested:str:EGLD",
+                        "nested:str:TOKENB-1234"
+                    ]
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
