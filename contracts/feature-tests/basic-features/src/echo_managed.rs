@@ -72,6 +72,7 @@ pub trait EchoManagedTypes {
         mv
     }
     
+    #[endpoint]
     fn echo_managed_async_result_empty(
         &self,
         #[var_args] a: ManagedAsyncCallResult<()>,
