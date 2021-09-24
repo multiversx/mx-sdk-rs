@@ -71,4 +71,14 @@ pub trait EchoManagedTypes {
     ) -> ManagedVec<TokenIdentifier> {
         mv
     }
+    
+    fn echo_managed_async_result_empty(
+        &self,
+        #[var_args] a: ManagedAsyncCallResult<()>,
+    ) -> SCResult<(), ManagedSCError> {
+        match a {
+            ManagedAsyncCallResult::Ok(()) => Ok(()),
+            ManagedAsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
+        }
+    }
 }
