@@ -118,6 +118,11 @@ fn echo_managed_bytes_rs() {
 }
 
 #[test]
+fn echo_managed_vec_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_managed_vec.scen.json", &contract_map());
+}
+
+#[test]
 fn echo_nothing_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_nothing.scen.json", &contract_map());
 }

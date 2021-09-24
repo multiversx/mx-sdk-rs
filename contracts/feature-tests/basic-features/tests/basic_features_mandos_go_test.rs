@@ -104,6 +104,11 @@ fn echo_managed_bytes_go() {
 }
 
 #[test]
+fn echo_managed_vec_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_managed_vec.scen.json");
+}
+
+#[test]
 fn echo_nothing_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_nothing.scen.json");
 }
