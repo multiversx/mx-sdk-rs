@@ -48,7 +48,7 @@ pub trait Child {
         &self,
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment] _amount: BigUint,
-        #[call_result] _result: AsyncCallResult<()>,
+        #[call_result] _result: ManagedAsyncCallResult<()>,
     ) {
         self.wrapped_egld_token_identifier().set(&token_identifier);
     }
