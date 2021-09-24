@@ -56,12 +56,19 @@ pub trait EchoManagedTypes {
         (addr, vec).into()
     }
 
-    /// This tests that nested serialization of managed buffers within unmanaged types works.
+    #[endpoint]
+    fn echo_managed_vec_of_managed_vec(
+        &self,
+        mv: ManagedVec<ManagedVec<usize>>,
+    ) -> ManagedVec<ManagedVec<usize>> {
+        mv
+    }
+
     #[endpoint]
     fn echo_managed_vec_of_token_identifier(
         &self,
-        mb: ManagedVec<TokenIdentifier>,
+        mv: ManagedVec<TokenIdentifier>,
     ) -> ManagedVec<TokenIdentifier> {
-        mb
+        mv
     }
 }

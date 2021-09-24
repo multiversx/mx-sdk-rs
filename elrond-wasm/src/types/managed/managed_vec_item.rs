@@ -3,7 +3,9 @@ use crate::{
     types::TokenIdentifier,
 };
 
-use super::{BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedType};
+use super::{
+    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec,
+};
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -48,6 +50,22 @@ macro_rules! impl_int {
 impl_int! {u32, 4}
 impl_int! {i32, 4}
 
+impl<M: ManagedTypeApi> ManagedVecItem<M> for usize {
+    const PAYLOAD_SIZE: usize = 4;
+    const NEEDS_RESERIALIZATION: bool = false;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(_api: M, mut reader: Reader) -> Self {
+        let mut arr: [u8; 4] = [0u8; 4];
+        reader(&mut arr[..]);
+        u32::from_be_bytes(arr) as usize
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+        let bytes = (*self as u32).to_be_bytes();
+        writer(&bytes)
+    }
+}
+
 macro_rules! impl_managed_type {
     ($ty:ident) => {
         impl<M: ManagedTypeApi> ManagedVecItem<M> for $ty<M> {
@@ -72,3 +90,21 @@ impl_managed_type! {BigInt}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {TokenIdentifier}
+
+impl<M, T> ManagedVecItem<M> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    const PAYLOAD_SIZE: usize = 4;
+    const NEEDS_RESERIALIZATION: bool = true;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
+        let handle = Handle::from_byte_reader(api.clone(), reader);
+        Self::from_raw_handle(api, handle)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+        <Handle as ManagedVecItem<M>>::to_byte_writer(&self.get_raw_handle(), writer)
+    }
+}

@@ -1,5 +1,4 @@
 {
-    "name": "echo_managed_vec_of_token_identifier",
     "gasSchedule": "v3",
     "steps": [
         {
@@ -17,6 +16,31 @@
                     "storage": {},
                     "code": ""
                 }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "echo_managed_vec_of_managed_vec",
+            "comment": "ManagedVec nested decode still missing, but implemented in another branch. TODO: expand example after merge",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "echo_managed_vec_of_managed_vec",
+                "arguments": [
+                    []
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    []
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
