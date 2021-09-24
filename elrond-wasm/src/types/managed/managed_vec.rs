@@ -287,7 +287,7 @@ where
 impl<M, T> NestedDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem<M> + NestedDecode,
 {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
