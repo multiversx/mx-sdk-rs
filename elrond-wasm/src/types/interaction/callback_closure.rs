@@ -2,7 +2,7 @@ use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     contract_base::ManagedSerializer,
     storage::StorageKey,
-    storage_clear, storage_get, storage_get_len, storage_set,
+    storage_clear, storage_get, storage_set,
     types::{ManagedBuffer, ManagedType},
     ContractCallArg, ManagedResultArgLoader,
 };
@@ -73,15 +73,7 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     pub fn matcher<const CB_NAME_MAX_LENGTH: usize>(
         &self,
     ) -> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
-        let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
-        let name_len = self.callback_name.len();
-        let _ = self
-            .callback_name
-            .load_slice(0, &mut compare_buffer[..name_len]);
-        CallbackClosureMatcher {
-            name_len,
-            compare_buffer,
-        }
+        CallbackClosureMatcher::new(&self.callback_name)
     }
 
     pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
@@ -98,6 +90,26 @@ pub struct CallbackClosureMatcher<const CB_NAME_MAX_LENGTH: usize> {
 }
 
 impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
+    pub fn new<M: ManagedTypeApi>(callback_name: &ManagedBuffer<M>) -> Self {
+        let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
+        let name_len = callback_name.len();
+        let _ = callback_name.load_slice(0, &mut compare_buffer[..name_len]);
+        CallbackClosureMatcher {
+            name_len,
+            compare_buffer,
+        }
+    }
+
+    pub fn new_from_unmanaged(callback_name: &[u8]) -> Self {
+        let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
+        let name_len = callback_name.len();
+        compare_buffer[..name_len].copy_from_slice(callback_name);
+        CallbackClosureMatcher {
+            name_len,
+            compare_buffer,
+        }
+    }
+
     pub fn matches_empty(&self) -> bool {
         self.name_len == 0
     }

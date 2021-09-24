@@ -23,7 +23,7 @@ pub fn generate_callback_selector_and_main(
             elrond_wasm::types::CallbackSelectorResult::Processed
         };
         let cb_main_body = quote! {
-            let _ = self.callback_selector(elrond_wasm::types::CallbackClosure::new_empty(self.raw_vm_api()));
+            let _ = self.callback_selector(elrond_wasm::types::CallbackClosureForDeser::new_empty(self.raw_vm_api()));
         };
         (cb_selector_body, cb_main_body)
     } else {
@@ -39,7 +39,7 @@ pub fn generate_callback_selector_and_main(
         } else {
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
-                if let Some(___cb_closure___) = elrond_wasm::types::CallbackClosure::storage_load_and_clear(self.raw_vm_api()) {
+                if let Some(___cb_closure___) = elrond_wasm::types::CallbackClosureForDeser::storage_load_and_clear(self.raw_vm_api()) {
                     if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                         self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
                         elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);

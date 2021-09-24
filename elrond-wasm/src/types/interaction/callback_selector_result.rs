@@ -1,6 +1,6 @@
 use crate::api::ManagedTypeApi;
 
-use super::CallbackClosure;
+use super::CallbackClosureForDeser;
 
 /// Used internally between the `callback` and `callback_selector` methods.
 /// It is likely to be removed in the future.
@@ -9,5 +9,5 @@ where
     A: ManagedTypeApi,
 {
     Processed,
-    NotProcessed(CallbackClosure<A>),
+    NotProcessed(CallbackClosureForDeser<A>),
 }

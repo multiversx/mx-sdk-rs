@@ -74,7 +74,7 @@ pub fn contract_implementation(
                 #function_selector_body
             }
 
-            fn callback_selector(&self, mut ___cb_closure___: elrond_wasm::types::CallbackClosure<Self::Api>) -> elrond_wasm::types::CallbackSelectorResult<Self::Api> {
+            fn callback_selector(&self, mut ___cb_closure___: elrond_wasm::types::CallbackClosureForDeser<Self::Api>) -> elrond_wasm::types::CallbackSelectorResult<Self::Api> {
                 #callback_selector_body
             }
 

@@ -14,7 +14,7 @@ wasm-output-mode = [ "elrond-wasm-node",]
 [dependencies.elrond-wasm]
 version = "0.19.1"
 path = "../../../elrond-wasm"
-features = ["derive"]
+features = ["derive", "cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
 version = "0.19.1"
