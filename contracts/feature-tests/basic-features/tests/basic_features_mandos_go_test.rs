@@ -129,6 +129,11 @@ fn echo_string_go() {
 }
 
 #[test]
+fn echo_token_identifier_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_token_identifier.scen.json");
+}
+
+#[test]
 fn echo_u64_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_u64.scen.json");
 }

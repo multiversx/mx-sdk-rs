@@ -55,4 +55,13 @@ pub trait EchoManagedTypes {
     ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         (addr, vec).into()
     }
+
+    /// This tests that nested serialization of managed buffers within unmanaged types works.
+    #[endpoint]
+    fn echo_managed_vec_of_token_identifier(
+        &self,
+        mb: ManagedVec<TokenIdentifier>,
+    ) -> ManagedVec<TokenIdentifier> {
+        mb
+    }
 }
