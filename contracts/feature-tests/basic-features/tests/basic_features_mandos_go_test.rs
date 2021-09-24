@@ -64,6 +64,11 @@ fn echo_async_result_empty_go() {
 }
 
 #[test]
+fn echo_async_result_empty_managed_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_async_result_empty_managed.scen.json");
+}
+
+#[test]
 fn echo_big_int_nested_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_big_int_nested.scen.json");
 }
@@ -96,6 +101,11 @@ fn echo_i64_go() {
 #[test]
 fn echo_managed_bytes_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_managed_bytes.scen.json");
+}
+
+#[test]
+fn echo_managed_vec_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_managed_vec.scen.json");
 }
 
 #[test]
