@@ -9,9 +9,20 @@ fn contract_map() -> ContractMap<TxContext> {
     );
     contract_map
 }
+
 #[test]
 fn big_int_to_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_int_to_i64.scen.json", &contract_map());
+}
+
+#[test]
+fn big_num_conversions_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_num_conversions.scen.json", &contract_map());
+}
+
+#[test]
+fn big_uint_sqrt_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_uint_sqrt.scen.json", &contract_map());
 }
 
 #[test]
@@ -153,6 +164,14 @@ fn echo_string_rs() {
 }
 
 #[test]
+fn echo_tuple_into_multiresult_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/echo_tuple_into_multiresult.scen.json",
+        &contract_map(),
+    );
+}
+
+#[test]
 fn echo_u64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_u64.scen.json", &contract_map());
 }
@@ -208,11 +227,6 @@ fn get_cumulated_validator_rewards_rs() {
 // 		&contract_map(),
 // 	);
 // }
-
-#[test]
-fn log2_func_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/log2_func.scen.json", &contract_map());
-}
 
 #[test]
 fn managed_buffer_concat_1_rs() {
@@ -271,11 +285,6 @@ fn panic_rs() {
 }
 
 #[test]
-fn pow_func_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/pow_func.scen.json", &contract_map());
-}
-
-#[test]
 fn return_codes_rs() {
     elrond_wasm_debug::mandos_rs("mandos/return_codes.scen.json", &contract_map());
 }
@@ -291,11 +300,6 @@ fn sc_properties_rs() {
 #[test]
 fn sc_result_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sc_result.scen.json", &contract_map());
-}
-
-#[test]
-fn sqrt_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/sqrt.scen.json", &contract_map());
 }
 
 #[test]
