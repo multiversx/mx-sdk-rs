@@ -251,16 +251,11 @@ where
     T: ManagedVecItem<M> + NestedEncode,
 {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if T::NEEDS_RESERIALIZATION {
-            self.len().dep_encode(dest)?;
-            for item in self {
-                item.dep_encode(dest)?;
-            }
-            Ok(())
-        } else {
-            self.buffer.dep_encode(dest)?;
-            Ok(())
+        self.len().dep_encode(dest)?;
+        for item in self {
+            item.dep_encode(dest)?;
         }
+        Ok(())
     }
 }
 
