@@ -10,6 +10,8 @@ use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
 
 use super::ManagedArgBuffer;
 
+pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
+
 #[derive(TopEncode, TopDecode)]
 pub struct CallbackClosure<M: ManagedTypeApi> {
     callback_name: ManagedBuffer<M>,
@@ -50,15 +52,14 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     }
 
     pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self, api: A) {
-        let tx_hash = api.get_tx_hash_managed();
-        storage_set(api, &tx_hash.into(), self);
+        let storage_key = cb_closure_storage_key(api.clone());
+        storage_set(api, &storage_key, self);
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
         api: A,
     ) -> Option<Self> {
-        let tx_hash = api.get_tx_hash_managed();
-        let storage_key = StorageKey::from(tx_hash);
+        let storage_key = cb_closure_storage_key(api.clone());
         let storage_value_raw: ManagedBuffer<A> = storage_get(api.clone(), &storage_key);
         if storage_value_raw.len() > 0 {
             let serializer = ManagedSerializer::new(api.clone());
@@ -79,6 +80,13 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
         ManagedResultArgLoader::new(self.closure_args.data)
     }
+}
+
+pub(super) fn cb_closure_storage_key<A: BlockchainApi>(api: A) -> StorageKey<A> {
+    let tx_hash = api.get_tx_hash_managed();
+    let mut storage_key = StorageKey::new(api, CALLBACK_CLOSURE_STORAGE_BASE_KEY);
+    storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
+    storage_key
 }
 
 /// Helps the callback macro expansion to perform callback name matching more efficiently.

@@ -1,6 +1,5 @@
 use crate::{
     api::{BlockchainApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
-    storage::StorageKey,
     storage_clear, storage_get, storage_get_len,
     types::{BoxedBytes, ManagedBuffer, ManagedBytesNestedDecodeInput, ManagedType},
     BytesArgLoader,
@@ -31,8 +30,7 @@ impl<M: ManagedTypeApi> CallbackClosureUnmanagedArgs<M> {
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
         api: A,
     ) -> Option<Self> {
-        let tx_hash = api.get_tx_hash_managed();
-        let storage_key = StorageKey::from(tx_hash);
+        let storage_key = super::callback_closure::cb_closure_storage_key(api.clone());
         if storage_get_len(api.clone(), &storage_key) > 0 {
             let closure = storage_get(api.clone(), &storage_key);
             storage_clear(api, &storage_key);
