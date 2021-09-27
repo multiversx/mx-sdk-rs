@@ -61,7 +61,7 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     ) -> Option<Self> {
         let storage_key = cb_closure_storage_key(api.clone());
         let storage_value_raw: ManagedBuffer<A> = storage_get(api.clone(), &storage_key);
-        if storage_value_raw.len() > 0 {
+        if !storage_value_raw.is_empty() {
             let serializer = ManagedSerializer::new(api.clone());
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
             storage_clear(api, &storage_key);
