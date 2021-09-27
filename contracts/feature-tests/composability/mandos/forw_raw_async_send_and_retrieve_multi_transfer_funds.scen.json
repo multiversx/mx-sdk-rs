@@ -1,0 +1,81 @@
+{
+    "name": "send, burn & create, send back new tokens",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-SFT": {
+                            "balance": "0",
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "2"
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-SFT": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "multi-transfer-through-callback-burn-and-create",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "value": "0",
+                "function": "forwarder_async_send_and_retrieve_multi_transfer_funds",
+                "arguments": [
+                    "sc:vault",
+                    "str:TEST-SFT",
+                    "1",
+                    "1000",
+                    "str:TEST-SFT",
+                    "2",
+                    "1000"
+                ],
+                "gasLimit": "70,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
