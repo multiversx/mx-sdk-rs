@@ -45,7 +45,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../forwarder-raw/output/forwarder-raw-new.wasm"
                 }
             }
         },
@@ -70,11 +70,80 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": ["3", "4"],
                 "status": "0",
                 "message": "",
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-SFT": {
+                            "balance": "0",
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "lastNonce": "4"
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-SFT": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "4",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:callback_data.item|u32:1": {
+                            "1-return_code": "u32:0",
+                            "2-length_arg_1": "u32:1",
+                            "3-arg_1_first_nft_create_nonce": "u8:3",
+                            "4-lenght_arg_2": "u32:1",
+                            "5-arg_2_second_nft_create_nonce": "u8:4"
+                        },
+                        "str:callback_data.len": "1",
+
+                        "str:callback_payments.item|u32:1": {
+                            "1-token_id": "nested:str:TEST-SFT",
+                            "2-nonce": "u64:3",
+                            "3-amount": "biguint:1000"
+                        },
+                        "str:callback_payments.item|u32:2": {
+                            "1-token_id": "nested:str:TEST-SFT",
+                            "2-nonce": "u64:4",
+                            "3-amount": "biguint:1000"
+                        },
+                        "str:callback_payments.len": "2"
+                    },
+                    "code": "file:../forwarder-raw/output/forwarder-raw-new.wasm"
+                }
             }
         }
     ]
