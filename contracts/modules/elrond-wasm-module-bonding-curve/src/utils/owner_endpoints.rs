@@ -44,11 +44,11 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     #[callback]
     fn change_roles_callback(
         &self,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
     ) -> SCResult<(), ManagedSCError> {
         match result {
-            AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into()),
+            ManagedAsyncCallResult::Ok(()) => Ok(()),
+            ManagedAsyncCallResult::Err(message) => Err(message.err_msg.into()),
         }
     }
 
