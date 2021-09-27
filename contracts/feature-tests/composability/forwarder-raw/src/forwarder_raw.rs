@@ -157,6 +157,31 @@ pub trait ForwarderRaw {
         );
     }
 
+    #[endpoint]
+    fn forwarder_async_send_and_retrieve_multi_transfer_funds(
+        &self,
+        to: ManagedAddress,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut all_payments = Vec::new();
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+
+            all_payments.push(EsdtTokenPayment {
+                token_identifier,
+                token_nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid // ignored
+            });
+        }
+
+        self.send().transfer_multiple_esdt_via_async_call(
+            &to,
+            &all_payments.managed_into(self.raw_vm_api()),
+            &b"burn_and_create_retrive_async"[..],
+        );
+    }
+
     #[view]
     #[storage_mapper("callback_data")]
     fn callback_data(&self) -> VecMapper<ManagedVec<Self::Api, ManagedBuffer>>;
