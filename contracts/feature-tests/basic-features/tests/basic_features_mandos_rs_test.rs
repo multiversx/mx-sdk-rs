@@ -367,9 +367,9 @@ fn storage_mapper_map_rs() {
 }
 
 #[test]
-fn storage_mapper_map_storage_rs() {
+fn storage_mapper_map_nested_rs() {
     elrond_wasm_debug::mandos_rs(
-        "mandos/storage_mapper_map_storage.scen.json",
+        "mandos/storage_mapper_map_nested.scen.json",
         &contract_map(),
     );
 }

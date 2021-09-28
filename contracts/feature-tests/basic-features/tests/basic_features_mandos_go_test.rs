@@ -339,8 +339,8 @@ fn storage_mapper_map_go() {
 }
 
 #[test]
-fn storage_mapper_map_storage_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_mapper_map_storage.scen.json");
+fn storage_mapper_map_nested_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_map_nested.scen.json");
 }
 
 #[test]

@@ -20,7 +20,7 @@ pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
-pub mod storage_mapper_map_storage;
+pub mod storage_mapper_map_nested;
 pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
@@ -48,7 +48,7 @@ pub trait BasicFeatures:
     + storage_direct_store::StorageStoreFeatures
     + storage_mapper_queue::QueueMapperFeatures
     + storage_mapper_map::MapMapperFeatures
-    + storage_mapper_map_storage::MapMapperNestedFeatures
+    + storage_mapper_map_nested::MapMapperNestedFeatures
     + storage_mapper_set::SetMapperFeatures
     + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
