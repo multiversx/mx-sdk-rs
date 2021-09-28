@@ -186,6 +186,45 @@ where
     }
 }
 
+impl<M, T> PartialEq for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M> + PartialEq,
+{
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        if self.buffer == other.buffer {
+            return true;
+        }
+        let self_len = self.buffer.byte_len();
+        let other_len = other.buffer.byte_len();
+        if self_len != other_len {
+            return false;
+        }
+        let mut byte_index = 0;
+        while byte_index < self_len {
+            let self_item = T::from_byte_reader(self.type_manager(), |dest_slice| {
+                let _ = self.buffer.load_slice(byte_index, dest_slice);
+            });
+            let other_item = T::from_byte_reader(self.type_manager(), |dest_slice| {
+                let _ = other.buffer.load_slice(byte_index, dest_slice);
+            });
+            if self_item != other_item {
+                return false;
+            }
+            byte_index += T::PAYLOAD_SIZE;
+        }
+        true
+    }
+}
+
+impl<M, T> Eq for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M> + PartialEq,
+{
+}
+
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -212,16 +251,11 @@ where
     T: ManagedVecItem<M> + NestedEncode,
 {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        if T::NEEDS_RESERIALIZATION {
-            self.len().dep_encode(dest)?;
-            for item in self {
-                item.dep_encode(dest)?;
-            }
-            Ok(())
-        } else {
-            self.buffer.dep_encode(dest)?;
-            Ok(())
+        self.len().dep_encode(dest)?;
+        for item in self {
+            item.dep_encode(dest)?;
         }
+        Ok(())
     }
 }
 
@@ -248,12 +282,16 @@ where
 impl<M, T> NestedDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem<M> + NestedDecode,
 {
-    fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
-        // TODO: this is more complex and requires more specialization
-        // not immediately needed
-        Err(DecodeError::UNSUPPORTED_OPERATION)
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        let size = usize::dep_decode(input)?;
+        let api: M = input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))?;
+        let mut result = ManagedVec::new_empty(api);
+        for _ in 0..size {
+            result.push(T::dep_decode(input)?);
+        }
+        Ok(result)
     }
 }
 
