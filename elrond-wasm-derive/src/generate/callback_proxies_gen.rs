@@ -50,7 +50,7 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
                     fn #method_name(
                         self,
                         #(#arg_decl),*
-                    ) -> elrond_wasm::types::CallbackCall<Self::Api> {
+                    ) -> elrond_wasm::types::CallbackClosure<Self::Api> {
                         let mut ___callback_call___ =
                             elrond_wasm::types::new_callback_call(self.cb_call_api(), #cb_name_literal);
                         #(#cb_arg_push_snippets)*
