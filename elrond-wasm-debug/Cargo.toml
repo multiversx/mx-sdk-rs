@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-debug"
-version = "0.19.0"
+version = "0.19.1"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -21,12 +21,13 @@ sha2 = "0.9.2"
 sha3 = "0.9.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+rustc_version = "0.4"
 
 [features]
 arwen-tests = []
 
 [dependencies.elrond-wasm]
-version = "0.19.0"
+version = "0.19.1"
 path = "../elrond-wasm"
 features = ["derive"]
 

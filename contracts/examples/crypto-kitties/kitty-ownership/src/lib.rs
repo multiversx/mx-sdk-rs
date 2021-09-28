@@ -565,12 +565,12 @@ pub trait KittyOwnership {
     #[callback]
     fn generate_kitty_genes_callback(
         &self,
-        #[call_result] result: AsyncCallResult<KittyGenes>,
+        #[call_result] result: ManagedAsyncCallResult<KittyGenes>,
         matron_id: u32,
         original_caller: ManagedAddress,
     ) {
         match result {
-            AsyncCallResult::Ok(genes) => {
+            ManagedAsyncCallResult::Ok(genes) => {
                 let mut matron = self.get_kitty_by_id(matron_id);
                 let sire_id = matron.siring_with_id;
                 let mut sire = self.get_kitty_by_id(sire_id);
@@ -606,7 +606,7 @@ pub trait KittyOwnership {
                 self.send()
                     .direct_egld(&original_caller, &fee, b"birth fee");
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_genes contract address is invalid
                 // in which case, the only thing we can do is call this again later
             },

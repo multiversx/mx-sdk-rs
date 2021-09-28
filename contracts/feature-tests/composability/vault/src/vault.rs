@@ -15,13 +15,19 @@ pub trait Vault {
         opt_arg_to_echo
     }
 
+    #[payable("*")]
+    #[endpoint]
+    fn just_accept_funds(&self) {
+        self.call_counts(b"accept_funds").update(|c| *c += 1);
+    }
+
     #[endpoint]
     fn echo_arguments(
         &self,
-        #[var_args] args: VarArgs<BoxedBytes>,
-    ) -> SCResult<MultiResultVec<BoxedBytes>> {
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<ManagedMultiResultVec<ManagedBuffer>> {
         self.call_counts(b"echo_arguments").update(|c| *c += 1);
-        Ok(args.into_vec().into())
+        Ok(args)
     }
 
     #[endpoint]

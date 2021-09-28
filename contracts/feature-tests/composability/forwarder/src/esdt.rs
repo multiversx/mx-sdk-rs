@@ -65,11 +65,11 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
-        for multi_arg in token_payments.into_vec() {
+        for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment {
                 token_identifier,
@@ -130,16 +130,16 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         caller: &ManagedAddress,
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment] returned_tokens: BigUint,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
         // callback is called with ESDTTransfer of the newly issued token, with the amount requested,
         // so we can get the token identifier and amount from the call data
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
             },
-            AsyncCallResult::Err(message) => {
+            ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
                     self.send().direct_egld(caller, &returned_tokens, &[]);

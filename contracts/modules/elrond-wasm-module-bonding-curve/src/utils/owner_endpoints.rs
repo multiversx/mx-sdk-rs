@@ -18,11 +18,11 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: VarArgs<EsdtLocalRole>,
+        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
     ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
-            .set_special_roles(&address, &token_identifier, roles.as_slice())
+            .set_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
     }
@@ -32,11 +32,11 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: VarArgs<EsdtLocalRole>,
+        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
     ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
-            .unset_special_roles(&address, &token_identifier, roles.as_slice())
+            .unset_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
     }
@@ -44,11 +44,11 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     #[callback]
     fn change_roles_callback(
         &self,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
     ) -> SCResult<(), ManagedSCError> {
         match result {
-            AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(message) => Err(message.err_msg.managed_into()),
+            ManagedAsyncCallResult::Ok(()) => Ok(()),
+            ManagedAsyncCallResult::Err(message) => Err(message.err_msg.into()),
         }
     }
 

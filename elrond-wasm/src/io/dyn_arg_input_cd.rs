@@ -31,7 +31,7 @@ where
     type ErrorApi = A;
 
     #[inline]
-    fn error_api(&self) -> Self::ErrorApi {
+    fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
         self.api.clone()
     }
 
@@ -45,8 +45,10 @@ where
             Ok(Some(arg_bytes)) => {
                 ManagedBytesTopDecodeInput::new(self.api.clone(), arg_bytes.into())
             },
-            Ok(None) => self.error_api().signal_error(err_msg::ARG_WRONG_NUMBER),
-            Err(sc_err) => self.error_api().signal_error(sc_err.as_bytes()),
+            Ok(None) => self
+                .dyn_arg_vm_api()
+                .signal_error(err_msg::ARG_WRONG_NUMBER),
+            Err(sc_err) => self.dyn_arg_vm_api().signal_error(sc_err.as_bytes()),
         }
     }
 }
