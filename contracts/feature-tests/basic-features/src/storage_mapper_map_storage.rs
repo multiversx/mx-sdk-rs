@@ -7,16 +7,16 @@ pub trait MapStorageMapperFeatures {
     fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;
 
     #[view]
-    fn map_storage_mapper_view(&self) -> MultiResultVec<u32> {
-        let mut vec: Vec<u32> = Vec::new();
+    fn map_storage_mapper_view(&self) -> ManagedMultiResultVec<u32> {
+        let mut result = ManagedMultiResultVec::new_empty(self.raw_vm_api());
         for (key1, map) in self.map_storage_mapper().iter() {
             for (key2, value) in map.iter() {
-                vec.push(key1);
-                vec.push(key2);
-                vec.push(value);
+                result.push(key1);
+                result.push(key2);
+                result.push(value);
             }
         }
-        MultiResultVec::from(vec)
+        result
     }
 
     #[endpoint]

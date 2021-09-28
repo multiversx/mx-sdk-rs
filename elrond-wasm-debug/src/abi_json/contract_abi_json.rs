@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContractAbiJson {
+    pub build_info: BuildInfoAbiJson,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub name: String,
@@ -18,6 +20,7 @@ pub struct ContractAbiJson {
 impl From<&ContractAbi> for ContractAbiJson {
     fn from(abi: &ContractAbi) -> Self {
         let mut contract_json = ContractAbiJson {
+            build_info: BuildInfoAbiJson::from(&abi.build_info),
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             constructor: abi.constructor.as_ref().map(ConstructorAbiJson::from),
@@ -41,8 +44,7 @@ impl From<&ContractAbi> for ContractAbiJson {
     }
 }
 
-pub fn serialize_abi_to_json(abi: &ContractAbi) -> String {
-    let abi_json = ContractAbiJson::from(abi);
+pub fn serialize_abi_to_json(abi_json: &ContractAbiJson) -> String {
     let buf = Vec::new();
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
     let mut ser = serde_json::Serializer::with_formatter(buf, formatter);

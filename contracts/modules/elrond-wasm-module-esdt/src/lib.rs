@@ -64,17 +64,17 @@ pub trait EsdtModule {
         Ok(self
             .send()
             .esdt_system_sc_proxy()
-            .set_special_roles(&dest_address, &token_id, &roles)
+            .set_special_roles(&dest_address, &token_id, (&roles[..]).into_iter().cloned())
             .async_call())
     }
 
     #[callback]
-    fn issue_callback(&self, #[call_result] result: AsyncCallResult<TokenIdentifier>) {
+    fn issue_callback(&self, #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>) {
         match result {
-            AsyncCallResult::Ok(token_id) => {
+            ManagedAsyncCallResult::Ok(token_id) => {
                 self.token_id().set(&token_id);
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // return payment to initial caller
                 let initial_caller = self.blockchain().get_owner_address();
                 let egld_returned = self.call_value().egld_value();

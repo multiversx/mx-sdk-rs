@@ -91,6 +91,7 @@ where
         self
     }
 
+    #[inline]
     pub fn with_multi_token_transfer(
         mut self,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
@@ -99,8 +100,14 @@ where
         self
     }
 
+    #[inline]
     pub fn with_gas_limit(mut self, gas_limit: u64) -> Self {
         self.explicit_gas_limit = gas_limit;
+        self
+    }
+
+    pub fn with_arguments_raw(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
+        self.arg_buffer = raw_argument_buffer;
         self
     }
 
@@ -136,7 +143,7 @@ where
 
     fn convert_to_single_transfer_esdt_call(mut self) -> Self {
         if let Some(payment) = self.payments.get(0) {
-            if payment.token_name.is_egld() {
+            if payment.token_identifier.is_egld() {
                 self.egld_payment = payment.amount;
                 self.payments.clear();
                 self
@@ -145,7 +152,7 @@ where
 
                 // fungible ESDT
                 let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
-                new_arg_buffer.push_arg(&payment.token_name);
+                new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.endpoint_name);
 
@@ -173,7 +180,7 @@ where
                 // arg2 - quantity to transfer
                 // arg3 - destination address
                 let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
-                new_arg_buffer.push_arg(&payment.token_name);
+                new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.to);
@@ -209,8 +216,8 @@ where
         new_arg_buffer.push_arg(self.payments.len());
 
         for payment in self.payments.into_iter() {
-            // TODO: check that `!token_name.is_egld()` or let Arwen throw the error?
-            new_arg_buffer.push_arg(payment.token_name);
+            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
+            new_arg_buffer.push_arg(payment.token_identifier);
             new_arg_buffer.push_arg(payment.token_nonce);
             new_arg_buffer.push_arg(payment.amount);
         }
@@ -272,7 +279,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(self.api, raw_result);
+        let mut loader = ManagedResultArgLoader::new(raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 
@@ -297,7 +304,7 @@ where
             range_closure,
         );
 
-        let mut loader = ManagedResultArgLoader::new(self.api, raw_result);
+        let mut loader = ManagedResultArgLoader::new(raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 
@@ -310,7 +317,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(self.api, raw_result);
+        let mut loader = ManagedResultArgLoader::new(raw_result);
         R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
     }
 }
@@ -383,7 +390,7 @@ where
         let gas_limit = self.resolve_gas_limit_with_leftover();
         let payment = &self.payments.get(0).unwrap();
 
-        if payment.token_name.is_egld() {
+        if payment.token_identifier.is_egld() {
             let _ = self.api.direct_egld_execute(
                 &self.to,
                 &payment.amount,
@@ -395,7 +402,7 @@ where
             // fungible ESDT
             let _ = self.api.direct_esdt_execute(
                 &self.to,
-                &payment.token_name,
+                &payment.token_identifier,
                 &payment.amount,
                 gas_limit,
                 &self.endpoint_name,
@@ -405,7 +412,7 @@ where
             // non-fungible/semi-fungible ESDT
             let _ = self.api.direct_esdt_nft_execute(
                 &self.to,
-                &payment.token_name,
+                &payment.token_identifier,
                 payment.token_nonce,
                 &payment.amount,
                 gas_limit,

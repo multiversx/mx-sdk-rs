@@ -140,14 +140,14 @@ pub trait ForwarderAsyncCallModule {
     fn multi_transfer_via_async(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
-        for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment {
-                token_name,
+                token_identifier,
                 token_nonce,
                 amount,
                 token_type: EsdtTokenType::Invalid, // not used

@@ -98,13 +98,13 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_exec_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: VarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new_empty(self.type_manager());
 
-        for multi_arg in token_payments.into_vec() {
-            let (token_name, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::from(token_name, token_nonce, amount);
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment::from(token_identifier, token_nonce, amount);
 
             all_token_payments.push(payment);
         }

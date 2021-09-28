@@ -9,11 +9,11 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: VarArgs<EsdtLocalRole>,
+        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
     ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
-            .set_special_roles(&address, &token_identifier, roles.as_slice())
+            .set_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
     }
@@ -23,22 +23,22 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: VarArgs<EsdtLocalRole>,
+        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
     ) -> AsyncCall {
         self.send()
             .esdt_system_sc_proxy()
-            .unset_special_roles(&address, &token_identifier, roles.as_slice())
+            .unset_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
     }
 
     #[callback]
-    fn change_roles_callback(&self, #[call_result] result: AsyncCallResult<()>) {
+    fn change_roles_callback(&self, #[call_result] result: ManagedAsyncCallResult<()>) {
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 self.last_error_message().clear();
             },
-            AsyncCallResult::Err(message) => {
+            ManagedAsyncCallResult::Err(message) => {
                 self.last_error_message().set(&message.err_msg);
             },
         }

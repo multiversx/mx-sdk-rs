@@ -15,13 +15,19 @@ pub trait Vault {
         opt_arg_to_echo
     }
 
+    #[payable("*")]
+    #[endpoint]
+    fn just_accept_funds(&self) {
+        self.call_counts(b"accept_funds").update(|c| *c += 1);
+    }
+
     #[endpoint]
     fn echo_arguments(
         &self,
-        #[var_args] args: VarArgs<BoxedBytes>,
-    ) -> SCResult<MultiResultVec<BoxedBytes>> {
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<ManagedMultiResultVec<ManagedBuffer>> {
         self.call_counts(b"echo_arguments").update(|c| *c += 1);
-        Ok(args.into_vec().into())
+        Ok(args)
     }
 
     #[endpoint]
@@ -51,7 +57,7 @@ pub trait Vault {
 
         for payment in payments.into_iter() {
             self.accept_funds_event(
-                &payment.token_name,
+                &payment.token_identifier,
                 payment.token_type.as_type_name(),
                 &payment.amount,
                 payment.token_nonce,
@@ -69,7 +75,14 @@ pub trait Vault {
         let mut result = Vec::new();
 
         for payment in payments.into_iter() {
-            result.push((payment.token_name, payment.token_nonce, payment.amount).into());
+            result.push(
+                (
+                    payment.token_identifier,
+                    payment.token_nonce,
+                    payment.amount,
+                )
+                    .into(),
+            );
         }
 
         result.into()

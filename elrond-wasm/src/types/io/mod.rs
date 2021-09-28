@@ -1,4 +1,5 @@
 mod async_call_result;
+mod async_call_result_managed;
 mod multi_args;
 mod multi_args_vec;
 mod operation_completion_status;
@@ -9,6 +10,7 @@ mod sc_error_static;
 mod sc_result;
 
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
+pub use async_call_result_managed::{ManagedAsyncCallError, ManagedAsyncCallResult};
 pub use multi_args::*;
 pub use multi_args_vec::{MultiArgVec, MultiResultVec, VarArgs};
 pub use operation_completion_status::OperationCompletionStatus;

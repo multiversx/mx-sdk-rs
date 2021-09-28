@@ -18,7 +18,7 @@ pub trait DeployContractModule {
     fn deploy_from_source(
         &self,
         source_contract_address: ManagedAddress,
-        #[var_args] arguments: VarArgs<ManagedBuffer>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> ManagedAddress {
         // TODO: use proxies to perform deploy here
         // raw deploy belongs to forwarder-raw
@@ -27,7 +27,7 @@ pub trait DeployContractModule {
             &self.types().big_uint_zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
-            &arguments.into_vec().managed_into(),
+            &arguments.to_arg_buffer(),
         );
 
         address
