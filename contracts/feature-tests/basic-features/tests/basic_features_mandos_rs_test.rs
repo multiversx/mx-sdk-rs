@@ -75,6 +75,14 @@ fn echo_async_result_empty_rs() {
 }
 
 #[test]
+fn echo_async_result_empty_managed_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/echo_async_result_empty_managed.scen.json",
+        &contract_map(),
+    );
+}
+
+#[test]
 fn echo_big_int_nested_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_big_int_nested.scen.json", &contract_map());
 }
@@ -107,6 +115,11 @@ fn echo_i64_rs() {
 #[test]
 fn echo_managed_bytes_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_managed_bytes.scen.json", &contract_map());
+}
+
+#[test]
+fn echo_managed_vec_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_managed_vec.scen.json", &contract_map());
 }
 
 #[test]
@@ -337,7 +350,10 @@ fn storage_map3_rs() {
 
 #[test]
 fn storage_mapper_linked_list_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_linked_list.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs(
+        "mandos/storage_mapper_linked_list.scen.json",
+        &contract_map(),
+    );
 }
 
 #[test]

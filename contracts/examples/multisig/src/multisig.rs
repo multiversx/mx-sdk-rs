@@ -59,24 +59,29 @@ pub trait Multisig {
     fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Vec<usize>>;
 
     #[init]
-    fn init(&self, quorum: usize, #[var_args] board: VarArgs<Address>) -> SCResult<()> {
+    fn init(
+        &self,
+        quorum: usize,
+        #[var_args] board: ManagedVarArgs<ManagedAddress>,
+    ) -> SCResult<()> {
+        let board_vec = board.to_vec();
         require!(
-            !board.is_empty(),
+            !board_vec.is_empty(),
             "board cannot be empty on init, no-one would be able to propose"
         );
-        require!(quorum <= board.len(), "quorum cannot exceed board size");
+        require!(quorum <= board_vec.len(), "quorum cannot exceed board size");
         self.quorum().set(&quorum);
 
         let mut duplicates = false;
         self.user_mapper()
-            .get_or_create_users(board.as_slice(), |user_id, new_user| {
+            .get_or_create_users(board_vec.into_iter(), |user_id, new_user| {
                 if !new_user {
                     duplicates = true;
                 }
                 self.set_user_id_to_role(user_id, UserRole::BoardMember);
             });
         require!(!duplicates, "duplicate board member");
-        self.num_board_members().set(&board.len());
+        self.num_board_members().set(&board_vec.len());
 
         Ok(())
     }
@@ -88,7 +93,7 @@ pub trait Multisig {
 
     fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_propose(),
@@ -217,7 +222,7 @@ pub trait Multisig {
     /// Does not check whether or not the user is still a board member and the signature valid.
     #[view]
     fn signed(&self, user: ManagedAddress, action_id: usize) -> bool {
-        let user_id = self.user_mapper().get_user_id(&user.to_address());
+        let user_id = self.user_mapper().get_user_id(&user);
         if user_id == 0 {
             false
         } else {
@@ -232,7 +237,7 @@ pub trait Multisig {
     /// `2` = can propose and sign.
     #[view(userRole)]
     fn user_role(&self, user: ManagedAddress) -> UserRole {
-        let user_id = self.user_mapper().get_user_id(&user.to_address());
+        let user_id = self.user_mapper().get_user_id(&user);
         if user_id == 0 {
             UserRole::None
         } else {
@@ -274,7 +279,7 @@ pub trait Multisig {
         );
 
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can sign");
 
@@ -297,7 +302,7 @@ pub trait Multisig {
         );
 
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can un-sign");
 
@@ -322,9 +327,7 @@ pub trait Multisig {
     /// - convert between board member and proposer
     /// Will keep the board size and proposer count in sync.
     fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
-        let user_id = self
-            .user_mapper()
-            .get_or_create_user(&user_address.to_address());
+        let user_id = self.user_mapper().get_or_create_user(&user_address);
         let old_role = if user_id == 0 {
             UserRole::None
         } else {
@@ -412,7 +415,7 @@ pub trait Multisig {
         action_id: usize,
     ) -> SCResult<PerformActionResult<Self::Api>> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_perform_action(),
@@ -526,7 +529,7 @@ pub trait Multisig {
     #[endpoint(discardAction)]
     fn discard_action(&self, action_id: usize) -> SCResult<()> {
         let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address.to_address());
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(
             caller_role.can_discard_action(),

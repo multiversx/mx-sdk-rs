@@ -172,10 +172,24 @@ where
     }
 }
 
+impl<M, T> Clone for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M> + Clone,
+{
+    fn clone(&self) -> Self {
+        let mut result = ManagedVec::new_empty(self.type_manager());
+        for item in self.into_iter() {
+            result.push(item.clone())
+        }
+        result
+    }
+}
+
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem<M> + NestedEncode,
 {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
@@ -195,7 +209,7 @@ where
 impl<M, T> NestedEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem<M> + NestedEncode,
 {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         if T::NEEDS_RESERIALIZATION {
@@ -214,7 +228,7 @@ where
 impl<M, T> TopDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem<M> + NestedDecode,
 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
@@ -246,7 +260,7 @@ where
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem<M> + TypeAbi,
 {
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> String {

@@ -339,14 +339,14 @@ pub trait Lottery {
     #[callback]
     fn transfer_from_callback(
         &self,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
         cb_lottery_name: &BoxedBytes,
         cb_sender: &ManagedAddress,
     ) {
         let mut info = self.get_lottery_info(cb_lottery_name);
 
         match result {
-            AsyncCallResult::Ok(()) => {
+            ManagedAsyncCallResult::Ok(()) => {
                 let mut entries = self.get_number_of_entries_for_user(cb_lottery_name, cb_sender);
 
                 self.set_ticket_holder(cb_lottery_name, info.current_ticket_number, cb_sender);
@@ -359,7 +359,7 @@ pub trait Lottery {
 
                 self.set_number_of_entries_for_user(cb_lottery_name, cb_sender, entries);
             },
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Err(_) => {
                 // payment error, return ticket to pool
                 info.tickets_left += 1;
             },
@@ -373,12 +373,12 @@ pub trait Lottery {
     #[callback]
     fn distribute_prizes_callback(
         &self,
-        #[call_result] result: AsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<()>,
         cb_lottery_name: &BoxedBytes,
     ) -> OptionalResult<AsyncCall> {
         match result {
-            AsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
-            AsyncCallResult::Err(_) => {
+            ManagedAsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
+            ManagedAsyncCallResult::Err(_) => {
                 // nothing we can do if an error occurs in the erc20 contract
                 OptionalResult::None
             },

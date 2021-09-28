@@ -102,6 +102,13 @@ fn generate_abi_method_body(
     let contract_name = &contract.trait_name.to_string();
     quote! {
         let mut contract_abi = elrond_wasm::abi::ContractAbi{
+            build_info: elrond_wasm::abi::BuildInfoAbi {
+                contract_crate: elrond_wasm::abi::ContractCrateBuildAbi {
+                    name: env!("CARGO_PKG_NAME"),
+                    version: env!("CARGO_PKG_VERSION"),
+                },
+                framework: elrond_wasm::abi::FrameworkBuildAbi::create(),
+            },
             docs: &[ #(#contract_docs),* ],
             name: #contract_name,
             constructor: None,
