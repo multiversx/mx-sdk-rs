@@ -416,8 +416,9 @@ where
     ///
     /// This operation should compute in *O*(1) time.
     pub fn pop_back_nested(&mut self) {
-        self.remove_by_node_id_nested(self.info().get().back)
-            .map(|mut mapper| mapper.clear());
+        if let Some(mut mapper) = self.remove_by_node_id_nested(self.info().get().back) {
+            mapper.clear();
+        }
     }
 
     /// Removes the first element and returns it, or `None` if the queue is
@@ -425,8 +426,9 @@ where
     ///
     /// This operation should compute in *O*(1) time.
     pub fn pop_front_nested(&mut self) {
-        self.remove_by_node_id_nested(self.info().get().front)
-            .map(|mut mapper| mapper.clear());
+        if let Some(mut mapper) = self.remove_by_node_id_nested(self.info().get().front) {
+            mapper.clear();
+        }
     }
 
     /// Removes the node information. The caller is responsible to clear the returned mapper.
