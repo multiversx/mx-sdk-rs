@@ -2,7 +2,7 @@ use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
+    types::{ArgBuffer, BoxedBytes, OwnedManagedBufferNestedDecodeInput},
 };
 use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;
@@ -234,7 +234,7 @@ where
         let buffer = ManagedBuffer::top_decode(input)?;
         if T::NEEDS_RESERIALIZATION {
             let mut result = ManagedVec::new_empty(buffer.type_manager());
-            let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
+            let mut nested_de_input = OwnedManagedBufferNestedDecodeInput::new(buffer);
             while nested_de_input.remaining_len() > 0 {
                 result.push(T::dep_decode(&mut nested_de_input)?);
             }
