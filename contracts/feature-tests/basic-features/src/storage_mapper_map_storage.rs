@@ -2,14 +2,14 @@ elrond_wasm::imports!();
 
 /// Storage mapper test.
 #[elrond_wasm::module]
-pub trait MapStorageMapperFeatures {
+pub trait MapMapperNestedFeatures {
     #[storage_mapper("map_storage_mapper")]
-    fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;
+    fn map_storage_mapper(&self) -> MapMapper<u32, MapMapper<u32, u32>>;
 
     #[view]
     fn map_storage_mapper_view(&self) -> ManagedMultiResultVec<u32> {
         let mut result = ManagedMultiResultVec::new_empty(self.raw_vm_api());
-        for (key1, map) in self.map_storage_mapper().iter() {
+        for (key1, map) in self.map_storage_mapper().iter_nested() {
             for (key2, value) in map.iter() {
                 result.push(key1);
                 result.push(key2);
@@ -20,9 +20,9 @@ pub trait MapStorageMapperFeatures {
     }
 
     #[endpoint]
-    fn map_storage_mapper_insert_default(&self, item: u32) -> bool {
+    fn map_storage_mapper_insert_nested(&self, item: u32) {
         let mut map_storage_mapper = self.map_storage_mapper();
-        map_storage_mapper.insert_default(item)
+        map_storage_mapper.insert_nested(item);
     }
 
     #[endpoint]
@@ -34,7 +34,7 @@ pub trait MapStorageMapperFeatures {
     #[endpoint]
     fn map_storage_mapper_get(&self, item: u32) -> SCResult<MultiResultVec<u32>> {
         let map_storage_mapper = self.map_storage_mapper();
-        if let Some(map) = map_storage_mapper.get(&item) {
+        if let Some(map) = map_storage_mapper.get_nested(&item) {
             let mut vec = Vec::new();
             for (key, value) in map.iter() {
                 vec.push(key);
@@ -53,7 +53,7 @@ pub trait MapStorageMapperFeatures {
         value: u32,
     ) -> SCResult<Option<u32>> {
         let map_storage_mapper = self.map_storage_mapper();
-        if let Some(mut map) = map_storage_mapper.get(&item) {
+        if let Some(mut map) = map_storage_mapper.get_nested(&item) {
             return Ok(map.insert(key, value));
         }
         sc_error!("No storage!")
@@ -62,7 +62,7 @@ pub trait MapStorageMapperFeatures {
     #[endpoint]
     fn map_storage_mapper_get_value(&self, item: u32, key: u32) -> SCResult<Option<u32>> {
         let map_storage_mapper = self.map_storage_mapper();
-        if let Some(map) = map_storage_mapper.get(&item) {
+        if let Some(map) = map_storage_mapper.get_nested(&item) {
             return Ok(map.get(&key));
         }
         sc_error!("No storage!")
@@ -71,7 +71,7 @@ pub trait MapStorageMapperFeatures {
     #[endpoint]
     fn map_storage_mapper_remove(&self, item: u32) -> bool {
         let mut map_storage_mapper = self.map_storage_mapper();
-        map_storage_mapper.remove(&item)
+        map_storage_mapper.remove_nested(&item)
     }
 
     #[endpoint]
@@ -87,7 +87,11 @@ pub trait MapStorageMapperFeatures {
         key: u32,
         increment: u32,
     ) -> u32 {
-        let mut map = self.map_storage_mapper().entry(item).or_default().get();
+        let mut map = self
+            .map_storage_mapper()
+            .entry_nested(item)
+            .or_default()
+            .get();
         map.entry(key).or_default().update(|value| {
             *value += increment;
             *value
@@ -104,7 +108,7 @@ pub trait MapStorageMapperFeatures {
     ) -> u32 {
         let map = self
             .map_storage_mapper()
-            .entry(item)
+            .entry_nested(item)
             .and_modify(|map| {
                 map.insert(key, value);
             })
@@ -121,7 +125,7 @@ pub trait MapStorageMapperFeatures {
         value: u32,
     ) -> Option<u32> {
         self.map_storage_mapper()
-            .entry(item)
+            .entry_nested(item)
             .or_default()
             .update(|map| map.insert(key, value))
     }

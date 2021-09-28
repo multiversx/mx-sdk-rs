@@ -120,6 +120,23 @@ where
         None
     }
 
+    /// Gets the given key's corresponding entry in the map for in-place manipulation.
+    pub fn entry(&mut self, key: K) -> Entry<'_, SA, K, V> {
+        if self.contains_key(&key) {
+            Entry::Occupied(OccupiedEntry {
+                key,
+                map: self,
+                _marker: PhantomData,
+            })
+        } else {
+            Entry::Vacant(VacantEntry {
+                key,
+                map: self,
+                _marker: PhantomData,
+            })
+        }
+    }
+
     /// An iterator visiting all values in arbitrary order.
     /// The iterator element type is `&'a V`.
     pub fn values(&self) -> Values<SA, K, V> {
@@ -173,22 +190,24 @@ where
     }
 
     /// Removes the entry
-    pub fn remove_nested(&mut self, k: &K) {
-        if self.keys_set.remove(k) {
+    pub fn remove_nested(&mut self, k: &K) -> bool {
+        let removed = self.keys_set.remove(k);
+        if removed {
             self.mapped_value(k).clear();
         }
+        removed
     }
 
     /// Gets the given key's corresponding entry in the map for in-place manipulation.
-    pub fn entry(&mut self, key: K) -> Entry<'_, SA, K, V> {
+    pub fn entry_nested(&mut self, key: K) -> NestedEntry<'_, SA, K, V> {
         if self.contains_key(&key) {
-            Entry::Occupied(OccupiedEntry {
+            NestedEntry::Occupied(OccupiedNestedEntry {
                 key,
                 map: self,
                 _marker: PhantomData,
             })
         } else {
-            Entry::Vacant(VacantEntry {
+            NestedEntry::Vacant(VacantNestedEntry {
                 key,
                 map: self,
                 _marker: PhantomData,
@@ -506,21 +525,14 @@ impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
-    V: 'static,
+    V: TopEncode + TopDecode + 'static,
 {
     /// Gets a reference to the key that would be used when inserting a value
     /// through the VacantEntry.
     pub fn key(&self) -> &K {
         &self.key
     }
-}
 
-impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
-    V: TopEncode + TopDecode + 'static,
-{
     /// Sets the value of the entry with the `VacantEntry`'s key,
     /// and returns an `OccupiedEntry`.
     pub fn insert(self, value: V) -> OccupiedEntry<'a, SA, K, V> {
@@ -533,43 +545,17 @@ where
     }
 }
 
-impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
-    V: IntoStorageMapper<SA> + 'static,
-    V::StorageMapperType: StorageClearable,
-{
-    /// Sets the value of the entry with the `VacantEntry`'s key,
-    /// and returns an `OccupiedEntry`.
-    pub fn insert_nested(self) -> OccupiedEntry<'a, SA, K, V> {
-        self.map.insert_nested(self.key.clone());
-        OccupiedEntry {
-            key: self.key,
-            map: self.map,
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
-where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
-    V: 'static,
-{
-    /// Gets a reference to the key in the entry.
-    pub fn key(&self) -> &K {
-        &self.key
-    }
-}
-
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: TopEncode + TopDecode + 'static,
 {
+    /// Gets a reference to the key in the entry.
+    pub fn key(&self) -> &K {
+        &self.key
+    }
+
     /// Take ownership of the key and value from the map.
     pub fn remove_entry(self) -> (K, V) {
         let value = self.map.remove(&self.key).unwrap();
@@ -603,34 +589,161 @@ where
     }
 }
 
-impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
+pub enum NestedEntry<'a, SA, K: 'a, V: 'a>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: IntoStorageMapper<SA> + 'static,
     V::StorageMapperType: StorageClearable,
 {
+    /// A vacant entry.
+    Vacant(VacantNestedEntry<'a, SA, K, V>),
+
+    /// An occupied entry.
+    Occupied(OccupiedNestedEntry<'a, SA, K, V>),
+}
+
+/// A view into a vacant entry in a `MapStorageMapper`.
+/// It is part of the [`Entry`] enum.
+pub struct VacantNestedEntry<'a, SA, K: 'a, V: 'a>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: IntoStorageMapper<SA> + 'static,
+    V::StorageMapperType: StorageClearable,
+{
+    pub(super) key: K,
+    pub(super) map: &'a mut MapMapper<SA, K, V>,
+
+    // Be invariant in `K` and `V`
+    pub(super) _marker: PhantomData<&'a mut (K, V)>,
+}
+
+/// A view into an occupied entry in a `MapStorageMapper`.
+/// It is part of the [`Entry`] enum.
+pub struct OccupiedNestedEntry<'a, SA, K: 'a, V: 'a>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: IntoStorageMapper<SA> + 'static,
+    V::StorageMapperType: StorageClearable,
+{
+    pub(super) key: K,
+    pub(super) map: &'a mut MapMapper<SA, K, V>,
+
+    // Be invariant in `K` and `V`
+    pub(super) _marker: PhantomData<&'a mut (K, V)>,
+}
+
+impl<'a, SA, K, V> NestedEntry<'a, SA, K, V>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: IntoStorageMapper<SA>,
+    V::StorageMapperType: StorageClearable,
+{
+    /// Ensures a value is in the entry by inserting the default if empty, and returns
+    /// an `OccupiedEntry`.
+    pub fn or_insert_default(self) -> OccupiedNestedEntry<'a, SA, K, V> {
+        match self {
+            NestedEntry::Occupied(entry) => entry,
+            NestedEntry::Vacant(entry) => entry.insert_default(),
+        }
+    }
+
+    /// Returns a reference to this entry's key.
+    pub fn key(&self) -> &K {
+        match *self {
+            NestedEntry::Occupied(ref entry) => entry.key(),
+            NestedEntry::Vacant(ref entry) => entry.key(),
+        }
+    }
+
+    /// Provides in-place mutable access to an occupied entry before any
+    /// potential inserts into the map.
+    pub fn and_modify<F>(self, f: F) -> Self
+    where
+        F: FnOnce(&mut V::StorageMapperType),
+    {
+        match self {
+            NestedEntry::Occupied(mut entry) => {
+                entry.update(f);
+                NestedEntry::Occupied(entry)
+            },
+            NestedEntry::Vacant(entry) => NestedEntry::Vacant(entry),
+        }
+    }
+}
+
+impl<'a, SA, K, V> NestedEntry<'a, SA, K, V>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: IntoStorageMapper<SA>,
+    V::StorageMapperType: StorageClearable,
+{
+    /// Ensures a value is in the entry by inserting the default value if empty,
+    /// and returns an `OccupiedEntry`.
+    pub fn or_default(self) -> OccupiedNestedEntry<'a, SA, K, V> {
+        match self {
+            NestedEntry::Occupied(entry) => entry,
+            NestedEntry::Vacant(entry) => entry.insert_default(),
+        }
+    }
+}
+
+impl<'a, SA, K, V> VacantNestedEntry<'a, SA, K, V>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: IntoStorageMapper<SA>,
+    V::StorageMapperType: StorageClearable,
+{
+    /// Gets a reference to the key that would be used when inserting a value
+    /// through the VacantEntry.
+    pub fn key(&self) -> &K {
+        &self.key
+    }
+
+    /// Sets the value of the entry with the `VacantEntry`'s key,
+    /// and returns an `OccupiedEntry`.
+    pub fn insert_default(self) -> OccupiedNestedEntry<'a, SA, K, V> {
+        self.map.insert_nested(self.key.clone());
+        OccupiedNestedEntry {
+            key: self.key,
+            map: self.map,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<'a, SA, K, V> OccupiedNestedEntry<'a, SA, K, V>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    V: IntoStorageMapper<SA>,
+    V::StorageMapperType: StorageClearable,
+{
+    /// Gets a reference to the key in the entry.
+    pub fn key(&self) -> &K {
+        &self.key
+    }
+
     /// Gets the value in the entry.
-    pub fn get_nested(&self) -> V::StorageMapperType {
+    pub fn get(&self) -> V::StorageMapperType {
         self.map.get_nested(&self.key).unwrap()
     }
 
     /// Syntactic sugar, to more compactly express a get, update and set in one line.
-    /// Takes whatever lies in storage, applies the given closure and saves the final value back to storage.
+    /// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
     /// Propagates the return value of the given function.
-    pub fn update_nested<R, F: FnOnce(&mut V::StorageMapperType) -> R>(&mut self, f: F) -> R {
-        let mut value = self.get_nested();
+    pub fn update<R, F: FnOnce(&mut V::StorageMapperType) -> R>(&mut self, f: F) -> R {
+        let mut value = self.get();
         f(&mut value)
     }
 
-    /// Sets the value of the entry with the `OccupiedEntry`'s key,
-    /// and returns the entry's old value.
-    pub fn insert_nested(self) -> V::StorageMapperType {
-        self.map.insert_nested(self.key)
-    }
-
-    /// Takes the value of the entry out of the map
-    pub fn remove_nested(self) {
-        self.map.remove_nested(&self.key)
+    /// Removes the entry from the map.
+    pub fn remove(self) {
+        self.map.remove_nested(&self.key);
     }
 }

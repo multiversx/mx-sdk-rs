@@ -48,7 +48,7 @@ pub trait BasicFeatures:
     + storage_direct_store::StorageStoreFeatures
     + storage_mapper_queue::QueueMapperFeatures
     + storage_mapper_map::MapMapperFeatures
-    + storage_mapper_map_storage::MapStorageMapperFeatures
+    + storage_mapper_map_storage::MapMapperNestedFeatures
     + storage_mapper_set::SetMapperFeatures
     + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
