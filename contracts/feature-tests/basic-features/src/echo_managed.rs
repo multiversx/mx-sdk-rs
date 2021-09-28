@@ -71,7 +71,7 @@ pub trait EchoManagedTypes {
     ) -> ManagedVec<TokenIdentifier> {
         mv
     }
-    
+
     #[endpoint]
     fn echo_managed_async_result_empty(
         &self,

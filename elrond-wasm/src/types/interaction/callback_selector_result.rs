@@ -1,8 +1,13 @@
-use crate::HexCallDataDeserializer;
+use crate::api::ManagedTypeApi;
+
+use super::CallbackClosureForDeser;
 
 /// Used internally between the `callback` and `callback_selector` methods.
 /// It is likely to be removed in the future.
-pub enum CallbackSelectorResult<'a> {
+pub enum CallbackSelectorResult<A>
+where
+    A: ManagedTypeApi,
+{
     Processed,
-    NotProcessed(HexCallDataDeserializer<'a>),
+    NotProcessed(CallbackClosureForDeser<A>),
 }

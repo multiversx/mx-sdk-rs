@@ -1,4 +1,6 @@
-use elrond_wasm::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedFrom};
+use elrond_wasm::types::{
+    BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedFrom, ManagedVec,
+};
 use elrond_wasm_debug::{check_managed_top_encode_decode, TxContext};
 
 #[test]
@@ -77,15 +79,19 @@ fn test_man_address_serialization() {
 }
 
 #[test]
-fn test_vec_of_man_address_serialization() {
+fn test_managed_vec_of_man_address_serialization() {
     let api = TxContext::dummy();
-    let v = vec![
-        ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]),
-        ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]),
-        ManagedAddress::new_from_bytes(api.clone(), &[9u8; 32]),
-    ];
+    let mut v = ManagedVec::new_empty(api.clone());
+    v.push(ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]));
+    v.push(ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]));
+    v.push(ManagedAddress::new_from_bytes(api.clone(), &[9u8; 32]));
 
-    let expected = BoxedBytes::from_concat(&[&[7u8; 32], &[8u8; 32], &[9u8; 32]]);
+    let expected_v = BoxedBytes::from_concat(&[&[7u8; 32], &[8u8; 32], &[9u8; 32]]);
 
-    check_managed_top_encode_decode(api, v, expected.as_slice());
+    check_managed_top_encode_decode(api.clone(), v.clone(), expected_v.as_slice());
+
+    let option = Some(v);
+    let expected_opt_v = BoxedBytes::from_concat(&[&[1], &[0, 0, 0, 3], expected_v.as_slice()]);
+
+    check_managed_top_encode_decode(api, option, expected_opt_v.as_slice());
 }
