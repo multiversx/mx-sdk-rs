@@ -1,4 +1,4 @@
-use elrond_codec::{EncodeError, TopEncodeOutput, TryStaticCast};
+use elrond_codec::{top_encode_number_to_output, EncodeError, TopEncodeOutput, TryStaticCast};
 
 use crate::{
     api::ManagedTypeApi,
@@ -10,6 +10,20 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
 
     fn set_slice_u8(self, bytes: &[u8]) {
         self.overwrite(bytes);
+    }
+
+    fn set_u64(self, value: u64) {
+        // it could alternatively be performed via big int conversion
+        // the most important thing is that no heap allocation happens
+        self.overwrite(&[]);
+        top_encode_number_to_output(self, value, false);
+    }
+
+    fn set_i64(self, value: i64) {
+        // it could alternatively be performed via big int conversion
+        // the most important thing is that no heap allocation happens
+        self.overwrite(&[]);
+        top_encode_number_to_output(self, value as u64, true);
     }
 
     #[inline]

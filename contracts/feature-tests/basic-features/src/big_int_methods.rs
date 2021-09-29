@@ -51,4 +51,14 @@ pub trait BigIntMethods {
     fn big_int_to_i64(&self, bi: &BigInt) -> OptionalResult<i64> {
         bi.to_i64().into()
     }
+
+    #[endpoint]
+    fn big_int_to_parts(&self, bi: BigInt) -> MultiResult2<Sign, BigUint> {
+        bi.to_parts().into()
+    }
+
+    #[endpoint]
+    fn big_int_from_biguint(&self, sign: Sign, unsigned: BigUint) -> BigInt {
+        BigInt::from_biguint(sign, unsigned)
+    }
 }
