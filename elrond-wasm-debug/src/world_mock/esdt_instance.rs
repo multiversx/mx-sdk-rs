@@ -36,6 +36,12 @@ impl Deref for EsdtInstances {
     }
 }
 
+impl Default for EsdtInstances {
+    fn default() -> Self {
+        EsdtInstances(HashMap::new())
+    }
+}
+
 impl EsdtInstances {
     pub fn add(&self, nonce: u64, value: BigUint) {
         if self.contains_key(&nonce) {
