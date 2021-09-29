@@ -1,7 +1,7 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageReadApi},
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType, OwnedManagedBufferNestedDecodeInput},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
 };
 use alloc::boxed::Box;
 use elrond_codec::*;
@@ -45,7 +45,7 @@ impl<'k, A> TopDecodeInput for StorageGetInput<'k, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    type NestedBuffer = OwnedManagedBufferNestedDecodeInput<A>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<A, ManagedBuffer<A>>;
 
     fn byte_len(&self) -> usize {
         let key_bytes = self.key.to_boxed_bytes();
@@ -86,7 +86,7 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        OwnedManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
+        ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
     }
 }
 
