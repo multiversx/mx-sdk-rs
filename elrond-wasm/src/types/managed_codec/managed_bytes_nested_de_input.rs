@@ -119,7 +119,9 @@ impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBytesNestedDecodeInput<M> {
         C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<T, DecodeError>,
     {
-        if let Some(result) = try_execute_then_cast(|| {
+        if let Some(result) = self.api.try_cast_ref::<T>() {
+            Ok(result.clone())
+        } else if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
                 self.read_managed_buffer_of_size(mb_context.0)
             } else {
@@ -150,7 +152,9 @@ impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBytesNestedDecodeInput<M> {
         F: FnOnce(&mut Self, ExitCtx) -> T,
         ExitCtx: Clone,
     {
-        if let Some(result) = try_execute_then_cast(|| {
+        if let Some(result) = self.api.try_cast_ref::<T>() {
+            result.clone()
+        } else if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
                 self.read_managed_buffer_of_size_or_exit(mb_context.0, c.clone(), exit)
             } else {

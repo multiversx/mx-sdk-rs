@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedType};
+use super::{BigUint, ManagedBuffer, ManagedDefault, ManagedType, Sign};
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::BoxedBytes,
@@ -13,14 +13,6 @@ use elrond_codec::{
 pub struct BigInt<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     pub(crate) api: M,
-}
-
-// BigInt sign.
-#[allow(clippy::enum_variant_names)]
-pub enum Sign {
-    Minus,
-    NoSign,
-    Plus,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
@@ -130,21 +122,50 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
-    // TODO: convert BigUint after new implementation
-    pub fn abs_uint(&self) -> Self {
-        let result = self.api.bi_new_zero();
-        self.api.bi_abs(result, self.handle);
+    pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
+        if sign.is_minus() {
+            unsigned.api.bi_neg(unsigned.handle, unsigned.handle);
+        }
         BigInt {
-            handle: result,
-            api: self.api.clone(),
+            handle: unsigned.handle,
+            api: unsigned.api,
         }
     }
 
+    /// Returns the sign of the `BigInt` as a `Sign`.
     pub fn sign(&self) -> Sign {
         match self.api.bi_sign(self.handle) {
             crate::api::Sign::Plus => Sign::Plus,
             crate::api::Sign::NoSign => Sign::NoSign,
             crate::api::Sign::Minus => Sign::Minus,
+        }
+    }
+
+    /// Returns the magnitude of the `BigInt` as a `BigUint`.
+    pub fn magnitude(&self) -> BigUint<M> {
+        let result = self.api.bi_new_zero();
+        self.api.bi_abs(result, self.handle);
+        BigUint {
+            handle: result,
+            api: self.api.clone(),
+        }
+    }
+
+    /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
+    /// the reverse of `BigInt::from_biguint`.
+    pub fn to_parts(self) -> (Sign, BigUint<M>) {
+        (self.sign(), self.magnitude())
+    }
+
+    /// Converts this `BigInt` into a `BigUint`, if it's not negative.
+    pub fn into_biguint(self) -> Option<BigUint<M>> {
+        if let Sign::Minus = self.sign() {
+            None
+        } else {
+            Some(BigUint {
+                handle: self.handle,
+                api: self.api,
+            })
         }
     }
 }
