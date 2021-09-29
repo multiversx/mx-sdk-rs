@@ -8,7 +8,7 @@ use std::{
 #[derive(Clone)]
 pub struct EsdtRoles(HashMap<Vec<u8>, Vec<u8>>);
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct EsdtData {
     pub instances: EsdtInstances,
     pub last_nonce: Option<u64>,
@@ -25,6 +25,24 @@ impl Deref for AccountEsdt {
     }
 }
 
+impl fmt::Display for EsdtData {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut esdt_buf = String::new();
+        write!(
+            &mut esdt_buf,
+            "{{
+                instances: [{}],
+                last_nonce: {},
+                roles: [{}],
+            }}",
+            self.instances,
+            self.last_nonce.unwrap(),
+            self.roles.unwrap()
+        )?;
+        Ok(())
+    }
+}
+
 impl fmt::Display for AccountEsdt {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
@@ -34,15 +52,9 @@ impl fmt::Display for AccountEsdt {
             let value = self.0.get(key).unwrap();
             write!(
                 &mut esdt_buf,
-                "\n\t\t\t{} -> {{
-                    instances: [{}],
-                    last_nonce: {},
-                    roles: [{}],
-                }}",
+                "\n\t\t\t{} -> {}",
                 key_hex(key.as_slice()),
-                value.instances,
-                value.last_nonce.unwrap(),
-                value.roles.unwrap()
+                value
             )?;
         }
         Ok(())

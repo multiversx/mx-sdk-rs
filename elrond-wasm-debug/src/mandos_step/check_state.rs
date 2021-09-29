@@ -1,7 +1,7 @@
 use mandos::{BigUintValue, BytesValue, CheckEsdt, CheckStorage, CheckValue, Checkable};
 use num_bigint::BigUint;
 
-use crate::{verbose_hex, BlockchainMock};
+use crate::{account_esdt::EsdtData, verbose_hex, BlockchainMock};
 
 pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
@@ -79,7 +79,7 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 
             match &expected_account.esdt {
                 CheckEsdt::Equal(eq) => {
-                    let default_value = &BigUint::from(0u32);
+                    let default_value = &EsdtData::default();
                     for (expected_key, expected_value) in eq.iter() {
                         let actual_value = account
                             .esdt
@@ -117,7 +117,7 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
             }
 
             if let CheckEsdt::Equal(eq) = &expected_account.esdt {
-                let default_value = &BigUint::from(0u32);
+                let default_value = &EsdtData::default();
                 for (expected_key, expected_value) in eq.iter() {
                     let actual_value = account
                         .esdt
