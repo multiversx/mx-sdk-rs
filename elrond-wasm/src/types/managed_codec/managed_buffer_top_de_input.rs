@@ -6,13 +6,13 @@ use crate::{
     types::{BigInt, BigUint, ManagedBuffer},
 };
 
-use super::{OwnedManagedBufferNestedDecodeInput, RefManagedBufferNestedDecodeInput};
+use super::ManagedBufferNestedDecodeInput;
 
 impl<'a, M> TopDecodeInput for &'a ManagedBuffer<M>
 where
     M: ManagedTypeApi + 'static,
 {
-    type NestedBuffer = RefManagedBufferNestedDecodeInput<'a, M>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M, &'a ManagedBuffer<M>>;
 
     fn byte_len(&self) -> usize {
         self.len()
@@ -41,7 +41,7 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        RefManagedBufferNestedDecodeInput::new(self)
+        ManagedBufferNestedDecodeInput::new(self)
     }
 }
 
@@ -50,7 +50,7 @@ impl<M> TopDecodeInput for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type NestedBuffer = OwnedManagedBufferNestedDecodeInput<M>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M, ManagedBuffer<M>>;
 
     fn byte_len(&self) -> usize {
         self.len()
@@ -69,6 +69,6 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        OwnedManagedBufferNestedDecodeInput::new(self)
+        ManagedBufferNestedDecodeInput::new(self)
     }
 }
