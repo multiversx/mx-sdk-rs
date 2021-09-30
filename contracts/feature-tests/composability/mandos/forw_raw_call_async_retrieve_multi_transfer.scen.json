@@ -1,5 +1,5 @@
 {
-    "gasSchedule": "v3",
+    "name": "forwarder receive multi transfer on callback",
     "steps": [
         {
             "step": "setState",
@@ -7,15 +7,23 @@
                 "address:a_user": {
                     "nonce": "0",
                     "balance": "0",
-                    "esdt": {
-                        "str:TEST-TOKEN": "1000"
-                    },
                     "storage": {},
                     "code": ""
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKEN": "1000",
+                        "str:TEST-SFT": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
@@ -29,48 +37,25 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "multi-transfer-through-callback",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:TEST-TOKEN",
-                    "value": "1000"
-                },
-                "function": "forward_payment",
+                "function": "forward_async_retrieve_multi_transfer_funds",
                 "arguments": [
-                    "sc:vault"
+                    "sc:vault",
+                    "str:TEST-SFT",
+                    "1",
+                    "500"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": [
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:ESDTTransfer",
-                        "topics": [
-                            "str:TEST-TOKEN",
-                            "",
-                            "1000",
-                            "sc:vault"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:callBack",
-                        "topics": [
-                            "str:callback_raw"
-                        ],
-                        "data": {
-                            "0-status": "biguint:0"
-                        }
-                    }
-                ],
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -81,29 +66,49 @@
                 "address:a_user": {
                     "nonce": "*",
                     "balance": "0",
-                    "esdt": {
-                        "str:TEST-TOKEN": "0"
-                    },
                     "storage": {},
                     "code": ""
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
-                        "str:TEST-TOKEN": "1000"
+                        "str:TEST-TOKEN": "1000",
+                        "str:TEST-SFT": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "500"
+                                }
+                            ]
+                        }
                     },
+                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:TEST-SFT": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "500"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {
+                        "str:callback_data.item|u32:1": "u32:0",
                         "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:1": [
-                            "u32:0"
-                        ]
+
+                        "str:callback_payments.item|u32:1": {
+                            "1-token_id": "nested:str:TEST-SFT",
+                            "2-nonce": "u64:1",
+                            "3-amount": "biguint:500"
+                        },
+                        "str:callback_payments.len": "1"
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }

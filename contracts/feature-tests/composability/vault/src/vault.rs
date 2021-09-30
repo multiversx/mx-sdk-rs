@@ -152,6 +152,75 @@ pub trait Vault {
         }
     }
 
+    #[endpoint]
+    fn retrieve_multi_funds_async(
+        &self,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let caller = self.blockchain().get_caller();
+        let mut all_payments = Vec::new();
+
+        for multi_arg in token_payments.into_iter() {
+            let (token_id, nonce, amount) = multi_arg.into_tuple();
+
+            all_payments.push(EsdtTokenPayment {
+                token_identifier: token_id,
+                token_nonce: nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid,
+            });
+        }
+
+        self.send().transfer_multiple_esdt_via_async_call(
+            &caller,
+            &all_payments.managed_into(self.raw_vm_api()),
+            b"",
+        );
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn burn_and_create_retrive_async(&self) {
+        let payments = self.call_value().all_esdt_transfers();
+        let mut uris = ManagedVec::new_empty(self.type_manager());
+        uris.push(self.types().managed_buffer_empty());
+
+        let mut new_tokens = Vec::new();
+
+        for payment in payments.into_iter() {
+            // burn old tokens
+            self.send().esdt_local_burn(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+
+            // create new ones
+            let new_token_nonce = self.send().esdt_nft_create(
+                &payment.token_identifier,
+                &payment.amount,
+                &self.types().managed_buffer_empty(),
+                &self.types().big_uint_zero(),
+                &self.types().managed_buffer_empty(),
+                &(),
+                &uris,
+            );
+
+            new_tokens.push(EsdtTokenPayment {
+                token_identifier: payment.token_identifier,
+                token_nonce: new_token_nonce,
+                amount: payment.amount,
+                token_type: EsdtTokenType::Invalid, // ignored
+            });
+        }
+
+        self.send().transfer_multiple_esdt_via_async_call(
+            &self.blockchain().get_caller(),
+            &new_tokens.managed_into(self.raw_vm_api()),
+            &[],
+        );
+    }
+
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
