@@ -615,7 +615,7 @@ where
     pub(super) key: K,
     pub(super) map: &'a mut MapMapper<SA, K, V>,
 
-    // Be invariant in `K` and `V`
+    // Be invariant in `K` and `V::StorageMapperType`
     pub(super) _marker: PhantomData<&'a mut (K, V::StorageMapperType)>,
 }
 
@@ -631,7 +631,7 @@ where
     pub(super) key: K,
     pub(super) map: &'a mut MapMapper<SA, K, V>,
 
-    // Be invariant in `K` and `V`
+    // Be invariant in `K` and `V::StorageMapperType`
     pub(super) _marker: PhantomData<&'a mut (K, V::StorageMapperType)>,
 }
 
