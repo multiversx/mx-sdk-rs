@@ -57,11 +57,10 @@ fn generate_topic_conversion_code(
     let pat = &arg.pat;
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
-            if type_reference.mutability.is_some() {
-                panic!(
-                    "[Event topic] Mutable references not supported as contract method arguments"
-                );
-            }
+            assert!(
+                type_reference.mutability.is_none(),
+                "[Event topic] Mutable references not supported as contract method arguments"
+            );
             match &*type_reference.elem {
                 syn::Type::Path(type_path) => {
                     let type_str = type_path.path.segments.last().unwrap().ident.to_string();
@@ -96,9 +95,10 @@ fn generate_topic_conversion_code(
 
 pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_macro2::TokenStream {
     let nr_args_no_self = m.method_args.len();
-    if nr_args_no_self == 0 {
-        panic!("events need at least 1 argument, for the data");
-    }
+    assert!(
+        nr_args_no_self != 0,
+        "events need at least 1 argument, for the data"
+    );
     let nr_topics = nr_args_no_self as usize; // -1 data, +1 event id
 
     let mut topic_index: usize = 1;

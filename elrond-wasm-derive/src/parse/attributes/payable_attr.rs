@@ -26,16 +26,18 @@ fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
     let mut iter = attr.clone().tokens.into_iter();
     let result_str = match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
-            if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-                panic!("payable token name must be specified in parantheses");
-            }
+            assert!(
+                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
+                "payable token name must be specified in parantheses"
+            );
             let mut iter2 = group.stream().into_iter();
             match iter2.next() {
                 Some(proc_macro2::TokenTree::Literal(lit)) => {
                     let str_val = lit.to_string();
-                    if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
-                        panic!("string literal expected as attribute argument");
-                    }
+                    assert!(
+                        str_val.starts_with('\"') && str_val.ends_with('\"'),
+                        "string literal expected as attribute argument"
+                    );
                     let substr = &str_val[1..str_val.len() - 1];
                     Some(substr.to_string())
                 },
@@ -46,9 +48,10 @@ fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
         _ => panic!("unexpected payable attribute format"),
     };
 
-    if iter.next().is_some() {
-        panic!("event too many tokens in event attribute");
-    }
+    assert!(
+        iter.next().is_none(),
+        "event too many tokens in event attribute"
+    );
 
     result_str
 }
