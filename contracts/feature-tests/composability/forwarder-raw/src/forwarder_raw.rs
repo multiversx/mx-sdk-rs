@@ -132,24 +132,62 @@ pub trait ForwarderRaw {
             .transfer_execute();
     }
 
-    #[view]
-    #[storage_mapper("callback_data")]
-    fn callback_data(
+    #[endpoint]
+    fn forward_async_retrieve_multi_transfer_funds(
         &self,
-    ) -> VecMapper<(
-        TokenIdentifier,
-        BigUint,
-        ManagedVec<Self::Api, ManagedBuffer>,
-    )>;
+        to: ManagedAddress,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.raw_vm_api());
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+
+            arg_buffer.push_arg(token_identifier);
+            arg_buffer.push_arg(token_nonce);
+            arg_buffer.push_arg(amount);
+        }
+
+        self.raw_vm_api().async_call_raw(
+            &to,
+            &self.types().big_uint_zero(),
+            &self
+                .types()
+                .managed_buffer_from(&b"retrieve_multi_funds_async"[..]),
+            &arg_buffer,
+        );
+    }
+
+    #[endpoint]
+    fn forwarder_async_send_and_retrieve_multi_transfer_funds(
+        &self,
+        to: ManagedAddress,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut all_payments = Vec::new();
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+
+            all_payments.push(EsdtTokenPayment {
+                token_identifier,
+                token_nonce,
+                amount,
+                token_type: EsdtTokenType::Invalid, // ignored
+            });
+        }
+
+        self.send().transfer_multiple_esdt_via_async_call(
+            &to,
+            &all_payments.managed_into(self.raw_vm_api()),
+            &b"burn_and_create_retrive_async"[..],
+        );
+    }
 
     #[view]
-    fn callback_data_at_index(
-        &self,
-        index: usize,
-    ) -> MultiResult3<TokenIdentifier, BigUint, ManagedVec<Self::Api, ManagedBuffer>> {
-        let (token, payment, args) = self.callback_data().get(index);
-        (token, payment, args.into()).into()
-    }
+    #[storage_mapper("callback_data")]
+    fn callback_data(&self) -> VecMapper<ManagedVec<Self::Api, ManagedBuffer>>;
+
+    #[storage_mapper("callback_payments")]
+    fn callback_payments(&self) -> VecMapper<(TokenIdentifier, u64, BigUint)>;
 
     #[endpoint]
     fn clear_callback_info(&self) {
@@ -157,25 +195,35 @@ pub trait ForwarderRaw {
     }
 
     #[callback_raw]
-    fn callback_raw(
-        &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
-        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) {
-        let args_as_vec = args.into_vec_of_buffers();
-        self.callback_raw_event(&token, &payment, &args_as_vec);
+    fn callback_raw(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
+        let payments = self.call_value().all_esdt_transfers();
+        if payments.len() == 0 {
+            let egld_value = self.call_value().egld_value();
+            if egld_value > 0 {
+                let _ = self.callback_payments().push(&(
+                    self.types().token_identifier_egld(),
+                    0,
+                    egld_value,
+                ));
+            }
+        } else {
+            for payment in payments.into_iter() {
+                let _ = self.callback_payments().push(&(
+                    payment.token_identifier,
+                    payment.token_nonce,
+                    payment.amount,
+                ));
+            }
+        }
 
-        let _ = self.callback_data().push(&(token, payment, args_as_vec));
+        let args_as_vec = args.into_vec_of_buffers();
+        self.callback_raw_event(&args_as_vec);
+
+        let _ = self.callback_data().push(&args_as_vec);
     }
 
     #[event("callback_raw")]
-    fn callback_raw_event(
-        &self,
-        #[indexed] token: &TokenIdentifier,
-        #[indexed] payment: &BigUint,
-        arguments: &ManagedVec<Self::Api, ManagedBuffer>,
-    );
+    fn callback_raw_event(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
 
     // SYNC CALLS
 

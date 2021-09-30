@@ -45,7 +45,7 @@ impl<'k, A> TopDecodeInput for StorageGetInput<'k, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<A>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<A, ManagedBuffer<A>>;
 
     fn byte_len(&self) -> usize {
         let key_bytes = self.key.to_boxed_bytes();

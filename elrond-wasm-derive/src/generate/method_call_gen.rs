@@ -5,11 +5,8 @@ use crate::model::Method;
 
 pub fn generate_call_to_method_expr(m: &Method) -> proc_macro2::TokenStream {
     let fn_ident = &m.name;
-    let arg_values: Vec<proc_macro2::TokenStream> = m
-        .method_args
-        .iter()
-        .map(|arg| generate_arg_call_name(arg))
-        .collect();
+    let arg_values: Vec<proc_macro2::TokenStream> =
+        m.method_args.iter().map(generate_arg_call_name).collect();
     quote! {
         self.#fn_ident (#(#arg_values),*)
     }

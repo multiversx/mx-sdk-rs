@@ -155,13 +155,15 @@ impl BlockchainMock {
         let is_sc = self.is_smart_contract_address(&account.address);
         let has_code = self.check_account_has_code(account);
 
-        if is_sc && !has_code {
-            panic!("Account has a smart contract address but no code");
-        }
+        assert!(
+            !is_sc || has_code,
+            "Account has a smart contract address but no code"
+        );
 
-        if !is_sc && has_code {
-            panic!("Account has no smart contract address but has code");
-        }
+        assert!(
+            is_sc || !has_code,
+            "Account has no smart contract address but has code"
+        );
     }
 
     pub fn is_smart_contract_address(&self, address: &Address) -> bool {
@@ -373,9 +375,10 @@ impl BlockchainMock {
                 contract_owner: Some(tx_input.from.clone()),
             },
         );
-        if old_value.is_some() {
-            panic!("Account already exists at deploy address.");
-        }
+        assert!(
+            old_value.is_none(),
+            "Account already exists at deploy address."
+        );
 
         new_address
     }

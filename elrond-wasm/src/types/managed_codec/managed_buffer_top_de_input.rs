@@ -8,11 +8,11 @@ use crate::{
 
 use super::ManagedBufferNestedDecodeInput;
 
-impl<M> TopDecodeInput for &ManagedBuffer<M>
+impl<'a, M> TopDecodeInput for &'a ManagedBuffer<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + 'static,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<M>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M, &'a ManagedBuffer<M>>;
 
     fn byte_len(&self) -> usize {
         self.len()
@@ -41,8 +41,7 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        // TODO: get rid of the clone, by making ManagedBufferNestedDecodeInput only take a reference
-        ManagedBufferNestedDecodeInput::new(self.clone())
+        ManagedBufferNestedDecodeInput::new(self)
     }
 }
 
@@ -51,7 +50,7 @@ impl<M> TopDecodeInput for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<M>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M, ManagedBuffer<M>>;
 
     fn byte_len(&self) -> usize {
         self.len()

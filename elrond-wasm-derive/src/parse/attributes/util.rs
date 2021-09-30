@@ -18,16 +18,18 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
     let mut iter = attr.clone().tokens.into_iter();
     match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
-            if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-                panic!("annotation paranthesis expected (check events and storage)");
-            }
+            assert!(
+                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
+                "annotation paranthesis expected (check events and storage)"
+            );
             let mut iter2 = group.stream().into_iter();
             match iter2.next() {
                 Some(proc_macro2::TokenTree::Literal(lit)) => {
                     let str_val = lit.to_string();
-                    if !str_val.starts_with('\"') || !str_val.ends_with('\"') {
-                        panic!("string literal expected as attribute argument (check events and storage)");
-                    }
+                    assert!(
+                        str_val.starts_with('\"') && str_val.ends_with('\"'),
+                        "string literal expected as attribute argument (check events and storage)"
+                    );
                     let substr = &str_val[1..str_val.len() - 1];
                     result_str = substr.to_string();
                 },
@@ -37,9 +39,10 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
         _ => panic!("missing annotation identifier (check events and storage)"),
     }
 
-    if iter.next().is_some() {
-        panic!("too many tokens in attribute (check events and storage)");
-    }
+    assert!(
+        iter.next().is_none(),
+        "too many tokens in attribute (check events and storage)"
+    );
 
     result_str
 }
@@ -60,9 +63,10 @@ fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::Tok
     let mut iter = attr.clone().tokens.into_iter();
     let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
-            if group.delimiter() != proc_macro2::Delimiter::Parenthesis {
-                panic!("attribute paranthesis expected");
-            }
+            assert!(
+                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
+                "attribute paranthesis expected"
+            );
             let mut iter2 = group.stream().into_iter();
             match iter2.next() {
                 Some(token_tree) => Some(token_tree),
@@ -73,9 +77,7 @@ fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::Tok
         None => None,
     };
 
-    if iter.next().is_some() {
-        panic!("too many tokens in attribute");
-    }
+    assert!(iter.next().is_none(), "too many tokens in attribute");
 
     arg_token_tree
 }
