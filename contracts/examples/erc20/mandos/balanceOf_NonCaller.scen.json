@@ -37,7 +37,9 @@
                 "gasPrice": "0x01"
             },
             "expect": {
-                "out": [ "0" ],
+                "out": [
+                    "0"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

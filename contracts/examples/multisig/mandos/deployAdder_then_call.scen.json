@@ -37,7 +37,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["3"],
+                "out": [
+                    "3"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -95,7 +97,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
-                "arguments": ["3"],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -115,7 +119,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
-                "arguments": ["3"],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -145,7 +151,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
-                "arguments": ["3"],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "90,000,000",
                 "gasPrice": "0"
             },
@@ -191,7 +199,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["4"],
+                "out": [
+                    "4"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -206,7 +216,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
-                "arguments": ["4"],
+                "arguments": [
+                    "4"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -226,7 +238,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
-                "arguments": ["4"],
+                "arguments": [
+                    "4"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -246,7 +260,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
-                "arguments": ["4"],
+                "arguments": [
+                    "4"
+                ],
                 "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
@@ -267,12 +283,16 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionData",
-                "arguments": ["4"],
+                "arguments": [
+                    "4"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "" ],
+                "out": [
+                    ""
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -288,12 +308,16 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "getActionSigners",
-                "arguments": ["4"],
+                "arguments": [
+                    "4"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "" ],
+                "out": [
+                    ""
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

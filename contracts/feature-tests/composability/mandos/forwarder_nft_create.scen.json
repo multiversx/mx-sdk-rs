@@ -55,7 +55,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["2", "2"],
+                "out": [
+                    "2",
+                    "2"
+                ],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

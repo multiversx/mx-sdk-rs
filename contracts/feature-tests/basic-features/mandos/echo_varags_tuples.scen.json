@@ -62,8 +62,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                ],
+                "out": [],
                 "status": "",
                 "logs": [],
                 "gas": "*",

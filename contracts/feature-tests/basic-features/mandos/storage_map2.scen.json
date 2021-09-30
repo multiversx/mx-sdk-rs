@@ -78,7 +78,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -144,7 +146,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0" ],
+                "out": [
+                    "0"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
