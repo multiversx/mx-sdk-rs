@@ -1,8 +1,8 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{ManagedTypeApi, SendApi},
+    api::{ManagedTypeApi, SendApi, StorageWriteApi},
     io::EndpointResult,
-    types::{BigUint, CallbackCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
 use alloc::{string::String, vec::Vec};
 
@@ -16,14 +16,14 @@ where
     pub(crate) egld_payment: BigUint<SA>,
     pub(crate) endpoint_name: ManagedBuffer<SA>,
     pub(crate) arg_buffer: ManagedArgBuffer<SA>,
-    pub(crate) callback_call: Option<CallbackCall<SA>>,
+    pub(crate) callback_call: Option<CallbackClosure<SA>>,
 }
 
 impl<SA> AsyncCall<SA>
 where
     SA: SendApi + 'static,
 {
-    pub fn with_callback(self, callback_call: CallbackCall<SA>) -> Self {
+    pub fn with_callback(self, callback_call: CallbackClosure<SA>) -> Self {
         AsyncCall {
             callback_call: Some(callback_call),
             ..self
@@ -33,7 +33,7 @@ where
 
 impl<SA> EndpointResult for AsyncCall<SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi + ManagedTypeApi + StorageWriteApi + 'static,
 {
     type DecodeAs = ();
 
@@ -41,12 +41,7 @@ where
     fn finish<FA>(&self, _api: FA) {
         // first, save the callback closure
         if let Some(callback_call) = &self.callback_call {
-            let hex_cd_ser = callback_call.serialize_hex_call_data();
-            self.api
-                .storage_store_tx_hash_key(&ManagedBuffer::new_from_bytes(
-                    self.api.clone(),
-                    hex_cd_ser.as_slice(),
-                ));
+            callback_call.save_to_storage(self.api.clone());
         }
 
         // last, send the async call, which will kill the execution

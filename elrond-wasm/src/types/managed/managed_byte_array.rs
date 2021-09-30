@@ -75,6 +75,11 @@ where
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
+
+    #[inline]
+    pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
+        &self.buffer
+    }
 }
 
 impl<M, const N: usize> PartialEq for ManagedByteArray<M, N>

@@ -48,7 +48,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``u64": "123"
+                        "str:u64": "123"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -109,7 +109,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``u64": "0"
+                        "str:u64": "0"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },

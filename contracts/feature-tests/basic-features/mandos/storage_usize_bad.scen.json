@@ -9,7 +9,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``usize": "0x0100000000"
+                        "str:usize": "0x0100000000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },

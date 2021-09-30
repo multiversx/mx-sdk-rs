@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
                     "storage": {},
@@ -23,7 +23,7 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "value": "0",
                 "function": "totalSupply",
@@ -42,7 +42,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "1",
                     "balance": "0xe8d4951000",
                     "storage": {},

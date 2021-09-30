@@ -47,8 +47,11 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
         Err(DecodeError::UNSUPPORTED_OPERATION) => {
             // Ok
         },
-        Err(_) => {
-            panic!("Unexpected encoding error");
+        Err(err) => {
+            panic!(
+                "Unexpected encoding error:: {}",
+                core::str::from_utf8(err.message_bytes()).unwrap()
+            )
         },
     }
 

@@ -31,9 +31,10 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                 let mut message_slice = lit_str.as_str();
 
                 // the useful part of the message is between quotes
-                if !message_slice.starts_with('\"') || !message_slice.ends_with('\"') {
-                    panic!("malformed doc attribute: string literal expected");
-                }
+                assert!(
+                    message_slice.starts_with('\"') && message_slice.ends_with('\"'),
+                    "malformed doc attribute: string literal expected"
+                );
                 message_slice = &message_slice[1..message_slice.len() - 1];
 
                 // most doc comments start with a space, so remove that too

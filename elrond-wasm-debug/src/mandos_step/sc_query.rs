@@ -28,9 +28,10 @@ pub fn execute(
     };
 
     let (tx_result, opt_async_data) = sc_call(tx_input, state, contract_map).unwrap();
-    if tx_result.result_status == 0 && opt_async_data.is_some() {
-        panic!("Can't query a view function that performs an async call");
-    }
+    assert!(
+        tx_result.result_status != 0 || !opt_async_data.is_some(),
+        "Can't query a view function that performs an async call"
+    );
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
     }
