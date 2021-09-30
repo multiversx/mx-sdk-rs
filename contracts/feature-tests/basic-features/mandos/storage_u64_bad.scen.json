@@ -9,7 +9,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``u64": "0x010000000000000000"
+                        "str:u64": "0x010000000000000000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },

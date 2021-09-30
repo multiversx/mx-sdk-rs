@@ -51,7 +51,7 @@
                 "function": "echo_async_result_empty",
                 "arguments": [
                     "5",
-                    "''message"
+                    "str:message"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
