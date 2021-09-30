@@ -50,7 +50,7 @@ where
     }
 }
 
-impl<'a, AA> TopDecodeInput for ArgDecodeInput<AA>
+impl<AA> TopDecodeInput for ArgDecodeInput<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
