@@ -9,9 +9,10 @@ pub fn generate_load_single_arg(
     let arg_name_expr = arg_id_literal(&arg.pat);
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
-            if type_reference.mutability.is_some() {
-                panic!("Mutable references not supported as contract method arguments");
-            }
+            assert!(
+                type_reference.mutability.is_none(),
+                "Mutable references not supported as contract method arguments"
+            );
             if let syn::Type::Slice(slice_type) = &*type_reference.elem {
                 // deserialize as boxed slice, so we have an owned object that we can reference
                 let slice_elem = &slice_type.elem;
@@ -54,9 +55,10 @@ pub fn generate_load_dyn_arg(
     let arg_name_expr = arg_id_literal(pat);
     match &arg.ty {
         syn::Type::Reference(type_reference) => {
-            if type_reference.mutability.is_some() {
-                panic!("Mutable references not supported as contract method arguments");
-            }
+            assert!(
+                type_reference.mutability.is_none(),
+                "Mutable references not supported as contract method arguments"
+            );
             let referenced_type = &*type_reference.elem;
             quote! {
                 let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_expr);

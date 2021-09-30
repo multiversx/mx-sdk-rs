@@ -46,9 +46,10 @@ fn fieldless_enum_match_arm(
 fn auto_default(ast: &syn::DeriveInput) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
     let name = &ast.ident;
     if let syn::Data::Enum(data_enum) = &ast.data {
-        if data_enum.variants.is_empty() {
-            panic!("cannot deserialize enums without variants");
-        }
+        assert!(
+            !data_enum.variants.is_empty(),
+            "cannot deserialize enums without variants"
+        );
         let first_variant = &data_enum.variants[0];
         if first_variant.fields.is_empty() {
             let first_variant_ident = &first_variant.ident;

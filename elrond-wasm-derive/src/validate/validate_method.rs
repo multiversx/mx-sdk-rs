@@ -19,12 +19,11 @@ pub fn validate_method(m: &Method) {
 fn validate_method_name(m: &Method) {
     if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
         let endpoint_name_str = endpoint_metadata.public_name.to_string();
-        if endpoint_name_str == INIT_ENDPOINT_NAME {
-            panic!("Cannot declare endpoint with name 'init'. Use #[init] instead.")
-        }
-        if reserved::is_reserved(endpoint_name_str.as_str()) {
-            panic!("Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
-        }
+        assert!(
+            endpoint_name_str != INIT_ENDPOINT_NAME,
+            "Cannot declare endpoint with name 'init'. Use #[init] instead."
+        );
+        assert!(!reserved::is_reserved(endpoint_name_str.as_str()), "Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
     }
 }
 
@@ -44,37 +43,31 @@ fn validate_payment_args(m: &Method) {
         .iter()
         .filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentNonce))
         .count();
-    if num_payment_amount > 1 {
-        panic!(
-            "only one `#[payment]` argument allowed (method: `{}`)",
-            m.name.to_string()
-        );
-    }
-    if num_payment_token > 1 {
-        panic!(
-            "only one `#[payment_token]` argument allowed (method: `{}`)",
-            m.name.to_string()
-        );
-    }
-    if num_payment_nonce > 1 {
-        panic!(
-            "only one `#[payment_nonce]` argument allowed (method: `{}`)",
-            m.name.to_string()
-        );
-    }
+    assert!(
+        num_payment_amount <= 1,
+        "only one `#[payment]` argument allowed (method: `{}`)",
+        m.name.to_string()
+    );
+    assert!(
+        num_payment_token <= 1,
+        "only one `#[payment_token]` argument allowed (method: `{}`)",
+        m.name.to_string()
+    );
+    assert!(
+        num_payment_nonce <= 1,
+        "only one `#[payment_nonce]` argument allowed (method: `{}`)",
+        m.name.to_string()
+    );
     if !m.is_payable() {
-        if num_payment_amount > 0 {
-            panic!("`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
-        }
-        if num_payment_token > 0 {
-            panic!(
-				"`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
-        }
+        assert!(num_payment_amount == 0, "`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
+
+        assert!(num_payment_token == 0, "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
     }
     if let PublicRole::Init(init_metadata) = &m.public_role {
-        if !init_metadata.payable.no_esdt() {
-            panic!("only EGLD payments currently allowed in constructors");
-        }
+        assert!(
+            init_metadata.payable.no_esdt(),
+            "only EGLD payments currently allowed in constructors"
+        );
     }
     validate_payment_args_not_reference(m);
 }
@@ -99,10 +92,14 @@ fn validate_callback_call_result_arg(m: &Method) {
         .count();
 
     if matches!(&m.public_role, PublicRole::Callback(_)) {
-        if num_call_result > 1 {
-            panic!("only one `#[call_result]` argument allowed");
-        }
-    } else if num_call_result > 1 {
-        panic!("`#[call_result]` argument only allowed in `#[callback]` methods");
+        assert!(
+            num_call_result <= 1,
+            "only one `#[call_result]` argument allowed"
+        );
+    } else {
+        assert!(
+            num_call_result <= 1,
+            "`#[call_result]` argument only allowed in `#[callback]` methods"
+        );
     }
 }
