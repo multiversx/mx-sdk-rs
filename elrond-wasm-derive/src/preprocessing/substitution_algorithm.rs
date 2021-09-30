@@ -1,5 +1,4 @@
 use proc_macro::{Group, TokenStream, TokenTree};
-use std::iter::FromIterator;
 
 use super::substitution_map::SubstitutionsMap;
 
@@ -41,5 +40,5 @@ pub(super) fn perform_substitutions(
             break;
         }
     }
-    proc_macro::TokenStream::from_iter(result.into_iter())
+    result.into_iter().collect::<proc_macro::TokenStream>()
 }
