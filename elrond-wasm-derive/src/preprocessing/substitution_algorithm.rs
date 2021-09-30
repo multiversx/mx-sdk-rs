@@ -40,5 +40,5 @@ pub(super) fn perform_substitutions(
             break;
         }
     }
-    result.into_iter().collect::<proc_macro::TokenStream>()
+    result.into_iter().collect()
 }
