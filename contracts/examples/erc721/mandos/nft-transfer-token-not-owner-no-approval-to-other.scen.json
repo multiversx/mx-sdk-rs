@@ -9,7 +9,7 @@
             "step": "setState",
             "accounts": {
                 "address:acc1": {
-                    "nonce" : "0",
+                    "nonce": "0",
                     "balance": "0",
                     "storage": {}
                 }
@@ -46,7 +46,7 @@
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce" : "1",
+                    "nonce": "1",
                     "balance": "0",
                     "storage": {}
                 },
@@ -54,7 +54,6 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        
                         "str:totalMinted": "3",
                         "str:tokenCount|address:contract_owner": "3",
                         "str:tokenOwner|u64:0": "address:contract_owner",

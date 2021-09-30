@@ -38,7 +38,6 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        
                         "str:totalMinted": "5",
                         "str:tokenCount|address:contract_owner": "5",
                         "str:tokenOwner|u64:0": "address:contract_owner",

@@ -47,7 +47,9 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_push",
-                "arguments": [ "123" ],
+                "arguments": [
+                    "123"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -72,7 +74,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -87,7 +91,9 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_push",
-                "arguments": [ "111" ],
+                "arguments": [
+                    "111"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -112,7 +118,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123", "111" ],
+                "out": [
+                    "123",
+                    "111"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -132,7 +141,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "2" ],
+                "out": [
+                    "2"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -146,9 +157,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``vec_mapper.len": "2",
-                        "``vec_mapper.item|u32:1": "123",
-                        "``vec_mapper.item|u32:2": "111"
+                        "str:vec_mapper.len": "2",
+                        "str:vec_mapper.item|u32:1": "123",
+                        "str:vec_mapper.item|u32:2": "111"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -168,7 +179,9 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_get",
-                "arguments": [ "0" ],
+                "arguments": [
+                    "0"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -189,12 +202,16 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_get",
-                "arguments": [ "2" ],
+                "arguments": [
+                    "2"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "111" ],
+                "out": [
+                    "111"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -209,7 +226,9 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "vec_mapper_get",
-                "arguments": [ "3" ],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },

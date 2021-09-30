@@ -52,9 +52,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ping_amount": "500,000,000,000",
-                        "''activation_timestamp": "780",
-                        "''deadline": "123,780"
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }

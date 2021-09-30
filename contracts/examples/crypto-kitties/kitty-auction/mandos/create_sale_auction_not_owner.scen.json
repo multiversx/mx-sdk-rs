@@ -62,7 +62,6 @@
                         "str:totalKitties": "2",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:1": "u8:1|u8:2|u8:3|u8:4|u8:5|u8:6|u8:7|u64:123456|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
-
                         "str:nrOwnedKitties|address:bidder2": "1",
                         "str:owner|u32:1": "address:bidder2"
                     },

@@ -90,7 +90,7 @@
                 "function": "logEventB",
                 "arguments": [
                     "0xa1",
-                    "``arg2_an_address_______________s3",
+                    "str:arg2_an_address_______________s3",
                     "1",
                     "2"
                 ],
@@ -107,13 +107,12 @@
                         "topics": [
                             "str:event_b",
                             "0xa1",
-                            "``arg2_an_address_______________s3"
+                            "str:arg2_an_address_______________s3"
                         ],
                         "data": [
                             "biguint:1",
                             "biguint:2"
                         ]
-                        
                     }
                 ],
                 "gas": "*",

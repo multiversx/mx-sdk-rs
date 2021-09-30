@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
                     "storage": {},
@@ -15,9 +15,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``balance|``account_1_____________________s1": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                        "``balance|``account_2_____________________s1": "0x0a",
-                        "``total_supply": "0x010000000000000000000000000000000000000000000000000000000000000009"
+                        "str:balance|address:account_1": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                        "str:balance|address:account_2": "0x0a",
+                        "str:totalSupply": "0x010000000000000000000000000000000000000000000000000000000000000009"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -27,12 +27,12 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "value": "0",
                 "function": "transfer",
                 "arguments": [
-                    "``account_2_____________________s1",
+                    "address:account_2",
                     "+0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                 ],
                 "gasLimit": "0x100000",
@@ -47,8 +47,8 @@
                         "endpoint": "str:transfer",
                         "topics": [
                             "str:transfer",
-                            "``account_1_____________________s1",
-                            "``account_2_____________________s1"
+                            "address:account_1",
+                            "address:account_2"
                         ],
                         "data": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                     }
@@ -60,7 +60,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "1",
                     "balance": "0xe8d4951000",
                     "storage": {},
@@ -70,9 +70,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``balance|``account_1_____________________s1": "0x0a",
-                        "``balance|``account_2_____________________s1": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                        "``total_supply": "0x010000000000000000000000000000000000000000000000000000000000000009"
+                        "str:balance|address:account_1": "0x0a",
+                        "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                        "str:totalSupply": "0x010000000000000000000000000000000000000000000000000000000000000009"
                     },
                     "code": "file:../output/erc20.wasm"
                 }

@@ -28,7 +28,7 @@
                 "value": "0",
                 "function": "store_map1",
                 "arguments": [
-                    "``__________address_1_____________",
+                    "str:__________address_1_____________",
                     "123"
                 ],
                 "gasLimit": "50,000,000",
@@ -49,7 +49,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map1__________address_1_____________": "123"
+                        "str:map1__________address_1_____________": "123"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -70,13 +70,15 @@
                 "value": "0",
                 "function": "load_map1",
                 "arguments": [
-                    "``__________address_1_____________"
+                    "str:__________address_1_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -92,7 +94,7 @@
                 "value": "0",
                 "function": "store_map1",
                 "arguments": [
-                    "``__________address_1_____________",
+                    "str:__________address_1_____________",
                     "0"
                 ],
                 "gasLimit": "50,000,000",
@@ -113,7 +115,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map1__________address_1_____________": "0"
+                        "str:map1__________address_1_____________": "0"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -134,13 +136,15 @@
                 "value": "0",
                 "function": "load_map1",
                 "arguments": [
-                    "``__________address_1_____________"
+                    "str:__________address_1_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0" ],
+                "out": [
+                    "0"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

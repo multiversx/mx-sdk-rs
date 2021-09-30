@@ -29,7 +29,9 @@
                 ]
             },
             "expect": {
-                "out": [ "str:abcdef" ]
+                "out": [
+                    "str:abcdef"
+                ]
             }
         },
         {
@@ -44,7 +46,9 @@
                 ]
             },
             "expect": {
-                "out": [ "str:def" ]
+                "out": [
+                    "str:def"
+                ]
             }
         },
         {
@@ -59,7 +63,9 @@
                 ]
             },
             "expect": {
-                "out": [ "str:abc" ]
+                "out": [
+                    "str:abc"
+                ]
             }
         },
         {
@@ -74,7 +80,9 @@
                 ]
             },
             "expect": {
-                "out": [ "" ]
+                "out": [
+                    ""
+                ]
             }
         }
     ]

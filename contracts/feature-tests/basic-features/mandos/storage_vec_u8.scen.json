@@ -48,7 +48,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``vec_u8": "123"
+                        "str:vec_u8": "123"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -73,7 +73,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -109,7 +111,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``vec_u8": "0"
+                        "str:vec_u8": "0"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -134,7 +136,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0" ],
+                "out": [
+                    "0"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

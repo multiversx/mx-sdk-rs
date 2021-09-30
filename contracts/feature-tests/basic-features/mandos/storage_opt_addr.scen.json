@@ -9,7 +9,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``opt_addr": ["1", "``____________address_too_long____________"]
+                        "str:opt_addr": [
+                            "1",
+                            "str:____________address_too_long____________"
+                        ]
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -51,7 +54,7 @@
                 "value": "0",
                 "function": "store_opt_addr",
                 "arguments": [
-                    "``____________address_____________"
+                    "str:____________address_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -71,7 +74,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``opt_addr": "1|``____________address_____________"
+                        "str:opt_addr": "1|str:____________address_____________"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -91,7 +94,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "``____________address_____________" ],
+                "out": [
+                    "str:____________address_____________"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -111,7 +116,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "false" ],
+                "out": [
+                    "false"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -126,8 +133,7 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "store_opt_addr",
-                "arguments": [
-                ],
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -152,7 +158,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "true" ],
+                "out": [
+                    "true"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -166,7 +174,7 @@
                     "nonce": "*",
                     "balance": "*",
                     "storage": {
-                        "``opt_addr": ""
+                        "str:opt_addr": ""
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -186,7 +194,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ ],
+                "out": [],
                 "status": "",
                 "logs": [],
                 "gas": "*",

@@ -48,7 +48,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``bool": "true"
+                        "str:bool": "true"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -73,7 +73,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "true" ],
+                "out": [
+                    "true"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -109,7 +111,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``bool": "false"
+                        "str:bool": "false"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -134,7 +136,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "false" ],
+                "out": [
+                    "false"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

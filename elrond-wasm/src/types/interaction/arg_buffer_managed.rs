@@ -6,7 +6,10 @@ use crate::{
     DynArgOutput,
 };
 use alloc::vec::Vec;
-use elrond_codec::{EncodeError, TopEncode};
+use elrond_codec::{
+    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+};
 
 #[derive(Debug)]
 pub struct ManagedArgBuffer<M>
@@ -14,7 +17,7 @@ where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
     api: M,
-    data: ManagedVec<M, ManagedBuffer<M>>,
+    pub(crate) data: ManagedVec<M, ManagedBuffer<M>>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedArgBuffer<M>
@@ -66,12 +69,15 @@ where
     }
 }
 
-impl<M> ManagedFrom<M, ManagedVec<M, ManagedBuffer<M>>> for ManagedArgBuffer<M>
+impl<M> From<ManagedVec<M, ManagedBuffer<M>>> for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    fn managed_from(api: M, data: ManagedVec<M, ManagedBuffer<M>>) -> Self {
-        ManagedArgBuffer { api, data }
+    fn from(data: ManagedVec<M, ManagedBuffer<M>>) -> Self {
+        ManagedArgBuffer {
+            api: data.type_manager(),
+            data,
+        }
     }
 }
 
@@ -149,5 +155,43 @@ impl<M: ManagedTypeApi> DynArgOutput for ManagedArgBuffer<M> {
     #[inline]
     fn push_single_arg<T: TopEncode>(&mut self, arg: T) {
         self.push_arg(arg)
+    }
+}
+
+impl<M> TopEncode for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.data.top_encode(output)
+    }
+}
+
+impl<M> NestedEncode for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.data.dep_encode(dest)
+    }
+}
+
+impl<M> TopDecode for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(ManagedVec::top_decode(input)?.into())
+    }
+}
+
+impl<M> NestedDecode for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(ManagedVec::dep_decode(input)?.into())
     }
 }

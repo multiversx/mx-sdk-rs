@@ -54,7 +54,6 @@
                         "data": [
                             "nested:sc:forwarder"
                         ]
-                        
                     }
                 ],
                 "gas": "*",

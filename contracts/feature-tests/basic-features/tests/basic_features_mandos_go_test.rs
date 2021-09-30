@@ -4,6 +4,16 @@ fn big_int_to_i64_go() {
 }
 
 #[test]
+fn big_num_conversions_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_num_conversions.scen.json");
+}
+
+#[test]
+fn big_uint_sqrt_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_uint_sqrt.scen.json");
+}
+
+#[test]
 fn big_uint_to_u64_go() {
     elrond_wasm_debug::mandos_go("mandos/big_uint_to_u64.scen.json");
 }
@@ -139,6 +149,11 @@ fn echo_string_go() {
 }
 
 #[test]
+fn echo_tuple_into_multiresult_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_tuple_into_multiresult.scen.json");
+}
+
+#[test]
 fn echo_u64_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_u64.scen.json");
 }
@@ -186,11 +201,6 @@ fn get_cumulated_validator_rewards_go() {
 #[test]
 fn get_esdt_local_roles_go() {
     elrond_wasm_debug::mandos_go("mandos/get_esdt_local_roles.scen.json");
-}
-
-#[test]
-fn log2_func_go() {
-    elrond_wasm_debug::mandos_go("mandos/log2_func.scen.json");
 }
 
 #[test]
@@ -249,11 +259,6 @@ fn panic_go() {
 }
 
 #[test]
-fn pow_func_go() {
-    elrond_wasm_debug::mandos_go("mandos/pow_func.scen.json");
-}
-
-#[test]
 fn return_codes_go() {
     elrond_wasm_debug::mandos_go("mandos/return_codes.scen.json");
 }
@@ -266,11 +271,6 @@ fn sc_properties_go() {
 #[test]
 fn sc_result_go() {
     elrond_wasm_debug::mandos_go("mandos/sc_result.scen.json");
-}
-
-#[test]
-fn sqrt_go() {
-    elrond_wasm_debug::mandos_go("mandos/sqrt.scen.json");
 }
 
 #[test]
@@ -329,11 +329,6 @@ fn storage_mapper_linked_list_go() {
 }
 
 #[test]
-fn storage_mapper_queue_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_mapper_queue.scen.json");
-}
-
-#[test]
 fn storage_mapper_map_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_map.scen.json");
 }
@@ -341,6 +336,11 @@ fn storage_mapper_map_go() {
 #[test]
 fn storage_mapper_map_nested_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_map_nested.scen.json");
+}
+
+#[test]
+fn storage_mapper_queue_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_queue.scen.json");
 }
 
 #[test]

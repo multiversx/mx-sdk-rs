@@ -7,7 +7,7 @@
         },
         {
             "step": "externalSteps",
-            "path": "set_accounts.json"
+            "path": "set_accounts.step.json"
         },
         {
             "step": "scCall",
@@ -79,11 +79,11 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                    "''balance|address:erc20_owner": "1,000,000,000",
-                    "''balance|address:acc1": "600,000",
-                    "''allowance|address:erc20_owner|address:acc1": "400,000",
-                    "''allowance|address:acc1|sc:crowdfunding": "400,000",
-                    "''total_supply": "1,000,000,000"
+                        "str:balance|address:erc20_owner": "1,000,000,000",
+                        "str:balance|address:acc1": "600,000",
+                        "str:allowance|address:erc20_owner|address:acc1": "400,000",
+                        "str:allowance|address:acc1|sc:crowdfunding": "400,000",
+                        "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },
@@ -91,9 +91,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                    "''target": "1,000,000",
-                    "''deadline": "123,456",
-                    "''erc20_contract_address": "sc:erc20"
+                        "str:target": "1,000,000",
+                        "str:deadline": "123,456",
+                        "str:erc20ContractAddress": "sc:erc20"
                     },
                     "code": "file:../output/crowdfunding-erc20.wasm"
                 }

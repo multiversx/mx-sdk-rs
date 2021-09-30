@@ -18,6 +18,7 @@ tutorial/book
 # Others
 my-arwen.sh
 publish.sh
+quick.sh
 
 # Zip output with example wasm binaries
 examples-wasm.zip

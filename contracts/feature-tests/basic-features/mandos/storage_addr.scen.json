@@ -28,7 +28,7 @@
                 "value": "0",
                 "function": "store_addr",
                 "arguments": [
-                    "``____________address_____________"
+                    "str:____________address_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -48,7 +48,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``addr": "``____________address_____________"
+                        "str:addr": "str:____________address_____________"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -73,7 +73,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "``____________address_____________" ],
+                "out": [
+                    "str:____________address_____________"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

@@ -1,6 +1,6 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
 use elrond_codec::*;
@@ -44,6 +44,23 @@ where
     #[inline]
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
         self.buffer.to_boxed_bytes()
+    }
+}
+
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for StorageKey<M> {
+    #[inline]
+    fn from(buffer: ManagedBuffer<M>) -> Self {
+        StorageKey { buffer }
+    }
+}
+
+impl<M, const N: usize> From<ManagedByteArray<M, N>> for StorageKey<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(mba: ManagedByteArray<M, N>) -> Self {
+        StorageKey { buffer: mba.buffer }
     }
 }
 

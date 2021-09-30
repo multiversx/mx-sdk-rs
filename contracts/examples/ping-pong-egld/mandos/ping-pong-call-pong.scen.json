@@ -52,13 +52,13 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ping_amount": "500,000,000,000",
-                        "''activation_timestamp": "780",
-                        "''deadline": "123,780",
-                        "''user_address_to_id|address:participant1": "1",
-                        "''user_id_to_address|0x0000001": "address:participant1",
-                        "''user_status|0x0000001": "2",
-                        "''user_count": "1"
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780",
+                        "str:user_address_to_id|address:participant1": "1",
+                        "str:user_id_to_address|0x0000001": "address:participant1",
+                        "str:userStatus|0x0000001": "2",
+                        "str:user_count": "1"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }

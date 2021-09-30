@@ -9,7 +9,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``nr_to_clear": "42"
+                        "str:nr_to_clear": "42"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -34,7 +34,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "42" ],
+                "out": [
+                    "42"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

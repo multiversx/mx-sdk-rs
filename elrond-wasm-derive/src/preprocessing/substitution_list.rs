@@ -16,7 +16,11 @@ pub fn substitutions() -> SubstitutionsMap {
 
 fn add_managed_type(substitutions: &mut SubstitutionsMap, type_name: &proc_macro2::TokenStream) {
     substitutions.add_substitution(
-        type_name.clone(),
+        quote!(#type_name::),
+        quote!(elrond_wasm::types::#type_name::<Self::Api>::),
+    );
+    substitutions.add_substitution(
+        quote!(#type_name),
         quote!(elrond_wasm::types::#type_name<Self::Api>),
     );
 }

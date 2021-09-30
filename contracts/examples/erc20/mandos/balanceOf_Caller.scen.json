@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
                     "storage": {},
@@ -15,8 +15,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``balance|``account_1_____________________s1": "0x2710",
-                        "``total_supply": "0x2710"
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -26,12 +26,12 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "value": "0",
                 "function": "balanceOf",
                 "arguments": [
-                    "``account_1_____________________s1"
+                    "address:account_1"
                 ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
@@ -49,7 +49,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "1",
                     "balance": "0xe8d4951000",
                     "storage": {},
@@ -59,8 +59,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``balance|``account_1_____________________s1": "0x2710",
-                        "``total_supply": "0x2710"
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }

@@ -15,7 +15,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 }
@@ -54,7 +54,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },

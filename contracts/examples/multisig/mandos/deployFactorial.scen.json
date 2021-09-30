@@ -36,7 +36,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["3"],
+                "out": [
+                    "3"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -50,27 +52,27 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``user_count": "5",
-                        "``user_address_to_id|address:alice": "1",
-                        "``user_address_to_id|address:bob": "2",
-                        "``user_address_to_id|address:charlie": "3",
-                        "``user_address_to_id|address:paul": "4",
-                        "``user_address_to_id|address:dan": "5",
-                        "``user_id_to_address|u32:1": "address:alice",
-                        "``user_id_to_address|u32:2": "address:bob",
-                        "``user_id_to_address|u32:3": "address:charlie",
-                        "``user_id_to_address|u32:4": "address:paul",
-                        "``user_id_to_address|u32:5": "address:dan",
-                        "``user_role|u32:1": "2",
-                        "``user_role|u32:2": "2",
-                        "``user_role|u32:3": "2",
-                        "``user_role|u32:4": "1",
-                        "``user_role|u32:5": "2",
-                        "``num_board_members": "4",
-                        "``num_proposers": "1",
-                        "``quorum": "2",
-                        "``action_data.len": "3",
-                        "``action_data.item|u32:3": {
+                        "str:user_count": "5",
+                        "str:user_address_to_id|address:alice": "1",
+                        "str:user_address_to_id|address:bob": "2",
+                        "str:user_address_to_id|address:charlie": "3",
+                        "str:user_address_to_id|address:paul": "4",
+                        "str:user_address_to_id|address:dan": "5",
+                        "str:user_id_to_address|u32:1": "address:alice",
+                        "str:user_id_to_address|u32:2": "address:bob",
+                        "str:user_id_to_address|u32:3": "address:charlie",
+                        "str:user_id_to_address|u32:4": "address:paul",
+                        "str:user_id_to_address|u32:5": "address:dan",
+                        "str:user_role|u32:1": "2",
+                        "str:user_role|u32:2": "2",
+                        "str:user_role|u32:3": "2",
+                        "str:user_role|u32:4": "1",
+                        "str:user_role|u32:5": "2",
+                        "str:num_board_members": "4",
+                        "str:num_proposers": "1",
+                        "str:quorum": "2",
+                        "str:action_data.len": "3",
+                        "str:action_data.item|u32:3": {
                             "1-discriminant": "0x06",
                             "2-amount": "u32:0",
                             "3-code": "nested:file:../test-contracts/factorial.wasm",
@@ -91,7 +93,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
-                "arguments": ["3"],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -111,7 +115,9 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "sign",
-                "arguments": ["3"],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -141,12 +147,16 @@
                 "to": "sc:multisig",
                 "value": "0",
                 "function": "performAction",
-                "arguments": ["3"],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "sc:factorial" ],
+                "out": [
+                    "sc:factorial"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -160,27 +170,26 @@
                     "nonce": "1",
                     "balance": "0",
                     "storage": {
-                        "``user_count": "5",
-                        "``user_address_to_id|address:alice": "1",
-                        "``user_address_to_id|address:bob": "2",
-                        "``user_address_to_id|address:charlie": "3",
-                        "``user_address_to_id|address:paul": "4",
-                        "``user_address_to_id|address:dan": "5",
-                        "``user_id_to_address|u32:1": "address:alice",
-                        "``user_id_to_address|u32:2": "address:bob",
-                        "``user_id_to_address|u32:3": "address:charlie",
-                        "``user_id_to_address|u32:4": "address:paul",
-                        "``user_id_to_address|u32:5": "address:dan",
-                        "``user_role|u32:1": "2",
-                        "``user_role|u32:2": "2",
-                        "``user_role|u32:3": "2",
-                        "``user_role|u32:4": "1",
-                        "``user_role|u32:5": "2",
-                        "``num_board_members": "4",
-                        "``num_proposers": "1",
-                        "``quorum": "2",
-                        "``action_data.len": "3"
-                        
+                        "str:user_count": "5",
+                        "str:user_address_to_id|address:alice": "1",
+                        "str:user_address_to_id|address:bob": "2",
+                        "str:user_address_to_id|address:charlie": "3",
+                        "str:user_address_to_id|address:paul": "4",
+                        "str:user_address_to_id|address:dan": "5",
+                        "str:user_id_to_address|u32:1": "address:alice",
+                        "str:user_id_to_address|u32:2": "address:bob",
+                        "str:user_id_to_address|u32:3": "address:charlie",
+                        "str:user_id_to_address|u32:4": "address:paul",
+                        "str:user_id_to_address|u32:5": "address:dan",
+                        "str:user_role|u32:1": "2",
+                        "str:user_role|u32:2": "2",
+                        "str:user_role|u32:3": "2",
+                        "str:user_role|u32:4": "1",
+                        "str:user_role|u32:5": "2",
+                        "str:num_board_members": "4",
+                        "str:num_proposers": "1",
+                        "str:quorum": "2",
+                        "str:action_data.len": "3"
                     },
                     "code": "file:../output/multisig.wasm"
                 },

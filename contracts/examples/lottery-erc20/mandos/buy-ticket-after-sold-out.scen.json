@@ -50,12 +50,12 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''lotteryInfo|u32:12|''lottery_name": "u32:1|u8:100|u32:0|u64:123,456|0xffffffff|u32:1|u8:100|u32:0|u32:2|u32:1|u8:200|u32:0",
-                        "''erc20_contract_address": "sc:erc20",
-                        "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
-                        "''ticketHolder|u32:12|''lottery_name|0x00000001": "address:acc2",
-                        "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc1": "1",
-                        "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc2": "1"
+                        "str:lotteryInfo|u32:12|str:lottery_name": "u32:1|u8:100|u32:0|u64:123,456|0xffffffff|u32:1|u8:100|u32:0|u32:2|u32:1|u8:200|u32:0",
+                        "str:erc20ContractAddress": "sc:erc20",
+                        "str:ticketHolder|u32:12|str:lottery_name|0x00000000": "address:acc1",
+                        "str:ticketHolder|u32:12|str:lottery_name|0x00000001": "address:acc2",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc2": "1"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
                 },
@@ -63,14 +63,14 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''balance|address:erc20_owner": "997,000,000",
-                        "''balance|address:my_address": "1,000,000",
-                        "''balance|address:acc1": "999,900",
-                        "''balance|address:acc2": "999,900",
-                        "''balance|sc:lottery": "200",
-                        "''allowance|address:acc1|sc:lottery": "0",
-                        "''allowance|address:acc2|sc:lottery": "0",
-                        "''total_supply": "1,000,000,000"
+                        "str:balance|address:erc20_owner": "997,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "999,900",
+                        "str:balance|address:acc2": "999,900",
+                        "str:balance|sc:lottery": "200",
+                        "str:allowance|address:acc1|sc:lottery": "0",
+                        "str:allowance|address:acc2|sc:lottery": "0",
+                        "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },

@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "0",
                     "balance": "0x10000000",
                     "esdt": {
@@ -18,8 +18,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``balance|``account_1_____________________s1": "0x2710",
-                        "``total_supply": "0x2710"
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -29,7 +29,7 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
@@ -53,7 +53,7 @@
             "step": "scCall",
             "txId": "2",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
@@ -61,7 +61,7 @@
                 },
                 "function": "balanceOf",
                 "arguments": [
-                    "``account_1_____________________s1"
+                    "address:account_1"
                 ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
@@ -79,7 +79,7 @@
             "step": "scCall",
             "txId": "3",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
@@ -87,8 +87,8 @@
                 },
                 "function": "allowance",
                 "arguments": [
-                    "``account_1_____________________s1",
-                    "``account_1_____________________s1"
+                    "address:account_1",
+                    "address:account_1"
                 ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
@@ -106,7 +106,7 @@
             "step": "scCall",
             "txId": "4",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
@@ -114,7 +114,7 @@
                 },
                 "function": "transfer",
                 "arguments": [
-                    "``account_1_____________________s1",
+                    "address:account_1",
                     "0x01"
                 ],
                 "gasLimit": "0x100000",
@@ -133,7 +133,7 @@
             "step": "scCall",
             "txId": "5",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
@@ -141,7 +141,7 @@
                 },
                 "function": "approve",
                 "arguments": [
-                    "``account_1_____________________s1",
+                    "address:account_1",
                     "0x01"
                 ],
                 "gasLimit": "0x100000",
@@ -160,7 +160,7 @@
             "step": "scCall",
             "txId": "6",
             "tx": {
-                "from": "``account_1_____________________s1",
+                "from": "address:account_1",
                 "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
@@ -168,8 +168,8 @@
                 },
                 "function": "transferFrom",
                 "arguments": [
-                    "``account_1_____________________s1",
-                    "``account_1_____________________s1",
+                    "address:account_1",
+                    "address:account_1",
                     "0x01"
                 ],
                 "gasLimit": "0x100000",
@@ -187,7 +187,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "``account_1_____________________s1": {
+                "address:account_1": {
                     "nonce": "6",
                     "balance": "0xfa00000",
                     "esdt": {
@@ -200,8 +200,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``balance|``account_1_____________________s1": "0x2710",
-                        "``total_supply": "0x2710"
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
