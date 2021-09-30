@@ -604,7 +604,7 @@ where
 }
 
 /// A view into a vacant entry in a `MapStorageMapper`.
-/// It is part of the [`Entry`] enum.
+/// It is part of the [`NestedEntry`] enum.
 pub struct VacantNestedEntry<'a, SA, K: 'a, V: 'a>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
@@ -616,11 +616,11 @@ where
     pub(super) map: &'a mut MapMapper<SA, K, V>,
 
     // Be invariant in `K` and `V`
-    pub(super) _marker: PhantomData<&'a mut (K, V)>,
+    pub(super) _marker: PhantomData<&'a mut (K, V::StorageMapperType)>,
 }
 
 /// A view into an occupied entry in a `MapStorageMapper`.
-/// It is part of the [`Entry`] enum.
+/// It is part of the [`NestedEntry`] enum.
 pub struct OccupiedNestedEntry<'a, SA, K: 'a, V: 'a>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
@@ -632,7 +632,7 @@ where
     pub(super) map: &'a mut MapMapper<SA, K, V>,
 
     // Be invariant in `K` and `V`
-    pub(super) _marker: PhantomData<&'a mut (K, V)>,
+    pub(super) _marker: PhantomData<&'a mut (K, V::StorageMapperType)>,
 }
 
 impl<'a, SA, K, V> NestedEntry<'a, SA, K, V>
