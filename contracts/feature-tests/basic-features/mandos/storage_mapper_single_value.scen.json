@@ -181,7 +181,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``my_single_value_mapper": "+234"
+                        "str:my_single_value_mapper": "+234"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
