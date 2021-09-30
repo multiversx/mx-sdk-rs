@@ -171,7 +171,7 @@ pub trait ForwarderRaw {
                 token_identifier,
                 token_nonce,
                 amount,
-                token_type: EsdtTokenType::Invalid // ignored
+                token_type: EsdtTokenType::Invalid, // ignored
             });
         }
 
