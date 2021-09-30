@@ -73,20 +73,16 @@
                         "str:lastValidTokenIdForType|biguint:1": "5",
                         "str:balanceOf|address:creator|str:.mapped|biguint:1": "4",
                         "str:balanceOf|sc:user_mock|str:.mapped|biguint:1": "1",
-
                         "str:lastValidTypeId": "1",
-
                         "str:tokenOwner|biguint:1|biguint:1": "address:creator",
                         "str:tokenOwner|biguint:1|biguint:2": "address:creator",
                         "str:tokenOwner|biguint:1|biguint:3": "sc:user_mock",
                         "str:tokenOwner|biguint:1|biguint:4": "address:creator",
                         "str:tokenOwner|biguint:1|biguint:5": "address:creator",
-
                         "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:creator|str:.value|u32:1": "1",
                         "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",
                         "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1",
-
                         "str:balanceOf|sc:user_mock|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|sc:user_mock|str:.value|u32:1": "1",
                         "str:balanceOf|sc:user_mock|str:.node_id|biguint:1": "1",

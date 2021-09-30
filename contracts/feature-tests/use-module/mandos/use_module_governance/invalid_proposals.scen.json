@@ -19,7 +19,6 @@
                 "function": "propose",
                 "arguments": [
                     "str:try-propose-with-too-few-tokens",
-
                     "50,000,000",
                     "sc:governance",
                     "",
@@ -77,7 +76,6 @@
                 "function": "propose",
                 "arguments": [
                     "str:try-propose-with-too-few-tokens",
-
                     "50,000,000",
                     "sc:governance",
                     "",
@@ -85,7 +83,6 @@
                     "0",
                     "str:changeQuorum",
                     "biguint:1000",
-
                     "50,000,000",
                     "sc:governance",
                     "",
@@ -93,7 +90,6 @@
                     "0",
                     "str:changeQuorum",
                     "biguint:1000",
-
                     "50,000,000",
                     "sc:governance",
                     "",

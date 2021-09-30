@@ -2,83 +2,83 @@
     "name": "ping-pong deployment test",
     "gasSchedule": "v3",
     "steps": [
-      {
-        "step": "setState",
-        "accounts": {
-          "address:my_address": {
-            "nonce": "0",
-            "balance": "1,000,000",
-            "storage": {}
-          },
-          "address:participant1": {
-            "nonce": "0",
-            "balance": "1,800,000,000,000",
-            "storage": {}
-          },
-          "address:participant2": {
-            "nonce": "0",
-            "balance": "2,500,000,000,000",
-            "storage": {}
-          }
-        },
-        "newAddresses": [
-          {
-            "creatorAddress": "address:my_address",
-            "creatorNonce": "0",
-            "newAddress": "sc:ping-pong"
-          }
-        ]
-      },
-      {
-        "step": "scDeploy",
-        "txId": "deploy",
-        "tx": {
-          "from": "address:my_address",
-          "contractCode": "file:../output/ping-pong-egld.wasm",
-          "value": "0",
-          "arguments": [
-              "500,000,000,000",
-              "123,000",
-              "1|u64:780"
-          ],
-          "gasLimit": "10,000,000",
-          "gasPrice": "0"
-        },
-        "expect": {
-          "status": "0",
-          "gas": "*",
-          "refund": "*"
-        }
-      },
-      {
-        "step": "checkState",
-        "accounts": {
-          "address:my_address": {
-            "nonce": "1",
-            "balance": "1,000,000",
-            "storage": {}
-          },
-          "address:participant1": {
-            "nonce": "0",
-            "balance": "1,800,000,000,000",
-            "storage": {}
-          },
-          "address:participant2": {
-            "nonce": "0",
-            "balance": "2,500,000,000,000",
-            "storage": {}
-          },
-          "sc:ping-pong": {
-            "nonce": "0",
-            "balance": "0",
-            "storage": {
-              "str:pingAmount": "500,000,000,000",
-              "str:activationTimestamp": "780",
-              "str:deadline": "123,780"
+        {
+            "step": "setState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:participant1": {
+                    "nonce": "0",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
+                    "storage": {}
+                }
             },
-            "code": "file:../output/ping-pong-egld.wasm"
-          }
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:my_address",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:ping-pong"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:my_address",
+                "contractCode": "file:../output/ping-pong-egld.wasm",
+                "value": "0",
+                "arguments": [
+                    "500,000,000,000",
+                    "123,000",
+                    "1|u64:780"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:participant1": {
+                    "nonce": "0",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
+                    "storage": {}
+                },
+                "sc:ping-pong": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780"
+                    },
+                    "code": "file:../output/ping-pong-egld.wasm"
+                }
+            }
         }
-      }
     ]
 }

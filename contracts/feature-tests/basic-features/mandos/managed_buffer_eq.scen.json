@@ -29,7 +29,9 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ]
+                "out": [
+                    "true"
+                ]
             }
         },
         {
@@ -44,7 +46,9 @@
                 ]
             },
             "expect": {
-                "out": [ "false" ]
+                "out": [
+                    "false"
+                ]
             }
         },
         {
@@ -59,7 +63,9 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ]
+                "out": [
+                    "true"
+                ]
             }
         },
         {
@@ -74,7 +80,9 @@
                 ]
             },
             "expect": {
-                "out": [ "false" ]
+                "out": [
+                    "false"
+                ]
             }
         },
         {
@@ -89,7 +97,9 @@
                 ]
             },
             "expect": {
-                "out": [ "false" ]
+                "out": [
+                    "false"
+                ]
             }
         }
     ]
