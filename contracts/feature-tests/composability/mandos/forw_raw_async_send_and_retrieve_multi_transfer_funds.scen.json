@@ -70,7 +70,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["3", "4"],
+                "out": [
+                    "3",
+                    "4"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -129,7 +132,6 @@
                             "5-arg_2_second_nft_create_nonce": "u8:4"
                         },
                         "str:callback_data.len": "1",
-
                         "str:callback_payments.item|u32:1": {
                             "1-token_id": "nested:str:TEST-SFT",
                             "2-nonce": "u64:3",

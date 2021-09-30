@@ -19,7 +19,6 @@
                 "function": "propose",
                 "arguments": [
                     "str:change-quorum",
-
                     "50,000,000",
                     "sc:governance",
                     "",
@@ -162,14 +161,11 @@
                     "storage": {
                         "str:governance:votes|u32:1|str:.mapped|address:user1": "500",
                         "str:governance:downvotes|u32:1|str:.mapped|address:user2": "999",
-
                         "str:governance:proposalStartBlock|u32:1": "",
                         "str:governance:totalVotes|u32:1": "",
                         "str:governance:totalDownvotes|u32:1": "",
                         "str:governance:proposals.item|u32:1": "",
-
                         "str:governance:quorum": "1500",
-
                         "+": {}
                     },
                     "code": "*"

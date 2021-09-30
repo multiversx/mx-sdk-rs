@@ -27,12 +27,16 @@
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "sqrt_big_uint",
-                "arguments": ["100"],
+                "arguments": [
+                    "100"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "10" ],
+                "out": [
+                    "10"
+                ],
                 "status": "0",
                 "logs": [],
                 "gas": "*",

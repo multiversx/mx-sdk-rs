@@ -51,9 +51,7 @@
                         "str:isFungible|biguint:1": "true",
                         "str:tokenTypeUri|biguint:1": "str:https://token-cdn-domain/{id}.json",
                         "str:balanceOf|address:creator|str:.mapped|biguint:1": "1500",
-                        
                         "str:lastValidTypeId": "1",
-
                         "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:creator|str:.value|u32:1": "1",
                         "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",

@@ -68,25 +68,20 @@
                         "str:balanceOf|address:creator|str:.mapped|biguint:1": "4",
                         "str:balanceOf|sc:marketplace_contract|str:.mapped|biguint:1": "0",
                         "str:balanceOf|address:user1|str:.mapped|biguint:1": "1",
-
                         "str:lastValidTypeId": "1",
-
                         "str:tokenOwner|biguint:1|biguint:1": "address:creator",
                         "str:tokenOwner|biguint:1|biguint:2": "address:user1",
                         "str:tokenOwner|biguint:1|biguint:3": "address:creator",
                         "str:tokenOwner|biguint:1|biguint:4": "address:creator",
                         "str:tokenOwner|biguint:1|biguint:5": "address:creator",
-
                         "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:creator|str:.value|u32:1": "1",
                         "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",
                         "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1",
-
                         "str:balanceOf|sc:marketplace_contract|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|sc:marketplace_contract|str:.value|u32:1": "1",
                         "str:balanceOf|sc:marketplace_contract|str:.node_id|biguint:1": "1",
                         "str:balanceOf|sc:marketplace_contract|str:.info": "u32:1|u32:1|u32:1|u32:1",
-
                         "str:balanceOf|address:user1|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:user1|str:.value|u32:1": "1",
                         "str:balanceOf|address:user1|str:.node_id|biguint:1": "1",
@@ -101,7 +96,6 @@
                         "str:tokenOwnershipContractAddress": "sc:ownership_contract",
                         "str:percentageCut": "10",
                         "str:claimableFunds|str:.mapped|nested:str:EGLD": "50",
-
                         "str:claimableFunds|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:claimableFunds|str:.value|u32:1": "str:EGLD",
                         "str:claimableFunds|str:.node_id|nested:str:EGLD": "1",

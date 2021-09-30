@@ -47,7 +47,8 @@
                 "value": "0",
                 "function": "repeat",
                 "arguments": [
-                    "str:abc", "3"
+                    "str:abc",
+                    "3"
                 ],
                 "gasLimit": "4,000,000",
                 "gasPrice": "0"
@@ -69,7 +70,8 @@
                 "value": "0",
                 "function": "repeat",
                 "arguments": [
-                    "str:abc", "0"
+                    "str:abc",
+                    "0"
                 ],
                 "gasLimit": "3,000,000",
                 "gasPrice": "0"
@@ -105,7 +107,8 @@
                 "value": "0",
                 "function": "repeat",
                 "arguments": [
-                    "", "1000"
+                    "",
+                    "1000"
                 ],
                 "gasLimit": "4,000,000",
                 "gasPrice": "0"

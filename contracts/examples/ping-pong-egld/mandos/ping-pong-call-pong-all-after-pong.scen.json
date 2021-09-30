@@ -24,7 +24,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:completed" ],
+                "out": [
+                    "str:completed"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",

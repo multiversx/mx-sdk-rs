@@ -29,7 +29,9 @@
                 ]
             },
             "expect": {
-                "out": [ "str:new" ]
+                "out": [
+                    "str:new"
+                ]
             }
         }
     ]

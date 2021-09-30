@@ -55,14 +55,11 @@
                         "str:tokenTypeUri|biguint:1": "str:https://token-cdn-domain/{id}.json",
                         "str:balanceOf|address:creator|str:.mapped|biguint:1": "700",
                         "str:balanceOf|address:user1|str:.mapped|biguint:1": "300",
-                        
                         "str:lastValidTypeId": "1",
-
                         "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:creator|str:.value|u32:1": "1",
                         "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",
                         "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1",
-
                         "str:balanceOf|address:user1|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:balanceOf|address:user1|str:.value|u32:1": "1",
                         "str:balanceOf|address:user1|str:.node_id|biguint:1": "1",

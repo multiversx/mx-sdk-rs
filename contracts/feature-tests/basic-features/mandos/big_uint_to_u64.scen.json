@@ -29,7 +29,9 @@
                 ]
             },
             "expect": {
-                "out": [ "0" ]
+                "out": [
+                    "0"
+                ]
             }
         },
         {
@@ -43,7 +45,9 @@
                 ]
             },
             "expect": {
-                "out": [ "1" ]
+                "out": [
+                    "1"
+                ]
             }
         },
         {
@@ -57,7 +61,9 @@
                 ]
             },
             "expect": {
-                "out": [ "0x7FFFFFFFFFFFFFFF" ]
+                "out": [
+                    "0x7FFFFFFFFFFFFFFF"
+                ]
             }
         },
         {
