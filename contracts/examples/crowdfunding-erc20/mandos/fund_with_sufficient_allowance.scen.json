@@ -62,7 +62,7 @@
                     "str:balance|address:acc1": "600,000",
                     "str:allowance|address:erc20_owner|address:acc1": "400,000",
                     "str:allowance|address:acc1|sc:crowdfunding": "500,000",
-                    "str:total_supply": "1,000,000,000"
+                    "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },
@@ -72,7 +72,7 @@
                     "storage": {
                     "str:target": "1,000,000",
                     "str:deadline": "123,456",
-                    "str:erc20_contract_address": "sc:erc20"
+                    "str:erc20ContractAddress": "sc:erc20"
                     },
                     "code": "file:../output/crowdfunding-erc20.wasm"
                 }
@@ -131,7 +131,7 @@
                     "str:balance|sc:crowdfunding": "500,000",
                     "str:allowance|address:erc20_owner|address:acc1": "400,000",
                     "str:allowance|address:acc1|sc:crowdfunding": "0",
-                    "str:total_supply": "1,000,000,000"
+                    "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },
@@ -141,9 +141,9 @@
                     "storage": {
                     "str:target": "1,000,000",
                     "str:deadline": "123,456",
-                    "str:erc20_contract_address": "sc:erc20",
+                    "str:erc20ContractAddress": "sc:erc20",
                     "str:deposit|address:acc1": "500,000",
-                    "str:erc20_balance": "500,000"
+                    "str:erc20Balance": "500,000"
                     },
                     "code": "file:../output/crowdfunding-erc20.wasm"
                 }

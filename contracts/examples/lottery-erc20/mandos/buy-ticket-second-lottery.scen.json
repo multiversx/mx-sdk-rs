@@ -20,7 +20,7 @@
                         "str:balance|sc:lottery": "0",
                         "str:allowance|address:acc1|sc:lottery": "500",
                         "str:allowance|address:acc2|sc:lottery": "500",
-                        "str:total_supply": "1,000,000,000"
+                        "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 }
@@ -76,7 +76,7 @@
                         "str:ticketHolder|u32:12|str:lottery_$$$$|0x00000000": "address:acc1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_$$$$|address:acc1": "1",
 
-                        "str:erc20_contract_address": "sc:erc20"
+                        "str:erc20ContractAddress": "sc:erc20"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
                 },
@@ -91,7 +91,7 @@
                         "str:balance|sc:lottery": "500",
                         "str:allowance|address:acc1|sc:lottery": "0",
                         "str:allowance|address:acc2|sc:lottery": "500",
-                        "str:total_supply": "1,000,000,000"
+                        "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },

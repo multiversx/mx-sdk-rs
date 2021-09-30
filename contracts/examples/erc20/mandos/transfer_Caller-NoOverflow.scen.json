@@ -16,7 +16,7 @@
                     "balance": "0",
                     "storage": {
                         "str:balance|address:account_1": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5",
-                        "str:total_supply": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
+                        "str:totalSupply": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -70,7 +70,7 @@
                     "balance": "0",
                     "storage": {
                         "str:balance|address:account_1": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5",
-                        "str:total_supply": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
+                        "str:totalSupply": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                     },
                     "code": "file:../output/erc20.wasm"
                 }

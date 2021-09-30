@@ -8,7 +8,7 @@ pub trait SimpleErc20Token {
 
     /// Total number of tokens in existence.
     #[view(totalSupply)]
-    #[storage_mapper("total_supply")]
+    #[storage_mapper("totalSupply")]
     fn total_supply(&self) -> SingleValueMapper<BigUint>;
 
     /// Gets the balance of the specified address.

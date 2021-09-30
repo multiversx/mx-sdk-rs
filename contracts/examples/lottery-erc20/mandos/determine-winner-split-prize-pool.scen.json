@@ -71,7 +71,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:erc20_contract_address": "sc:erc20"
+                        "str:erc20ContractAddress": "sc:erc20"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
                 },
@@ -92,7 +92,7 @@
                         "str:allowance|address:acc3|sc:lottery": "0",
                         "str:allowance|address:acc4|sc:lottery": "0",
                         "str:allowance|address:acc5|sc:lottery": "0",
-                        "str:total_supply": "1,000,000,000"
+                        "str:totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 },

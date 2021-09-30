@@ -65,7 +65,7 @@
             "balance": "0",
             "storage": {
               "str:balance|address:erc20_owner": "1,000,000,000",
-              "str:total_supply": "1,000,000,000"
+              "str:totalSupply": "1,000,000,000"
             },
             "code": "file:../../erc20/output/erc20.wasm"
           }
@@ -110,7 +110,7 @@
             "balance": "0",
             "storage": {
               "str:balance|address:erc20_owner": "1,000,000,000",
-              "str:total_supply": "1,000,000,000"
+              "str:totalSupply": "1,000,000,000"
             },
             "code": "file:../../erc20/output/erc20.wasm"
           },
@@ -120,7 +120,7 @@
             "storage": {
               "str:target": "1,000,000",
               "str:deadline": "123,456",
-              "str:erc20_contract_address": "sc:erc20"
+              "str:erc20ContractAddress": "sc:erc20"
             },
             "code": "file:../output/crowdfunding-erc20.wasm"
           }
