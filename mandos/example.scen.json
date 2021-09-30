@@ -27,17 +27,17 @@
                     "balance": "23,000",
                     "storage": {
                         "0x19efaebcc296cffac396adb4a60d54c05eff43926a6072498a618e943908efe1": "-5",
-                        "``32_byte_key_____________________": "``string___interpreted___as__bytes",
-                        "``serialized_list_example": [
-                            "``component1",
-                            "``component2"
+                        "str:32_byte_key_____________________": "str:string___interpreted___as__bytes",
+                        "str:serialized_list_example": [
+                            "str:component1",
+                            "str:component2"
                         ],
-                        "``serialized_map_example": {
-                            "``field1": "u32:5",
-                            "``field2": [
-                                "``field2elem1",
+                        "str:serialized_map_example": {
+                            "str:field1": "u32:5",
+                            "str:field2": [
+                                "str:field2elem1",
                                 "u64:0",
-                                "``field2elem3"
+                                "str:field2elem3"
                             ]
                         }
                     },
@@ -86,14 +86,14 @@
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
                     "0x00",
                     "",
-                    "``a message (as bytes)",
+                    "str:a message (as bytes)",
                     [
-                        "``serialized_list_item_1",
-                        "``serialized_list_item_2"
+                        "str:serialized_list_item_1",
+                        "str:serialized_list_item_2"
                     ],
                     {
-                        "``field1": "u32:5",
-                        "``field2": "5"
+                        "str:field1": "u32:5",
+                        "str:field2": "5"
                     }
                 ],
                 "gasLimit": "0x100000",
@@ -104,12 +104,12 @@
                     "5",
                     "*",
                     [
-                        "``serialized_list_item_1",
-                        "``serialized_list_item_2"
+                        "str:serialized_list_item_1",
+                        "str:serialized_list_item_2"
                     ],
                     {
-                        "``field1": "u32:5",
-                        "``field2": "5"
+                        "str:field1": "u32:5",
+                        "str:field2": "5"
                     }
                 ],
                 "status": "",
@@ -192,12 +192,12 @@
                 "value": "0x00",
                 "esdtValue": "250,000,000,000",
                 "esdtTokenIdentifier": "str:CROWD-123456",
-                "contractCode": "``new contract code here",
+                "contractCode": "str:new contract code here",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
                     "0x00",
                     "",
-                    "``a message (as bytes)"
+                    "str:a message (as bytes)"
                 ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
@@ -227,7 +227,7 @@
             "txId": "4",
             "comment": "system send out validator rewards",
             "tx": {
-                "to": "``delegation_contract___________s1",
+                "to": "str:delegation_contract___________s1",
                 "value": "555,000,000"
             }
         },
@@ -250,13 +250,13 @@
                     "balance": "23,000",
                     "storage": {
                         "0x19efaebcc296cffac396adb4a60d54c05eff43926a6072498a618e943908efe1": "-5",
-                        "``32_byte_key_____________________": "``string___interpreted___as__bytes",
-                        "``serialized_map_example": {
-                            "``field1": "u32:5",
-                            "``field2": [
-                                "``field2elem1",
+                        "str:32_byte_key_____________________": "str:string___interpreted___as__bytes",
+                        "str:serialized_map_example": {
+                            "str:field1": "u32:5",
+                            "str:field2": [
+                                "str:field2elem1",
                                 "u64:0",
-                                "``field2elem3"
+                                "str:field2elem3"
                             ]
                         }
                     },
@@ -267,7 +267,7 @@
                     "balance": "*",
                     "storage": "*",
                     "code": "*",
-                    "asyncCallData": "``func@arg1@arg2"
+                    "asyncCallData": "str:func@arg1@arg2"
                 },
                 "+": ""
             }

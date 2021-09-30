@@ -82,15 +82,18 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         })
         .collect();
 
-    if payment_count > 1 {
-        panic!("No more than one payment argument allowed in call proxy");
-    }
-    if token_count > 1 {
-        panic!("No more than one payment token argument allowed in call proxy");
-    }
-    if nonce_count > 1 {
-        panic!("No more than one payment nonce argument allowed in call proxy");
-    }
+    assert!(
+        payment_count <= 1,
+        "No more than one payment argument allowed in call proxy"
+    );
+    assert!(
+        token_count <= 1,
+        "No more than one payment token argument allowed in call proxy"
+    );
+    assert!(
+        nonce_count <= 1,
+        "No more than one payment nonce argument allowed in call proxy"
+    );
 
     let single_payment_snippet = if token_count > 0 || nonce_count > 0 || payment_count > 0 {
         quote! {
@@ -158,15 +161,12 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
         })
         .collect();
 
-    if payment_count > 1 {
-        panic!("No more than one payment argument allowed in call proxy");
-    }
-    if token_count > 0 {
-        panic!("No ESDT payment allowed in #[init]");
-    }
-    if nonce_count > 0 {
-        panic!("No SFT/NFT payment allowed in #[init]");
-    }
+    assert!(
+        payment_count <= 1,
+        "No more than one payment argument allowed in call proxy"
+    );
+    assert!(token_count == 0, "No ESDT payment allowed in #[init]");
+    assert!(nonce_count == 0, "No SFT/NFT payment allowed in #[init]");
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
