@@ -15,7 +15,7 @@
                         "''balance|address:acc2": "1,000,000",
                         "''allowance|address:acc1|sc:lottery": "100",
                         "''allowance|address:acc2|sc:lottery": "100",
-                        "''total_supply": "1,000,000,000"
+                        "''totalSupply": "1,000,000,000"
                     },
                     "code": "file:../../erc20/output/erc20.wasm"
                 }

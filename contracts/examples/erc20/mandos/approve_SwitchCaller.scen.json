@@ -22,7 +22,7 @@
                     "balance": "0",
                     "storage": {
                         "str:balance|address:account_1": "0x2710",
-                        "str:total_supply": "0x2710"
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -131,7 +131,7 @@
                     "storage": {
                         "str:balance|address:account_1": "0x2710",
                         "str:allowance|0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1000000000000000000000000|address:account_1": "0x19",
-                        "str:total_supply": "0x2710"
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
