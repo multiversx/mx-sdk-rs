@@ -82,7 +82,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "100", "str:PAYABLE-FEATURES-TOKEN" ],
+                "out": [
+                    "100",
+                    "str:PAYABLE-FEATURES-TOKEN"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

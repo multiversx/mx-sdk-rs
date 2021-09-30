@@ -26,7 +26,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:interrupted" ],
+                "out": [
+                    "str:interrupted"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -85,7 +87,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:completed" ],
+                "out": [
+                    "str:completed"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",

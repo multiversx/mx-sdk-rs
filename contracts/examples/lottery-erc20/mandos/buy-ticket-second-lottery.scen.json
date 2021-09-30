@@ -71,11 +71,9 @@
                     "balance": "0",
                     "storage": {
                         "str:lotteryInfo|u32:12|str:lottery_name": "u32:1|u8:100|u32:2|u64:123,456|0xffffffff|u32:1|u8:100|u32:0|u32:0|u32:0|u32:0",
-
                         "str:lotteryInfo|u32:12|str:lottery_$$$$": "u32:2|u16:500|u32:4|u64:234,567|0xffffffff|u32:1|u8:100|u32:0|u32:1|u32:2|u16:500|u32:0",
                         "str:ticketHolder|u32:12|str:lottery_$$$$|0x00000000": "address:acc1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_$$$$|address:acc1": "1",
-
                         "str:erc20ContractAddress": "sc:erc20"
                     },
                     "code": "file:../output/lottery-erc20.wasm"
