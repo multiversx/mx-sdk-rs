@@ -8,7 +8,7 @@
         },
         {
             "step": "externalSteps",
-            "path": "set_accounts.json"
+            "path": "set_accounts.step.json"
         },
         {
             "step": "scCall",
