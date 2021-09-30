@@ -79,11 +79,7 @@ fn process_arg_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) 
 }
 
 fn check_no_other_payment_attr(arg_metadata: &ArgMetadata) {
-    if arg_metadata.payment.is_payment_arg() {
-        panic!(
-			"Can only annotate argument with one of the following attributes: `#[payment_token]`, `#[payment_nonce]` or `#[payment_amount]`/`#[payment]`."
-		);
-    }
+    assert!(!arg_metadata.payment.is_payment_arg(), "Can only annotate argument with one of the following attributes: `#[payment_token]`, `#[payment_nonce]` or `#[payment_amount]`/`#[payment]`.");
 }
 
 fn process_payment_token_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {

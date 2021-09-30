@@ -149,8 +149,11 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                     );
                 }
             }
-        } else if !accounts.other_accounts_allowed {
-            panic!("Expected account not found");
+        } else {
+            assert!(
+                accounts.other_accounts_allowed,
+                "Expected account not found"
+            );
         }
     }
 }
