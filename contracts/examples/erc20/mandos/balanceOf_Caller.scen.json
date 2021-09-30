@@ -16,7 +16,7 @@
                     "balance": "0",
                     "storage": {
                         "str:balance|address:account_1": "0x2710",
-                        "str:total_supply": "0x2710"
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -60,7 +60,7 @@
                     "balance": "0",
                     "storage": {
                         "str:balance|address:account_1": "0x2710",
-                        "str:total_supply": "0x2710"
+                        "str:totalSupply": "0x2710"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
