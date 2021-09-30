@@ -9,11 +9,9 @@ use super::{
 };
 
 fn check_single_role(method: &Method) {
-    if !matches!(method.public_role, PublicRole::Private) {
-        panic!(
-			"Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`."
-		);
-    }
+    assert!(matches!(method.public_role, PublicRole::Private),
+		"Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`."
+	);
 }
 
 pub fn process_init_attribute(

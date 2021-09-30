@@ -146,9 +146,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``vec_mapper.len": "2",
-                        "``vec_mapper.item|u32:1": "123",
-                        "``vec_mapper.item|u32:2": "111"
+                        "str:vec_mapper.len": "2",
+                        "str:vec_mapper.item|u32:1": "123",
+                        "str:vec_mapper.item|u32:2": "111"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },

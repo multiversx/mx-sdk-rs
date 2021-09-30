@@ -36,9 +36,10 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     }
 
     fn get_balance(&self, address: &Address) -> BigUint<Self> {
-        if address != &self.get_sc_address_legacy() {
-            panic!("get balance not yet implemented for accounts other than the contract itself");
-        }
+        assert!(
+            address == &self.get_sc_address_legacy(),
+            "get balance not yet implemented for accounts other than the contract itself"
+        );
         self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
     }
 
@@ -116,11 +117,10 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         token: &TokenIdentifier<Self>,
         _nonce: u64,
     ) -> BigUint<Self> {
-        if address != &self.get_sc_address() {
-            panic!(
-                "get_esdt_balance not yet implemented for accounts other than the contract itself"
-            );
-        }
+        assert!(
+            address == &self.get_sc_address(),
+            "get_esdt_balance not yet implemented for accounts other than the contract itself"
+        );
 
         match self
             .blockchain_info_box
