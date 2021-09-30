@@ -180,7 +180,7 @@ pub trait PingPong {
     // storage
 
     #[view(getPingAmount)]
-    #[storage_mapper("ping_amount")]
+    #[storage_mapper("pingAmount")]
     fn ping_amount(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getDeadline)]
@@ -190,12 +190,12 @@ pub trait PingPong {
     /// Block timestamp of the block where the contract got activated.
     /// If not specified in the constructor it is the the deploy block timestamp.
     #[view(getActivationTimestamp)]
-    #[storage_mapper("activation_timestamp")]
+    #[storage_mapper("activationTimestamp")]
     fn activation_timestamp(&self) -> SingleValueMapper<u64>;
 
     /// Optional funding cap.
     #[view(getMaxFunds)]
-    #[storage_mapper("max_funds")]
+    #[storage_mapper("maxFunds")]
     fn max_funds(&self) -> SingleValueMapper<Option<BigUint>>;
 
     #[storage_mapper("user")]
@@ -206,12 +206,12 @@ pub trait PingPong {
     /// 1 - `ping`-ed
     /// 2 - `pong`-ed
     #[view(getUserStatus)]
-    #[storage_mapper("user_status")]
+    #[storage_mapper("userStatus")]
     fn user_status(&self, user_id: usize) -> SingleValueMapper<UserStatus>;
 
     /// Part of the `pongAll` status, the last user to be processed.
     /// 0 if never called `pongAll` or `pongAll` completed..
     #[view(pongAllLastUser)]
-    #[storage_mapper("pong_all_last_user")]
+    #[storage_mapper("pongAllLastUser")]
     fn pong_all_last_user(&self) -> SingleValueMapper<usize>;
 }

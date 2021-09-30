@@ -18,7 +18,7 @@
                         "str:allowance|address:coin_holder_1|address:account_1": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5",
                         "str:balance|address:coin_holder_1": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5",
                         "str:balance|address:account_2": "0x0a",
-                        "str:total_supply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -73,7 +73,7 @@
                     "balance": "0",
                     "storage": {
                         "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                        "str:total_supply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
                     "code": "file:../output/erc20.wasm"
                 }

@@ -17,7 +17,7 @@
                     "storage": {
                         "str:balance|address:account_1": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:balance|address:account_2": "0x0a",
-                        "str:total_supply": "0x010000000000000000000000000000000000000000000000000000000000000009"
+                        "str:totalSupply": "0x010000000000000000000000000000000000000000000000000000000000000009"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
@@ -72,7 +72,7 @@
                     "storage": {
                         "str:balance|address:account_1": "0x0a",
                         "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                        "str:total_supply": "0x010000000000000000000000000000000000000000000000000000000000000009"
+                        "str:totalSupply": "0x010000000000000000000000000000000000000000000000000000000000000009"
                     },
                     "code": "file:../output/erc20.wasm"
                 }
