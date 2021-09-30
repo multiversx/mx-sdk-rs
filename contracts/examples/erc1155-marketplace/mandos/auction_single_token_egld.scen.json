@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "externalSteps",
-            "path": "setup_accounts.json"
+            "path": "setup_accounts.step.json"
         },
         {
             "step": "scCall",
