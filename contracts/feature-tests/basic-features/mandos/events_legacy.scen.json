@@ -90,7 +90,7 @@
                 "function": "logLegacyEventB",
                 "arguments": [
                     "0xa1",
-                    "``arg2_an_address_______________s3",
+                    "str:arg2_an_address_______________s3",
                     "0x1234abc"
                 ],
                 "gasLimit": "50,000,000",
@@ -106,7 +106,7 @@
                         "topics": [
                             "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b",
                             "0x00000000000000000000000000000000000000000000000000000000000000a1",
-                            "``arg2_an_address_______________s3"
+                            "str:arg2_an_address_______________s3"
                         ],
                         "data": "0x1234abc"
                     }

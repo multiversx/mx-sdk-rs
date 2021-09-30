@@ -15,7 +15,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
@@ -60,7 +60,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
@@ -68,8 +68,8 @@
                     "nonce": "0",
                     "balance": "0x123400",
                     "storage": {
-                        "``pay_me_arg": "0x56",
-                        "``last_payment": "0x123400"
+                        "str:pay_me_arg": "0x56",
+                        "str:last_payment": "0x123400"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }
