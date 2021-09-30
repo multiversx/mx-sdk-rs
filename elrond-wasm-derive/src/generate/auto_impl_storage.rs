@@ -41,12 +41,14 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
 
 pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
     let msig = method_gen::generate_sig_with_attributes(m);
-    if m.method_args.is_empty() {
-        panic!("setter must have at least one argument, for the value");
-    }
-    if m.return_type != syn::ReturnType::Default {
-        panic!("setter should not return anything");
-    }
+    assert!(
+        !m.method_args.is_empty(),
+        "setter must have at least one argument, for the value"
+    );
+    assert!(
+        m.return_type == syn::ReturnType::Default,
+        "setter should not return anything"
+    );
     let key_args = &m.method_args[..m.method_args.len() - 1];
     let key_snippet = generate_key_snippet(key_args, identifier);
     let value_arg = &m.method_args[m.method_args.len() - 1];
@@ -91,9 +93,10 @@ pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::Toke
 
 pub fn generate_clear_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
     let msig = method_gen::generate_sig_with_attributes(m);
-    if m.return_type != syn::ReturnType::Default {
-        panic!("storage clear should not return anything");
-    }
+    assert!(
+        m.return_type == syn::ReturnType::Default,
+        "storage clear should not return anything"
+    );
     let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);
     quote! {
         #msig {
