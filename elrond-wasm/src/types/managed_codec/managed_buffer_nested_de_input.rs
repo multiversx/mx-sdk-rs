@@ -6,7 +6,7 @@ use elrond_codec::{
 
 use crate::{
     api::ManagedTypeApi,
-    types::{managed::ManagedBufferSizeContext, BigInt, BigUint, ManagedBuffer},
+    types::{managed::ManagedBufferSizeContext, BigInt, BigUint, ManagedBuffer, ManagedType},
 };
 
 /// Nested decode buffer based on a managed buffer.
@@ -156,7 +156,15 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> NestedDecodeInput
         C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<T, DecodeError>,
     {
-        if let Some(result) = try_execute_then_cast(|| {
+        if let Some(result) = self
+            .managed_buffer
+            .borrow()
+            .type_manager()
+            .try_cast_ref::<T>()
+        {
+            // API for instancing empty Vec
+            Ok(result.clone())
+        } else if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
                 self.read_managed_buffer_of_size(mb_context.0)
             } else {
@@ -187,7 +195,15 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> NestedDecodeInput
         F: FnOnce(&mut Self, ExitCtx) -> T,
         ExitCtx: Clone,
     {
-        if let Some(result) = try_execute_then_cast(|| {
+        if let Some(result) = self
+            .managed_buffer
+            .borrow()
+            .type_manager()
+            .try_cast_ref::<T>()
+        {
+            // API for instancing empty Vec
+            result.clone()
+        } else if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
                 self.read_managed_buffer_of_size_or_exit(mb_context.0, c.clone(), exit)
             } else {
