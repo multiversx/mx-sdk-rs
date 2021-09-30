@@ -15,7 +15,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
@@ -60,8 +60,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:proxy-second",
-                        "``callback_info": "0x5555"
+                        "str:other_contract": "sc:proxy-second",
+                        "str:callback_info": "0x5555"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
@@ -69,10 +69,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``message_me_1": "0x01",
-                        "``message_me_2": "0x02",
-                        "``message_me_3": "0x030303",
-                        "``message_me_4": "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe"
+                        "str:message_me_1": "0x01",
+                        "str:message_me_2": "0x02",
+                        "str:message_me_3": "0x030303",
+                        "str:message_me_4": "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }
