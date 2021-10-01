@@ -68,7 +68,7 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBuffer::new_empty(self.api.clone())
+        ManagedBuffer::new(self.api.clone())
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {

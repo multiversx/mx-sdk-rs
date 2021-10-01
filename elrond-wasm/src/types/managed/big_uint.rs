@@ -47,25 +47,14 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
     }
 }
 
-impl<M> ManagedFrom<M, u64> for BigUint<M>
+impl<M, U> ManagedFrom<M, U> for BigUint<M>
 where
     M: ManagedTypeApi,
+    U: Into<u64>,
 {
-    fn managed_from(api: M, value: u64) -> Self {
+    fn managed_from(api: M, value: U) -> Self {
         BigUint {
-            handle: api.bi_new(value as i64),
-            api,
-        }
-    }
-}
-
-impl<M> ManagedFrom<M, u32> for BigUint<M>
-where
-    M: ManagedTypeApi,
-{
-    fn managed_from(api: M, value: u32) -> Self {
-        BigUint {
-            handle: api.bi_new(value as i64),
+            handle: api.bi_new(value.into() as i64),
             api,
         }
     }

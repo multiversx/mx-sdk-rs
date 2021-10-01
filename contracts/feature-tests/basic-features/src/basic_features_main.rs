@@ -3,8 +3,8 @@
 
 elrond_wasm::imports!();
 
-pub mod big_int_methods;
-pub mod big_int_operators;
+pub mod big_num_methods;
+pub mod big_num_operators;
 pub mod block_info_features;
 pub mod blockchain_api_features;
 pub mod codec_err_test;
@@ -13,7 +13,7 @@ pub mod echo;
 pub mod echo_managed;
 pub mod elliptic_curve_features;
 pub mod event_features;
-pub mod macros;
+pub mod macro_features;
 pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod storage_direct_load;
@@ -31,8 +31,8 @@ pub mod types;
 
 #[elrond_wasm::contract]
 pub trait BasicFeatures:
-    big_int_methods::BigIntMethods
-    + big_int_operators::BigIntOperators
+    big_num_methods::BigIntMethods
+    + big_num_operators::BigIntOperators
     + elliptic_curve_features::EllipticCurveFeatures
     + block_info_features::BlockInfoFeatures
     + blockchain_api_features::BlockchainApiFeatures
@@ -41,7 +41,7 @@ pub trait BasicFeatures:
     + echo::EchoTypes
     + echo_managed::EchoManagedTypes
     + event_features::EventFeatures
-    + macros::Macros
+    + macro_features::Macros
     + managed_buffer_features::ManagedBufferFeatures
     + managed_vec_features::ManagedVecFeatures
     + storage_direct_load::StorageLoadFeatures
