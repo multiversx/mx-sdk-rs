@@ -1,6 +1,8 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedFrom, TokenIdentifier},
+    types::{
+        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto, TokenIdentifier,
+    },
 };
 
 pub struct ManagedTypeHelper<M: ManagedTypeApi> {
@@ -12,20 +14,37 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
         ManagedTypeHelper { api }
     }
 
+    #[inline]
     pub fn big_uint_zero(&self) -> BigUint<M> {
         BigUint::zero(self.api.clone())
     }
 
-    pub fn big_uint_from<T: Into<u64>>(&self, value: T) -> BigUint<M> {
-        BigUint::managed_from(self.api.clone(), value.into())
+    #[inline]
+    pub fn big_uint_from<T: ManagedInto<M, BigUint<M>>>(&self, value: T) -> BigUint<M> {
+        value.managed_into(self.api.clone())
     }
 
+    #[inline]
+    pub fn big_int_zero(&self) -> BigInt<M> {
+        BigInt::zero(self.api.clone())
+    }
+
+    #[inline]
+    pub fn big_int_from<T: ManagedInto<M, BigInt<M>>>(&self, value: T) -> BigInt<M> {
+        value.managed_into(self.api.clone())
+    }
+
+    #[inline]
     pub fn managed_buffer_empty(&self) -> ManagedBuffer<M> {
         ManagedBuffer::new_empty(self.api.clone())
     }
 
-    pub fn managed_buffer_from(&self, bytes: &[u8]) -> ManagedBuffer<M> {
-        ManagedBuffer::new_from_bytes(self.api.clone(), bytes)
+    #[inline]
+    pub fn managed_buffer_from<T: ManagedInto<M, ManagedBuffer<M>>>(
+        &self,
+        value: T,
+    ) -> ManagedBuffer<M> {
+        value.managed_into(self.api.clone())
     }
 
     pub fn elliptic_curve(&self, name: &str) -> EllipticCurve<M> {
