@@ -3,12 +3,8 @@ use super::substitution_map::SubstitutionsMap;
 pub fn substitutions() -> SubstitutionsMap {
     let mut substitutions = SubstitutionsMap::new();
 
-    substitutions.add_substitution(
-        quote!(.managed_into()),
-        quote!(.managed_into(self.type_manager())),
-    );
-
     add_managed_types(&mut substitutions);
+    add_special_methods(&mut substitutions);
     add_storage_mappers(&mut substitutions);
 
     substitutions
@@ -61,8 +57,29 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
         &quote!(ManagedAsyncCallResult),
         &quote!(ManagedAsyncCallResult),
     );
+}
 
+fn add_special_methods(substitutions: &mut SubstitutionsMap) {
+    substitutions.add_substitution(
+        quote!(.managed_into()),
+        quote!(.managed_into(self.type_manager())),
+    );
+
+    substitutions.add_substitution(
+        quote!(BigUint::zero()),
+        quote!(self.types().big_uint_zero()),
+    );
     substitutions.add_substitution(quote!(BigUint::from), quote!(self.types().big_uint_from));
+    substitutions.add_substitution(quote!(BigInt::zero()), quote!(self.types().big_int_zero()));
+    substitutions.add_substitution(quote!(BigInt::from), quote!(self.types().big_int_from));
+    substitutions.add_substitution(
+        quote!(ManagedBuffer::new_empty()),
+        quote!(self.types().managed_buffer_empty()),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedBuffer::from),
+        quote!(self.types().managed_buffer_from),
+    );
 }
 
 fn add_storage_mapper_single_generic_arg(

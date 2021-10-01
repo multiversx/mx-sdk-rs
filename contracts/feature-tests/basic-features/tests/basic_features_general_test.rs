@@ -1,7 +1,7 @@
 use elrond_wasm::types::{SCResult, StaticSCError};
 use elrond_wasm_debug::*;
 
-use basic_features::macros::Macros;
+use basic_features::macro_features::Macros;
 
 #[test]
 fn test_sc_error() {
