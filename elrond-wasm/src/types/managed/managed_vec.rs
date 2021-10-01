@@ -54,9 +54,9 @@ where
     T: ManagedVecItem<M>,
 {
     #[inline]
-    pub fn new_empty(api: M) -> Self {
+    pub fn new(api: M) -> Self {
         ManagedVec {
-            buffer: ManagedBuffer::new_empty(api),
+            buffer: ManagedBuffer::new(api),
             _phantom: PhantomData,
         }
     }
@@ -77,7 +77,7 @@ where
     I: ManagedInto<M, T>,
 {
     fn managed_from(api: M, v: Vec<I>) -> Self {
-        let mut result = Self::new_empty(api.clone());
+        let mut result = Self::new(api.clone());
         for item in v.into_iter() {
             result.push(item.managed_into(api.clone()));
         }
@@ -92,7 +92,7 @@ where
 {
     #[inline]
     fn managed_default(api: M) -> Self {
-        Self::new_empty(api)
+        Self::new(api)
     }
 }
 
@@ -178,7 +178,7 @@ where
     T: ManagedVecItem<M> + Clone,
 {
     fn clone(&self) -> Self {
-        let mut result = ManagedVec::new_empty(self.type_manager());
+        let mut result = ManagedVec::new(self.type_manager());
         for item in self.into_iter() {
             result.push(item.clone())
         }
@@ -267,7 +267,7 @@ where
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
         if T::NEEDS_RESERIALIZATION {
-            let mut result = ManagedVec::new_empty(buffer.type_manager());
+            let mut result = ManagedVec::new(buffer.type_manager());
             let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
             while nested_de_input.remaining_len() > 0 {
                 result.push(T::dep_decode(&mut nested_de_input)?);
@@ -287,7 +287,7 @@ where
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
         let api: M = input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))?;
-        let mut result = ManagedVec::new_empty(api);
+        let mut result = ManagedVec::new(api);
         for _ in 0..size {
             result.push(T::dep_decode(input)?);
         }
@@ -321,7 +321,7 @@ pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
     api: M,
     data: &[BoxedBytes],
 ) -> ManagedVec<M, ManagedBuffer<M>> {
-    let mut result = ManagedVec::new_empty(api.clone());
+    let mut result = ManagedVec::new(api.clone());
     for boxed_bytes in data {
         result.push(ManagedBuffer::new_from_bytes(
             api.clone(),

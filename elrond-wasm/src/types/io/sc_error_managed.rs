@@ -32,7 +32,7 @@ where
     #[inline]
     pub fn new_empty(api: M) -> Self {
         ManagedSCError {
-            buffer: ManagedBuffer::new_empty(api),
+            buffer: ManagedBuffer::new(api),
         }
     }
 

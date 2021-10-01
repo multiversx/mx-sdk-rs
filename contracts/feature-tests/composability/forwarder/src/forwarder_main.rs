@@ -42,7 +42,7 @@ pub trait Forwarder:
     ) {
         let data = match opt_data {
             OptionalArg::Some(data) => data,
-            OptionalArg::None => self.types().managed_buffer_empty(),
+            OptionalArg::None => ManagedBuffer::new(),
         };
         self.send().direct_egld(to, amount, data);
     }

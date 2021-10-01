@@ -433,7 +433,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
             // Token is frozen if properties are not 0
             let frozen = properties[0] == 0 && properties[1] == 0;
 
-            let mut uris_vec = ManagedVec::new_empty(self.clone());
+            let mut uris_vec = ManagedVec::new(self.clone());
             uris_vec.push(ManagedBuffer::new_from_bytes(
                 self.clone(),
                 uri_bytes.as_slice(),

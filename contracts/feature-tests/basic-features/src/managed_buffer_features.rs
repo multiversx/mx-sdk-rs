@@ -3,8 +3,8 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait ManagedBufferFeatures {
     #[endpoint]
-    fn mbuffer_empty(&self) -> ManagedBuffer {
-        ManagedBuffer::new_empty()
+    fn mbuffer_new(&self) -> ManagedBuffer {
+        ManagedBuffer::new()
     }
 
     #[endpoint]

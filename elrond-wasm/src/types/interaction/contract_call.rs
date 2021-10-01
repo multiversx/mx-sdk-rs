@@ -54,7 +54,7 @@ where
     pub fn new(api: SA, to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
         let egld_payment = BigUint::zero(api.clone());
-        let payments = ManagedVec::new_empty(api.clone());
+        let payments = ManagedVec::new(api.clone());
         ContractCall {
             api,
             to,
@@ -128,7 +128,7 @@ where
     }
 
     fn no_payments(&self) -> ManagedVec<SA, EsdtTokenPayment<SA>> {
-        ManagedVec::new_empty(self.api.clone())
+        ManagedVec::new(self.api.clone())
     }
 
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.

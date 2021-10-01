@@ -22,7 +22,7 @@ where
     }
 
     pub fn top_encode_to_managed_buffer<T: TopEncode>(&self, value: &T) -> ManagedBuffer<M> {
-        let mut result = ManagedBuffer::new_empty(self.api.clone());
+        let mut result = ManagedBuffer::new(self.api.clone());
         value.top_encode_or_exit(&mut result, self.api.clone(), top_encode_exit);
         result
     }
