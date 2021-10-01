@@ -7,8 +7,8 @@ use basic_features::managed_buffer_features::ManagedBufferFeatures;
 fn test_managed_buffer_new_empty() {
     let context = TxContext::dummy();
     let bf = basic_features::contract_obj(context.clone());
-    let result = bf.mbuffer_empty();
-    assert_eq!(ManagedBuffer::new_empty(context), result);
+    let result = bf.mbuffer_new();
+    assert_eq!(ManagedBuffer::new(context), result);
 }
 
 #[test]

@@ -42,7 +42,7 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     /// TODO: avoid creating any new managed buffers.
     pub fn new_empty(api: M) -> Self {
         CallbackClosure {
-            callback_name: ManagedBuffer::new_empty(api.clone()),
+            callback_name: ManagedBuffer::new(api.clone()),
             closure_args: ManagedArgBuffer::new_empty(api),
         }
     }

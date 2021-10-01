@@ -32,8 +32,8 @@ where
     }
 
     #[inline]
-    pub fn new_empty(api: M) -> Self {
-        ManagedMultiResultVec::from_raw_vec(ManagedVec::new_empty(api))
+    pub fn new(api: M) -> Self {
+        ManagedMultiResultVec::from_raw_vec(ManagedVec::new(api))
     }
 }
 
@@ -72,7 +72,7 @@ where
 {
     #[inline]
     fn from(v: &ManagedVec<M, T>) -> Self {
-        let mut result = ManagedMultiResultVec::new_empty(v.type_manager());
+        let mut result = ManagedMultiResultVec::new(v.type_manager());
         for item in v.into_iter() {
             result.push(item);
         }
@@ -107,7 +107,7 @@ where
     T: ManagedVecItem<M> + TopDecode,
 {
     pub fn to_vec(&self) -> ManagedVec<M, T> {
-        let mut result = ManagedVec::new_empty(self.raw_buffers.type_manager());
+        let mut result = ManagedVec::new(self.raw_buffers.type_manager());
         let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
         for item in self.raw_buffers.into_iter() {
             result.push(serializer.top_decode_from_managed_buffer(&item));
@@ -122,7 +122,7 @@ where
 {
     // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut raw_buffers = ManagedVec::new_empty(loader.vm_api_cast::<M>());
+        let mut raw_buffers = ManagedVec::new(loader.vm_api_cast::<M>());
         while loader.has_next() {
             raw_buffers.push(ManagedBuffer::dyn_load(loader, arg_id));
         }

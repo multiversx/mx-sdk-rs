@@ -1,7 +1,8 @@
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto, TokenIdentifier,
+        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto, ManagedVec,
+        ManagedVecItem, TokenIdentifier,
     },
 };
 
@@ -35,8 +36,8 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     #[inline]
-    pub fn managed_buffer_empty(&self) -> ManagedBuffer<M> {
-        ManagedBuffer::new_empty(self.api.clone())
+    pub fn managed_buffer_new(&self) -> ManagedBuffer<M> {
+        ManagedBuffer::new(self.api.clone())
     }
 
     #[inline]
@@ -44,6 +45,19 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
         &self,
         value: T,
     ) -> ManagedBuffer<M> {
+        value.managed_into(self.api.clone())
+    }
+
+    #[inline]
+    pub fn managed_vec_new<T: ManagedVecItem<M>>(&self) -> ManagedVec<M, T> {
+        ManagedVec::new(self.api.clone())
+    }
+
+    #[inline]
+    pub fn managed_vec_from<T: ManagedVecItem<M>, V: ManagedInto<M, ManagedVec<M, T>>>(
+        &self,
+        value: V,
+    ) -> ManagedVec<M, T> {
         value.managed_into(self.api.clone())
     }
 

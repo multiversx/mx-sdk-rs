@@ -159,7 +159,7 @@ where
     /// Can easily consume a lot of gas.
     pub fn get_all_addresses(&self) -> ManagedVec<SA, ManagedAddress<SA>> {
         let user_count = self.get_user_count();
-        let mut result = ManagedVec::new_empty(self.api.clone());
+        let mut result = ManagedVec::new(self.api.clone());
         for i in 1..=user_count {
             result.push(self.get_user_address_or_zero(i));
         }

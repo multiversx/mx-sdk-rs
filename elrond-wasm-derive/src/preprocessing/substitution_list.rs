@@ -73,12 +73,20 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
     substitutions.add_substitution(quote!(BigInt::zero()), quote!(self.types().big_int_zero()));
     substitutions.add_substitution(quote!(BigInt::from), quote!(self.types().big_int_from));
     substitutions.add_substitution(
-        quote!(ManagedBuffer::new_empty()),
-        quote!(self.types().managed_buffer_empty()),
+        quote!(ManagedBuffer::new()),
+        quote!(self.types().managed_buffer_new()),
     );
     substitutions.add_substitution(
         quote!(ManagedBuffer::from),
         quote!(self.types().managed_buffer_from),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedVec::new()),
+        quote!(self.types().managed_vec_new()),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedVec::from),
+        quote!(self.types().managed_vec_from),
     );
 }
 
