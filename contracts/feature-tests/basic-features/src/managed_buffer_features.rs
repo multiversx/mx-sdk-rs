@@ -3,6 +3,21 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait ManagedBufferFeatures {
     #[endpoint]
+    fn mbuffer_new(&self) -> ManagedBuffer {
+        ManagedBuffer::new()
+    }
+
+    #[endpoint]
+    fn mbuffer_from_slice(&self, slice: &[u8]) -> ManagedBuffer {
+        ManagedBuffer::from(slice)
+    }
+
+    #[endpoint]
+    fn mbuffer_from_boxed_bytes(&self, boxed_bytes: BoxedBytes) -> ManagedBuffer {
+        ManagedBuffer::from(boxed_bytes)
+    }
+
+    #[endpoint]
     fn mbuffer_overwrite(&self, mb1: ManagedBuffer, bytes: &[u8]) -> ManagedBuffer {
         let mut result = mb1;
         result.overwrite(bytes);

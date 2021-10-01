@@ -40,7 +40,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedVec::new_empty(self.type_manager()),
+            &ManagedVec::new(self.type_manager()),
         );
 
         Ok(())
@@ -68,7 +68,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedVec::new_empty(self.type_manager()),
+            &ManagedVec::new(self.type_manager()),
         );
 
         Ok(())
@@ -96,7 +96,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedVec::new_empty(self.type_manager()),
+            &ManagedVec::new(self.type_manager()),
         );
 
         Ok(())

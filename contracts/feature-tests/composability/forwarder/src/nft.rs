@@ -119,7 +119,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         color: Color,
         uri: ManagedBuffer,
     ) -> u64 {
-        let mut uris = ManagedVec::new_empty(self.type_manager());
+        let mut uris = ManagedVec::new(self.type_manager());
         uris.push(uri);
         let token_nonce = self.send().esdt_nft_create::<Color>(
             &token_identifier,
@@ -156,7 +156,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             boxed_bytes: attrs_pieces.4,
         };
 
-        let mut uris = ManagedVec::new_empty(self.type_manager());
+        let mut uris = ManagedVec::new(self.type_manager());
         uris.push(uri);
         let token_nonce = self.send().esdt_nft_create::<ComplexAttributes<Self::Api>>(
             &token_identifier,

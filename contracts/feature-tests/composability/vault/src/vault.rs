@@ -141,7 +141,7 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
         let data = match return_message {
             OptionalArg::Some(data) => data,
-            OptionalArg::None => self.types().managed_buffer_empty(),
+            OptionalArg::None => ManagedBuffer::new(),
         };
 
         if token.is_egld() {
@@ -182,8 +182,8 @@ pub trait Vault {
     #[endpoint]
     fn burn_and_create_retrive_async(&self) {
         let payments = self.call_value().all_esdt_transfers();
-        let mut uris = ManagedVec::new_empty(self.type_manager());
-        uris.push(self.types().managed_buffer_empty());
+        let mut uris = ManagedVec::new(self.type_manager());
+        uris.push(ManagedBuffer::new());
 
         let mut new_tokens = Vec::new();
 
@@ -199,9 +199,9 @@ pub trait Vault {
             let new_token_nonce = self.send().esdt_nft_create(
                 &payment.token_identifier,
                 &payment.amount,
-                &self.types().managed_buffer_empty(),
+                &ManagedBuffer::new(),
                 &self.types().big_uint_zero(),
-                &self.types().managed_buffer_empty(),
+                &ManagedBuffer::new(),
                 &(),
                 &uris,
             );

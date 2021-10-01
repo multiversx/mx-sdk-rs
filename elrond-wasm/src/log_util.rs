@@ -13,7 +13,7 @@ pub fn event_topic_accumulator<A>(
 where
     A: ErrorApi + ManagedTypeApi,
 {
-    let mut accumulator = ManagedVec::new_empty(api.clone());
+    let mut accumulator = ManagedVec::new(api.clone());
     accumulator.push(ManagedBuffer::new_from_bytes(api, event_identifier));
     accumulator
 }
@@ -23,7 +23,7 @@ where
     A: ErrorApi + ManagedTypeApi,
     T: TopEncode,
 {
-    let mut topic_buffer = ManagedBuffer::new_empty(accumulator.type_manager());
+    let mut topic_buffer = ManagedBuffer::new(accumulator.type_manager());
     topic.top_encode_or_exit(
         &mut topic_buffer,
         accumulator.type_manager(),
@@ -48,7 +48,7 @@ where
     T: TopEncode,
     A: ErrorApi + ManagedTypeApi + Clone + 'static,
 {
-    let mut data_buffer = ManagedBuffer::new_empty(api.clone());
+    let mut data_buffer = ManagedBuffer::new(api.clone());
     data.top_encode_or_exit(&mut data_buffer, api, serialize_log_data_exit);
     data_buffer
 }
