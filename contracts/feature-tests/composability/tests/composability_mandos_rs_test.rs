@@ -349,7 +349,7 @@ fn proxy_test_message_sameshard_rs() {
 #[test]
 fn proxy_test_message_sameshard_callback_rs() {
     elrond_wasm_debug::mandos_rs(
-        "/home/andreim/elrond/smartcontract/elrond-wasm-rs/contracts/feature-tests/composability/mandos/proxy_test_message_sameShard_callback.scen.json",
+        "mandos/proxy_test_message_sameShard_callback.scen.json",
         &contract_map(),
     );
 }
