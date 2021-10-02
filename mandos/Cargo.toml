@@ -1,6 +1,6 @@
 [package]
 name = "mandos"
-version = "0.9.0"
+version = "0.10.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
