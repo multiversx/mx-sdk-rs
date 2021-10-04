@@ -29,7 +29,9 @@
                 ]
             },
             "expect": {
-                "out": [ "biguint:1|biguint:2" ]
+                "out": [
+                    "biguint:1|biguint:2"
+                ]
             }
         },
         {
@@ -44,7 +46,9 @@
                 ]
             },
             "expect": {
-                "out": [ "biguint:2" ]
+                "out": [
+                    "biguint:2"
+                ]
             }
         },
         {
@@ -59,7 +63,9 @@
                 ]
             },
             "expect": {
-                "out": [ "biguint:1|biguint:0" ]
+                "out": [
+                    "biguint:1|biguint:0"
+                ]
             }
         },
         {
@@ -74,7 +80,9 @@
                 ]
             },
             "expect": {
-                "out": [ "biguint:0" ]
+                "out": [
+                    "biguint:0"
+                ]
             }
         }
     ]

@@ -47,7 +47,9 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ],
+                "out": [
+                    "true"
+                ],
                 "status": ""
             }
         },
@@ -63,7 +65,9 @@
                 ]
             },
             "expect": {
-                "out": [ "false" ],
+                "out": [
+                    "false"
+                ],
                 "status": ""
             }
         }

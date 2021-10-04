@@ -10,7 +10,7 @@
                 },
                 "sc:child": {
                     "owner": "sc:forwarder",
-                    "code":"file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm"
                 }
             }
         },

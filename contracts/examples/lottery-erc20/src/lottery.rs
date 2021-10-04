@@ -432,11 +432,11 @@ pub trait Lottery {
     #[storage_clear("numberOfEntriesForUser")]
     fn clear_number_of_entries_for_user(&self, lottery_name: &BoxedBytes, user: &ManagedAddress);
 
-    #[storage_set("erc20_contract_address")]
+    #[storage_set("erc20ContractAddress")]
     fn set_erc20_contract_address(&self, address: &ManagedAddress);
 
     #[view(erc20ContractManagedAddress)]
-    #[storage_get("erc20_contract_address")]
+    #[storage_get("erc20ContractAddress")]
     fn get_erc20_contract_address(&self) -> ManagedAddress;
 
     // temporary storage between "determine_winner" proxy callbacks

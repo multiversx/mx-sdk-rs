@@ -144,10 +144,10 @@ pub trait Crowdfunding {
     fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[view(get_erc20_contract_address)]
-    #[storage_mapper("erc20_contract_address")]
+    #[storage_mapper("erc20ContractAddress")]
     fn erc20_contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     #[view(get_total_balance)]
-    #[storage_mapper("erc20_balance")]
+    #[storage_mapper("erc20Balance")]
     fn total_balance(&self) -> SingleValueMapper<BigUint>;
 }

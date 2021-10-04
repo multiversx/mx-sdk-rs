@@ -37,7 +37,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x01"],
+                "out": [
+                    "0x01"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -61,7 +63,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x01"],
+                "out": [
+                    "0x01"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -85,7 +89,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x01"],
+                "out": [
+                    "0x01"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -109,7 +115,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x01"],
+                "out": [
+                    "0x01"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

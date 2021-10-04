@@ -19,7 +19,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["2"],
+                "out": [
+                    "2"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -34,12 +36,16 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "balanceOf",
-                "arguments": ["address:acc1"],
+                "arguments": [
+                    "address:acc1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["1"],
+                "out": [
+                    "1"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -54,12 +60,16 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "ownerOf",
-                "arguments": ["2"],
+                "arguments": [
+                    "2"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["address:acc2"],
+                "out": [
+                    "address:acc2"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -74,12 +84,16 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "tokensOfOwner",
-                "arguments": ["address:acc1"],
+                "arguments": [
+                    "address:acc1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["u32:1"],
+                "out": [
+                    "u32:1"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -94,12 +108,16 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "getKittyById",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"],
+                "out": [
+                    "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -114,12 +132,16 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "isReadyToBreed",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x1"],
+                "out": [
+                    "0x1"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -134,12 +156,16 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "isPregnant",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x"],
+                "out": [
+                    "0x"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",
@@ -154,12 +180,17 @@
                 "to": "sc:kitty_ownership_contract",
                 "value": "0",
                 "function": "canBreedWith",
-                "arguments": ["1", "2"],
+                "arguments": [
+                    "1",
+                    "2"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["0x"],
+                "out": [
+                    "0x"
+                ],
                 "message": "",
                 "status": "0",
                 "gas": "*",

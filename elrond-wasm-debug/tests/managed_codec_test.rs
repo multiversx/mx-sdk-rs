@@ -81,7 +81,7 @@ fn test_man_address_serialization() {
 #[test]
 fn test_managed_vec_of_man_address_serialization() {
     let api = TxContext::dummy();
-    let mut v = ManagedVec::new_empty(api.clone());
+    let mut v = ManagedVec::new(api.clone());
     v.push(ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]));
     v.push(ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]));
     v.push(ManagedAddress::new_from_bytes(api.clone(), &[9u8; 32]));

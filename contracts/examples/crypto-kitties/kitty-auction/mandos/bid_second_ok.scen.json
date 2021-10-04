@@ -24,7 +24,9 @@
                 "to": "sc:kitty_auction_contract",
                 "value": "250",
                 "function": "bid",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
@@ -61,7 +63,6 @@
                         "str:totalKitties": "2",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:1": "u8:1|u8:2|u8:3|u8:4|u8:5|u8:6|u8:7|u64:123456|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
-
                         "str:nrOwnedKitties|sc:kitty_auction_contract": "1",
                         "str:owner|u32:1": "sc:kitty_auction_contract"
                     },
@@ -75,7 +76,6 @@
                         "str:genZeroKittyStartingPrice": "100",
                         "str:genZeroKittyEndingPrice": "500",
                         "str:genZeroKittyAuctionDuration": "100,000",
-
                         "str:auction|u32:1": "u8:0|u32:1|u8:100|u32:2|u16:500|u64:223456|sc:kitty_auction_contract|u32:1|u8:250|address:bidder2"
                     },
                     "code": "file:../output/kitty-auction.wasm"

@@ -61,7 +61,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     /// New instance of the special EGLD token representation.
     pub fn egld(api: M) -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::new_empty(api),
+            buffer: ManagedBuffer::new(api),
         }
     }
 
