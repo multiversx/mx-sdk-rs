@@ -106,23 +106,23 @@ where
     }
 
     #[inline]
-    pub fn get_state_root_hash(&self) -> H256 {
+    pub fn get_state_root_hash_legacy(&self) -> H256 {
+        self.api.get_state_root_hash_legacy()
+    }
+
+    #[inline]
+    pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
         self.api.get_state_root_hash()
     }
 
     #[inline]
-    pub fn get_state_root_hash_managed(&self) -> ManagedByteArray<A, 32> {
-        self.api.get_state_root_hash_managed()
+    pub fn get_tx_hash_legacy(&self) -> H256 {
+        self.api.get_tx_hash_legacy()
     }
 
     #[inline]
-    pub fn get_tx_hash(&self) -> H256 {
+    pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
         self.api.get_tx_hash()
-    }
-
-    #[inline]
-    pub fn get_tx_hash_managed(&self) -> ManagedByteArray<A, 32> {
-        self.api.get_tx_hash_managed()
     }
 
     #[inline]
@@ -151,13 +151,13 @@ where
     }
 
     #[inline]
-    pub fn get_block_random_seed(&self) -> Box<[u8; 48]> {
-        self.api.get_block_random_seed()
+    pub fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+        self.api.get_block_random_seed_legacy()
     }
 
     #[inline]
-    pub fn get_block_random_seed_managed(&self) -> ManagedByteArray<A, 48> {
-        self.api.get_block_random_seed_managed()
+    pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
+        self.api.get_block_random_seed()
     }
 
     #[inline]
@@ -181,13 +181,13 @@ where
     }
 
     #[inline]
-    pub fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
-        self.api.get_prev_block_random_seed()
+    pub fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+        self.api.get_prev_block_random_seed_legacy()
     }
 
     #[inline]
-    pub fn get_prev_block_random_seed_managed(&self) -> ManagedByteArray<A, 48> {
-        self.api.get_prev_block_random_seed_managed()
+    pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
+        self.api.get_prev_block_random_seed()
     }
 
     #[inline]

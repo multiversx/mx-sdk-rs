@@ -47,17 +47,17 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
         self.get_balance_legacy(&address.to_address())
     }
 
-    fn get_state_root_hash(&self) -> H256;
+    fn get_state_root_hash_legacy(&self) -> H256;
 
     #[inline]
-    fn get_state_root_hash_managed(&self) -> ManagedByteArray<Self, 32> {
-        ManagedByteArray::new_from_bytes(self.clone(), self.get_state_root_hash().as_array())
+    fn get_state_root_hash(&self) -> ManagedByteArray<Self, 32> {
+        ManagedByteArray::new_from_bytes(self.clone(), self.get_state_root_hash_legacy().as_array())
     }
 
-    fn get_tx_hash(&self) -> H256;
+    fn get_tx_hash_legacy(&self) -> H256;
 
-    fn get_tx_hash_managed(&self) -> ManagedByteArray<Self, 32> {
-        ManagedByteArray::new_from_bytes(self.clone(), self.get_tx_hash().as_array())
+    fn get_tx_hash(&self) -> ManagedByteArray<Self, 32> {
+        ManagedByteArray::new_from_bytes(self.clone(), self.get_tx_hash_legacy().as_array())
     }
 
     fn get_gas_left(&self) -> u64;
@@ -70,10 +70,10 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
 
     fn get_block_epoch(&self) -> u64;
 
-    fn get_block_random_seed(&self) -> Box<[u8; 48]>;
+    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
-    fn get_block_random_seed_managed(&self) -> ManagedByteArray<Self, 48> {
-        ManagedByteArray::new_from_bytes(self.clone(), &*self.get_block_random_seed())
+    fn get_block_random_seed(&self) -> ManagedByteArray<Self, 48> {
+        ManagedByteArray::new_from_bytes(self.clone(), &*self.get_block_random_seed_legacy())
     }
 
     fn get_prev_block_timestamp(&self) -> u64;
@@ -84,10 +84,10 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
 
     fn get_prev_block_epoch(&self) -> u64;
 
-    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]>;
+    fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
-    fn get_prev_block_random_seed_managed(&self) -> ManagedByteArray<Self, 48> {
-        ManagedByteArray::new_from_bytes(self.clone(), &*self.get_prev_block_random_seed())
+    fn get_prev_block_random_seed(&self) -> ManagedByteArray<Self, 48> {
+        ManagedByteArray::new_from_bytes(self.clone(), &*self.get_prev_block_random_seed_legacy())
     }
 
     fn get_current_esdt_nft_nonce(

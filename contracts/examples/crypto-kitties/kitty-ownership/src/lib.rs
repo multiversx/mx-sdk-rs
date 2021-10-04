@@ -241,8 +241,8 @@ pub trait KittyOwnership {
         );
 
         let mut random = Random::new(
-            *self.blockchain().get_block_random_seed(),
-            self.blockchain().get_tx_hash().as_bytes(),
+            *self.blockchain().get_block_random_seed_legacy(),
+            self.blockchain().get_tx_hash_legacy().as_bytes(),
         );
         let genes = KittyGenes::get_random(&mut random);
         let kitty_id = self._create_new_gen_zero_kitty(&genes);
