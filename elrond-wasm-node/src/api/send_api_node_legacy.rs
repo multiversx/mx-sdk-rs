@@ -163,12 +163,8 @@ extern "C" {
 }
 
 impl SendApi for ArwenApiImpl {
-    fn direct_egld<D>(
-        &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        data: D,
-    ) where
+    fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
+    where
         D: ManagedInto<Self, ManagedBuffer<Self>>,
     {
         let to_address = to.to_address();
@@ -365,10 +361,7 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (
-        ManagedAddress<Self>,
-        ManagedVec<Self, ManagedBuffer<Self>>,
-    ) {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         let mut new_address = Address::zero();
         unsafe {
             let num_return_data_before = getNumReturnData();
@@ -407,10 +400,7 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (
-        ManagedAddress<Self>,
-        ManagedVec<Self, ManagedBuffer<Self>>,
-    ) {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         let mut new_address = Address::zero();
         unsafe {
             let num_return_data_before = getNumReturnData();

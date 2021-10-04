@@ -14,12 +14,12 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_shard_of_address(&self, address: &Address) -> u32 {
+    fn get_shard_of_address(&self, address: &ManagedAddress) -> u32 {
         self.blockchain().get_shard_of_address(address)
     }
 
     #[endpoint]
-    fn is_smart_contract(&self, address: &Address) -> bool {
+    fn is_smart_contract(&self, address: &ManagedAddress) -> bool {
         self.blockchain().is_smart_contract(address)
     }
 
