@@ -51,7 +51,7 @@ where
     pub fn new_empty(api: M) -> Self {
         ManagedArgBuffer {
             api: api.clone(),
-            data: ManagedVec::new_empty(api),
+            data: ManagedVec::new(api),
         }
     }
 }
@@ -101,7 +101,7 @@ where
     }
 
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
-        let mut encoded_buffer = ManagedBuffer::new_empty(self.api.clone());
+        let mut encoded_buffer = ManagedBuffer::new(self.api.clone());
         arg.top_encode_or_exit(
             &mut encoded_buffer,
             self.api.clone(),

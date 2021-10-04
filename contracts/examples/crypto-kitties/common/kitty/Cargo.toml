@@ -9,7 +9,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.elrond-wasm]
-version = "0.19.1"
+version = "0.20.0"
 path = "../../../../../elrond-wasm"
 features = ["derive"]
 

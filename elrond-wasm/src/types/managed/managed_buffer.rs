@@ -35,7 +35,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
-    pub fn new_empty(api: M) -> Self {
+    pub fn new(api: M) -> Self {
         ManagedBuffer {
             handle: api.mb_new_empty(),
             api,
@@ -85,7 +85,7 @@ where
 impl<M: ManagedTypeApi> ManagedDefault<M> for ManagedBuffer<M> {
     #[inline]
     fn managed_default(api: M) -> Self {
-        Self::new_empty(api)
+        Self::new(api)
     }
 }
 

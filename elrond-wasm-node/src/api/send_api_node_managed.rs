@@ -179,7 +179,7 @@ impl SendApi for ArwenApiImpl {
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
-        let mut payments = ManagedVec::new_empty(self.clone());
+        let mut payments = ManagedVec::new(self.clone());
         payments.push(EsdtTokenPayment::from(token.clone(), nonce, amount.clone()));
         self.direct_multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }

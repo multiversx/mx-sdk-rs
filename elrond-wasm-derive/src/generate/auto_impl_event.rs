@@ -30,7 +30,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
         }
     } else {
         quote! {
-            let ___data_buffer___ = elrond_wasm::types::ManagedBuffer::new_empty(self.raw_vm_api());
+            let ___data_buffer___ = elrond_wasm::types::ManagedBuffer::new(self.raw_vm_api());
         }
     };
 

@@ -48,6 +48,36 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
+    fn big_uint_zero(&self) -> BigUint {
+        BigUint::zero()
+    }
+
+    #[endpoint]
+    fn big_uint_from_u64_1(&self, small: u64) -> BigUint {
+        BigUint::from(small)
+    }
+
+    #[endpoint]
+    fn big_uint_from_u64_2(&self, small: u64) -> BigUint {
+        small.managed_into()
+    }
+
+    #[endpoint]
+    fn big_int_zero(&self) -> BigInt {
+        BigInt::zero()
+    }
+
+    #[endpoint]
+    fn big_int_from_i64_1(&self, small: i64) -> BigInt {
+        BigInt::from(small)
+    }
+
+    #[endpoint]
+    fn big_int_from_i64_2(&self, small: i64) -> BigInt {
+        small.managed_into()
+    }
+
+    #[endpoint]
     fn big_int_to_i64(&self, bi: &BigInt) -> OptionalResult<i64> {
         bi.to_i64().into()
     }

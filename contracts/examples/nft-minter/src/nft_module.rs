@@ -176,7 +176,7 @@ pub trait NftModule {
         let attributes_hash = self.crypto().sha256(&serialized_attributes);
         let hash_buffer = self.types().managed_buffer_from(attributes_hash.as_bytes());
 
-        let mut uris = ManagedVec::new_empty(self.type_manager());
+        let mut uris = ManagedVec::new(self.type_manager());
         uris.push(uri);
 
         let nft_nonce = self.send().esdt_nft_create(

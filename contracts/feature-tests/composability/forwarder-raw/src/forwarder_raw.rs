@@ -25,7 +25,7 @@ pub trait ForwarderRaw {
             to,
             token,
             amount: payment,
-            data: self.types().managed_buffer_empty(),
+            data: ManagedBuffer::new(),
         }
     }
 
