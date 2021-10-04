@@ -448,12 +448,12 @@ impl SendApi for ArwenApiImpl {
     }
 
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>) {
-        let tx_hash = self.get_tx_hash_managed();
+        let tx_hash = self.get_tx_hash();
         self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
     }
 
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
-        let tx_hash = self.get_tx_hash_managed();
+        let tx_hash = self.get_tx_hash();
         ManagedBuffer::from_raw_handle(
             self.clone(),
             self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
