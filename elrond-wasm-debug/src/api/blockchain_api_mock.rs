@@ -43,11 +43,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
     }
 
-    fn get_state_root_hash(&self) -> H256 {
-        panic!("get_state_root_hash not yet implemented")
+    fn get_state_root_hash_legacy(&self) -> H256 {
+        panic!("get_state_root_hash_legacy not yet implemented")
     }
 
-    fn get_tx_hash(&self) -> H256 {
+    fn get_tx_hash_legacy(&self) -> H256 {
         self.tx_input_box.tx_hash.clone()
     }
 
@@ -71,7 +71,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.blockchain_info_box.current_block_info.block_epoch
     }
 
-    fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         self.blockchain_info_box
             .current_block_info
             .block_random_seed
@@ -94,7 +94,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.blockchain_info_box.previous_block_info.block_epoch
     }
 
-    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         self.blockchain_info_box
             .previous_block_info
             .block_random_seed
