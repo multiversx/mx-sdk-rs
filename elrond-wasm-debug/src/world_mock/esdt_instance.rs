@@ -11,7 +11,7 @@ pub struct EsdtUri(HashMap<Vec<u8>, Vec<u8>>);
 
 // EsdtInstance holds the data for a Elrond standard digital token transaction
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct EsdtInstance {
     pub value: BigUint,
     pub esdt_type: u32,

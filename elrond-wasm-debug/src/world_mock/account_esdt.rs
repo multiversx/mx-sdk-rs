@@ -19,6 +19,18 @@ pub struct EsdtData {
 
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
 
+impl AccountEsdt {
+    pub fn get_by_identifier(&self, identifier: Vec<u8>) -> Option<&EsdtData> {
+        self.iter().find_map(|(_, x)| {
+            if x.token_identifier == identifier {
+                Some(x)
+            } else {
+                None
+            }
+        })
+    }
+}
+
 impl Deref for AccountEsdt {
     type Target = HashMap<Vec<u8>, EsdtData>;
 
