@@ -29,7 +29,9 @@
                 ]
             },
             "expect": {
-                "out": [ "address:a1|address:a2" ]
+                "out": [
+                    "address:a1|address:a2"
+                ]
             }
         },
         {
@@ -44,7 +46,9 @@
                 ]
             },
             "expect": {
-                "out": [ "address:a2" ]
+                "out": [
+                    "address:a2"
+                ]
             }
         }
     ]

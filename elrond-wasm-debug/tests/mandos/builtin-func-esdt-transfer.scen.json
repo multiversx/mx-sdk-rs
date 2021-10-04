@@ -25,7 +25,9 @@
                 "from": "address:A",
                 "to": "address:B",
                 "function": "ESDTTransfer",
-                "arguments": [ "100" ],
+                "arguments": [
+                    "100"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },

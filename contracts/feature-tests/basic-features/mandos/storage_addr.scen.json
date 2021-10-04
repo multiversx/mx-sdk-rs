@@ -73,7 +73,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:____________address_____________" ],
+                "out": [
+                    "str:____________address_____________"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

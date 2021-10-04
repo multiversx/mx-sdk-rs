@@ -52,12 +52,12 @@
                     "nonce": "0",
                     "balance": "500,000,000,000",
                     "storage": {
-                        "str:ping_amount": "500,000,000,000",
-                        "str:activation_timestamp": "780",
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
                         "str:deadline": "123,780",
                         "str:user_address_to_id|address:participant1": "1",
                         "str:user_id_to_address|0x0000001": "address:participant1",
-                        "str:user_status|0x0000001": "1",
+                        "str:userStatus|0x0000001": "1",
                         "str:user_count": "1"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"

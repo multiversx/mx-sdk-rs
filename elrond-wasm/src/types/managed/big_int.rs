@@ -1,4 +1,4 @@
-use super::{BigUint, ManagedBuffer, ManagedDefault, ManagedType, Sign};
+use super::{BigUint, ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, Sign};
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::BoxedBytes,
@@ -56,8 +56,29 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     }
 }
 
+impl<M, U> ManagedFrom<M, U> for BigInt<M>
+where
+    M: ManagedTypeApi,
+    U: Into<i64>,
+{
+    fn managed_from(api: M, value: U) -> Self {
+        BigInt {
+            handle: api.bi_new(value.into()),
+            api,
+        }
+    }
+}
+
 /// More conversions here.
 impl<M: ManagedTypeApi> BigInt<M> {
+    #[inline]
+    pub fn zero(api: M) -> Self {
+        BigInt {
+            handle: api.bi_new_zero(),
+            api,
+        }
+    }
+
     #[inline]
     pub fn from_i64(api: M, value: i64) -> Self {
         BigInt {

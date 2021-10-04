@@ -26,7 +26,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:interrupted" ],
+                "out": [
+                    "str:interrupted"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -55,17 +57,17 @@
                     "nonce": "0",
                     "balance": "500,000,000,000",
                     "storage": {
-                        "str:ping_amount": "500,000,000,000",
-                        "str:activation_timestamp": "780",
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
                         "str:deadline": "123,780",
                         "str:user_address_to_id|address:participant1": "1",
                         "str:user_id_to_address|0x0000001": "address:participant1",
-                        "str:user_status|0x0000001": "2",
+                        "str:userStatus|0x0000001": "2",
                         "str:user_address_to_id|address:participant2": "2",
                         "str:user_id_to_address|0x0000002": "address:participant2",
-                        "str:user_status|0x0000002": "1",
+                        "str:userStatus|0x0000002": "1",
                         "str:user_count": "2",
-                        "str:pong_all_last_user": "1"
+                        "str:pongAllLastUser": "1"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }
@@ -85,7 +87,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:completed" ],
+                "out": [
+                    "str:completed"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -114,15 +118,15 @@
                     "nonce": "0",
                     "balance": "*",
                     "storage": {
-                        "str:ping_amount": "500,000,000,000",
-                        "str:activation_timestamp": "780",
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
                         "str:deadline": "123,780",
                         "str:user_address_to_id|address:participant1": "1",
                         "str:user_id_to_address|0x0000001": "address:participant1",
-                        "str:user_status|0x0000001": "2",
+                        "str:userStatus|0x0000001": "2",
                         "str:user_address_to_id|address:participant2": "2",
                         "str:user_id_to_address|0x0000002": "address:participant2",
-                        "str:user_status|0x0000002": "2",
+                        "str:userStatus|0x0000002": "2",
                         "str:user_count": "2"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"

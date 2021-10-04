@@ -32,7 +32,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "address:an_account" ],
+                "out": [
+                    "address:an_account"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -47,7 +49,9 @@
                 "function": "get_caller"
             },
             "expect": {
-                "out": [ "sc:basic-features" ],
+                "out": [
+                    "sc:basic-features"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

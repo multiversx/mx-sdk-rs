@@ -38,7 +38,9 @@
                 ]
             },
             "expect": {
-                "out": [ "false" ]
+                "out": [
+                    "false"
+                ]
             }
         },
         {
@@ -52,7 +54,9 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ]
+                "out": [
+                    "true"
+                ]
             }
         },
         {
@@ -64,7 +68,9 @@
                 "arguments": []
             },
             "expect": {
-                "out": [ "address:someone_else" ]
+                "out": [
+                    "address:someone_else"
+                ]
             }
         },
         {
@@ -93,7 +99,9 @@
                 ]
             },
             "expect": {
-                "out": [ "true" ]
+                "out": [
+                    "true"
+                ]
             }
         },
         {
@@ -105,7 +113,9 @@
                 "arguments": []
             },
             "expect": {
-                "out": [ "address:an_account" ]
+                "out": [
+                    "address:an_account"
+                ]
             }
         },
         {

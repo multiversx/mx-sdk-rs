@@ -36,7 +36,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0", "str:EGLD" ],
+                "out": [
+                    "0",
+                    "str:EGLD"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -56,7 +59,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "5", "str:EGLD" ],
+                "out": [
+                    "5",
+                    "str:EGLD"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
