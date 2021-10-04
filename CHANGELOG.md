@@ -4,6 +4,14 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.20.0, elrond-codec 0.7.0, mandos 0.10.0] - 2021-10-02
+- Managed callback handling
+- Managed async call result
+- ManagedVec improvements, deserialization fix
+- Better conversions between big numeric types
+- Improved preprocessor substitutions: hidden generics for most managed types
+- Build info in ABI - rustc version, framework version, crate version
+
 ## [elrond-wasm 0.19.1] - 2021-09-17
 - Legacy Send API implementation fix
 
