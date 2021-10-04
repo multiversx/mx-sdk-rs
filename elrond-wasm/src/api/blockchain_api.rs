@@ -29,11 +29,23 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
         ManagedAddress::from_address(self.clone(), &self.get_owner_address_legacy())
     }
 
-    fn get_shard_of_address(&self, address: &Address) -> u32;
+    fn get_shard_of_address_legacy(&self, address: &Address) -> u32;
 
-    fn is_smart_contract(&self, address: &Address) -> bool;
+    fn get_shard_of_address(&self, address: &ManagedAddress<Self>) -> u32 {
+        self.get_shard_of_address_legacy(&address.to_address())
+    }
 
-    fn get_balance(&self, address: &Address) -> BigUint<Self>;
+    fn is_smart_contract_legacy(&self, address: &Address) -> bool;
+
+    fn is_smart_contract(&self, address: &ManagedAddress<Self>) -> bool {
+        self.is_smart_contract_legacy(&address.to_address())
+    }
+
+    fn get_balance_legacy(&self, address: &Address) -> BigUint<Self>;
+
+    fn get_balance(&self, address: &ManagedAddress<Self>) -> BigUint<Self> {
+        self.get_balance_legacy(&address.to_address())
+    }
 
     fn get_state_root_hash(&self) -> H256;
 
