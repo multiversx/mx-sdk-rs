@@ -36,6 +36,20 @@ impl CheckEsdt {
     pub fn is_star(&self) -> bool {
         matches!(self, CheckEsdt::Star)
     }
+
+    pub fn contains_identifier(&self, identifier: &Vec<u8>) -> bool {
+        match self {
+            CheckEsdt::Star => return false,
+            CheckEsdt::Equal(x) => {
+                for item in x {
+                    if item.token_identifier.check(identifier) {
+                        return true;
+                    }
+                }
+            },
+        }
+        false
+    }
 }
 
 impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {

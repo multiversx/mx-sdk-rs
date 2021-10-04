@@ -1,6 +1,6 @@
 use mandos::{
-    AddressKey, BytesKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtValues, CheckStorage,
-    CheckValue, Checkable,
+    AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtValues, CheckStorage, CheckValue,
+    Checkable,
 };
 
 use crate::{
@@ -96,11 +96,13 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &A
     match expected {
         CheckEsdt::Equal(eq) => {
             let default_value = &EsdtData::default();
-            for (expected_key, expected_value) in eq.iter() {
-                let actual_value = actual.get(&expected_key.value).unwrap_or(default_value);
+            for expected_value in eq.iter() {
+                let actual_value = actual
+                    .get_by_identifier(expected_value.token_identifier.value)
+                    .unwrap_or(default_value);
                 check_esdt_data(
                     address,
-                    expected_key.to_string(),
+                    verbose_hex(&expected_value.token_identifier.value),
                     expected_value,
                     actual_value,
                 )
@@ -109,11 +111,11 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &A
             let default_check_value = CheckEsdtData::default();
             for (actual_key, actual_value) in actual
                 .iter()
-                .filter(|&(key, val)| !eq.contains_key(&BytesKey::from(key.clone())))
+                .filter(|&(key, val)| !expected.contains_identifier(key))
             {
                 check_esdt_data(
                     address,
-                    verbose_hex(actual_key),
+                    verbose_hex(&actual_value.token_identifier),
                     &default_check_value,
                     actual_value,
                 );
@@ -150,18 +152,18 @@ pub fn check_token_instances(
 ) {
     match expected {
         CheckEsdtValues::Equal(eq) => {
-            let default_value = &EsdtInstance::default();
-            for (expected_key, expected_value) in eq.iter() {
+            let default_value = EsdtInstance::default();
+            for expected_value in eq.iter() {
                 let actual_value = actual
-                    .find_instance_with_nonce(expected_value.nonce)
+                    .find_instance_with_nonce(expected_value.nonce.value)
                     .unwrap_or(default_value);
                 assert!(
-                    expected_value.balance.check(&actual.),
+                    expected_value.balance.check(&actual_value.value),
                     "bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
                     address,
                     token,
-                    expected_value.token_identifier,
-                    verbose_hex(&actual.token_identifier)
+                    expected_value.balance,
+                    &actual_value.value
                 );
             }
         },
