@@ -1,7 +1,7 @@
 use super::mock_error::BlockchainMockError;
 use crate::{
-    account_esdt::AccountEsdt, contract_map::*, display_util::*, esdt_instance::EsdtInstance,
-    esdt_transfer_event_log, tx_context::*, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
+    account_esdt::AccountEsdt, contract_map::*, display_util::*, esdt_transfer_event_log,
+    tx_context::*, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
 };
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;

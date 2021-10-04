@@ -42,6 +42,15 @@ impl Serialize for CheckStorageRaw {
     }
 }
 
+impl<'de> Deserialize<'de> for CheckStorageRaw {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(CheckStorageRawVisitor)
+    }
+}
+
 impl Serialize for CheckStorageDetailsRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -129,14 +138,5 @@ impl<'de> Visitor<'de> for CheckStorageRawVisitor {
         Ok(CheckStorageRaw::Equal(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
         )?))
-    }
-}
-
-impl<'de> Deserialize<'de> for CheckStorageRaw {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_any(CheckStorageRawVisitor)
     }
 }
