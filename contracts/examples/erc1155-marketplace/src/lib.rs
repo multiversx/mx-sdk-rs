@@ -376,7 +376,7 @@ pub trait Erc1155Marketplace {
     }
 
     fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(&dest) {
+        if self.blockchain().is_smart_contract(dest) {
             &[]
         } else {
             data
