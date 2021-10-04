@@ -228,7 +228,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_state_root_hash(&self) -> H256 {
+    fn get_state_root_hash_legacy(&self) -> H256 {
         unsafe {
             let mut res = H256::zero();
             getOriginalTxHash(res.as_mut_ptr());
@@ -238,7 +238,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_state_root_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
+    fn get_state_root_hash(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetStateRootHash(result_handle);
@@ -247,7 +247,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_tx_hash(&self) -> H256 {
+    fn get_tx_hash_legacy(&self) -> H256 {
         unsafe {
             let mut res = H256::zero();
             getOriginalTxHash(res.as_mut_ptr());
@@ -257,7 +257,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_tx_hash_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
+    fn get_tx_hash(&self) -> elrond_wasm::types::ManagedByteArray<Self, 32> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetOriginalTxHash(result_handle);
@@ -291,7 +291,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         unsafe {
             let mut res = [0u8; 48];
             getBlockRandomSeed(res.as_mut_ptr());
@@ -301,7 +301,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
+    fn get_block_random_seed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetBlockRandomSeed(result_handle);
@@ -330,7 +330,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         unsafe {
             let mut res = [0u8; 48];
             getPrevBlockRandomSeed(res.as_mut_ptr());
@@ -340,7 +340,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
 
     #[inline]
     #[cfg(not(feature = "unmanaged-ei"))]
-    fn get_prev_block_random_seed_managed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
+    fn get_prev_block_random_seed(&self) -> elrond_wasm::types::ManagedByteArray<Self, 48> {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);

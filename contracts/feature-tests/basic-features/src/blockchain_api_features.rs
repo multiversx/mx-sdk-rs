@@ -24,13 +24,13 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_state_root_hash(&self) -> ManagedByteArray<Self::Api, 32> {
-        self.blockchain().get_state_root_hash_managed()
+    fn get_state_root_hash_legacy(&self) -> ManagedByteArray<Self::Api, 32> {
+        self.blockchain().get_state_root_hash()
     }
 
     #[endpoint]
-    fn get_tx_hash(&self) -> ManagedByteArray<Self::Api, 32> {
-        self.blockchain().get_tx_hash_managed()
+    fn get_tx_hash_legacy(&self) -> ManagedByteArray<Self::Api, 32> {
+        self.blockchain().get_tx_hash()
     }
 
     #[endpoint]

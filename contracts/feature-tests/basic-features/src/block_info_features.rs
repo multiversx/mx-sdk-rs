@@ -25,7 +25,7 @@ pub trait BlockInfoFeatures {
 
     #[view]
     fn get_block_random_seed(&self) -> ManagedByteArray<Self::Api, 48> {
-        self.blockchain().get_block_random_seed_managed()
+        self.blockchain().get_block_random_seed()
     }
 
     #[view]
@@ -50,6 +50,6 @@ pub trait BlockInfoFeatures {
 
     #[view]
     fn get_prev_block_random_seed(&self) -> ManagedByteArray<Self::Api, 48> {
-        self.blockchain().get_prev_block_random_seed_managed()
+        self.blockchain().get_prev_block_random_seed()
     }
 }
