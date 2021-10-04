@@ -1,7 +1,13 @@
-use mandos::{BigUintValue, BytesValue, CheckEsdt, CheckStorage, CheckValue, Checkable};
-use num_bigint::BigUint;
+use mandos::{
+    AddressKey, BytesKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtValues, CheckStorage,
+    CheckValue, Checkable,
+};
 
-use crate::{account_esdt::EsdtData, verbose_hex, BlockchainMock};
+use crate::{
+    account_esdt::{AccountEsdt, EsdtData},
+    esdt_instance::{EsdtInstance, EsdtInstances},
+    verbose_hex, BlockchainMock,
+};
 
 pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
@@ -75,79 +81,7 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                         );
                     }
                 }
-            }
-
-            match &expected_account.esdt {
-                CheckEsdt::Equal(eq) => {
-                    let default_value = &EsdtData::default();
-                    for (expected_key, expected_value) in eq.iter() {
-                        let actual_value = account
-                            .esdt
-                            .get(&expected_key.value)
-                            .unwrap_or(default_value);
-                        assert!(
-                            expected_value.check(actual_value),
-                            "bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
-                            expected_address,
-                            expected_key,
-                            expected_value,
-                            actual_value
-                        );
-                    }
-
-                    let default_check_value = CheckValue::Equal(BigUintValue::default());
-
-                    for (actual_key, actual_value) in account.esdt.iter() {
-                        let expected_value = eq
-                            .get(&actual_key.clone().into())
-                            .unwrap_or(&default_check_value);
-                        assert!(
-                            expected_value.check(actual_value),
-                            "bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
-                            expected_address,
-                            verbose_hex(actual_key),
-                            expected_value,
-                            actual_value
-                        );
-                    }
-                },
-                CheckEsdt::Star => {
-                    // nothing to be done for *
-                },
-            }
-
-            if let CheckEsdt::Equal(eq) = &expected_account.esdt {
-                let default_value = &EsdtData::default();
-                for (expected_key, expected_value) in eq.iter() {
-                    let actual_value = account
-                        .esdt
-                        .get(&expected_key.value)
-                        .unwrap_or(default_value);
-                    assert!(
-                        expected_value.check(actual_value),
-                        "bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
-                        expected_address,
-                        expected_key,
-                        expected_value,
-                        actual_value
-                    );
-                }
-
-                let default_check_value = CheckValue::Equal(BigUintValue::default());
-
-                for (actual_key, actual_value) in account.esdt.iter() {
-                    let expected_value = eq
-                        .get(&actual_key.clone().into())
-                        .unwrap_or(&default_check_value);
-                    assert!(
-                        expected_value.check(actual_value),
-                        "bad esdt value. Address: {}. Token: {}. Want: {}. Have: {}",
-                        expected_address,
-                        verbose_hex(actual_key),
-                        expected_value,
-                        actual_value
-                    );
-                }
+                check_account_esdt(&expected_address, &expected_account.esdt, &account.esdt);
             }
         } else {
             assert!(
@@ -155,5 +89,84 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                 "Expected account not found"
             );
         }
+    }
+}
+
+pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &AccountEsdt) {
+    match expected {
+        CheckEsdt::Equal(eq) => {
+            let default_value = &EsdtData::default();
+            for (expected_key, expected_value) in eq.iter() {
+                let actual_value = actual.get(&expected_key.value).unwrap_or(default_value);
+                check_esdt_data(
+                    address,
+                    expected_key.to_string(),
+                    expected_value,
+                    actual_value,
+                )
+            }
+
+            let default_check_value = CheckEsdtData::default();
+            for (actual_key, actual_value) in actual
+                .iter()
+                .filter(|&(key, val)| !eq.contains_key(&BytesKey::from(key.clone())))
+            {
+                check_esdt_data(
+                    address,
+                    verbose_hex(actual_key),
+                    &default_check_value,
+                    actual_value,
+                );
+            }
+        },
+        CheckEsdt::Star => {
+            // nothing to be done for *
+        },
+    }
+}
+
+pub fn check_esdt_data(
+    address: &AddressKey,
+    token: String,
+    expected: &CheckEsdtData,
+    actual: &EsdtData,
+) {
+    check_token_instances(address, token, &expected.instances, &actual.instances);
+    assert!(
+        expected.last_nonce.check(actual.last_nonce),
+        "bad last nonce. Address: {}. Token Name: {}. Want: {}. Have: {}",
+        address,
+        token,
+        expected.last_nonce,
+        &actual.last_nonce
+    );
+}
+
+pub fn check_token_instances(
+    address: &AddressKey,
+    token: String,
+    expected: &CheckEsdtValues,
+    actual: &EsdtInstances,
+) {
+    match expected {
+        CheckEsdtValues::Equal(eq) => {
+            let default_value = &EsdtInstance::default();
+            for (expected_key, expected_value) in eq.iter() {
+                let actual_value = actual
+                    .find_instance_with_nonce(expected_value.nonce)
+                    .unwrap_or(default_value);
+                assert!(
+                    expected_value.balance.check(&actual.),
+                    "bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
+                    address,
+                    token,
+                    expected_value.token_identifier,
+                    verbose_hex(&actual.token_identifier)
+                );
+            }
+        },
+        CheckEsdtValues::Star => {
+            // nothing to be done for *
+        },
     }
 }

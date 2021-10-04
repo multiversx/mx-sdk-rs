@@ -69,6 +69,10 @@ impl EsdtInstances {
             },
         );
     }
+    pub fn find_instance_with_nonce(&self, nonce: u64) -> Option<EsdtInstance> {
+        self.iter()
+            .find_map(|(key, &val)| if key == &nonce { Some(val) } else { None })
+    }
 }
 
 impl fmt::Display for EsdtInstances {

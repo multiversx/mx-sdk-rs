@@ -1,15 +1,74 @@
 use super::*;
 use serde::{
     de::{self, Deserializer, MapAccess, Visitor},
-    ser::{SerializeMap, Serializer},
+    ser::{SerializeMap, SerializeSeq, Serializer},
     Deserialize, Serialize,
 };
-use std::{collections::BTreeMap, fmt};
+use std::fmt;
 
 pub enum CheckEsdtRaw {
     Unspecified,
     Star,
-    Equal(CheckEsdtDataRaw),
+    Equal(Vec<CheckEsdtDataRaw>),
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CheckEsdtDataRaw {
+    pub token_identifier: ValueSubTree,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckEsdtValuesRaw::is_unspecified")]
+    pub instances: CheckEsdtValuesRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub last_nonce: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub roles: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub frozen: CheckBytesValueRaw,
+}
+
+#[derive(Deserialize)]
+pub enum CheckEsdtValuesRaw {
+    Unspecified,
+    Star,
+    Equal(Vec<CheckEsdtValueRaw>),
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CheckEsdtValueRaw {
+    pub nonce: ValueSubTree,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub balance: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub creator: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub royalties: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub hash: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub uri: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub attributes: CheckBytesValueRaw,
 }
 
 impl CheckEsdtRaw {
@@ -46,6 +105,14 @@ impl Serialize for CheckEsdtRaw {
     }
 }
 
+impl<'de> Deserialize<'de> for CheckEsdtRaw {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(CheckEsdtRawVisitor)
+    }
+}
 struct CheckEsdtRawVisitor;
 
 impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
@@ -77,78 +144,6 @@ impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
     }
 }
 
-impl<'de> Deserialize<'de> for CheckEsdtRaw {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_any(CheckEsdtRawVisitor)
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CheckEsdtValueRaw {
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub nonce: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub balance: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub creator: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub royalties: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub hash: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub uri: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub attributes: CheckBytesValueRaw,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CheckEsdtDataRaw {
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub token_identifier: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckEsdtValuesRaw::is_unspecified")]
-    pub instances: CheckEsdtValuesRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub last_nonce: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub roles: CheckBytesValueRaw,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub frozen: CheckBytesValueRaw,
-}
-
-#[derive(Deserialize)]
-pub enum CheckEsdtValuesRaw {
-    Unspecified,
-    Star,
-    Equal(BTreeMap<String, CheckEsdtValueRaw>),
-}
-
 impl CheckEsdtValuesRaw {
     pub fn is_star(&self) -> bool {
         matches!(self, CheckEsdtValuesRaw::Star)
@@ -177,9 +172,9 @@ impl Serialize for CheckEsdtValuesRaw {
             },
             CheckEsdtValuesRaw::Star => serializer.serialize_str("*"),
             CheckEsdtValuesRaw::Equal(m) => {
-                let mut map = serializer.serialize_map(Some(m.len()))?;
-                for (k, v) in m {
-                    map.serialize_entry(k, v)?;
+                let mut map = serializer.serialize_seq(Some(m.len()))?;
+                for v in m {
+                    map.serialize_element(v)?;
                 }
                 map.end()
             },

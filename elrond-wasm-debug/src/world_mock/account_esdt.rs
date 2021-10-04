@@ -10,9 +10,11 @@ pub struct EsdtRoles(HashMap<Vec<u8>, Vec<u8>>);
 
 #[derive(Clone, Default)]
 pub struct EsdtData {
+    pub token_identifier: Vec<u8>,
     pub instances: EsdtInstances,
-    pub last_nonce: Option<u64>,
+    pub last_nonce: u64,
     pub roles: Option<EsdtRoles>,
+    pub frozen: u64,
 }
 
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
@@ -31,13 +33,17 @@ impl fmt::Display for EsdtData {
         write!(
             &mut esdt_buf,
             "{{
+                token_identifier: {},
                 instances: [{}],
                 last_nonce: {},
                 roles: [{}],
+                frozen: {},
             }}",
+            key_hex(self.token_identifier.as_slice()),
             self.instances,
-            self.last_nonce.unwrap(),
-            self.roles.unwrap()
+            self.last_nonce,
+            self.roles.unwrap(),
+            self.frozen
         )?;
         Ok(())
     }
