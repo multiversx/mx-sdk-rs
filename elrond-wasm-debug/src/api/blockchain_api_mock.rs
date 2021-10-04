@@ -13,11 +13,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .unwrap_or_else(|| panic!("contract owner address not set"))
     }
 
-    fn get_shard_of_address(&self, _address: &Address) -> u32 {
+    fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
         panic!("get_shard_of_address not implemented")
     }
 
-    fn is_smart_contract(&self, _address: &Address) -> bool {
+    fn is_smart_contract_legacy(&self, _address: &Address) -> bool {
         panic!("is_smart_contract not implemented")
 
         /*
@@ -35,7 +35,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.tx_input_box.from.clone()
     }
 
-    fn get_balance(&self, address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, address: &Address) -> BigUint<Self> {
         assert!(
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"

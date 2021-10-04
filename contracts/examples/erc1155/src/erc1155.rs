@@ -54,7 +54,7 @@ pub trait Erc1155 {
     ) -> SCResult<OptionalResult<AsyncCall>> {
         self.try_reserve_fungible(&from, &type_id, &amount)?;
 
-        Ok(if self.blockchain().is_smart_contract(&to.to_address()) {
+        Ok(if self.blockchain().is_smart_contract(&to) {
             OptionalResult::Some(
                 self.peform_async_call_single_transfer(from, to, type_id, amount, data),
             )
@@ -75,7 +75,7 @@ pub trait Erc1155 {
     ) -> SCResult<OptionalResult<AsyncCall>> {
         self.try_reserve_non_fungible(&from, &type_id, &nft_id)?;
 
-        Ok(if self.blockchain().is_smart_contract(&to.to_address()) {
+        Ok(if self.blockchain().is_smart_contract(&to) {
             OptionalResult::Some(
                 self.peform_async_call_single_transfer(from, to, type_id, nft_id, data),
             )
@@ -99,7 +99,7 @@ pub trait Erc1155 {
         data: &[u8],
     ) -> SCResult<OptionalResult<AsyncCall>> {
         let caller = self.blockchain().get_caller();
-        let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to.to_address());
+        let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to);
 
         require!(
             caller == from || self.is_approved(&caller, &from).get(),

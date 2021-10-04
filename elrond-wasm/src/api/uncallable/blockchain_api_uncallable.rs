@@ -16,11 +16,11 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_shard_of_address(&self, _address: &Address) -> u32 {
+    fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
         unreachable!()
     }
 
-    fn is_smart_contract(&self, _address: &Address) -> bool {
+    fn is_smart_contract_legacy(&self, _address: &Address) -> bool {
         unreachable!()
     }
 
@@ -28,7 +28,7 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_balance(&self, _address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, _address: &Address) -> BigUint<Self> {
         unreachable!()
     }
 

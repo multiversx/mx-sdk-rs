@@ -144,8 +144,7 @@ pub trait Erc1155Marketplace {
             "Cannot set to zero address"
         );
         require!(
-            self.blockchain()
-                .is_smart_contract(&new_address.to_address()),
+            self.blockchain().is_smart_contract(&new_address),
             "The provided address is not a smart contract"
         );
 
@@ -377,7 +376,7 @@ pub trait Erc1155Marketplace {
     }
 
     fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(&dest.to_address()) {
+        if self.blockchain().is_smart_contract(dest) {
             &[]
         } else {
             data

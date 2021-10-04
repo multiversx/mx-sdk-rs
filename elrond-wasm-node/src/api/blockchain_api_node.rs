@@ -1,3 +1,4 @@
+use crate::api::managed_types::managed_buffer_api_node::unsafe_buffer_load_address;
 use elrond_wasm::{
     api::BlockchainApi,
     types::{
@@ -169,13 +170,23 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_shard_of_address(&self, address: &Address) -> u32 {
+    fn get_shard_of_address_legacy(&self, address: &Address) -> u32 {
         unsafe { getShardOfAddress(address.as_ref().as_ptr()) as u32 }
     }
 
     #[inline]
-    fn is_smart_contract(&self, address: &Address) -> bool {
+    fn get_shard_of_address(&self, address: &ManagedAddress<Self>) -> u32 {
+        unsafe { getShardOfAddress(unsafe_buffer_load_address(address.get_raw_handle())) as u32 }
+    }
+
+    #[inline]
+    fn is_smart_contract_legacy(&self, address: &Address) -> bool {
         unsafe { isSmartContract(address.as_ref().as_ptr()) > 0 }
+    }
+
+    #[inline]
+    fn is_smart_contract(&self, address: &ManagedAddress<Self>) -> bool {
+        unsafe { isSmartContract(unsafe_buffer_load_address(address.get_raw_handle())) > 0 }
     }
 
     #[inline]
@@ -197,10 +208,21 @@ impl BlockchainApi for crate::ArwenApiImpl {
         }
     }
 
-    fn get_balance(&self, address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, address: &Address) -> BigUint<Self> {
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
+            BigUint::from_raw_handle(self.clone(), balance_handle)
+        }
+    }
+
+    fn get_balance(&self, address: &ManagedAddress<Self>) -> BigUint<Self> {
+        unsafe {
+            let balance_handle = bigIntNew(0);
+            bigIntGetExternalBalance(
+                unsafe_buffer_load_address(address.get_raw_handle()),
+                balance_handle,
+            );
             BigUint::from_raw_handle(self.clone(), balance_handle)
         }
     }

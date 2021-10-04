@@ -1,10 +1,9 @@
+use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
     err_msg,
     types::BoxedBytes,
 };
-
-use crate::error_hook;
 
 // #[allow(dead_code)]
 extern "C" {
@@ -164,4 +163,10 @@ impl ManagedBufferApi for crate::ArwenApiImpl {
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         unsafe { mBufferEq(handle1, handle2) > 0 }
     }
+}
+
+pub(crate) unsafe fn unsafe_buffer_load_address(address_handle: Handle) -> *const u8 {
+    let unsafe_buffer_ptr = unsafe_buffer::buffer_ptr();
+    let _ = mBufferGetBytes(address_handle, unsafe_buffer_ptr);
+    unsafe_buffer_ptr
 }
