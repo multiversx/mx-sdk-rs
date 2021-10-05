@@ -46,7 +46,7 @@ pub trait KittyAuction {
     fn create_and_auction_gen_zero_kitty(&self) -> SCResult<AsyncCall> {
         let kitty_ownership_contract_address =
             self.get_kitty_ownership_contract_address_or_default();
-        if kitty_ownership_contract_address != self.types().address_zero() {
+        if !kitty_ownership_contract_address.is_zero() {
             Ok(self
                 .kitty_ownership_proxy(kitty_ownership_contract_address)
                 .create_gen_zero_kitty()
@@ -185,7 +185,7 @@ pub trait KittyAuction {
         );
 
         // refund losing bid
-        if auction.current_winner != self.types().address_zero() {
+        if !auction.current_winner.is_zero() {
             self.send()
                 .direct_egld(&auction.current_winner, &auction.current_bid, b"bid refund");
         }
@@ -213,7 +213,7 @@ pub trait KittyAuction {
             "auction has not ended yet!"
         );
 
-        if auction.current_winner != self.types().address_zero() {
+        if !auction.current_winner.is_zero() {
             match auction.auction_type {
                 AuctionType::Selling => Ok(self.transfer_to(auction.current_winner, kitty_id)),
                 AuctionType::Siring => Ok(self.approve_siring_and_return_kitty(
@@ -242,7 +242,7 @@ pub trait KittyAuction {
 
         let kitty_ownership_contract_address =
             self.get_kitty_ownership_contract_address_or_default();
-        if kitty_ownership_contract_address != self.types().address_zero() {
+        if !kitty_ownership_contract_address.is_zero() {
             OptionalResult::Some(
                 self.kitty_ownership_proxy(kitty_ownership_contract_address)
                     .allow_auctioning(caller.clone(), kitty_id)
@@ -281,7 +281,7 @@ pub trait KittyAuction {
     fn transfer_to(&self, address: ManagedAddress, kitty_id: u32) -> OptionalResult<AsyncCall> {
         let kitty_ownership_contract_address =
             self.get_kitty_ownership_contract_address_or_default();
-        if kitty_ownership_contract_address != self.types().address_zero() {
+        if !kitty_ownership_contract_address.is_zero() {
             OptionalResult::Some(
                 self.kitty_ownership_proxy(kitty_ownership_contract_address)
                     .transfer(address, kitty_id)
@@ -301,7 +301,7 @@ pub trait KittyAuction {
     ) -> OptionalResult<AsyncCall> {
         let kitty_ownership_contract_address =
             self.get_kitty_ownership_contract_address_or_default();
-        if kitty_ownership_contract_address != self.types().address_zero() {
+        if !kitty_ownership_contract_address.is_zero() {
             OptionalResult::Some(
                 self.kitty_ownership_proxy(kitty_ownership_contract_address)
                     .approve_siring_and_return_kitty(approved_address, kitty_owner, kitty_id)
@@ -316,7 +316,7 @@ pub trait KittyAuction {
 
     fn get_kitty_ownership_contract_address_or_default(&self) -> ManagedAddress {
         if self.kitty_ownership_contract_address().is_empty() {
-            self.types().address_zero()
+            ManagedAddress::zero()
         } else {
             self.kitty_ownership_contract_address().get()
         }
@@ -368,7 +368,7 @@ pub trait KittyAuction {
                 // condition needed for gen zero kitties, since this sc is their owner
                 // and for when no bid was made
                 if auction.kitty_owner != self.blockchain().get_sc_address()
-                    && auction.current_winner != self.types().address_zero()
+                    && !auction.current_winner.is_zero()
                 {
                     self.send().direct_egld(
                         &auction.kitty_owner,

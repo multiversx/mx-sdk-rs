@@ -26,6 +26,7 @@ pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_vec;
+pub mod token_identifier_features;
 pub mod type_features;
 pub mod types;
 
@@ -46,6 +47,7 @@ pub trait BasicFeatures:
     + managed_vec_features::ManagedVecFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
+    + storage_mapper_linked_list::LinkedListMapperFeatures
     + storage_mapper_queue::QueueMapperFeatures
     + storage_mapper_map::MapMapperFeatures
     + storage_mapper_map_storage::MapStorageMapperFeatures
@@ -53,8 +55,8 @@ pub trait BasicFeatures:
     + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
     + storage_mapper_token_attributes::TokenAttributesMapperFeatures
+    + token_identifier_features::TokenIdentifierFeatures
     + type_features::TypeFeatures
-    + storage_mapper_linked_list::LinkedListMapperFeatures
 {
     #[init]
     fn init(&self) {}

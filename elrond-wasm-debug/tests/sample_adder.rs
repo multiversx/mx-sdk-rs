@@ -386,7 +386,7 @@ mod sample_adder {
         type Api = A;
 
         fn new_proxy_obj(api: A) -> Self {
-            let zero_address = ManagedAddress::zero_address(api.clone());
+            let zero_address = ManagedAddress::zero(api.clone());
             Proxy {
                 api,
                 address: zero_address,
@@ -468,7 +468,7 @@ fn test_add() {
     assert!(adder.call(b"version"));
 
     let own_proxy = sample_adder::Proxy::new_proxy_obj(tx_context.clone())
-        .contract(ManagedAddress::zero_address(tx_context));
+        .contract(ManagedAddress::zero(tx_context));
     let _ = own_proxy.get_sum();
 
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();

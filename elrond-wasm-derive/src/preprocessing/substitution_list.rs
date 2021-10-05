@@ -88,6 +88,22 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
         quote!(ManagedVec::from),
         quote!(self.types().managed_vec_from),
     );
+    substitutions.add_substitution(
+        quote!(TokenIdentifier::egld()),
+        quote!(self.types().token_identifier_egld()),
+    );
+    substitutions.add_substitution(
+        quote!(TokenIdentifier::from),
+        quote!(self.types().token_identifier_from),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedAddress::zero()),
+        quote!(self.types().managed_address_zero()),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedAddress::from),
+        quote!(self.types().managed_address_from),
+    );
 }
 
 fn add_storage_mapper_single_generic_arg(

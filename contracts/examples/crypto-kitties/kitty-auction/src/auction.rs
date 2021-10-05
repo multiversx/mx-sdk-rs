@@ -38,7 +38,7 @@ impl<M: ManagedTypeApi> Auction<M> {
             deadline,
             kitty_owner: kitty_owner.clone(),
             current_bid: BigUint::zero(type_manager.clone()),
-            current_winner: ManagedAddress::zero_address(type_manager),
+            current_winner: ManagedAddress::zero(type_manager),
         }
     }
 }
