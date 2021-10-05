@@ -13,11 +13,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .unwrap_or_else(|| panic!("contract owner address not set"))
     }
 
-    fn get_shard_of_address(&self, _address: &Address) -> u32 {
+    fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
         panic!("get_shard_of_address not implemented")
     }
 
-    fn is_smart_contract(&self, _address: &Address) -> bool {
+    fn is_smart_contract_legacy(&self, _address: &Address) -> bool {
         panic!("is_smart_contract not implemented")
 
         /*
@@ -35,7 +35,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.tx_input_box.from.clone()
     }
 
-    fn get_balance(&self, address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, address: &Address) -> BigUint<Self> {
         assert!(
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"
@@ -43,11 +43,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
     }
 
-    fn get_state_root_hash(&self) -> H256 {
-        panic!("get_state_root_hash not yet implemented")
+    fn get_state_root_hash_legacy(&self) -> H256 {
+        panic!("get_state_root_hash_legacy not yet implemented")
     }
 
-    fn get_tx_hash(&self) -> H256 {
+    fn get_tx_hash_legacy(&self) -> H256 {
         self.tx_input_box.tx_hash.clone()
     }
 
@@ -71,7 +71,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.blockchain_info_box.current_block_info.block_epoch
     }
 
-    fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         self.blockchain_info_box
             .current_block_info
             .block_random_seed
@@ -94,7 +94,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         self.blockchain_info_box.previous_block_info.block_epoch
     }
 
-    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         self.blockchain_info_box
             .previous_block_info
             .block_random_seed

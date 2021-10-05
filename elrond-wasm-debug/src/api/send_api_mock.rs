@@ -149,7 +149,7 @@ impl SendApi for TxContext {
         let recipient = to.to_address();
         let call_data =
             HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
-        let tx_hash = self.get_tx_hash();
+        let tx_hash = self.get_tx_hash_legacy();
         // the cell is no longer needed, since we end in a panic
         let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
         tx_output.async_call = Some(AsyncCallTxData {
@@ -254,12 +254,12 @@ impl SendApi for TxContext {
     }
 
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>) {
-        let tx_hash = self.get_tx_hash();
+        let tx_hash = self.get_tx_hash_legacy();
         self.storage_store_slice_u8(tx_hash.as_bytes(), data.to_boxed_bytes().as_slice());
     }
 
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
-        let tx_hash = self.get_tx_hash();
+        let tx_hash = self.get_tx_hash_legacy();
         let bytes = self.storage_load_boxed_bytes(tx_hash.as_bytes());
         ManagedBuffer::new_from_bytes(self.clone(), bytes.as_slice())
     }
