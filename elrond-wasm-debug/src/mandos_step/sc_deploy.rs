@@ -19,6 +19,7 @@ pub fn execute(
         call_value: tx.call_value.value.clone(),
         esdt_value: tx.esdt_value.value.clone(),
         esdt_token_identifier: tx.esdt_token_identifier.value.clone(),
+        nonce: tx.nonce.value.clone(),
         func_name: b"init".to_vec(),
         args: tx
             .arguments
@@ -51,11 +52,12 @@ pub fn sc_create(
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
+    let nonce = tx_input.nonce.clone();
     let esdt_value = tx_input.esdt_value.clone();
     let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
     if esdt_used {
-        state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value)
+        state.substract_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value)
     }
 
     let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
@@ -76,7 +78,7 @@ pub fn sc_create(
         state.increase_balance(&from, &call_value);
 
         if esdt_used {
-            state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
+            state.increase_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
         }
     }
 

@@ -17,6 +17,7 @@ pub struct EsdtData {
     pub frozen: u64,
 }
 
+#[derive(Clone, Default)]
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
 
 impl AccountEsdt {

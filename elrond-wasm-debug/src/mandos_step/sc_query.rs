@@ -16,6 +16,7 @@ pub fn execute(
         call_value: BigUint::from(0u32),
         esdt_value: BigUint::from(0u32),
         esdt_token_identifier: Vec::new(),
+        nonce: 0u64,
         func_name: tx.function.as_bytes().to_vec(),
         args: tx
             .arguments

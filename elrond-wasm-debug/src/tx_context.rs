@@ -40,6 +40,7 @@ impl TxContext {
                 call_value: 0u32.into(),
                 esdt_value: 0u32.into(),
                 esdt_token_identifier: Vec::new(),
+                nonce: 0u64,
                 func_name: Vec::new(),
                 args: Vec::new(),
                 gas_limit: 0,

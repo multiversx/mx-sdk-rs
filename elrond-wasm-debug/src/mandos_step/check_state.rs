@@ -150,6 +150,7 @@ pub fn check_token_instances(
     expected: &CheckEsdtValues,
     actual: &EsdtInstances,
 ) {
+    let errors: Vec<String>;
     match expected {
         CheckEsdtValues::Equal(eq) => {
             let default_value = EsdtInstance::default();
@@ -157,14 +158,76 @@ pub fn check_token_instances(
                 let actual_value = actual
                     .find_instance_with_nonce(expected_value.nonce.value)
                     .unwrap_or(default_value);
-                assert!(
-                    expected_value.balance.check(&actual_value.value),
-                    "bad esdt value. Address: {}. Token Name: {}. Want: {}. Have: {}",
-                    address,
-                    token,
-                    expected_value.balance,
-                    &actual_value.value
-                );
+
+                if !expected_value.balance.check(&actual_value.value) {
+                    errors.push(format!(
+                        "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+                        address,
+                        token,
+                        expected_value.nonce,
+                        expected_value.balance,
+                        &actual_value.value,
+                    ))
+                }
+
+                if !expected_value.balance.check(&actual_value.value) {
+                    errors.push(format!(
+                        "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+                        address,
+                        token,
+                        expected_value.nonce,
+                        expected_value.balance,
+                        &actual_value.value,
+                    ))
+                }
+
+                let actual_creator = &actual_value.creator.unwrap_or_default();
+                if !expected_value.creator.check(actual_creator) {
+                    errors.push(format!(
+                        "bad esdt creator. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+                        address,
+                        token,
+                        expected_value.nonce,
+                        expected_value.creator,
+                        verbose_hex(actual_creator),
+                    ))
+                }
+
+                let actual_royalties = &actual_value.royalties.unwrap_or_default();
+                if !expected_value.royalties.check(*actual_royalties) {
+                    errors.push(format!(
+                        "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+                        address,
+                        token,
+                        expected_value.nonce,
+                        expected_value.royalties,
+                        &actual_value.value,
+                    ))
+                }
+
+                let actual_hash = &actual_value.hash.unwrap_or_default();
+                if !expected_value.hash.check(actual_hash) {
+                    errors.push(format!(
+                        "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+                        address,
+                        token,
+                        expected_value.nonce,
+                        expected_value.hash,
+                        verbose_hex(actual_hash),
+                    ))
+                }
+
+                let actual_uri = &actual_value.uri.unwrap_or_default();
+                if !expected_value.uri.check(actual_uri) {
+                    errors.push(format!(
+                        "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+                        address,
+                        token,
+                        expected_value.balance,
+                        expected_value.nonce,
+                        &actual_value.value,
+                    ))
+                }
             }
         },
         CheckEsdtValues::Star => {

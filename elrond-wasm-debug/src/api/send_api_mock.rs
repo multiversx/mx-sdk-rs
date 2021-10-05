@@ -72,6 +72,7 @@ impl SendApi for TxContext {
             recipient,
             token_identifier: BoxedBytes::empty(),
             amount: amount_value,
+            nonce: 0u64,
         });
     }
 
@@ -110,6 +111,7 @@ impl SendApi for TxContext {
             recipient,
             token_identifier,
             amount: amount_value,
+            nonce: 0u64,
         });
         Ok(())
     }
