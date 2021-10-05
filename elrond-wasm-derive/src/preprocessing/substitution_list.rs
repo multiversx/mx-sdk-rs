@@ -93,8 +93,8 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
         quote!(self.types().token_identifier_egld()),
     );
     substitutions.add_substitution(
-        quote!(TokenIdentifier::from_esdt_bytes),
-        quote!(self.types().token_identifier_from_esdt_bytes),
+        quote!(TokenIdentifier::from),
+        quote!(self.types().token_identifier_from),
     );
     substitutions.add_substitution(
         quote!(ManagedAddress::zero()),

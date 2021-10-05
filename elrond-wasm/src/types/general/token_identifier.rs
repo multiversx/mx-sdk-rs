@@ -2,7 +2,7 @@ use super::BoxedBytes;
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    types::{ManagedBuffer, ManagedInto, ManagedType},
+    types::{ManagedBuffer, ManagedFrom, ManagedInto, ManagedType},
 };
 use alloc::string::String;
 use elrond_codec::*;
@@ -175,6 +175,25 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
         let mut token_identifier = TokenIdentifier { buffer };
         token_identifier.normalize();
         token_identifier
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, ManagedBuffer<M>> for TokenIdentifier<M> {
+    #[inline]
+    fn managed_from(_: M, buffer: ManagedBuffer<M>) -> Self {
+        TokenIdentifier::from(buffer)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, &[u8]> for TokenIdentifier<M> {
+    fn managed_from(api: M, bytes: &[u8]) -> Self {
+        if bytes == Self::EGLD_REPRESENTATION {
+            TokenIdentifier::egld(api)
+        } else {
+            TokenIdentifier {
+                buffer: ManagedBuffer::new_from_bytes(api, bytes),
+            }
+        }
     }
 }
 
