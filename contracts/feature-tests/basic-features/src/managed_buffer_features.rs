@@ -72,6 +72,11 @@ pub trait ManagedBufferFeatures {
     }
 
     #[endpoint]
+    fn managed_address_zero(&self) -> ManagedAddress {
+        ManagedAddress::zero()
+    }
+
+    #[endpoint]
     fn managed_address_eq(&self, mb1: ManagedAddress, mb2: ManagedAddress) -> bool {
         mb1 == mb2
     }

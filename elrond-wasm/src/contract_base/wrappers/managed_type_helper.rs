@@ -84,8 +84,9 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
         TokenIdentifier::from_esdt_bytes(self.api.clone(), bytes)
     }
 
+    #[inline]
     pub fn address_zero(&self) -> ManagedAddress<M> {
-        ManagedAddress::zero_address(self.api.clone())
+        ManagedAddress::zero(self.api.clone())
     }
 
     pub fn address_const(&self, bytes: &'static [u8; 32]) -> ManagedAddress<M> {
