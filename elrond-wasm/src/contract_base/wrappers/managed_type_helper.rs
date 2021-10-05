@@ -61,16 +61,27 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
         value.managed_into(self.api.clone())
     }
 
+    #[inline]
     pub fn elliptic_curve(&self, name: &str) -> EllipticCurve<M> {
         EllipticCurve::from_name(self.api.clone(), name)
     }
 
+    #[inline]
     pub fn elliptic_curve_from_bitsize(&self, bitsize: u32) -> Option<EllipticCurve<M>> {
         EllipticCurve::from_bitsize(self.api.clone(), bitsize)
     }
 
+    #[inline]
     pub fn token_identifier_egld(&self) -> TokenIdentifier<M> {
         TokenIdentifier::egld(self.api.clone())
+    }
+
+    #[inline]
+    pub fn token_identifier_from_esdt_bytes<B>(&self, bytes: B) -> TokenIdentifier<M>
+    where
+        B: ManagedInto<M, ManagedBuffer<M>>,
+    {
+        TokenIdentifier::from_esdt_bytes(self.api.clone(), bytes)
     }
 
     pub fn address_zero(&self) -> ManagedAddress<M> {
