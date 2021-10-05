@@ -40,7 +40,7 @@ where
 {
     pub fn new(api: SA) -> Self {
         let zero = BigUint::zero(api.clone());
-        let zero_address = ManagedAddress::zero_address(api.clone());
+        let zero_address = ManagedAddress::zero(api.clone());
         let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
         ContractDeploy {
             api,

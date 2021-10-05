@@ -79,7 +79,7 @@ pub trait KittyOwnership {
         if self._is_valid_id(kitty_id) {
             self.get_kitty_owner(kitty_id)
         } else {
-            self.types().address_zero()
+            ManagedAddress::zero()
         }
     }
 
@@ -104,10 +104,7 @@ pub trait KittyOwnership {
         let caller = self.blockchain().get_caller();
 
         require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
-        require!(
-            to != self.types().address_zero(),
-            "Can't transfer to default address 0x0!"
-        );
+        require!(!to.is_zero(), "Can't transfer to default address 0x0!");
         require!(
             to != self.blockchain().get_sc_address(),
             "Can't transfer to this contract!"
@@ -132,10 +129,7 @@ pub trait KittyOwnership {
         let caller = self.blockchain().get_caller();
 
         require!(self._is_valid_id(kitty_id), "Invalid kitty id!");
-        require!(
-            to != self.types().address_zero(),
-            "Can't transfer to default address 0x0!"
-        );
+        require!(!to.is_zero(), "Can't transfer to default address 0x0!");
         require!(
             to != self.blockchain().get_sc_address(),
             "Can't transfer to this contract!"
@@ -241,8 +235,8 @@ pub trait KittyOwnership {
         );
 
         let mut random = Random::new(
-            *self.blockchain().get_block_random_seed(),
-            self.blockchain().get_tx_hash().as_bytes(),
+            *self.blockchain().get_block_random_seed_legacy(),
+            self.blockchain().get_tx_hash_legacy().as_bytes(),
         );
         let genes = KittyGenes::get_random(&mut random);
         let kitty_id = self._create_new_gen_zero_kitty(&genes);
@@ -298,7 +292,8 @@ pub trait KittyOwnership {
             "You are not the owner of the kitty!"
         );
         require!(
-            self._get_sire_allowed_address_or_default(kitty_id) == self.types().address_zero(),
+            self._get_sire_allowed_address_or_default(kitty_id)
+                .is_zero(),
             "Can't overwrite approved sire address!"
         );
 
@@ -364,7 +359,7 @@ pub trait KittyOwnership {
         let sire = self.get_kitty_by_id(sire_id);
 
         let gene_science_contract_address = self._get_gene_science_contract_address_or_default();
-        if gene_science_contract_address != self.types().address_zero() {
+        if !gene_science_contract_address.is_zero() {
             Ok(self
                 .kitty_genetic_alg_proxy(gene_science_contract_address)
                 .generate_kitty_genes(matron, sire)
@@ -388,7 +383,7 @@ pub trait KittyOwnership {
         let mut nr_owned_to = self.get_nr_owned_kitties(to);
         nr_owned_to += 1;
 
-        if from != &self.types().address_zero() {
+        if !from.is_zero() {
             let mut nr_owned_from = self.get_nr_owned_kitties(from);
             nr_owned_from -= 1;
 
@@ -427,7 +422,7 @@ pub trait KittyOwnership {
         self.set_total_kitties(total_kitties);
         self.set_kitty_at_id(new_kitty_id, &kitty);
 
-        self._transfer(&self.types().address_zero(), owner, new_kitty_id);
+        self._transfer(&ManagedAddress::zero(), owner, new_kitty_id);
 
         new_kitty_id
     }
@@ -444,7 +439,7 @@ pub trait KittyOwnership {
             genesis_kitty.sire_id,
             genesis_kitty.generation,
             &genesis_kitty.genes,
-            &self.types().address_zero(),
+            &ManagedAddress::zero(),
         );
     }
 
@@ -530,7 +525,7 @@ pub trait KittyOwnership {
 
     fn _get_gene_science_contract_address_or_default(&self) -> ManagedAddress {
         if self.is_empty_gene_science_contract_address() {
-            self.types().address_zero()
+            ManagedAddress::zero()
         } else {
             self.get_gene_science_contract_address()
         }
@@ -538,7 +533,7 @@ pub trait KittyOwnership {
 
     fn _get_kitty_auction_contract_address_or_default(&self) -> ManagedAddress {
         if self.is_empty_kitty_auction_contract_address() {
-            self.types().address_zero()
+            ManagedAddress::zero()
         } else {
             self.get_kitty_auction_contract_address()
         }
@@ -546,7 +541,7 @@ pub trait KittyOwnership {
 
     fn _get_approved_address_or_default(&self, kitty_id: u32) -> ManagedAddress {
         if self.is_empty_approved_address(kitty_id) {
-            self.types().address_zero()
+            ManagedAddress::zero()
         } else {
             self.get_approved_address(kitty_id)
         }
@@ -554,7 +549,7 @@ pub trait KittyOwnership {
 
     fn _get_sire_allowed_address_or_default(&self, kitty_id: u32) -> ManagedAddress {
         if self.is_empty_sire_allowed_address(kitty_id) {
-            self.types().address_zero()
+            ManagedAddress::zero()
         } else {
             self.get_sire_allowed_address(kitty_id)
         }

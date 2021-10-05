@@ -15,8 +15,8 @@ pub trait KittyGeneticAlg {
     #[endpoint(generateKittyGenes)]
     fn generate_kitty_genes(&self, matron: Kitty, sire: Kitty) -> SCResult<KittyGenes> {
         let mut random = Random::new(
-            *self.blockchain().get_block_random_seed(),
-            self.blockchain().get_tx_hash().as_bytes(),
+            *self.blockchain().get_block_random_seed_legacy(),
+            self.blockchain().get_tx_hash_legacy().as_bytes(),
         );
 
         let fur_color_percentage = 1 + random.next_u8() % 99; // val in [1, 100)

@@ -139,13 +139,9 @@ pub trait Erc1155Marketplace {
         &self,
         new_address: ManagedAddress,
     ) -> SCResult<()> {
+        require!(!new_address.is_zero(), "Cannot set to zero address");
         require!(
-            new_address != self.types().address_zero(),
-            "Cannot set to zero address"
-        );
-        require!(
-            self.blockchain()
-                .is_smart_contract(&new_address.to_address()),
+            self.blockchain().is_smart_contract(&new_address),
             "The provided address is not a smart contract"
         );
 
@@ -200,7 +196,7 @@ pub trait Erc1155Marketplace {
         );
 
         // refund losing bid
-        if auction.current_winner != self.types().address_zero() {
+        if !auction.current_winner.is_zero() {
             let data = self.data_or_empty_if_sc(&caller, b"bid refund");
             self.send().direct(
                 &auction.current_winner,
@@ -236,7 +232,7 @@ pub trait Erc1155Marketplace {
 
         self.auction_for_token(&type_id, &nft_id).clear();
 
-        if auction.current_winner != self.types().address_zero() {
+        if !auction.current_winner.is_zero() {
             let percentage_cut = self.percentage_cut().get();
             let cut_amount = self.calculate_cut_amount(&auction.current_bid, percentage_cut);
             let amount_to_send = &auction.current_bid - &cut_amount;
@@ -338,7 +334,7 @@ pub trait Erc1155Marketplace {
             deadline,
             original_owner: original_owner.clone(),
             current_bid: self.types().big_uint_zero(),
-            current_winner: self.types().address_zero(),
+            current_winner: ManagedAddress::zero(),
         });
 
         Ok(())
@@ -377,7 +373,7 @@ pub trait Erc1155Marketplace {
     }
 
     fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(&dest.to_address()) {
+        if self.blockchain().is_smart_contract(dest) {
             &[]
         } else {
             data
