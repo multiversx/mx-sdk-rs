@@ -85,11 +85,15 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     #[inline]
-    pub fn address_zero(&self) -> ManagedAddress<M> {
+    pub fn managed_address_zero(&self) -> ManagedAddress<M> {
         ManagedAddress::zero(self.api.clone())
     }
 
-    pub fn address_const(&self, bytes: &'static [u8; 32]) -> ManagedAddress<M> {
-        ManagedAddress::new_from_bytes(self.api.clone(), bytes)
+    #[inline]
+    pub fn managed_address_from<T: ManagedInto<M, ManagedAddress<M>>>(
+        &self,
+        value: T,
+    ) -> ManagedAddress<M> {
+        value.managed_into(self.api.clone())
     }
 }

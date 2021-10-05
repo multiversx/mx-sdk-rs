@@ -98,7 +98,11 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
     );
     substitutions.add_substitution(
         quote!(ManagedAddress::zero()),
-        quote!(self.types().address_zero()),
+        quote!(self.types().managed_address_zero()),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedAddress::from),
+        quote!(self.types().managed_address_from),
     );
 }
 
