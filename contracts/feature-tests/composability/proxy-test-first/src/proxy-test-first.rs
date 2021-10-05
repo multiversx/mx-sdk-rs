@@ -115,7 +115,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &self.types().big_uint_from(2u32),
                 [3u8; 3].to_vec(),
-                &self.types().address_const(&HARDCODED_ADDRESS),
+                &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
             .async_call()
     }
@@ -129,7 +129,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &self.types().big_uint_from(2u32),
                 [3u8; 3].to_vec(),
-                &self.types().address_const(&HARDCODED_ADDRESS),
+                &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
             .async_call()
             .with_callback(self.callbacks().message_callback())

@@ -16,16 +16,6 @@ where
     }
 }
 
-// impl<M, T, F> ManagedFrom<M, T> for F
-// where
-//     F: From<T>,
-//     M: ManagedTypeApi,
-// {
-//     fn managed_from(_: M, t: T) -> Self {
-//         Self::from(t)
-//     }
-// }
-
 pub trait ManagedInto<M, T>
 where
     M: ManagedTypeApi,
