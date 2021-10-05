@@ -24,15 +24,15 @@ wasm-output-mode-unmanaged-ei = [
 hex-literal = "0.3.1"
 
 [dependencies.elrond-wasm]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../../elrond-wasm"
 features = ["derive", "cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../../elrond-wasm-debug"

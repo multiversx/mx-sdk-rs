@@ -20,7 +20,7 @@ path = ".."
 features=["wasm-output-mode-managed-ei"]
 
 [dependencies.elrond-wasm-output]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../../../elrond-wasm-output"
 features=["wasm-output-mode"]
 
