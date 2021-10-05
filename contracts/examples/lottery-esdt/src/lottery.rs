@@ -341,7 +341,7 @@ pub trait Lottery {
     fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
         let mut rand_numbers: Vec<usize> = (min..=max).collect();
         let total_numbers = rand_numbers.len();
-        let seed = self.blockchain().get_block_random_seed();
+        let seed = self.blockchain().get_block_random_seed_legacy();
         let mut rand = Random::new(*seed);
 
         for i in 0..amount {
