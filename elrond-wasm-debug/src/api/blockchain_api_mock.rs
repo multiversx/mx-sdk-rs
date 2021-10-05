@@ -115,7 +115,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         &self,
         address: &ManagedAddress<Self>,
         token: &TokenIdentifier<Self>,
-        _nonce: u64,
+        nonce: u64,
     ) -> BigUint<Self> {
         assert!(
             address == &self.get_sc_address(),
@@ -125,9 +125,12 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         match self
             .blockchain_info_box
             .contract_esdt
-            .get(&token.to_esdt_identifier().into_vec())
+            .get_by_identifier(token.to_esdt_identifier().into_vec())
+            .unwrap_or_default()
+            .instances
+            .get_by_nonce(nonce)
         {
-            Some(value) => self.insert_new_big_uint(value.clone()),
+            Some(instance) => self.insert_new_big_uint(instance.value.clone()),
             None => BigUint::zero(self.clone()),
         }
     }

@@ -324,7 +324,7 @@ impl BlockchainMock {
         } else {
             account
                 .esdt
-                .insert(esdt_token_identifier.to_vec(), value.clone());
+                .push_esdt(esdt_token_identifier.to_vec(), nonce, value.clone());
         }
     }
 
@@ -356,8 +356,9 @@ impl BlockchainMock {
             });
         let mut esdt = AccountEsdt::default();
         if !tx_input.esdt_token_identifier.is_empty() {
-            esdt.insert(
+            esdt.push_esdt(
                 tx_input.esdt_token_identifier.clone(),
+                tx_input.nonce,
                 tx_input.esdt_value.clone(),
             );
         }
@@ -469,7 +470,7 @@ pub struct BlockchainTxInfo {
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_balance: BigUint,
-    pub contract_esdt: Esdt,
+    pub contract_esdt: AccountEsdt,
     pub contract_owner: Option<Address>,
 }
 
@@ -488,7 +489,7 @@ impl BlockchainMock {
                 previous_block_info: self.previous_block_info.clone(),
                 current_block_info: self.current_block_info.clone(),
                 contract_balance: 0u32.into(),
-                contract_esdt: HashMap::new(),
+                contract_esdt: AccountEsdt::default(),
                 contract_owner: None,
             }
         }

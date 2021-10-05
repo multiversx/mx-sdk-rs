@@ -5,7 +5,7 @@ use mandos::{
 
 use crate::{
     account_esdt::{AccountEsdt, EsdtData},
-    esdt_instance::{EsdtInstance, EsdtInstances},
+    esdt_instance::EsdtInstances,
     verbose_hex, BlockchainMock,
 };
 
@@ -95,16 +95,15 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &AccountEsdt) {
     match expected {
         CheckEsdt::Equal(eq) => {
-            let default_value = &EsdtData::default();
             for expected_value in eq.iter() {
                 let actual_value = actual
                     .get_by_identifier(expected_value.token_identifier.value)
-                    .unwrap_or(default_value);
+                    .unwrap_or_default();
                 check_esdt_data(
                     address,
                     verbose_hex(&expected_value.token_identifier.value),
                     expected_value,
-                    actual_value,
+                    &actual_value,
                 )
             }
 
@@ -153,11 +152,10 @@ pub fn check_token_instances(
     let errors: Vec<String>;
     match expected {
         CheckEsdtValues::Equal(eq) => {
-            let default_value = EsdtInstance::default();
             for expected_value in eq.iter() {
                 let actual_value = actual
-                    .find_instance_with_nonce(expected_value.nonce.value)
-                    .unwrap_or(default_value);
+                    .get_by_nonce(expected_value.nonce.value)
+                    .unwrap_or_default();
 
                 if !expected_value.balance.check(&actual_value.value) {
                     errors.push(format!(
