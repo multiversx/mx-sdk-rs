@@ -25,7 +25,7 @@ where
     }
 
     #[inline]
-    pub fn zero_address(api: M) -> Self {
+    pub fn zero(api: M) -> Self {
         Self::new_from_bytes(api, &[0u8; 32])
     }
 
@@ -33,6 +33,11 @@ where
         let mut result = Address::zero();
         let _ = self.bytes.buffer.load_slice(0, result.as_mut());
         result
+    }
+
+    #[inline]
+    pub fn is_zero(&self) -> bool {
+        self.bytes.buffer == &[0u8; 32]
     }
 
     #[inline]
@@ -60,6 +65,16 @@ where
     #[inline]
     fn managed_from(api: M, address: Address) -> Self {
         Self::managed_from(api, &address)
+    }
+}
+
+impl<M> ManagedFrom<M, &[u8; 32]> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: &[u8; 32]) -> Self {
+        Self::new_from_bytes(api, bytes)
     }
 }
 
@@ -91,7 +106,7 @@ where
 {
     #[inline]
     fn managed_default(api: M) -> Self {
-        Self::zero_address(api)
+        Self::zero(api)
     }
 }
 
