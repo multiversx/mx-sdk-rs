@@ -2,7 +2,7 @@ use super::BoxedBytes;
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    types::{ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedInto, ManagedType},
 };
 use alloc::string::String;
 use elrond_codec::*;
@@ -52,13 +52,15 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
 
     pub const DASH_CHARACTER: u8 = b'-';
 
-    pub fn from_esdt_bytes(api: M, bytes: &[u8]) -> Self {
+    #[inline]
+    pub fn from_esdt_bytes<B: ManagedInto<M, ManagedBuffer<M>>>(api: M, bytes: B) -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::new_from_bytes(api, bytes),
+            buffer: bytes.managed_into(api),
         }
     }
 
     /// New instance of the special EGLD token representation.
+    #[inline]
     pub fn egld(api: M) -> Self {
         TokenIdentifier {
             buffer: ManagedBuffer::new(api),
