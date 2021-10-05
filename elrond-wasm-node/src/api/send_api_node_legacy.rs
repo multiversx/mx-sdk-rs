@@ -163,12 +163,8 @@ extern "C" {
 }
 
 impl SendApi for ArwenApiImpl {
-    fn direct_egld<D>(
-        &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        data: D,
-    ) where
+    fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
+    where
         D: ManagedInto<Self, ManagedBuffer<Self>>,
     {
         let to_address = to.to_address();
@@ -365,10 +361,7 @@ impl SendApi for ArwenApiImpl {
         code: &ManagedBuffer<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (
-        ManagedAddress<Self>,
-        ManagedVec<Self, ManagedBuffer<Self>>,
-    ) {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         let mut new_address = Address::zero();
         unsafe {
             let num_return_data_before = getNumReturnData();
@@ -407,10 +400,7 @@ impl SendApi for ArwenApiImpl {
         source_contract_address: &ManagedAddress<Self>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (
-        ManagedAddress<Self>,
-        ManagedVec<Self, ManagedBuffer<Self>>,
-    ) {
+    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
         let mut new_address = Address::zero();
         unsafe {
             let num_return_data_before = getNumReturnData();
@@ -637,12 +627,12 @@ impl SendApi for ArwenApiImpl {
     }
 
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>) {
-        let tx_hash = self.get_tx_hash_managed();
+        let tx_hash = self.get_tx_hash();
         self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
     }
 
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
-        let tx_hash = self.get_tx_hash_managed();
+        let tx_hash = self.get_tx_hash();
         ManagedBuffer::from_raw_handle(
             self.clone(),
             self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
