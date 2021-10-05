@@ -33,8 +33,7 @@ pub trait ValidationModule: common::CommonModule {
         params: &OrderInputParams<Self::Api>,
     ) -> SCResult<()> {
         require!(
-            params.match_provider.is_none()
-                || params.match_provider.clone().unwrap() != self.types().address_zero(),
+            params.match_provider.is_none() || !params.match_provider.clone().unwrap().is_zero(),
             "Match address cannot be zero"
         );
         Ok(())

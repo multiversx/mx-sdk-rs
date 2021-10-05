@@ -25,10 +25,7 @@ pub trait Erc1155 {
     ) -> SCResult<OptionalResult<AsyncCall>> {
         let caller = self.blockchain().get_caller();
 
-        require!(
-            to != self.types().address_zero(),
-            "Can't transfer to address zero"
-        );
+        require!(!to.is_zero(), "Can't transfer to address zero");
         require!(self.is_valid_type_id(&type_id), "Token id is invalid");
         require!(
             caller == from || self.is_approved(&caller, &from).get(),
@@ -105,10 +102,7 @@ pub trait Erc1155 {
             caller == from || self.is_approved(&caller, &from).get(),
             "Caller is not approved to transfer tokens from address"
         );
-        require!(
-            to != self.types().address_zero(),
-            "Can't transfer to address zero"
-        );
+        require!(!to.is_zero(), "Can't transfer to address zero");
         require!(
             !type_ids.is_empty() && !values.is_empty(),
             "No type_ids and/or values provided"
@@ -179,7 +173,7 @@ pub trait Erc1155 {
             self.token_owner(type_id, nft_id).set(to);
         } else {
             self.token_owner(type_id, nft_id)
-                .set(&self.types().address_zero());
+                .set(&ManagedAddress::zero());
         }
         Ok(())
     }
@@ -351,7 +345,7 @@ pub trait Erc1155 {
         let amount = self.types().big_uint_from(1u32);
         self.decrease_balance(owner, type_id, &amount);
         self.token_owner(type_id, nft_id)
-            .set(&self.types().address_zero());
+            .set(&ManagedAddress::zero());
 
         Ok(())
     }

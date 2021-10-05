@@ -97,7 +97,7 @@ where
         if storage_get_len(self.api.clone(), &key) > 0 {
             storage_get(self.api.clone(), &key)
         } else {
-            ManagedAddress::zero_address(self.api.clone())
+            ManagedAddress::zero(self.api.clone())
         }
     }
 
