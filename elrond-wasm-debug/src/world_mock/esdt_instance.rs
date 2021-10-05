@@ -7,10 +7,10 @@ use std::{
 
 // EsdtInstance holds the data for a Elrond standard digital token transaction
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct EsdtInstance {
     pub value: BigUint,
-    pub esdt_type: u32,
+    pub esdt_type: u64,
     pub name: Option<Vec<u8>>,
     pub creator: Option<Vec<u8>>,
     pub reserved: Option<Vec<u8>>,
@@ -21,7 +21,7 @@ pub struct EsdtInstance {
     pub attributes: Option<Vec<u8>>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct EsdtInstances(HashMap<u64, EsdtInstance>);
 
 impl Deref for EsdtInstances {
@@ -39,6 +39,11 @@ impl Default for EsdtInstances {
 }
 
 impl EsdtInstances {
+    pub fn new(nonce: u64, value: BigUint) -> Self {
+        let instances = EsdtInstances(HashMap::new());
+        instances.add(nonce, value);
+        instances
+    }
     pub fn add(&self, nonce: u64, value: BigUint) {
         if self.contains_key(&nonce) {
             let esdt_balance = &self.get_mut(&nonce).unwrap();
@@ -53,7 +58,7 @@ impl EsdtInstances {
             nonce,
             EsdtInstance {
                 value: value.clone(),
-                esdt_type: 0u32,
+                esdt_type: 0u64,
                 name: None,
                 creator: None,
                 reserved: None,
@@ -65,7 +70,7 @@ impl EsdtInstances {
             },
         );
     }
-    pub fn find_instance_with_nonce(&self, nonce: u64) -> Option<EsdtInstance> {
+    pub fn get_by_nonce(&self, nonce: u64) -> Option<EsdtInstance> {
         self.iter()
             .find_map(|(key, &val)| if key == &nonce { Some(val) } else { None })
     }

@@ -1,8 +1,7 @@
-use crate::{blockchain_mock::*, TxInput, TxOutput};
+use crate::{account_esdt::AccountEsdt, blockchain_mock::*, TxInput, TxOutput};
 use alloc::{rc::Rc, vec::Vec};
 use core::cell::RefCell;
 use elrond_wasm::types::Address;
-use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct TxContext {
@@ -31,7 +30,7 @@ impl TxContext {
                 previous_block_info: BlockInfo::new(),
                 current_block_info: BlockInfo::new(),
                 contract_balance: 0u32.into(),
-                contract_esdt: HashMap::new(),
+                contract_esdt: AccountEsdt::default(),
                 contract_owner: None,
             }),
             tx_input_box: Box::new(TxInput {
