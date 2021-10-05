@@ -72,6 +72,16 @@ pub trait ManagedBufferFeatures {
     }
 
     #[endpoint]
+    fn managed_address_zero(&self) -> ManagedAddress {
+        ManagedAddress::zero()
+    }
+
+    #[endpoint]
+    fn managed_address_from(&self, bytes: &[u8; 32]) -> ManagedAddress {
+        ManagedAddress::from(bytes)
+    }
+
+    #[endpoint]
     fn managed_address_eq(&self, mb1: ManagedAddress, mb2: ManagedAddress) -> bool {
         mb1 == mb2
     }
