@@ -354,7 +354,7 @@ impl BlockchainMock {
             .unwrap_or_else(|| {
                 panic!("Missing new address. Only explicit new deploy addresses supported")
             });
-        let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
+        let mut esdt = AccountEsdt::default();
         if !tx_input.esdt_token_identifier.is_empty() {
             esdt.insert(
                 tx_input.esdt_token_identifier.clone(),
@@ -469,7 +469,7 @@ pub struct BlockchainTxInfo {
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_balance: BigUint,
-    pub contract_esdt: HashMap<Vec<u8>, BigUint>,
+    pub contract_esdt: Esdt,
     pub contract_owner: Option<Address>,
 }
 

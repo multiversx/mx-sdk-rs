@@ -1,8 +1,8 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use mandos::{Account, AddressKey, BlockInfo, NewAddress};
 
-use crate::{AccountData, BlockInfo as CrateBlockInfo, BlockchainMock};
+use crate::{account_esdt::AccountEsdt, AccountData, BlockInfo as CrateBlockInfo, BlockchainMock};
 
 pub fn execute(
     state: &mut BlockchainMock,
@@ -23,7 +23,7 @@ pub fn execute(
                 .map(|(k, v)| (k.value.clone(), v.value.clone()))
                 .collect()
         } else {
-            HashMap::new()
+            AccountEsdt::default()
         };
         state.validate_and_add_account(AccountData {
             address: address.value.into(),

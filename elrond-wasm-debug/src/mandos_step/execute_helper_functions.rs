@@ -3,10 +3,10 @@ use mandos::{CheckLogs, Checkable, TxExpect};
 use std::collections::HashMap;
 
 use crate::{
-    address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, execute_tx,
-    merge_results, try_execute_builtin_function, verbose_hex, AccountData, AsyncCallTxData,
-    BlockchainMock, BlockchainMockError, ContractMap, TxContext, TxInput, TxManagedTypes, TxOutput,
-    TxResult,
+    account_esdt::AccountEsdt, address_hex, async_call_tx_input, async_callback_tx_input,
+    bytes_to_string, execute_tx, merge_results, try_execute_builtin_function, verbose_hex,
+    AccountData, AsyncCallTxData, BlockchainMock, BlockchainMockError, ContractMap, TxContext,
+    TxInput, TxManagedTypes, TxOutput, TxResult,
 };
 pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
     let bytes = tx_id.as_bytes();
@@ -37,11 +37,12 @@ pub fn sc_call(
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
+    let nonce = tx_input.nonce.clone();
     let esdt_value = tx_input.esdt_value.clone();
     let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
     if esdt_used {
-        state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
+        state.substract_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
     }
 
     let contract_account = state
@@ -75,7 +76,7 @@ pub fn sc_call(
 
         state.increase_balance(&to, &call_value);
         if esdt_used {
-            state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
+            state.increase_esdt_balance(&to, &esdt_token_identifier, nonce, &esdt_value);
         }
 
         state.send_balance(
@@ -87,7 +88,7 @@ pub fn sc_call(
         state.increase_balance(&from, &call_value);
 
         if esdt_used {
-            state.increase_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
+            state.increase_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
         }
     }
 
@@ -128,7 +129,7 @@ pub fn sc_call_with_async_and_callback(
                     address: async_data.to.clone(),
                     nonce: 0,
                     balance: async_data.call_value,
-                    esdt: HashMap::new(),
+                    esdt: AccountEsdt::default(),
                     username: Vec::new(),
                     storage: HashMap::new(),
                     contract_path: None,
