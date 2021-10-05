@@ -85,7 +85,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             type Api = A;
 
             fn new_proxy_obj(api: A) -> Self {
-                let zero_address = ManagedAddress::zero_address(api.clone());
+                let zero_address = ManagedAddress::zero(api.clone());
                 Proxy {
                     api,
                     address: zero_address,

@@ -89,12 +89,16 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
         quote!(self.types().managed_vec_from),
     );
     substitutions.add_substitution(
-        quote!(TokenIdentifier::egld),
-        quote!(self.types().token_identifier_egld),
+        quote!(TokenIdentifier::egld()),
+        quote!(self.types().token_identifier_egld()),
     );
     substitutions.add_substitution(
         quote!(TokenIdentifier::from_esdt_bytes),
         quote!(self.types().token_identifier_from_esdt_bytes),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedAddress::zero()),
+        quote!(self.types().address_zero()),
     );
 }
 
