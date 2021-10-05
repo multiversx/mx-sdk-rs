@@ -104,6 +104,10 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
         quote!(ManagedAddress::from),
         quote!(self.types().managed_address_from),
     );
+    substitutions.add_substitution(
+        quote!(.unwrap_or_signal_error()),
+        quote!(.unwrap_or_signal_error(self.raw_vm_api())),
+    );
 }
 
 fn add_storage_mapper_single_generic_arg(
