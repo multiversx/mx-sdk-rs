@@ -77,11 +77,11 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     #[inline]
-    pub fn token_identifier_from_esdt_bytes<B>(&self, bytes: B) -> TokenIdentifier<M>
-    where
-        B: ManagedInto<M, ManagedBuffer<M>>,
-    {
-        TokenIdentifier::from_esdt_bytes(self.api.clone(), bytes)
+    pub fn token_identifier_from<T: ManagedInto<M, TokenIdentifier<M>>>(
+        &self,
+        value: T,
+    ) -> TokenIdentifier<M> {
+        value.managed_into(self.api.clone())
     }
 
     #[inline]
