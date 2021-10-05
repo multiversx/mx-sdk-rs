@@ -16,11 +16,11 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_shard_of_address(&self, _address: &Address) -> u32 {
+    fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
         unreachable!()
     }
 
-    fn is_smart_contract(&self, _address: &Address) -> bool {
+    fn is_smart_contract_legacy(&self, _address: &Address) -> bool {
         unreachable!()
     }
 
@@ -28,15 +28,15 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_balance(&self, _address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, _address: &Address) -> BigUint<Self> {
         unreachable!()
     }
 
-    fn get_state_root_hash(&self) -> H256 {
+    fn get_state_root_hash_legacy(&self) -> H256 {
         unreachable!()
     }
 
-    fn get_tx_hash(&self) -> H256 {
+    fn get_tx_hash_legacy(&self) -> H256 {
         unreachable!()
     }
 
@@ -60,7 +60,7 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         unreachable!()
     }
 
@@ -80,7 +80,7 @@ impl BlockchainApi for UncallableApi {
         unreachable!()
     }
 
-    fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
+    fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
         unreachable!()
     }
 
