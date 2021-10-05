@@ -34,3 +34,13 @@ fn test_managed_address_zero() {
     let result = bf.managed_address_zero();
     assert_eq!(ManagedAddress::zero(context), result);
 }
+
+#[test]
+fn test_managed_address_from() {
+    let context = TxContext::dummy();
+    let bf = basic_features::contract_obj(context.clone());
+    assert_eq!(
+        bf.managed_address_zero(),
+        bf.managed_address_from(&[0u8; 32])
+    );
+}

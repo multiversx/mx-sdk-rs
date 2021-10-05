@@ -68,6 +68,16 @@ where
     }
 }
 
+impl<M> ManagedFrom<M, &[u8; 32]> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: &[u8; 32]) -> Self {
+        Self::new_from_bytes(api, bytes)
+    }
+}
+
 impl<M> ManagedType<M> for ManagedAddress<M>
 where
     M: ManagedTypeApi,
