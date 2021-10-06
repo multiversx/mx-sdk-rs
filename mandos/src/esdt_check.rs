@@ -9,14 +9,14 @@ pub enum CheckEsdt {
 #[derive(Debug, Default)]
 pub struct CheckEsdtData {
     pub token_identifier: BytesValue,
-    pub instances: CheckEsdtValues,
+    pub instances: CheckEsdtInstances,
     pub last_nonce: CheckValue<U64Value>,
     pub roles: CheckValue<BytesValue>,
     pub frozen: CheckValue<U64Value>,
 }
 
 #[derive(Debug)]
-pub enum CheckEsdtValues {
+pub enum CheckEsdtInstances {
     Star,
     Equal(Vec<CheckEsdtValue>),
 }
@@ -70,7 +70,7 @@ impl InterpretableFrom<CheckEsdtDataRaw> for CheckEsdtData {
     fn interpret_from(from: CheckEsdtDataRaw, context: &InterpreterContext) -> Self {
         CheckEsdtData {
             token_identifier: BytesValue::interpret_from(from.token_identifier, context),
-            instances: CheckEsdtValues::interpret_from(from.instances, context),
+            instances: CheckEsdtInstances::interpret_from(from.instances, context),
             last_nonce: CheckValue::<U64Value>::interpret_from(from.last_nonce, context),
             roles: CheckValue::<BytesValue>::interpret_from(from.roles, context),
             frozen: CheckValue::<U64Value>::interpret_from(from.frozen, context),
@@ -78,18 +78,18 @@ impl InterpretableFrom<CheckEsdtDataRaw> for CheckEsdtData {
     }
 }
 
-impl CheckEsdtValues {
+impl CheckEsdtInstances {
     pub fn is_star(&self) -> bool {
-        matches!(self, CheckEsdtValues::Star)
+        matches!(self, CheckEsdtInstances::Star)
     }
 }
 
-impl InterpretableFrom<CheckEsdtValuesRaw> for CheckEsdtValues {
-    fn interpret_from(from: CheckEsdtValuesRaw, context: &InterpreterContext) -> Self {
+impl InterpretableFrom<CheckEsdtInstancesRaw> for CheckEsdtInstances {
+    fn interpret_from(from: CheckEsdtInstancesRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckEsdtValuesRaw::Unspecified => CheckEsdtValues::Equal(Vec::new()),
-            CheckEsdtValuesRaw::Star => CheckEsdtValues::Star,
-            CheckEsdtValuesRaw::Equal(m) => CheckEsdtValues::Equal(
+            CheckEsdtInstancesRaw::Unspecified => CheckEsdtInstances::Equal(Vec::new()),
+            CheckEsdtInstancesRaw::Star => CheckEsdtInstances::Star,
+            CheckEsdtInstancesRaw::Equal(m) => CheckEsdtInstances::Equal(
                 m.into_iter()
                     .map(|v| CheckEsdtValue::interpret_from(v, context))
                     .collect(),
@@ -98,9 +98,9 @@ impl InterpretableFrom<CheckEsdtValuesRaw> for CheckEsdtValues {
     }
 }
 
-impl Default for CheckEsdtValues {
+impl Default for CheckEsdtInstances {
     fn default() -> Self {
-        CheckEsdtValues::Equal(Vec::new())
+        CheckEsdtInstances::Equal(Vec::new())
     }
 }
 

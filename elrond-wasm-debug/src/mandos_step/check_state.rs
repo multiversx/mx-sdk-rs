@@ -1,5 +1,5 @@
 use mandos::{
-    AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtValues, CheckStorage, CheckValue,
+    AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstances, CheckStorage, CheckValue,
     Checkable,
 };
 
@@ -150,12 +150,12 @@ pub fn check_esdt_data(
 pub fn check_token_instances(
     address: &AddressKey,
     token: String,
-    expected: &CheckEsdtValues,
+    expected: &CheckEsdtInstances,
     actual: &EsdtInstances,
 ) {
     let mut errors: Vec<String> = Vec::new();
     match expected {
-        CheckEsdtValues::Equal(eq) => {
+        CheckEsdtInstances::Equal(eq) => {
             for expected_value in eq.iter() {
                 let actual_value = actual.get_by_nonce_or_default(expected_value.nonce.value);
 
@@ -230,7 +230,7 @@ pub fn check_token_instances(
                 }
             }
         },
-        CheckEsdtValues::Star => {
+        CheckEsdtInstances::Star => {
             // nothing to be done for *
         },
     }
