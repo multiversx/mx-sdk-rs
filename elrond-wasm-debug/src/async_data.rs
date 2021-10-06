@@ -24,7 +24,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
     let func_name = de.get_func_name().to_vec();
     let mut args: Vec<Vec<u8>> = Vec::new();
     let mut esdt_token_identifier = Vec::<u8>::new();
-    let mut nonce = 0u64;
+    let nonce = 0u64;
     let mut esdt_value = 0u32.into();
 
     if func_name == ESDT_TRANSFER_STRING {

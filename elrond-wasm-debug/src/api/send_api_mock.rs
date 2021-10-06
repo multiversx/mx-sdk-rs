@@ -39,7 +39,7 @@ impl TxContext {
             .instances
             .get_by_nonce(nonce)
             .unwrap_or_default()
-            .value
+            .balance
             .clone();
 
         // add amount received (if the same token)
