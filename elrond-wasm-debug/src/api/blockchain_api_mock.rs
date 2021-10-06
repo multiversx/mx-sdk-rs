@@ -110,7 +110,6 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         0u64
     }
 
-    // TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
     fn get_esdt_balance(
         &self,
         address: &ManagedAddress<Self>,
@@ -122,17 +121,11 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 
-        match self
+        let esdt_balance = self
             .blockchain_info_box
             .contract_esdt
-            .get_by_identifier(token.to_esdt_identifier().into_vec())
-            .unwrap_or_default()
-            .instances
-            .get_by_nonce(nonce)
-        {
-            Some(instance) => self.insert_new_big_uint(instance.balance.clone()),
-            None => BigUint::zero(self.clone()),
-        }
+            .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce);
+        self.insert_new_big_uint(esdt_balance)
     }
 
     fn get_esdt_token_data(

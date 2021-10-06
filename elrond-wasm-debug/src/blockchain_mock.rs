@@ -1,7 +1,7 @@
 use super::mock_error::BlockchainMockError;
 use crate::{
-    account_esdt::AccountEsdt, contract_map::*, display_util::*, esdt_transfer_event_log,
-    tx_context::*, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
+    contract_map::*, display_util::*, esdt_transfer_event_log, tx_context::*,
+    world_mock::AccountEsdt, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
 };
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
@@ -269,30 +269,28 @@ impl BlockchainMock {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Sender account {} not found", address_hex(address)));
 
-        let esdt_nonces = &sender_account
-            .esdt
-            .get_mut(esdt_token_identifier)
+        let esdt_data_map = &mut sender_account.esdt;
+        let esdt_data = esdt_data_map
+            .get_mut_by_identifier(esdt_token_identifier)
             .unwrap_or_else(|| {
                 panic!(
                     "Account {} has no esdt tokens with name {}",
                     address_hex(address),
                     String::from_utf8(esdt_token_identifier.to_vec()).unwrap()
                 )
-            })
-            .instances;
+            });
 
-        let esdt_balance = &mut esdt_nonces
-            .get_mut(&nonce.to_be_bytes().to_vec())
-            .unwrap_or_else(|| {
-                panic!(
-                    "Esdt token {} has no nonce {}",
-                    String::from_utf8(esdt_token_identifier.to_vec()).unwrap(),
-                    nonce.to_string()
-                )
-            })
-            .balance;
+        let esdt_instances = &mut esdt_data.instances;
+        let esdt_instance = esdt_instances.get_mut_by_nonce(nonce).unwrap_or_else(|| {
+            panic!(
+                "Esdt token {} has no nonce {}",
+                String::from_utf8(esdt_token_identifier.to_vec()).unwrap(),
+                nonce.to_string()
+            )
+        });
+        let esdt_balance = &mut esdt_instance.balance;
         assert!(
-            esdt_balance >= value,
+            &*esdt_balance >= value,
             "Not enough esdt balance, have {}, need at least {}",
             esdt_balance,
             value
@@ -313,14 +311,8 @@ impl BlockchainMock {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Receiver account not found"));
 
-        if account.esdt.contains_key(esdt_token_identifier) {
-            let esdt_nonces = account
-                .esdt
-                .get_mut(esdt_token_identifier)
-                .unwrap()
-                .instances;
-
-            esdt_nonces.add(nonce, value.clone());
+        if let Some(esdt_data) = account.esdt.get_mut_by_identifier(esdt_token_identifier) {
+            esdt_data.instances.add(nonce, value.clone());
         } else {
             account
                 .esdt

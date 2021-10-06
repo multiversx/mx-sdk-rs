@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use super::*;
 use serde::{Deserialize, Serialize};
 
@@ -11,14 +9,15 @@ pub struct EsdtRaw {
     pub token_identifier: Option<ValueSubTree>,
 
     #[serde(default)]
-    pub instances: BTreeMap<String, InstanceRaw>,
+    pub instances: Vec<InstanceRaw>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_nonce: Option<ValueSubTree>,
 
     #[serde(default)]
-    pub roles: BTreeMap<String, ValueSubTree>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub roles: Vec<ValueSubTree>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

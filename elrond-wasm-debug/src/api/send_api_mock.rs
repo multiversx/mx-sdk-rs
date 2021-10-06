@@ -34,13 +34,7 @@ impl TxContext {
         let mut available_balance = self
             .blockchain_info_box
             .contract_esdt
-            .get_by_identifier(token_identifier.to_vec())
-            .unwrap_or_default()
-            .instances
-            .get_by_nonce(nonce)
-            .unwrap_or_default()
-            .balance
-            .clone();
+            .get_esdt_balance(token_identifier, nonce);
 
         // add amount received (if the same token)
         if self.tx_input_box.esdt_token_identifier == token_identifier {

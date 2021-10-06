@@ -1,14 +1,13 @@
 use num_bigint::BigUint;
+use num_traits::Zero;
 
-use crate::{esdt_instance::EsdtInstances, key_hex};
+use crate::key_hex;
 use std::{
-    collections::HashMap,
+    collections::{hash_map::Iter, HashMap},
     fmt::{self, Write},
-    ops::Deref,
 };
 
-#[derive(Clone, Default, Debug)]
-pub struct EsdtRoles(Vec<Vec<u8>>);
+use super::{EsdtInstances, EsdtRoles};
 
 #[derive(Clone, Default, Debug)]
 pub struct EsdtData {
@@ -23,14 +22,21 @@ pub struct EsdtData {
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
 
 impl AccountEsdt {
-    pub fn get_by_identifier(&self, identifier: Vec<u8>) -> Option<EsdtData> {
-        self.iter().find_map(|(_, x)| {
-            if x.token_identifier == identifier {
-                Some(x.clone())
-            } else {
-                None
-            }
-        })
+    pub fn get_by_identifier(&self, identifier: &[u8]) -> Option<&EsdtData> {
+        self.0.get(identifier)
+    }
+
+    /// Will provide a clone.
+    pub fn get_by_identifier_or_default(&self, identifier: &[u8]) -> EsdtData {
+        if let Some(value) = self.0.get(identifier) {
+            value.clone()
+        } else {
+            EsdtData::default()
+        }
+    }
+
+    pub fn get_mut_by_identifier(&mut self, identifier: &[u8]) -> Option<&mut EsdtData> {
+        self.0.get_mut(identifier)
     }
 
     pub fn new(token_identifier: Vec<u8>, nonce: u64, value: BigUint) -> Self {
@@ -56,13 +62,21 @@ impl AccountEsdt {
             },
         );
     }
-}
 
-impl Deref for AccountEsdt {
-    type Target = HashMap<Vec<u8>, EsdtData>;
+    pub fn get_esdt_balance(&self, token_identifier: &[u8], nonce: u64) -> BigUint {
+        if let Some(esdt_data) = self.get_by_identifier(token_identifier) {
+            if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
+                instance.balance.clone()
+            } else {
+                BigUint::zero()
+            }
+        } else {
+            BigUint::zero()
+        }
+    }
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    pub fn iter(&self) -> Iter<Vec<u8>, EsdtData> {
+        self.0.iter()
     }
 }
 
@@ -88,12 +102,6 @@ impl fmt::Display for EsdtData {
     }
 }
 
-impl EsdtRoles {
-    pub fn new(roles: Vec<Vec<u8>>) -> Self {
-        EsdtRoles(roles)
-    }
-}
-
 impl fmt::Display for AccountEsdt {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
@@ -107,18 +115,6 @@ impl fmt::Display for AccountEsdt {
                 key_hex(key.as_slice()),
                 value
             )?;
-        }
-        Ok(())
-    }
-}
-
-impl fmt::Display for EsdtRoles {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut esdt_buf = String::new();
-        let esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|k| k.clone()).collect();
-
-        for value in &esdt_keys {
-            write!(&mut esdt_buf, "{}", hex::encode(value.as_slice()))?;
         }
         Ok(())
     }
