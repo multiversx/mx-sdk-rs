@@ -18,8 +18,8 @@ pub struct CheckEsdtDataRaw {
     pub token_identifier: ValueSubTree,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "CheckEsdtValuesRaw::is_unspecified")]
-    pub instances: CheckEsdtValuesRaw,
+    #[serde(skip_serializing_if = "CheckEsdtInstancesRaw::is_unspecified")]
+    pub instances: CheckEsdtInstancesRaw,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
@@ -35,7 +35,7 @@ pub struct CheckEsdtDataRaw {
 }
 
 #[derive(Deserialize)]
-pub enum CheckEsdtValuesRaw {
+pub enum CheckEsdtInstancesRaw {
     Unspecified,
     Star,
     Equal(Vec<CheckEsdtValueRaw>),
@@ -144,34 +144,34 @@ impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
     }
 }
 
-impl CheckEsdtValuesRaw {
+impl CheckEsdtInstancesRaw {
     pub fn is_star(&self) -> bool {
-        matches!(self, CheckEsdtValuesRaw::Star)
+        matches!(self, CheckEsdtInstancesRaw::Star)
     }
 
     pub fn is_unspecified(&self) -> bool {
-        matches!(self, CheckEsdtValuesRaw::Unspecified)
+        matches!(self, CheckEsdtInstancesRaw::Unspecified)
     }
 }
 
-impl Default for CheckEsdtValuesRaw {
+impl Default for CheckEsdtInstancesRaw {
     fn default() -> Self {
-        CheckEsdtValuesRaw::Unspecified
+        CheckEsdtInstancesRaw::Unspecified
     }
 }
 
-impl Serialize for CheckEsdtValuesRaw {
+impl Serialize for CheckEsdtInstancesRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         match self {
-            CheckEsdtValuesRaw::Unspecified => {
+            CheckEsdtInstancesRaw::Unspecified => {
                 let map = serializer.serialize_map(Some(0))?;
                 map.end()
             },
-            CheckEsdtValuesRaw::Star => serializer.serialize_str("*"),
-            CheckEsdtValuesRaw::Equal(m) => {
+            CheckEsdtInstancesRaw::Star => serializer.serialize_str("*"),
+            CheckEsdtInstancesRaw::Equal(m) => {
                 let mut map = serializer.serialize_seq(Some(m.len()))?;
                 for v in m {
                     map.serialize_element(v)?;
