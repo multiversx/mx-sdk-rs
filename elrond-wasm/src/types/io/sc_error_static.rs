@@ -12,7 +12,7 @@ use super::SCError;
 pub struct StaticSCError(&'static [u8]);
 
 impl SCError for StaticSCError {
-    fn finish_err<FA: EndpointFinishApi>(&self, api: FA) {
+    fn finish_err<FA: EndpointFinishApi>(&self, api: FA) -> ! {
         api.signal_error(self.0)
     }
 }
