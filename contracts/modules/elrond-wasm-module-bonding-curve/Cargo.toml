@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-module-bonding-curve"
-version = "0.20.0"
+version = "0.20.1"
 edition = "2018"
 
 authors = ["Alin Cruceat <alin.cruceat@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -17,15 +17,15 @@ categories = ["no-std", "wasm"]
 wasm-output-mode = ["elrond-wasm-node"]
 
 [dependencies.elrond-wasm]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../elrond-wasm"
 features = ["derive"]
 
 [dependencies.elrond-wasm-node]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.20.0"
+version = "0.20.1"
 path = "../../../elrond-wasm-debug"
