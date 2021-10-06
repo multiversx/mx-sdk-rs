@@ -8,7 +8,7 @@ use std::{
 };
 
 #[derive(Clone, Default, Debug)]
-pub struct EsdtRoles(HashMap<Vec<u8>, Vec<u8>>);
+pub struct EsdtRoles(Vec<Vec<u8>>);
 
 #[derive(Clone, Default, Debug)]
 pub struct EsdtData {
@@ -24,9 +24,9 @@ pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
 
 impl AccountEsdt {
     pub fn get_by_identifier(&self, identifier: Vec<u8>) -> Option<EsdtData> {
-        self.iter().find_map(|(_, &x)| {
+        self.iter().find_map(|(_, x)| {
             if x.token_identifier == identifier {
-                Some(x)
+                Some(x.clone())
             } else {
                 None
             }
@@ -34,14 +34,19 @@ impl AccountEsdt {
     }
 
     pub fn new(token_identifier: Vec<u8>, nonce: u64, value: BigUint) -> Self {
-        let esdt = AccountEsdt::default();
+        let mut esdt = AccountEsdt::default();
 
         esdt.push_esdt(token_identifier, nonce, value);
         esdt
     }
-    pub fn push_esdt(&self, token_identifier: Vec<u8>, nonce: u64, value: BigUint) {
-        self.insert(
-            token_identifier,
+
+    pub fn new_from_hash(hash: HashMap<Vec<u8>, EsdtData>) -> Self {
+        AccountEsdt(hash)
+    }
+
+    pub fn push_esdt(&mut self, token_identifier: Vec<u8>, nonce: u64, value: BigUint) {
+        self.0.insert(
+            token_identifier.clone(),
             EsdtData {
                 token_identifier,
                 instances: EsdtInstances::new(nonce, value),
@@ -62,7 +67,7 @@ impl Deref for AccountEsdt {
 }
 
 impl fmt::Display for EsdtData {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
         write!(
             &mut esdt_buf,
@@ -83,10 +88,16 @@ impl fmt::Display for EsdtData {
     }
 }
 
+impl EsdtRoles {
+    pub fn new(roles: Vec<Vec<u8>>) -> Self {
+        EsdtRoles(roles)
+    }
+}
+
 impl fmt::Display for AccountEsdt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
-        let mut esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
+        let esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
 
         for key in &esdt_keys {
             let value = self.0.get(key).unwrap();
@@ -102,18 +113,12 @@ impl fmt::Display for AccountEsdt {
 }
 
 impl fmt::Display for EsdtRoles {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
-        let mut esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
+        let esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|k| k.clone()).collect();
 
-        for key in &esdt_keys {
-            let value = self.0.get(key).unwrap();
-            write!(
-                &mut esdt_buf,
-                "\n\t\t\t\t{} -> 0x{}",
-                key_hex(key.as_slice()),
-                hex::encode(value.as_slice())
-            )?;
+        for value in &esdt_keys {
+            write!(&mut esdt_buf, "{}", hex::encode(value.as_slice()))?;
         }
         Ok(())
     }

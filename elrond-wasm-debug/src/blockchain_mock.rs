@@ -269,7 +269,7 @@ impl BlockchainMock {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Sender account {} not found", address_hex(address)));
 
-        let esdt_nonces = sender_account
+        let esdt_nonces = &sender_account
             .esdt
             .get_mut(esdt_token_identifier)
             .unwrap_or_else(|| {
@@ -281,8 +281,8 @@ impl BlockchainMock {
             })
             .instances;
 
-        let esdt_balance = esdt_nonces
-            .get_mut(&nonce)
+        let esdt_balance = &mut esdt_nonces
+            .get_mut(&nonce.to_be_bytes().to_vec())
             .unwrap_or_else(|| {
                 panic!(
                     "Esdt token {} has no nonce {}",
@@ -290,15 +290,15 @@ impl BlockchainMock {
                     nonce.to_string()
                 )
             })
-            .value;
+            .balance;
         assert!(
-            esdt_balance >= *value,
+            esdt_balance >= value,
             "Not enough esdt balance, have {}, need at least {}",
             esdt_balance,
             value
         );
 
-        esdt_balance -= value;
+        *esdt_balance -= value;
     }
 
     pub fn increase_esdt_balance(

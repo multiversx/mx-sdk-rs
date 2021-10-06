@@ -130,7 +130,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             .instances
             .get_by_nonce(nonce)
         {
-            Some(instance) => self.insert_new_big_uint(instance.value.clone()),
+            Some(instance) => self.insert_new_big_uint(instance.balance.clone()),
             None => BigUint::zero(self.clone()),
         }
     }

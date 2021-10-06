@@ -18,8 +18,7 @@ pub struct EsdtRaw {
     pub last_nonce: Option<ValueSubTree>,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub roles: Option<ValueSubTree>,
+    pub roles: BTreeMap<String, ValueSubTree>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
