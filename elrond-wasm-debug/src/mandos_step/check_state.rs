@@ -4,9 +4,9 @@ use mandos::{
 };
 
 use crate::{
-    account_esdt::{AccountEsdt, EsdtData},
-    esdt_instance::EsdtInstances,
-    verbose_hex, BlockchainMock,
+    verbose_hex,
+    world_mock::{AccountEsdt, EsdtData, EsdtInstances},
+    BlockchainMock,
 };
 
 pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
@@ -97,8 +97,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &A
         CheckEsdt::Equal(eq) => {
             for expected_value in eq.iter() {
                 let actual_value = actual
-                    .get_by_identifier(expected_value.token_identifier.value.clone())
-                    .unwrap_or_default();
+                    .get_by_identifier_or_default(expected_value.token_identifier.value.as_slice());
                 check_esdt_data(
                     address,
                     verbose_hex(&expected_value.token_identifier.value),
@@ -158,9 +157,7 @@ pub fn check_token_instances(
     match expected {
         CheckEsdtValues::Equal(eq) => {
             for expected_value in eq.iter() {
-                let actual_value = actual
-                    .get_by_nonce(expected_value.nonce.value)
-                    .unwrap_or_default();
+                let actual_value = actual.get_by_nonce_or_default(expected_value.nonce.value);
 
                 if !expected_value.balance.check(&actual_value.balance) {
                     errors.push(format!(
@@ -196,7 +193,7 @@ pub fn check_token_instances(
                     ))
                 }
 
-                let actual_royalties = &actual_value.royalties.unwrap_or_default();
+                let actual_royalties = &actual_value.royalties;
                 if !expected_value.royalties.check(*actual_royalties) {
                     errors.push(format!(
                         "bad esdt royalties. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",

@@ -1,4 +1,4 @@
-use crate::{account_esdt::AccountEsdt, blockchain_mock::*, TxInput, TxOutput};
+use crate::{blockchain_mock::*, world_mock::AccountEsdt, TxInput, TxOutput};
 use alloc::{rc::Rc, vec::Vec};
 use core::cell::RefCell;
 use elrond_wasm::types::Address;

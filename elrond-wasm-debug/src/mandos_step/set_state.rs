@@ -1,10 +1,9 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use mandos::{Account, AddressKey, BlockInfo, NewAddress};
 
 use crate::{
-    account_esdt::{AccountEsdt, EsdtData, EsdtRoles},
-    esdt_instance::{EsdtInstance, EsdtInstances},
+    world_mock::{AccountEsdt, EsdtData, EsdtInstance, EsdtInstances, EsdtRoles},
     AccountData, BlockInfo as CrateBlockInfo, BlockchainMock,
 };
 
@@ -25,70 +24,7 @@ pub fn execute(
             account
                 .esdt
                 .iter()
-                .map(|(k, v)| {
-                    (
-                        k.value.clone(),
-                        EsdtData {
-                            token_identifier: v
-                                .token_identifier
-                                .as_ref()
-                                .map(|token_identifier| token_identifier.value.clone())
-                                .unwrap_or_default(),
-                            instances: EsdtInstances::new_from_hash(
-                                v.instances
-                                    .iter()
-                                    .map(|(k1, v1)| {
-                                        (
-                                            k1.value.clone(),
-                                            EsdtInstance {
-                                                nonce: v1
-                                                    .nonce
-                                                    .as_ref()
-                                                    .map(|nonce| nonce.value.clone())
-                                                    .unwrap_or_default(),
-                                                balance: v1
-                                                    .balance
-                                                    .as_ref()
-                                                    .map(|value| value.value.clone())
-                                                    .unwrap_or_default(),
-                                                creator: v1
-                                                    .creator
-                                                    .as_ref()
-                                                    .map(|creator| creator.value.clone()),
-                                                royalties: v1
-                                                    .royalties
-                                                    .as_ref()
-                                                    .map(|royalties| royalties.value.clone()),
-                                                hash: v1
-                                                    .hash
-                                                    .as_ref()
-                                                    .map(|hash| hash.value.clone()),
-                                                uri: v1.uri.as_ref().map(|uri| uri.value.clone()),
-                                                attributes: v1
-                                                    .attributes
-                                                    .as_ref()
-                                                    .map(|attributes| attributes.value.clone()),
-                                            },
-                                        )
-                                    })
-                                    .collect::<HashMap<Vec<u8>, EsdtInstance>>(),
-                            ),
-                            last_nonce: v
-                                .last_nonce
-                                .as_ref()
-                                .map(|last_nonce| last_nonce.value.clone())
-                                .unwrap_or_default(),
-                            roles: EsdtRoles::new(
-                                v.roles.iter().map(|(_, v)| v.value.clone()).collect(),
-                            ),
-                            frozen: v
-                                .frozen
-                                .as_ref()
-                                .map(|frozen| frozen.value.clone())
-                                .unwrap_or_default(),
-                        },
-                    )
-                })
+                .map(|(k, v)| (k.value.clone(), convert_mandos_esdt_to_world_mock(v)))
                 .collect(),
         );
 
@@ -137,6 +73,74 @@ pub fn execute(
     }
     if let Some(block_info_obj) = &*current_block_info {
         update_block_info(&mut state.current_block_info, block_info_obj);
+    }
+}
+
+fn convert_mandos_esdt_to_world_mock(mandos_esdt: &mandos::Esdt) -> EsdtData {
+    EsdtData {
+        token_identifier: mandos_esdt
+            .token_identifier
+            .as_ref()
+            .map(|token_identifier| token_identifier.value.clone())
+            .unwrap_or_default(),
+        instances: EsdtInstances::new_from_hash(
+            mandos_esdt
+                .instances
+                .iter()
+                .map(|mandos_instance| {
+                    let mock_instance = convert_mandos_esdt_instance_to_world_mock(mandos_instance);
+                    (mock_instance.nonce, mock_instance)
+                })
+                .collect(),
+        ),
+        last_nonce: mandos_esdt
+            .last_nonce
+            .as_ref()
+            .map(|last_nonce| last_nonce.value.clone())
+            .unwrap_or_default(),
+        roles: EsdtRoles::new(
+            mandos_esdt
+                .roles
+                .iter()
+                .map(|role| role.value.clone())
+                .collect(),
+        ),
+        frozen: mandos_esdt
+            .frozen
+            .as_ref()
+            .map(|frozen| frozen.value.clone())
+            .unwrap_or_default(),
+    }
+}
+
+fn convert_mandos_esdt_instance_to_world_mock(mandos_esdt: &mandos::Instance) -> EsdtInstance {
+    EsdtInstance {
+        nonce: mandos_esdt
+            .nonce
+            .as_ref()
+            .map(|nonce| nonce.value.clone())
+            .unwrap_or_default(),
+        balance: mandos_esdt
+            .balance
+            .as_ref()
+            .map(|value| value.value.clone())
+            .unwrap_or_default(),
+        creator: mandos_esdt
+            .creator
+            .as_ref()
+            .map(|creator| creator.value.clone()),
+        royalties: mandos_esdt
+            .royalties
+            .as_ref()
+            .map(|royalties| royalties.value)
+            .unwrap_or_default(),
+        hash: mandos_esdt.hash.as_ref().map(|hash| hash.value.clone()),
+        uri: mandos_esdt.uri.as_ref().map(|uri| uri.value.clone()),
+        attributes: mandos_esdt
+            .attributes
+            .as_ref()
+            .map(|attributes| attributes.value.clone())
+            .unwrap_or_default(),
     }
 }
 

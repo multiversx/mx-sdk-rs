@@ -19,6 +19,8 @@ mod storage_raw_check;
 mod value;
 mod value_check;
 mod value_interpreter;
+mod value_key_bytes;
+mod value_key_u64;
 mod value_raw;
 mod value_raw_check;
 
