@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use mandos::{Account, AddressKey, BlockInfo, NewAddress};
 
 use crate::{
-    world_mock::{AccountEsdt, EsdtData, EsdtInstance, EsdtInstances, EsdtRoles},
+    world_mock::{AccountEsdt, EsdtData, EsdtFullData, EsdtInstance, EsdtInstances, EsdtRoles},
     AccountData, BlockInfo as CrateBlockInfo, BlockchainMock,
 };
 
@@ -77,39 +77,43 @@ pub fn execute(
 }
 
 fn convert_mandos_esdt_to_world_mock(mandos_esdt: &mandos::Esdt) -> EsdtData {
-    EsdtData {
-        token_identifier: mandos_esdt
-            .token_identifier
-            .as_ref()
-            .map(|token_identifier| token_identifier.value.clone())
-            .unwrap_or_default(),
-        instances: EsdtInstances::new_from_hash(
-            mandos_esdt
-                .instances
-                .iter()
-                .map(|mandos_instance| {
-                    let mock_instance = convert_mandos_esdt_instance_to_world_mock(mandos_instance);
-                    (mock_instance.nonce, mock_instance)
-                })
-                .collect(),
-        ),
-        last_nonce: mandos_esdt
-            .last_nonce
-            .as_ref()
-            .map(|last_nonce| last_nonce.value.clone())
-            .unwrap_or_default(),
-        roles: EsdtRoles::new(
-            mandos_esdt
-                .roles
-                .iter()
-                .map(|role| role.value.clone())
-                .collect(),
-        ),
-        frozen: mandos_esdt
-            .frozen
-            .as_ref()
-            .map(|frozen| frozen.value.clone())
-            .unwrap_or_default(),
+    match mandos_esdt {
+        mandos::Esdt::Short(short_esdt) => EsdtData::Short(short_esdt.value.clone()),
+        mandos::Esdt::Full(full_esdt) => EsdtData::Full(EsdtFullData {
+            token_identifier: full_esdt
+                .token_identifier
+                .as_ref()
+                .map(|token_identifier| token_identifier.value.clone())
+                .unwrap_or_default(),
+            instances: EsdtInstances::new_from_hash(
+                full_esdt
+                    .instances
+                    .iter()
+                    .map(|mandos_instance| {
+                        let mock_instance =
+                            convert_mandos_esdt_instance_to_world_mock(mandos_instance);
+                        (mock_instance.nonce, mock_instance)
+                    })
+                    .collect(),
+            ),
+            last_nonce: full_esdt
+                .last_nonce
+                .as_ref()
+                .map(|last_nonce| last_nonce.value.clone())
+                .unwrap_or_default(),
+            roles: EsdtRoles::new(
+                full_esdt
+                    .roles
+                    .iter()
+                    .map(|role| role.value.clone())
+                    .collect(),
+            ),
+            frozen: full_esdt
+                .frozen
+                .as_ref()
+                .map(|frozen| frozen.value.clone())
+                .unwrap_or_default(),
+        }),
     }
 }
 

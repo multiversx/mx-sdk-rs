@@ -3,7 +3,8 @@ use super::*;
 #[derive(Debug)]
 pub enum CheckEsdt {
     Star,
-    Equal(Vec<CheckEsdtData>),
+    Short(Vec<CheckValue<BytesValue>>),
+    Full(Vec<CheckEsdtData>),
 }
 
 #[derive(Debug, Default)]
@@ -40,7 +41,14 @@ impl CheckEsdt {
     pub fn contains_identifier(&self, identifier: &Vec<u8>) -> bool {
         match self {
             CheckEsdt::Star => return false,
-            CheckEsdt::Equal(x) => {
+            CheckEsdt::Short(x) => {
+                for item in x {
+                    if item.check(identifier) {
+                        return true;
+                    }
+                }
+            },
+            CheckEsdt::Full(x) => {
                 for item in x {
                     if item.token_identifier.check(identifier) {
                         return true;
@@ -55,11 +63,16 @@ impl CheckEsdt {
 impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
     fn interpret_from(from: CheckEsdtRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckEsdtRaw::Unspecified => CheckEsdt::Equal(Vec::new()),
+            CheckEsdtRaw::Unspecified => CheckEsdt::Full(Vec::new()),
             CheckEsdtRaw::Star => CheckEsdt::Star,
-            CheckEsdtRaw::Equal(m) => CheckEsdt::Equal(
+            CheckEsdtRaw::Full(m) => CheckEsdt::Full(
                 m.into_iter()
                     .map(|v| (CheckEsdtData::interpret_from(v, context)))
+                    .collect(),
+            ),
+            CheckEsdtRaw::Short(m) => CheckEsdt::Short(
+                m.into_iter()
+                    .map(|v| (CheckValue::<BytesValue>::interpret_from(v, context)))
                     .collect(),
             ),
         }

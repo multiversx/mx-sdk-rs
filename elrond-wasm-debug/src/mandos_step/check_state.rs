@@ -94,7 +94,36 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
 
 pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &AccountEsdt) {
     match expected {
-        CheckEsdt::Equal(eq) => {
+        CheckEsdt::Full(eq) => {
+            for expected_value in eq.iter() {
+                let actual_value = actual
+                    .get_by_identifier_or_default(expected_value.token_identifier.value.as_slice());
+                check_esdt_data(
+                    address,
+                    verbose_hex(&expected_value.token_identifier.value),
+                    expected_value,
+                    &actual_value,
+                )
+            }
+
+            let default_check_value = CheckEsdtData::default();
+            for (_, actual_value) in actual
+                .iter()
+                .filter(|&(key, _)| !expected.contains_identifier(key))
+            {
+                let actual_identifier = match actual_value {
+                    EsdtData::Short(short_esdt) => &short_esdt,
+                    EsdtData::Full(full_esdt) => &full_esdt.token_identifier,
+                };
+                check_esdt_data(
+                    address,
+                    verbose_hex(actual_identifier),
+                    &default_check_value,
+                    actual_value,
+                );
+            }
+        },
+        CheckEsdt::Short(eq) => {
             for expected_value in eq.iter() {
                 let actual_value = actual
                     .get_by_identifier_or_default(expected_value.token_identifier.value.as_slice());
