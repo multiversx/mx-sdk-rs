@@ -1,4 +1,8 @@
-use super::*;
+use crate::{
+    AddressKey, BigUintValue, BytesValue, CheckAccountRaw, CheckAccountsRaw, CheckEsdtMap,
+    CheckStorage, CheckValue, InterpretableFrom, InterpreterContext, U64Value,
+};
+
 use std::collections::BTreeMap;
 
 #[derive(Debug)]
@@ -6,7 +10,7 @@ pub struct CheckAccount {
     pub comment: Option<String>,
     pub nonce: CheckValue<U64Value>,
     pub balance: CheckValue<BigUintValue>,
-    pub esdt: CheckEsdt,
+    pub esdt: CheckEsdtMap,
     pub username: CheckValue<BytesValue>,
     pub storage: CheckStorage,
     pub code: CheckValue<BytesValue>,
@@ -19,7 +23,7 @@ impl InterpretableFrom<CheckAccountRaw> for CheckAccount {
             comment: from.comment,
             nonce: CheckValue::<U64Value>::interpret_from(from.nonce, context),
             balance: CheckValue::<BigUintValue>::interpret_from(from.balance, context),
-            esdt: CheckEsdt::interpret_from(from.esdt, context),
+            esdt: CheckEsdtMap::interpret_from(from.esdt, context),
             username: CheckValue::<BytesValue>::interpret_from(from.username, context),
             storage: CheckStorage::interpret_from(from.storage, context),
             code: CheckValue::<BytesValue>::interpret_from(from.code, context),

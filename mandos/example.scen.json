@@ -292,10 +292,6 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "value": "0x00",
-                "esdt": {
-                    "tokenIdentifier": "str:CrowdToken",
-                    "value": "250,000,000,000"
-                },
                 "contractCode": "``new contract code here",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
@@ -339,9 +335,7 @@
                 "esdt": {
                     "tokenIdentifier": "str:MyToken",
                     "value": "250,000,000,000"
-                },
-                "gasLimit": "",
-                "gasPrice": ""
+                }
             }
         },
         {
@@ -440,8 +434,7 @@
                         "str:anything-goes": "*",
                         "+": ""
                     },
-                    "code": "file:smart-contract.wasm",
-                    "owner": "address:bob"
+                    "code": "file:smart-contract.wasm"
                 },
                 "address:smart_contract_address_2": {
                     "nonce": "*",
@@ -449,10 +442,9 @@
                     "username": "*",
                     "storage": "*",
                     "code": "*",
-                    "owner": "*",
                     "asyncCallData": "``func@arg1@arg2"
                 },
-                "``account_with_defaults___________": {
+                "str:account_with_defaults___________": {
                     "storage": "*"
                 },
                 "+": ""
@@ -461,33 +453,6 @@
         {
             "step": "dumpState",
             "comment": "print everything to console"
-        },
-        {
-            "step": "transfer",
-            "txId": "multi-transfer",
-            "comment": "test ESDT multi-transfer",
-            "tx": {
-                "from": "address:A",
-                "to": "address:B",
-                "value": "",
-                "esdt": [
-                    {
-                        "tokenIdentifier": "str:TOK-123",
-                        "value": "100"
-                    },
-                    {
-                        "tokenIdentifier": "str:OTHERTOK-123",
-                        "value": "1000"
-                    },
-                    {
-                        "tokenIdentifier": "str:NFT-123",
-                        "nonce": "5",
-                        "value": "10"
-                    }
-                ],
-                "gasLimit": "0x100000000",
-                "gasPrice": "0x01"
-            }
         }
     ]
 }

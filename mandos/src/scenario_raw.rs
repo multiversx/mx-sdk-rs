@@ -31,6 +31,10 @@ pub struct ScenarioRaw {
 #[serde(tag = "step")]
 pub enum StepRaw {
     ExternalSteps {
+        #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        comment: Option<String>,
+
         path: String,
     },
 

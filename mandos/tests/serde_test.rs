@@ -32,6 +32,7 @@ fn test_ser() {
         check_gas: Some(false),
         gas_schedule: Some("dummy".to_string()),
         steps: vec![StepRaw::ExternalSteps {
+            comment: None,
             path: "hello.txt".to_string(),
         }],
     };

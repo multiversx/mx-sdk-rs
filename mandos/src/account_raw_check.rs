@@ -22,8 +22,8 @@ pub struct CheckAccountRaw {
     pub balance: CheckBytesValueRaw,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "CheckEsdtRaw::is_unspecified")]
-    pub esdt: CheckEsdtRaw,
+    #[serde(skip_serializing_if = "CheckEsdtMapRaw::is_unspecified")]
+    pub esdt: CheckEsdtMapRaw,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]

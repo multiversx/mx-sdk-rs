@@ -1,6 +1,6 @@
 use super::*;
 use serde::{
-    de::{self, Deserializer, MapAccess, Visitor},
+    de::{self, Deserializer, MapAccess, SeqAccess, Visitor},
     ser::{SerializeMap, SerializeSeq, Serializer},
     Deserialize, Serialize,
 };
@@ -9,15 +9,13 @@ use std::fmt;
 pub enum CheckEsdtRaw {
     Unspecified,
     Star,
-    Short(Vec<CheckBytesValueRaw>),
-    Full(Vec<CheckEsdtDataRaw>),
+    Short(String),
+    Full(CheckEsdtDataRaw),
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckEsdtDataRaw {
-    pub token_identifier: ValueSubTree,
-
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckEsdtInstancesRaw::is_unspecified")]
     pub instances: CheckEsdtInstancesRaw,
@@ -35,16 +33,15 @@ pub struct CheckEsdtDataRaw {
     pub frozen: CheckBytesValueRaw,
 }
 
-#[derive(Deserialize)]
 pub enum CheckEsdtInstancesRaw {
     Unspecified,
     Star,
-    Equal(Vec<CheckEsdtValueRaw>),
+    Equal(Vec<CheckEsdtInstanceRaw>),
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CheckEsdtValueRaw {
+pub struct CheckEsdtInstanceRaw {
     pub nonce: ValueSubTree,
 
     #[serde(default)]
@@ -132,7 +129,7 @@ impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
         if value == "*" {
             Ok(CheckEsdtRaw::Star)
         } else {
-            Err(de::Error::custom("only '*' allowed as esdt string value"))
+            Ok(CheckEsdtRaw::Short(value.to_string()))
         }
     }
 
@@ -181,5 +178,51 @@ impl Serialize for CheckEsdtInstancesRaw {
                 map.end()
             },
         }
+    }
+}
+
+struct CheckEsdtInstancesRawVisitor;
+
+impl<'de> Visitor<'de> for CheckEsdtInstancesRawVisitor {
+    type Value = CheckEsdtInstancesRaw;
+
+    // Format a message stating what data this Visitor expects to receive.
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("serialized object JSON representation of an ESDT instances list")
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        if value == "*" {
+            Ok(CheckEsdtInstancesRaw::Star)
+        } else {
+            Err(de::Error::custom(
+                "only '*' allowed as ESDT instances value",
+            ))
+        }
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: SeqAccess<'de>,
+    {
+        let mut list = Vec::<CheckEsdtInstanceRaw>::new();
+
+        while let Some(item) = seq.next_element()? {
+            list.push(item);
+        }
+
+        Ok(CheckEsdtInstancesRaw::Equal(list))
+    }
+}
+
+impl<'de> Deserialize<'de> for CheckEsdtInstancesRaw {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(CheckEsdtInstancesRawVisitor)
     }
 }
