@@ -57,6 +57,10 @@ impl EsdtInstances {
         self.0.get_mut(&nonce)
     }
 
+    pub fn get_instances(&self) -> &BTreeMap<u64, EsdtInstance> {
+        &self.0
+    }
+
     pub fn is_empty_esdt(&self) -> bool {
         self.0.values().all(EsdtInstance::is_empty_esdt)
     }

@@ -207,6 +207,7 @@ fn builtin_func_esdt_transfer() {
 }
 
 #[test]
+#[should_panic]
 fn esdt_non_zero_balance_check_err_rs() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/esdt-non-zero-balance-check-err.scen.json",
@@ -215,6 +216,7 @@ fn esdt_non_zero_balance_check_err_rs() {
 }
 
 #[test]
+#[should_panic]
 fn esdt_zero_balance_check_err_rs() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos/esdt-zero-balance-check-err.scen.json",
