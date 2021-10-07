@@ -1,8 +1,10 @@
+use crate::value_key_bytes::BytesKey;
+
 use super::*;
 
 #[derive(Debug)]
 pub enum Esdt {
-    Short(BytesValue),
+    Short(BytesKey),
     Full(EsdtObject),
 }
 
@@ -30,7 +32,7 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
     fn interpret_from(from: EsdtRaw, context: &InterpreterContext) -> Self {
         match from {
             EsdtRaw::Short(short_esdt) => {
-                Esdt::Short(BytesValue::interpret_from(short_esdt, context))
+                Esdt::Short(BytesKey::interpret_from(short_esdt, context))
             },
             EsdtRaw::Full(full_esdt) => Esdt::Full(EsdtObject {
                 token_identifier: full_esdt

@@ -92,6 +92,15 @@ pub struct U64Value {
     pub original: ValueSubTree,
 }
 
+impl U64Value {
+    pub fn empty() -> Self {
+        U64Value {
+            value: 0,
+            original: ValueSubTree::Str(String::default()),
+        }
+    }
+}
+
 impl InterpretableFrom<ValueSubTree> for U64Value {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
         let bytes = interpret_subtree(&from, context);
