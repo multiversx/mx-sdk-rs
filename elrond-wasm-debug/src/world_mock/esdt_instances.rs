@@ -6,14 +6,8 @@ use std::{
 
 use super::EsdtInstance;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct EsdtInstances(BTreeMap<u64, EsdtInstance>);
-
-impl Default for EsdtInstances {
-    fn default() -> Self {
-        EsdtInstances(BTreeMap::new())
-    }
-}
 
 impl EsdtInstances {
     pub fn new(nonce: u64, value: BigUint) -> Self {

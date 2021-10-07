@@ -16,7 +16,7 @@ impl EsdtRoles {
 impl fmt::Display for EsdtRoles {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
-        let esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|k| k.clone()).collect();
+        let esdt_keys: Vec<Vec<u8>> = self.clone().0.to_vec();
 
         for value in &esdt_keys {
             write!(&mut esdt_buf, "{}", hex::encode(value.as_slice()))?;

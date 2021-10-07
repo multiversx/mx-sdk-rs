@@ -84,7 +84,7 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                     }
                 }
             }
-            check_account_esdt(&expected_address, &expected_account.esdt, &account.esdt);
+            check_account_esdt(expected_address, &expected_account.esdt, &account.esdt);
         } else {
             assert!(
                 accounts.other_accounts_allowed,
@@ -128,7 +128,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                         check_esdt_data(
                             address,
                             bytes_to_string(key.value.as_slice()),
-                            &expected_esdt,
+                            expected_esdt,
                             &actual_value,
                         );
                     },
@@ -215,7 +215,7 @@ pub fn check_token_instances(
                         address,
                         &token,
                         &default_expected_value,
-                        &actual_value,
+                        actual_value,
                         errors,
                     );
                 }
@@ -229,7 +229,7 @@ pub fn check_token_instances(
 
 pub fn check_token_instance(
     address: &AddressKey,
-    token: &String,
+    token: &str,
     expected_value: &CheckEsdtInstance,
     actual_value: &EsdtInstance,
     errors: &mut Vec<String>,

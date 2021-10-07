@@ -16,11 +16,11 @@ pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
         let esdt_value = esdt_transfer.esdt_value.value.clone();
         if !esdt_value.is_zero() {
             let esdt_token_identifier = esdt_transfer.esdt_token_identifier.value.clone();
-            let nonce = esdt_transfer.nonce.value.clone();
+            let nonce = esdt_transfer.nonce.value;
             state.substract_esdt_balance(
                 sender_address,
                 &esdt_token_identifier[..],
-                nonce.clone(),
+                nonce,
                 &esdt_value,
             );
             state.increase_esdt_balance(

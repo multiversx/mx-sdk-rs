@@ -16,7 +16,7 @@ pub struct EsdtInstance {
 impl EsdtInstance {
     pub fn default(nonce: u64) -> Self {
         EsdtInstance {
-            nonce: nonce,
+            nonce,
             balance: BigUint::zero(),
             creator: None,
             royalties: 0,

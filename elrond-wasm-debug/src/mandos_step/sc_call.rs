@@ -17,7 +17,7 @@ pub fn execute(
     if let Some(value) = tx.esdt_value.as_ref() {
         esdt_value = value.esdt_value.value.clone();
         esdt_token_identifier = value.esdt_token_identifier.value.clone();
-        nonce = value.nonce.value.clone();
+        nonce = value.nonce.value;
     };
     let tx_input = TxInput {
         from: tx.from.value.into(),

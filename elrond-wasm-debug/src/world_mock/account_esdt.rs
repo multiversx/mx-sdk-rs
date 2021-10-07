@@ -20,7 +20,10 @@ pub struct EsdtData {
 
 impl EsdtData {
     pub fn is_empty(&self) -> bool {
-        self.instances.is_empty_esdt() && self.last_nonce == 0 && self.roles.is_empty() && !self.frozen
+        self.instances.is_empty_esdt()
+            && self.last_nonce == 0
+            && self.roles.is_empty()
+            && !self.frozen
     }
 }
 

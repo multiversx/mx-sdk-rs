@@ -37,7 +37,7 @@ pub fn sc_call(
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
-    let nonce = tx_input.nonce.clone();
+    let nonce = tx_input.nonce;
     let esdt_value = tx_input.esdt_value.clone();
     let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
 
