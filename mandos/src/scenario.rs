@@ -222,6 +222,14 @@ fn interpret_esdt_token_identifier(
     }
 }
 
+fn interpret_opt_u64(opt_u64: Option<ValueSubTree>, context: &InterpreterContext) -> U64Value {
+    if let Some(u) = opt_u64 {
+        U64Value::interpret_from(u, context)
+    } else {
+        U64Value::empty()
+    }
+}
+
 #[derive(Debug)]
 pub struct TxESDT {
     pub esdt_token_identifier: BytesValue,
@@ -233,7 +241,7 @@ impl InterpretableFrom<TxESDTRaw> for TxESDT {
     fn interpret_from(from: TxESDTRaw, context: &InterpreterContext) -> Self {
         TxESDT {
             esdt_token_identifier: interpret_esdt_token_identifier(from.token_identifier, context),
-            nonce: U64Value::interpret_from(from.nonce, context),
+            nonce: interpret_opt_u64(from.nonce, context),
             esdt_value: BigUintValue::interpret_from(from.value, context),
         }
     }
@@ -297,9 +305,6 @@ impl InterpretableFrom<TxQueryRaw> for TxQuery {
 pub struct TxDeploy {
     pub from: AddressValue,
     pub call_value: BigUintValue,
-    pub esdt_value: BigUintValue,
-    pub esdt_token_identifier: BytesValue,
-    pub nonce: U64Value,
     pub contract_code: BytesValue,
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
@@ -311,12 +316,6 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
         TxDeploy {
             from: AddressValue::interpret_from(from.from, context),
             call_value: BigUintValue::interpret_from(from.value, context),
-            esdt_value: BigUintValue::interpret_from(from.esdt_value, context),
-            esdt_token_identifier: interpret_esdt_token_identifier(
-                from.esdt_token_identifier,
-                context,
-            ),
-            nonce: U64Value::interpret_from(from.nonce, context),
             contract_code: BytesValue::interpret_from(from.contract_code, context),
             arguments: from
                 .arguments
@@ -334,9 +333,7 @@ pub struct TxTransfer {
     pub from: AddressValue,
     pub to: AddressValue,
     pub value: BigUintValue,
-    pub esdt_value: BigUintValue,
-    pub esdt_token_identifier: BytesValue,
-    pub nonce: U64Value,
+    pub esdt_value: Option<TxESDT>,
 }
 
 impl InterpretableFrom<TxTransferRaw> for TxTransfer {
@@ -345,12 +342,9 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
             from: AddressValue::interpret_from(from.from, context),
             to: AddressValue::interpret_from(from.to, context),
             value: BigUintValue::interpret_from(from.value, context),
-            esdt_value: BigUintValue::interpret_from(from.esdt_value, context),
-            esdt_token_identifier: interpret_esdt_token_identifier(
-                from.esdt_token_identifier,
-                context,
-            ),
-            nonce: U64Value::interpret_from(from.nonce, context),
+            esdt_value: from
+                .esdt
+                .map(|esdt_value| TxESDT::interpret_from(esdt_value, context)),
         }
     }
 }
