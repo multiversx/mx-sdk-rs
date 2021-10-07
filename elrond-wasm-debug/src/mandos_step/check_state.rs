@@ -83,8 +83,8 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
                         );
                     }
                 }
-                check_account_esdt(&expected_address, &expected_account.esdt, &account.esdt);
             }
+            check_account_esdt(&expected_address, &expected_account.esdt, &account.esdt);
         } else {
             assert!(
                 accounts.other_accounts_allowed,
@@ -101,7 +101,6 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
             for (key, expected_value) in contents.contents.iter() {
                 let actual_value = actual.get_by_identifier_or_default(key.value.as_slice());
                 match expected_value {
-                    CheckEsdt::Star => {},
                     CheckEsdt::Short(expected_balance_bytes) => {
                         let expected_balance =
                             BigUint::from_bytes_be(expected_balance_bytes.value.as_slice());
@@ -126,7 +125,6 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                         }
                     },
                     CheckEsdt::Full(expected_esdt) => {
-                        // let default_check_value = CheckEsdtData::default();
                         check_esdt_data(
                             address,
                             verbose_hex(key.value.as_slice()),
@@ -137,13 +135,28 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                 }
             }
 
-            if contents.other_esdts_allowed {
-                for (token_identifier, _) in actual.iter() {
-                    assert!(
-                        contents.contains_token(token_identifier.as_slice()),
-                        "Unexpected ESDT token"
-                    )
+            if !contents.other_esdts_allowed {
+                for (token_identifier, actual_value) in actual.iter() {
+                    if contents.contains_token(token_identifier) {
+                        continue;
+                    }
+                    check_esdt_data(
+                        address,
+                        verbose_hex(token_identifier).to_string(),
+                        &CheckEsdtData::default(),
+                        actual_value,
+                    );
                 }
+            }
+        },
+        CheckEsdtMap::Unspecified => {
+            for (token_identifier, actual_value) in actual.iter() {
+                check_esdt_data(
+                    address,
+                    verbose_hex(token_identifier).to_string(),
+                    &CheckEsdtData::default(),
+                    actual_value,
+                );
             }
         },
     }
@@ -168,6 +181,14 @@ pub fn check_esdt_data(
         token,
         expected.last_nonce,
         &actual.last_nonce
+    );
+    assert!(
+        expected.frozen.check(u64::from(actual.frozen)),
+        "bad last nonce. Address: {}. Token Name: {}. Want: {}. Have: {}",
+        address,
+        token,
+        expected.frozen,
+        &actual.frozen
     );
 }
 

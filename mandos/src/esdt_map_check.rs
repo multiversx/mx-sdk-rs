@@ -4,6 +4,7 @@ use super::*;
 use std::collections::BTreeMap;
 #[derive(Debug)]
 pub enum CheckEsdtMap {
+    Unspecified,
     Star,
     Equal(CheckEsdtMapContents),
 }
@@ -24,7 +25,7 @@ impl CheckEsdtMapContents {
 impl InterpretableFrom<CheckEsdtMapRaw> for CheckEsdtMap {
     fn interpret_from(from: CheckEsdtMapRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckEsdtMapRaw::Unspecified => CheckEsdtMap::Star,
+            CheckEsdtMapRaw::Unspecified => CheckEsdtMap::Unspecified,
             CheckEsdtMapRaw::Star => CheckEsdtMap::Star,
             CheckEsdtMapRaw::Equal(m) => {
                 CheckEsdtMap::Equal(CheckEsdtMapContents::interpret_from(m, context))

@@ -4,7 +4,6 @@ use super::*;
 
 #[derive(Debug)]
 pub enum CheckEsdt {
-    Star,
     Short(BytesKey),
     Full(CheckEsdtData),
 }
@@ -34,17 +33,9 @@ pub struct CheckEsdtInstance {
     pub attributes: CheckValue<BytesValue>,
 }
 
-impl CheckEsdt {
-    pub fn is_star(&self) -> bool {
-        matches!(self, CheckEsdt::Star)
-    }
-}
-
 impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
     fn interpret_from(from: CheckEsdtRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckEsdtRaw::Unspecified => CheckEsdt::Star,
-            CheckEsdtRaw::Star => CheckEsdt::Star,
             CheckEsdtRaw::Full(m) => CheckEsdt::Full(CheckEsdtData::interpret_from(m, context)),
             CheckEsdtRaw::Short(v) => CheckEsdt::Short(BytesKey::interpret_from(v, context)),
         }

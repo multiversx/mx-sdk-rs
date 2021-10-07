@@ -7,8 +7,6 @@ use serde::{
 use std::fmt;
 
 pub enum CheckEsdtRaw {
-    Unspecified,
-    Star,
     Short(String),
     Full(CheckEsdtDataRaw),
 }
@@ -69,35 +67,12 @@ pub struct CheckEsdtInstanceRaw {
     pub attributes: CheckBytesValueRaw,
 }
 
-impl CheckEsdtRaw {
-    pub fn is_star(&self) -> bool {
-        matches!(self, CheckEsdtRaw::Star)
-    }
-
-    pub fn is_unspecified(&self) -> bool {
-        matches!(self, CheckEsdtRaw::Unspecified)
-    }
-}
-
-impl Default for CheckEsdtRaw {
-    fn default() -> Self {
-        CheckEsdtRaw::Unspecified
-    }
-}
-
 impl Serialize for CheckEsdtRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         match self {
-            CheckEsdtRaw::Unspecified => {
-                // empty map, just in case
-                // won't get serialized anyway
-                let map = serializer.serialize_map(Some(0))?;
-                map.end()
-            },
-            CheckEsdtRaw::Star => serializer.serialize_str("*"),
             CheckEsdtRaw::Short(m) => m.serialize(serializer),
             CheckEsdtRaw::Full(m) => m.serialize(serializer),
         }
@@ -126,11 +101,7 @@ impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
     where
         E: de::Error,
     {
-        if value == "*" {
-            Ok(CheckEsdtRaw::Star)
-        } else {
-            Ok(CheckEsdtRaw::Short(value.to_string()))
-        }
+        Ok(CheckEsdtRaw::Short(value.to_string()))
     }
 
     fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
