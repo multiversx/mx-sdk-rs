@@ -20,7 +20,7 @@ impl<M> SCError for ManagedSCError<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    fn finish_err<FA: EndpointFinishApi>(&self, api: FA) {
+    fn finish_err<FA: EndpointFinishApi>(&self, api: FA) -> ! {
         api.signal_error_from_buffer(self.buffer.get_raw_handle())
     }
 }

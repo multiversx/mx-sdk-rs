@@ -45,6 +45,18 @@ impl<T, E> SCResult<T, E> {
         }
     }
 
+    #[inline]
+    /// Returns the contained Ok value or signals the error and exits.
+    pub fn unwrap_or_signal_error<FA: EndpointFinishApi>(self, api: FA) -> T
+    where
+        E: SCError,
+    {
+        match self {
+            SCResult::Ok(t) => t,
+            SCResult::Err(e) => e.finish_err(api),
+        }
+    }
+
     /// Used to convert from a regular Rust result.
     /// Any error type is accepted as long as it can be converted to a SCError
     /// (`Vec<u8>`, `&[u8]`, `BoxedBytes`, `String`, `&str` are covered).
