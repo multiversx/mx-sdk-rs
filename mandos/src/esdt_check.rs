@@ -22,7 +22,7 @@ pub enum CheckEsdtInstances {
     Equal(Vec<CheckEsdtInstance>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CheckEsdtInstance {
     pub nonce: U64Value,
     pub balance: CheckValue<BigUintValue>,
@@ -56,6 +56,20 @@ impl InterpretableFrom<CheckEsdtDataRaw> for CheckEsdtData {
 impl CheckEsdtInstances {
     pub fn is_star(&self) -> bool {
         matches!(self, CheckEsdtInstances::Star)
+    }
+
+    pub fn contains_nonce(&self, nonce: u64) -> bool {
+        match &self {
+            CheckEsdtInstances::Equal(eq) => {
+                for expected_value in eq.iter() {
+                    if expected_value.nonce.value == nonce {
+                        return true;
+                    }
+                }
+            },
+            CheckEsdtInstances::Star => {},
+        }
+        false
     }
 }
 
