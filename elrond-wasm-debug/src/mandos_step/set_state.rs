@@ -89,8 +89,10 @@ fn convert_mandos_esdt_to_world_mock(
     match mandos_esdt {
         mandos::Esdt::Short(short_esdt) => {
             let balance = BigUint::from_bytes_be(short_esdt.value.as_slice());
-            let mut esdt_data = EsdtData::default();
-            esdt_data.token_identifier = token_identifier.to_vec();
+            let mut esdt_data = EsdtData {
+                token_identifier: token_identifier.to_vec(),
+                ..Default::default()
+            };
             esdt_data.instances.add(0, balance);
             esdt_data
         },
@@ -114,7 +116,7 @@ fn convert_mandos_esdt_to_world_mock(
             last_nonce: full_esdt
                 .last_nonce
                 .as_ref()
-                .map(|last_nonce| last_nonce.value.clone())
+                .map(|last_nonce| last_nonce.value)
                 .unwrap_or_default(),
             roles: EsdtRoles::new(
                 full_esdt
@@ -137,7 +139,7 @@ fn convert_mandos_esdt_instance_to_world_mock(mandos_esdt: &mandos::Instance) ->
         nonce: mandos_esdt
             .nonce
             .as_ref()
-            .map(|nonce| nonce.value.clone())
+            .map(|nonce| nonce.value)
             .unwrap_or_default(),
         balance: mandos_esdt
             .balance
