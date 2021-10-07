@@ -77,7 +77,7 @@ pub enum Step {
 impl InterpretableFrom<StepRaw> for Step {
     fn interpret_from(from: StepRaw, context: &InterpreterContext) -> Self {
         match from {
-            StepRaw::ExternalSteps { path } => Step::ExternalSteps { path },
+            StepRaw::ExternalSteps { comment: _, path } => Step::ExternalSteps { path },
             StepRaw::SetState {
                 comment,
                 accounts,

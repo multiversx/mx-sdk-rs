@@ -1,15 +1,16 @@
+use crate::value_key_bytes::BytesKey;
+
 use super::*;
 
 #[derive(Debug)]
 pub enum CheckEsdt {
     Star,
-    Short(Vec<CheckValue<BytesValue>>),
-    Full(Vec<CheckEsdtData>),
+    Short(BytesKey),
+    Full(CheckEsdtData),
 }
 
 #[derive(Debug, Default)]
 pub struct CheckEsdtData {
-    pub token_identifier: BytesValue,
     pub instances: CheckEsdtInstances,
     pub last_nonce: CheckValue<U64Value>,
     pub roles: CheckValue<BytesValue>,
@@ -38,43 +39,35 @@ impl CheckEsdt {
         matches!(self, CheckEsdt::Star)
     }
 
-    pub fn contains_identifier(&self, identifier: &Vec<u8>) -> bool {
-        match self {
-            CheckEsdt::Star => return false,
-            CheckEsdt::Short(x) => {
-                for item in x {
-                    if item.check(identifier) {
-                        return true;
-                    }
-                }
-            },
-            CheckEsdt::Full(x) => {
-                for item in x {
-                    if item.token_identifier.check(identifier) {
-                        return true;
-                    }
-                }
-            },
-        }
-        false
-    }
+    // pub fn contains_identifier(&self, identifier: &Vec<u8>) -> bool {
+    //     match self {
+    //         CheckEsdt::Star => return false,
+    //         CheckEsdt::Short(x) => {
+    //             for item in x {
+    //                 if item.check(identifier) {
+    //                     return true;
+    //                 }
+    //             }
+    //         },
+    //         CheckEsdt::Full(x) => {
+    //             for item in x {
+    //                 if item.token_identifier.check(identifier) {
+    //                     return true;
+    //                 }
+    //             }
+    //         },
+    //     }
+    //     false
+    // }
 }
 
 impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
     fn interpret_from(from: CheckEsdtRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckEsdtRaw::Unspecified => CheckEsdt::Full(Vec::new()),
+            CheckEsdtRaw::Unspecified => CheckEsdt::Star,
             CheckEsdtRaw::Star => CheckEsdt::Star,
-            CheckEsdtRaw::Full(m) => CheckEsdt::Full(
-                m.into_iter()
-                    .map(|v| (CheckEsdtData::interpret_from(v, context)))
-                    .collect(),
-            ),
-            CheckEsdtRaw::Short(m) => CheckEsdt::Short(
-                m.into_iter()
-                    .map(|v| (CheckValue::<BytesValue>::interpret_from(v, context)))
-                    .collect(),
-            ),
+            CheckEsdtRaw::Full(m) => CheckEsdt::Full(CheckEsdtData::interpret_from(m, context)),
+            CheckEsdtRaw::Short(v) => CheckEsdt::Short(BytesKey::interpret_from(v, context)),
         }
     }
 }
@@ -82,7 +75,6 @@ impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
 impl InterpretableFrom<CheckEsdtDataRaw> for CheckEsdtData {
     fn interpret_from(from: CheckEsdtDataRaw, context: &InterpreterContext) -> Self {
         CheckEsdtData {
-            token_identifier: BytesValue::interpret_from(from.token_identifier, context),
             instances: CheckEsdtInstances::interpret_from(from.instances, context),
             last_nonce: CheckValue::<U64Value>::interpret_from(from.last_nonce, context),
             roles: CheckValue::<BytesValue>::interpret_from(from.roles, context),
@@ -117,8 +109,8 @@ impl Default for CheckEsdtInstances {
     }
 }
 
-impl InterpretableFrom<CheckEsdtValueRaw> for CheckEsdtValue {
-    fn interpret_from(from: CheckEsdtValueRaw, context: &InterpreterContext) -> Self {
+impl InterpretableFrom<CheckEsdtInstanceRaw> for CheckEsdtValue {
+    fn interpret_from(from: CheckEsdtInstanceRaw, context: &InterpreterContext) -> Self {
         CheckEsdtValue {
             nonce: U64Value::interpret_from(from.nonce, context),
             balance: CheckValue::<BigUintValue>::interpret_from(from.balance, context),
