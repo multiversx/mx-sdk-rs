@@ -52,7 +52,7 @@ impl InterpretableFrom<CheckEsdtMapContentsRaw> for CheckEsdtMapContents {
                     )
                 })
                 .collect(),
-            other_esdts_allowed: from.other_storages_allowed,
+            other_esdts_allowed: from.other_esdts_allowed,
         }
     }
 }
