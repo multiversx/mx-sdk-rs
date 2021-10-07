@@ -3,7 +3,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct EsdtRaw {
+pub enum EsdtRaw {
+    Short(ValueSubTree),
+    Full(EsdtFullRaw),
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EsdtFullRaw {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub token_identifier: Option<ValueSubTree>,

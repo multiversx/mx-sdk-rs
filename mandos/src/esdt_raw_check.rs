@@ -9,7 +9,8 @@ use std::fmt;
 pub enum CheckEsdtRaw {
     Unspecified,
     Star,
-    Equal(Vec<CheckEsdtDataRaw>),
+    Short(Vec<CheckBytesValueRaw>),
+    Full(Vec<CheckEsdtDataRaw>),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -100,7 +101,8 @@ impl Serialize for CheckEsdtRaw {
                 map.end()
             },
             CheckEsdtRaw::Star => serializer.serialize_str("*"),
-            CheckEsdtRaw::Equal(m) => m.serialize(serializer),
+            CheckEsdtRaw::Short(m) => m.serialize(serializer),
+            CheckEsdtRaw::Full(m) => m.serialize(serializer),
         }
     }
 }
@@ -138,7 +140,7 @@ impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
     where
         M: MapAccess<'de>,
     {
-        Ok(CheckEsdtRaw::Equal(Deserialize::deserialize(
+        Ok(CheckEsdtRaw::Full(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
         )?))
     }
