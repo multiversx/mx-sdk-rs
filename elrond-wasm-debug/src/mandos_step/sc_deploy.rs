@@ -1,5 +1,7 @@
 use elrond_wasm::types::Address;
 use mandos::{TxDeploy, TxExpect};
+use num_bigint::BigUint;
+use num_traits::Zero;
 
 use crate::{
     execute_helper_functions::*, execute_tx, AsyncCallTxData, BlockchainMock, BlockchainMockError,
@@ -17,9 +19,9 @@ pub fn execute(
         from: tx.from.value.into(),
         to: Address::zero(),
         call_value: tx.call_value.value.clone(),
-        esdt_value: tx.esdt_value.value.clone(),
-        esdt_token_identifier: tx.esdt_token_identifier.value.clone(),
-        nonce: tx.nonce.value.clone(),
+        esdt_value: BigUint::zero(),
+        esdt_token_identifier: Vec::new(),
+        nonce: 0,
         func_name: b"init".to_vec(),
         args: tx
             .arguments

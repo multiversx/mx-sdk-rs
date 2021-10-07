@@ -9,24 +9,18 @@ use std::{
 
 use super::{EsdtInstances, EsdtRoles};
 
-#[derive(Clone, Debug)]
-pub enum EsdtData {
-    Short(Vec<u8>),
-    Full(EsdtFullData),
-}
-
 #[derive(Clone, Default, Debug)]
-pub struct EsdtFullData {
+pub struct EsdtData {
     pub token_identifier: Vec<u8>,
     pub instances: EsdtInstances,
     pub last_nonce: u64,
     pub roles: EsdtRoles,
-    pub frozen: u64,
+    pub frozen: bool,
 }
 
-impl Default for EsdtData {
-    fn default() -> Self {
-        EsdtData::Short("".as_bytes().to_vec())
+impl EsdtData {
+    pub fn is_empty(&self) -> bool {
+        self.instances.is_empty_esdt() && self.last_nonce == 0 && self.roles.is_empty() && !self.frozen
     }
 }
 
@@ -65,27 +59,22 @@ impl AccountEsdt {
     pub fn push_esdt(&mut self, token_identifier: Vec<u8>, nonce: u64, value: BigUint) {
         self.0.insert(
             token_identifier.clone(),
-            EsdtData::Full(EsdtFullData {
+            EsdtData {
                 token_identifier,
                 instances: EsdtInstances::new(nonce, value),
                 last_nonce: nonce,
                 roles: EsdtRoles::default(),
-                frozen: 0u64,
-            }),
+                frozen: false,
+            },
         );
     }
 
     pub fn get_esdt_balance(&self, token_identifier: &[u8], nonce: u64) -> BigUint {
         if let Some(esdt_data) = self.get_by_identifier(token_identifier) {
-            match esdt_data {
-                EsdtData::Short(short_esdt) => todo!(),
-                EsdtData::Full(full_esdt) => {
-                    if let Some(instance) = full_esdt.instances.get_by_nonce(nonce) {
-                        instance.balance.clone()
-                    } else {
-                        BigUint::zero()
-                    }
-                },
+            if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
+                instance.balance.clone()
+            } else {
+                BigUint::zero()
             }
         } else {
             BigUint::zero()
@@ -100,19 +89,21 @@ impl AccountEsdt {
 impl fmt::Display for EsdtData {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
-        match self {
-            EsdtData::Short(short_esdt) => write!(&mut esdt_buf, "{}", key_hex(short_esdt),)?,
-            EsdtData::Full(full_esdt) => write!(
-                &mut esdt_buf,
-                "{{
-                    instances: [{}],
-                    last_nonce: {},
-                    roles: [{}],
-                    frozen: {},
-                }}",
-                full_esdt.instances, full_esdt.last_nonce, full_esdt.roles, full_esdt.frozen
-            )?,
-        };
+        write!(
+            &mut esdt_buf,
+            "{{
+                token_identifier: {},
+                instances: [{}],
+                last_nonce: {},
+                roles: [{}],
+                frozen: {},
+            }}",
+            key_hex(self.token_identifier.as_slice()),
+            self.instances,
+            self.last_nonce,
+            self.roles,
+            self.frozen
+        )?;
         Ok(())
     }
 }

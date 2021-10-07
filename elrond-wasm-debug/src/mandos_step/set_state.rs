@@ -1,9 +1,10 @@
 use std::collections::BTreeMap;
 
 use mandos::{Account, AddressKey, BlockInfo, NewAddress};
+use num_bigint::BigUint;
 
 use crate::{
-    world_mock::{AccountEsdt, EsdtData, EsdtFullData, EsdtInstance, EsdtInstances, EsdtRoles},
+    world_mock::{AccountEsdt, EsdtData, EsdtInstance, EsdtInstances, EsdtRoles},
     AccountData, BlockInfo as CrateBlockInfo, BlockchainMock,
 };
 
@@ -24,7 +25,12 @@ pub fn execute(
             account
                 .esdt
                 .iter()
-                .map(|(k, v)| (k.value.clone(), convert_mandos_esdt_to_world_mock(v)))
+                .map(|(k, v)| {
+                    (
+                        k.value.clone(),
+                        convert_mandos_esdt_to_world_mock(k.value.as_slice(), v),
+                    )
+                })
                 .collect(),
         );
 
@@ -76,10 +82,19 @@ pub fn execute(
     }
 }
 
-fn convert_mandos_esdt_to_world_mock(mandos_esdt: &mandos::Esdt) -> EsdtData {
+fn convert_mandos_esdt_to_world_mock(
+    token_identifier: &[u8],
+    mandos_esdt: &mandos::Esdt,
+) -> EsdtData {
     match mandos_esdt {
-        mandos::Esdt::Short(short_esdt) => EsdtData::Short(short_esdt.value.clone()),
-        mandos::Esdt::Full(full_esdt) => EsdtData::Full(EsdtFullData {
+        mandos::Esdt::Short(short_esdt) => {
+            let balance = BigUint::from_bytes_be(short_esdt.value.as_slice());
+            let mut esdt_data = EsdtData::default();
+            esdt_data.token_identifier = token_identifier.to_vec();
+            esdt_data.instances.add(0, balance);
+            esdt_data
+        },
+        mandos::Esdt::Full(full_esdt) => EsdtData {
             token_identifier: full_esdt
                 .token_identifier
                 .as_ref()
@@ -108,12 +123,12 @@ fn convert_mandos_esdt_to_world_mock(mandos_esdt: &mandos::Esdt) -> EsdtData {
                     .map(|role| role.value.clone())
                     .collect(),
             ),
-            frozen: full_esdt
-                .frozen
-                .as_ref()
-                .map(|frozen| frozen.value.clone())
-                .unwrap_or_default(),
-        }),
+            frozen: if let Some(u64_value) = &full_esdt.frozen {
+                u64_value.value > 0
+            } else {
+                false
+            },
+        },
     }
 }
 
