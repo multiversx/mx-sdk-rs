@@ -13,7 +13,7 @@ pub enum CheckEsdtMapRaw {
 
 pub struct CheckEsdtMapContentsRaw {
     pub contents: BTreeMap<String, CheckEsdtRaw>,
-    pub other_storages_allowed: bool,
+    pub other_esdts_allowed: bool,
 }
 
 impl CheckEsdtMapRaw {
@@ -50,7 +50,7 @@ impl<'de> Deserialize<'de> for CheckEsdtMapRaw {
     where
         D: Deserializer<'de>,
     {
-        deserializer.deserialize_any(CheckStorageRawVisitor)
+        deserializer.deserialize_any(CheckEsdtMapRawVisitor)
     }
 }
 
@@ -63,7 +63,7 @@ impl Serialize for CheckEsdtMapContentsRaw {
         for (k, v) in self.contents.iter() {
             map.serialize_entry(k, v)?;
         }
-        if self.other_storages_allowed {
+        if self.other_esdts_allowed {
             map.serialize_entry("+", "")?;
         }
         map.end()
@@ -74,13 +74,13 @@ impl<'de> Deserialize<'de> for CheckEsdtMapContentsRaw {
     where
         D: Deserializer<'de>,
     {
-        deserializer.deserialize_any(CheckStorageDetailsRawVisitor)
+        deserializer.deserialize_any(CheckEsdtMapContentsRawVisitor)
     }
 }
 
-struct CheckStorageDetailsRawVisitor;
+struct CheckEsdtMapContentsRawVisitor;
 
-impl<'de> Visitor<'de> for CheckStorageDetailsRawVisitor {
+impl<'de> Visitor<'de> for CheckEsdtMapContentsRawVisitor {
     type Value = CheckEsdtMapContentsRaw;
 
     // Format a message stating what data this Visitor expects to receive.
@@ -96,26 +96,26 @@ impl<'de> Visitor<'de> for CheckStorageDetailsRawVisitor {
 
         // While there are entries remaining in the input, add them
         // into our map.
-        let mut other_storages_allowed = false;
+        let mut other_esdts_allowed = false;
 
         while let Some((key, value)) = access.next_entry()? {
             if key == "+" {
-                other_storages_allowed = true;
+                other_esdts_allowed = true;
             } else {
                 contents.insert(key, value);
             }
         }
 
         Ok(CheckEsdtMapContentsRaw {
-            other_storages_allowed,
+            other_esdts_allowed,
             contents,
         })
     }
 }
 
-struct CheckStorageRawVisitor;
+struct CheckEsdtMapRawVisitor;
 
-impl<'de> Visitor<'de> for CheckStorageRawVisitor {
+impl<'de> Visitor<'de> for CheckEsdtMapRawVisitor {
     type Value = CheckEsdtMapRaw;
 
     // Format a message stating what data this Visitor expects to receive.
