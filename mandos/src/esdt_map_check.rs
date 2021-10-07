@@ -11,7 +11,14 @@ pub enum CheckEsdtMap {
 #[derive(Debug)]
 pub struct CheckEsdtMapContents {
     pub contents: BTreeMap<BytesKey, CheckEsdt>,
-    pub other_storages_allowed: bool,
+    pub other_esdts_allowed: bool,
+}
+
+impl CheckEsdtMapContents {
+    pub fn contains_token(&self, token_identifier: &[u8]) -> bool {
+        let token_id_conv = BytesKey::from(token_identifier.to_vec());
+        self.contents.contains_key(&token_id_conv)
+    }
 }
 
 impl InterpretableFrom<CheckEsdtMapRaw> for CheckEsdtMap {
@@ -45,7 +52,7 @@ impl InterpretableFrom<CheckEsdtMapContentsRaw> for CheckEsdtMapContents {
                     )
                 })
                 .collect(),
-            other_storages_allowed: from.other_storages_allowed,
+            other_esdts_allowed: from.other_storages_allowed,
         }
     }
 }

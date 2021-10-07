@@ -56,6 +56,18 @@ impl EsdtInstances {
     pub fn get_mut_by_nonce(&mut self, nonce: u64) -> Option<&mut EsdtInstance> {
         self.0.get_mut(&nonce)
     }
+
+    pub fn is_empty_esdt(&self) -> bool {
+        self.0.values().all(EsdtInstance::is_empty_esdt)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 impl fmt::Display for EsdtInstances {

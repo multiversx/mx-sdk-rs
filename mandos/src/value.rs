@@ -86,7 +86,7 @@ impl Default for BigUintValue {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct U64Value {
     pub value: u64,
     pub original: ValueSubTree,
@@ -98,6 +98,12 @@ impl U64Value {
             value: 0,
             original: ValueSubTree::Str(String::default()),
         }
+    }
+}
+
+impl Default for U64Value {
+    fn default() -> Self {
+        U64Value::empty()
     }
 }
 

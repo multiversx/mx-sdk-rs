@@ -7,6 +7,10 @@ impl EsdtRoles {
     pub fn new(roles: Vec<Vec<u8>>) -> Self {
         EsdtRoles(roles)
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
 }
 
 impl fmt::Display for EsdtRoles {

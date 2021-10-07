@@ -25,4 +25,20 @@ impl EsdtInstance {
             attributes: Vec::new(),
         }
     }
+
+    pub fn fungible(balance: BigUint) -> Self {
+        EsdtInstance {
+            nonce: 0,
+            balance,
+            creator: None,
+            royalties: 0,
+            hash: None,
+            uri: None,
+            attributes: Vec::new(),
+        }
+    }
+
+    pub fn is_empty_esdt(&self) -> bool {
+        self.balance.is_zero()
+    }
 }

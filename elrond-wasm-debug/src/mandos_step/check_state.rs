@@ -1,7 +1,9 @@
 use mandos::{
-    AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstances, CheckStorage, CheckValue,
-    Checkable,
+    AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstances, CheckEsdtMap,
+    CheckStorage, CheckValue, Checkable,
 };
+use num_bigint::BigUint;
+use num_traits::Zero;
 
 use crate::{
     verbose_hex,
@@ -92,64 +94,57 @@ pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
     }
 }
 
-pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdt, actual: &AccountEsdt) {
+pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual: &AccountEsdt) {
     match expected {
-        CheckEsdt::Full(eq) => {
-            for expected_value in eq.iter() {
-                let actual_value = actual
-                    .get_by_identifier_or_default(expected_value.token_identifier.value.as_slice());
-                check_esdt_data(
-                    address,
-                    verbose_hex(&expected_value.token_identifier.value),
-                    expected_value,
-                    &actual_value,
-                )
+        CheckEsdtMap::Star => {},
+        CheckEsdtMap::Equal(contents) => {
+            for (key, expected_value) in contents.contents.iter() {
+                let actual_value = actual.get_by_identifier_or_default(key.value.as_slice());
+                match expected_value {
+                    CheckEsdt::Star => {},
+                    CheckEsdt::Short(expected_balance_bytes) => {
+                        let expected_balance =
+                            BigUint::from_bytes_be(expected_balance_bytes.value.as_slice());
+                        if expected_balance.is_zero() {
+                            assert!(
+                                actual_value.is_empty(),
+                                "No balance expected for ESDT token"
+                            );
+                        } else {
+                            assert!(
+                                actual_value.instances.len() == 1,
+                                "One ESDT instance expected, with nonce 0"
+                            );
+                            let single_instance = actual_value
+                                .instances
+                                .get_by_nonce(0)
+                                .unwrap_or_else(|| panic!("Expected fungible ESDT with none 0"));
+                            assert_eq!(
+                                single_instance.balance, expected_balance,
+                                "Unexpected fungible token balance"
+                            );
+                        }
+                    },
+                    CheckEsdt::Full(expected_esdt) => {
+                        // let default_check_value = CheckEsdtData::default();
+                        check_esdt_data(
+                            address,
+                            verbose_hex(key.value.as_slice()),
+                            &expected_esdt,
+                            &actual_value,
+                        );
+                    },
+                }
             }
 
-            let default_check_value = CheckEsdtData::default();
-            for (_, actual_value) in actual
-                .iter()
-                .filter(|&(key, _)| !expected.contains_identifier(key))
-            {
-                let actual_identifier = match actual_value {
-                    EsdtData::Short(short_esdt) => &short_esdt,
-                    EsdtData::Full(full_esdt) => &full_esdt.token_identifier,
-                };
-                check_esdt_data(
-                    address,
-                    verbose_hex(actual_identifier),
-                    &default_check_value,
-                    actual_value,
-                );
+            if contents.other_esdts_allowed {
+                for (token_identifier, _) in actual.iter() {
+                    assert!(
+                        contents.contains_token(token_identifier.as_slice()),
+                        "Unexpected ESDT token"
+                    )
+                }
             }
-        },
-        CheckEsdt::Short(eq) => {
-            for expected_value in eq.iter() {
-                let actual_value = actual
-                    .get_by_identifier_or_default(expected_value.token_identifier.value.as_slice());
-                check_esdt_data(
-                    address,
-                    verbose_hex(&expected_value.token_identifier.value),
-                    expected_value,
-                    &actual_value,
-                )
-            }
-
-            let default_check_value = CheckEsdtData::default();
-            for (_, actual_value) in actual
-                .iter()
-                .filter(|&(key, _)| !expected.contains_identifier(key))
-            {
-                check_esdt_data(
-                    address,
-                    verbose_hex(&actual_value.token_identifier),
-                    &default_check_value,
-                    actual_value,
-                );
-            }
-        },
-        CheckEsdt::Star => {
-            // nothing to be done for *
         },
     }
 }

@@ -20,11 +20,11 @@ pub struct CheckEsdtData {
 #[derive(Debug)]
 pub enum CheckEsdtInstances {
     Star,
-    Equal(Vec<CheckEsdtValue>),
+    Equal(Vec<CheckEsdtInstance>),
 }
 
 #[derive(Debug)]
-pub struct CheckEsdtValue {
+pub struct CheckEsdtInstance {
     pub nonce: U64Value,
     pub balance: CheckValue<BigUintValue>,
     pub creator: CheckValue<BytesValue>,
@@ -38,27 +38,6 @@ impl CheckEsdt {
     pub fn is_star(&self) -> bool {
         matches!(self, CheckEsdt::Star)
     }
-
-    // pub fn contains_identifier(&self, identifier: &Vec<u8>) -> bool {
-    //     match self {
-    //         CheckEsdt::Star => return false,
-    //         CheckEsdt::Short(x) => {
-    //             for item in x {
-    //                 if item.check(identifier) {
-    //                     return true;
-    //                 }
-    //             }
-    //         },
-    //         CheckEsdt::Full(x) => {
-    //             for item in x {
-    //                 if item.token_identifier.check(identifier) {
-    //                     return true;
-    //                 }
-    //             }
-    //         },
-    //     }
-    //     false
-    // }
 }
 
 impl InterpretableFrom<CheckEsdtRaw> for CheckEsdt {
@@ -96,7 +75,7 @@ impl InterpretableFrom<CheckEsdtInstancesRaw> for CheckEsdtInstances {
             CheckEsdtInstancesRaw::Star => CheckEsdtInstances::Star,
             CheckEsdtInstancesRaw::Equal(m) => CheckEsdtInstances::Equal(
                 m.into_iter()
-                    .map(|v| CheckEsdtValue::interpret_from(v, context))
+                    .map(|v| CheckEsdtInstance::interpret_from(v, context))
                     .collect(),
             ),
         }
@@ -109,9 +88,9 @@ impl Default for CheckEsdtInstances {
     }
 }
 
-impl InterpretableFrom<CheckEsdtInstanceRaw> for CheckEsdtValue {
+impl InterpretableFrom<CheckEsdtInstanceRaw> for CheckEsdtInstance {
     fn interpret_from(from: CheckEsdtInstanceRaw, context: &InterpreterContext) -> Self {
-        CheckEsdtValue {
+        CheckEsdtInstance {
             nonce: U64Value::interpret_from(from.nonce, context),
             balance: CheckValue::<BigUintValue>::interpret_from(from.balance, context),
             creator: CheckValue::<BytesValue>::interpret_from(from.creator, context),
