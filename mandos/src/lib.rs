@@ -1,4 +1,3 @@
-mod functions;
 mod model;
 mod serde_raw;
 mod value_interpreter;
