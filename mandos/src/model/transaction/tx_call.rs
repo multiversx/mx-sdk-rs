@@ -1,9 +1,10 @@
 use crate::{
-    AddressValue, BigUintValue, BytesValue, InterpretableFrom, InterpreterContext, TxCallRaw,
-    U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{AddressValue, BigUintValue, BytesValue, U64Value},
+    serde_raw::TxCallRaw,
 };
 
-use super::*;
+use super::TxESDT;
 
 #[derive(Debug)]
 pub struct TxCall {

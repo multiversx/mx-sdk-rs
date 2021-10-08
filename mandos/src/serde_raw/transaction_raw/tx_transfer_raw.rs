@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{TxESDTRaw, ValueSubTree};
+use crate::serde_raw::{TxESDTRaw, ValueSubTree};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

@@ -1,4 +1,7 @@
-use crate::{CheckBytesValueRaw, InterpreterContext, ValueSubTree};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::{CheckBytesValueRaw, ValueSubTree},
+};
 
 use super::value::*;
 use num_bigint::BigUint;
@@ -102,7 +105,10 @@ impl Checkable<&[Vec<u8>]> for Vec<CheckValue<BytesValue>> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::{
+        model::{BytesValue, CheckValue, Checkable, U64Value},
+        serde_raw::ValueSubTree,
+    };
 
     #[test]
     fn check_bytes() {

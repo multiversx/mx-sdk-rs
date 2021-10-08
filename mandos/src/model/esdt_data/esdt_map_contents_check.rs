@@ -1,10 +1,12 @@
 use crate::{
-    model::value_key_bytes::BytesKey, CheckEsdtMapContentsRaw, InterpretableFrom,
-    InterpreterContext,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::value_key_bytes::BytesKey,
+    serde_raw::CheckEsdtMapContentsRaw,
 };
 
-use super::*;
 use std::collections::BTreeMap;
+
+use super::CheckEsdt;
 
 #[derive(Debug)]
 pub struct CheckEsdtMapContents {

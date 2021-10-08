@@ -1,6 +1,9 @@
-use crate::{BlockInfoRaw, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::BlockInfoRaw,
+};
 
-use super::*;
+use super::{BytesValue, U64Value};
 
 #[derive(Debug)]
 pub struct BlockInfo {

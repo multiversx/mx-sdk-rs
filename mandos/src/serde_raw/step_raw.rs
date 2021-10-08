@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
+use crate::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountsRaw, NewAddressRaw, TxCallRaw, TxDeployRaw, TxExpectRaw,
     TxQueryRaw, TxTransferRaw, TxValidatorRewardRaw, ValueSubTree,
 };

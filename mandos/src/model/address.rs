@@ -1,6 +1,8 @@
-use crate::{interpret_string, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    value_interpreter::interpret_string,
+};
 
-use super::*;
 use std::{cmp::Ordering, fmt};
 
 #[derive(Debug, Eq)]

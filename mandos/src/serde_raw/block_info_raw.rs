@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::ValueSubTree;
+use crate::serde_raw::ValueSubTree;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

@@ -1,4 +1,8 @@
-use crate::{AddressValue, BytesValue, InterpretableFrom, InterpreterContext, TxQueryRaw};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{AddressValue, BytesValue},
+    serde_raw::TxQueryRaw,
+};
 
 #[derive(Debug)]
 pub struct TxQuery {

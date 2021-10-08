@@ -1,8 +1,10 @@
 use crate::{
-    BytesValue, CheckEsdtDataRaw, CheckValue, InterpretableFrom, InterpreterContext, U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{BytesValue, CheckValue, U64Value},
+    serde_raw::CheckEsdtDataRaw,
 };
 
-use super::*;
+use super::CheckEsdtInstances;
 
 #[derive(Debug, Default)]
 pub struct CheckEsdtData {

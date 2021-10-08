@@ -1,6 +1,9 @@
-use crate::{CheckEsdtInstancesRaw, InterpretableFrom, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::CheckEsdtInstancesRaw,
+};
 
-use super::*;
+use super::CheckEsdtInstance;
 
 #[derive(Debug)]
 pub enum CheckEsdtInstances {

@@ -1,6 +1,10 @@
-use crate::{CheckLogsRaw, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::CheckLogsRaw,
+};
 
-use super::*;
+use super::CheckLog;
+
 #[derive(Debug)]
 pub enum CheckLogs {
     Star,

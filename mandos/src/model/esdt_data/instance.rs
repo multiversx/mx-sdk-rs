@@ -1,5 +1,7 @@
 use crate::{
-    BigUintValue, BytesValue, InstanceRaw, InterpretableFrom, InterpreterContext, U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{BigUintValue, BytesValue, U64Value},
+    serde_raw::InstanceRaw,
 };
 
 #[derive(Debug, Default)]

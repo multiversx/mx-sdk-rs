@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::StepRaw;
+use crate::serde_raw::StepRaw;
 
 /// Mapped 1-on-1 with the JSON. No complex logic here, just a basic interface with the JSON.
 /// The conversion to `Scenario` adds all additional functionality.

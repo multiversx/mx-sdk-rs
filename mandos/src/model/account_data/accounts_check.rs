@@ -1,8 +1,12 @@
 use std::collections::BTreeMap;
 
-use crate::{AddressKey, CheckAccountsRaw, InterpretableFrom, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::AddressKey,
+    serde_raw::CheckAccountsRaw,
+};
 
-use super::*;
+use super::CheckAccount;
 
 #[derive(Debug)]
 pub struct CheckAccounts {

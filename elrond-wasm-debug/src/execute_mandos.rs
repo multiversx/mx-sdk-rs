@@ -2,7 +2,7 @@
 
 use crate::*;
 
-use mandos::*;
+use mandos::model::Step;
 use std::path::Path;
 
 /// Runs mandos test using the Rust infrastructure and the debug mode.

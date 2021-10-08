@@ -1,6 +1,7 @@
 use crate::{
-    BigUintValue, BytesValue, CheckEsdtInstanceRaw, CheckValue, InterpretableFrom,
-    InterpreterContext, U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{BigUintValue, BytesValue, CheckValue, U64Value},
+    serde_raw::CheckEsdtInstanceRaw,
 };
 
 #[derive(Debug, Default)]

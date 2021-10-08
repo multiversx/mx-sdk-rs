@@ -1,6 +1,7 @@
 use crate::{
-    AddressValue, BigUintValue, BytesValue, InterpretableFrom, InterpreterContext, TxDeployRaw,
-    U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{AddressValue, BigUintValue, BytesValue, U64Value},
+    serde_raw::TxDeployRaw,
 };
 
 #[derive(Debug)]

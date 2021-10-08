@@ -1,6 +1,9 @@
-use crate::{InterpreterContext, ScenarioRaw};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::ScenarioRaw,
+};
 
-use super::*;
+use super::Step;
 
 #[derive(Debug)]
 pub struct Scenario {

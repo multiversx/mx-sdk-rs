@@ -1,6 +1,9 @@
-use crate::{InterpreterContext, NewAddressRaw};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::NewAddressRaw,
+};
 
-use super::*;
+use super::{AddressValue, U64Value};
 
 #[derive(Debug)]
 pub struct NewAddress {

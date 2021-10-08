@@ -1,5 +1,7 @@
 use crate::{
-    BytesValue, CheckStorageDetailsRaw, CheckValue, InterpretableFrom, InterpreterContext,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{BytesValue, CheckValue},
+    serde_raw::CheckStorageDetailsRaw,
 };
 
 use std::collections::BTreeMap;

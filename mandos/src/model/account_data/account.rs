@@ -1,6 +1,7 @@
 use crate::{
-    model::value_key_bytes::BytesKey, AccountRaw, AddressValue, BigUintValue, BytesValue, Esdt,
-    InterpretableFrom, InterpreterContext, U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{value_key_bytes::BytesKey, AddressValue, BigUintValue, BytesValue, Esdt, U64Value},
+    serde_raw::AccountRaw,
 };
 
 use std::collections::BTreeMap;
