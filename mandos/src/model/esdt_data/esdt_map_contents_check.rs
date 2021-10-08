@@ -1,6 +1,6 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::value_key_bytes::BytesKey,
+    model::BytesKey,
     serde_raw::CheckEsdtMapContentsRaw,
 };
 

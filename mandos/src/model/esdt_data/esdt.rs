@@ -1,6 +1,6 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{value_key_bytes::BytesKey, BytesValue, U64Value},
+    model::{BytesKey, BytesValue, U64Value},
     serde_raw::EsdtRaw,
 };
 
