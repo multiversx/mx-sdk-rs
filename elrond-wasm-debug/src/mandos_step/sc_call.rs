@@ -1,5 +1,5 @@
 use crate::execute_helper_functions::{self, *};
-use mandos::{TxCall, TxExpect};
+use mandos::model::{TxCall, TxExpect};
 use num_bigint::BigUint;
 use num_traits::Zero;
 

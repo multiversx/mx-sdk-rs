@@ -1,5 +1,5 @@
 use elrond_wasm::types::Address;
-use mandos::{TxDeploy, TxExpect};
+use mandos::model::{TxDeploy, TxExpect};
 use num_bigint::BigUint;
 use num_traits::Zero;
 

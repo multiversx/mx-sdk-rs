@@ -1,4 +1,4 @@
-use mandos::TxTransfer;
+use mandos::model::TxTransfer;
 use num_traits::Zero;
 
 use crate::BlockchainMock;

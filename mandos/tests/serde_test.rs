@@ -1,8 +1,8 @@
 extern crate mandos;
-use mandos::*;
 
 use std::{fs, fs::File, io::Write};
 
+use mandos::serde_raw::{ScenarioRaw, StepRaw};
 use serde::Serialize;
 
 #[test]

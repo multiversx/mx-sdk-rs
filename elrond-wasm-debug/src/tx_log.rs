@@ -10,7 +10,7 @@ pub struct TxLog {
 }
 
 impl TxLog {
-    pub fn equals(&self, check_log: &mandos::CheckLog) -> bool {
+    pub fn equals(&self, check_log: &mandos::model::CheckLog) -> bool {
         if self.address.to_vec() == check_log.address.value
             && self.endpoint == check_log.endpoint.value
             && self.data == check_log.data.value

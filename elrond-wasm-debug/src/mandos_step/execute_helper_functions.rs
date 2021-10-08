@@ -1,5 +1,5 @@
 use elrond_wasm::types::H256;
-use mandos::{CheckLogs, Checkable, TxExpect};
+use mandos::model::{CheckLogs, Checkable, TxExpect};
 use std::collections::HashMap;
 
 use crate::{
