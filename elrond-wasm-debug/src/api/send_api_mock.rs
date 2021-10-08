@@ -7,8 +7,6 @@ use elrond_wasm::{
     },
     HexCallDataSerializer,
 };
-// use num_bigint::BigUint;
-use num_traits::Zero;
 
 impl TxContext {
     fn get_available_egld_balance(&self) -> num_bigint::BigUint {
@@ -27,14 +25,16 @@ impl TxContext {
         available_balance
     }
 
-    fn get_available_esdt_balance(&self, token_identifier: &[u8]) -> num_bigint::BigUint {
+    fn get_available_esdt_balance(
+        &self,
+        token_identifier: &[u8],
+        nonce: u64,
+    ) -> num_bigint::BigUint {
         // start with the pre-existing balance
         let mut available_balance = self
             .blockchain_info_box
             .contract_esdt
-            .get(token_identifier)
-            .unwrap_or(&num_bigint::BigUint::zero())
-            .clone();
+            .get_esdt_balance(token_identifier, nonce);
 
         // add amount received (if the same token)
         if self.tx_input_box.esdt_token_identifier == token_identifier {
@@ -72,6 +72,7 @@ impl SendApi for TxContext {
             recipient,
             token_identifier: BoxedBytes::empty(),
             amount: amount_value,
+            nonce: 0u64,
         });
     }
 
@@ -96,7 +97,9 @@ impl SendApi for TxContext {
         _arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let amount_value = self.big_uint_value(amount);
-        if amount_value > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice()) {
+        if amount_value
+            > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice(), 0u64)
+        {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: b"insufficient funds".to_vec(),
@@ -110,6 +113,7 @@ impl SendApi for TxContext {
             recipient,
             token_identifier,
             amount: amount_value,
+            nonce: 0u64,
         });
         Ok(())
     }

@@ -24,6 +24,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
     let func_name = de.get_func_name().to_vec();
     let mut args: Vec<Vec<u8>> = Vec::new();
     let mut esdt_token_identifier = Vec::<u8>::new();
+    let nonce = 0u64;
     let mut esdt_value = 0u32.into();
 
     if func_name == ESDT_TRANSFER_STRING {
@@ -40,6 +41,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
         call_value: async_data.call_value.clone(),
         esdt_value,
         esdt_token_identifier,
+        nonce,
         func_name,
         args,
         gas_limit: 1000,
@@ -67,6 +69,7 @@ pub fn async_callback_tx_input(
         call_value: 0u32.into(),
         esdt_value: 0u32.into(),
         esdt_token_identifier: Vec::new(),
+        nonce: 0u64,
         func_name: b"callBack".to_vec(),
         args,
         gas_limit: 1000,

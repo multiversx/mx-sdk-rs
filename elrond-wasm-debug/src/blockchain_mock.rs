@@ -1,7 +1,7 @@
 use super::mock_error::BlockchainMockError;
 use crate::{
-    contract_map::*, display_util::*, esdt_transfer_event_log, tx_context::*, SendBalance, TxInput,
-    TxLog, TxOutput, TxPanic,
+    contract_map::*, display_util::*, esdt_transfer_event_log, tx_context::*,
+    world_mock::AccountEsdt, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
 };
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
@@ -13,7 +13,6 @@ const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
-pub type AccountEsdt = HashMap<Vec<u8>, BigUint>;
 
 pub struct AccountData {
     pub address: Address,
@@ -28,22 +27,6 @@ pub struct AccountData {
 
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut esdt_buf = String::new();
-        let mut esdt_keys: Vec<Vec<u8>> =
-            self.esdt.clone().iter().map(|(k, _)| k.clone()).collect();
-        esdt_keys.sort();
-
-        for key in &esdt_keys {
-            let value = self.esdt.get(key).unwrap();
-            write!(
-                &mut esdt_buf,
-                "\n\t\t\t\t{} -> 0x{}",
-                key_hex(key.as_slice()),
-                hex::encode(value.to_bytes_be())
-            )
-            .unwrap();
-        }
-
         let mut storage_buf = String::new();
         let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
         storage_keys.sort();
@@ -70,7 +53,7 @@ impl fmt::Display for AccountData {
 	}}",
             self.nonce,
             self.balance,
-            esdt_buf,
+            self.esdt,
             String::from_utf8(self.username.clone()).unwrap(),
             storage_buf
         )
@@ -248,14 +231,17 @@ impl BlockchainMock {
                 self.increase_balance(&send_balance.recipient, &send_balance.amount);
             } else {
                 let esdt_token_identifier = send_balance.token_identifier.as_slice();
+                let esdt_nonce = send_balance.nonce;
                 self.substract_esdt_balance(
                     contract_address,
                     esdt_token_identifier,
+                    esdt_nonce,
                     &send_balance.amount,
                 );
                 self.increase_esdt_balance(
                     &send_balance.recipient,
                     esdt_token_identifier,
+                    esdt_nonce,
                     &send_balance.amount,
                 );
 
@@ -275,6 +261,7 @@ impl BlockchainMock {
         &mut self,
         address: &Address,
         esdt_token_identifier: &[u8],
+        nonce: u64,
         value: &BigUint,
     ) {
         let sender_account = self
@@ -282,9 +269,9 @@ impl BlockchainMock {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Sender account {} not found", address_hex(address)));
 
-        let esdt_balance = sender_account
-            .esdt
-            .get_mut(esdt_token_identifier)
+        let esdt_data_map = &mut sender_account.esdt;
+        let esdt_data = esdt_data_map
+            .get_mut_by_identifier(esdt_token_identifier)
             .unwrap_or_else(|| {
                 panic!(
                     "Account {} has no esdt tokens with name {}",
@@ -293,8 +280,17 @@ impl BlockchainMock {
                 )
             });
 
+        let esdt_instances = &mut esdt_data.instances;
+        let esdt_instance = esdt_instances.get_mut_by_nonce(nonce).unwrap_or_else(|| {
+            panic!(
+                "Esdt token {} has no nonce {}",
+                String::from_utf8(esdt_token_identifier.to_vec()).unwrap(),
+                nonce.to_string()
+            )
+        });
+        let esdt_balance = &mut esdt_instance.balance;
         assert!(
-            *esdt_balance >= *value,
+            &*esdt_balance >= value,
             "Not enough esdt balance, have {}, need at least {}",
             esdt_balance,
             value
@@ -307,6 +303,7 @@ impl BlockchainMock {
         &mut self,
         address: &Address,
         esdt_token_identifier: &[u8],
+        nonce: u64,
         value: &BigUint,
     ) {
         let account = self
@@ -314,13 +311,12 @@ impl BlockchainMock {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Receiver account not found"));
 
-        if account.esdt.contains_key(esdt_token_identifier) {
-            let esdt_balance = account.esdt.get_mut(esdt_token_identifier).unwrap();
-            *esdt_balance += value;
+        if let Some(esdt_data) = account.esdt.get_mut_by_identifier(esdt_token_identifier) {
+            esdt_data.instances.add(nonce, value.clone());
         } else {
             account
                 .esdt
-                .insert(esdt_token_identifier.to_vec(), value.clone());
+                .push_esdt(esdt_token_identifier.to_vec(), nonce, value.clone());
         }
     }
 
@@ -350,10 +346,11 @@ impl BlockchainMock {
             .unwrap_or_else(|| {
                 panic!("Missing new address. Only explicit new deploy addresses supported")
             });
-        let mut esdt = HashMap::<Vec<u8>, BigUint>::new();
+        let mut esdt = AccountEsdt::default();
         if !tx_input.esdt_token_identifier.is_empty() {
-            esdt.insert(
+            esdt.push_esdt(
                 tx_input.esdt_token_identifier.clone(),
+                tx_input.nonce,
                 tx_input.esdt_value.clone(),
             );
         }
@@ -465,7 +462,7 @@ pub struct BlockchainTxInfo {
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_balance: BigUint,
-    pub contract_esdt: HashMap<Vec<u8>, BigUint>,
+    pub contract_esdt: AccountEsdt,
     pub contract_owner: Option<Address>,
 }
 
@@ -484,7 +481,7 @@ impl BlockchainMock {
                 previous_block_info: self.previous_block_info.clone(),
                 current_block_info: self.current_block_info.clone(),
                 contract_balance: 0u32.into(),
-                contract_esdt: HashMap::new(),
+                contract_esdt: AccountEsdt::default(),
                 contract_owner: None,
             }
         }

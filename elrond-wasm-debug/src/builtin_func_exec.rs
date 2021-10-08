@@ -21,10 +21,11 @@ fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxRe
     let from = tx_input.from.clone();
     let to = tx_input.to.clone();
     let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
+    let nonce = tx_input.nonce;
     let esdt_value = tx_input.esdt_value.clone();
 
-    state.substract_esdt_balance(&from, &esdt_token_identifier, &esdt_value);
-    state.increase_esdt_balance(&to, &esdt_token_identifier, &esdt_value);
+    state.substract_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
+    state.increase_esdt_balance(&to, &esdt_token_identifier, nonce, &esdt_value);
     TxResult {
         result_status: 0,
         result_message: Vec::new(),

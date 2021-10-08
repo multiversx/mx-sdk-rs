@@ -18,8 +18,8 @@ pub struct AccountRaw {
     pub balance: Option<ValueSubTree>,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub esdt: Option<BTreeMap<String, ValueSubTree>>,
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub esdt: BTreeMap<String, EsdtRaw>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -22,8 +22,8 @@ pub struct CheckAccountRaw {
     pub balance: CheckBytesValueRaw,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "CheckEsdtRaw::is_unspecified")]
-    pub esdt: CheckEsdtRaw,
+    #[serde(skip_serializing_if = "CheckEsdtMapRaw::is_unspecified")]
+    pub esdt: CheckEsdtMapRaw,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
@@ -41,10 +41,7 @@ pub struct CheckAccountRaw {
     pub async_call_data: CheckBytesValueRaw,
 }
 
-pub enum CheckAccountRawOrNothing {
-    Some(CheckAccountRaw),
-    Nothing,
-}
+pub struct CheckAccountRawOrNothing(Option<Box<CheckAccountRaw>>);
 
 struct CheckAccountRawOrNothingVisitor;
 
@@ -60,16 +57,16 @@ impl<'de> Visitor<'de> for CheckAccountRawOrNothingVisitor {
     where
         E: de::Error,
     {
-        Ok(CheckAccountRawOrNothing::Nothing)
+        Ok(CheckAccountRawOrNothing(None))
     }
 
     fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {
-        Ok(CheckAccountRawOrNothing::Some(Deserialize::deserialize(
+        Ok(CheckAccountRawOrNothing(Some(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
-        )?))
+        )?)))
     }
 }
 
@@ -84,7 +81,7 @@ impl<'de> Deserialize<'de> for CheckAccountRawOrNothing {
 
 pub struct CheckAccountsRaw {
     pub other_accounts_allowed: bool,
-    pub accounts: BTreeMap<String, CheckAccountRaw>,
+    pub accounts: BTreeMap<String, Box<CheckAccountRaw>>,
 }
 
 impl Serialize for CheckAccountsRaw {
@@ -117,7 +114,7 @@ impl<'de> Visitor<'de> for CheckAccountRawsVisitor {
     where
         M: MapAccess<'de>,
     {
-        let mut accounts = BTreeMap::<String, CheckAccountRaw>::new();
+        let mut accounts = BTreeMap::<String, Box<CheckAccountRaw>>::new();
         let mut other_accounts_allowed = false;
 
         // While there are entries remaining in the input, add them
@@ -125,7 +122,7 @@ impl<'de> Visitor<'de> for CheckAccountRawsVisitor {
         while let Some((key, value)) = access.next_entry()? {
             if key == "+" {
                 other_accounts_allowed = true;
-            } else if let CheckAccountRawOrNothing::Some(check_account) = value {
+            } else if let CheckAccountRawOrNothing(Some(check_account)) = value {
                 accounts.insert(key, check_account);
             } else {
                 return Err(de::Error::custom("invalid CheckAccountRaw"));

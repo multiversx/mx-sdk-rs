@@ -9,8 +9,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -98,8 +102,12 @@
                     },
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "code": "file:../vault/output/vault.wasm"
