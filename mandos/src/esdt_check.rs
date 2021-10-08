@@ -87,6 +87,7 @@ impl InterpretableFrom<CheckEsdtInstancesRaw> for CheckEsdtInstances {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for CheckEsdtInstances {
     fn default() -> Self {
         CheckEsdtInstances::Equal(Vec::new())
