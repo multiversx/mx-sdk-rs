@@ -21,6 +21,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Token does not exist!",
                 "gas": "*",

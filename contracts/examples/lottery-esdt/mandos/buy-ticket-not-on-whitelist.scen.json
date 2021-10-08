@@ -12,7 +12,6 @@
                 "address:acc3": {
                     "nonce": "0",
                     "balance": "500,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "100"
                     }
@@ -26,10 +25,12 @@
                 "from": "address:acc3",
                 "to": "sc:lottery",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:LOTTERY-123456",
-                    "value": "100"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -38,6 +39,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:You are not allowed to participate in this lottery!",
                 "gas": "*",
@@ -65,10 +67,10 @@
                 "address:acc3": {
                     "nonce": "1",
                     "balance": "500,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "100"
-                    }
+                    },
+                    "storage": {}
                 },
                 "sc:lottery": {
                     "nonce": "0",

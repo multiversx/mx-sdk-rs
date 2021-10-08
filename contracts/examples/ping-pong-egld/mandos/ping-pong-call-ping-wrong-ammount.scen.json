@@ -18,6 +18,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:the payment must match the fixed sum",
                 "gas": "*",

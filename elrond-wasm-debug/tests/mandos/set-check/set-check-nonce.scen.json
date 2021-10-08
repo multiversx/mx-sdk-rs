@@ -5,7 +5,8 @@
             "step": "setState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "125"
+                    "nonce": "125",
+                    "balance": ""
                 }
             }
         },
@@ -13,7 +14,8 @@
             "step": "checkState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "125"
+                    "nonce": "125",
+                    "storage": {}
                 }
             }
         },
@@ -21,7 +23,8 @@
             "step": "checkState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "*"
+                    "nonce": "*",
+                    "storage": {}
                 }
             }
         }

@@ -29,8 +29,8 @@
                 "out": [
                     "1"
                 ],
-                "message": "",
                 "status": "0",
+                "message": "",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

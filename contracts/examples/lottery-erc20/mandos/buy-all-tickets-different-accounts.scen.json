@@ -22,10 +22,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {
@@ -44,10 +45,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {
@@ -66,10 +68,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {
@@ -88,10 +91,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {
@@ -110,10 +114,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {

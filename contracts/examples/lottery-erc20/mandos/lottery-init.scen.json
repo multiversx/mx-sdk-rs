@@ -7,23 +7,19 @@
             "accounts": {
                 "address:erc20_owner": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             },
             "newAddresses": [
@@ -44,8 +40,8 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:erc20_owner",
-                "contractCode": "file:../../erc20/output/erc20.wasm",
                 "value": "0",
+                "contractCode": "file:../../erc20/output/erc20.wasm",
                 "arguments": [
                     "1,000,000,000"
                 ],
@@ -53,6 +49,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -97,8 +94,8 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../output/lottery-erc20.wasm",
                 "value": "0",
+                "contractCode": "file:../output/lottery-erc20.wasm",
                 "arguments": [
                     "sc:erc20"
                 ],
@@ -106,6 +103,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

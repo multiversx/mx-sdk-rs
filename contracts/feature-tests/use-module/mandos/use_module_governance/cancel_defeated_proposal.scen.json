@@ -12,10 +12,12 @@
                 "from": "address:user1",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "500"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
                 "function": "propose",
                 "arguments": [
                     "str:change-quorum",
@@ -52,10 +54,12 @@
                 "from": "address:user2",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "999"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "999"
+                    }
+                ],
                 "function": "downvote",
                 "arguments": [
                     "1"
@@ -166,11 +170,11 @@
                         "str:governance:totalDownvotes|u32:1": "",
                         "str:governance:proposals.item|u32:1": "",
                         "str:governance:quorum": "1500",
-                        "+": {}
+                        "+": ""
                     },
                     "code": "*"
                 },
-                "+": {}
+                "+": ""
             }
         }
     ]

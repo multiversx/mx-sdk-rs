@@ -7,9 +7,7 @@
             "accounts": {
                 "address:account_1": {
                     "nonce": "0",
-                    "balance": "0x10000000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x10000000"
                 },
                 "sc:erc20": {
                     "nonce": "0",

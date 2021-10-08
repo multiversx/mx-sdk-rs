@@ -8,7 +8,6 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
                         "str:BASIC-FEATURES-TOKEN": "1,000"
                     },
@@ -16,9 +15,7 @@
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -120,19 +117,19 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
                         "str:BASIC-FEATURES-TOKEN": "800"
                     },
+                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
                         "str:BASIC-FEATURES-TOKEN": "200"
                     },
+                    "storage": {},
                     "code": ""
                 }
             }

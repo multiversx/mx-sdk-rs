@@ -10,9 +10,7 @@
                     "balance": "0x10000000",
                     "esdt": {
                         "str:ANY_TOKEN": "1000"
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:erc20": {
                     "nonce": "0",
@@ -31,10 +29,13 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "esdt": {
-                    "tokenIdentifier": "str:ANY_TOKEN",
-                    "value": "1"
-                },
+                "value": "",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "value": "1"
+                    }
+                ],
                 "function": "totalSupply",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -55,10 +56,13 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "esdt": {
-                    "tokenIdentifier": "str:ANY_TOKEN",
-                    "value": "1"
-                },
+                "value": "",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "value": "1"
+                    }
+                ],
                 "function": "balanceOf",
                 "arguments": [
                     "address:account_1"
@@ -81,10 +85,13 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "esdt": {
-                    "tokenIdentifier": "str:ANY_TOKEN",
-                    "value": "1"
-                },
+                "value": "",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "value": "1"
+                    }
+                ],
                 "function": "allowance",
                 "arguments": [
                     "address:account_1",
@@ -108,10 +115,13 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "esdt": {
-                    "tokenIdentifier": "str:ANY_TOKEN",
-                    "value": "1"
-                },
+                "value": "",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "value": "1"
+                    }
+                ],
                 "function": "transfer",
                 "arguments": [
                     "address:account_1",
@@ -135,10 +145,13 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "esdt": {
-                    "tokenIdentifier": "str:ANY_TOKEN",
-                    "value": "1"
-                },
+                "value": "",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "value": "1"
+                    }
+                ],
                 "function": "approve",
                 "arguments": [
                     "address:account_1",
@@ -162,10 +175,13 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "esdt": {
-                    "tokenIdentifier": "str:ANY_TOKEN",
-                    "value": "1"
-                },
+                "value": "",
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "value": "1"
+                    }
+                ],
                 "function": "transferFrom",
                 "arguments": [
                     "address:account_1",

@@ -21,8 +21,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:auction has not ended yet!",
+                "out": [],
                 "status": "4",
+                "message": "str:auction has not ended yet!",
                 "gas": "*",
                 "refund": "*"
             }

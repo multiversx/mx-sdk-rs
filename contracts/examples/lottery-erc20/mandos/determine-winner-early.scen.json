@@ -27,10 +27,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
                 "out": [
                     "1"
                 ],
+                "status": "0",
                 "gas": "*",
                 "refund": "*"
             }
@@ -50,6 +50,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Lottery is still running!",
                 "gas": "*",

@@ -12,7 +12,6 @@
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "500"
                     }
@@ -26,10 +25,12 @@
                 "from": "address:acc1",
                 "to": "sc:lottery",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:LOTTERY-123456",
-                    "value": "200"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "200"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -38,6 +39,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Wrong ticket fee!",
                 "gas": "*",
@@ -55,10 +57,10 @@
                 "address:acc1": {
                     "nonce": "1",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "500"
-                    }
+                    },
+                    "storage": {}
                 },
                 "address:acc2": {
                     "nonce": "0",

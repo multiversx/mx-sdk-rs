@@ -6,8 +6,7 @@
             "accounts": {
                 "address:contract_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -23,8 +22,8 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:contract_owner",
-                "contractCode": "file:../output/erc721.wasm",
                 "value": "0",
+                "contractCode": "file:../output/erc721.wasm",
                 "arguments": [
                     "3"
                 ],
@@ -32,6 +31,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

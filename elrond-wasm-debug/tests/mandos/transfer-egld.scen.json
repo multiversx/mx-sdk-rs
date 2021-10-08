@@ -7,15 +7,11 @@
             "accounts": {
                 "address:A": {
                     "nonce": "0",
-                    "balance": "150",
-                    "storage": {},
-                    "code": ""
+                    "balance": "150"
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },

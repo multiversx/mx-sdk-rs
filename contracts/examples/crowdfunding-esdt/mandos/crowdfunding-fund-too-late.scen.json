@@ -18,16 +18,19 @@
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:CROWD-123456",
-                    "value": "10,000,000,000"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "10,000,000,000"
+                    }
+                ],
                 "function": "fund",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:cannot fund after deadline",
                 "gas": "*",
@@ -45,22 +48,22 @@
                 "address:donor1": {
                     "nonce": "*",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
                         "str:CROWD-123456": "150,000,000,000"
-                    }
+                    },
+                    "storage": {}
                 },
                 "sc:crowdfunding": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:CROWD-123456": "250,000,000,000"
+                    },
                     "storage": {
                         "str:target": "500,000,000,000",
                         "str:deadline": "123,000",
                         "str:tokenIdentifier": "str:CROWD-123456",
                         "str:deposit|address:donor1": "250,000,000,000"
-                    },
-                    "esdt": {
-                        "str:CROWD-123456": "250,000,000,000"
                     },
                     "code": "file:../output/crowdfunding-esdt.wasm"
                 }

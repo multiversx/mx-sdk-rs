@@ -18,11 +18,11 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
                 "out": [
                     "address:participant1",
                     "address:participant2"
                 ],
+                "status": "0",
                 "message": "",
                 "gas": "*",
                 "refund": "*"

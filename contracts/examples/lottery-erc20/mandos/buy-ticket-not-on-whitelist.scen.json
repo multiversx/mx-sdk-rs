@@ -15,8 +15,7 @@
             "accounts": {
                 "address:acc3": {
                     "nonce": "0",
-                    "balance": "500,000,000",
-                    "storage": {}
+                    "balance": "500,000,000"
                 }
             }
         },
@@ -36,6 +35,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:You are not allowed to participate in this lottery!",
                 "gas": "*",

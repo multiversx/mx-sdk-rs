@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -289,6 +286,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "message": "",
                 "logs": [],
@@ -330,6 +328,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "message": "",
                 "logs": [],
@@ -361,7 +360,8 @@
             "txId": "query-raw-byte-length",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "raw_byte_length_single_value_mapper"
+                "function": "raw_byte_length_single_value_mapper",
+                "arguments": []
             },
             "expect": {
                 "out": [

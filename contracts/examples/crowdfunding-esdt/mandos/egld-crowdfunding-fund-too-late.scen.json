@@ -24,6 +24,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:cannot fund after deadline",
                 "gas": "*",

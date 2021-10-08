@@ -8,9 +8,7 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "1",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [

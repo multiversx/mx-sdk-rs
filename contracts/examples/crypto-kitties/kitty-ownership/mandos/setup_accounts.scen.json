@@ -8,29 +8,22 @@
         },
         {
             "step": "setState",
-            "currentBlockInfo": {
-                "blockTimestamp": "100,000"
-            },
             "accounts": {
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc3": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:my_address": {
                     "nonce": "2",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "sc:kitty_ownership_contract": {
                     "nonce": "0",
@@ -50,6 +43,9 @@
                     },
                     "code": "file:../output/kitty-ownership.wasm"
                 }
+            },
+            "currentBlockInfo": {
+                "blockTimestamp": "100,000"
             }
         }
     ]

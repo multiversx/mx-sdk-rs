@@ -6,8 +6,7 @@
             "accounts": {
                 "address:user": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {}
+                    "balance": "1000"
                 },
                 "sc:egld-esdt-swap": {
                     "nonce": "0",
@@ -36,6 +35,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "message": "",
                 "logs": [

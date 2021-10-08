@@ -12,10 +12,12 @@
                 "from": "address:user1",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "500"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
                 "function": "propose",
                 "arguments": [
                     "str:change-quorum",
@@ -77,11 +79,11 @@
                             },
                             "4-description": "nested:str:change-quorum"
                         },
-                        "+": {}
+                        "+": ""
                     },
                     "code": "*"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -97,10 +99,12 @@
                 "from": "address:user2",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "999"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "999"
+                    }
+                ],
                 "function": "vote",
                 "arguments": [
                     "1"
@@ -128,10 +132,12 @@
                 "from": "address:user2",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "999"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "999"
+                    }
+                ],
                 "function": "vote",
                 "arguments": [
                     "1"
@@ -185,11 +191,11 @@
                             },
                             "4-description": "nested:str:change-quorum"
                         },
-                        "+": {}
+                        "+": ""
                     },
                     "code": "*"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -274,10 +280,12 @@
                 "from": "address:user1",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "200"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "200"
+                    }
+                ],
                 "function": "vote",
                 "arguments": [
                     "1"
@@ -299,10 +307,12 @@
                 "from": "address:owner",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "200"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "200"
+                    }
+                ],
                 "function": "downvote",
                 "arguments": [
                     "1"
@@ -357,10 +367,12 @@
                 "from": "address:user1",
                 "to": "sc:governance",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "200"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "200"
+                    }
+                ],
                 "function": "vote",
                 "arguments": [
                     "1"
@@ -447,8 +459,8 @@
                 "out": [],
                 "status": "0",
                 "message": "",
-                "refund": "*",
-                "gas": "*"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -493,11 +505,11 @@
                         "str:governance:totalDownvotes|u32:1": "",
                         "str:governance:proposals.item|u32:1": "",
                         "str:governance:quorum": "1000",
-                        "+": {}
+                        "+": ""
                     },
                     "code": "*"
                 },
-                "+": {}
+                "+": ""
             }
         }
     ]

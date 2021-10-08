@@ -16,9 +16,7 @@
                                 }
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -37,7 +35,6 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -49,6 +46,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
+                "value": "",
                 "function": "nft_decode_complex_attributes",
                 "arguments": [
                     "str:NFT-0001",
@@ -110,10 +108,7 @@
                                     "creator": "sc:forwarder",
                                     "royalties": "0",
                                     "hash": "str:nft-create-hash-----------------",
-                                    "attributes": "*",
-                                    "uri": [
-                                        "str:nft-create-uri"
-                                    ]
+                                    "uri": "sc:forwarder"
                                 }
                             ],
                             "lastNonce": "2",
