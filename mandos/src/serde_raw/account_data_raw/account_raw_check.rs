@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{CheckBytesValueRaw, CheckEsdtMapRaw, CheckStorageRaw};
+use crate::serde_raw::{CheckBytesValueRaw, CheckEsdtMapRaw, CheckStorageRaw};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

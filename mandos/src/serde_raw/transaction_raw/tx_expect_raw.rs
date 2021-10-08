@@ -1,4 +1,4 @@
-use crate::{CheckBytesValueRaw, CheckLogsRaw};
+use crate::serde_raw::{CheckBytesValueRaw, CheckLogsRaw};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

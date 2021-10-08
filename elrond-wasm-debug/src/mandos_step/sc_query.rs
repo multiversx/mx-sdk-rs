@@ -1,4 +1,4 @@
-use mandos::{TxExpect, TxQuery};
+use mandos::model::{TxExpect, TxQuery};
 use num_bigint::BigUint;
 
 use crate::{execute_helper_functions::*, BlockchainMock, ContractMap, TxContext, TxInput};

@@ -1,4 +1,7 @@
-use crate::{interpret_string, InterpretableFrom, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    value_interpreter::interpret_string,
+};
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;

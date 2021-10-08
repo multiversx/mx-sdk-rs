@@ -1,6 +1,10 @@
-use crate::{AddressValue, BigUintValue, InterpretableFrom, InterpreterContext, TxTransferRaw};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{AddressValue, BigUintValue},
+    serde_raw::TxTransferRaw,
+};
 
-use super::*;
+use super::TxESDT;
 
 #[derive(Debug)]
 pub struct TxTransfer {

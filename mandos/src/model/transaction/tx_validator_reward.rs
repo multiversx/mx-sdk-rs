@@ -1,5 +1,7 @@
 use crate::{
-    AddressValue, BigUintValue, InterpretableFrom, InterpreterContext, TxValidatorRewardRaw,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{AddressValue, BigUintValue},
+    serde_raw::TxValidatorRewardRaw,
 };
 
 #[derive(Debug)]

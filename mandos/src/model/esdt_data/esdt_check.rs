@@ -1,8 +1,10 @@
 use crate::{
-    model::value_key_bytes::BytesKey, CheckEsdtRaw, InterpretableFrom, InterpreterContext,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::value_key_bytes::BytesKey,
+    serde_raw::CheckEsdtRaw,
 };
 
-use super::*;
+use super::CheckEsdtData;
 
 #[derive(Debug)]
 pub enum CheckEsdt {

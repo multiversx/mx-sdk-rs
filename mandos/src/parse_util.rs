@@ -1,6 +1,8 @@
-use crate::{InterpreterContext, ScenarioRaw};
-
-use super::*;
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::Scenario,
+    serde_raw::ScenarioRaw,
+};
 
 use std::{fs, path::Path};
 

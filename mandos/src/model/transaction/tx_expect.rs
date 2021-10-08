@@ -1,6 +1,7 @@
 use crate::{
-    BytesValue, CheckBytesValueRaw, CheckLogs, CheckValue, InterpretableFrom, InterpreterContext,
-    TxExpectRaw, U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{BytesValue, CheckLogs, CheckValue, U64Value},
+    serde_raw::{CheckBytesValueRaw, TxExpectRaw},
 };
 
 #[derive(Debug)]

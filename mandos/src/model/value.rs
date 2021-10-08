@@ -1,12 +1,12 @@
-use crate::{interpret_subtree, InterpreterContext, ValueSubTree};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::ValueSubTree,
+    value_interpreter::interpret_subtree,
+};
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use std::fmt;
-
-pub trait InterpretableFrom<T> {
-    fn interpret_from(from: T, context: &InterpreterContext) -> Self;
-}
 
 #[derive(Clone, Debug)]
 pub struct BytesValue {

@@ -1,9 +1,10 @@
 use crate::{
-    model::value_key_bytes::BytesKey, BytesValue, EsdtRaw, InterpretableFrom, InterpreterContext,
-    U64Value,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{value_key_bytes::BytesKey, BytesValue, U64Value},
+    serde_raw::EsdtRaw,
 };
 
-use super::*;
+use super::{EsdtObject, Instance};
 
 #[derive(Debug)]
 pub enum Esdt {

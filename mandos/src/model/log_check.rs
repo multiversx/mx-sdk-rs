@@ -1,6 +1,9 @@
-use crate::{CheckLogRaw, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::CheckLogRaw,
+};
 
-use super::*;
+use super::BytesValue;
 
 #[derive(Debug)]
 pub struct CheckLog {

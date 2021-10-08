@@ -1,6 +1,10 @@
-use crate::{CheckStorageRaw, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::CheckStorageRaw,
+};
 
-use super::*;
+use super::CheckStorageDetails;
+
 #[derive(Debug)]
 pub enum CheckStorage {
     Star,

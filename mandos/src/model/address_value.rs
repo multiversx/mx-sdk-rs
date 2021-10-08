@@ -1,8 +1,10 @@
 use std::fmt;
 
-use crate::{interpret_subtree, InterpreterContext, ValueSubTree};
-
-use super::*;
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::ValueSubTree,
+    value_interpreter::interpret_subtree,
+};
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct AddressValue {

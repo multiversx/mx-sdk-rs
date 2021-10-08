@@ -1,6 +1,7 @@
 use crate::{
-    BigUintValue, BytesValue, InterpretableFrom, InterpreterContext, TxESDTRaw, U64Value,
-    ValueSubTree,
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    model::{BigUintValue, BytesValue, U64Value},
+    serde_raw::{TxESDTRaw, ValueSubTree},
 };
 
 #[derive(Debug)]

@@ -1,6 +1,6 @@
-use crate::{BytesValue, U64Value};
+use crate::model::{BytesValue, U64Value};
 
-use super::*;
+use super::Instance;
 
 #[derive(Debug, Default)]
 pub struct EsdtObject {

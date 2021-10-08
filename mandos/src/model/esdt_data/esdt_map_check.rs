@@ -1,6 +1,10 @@
-use crate::{CheckEsdtMapRaw, InterpretableFrom, InterpreterContext};
+use crate::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::CheckEsdtMapRaw,
+};
 
-use super::*;
+use super::CheckEsdtMapContents;
+
 #[derive(Debug)]
 pub enum CheckEsdtMap {
     Unspecified,
