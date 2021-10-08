@@ -168,8 +168,7 @@ pub fn check_esdt_data(
     expected: &CheckEsdtData,
     actual: &EsdtData,
 ) {
-    let mut errors: Vec<String> = Vec::new();
-    errors.push("".to_string());
+    let mut errors: Vec<String> = vec!["".to_string()];
     check_token_instances(
         address,
         token.clone(),

@@ -42,7 +42,7 @@ pub struct CheckAccountRaw {
 }
 
 pub enum CheckAccountRawOrNothing {
-    Some(CheckAccountRaw),
+    Some(Box<CheckAccountRaw>),
     Nothing,
 }
 
@@ -84,7 +84,7 @@ impl<'de> Deserialize<'de> for CheckAccountRawOrNothing {
 
 pub struct CheckAccountsRaw {
     pub other_accounts_allowed: bool,
-    pub accounts: BTreeMap<String, CheckAccountRaw>,
+    pub accounts: BTreeMap<String, Box<CheckAccountRaw>>,
 }
 
 impl Serialize for CheckAccountsRaw {
@@ -117,7 +117,7 @@ impl<'de> Visitor<'de> for CheckAccountRawsVisitor {
     where
         M: MapAccess<'de>,
     {
-        let mut accounts = BTreeMap::<String, CheckAccountRaw>::new();
+        let mut accounts = BTreeMap::<String, Box<CheckAccountRaw>>::new();
         let mut other_accounts_allowed = false;
 
         // While there are entries remaining in the input, add them
