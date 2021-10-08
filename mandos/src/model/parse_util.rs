@@ -1,4 +1,4 @@
-use crate::ScenarioRaw;
+use crate::{InterpreterContext, ScenarioRaw};
 
 use super::*;
 

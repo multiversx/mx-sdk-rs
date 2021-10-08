@@ -1,5 +1,6 @@
 use crate::{
-    value_key_bytes::BytesKey, BytesValue, EsdtRaw, InterpretableFrom, InterpreterContext, U64Value,
+    model::value_key_bytes::BytesKey, BytesValue, EsdtRaw, InterpretableFrom, InterpreterContext,
+    U64Value,
 };
 
 use super::*;

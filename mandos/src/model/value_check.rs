@@ -1,6 +1,6 @@
-use crate::{CheckBytesValueRaw, ValueSubTree};
+use crate::{CheckBytesValueRaw, InterpreterContext, ValueSubTree};
 
-use super::{context::*, value::*};
+use super::value::*;
 use num_bigint::BigUint;
 use std::fmt;
 
