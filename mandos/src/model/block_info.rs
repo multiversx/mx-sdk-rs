@@ -1,3 +1,5 @@
+use crate::{BlockInfoRaw, InterpreterContext};
+
 use super::*;
 
 #[derive(Debug)]

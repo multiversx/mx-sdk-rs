@@ -1,3 +1,5 @@
+use crate::{InterpreterContext, ScenarioRaw};
+
 use super::*;
 
 #[derive(Debug)]

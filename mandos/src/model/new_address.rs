@@ -1,3 +1,5 @@
+use crate::{InterpreterContext, NewAddressRaw};
+
 use super::*;
 
 #[derive(Debug)]

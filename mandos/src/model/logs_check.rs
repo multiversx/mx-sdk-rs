@@ -1,3 +1,5 @@
+use crate::{CheckLogsRaw, InterpreterContext};
+
 use super::*;
 #[derive(Debug)]
 pub enum CheckLogs {

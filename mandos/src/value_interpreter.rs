@@ -1,6 +1,6 @@
-use crate::ValueSubTree;
+use crate::{InterpreterContext, ValueSubTree};
 
-use super::{context::*, functions::*};
+use super::functions::*;
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::identities::Zero;
 

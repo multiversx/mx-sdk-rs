@@ -1,5 +1,5 @@
 use crate::{
-    value_key_bytes::BytesKey, AccountRaw, AddressValue, BigUintValue, BytesValue, Esdt,
+    model::value_key_bytes::BytesKey, AccountRaw, AddressValue, BigUintValue, BytesValue, Esdt,
     InterpretableFrom, InterpreterContext, U64Value,
 };
 
