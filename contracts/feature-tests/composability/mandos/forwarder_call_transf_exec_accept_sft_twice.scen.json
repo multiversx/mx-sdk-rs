@@ -9,8 +9,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "2"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "2"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -115,8 +119,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "2"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "2"
+                                }
+                            ]
                         }
                     },
                     "storage": {

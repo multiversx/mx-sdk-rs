@@ -17,6 +17,7 @@ mod tx_input;
 mod tx_log;
 mod tx_managed_types;
 mod tx_output;
+pub mod world_mock;
 
 pub use async_data::*;
 pub use blockchain_mock::*;

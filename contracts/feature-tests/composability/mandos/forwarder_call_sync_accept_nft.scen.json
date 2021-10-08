@@ -9,8 +9,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1",
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ],
                             "lastNonce": "1",
                             "roles": [
                                 "ESDTRoleNFTCreate"
@@ -126,8 +130,12 @@
                     },
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "code": "file:../vault/output/vault.wasm"

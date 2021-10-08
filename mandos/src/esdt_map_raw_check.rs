@@ -5,80 +5,83 @@ use serde::{
     Deserialize, Serialize,
 };
 use std::{collections::BTreeMap, fmt};
-pub enum CheckStorageRaw {
+pub enum CheckEsdtMapRaw {
+    Unspecified,
     Star,
-    Equal(CheckStorageDetailsRaw),
+    Equal(CheckEsdtMapContentsRaw),
 }
 
-pub struct CheckStorageDetailsRaw {
-    pub storages: BTreeMap<String, CheckBytesValueRaw>,
-    pub other_storages_allowed: bool,
+pub struct CheckEsdtMapContentsRaw {
+    pub contents: BTreeMap<String, CheckEsdtRaw>,
+    pub other_esdts_allowed: bool,
 }
 
-impl CheckStorageRaw {
+impl CheckEsdtMapRaw {
+    pub fn is_unspecified(&self) -> bool {
+        matches!(self, CheckEsdtMapRaw::Unspecified)
+    }
+
     pub fn is_star(&self) -> bool {
-        matches!(self, CheckStorageRaw::Star)
+        matches!(self, CheckEsdtMapRaw::Star)
     }
 }
 
-impl Default for CheckStorageRaw {
+impl Default for CheckEsdtMapRaw {
     fn default() -> Self {
-        CheckStorageRaw::Equal(CheckStorageDetailsRaw {
-            storages: BTreeMap::new(),
-            other_storages_allowed: false,
-        })
+        CheckEsdtMapRaw::Unspecified
     }
 }
 
-impl Serialize for CheckStorageRaw {
+impl Serialize for CheckEsdtMapRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         match self {
-            CheckStorageRaw::Star => serializer.serialize_str("*"),
-            CheckStorageRaw::Equal(m) => m.serialize(serializer),
+            CheckEsdtMapRaw::Unspecified => serializer.serialize_str(""),
+            CheckEsdtMapRaw::Star => serializer.serialize_str("*"),
+            CheckEsdtMapRaw::Equal(m) => m.serialize(serializer),
         }
     }
 }
 
-impl<'de> Deserialize<'de> for CheckStorageRaw {
+impl<'de> Deserialize<'de> for CheckEsdtMapRaw {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        deserializer.deserialize_any(CheckStorageRawVisitor)
+        deserializer.deserialize_any(CheckEsdtMapRawVisitor)
     }
 }
 
-impl Serialize for CheckStorageDetailsRaw {
+impl Serialize for CheckEsdtMapContentsRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let mut map = serializer.serialize_map(Some(self.storages.len()))?;
-        for (k, v) in self.storages.iter() {
+        let mut map = serializer.serialize_map(Some(self.contents.len()))?;
+        for (k, v) in self.contents.iter() {
             map.serialize_entry(k, v)?;
         }
-        if self.other_storages_allowed {
+        if self.other_esdts_allowed {
             map.serialize_entry("+", "")?;
         }
         map.end()
     }
 }
-impl<'de> Deserialize<'de> for CheckStorageDetailsRaw {
+impl<'de> Deserialize<'de> for CheckEsdtMapContentsRaw {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        deserializer.deserialize_any(CheckStorageDetailsRawVisitor)
+        deserializer.deserialize_any(CheckEsdtMapContentsRawVisitor)
     }
 }
 
-struct CheckStorageDetailsRawVisitor;
+struct CheckEsdtMapContentsRawVisitor;
 
-impl<'de> Visitor<'de> for CheckStorageDetailsRawVisitor {
-    type Value = CheckStorageDetailsRaw;
+impl<'de> Visitor<'de> for CheckEsdtMapContentsRawVisitor {
+    type Value = CheckEsdtMapContentsRaw;
 
     // Format a message stating what data this Visitor expects to receive.
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -89,31 +92,31 @@ impl<'de> Visitor<'de> for CheckStorageDetailsRawVisitor {
     where
         M: MapAccess<'de>,
     {
-        let mut storages = BTreeMap::<String, CheckBytesValueRaw>::new();
+        let mut contents = BTreeMap::<String, CheckEsdtRaw>::new();
 
         // While there are entries remaining in the input, add them
         // into our map.
-        let mut other_storages_allowed = false;
+        let mut other_esdts_allowed = false;
 
         while let Some((key, value)) = access.next_entry()? {
             if key == "+" {
-                other_storages_allowed = true;
+                other_esdts_allowed = true;
             } else {
-                storages.insert(key, value);
+                contents.insert(key, value);
             }
         }
 
-        Ok(CheckStorageDetailsRaw {
-            other_storages_allowed,
-            storages,
+        Ok(CheckEsdtMapContentsRaw {
+            other_esdts_allowed,
+            contents,
         })
     }
 }
 
-struct CheckStorageRawVisitor;
+struct CheckEsdtMapRawVisitor;
 
-impl<'de> Visitor<'de> for CheckStorageRawVisitor {
-    type Value = CheckStorageRaw;
+impl<'de> Visitor<'de> for CheckEsdtMapRawVisitor {
+    type Value = CheckEsdtMapRaw;
 
     // Format a message stating what data this Visitor expects to receive.
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -125,7 +128,7 @@ impl<'de> Visitor<'de> for CheckStorageRawVisitor {
         E: de::Error,
     {
         if value == "*" {
-            Ok(CheckStorageRaw::Star)
+            Ok(CheckEsdtMapRaw::Star)
         } else {
             Err(de::Error::custom("only '*' allowed as logs string value"))
         }
@@ -135,7 +138,7 @@ impl<'de> Visitor<'de> for CheckStorageRawVisitor {
     where
         M: MapAccess<'de>,
     {
-        Ok(CheckStorageRaw::Equal(Deserialize::deserialize(
+        Ok(CheckEsdtMapRaw::Equal(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
         )?))
     }

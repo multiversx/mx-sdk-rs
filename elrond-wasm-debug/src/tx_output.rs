@@ -50,6 +50,7 @@ impl TxResult {
 pub struct SendBalance {
     pub recipient: Address,
     pub token_identifier: BoxedBytes,
+    pub nonce: u64,
     pub amount: BigUint,
 }
 

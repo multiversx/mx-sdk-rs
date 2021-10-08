@@ -15,7 +15,6 @@
                     "balance": "0",
                     "esdt": {
                         "str:TEST-SFT": {
-                            "balance": "0",
                             "roles": [
                                 "ESDTRoleNFTCreate",
                                 "ESDTRoleNFTAddQuantity",
@@ -94,7 +93,6 @@
                     "balance": "0",
                     "esdt": {
                         "str:TEST-SFT": {
-                            "balance": "0",
                             "roles": [
                                 "ESDTRoleNFTCreate",
                                 "ESDTRoleNFTAddQuantity",

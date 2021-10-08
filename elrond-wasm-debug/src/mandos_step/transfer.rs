@@ -1,4 +1,5 @@
 use mandos::TxTransfer;
+use num_traits::Zero;
 
 use crate::BlockchainMock;
 
@@ -10,11 +11,24 @@ pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
         .unwrap();
     let recipient_address = &tx.to.value.into();
     state.increase_balance(recipient_address, &tx.value.value);
-    let esdt_token_identifier = tx.esdt_token_identifier.value.clone();
-    let esdt_value = tx.esdt_value.value.clone();
 
-    if !esdt_token_identifier.is_empty() && esdt_value > 0u32.into() {
-        state.substract_esdt_balance(sender_address, &esdt_token_identifier[..], &esdt_value);
-        state.increase_esdt_balance(recipient_address, &esdt_token_identifier[..], &esdt_value);
+    if let Some(esdt_transfer) = &tx.esdt_value {
+        let esdt_value = esdt_transfer.esdt_value.value.clone();
+        if !esdt_value.is_zero() {
+            let esdt_token_identifier = esdt_transfer.esdt_token_identifier.value.clone();
+            let nonce = esdt_transfer.nonce.value;
+            state.substract_esdt_balance(
+                sender_address,
+                &esdt_token_identifier[..],
+                nonce,
+                &esdt_value,
+            );
+            state.increase_esdt_balance(
+                recipient_address,
+                &esdt_token_identifier[..],
+                nonce,
+                &esdt_value,
+            );
+        }
     }
 }
