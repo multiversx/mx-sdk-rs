@@ -17,8 +17,8 @@ pub struct CheckAccount {
     pub async_call_data: CheckValue<BytesValue>,
 }
 
-impl InterpretableFrom<CheckAccountRaw> for CheckAccount {
-    fn interpret_from(from: CheckAccountRaw, context: &InterpreterContext) -> Self {
+impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {
+    fn interpret_from(from: Box<CheckAccountRaw>, context: &InterpreterContext) -> Self {
         CheckAccount {
             comment: from.comment,
             nonce: CheckValue::<U64Value>::interpret_from(from.nonce, context),
