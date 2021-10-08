@@ -41,10 +41,7 @@ pub struct CheckAccountRaw {
     pub async_call_data: CheckBytesValueRaw,
 }
 
-pub enum CheckAccountRawOrNothing {
-    Some(Box<CheckAccountRaw>),
-    Nothing,
-}
+pub struct CheckAccountRawOrNothing(Option<Box<CheckAccountRaw>>);
 
 struct CheckAccountRawOrNothingVisitor;
 
@@ -60,16 +57,16 @@ impl<'de> Visitor<'de> for CheckAccountRawOrNothingVisitor {
     where
         E: de::Error,
     {
-        Ok(CheckAccountRawOrNothing::Nothing)
+        Ok(CheckAccountRawOrNothing(None))
     }
 
     fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {
-        Ok(CheckAccountRawOrNothing::Some(Deserialize::deserialize(
+        Ok(CheckAccountRawOrNothing(Some(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
-        )?))
+        )?)))
     }
 }
 
@@ -125,7 +122,7 @@ impl<'de> Visitor<'de> for CheckAccountRawsVisitor {
         while let Some((key, value)) = access.next_entry()? {
             if key == "+" {
                 other_accounts_allowed = true;
-            } else if let CheckAccountRawOrNothing::Some(check_account) = value {
+            } else if let CheckAccountRawOrNothing(Some(check_account)) = value {
                 accounts.insert(key, check_account);
             } else {
                 return Err(de::Error::custom("invalid CheckAccountRaw"));
