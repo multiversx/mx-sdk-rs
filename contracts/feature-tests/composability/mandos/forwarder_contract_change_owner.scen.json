@@ -4,20 +4,29 @@
         {
             "step": "setState",
             "accounts": {
-                "address:a_user": {},
-                "address:new_owner": {},
+                "address:a_user": {
+                    "nonce": "",
+                    "balance": ""
+                },
+                "address:new_owner": {
+                    "nonce": "",
+                    "balance": ""
+                },
                 "sc:forwarder": {
+                    "nonce": "",
+                    "balance": "",
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "sc:child": {
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "nonce": "",
+                    "balance": "",
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 }
             }
         },
         {
-            "step": "setState",
-            "accounts": {}
+            "step": "setState"
         },
         {
             "step": "scCall",
@@ -45,10 +54,11 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "owner": "address:new_owner",
-                    "code": "file:../vault/output/vault.wasm"
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "address:new_owner"
                 },
-                "+": {}
+                "+": ""
             }
         }
     ]

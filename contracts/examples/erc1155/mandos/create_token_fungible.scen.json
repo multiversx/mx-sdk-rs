@@ -11,8 +11,7 @@
             "accounts": {
                 "address:creator": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             }
         },

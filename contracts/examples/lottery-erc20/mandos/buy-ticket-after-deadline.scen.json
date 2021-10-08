@@ -28,6 +28,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Lottery entry period has ended! Awaiting winner announcement.",
                 "gas": "*",

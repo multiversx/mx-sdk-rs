@@ -6,9 +6,14 @@
             "step": "setState",
             "accounts": {
                 "sc:basic-features": {
+                    "nonce": "",
+                    "balance": "",
                     "code": "file:../output/basic-features.wasm"
                 },
-                "address:an_account": {}
+                "address:an_account": {
+                    "nonce": "",
+                    "balance": ""
+                }
             }
         },
         {
@@ -24,6 +29,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:endpoint result encode error: deliberate top encode error"
             }
@@ -33,9 +39,11 @@
             "txId": "codec_err_storage_key",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "codec_err_storage_key"
+                "function": "codec_err_storage_key",
+                "arguments": []
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:storage key encode error: deliberate nested encode error"
             }
@@ -45,9 +53,11 @@
             "txId": "codec_err_storage_get",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "codec_err_storage_get"
+                "function": "codec_err_storage_get",
+                "arguments": []
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:storage decode error: deliberate top decode error"
             }
@@ -65,6 +75,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:storage encode error: deliberate top encode error"
             }
@@ -82,6 +93,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:log topic encode error: deliberate top encode error"
             }
@@ -99,6 +111,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:log data encode error: deliberate top encode error"
             }
@@ -116,6 +129,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:contract call encode error: deliberate top encode error"
             }
@@ -133,6 +147,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:contract call encode error: deliberate top encode error"
             }

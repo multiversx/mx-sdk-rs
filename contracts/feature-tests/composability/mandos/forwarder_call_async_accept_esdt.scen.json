@@ -9,20 +9,16 @@
                     "balance": "0",
                     "esdt": {
                         "str:TEST-TOKEN": "1000"
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -34,10 +30,12 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:TEST-TOKEN",
-                    "value": "1000"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:TEST-TOKEN",
+                        "value": "1000"
+                    }
+                ],
                 "function": "forward_async_accept_funds",
                 "arguments": [
                     "sc:vault"
@@ -92,11 +90,11 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
-                    },
                     "esdt": {
                         "str:TEST-TOKEN": "1000"
+                    },
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },

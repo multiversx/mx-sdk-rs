@@ -6,15 +6,11 @@
             "accounts": {
                 "address:A": {
                     "nonce": "0",
-                    "balance": "150",
-                    "storage": {},
-                    "code": ""
+                    "balance": "150"
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,6 +20,7 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
+                "value": "",
                 "function": "ESDTTransfer",
                 "arguments": [
                     "100"
@@ -32,6 +29,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

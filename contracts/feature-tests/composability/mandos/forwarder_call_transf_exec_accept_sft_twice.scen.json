@@ -16,20 +16,16 @@
                                 }
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -41,11 +37,13 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:NFT-0001",
-                    "value": "2",
-                    "nonce": "5"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:NFT-0001",
+                        "nonce": "5",
+                        "value": "2"
+                    }
+                ],
                 "function": "forward_transf_exec_accept_funds_twice",
                 "arguments": [
                     "sc:vault"
@@ -112,7 +110,8 @@
             "step": "checkState",
             "accounts": {
                 "address:a_user": {
-                    "nonce": "*"
+                    "nonce": "*",
+                    "storage": {}
                 },
                 "sc:vault": {
                     "nonce": "0",

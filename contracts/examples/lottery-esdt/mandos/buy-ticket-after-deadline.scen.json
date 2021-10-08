@@ -8,18 +8,17 @@
         },
         {
             "step": "setState",
-            "currentBlockInfo": {
-                "blockTimestamp": "123,567"
-            },
             "accounts": {
                 "address:acc2": {
                     "nonce": "0",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "100"
                     }
                 }
+            },
+            "currentBlockInfo": {
+                "blockTimestamp": "123,567"
             }
         },
         {
@@ -29,10 +28,12 @@
                 "from": "address:acc2",
                 "to": "sc:lottery",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:LOTTERY-123456",
-                    "value": "100"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -41,6 +42,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Lottery entry period has ended! Awaiting winner announcement.",
                 "gas": "*",
@@ -63,14 +65,17 @@
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "100"
-                    }
+                    },
+                    "storage": {}
                 },
                 "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:LOTTERY-123456": "100"
+                    },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
                             "0-token_identifier": "nested:str:LOTTERY-123456",
@@ -85,9 +90,6 @@
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1"
-                    },
-                    "esdt": {
-                        "str:LOTTERY-123456": "100"
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

@@ -103,7 +103,7 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft1.jpg",
+                                    "uri": "sc:nft-minter",
                                     "attributes": "u64:100,000"
                                 }
                             ]
@@ -116,19 +116,19 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-123456": {
-                            "lastNonce": "2",
-                            "roles": [
-                                "ESDTRoleNFTCreate"
-                            ],
                             "instances": [
                                 {
                                     "nonce": "2",
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft2.jpg",
+                                    "uri": "sc:nft-minter",
                                     "attributes": "u64:200,000"
                                 }
+                            ],
+                            "lastNonce": "2",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
                             ]
                         }
                     },
@@ -152,11 +152,13 @@
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:SEMIFUNG-123456",
-                    "nonce": "1",
-                    "value": "500"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:SEMIFUNG-123456",
+                        "nonce": "1",
+                        "value": "500"
+                    }
+                ],
                 "function": "buyNft",
                 "arguments": [
                     "2"
@@ -179,11 +181,13 @@
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
                 "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:SEMIFUNG-123456",
-                    "nonce": "2",
-                    "value": "500"
-                },
+                "esdt": [
+                    {
+                        "tokenIdentifier": "str:SEMIFUNG-123456",
+                        "nonce": "2",
+                        "value": "500"
+                    }
+                ],
                 "function": "buyNft",
                 "arguments": [
                     "2"
@@ -241,7 +245,7 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft1.jpg",
+                                    "uri": "sc:nft-minter",
                                     "attributes": "u64:100,000"
                                 },
                                 {
@@ -249,7 +253,7 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft2.jpg",
+                                    "uri": "sc:nft-minter",
                                     "attributes": "u64:200,000"
                                 }
                             ]
@@ -265,8 +269,7 @@
                             "lastNonce": "2",
                             "roles": [
                                 "ESDTRoleNFTCreate"
-                            ],
-                            "instances": []
+                            ]
                         }
                     },
                     "storage": {

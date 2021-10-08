@@ -9,24 +9,21 @@
                     "balance": "1000",
                     "esdt": {
                         "str:GOV-123456": "1000"
-                    },
-                    "storage": {}
+                    }
                 },
                 "address:user1": {
                     "nonce": "0",
                     "balance": "1000",
                     "esdt": {
                         "str:GOV-123456": "1000"
-                    },
-                    "storage": {}
+                    }
                 },
                 "address:user2": {
                     "nonce": "0",
                     "balance": "1000",
                     "esdt": {
                         "str:GOV-123456": "1000"
-                    },
-                    "storage": {}
+                    }
                 }
             },
             "newAddresses": [
@@ -98,7 +95,7 @@
                     },
                     "code": "file:../../output/use-module.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {

@@ -6,14 +6,11 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "100",
-                    "storage": {},
-                    "code": ""
+                    "balance": "100"
                 },
                 "sc:proxy-first": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 }
             },

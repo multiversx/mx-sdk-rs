@@ -5,6 +5,8 @@
             "step": "setState",
             "accounts": {
                 "address:the-address": {
+                    "nonce": "",
+                    "balance": "",
                     "username": "str:theusername.elrond"
                 }
             }
@@ -13,7 +15,8 @@
             "step": "checkState",
             "accounts": {
                 "address:the-address": {
-                    "username": "str:theusername.elrond"
+                    "username": "str:theusername.elrond",
+                    "storage": {}
                 }
             }
         },
@@ -21,7 +24,8 @@
             "step": "checkState",
             "accounts": {
                 "address:the-address": {
-                    "username": "*"
+                    "username": "*",
+                    "storage": {}
                 }
             }
         }

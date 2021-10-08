@@ -6,15 +6,11 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "1,000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "1,000"
                 },
                 "address:receiver": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [

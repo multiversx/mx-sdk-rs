@@ -7,9 +7,7 @@
             "accounts": {
                 "address:crypto_bubbles_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:crypto_bubbles": {
                     "nonce": "0",
@@ -21,9 +19,7 @@
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x300abc",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x300abc"
                 }
             }
         },

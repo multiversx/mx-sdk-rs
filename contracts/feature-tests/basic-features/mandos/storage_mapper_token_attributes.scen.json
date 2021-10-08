@@ -8,14 +8,11 @@
                 "sc:contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "1000"
                 }
             }
         },

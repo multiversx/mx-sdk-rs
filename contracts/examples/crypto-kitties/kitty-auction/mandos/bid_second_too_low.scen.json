@@ -11,8 +11,7 @@
             "accounts": {
                 "address:bidder2": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             }
         },
@@ -31,8 +30,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:bid amount must be higher than current winning bid!",
+                "out": [],
                 "status": "4",
+                "message": "str:bid amount must be higher than current winning bid!",
                 "gas": "*",
                 "refund": "*"
             }

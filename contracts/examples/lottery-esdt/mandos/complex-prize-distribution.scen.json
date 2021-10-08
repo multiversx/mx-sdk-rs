@@ -8,64 +8,50 @@
         },
         {
             "step": "setState",
-            "currentBlockInfo": {
-                "blockRandomSeed": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-            },
             "accounts": {
                 "address:my_address": {
                     "nonce": "1",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc3": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc4": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc5": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc6": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc7": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc8": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc9": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:acc10": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "sc:lottery": {
                     "nonce": "0",
@@ -105,6 +91,9 @@
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }
+            },
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
             }
         },
         {
@@ -122,6 +111,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

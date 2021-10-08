@@ -25,10 +25,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {
@@ -93,10 +94,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {

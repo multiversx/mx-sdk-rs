@@ -6,20 +6,16 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "2000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "2000"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }

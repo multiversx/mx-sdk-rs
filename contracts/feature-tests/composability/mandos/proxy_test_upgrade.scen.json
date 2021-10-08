@@ -10,9 +10,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "1",
-                    "balance": "200",
-                    "storage": {},
-                    "code": ""
+                    "balance": "200"
                 }
             }
         },

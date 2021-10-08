@@ -276,8 +276,8 @@
         },
         {
             "step": "scCall",
-            "comment": "check that account data got cleaned up",
             "txId": "check-cleanup-1",
+            "comment": "check that account data got cleaned up",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -301,8 +301,8 @@
         },
         {
             "step": "scCall",
-            "comment": "check that account data got cleaned up",
             "txId": "check-cleanup-2",
+            "comment": "check that account data got cleaned up",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",

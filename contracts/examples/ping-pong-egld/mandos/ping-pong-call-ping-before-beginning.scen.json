@@ -26,6 +26,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:smart contract not active yet",
                 "gas": "*",

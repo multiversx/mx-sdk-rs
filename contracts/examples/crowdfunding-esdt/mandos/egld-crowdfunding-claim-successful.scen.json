@@ -10,8 +10,7 @@
             "accounts": {
                 "address:donor2": {
                     "nonce": "0",
-                    "balance": "1,000,000,000,000",
-                    "storage": {}
+                    "balance": "1,000,000,000,000"
                 }
             }
         },
@@ -28,6 +27,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"
@@ -84,8 +84,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:only owner can claim successful funding",
+                "out": [],
                 "status": "4",
+                "message": "str:only owner can claim successful funding",
                 "gas": "*",
                 "refund": "*"
             }
@@ -103,6 +104,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

@@ -16,9 +16,7 @@
                                 }
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -33,7 +31,6 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -44,6 +41,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
+                "value": "",
                 "function": "transfer_nft_and_execute",
                 "arguments": [
                     "address:a_user",

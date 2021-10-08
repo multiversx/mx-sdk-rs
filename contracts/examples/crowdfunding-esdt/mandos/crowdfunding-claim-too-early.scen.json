@@ -18,8 +18,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:cannot claim before deadline",
+                "out": [],
                 "status": "4",
+                "message": "str:cannot claim before deadline",
                 "gas": "*",
                 "refund": "*"
             }
@@ -37,8 +38,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:cannot claim before deadline",
+                "out": [],
                 "status": "4",
+                "message": "str:cannot claim before deadline",
                 "gas": "*",
                 "refund": "*"
             }
