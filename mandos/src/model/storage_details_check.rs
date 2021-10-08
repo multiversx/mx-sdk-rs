@@ -6,7 +6,7 @@ use crate::{
 
 use std::collections::BTreeMap;
 
-use super::value_key_bytes::BytesKey;
+use super::BytesKey;
 
 #[derive(Debug)]
 pub struct CheckStorageDetails {
