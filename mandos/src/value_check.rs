@@ -56,7 +56,7 @@ where
 {
     fn interpret_from(from: CheckBytesValueRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckBytesValueRaw::Unspecified => CheckValue::Equal(T::default()),
+            CheckBytesValueRaw::Unspecified => CheckValue::Star,
             CheckBytesValueRaw::Star => CheckValue::Star,
             CheckBytesValueRaw::Equal(bytes_value) => {
                 CheckValue::Equal(T::interpret_from(bytes_value, context))
