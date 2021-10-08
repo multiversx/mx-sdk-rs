@@ -255,49 +255,47 @@ pub fn check_token_instance(
             &actual_value.balance,
         ))
     }
-    /*
-        let actual_creator = actual_value.creator.clone().unwrap_or_default();
-        if !expected_value.creator.check(&actual_creator) {
-            errors.push(format!(
-                "bad esdt creator. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-                address,
-                token,
-                expected_value.nonce.value,
-                expected_value.creator,
-                verbose_hex(&actual_creator),
-            ))
-        }
+    let actual_creator = actual_value.creator.clone().unwrap_or_default();
+    if !expected_value.creator.check(&actual_creator) {
+        errors.push(format!(
+            "bad esdt creator. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.creator,
+            verbose_hex(&actual_creator),
+        ))
+    }
 
-        let actual_royalties = actual_value.royalties;
-        if !expected_value.royalties.check(actual_royalties) {
-            errors.push(format!(
-                "bad esdt royalties. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-                address, token, expected_value.nonce.value, expected_value.royalties, actual_royalties
-            ))
-        }
+    let actual_royalties = actual_value.royalties;
+    if !expected_value.royalties.check(actual_royalties) {
+        errors.push(format!(
+            "bad esdt royalties. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address, token, expected_value.nonce.value, expected_value.royalties, actual_royalties
+        ))
+    }
 
-        let actual_hash = actual_value.hash.clone().unwrap_or_default();
-        if !expected_value.hash.check(&actual_hash) {
-            errors.push(format!(
-                "bad esdt hash. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-                address,
-                token,
-                expected_value.nonce.value,
-                expected_value.hash,
-                verbose_hex(&actual_hash),
-            ))
-        }
+    let actual_hash = actual_value.hash.clone().unwrap_or_default();
+    if !expected_value.hash.check(&actual_hash) {
+        errors.push(format!(
+            "bad esdt hash. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.hash,
+            verbose_hex(&actual_hash),
+        ))
+    }
 
-        let actual_uri = actual_value.uri.clone().unwrap_or_default();
-        if !expected_value.uri.check(&actual_uri) {
-            errors.push(format!(
-                "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-                address,
-                token,
-                expected_value.nonce.value,
-                expected_value.uri,
-                verbose_hex(&actual_uri),
-            ))
-        }
-    */
+    let actual_uri = actual_value.uri.clone().unwrap_or_default();
+    if !expected_value.uri.check(&actual_uri) {
+        errors.push(format!(
+            "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.uri,
+            verbose_hex(&actual_uri),
+        ))
+    }
 }
