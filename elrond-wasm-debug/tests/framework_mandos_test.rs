@@ -197,7 +197,7 @@ fn set_check_username_rs() {
         &contract_map(),
     );
 }
-/*  todo
+/*  TODO: implement & test
 #[test]
 fn builtin_func_esdt_transfer() {
     elrond_wasm_debug::mandos_rs(
@@ -223,7 +223,7 @@ fn esdt_zero_balance_check_err_rs() {
         &contract_map(),
     );
 }
-/* todo
+/* TODO: implement & test
 #[test]
 fn multi_transfer_esdt_rs() {
     elrond_wasm_debug::mandos_rs(
@@ -236,7 +236,7 @@ fn multi_transfer_esdt_rs() {
 fn transfer_egld_rs() {
     elrond_wasm_debug::mandos_rs("tests/mandos/transfer-egld.scen.json", &contract_map());
 }
-/* todo
+/* TODO: implement & test
 #[test]
 fn transfer_esdt_rs() {
     elrond_wasm_debug::mandos_rs("tests/mandos/transfer-esdt.scen.json", &contract_map());
