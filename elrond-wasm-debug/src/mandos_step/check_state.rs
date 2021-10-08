@@ -237,14 +237,22 @@ pub fn check_token_instance(
     if !expected_value.balance.check(&actual_value.balance) {
         errors.push(format!(
             "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-            address, token, expected_value.nonce, expected_value.balance, &actual_value.balance,
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.balance,
+            &actual_value.balance,
         ))
     }
 
     if !expected_value.balance.check(&actual_value.balance) {
         errors.push(format!(
             "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-            address, token, expected_value.nonce, expected_value.balance, &actual_value.balance,
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.balance,
+            &actual_value.balance,
         ))
     }
 
@@ -254,7 +262,7 @@ pub fn check_token_instance(
             "bad esdt creator. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
-            expected_value.nonce,
+            expected_value.nonce.value,
             expected_value.creator,
             verbose_hex(&actual_creator),
         ))
@@ -264,7 +272,7 @@ pub fn check_token_instance(
     if !expected_value.royalties.check(actual_royalties) {
         errors.push(format!(
             "bad esdt royalties. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-            address, token, expected_value.nonce, expected_value.royalties, actual_royalties
+            address, token, expected_value.nonce.value, expected_value.royalties, actual_royalties
         ))
     }
 
@@ -274,7 +282,7 @@ pub fn check_token_instance(
             "bad esdt hash. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
-            expected_value.nonce,
+            expected_value.nonce.value,
             expected_value.hash,
             verbose_hex(&actual_hash),
         ))
@@ -286,7 +294,7 @@ pub fn check_token_instance(
             "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
-            expected_value.nonce,
+            expected_value.nonce.value,
             expected_value.uri,
             verbose_hex(&actual_uri),
         ))
