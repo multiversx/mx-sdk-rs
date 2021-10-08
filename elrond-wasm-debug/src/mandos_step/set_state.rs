@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use mandos::{Account, AddressKey, BlockInfo, NewAddress};
+use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
 use num_bigint::BigUint;
 
 use crate::{
@@ -84,10 +84,10 @@ pub fn execute(
 
 fn convert_mandos_esdt_to_world_mock(
     token_identifier: &[u8],
-    mandos_esdt: &mandos::Esdt,
+    mandos_esdt: &mandos::model::Esdt,
 ) -> EsdtData {
     match mandos_esdt {
-        mandos::Esdt::Short(short_esdt) => {
+        mandos::model::Esdt::Short(short_esdt) => {
             let balance = BigUint::from_bytes_be(short_esdt.value.as_slice());
             let mut esdt_data = EsdtData {
                 token_identifier: token_identifier.to_vec(),
@@ -96,7 +96,7 @@ fn convert_mandos_esdt_to_world_mock(
             esdt_data.instances.add(0, balance);
             esdt_data
         },
-        mandos::Esdt::Full(full_esdt) => EsdtData {
+        mandos::model::Esdt::Full(full_esdt) => EsdtData {
             token_identifier: full_esdt
                 .token_identifier
                 .as_ref()
@@ -134,7 +134,9 @@ fn convert_mandos_esdt_to_world_mock(
     }
 }
 
-fn convert_mandos_esdt_instance_to_world_mock(mandos_esdt: &mandos::Instance) -> EsdtInstance {
+fn convert_mandos_esdt_instance_to_world_mock(
+    mandos_esdt: &mandos::model::Instance,
+) -> EsdtInstance {
     EsdtInstance {
         nonce: mandos_esdt
             .nonce
@@ -165,7 +167,10 @@ fn convert_mandos_esdt_instance_to_world_mock(mandos_esdt: &mandos::Instance) ->
     }
 }
 
-fn update_block_info(block_info: &mut CrateBlockInfo, mandos_block_info: &mandos::BlockInfo) {
+fn update_block_info(
+    block_info: &mut CrateBlockInfo,
+    mandos_block_info: &mandos::model::BlockInfo,
+) {
     if let Some(u64_value) = &mandos_block_info.block_timestamp {
         block_info.block_timestamp = u64_value.value;
     }

@@ -1,4 +1,4 @@
-use mandos::{
+use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
     CheckEsdtMap, CheckStorage, CheckValue, Checkable,
 };
@@ -11,7 +11,7 @@ use crate::{
     BlockchainMock,
 };
 
-pub fn execute(accounts: &mandos::CheckAccounts, state: &mut BlockchainMock) {
+pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
         if let Some(account) = state.accounts.get(&expected_address.value.into()) {
             assert!(
