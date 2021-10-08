@@ -76,7 +76,7 @@ impl CheckEsdtInstances {
 impl InterpretableFrom<CheckEsdtInstancesRaw> for CheckEsdtInstances {
     fn interpret_from(from: CheckEsdtInstancesRaw, context: &InterpreterContext) -> Self {
         match from {
-            CheckEsdtInstancesRaw::Unspecified => CheckEsdtInstances::Equal(Vec::new()),
+            CheckEsdtInstancesRaw::Unspecified => CheckEsdtInstances::Star,
             CheckEsdtInstancesRaw::Star => CheckEsdtInstances::Star,
             CheckEsdtInstancesRaw::Equal(m) => CheckEsdtInstances::Equal(
                 m.into_iter()
