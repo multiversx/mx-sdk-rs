@@ -107,20 +107,28 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                         if expected_balance.is_zero() {
                             assert!(
                                 actual_value.is_empty(),
-                                "No balance expected for ESDT token"
+                                "No balance expected for ESDT token address: {}. token name: {}. nonce: {}.",
+                                address,
+                                bytes_to_string(key.value.as_slice()),
+                                0
                             );
                         } else {
                             assert!(
                                 actual_value.instances.len() == 1,
-                                "One ESDT instance expected, with nonce 0"
+                                "One ESDT instance expected, with nonce 0 for address: {}. token name: {}.",
+                                address,
+                                bytes_to_string(key.value.as_slice()),
                             );
                             let single_instance = actual_value
                                 .instances
                                 .get_by_nonce(0)
                                 .unwrap_or_else(|| panic!("Expected fungible ESDT with none 0"));
                             assert_eq!(
-                                single_instance.balance, expected_balance,
-                                "Unexpected fungible token balance"
+                                single_instance.balance,
+                                expected_balance,
+                                "Unexpected fungible token balancefor address: {}. token name: {}.",
+                                address,
+                                bytes_to_string(key.value.as_slice()),
                             );
                         }
                     },
