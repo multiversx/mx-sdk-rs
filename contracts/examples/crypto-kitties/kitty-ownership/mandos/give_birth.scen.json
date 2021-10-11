@@ -19,7 +19,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "giveBirth",
                 "arguments": [
                     "2"

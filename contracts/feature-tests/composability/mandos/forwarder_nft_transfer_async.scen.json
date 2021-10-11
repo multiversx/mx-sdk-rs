@@ -41,7 +41,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "",
                 "function": "transfer_nft_via_async_call",
                 "arguments": [
                     "address:a_user",

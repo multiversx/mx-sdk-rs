@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_i64",
                 "arguments": [
                     "123"
@@ -63,7 +62,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_i64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -85,7 +83,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_i64",
                 "arguments": [
                     "0"
@@ -126,7 +123,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_i64",
                 "arguments": [],
                 "gasLimit": "50,000,000",

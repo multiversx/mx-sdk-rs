@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_map2",
                 "arguments": [
                     "str:__________address_1_____________",
@@ -65,7 +64,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_map2",
                 "arguments": [
                     "str:__________address_1_____________",
@@ -90,7 +88,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_map2",
                 "arguments": [
                     "str:__________address_1_____________",
@@ -133,7 +130,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_map2",
                 "arguments": [
                     "str:__________address_1_____________",

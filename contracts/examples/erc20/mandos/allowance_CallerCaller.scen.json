@@ -26,7 +26,6 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0",
                 "function": "allowance",
                 "arguments": [
                     "address:account_1",

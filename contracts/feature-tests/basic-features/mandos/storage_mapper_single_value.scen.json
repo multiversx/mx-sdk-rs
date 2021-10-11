@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -44,7 +43,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "my_single_value_mapper_increment_1",
                 "arguments": [
                     "123"
@@ -66,7 +64,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -88,7 +85,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "my_single_value_mapper_increment_2",
                 "arguments": [
                     "121"
@@ -110,7 +106,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "my_single_value_mapper_subtract_with_require",
                 "arguments": [
                     "10,000"
@@ -133,7 +128,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "my_single_value_mapper_subtract_with_require",
                 "arguments": [
                     "10"
@@ -155,7 +149,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_my_single_value_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -196,7 +189,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -218,7 +210,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "clear_single_value_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -238,7 +229,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -277,7 +267,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "my_single_value_mapper_set_if_empty",
                 "arguments": [
                     "42"
@@ -319,7 +308,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "my_single_value_mapper_set_if_empty",
                 "arguments": [
                     "100"

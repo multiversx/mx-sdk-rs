@@ -27,7 +27,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "only_owner_endpoint",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -48,7 +47,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "only_owner_endpoint",
                 "arguments": [],
                 "gasLimit": "50,000,000",

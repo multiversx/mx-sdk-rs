@@ -36,8 +36,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:NFT-0001",
                         "nonce": "5",
@@ -110,8 +109,7 @@
             "step": "checkState",
             "accounts": {
                 "address:a_user": {
-                    "nonce": "*",
-                    "storage": {}
+                    "nonce": "*"
                 },
                 "sc:vault": {
                     "nonce": "0",

@@ -35,7 +35,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_prev_block_timestamp",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -57,7 +56,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_prev_block_nonce",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -79,7 +77,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_prev_block_round",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -101,7 +98,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_prev_block_epoch",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -123,7 +119,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_prev_block_random_seed",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -145,7 +140,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_block_timestamp",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -167,7 +161,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_block_nonce",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -189,7 +182,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_block_round",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -211,7 +203,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_block_epoch",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -234,7 +225,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_block_random_seed",
                 "arguments": [],
                 "gasLimit": "50,000,000",

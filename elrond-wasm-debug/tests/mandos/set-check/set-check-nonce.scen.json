@@ -5,8 +5,7 @@
             "step": "setState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "125",
-                    "balance": ""
+                    "nonce": "125"
                 }
             }
         },

@@ -30,7 +30,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "value": "0x123400",
+                "egldValue": "0x123400",
                 "function": "forwardToOtherContractWithCallback",
                 "arguments": [],
                 "gasLimit": "0x1000000000000",

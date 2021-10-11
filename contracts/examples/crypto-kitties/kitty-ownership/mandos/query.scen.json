@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "totalSupply",
                 "arguments": [],
                 "gasLimit": "100,000,000",
@@ -34,7 +33,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "balanceOf",
                 "arguments": [
                     "address:acc1"
@@ -58,7 +56,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "ownerOf",
                 "arguments": [
                     "2"
@@ -82,7 +79,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "tokensOfOwner",
                 "arguments": [
                     "address:acc1"
@@ -106,7 +102,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "getKittyById",
                 "arguments": [
                     "1"
@@ -130,7 +125,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "isReadyToBreed",
                 "arguments": [
                     "1"
@@ -154,7 +148,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "isPregnant",
                 "arguments": [
                     "1"
@@ -178,7 +171,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "canBreedWith",
                 "arguments": [
                     "1",

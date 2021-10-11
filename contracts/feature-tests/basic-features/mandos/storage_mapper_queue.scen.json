@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -42,7 +41,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_push_back",
                 "arguments": [
                     "123"
@@ -85,7 +83,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -107,7 +104,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_push_back",
                 "arguments": [
                     "111"
@@ -129,7 +125,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -175,7 +170,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_front",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -197,7 +191,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_pop_front",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -240,7 +233,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_pop_front",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -279,7 +271,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_front",
                 "arguments": [],
                 "gasLimit": "50,000,000",

@@ -24,8 +24,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:first_contract",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:cool_token",
                         "value": "500,000"

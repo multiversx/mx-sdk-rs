@@ -23,7 +23,6 @@
             "tx": {
                 "from": "address:crypto_bubbles_owner",
                 "to": "sc:crypto_bubbles",
-                "value": "0",
                 "function": "rewardWinner",
                 "arguments": [
                     "0x12",
@@ -48,7 +47,6 @@
             "tx": {
                 "from": "address:crypto_bubbles_owner",
                 "to": "sc:crypto_bubbles",
-                "value": "0",
                 "function": "balanceOf",
                 "arguments": [
                     "0x22acc1000000000000000000000000000000000000000000000000000000000000"

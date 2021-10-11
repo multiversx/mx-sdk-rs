@@ -75,7 +75,6 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "value": "0",
                 "contractCode": "file:../output/basic-features.wasm",
                 "arguments": [],
                 "gasLimit": "50,000,000",

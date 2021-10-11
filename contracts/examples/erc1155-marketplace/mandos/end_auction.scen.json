@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:marketplace_contract",
-                "value": "0",
                 "function": "endAuction",
                 "arguments": [
                     "1",

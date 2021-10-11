@@ -30,7 +30,6 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0",
                 "function": "allowance",
                 "arguments": [
                     "0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1000000000000000000000000",
@@ -55,7 +54,6 @@
             "tx": {
                 "from": "0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1000000000000000000000000",
                 "to": "sc:erc20",
-                "value": "0",
                 "function": "approve",
                 "arguments": [
                     "address:account_1",
@@ -89,7 +87,6 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0",
                 "function": "allowance",
                 "arguments": [
                     "0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1000000000000000000000000",

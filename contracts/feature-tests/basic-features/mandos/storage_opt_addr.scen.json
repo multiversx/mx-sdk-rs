@@ -28,7 +28,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -49,7 +48,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_opt_addr",
                 "arguments": [
                     "str:____________address_____________"
@@ -85,7 +83,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -107,7 +104,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "is_empty_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -129,7 +125,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -149,7 +144,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "is_empty_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -185,7 +179,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",

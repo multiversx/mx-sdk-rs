@@ -26,7 +26,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_sync_retrieve_funds",
                 "arguments": [
                     "sc:vault",

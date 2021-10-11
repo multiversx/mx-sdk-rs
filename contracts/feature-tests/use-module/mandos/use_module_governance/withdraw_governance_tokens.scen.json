@@ -11,7 +11,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "withdrawGovernanceTokens",
                 "arguments": [
                     "1"
@@ -33,7 +32,6 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "withdrawGovernanceTokens",
                 "arguments": [
                     "1"
@@ -55,7 +53,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "withdrawGovernanceTokens",
                 "arguments": [
                     "1"

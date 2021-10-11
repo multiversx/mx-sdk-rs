@@ -22,7 +22,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:contract_owner",
-                "value": "0",
                 "contractCode": "file:../output/erc721.wasm",
                 "arguments": [
                     "3"

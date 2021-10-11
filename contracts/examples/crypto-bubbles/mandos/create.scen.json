@@ -23,7 +23,6 @@
             "txId": "1",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "value": "0",
                 "contractCode": "file:../output/crypto-bubbles.wasm",
                 "arguments": [],
                 "gasLimit": "0x100000",

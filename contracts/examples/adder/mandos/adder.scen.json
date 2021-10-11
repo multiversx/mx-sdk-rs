@@ -24,7 +24,6 @@
             "txId": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/adder.wasm",
                 "arguments": [
                     "5"
@@ -62,7 +61,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:adder",
-                "value": "0",
                 "function": "add",
                 "arguments": [
                     "3"

@@ -26,7 +26,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "1000",
+                "egldValue": "1000",
                 "function": "forward_transf_exec_accept_funds",
                 "arguments": [
                     "sc:vault"

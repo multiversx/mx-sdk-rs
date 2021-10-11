@@ -11,8 +11,7 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:GOV-123456",
                         "value": "500"
@@ -98,8 +97,7 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:GOV-123456",
                         "value": "999"
@@ -131,8 +129,7 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:GOV-123456",
                         "value": "999"
@@ -204,7 +201,6 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "execute",
                 "arguments": [
                     "1"
@@ -225,7 +221,6 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "queue",
                 "arguments": [
                     "1"
@@ -252,7 +247,6 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "queue",
                 "arguments": [
                     "1"
@@ -279,8 +273,7 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:GOV-123456",
                         "value": "200"
@@ -306,8 +299,7 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:GOV-123456",
                         "value": "200"
@@ -339,7 +331,6 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "queue",
                 "arguments": [
                     "1"
@@ -366,8 +357,7 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:GOV-123456",
                         "value": "200"
@@ -399,7 +389,6 @@
             "tx": {
                 "from": "address:user2",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "queue",
                 "arguments": [
                     "1"
@@ -420,7 +409,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "execute",
                 "arguments": [
                     "1"
@@ -447,7 +435,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "execute",
                 "arguments": [
                     "1"

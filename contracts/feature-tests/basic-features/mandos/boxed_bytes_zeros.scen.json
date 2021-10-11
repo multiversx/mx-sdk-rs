@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "boxed_bytes_zeros",
                 "arguments": [
                     "5"
@@ -46,7 +45,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "boxed_bytes_zeros",
                 "arguments": [
                     "0"

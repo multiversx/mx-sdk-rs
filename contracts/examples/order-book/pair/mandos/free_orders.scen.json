@@ -25,7 +25,6 @@
             "tx": {
                 "from": "address:match_provider",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "freeOrders",
                 "arguments": [
                     "u64:0|u64:1"

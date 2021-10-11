@@ -39,7 +39,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../../output/use-module.wasm",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -57,7 +56,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:governance",
-                "value": "0",
                 "function": "initGovernanceModule",
                 "arguments": [
                     "str:GOV-123456",

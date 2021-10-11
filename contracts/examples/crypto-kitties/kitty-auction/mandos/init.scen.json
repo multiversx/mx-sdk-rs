@@ -29,7 +29,6 @@
             "comment": "we don't care about autoBirthFee in this test, so we set it to 0",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../../kitty-ownership/output/kitty-ownership.wasm",
                 "arguments": [
                     "0"
@@ -50,7 +49,6 @@
             "txId": "deploy - kitty auction contract",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../output/kitty-auction.wasm",
                 "arguments": [
                     "100",
@@ -75,7 +73,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "setKittyAuctionContractAddress",
                 "arguments": [
                     "sc:kitty_auction_contract"

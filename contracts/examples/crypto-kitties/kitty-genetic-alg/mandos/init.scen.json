@@ -23,7 +23,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../output/kitty-genetic-alg.wasm",
                 "arguments": [],
                 "gasLimit": "1,000,000",

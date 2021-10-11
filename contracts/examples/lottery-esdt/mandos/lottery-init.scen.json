@@ -31,7 +31,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../output/lottery-esdt.wasm",
                 "arguments": [],
                 "gasLimit": "1,000,000",

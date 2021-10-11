@@ -40,7 +40,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:erc20_owner",
-                "value": "0",
                 "contractCode": "file:../../erc20/output/erc20.wasm",
                 "arguments": [
                     "1,000,000,000"
@@ -94,7 +93,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../output/lottery-erc20.wasm",
                 "arguments": [
                     "sc:erc20"

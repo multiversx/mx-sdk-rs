@@ -20,7 +20,6 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "value": "",
                 "function": "ESDTTransfer",
                 "arguments": [
                     "100"
@@ -58,7 +57,7 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "value": "50"
+                "egldValue": "50"
             }
         },
         {

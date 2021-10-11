@@ -24,8 +24,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
                         "value": "100"

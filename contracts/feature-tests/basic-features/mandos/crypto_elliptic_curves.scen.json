@@ -21,7 +21,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_create_ec",
                 "arguments": [
                     "str:p22424"
@@ -44,7 +43,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_create_ec",
                 "arguments": [
                     "str:p224"
@@ -75,7 +73,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_create_ec",
                 "arguments": [
                     "str:p256"
@@ -106,7 +103,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_create_ec",
                 "arguments": [
                     "str:p384"
@@ -137,7 +133,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_create_ec",
                 "arguments": [
                     "str:p521"
@@ -168,7 +163,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_values",
                 "arguments": [
                     "224"
@@ -199,7 +193,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_values",
                 "arguments": [
                     "256"
@@ -230,7 +223,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_values",
                 "arguments": [
                     "384"
@@ -261,7 +253,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_values",
                 "arguments": [
                     "521"
@@ -292,7 +283,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_ec_length",
                 "arguments": [
                     "224"
@@ -316,7 +306,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_ec_length",
                 "arguments": [
                     "256"
@@ -340,7 +329,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_ec_length",
                 "arguments": [
                     "384"
@@ -364,7 +352,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_ec_length",
                 "arguments": [
                     "521"
@@ -388,7 +375,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_priv_key_byte_length",
                 "arguments": [
                     "224"
@@ -412,7 +398,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_priv_key_byte_length",
                 "arguments": [
                     "256"
@@ -436,7 +421,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_priv_key_byte_length",
                 "arguments": [
                     "384"
@@ -460,7 +444,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_get_priv_key_byte_length",
                 "arguments": [
                     "521"
@@ -484,7 +467,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_is_on_curve_ec",
                 "arguments": [
                     "521",
@@ -510,7 +492,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_is_on_curve_ec",
                 "arguments": [
                     "521",
@@ -536,7 +517,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_is_on_curve_ec",
                 "arguments": [
                     "521",
@@ -562,7 +542,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_ec_add",
                 "arguments": [
                     "256",
@@ -588,7 +567,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_ec_add",
                 "arguments": [
                     "256",
@@ -614,7 +592,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_ec_add",
                 "arguments": [
                     "256",
@@ -643,7 +620,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_ec_double",
                 "arguments": [
                     "521",
@@ -667,7 +643,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_ec_double",
                 "arguments": [
                     "521",
@@ -694,7 +669,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_marshal_ec",
                 "arguments": [
                     "256",
@@ -716,7 +690,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_marshal_ec",
                 "arguments": [
                     "256",
@@ -740,7 +713,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_marshal_ec",
                 "arguments": [
                     "256",
@@ -762,7 +734,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_unmarshal_ec",
                 "arguments": [
                     "256",
@@ -783,7 +754,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_unmarshal_ec",
                 "arguments": [
                     "256",
@@ -804,7 +774,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_unmarshal_ec",
                 "arguments": [
                     "256",
@@ -828,7 +797,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_marshal_compressed_ec",
                 "arguments": [
                     "256",
@@ -850,7 +818,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_marshal_compressed_ec",
                 "arguments": [
                     "256",
@@ -874,7 +841,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_marshal_compressed_ec",
                 "arguments": [
                     "256",
@@ -896,7 +862,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_unmarshal_compressed_ec",
                 "arguments": [
                     "256",
@@ -917,7 +882,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_unmarshal_compressed_ec",
                 "arguments": [
                     "256",
@@ -938,7 +902,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_unmarshal_compressed_ec",
                 "arguments": [
                     "256",
@@ -962,7 +925,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_generate_key_ec",
                 "arguments": [
                     "224"
@@ -986,7 +948,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_generate_key_ec",
                 "arguments": [
                     "256"
@@ -1010,7 +971,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_generate_key_ec",
                 "arguments": [
                     "384"
@@ -1034,7 +994,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_generate_key_ec",
                 "arguments": [
                     "521"
@@ -1058,7 +1017,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_scalar_base_mult",
                 "arguments": [
                     "224",
@@ -1082,7 +1040,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_scalar_mult",
                 "arguments": [
                     "256",
@@ -1105,7 +1062,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_scalar_mult",
                 "arguments": [
                     "224",
@@ -1131,7 +1087,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_scalar_mult",
                 "arguments": [
                     "256",
@@ -1157,7 +1112,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_scalar_mult",
                 "arguments": [
                     "384",
@@ -1183,7 +1137,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
-                "value": "0",
                 "function": "compute_scalar_mult",
                 "arguments": [
                     "521",

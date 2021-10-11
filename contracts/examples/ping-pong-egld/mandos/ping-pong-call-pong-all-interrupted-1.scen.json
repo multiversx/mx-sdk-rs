@@ -19,7 +19,6 @@
             "tx": {
                 "from": "address:participant1",
                 "to": "sc:ping-pong",
-                "value": "0",
                 "function": "pongAll",
                 "arguments": [],
                 "gasLimit": "7,000,000",

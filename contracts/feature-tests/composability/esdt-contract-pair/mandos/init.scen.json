@@ -28,7 +28,6 @@
             "txId": "deploy-first-contract",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../first-contract/output/first-contract.wasm",
                 "arguments": [
                     "str:cool_token",
@@ -49,7 +48,6 @@
             "txId": "deploy-second-contract",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../second-contract/output/second-contract.wasm",
                 "arguments": [
                     "str:cool_token"

@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_addr",
                 "arguments": [
                     "str:____________address_____________"
@@ -63,7 +62,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
