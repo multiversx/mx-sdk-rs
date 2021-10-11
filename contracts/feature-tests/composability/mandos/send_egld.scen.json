@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
@@ -44,7 +43,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
@@ -65,7 +63,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",

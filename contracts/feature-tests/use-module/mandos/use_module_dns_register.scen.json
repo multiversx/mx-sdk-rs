@@ -30,7 +30,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:use_module",
-                "value": "1000",
+                "egldValue": "1000",
                 "function": "dnsRegister",
                 "arguments": [
                     "sc:dns#87",

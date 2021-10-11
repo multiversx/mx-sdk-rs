@@ -30,7 +30,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "value": "0",
                 "function": "messageOtherContractWithCallback",
                 "arguments": [],
                 "gasLimit": "0x1000000000000",

@@ -26,7 +26,6 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
                 "function": "payable_token_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -47,7 +46,7 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "5",
+                "egldValue": "5",
                 "function": "payable_token_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -68,8 +67,7 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
                         "value": "100"
@@ -97,8 +95,7 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:OTHER-TOKEN",
                         "value": "100"

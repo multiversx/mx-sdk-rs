@@ -6,14 +6,9 @@
             "step": "setState",
             "accounts": {
                 "sc:basic-features": {
-                    "nonce": "",
-                    "balance": "",
                     "code": "file:../output/basic-features.wasm"
                 },
-                "address:an_account": {
-                    "nonce": "",
-                    "balance": ""
-                }
+                "address:an_account": {}
             }
         },
         {
@@ -22,7 +17,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "codec_err_finish",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -68,7 +62,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "codec_err_storage_set",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -86,7 +79,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "codec_err_event_topic",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -104,7 +96,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "codec_err_event_data",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -122,7 +113,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "codec_err_contract_init",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -140,7 +130,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "codec_err_contract_call",
                 "arguments": [],
                 "gasLimit": "50,000,000",

@@ -46,7 +46,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "",
                 "function": "nft_decode_complex_attributes",
                 "arguments": [
                     "str:NFT-0001",
@@ -108,7 +107,9 @@
                                     "creator": "sc:forwarder",
                                     "royalties": "0",
                                     "hash": "str:nft-create-hash-----------------",
-                                    "uri": "sc:forwarder"
+                                    "uri": [
+                                        "str:nft-create-uri"
+                                    ]
                                 }
                             ],
                             "lastNonce": "2",

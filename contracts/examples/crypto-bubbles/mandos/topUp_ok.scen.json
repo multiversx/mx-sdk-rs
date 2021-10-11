@@ -30,7 +30,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "value": "0x100",
+                "egldValue": "0x100",
                 "function": "topUp",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -60,7 +60,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
-                "value": "0x100",
+                "egldValue": "0x100",
                 "function": "topUp",
                 "arguments": [],
                 "gasLimit": "0x100000",

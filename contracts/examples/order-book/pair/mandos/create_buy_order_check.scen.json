@@ -15,7 +15,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "getOrderById",
                 "arguments": [
                     "0"
@@ -38,7 +37,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "getAddressOrderIds",
                 "arguments": [
                     "address:user1"

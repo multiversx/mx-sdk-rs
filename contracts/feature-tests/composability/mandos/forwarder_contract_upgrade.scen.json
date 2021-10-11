@@ -4,18 +4,11 @@
         {
             "step": "setState",
             "accounts": {
-                "address:a_user": {
-                    "nonce": "",
-                    "balance": ""
-                },
+                "address:a_user": {},
                 "sc:forwarder": {
-                    "nonce": "",
-                    "balance": "",
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "sc:child": {
-                    "nonce": "",
-                    "balance": "",
                     "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder"
                 }
@@ -27,7 +20,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "upgradeChildContract",
                 "arguments": [
                     "sc:child",
@@ -44,7 +36,6 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "+": ""
@@ -57,7 +48,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "upgradeVault",
                 "arguments": [
                     "sc:child",
@@ -74,7 +64,6 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "+": ""

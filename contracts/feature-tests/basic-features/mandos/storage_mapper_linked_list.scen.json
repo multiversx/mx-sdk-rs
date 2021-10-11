@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -42,7 +41,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPushBack",
                 "arguments": [
                     "123"
@@ -84,7 +82,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -106,7 +103,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPushBack",
                 "arguments": [
                     "111"
@@ -128,7 +124,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -172,7 +167,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -194,7 +188,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPopFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -236,7 +229,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPopFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -275,7 +267,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -296,7 +287,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPushBack",
                 "arguments": [
                     "5"
@@ -318,7 +308,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPushAfter",
                 "arguments": [
                     "1",
@@ -343,7 +332,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPushBefore",
                 "arguments": [
                     "1",
@@ -368,7 +356,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPushFront",
                 "arguments": [
                     "3"
@@ -390,7 +377,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -415,7 +401,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperIterateByHand",
                 "arguments": [
                     "4"
@@ -442,7 +427,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperIterateByIter",
                 "arguments": [
                     "4"
@@ -469,7 +453,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperRemoveNode",
                 "arguments": [
                     "1"
@@ -491,7 +474,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -515,7 +497,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPopFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -537,7 +518,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -560,7 +540,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperRemoveNodeById",
                 "arguments": [
                     "2"
@@ -584,7 +563,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -606,7 +584,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "listMapperPopBack",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -628,7 +605,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",

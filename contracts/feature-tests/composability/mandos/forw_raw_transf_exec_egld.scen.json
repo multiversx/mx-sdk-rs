@@ -26,7 +26,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "1000",
+                "egldValue": "1000",
                 "function": "forward_transf_exec_egld",
                 "arguments": [
                     "sc:vault",
@@ -74,7 +74,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_transf_exec_egld",
                 "arguments": [
                     "sc:vault",

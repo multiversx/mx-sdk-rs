@@ -10,7 +10,6 @@
             "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/multisig.wasm",
                 "arguments": [
                     "1",
@@ -33,7 +32,6 @@
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "proposeRemoveUser",
                 "arguments": [
                     "address:alice"
@@ -57,7 +55,6 @@
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "sign",
                 "arguments": [
                     "1"
@@ -79,7 +76,6 @@
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "performAction",
                 "arguments": [
                     "1"

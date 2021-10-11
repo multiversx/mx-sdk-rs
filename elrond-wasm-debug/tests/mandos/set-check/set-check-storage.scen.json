@@ -5,8 +5,6 @@
             "step": "setState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "",
-                    "balance": "",
                     "storage": {
                         "str:key-a": "str:value-a",
                         "str:key-b": "str:value-b",

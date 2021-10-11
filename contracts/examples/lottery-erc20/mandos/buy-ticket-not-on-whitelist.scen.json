@@ -25,7 +25,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",

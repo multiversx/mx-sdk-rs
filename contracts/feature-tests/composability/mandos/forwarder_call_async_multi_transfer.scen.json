@@ -46,7 +46,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "multi_transfer_via_async",
                 "arguments": [
                     "sc:vault",
@@ -127,7 +126,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "multi_transfer_via_async",
                 "arguments": [
                     "sc:vault",

@@ -22,7 +22,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/str-repeat.wasm",
                 "arguments": [],
                 "gasLimit": "2,000,000",
@@ -42,7 +41,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "repeat",
                 "arguments": [
                     "str:abc",
@@ -65,7 +63,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "repeat",
                 "arguments": [
                     "str:abc",
@@ -102,7 +99,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "repeat",
                 "arguments": [
                     "",

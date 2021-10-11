@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_varags_tuples",
                 "arguments": [
                     "10",
@@ -52,7 +51,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_varags_tuples",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -73,7 +71,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_varags_tuples",
                 "arguments": [
                     "10",

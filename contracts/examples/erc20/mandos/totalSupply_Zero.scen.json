@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0",
                 "function": "totalSupply",
                 "arguments": [],
                 "gasLimit": "0x100000",

@@ -28,7 +28,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "value": "100",
+                "egldValue": "100",
                 "function": "deploySecondContract",
                 "arguments": [
                     "file:../proxy-test-second/output/proxy-test-second.wasm"

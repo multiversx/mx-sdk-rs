@@ -23,8 +23,7 @@
             "tx": {
                 "from": "address:donor2",
                 "to": "sc:crowdfunding",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:CROWD-123456",
                         "value": "250,000,000,000"
@@ -95,7 +94,6 @@
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "claim",
                 "arguments": [],
                 "gasLimit": "100,000,000",
@@ -115,7 +113,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "claim",
                 "arguments": [],
                 "gasLimit": "100,000,000",

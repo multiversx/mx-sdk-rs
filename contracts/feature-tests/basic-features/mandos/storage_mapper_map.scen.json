@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -42,7 +41,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_insert",
                 "arguments": [
                     "123",
@@ -90,7 +88,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -112,7 +109,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_values",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -134,7 +130,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_insert",
                 "arguments": [
                     "111",
@@ -159,7 +154,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_keys",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -182,7 +176,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_values",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -232,7 +225,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_contains_key",
                 "arguments": [
                     "111"
@@ -256,7 +248,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_remove",
                 "arguments": [
                     "123"
@@ -303,7 +294,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_remove",
                 "arguments": [
                     "111"
@@ -344,7 +334,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_get",
                 "arguments": [
                     "123"
@@ -385,7 +374,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_or_default_update_increment",
                 "arguments": [
                     "123",
@@ -433,7 +421,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_or_default_update_increment",
                 "arguments": [
                     "123",
@@ -481,7 +468,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_or_insert_default",
                 "arguments": [
                     "123",
@@ -529,7 +515,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_or_insert_default",
                 "arguments": [
                     "142",
@@ -581,7 +566,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_and_modify",
                 "arguments": [
                     "123",
@@ -607,7 +591,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_and_modify",
                 "arguments": [
                     "167",
@@ -664,7 +647,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_or_insert_with_key",
                 "arguments": [
                     "123",
@@ -689,7 +671,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_mapper_entry_or_insert_with_key",
                 "arguments": [
                     "78",

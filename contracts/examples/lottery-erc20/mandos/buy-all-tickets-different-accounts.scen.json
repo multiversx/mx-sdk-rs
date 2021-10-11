@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -35,7 +34,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -58,7 +56,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -81,7 +78,6 @@
             "tx": {
                 "from": "address:acc4",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -104,7 +100,6 @@
             "tx": {
                 "from": "address:acc5",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",

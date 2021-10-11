@@ -23,7 +23,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/erc1155.wasm",
                 "arguments": [],
                 "gasLimit": "0x100000",

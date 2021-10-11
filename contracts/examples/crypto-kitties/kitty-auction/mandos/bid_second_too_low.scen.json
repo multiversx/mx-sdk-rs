@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:bidder2",
                 "to": "sc:kitty_auction_contract",
-                "value": "150",
+                "egldValue": "150",
                 "function": "bid",
                 "arguments": [
                     "1"

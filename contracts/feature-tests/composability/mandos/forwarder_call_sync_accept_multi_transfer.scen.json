@@ -46,7 +46,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_sync_accept_funds_multi_transfer",
                 "arguments": [
                     "sc:vault",

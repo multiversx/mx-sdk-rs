@@ -21,7 +21,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_ser_example_1",
                 "arguments": [
                     {
@@ -72,7 +71,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_boxed_ser_example_1",
                 "arguments": [
                     {

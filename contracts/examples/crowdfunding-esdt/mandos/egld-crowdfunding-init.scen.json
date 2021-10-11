@@ -22,7 +22,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../output/crowdfunding-esdt.wasm",
                 "arguments": [
                     "500,000,000,000",

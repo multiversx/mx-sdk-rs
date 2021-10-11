@@ -15,7 +15,6 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "fund",
                 "arguments": [
                     "500,000"

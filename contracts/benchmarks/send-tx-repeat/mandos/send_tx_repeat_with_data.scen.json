@@ -26,7 +26,6 @@
             "txId": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/send-tx-repeat.wasm",
                 "arguments": [],
                 "gasLimit": "100,000,000",
@@ -46,7 +45,7 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "1000",
+                "egldValue": "1000",
                 "function": "repeat",
                 "arguments": [
                     "address:receiver",

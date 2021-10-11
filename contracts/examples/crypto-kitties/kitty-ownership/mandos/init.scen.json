@@ -31,7 +31,6 @@
             "txId": "deploy - kitty genetic alg contract",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
                 "arguments": [],
                 "gasLimit": "1,000,000",
@@ -50,7 +49,6 @@
             "txId": "deploy - kitty ownership contract",
             "tx": {
                 "from": "address:my_address",
-                "value": "0",
                 "contractCode": "file:../output/kitty-ownership.wasm",
                 "arguments": [
                     "10",

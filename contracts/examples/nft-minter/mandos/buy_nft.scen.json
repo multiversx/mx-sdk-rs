@@ -11,7 +11,7 @@
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
-                "value": "400",
+                "egldValue": "400",
                 "function": "buyNft",
                 "arguments": [
                     "1"
@@ -33,7 +33,7 @@
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
-                "value": "500",
+                "egldValue": "500",
                 "function": "buyNft",
                 "arguments": [
                     "3"
@@ -55,7 +55,7 @@
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
-                "value": "500",
+                "egldValue": "500",
                 "function": "buyNft",
                 "arguments": [
                     "1"
@@ -151,8 +151,7 @@
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:SEMIFUNG-123456",
                         "nonce": "1",
@@ -180,8 +179,7 @@
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:SEMIFUNG-123456",
                         "nonce": "2",

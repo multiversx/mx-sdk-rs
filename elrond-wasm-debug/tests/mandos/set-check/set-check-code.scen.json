@@ -6,8 +6,6 @@
             "comment": "any large(r) file will do, so we can get a more realistic case",
             "accounts": {
                 "sc:contract-address": {
-                    "nonce": "",
-                    "balance": "",
                     "code": "file:set-check-esdt.scen.json"
                 }
             },

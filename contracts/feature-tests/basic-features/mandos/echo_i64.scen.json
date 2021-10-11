@@ -22,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "0"
@@ -46,7 +45,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "5"
@@ -70,7 +68,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "-3"
@@ -94,7 +91,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "0x010000000000000000"
@@ -117,7 +113,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "0xffffffffffffffff"
@@ -141,7 +136,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "0x7fffffffffffffff"
@@ -165,7 +159,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "+9223372036854775808"
@@ -188,7 +181,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "-9223372036854775809"
@@ -211,7 +203,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_i64",
                 "arguments": [
                     "0x00"

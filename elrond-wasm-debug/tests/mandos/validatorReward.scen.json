@@ -16,7 +16,7 @@
             "txId": "1",
             "tx": {
                 "to": "address:A",
-                "value": "100"
+                "egldValue": "100"
             }
         },
         {
@@ -37,7 +37,7 @@
             "txId": "2",
             "tx": {
                 "to": "address:A",
-                "value": "50"
+                "egldValue": "50"
             }
         },
         {

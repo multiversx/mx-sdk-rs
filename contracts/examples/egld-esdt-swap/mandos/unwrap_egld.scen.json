@@ -11,8 +11,7 @@
             "tx": {
                 "from": "address:user",
                 "to": "sc:egld-esdt-swap",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:WEGLD-abcdef",
                         "value": "300"

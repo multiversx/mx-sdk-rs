@@ -31,7 +31,6 @@
             "tx": {
                 "from": "address:crypto_bubbles_owner",
                 "to": "sc:crypto_bubbles",
-                "value": "0",
                 "function": "rewardAndSendToWallet",
                 "arguments": [
                     "0x12",

@@ -43,7 +43,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm"
@@ -81,7 +80,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm",
@@ -121,7 +119,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deployFromSource",
                 "arguments": [
                     "sc:child"
@@ -158,7 +155,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_vault_from_source",
                 "arguments": [
                     "sc:child",

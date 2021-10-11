@@ -29,8 +29,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:ANY_TOKEN",
                         "value": "1"
@@ -56,8 +55,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:ANY_TOKEN",
                         "value": "1"
@@ -85,8 +83,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:ANY_TOKEN",
                         "value": "1"
@@ -115,8 +112,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:ANY_TOKEN",
                         "value": "1"
@@ -145,8 +141,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:ANY_TOKEN",
                         "value": "1"
@@ -175,8 +170,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:ANY_TOKEN",
                         "value": "1"
