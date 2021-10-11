@@ -30,20 +30,13 @@ pub fn sc_call(
 
     let from = tx_input.from.clone();
     let to = tx_input.to.clone();
-    let call_value = tx_input.call_value.clone();
+    let egld_value = tx_input.egld_value.clone();
+    let esdt_values = tx_input.esdt_values.clone();
     let blockchain_info = state.create_tx_info(&to);
 
-    state.subtract_tx_payment(&from, &call_value)?;
+    state.subtract_tx_payment(&from, &egld_value)?;
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
-
-    let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
-    let nonce = tx_input.nonce;
-    let esdt_value = tx_input.esdt_value.clone();
-    let esdt_used = !esdt_token_identifier.is_empty() && esdt_value > 0u32.into();
-
-    if esdt_used {
-        state.substract_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
-    }
+    state.subtract_multi_esdt_balance(&from, tx_input.esdt_values.as_slice());
 
     let contract_account = state
         .accounts
@@ -74,10 +67,8 @@ pub fn sc_call(
         // replace storage with new one
         let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
 
-        state.increase_balance(&to, &call_value);
-        if esdt_used {
-            state.increase_esdt_balance(&to, &esdt_token_identifier, nonce, &esdt_value);
-        }
+        state.increase_balance(&to, &egld_value);
+        state.increase_multi_esdt_balance(&to, esdt_values.as_slice());
 
         state.send_balance(
             &to,
@@ -85,11 +76,9 @@ pub fn sc_call(
             &mut tx_result.result_logs,
         )?;
     } else {
-        state.increase_balance(&from, &call_value);
-
-        if esdt_used {
-            state.increase_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
-        }
+        // revert
+        state.increase_balance(&from, &egld_value);
+        state.increase_multi_esdt_balance(&from, esdt_values.as_slice());
     }
 
     Ok((tx_result, tx_output.async_call))

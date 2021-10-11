@@ -36,10 +36,8 @@ impl TxContext {
             tx_input_box: Box::new(TxInput {
                 from: Address::zero(),
                 to: Address::zero(),
-                call_value: 0u32.into(),
-                esdt_value: 0u32.into(),
-                esdt_token_identifier: Vec::new(),
-                nonce: 0u64,
+                egld_value: 0u32.into(),
+                esdt_values: Vec::new(),
                 func_name: Vec::new(),
                 args: Vec::new(),
                 gas_limit: 0,

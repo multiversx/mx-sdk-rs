@@ -8,10 +8,8 @@ use std::fmt;
 pub struct TxInput {
     pub from: Address,
     pub to: Address,
-    pub call_value: BigUint,
-    pub esdt_value: BigUint,
-    pub esdt_token_identifier: Vec<u8>,
-    pub nonce: u64,
+    pub egld_value: BigUint,
+    pub esdt_values: Vec<TxInputESDT>,
     pub func_name: Vec<u8>,
     pub args: Vec<Vec<u8>>,
     pub gas_limit: u64,
@@ -21,13 +19,11 @@ pub struct TxInput {
 
 impl fmt::Display for TxInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_token_identifier: {:?}, esdt_nonce: {:?}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
+        write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
             String::from_utf8(self.func_name.clone()).unwrap(),
             self.args,
-            self.call_value,
-            self.esdt_token_identifier,
-            self.nonce,
-            self.esdt_value,
+            self.egld_value,
+            self.esdt_values,
             address_hex(&self.from),
             address_hex(&self.to))
     }
@@ -37,4 +33,11 @@ impl TxInput {
     pub fn add_arg(&mut self, arg: Vec<u8>) {
         self.args.push(arg);
     }
+}
+
+#[derive(Clone, Debug)]
+pub struct TxInputESDT {
+    pub token_identifier: Vec<u8>,
+    pub nonce: u64,
+    pub value: BigUint,
 }

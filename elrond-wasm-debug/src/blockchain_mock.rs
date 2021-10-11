@@ -1,7 +1,7 @@
 use super::mock_error::BlockchainMockError;
 use crate::{
     contract_map::*, display_util::*, esdt_transfer_event_log, tx_context::*,
-    world_mock::AccountEsdt, SendBalance, TxInput, TxLog, TxOutput, TxPanic,
+    world_mock::AccountEsdt, SendBalance, TxInput, TxInputESDT, TxLog, TxOutput, TxPanic,
 };
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
@@ -232,7 +232,7 @@ impl BlockchainMock {
             } else {
                 let esdt_token_identifier = send_balance.token_identifier.as_slice();
                 let esdt_nonce = send_balance.nonce;
-                self.substract_esdt_balance(
+                self.subtract_esdt_balance(
                     contract_address,
                     esdt_token_identifier,
                     esdt_nonce,
@@ -257,7 +257,7 @@ impl BlockchainMock {
         Ok(())
     }
 
-    pub fn substract_esdt_balance(
+    pub fn subtract_esdt_balance(
         &mut self,
         address: &Address,
         esdt_token_identifier: &[u8],
@@ -299,6 +299,23 @@ impl BlockchainMock {
         *esdt_balance -= value;
     }
 
+    pub fn subtract_multi_esdt_balance(
+        &mut self,
+        address: &Address,
+        esdt_transfers: &[TxInputESDT],
+    ) {
+        for esdt_transfer in esdt_transfers {
+            if !esdt_transfer.value.is_zero() {
+                self.subtract_esdt_balance(
+                    address,
+                    esdt_transfer.token_identifier.as_slice(),
+                    esdt_transfer.nonce,
+                    &esdt_transfer.value,
+                );
+            }
+        }
+    }
+
     pub fn increase_esdt_balance(
         &mut self,
         address: &Address,
@@ -317,6 +334,23 @@ impl BlockchainMock {
             account
                 .esdt
                 .push_esdt(esdt_token_identifier.to_vec(), nonce, value.clone());
+        }
+    }
+
+    pub fn increase_multi_esdt_balance(
+        &mut self,
+        address: &Address,
+        esdt_transfers: &[TxInputESDT],
+    ) {
+        for esdt_transfer in esdt_transfers {
+            if !esdt_transfer.value.is_zero() {
+                self.increase_esdt_balance(
+                    address,
+                    esdt_transfer.token_identifier.as_slice(),
+                    esdt_transfer.nonce,
+                    &esdt_transfer.value,
+                );
+            }
         }
     }
 
@@ -346,23 +380,15 @@ impl BlockchainMock {
             .unwrap_or_else(|| {
                 panic!("Missing new address. Only explicit new deploy addresses supported")
             });
-        let mut esdt = AccountEsdt::default();
-        if !tx_input.esdt_token_identifier.is_empty() {
-            esdt.push_esdt(
-                tx_input.esdt_token_identifier.clone(),
-                tx_input.nonce,
-                tx_input.esdt_value.clone(),
-            );
-        }
 
         let old_value = self.accounts.insert(
             new_address.clone(),
             AccountData {
                 address: new_address.clone(),
                 nonce: 0,
-                balance: tx_input.call_value.clone(),
+                balance: tx_input.egld_value.clone(),
                 storage: new_storage,
-                esdt,
+                esdt: AccountEsdt::default(),
                 username: Vec::new(),
                 contract_path: Some(contract_path),
                 contract_owner: Some(tx_input.from.clone()),

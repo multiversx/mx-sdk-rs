@@ -14,7 +14,7 @@ impl TxContext {
         let mut available_balance = self.blockchain_info_box.contract_balance.clone();
 
         // add amount received
-        available_balance += &self.tx_input_box.call_value;
+        available_balance += &self.tx_input_box.egld_value;
 
         // already sent
         let tx_output = self.tx_output_cell.borrow();
@@ -37,9 +37,12 @@ impl TxContext {
             .get_esdt_balance(token_identifier, nonce);
 
         // add amount received (if the same token)
-        if self.tx_input_box.esdt_token_identifier == token_identifier {
-            available_balance += &self.tx_input_box.esdt_value;
+        for esdt_value in self.tx_input_box.esdt_values.iter() {
+            if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
+                available_balance += &esdt_value.value;
+            }
         }
+
         let tx_output = self.tx_output_cell.borrow();
 
         // already sent

@@ -9,8 +9,6 @@ use num_bigint::BigUint;
 
 use alloc::vec::Vec;
 
-const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
-
 #[derive(Debug)]
 pub struct AsyncCallTxData {
     pub to: Address,
@@ -23,14 +21,6 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
     let mut de = HexCallDataDeserializer::new(async_data.call_data.as_slice());
     let func_name = de.get_func_name().to_vec();
     let mut args: Vec<Vec<u8>> = Vec::new();
-    let mut esdt_token_identifier = Vec::<u8>::new();
-    let nonce = 0u64;
-    let mut esdt_value = 0u32.into();
-
-    if func_name == ESDT_TRANSFER_STRING {
-        esdt_token_identifier = de.next_argument().unwrap().unwrap();
-        esdt_value = BigUint::from_bytes_be(&de.next_argument().unwrap().unwrap());
-    }
 
     while let Some(deserialized_arg) = de.next_argument().unwrap() {
         args.push(deserialized_arg);
@@ -38,10 +28,8 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
     TxInput {
         from: contract_addr.clone(),
         to: async_data.to.clone(),
-        call_value: async_data.call_value.clone(),
-        esdt_value,
-        esdt_token_identifier,
-        nonce,
+        egld_value: async_data.call_value.clone(),
+        esdt_values: Vec::new(),
         func_name,
         args,
         gas_limit: 1000,
@@ -66,10 +54,8 @@ pub fn async_callback_tx_input(
     TxInput {
         from: async_data.to.clone(),
         to: contract_addr.clone(),
-        call_value: 0u32.into(),
-        esdt_value: 0u32.into(),
-        esdt_token_identifier: Vec::new(),
-        nonce: 0u64,
+        egld_value: 0u32.into(),
+        esdt_values: Vec::new(),
         func_name: b"callBack".to_vec(),
         args,
         gas_limit: 1000,
