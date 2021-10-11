@@ -7,9 +7,7 @@ use crate::serde_raw::{TxESDTRaw, ValueSubTree};
 pub struct TxTransferRaw {
     pub from: ValueSubTree,
     pub to: ValueSubTree,
-    pub value: ValueSubTree,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub esdt: Option<TxESDTRaw>,
+    pub value: Option<ValueSubTree>,
+    pub egld: Option<ValueSubTree>,
+    pub esdt: Vec<TxESDTRaw>,
 }

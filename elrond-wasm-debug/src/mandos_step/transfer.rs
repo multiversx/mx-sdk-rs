@@ -12,7 +12,7 @@ pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
     let recipient_address = &tx.to.value.into();
     state.increase_balance(recipient_address, &tx.value.value);
 
-    if let Some(esdt_transfer) = &tx.esdt_value {
+    tx.esdt_value.iter().for_each(|esdt_transfer| {
         let esdt_value = esdt_transfer.esdt_value.value.clone();
         if !esdt_value.is_zero() {
             let esdt_token_identifier = esdt_transfer.esdt_token_identifier.value.clone();
@@ -30,5 +30,5 @@ pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
                 &esdt_value,
             );
         }
-    }
+    })
 }

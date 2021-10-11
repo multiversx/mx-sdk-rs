@@ -11,7 +11,7 @@ pub struct TxTransfer {
     pub from: AddressValue,
     pub to: AddressValue,
     pub value: BigUintValue,
-    pub esdt_value: Option<TxESDT>,
+    pub esdt_value: Vec<TxESDT>,
 }
 
 impl InterpretableFrom<TxTransferRaw> for TxTransfer {
@@ -19,10 +19,15 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
         TxTransfer {
             from: AddressValue::interpret_from(from.from, context),
             to: AddressValue::interpret_from(from.to, context),
-            value: BigUintValue::interpret_from(from.value, context),
+            value: BigUintValue::interpret_from(
+                from.value.unwrap_or(from.egld.unwrap_or_default()),
+                context,
+            ),
             esdt_value: from
                 .esdt
-                .map(|esdt_value| TxESDT::interpret_from(esdt_value, context)),
+                .iter()
+                .map(|esdt_value| TxESDT::interpret_from(esdt_value.clone(), context))
+                .collect(),
         }
     }
 }
