@@ -56,6 +56,7 @@ fn esdt_transfer_execute_additional(
     let mut new_tx_input = tx_input.clone();
     new_tx_input.func_name = tx_input.args[2].clone();
     new_tx_input.args = Vec::<Vec<u8>>::new();
+    let dest = new_tx_input.to.clone();
 
     if tx_input.args.len() > 3 {
         for arg in tx_input.args[3..].iter() {
@@ -100,7 +101,7 @@ fn esdt_transfer_execute_additional(
     );
 
     let send_result = state.send_balance(
-        &new_tx_input.to,
+        &dest,
         tx_output.send_balance_list.as_slice(),
         &mut tx_output.result.result_logs,
     );

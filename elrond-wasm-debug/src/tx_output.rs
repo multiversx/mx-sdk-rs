@@ -1,9 +1,6 @@
 use crate::{async_data::*, TxLog, TxManagedTypes};
 use alloc::vec::Vec;
-use elrond_wasm::{
-    api::ManagedTypeApi,
-    types::{Address, BoxedBytes, ManagedArgBuffer, ManagedBuffer},
-};
+use elrond_wasm::types::{Address, BoxedBytes};
 use num_bigint::BigUint;
 use std::{collections::HashMap, fmt};
 
