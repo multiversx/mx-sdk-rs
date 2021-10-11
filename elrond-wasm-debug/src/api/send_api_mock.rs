@@ -97,9 +97,10 @@ impl SendApi for TxContext {
         _arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let amount_value = self.big_uint_value(amount);
-        if amount_value
-            > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice(), 0u64)
-        {
+        let token_as_box = token.to_esdt_identifier();
+        let available_value = self.get_available_esdt_balance(token_as_box.as_slice(), 0u64);
+
+        if amount_value > available_value {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: b"insufficient funds".to_vec(),
@@ -110,9 +111,9 @@ impl SendApi for TxContext {
         let token_identifier = token.to_esdt_identifier();
         let mut tx_output = self.tx_output_cell.borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
-            recipient,
-            token_identifier,
-            amount: amount_value,
+            recipient: recipient.clone(),
+            token_identifier: token_identifier.clone(),
+            amount: amount_value.clone(),
             nonce: 0u64,
         });
         Ok(())

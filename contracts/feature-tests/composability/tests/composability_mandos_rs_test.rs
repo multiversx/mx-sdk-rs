@@ -208,13 +208,13 @@ fn forwarder_call_async_accept_egld_rs() {
 // 	);
 // }
 
-// #[test]
-// fn forwarder_call_transf_exec_accept_esdt_rs() {
-// 	elrond_wasm_debug::mandos_rs(
-// 		"mandos/forwarder_call_transf_exec_accept_esdt.scen.json",
-// 		&contract_map(),
-// 	);
-// }
+#[test]
+fn forwarder_call_transf_exec_accept_esdt_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "/home/elrond/Github/elrond-wasm-rs/contracts/feature-tests/composability/mandos/forwarder_call_transf_exec_accept_esdt.scen.json",
+        &contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_call_transf_exec_accept_esdt_twice_rs() {

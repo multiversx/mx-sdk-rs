@@ -2,12 +2,16 @@ use elrond_wasm::types::H256;
 use mandos::model::{CheckLogs, Checkable, TxExpect};
 use std::collections::HashMap;
 
+pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
+pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
+
 use crate::{
     address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, execute_tx,
     merge_results, try_execute_builtin_function, verbose_hex, world_mock::AccountEsdt, AccountData,
     AsyncCallTxData, BlockchainMock, BlockchainMockError, ContractMap, TxContext, TxInput,
     TxManagedTypes, TxOutput, TxResult,
 };
+
 pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
     let bytes = tx_id.as_bytes();
     let mut result = [b'.'; 32];
@@ -19,13 +23,117 @@ pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
     result.into()
 }
 
+fn try_prepare_builtin_function(tx_input: &TxInput) -> Option<TxInput> {
+    if tx_already_builtin_func(tx_input) {
+        return Some(tx_input.clone());
+    }
+
+    if tx_is_esdt_transfer(tx_input) {
+        return Some(to_esdt_transfer_builtin_repr(tx_input));
+    }
+
+    if tx_is_esdt_nft_transfer(tx_input) {
+        return Some(to_esdt_nft_transfer_builtin_repr(tx_input));
+    }
+
+    None
+}
+
+fn to_esdt_transfer_builtin_repr(tx_input: &TxInput) -> TxInput {
+    let mut builtin_tx = tx_input.clone();
+
+    let orig_func = builtin_tx.func_name;
+    builtin_tx.func_name = ESDT_TRANSFER_STRING.into();
+
+    let args_to_prepend = [
+        builtin_tx.esdt_token_identifier.clone(),
+        builtin_tx.esdt_value.to_bytes_be(),
+        orig_func,
+    ];
+
+    builtin_tx
+        .args
+        .splice(0..0, args_to_prepend.iter().cloned());
+
+    builtin_tx
+}
+
+fn to_esdt_nft_transfer_builtin_repr(tx_input: &TxInput) -> TxInput {
+    let mut builtin_tx = tx_input.clone();
+
+    let orig_func = builtin_tx.func_name;
+    builtin_tx.func_name = ESDT_NFT_TRANSFER_STRING.into();
+
+    let args_to_prepend = [
+        builtin_tx.esdt_token_identifier.clone(),
+        builtin_tx.nonce.to_be_bytes().into(),
+        builtin_tx.esdt_value.to_bytes_be(),
+        builtin_tx.from.to_vec(),
+        orig_func,
+    ];
+
+    builtin_tx
+        .args
+        .splice(0..0, args_to_prepend.iter().cloned());
+
+    builtin_tx
+}
+
+fn tx_already_builtin_func(tx_input: &TxInput) -> bool {
+    if compare(tx_input.func_name.as_slice(), ESDT_TRANSFER_STRING) == 0 {
+        return true;
+    }
+
+    if compare(tx_input.func_name.as_slice(), ESDT_NFT_TRANSFER_STRING) == 0 {
+        return true;
+    }
+
+    false
+}
+
+fn compare(a: &[u8], b: &[u8]) -> i64 {
+    let mut ret = 0;
+    for (p1, p2) in a.iter().zip(b.iter()) {
+        if p1 != p2 {
+            ret = *p1 as i64 - *p2 as i64;
+            break;
+        }
+    }
+
+    if ret == 0 {
+        if a.len() < b.len() {
+            ret = -1;
+        } else if a.len() > b.len() {
+            ret = 1;
+        }
+    }
+
+    ret
+}
+
+fn tx_is_esdt_transfer(tx_input: &TxInput) -> bool {
+    !tx_input.esdt_token_identifier.is_empty()
+        && tx_input.esdt_value.count_ones() != 0
+        && tx_input.nonce == 0
+}
+
+fn tx_is_esdt_nft_transfer(tx_input: &TxInput) -> bool {
+    !tx_input.esdt_token_identifier.is_empty()
+        && tx_input.esdt_value.count_ones() != 0
+        && tx_input.nonce != 0
+}
+
 pub fn sc_call(
     tx_input: TxInput,
     state: &mut BlockchainMock,
     contract_map: &ContractMap<TxContext>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
-    if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
-        return Ok((tx_result, None));
+    let builtin_tx_input_opt = try_prepare_builtin_function(&tx_input);
+    if let Some(builtin_tx_input) = builtin_tx_input_opt {
+        let tx_result_opt = try_execute_builtin_function(&builtin_tx_input, state, contract_map);
+        if let Some(tx_result) = tx_result_opt {
+            return Ok((tx_result, None));
+        }
     }
 
     let from = tx_input.from.clone();

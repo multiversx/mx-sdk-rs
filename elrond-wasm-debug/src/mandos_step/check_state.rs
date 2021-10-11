@@ -253,16 +253,6 @@ pub fn check_token_instance(
         ))
     }
 
-    if !expected_value.balance.check(&actual_value.balance) {
-        errors.push(format!(
-            "bad esdt balance. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-            address,
-            token,
-            expected_value.nonce.value,
-            expected_value.balance,
-            &actual_value.balance,
-        ))
-    }
     let actual_creator = actual_value.creator.clone().unwrap_or_default();
     if !expected_value.creator.check(&actual_creator) {
         errors.push(format!(
