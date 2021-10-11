@@ -2,6 +2,7 @@ mod tx_call;
 mod tx_deploy;
 mod tx_esdt;
 mod tx_expect;
+mod tx_interpret_util;
 mod tx_query;
 mod tx_transfer;
 mod tx_validator_reward;

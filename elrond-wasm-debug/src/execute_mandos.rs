@@ -63,7 +63,7 @@ fn parse_execute_mandos_steps(
             } => mandos_step::sc_deploy::execute(state, contract_map, tx_id, tx, expect),
             Step::Transfer { tx_id, comment, tx } => mandos_step::transfer::execute(state, tx),
             Step::ValidatorReward { tx_id, comment, tx } => {
-                state.increase_validator_reward(&tx.to.value.into(), &tx.value.value);
+                state.increase_validator_reward(&tx.to.value.into(), &tx.egld_value.value);
             },
             Step::CheckState { comment, accounts } => {
                 mandos_step::check_state::execute(accounts, state);

@@ -100,6 +100,7 @@ impl InterpretableFrom<StepRaw> for Step {
             StepRaw::ScCall {
                 tx_id,
                 comment,
+                display_logs: _,
                 tx,
                 expect,
             } => Step::ScCall {
@@ -111,6 +112,7 @@ impl InterpretableFrom<StepRaw> for Step {
             StepRaw::ScQuery {
                 tx_id,
                 comment,
+                display_logs: _,
                 tx,
                 expect,
             } => Step::ScQuery {
@@ -122,6 +124,7 @@ impl InterpretableFrom<StepRaw> for Step {
             StepRaw::ScDeploy {
                 tx_id,
                 comment,
+                display_logs: _,
                 tx,
                 expect,
             } => Step::ScDeploy {

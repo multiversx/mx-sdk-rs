@@ -18,7 +18,7 @@ pub fn execute(
     let tx_input = TxInput {
         from: tx.from.value.into(),
         to: Address::zero(),
-        call_value: tx.call_value.value.clone(),
+        call_value: tx.egld_value.value.clone(),
         esdt_value: BigUint::zero(),
         esdt_token_identifier: Vec::new(),
         nonce: 0,

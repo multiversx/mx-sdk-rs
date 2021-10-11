@@ -7,10 +7,10 @@ pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
     let sender_address = &tx.from.value.into();
     state.increase_nonce(sender_address);
     state
-        .subtract_tx_payment(sender_address, &tx.value.value)
+        .subtract_tx_payment(sender_address, &tx.egld_value.value)
         .unwrap();
     let recipient_address = &tx.to.value.into();
-    state.increase_balance(recipient_address, &tx.value.value);
+    state.increase_balance(recipient_address, &tx.egld_value.value);
 
     tx.esdt_value.iter().for_each(|esdt_transfer| {
         let esdt_value = esdt_transfer.esdt_value.value.clone();
