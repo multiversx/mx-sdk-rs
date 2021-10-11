@@ -14,7 +14,7 @@ pub fn execute(
     let mut esdt_value = BigUint::zero();
     let mut esdt_token_identifier = Vec::new();
     let mut nonce = 0u64;
-    if let Some(value) = tx.esdt_value.as_ref() {
+    if let Some(value) = tx.esdt_value.first() {
         esdt_value = value.esdt_value.value.clone();
         esdt_token_identifier = value.esdt_token_identifier.value.clone();
         nonce = value.nonce.value;
@@ -22,7 +22,7 @@ pub fn execute(
     let tx_input = TxInput {
         from: tx.from.value.into(),
         to: tx.to.value.into(),
-        call_value: tx.call_value.value.clone(),
+        call_value: tx.egld_value.value.clone(),
         esdt_value,
         esdt_token_identifier,
         nonce,
