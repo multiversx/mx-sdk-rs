@@ -1,0 +1,29 @@
+[package]
+name = "single-value-repeat-wasm"
+version = "0.0.0"
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies.single-value-repeat]
+path = ".."
+features = ["wasm-output-mode"]
+default-features = false
+
+[dependencies.elrond-wasm-output]
+version = "0.20.0"
+path = "../../../../../elrond-wasm-output"
+features = ["wasm-output-mode"]
+
+[workspace]
+members = ["."]
