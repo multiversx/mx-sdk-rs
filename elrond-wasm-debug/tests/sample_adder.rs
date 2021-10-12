@@ -442,10 +442,10 @@ mod sample_adder {
 
 #[test]
 fn test_add() {
-    use elrond_wasm_debug::TxContext;
+    use elrond_wasm_debug::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let tx_context = TxContext::dummy();
+    let tx_context = DebugApi::dummy();
 
     let adder = sample_adder::contract_obj(tx_context.clone());
 
@@ -474,7 +474,7 @@ fn test_add() {
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::TxContext> {
+fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::DebugApi> {
     let mut contract_map = elrond_wasm_debug::ContractMap::new();
     contract_map.register_contract(
         "file:../output/adder.wasm",

@@ -2,10 +2,10 @@ use elrond_wasm::storage::{
     mappers::{LinkedListMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::TxContext;
+use elrond_wasm_debug::DebugApi;
 
-fn create_list() -> LinkedListMapper<TxContext, u64> {
-    let api = TxContext::dummy();
+fn create_list() -> LinkedListMapper<DebugApi, u64> {
+    let api = DebugApi::dummy();
     let base_key = StorageKey::new(api.clone(), &b"my_list"[..]);
     LinkedListMapper::new(api, base_key)
 }
@@ -33,7 +33,7 @@ fn test_list_simple() {
     assert!(list.check_internal_consistency());
 }
 
-fn check_list(list: &LinkedListMapper<TxContext, u64>, expected: Vec<u64>) {
+fn check_list(list: &LinkedListMapper<DebugApi, u64>, expected: Vec<u64>) {
     assert_eq!(list.len(), expected.len());
     let vec: Vec<u64> = list.iter().map(|x| x.into_value()).collect();
     assert_eq!(vec, expected);
