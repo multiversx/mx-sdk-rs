@@ -6,7 +6,6 @@
                 "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/payable-features.wasm"
                 },
                 "address:an-account": {
@@ -16,12 +15,14 @@
                         "str:TOK-123": "1000",
                         "str:OTHERTOK-123": "500",
                         "str:SFT-123": {
-                            "nonce": "5",
-                            "balance": "20"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "20"
+                                }
+                            ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 }
             }
         },
@@ -31,7 +32,7 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "100",
+                "egldValue": "100",
                 "function": "echo_call_value",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -54,12 +55,14 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:TOK-123",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123",
+                        "value": "100"
+                    }
+                ],
                 "function": "echo_call_value",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -82,8 +85,7 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:TOK-123",
                         "value": "100"
@@ -99,6 +101,7 @@
                     }
                 ],
                 "function": "echo_call_value",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
