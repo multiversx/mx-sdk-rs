@@ -17,7 +17,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:nft-minter",
-                "value": "0",
                 "function": "createNft",
                 "arguments": [
                     "str:NFT 1",
@@ -51,7 +50,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:nft-minter",
-                "value": "0",
                 "function": "createNft",
                 "arguments": [
                     "str:NFT 2",
@@ -83,10 +81,6 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-123456": {
-                            "lastNonce": "2",
-                            "roles": [
-                                "ESDTRoleNFTCreate"
-                            ],
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -104,6 +98,10 @@
                                     "uri": "str:www.mycoolnft.com/nft2.jpg",
                                     "attributes": "u64:200,000"
                                 }
+                            ],
+                            "lastNonce": "2",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
                             ]
                         }
                     },
