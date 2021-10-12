@@ -7,7 +7,7 @@ use crate::{address_hex, tx_mock::TxInputESDT};
 use super::{BlockchainMock, BlockchainMockError};
 
 impl BlockchainMock {
-    pub fn subtract_tx_payment(
+    pub fn subtract_egld_balance(
         &mut self,
         address: &Address,
         call_value: &BigUint,
@@ -16,10 +16,10 @@ impl BlockchainMock {
             .accounts
             .get_mut(address)
             .unwrap_or_else(|| panic!("Sender account not found"));
-        if &sender_account.balance < call_value {
+        if &sender_account.egld_balance < call_value {
             return Err("failed transfer (insufficient funds)".into());
         }
-        sender_account.balance -= call_value;
+        sender_account.egld_balance -= call_value;
         Ok(())
     }
 
@@ -30,18 +30,18 @@ impl BlockchainMock {
             .unwrap_or_else(|| panic!("Sender account not found"));
         let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
         assert!(
-            sender_account.balance >= gas_cost,
+            sender_account.egld_balance >= gas_cost,
             "Not enough balance to pay gas upfront"
         );
-        sender_account.balance -= &gas_cost;
+        sender_account.egld_balance -= &gas_cost;
     }
 
-    pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
+    pub fn increase_egld_balance(&mut self, address: &Address, amount: &BigUint) {
         let account = self
             .accounts
             .get_mut(address)
             .unwrap_or_else(|| panic!("Receiver account not found"));
-        account.balance += amount;
+        account.egld_balance += amount;
     }
 
     pub fn subtract_esdt_balance(

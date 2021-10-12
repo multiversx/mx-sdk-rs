@@ -48,7 +48,7 @@ pub fn sc_create(
     let call_value = tx_input.egld_value.clone();
     let blockchain_info = state.create_tx_info(&to);
 
-    state.subtract_tx_payment(&from, &call_value)?;
+    state.subtract_egld_balance(&from, &call_value)?;
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     let tx_context = TxContext::new(blockchain_info, tx_input.clone(), TxOutput::default());
@@ -66,7 +66,7 @@ pub fn sc_create(
             &mut tx_output.result.result_logs,
         )?;
     } else {
-        state.increase_balance(&from, &call_value);
+        state.increase_egld_balance(&from, &call_value);
     }
 
     Ok((tx_output.result, tx_output.async_call))

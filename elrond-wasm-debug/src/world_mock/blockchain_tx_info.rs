@@ -21,7 +21,7 @@ impl BlockchainMock {
             BlockchainTxInfo {
                 previous_block_info: self.previous_block_info.clone(),
                 current_block_info: self.current_block_info.clone(),
-                contract_balance: contract.balance.clone(),
+                contract_balance: contract.egld_balance.clone(),
                 contract_esdt: contract.esdt.clone(),
                 contract_owner: contract.contract_owner.clone(),
             }

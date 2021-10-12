@@ -41,7 +41,7 @@ pub fn execute(
                 .as_ref()
                 .map(|nonce| nonce.value)
                 .unwrap_or_default(),
-            balance: account
+            egld_balance: account
                 .balance
                 .as_ref()
                 .map(|balance| balance.value.clone())
