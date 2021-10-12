@@ -6,7 +6,7 @@ use elrond_wasm::{
 
 use core::fmt::Debug;
 
-use crate::tx_mock::DebugApi;
+use crate::DebugApi;
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.

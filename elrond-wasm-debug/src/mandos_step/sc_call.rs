@@ -2,9 +2,9 @@ use mandos::model::{TxCall, TxESDT, TxExpect};
 
 use crate::{
     execute_helper_functions::{self, check_tx_output, sc_call_with_async_and_callback},
-    tx_mock::{DebugApi, TxInput, TxInputESDT},
+    tx_mock::{TxInput, TxInputESDT},
     world_mock::BlockchainMock,
-    ContractMap,
+    ContractMap, DebugApi,
 };
 
 pub fn execute(

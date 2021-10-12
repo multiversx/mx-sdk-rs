@@ -3,9 +3,9 @@ use mandos::model::{TxDeploy, TxExpect};
 
 use crate::{
     execute_helper_functions::{check_tx_output, generate_tx_hash_dummy},
-    tx_mock::{DebugApi, TxInput, TxOutput, TxResult},
+    tx_mock::{TxInput, TxOutput, TxResult},
     world_mock::{execute_tx, BlockchainMock, BlockchainMockError},
-    AsyncCallTxData, ContractMap,
+    AsyncCallTxData, ContractMap, DebugApi,
 };
 
 pub fn execute(
