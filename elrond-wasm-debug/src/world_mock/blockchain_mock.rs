@@ -2,7 +2,7 @@ use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use crate::{
     esdt_transfer_event_log,
@@ -40,10 +40,6 @@ impl Default for BlockchainMock {
 }
 
 impl BlockchainMock {
-    
-
-   
-
     pub fn send_balance(
         &mut self,
         contract_address: &Address,
@@ -52,8 +48,8 @@ impl BlockchainMock {
     ) -> Result<(), BlockchainMockError> {
         for send_balance in send_balance_list {
             if send_balance.token_identifier.is_empty() {
-                self.subtract_tx_payment(contract_address, &send_balance.amount)?;
-                self.increase_balance(&send_balance.recipient, &send_balance.amount);
+                self.subtract_egld_balance(contract_address, &send_balance.amount)?;
+                self.increase_egld_balance(&send_balance.recipient, &send_balance.amount);
             } else {
                 let esdt_token_identifier = send_balance.token_identifier.as_slice();
                 let esdt_nonce = send_balance.nonce;
@@ -114,7 +110,7 @@ impl BlockchainMock {
             AccountData {
                 address: new_address.clone(),
                 nonce: 0,
-                balance: tx_input.egld_value.clone(),
+                egld_balance: tx_input.egld_value.clone(),
                 storage: new_storage,
                 esdt: AccountEsdt::default(),
                 username: Vec::new(),
@@ -137,7 +133,7 @@ impl BlockchainMock {
                 &std::str::from_utf8(address.as_ref()).unwrap()
             )
         });
-        account.balance += amount;
+        account.egld_balance += amount;
         let mut storage_v_rew =
             if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY) {
                 BigUint::from_bytes_be(old_storage_value)

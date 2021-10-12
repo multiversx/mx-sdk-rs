@@ -12,9 +12,9 @@ pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 pub struct AccountData {
     pub address: Address,
     pub nonce: u64,
-    pub balance: BigUint,
-    pub storage: AccountStorage,
+    pub egld_balance: BigUint,
     pub esdt: AccountEsdt,
+    pub storage: AccountStorage,
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
     pub contract_owner: Option<Address>,
@@ -47,7 +47,7 @@ impl fmt::Display for AccountData {
 		storage: [{} ]
 	}}",
             self.nonce,
-            self.balance,
+            self.egld_balance,
             self.esdt,
             String::from_utf8(self.username.clone()).unwrap(),
             storage_buf
