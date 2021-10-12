@@ -1,11 +1,11 @@
-use crate::tx_mock::{TxContext, TxPanic};
+use crate::tx_mock::{DebugApi, TxPanic};
 use elrond_wasm::{
     api::CallValueApi,
     err_msg,
     types::{BigUint, EsdtTokenType, TokenIdentifier},
 };
 
-impl TxContext {
+impl DebugApi {
     fn fail_if_more_than_one_esdt_transfer(&self) {
         if self.esdt_num_transfers() > 1 {
             std::panic::panic_any(TxPanic {
@@ -16,7 +16,7 @@ impl TxContext {
     }
 }
 
-impl CallValueApi for TxContext {
+impl CallValueApi for DebugApi {
     fn check_not_payable(&self) {
         if self.egld_value() > 0 {
             std::panic::panic_any(TxPanic {
@@ -34,7 +34,7 @@ impl CallValueApi for TxContext {
 
     #[inline]
     fn egld_value(&self) -> BigUint<Self> {
-        self.insert_new_big_uint(self.tx_input_box.egld_value.clone())
+        self.insert_new_big_uint(self.input_ref().egld_value.clone())
     }
 
     #[inline]
@@ -63,12 +63,12 @@ impl CallValueApi for TxContext {
 
     #[inline]
     fn esdt_num_transfers(&self) -> usize {
-        self.tx_input_box.esdt_values.len()
+        self.input_ref().esdt_values.len()
     }
 
     #[inline]
     fn esdt_value_by_index(&self, index: usize) -> BigUint<Self> {
-        if let Some(esdt_value) = self.tx_input_box.esdt_values.get(index) {
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {
             self.insert_new_big_uint_zero()
@@ -77,7 +77,7 @@ impl CallValueApi for TxContext {
 
     #[inline]
     fn token_by_index(&self, index: usize) -> TokenIdentifier<Self> {
-        if let Some(esdt_value) = self.tx_input_box.esdt_values.get(index) {
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             TokenIdentifier::from(
                 self.insert_new_managed_buffer(esdt_value.token_identifier.clone()),
             )
@@ -88,7 +88,7 @@ impl CallValueApi for TxContext {
 
     #[inline]
     fn esdt_token_nonce_by_index(&self, index: usize) -> u64 {
-        if let Some(esdt_value) = self.tx_input_box.esdt_values.get(index) {
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             esdt_value.nonce
         } else {
             0

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::{
     address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, merge_results,
     try_execute_builtin_function,
-    tx_mock::{TxContext, TxInput, TxManagedTypes, TxOutput, TxResult},
+    tx_mock::{DebugApi, TxInput, TxOutput, TxResult},
     verbose_hex,
     world_mock::{execute_tx, AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap,
@@ -25,7 +25,7 @@ pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
 pub fn sc_call(
     tx_input: TxInput,
     state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
+    contract_map: &ContractMap<DebugApi>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
     if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
         return Ok((tx_result, None));
@@ -51,12 +51,11 @@ pub fn sc_call(
         .clone()
         .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
 
-    let tx_context = TxContext::new(
+    let tx_context = DebugApi::new(
         blockchain_info,
         tx_input,
         TxOutput {
             contract_storage: contract_account.storage.clone(),
-            managed_types: TxManagedTypes::new(),
             result: TxResult::empty(),
             send_balance_list: Vec::new(),
             async_call: None,
@@ -90,7 +89,7 @@ pub fn sc_call(
 pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
     state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
+    contract_map: &ContractMap<DebugApi>,
 ) -> Result<TxResult, BlockchainMockError> {
     let contract_address = tx_input.to.clone();
     let (mut tx_result, opt_async_data) = sc_call(tx_input, state, contract_map)?;

@@ -1,6 +1,6 @@
 use crate::{
     async_data::AsyncCallTxData,
-    tx_mock::{SendBalance, TxContext, TxOutput, TxPanic},
+    tx_mock::{DebugApi, SendBalance, TxPanic},
 };
 use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
@@ -11,16 +11,16 @@ use elrond_wasm::{
     HexCallDataSerializer,
 };
 
-impl TxContext {
+impl DebugApi {
     fn get_available_egld_balance(&self) -> num_bigint::BigUint {
         // start with the pre-existing balance
-        let mut available_balance = self.blockchain_info_box.contract_balance.clone();
+        let mut available_balance = self.blockchain_info_ref().contract_balance.clone();
 
         // add amount received
-        available_balance += &self.tx_input_box.egld_value;
+        available_balance += &self.input_ref().egld_value;
 
         // already sent
-        let tx_output = self.tx_output_cell.borrow();
+        let tx_output = self.output_borrow();
         for send_balance in &tx_output.send_balance_list {
             available_balance -= &send_balance.amount;
         }
@@ -35,18 +35,18 @@ impl TxContext {
     ) -> num_bigint::BigUint {
         // start with the pre-existing balance
         let mut available_balance = self
-            .blockchain_info_box
+            .blockchain_info_ref()
             .contract_esdt
             .get_esdt_balance(token_identifier, nonce);
 
         // add amount received (if the same token)
-        for esdt_value in self.tx_input_box.esdt_values.iter() {
+        for esdt_value in self.input_ref().esdt_values.iter() {
             if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
                 available_balance += &esdt_value.value;
             }
         }
 
-        let tx_output = self.tx_output_cell.borrow();
+        let tx_output = self.output_borrow();
 
         // already sent
         for send_balance in &tx_output.send_balance_list {
@@ -59,7 +59,7 @@ impl TxContext {
     }
 }
 
-impl SendApi for TxContext {
+impl SendApi for DebugApi {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, _data: D)
     where
         D: ManagedInto<Self, ManagedBuffer<Self>>,
@@ -73,7 +73,7 @@ impl SendApi for TxContext {
         }
 
         let recipient = to.to_address();
-        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let mut tx_output = self.output_borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
             recipient,
             token_identifier: BoxedBytes::empty(),
@@ -114,7 +114,7 @@ impl SendApi for TxContext {
 
         let recipient = to.to_address();
         let token_identifier = token.to_esdt_identifier();
-        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let mut tx_output = self.output_borrow_mut();
         tx_output.send_balance_list.push(SendBalance {
             recipient,
             token_identifier,
@@ -161,7 +161,7 @@ impl SendApi for TxContext {
             HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
         let tx_hash = self.get_tx_hash_legacy();
         // the cell is no longer needed, since we end in a panic
-        let mut tx_output = self.tx_output_cell.replace(TxOutput::default());
+        let mut tx_output = self.consume_output();
         tx_output.async_call = Some(AsyncCallTxData {
             to: recipient,
             call_value: amount_value,

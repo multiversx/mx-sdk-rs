@@ -1,13 +1,13 @@
-use crate::tx_mock::TxContext;
+use crate::DebugApi;
 use elrond_wasm::types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256};
 
-impl elrond_wasm::api::BlockchainApi for TxContext {
+impl elrond_wasm::api::BlockchainApi for DebugApi {
     fn get_sc_address_legacy(&self) -> Address {
-        self.tx_input_box.to.clone()
+        self.input_ref().to.clone()
     }
 
     fn get_owner_address_legacy(&self) -> Address {
-        self.blockchain_info_box
+        self.blockchain_info_ref()
             .contract_owner
             .clone()
             .unwrap_or_else(|| panic!("contract owner address not set"))
@@ -32,7 +32,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     }
 
     fn get_caller_legacy(&self) -> Address {
-        self.tx_input_box.from.clone()
+        self.input_ref().from.clone()
     }
 
     fn get_balance_legacy(&self, address: &Address) -> BigUint<Self> {
@@ -40,7 +40,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"
         );
-        self.insert_new_big_uint(self.blockchain_info_box.contract_balance.clone())
+        self.insert_new_big_uint(self.blockchain_info_ref().contract_balance.clone())
     }
 
     fn get_state_root_hash_legacy(&self) -> H256 {
@@ -48,54 +48,58 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
     }
 
     fn get_tx_hash_legacy(&self) -> H256 {
-        self.tx_input_box.tx_hash.clone()
+        self.input_ref().tx_hash.clone()
     }
 
     fn get_gas_left(&self) -> u64 {
-        self.tx_input_box.gas_limit
+        self.input_ref().gas_limit
     }
 
     fn get_block_timestamp(&self) -> u64 {
-        self.blockchain_info_box.current_block_info.block_timestamp
+        self.blockchain_info_ref()
+            .current_block_info
+            .block_timestamp
     }
 
     fn get_block_nonce(&self) -> u64 {
-        self.blockchain_info_box.current_block_info.block_nonce
+        self.blockchain_info_ref().current_block_info.block_nonce
     }
 
     fn get_block_round(&self) -> u64 {
-        self.blockchain_info_box.current_block_info.block_round
+        self.blockchain_info_ref().current_block_info.block_round
     }
 
     fn get_block_epoch(&self) -> u64 {
-        self.blockchain_info_box.current_block_info.block_epoch
+        self.blockchain_info_ref().current_block_info.block_epoch
     }
 
     fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
-        self.blockchain_info_box
+        self.blockchain_info_ref()
             .current_block_info
             .block_random_seed
             .clone()
     }
 
     fn get_prev_block_timestamp(&self) -> u64 {
-        self.blockchain_info_box.previous_block_info.block_timestamp
+        self.blockchain_info_ref()
+            .previous_block_info
+            .block_timestamp
     }
 
     fn get_prev_block_nonce(&self) -> u64 {
-        self.blockchain_info_box.previous_block_info.block_nonce
+        self.blockchain_info_ref().previous_block_info.block_nonce
     }
 
     fn get_prev_block_round(&self) -> u64 {
-        self.blockchain_info_box.previous_block_info.block_round
+        self.blockchain_info_ref().previous_block_info.block_round
     }
 
     fn get_prev_block_epoch(&self) -> u64 {
-        self.blockchain_info_box.previous_block_info.block_epoch
+        self.blockchain_info_ref().previous_block_info.block_epoch
     }
 
     fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
-        self.blockchain_info_box
+        self.blockchain_info_ref()
             .previous_block_info
             .block_random_seed
             .clone()
@@ -122,7 +126,7 @@ impl elrond_wasm::api::BlockchainApi for TxContext {
         );
 
         let esdt_balance = self
-            .blockchain_info_box
+            .blockchain_info_ref()
             .contract_esdt
             .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce);
         self.insert_new_big_uint(esdt_balance)

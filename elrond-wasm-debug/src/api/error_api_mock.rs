@@ -1,7 +1,7 @@
-use crate::tx_mock::{TxContext, TxPanic};
+use crate::tx_mock::{DebugApi, TxPanic};
 use elrond_wasm::api::{ErrorApi, Handle, ManagedBufferApi};
 
-impl ErrorApi for TxContext {
+impl ErrorApi for DebugApi {
     fn signal_error(&self, message: &[u8]) -> ! {
         // can sometimes help in tests
         // run `clear & cargo test -- --nocapture` to see the output

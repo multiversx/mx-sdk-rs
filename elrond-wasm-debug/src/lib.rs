@@ -22,7 +22,7 @@ pub use mandos_step::*;
 
 pub use arwen_mandos_runner::mandos_go;
 pub use execute_mandos::mandos_rs;
-pub use tx_mock::TxContext;
+pub use tx_mock::DebugApi;
 
 #[macro_use]
 extern crate alloc;
