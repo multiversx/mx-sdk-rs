@@ -14,24 +14,4 @@ pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
     let tx_esdt = tx_esdt_transfers_from_mandos(tx.esdt_value.as_slice());
     state.subtract_multi_esdt_balance(sender_address, tx_esdt.as_slice());
     state.increase_multi_esdt_balance(recipient_address, tx_esdt.as_slice());
-
-    // tx.esdt_value.iter().for_each(|esdt_transfer| {
-    //     let esdt_value = esdt_transfer.esdt_value.value.clone();
-    //     if !esdt_value.is_zero() {
-    //         let esdt_token_identifier = esdt_transfer.esdt_token_identifier.value.clone();
-    //         let nonce = esdt_transfer.nonce.value;
-    //         state.substract_esdt_balance(
-    //             sender_address,
-    //             &esdt_token_identifier[..],
-    //             nonce,
-    //             &esdt_value,
-    //         );
-    //         state.increase_esdt_balance(
-    //             recipient_address,
-    //             &esdt_token_identifier[..],
-    //             nonce,
-    //             &esdt_value,
-    //         );
-    //     }
-    // })
 }
