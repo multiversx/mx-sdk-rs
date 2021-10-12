@@ -1,4 +1,4 @@
-use crate::tx_mock::{DebugApi, TxPanic};
+use crate::{tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
     api::CallValueApi,
     err_msg,

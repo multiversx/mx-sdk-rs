@@ -6,9 +6,9 @@ use std::collections::HashMap;
 
 use crate::{
     esdt_transfer_event_log,
-    tx_mock::{DebugApi, SendBalance, TxInput, TxLog, TxOutput, TxPanic},
+    tx_mock::{SendBalance, TxInput, TxLog, TxOutput, TxPanic},
     world_mock::AccountEsdt,
-    ContractMap,
+    ContractMap, DebugApi,
 };
 
 use super::{AccountData, BlockInfo, BlockchainMockError};

@@ -1,4 +1,4 @@
-use crate::tx_mock::{DebugApi, TxPanic};
+use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{EndpointArgumentApi, Handle},

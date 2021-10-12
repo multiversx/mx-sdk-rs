@@ -1,6 +1,6 @@
 #![allow(unused_variables)] // for now
 
-use crate::{mandos_step, tx_mock::DebugApi, world_mock::BlockchainMock, ContractMap};
+use crate::{mandos_step, world_mock::BlockchainMock, ContractMap, DebugApi};
 
 use mandos::model::Step;
 use std::path::Path;

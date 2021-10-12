@@ -5,7 +5,7 @@ use std::{
 
 use crate::world_mock::BlockchainTxInfo;
 
-use super::{TxContext, TxInput, TxManagedTypes, TxOutput};
+use crate::tx_mock::{TxContext, TxInput, TxManagedTypes, TxOutput};
 
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.

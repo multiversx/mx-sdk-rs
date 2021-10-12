@@ -3,9 +3,9 @@ use num_bigint::BigUint;
 
 use crate::{
     execute_helper_functions::{check_tx_output, generate_tx_hash_dummy, sc_call},
-    tx_mock::{DebugApi, TxInput},
+    tx_mock::TxInput,
     world_mock::BlockchainMock,
-    ContractMap,
+    ContractMap, DebugApi,
 };
 
 pub fn execute(

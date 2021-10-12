@@ -1,4 +1,4 @@
-use crate::tx_mock::DebugApi;
+use crate::DebugApi;
 
 use super::*;
 
