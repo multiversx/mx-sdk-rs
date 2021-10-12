@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -25,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -45,7 +41,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_push",
                 "arguments": [
                     "123"
@@ -67,7 +62,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -89,7 +83,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_push",
                 "arguments": [
                     "111"
@@ -111,7 +104,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -134,7 +126,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_len",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -177,7 +168,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [
                     "0"
@@ -200,7 +190,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [
                     "2"
@@ -224,7 +213,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_get",
                 "arguments": [
                     "3"

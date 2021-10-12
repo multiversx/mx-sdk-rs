@@ -16,9 +16,7 @@
                                 }
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -37,7 +35,6 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -107,10 +104,10 @@
                                     "creator": "sc:forwarder",
                                     "royalties": "0",
                                     "hash": "str:nft-create-hash-----------------",
-                                    "attributes": "0x808080",
                                     "uri": [
                                         "str:nft-create-uri"
-                                    ]
+                                    ],
+                                    "attributes": "0x808080"
                                 }
                             ],
                             "lastNonce": "2",

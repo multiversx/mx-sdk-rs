@@ -7,9 +7,7 @@
             "accounts": {
                 "address:crypto_bubbles_owner": {
                     "nonce": "0",
-                    "balance": "0x10000000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x10000000"
                 },
                 "sc:crypto_bubbles": {
                     "nonce": "0",
@@ -22,15 +20,11 @@
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x20100200",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x20100200"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "0x20202150",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x20202150"
                 }
             }
         },
@@ -40,7 +34,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "value": "0x200",
+                "egldValue": "0x200",
                 "function": "joinGame",
                 "arguments": [
                     "0x12"
@@ -82,7 +76,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
-                "value": "0x150",
+                "egldValue": "0x150",
                 "function": "joinGame",
                 "arguments": [
                     "0x12"
@@ -124,7 +118,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
-                "value": "0x2000",
+                "egldValue": "0x2000",
                 "function": "joinGame",
                 "arguments": [
                     "0x12"

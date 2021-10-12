@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:bidder2",
                 "to": "sc:kitty_auction_contract",
-                "value": "0",
                 "function": "endAuction",
                 "arguments": [
                     "1"
@@ -21,8 +20,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:auction has not ended yet!",
+                "out": [],
                 "status": "4",
+                "message": "str:auction has not ended yet!",
                 "gas": "*",
                 "refund": "*"
             }

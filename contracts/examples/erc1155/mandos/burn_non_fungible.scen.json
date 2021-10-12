@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",
-                "value": "0",
                 "function": "burn",
                 "arguments": [
                     "1",

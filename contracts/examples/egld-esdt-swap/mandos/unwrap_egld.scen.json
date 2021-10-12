@@ -11,17 +11,19 @@
             "tx": {
                 "from": "address:user",
                 "to": "sc:egld-esdt-swap",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:WEGLD-abcdef",
-                    "value": "300"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:WEGLD-abcdef",
+                        "value": "300"
+                    }
+                ],
                 "function": "unwrapEgld",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "message": "",
                 "logs": [

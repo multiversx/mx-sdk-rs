@@ -18,23 +18,29 @@ pub fn try_execute_builtin_function(
 }
 
 fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxResult {
-    let from = tx_input.from.clone();
-    let to = tx_input.to.clone();
-    let esdt_token_identifier = tx_input.esdt_token_identifier.clone();
-    let nonce = tx_input.nonce;
-    let esdt_value = tx_input.esdt_value.clone();
+    if tx_input.args.len() != 2 {
+        return TxResult {
+            result_status: 10,
+            result_message: b"ESDTTransfer too few arguments".to_vec(),
+            result_values: Vec::new(),
+            result_logs: Vec::new(),
+        };
+    }
 
-    state.substract_esdt_balance(&from, &esdt_token_identifier, nonce, &esdt_value);
-    state.increase_esdt_balance(&to, &esdt_token_identifier, nonce, &esdt_value);
+    let token_identifier = tx_input.args[0].clone();
+    let value = BigUint::from_bytes_be(tx_input.args[1].as_slice());
+
+    state.subtract_esdt_balance(&tx_input.from, &token_identifier, 0, &value);
+    state.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
     TxResult {
         result_status: 0,
         result_message: Vec::new(),
         result_values: Vec::new(),
         result_logs: vec![esdt_transfer_event_log(
-            from,
-            to,
-            esdt_token_identifier,
-            &esdt_value,
+            tx_input.from.clone(),
+            tx_input.to.clone(),
+            token_identifier,
+            &value,
         )],
     }
 }
@@ -48,7 +54,7 @@ pub fn esdt_transfer_event_log(
     let nonce_topic = Vec::<u8>::new();
     TxLog {
         address: from,
-        endpoint: b"ESDTTransfer".to_vec(),
+        endpoint: ESDT_TRANSFER_FUNC.to_vec(),
         topics: vec![
             esdt_token_identifier,
             nonce_topic,

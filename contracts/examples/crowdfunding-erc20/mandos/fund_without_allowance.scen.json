@@ -15,7 +15,6 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "fund",
                 "arguments": [
                     "500,000"
@@ -24,10 +23,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {

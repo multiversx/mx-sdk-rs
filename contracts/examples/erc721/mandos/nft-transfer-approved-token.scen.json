@@ -10,8 +10,7 @@
             "accounts": {
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             }
         },
@@ -21,7 +20,6 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_nft_contract",
-                "value": "0",
                 "function": "transfer",
                 "arguments": [
                     "2",
@@ -31,6 +29,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"

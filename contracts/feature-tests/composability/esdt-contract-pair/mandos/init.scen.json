@@ -7,8 +7,7 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -30,7 +29,6 @@
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../first-contract/output/first-contract.wasm",
-                "value": "0",
                 "arguments": [
                     "str:cool_token",
                     "sc:second_contract"
@@ -39,6 +37,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -50,7 +49,6 @@
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../second-contract/output/second-contract.wasm",
-                "value": "0",
                 "arguments": [
                     "str:cool_token"
                 ],
@@ -58,6 +56,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

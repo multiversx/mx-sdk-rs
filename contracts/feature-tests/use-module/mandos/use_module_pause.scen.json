@@ -6,9 +6,7 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "5",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -24,7 +22,6 @@
             "txId": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -44,7 +41,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "checkPause",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -66,7 +62,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "pause",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -86,7 +81,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "checkPause",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -108,7 +102,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "unpause",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -128,7 +121,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "checkPause",
                 "arguments": [],
                 "gasLimit": "20,000,000",

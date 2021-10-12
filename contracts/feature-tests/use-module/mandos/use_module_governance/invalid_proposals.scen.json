@@ -11,11 +11,12 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "400"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "400"
+                    }
+                ],
                 "function": "propose",
                 "arguments": [
                     "str:try-propose-with-too-few-tokens",
@@ -43,11 +44,12 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "500"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
                 "function": "propose",
                 "arguments": [
                     "str:try-propose-with-too-few-tokens"
@@ -68,11 +70,12 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:governance",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:GOV-123456",
-                    "value": "500"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
                 "function": "propose",
                 "arguments": [
                     "str:try-propose-with-too-few-tokens",
