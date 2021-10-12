@@ -1,7 +1,10 @@
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 
-use crate::*;
+use crate::{
+    tx_mock::{TxInput, TxLog, TxResult},
+    world_mock::BlockchainMock,
+};
 
 const ESDT_TRANSFER_FUNC: &[u8] = b"ESDTTransfer";
 const SET_USERNAME_FUNC: &[u8] = b"SetUserName";

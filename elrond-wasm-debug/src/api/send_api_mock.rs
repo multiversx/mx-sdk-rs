@@ -1,4 +1,7 @@
-use crate::{async_data::AsyncCallTxData, SendBalance, TxContext, TxOutput, TxPanic};
+use crate::{
+    async_data::AsyncCallTxData,
+    tx_mock::{SendBalance, TxContext, TxOutput, TxPanic},
+};
 use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
     types::{

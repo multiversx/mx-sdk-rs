@@ -4,7 +4,7 @@ use elrond_wasm::types::{ManagedBuffer, ManagedType};
 use num_bigint::Sign;
 use num_traits::Zero;
 
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 
 impl TxContext {
     pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> ManagedBuffer<Self> {

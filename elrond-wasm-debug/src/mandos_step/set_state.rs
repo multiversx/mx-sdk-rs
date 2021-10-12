@@ -3,9 +3,9 @@ use std::collections::BTreeMap;
 use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
 use num_bigint::BigUint;
 
-use crate::{
-    world_mock::{AccountEsdt, EsdtData, EsdtInstance, EsdtInstances, EsdtRoles},
-    AccountData, BlockInfo as CrateBlockInfo, BlockchainMock,
+use crate::world_mock::{
+    AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainMock, EsdtData, EsdtInstance,
+    EsdtInstances, EsdtRoles,
 };
 
 pub fn execute(

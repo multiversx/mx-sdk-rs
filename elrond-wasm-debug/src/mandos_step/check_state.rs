@@ -7,8 +7,7 @@ use num_traits::Zero;
 
 use crate::{
     bytes_to_string, verbose_hex,
-    world_mock::{AccountEsdt, EsdtData, EsdtInstance, EsdtInstances},
-    BlockchainMock,
+    world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
 pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
