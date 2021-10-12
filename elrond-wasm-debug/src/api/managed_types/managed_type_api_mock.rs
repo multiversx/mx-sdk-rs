@@ -1,7 +1,7 @@
 use elrond_wasm::api::{BigIntApi, Handle, ManagedTypeApi};
 use num_bigint::{BigInt, Sign};
 
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 
 impl ManagedTypeApi for TxContext {
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {

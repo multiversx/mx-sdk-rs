@@ -1,8 +1,11 @@
-use crate::{async_data::*, TxLog, TxManagedTypes};
 use alloc::vec::Vec;
 use elrond_wasm::types::{Address, BoxedBytes};
 use num_bigint::BigUint;
 use std::{collections::HashMap, fmt};
+
+use crate::AsyncCallTxData;
+
+use super::{TxLog, TxManagedTypes};
 
 pub struct TxPanic {
     pub status: u64,

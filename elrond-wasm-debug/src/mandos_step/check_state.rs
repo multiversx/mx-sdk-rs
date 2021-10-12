@@ -7,8 +7,7 @@ use num_traits::Zero;
 
 use crate::{
     bytes_to_string, verbose_hex,
-    world_mock::{AccountEsdt, EsdtData, EsdtInstance, EsdtInstances},
-    BlockchainMock,
+    world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
 pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
@@ -23,11 +22,11 @@ pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMo
             );
 
             assert!(
-                expected_account.balance.check(&account.balance),
+                expected_account.balance.check(&account.egld_balance),
                 "bad account balance. Address: {}. Want: {}. Have: {}",
                 expected_address,
                 expected_account.balance,
-                account.balance
+                account.egld_balance
             );
 
             assert!(

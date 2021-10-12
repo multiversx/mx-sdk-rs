@@ -3,7 +3,7 @@ use elrond_wasm::{
     types::BoxedBytes,
 };
 
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 
 impl TxContext {
     fn mb_get_slice(
