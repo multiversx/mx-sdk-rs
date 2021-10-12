@@ -4,7 +4,7 @@ pub mod abi_json;
 pub mod api;
 mod arwen_mandos_runner;
 mod async_data;
-mod builtin_func_exec;
+mod builtin_function_mocks;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
@@ -14,7 +14,7 @@ pub mod tx_mock;
 pub mod world_mock;
 
 pub use async_data::*;
-pub use builtin_func_exec::*;
+pub use builtin_function_mocks::*;
 pub use contract_map::*;
 pub use display_util::*;
 pub use managed_test_util::*;
