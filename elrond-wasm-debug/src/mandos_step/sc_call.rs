@@ -1,7 +1,8 @@
-use crate::execute_helper_functions::{self, *};
-use mandos::model::{TxCall, TxExpect};
-use num_bigint::BigUint;
-use num_traits::Zero;
+use crate::{
+    execute_helper_functions::{self, *},
+    TxInputESDT,
+};
+use mandos::model::{TxCall, TxESDT, TxExpect};
 
 use crate::{BlockchainMock, ContractMap, TxContext, TxInput};
 pub fn execute(
@@ -11,21 +12,11 @@ pub fn execute(
     tx: &TxCall,
     expect: &Option<TxExpect>,
 ) {
-    let mut esdt_value = BigUint::zero();
-    let mut esdt_token_identifier = Vec::new();
-    let mut nonce = 0u64;
-    if let Some(value) = tx.esdt_value.as_ref() {
-        esdt_value = value.esdt_value.value.clone();
-        esdt_token_identifier = value.esdt_token_identifier.value.clone();
-        nonce = value.nonce.value;
-    };
     let tx_input = TxInput {
         from: tx.from.value.into(),
         to: tx.to.value.into(),
-        call_value: tx.call_value.value.clone(),
-        esdt_value,
-        esdt_token_identifier,
-        nonce,
+        egld_value: tx.egld_value.value.clone(),
+        esdt_values: tx_esdt_transfers_from_mandos(tx.esdt_value.as_slice()),
         func_name: tx.function.as_bytes().to_vec(),
         args: tx
             .arguments
@@ -40,5 +31,20 @@ pub fn execute(
     let tx_result = sc_call_with_async_and_callback(tx_input, state, contract_map).unwrap();
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
+    }
+}
+
+pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxInputESDT> {
+    mandos_transf_esdt
+        .iter()
+        .map(tx_esdt_transfer_from_mandos)
+        .collect()
+}
+
+pub fn tx_esdt_transfer_from_mandos(mandos_transf_esdt: &TxESDT) -> TxInputESDT {
+    TxInputESDT {
+        token_identifier: mandos_transf_esdt.esdt_token_identifier.value.clone(),
+        nonce: mandos_transf_esdt.nonce.value,
+        value: mandos_transf_esdt.esdt_value.value.clone(),
     }
 }

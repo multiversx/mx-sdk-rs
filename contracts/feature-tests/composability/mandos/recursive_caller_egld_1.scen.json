@@ -7,20 +7,16 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "1000",
-                    "storage": {},
                     "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }
             }
@@ -31,7 +27,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:recursive-caller",
-                "value": "0",
                 "function": "recursive_send_funds",
                 "arguments": [
                     "sc:vault",

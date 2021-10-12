@@ -12,7 +12,7 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:marketplace_contract",
-                "value": "500",
+                "egldValue": "500",
                 "function": "bid",
                 "arguments": [
                     "1",

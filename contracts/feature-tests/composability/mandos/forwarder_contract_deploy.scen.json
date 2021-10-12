@@ -11,7 +11,6 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             },
@@ -44,7 +43,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm"
@@ -53,12 +51,12 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "sc:child",
                     ""
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -70,10 +68,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -82,7 +80,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm",
@@ -92,13 +89,13 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "str:some_argument",
                     "sc:child-with-arg",
                     "nested:str:some_argument"
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -110,10 +107,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -122,7 +119,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deployFromSource",
                 "arguments": [
                     "sc:child"
@@ -131,11 +127,11 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "sc:child-2"
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -147,8 +143,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 },
                 "+": ""
             }
@@ -159,7 +155,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_vault_from_source",
                 "arguments": [
                     "sc:child",
@@ -169,13 +164,13 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "str:some_argument",
                     "sc:child-src-with-arg",
                     "nested:str:some_argument"
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }

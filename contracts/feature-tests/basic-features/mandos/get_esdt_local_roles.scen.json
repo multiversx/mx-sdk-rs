@@ -11,25 +11,21 @@
                     "esdt": {
                         "str:ESDT-123456": "200"
                     },
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "comment": "no roles",
             "txId": "0",
+            "comment": "no roles",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"
@@ -58,25 +54,21 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "comment": "one role",
             "txId": "1",
+            "comment": "one role",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"
@@ -108,25 +100,21 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "comment": "multiple roles",
             "txId": "2",
+            "comment": "multiple roles",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"
@@ -161,25 +149,21 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "comment": "nft roles",
             "txId": "3",
+            "comment": "nft roles",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"

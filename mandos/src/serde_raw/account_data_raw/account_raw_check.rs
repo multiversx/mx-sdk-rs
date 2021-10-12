@@ -34,5 +34,9 @@ pub struct CheckAccountRaw {
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub owner: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
     pub async_call_data: CheckBytesValueRaw,
 }

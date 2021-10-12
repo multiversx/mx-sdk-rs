@@ -7,12 +7,8 @@
             "accounts": {
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
-            },
-            "currentBlockInfo": {
-                "blockTimestamp": "0"
             },
             "newAddresses": [
                 {
@@ -25,7 +21,10 @@
                     "creatorNonce": "1",
                     "newAddress": "sc:kitty_ownership_contract"
                 }
-            ]
+            ],
+            "currentBlockInfo": {
+                "blockTimestamp": "0"
+            }
         },
         {
             "step": "scDeploy",
@@ -33,14 +32,14 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
-                "value": "0",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -51,7 +50,6 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/kitty-ownership.wasm",
-                "value": "0",
                 "arguments": [
                     "10",
                     "sc:kitty_genetic_alg",
@@ -61,8 +59,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }

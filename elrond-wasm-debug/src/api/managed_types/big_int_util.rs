@@ -1,12 +1,21 @@
 use std::cmp::Ordering;
 
-use elrond_wasm::types::ManagedType;
+use elrond_wasm::types::{ManagedBuffer, ManagedType};
 use num_bigint::Sign;
 use num_traits::Zero;
 
 use crate::TxContext;
 
 impl TxContext {
+    pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> ManagedBuffer<Self> {
+        let mut tx_output = self.tx_output_cell.borrow_mut();
+        let handle = tx_output
+            .managed_types
+            .managed_buffer_map
+            .insert_new_handle(value);
+        ManagedBuffer::from_raw_handle(self.clone(), handle)
+    }
+
     pub fn insert_new_big_uint(
         &self,
         value: num_bigint::BigUint,

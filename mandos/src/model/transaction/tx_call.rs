@@ -4,14 +4,14 @@ use crate::{
     serde_raw::TxCallRaw,
 };
 
-use super::TxESDT;
+use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 
 #[derive(Debug)]
 pub struct TxCall {
     pub from: AddressValue,
     pub to: AddressValue,
-    pub call_value: BigUintValue,
-    pub esdt_value: Option<TxESDT>,
+    pub egld_value: BigUintValue,
+    pub esdt_value: Vec<TxESDT>,
     pub function: String,
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
@@ -23,10 +23,12 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
         TxCall {
             from: AddressValue::interpret_from(from.from, context),
             to: AddressValue::interpret_from(from.to, context),
-            call_value: BigUintValue::interpret_from(from.value, context),
+            egld_value: interpret_egld_value(from.value, from.egld_value, context),
             esdt_value: from
-                .esdt
-                .map(|esdt_value| TxESDT::interpret_from(esdt_value, context)),
+                .esdt_value
+                .into_iter()
+                .map(|esdt_value| TxESDT::interpret_from(esdt_value, context))
+                .collect(),
             function: from.function,
             arguments: from
                 .arguments

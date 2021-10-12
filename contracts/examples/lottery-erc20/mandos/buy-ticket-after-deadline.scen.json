@@ -18,7 +18,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -28,6 +27,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Lottery entry period has ended! Awaiting winner announcement.",
                 "gas": "*",

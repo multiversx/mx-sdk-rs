@@ -5,6 +5,8 @@
             "step": "setState",
             "accounts": {
                 "address:the-address": {
+                    "nonce": "",
+                    "balance": "",
                     "esdt": {
                         "str:NFT-123456": {
                             "instances": [
@@ -45,7 +47,8 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "storage": {}
                 }
             }
         },
@@ -59,15 +62,12 @@
                                 {
                                     "nonce": "1",
                                     "balance": "1",
-                                    "creator": "*",
-                                    "royalties": "*",
-                                    "hash": "*",
-                                    "uri": "*",
-                                    "attributes": "*"
+                                    "royalties": "*"
                                 }
                             ]
                         }
-                    }
+                    },
+                    "storage": {}
                 }
             }
         },
@@ -84,7 +84,8 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "storage": {}
                 }
             }
         }

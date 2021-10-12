@@ -13,10 +13,8 @@ pub fn execute(
     let tx_input = TxInput {
         from: tx.to.value.into(),
         to: tx.to.value.into(),
-        call_value: BigUint::from(0u32),
-        esdt_value: BigUint::from(0u32),
-        esdt_token_identifier: Vec::new(),
-        nonce: 0u64,
+        egld_value: BigUint::from(0u32),
+        esdt_values: Vec::new(),
         func_name: tx.function.as_bytes().to_vec(),
         args: tx
             .arguments
