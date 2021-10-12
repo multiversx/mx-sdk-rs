@@ -6,21 +6,9 @@ use crate::{
     world_mock::BlockchainMock,
 };
 
-const ESDT_TRANSFER_FUNC: &[u8] = b"ESDTTransfer";
-const SET_USERNAME_FUNC: &[u8] = b"SetUserName";
+use super::builtin_func_exec::ESDT_TRANSFER_FUNC;
 
-pub fn try_execute_builtin_function(
-    tx_input: &TxInput,
-    state: &mut BlockchainMock,
-) -> Option<TxResult> {
-    match tx_input.func_name.as_slice() {
-        ESDT_TRANSFER_FUNC => Some(execute_esdt_transfer(tx_input, state)),
-        SET_USERNAME_FUNC => Some(execute_set_username(tx_input, state)),
-        _ => None,
-    }
-}
-
-fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxResult {
+pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxResult {
     if tx_input.args.len() != 2 {
         return TxResult {
             result_status: 10,
@@ -65,19 +53,5 @@ pub fn esdt_transfer_event_log(
             to.to_vec(),
         ],
         data: vec![],
-    }
-}
-
-fn execute_set_username(tx_input: &TxInput, state: &mut BlockchainMock) -> TxResult {
-    assert_eq!(tx_input.args.len(), 1, "SetUserName expects 1 argument");
-    if state.try_set_username(&tx_input.to, tx_input.args[0].as_slice()) {
-        TxResult::empty()
-    } else {
-        TxResult {
-            result_status: 10,
-            result_message: b"username already set".to_vec(),
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-        }
     }
 }
