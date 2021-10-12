@@ -2,11 +2,11 @@ use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, fmt::Write};
+use std::{collections::HashMap};
 
 use crate::{
-    address_hex, esdt_transfer_event_log,
-    tx_mock::{SendBalance, TxContext, TxInput, TxInputESDT, TxLog, TxOutput, TxPanic},
+    esdt_transfer_event_log,
+    tx_mock::{SendBalance, TxContext, TxInput, TxLog, TxOutput, TxPanic},
     world_mock::AccountEsdt,
     ContractMap,
 };
@@ -14,7 +14,6 @@ use crate::{
 use super::{AccountData, BlockInfo, BlockchainMockError};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
-const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
@@ -41,112 +40,9 @@ impl Default for BlockchainMock {
 }
 
 impl BlockchainMock {
-    pub fn add_account(&mut self, acct: AccountData) {
-        self.accounts.insert(acct.address.clone(), acct);
-    }
+    
 
-    pub fn validate_and_add_account(&mut self, acct: AccountData) {
-        self.validate_account(&acct);
-        self.add_account(acct);
-    }
-
-    pub fn print_accounts(&self) {
-        let mut accounts_buf = String::new();
-        for (address, account) in &self.accounts {
-            write!(
-                &mut accounts_buf,
-                "\n\t{} -> {}",
-                address_hex(address),
-                account
-            )
-            .unwrap();
-        }
-        println!("Accounts: {}", &accounts_buf);
-    }
-
-    pub fn put_new_address(
-        &mut self,
-        creator_address: Address,
-        creator_nonce: u64,
-        new_address: Address,
-    ) {
-        self.new_addresses
-            .insert((creator_address, creator_nonce), new_address);
-    }
-
-    fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
-        self.new_addresses
-            .get(&(creator_address, creator_nonce))
-            .cloned()
-    }
-
-    pub fn validate_account(&self, account: &AccountData) {
-        let is_sc = self.is_smart_contract_address(&account.address);
-        let has_code = self.check_account_has_code(account);
-
-        assert!(
-            !is_sc || has_code,
-            "Account has a smart contract address but no code"
-        );
-
-        assert!(
-            is_sc || !has_code,
-            "Account has no smart contract address but has code"
-        );
-    }
-
-    pub fn is_smart_contract_address(&self, address: &Address) -> bool {
-        address
-            .as_bytes()
-            .iter()
-            .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
-            .all(|item| item == &0u8)
-    }
-
-    pub fn check_account_has_code(&self, account: &AccountData) -> bool {
-        !account
-            .contract_path
-            .as_ref()
-            .unwrap_or(&Vec::<u8>::new())
-            .is_empty()
-    }
-
-    pub fn subtract_tx_payment(
-        &mut self,
-        address: &Address,
-        call_value: &BigUint,
-    ) -> Result<(), BlockchainMockError> {
-        let sender_account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
-        if &sender_account.balance < call_value {
-            return Err("failed transfer (insufficient funds)".into());
-        }
-        sender_account.balance -= call_value;
-        Ok(())
-    }
-
-    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
-        let sender_account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
-        let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
-        assert!(
-            sender_account.balance >= gas_cost,
-            "Not enough balance to pay gas upfront"
-        );
-        sender_account.balance -= &gas_cost;
-    }
-
-    pub fn increase_balance(&mut self, address: &Address, amount: &BigUint) {
-        let account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Receiver account not found"));
-        account.balance += amount;
-    }
+   
 
     pub fn send_balance(
         &mut self,
@@ -184,103 +80,6 @@ impl BlockchainMock {
             }
         }
         Ok(())
-    }
-
-    pub fn subtract_esdt_balance(
-        &mut self,
-        address: &Address,
-        esdt_token_identifier: &[u8],
-        nonce: u64,
-        value: &BigUint,
-    ) {
-        let sender_account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account {} not found", address_hex(address)));
-
-        let esdt_data_map = &mut sender_account.esdt;
-        let esdt_data = esdt_data_map
-            .get_mut_by_identifier(esdt_token_identifier)
-            .unwrap_or_else(|| {
-                panic!(
-                    "Account {} has no esdt tokens with name {}",
-                    address_hex(address),
-                    String::from_utf8(esdt_token_identifier.to_vec()).unwrap()
-                )
-            });
-
-        let esdt_instances = &mut esdt_data.instances;
-        let esdt_instance = esdt_instances.get_mut_by_nonce(nonce).unwrap_or_else(|| {
-            panic!(
-                "Esdt token {} has no nonce {}",
-                String::from_utf8(esdt_token_identifier.to_vec()).unwrap(),
-                nonce.to_string()
-            )
-        });
-        let esdt_balance = &mut esdt_instance.balance;
-        assert!(
-            &*esdt_balance >= value,
-            "Not enough esdt balance, have {}, need at least {}",
-            esdt_balance,
-            value
-        );
-
-        *esdt_balance -= value;
-    }
-
-    pub fn subtract_multi_esdt_balance(
-        &mut self,
-        address: &Address,
-        esdt_transfers: &[TxInputESDT],
-    ) {
-        for esdt_transfer in esdt_transfers {
-            if !esdt_transfer.value.is_zero() {
-                self.subtract_esdt_balance(
-                    address,
-                    esdt_transfer.token_identifier.as_slice(),
-                    esdt_transfer.nonce,
-                    &esdt_transfer.value,
-                );
-            }
-        }
-    }
-
-    pub fn increase_esdt_balance(
-        &mut self,
-        address: &Address,
-        esdt_token_identifier: &[u8],
-        nonce: u64,
-        value: &BigUint,
-    ) {
-        let account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Receiver account not found"));
-
-        if let Some(esdt_data) = account.esdt.get_mut_by_identifier(esdt_token_identifier) {
-            esdt_data.instances.add(nonce, value.clone());
-        } else {
-            account
-                .esdt
-                .push_esdt(esdt_token_identifier.to_vec(), nonce, value.clone());
-        }
-    }
-
-    pub fn increase_multi_esdt_balance(
-        &mut self,
-        address: &Address,
-        esdt_transfers: &[TxInputESDT],
-    ) {
-        for esdt_transfer in esdt_transfers {
-            if !esdt_transfer.value.is_zero() {
-                self.increase_esdt_balance(
-                    address,
-                    esdt_transfer.token_identifier.as_slice(),
-                    esdt_transfer.nonce,
-                    &esdt_transfer.value,
-                );
-            }
-        }
     }
 
     pub fn increase_nonce(&mut self, address: &Address) {

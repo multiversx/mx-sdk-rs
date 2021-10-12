@@ -2,6 +2,8 @@ mod account_data;
 mod account_esdt;
 mod block_info;
 mod blockchain_mock;
+mod blockchain_mock_account_util;
+mod blockchain_mock_balance_util;
 mod blockchain_mock_error;
 mod blockchain_tx_info;
 mod esdt_instance;
