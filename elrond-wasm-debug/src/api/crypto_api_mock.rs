@@ -1,4 +1,4 @@
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 use elrond_wasm::{
     api::CryptoApi,
     types::{BoxedBytes, MessageHashType, H256},

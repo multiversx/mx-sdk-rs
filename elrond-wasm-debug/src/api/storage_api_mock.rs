@@ -1,4 +1,4 @@
-use crate::{TxContext, TxPanic};
+use crate::tx_mock::{TxContext, TxPanic};
 use alloc::vec::Vec;
 use elrond_wasm::api::{BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageWriteApi};
 use num_bigint::{BigInt, BigUint, Sign};

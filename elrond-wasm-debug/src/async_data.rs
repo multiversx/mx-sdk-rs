@@ -1,4 +1,4 @@
-use crate::{TxInput, TxResult};
+use crate::tx_mock::{TxInput, TxResult};
 use elrond_wasm::{
     elrond_codec::*,
     hex_call_data::HexCallDataDeserializer,

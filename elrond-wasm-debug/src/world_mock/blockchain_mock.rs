@@ -1,91 +1,20 @@
-use super::mock_error::BlockchainMockError;
-use crate::{
-    contract_map::*, display_util::*, esdt_transfer_event_log, tx_context::*,
-    world_mock::AccountEsdt, SendBalance, TxInput, TxInputESDT, TxLog, TxOutput, TxPanic,
-};
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, fmt, fmt::Write};
+use std::{collections::HashMap, fmt::Write};
+
+use crate::{
+    address_hex, esdt_transfer_event_log,
+    tx_mock::{SendBalance, TxContext, TxInput, TxInputESDT, TxLog, TxOutput, TxPanic},
+    world_mock::AccountEsdt,
+    ContractMap,
+};
+
+use super::{AccountData, BlockInfo, BlockchainMockError};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
-
-pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
-
-pub struct AccountData {
-    pub address: Address,
-    pub nonce: u64,
-    pub balance: BigUint,
-    pub storage: AccountStorage,
-    pub esdt: AccountEsdt,
-    pub username: Vec<u8>,
-    pub contract_path: Option<Vec<u8>>,
-    pub contract_owner: Option<Address>,
-}
-
-impl fmt::Display for AccountData {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut storage_buf = String::new();
-        let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
-        storage_keys.sort();
-
-        for key in &storage_keys {
-            let value = self.storage.get(key).unwrap();
-            write!(
-                &mut storage_buf,
-                "\n\t\t\t{} -> 0x{}",
-                key_hex(key.as_slice()),
-                hex::encode(value.as_slice())
-            )
-            .unwrap();
-        }
-
-        write!(
-            f,
-            "AccountData {{
-		nonce: {},
-		balance: {},
-		esdt: [{} ],
-		username: {},
-		storage: [{} ]
-	}}",
-            self.nonce,
-            self.balance,
-            self.esdt,
-            String::from_utf8(self.username.clone()).unwrap(),
-            storage_buf
-        )
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct BlockInfo {
-    pub block_timestamp: u64,
-    pub block_nonce: u64,
-    pub block_round: u64,
-    pub block_epoch: u64,
-    pub block_random_seed: Box<[u8; 48]>,
-}
-
-impl BlockInfo {
-    pub fn new() -> Self {
-        BlockInfo {
-            block_timestamp: 0,
-            block_nonce: 0,
-            block_round: 0,
-            block_epoch: 0,
-            block_random_seed: Box::from([0u8; 48]),
-        }
-    }
-}
-
-impl Default for BlockInfo {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
@@ -478,38 +407,4 @@ fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutp
     }
 
     TxOutput::from_panic_string("unknown panic")
-}
-
-/// Some data to get copied for the tx.
-/// Would be nice maybe at some point to have a reference to the full blockchain mock in the tx context,
-/// but for now, copying some data is enough.
-#[derive(Clone, Debug)]
-pub struct BlockchainTxInfo {
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
-    pub contract_balance: BigUint,
-    pub contract_esdt: AccountEsdt,
-    pub contract_owner: Option<Address>,
-}
-
-impl BlockchainMock {
-    pub fn create_tx_info(&self, contract_address: &Address) -> BlockchainTxInfo {
-        if let Some(contract) = self.accounts.get(contract_address) {
-            BlockchainTxInfo {
-                previous_block_info: self.previous_block_info.clone(),
-                current_block_info: self.current_block_info.clone(),
-                contract_balance: contract.balance.clone(),
-                contract_esdt: contract.esdt.clone(),
-                contract_owner: contract.contract_owner.clone(),
-            }
-        } else {
-            BlockchainTxInfo {
-                previous_block_info: self.previous_block_info.clone(),
-                current_block_info: self.current_block_info.clone(),
-                contract_balance: 0u32.into(),
-                contract_esdt: AccountEsdt::default(),
-                contract_owner: None,
-            }
-        }
-    }
 }

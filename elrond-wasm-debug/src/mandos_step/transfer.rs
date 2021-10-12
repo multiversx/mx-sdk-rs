@@ -1,6 +1,6 @@
 use mandos::model::TxTransfer;
 
-use crate::{sc_call::tx_esdt_transfers_from_mandos, BlockchainMock};
+use crate::{sc_call::tx_esdt_transfers_from_mandos, world_mock::BlockchainMock};
 
 pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
     let sender_address = &tx.from.value.into();

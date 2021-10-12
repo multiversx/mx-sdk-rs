@@ -1,4 +1,4 @@
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 use elrond_wasm::api::{BigIntApi, EndpointFinishApi, Handle, ManagedBufferApi};
 use num_bigint::{BigInt, BigUint};
 

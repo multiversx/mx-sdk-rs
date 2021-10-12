@@ -1,4 +1,4 @@
-use crate::{TxContext, TxPanic};
+use crate::tx_mock::{TxContext, TxPanic};
 use elrond_wasm::api::{ErrorApi, Handle, ManagedBufferApi};
 
 impl ErrorApi for TxContext {
