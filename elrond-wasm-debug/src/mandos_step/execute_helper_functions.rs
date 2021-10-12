@@ -3,11 +3,14 @@ use mandos::model::{CheckLogs, Checkable, TxExpect};
 use std::collections::HashMap;
 
 use crate::{
-    address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, execute_tx,
-    merge_results, try_execute_builtin_function, verbose_hex, world_mock::AccountEsdt, AccountData,
-    AsyncCallTxData, BlockchainMock, BlockchainMockError, ContractMap, TxContext, TxInput,
-    TxManagedTypes, TxOutput, TxResult,
+    address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, merge_results,
+    try_execute_builtin_function,
+    tx_mock::{TxContext, TxInput, TxManagedTypes, TxOutput, TxResult},
+    verbose_hex,
+    world_mock::{execute_tx, AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
+    AsyncCallTxData, ContractMap,
 };
+
 pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
     let bytes = tx_id.as_bytes();
     let mut result = [b'.'; 32];
@@ -34,7 +37,7 @@ pub fn sc_call(
     let esdt_values = tx_input.esdt_values.clone();
     let blockchain_info = state.create_tx_info(&to);
 
-    state.subtract_tx_payment(&from, &egld_value)?;
+    state.subtract_egld_balance(&from, &egld_value)?;
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
     state.subtract_multi_esdt_balance(&from, tx_input.esdt_values.as_slice());
 
@@ -67,7 +70,7 @@ pub fn sc_call(
         // replace storage with new one
         let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
 
-        state.increase_balance(&to, &egld_value);
+        state.increase_egld_balance(&to, &egld_value);
         state.increase_multi_esdt_balance(&to, esdt_values.as_slice());
 
         state.send_balance(
@@ -77,7 +80,7 @@ pub fn sc_call(
         )?;
     } else {
         // revert
-        state.increase_balance(&from, &egld_value);
+        state.increase_egld_balance(&from, &egld_value);
         state.increase_multi_esdt_balance(&from, esdt_values.as_slice());
     }
 
@@ -112,12 +115,12 @@ pub fn sc_call_with_async_and_callback(
                 tx_result = merge_results(tx_result, callback_result);
             } else {
                 state
-                    .subtract_tx_payment(&contract_address, &async_data.call_value)
+                    .subtract_egld_balance(&contract_address, &async_data.call_value)
                     .unwrap();
                 state.add_account(AccountData {
                     address: async_data.to.clone(),
                     nonce: 0,
-                    balance: async_data.call_value,
+                    egld_balance: async_data.call_value,
                     esdt: AccountEsdt::default(),
                     username: Vec::new(),
                     storage: HashMap::new(),

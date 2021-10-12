@@ -3,7 +3,7 @@ use elrond_wasm::{
     types::BoxedBytes,
 };
 
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 
 impl EllipticCurveApi for TxContext {
     fn ec_create(&self, _name: &[u8]) -> Handle {

@@ -1,4 +1,4 @@
-use crate::TxContext;
+use crate::tx_mock::TxContext;
 use elrond_wasm::types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256};
 
 impl elrond_wasm::api::BlockchainApi for TxContext {

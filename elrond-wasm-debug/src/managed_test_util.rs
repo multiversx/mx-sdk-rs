@@ -4,9 +4,9 @@ use elrond_wasm::{
     types::{BoxedBytes, ManagedBuffer},
 };
 
-use crate::TxContext;
-
 use core::fmt::Debug;
+
+use crate::tx_mock::TxContext;
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.

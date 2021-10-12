@@ -1,7 +1,9 @@
-use crate::{blockchain_mock::*, world_mock::AccountEsdt, TxInput, TxOutput};
+use crate::world_mock::{AccountEsdt, BlockInfo, BlockchainTxInfo};
 use alloc::{rc::Rc, vec::Vec};
 use core::cell::RefCell;
 use elrond_wasm::types::Address;
+
+use super::{TxInput, TxOutput};
 
 #[derive(Debug)]
 pub struct TxContext {
