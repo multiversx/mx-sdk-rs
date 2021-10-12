@@ -48,13 +48,3 @@ impl TxContext {
         }
     }
 }
-
-// impl Clone for TxContext {
-//     fn clone(&self) -> Self {
-//         TxContext {
-//             blockchain_info_box: self.blockchain_info_box.clone(),
-//             tx_input_box: self.tx_input_box.clone(),
-//             tx_output_cell: Rc::clone(&self.tx_output_cell),
-//         }
-//     }
-// }
