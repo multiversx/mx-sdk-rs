@@ -5,6 +5,7 @@ pub(super) static ATTR_PAYMENT: &str = "payment"; // synonymous with `payment_am
 pub(super) static ATTR_PAYMENT_AMOUNT: &str = "payment_amount";
 pub(super) static ATTR_PAYMENT_TOKEN: &str = "payment_token";
 pub(super) static ATTR_PAYMENT_NONCE: &str = "payment_nonce";
+pub(super) static ATTR_PAYMENT_MULTI: &str = "payment_multi";
 pub(super) static ATTR_VAR_ARGS: &str = "var_args";
 pub(super) static ATTR_INIT: &str = "init";
 pub(super) static ATTR_VIEW: &str = "view";
