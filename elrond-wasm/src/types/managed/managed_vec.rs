@@ -175,7 +175,7 @@ where
     }
 
     pub fn iter(&self) -> ManagedVecIterator<M, T> {
-        ManagedVecIterator::new(&self)
+        ManagedVecIterator::new(self)
     }
 }
 
