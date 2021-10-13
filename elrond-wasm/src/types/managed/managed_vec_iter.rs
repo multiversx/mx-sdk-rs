@@ -20,8 +20,8 @@ where
     T: ManagedVecItem<M>,
 {
     managed_vec: &'a ManagedVec<M, T>,
-    byte_index: usize,
-    byte_limit: usize,
+    byte_start: usize,
+    byte_end: usize,
 }
 
 impl<'a, M, T> ManagedVecIterator<'a, M, T>
@@ -32,8 +32,8 @@ where
     pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
         ManagedVecIterator {
             managed_vec,
-            byte_index: 0,
-            byte_limit: managed_vec.byte_len(),
+            byte_start: 0,
+            byte_end: managed_vec.byte_len(),
         }
     }
 
@@ -51,18 +51,40 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        let next_byte_index = self.byte_index + T::PAYLOAD_SIZE;
-        if next_byte_index > self.byte_limit {
+        let next_byte_start = self.byte_start + T::PAYLOAD_SIZE;
+        if next_byte_start > self.byte_end {
             return None;
         }
         let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
-                .load_slice(self.byte_index, dest_slice);
+                .load_slice(self.byte_start, dest_slice);
         });
 
-        self.byte_index = next_byte_index;
+        self.byte_start = next_byte_start;
+        Some(result)
+    }
+}
+
+impl<'a, M, T> DoubleEndedIterator for ManagedVecIterator<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.byte_start + T::PAYLOAD_SIZE > self.byte_end {
+            return None;
+        }
+        self.byte_end -= T::PAYLOAD_SIZE;
+
+        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
+            let _ = self
+                .managed_vec
+                .buffer
+                .load_slice(self.byte_end, dest_slice);
+        });
+
         Some(result)
     }
 }
