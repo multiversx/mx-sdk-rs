@@ -2,15 +2,21 @@ use super::util::*;
 use crate::model::{Method, MethodArgument, MethodPayableMetadata};
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-    payable_snippet_for_metadata(
+    let payment_single = payable_single_snippet_for_metadata(
         m.payable_metadata(),
         &m.payment_token_arg(),
         &m.payment_amount_arg(),
         &m.payment_nonce_arg(),
-    )
+    );
+    let payment_multi = multi_getter_init(&m.payment_multi_arg());
+
+    quote! {
+        #payment_single
+        #payment_multi
+    }
 }
 
-fn payable_snippet_for_metadata(
+fn payable_single_snippet_for_metadata(
     mpm: MethodPayableMetadata,
     payment_token_arg: &Option<MethodArgument>,
     payment_amount_arg: &Option<MethodArgument>,
@@ -50,6 +56,7 @@ fn payable_snippet_for_metadata(
                 quote! {}
             };
             let nonce_init = nonce_getter_init(payment_nonce_arg);
+
             quote! {
                 let #payment_var_name = elrond_wasm::api::CallValueApi::require_esdt(&self.raw_vm_api(), #token_literal);
                 #token_init
@@ -63,6 +70,7 @@ fn payable_snippet_for_metadata(
             } else {
                 let payment_var_name = var_name_or_underscore(payment_amount_arg);
                 let token_var_name = var_name_or_underscore(payment_token_arg);
+
                 quote! {
                     let (#payment_var_name, #token_var_name) = elrond_wasm::api::CallValueApi::payment_token_pair(&self.raw_vm_api());
                     #nonce_init
@@ -110,6 +118,17 @@ fn nonce_getter_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStre
         let pat = &arg.pat;
         quote! {
             let #pat = self.call_value().esdt_token_nonce();
+        }
+    } else {
+        quote! {}
+    }
+}
+
+fn multi_getter_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! {
+            let #pat = self.call_value().all_esdt_transfers();
         }
     } else {
         quote! {}

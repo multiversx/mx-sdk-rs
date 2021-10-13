@@ -39,12 +39,13 @@ pub fn new_contract_call<SA, R>(
     api: SA,
     to: ManagedAddress<SA>,
     endpoint_name_slice: &'static [u8],
+    payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 ) -> ContractCall<SA, R>
 where
     SA: SendApi + 'static,
 {
     let endpoint_name = ManagedBuffer::new_from_bytes(api.clone(), endpoint_name_slice);
-    ContractCall::<SA, R>::new(api, to, endpoint_name)
+    ContractCall::<SA, R>::new_with_esdt_payment(api, to, endpoint_name, payments)
 }
 
 impl<SA, R> ContractCall<SA, R>
@@ -52,9 +53,18 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA, to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
+        let payments = ManagedVec::new(api.clone());
+        Self::new_with_esdt_payment(api, to, endpoint_name, payments)
+    }
+
+    pub fn new_with_esdt_payment(
+        api: SA,
+        to: ManagedAddress<SA>,
+        endpoint_name: ManagedBuffer<SA>,
+        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    ) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
         let egld_payment = BigUint::zero(api.clone());
-        let payments = ManagedVec::new(api.clone());
         ContractCall {
             api,
             to,

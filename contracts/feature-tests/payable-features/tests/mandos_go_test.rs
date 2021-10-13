@@ -1,3 +1,9 @@
+
+#[test]
+fn call_value_check_go() {
+    elrond_wasm_debug::mandos_go("mandos/call-value-check.scen.json");
+}
+
 #[test]
 fn payable_any_1_go() {
     elrond_wasm_debug::mandos_go("mandos/payable_any_1.scen.json");
