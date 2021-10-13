@@ -24,3 +24,18 @@ fn test_managed_vec_iter_rev() {
     let expected_reversed_numbers: Vec<u64> = (20u64..=30u64).rev().collect();
     assert_eq!(reversed_numbers, expected_reversed_numbers);
 }
+
+#[test]
+fn test_managed_into_vec() {
+    let context = DebugApi::dummy();
+
+    let mut vec = Vec::new();
+    let mut managed_vec = ManagedVec::new(context.clone());
+    for i in 20u64..=30u64 {
+        let biguint = BigUint::managed_from(context.clone(), i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
