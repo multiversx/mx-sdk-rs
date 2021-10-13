@@ -1,4 +1,7 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem};
+use super::{
+    ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem,
+    ManagedVecIterator,
+};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -169,6 +172,10 @@ where
             v.push(item);
         }
         v
+    }
+
+    pub fn iter(&self) -> ManagedVecIterator<M, T> {
+        ManagedVecIterator::new(&self)
     }
 }
 

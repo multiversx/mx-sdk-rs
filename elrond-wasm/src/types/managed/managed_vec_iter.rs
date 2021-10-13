@@ -66,3 +66,25 @@ where
         Some(result)
     }
 }
+
+impl<'a, M, T> DoubleEndedIterator for ManagedVecIterator<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.byte_index + T::PAYLOAD_SIZE > self.byte_limit {
+            return None;
+        }
+        self.byte_limit -= T::PAYLOAD_SIZE;
+
+        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
+            let _ = self
+                .managed_vec
+                .buffer
+                .load_slice(self.byte_limit, dest_slice);
+        });
+
+        Some(result)
+    }
+}
