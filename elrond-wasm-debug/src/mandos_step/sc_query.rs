@@ -2,11 +2,13 @@ use mandos::model::{TxExpect, TxQuery};
 use num_bigint::BigUint;
 
 use crate::{
-    execute_helper_functions::{check_tx_output, generate_tx_hash_dummy, sc_call},
-    tx_mock::TxInput,
+    tx_execution::sc_call,
+    tx_mock::{generate_tx_hash_dummy, TxInput},
     world_mock::BlockchainMock,
     ContractMap, DebugApi,
 };
+
+use super::check_tx_output;
 
 pub fn execute(
     state: &mut BlockchainMock,
