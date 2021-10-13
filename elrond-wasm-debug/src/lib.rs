@@ -11,6 +11,7 @@ mod display_util;
 mod execute_mandos;
 mod managed_test_util;
 mod mandos_step;
+pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 

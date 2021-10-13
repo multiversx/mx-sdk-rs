@@ -1,26 +1,14 @@
-use elrond_wasm::types::H256;
-use mandos::model::{CheckLogs, Checkable, TxExpect};
 use std::collections::HashMap;
 
 use crate::{
-    address_hex, async_call_tx_input, async_callback_tx_input, bytes_to_string, merge_results,
+    address_hex, async_call_tx_input, async_callback_tx_input, merge_results,
     try_execute_builtin_function,
     tx_mock::{TxInput, TxOutput, TxResult},
-    verbose_hex,
-    world_mock::{execute_tx, AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
+    world_mock::{AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap, DebugApi,
 };
 
-pub fn generate_tx_hash_dummy(tx_id: &str) -> H256 {
-    let bytes = tx_id.as_bytes();
-    let mut result = [b'.'; 32];
-    if bytes.len() > 32 {
-        result[..].copy_from_slice(&bytes[..32]);
-    } else {
-        result[..bytes.len()].copy_from_slice(bytes);
-    }
-    result.into()
-}
+use super::execute_contract_endpoint;
 
 pub fn sc_call(
     tx_input: TxInput,
@@ -62,7 +50,7 @@ pub fn sc_call(
         },
     );
 
-    let tx_output = execute_tx(tx_context, contract_path, contract_map);
+    let tx_output = execute_contract_endpoint(tx_context, contract_path, contract_map);
     let mut tx_result = tx_output.result;
 
     if tx_result.result_status == 0 {
@@ -130,73 +118,4 @@ pub fn sc_call_with_async_and_callback(
         }
     }
     Ok(tx_result)
-}
-
-pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
-    let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
-    assert!(
-        tx_expect.status.check(tx_result.result_status),
-        "result code mismatch. Tx id: {}. Want: {}. Have: {}. Message: {}",
-        tx_id,
-        tx_expect.status,
-        tx_result.result_status,
-        have_str,
-    );
-
-    assert_eq!(
-        tx_expect.out.len(),
-        tx_result.result_values.len(),
-        "bad out value. Tx id: {}. Want: {:?}. Have: {:?}",
-        tx_id,
-        tx_expect.out,
-        tx_result.result_values
-    );
-    for (i, expected_out) in tx_expect.out.iter().enumerate() {
-        let actual_value = &tx_result.result_values[i];
-        assert!(
-            expected_out.check(actual_value.as_slice()),
-            "bad out value. Tx id: {}. Want: {}. Have: {}",
-            tx_id,
-            expected_out,
-            verbose_hex(actual_value.as_slice())
-        );
-    }
-
-    assert!(
-        tx_expect.message.check(&tx_result.result_message),
-        "result message mismatch. Tx id: {}. Want: {}. Have: {}.",
-        tx_id,
-        &tx_expect.message,
-        have_str,
-    );
-
-    match &tx_expect.logs {
-        CheckLogs::Star => {},
-        CheckLogs::List(expected_logs) => {
-            assert!(
-                expected_logs.len() == tx_result.result_logs.len(),
-                "Log amounts do not match. Tx id: {}. Want: {}. Have: {}",
-                tx_id,
-                expected_logs.len(),
-                tx_result.result_logs.len()
-            );
-
-            for (expected_log, actual_log) in expected_logs.iter().zip(tx_result.result_logs.iter())
-            {
-                assert!(
-					actual_log.equals(expected_log),
-					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
-					tx_id,
-					verbose_hex(&expected_log.address.value),
-					bytes_to_string(&expected_log.endpoint.value),
-					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
-					verbose_hex(&expected_log.data.value),
-					address_hex(&actual_log.address),
-					bytes_to_string(&actual_log.endpoint),
-					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),
-					verbose_hex(&actual_log.data),
-				);
-            }
-        },
-    }
 }

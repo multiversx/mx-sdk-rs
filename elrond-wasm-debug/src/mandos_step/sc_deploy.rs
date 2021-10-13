@@ -2,11 +2,13 @@ use elrond_wasm::types::Address;
 use mandos::model::{TxDeploy, TxExpect};
 
 use crate::{
-    execute_helper_functions::{check_tx_output, generate_tx_hash_dummy},
-    tx_mock::{TxInput, TxOutput, TxResult},
-    world_mock::{execute_tx, BlockchainMock, BlockchainMockError},
+    tx_execution::execute_contract_endpoint,
+    tx_mock::{generate_tx_hash_dummy, TxInput, TxOutput, TxResult},
+    world_mock::{BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap, DebugApi,
 };
+
+use super::check_tx_output;
 
 pub fn execute(
     state: &mut BlockchainMock,
@@ -52,7 +54,7 @@ pub fn sc_create(
     state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
 
     let tx_context = DebugApi::new(blockchain_info, tx_input.clone(), TxOutput::default());
-    let mut tx_output = execute_tx(tx_context, contract_path, contract_map);
+    let mut tx_output = execute_contract_endpoint(tx_context, contract_path, contract_map);
 
     if tx_output.result.result_status == 0 {
         let new_address = state.create_account_after_deploy(
