@@ -142,12 +142,12 @@ where
     }
 }
 
-impl<'a, M: ManagedTypeApi> ManagedArgBuffer<M>
+impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    pub fn raw_arg_iter(&'a self) -> ManagedVecIterator<'a, M, ManagedBuffer<M>> {
-        ManagedVecIterator::new(&self.data)
+    pub fn raw_arg_iter(&self) -> ManagedVecIterator<M, ManagedBuffer<M>> {
+        self.data.iter()
     }
 }
 
