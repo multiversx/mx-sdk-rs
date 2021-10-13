@@ -5,7 +5,7 @@ use std::{collections::HashMap, fmt};
 
 use crate::AsyncCallTxData;
 
-use super::{TxLog, TxManagedTypes};
+use super::TxLog;
 
 pub struct TxPanic {
     pub status: u64,
@@ -60,7 +60,6 @@ pub struct SendBalance {
 #[derive(Debug)]
 pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
-    pub managed_types: TxManagedTypes, // TODO: move to root TxContext and reorg everything
     pub result: TxResult,
     pub send_balance_list: Vec<SendBalance>,
     pub async_call: Option<AsyncCallTxData>,
@@ -70,7 +69,6 @@ impl Default for TxOutput {
     fn default() -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
-            managed_types: TxManagedTypes::new(),
             result: TxResult::empty(),
             send_balance_list: Vec::new(),
             async_call: None,
@@ -82,7 +80,6 @@ impl TxOutput {
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
-            managed_types: TxManagedTypes::new(),
             result: TxResult {
                 result_status: panic_obj.status,
                 result_message: panic_obj.message.clone(),
@@ -97,7 +94,6 @@ impl TxOutput {
     pub fn from_panic_string(_: &str) -> Self {
         TxOutput {
             contract_storage: HashMap::new(),
-            managed_types: TxManagedTypes::new(),
             result: TxResult {
                 result_status: 4,
                 result_message: b"panic occurred".to_vec(),

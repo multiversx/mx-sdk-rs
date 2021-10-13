@@ -1,6 +1,6 @@
 #![allow(unused_variables)] // for now
 
-use crate::{mandos_step, tx_mock::TxContext, world_mock::BlockchainMock, ContractMap};
+use crate::{mandos_step, world_mock::BlockchainMock, ContractMap, DebugApi};
 
 use mandos::model::Step;
 use std::path::Path;
@@ -8,7 +8,7 @@ use std::path::Path;
 /// Runs mandos test using the Rust infrastructure and the debug mode.
 /// Uses a contract map to replace the references to the wasm bytecode
 /// with the contracts running in debug mode.
-pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: &ContractMap<TxContext>) {
+pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: &ContractMap<DebugApi>) {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(relative_path);
     let mut state = BlockchainMock::new();
@@ -18,7 +18,7 @@ pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: &ContractMap<Tx
 fn parse_execute_mandos_steps(
     steps_path: &Path,
     state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
+    contract_map: &ContractMap<DebugApi>,
 ) {
     let scenario = mandos::parse_scenario(steps_path);
 

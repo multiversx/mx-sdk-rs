@@ -1,7 +1,7 @@
 use elrond_wasm::{api::VMApi, elrond_codec::TryStaticCast};
 
-use crate::tx_mock::TxContext;
+use crate::DebugApi;
 
-impl TryStaticCast for TxContext {}
+impl TryStaticCast for DebugApi {}
 
-impl VMApi for TxContext {}
+impl VMApi for DebugApi {}
