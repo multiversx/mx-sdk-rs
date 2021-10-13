@@ -51,8 +51,8 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        let next_byte_index = self.byte_start + T::PAYLOAD_SIZE;
-        if next_byte_index > self.byte_end {
+        let next_byte_start = self.byte_start + T::PAYLOAD_SIZE;
+        if next_byte_start > self.byte_end {
             return None;
         }
         let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
@@ -62,7 +62,7 @@ where
                 .load_slice(self.byte_start, dest_slice);
         });
 
-        self.byte_start = next_byte_index;
+        self.byte_start = next_byte_start;
         Some(result)
     }
 }
