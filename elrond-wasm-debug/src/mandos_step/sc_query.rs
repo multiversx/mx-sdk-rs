@@ -3,14 +3,14 @@ use num_bigint::BigUint;
 
 use crate::{
     execute_helper_functions::{check_tx_output, generate_tx_hash_dummy, sc_call},
-    tx_mock::{TxContext, TxInput},
+    tx_mock::TxInput,
     world_mock::BlockchainMock,
-    ContractMap,
+    ContractMap, DebugApi,
 };
 
 pub fn execute(
     state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
+    contract_map: &ContractMap<DebugApi>,
     tx_id: &str,
     tx: &TxQuery,
     expect: &Option<TxExpect>,

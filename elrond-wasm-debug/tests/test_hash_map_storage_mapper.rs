@@ -2,10 +2,10 @@ use elrond_wasm::storage::{
     mappers::{MapMapper, MapStorageMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::TxContext;
+use elrond_wasm_debug::DebugApi;
 
-fn create_map_storage() -> MapStorageMapper<TxContext, u64, MapMapper<TxContext, u64, u64>> {
-    let api = TxContext::dummy();
+fn create_map_storage() -> MapStorageMapper<DebugApi, u64, MapMapper<DebugApi, u64, u64>> {
+    let api = DebugApi::dummy();
     let base_key = StorageKey::new(api.clone(), &b"my_map_storage"[..]);
     MapStorageMapper::new(api, base_key)
 }

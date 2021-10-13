@@ -6,11 +6,11 @@ use elrond_wasm::{
 
 use core::fmt::Debug;
 
-use crate::tx_mock::TxContext;
+use crate::DebugApi;
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
-pub fn check_managed_top_encode<T: TopEncode>(api: TxContext, obj: &T) -> BoxedBytes {
+pub fn check_managed_top_encode<T: TopEncode>(api: DebugApi, obj: &T) -> BoxedBytes {
     let serializer = ManagedSerializer::new(api);
     let as_mb = serializer.top_encode_to_managed_buffer(obj);
     let as_bb = serializer.top_encode_to_boxed_bytes(obj);
@@ -31,7 +31,7 @@ pub fn check_managed_top_encode<T: TopEncode>(api: TxContext, obj: &T) -> BoxedB
 /// Also works on types that have no un-managed decoding,
 /// by allowing DecodeError::UNSUPPORTED_OPERATION result.
 pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
-    api: TxContext,
+    api: DebugApi,
     bytes: &[u8],
 ) -> T {
     let serializer = ManagedSerializer::new(api.clone());
@@ -59,7 +59,7 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
 }
 
 /// Uses the managed types api to test encoding both ways.
-pub fn check_managed_top_encode_decode<V>(api: TxContext, element: V, expected_bytes: &[u8])
+pub fn check_managed_top_encode_decode<V>(api: DebugApi, element: V, expected_bytes: &[u8])
 where
     V: TopEncode + TopDecode + PartialEq + Debug + 'static,
 {

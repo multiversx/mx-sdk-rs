@@ -4,15 +4,12 @@ use elrond_wasm::types::{ManagedBuffer, ManagedType};
 use num_bigint::Sign;
 use num_traits::Zero;
 
-use crate::tx_mock::TxContext;
+use crate::DebugApi;
 
-impl TxContext {
+impl DebugApi {
     pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> ManagedBuffer<Self> {
-        let mut tx_output = self.tx_output_cell.borrow_mut();
-        let handle = tx_output
-            .managed_types
-            .managed_buffer_map
-            .insert_new_handle(value);
+        let mut managed_types = self.m_types_borrow_mut();
+        let handle = managed_types.managed_buffer_map.insert_new_handle(value);
         ManagedBuffer::from_raw_handle(self.clone(), handle)
     }
 
@@ -20,11 +17,8 @@ impl TxContext {
         &self,
         value: num_bigint::BigUint,
     ) -> elrond_wasm::types::BigUint<Self> {
-        let mut tx_output = self.tx_output_cell.borrow_mut();
-        let handle = tx_output
-            .managed_types
-            .big_int_map
-            .insert_new_handle(value.into());
+        let mut managed_types = self.m_types_borrow_mut();
+        let handle = managed_types.big_int_map.insert_new_handle(value.into());
         elrond_wasm::types::BigUint::from_raw_handle(self.clone(), handle)
     }
 
@@ -33,9 +27,8 @@ impl TxContext {
     }
 
     pub fn big_uint_value(&self, bu: &elrond_wasm::types::BigUint<Self>) -> num_bigint::BigUint {
-        let tx_output = self.tx_output_cell.borrow();
-        tx_output
-            .managed_types
+        let managed_types = self.m_types_borrow();
+        managed_types
             .big_int_map
             .get(bu.get_raw_handle())
             .magnitude()

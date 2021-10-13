@@ -1,15 +1,16 @@
 use crate::world_mock::{AccountEsdt, BlockInfo, BlockchainTxInfo};
-use alloc::{rc::Rc, vec::Vec};
+use alloc::vec::Vec;
 use core::cell::RefCell;
 use elrond_wasm::types::Address;
 
-use super::{TxInput, TxOutput};
+use super::{TxInput, TxManagedTypes, TxOutput};
 
 #[derive(Debug)]
 pub struct TxContext {
     pub blockchain_info_box: Box<BlockchainTxInfo>,
     pub tx_input_box: Box<TxInput>,
-    pub tx_output_cell: Rc<RefCell<TxOutput>>,
+    pub managed_types: RefCell<TxManagedTypes>,
+    pub tx_output_cell: RefCell<TxOutput>,
 }
 
 impl TxContext {
@@ -17,13 +18,9 @@ impl TxContext {
         TxContext {
             blockchain_info_box: Box::new(blockchain_info),
             tx_input_box: Box::new(tx_input),
-            tx_output_cell: Rc::new(RefCell::new(tx_output)),
+            managed_types: RefCell::new(TxManagedTypes::new()),
+            tx_output_cell: RefCell::new(tx_output),
         }
-    }
-
-    pub fn into_output(self) -> TxOutput {
-        let ref_cell = Rc::try_unwrap(self.tx_output_cell).unwrap();
-        ref_cell.replace(TxOutput::default())
     }
 
     pub fn dummy() -> Self {
@@ -46,17 +43,8 @@ impl TxContext {
                 gas_price: 0,
                 tx_hash: b"dummy...........................".into(),
             }),
-            tx_output_cell: Rc::new(RefCell::new(TxOutput::default())),
-        }
-    }
-}
-
-impl Clone for TxContext {
-    fn clone(&self) -> Self {
-        TxContext {
-            blockchain_info_box: self.blockchain_info_box.clone(),
-            tx_input_box: self.tx_input_box.clone(),
-            tx_output_cell: Rc::clone(&self.tx_output_cell),
+            managed_types: RefCell::new(TxManagedTypes::new()),
+            tx_output_cell: RefCell::new(TxOutput::default()),
         }
     }
 }

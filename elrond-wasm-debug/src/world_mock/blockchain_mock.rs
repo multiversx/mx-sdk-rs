@@ -6,9 +6,9 @@ use std::collections::HashMap;
 
 use crate::{
     esdt_transfer_event_log,
-    tx_mock::{SendBalance, TxContext, TxInput, TxLog, TxOutput, TxPanic},
+    tx_mock::{SendBalance, TxInput, TxLog, TxOutput, TxPanic},
     world_mock::AccountEsdt,
-    ContractMap,
+    ContractMap, DebugApi,
 };
 
 use super::{AccountData, BlockInfo, BlockchainMockError};
@@ -163,11 +163,11 @@ impl BlockchainMock {
 }
 
 pub fn execute_tx(
-    tx_context: TxContext,
+    tx_context: DebugApi,
     contract_identifier: &[u8],
-    contract_map: &ContractMap<TxContext>,
+    contract_map: &ContractMap<DebugApi>,
 ) -> TxOutput {
-    let func_name = tx_context.tx_input_box.func_name.clone();
+    let func_name = tx_context.input_ref().func_name.clone();
     let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let call_successful = contract_inst.call(func_name.as_slice());

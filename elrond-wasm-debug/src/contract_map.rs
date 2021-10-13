@@ -1,4 +1,4 @@
-use crate::tx_mock::TxContext;
+use crate::DebugApi;
 
 use super::*;
 
@@ -6,7 +6,7 @@ use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::contract_base::CallableContract;
 use std::collections::HashMap;
 
-pub type ContractCallFactory<A> = Box<dyn Fn(TxContext) -> Box<dyn CallableContract<A>>>;
+pub type ContractCallFactory<A> = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>;
 
 pub struct ContractMap<A> {
     factories: HashMap<Vec<u8>, ContractCallFactory<A>>,
@@ -22,7 +22,7 @@ impl<A> ContractMap<A> {
     pub fn new_contract_instance(
         &self,
         contract_identifier: &[u8],
-        tx_context: TxContext,
+        tx_context: DebugApi,
     ) -> Box<dyn CallableContract<A>> {
         if let Some(new_contract_closure) = self.factories.get(contract_identifier) {
             new_contract_closure(tx_context)
@@ -37,7 +37,7 @@ impl<A> ContractMap<A> {
     pub fn register_contract(
         &mut self,
         path: &str,
-        new_contract_closure: Box<dyn Fn(TxContext) -> Box<dyn CallableContract<A>>>,
+        new_contract_closure: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>,
     ) {
         self.factories
             .insert(path.as_bytes().to_vec(), new_contract_closure);
