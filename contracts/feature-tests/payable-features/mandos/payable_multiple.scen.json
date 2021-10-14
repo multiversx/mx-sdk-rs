@@ -18,8 +18,12 @@
                         "str:TOK-123": "1000",
                         "str:OTHERTOK-123": "500",
                         "str:SFT-123": {
-                            "nonce": "5",
-                            "balance": "20"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "20"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -54,9 +58,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:0|nested:str:TOK-123|u64:0|biguint:100",
-                    "u8:0|nested:str:OTHERTOK-123|u64:0|biguint:400",
-                    "u8:2|nested:str:SFT-123|u64:5|biguint:10"
+                    "u8:0|nested:str:TOK-123|u64:0|biguint:100|u8:0|nested:str:OTHERTOK-123|u64:0|biguint:400|u8:2|nested:str:SFT-123|u64:5|biguint:10"
                 ],
                 "status": "",
                 "logs": [],
