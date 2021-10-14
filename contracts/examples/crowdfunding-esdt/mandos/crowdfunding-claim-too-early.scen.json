@@ -11,15 +11,15 @@
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "claim",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:cannot claim before deadline",
+                "out": [],
                 "status": "4",
+                "message": "str:cannot claim before deadline",
                 "gas": "*",
                 "refund": "*"
             }
@@ -30,15 +30,15 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "claim",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:cannot claim before deadline",
+                "out": [],
                 "status": "4",
+                "message": "str:cannot claim before deadline",
                 "gas": "*",
                 "refund": "*"
             }

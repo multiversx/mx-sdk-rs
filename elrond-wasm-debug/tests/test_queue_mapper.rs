@@ -2,10 +2,10 @@ use elrond_wasm::storage::{
     mappers::{QueueMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::TxContext;
+use elrond_wasm_debug::DebugApi;
 
-fn create_queue() -> QueueMapper<TxContext, u64> {
-    let api = TxContext::dummy();
+fn create_queue() -> QueueMapper<DebugApi, u64> {
+    let api = DebugApi::dummy();
     let base_key = StorageKey::new(api.clone(), &b"my_queue"[..]);
     QueueMapper::new(api, base_key)
 }
@@ -33,7 +33,7 @@ fn test_queue_simple() {
     assert!(queue.check_internal_consistency());
 }
 
-fn check_queue(queue: &QueueMapper<TxContext, u64>, expected: Vec<u64>) {
+fn check_queue(queue: &QueueMapper<DebugApi, u64>, expected: Vec<u64>) {
     assert_eq!(queue.len(), expected.len());
     let vec: Vec<u64> = queue.iter().collect();
     assert_eq!(vec, expected);

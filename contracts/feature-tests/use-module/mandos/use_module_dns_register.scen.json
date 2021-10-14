@@ -6,14 +6,11 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "1000"
                 },
                 "sc:use_module": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/use-module.wasm",
                     "owner": "address:a_user"
                 },
@@ -33,7 +30,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:use_module",
-                "value": "1000",
+                "egldValue": "1000",
                 "function": "dnsRegister",
                 "arguments": [
                     "sc:dns#87",

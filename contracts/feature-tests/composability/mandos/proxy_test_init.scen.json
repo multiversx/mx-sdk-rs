@@ -6,14 +6,11 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "100",
-                    "storage": {},
-                    "code": ""
+                    "balance": "100"
                 },
                 "sc:proxy-first": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 }
             },
@@ -31,7 +28,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "value": "100",
+                "egldValue": "100",
                 "function": "deploySecondContract",
                 "arguments": [
                     "file:../proxy-test-second/output/proxy-test-second.wasm"

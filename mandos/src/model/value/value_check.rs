@@ -3,7 +3,7 @@ use crate::{
     serde_raw::{CheckBytesValueRaw, ValueSubTree},
 };
 
-use super::value::*;
+use super::value_basic::*;
 use num_bigint::BigUint;
 use std::fmt;
 

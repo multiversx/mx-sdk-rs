@@ -12,7 +12,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:kitty_ownership_contract",
-                "value": "10",
+                "egldValue": "10",
                 "function": "breedWith",
                 "arguments": [
                     "2",
@@ -22,8 +22,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }

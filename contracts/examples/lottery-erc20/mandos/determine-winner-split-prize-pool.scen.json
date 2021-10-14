@@ -19,7 +19,6 @@
             "tx": {
                 "from": "address:acc4",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -28,10 +27,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {

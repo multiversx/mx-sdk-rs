@@ -7,8 +7,7 @@
             "accounts": {
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             },
             "newAddresses": [
@@ -31,7 +30,6 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../../kitty-ownership/output/kitty-ownership.wasm",
-                "value": "0",
                 "arguments": [
                     "0"
                 ],
@@ -39,8 +37,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -51,7 +50,6 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/kitty-auction.wasm",
-                "value": "0",
                 "arguments": [
                     "100",
                     "500",
@@ -62,8 +60,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -74,7 +73,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "setKittyAuctionContractAddress",
                 "arguments": [
                     "sc:kitty_auction_contract"
@@ -83,8 +81,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }

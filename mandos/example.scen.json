@@ -118,9 +118,7 @@
                             ]
                         }
                     },
-                    "username": "str:myusername.elrond",
-                    "storage": {},
-                    "code": ""
+                    "username": "str:myusername.elrond"
                 },
                 "address:smart_contract_address": {
                     "nonce": "0x00",
@@ -181,7 +179,7 @@
             "tx": {
                 "from": "address:an_address",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
+                "egldValue": "0x00",
                 "function": "someFunctionName",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
@@ -237,11 +235,13 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
-                "esdt": {
-                    "tokenIdentifier": "str:MyToken",
-                    "value": "250,000,000,000"
-                },
+                "egldValue": "0x00",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MyToken",
+                        "value": "250,000,000,000"
+                    }
+                ],
                 "function": "someFunctionName",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -255,7 +255,6 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
                 "function": "someFunctionName",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -274,7 +273,6 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
                 "function": "someFunctionName",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -291,7 +289,7 @@
             "comment": "another",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
-                "value": "0x00",
+                "egldValue": "123,456,000",
                 "contractCode": "``new contract code here",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
@@ -331,11 +329,13 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "1234",
-                "esdt": {
-                    "tokenIdentifier": "str:MyToken",
-                    "value": "250,000,000,000"
-                }
+                "egldValue": "1234",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MyToken",
+                        "value": "250,000,000,000"
+                    }
+                ]
             }
         },
         {
@@ -344,7 +344,21 @@
             "comment": "system send out validator rewards",
             "tx": {
                 "to": "sc:delegation",
-                "value": "555,000,000"
+                "egldValue": "555,000,000"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "5",
+            "displayLogs": true,
+            "tx": {
+                "to": "address:this_is_just_a_display_logs_test",
+                "function": "thisIsJustADisplayLogsTest",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": ""
             }
         },
         {
@@ -434,7 +448,8 @@
                         "str:anything-goes": "*",
                         "+": ""
                     },
-                    "code": "file:smart-contract.wasm"
+                    "code": "file:smart-contract.wasm",
+                    "owner": "address:bob"
                 },
                 "address:smart_contract_address_2": {
                     "nonce": "*",
@@ -442,6 +457,7 @@
                     "username": "*",
                     "storage": "*",
                     "code": "*",
+                    "owner": "*",
                     "asyncCallData": "``func@arg1@arg2"
                 },
                 "str:account_with_defaults___________": {
@@ -453,6 +469,32 @@
         {
             "step": "dumpState",
             "comment": "print everything to console"
+        },
+        {
+            "step": "transfer",
+            "txId": "multi-transfer",
+            "comment": "test ESDT multi-transfer",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:OTHERTOK-123",
+                        "value": "1000"
+                    },
+                    {
+                        "tokenIdentifier": "str:NFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "gasLimit": "0x100000000",
+                "gasPrice": "0x01"
+            }
         }
     ]
 }

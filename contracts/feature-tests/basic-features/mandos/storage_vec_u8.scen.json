@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -25,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_vec_u8",
                 "arguments": [
                     "123"
@@ -66,7 +62,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_vec_u8",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -88,7 +83,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_vec_u8",
                 "arguments": [
                     "0"
@@ -129,7 +123,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_vec_u8",
                 "arguments": [],
                 "gasLimit": "50,000,000",

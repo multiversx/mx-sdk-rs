@@ -17,13 +17,14 @@
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
-                "value": "10,000,000,000",
+                "egldValue": "10,000,000,000",
                 "function": "fund",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:cannot fund after deadline",
                 "gas": "*",
@@ -62,7 +63,6 @@
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "status",
                 "arguments": [],
                 "gasLimit": "100,000,000",

@@ -55,6 +55,10 @@ pub enum StepRaw {
         #[serde(skip_serializing_if = "Option::is_none")]
         comment: Option<String>,
 
+        #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        display_logs: Option<bool>,
+
         tx: TxCallRaw,
 
         #[serde(default)]
@@ -71,6 +75,10 @@ pub enum StepRaw {
         #[serde(skip_serializing_if = "Option::is_none")]
         comment: Option<String>,
 
+        #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        display_logs: Option<bool>,
+
         tx: TxQueryRaw,
 
         #[serde(default)]
@@ -86,6 +94,10 @@ pub enum StepRaw {
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
         comment: Option<String>,
+
+        #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        display_logs: Option<bool>,
 
         tx: TxDeployRaw,
 

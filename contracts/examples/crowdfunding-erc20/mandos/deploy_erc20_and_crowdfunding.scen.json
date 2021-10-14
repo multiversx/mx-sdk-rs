@@ -6,13 +6,11 @@
             "accounts": {
                 "address:erc20_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:crowdfunding_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -34,7 +32,6 @@
             "tx": {
                 "from": "address:erc20_owner",
                 "contractCode": "file:../../erc20/output/erc20.wasm",
-                "value": "0",
                 "arguments": [
                     "1,000,000,000"
                 ],
@@ -42,6 +39,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -77,7 +75,6 @@
             "tx": {
                 "from": "address:crowdfunding_owner",
                 "contractCode": "file:../output/crowdfunding-erc20.wasm",
-                "value": "0",
                 "arguments": [
                     "1,000,000",
                     "123,456",
@@ -87,6 +84,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
