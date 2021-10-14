@@ -1,6 +1,30 @@
 use super::util::*;
 use crate::model::MethodArgument;
 
+pub fn generate_arg_dyn_check(
+    args: &[MethodArgument],
+    fixed_args_expr: &proc_macro2::TokenStream,
+    dyn_args_expr: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    let arg_types: Vec<proc_macro2::TokenStream> = args
+        .iter()
+        .map(|arg| {
+            let arg_ty = &arg.ty;
+            quote! {
+                #arg_ty,
+            }
+        })
+        .collect();
+    quote! {
+        if <(#(#arg_types)*)>::IS_FIXED_NUMBER_ARG {
+            #fixed_args_expr
+        }
+        else {
+            #dyn_args_expr
+        }
+    }
+}
+
 pub fn generate_load_single_arg(
     arg: &MethodArgument,
     arg_index_expr: &proc_macro2::TokenStream,

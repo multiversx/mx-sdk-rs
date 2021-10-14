@@ -6,6 +6,8 @@ use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.
 pub trait DynArg: Sized {
+    const IS_FIXED_NUMBER_ARG: bool = false;
+
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self;
 }
 
@@ -14,6 +16,8 @@ impl<T> DynArg for T
 where
     T: TopEncode + TopDecode,
 {
+    const IS_FIXED_NUMBER_ARG: bool = true;
+
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         if let TypeInfo::Unit = <T as TopDecode>::TYPE_INFO {
             // unit type returns without loading anything

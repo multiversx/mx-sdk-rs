@@ -18,6 +18,8 @@ macro_rules! multi_arg_impls {
             where
                 $($name: DynArg,)+
             {
+                const IS_FIXED_NUMBER_ARG: bool = $($name::IS_FIXED_NUMBER_ARG &&)+ true;
+
                 fn dyn_load<I>(loader: &mut I, arg_id: ArgId) -> Self
                 where
                     I: DynArgInput,

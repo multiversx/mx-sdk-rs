@@ -24,13 +24,12 @@ pub fn generate_call_method(m: &Method) -> proc_macro2::TokenStream {
 }
 
 pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
-    if m.has_variable_nr_args() {
-        generate_call_method_body_variable_nr_args(m)
-    } else {
-        generate_call_method_body_fixed_args(m)
-    }
+    let fixed_args_expr = generate_call_method_body_fixed_args(m);
+    let dyn_args_expr = generate_call_method_body_variable_nr_args(m);
+    generate_arg_dyn_check(&m.method_args, &fixed_args_expr, &dyn_args_expr)
 }
 
+#[allow(unused)]
 pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStream {
     let payable_snippet = generate_payable_snippet(m);
     let only_owner_snippet = generate_only_owner_snippet(m);
@@ -40,11 +39,6 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
         .method_args
         .iter()
         .map(|arg| {
-            assert!(
-                !arg.metadata.var_args,
-                "var_args not accepted in function generate_call_method_fixed_args"
-            );
-
             if arg.is_endpoint_arg() {
                 arg_index += 1;
                 let pat = &arg.pat;
