@@ -1,11 +1,16 @@
 use mandos::model::{TxExpect, TxQuery};
 use num_bigint::BigUint;
 
-use crate::{execute_helper_functions::*, BlockchainMock, ContractMap, TxContext, TxInput};
+use crate::{
+    execute_helper_functions::{check_tx_output, generate_tx_hash_dummy, sc_call},
+    tx_mock::TxInput,
+    world_mock::BlockchainMock,
+    ContractMap, DebugApi,
+};
 
 pub fn execute(
     state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
+    contract_map: &ContractMap<DebugApi>,
     tx_id: &str,
     tx: &TxQuery,
     expect: &Option<TxExpect>,
@@ -13,10 +18,8 @@ pub fn execute(
     let tx_input = TxInput {
         from: tx.to.value.into(),
         to: tx.to.value.into(),
-        call_value: BigUint::from(0u32),
-        esdt_value: BigUint::from(0u32),
-        esdt_token_identifier: Vec::new(),
-        nonce: 0u64,
+        egld_value: BigUint::from(0u32),
+        esdt_values: Vec::new(),
         func_name: tx.function.as_bytes().to_vec(),
         args: tx
             .arguments

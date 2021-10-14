@@ -3,9 +3,9 @@ use elrond_wasm::{
     types::BoxedBytes,
 };
 
-use crate::TxContext;
+use crate::DebugApi;
 
-impl EllipticCurveApi for TxContext {
+impl EllipticCurveApi for DebugApi {
     fn ec_create(&self, _name: &[u8]) -> Handle {
         panic!("ec_create not implemented")
     }

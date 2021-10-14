@@ -8,18 +8,15 @@
                 "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/payable-features.wasm"
                 },
                 "address:an-account": {
                     "nonce": "0",
                     "balance": "1,000,000,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
                         "str:OTHER-TOKEN": "1,000,000,000,000"
-                    },
-                    "code": ""
+                    }
                 }
             }
         },
@@ -29,7 +26,6 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
                 "function": "payable_any_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -52,7 +48,7 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "5",
+                "egldValue": "5",
                 "function": "payable_any_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -75,11 +71,12 @@
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "payable_any_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",

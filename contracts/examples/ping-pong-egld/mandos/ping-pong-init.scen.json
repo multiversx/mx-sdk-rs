@@ -7,18 +7,15 @@
             "accounts": {
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:participant1": {
                     "nonce": "0",
-                    "balance": "1,800,000,000,000",
-                    "storage": {}
+                    "balance": "1,800,000,000,000"
                 },
                 "address:participant2": {
                     "nonce": "0",
-                    "balance": "2,500,000,000,000",
-                    "storage": {}
+                    "balance": "2,500,000,000,000"
                 }
             },
             "newAddresses": [
@@ -35,7 +32,6 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/ping-pong-egld.wasm",
-                "value": "0",
                 "arguments": [
                     "500,000,000,000",
                     "123,000",
@@ -45,6 +41,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

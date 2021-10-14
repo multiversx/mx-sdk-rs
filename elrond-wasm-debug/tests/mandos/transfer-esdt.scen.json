@@ -10,15 +10,11 @@
                     "balance": "0x1000000000",
                     "esdt": {
                         "str:TOK-123": "150"
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -28,10 +24,12 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "esdt": {
-                    "tokenIdentifier": "str:TOK-123",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123",
+                        "value": "100"
+                    }
+                ],
                 "gasLimit": "0x100000000",
                 "gasPrice": "0x01"
             }
@@ -65,10 +63,12 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "esdt": {
-                    "tokenIdentifier": "str:TOK-123",
-                    "value": "50"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123",
+                        "value": "50"
+                    }
+                ],
                 "gasLimit": "0x100000000",
                 "gasPrice": "0x01"
             }

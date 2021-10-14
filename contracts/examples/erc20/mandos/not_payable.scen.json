@@ -7,9 +7,7 @@
             "accounts": {
                 "address:account_1": {
                     "nonce": "0",
-                    "balance": "0x10000000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x10000000"
                 },
                 "sc:erc20": {
                     "nonce": "0",
@@ -28,7 +26,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0x01",
+                "egldValue": "0x01",
                 "function": "totalSupply",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -49,7 +47,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0x01",
+                "egldValue": "0x01",
                 "function": "balanceOf",
                 "arguments": [
                     "address:account_1"
@@ -72,7 +70,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0x01",
+                "egldValue": "0x01",
                 "function": "allowance",
                 "arguments": [
                     "address:account_1",
@@ -96,7 +94,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0x01",
+                "egldValue": "0x01",
                 "function": "transfer",
                 "arguments": [
                     "address:account_1",
@@ -120,7 +118,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0x01",
+                "egldValue": "0x01",
                 "function": "approve",
                 "arguments": [
                     "address:account_1",
@@ -144,7 +142,7 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0x01",
+                "egldValue": "0x01",
                 "function": "transferFrom",
                 "arguments": [
                     "address:account_1",

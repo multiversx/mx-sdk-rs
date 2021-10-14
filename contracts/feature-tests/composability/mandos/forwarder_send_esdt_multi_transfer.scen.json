@@ -6,9 +6,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -32,7 +30,6 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -44,7 +41,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "send_esdt_direct_multi_transfer",
                 "arguments": [
                     "address:a_user",
@@ -112,7 +108,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "send_esdt_direct_multi_transfer",
                 "arguments": [
                     "address:a_user",
@@ -191,7 +186,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "send_esdt_direct_multi_transfer",
                 "arguments": [
                     "address:a_user",

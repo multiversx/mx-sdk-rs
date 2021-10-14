@@ -4,10 +4,12 @@ use crate::{
     serde_raw::TxDeployRaw,
 };
 
+use super::tx_interpret_util::interpret_egld_value;
+
 #[derive(Debug)]
 pub struct TxDeploy {
     pub from: AddressValue,
-    pub call_value: BigUintValue,
+    pub egld_value: BigUintValue,
     pub contract_code: BytesValue,
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
@@ -18,7 +20,7 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
     fn interpret_from(from: TxDeployRaw, context: &InterpreterContext) -> Self {
         TxDeploy {
             from: AddressValue::interpret_from(from.from, context),
-            call_value: BigUintValue::interpret_from(from.value, context),
+            egld_value: interpret_egld_value(from.value, from.egld_value, context),
             contract_code: BytesValue::interpret_from(from.contract_code, context),
             arguments: from
                 .arguments

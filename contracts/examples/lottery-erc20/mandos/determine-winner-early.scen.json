@@ -18,7 +18,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "status",
                 "arguments": [
                     "str:lottery_name"
@@ -27,10 +26,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
                 "out": [
                     "1"
                 ],
+                "status": "0",
                 "gas": "*",
                 "refund": "*"
             }
@@ -41,7 +40,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -50,6 +48,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Lottery is still running!",
                 "gas": "*",

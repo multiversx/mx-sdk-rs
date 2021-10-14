@@ -17,7 +17,7 @@
             "tx": {
                 "from": "address:participant1",
                 "to": "sc:ping-pong",
-                "value": "500,000,000,000",
+                "egldValue": "500,000,000,000",
                 "function": "ping",
                 "arguments": [
                     "str:optional data, which we ignore"
@@ -26,6 +26,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"

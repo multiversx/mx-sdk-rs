@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "approveSiring",
                 "arguments": [
                     "address:acc2",
@@ -22,8 +21,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }

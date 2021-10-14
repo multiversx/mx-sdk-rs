@@ -27,6 +27,7 @@ pub struct AccountRaw {
     pub username: Option<ValueSubTree>,
 
     #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub storage: BTreeMap<String, ValueSubTree>,
 
     #[serde(default)]

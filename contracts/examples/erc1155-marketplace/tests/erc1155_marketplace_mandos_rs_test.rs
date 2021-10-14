@@ -2,7 +2,7 @@ use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 #[allow(dead_code)]
-fn contract_map() -> ContractMap<TxContext> {
+fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/erc1155-marketplace.wasm",

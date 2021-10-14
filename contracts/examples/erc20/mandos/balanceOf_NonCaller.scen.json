@@ -7,9 +7,7 @@
             "accounts": {
                 "address:account_1": {
                     "nonce": "0",
-                    "balance": "0xe8d4a51000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0xe8d4a51000"
                 },
                 "sc:erc20": {
                     "nonce": "0",
@@ -28,7 +26,6 @@
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
-                "value": "0",
                 "function": "balanceOf",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000009"
