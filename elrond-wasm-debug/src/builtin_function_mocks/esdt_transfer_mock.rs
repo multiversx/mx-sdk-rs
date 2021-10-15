@@ -1,8 +1,10 @@
+use std::{cell::RefCell, rc::Rc};
+
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 
 use crate::{
-    tx_mock::{TxInput, TxLog, TxResult},
+    tx_mock::{TxCache, TxContext, TxInput, TxLog, TxResult},
     world_mock::BlockchainMock,
 };
 
@@ -21,8 +23,12 @@ pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> 
     let token_identifier = tx_input.args[0].clone();
     let value = BigUint::from_bytes_be(tx_input.args[1].as_slice());
 
-    state.subtract_esdt_balance(&tx_input.from, &token_identifier, 0, &value);
-    state.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
+    let blockchain_cell = Rc::new(RefCell::new(*state));
+    let tx_cache = TxCache::new(blockchain_cell);
+
+    tx_cache.subtract_esdt_balance(&tx_input.from, &token_identifier, 0, &value);
+    tx_cache.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
+    tx_cache.commit();
     TxResult {
         result_status: 0,
         result_message: Vec::new(),

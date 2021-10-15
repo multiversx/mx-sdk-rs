@@ -15,16 +15,16 @@ use elrond_wasm::{
 impl DebugApi {
     fn get_available_egld_balance(&self) -> num_bigint::BigUint {
         // start with the pre-existing balance
-        let mut available_balance = self.blockchain_info_ref().contract_balance.clone();
+        let mut available_balance = self.get_contract_account().egld_balance.clone();
 
-        // add amount received
-        available_balance += &self.input_ref().egld_value;
+        // // add amount received
+        // available_balance += &self.input_ref().egld_value;
 
-        // already sent
-        let tx_output = self.output_borrow();
-        for send_balance in &tx_output.send_balance_list {
-            available_balance -= &send_balance.amount;
-        }
+        // // already sent
+        // let tx_output = self.output_borrow();
+        // for send_balance in &tx_output.send_balance_list {
+        //     available_balance -= &send_balance.amount;
+        // }
 
         available_balance
     }
@@ -36,25 +36,25 @@ impl DebugApi {
     ) -> num_bigint::BigUint {
         // start with the pre-existing balance
         let mut available_balance = self
-            .blockchain_info_ref()
-            .contract_esdt
+            .get_contract_account()
+            .esdt
             .get_esdt_balance(token_identifier, nonce);
 
-        // add amount received (if the same token)
-        for esdt_value in self.input_ref().esdt_values.iter() {
-            if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
-                available_balance += &esdt_value.value;
-            }
-        }
+        // // add amount received (if the same token)
+        // for esdt_value in self.input_ref().esdt_values.iter() {
+        //     if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
+        //         available_balance += &esdt_value.value;
+        //     }
+        // }
 
-        let tx_output = self.output_borrow();
+        // let tx_output = self.output_borrow();
 
-        // already sent
-        for send_balance in &tx_output.send_balance_list {
-            if send_balance.token_identifier.as_slice() == token_identifier {
-                available_balance -= &send_balance.amount;
-            }
-        }
+        // // already sent
+        // for send_balance in &tx_output.send_balance_list {
+        //     if send_balance.token_identifier.as_slice() == token_identifier {
+        //         available_balance -= &send_balance.amount;
+        //     }
+        // }
 
         available_balance
     }
@@ -66,21 +66,28 @@ impl SendApi for DebugApi {
         D: ManagedInto<Self, ManagedBuffer<Self>>,
     {
         let amount_value = self.big_uint_value(amount);
-        if amount_value > self.get_available_egld_balance() {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: b"failed transfer (insufficient funds)".to_vec(),
-            });
-        }
+        // if amount_value > self.get_available_egld_balance() {
+        //     std::panic::panic_any(TxPanic {
+        //         status: 10,
+        //         message: b"failed transfer (insufficient funds)".to_vec(),
+        //     });
+        // }
 
-        let recipient = to.to_address();
-        let mut tx_output = self.output_borrow_mut();
-        tx_output.send_balance_list.push(SendBalance {
-            recipient,
-            token_identifier: BoxedBytes::empty(),
-            amount: amount_value,
-            nonce: 0u64,
-        });
+        let contract_address = &self.input_ref().to;
+        self.blockchain_cache()
+            .subtract_egld_balance(contract_address, &amount_value);
+
+        let recipient = &to.to_address();
+        self.blockchain_cache()
+            .increase_egld_balance(recipient, &amount_value);
+
+        // let mut tx_result = self.result_borrow_mut();
+        // tx_output.send_balance_list.push(SendBalance {
+        //     recipient,
+        //     token_identifier: BoxedBytes::empty(),
+        //     amount: amount_value,
+        //     nonce: 0u64,
+        // });
     }
 
     fn direct_egld_execute(
@@ -103,26 +110,28 @@ impl SendApi for DebugApi {
         _endpoint_name: &ManagedBuffer<Self>,
         _arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
-        let amount_value = self.big_uint_value(amount);
-        if amount_value
-            > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice(), 0u64)
-        {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: b"insufficient funds".to_vec(),
-            });
-        }
+        // let amount_value = self.big_uint_value(amount);
+        // if amount_value
+        //     > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice(), 0u64)
+        // {
+        //     std::panic::panic_any(TxPanic {
+        //         status: 10,
+        //         message: b"insufficient funds".to_vec(),
+        //     });
+        // }
 
-        let recipient = to.to_address();
-        let token_identifier = token.to_esdt_identifier();
-        let mut tx_output = self.output_borrow_mut();
-        tx_output.send_balance_list.push(SendBalance {
-            recipient,
-            token_identifier,
-            amount: amount_value,
-            nonce: 0u64,
-        });
-        Ok(())
+        // let recipient = to.to_address();
+        // let token_identifier = token.to_esdt_identifier();
+        // let mut tx_result = self.result_borrow_mut();
+        // tx_output.send_balance_list.push(SendBalance {
+        //     recipient,
+        //     token_identifier,
+        //     amount: amount_value,
+        //     nonce: 0u64,
+        // });
+        // Ok(())
+
+        panic!("direct_esdt_execute not yet implemented")
     }
 
     fn direct_esdt_nft_execute(
@@ -156,20 +165,21 @@ impl SendApi for DebugApi {
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ! {
-        let amount_value = self.big_uint_value(amount);
-        let recipient = to.to_address();
-        let call_data =
-            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
-        let tx_hash = self.get_tx_hash_legacy();
-        // the cell is no longer needed, since we end in a panic
-        let mut tx_output = self.consume_output();
-        tx_output.async_call = Some(AsyncCallTxData {
-            to: recipient,
-            call_value: amount_value,
-            call_data,
-            tx_hash,
-        });
-        std::panic::panic_any(tx_output)
+        // let amount_value = self.big_uint_value(amount);
+        // let recipient = to.to_address();
+        // let call_data =
+        //     HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
+        // let tx_hash = self.get_tx_hash_legacy();
+        // // the cell is no longer needed, since we end in a panic
+        // let mut tx_output = self.consume_output();
+        // tx_output.async_call = Some(AsyncCallTxData {
+        //     to: recipient,
+        //     call_value: amount_value,
+        //     call_data,
+        //     tx_hash,
+        // });
+        // std::panic::panic_any(tx_output)
+        panic!("async_call_raw not implemented yet");
     }
 
     fn deploy_contract(

@@ -2,20 +2,17 @@ use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::{address_hex, tx_mock::TxInputESDT};
+use crate::{address_hex, tx_mock::TxInputESDT, world_mock::BlockchainMockError};
 
-use super::{BlockchainMock, BlockchainMockError};
+use super::TxCache;
 
-impl BlockchainMock {
+impl TxCache {
     pub fn subtract_egld_balance(
-        &mut self,
+        &self,
         address: &Address,
         call_value: &BigUint,
     ) -> Result<(), BlockchainMockError> {
-        let sender_account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
+        let sender_account = self.get_account_mut(address);
         if &sender_account.egld_balance < call_value {
             return Err("failed transfer (insufficient funds)".into());
         }
@@ -23,11 +20,8 @@ impl BlockchainMock {
         Ok(())
     }
 
-    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
-        let sender_account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account not found"));
+    pub fn subtract_tx_gas(&self, address: &Address, gas_limit: u64, gas_price: u64) {
+        let sender_account = self.get_account_mut(address);
         let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
         assert!(
             sender_account.egld_balance >= gas_cost,
@@ -36,11 +30,8 @@ impl BlockchainMock {
         sender_account.egld_balance -= &gas_cost;
     }
 
-    pub fn increase_egld_balance(&mut self, address: &Address, amount: &BigUint) {
-        let account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Receiver account not found"));
+    pub fn increase_egld_balance(&self, address: &Address, amount: &BigUint) {
+        let account = self.get_account_mut(address);
         account.egld_balance += amount;
     }
 
@@ -51,10 +42,7 @@ impl BlockchainMock {
         nonce: u64,
         value: &BigUint,
     ) {
-        let sender_account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Sender account {} not found", address_hex(address)));
+        let sender_account = self.get_account_mut(address);
 
         let esdt_data_map = &mut sender_account.esdt;
         let esdt_data = esdt_data_map
@@ -110,10 +98,7 @@ impl BlockchainMock {
         nonce: u64,
         value: &BigUint,
     ) {
-        let account = self
-            .accounts
-            .get_mut(address)
-            .unwrap_or_else(|| panic!("Receiver account not found"));
+        let account = self.get_account_mut(address);
 
         if let Some(esdt_data) = account.esdt.get_mut_by_identifier(esdt_token_identifier) {
             esdt_data.instances.add(nonce, value.clone());
