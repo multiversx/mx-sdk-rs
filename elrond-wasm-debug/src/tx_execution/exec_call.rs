@@ -1,14 +1,24 @@
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::{
     address_hex, async_call_tx_input, async_callback_tx_input, merge_results,
     try_execute_builtin_function,
-    tx_mock::{TxInput, TxOutput, TxResult},
+    tx_mock::{TxContext, TxInput, TxOutput, TxResult},
     world_mock::{AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap, DebugApi,
 };
 
-use super::execute_contract_endpoint;
+use super::execute_tx_context;
+
+pub fn sc_query(
+    tx_input: TxInput,
+    state: &mut BlockchainMock,
+    contract_map: &ContractMap<DebugApi>,
+) -> TxResult {
+    let blockchain_cell = Rc::new(RefCell::new(*state));
+    let tx_context = TxContext::new(tx_input, blockchain_cell);
+    execute_tx_context(&tx_context, contract_map)
+}
 
 pub fn sc_call(
     tx_input: TxInput,
@@ -19,59 +29,55 @@ pub fn sc_call(
         return Ok((tx_result, None));
     }
 
-    let from = tx_input.from.clone();
-    let to = tx_input.to.clone();
-    let egld_value = tx_input.egld_value.clone();
-    let esdt_values = tx_input.esdt_values.clone();
-    let blockchain_info = state.create_tx_info(&to);
+    let blockchain_cell = Rc::new(RefCell::new(*state));
+    let tx_context = TxContext::new(tx_input.clone(), blockchain_cell);
 
-    state.subtract_egld_balance(&from, &egld_value)?;
-    state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
-    state.subtract_multi_esdt_balance(&from, tx_input.esdt_values.as_slice());
-
-    let contract_account = state
-        .accounts
-        .get_mut(&to)
-        .unwrap_or_else(|| panic!("Recipient account not found: {}", address_hex(&to)));
-
-    let contract_path = &contract_account
-        .contract_path
-        .clone()
-        .unwrap_or_else(|| panic!("Recipient account is not a smart contract"));
-
-    let tx_context = DebugApi::new(
-        blockchain_info,
-        tx_input,
-        TxOutput {
-            contract_storage: contract_account.storage.clone(),
-            result: TxResult::empty(),
-            send_balance_list: Vec::new(),
-            async_call: None,
-        },
+    tx_context
+        .blockchain_cache
+        .increase_acount_nonce(&tx_input.from);
+    tx_context
+        .blockchain_cache
+        .subtract_egld_balance(&tx_input.from, &tx_input.egld_value)?;
+    tx_context.blockchain_cache.subtract_tx_gas(
+        &tx_input.from,
+        tx_input.gas_limit,
+        tx_input.gas_price,
     );
+    tx_context
+        .blockchain_cache
+        .increase_egld_balance(&tx_input.to, &tx_input.egld_value);
 
-    let tx_output = execute_contract_endpoint(tx_context, contract_path, contract_map);
-    let mut tx_result = tx_output.result;
+    let tx_result = if tx_input.func_name.is_empty() {
+        // direct EGLD transfer
+        TxResult::empty()
+    } else {
+        execute_tx_context(&tx_context, contract_map)
+    };
 
     if tx_result.result_status == 0 {
-        // replace storage with new one
-        let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
-
-        state.increase_egld_balance(&to, &egld_value);
-        state.increase_multi_esdt_balance(&to, esdt_values.as_slice());
-
-        state.send_balance(
-            &to,
-            tx_output.send_balance_list.as_slice(),
-            &mut tx_result.result_logs,
-        )?;
-    } else {
-        // revert
-        state.increase_egld_balance(&from, &egld_value);
-        state.increase_multi_esdt_balance(&from, esdt_values.as_slice());
+        tx_context.blockchain_cache.commit();
     }
 
-    Ok((tx_result, tx_output.async_call))
+    // if tx_result.result_status == 0 {
+    //     // replace storage with new one
+    //     let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
+
+    //     state.increase_egld_balance(&to, &egld_value);
+    //     state.increase_multi_esdt_balance(&to, esdt_values.as_slice());
+
+    //     state.send_balance(
+    //         &to,
+    //         tx_output.send_balance_list.as_slice(),
+    //         &mut tx_result.result_logs,
+    //     )?;
+    // } else {
+    //     // revert
+    //     state.increase_egld_balance(&from, &egld_value);
+    //     state.increase_multi_esdt_balance(&from, esdt_values.as_slice());
+    // }
+
+    // Ok((tx_result, tx_output.async_call))
+    Ok((tx_result, None))
 }
 
 pub fn sc_call_with_async_and_callback(
@@ -101,19 +107,20 @@ pub fn sc_call_with_async_and_callback(
                 );
                 tx_result = merge_results(tx_result, callback_result);
             } else {
-                state
-                    .subtract_egld_balance(&contract_address, &async_data.call_value)
-                    .unwrap();
-                state.add_account(AccountData {
-                    address: async_data.to.clone(),
-                    nonce: 0,
-                    egld_balance: async_data.call_value,
-                    esdt: AccountEsdt::default(),
-                    username: Vec::new(),
-                    storage: HashMap::new(),
-                    contract_path: None,
-                    contract_owner: None,
-                });
+                panic!("async cross shard simuation not supported")
+                // state
+                //     .subtract_egld_balance(&contract_address, &async_data.call_value)
+                //     .unwrap();
+                // state.add_account(AccountData {
+                //     address: async_data.to.clone(),
+                //     nonce: 0,
+                //     egld_balance: async_data.call_value,
+                //     esdt: AccountEsdt::default(),
+                //     username: Vec::new(),
+                //     storage: HashMap::new(),
+                //     contract_path: None,
+                //     contract_owner: None,
+                // });
             }
         }
     }

@@ -1,30 +1,50 @@
 use alloc::boxed::Box;
+use elrond_wasm::contract_base::CallableContract;
 
 use crate::{
-    tx_mock::{TxOutput, TxPanic},
+    tx_mock::{TxContext, TxOutput, TxPanic, TxResult},
     ContractMap, DebugApi,
 };
 
 /// Runs contract code using the auto-generated function selector.
 /// The endpoint name is taken from the tx context.
 /// Catches and wraps any panics thrown in the contract.
-pub fn execute_contract_endpoint(
-    tx_context: DebugApi,
-    contract_identifier: &[u8],
-    contract_map: &ContractMap<DebugApi>,
-) -> TxOutput {
-    let func_name = tx_context.input_ref().func_name.clone();
-    let contract_inst = contract_map.new_contract_instance(contract_identifier, tx_context);
+pub fn execute_tx_context(
+    tx_context: &TxContext,
+    contract_map: &ContractMap<DebugApi>, // TODO: move to blockchain mock
+) -> TxResult {
+    let func_name = tx_context.tx_input_box.func_name.as_slice();
+    let debug_api = DebugApi::new(*tx_context);
+    let contract_identifier = get_contract_identifier(tx_context);
+    let contract_instance = contract_map.new_contract_instance(contract_identifier, debug_api);
+    execute_contract_instance_endpoint(tx_context, contract_instance, func_name)
+}
+
+fn get_contract_identifier(tx_context: &TxContext) -> &[u8] {
+    tx_context
+        .blockchain_cache
+        .get_account(&tx_context.tx_input_box.to)
+        .contract_path
+        .unwrap_or_else(|| panic!("Recipient account is not a smart contract"))
+        .as_slice()
+}
+
+/// The actual execution and the extraction/wrapping of results.
+fn execute_contract_instance_endpoint(
+    tx_context: &TxContext,
+    contract_instance: Box<dyn CallableContract<DebugApi>>,
+    endpoint_name: &[u8],
+) -> TxResult {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let call_successful = contract_inst.call(func_name.as_slice());
+        let call_successful = contract_instance.call(endpoint_name);
         if !call_successful {
             std::panic::panic_any(TxPanic {
                 status: 1,
                 message: b"invalid function (not found)".to_vec(),
             });
         }
-        let context = contract_inst.into_api();
-        context.into_output()
+        let debug_api = contract_instance.into_api();
+        debug_api.into_tx_result()
     }));
     match result {
         Ok(tx_output) => tx_output,
@@ -32,20 +52,20 @@ pub fn execute_contract_endpoint(
     }
 }
 
-fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxOutput {
-    if panic_any.downcast_ref::<TxOutput>().is_some() {
+fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxResult {
+    if panic_any.downcast_ref::<TxResult>().is_some() {
         // async calls panic with the tx output directly
         // it is not a failure, simply a way to kill the execution
-        return *panic_any.downcast::<TxOutput>().unwrap();
+        return *panic_any.downcast::<TxResult>().unwrap();
     }
 
     if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
-        return TxOutput::from_panic_obj(panic_obj);
+        return TxResult::from_panic_obj(panic_obj);
     }
 
     if let Some(panic_string) = panic_any.downcast_ref::<String>() {
-        return TxOutput::from_panic_string(panic_string.as_str());
+        return TxResult::from_panic_string(panic_string.as_str());
     }
 
-    TxOutput::from_panic_string("unknown panic")
+    TxResult::from_unknown_panic()
 }

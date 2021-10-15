@@ -22,10 +22,10 @@ impl<A> ContractMap<A> {
     pub fn new_contract_instance(
         &self,
         contract_identifier: &[u8],
-        tx_context: DebugApi,
+        debug_api: DebugApi,
     ) -> Box<dyn CallableContract<A>> {
         if let Some(new_contract_closure) = self.factories.get(contract_identifier) {
-            new_contract_closure(tx_context)
+            new_contract_closure(debug_api)
         } else {
             panic!(
                 "Unknown contract: {}",

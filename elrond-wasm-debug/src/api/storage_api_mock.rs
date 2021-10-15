@@ -10,8 +10,7 @@ impl StorageReadApi for DebugApi {
     }
 
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
-        let tx_output = self.output_borrow();
-        match tx_output.contract_storage.get(&key.to_vec()) {
+        match self.get_contract_account().storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
             Some(value) => value.clone(),
         }
@@ -73,9 +72,8 @@ impl StorageWriteApi for DebugApi {
             });
         }
 
-        let mut tx_output = self.output_borrow_mut();
-        tx_output
-            .contract_storage
+        self.get_contract_account_mut()
+            .storage
             .insert(key.to_vec(), value.to_vec());
     }
 
