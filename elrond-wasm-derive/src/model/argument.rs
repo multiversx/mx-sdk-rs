@@ -34,6 +34,7 @@ pub enum ArgPaymentMetadata {
     PaymentAmount,
     PaymentToken,
     PaymentNonce,
+    PaymentMulti,
 }
 
 impl ArgPaymentMetadata {
@@ -43,6 +44,7 @@ impl ArgPaymentMetadata {
             ArgPaymentMetadata::PaymentAmount
                 | ArgPaymentMetadata::PaymentToken
                 | ArgPaymentMetadata::PaymentNonce
+                | ArgPaymentMetadata::PaymentMulti
         )
     }
 }

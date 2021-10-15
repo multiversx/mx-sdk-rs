@@ -21,6 +21,15 @@ pub trait PayableFeatures {
 
     #[endpoint]
     #[payable("*")]
+    fn payment_multiple(
+        &self,
+        #[payment_multi] payments: ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>,
+    ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
+        payments
+    }
+
+    #[endpoint]
+    #[payable("*")]
     fn payable_any_1(
         &self,
         #[payment] payment: BigUint,

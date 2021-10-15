@@ -43,6 +43,11 @@ fn validate_payment_args(m: &Method) {
         .iter()
         .filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentNonce))
         .count();
+    let num_payment_multi = m
+        .method_args
+        .iter()
+        .filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentMulti))
+        .count();
     assert!(
         num_payment_amount <= 1,
         "only one `#[payment]` argument allowed (method: `{}`)",
@@ -56,6 +61,11 @@ fn validate_payment_args(m: &Method) {
     assert!(
         num_payment_nonce <= 1,
         "only one `#[payment_nonce]` argument allowed (method: `{}`)",
+        m.name.to_string()
+    );
+    assert!(
+        num_payment_multi <= 1,
+        "only one `#[payment_multi]` argument allowed (method: `{}`)",
         m.name.to_string()
     );
     if !m.is_payable() {
