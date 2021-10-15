@@ -109,6 +109,7 @@ mod module_1 {
                 ___api___.clone(),
                 ___address___,
                 &b"version"[..],
+                ManagedVec::new(___api___.clone()),
             );
             ___contract_call___
         }
@@ -246,6 +247,7 @@ mod sample_adder {
                 ___api___.clone(),
                 ___address___,
                 &b"get_sum"[..],
+                ManagedVec::new(___api___.clone()),
             );
             ___contract_call___
         }
@@ -259,6 +261,7 @@ mod sample_adder {
                 ___api___.clone(),
                 ___address___,
                 &b"add"[..],
+                ManagedVec::new(___api___.clone()),
             );
             ___contract_call___.push_endpoint_arg(amount);
             ___contract_call___
