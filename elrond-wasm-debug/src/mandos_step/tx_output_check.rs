@@ -3,7 +3,7 @@ use mandos::model::{CheckLogs, Checkable, TxExpect};
 use crate::{address_hex, bytes_to_string, tx_mock::TxResult, verbose_hex};
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
-    let have_str = std::str::from_utf8(tx_result.result_message.as_slice()).unwrap();
+    let have_str = tx_result.result_message.as_str();
     assert!(
         tx_expect.status.check(tx_result.result_status),
         "result code mismatch. Tx id: {}. Want: {}. Have: {}. Message: {}",
@@ -33,7 +33,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
     }
 
     assert!(
-        tx_expect.message.check(&tx_result.result_message),
+        tx_expect.message.check(tx_result.result_message.as_bytes()),
         "result message mismatch. Tx id: {}. Want: {}. Have: {}.",
         tx_id,
         &tx_expect.message,

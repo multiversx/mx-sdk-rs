@@ -1,5 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
+use elrond_wasm::types::Address;
+
 use crate::{
     tx_mock::{TxContext, TxContextRef, TxInput, TxOutput, TxResult},
     world_mock::{AccountData, BlockchainMock, BlockchainMockError},
@@ -8,12 +10,26 @@ use crate::{
 
 use super::execute_tx_context;
 
+fn get_new_address(tx_input: &TxInput, state: Rc<BlockchainMock>) -> Address {
+    let sender = state
+        .accounts
+        .get(&tx_input.from)
+        .unwrap_or_else(|| panic!("scDeploy sender does not exist"));
+    state
+        .get_new_address(tx_input.from.clone(), sender.nonce)
+        .unwrap_or_else(|| {
+            panic!("Missing new address. Only explicit new deploy addresses supported")
+        })
+}
+
 pub fn sc_create(
-    tx_input: TxInput,
+    mut tx_input: TxInput,
     contract_path: &[u8],
     state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
+    let new_address = get_new_address(&tx_input, state.clone());
+    tx_input.to = new_address.clone();
     let tx_context = TxContextRef::new(tx_input, state.clone());
     let tx_input_ref = &*tx_context.tx_input_box;
 
@@ -28,8 +44,11 @@ pub fn sc_create(
         tx_input_ref.gas_limit,
         tx_input_ref.gas_price,
     );
-    let new_address =
-        tx_context.create_new_contract(contract_path.to_vec(), tx_input_ref.from.clone());
+    tx_context.create_new_contract(
+        &new_address,
+        contract_path.to_vec(),
+        tx_input_ref.from.clone(),
+    );
     tx_context
         .blockchain_cache
         .increase_egld_balance(&new_address, &tx_input_ref.egld_value);

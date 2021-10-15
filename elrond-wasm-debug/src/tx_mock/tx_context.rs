@@ -32,10 +32,25 @@ impl TxContext {
     }
 
     pub fn dummy() -> Self {
+        let blockchain_cache = TxCache::new(Rc::new(BlockchainMock::new()));
+        let contract_address = Address::from(&[b'c'; 32]);
+        blockchain_cache.insert_account(
+            contract_address.clone(),
+            AccountData {
+                address: contract_address.clone(),
+                nonce: 0,
+                egld_balance: BigUint::zero(),
+                storage: HashMap::new(),
+                esdt: AccountEsdt::default(),
+                username: Vec::new(),
+                contract_path: None,
+                contract_owner: None,
+            },
+        );
         TxContext {
             tx_input_box: Box::new(TxInput {
-                from: Address::zero(),
-                to: Address::zero(),
+                from: contract_address.clone(),
+                to: contract_address.clone(),
                 egld_value: 0u32.into(),
                 esdt_values: Vec::new(),
                 func_name: Vec::new(),
@@ -44,7 +59,7 @@ impl TxContext {
                 gas_price: 0,
                 tx_hash: b"dummy...........................".into(),
             }),
-            blockchain_cache: TxCache::new(Rc::new(BlockchainMock::new())),
+            blockchain_cache,
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
         }
@@ -122,17 +137,22 @@ impl TxContext {
         self.tx_result_cell.borrow_mut()
     }
 
-    pub fn create_new_contract(&self, contract_path: Vec<u8>, contract_owner: Address) -> Address {
-        let sender_nonce_before_tx = self
-            .blockchain_cache
-            .with_account(&self.tx_input_box.from, |account| account.nonce - 1);
-        let new_address = self
-            .blockchain_cache
-            .blockchain_ref()
-            .get_new_address(self.tx_input_box.from.clone(), sender_nonce_before_tx)
-            .unwrap_or_else(|| {
-                panic!("Missing new address. Only explicit new deploy addresses supported")
-            });
+    pub fn create_new_contract(
+        &self,
+        new_address: &Address,
+        contract_path: Vec<u8>,
+        contract_owner: Address,
+    ) {
+        // let sender_nonce_before_tx = self
+        //     .blockchain_cache
+        //     .with_account(&self.tx_input_box.from, |account| account.nonce - 1);
+        // let new_address = self
+        //     .blockchain_cache
+        //     .blockchain_ref()
+        //     .get_new_address(self.tx_input_box.from.clone(), sender_nonce_before_tx)
+        //     .unwrap_or_else(|| {
+        //         panic!("Missing new address. Only explicit new deploy addresses supported")
+        //     });
 
         assert!(
             !self
@@ -155,7 +175,5 @@ impl TxContext {
                 contract_owner: Some(contract_owner),
             },
         );
-
-        new_address
     }
 }

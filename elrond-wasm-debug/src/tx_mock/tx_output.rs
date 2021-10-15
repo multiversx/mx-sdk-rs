@@ -40,7 +40,7 @@ impl TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult {
                 result_status: panic_obj.status,
-                result_message: panic_obj.message.clone(),
+                result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
                 result_values: Vec::new(),
                 result_logs: Vec::new(),
             },
@@ -54,7 +54,7 @@ impl TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult {
                 result_status: 4,
-                result_message: b"panic occurred".to_vec(),
+                result_message: "panic occurred".to_string(),
                 result_values: Vec::new(),
                 result_logs: Vec::new(),
             },

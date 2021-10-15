@@ -49,7 +49,7 @@ pub fn async_callback_tx_input(
     if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
     } else {
-        args.push(async_result.result_message.clone());
+        args.push(async_result.result_message.clone().into_bytes());
     }
     TxInput {
         from: async_data.to.clone(),
