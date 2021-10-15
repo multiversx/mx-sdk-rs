@@ -3,6 +3,7 @@
 mod tx_cache;
 mod tx_cache_balance_util;
 mod tx_context;
+mod tx_context_ref;
 mod tx_input;
 mod tx_input_util;
 mod tx_log;
@@ -13,6 +14,7 @@ mod tx_result;
 
 pub use tx_cache::*;
 pub use tx_context::*;
+pub use tx_context_ref::*;
 pub use tx_input::*;
 pub use tx_input_util::*;
 pub use tx_log::*;

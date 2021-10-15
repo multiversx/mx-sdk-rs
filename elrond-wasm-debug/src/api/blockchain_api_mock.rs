@@ -7,10 +7,12 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
     }
 
     fn get_owner_address_legacy(&self) -> Address {
-        self.get_contract_account()
-            .contract_owner
-            .clone()
-            .unwrap_or_else(|| panic!("contract owner address not set"))
+        self.with_contract_account(|account| {
+            account
+                .contract_owner
+                .clone()
+                .unwrap_or_else(|| panic!("contract owner address not set"))
+        })
     }
 
     fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
@@ -40,7 +42,8 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"
         );
-        self.insert_new_big_uint(self.get_contract_account().egld_balance.clone())
+        let egld_balance = self.with_contract_account(|account| account.egld_balance.clone());
+        self.insert_new_big_uint(egld_balance)
     }
 
     fn get_state_root_hash_legacy(&self) -> H256 {
@@ -121,10 +124,11 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 
-        let esdt_balance = self
-            .get_contract_account()
-            .esdt
-            .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce);
+        let esdt_balance = self.with_contract_account(|account| {
+            account
+                .esdt
+                .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce)
+        });
         self.insert_new_big_uint(esdt_balance)
     }
 

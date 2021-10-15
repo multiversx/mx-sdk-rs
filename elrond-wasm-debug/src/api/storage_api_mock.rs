@@ -10,10 +10,10 @@ impl StorageReadApi for DebugApi {
     }
 
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
-        match self.get_contract_account().storage.get(&key.to_vec()) {
+        self.with_contract_account(|account| match account.storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
             Some(value) => value.clone(),
-        }
+        })
     }
 
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {
@@ -72,9 +72,9 @@ impl StorageWriteApi for DebugApi {
             });
         }
 
-        self.get_contract_account_mut()
-            .storage
-            .insert(key.to_vec(), value.to_vec());
+        self.with_contract_account_mut(|account| {
+            account.storage.insert(key.to_vec(), value.to_vec());
+        });
     }
 
     fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {

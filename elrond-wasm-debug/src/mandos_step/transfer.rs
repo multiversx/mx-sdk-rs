@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use elrond_wasm::types::H256;
 use mandos::model::TxTransfer;
 
@@ -6,7 +8,7 @@ use crate::{
     world_mock::BlockchainMock, ContractMap,
 };
 
-pub fn execute(state: &mut BlockchainMock, tx_transfer: &TxTransfer) {
+pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
     match tx_transfer.esdt_value.len() {
         0 => {
             let tx_input = TxInput {
@@ -20,7 +22,7 @@ pub fn execute(state: &mut BlockchainMock, tx_transfer: &TxTransfer) {
                 gas_price: 0,
                 tx_hash: H256::zero(),
             };
-            sc_call(tx_input, state, &ContractMap::default());
+            sc_call(tx_input, state, &ContractMap::default()).unwrap();
         },
         1 => panic!("single ESDT transfer not yet implemented"),
         _ => panic!("multi ESDT transfer not yet implemented"),
