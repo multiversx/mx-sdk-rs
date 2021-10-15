@@ -14,7 +14,7 @@ pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut Rc<BlockchainMock>)
     if tx_input.args.len() != 2 {
         return TxResult {
             result_status: 10,
-            result_message: b"ESDTTransfer too few arguments".to_vec(),
+            result_message: "ESDTTransfer too few arguments".to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
         };
@@ -31,7 +31,7 @@ pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut Rc<BlockchainMock>)
 
     TxResult {
         result_status: 0,
-        result_message: Vec::new(),
+        result_message: String::new(),
         result_values: Vec::new(),
         result_logs: vec![esdt_transfer_event_log(
             tx_input.from.clone(),

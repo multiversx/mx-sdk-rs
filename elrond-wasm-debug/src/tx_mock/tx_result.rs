@@ -10,7 +10,7 @@ use super::{TxLog, TxPanic};
 #[derive(Clone, Default, Debug)]
 pub struct TxResult {
     pub result_status: u64,
-    pub result_message: Vec<u8>,
+    pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
 }
@@ -34,7 +34,7 @@ impl TxResult {
     pub fn empty() -> TxResult {
         TxResult {
             result_status: 0,
-            result_message: Vec::new(),
+            result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
         }
@@ -46,16 +46,17 @@ impl TxResult {
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
         TxResult {
             result_status: panic_obj.status,
-            result_message: panic_obj.message.clone(),
+            result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
         }
     }
 
-    pub fn from_panic_string(_: &str) -> Self {
+    pub fn from_panic_string(s: &str) -> Self {
         TxResult {
             result_status: 4,
-            result_message: b"panic occurred".to_vec(),
+            result_message: "panic occurred".to_string(),
+            // result_message: s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
         }

@@ -15,7 +15,7 @@ use super::BlockchainUpdate;
 
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct TxContextRef(Rc<TxContext>);
 
 pub type DebugApi = TxContextRef;
@@ -24,6 +24,12 @@ impl Deref for TxContextRef {
     type Target = TxContext;
     fn deref(&self) -> &Self::Target {
         self.0.deref()
+    }
+}
+
+impl Clone for TxContextRef {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
     }
 }
 
@@ -49,8 +55,10 @@ impl TxContextRef {
     /// Should be called at the end of a tx execution.
     /// Will fail if any other references to the tx context survive, this must be the last.
     pub fn into_tx_result(self) -> TxResult {
-        let tx_context = Rc::try_unwrap(self.0).unwrap();
-        tx_context.tx_result_cell.replace(TxResult::default())
+        // TODO: investigate if we can also destroy the Rc
+        // can be done if we can make sure that no more references exist at this point
+        // let tx_context = Rc::try_unwrap(self.0).unwrap();
+        self.tx_result_cell.replace(TxResult::default())
     }
 
     // /// Extracts the output and replaces the one in the TxContext with an empty one.
