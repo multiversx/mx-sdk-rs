@@ -3,7 +3,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 use crate::{
     address_hex, async_call_tx_input, async_callback_tx_input, merge_results,
     try_execute_builtin_function,
-    tx_mock::{TxContext, TxInput, TxOutput, TxResult},
+    tx_mock::{TxContext, TxContextRef, TxInput, TxOutput, TxResult},
     world_mock::{AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap, DebugApi,
 };
@@ -12,50 +12,53 @@ use super::execute_tx_context;
 
 pub fn sc_query(
     tx_input: TxInput,
-    state: &mut BlockchainMock,
+    state: Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
 ) -> TxResult {
-    let blockchain_cell = Rc::new(RefCell::new(*state));
-    let tx_context = TxContext::new(tx_input, blockchain_cell);
-    execute_tx_context(&tx_context, contract_map)
+    let tx_context = TxContextRef::new(tx_input, state);
+    execute_tx_context(tx_context, contract_map)
 }
 
 pub fn sc_call(
     tx_input: TxInput,
-    state: &mut BlockchainMock,
+    state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
     if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
         return Ok((tx_result, None));
     }
 
-    let blockchain_cell = Rc::new(RefCell::new(*state));
-    let tx_context = TxContext::new(tx_input.clone(), blockchain_cell);
+    let func_name_empty = tx_input.func_name.is_empty();
+    let tx_context = TxContextRef::new(tx_input, state.clone());
 
     tx_context
         .blockchain_cache
-        .increase_acount_nonce(&tx_input.from);
-    tx_context
-        .blockchain_cache
-        .subtract_egld_balance(&tx_input.from, &tx_input.egld_value)?;
+        .increase_acount_nonce(&tx_context.tx_input_box.from);
+    tx_context.blockchain_cache.subtract_egld_balance(
+        &tx_context.tx_input_box.from,
+        &tx_context.tx_input_box.egld_value,
+    )?;
     tx_context.blockchain_cache.subtract_tx_gas(
-        &tx_input.from,
-        tx_input.gas_limit,
-        tx_input.gas_price,
+        &tx_context.tx_input_box.from,
+        tx_context.tx_input_box.gas_limit,
+        tx_context.tx_input_box.gas_price,
     );
-    tx_context
-        .blockchain_cache
-        .increase_egld_balance(&tx_input.to, &tx_input.egld_value);
+    tx_context.blockchain_cache.increase_egld_balance(
+        &tx_context.tx_input_box.to,
+        &tx_context.tx_input_box.egld_value,
+    );
 
-    let tx_result = if tx_input.func_name.is_empty() {
+    let tx_result = if func_name_empty {
         // direct EGLD transfer
         TxResult::empty()
     } else {
-        execute_tx_context(&tx_context, contract_map)
+        execute_tx_context(tx_context.clone(), contract_map)
     };
 
+    let blockchain_updates = tx_context.into_blockchain_updates();
+
     if tx_result.result_status == 0 {
-        tx_context.blockchain_cache.commit();
+        blockchain_updates.apply(Rc::get_mut(state).unwrap());
     }
 
     // if tx_result.result_status == 0 {
@@ -82,7 +85,7 @@ pub fn sc_call(
 
 pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
-    state: &mut BlockchainMock,
+    state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
 ) -> Result<TxResult, BlockchainMockError> {
     let contract_address = tx_input.to.clone();

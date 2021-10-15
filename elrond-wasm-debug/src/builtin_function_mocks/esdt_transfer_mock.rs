@@ -10,7 +10,7 @@ use crate::{
 
 use super::builtin_func_exec::ESDT_TRANSFER_FUNC;
 
-pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> TxResult {
+pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut Rc<BlockchainMock>) -> TxResult {
     if tx_input.args.len() != 2 {
         return TxResult {
             result_status: 10,
@@ -23,12 +23,12 @@ pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut BlockchainMock) -> 
     let token_identifier = tx_input.args[0].clone();
     let value = BigUint::from_bytes_be(tx_input.args[1].as_slice());
 
-    let blockchain_cell = Rc::new(RefCell::new(*state));
-    let tx_cache = TxCache::new(blockchain_cell);
-
+    let tx_cache = TxCache::new(state.clone());
     tx_cache.subtract_esdt_balance(&tx_input.from, &token_identifier, 0, &value);
     tx_cache.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
-    tx_cache.commit();
+    let blockchain_updates = tx_cache.into_blockchain_updates();
+    blockchain_updates.apply(Rc::get_mut(state).unwrap());
+
     TxResult {
         result_status: 0,
         result_message: Vec::new(),

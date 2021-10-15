@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use crate::{
     esdt_transfer_event_log,
-    tx_mock::{SendBalance, TxInput, TxLog},
+    tx_mock::{SendBalance, TxCache, TxInput, TxLog},
     world_mock::AccountEsdt,
 };
 
@@ -40,6 +40,10 @@ impl Default for BlockchainMock {
 }
 
 impl BlockchainMock {
+    // pub fn commit_tx_cache(&mut self, tx_cache: &TxCache) {
+    //     self.accounts.extend(tx_cache.get_all_accounts().into_iter());
+    // }
+
     pub fn account_exists(&self, address: &Address) -> bool {
         self.accounts.contains_key(address)
     }

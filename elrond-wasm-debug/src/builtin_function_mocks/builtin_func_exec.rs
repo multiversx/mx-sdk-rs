@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     tx_mock::{TxInput, TxResult},
     world_mock::BlockchainMock,
@@ -10,7 +12,7 @@ pub const SET_USERNAME_FUNC: &[u8] = b"SetUserName";
 
 pub fn try_execute_builtin_function(
     tx_input: &TxInput,
-    state: &mut BlockchainMock,
+    state: &mut Rc<BlockchainMock>,
 ) -> Option<TxResult> {
     match tx_input.func_name.as_slice() {
         ESDT_TRANSFER_FUNC => Some(execute_esdt_transfer(tx_input, state)),

@@ -13,51 +13,39 @@ use elrond_wasm::{
 };
 
 impl DebugApi {
-    fn get_available_egld_balance(&self) -> num_bigint::BigUint {
-        // start with the pre-existing balance
-        let mut available_balance = self.get_contract_account().egld_balance.clone();
+    // fn get_available_egld_balance(&self) -> num_bigint::BigUint {
+    //     self.with_contract_account(|account| account.egld_balance.clone())
+    // }
 
-        // // add amount received
-        // available_balance += &self.input_ref().egld_value;
+    // fn get_available_esdt_balance(
+    //     &self,
+    //     token_identifier: &[u8],
+    //     nonce: u64,
+    // ) -> num_bigint::BigUint {
+    //     // start with the pre-existing balance
+    //     let mut available_balance = self
+    //         .get_contract_account()
+    //         .esdt
+    //         .get_esdt_balance(token_identifier, nonce);
 
-        // // already sent
-        // let tx_output = self.output_borrow();
-        // for send_balance in &tx_output.send_balance_list {
-        //     available_balance -= &send_balance.amount;
-        // }
+    //     // // add amount received (if the same token)
+    //     // for esdt_value in self.input_ref().esdt_values.iter() {
+    //     //     if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
+    //     //         available_balance += &esdt_value.value;
+    //     //     }
+    //     // }
 
-        available_balance
-    }
+    //     // let tx_output = self.output_borrow();
 
-    fn get_available_esdt_balance(
-        &self,
-        token_identifier: &[u8],
-        nonce: u64,
-    ) -> num_bigint::BigUint {
-        // start with the pre-existing balance
-        let mut available_balance = self
-            .get_contract_account()
-            .esdt
-            .get_esdt_balance(token_identifier, nonce);
+    //     // // already sent
+    //     // for send_balance in &tx_output.send_balance_list {
+    //     //     if send_balance.token_identifier.as_slice() == token_identifier {
+    //     //         available_balance -= &send_balance.amount;
+    //     //     }
+    //     // }
 
-        // // add amount received (if the same token)
-        // for esdt_value in self.input_ref().esdt_values.iter() {
-        //     if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
-        //         available_balance += &esdt_value.value;
-        //     }
-        // }
-
-        // let tx_output = self.output_borrow();
-
-        // // already sent
-        // for send_balance in &tx_output.send_balance_list {
-        //     if send_balance.token_identifier.as_slice() == token_identifier {
-        //         available_balance -= &send_balance.amount;
-        //     }
-        // }
-
-        available_balance
-    }
+    //     available_balance
+    // }
 }
 
 impl SendApi for DebugApi {
@@ -75,7 +63,8 @@ impl SendApi for DebugApi {
 
         let contract_address = &self.input_ref().to;
         self.blockchain_cache()
-            .subtract_egld_balance(contract_address, &amount_value);
+            .subtract_egld_balance(contract_address, &amount_value)
+            .unwrap();
 
         let recipient = &to.to_address();
         self.blockchain_cache()

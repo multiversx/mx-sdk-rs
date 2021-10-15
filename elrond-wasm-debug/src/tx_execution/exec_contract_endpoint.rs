@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 use elrond_wasm::contract_base::CallableContract;
 
 use crate::{
-    tx_mock::{TxContext, TxOutput, TxPanic, TxResult},
+    tx_mock::{TxContext, TxContextRef, TxOutput, TxPanic, TxResult},
     ContractMap, DebugApi,
 };
 
@@ -10,28 +10,29 @@ use crate::{
 /// The endpoint name is taken from the tx context.
 /// Catches and wraps any panics thrown in the contract.
 pub fn execute_tx_context(
-    tx_context: &TxContext,
+    tx_context_ref: TxContextRef,
     contract_map: &ContractMap<DebugApi>, // TODO: move to blockchain mock
 ) -> TxResult {
-    let func_name = tx_context.tx_input_box.func_name.as_slice();
-    let debug_api = DebugApi::new(*tx_context);
-    let contract_identifier = get_contract_identifier(tx_context);
-    let contract_instance = contract_map.new_contract_instance(contract_identifier, debug_api);
-    execute_contract_instance_endpoint(tx_context, contract_instance, func_name)
+    let func_name = tx_context_ref.tx_input_box.func_name.as_slice();
+    let contract_identifier = get_contract_identifier(&tx_context_ref);
+    let contract_instance =
+        contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
+    execute_contract_instance_endpoint(contract_instance, func_name)
 }
 
-fn get_contract_identifier(tx_context: &TxContext) -> &[u8] {
+fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
     tx_context
         .blockchain_cache
-        .get_account(&tx_context.tx_input_box.to)
-        .contract_path
-        .unwrap_or_else(|| panic!("Recipient account is not a smart contract"))
-        .as_slice()
+        .with_account(&tx_context.tx_input_box.to, |account| {
+            account
+                .contract_path
+                .clone()
+                .unwrap_or_else(|| panic!("Recipient account is not a smart contract"))
+        })
 }
 
 /// The actual execution and the extraction/wrapping of results.
 fn execute_contract_instance_endpoint(
-    tx_context: &TxContext,
     contract_instance: Box<dyn CallableContract<DebugApi>>,
     endpoint_name: &[u8],
 ) -> TxResult {

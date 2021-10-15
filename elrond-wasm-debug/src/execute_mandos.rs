@@ -3,7 +3,7 @@
 use crate::{mandos_step, world_mock::BlockchainMock, ContractMap, DebugApi};
 
 use mandos::model::Step;
-use std::path::Path;
+use std::{path::Path, rc::Rc};
 
 /// Runs mandos test using the Rust infrastructure and the debug mode.
 /// Uses a contract map to replace the references to the wasm bytecode
@@ -11,13 +11,13 @@ use std::path::Path;
 pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: &ContractMap<DebugApi>) {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(relative_path);
-    let mut state = BlockchainMock::new();
+    let mut state = Rc::new(BlockchainMock::new());
     parse_execute_mandos_steps(absolute_path.as_ref(), &mut state, contract_map);
 }
 
 fn parse_execute_mandos_steps(
     steps_path: &Path,
-    state: &mut BlockchainMock,
+    state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
 ) {
     let scenario = mandos::parse_scenario(steps_path);
@@ -37,7 +37,7 @@ fn parse_execute_mandos_steps(
                 previous_block_info,
                 current_block_info,
             } => mandos_step::set_state::execute(
-                state,
+                Rc::get_mut(state).unwrap(),
                 accounts,
                 new_addresses,
                 previous_block_info,
@@ -54,7 +54,7 @@ fn parse_execute_mandos_steps(
                 comment,
                 tx,
                 expect,
-            } => mandos_step::sc_query::execute(state, contract_map, tx_id, tx, expect),
+            } => mandos_step::sc_query::execute(state.clone(), contract_map, tx_id, tx, expect),
             Step::ScDeploy {
                 tx_id,
                 comment,
@@ -63,10 +63,12 @@ fn parse_execute_mandos_steps(
             } => mandos_step::sc_deploy::execute(state, contract_map, tx_id, tx, expect),
             Step::Transfer { tx_id, comment, tx } => mandos_step::transfer::execute(state, tx),
             Step::ValidatorReward { tx_id, comment, tx } => {
-                state.increase_validator_reward(&tx.to.value.into(), &tx.egld_value.value);
+                Rc::get_mut(state)
+                    .unwrap()
+                    .increase_validator_reward(&tx.to.value.into(), &tx.egld_value.value);
             },
             Step::CheckState { comment, accounts } => {
-                mandos_step::check_state::execute(accounts, state);
+                mandos_step::check_state::execute(accounts, Rc::get_mut(state).unwrap());
             },
             Step::DumpState { .. } => {
                 state.print_accounts();

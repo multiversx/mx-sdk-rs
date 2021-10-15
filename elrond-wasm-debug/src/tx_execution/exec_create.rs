@@ -1,7 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
-    tx_mock::{TxContext, TxInput, TxOutput, TxResult},
+    tx_mock::{TxContext, TxContextRef, TxInput, TxOutput, TxResult},
     world_mock::{AccountData, BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap, DebugApi,
 };
@@ -11,31 +11,33 @@ use super::execute_tx_context;
 pub fn sc_create(
     tx_input: TxInput,
     contract_path: &[u8],
-    state: &mut BlockchainMock,
+    state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
-    let blockchain_cell = Rc::new(RefCell::new(*state));
-    let tx_context = TxContext::new(tx_input, blockchain_cell);
+    let tx_context = TxContextRef::new(tx_input, state.clone());
+    let tx_input_ref = &*tx_context.tx_input_box;
 
     tx_context
         .blockchain_cache
-        .increase_acount_nonce(&tx_input.from);
+        .increase_acount_nonce(&tx_input_ref.from);
     tx_context
         .blockchain_cache
-        .subtract_egld_balance(&tx_input.from, &tx_input.egld_value)?;
+        .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)?;
     tx_context.blockchain_cache.subtract_tx_gas(
-        &tx_input.from,
-        tx_input.gas_limit,
-        tx_input.gas_price,
+        &tx_input_ref.from,
+        tx_input_ref.gas_limit,
+        tx_input_ref.gas_price,
     );
-    let new_address = tx_context.create_new_contract(contract_path.to_vec(), tx_input.from.clone());
+    let new_address =
+        tx_context.create_new_contract(contract_path.to_vec(), tx_input_ref.from.clone());
     tx_context
         .blockchain_cache
-        .increase_egld_balance(&tx_input.to, &tx_input.egld_value);
+        .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-    let tx_result = execute_tx_context(&tx_context, contract_map);
+    let tx_result = execute_tx_context(tx_context.clone(), contract_map);
 
-    tx_context.blockchain_cache.commit();
+    let blockchain_updates = tx_context.into_blockchain_updates();
+    blockchain_updates.apply(Rc::get_mut(state).unwrap());
 
     // let from = tx_input.from.clone();
     // let to = tx_input.to.clone();
