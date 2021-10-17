@@ -11,6 +11,16 @@ fn contract_map() -> ContractMap<DebugApi> {
 }
 
 #[test]
+fn call_value_check_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/call-value-check.scen.json", &contract_map());
+}
+
+#[test]
+fn payable_multiple_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/payable_multiple.scen.json", &contract_map());
+}
+
+#[test]
 fn payable_any_1_rs() {
     elrond_wasm_debug::mandos_rs("mandos/payable_any_1.scen.json", &contract_map());
 }
