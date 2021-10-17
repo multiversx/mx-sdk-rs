@@ -73,6 +73,7 @@ fn process_arg_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) 
     process_payment_token_attribute(attr, arg_metadata)
         || process_payment_nonce_attribute(attr, arg_metadata)
         || process_payment_amount_attribute(attr, arg_metadata)
+        || process_payment_multi_attribute(attr, arg_metadata)
         || process_var_args_attribute(attr, arg_metadata)
         || process_callback_result_attribute(attr, arg_metadata)
         || process_event_topic_attribute(attr, arg_metadata)
@@ -105,6 +106,15 @@ fn process_payment_amount_attribute(attr: &syn::Attribute, arg_metadata: &mut Ar
     if has_attr {
         check_no_other_payment_attr(&*arg_metadata);
         arg_metadata.payment = ArgPaymentMetadata::PaymentAmount;
+    }
+    has_attr
+}
+
+fn process_payment_multi_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
+    let has_attr = is_payment_multi(attr);
+    if has_attr {
+        check_no_other_payment_attr(&*arg_metadata);
+        arg_metadata.payment = ArgPaymentMetadata::PaymentMulti;
     }
     has_attr
 }

@@ -168,7 +168,7 @@ where
 
     pub fn into_vec(self) -> Vec<T> {
         let mut v = Vec::new();
-        for item in self.into_vec() {
+        for item in self.into_iter() {
             v.push(item);
         }
         v
