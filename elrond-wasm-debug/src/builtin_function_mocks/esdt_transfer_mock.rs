@@ -4,7 +4,7 @@ use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 
 use crate::{
-    tx_mock::{TxCache, TxContext, TxInput, TxLog, TxResult},
+    tx_mock::{TxCache, TxContext, TxInput, TxLog, TxResult, TxResultCalls},
     world_mock::BlockchainMock,
 };
 
@@ -34,7 +34,7 @@ pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut Rc<BlockchainMock>)
             token_identifier,
             &value,
         )],
-        async_call: None,
+        result_calls: TxResultCalls::empty(),
     }
 }
 

@@ -83,13 +83,28 @@ impl SendApi for DebugApi {
 
     fn direct_egld_execute(
         &self,
-        _to: &ManagedAddress<Self>,
-        _amount: &BigUint<Self>,
-        _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
-        panic!("direct_egld_execute not yet implemented")
+        let amount_value = self.big_uint_value(amount);
+        let recipient = to.to_address();
+        let call_data =
+            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
+        let tx_hash = self.get_tx_hash_legacy();
+        let mut tx_result = self.result_borrow_mut();
+        tx_result
+            .result_calls
+            .transfer_execute
+            .push(AsyncCallTxData {
+                to: recipient,
+                call_value: amount_value,
+                call_data,
+                tx_hash,
+            });
+        Ok(())
     }
 
     fn direct_esdt_execute(
@@ -163,7 +178,7 @@ impl SendApi for DebugApi {
         let tx_hash = self.get_tx_hash_legacy();
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
-        tx_result.async_call = Some(AsyncCallTxData {
+        tx_result.result_calls.async_call = Some(AsyncCallTxData {
             to: recipient,
             call_value: amount_value,
             call_data,

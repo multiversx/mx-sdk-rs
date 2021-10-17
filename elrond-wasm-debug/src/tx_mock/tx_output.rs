@@ -5,7 +5,7 @@ use std::{collections::HashMap, fmt};
 
 use crate::AsyncCallTxData;
 
-use super::{TxLog, TxPanic, TxResult};
+use super::{TxLog, TxPanic, TxResult, TxResultCalls};
 
 #[derive(Debug)]
 pub struct SendBalance {
@@ -41,7 +41,7 @@ impl TxOutput {
                 result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
                 result_values: Vec::new(),
                 result_logs: Vec::new(),
-                async_call: None,
+                result_calls: TxResultCalls::empty(),
             },
             send_balance_list: Vec::new(),
         }
@@ -55,7 +55,7 @@ impl TxOutput {
                 result_message: "panic occurred".to_string(),
                 result_values: Vec::new(),
                 result_logs: Vec::new(),
-                async_call: None,
+                result_calls: TxResultCalls::empty(),
             },
             send_balance_list: Vec::new(),
         }
