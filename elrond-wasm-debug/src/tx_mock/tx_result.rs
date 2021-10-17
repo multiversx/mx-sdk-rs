@@ -5,7 +5,7 @@ use std::{collections::HashMap, fmt};
 
 use crate::AsyncCallTxData;
 
-use super::{TxLog, TxPanic};
+use super::{TxLog, TxPanic, TxResultCalls};
 
 #[derive(Clone, Default, Debug)]
 pub struct TxResult {
@@ -13,7 +13,7 @@ pub struct TxResult {
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
-    pub async_call: Option<AsyncCallTxData>,
+    pub result_calls: TxResultCalls,
 }
 
 impl fmt::Display for TxResult {
@@ -38,9 +38,10 @@ impl TxResult {
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            async_call: None,
+            result_calls: TxResultCalls::empty(),
         }
     }
+
     pub fn print(&self) {
         println!("{}", self);
     }
@@ -51,7 +52,7 @@ impl TxResult {
             result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            async_call: None,
+            result_calls: TxResultCalls::empty(),
         }
     }
 
@@ -62,7 +63,7 @@ impl TxResult {
             // result_message: s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            async_call: None,
+            result_calls: TxResultCalls::empty(),
         }
     }
 
@@ -76,7 +77,7 @@ impl TxResult {
             result_message: error_message.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            async_call: None,
+            result_calls: TxResultCalls::empty(),
         }
     }
 }

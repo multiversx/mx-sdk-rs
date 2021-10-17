@@ -3,7 +3,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 use crate::{
     address_hex, async_call_tx_input, async_callback_tx_input, merge_results,
     try_execute_builtin_function,
-    tx_mock::{TxCache, TxContext, TxContextRef, TxInput, TxOutput, TxResult},
+    tx_mock::{TxCache, TxContext, TxContextRef, TxInput, TxOutput, TxResult, TxResultCalls},
     world_mock::{AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
     AsyncCallTxData, ContractMap, DebugApi,
 };
@@ -86,6 +86,7 @@ pub fn sc_call(
     Ok(tx_result)
 }
 
+// TODO: refactor
 pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
     state: &mut Rc<BlockchainMock>,
@@ -94,8 +95,9 @@ pub fn sc_call_with_async_and_callback(
 ) -> Result<TxResult, BlockchainMockError> {
     let contract_address = tx_input.to.clone();
     let mut tx_result = sc_call(tx_input, state, contract_map, increase_nonce)?;
+    let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
     if tx_result.result_status == 0 {
-        if let Some(async_data) = tx_result.async_call.clone() {
+        if let Some(async_data) = result_calls.async_call {
             if state.accounts.contains_key(&async_data.to) {
                 let async_input = async_call_tx_input(&async_data, &contract_address);
 
@@ -108,7 +110,7 @@ pub fn sc_call_with_async_and_callback(
                     async_callback_tx_input(&async_data, &contract_address, &async_result);
                 let callback_result = sc_call(callback_input, state, contract_map, false)?;
                 assert!(
-                    callback_result.async_call.is_none(),
+                    tx_result.result_calls.async_call.is_none(),
                     "successive asyncs currently not supported"
                 );
                 tx_result = merge_results(tx_result, callback_result);
@@ -130,6 +132,14 @@ pub fn sc_call_with_async_and_callback(
                 });
                 state.commit_tx_cache(tx_cache);
             }
+        }
+
+        for te_call in result_calls.transfer_execute {
+            let te_input = async_call_tx_input(&te_call, &contract_address);
+
+            let te_result = sc_call(te_input, state, contract_map, false)?;
+
+            tx_result = merge_results(tx_result, te_result.clone());
         }
     }
     Ok(tx_result)
