@@ -2,6 +2,7 @@ use crate::display_util::*;
 use alloc::vec::Vec;
 use elrond_wasm::types::{Address, H256};
 use num_bigint::BigUint;
+use num_traits::Zero;
 use std::fmt;
 
 #[derive(Clone, Debug)]
@@ -32,6 +33,20 @@ impl fmt::Display for TxInput {
 impl TxInput {
     pub fn add_arg(&mut self, arg: Vec<u8>) {
         self.args.push(arg);
+    }
+
+    pub fn dummy() -> Self {
+        TxInput {
+            from: Address::zero(),
+            to: Address::zero(),
+            egld_value: BigUint::zero(),
+            esdt_values: Vec::new(),
+            func_name: Vec::new(),
+            args: Vec::new(),
+            gas_limit: 0,
+            gas_price: 0,
+            tx_hash: H256::zero(),
+        }
     }
 }
 

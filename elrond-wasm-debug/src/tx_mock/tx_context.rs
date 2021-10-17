@@ -34,19 +34,16 @@ impl TxContext {
     pub fn dummy() -> Self {
         let blockchain_cache = TxCache::new(Rc::new(BlockchainMock::new()));
         let contract_address = Address::from(&[b'c'; 32]);
-        blockchain_cache.insert_account(
-            contract_address.clone(),
-            AccountData {
-                address: contract_address.clone(),
-                nonce: 0,
-                egld_balance: BigUint::zero(),
-                storage: HashMap::new(),
-                esdt: AccountEsdt::default(),
-                username: Vec::new(),
-                contract_path: None,
-                contract_owner: None,
-            },
-        );
+        blockchain_cache.insert_account(AccountData {
+            address: contract_address.clone(),
+            nonce: 0,
+            egld_balance: BigUint::zero(),
+            storage: HashMap::new(),
+            esdt: AccountEsdt::default(),
+            username: Vec::new(),
+            contract_path: None,
+            contract_owner: None,
+        });
         TxContext {
             tx_input_box: Box::new(TxInput {
                 from: contract_address.clone(),
@@ -137,6 +134,10 @@ impl TxContext {
         self.tx_result_cell.borrow_mut()
     }
 
+    pub fn extract_result(&self) -> TxResult {
+        self.tx_result_cell.replace(TxResult::empty())
+    }
+
     pub fn create_new_contract(
         &self,
         new_address: &Address,
@@ -162,18 +163,15 @@ impl TxContext {
             "Account already exists at deploy address."
         );
 
-        self.blockchain_cache.insert_account(
-            new_address.clone(),
-            AccountData {
-                address: new_address.clone(),
-                nonce: 0,
-                egld_balance: BigUint::zero(),
-                storage: HashMap::new(),
-                esdt: AccountEsdt::default(),
-                username: Vec::new(),
-                contract_path: Some(contract_path),
-                contract_owner: Some(contract_owner),
-            },
-        );
+        self.blockchain_cache.insert_account(AccountData {
+            address: new_address.clone(),
+            nonce: 0,
+            egld_balance: BigUint::zero(),
+            storage: HashMap::new(),
+            esdt: AccountEsdt::default(),
+            username: Vec::new(),
+            contract_path: Some(contract_path),
+            contract_owner: Some(contract_owner),
+        });
     }
 }

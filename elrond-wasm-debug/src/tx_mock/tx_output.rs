@@ -20,7 +20,6 @@ pub struct TxOutput {
     pub contract_storage: HashMap<Vec<u8>, Vec<u8>>,
     pub result: TxResult,
     pub send_balance_list: Vec<SendBalance>,
-    pub async_call: Option<AsyncCallTxData>,
 }
 
 impl Default for TxOutput {
@@ -29,7 +28,6 @@ impl Default for TxOutput {
             contract_storage: HashMap::new(),
             result: TxResult::empty(),
             send_balance_list: Vec::new(),
-            async_call: None,
         }
     }
 }
@@ -43,9 +41,9 @@ impl TxOutput {
                 result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
                 result_values: Vec::new(),
                 result_logs: Vec::new(),
+                async_call: None,
             },
             send_balance_list: Vec::new(),
-            async_call: None,
         }
     }
 
@@ -57,9 +55,9 @@ impl TxOutput {
                 result_message: "panic occurred".to_string(),
                 result_values: Vec::new(),
                 result_logs: Vec::new(),
+                async_call: None,
             },
             send_balance_list: Vec::new(),
-            async_call: None,
         }
     }
 }

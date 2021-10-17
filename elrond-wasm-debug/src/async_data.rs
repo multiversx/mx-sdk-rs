@@ -9,7 +9,7 @@ use num_bigint::BigUint;
 
 use alloc::vec::Vec;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
     pub to: Address,
     pub call_data: Vec<u8>,

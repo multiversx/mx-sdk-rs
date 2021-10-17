@@ -13,6 +13,7 @@ pub struct TxResult {
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
+    pub async_call: Option<AsyncCallTxData>,
 }
 
 impl fmt::Display for TxResult {
@@ -37,6 +38,7 @@ impl TxResult {
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
+            async_call: None,
         }
     }
     pub fn print(&self) {
@@ -49,6 +51,7 @@ impl TxResult {
             result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
+            async_call: None,
         }
     }
 
@@ -59,10 +62,21 @@ impl TxResult {
             // result_message: s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
+            async_call: None,
         }
     }
 
     pub fn from_unknown_panic() -> Self {
         Self::from_panic_string("")
+    }
+
+    pub fn from_vm_error(error_message: &str) -> Self {
+        TxResult {
+            result_status: 10,
+            result_message: error_message.to_string(),
+            result_values: Vec::new(),
+            result_logs: Vec::new(),
+            async_call: None,
+        }
     }
 }
