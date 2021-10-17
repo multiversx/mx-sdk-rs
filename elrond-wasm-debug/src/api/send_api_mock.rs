@@ -54,12 +54,14 @@ impl SendApi for DebugApi {
         D: ManagedInto<Self, ManagedBuffer<Self>>,
     {
         let amount_value = self.big_uint_value(amount);
-        // if amount_value > self.get_available_egld_balance() {
-        //     std::panic::panic_any(TxPanic {
-        //         status: 10,
-        //         message: b"failed transfer (insufficient funds)".to_vec(),
-        //     });
-        // }
+        let available_egld_balance =
+            self.with_contract_account(|account| account.egld_balance.clone());
+        if amount_value > available_egld_balance {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: b"failed transfer (insufficient funds)".to_vec(),
+            });
+        }
 
         let contract_address = &self.input_ref().to;
         self.blockchain_cache()
