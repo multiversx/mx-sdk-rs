@@ -23,6 +23,7 @@ pub fn sc_call(
     tx_input: TxInput,
     state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
+    increase_nonce: bool, // TODO: flag = code smell, refactor!
 ) -> Result<TxResult, BlockchainMockError> {
     if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
         return Ok(tx_result);
@@ -31,9 +32,11 @@ pub fn sc_call(
     let func_name_empty = tx_input.func_name.is_empty();
     let tx_context = TxContextRef::new(tx_input, state.clone());
 
-    tx_context
-        .blockchain_cache
-        .increase_acount_nonce(&tx_context.tx_input_box.from);
+    if increase_nonce {
+        tx_context
+            .blockchain_cache
+            .increase_acount_nonce(&tx_context.tx_input_box.from);
+    }
     tx_context.blockchain_cache.subtract_egld_balance(
         &tx_context.tx_input_box.from,
         &tx_context.tx_input_box.egld_value,
@@ -87,22 +90,23 @@ pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
     state: &mut Rc<BlockchainMock>,
     contract_map: &ContractMap<DebugApi>,
+    increase_nonce: bool,
 ) -> Result<TxResult, BlockchainMockError> {
     let contract_address = tx_input.to.clone();
-    let mut tx_result = sc_call(tx_input, state, contract_map)?;
+    let mut tx_result = sc_call(tx_input, state, contract_map, increase_nonce)?;
     if tx_result.result_status == 0 {
         if let Some(async_data) = tx_result.async_call.clone() {
             if state.accounts.contains_key(&async_data.to) {
                 let async_input = async_call_tx_input(&async_data, &contract_address);
 
                 let async_result =
-                    sc_call_with_async_and_callback(async_input, state, contract_map)?;
+                    sc_call_with_async_and_callback(async_input, state, contract_map, false)?;
 
                 tx_result = merge_results(tx_result, async_result.clone());
 
                 let callback_input =
                     async_callback_tx_input(&async_data, &contract_address, &async_result);
-                let callback_result = sc_call(callback_input, state, contract_map)?;
+                let callback_result = sc_call(callback_input, state, contract_map, false)?;
                 assert!(
                     callback_result.async_call.is_none(),
                     "successive asyncs currently not supported"
