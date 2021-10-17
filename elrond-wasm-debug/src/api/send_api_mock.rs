@@ -154,21 +154,20 @@ impl SendApi for DebugApi {
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ! {
-        // let amount_value = self.big_uint_value(amount);
-        // let recipient = to.to_address();
-        // let call_data =
-        //     HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
-        // let tx_hash = self.get_tx_hash_legacy();
-        // // the cell is no longer needed, since we end in a panic
-        // let mut tx_output = self.consume_output();
-        // tx_output.async_call = Some(AsyncCallTxData {
-        //     to: recipient,
-        //     call_value: amount_value,
-        //     call_data,
-        //     tx_hash,
-        // });
-        // std::panic::panic_any(tx_output)
-        panic!("async_call_raw not implemented yet");
+        let amount_value = self.big_uint_value(amount);
+        let recipient = to.to_address();
+        let call_data =
+            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
+        let tx_hash = self.get_tx_hash_legacy();
+        // the cell is no longer needed, since we end in a panic
+        let mut tx_result = self.extract_result();
+        tx_result.async_call = Some(AsyncCallTxData {
+            to: recipient,
+            call_value: amount_value,
+            call_data,
+            tx_hash,
+        });
+        std::panic::panic_any(tx_result)
     }
 
     fn deploy_contract(

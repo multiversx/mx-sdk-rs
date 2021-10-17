@@ -12,12 +12,7 @@ use super::builtin_func_exec::ESDT_TRANSFER_FUNC;
 
 pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut Rc<BlockchainMock>) -> TxResult {
     if tx_input.args.len() != 2 {
-        return TxResult {
-            result_status: 10,
-            result_message: "ESDTTransfer too few arguments".to_string(),
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-        };
+        return TxResult::from_vm_error("ESDTTransfer too few arguments");
     }
 
     let token_identifier = tx_input.args[0].clone();
@@ -39,6 +34,7 @@ pub fn execute_esdt_transfer(tx_input: &TxInput, state: &mut Rc<BlockchainMock>)
             token_identifier,
             &value,
         )],
+        async_call: None,
     }
 }
 

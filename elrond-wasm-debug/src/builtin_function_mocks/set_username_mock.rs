@@ -13,11 +13,6 @@ pub fn execute_set_username(tx_input: &TxInput, state: &mut Rc<BlockchainMock>) 
     {
         TxResult::empty()
     } else {
-        TxResult {
-            result_status: 10,
-            result_message: "username already set".to_string(),
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-        }
+        return TxResult::from_vm_error("username already set");
     }
 }

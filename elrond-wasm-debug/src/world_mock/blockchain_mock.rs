@@ -2,11 +2,11 @@ use alloc::vec::Vec;
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 
 use crate::{
     esdt_transfer_event_log,
-    tx_mock::{SendBalance, TxCache, TxInput, TxLog},
+    tx_mock::{SendBalance, TxCache, TxContext, TxContextRef, TxInput, TxLog},
     world_mock::AccountEsdt,
 };
 
@@ -40,13 +40,20 @@ impl Default for BlockchainMock {
 }
 
 impl BlockchainMock {
-    // pub fn commit_tx_cache(&mut self, tx_cache: &TxCache) {
-    //     self.accounts.extend(tx_cache.get_all_accounts().into_iter());
-    // }
-
     pub fn account_exists(&self, address: &Address) -> bool {
         self.accounts.contains_key(address)
     }
+
+    pub fn commit_tx_cache(self: &mut Rc<Self>, tx_cache: TxCache) {
+        let blockchain_updates = tx_cache.into_blockchain_updates();
+        blockchain_updates.apply(Rc::get_mut(self).unwrap());
+    }
+
+    pub fn commit_tx(&mut self, tx_context: TxContextRef) {
+        let blockchain_updates = tx_context.into_blockchain_updates();
+        blockchain_updates.apply(self);
+    }
+
     // pub fn send_balance(
     //     &mut self,
     //     contract_address: &Address,

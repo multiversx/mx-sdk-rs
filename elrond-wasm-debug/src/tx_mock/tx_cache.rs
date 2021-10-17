@@ -62,8 +62,10 @@ impl TxCache {
         f(&mut account)
     }
 
-    pub fn insert_account(&self, address: Address, account_data: AccountData) {
-        self.accounts.borrow_mut().insert(address, account_data);
+    pub fn insert_account(&self, account_data: AccountData) {
+        self.accounts
+            .borrow_mut()
+            .insert(account_data.address.clone(), account_data);
     }
 
     pub fn increase_acount_nonce(&self, address: &Address) {
