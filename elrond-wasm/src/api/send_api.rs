@@ -98,6 +98,16 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
 
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address: &ManagedAddress<Self>,
+        gas: u64,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    );
+
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
     /// The child contract's new init function will be called with the provided arguments
