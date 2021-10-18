@@ -1,12 +1,12 @@
 {
-    "name": "upgrade Vault SC to Forwarder, and then back to vault",
+    "name": "upgrade Vault SC to Forwarder Raw, and then back to vault",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 },
                 "sc:child": {
                     "code": "file:../vault/output/vault.wasm",
@@ -20,7 +20,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "upgrade_vault_from_source",
+                "function": "upgrade_from_source",
                 "arguments": [
                     "sc:child",
                     "sc:forwarder"
@@ -36,7 +36,7 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 },
                 "+": ""
             }
@@ -44,11 +44,10 @@
         {
             "step": "scCall",
             "txId": "upgrade-back-to-vault",
-            "comment": "init results cannot be retrieved directly, since it is an async call, but we can experiment with callbacks in the future",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "upgradeVault",
+                "function": "upgrade",
                 "arguments": [
                     "sc:child",
                     "file:../vault/output/vault.wasm"

@@ -38,6 +38,7 @@ const RESERVED: &[&str] = &[
     "delegateExecution",
     "createContract",
     "deployFromSourceContract",
+    "upgradeFromSourceContract",
     "executeReadOnly",
     "getNumReturnData",
     "getReturnDataSize",
