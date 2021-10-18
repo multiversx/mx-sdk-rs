@@ -8,7 +8,7 @@ pub struct InitMetadata {
 pub enum EndpointMutabilityMetadata {
     Mutable,
     Readonly,
-    _Pure,
+    Pure,
 }
 impl EndpointMutabilityMetadata {
     pub fn to_token(&self) -> proc_macro2::TokenStream {
@@ -19,7 +19,7 @@ impl EndpointMutabilityMetadata {
             EndpointMutabilityMetadata::Readonly => {
                 quote! { elrond_wasm::abi::EndpointMutabilityAbi::Readonly }
             },
-            EndpointMutabilityMetadata::_Pure => {
+            EndpointMutabilityMetadata::Pure => {
                 quote! { elrond_wasm::abi::EndpointMutabilityAbi::Pure }
             },
         }
