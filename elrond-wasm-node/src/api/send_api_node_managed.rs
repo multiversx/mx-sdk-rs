@@ -285,6 +285,30 @@ impl SendApi for ArwenApiImpl {
         }
     }
 
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address: &ManagedAddress<Self>,
+        gas: u64,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        unsafe {
+            let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
+            let result_handle = mBufferNew();
+            managedUpgradeFromSourceContract(
+                sc_address.get_raw_handle(),
+                gas as i64,
+                amount.get_raw_handle(),
+                source_contract_address.get_raw_handle(),
+                code_metadata_handle,
+                arg_buffer.get_raw_handle(),
+                result_handle,
+            );
+        }
+    }
+
     fn upgrade_contract(
         &self,
         sc_address: &ManagedAddress<Self>,
