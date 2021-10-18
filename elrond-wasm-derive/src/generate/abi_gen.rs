@@ -41,14 +41,14 @@ fn generate_endpoint_snippet(
             }
         },
     };
-    let mutability_string = mutability.to_token();
+    let mutability_tokens = mutability.to_tokens();
 
     quote! {
         let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
             docs: &[ #(#endpoint_docs),* ],
             name: #endpoint_name,
             only_owner: #only_owner,
-            mutability: #mutability_string,
+            mutability: #mutability_tokens,
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
             inputs: Vec::new(),
             outputs: Vec::new(),
