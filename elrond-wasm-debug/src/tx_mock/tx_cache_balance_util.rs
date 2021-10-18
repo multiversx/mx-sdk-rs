@@ -12,7 +12,6 @@ impl TxCache {
         address: &Address,
         call_value: &BigUint,
     ) -> Result<(), BlockchainMockError> {
-        // let sender_account = self.get_account_mut(address);
         self.with_account_mut(address, |account| {
             if &account.egld_balance < call_value {
                 return Err("failed transfer (insufficient funds)".into());
@@ -23,7 +22,6 @@ impl TxCache {
     }
 
     pub fn subtract_tx_gas(&self, address: &Address, gas_limit: u64, gas_price: u64) {
-        // let sender_account = self.get_account_mut(address);
         self.with_account_mut(address, |account| {
             let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
             assert!(
@@ -47,7 +45,6 @@ impl TxCache {
         nonce: u64,
         value: &BigUint,
     ) {
-        // let sender_account = self.get_account_mut(address);
         self.with_account_mut(address, |account| {
             let esdt_data_map = &mut account.esdt;
             let esdt_data = esdt_data_map

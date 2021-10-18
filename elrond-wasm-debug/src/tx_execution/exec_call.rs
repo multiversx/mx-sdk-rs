@@ -71,25 +71,6 @@ pub fn sc_call(
         blockchain_updates.apply(Rc::get_mut(state).unwrap());
     }
 
-    // if tx_result.result_status == 0 {
-    //     // replace storage with new one
-    //     let _ = std::mem::replace(&mut contract_account.storage, tx_output.contract_storage);
-
-    //     state.increase_egld_balance(&to, &egld_value);
-    //     state.increase_multi_esdt_balance(&to, esdt_values.as_slice());
-
-    //     state.send_balance(
-    //         &to,
-    //         tx_output.send_balance_list.as_slice(),
-    //         &mut tx_result.result_logs,
-    //     )?;
-    // } else {
-    //     // revert
-    //     state.increase_egld_balance(&from, &egld_value);
-    //     state.increase_multi_esdt_balance(&from, esdt_values.as_slice());
-    // }
-
-    // Ok((tx_result, tx_output.async_call))
     Ok(tx_result)
 }
 
