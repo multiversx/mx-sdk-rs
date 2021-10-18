@@ -56,11 +56,11 @@ impl TxResult {
         }
     }
 
-    pub fn from_panic_string(s: &str) -> Self {
+    pub fn from_panic_string(_s: &str) -> Self {
         TxResult {
             result_status: 4,
             result_message: "panic occurred".to_string(),
-            // result_message: s.to_string(),
+            // result_message: _s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
             result_calls: TxResultCalls::empty(),
@@ -71,10 +71,10 @@ impl TxResult {
         Self::from_panic_string("")
     }
 
-    pub fn from_vm_error(error_message: &str) -> Self {
+    pub fn from_vm_error(result_message: String) -> Self {
         TxResult {
             result_status: 10,
-            result_message: error_message.to_string(),
+            result_message,
             result_values: Vec::new(),
             result_logs: Vec::new(),
             result_calls: TxResultCalls::empty(),
