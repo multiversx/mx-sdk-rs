@@ -47,7 +47,7 @@ impl TxContext {
         TxContext {
             tx_input_box: Box::new(TxInput {
                 from: contract_address.clone(),
-                to: contract_address.clone(),
+                to: contract_address,
                 egld_value: 0u32.into(),
                 esdt_values: Vec::new(),
                 func_name: Vec::new(),
@@ -159,7 +159,7 @@ impl TxContext {
             !self
                 .blockchain_cache
                 .blockchain_ref()
-                .account_exists(&new_address),
+                .account_exists(new_address),
             "Account already exists at deploy address."
         );
 

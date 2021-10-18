@@ -12,8 +12,8 @@ pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
     match tx_transfer.esdt_value.len() {
         0 => {
             let tx_input = TxInput {
-                from: tx_transfer.from.value.clone().into(),
-                to: tx_transfer.to.value.clone().into(),
+                from: tx_transfer.from.value.into(),
+                to: tx_transfer.to.value.into(),
                 egld_value: tx_transfer.egld_value.value.clone(),
                 esdt_values: Vec::new(),
                 func_name: Vec::new(),

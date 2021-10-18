@@ -127,9 +127,7 @@ impl SendApi for DebugApi {
 
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
-        let mut arguments = Vec::new();
-        arguments.push(token_bytes.into_vec());
-        arguments.push(amount_value.to_bytes_be());
+        let mut arguments = vec![token_bytes.into_vec(), amount_value.to_bytes_be()];
         if !endpoint_name.is_empty() {
             arguments.push(endpoint_name.to_boxed_bytes().into_vec());
             arguments.extend(
