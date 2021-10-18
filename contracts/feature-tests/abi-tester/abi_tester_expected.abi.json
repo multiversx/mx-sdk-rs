@@ -49,7 +49,7 @@
                 "Example endpoint docs."
             ],
             "name": "echo_abi_test_type",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [
                 {
                     "name": "att",
@@ -66,7 +66,7 @@
         {
             "name": "echo_enum",
             "onlyOwner": true,
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [
                 {
                     "name": "e",
@@ -81,7 +81,7 @@
         },
         {
             "name": "multi_result_3",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -100,7 +100,7 @@
         },
         {
             "name": "multi_result_4",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -121,7 +121,7 @@
         },
         {
             "name": "var_args",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [
                 {
                     "name": "_simple_arg",
@@ -137,7 +137,7 @@
         },
         {
             "name": "multi_result_vec",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -148,7 +148,7 @@
         },
         {
             "name": "optional_arg",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [
                 {
                     "name": "_simple_arg",
@@ -164,7 +164,7 @@
         },
         {
             "name": "optional_result",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -175,7 +175,7 @@
         },
         {
             "name": "address_vs_h256",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [
                 {
                     "name": "address",
@@ -197,7 +197,7 @@
         },
         {
             "name": "managed_address_vs_byte_array",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [
                 {
                     "name": "address",
@@ -219,7 +219,7 @@
         },
         {
             "name": "esdt_local_role",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -229,7 +229,7 @@
         },
         {
             "name": "sample_storage_mapper",
-            "mutability": "Mutable",
+            "mutability": "Readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -239,7 +239,7 @@
         },
         {
             "name": "payable_egld",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "payableInTokens": [
                 "EGLD"
             ],
@@ -248,7 +248,7 @@
         },
         {
             "name": "payable_some_token",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "payableInTokens": [
                 "TOKEN-FOR-ABI"
             ],
@@ -257,7 +257,7 @@
         },
         {
             "name": "payable_any_token",
-            "mutability": "Readonly",
+            "mutability": "Mutable",
             "payableInTokens": [
                 "*"
             ],
