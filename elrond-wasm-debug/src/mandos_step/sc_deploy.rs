@@ -14,7 +14,6 @@ use super::check_tx_output;
 
 pub fn execute(
     state: &mut Rc<BlockchainMock>,
-    contract_map: &ContractMap<DebugApi>,
     tx_id: &str,
     tx: &TxDeploy,
     expect: &Option<TxExpect>,
@@ -35,7 +34,7 @@ pub fn execute(
         tx_hash: generate_tx_hash_dummy(tx_id),
     };
     // state.increase_nonce(&tx_input.from);
-    let (tx_result, _) = sc_create(tx_input, &tx.contract_code.value, state, contract_map).unwrap();
+    let (tx_result, _) = sc_create(tx_input, &tx.contract_code.value, state).unwrap();
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
     }

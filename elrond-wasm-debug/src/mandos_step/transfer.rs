@@ -22,7 +22,7 @@ pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
                 gas_price: 0,
                 tx_hash: H256::zero(),
             };
-            sc_call(tx_input, state, &ContractMap::default(), true).unwrap();
+            sc_call(tx_input, state, true).unwrap();
         },
         1 => panic!("single ESDT transfer not yet implemented"),
         _ => panic!("multi ESDT transfer not yet implemented"),

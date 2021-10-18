@@ -12,13 +12,7 @@ use crate::{
 
 use super::check_tx_output;
 
-pub fn execute(
-    state: Rc<BlockchainMock>,
-    contract_map: &ContractMap<DebugApi>,
-    tx_id: &str,
-    tx: &TxQuery,
-    expect: &Option<TxExpect>,
-) {
+pub fn execute(state: Rc<BlockchainMock>, tx_id: &str, tx: &TxQuery, expect: &Option<TxExpect>) {
     let tx_input = TxInput {
         from: tx.to.value.into(),
         to: tx.to.value.into(),
@@ -35,7 +29,7 @@ pub fn execute(
         tx_hash: generate_tx_hash_dummy(tx_id),
     };
 
-    let tx_result = sc_query(tx_input, state, contract_map);
+    let tx_result = sc_query(tx_input, state);
     // assert!(
     //     tx_result.result_status != 0 || !opt_async_data.is_some(),
     //     "Can't query a view function that performs an async call"

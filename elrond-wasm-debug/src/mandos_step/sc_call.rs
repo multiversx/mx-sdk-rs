@@ -13,7 +13,6 @@ use super::check_tx_output;
 
 pub fn execute(
     state: &mut Rc<BlockchainMock>,
-    contract_map: &ContractMap<DebugApi>,
     tx_id: &str,
     tx: &TxCall,
     expect: &Option<TxExpect>,
@@ -34,7 +33,7 @@ pub fn execute(
         tx_hash: generate_tx_hash_dummy(tx_id),
     };
     // state.increase_nonce(&tx_input.from);
-    let tx_result = sc_call_with_async_and_callback(tx_input, state, contract_map, true).unwrap();
+    let tx_result = sc_call_with_async_and_callback(tx_input, state, true).unwrap();
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
     }

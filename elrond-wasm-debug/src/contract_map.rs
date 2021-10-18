@@ -4,12 +4,18 @@ use super::*;
 
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::contract_base::CallableContract;
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
 pub type ContractCallFactory<A> = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>;
 
 pub struct ContractMap<A> {
     factories: HashMap<Vec<u8>, ContractCallFactory<A>>,
+}
+
+impl<A> fmt::Debug for ContractMap<A> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ContractMap").finish()
+    }
 }
 
 impl<A> ContractMap<A> {
