@@ -1,4 +1,7 @@
-use crate::model::{CallbackMetadata, EndpointMetadata, InitMetadata, Method, PublicRole};
+use crate::model::{
+    CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata, InitMetadata, Method,
+    PublicRole,
+};
 
 use super::{
     attributes::{
@@ -57,6 +60,7 @@ pub fn process_endpoint_attribute(
                 public_name: endpoint_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
+                mutability: EndpointMutabilityMetadata::Mutable,
             });
         })
         .is_some()
@@ -78,6 +82,7 @@ pub fn process_view_attribute(
                 public_name: view_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
+                mutability: EndpointMutabilityMetadata::Readonly,
             });
         })
         .is_some()
