@@ -8,11 +8,11 @@ use std::{path::Path, rc::Rc};
 /// Runs mandos test using the Rust infrastructure and the debug mode.
 /// Uses a contract map to replace the references to the wasm bytecode
 /// with the contracts running in debug mode.
-pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: &ContractMap<DebugApi>) {
+pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: ContractMap<DebugApi>) {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(relative_path);
     let mut state = Rc::new(BlockchainMock::new());
-    parse_execute_mandos_steps(absolute_path.as_ref(), &mut state, contract_map);
+    parse_execute_mandos_steps(absolute_path.as_ref(), &mut state, &contract_map);
 }
 
 fn parse_execute_mandos_steps(

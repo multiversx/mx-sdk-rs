@@ -12,5 +12,5 @@ fn contract_map() -> ContractMap<DebugApi> {
 
 #[test]
 fn adder_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/adder.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/adder.scen.json", contract_map());
 }
