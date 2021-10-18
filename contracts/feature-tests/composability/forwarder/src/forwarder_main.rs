@@ -6,7 +6,7 @@ mod call_sync;
 mod call_transf_exec;
 mod contract_change_owner;
 mod contract_deploy;
-mod contract_update;
+mod contract_upgrade;
 mod esdt;
 mod nft;
 mod roles;
@@ -23,7 +23,7 @@ pub trait Forwarder:
     + call_transf_exec::ForwarderTransferExecuteModule
     + contract_change_owner::ChangeOwnerModule
     + contract_deploy::DeployContractModule
-    + contract_update::UpgradeContractModule
+    + contract_upgrade::UpgradeContractModule
     + esdt::ForwarderEsdtModule
     + sft::ForwarderSftModule
     + nft::ForwarderNftModule

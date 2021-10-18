@@ -45,6 +45,14 @@ impl From<&OutputAbi> for OutputAbiJson {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum EndpointMutabilityAbiJson {
+    Mutable,
+    Readonly,
+    Pure,
+}
+
 /// Same as EndpointAbiJson but ignores the name
 #[derive(Serialize, Deserialize)]
 pub struct ConstructorAbiJson {
@@ -80,6 +88,7 @@ pub struct EndpointAbiJson {
     #[serde(rename = "onlyOwner")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub only_owner: Option<bool>,
+    pub mutability: EndpointMutabilityAbiJson,
     #[serde(rename = "payableInTokens")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub payable_in_tokens: Vec<String>,
@@ -93,6 +102,11 @@ impl From<&EndpointAbi> for EndpointAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             only_owner: if abi.only_owner { Some(true) } else { None },
+            mutability: match abi.mutability {
+                EndpointMutabilityAbi::Mutable => EndpointMutabilityAbiJson::Mutable,
+                EndpointMutabilityAbi::Readonly => EndpointMutabilityAbiJson::Readonly,
+                EndpointMutabilityAbi::Pure => EndpointMutabilityAbiJson::Pure,
+            },
             payable_in_tokens: abi
                 .payable_in_tokens
                 .iter()
