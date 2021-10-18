@@ -278,10 +278,15 @@ where
         arg_buffer.push_arg(hash);
         arg_buffer.push_arg(attributes);
 
-        // The API function has the last argument as variadic,
-        // so we top-encode each and send as separate argument
-        for uri in uris {
-            arg_buffer.push_arg(uri);
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            arg_buffer.push_arg(ManagedBuffer::new(self.api.clone()));
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                arg_buffer.push_arg(uri);
+            }
         }
 
         let output = self.call_local_esdt_built_in_function(
