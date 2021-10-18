@@ -60,7 +60,7 @@ pub fn process_endpoint_attribute(
                 public_name: endpoint_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
-                mutability: EndpointMutabilityMetadata::Readonly,
+                mutability: EndpointMutabilityMetadata::Mutable,
             });
         })
         .is_some()
@@ -82,7 +82,7 @@ pub fn process_view_attribute(
                 public_name: view_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
-                mutability: EndpointMutabilityMetadata::Mutable,
+                mutability: EndpointMutabilityMetadata::Readonly,
             });
         })
         .is_some()

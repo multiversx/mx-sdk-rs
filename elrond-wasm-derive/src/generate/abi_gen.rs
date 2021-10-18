@@ -67,12 +67,8 @@ fn generate_abi_method_body(
         .iter()
         .filter_map(|m| {
             if let PublicRole::Init(_) = &m.public_role {
-                let endpoint_def = generate_endpoint_snippet(
-                    m,
-                    "init",
-                    false,
-                    EndpointMutabilityMetadata::Mutable,
-                );
+                let endpoint_def =
+                    generate_endpoint_snippet(m, "init", false, EndpointMutabilityMetadata::Pure);
                 Some(quote! {
                     #endpoint_def
                     contract_abi.constructor = Some(endpoint_abi);
