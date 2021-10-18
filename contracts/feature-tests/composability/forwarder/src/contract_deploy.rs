@@ -14,25 +14,6 @@ pub trait DeployContractModule {
         self.deploy_vault(&code, opt_arg)
     }
 
-    #[endpoint(deployFromSource)]
-    fn deploy_from_source(
-        &self,
-        source_contract_address: ManagedAddress,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> ManagedAddress {
-        // TODO: use proxies to perform deploy here
-        // raw deploy belongs to forwarder-raw
-        let (address, _) = self.raw_vm_api().deploy_from_source_contract(
-            self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
-            &source_contract_address,
-            CodeMetadata::DEFAULT,
-            &arguments.to_arg_buffer(),
-        );
-
-        address
-    }
-
     #[endpoint]
     fn deploy_two_contracts(
         &self,
@@ -50,7 +31,6 @@ pub trait DeployContractModule {
             .into()
     }
 
-    #[endpoint]
     fn deploy_vault(
         &self,
         code: &ManagedBuffer,
