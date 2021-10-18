@@ -120,7 +120,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault",
+            "txId": "deploy-vault-twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -128,7 +128,7 @@
                 "arguments": [
                     "file:../vault/output/vault.wasm"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "80,000,000",
                 "gasPrice": "0"
             },
             "expect": {

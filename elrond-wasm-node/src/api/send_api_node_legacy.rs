@@ -111,7 +111,7 @@ extern "C" {
         numArguments: i32,
         argumentsLengthOffset: *const u8,
         dataOffset: *const u8,
-    ) -> i32;
+    );
 
     fn upgradeContract(
         scAddressOffset: *const u8,
@@ -457,7 +457,7 @@ impl SendApi for ArwenApiImpl {
             let source_contract_address_bytes = source_contract_address.to_address();
             let sc_address_bytes = sc_address.to_address();
 
-            let _ = upgradeFromSourceContract(
+            upgradeFromSourceContract(
                 sc_address_bytes.as_ptr(),
                 gas as i64,
                 amount_bytes32_ptr,
