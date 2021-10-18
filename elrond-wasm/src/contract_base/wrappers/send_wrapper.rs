@@ -268,7 +268,7 @@ where
         royalties: &BigUint<A>,
         hash: &ManagedBuffer<A>,
         attributes: &T,
-        uris: &ManagedVec<A, ManagedBuffer<A>>,
+        opt_uris: Option<&ManagedVec<A, ManagedBuffer<A>>>,
     ) -> u64 {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         arg_buffer.push_arg(token);
@@ -278,10 +278,18 @@ where
         arg_buffer.push_arg(hash);
         arg_buffer.push_arg(attributes);
 
-        // The API function has the last argument as variadic,
-        // so we top-encode each and send as separate argument
-        for uri in uris {
-            arg_buffer.push_arg(uri);
+        match opt_uris {
+            Some(uris) => {
+                // The API function has the last argument as variadic,
+                // so we top-encode each and send as separate argument
+                for uri in uris {
+                    arg_buffer.push_arg(uri);
+                }
+            },
+            None => {
+                // at least one URI is required, so we push an empty one
+                arg_buffer.push_arg(ManagedBuffer::new(self.api.clone()));
+            },
         }
 
         let output = self.call_local_esdt_built_in_function(
