@@ -490,6 +490,6 @@ fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::DebugApi>
 fn test_mandos() {
     elrond_wasm_debug::mandos_rs(
         "../contracts/examples/adder/mandos/adder.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }

@@ -1,4 +1,3 @@
-
 #[test]
 fn call_value_check_go() {
     elrond_wasm_debug::mandos_go("mandos/call-value-check.scen.json");

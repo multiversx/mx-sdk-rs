@@ -1,4 +1,4 @@
 // #[test]
 // fn panic_message_rs() {
-// 	elrond_wasm_debug::mandos_rs("mandos/panic-message.scen.json", &contract_map());
+// 	elrond_wasm_debug::mandos_rs("mandos/panic-message.scen.json", contract_map());
 // }
