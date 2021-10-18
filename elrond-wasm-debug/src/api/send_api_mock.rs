@@ -1,13 +1,13 @@
 use crate::{
     async_data::AsyncCallTxData,
-    tx_mock::{SendBalance, TxPanic},
+    tx_mock::{SendBalance, TxContextRef, TxPanic},
     DebugApi,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
+    api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_TRANSFER_STRING},
     types::{
-        BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
+        BigUint, BoxedBytes, CodeMetadata, ContractCall, EsdtTokenPayment, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
     },
     HexCallDataSerializer,
 };
@@ -85,24 +85,22 @@ impl SendApi for DebugApi {
         &self,
         to: &ManagedAddress<Self>,
         amount: &BigUint<Self>,
-        gas_limit: u64,
+        _gas_limit: u64,
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let amount_value = self.big_uint_value(amount);
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
+        let call = AsyncCallTxData {
+            to: recipient,
+            call_value: amount_value,
+            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            arguments: arg_buffer.to_raw_args_vec(),
+            tx_hash,
+        };
         let mut tx_result = self.result_borrow_mut();
-        tx_result
-            .result_calls
-            .transfer_execute
-            .push(AsyncCallTxData {
-                to: recipient,
-                call_value: amount_value,
-                endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
-                arguments: arg_buffer.to_raw_args_vec(),
-                tx_hash,
-            });
+        tx_result.result_calls.transfer_execute.push(call);
         Ok(())
     }
 
@@ -111,10 +109,45 @@ impl SendApi for DebugApi {
         to: &ManagedAddress<Self>,
         token: &TokenIdentifier<Self>,
         amount: &BigUint<Self>,
-        _gas: u64,
-        _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        _gas_limit: u64,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
+        let token_bytes = token.as_name();
+        let amount_value = self.big_uint_value(amount);
+        let available_esdt_balance = self.with_contract_account(|account| {
+            account.esdt.get_esdt_balance(token_bytes.as_slice(), 0)
+        });
+        if amount_value > available_esdt_balance {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: b"insufficient funds".to_vec(),
+            });
+        }
+
+        let recipient = to.to_address();
+        let tx_hash = self.get_tx_hash_legacy();
+        let mut arguments = Vec::new();
+        arguments.push(token_bytes.into_vec());
+        arguments.push(amount_value.to_bytes_be());
+        if !endpoint_name.is_empty() {
+            arguments.push(endpoint_name.to_boxed_bytes().into_vec());
+            arguments.extend(
+                arg_buffer
+                    .raw_arg_iter()
+                    .map(|mb| mb.to_boxed_bytes().into_vec()),
+            );
+        }
+        let call = AsyncCallTxData {
+            to: recipient,
+            call_value: amount_value,
+            endpoint_name: ESDT_TRANSFER_STRING.to_vec(),
+            arguments,
+            tx_hash,
+        };
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_calls.transfer_execute.push(call);
+        Ok(())
         // let amount_value = self.big_uint_value(amount);
         // if amount_value
         //     > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice(), 0u64)
@@ -135,8 +168,6 @@ impl SendApi for DebugApi {
         //     nonce: 0u64,
         // });
         // Ok(())
-
-        panic!("direct_esdt_execute not yet implemented")
     }
 
     fn direct_esdt_nft_execute(
@@ -173,15 +204,16 @@ impl SendApi for DebugApi {
         let amount_value = self.big_uint_value(amount);
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
-        // the cell is no longer needed, since we end in a panic
-        let mut tx_result = self.extract_result();
-        tx_result.result_calls.async_call = Some(AsyncCallTxData {
+        let call = AsyncCallTxData {
             to: recipient,
             call_value: amount_value,
             endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
-        });
+        };
+        // the cell is no longer needed, since we end in a panic
+        let mut tx_result = self.extract_result();
+        tx_result.result_calls.async_call = Some(call);
         std::panic::panic_any(tx_result)
     }
 

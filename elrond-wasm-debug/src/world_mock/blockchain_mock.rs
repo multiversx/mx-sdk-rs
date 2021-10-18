@@ -54,6 +54,17 @@ impl BlockchainMock {
         blockchain_updates.apply(self);
     }
 
+    pub fn increase_account_nonce(self: &mut Rc<Self>, address: &Address) {
+        let self_ref = Rc::get_mut(self).unwrap();
+        let account = self_ref.accounts.get_mut(address).unwrap_or_else(|| {
+            panic!(
+                "Account not found: {}",
+                &std::str::from_utf8(address.as_ref()).unwrap()
+            )
+        });
+        account.nonce += 1;
+    }
+
     // pub fn send_balance(
     //     &mut self,
     //     contract_address: &Address,
@@ -91,16 +102,6 @@ impl BlockchainMock {
     //     }
     //     Ok(())
     // }
-
-    pub fn increase_nonce(&mut self, address: &Address) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
-        account.nonce += 1;
-    }
 
     // pub fn create_account_after_deploy(
     //     &mut self,

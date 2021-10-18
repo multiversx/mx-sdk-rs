@@ -30,12 +30,14 @@ pub fn sc_create(
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
     let new_address = get_new_address(&tx_input, state.clone());
     tx_input.to = new_address.clone();
+
+    // nonce gets increased irrespective of whether the tx fails or not
+    // must be done after computing the new address
+    state.increase_account_nonce(&tx_input.from);
+
     let tx_context = TxContextRef::new(tx_input, state.clone());
     let tx_input_ref = &*tx_context.tx_input_box;
 
-    tx_context
-        .blockchain_cache
-        .increase_acount_nonce(&tx_input_ref.from);
     tx_context
         .blockchain_cache
         .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)?;

@@ -25,6 +25,11 @@ pub fn sc_call(
     contract_map: &ContractMap<DebugApi>,
     increase_nonce: bool, // TODO: flag = code smell, refactor!
 ) -> Result<TxResult, BlockchainMockError> {
+    if increase_nonce {
+        // nonce gets increased irrespective of whether the tx fails or not
+        state.increase_account_nonce(&tx_input.from);
+    }
+
     if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
         return Ok(tx_result);
     }
@@ -32,11 +37,6 @@ pub fn sc_call(
     let func_name_empty = tx_input.func_name.is_empty();
     let tx_context = TxContextRef::new(tx_input, state.clone());
 
-    if increase_nonce {
-        tx_context
-            .blockchain_cache
-            .increase_acount_nonce(&tx_context.tx_input_box.from);
-    }
     tx_context.blockchain_cache.subtract_egld_balance(
         &tx_context.tx_input_box.from,
         &tx_context.tx_input_box.egld_value,
@@ -50,6 +50,22 @@ pub fn sc_call(
         &tx_context.tx_input_box.to,
         &tx_context.tx_input_box.egld_value,
     );
+
+    // TODO: temporary, will convert to explicit builtin function first
+    for esdt_transfer in tx_context.tx_input_box.esdt_values.iter() {
+        tx_context.blockchain_cache.subtract_esdt_balance(
+            &tx_context.tx_input_box.from,
+            &esdt_transfer.token_identifier,
+            esdt_transfer.nonce,
+            &esdt_transfer.value,
+        );
+        tx_context.blockchain_cache.increase_esdt_balance(
+            &tx_context.tx_input_box.to,
+            &esdt_transfer.token_identifier,
+            esdt_transfer.nonce,
+            &esdt_transfer.value,
+        );
+    }
 
     let tx_result = if func_name_empty {
         // direct EGLD transfer
