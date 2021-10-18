@@ -26,7 +26,7 @@ pub fn sc_create(
     mut tx_input: TxInput,
     contract_path: &[u8],
     state: &mut Rc<BlockchainMock>,
-) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
+) -> Result<TxResult, BlockchainMockError> {
     let new_address = get_new_address(&tx_input, state.clone());
     tx_input.to = new_address.clone();
 
@@ -55,31 +55,5 @@ pub fn sc_create(
     let blockchain_updates = tx_context.into_blockchain_updates();
     blockchain_updates.apply(Rc::get_mut(state).unwrap());
 
-    // let from = tx_input.from.clone();
-    // let to = tx_input.to.clone();
-    // let call_value = tx_input.egld_value.clone();
-    // let blockchain_info = state.create_tx_info(&to);
-
-    // state.subtract_egld_balance(&from, &call_value)?;
-    // state.subtract_tx_gas(&from, tx_input.gas_limit, tx_input.gas_price);
-
-    // let tx_context = DebugApi::new(blockchain_info, tx_input.clone(), TxOutput::default());
-    // let mut tx_output = execute_contract_endpoint(tx_context, contract_path, contract_map);
-
-    // if tx_result.result_status == 0 {
-    //     let new_address = state.create_account_after_deploy(
-    //         &tx_input,
-    //         tx_output.contract_storage,
-    //         contract_path.to_vec(),
-    //     );
-    //     state.send_balance(
-    //         &new_address,
-    //         tx_output.send_balance_list.as_slice(),
-    //         &mut tx_result.result_logs,
-    //     )?;
-    // } else {
-    //     state.increase_egld_balance(&from, &call_value);
-    // }
-
-    Ok((tx_result, None))
+    Ok(tx_result)
 }

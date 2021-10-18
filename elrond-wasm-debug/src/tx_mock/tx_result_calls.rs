@@ -13,4 +13,8 @@ impl TxResultCalls {
             transfer_execute: Vec::new(),
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.async_call.is_none() && self.transfer_execute.is_empty()
+    }
 }

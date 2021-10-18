@@ -30,10 +30,10 @@ pub fn execute(state: Rc<BlockchainMock>, tx_id: &str, tx: &TxQuery, expect: &Op
     };
 
     let tx_result = sc_query(tx_input, state);
-    // assert!(
-    //     tx_result.result_status != 0 || !opt_async_data.is_some(),
-    //     "Can't query a view function that performs an async call"
-    // );
+    assert!(
+        tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
+        "Can't query a view function that performs an async call"
+    );
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
     }
