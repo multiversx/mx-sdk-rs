@@ -65,6 +65,22 @@ impl BlockchainMock {
         account.nonce += 1;
     }
 
+    pub fn subtract_tx_gas(self: &mut Rc<Self>, address: &Address, gas_limit: u64, gas_price: u64) {
+        let self_ref = Rc::get_mut(self).unwrap();
+        let account = self_ref.accounts.get_mut(address).unwrap_or_else(|| {
+            panic!(
+                "Account not found: {}",
+                &std::str::from_utf8(address.as_ref()).unwrap()
+            )
+        });
+        let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
+        assert!(
+            account.egld_balance >= gas_cost,
+            "Not enough balance to pay gas upfront"
+        );
+        account.egld_balance -= &gas_cost;
+    }
+
     // pub fn send_balance(
     //     &mut self,
     //     contract_address: &Address,

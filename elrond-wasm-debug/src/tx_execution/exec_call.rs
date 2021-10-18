@@ -29,6 +29,7 @@ pub fn sc_call(
         // nonce gets increased irrespective of whether the tx fails or not
         state.increase_account_nonce(&tx_input.from);
     }
+    state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
     if let Some(tx_result) = try_execute_builtin_function(&tx_input, state) {
         return Ok(tx_result);
@@ -41,11 +42,6 @@ pub fn sc_call(
         &tx_context.tx_input_box.from,
         &tx_context.tx_input_box.egld_value,
     )?;
-    tx_context.blockchain_cache.subtract_tx_gas(
-        &tx_context.tx_input_box.from,
-        tx_context.tx_input_box.gas_limit,
-        tx_context.tx_input_box.gas_price,
-    );
     tx_context.blockchain_cache.increase_egld_balance(
         &tx_context.tx_input_box.to,
         &tx_context.tx_input_box.egld_value,

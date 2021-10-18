@@ -34,6 +34,7 @@ pub fn sc_create(
     // nonce gets increased irrespective of whether the tx fails or not
     // must be done after computing the new address
     state.increase_account_nonce(&tx_input.from);
+    state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
     let tx_context = TxContextRef::new(tx_input, state.clone());
     let tx_input_ref = &*tx_context.tx_input_box;
@@ -41,11 +42,6 @@ pub fn sc_create(
     tx_context
         .blockchain_cache
         .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)?;
-    tx_context.blockchain_cache.subtract_tx_gas(
-        &tx_input_ref.from,
-        tx_input_ref.gas_limit,
-        tx_input_ref.gas_price,
-    );
     tx_context.create_new_contract(
         &new_address,
         contract_path.to_vec(),
