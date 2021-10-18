@@ -49,7 +49,7 @@
                 "Example endpoint docs."
             ],
             "name": "echo_abi_test_type",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "att",
@@ -66,7 +66,7 @@
         {
             "name": "echo_enum",
             "onlyOwner": true,
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "e",
@@ -81,7 +81,7 @@
         },
         {
             "name": "multi_result_3",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -100,7 +100,7 @@
         },
         {
             "name": "multi_result_4",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -121,7 +121,7 @@
         },
         {
             "name": "var_args",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "_simple_arg",
@@ -137,7 +137,7 @@
         },
         {
             "name": "multi_result_vec",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -148,7 +148,7 @@
         },
         {
             "name": "optional_arg",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "_simple_arg",
@@ -164,7 +164,7 @@
         },
         {
             "name": "optional_result",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -175,7 +175,7 @@
         },
         {
             "name": "address_vs_h256",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "address",
@@ -197,7 +197,7 @@
         },
         {
             "name": "managed_address_vs_byte_array",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "address",
@@ -219,7 +219,7 @@
         },
         {
             "name": "esdt_local_role",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -229,7 +229,7 @@
         },
         {
             "name": "sample_storage_mapper",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -239,7 +239,7 @@
         },
         {
             "name": "payable_egld",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "EGLD"
             ],
@@ -248,7 +248,7 @@
         },
         {
             "name": "payable_some_token",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "TOKEN-FOR-ABI"
             ],
@@ -257,7 +257,7 @@
         },
         {
             "name": "payable_any_token",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "*"
             ],

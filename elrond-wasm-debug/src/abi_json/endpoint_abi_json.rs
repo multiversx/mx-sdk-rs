@@ -46,6 +46,7 @@ impl From<&OutputAbi> for OutputAbiJson {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum EndpointMutabilityAbiJson {
     Mutable,
     Readonly,

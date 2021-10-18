@@ -37,13 +37,13 @@
                 "Uses the `feature_guard!` macro."
             ],
             "name": "checkFeatureGuard",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "checkPause",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": [
                 {
@@ -53,25 +53,25 @@
         },
         {
             "name": "call_mod_a",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "call_mod_b",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "call_mod_c",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "dnsRegister",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "EGLD"
             ],
@@ -89,7 +89,7 @@
         },
         {
             "name": "issueToken",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "EGLD"
             ],
@@ -114,7 +114,7 @@
                 "optional address to set roles for. Defaults to SC's address."
             ],
             "name": "setLocalRoles",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "opt_dest_address",
@@ -126,7 +126,7 @@
         },
         {
             "name": "setFeatureFlag",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "feature_name",
@@ -141,7 +141,7 @@
         },
         {
             "name": "depositTokensForAction",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "*"
             ],
@@ -150,7 +150,7 @@
         },
         {
             "name": "withdrawGovernanceTokens",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -161,7 +161,7 @@
         },
         {
             "name": "propose",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "*"
             ],
@@ -184,7 +184,7 @@
         },
         {
             "name": "vote",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "*"
             ],
@@ -198,7 +198,7 @@
         },
         {
             "name": "downvote",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "payableInTokens": [
                 "*"
             ],
@@ -212,7 +212,7 @@
         },
         {
             "name": "queue",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -223,7 +223,7 @@
         },
         {
             "name": "execute",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -234,7 +234,7 @@
         },
         {
             "name": "cancel",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -245,7 +245,7 @@
         },
         {
             "name": "getProposalStatus",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -260,7 +260,7 @@
         },
         {
             "name": "getProposer",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -276,7 +276,7 @@
         },
         {
             "name": "getProposalDescription",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -292,7 +292,7 @@
         },
         {
             "name": "getProposalActions",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -311,7 +311,7 @@
                 "Could be calculated by iterating over the \"votes\" mapper, but that costs a lot of gas"
             ],
             "name": "getTotalVotes",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -329,7 +329,7 @@
                 "Could be calculated by iterating over the \"downvotes\" mapper, but that costs a lot of gas"
             ],
             "name": "getTotalDownvotes",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "proposal_id",
@@ -348,7 +348,7 @@
                 "to not modify parameters manually"
             ],
             "name": "initGovernanceModule",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "governance_token_id",
@@ -383,7 +383,7 @@
         },
         {
             "name": "changeQuorum",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "new_value",
@@ -394,7 +394,7 @@
         },
         {
             "name": "changeMinTokenBalanceForProposing",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "new_value",
@@ -405,7 +405,7 @@
         },
         {
             "name": "changeMaxActionsPerProposal",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "new_value",
@@ -416,7 +416,7 @@
         },
         {
             "name": "changeVotingDelayInBlocks",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "new_value",
@@ -427,7 +427,7 @@
         },
         {
             "name": "changeVotingPeriodInBlocks",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "new_value",
@@ -438,7 +438,7 @@
         },
         {
             "name": "changeLockTimeAfterVotingEndsInBlocks",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "new_value",
@@ -449,7 +449,7 @@
         },
         {
             "name": "getGovernanceTokenId",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -459,7 +459,7 @@
         },
         {
             "name": "getQuorum",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -469,7 +469,7 @@
         },
         {
             "name": "getMinTokenBalanceForProposing",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -479,7 +479,7 @@
         },
         {
             "name": "getMaxActionsPerProposal",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -489,7 +489,7 @@
         },
         {
             "name": "getVotingDelayInBlocks",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -499,7 +499,7 @@
         },
         {
             "name": "getVotingPeriodInBlocks",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -509,7 +509,7 @@
         },
         {
             "name": "getLockTimeAfterVotingEndsInBlocks",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -519,7 +519,7 @@
         },
         {
             "name": "isPaused",
-            "mutability": "Readonly",
+            "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
@@ -529,13 +529,13 @@
         },
         {
             "name": "pause",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "unpause",
-            "mutability": "Mutable",
+            "mutability": "mutable",
             "inputs": [],
             "outputs": []
         }
