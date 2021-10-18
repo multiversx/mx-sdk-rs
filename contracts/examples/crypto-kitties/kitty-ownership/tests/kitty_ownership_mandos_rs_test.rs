@@ -18,30 +18,30 @@ fn contract_map() -> ContractMap<DebugApi> {
 
 #[test]
 fn approve_siring_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/approve_siring.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/approve_siring.scen.json", contract_map());
 }
 
 #[test]
 fn breed_ok_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/breed_ok.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/breed_ok.scen.json", contract_map());
 }
 
 #[test]
 fn give_birth_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/give_birth.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/give_birth.scen.json", contract_map());
 }
 
 #[test]
 fn init_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/init.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/init.scen.json", contract_map());
 }
 
 #[test]
 fn query_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/query.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/query.scen.json", contract_map());
 }
 
 #[test]
 fn setup_accounts_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/setup_accounts.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/setup_accounts.scen.json", contract_map());
 }
