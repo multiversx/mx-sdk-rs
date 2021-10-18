@@ -47,7 +47,7 @@ impl TxCache {
         let account = accounts
             .get(address)
             .unwrap_or_else(|| panic!("Account {} not found", address_hex(address)));
-        f(&account)
+        f(account)
     }
 
     pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
@@ -56,10 +56,10 @@ impl TxCache {
     {
         self.load_account_if_necessary(address);
         let mut accounts = self.accounts.borrow_mut();
-        let mut account = accounts
+        let account = accounts
             .get_mut(address)
             .unwrap_or_else(|| panic!("Account {} not found", address_hex(address)));
-        f(&mut account)
+        f(account)
     }
 
     pub fn insert_account(&self, account_data: AccountData) {
