@@ -194,6 +194,18 @@ impl SendApi for DebugApi {
         panic!("deploy_from_source_contract not yet implemented")
     }
 
+    fn upgrade_from_source_contract(
+        &self,
+        _sc_address: &ManagedAddress<Self>,
+        _gas: u64,
+        _amount: &BigUint<Self>,
+        _source_contract_address: &ManagedAddress<Self>,
+        _code_metadata: CodeMetadata,
+        _arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        panic!("upgrade_from_source_contract not yet implemented")
+    }
+
     fn upgrade_contract(
         &self,
         _sc_address: &ManagedAddress<Self>,

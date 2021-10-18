@@ -102,6 +102,17 @@ extern "C" {
         dataOffset: *const u8,
     ) -> i32;
 
+    fn upgradeFromSourceContract(
+        scAddressOffset: *const u8,
+        gas: i64,
+        valueOffset: *const u8,
+        sourceContractAddressOffset: *const u8,
+        codeMetadataOffset: *const u8,
+        numArguments: i32,
+        argumentsLengthOffset: *const u8,
+        dataOffset: *const u8,
+    );
+
     fn upgradeContract(
         scAddressOffset: *const u8,
         gas: i64,
@@ -428,6 +439,34 @@ impl SendApi for ArwenApiImpl {
                 ManagedAddress::managed_from(self.clone(), new_address),
                 results,
             )
+        }
+    }
+
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address: &ManagedAddress<Self>,
+        gas: u64,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        unsafe {
+            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let source_contract_address_bytes = source_contract_address.to_address();
+            let sc_address_bytes = sc_address.to_address();
+
+            upgradeFromSourceContract(
+                sc_address_bytes.as_ptr(),
+                gas as i64,
+                amount_bytes32_ptr,
+                source_contract_address_bytes.as_ptr(),
+                code_metadata.as_ptr(),
+                legacy_arg_buffer.num_args() as i32,
+                legacy_arg_buffer.arg_lengths_bytes_ptr(),
+                legacy_arg_buffer.arg_data_ptr(),
+            );
         }
     }
 
