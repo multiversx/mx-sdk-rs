@@ -20,7 +20,7 @@ pub fn contract_abi<AbiObj: ContractAbiProvider>() -> String {
 /// Function provided for convenience.
 /// Prints the ABI JSON of a contract to console.
 pub fn print_abi<AbiTrait: ContractAbiProvider>() {
-    print!("{}", contract_abi::<AbiTrait>());
+    println!("{}", contract_abi::<AbiTrait>());
 }
 
 /// Same as `contract_abi`, but allows caller to replace the compiler metadata,
