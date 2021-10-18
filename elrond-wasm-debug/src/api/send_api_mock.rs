@@ -91,8 +91,6 @@ impl SendApi for DebugApi {
     ) -> Result<(), &'static [u8]> {
         let amount_value = self.big_uint_value(amount);
         let recipient = to.to_address();
-        let call_data =
-            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
         let tx_hash = self.get_tx_hash_legacy();
         let mut tx_result = self.result_borrow_mut();
         tx_result
@@ -101,7 +99,8 @@ impl SendApi for DebugApi {
             .push(AsyncCallTxData {
                 to: recipient,
                 call_value: amount_value,
-                call_data,
+                endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+                arguments: arg_buffer.to_raw_args_vec(),
                 tx_hash,
             });
         Ok(())
@@ -173,15 +172,14 @@ impl SendApi for DebugApi {
     ) -> ! {
         let amount_value = self.big_uint_value(amount);
         let recipient = to.to_address();
-        let call_data =
-            HexCallDataSerializer::from_managed_arg_buffer(endpoint_name, arg_buffer).into_vec();
         let tx_hash = self.get_tx_hash_legacy();
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
         tx_result.result_calls.async_call = Some(AsyncCallTxData {
             to: recipient,
             call_value: amount_value,
-            call_data,
+            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
         });
         std::panic::panic_any(tx_result)

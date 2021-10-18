@@ -12,26 +12,20 @@ use alloc::vec::Vec;
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
     pub to: Address,
-    pub call_data: Vec<u8>,
     pub call_value: BigUint,
+    pub endpoint_name: Vec<u8>,
+    pub arguments: Vec<Vec<u8>>,
     pub tx_hash: H256,
 }
 
 pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address) -> TxInput {
-    let mut de = HexCallDataDeserializer::new(async_data.call_data.as_slice());
-    let func_name = de.get_func_name().to_vec();
-    let mut args: Vec<Vec<u8>> = Vec::new();
-
-    while let Some(deserialized_arg) = de.next_argument().unwrap() {
-        args.push(deserialized_arg);
-    }
     TxInput {
         from: contract_addr.clone(),
         to: async_data.to.clone(),
         egld_value: async_data.call_value.clone(),
         esdt_values: Vec::new(),
-        func_name,
-        args,
+        func_name: async_data.endpoint_name.clone(),
+        args: async_data.arguments.clone(),
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
