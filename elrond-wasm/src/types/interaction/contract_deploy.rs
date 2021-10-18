@@ -117,6 +117,21 @@ where
         )
     }
 
+    pub fn upgrade_from_source(
+        self,
+        source_address: &ManagedAddress<SA>,
+        code_metadata: CodeMetadata,
+    ) {
+        self.api.upgrade_from_source_contract(
+            &self.to,
+            self.resolve_gas_limit(),
+            &self.egld_payment,
+            source_address,
+            code_metadata,
+            &self.arg_buffer,
+        )
+    }
+
     pub fn upgrade_contract(self, code: &ManagedBuffer<SA>, code_metadata: CodeMetadata) {
         self.api.upgrade_contract(
             &self.to,
