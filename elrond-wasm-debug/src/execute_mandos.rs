@@ -11,15 +11,13 @@ use std::{path::Path, rc::Rc};
 pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, contract_map: ContractMap<DebugApi>) {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(relative_path);
-    let mut state = Rc::new(BlockchainMock::new());
-    parse_execute_mandos_steps(absolute_path.as_ref(), &mut state, &contract_map);
+    let mut blockchain_mock = BlockchainMock::new();
+    blockchain_mock.contract_map = contract_map;
+    let mut state = Rc::new(blockchain_mock);
+    parse_execute_mandos_steps(absolute_path.as_ref(), &mut state);
 }
 
-fn parse_execute_mandos_steps(
-    steps_path: &Path,
-    state: &mut Rc<BlockchainMock>,
-    contract_map: &ContractMap<DebugApi>,
-) {
+fn parse_execute_mandos_steps(steps_path: &Path, state: &mut Rc<BlockchainMock>) {
     let scenario = mandos::parse_scenario(steps_path);
 
     for step in scenario.steps.iter() {
@@ -27,7 +25,7 @@ fn parse_execute_mandos_steps(
             Step::ExternalSteps { path } => {
                 let parent_path = steps_path.parent().unwrap();
                 let new_path = parent_path.join(path);
-                parse_execute_mandos_steps(new_path.as_path(), state, contract_map);
+                parse_execute_mandos_steps(new_path.as_path(), state);
             },
             Step::SetState {
                 comment,
@@ -48,19 +46,19 @@ fn parse_execute_mandos_steps(
                 comment,
                 tx,
                 expect,
-            } => mandos_step::sc_call::execute(state, contract_map, tx_id, tx, expect),
+            } => mandos_step::sc_call::execute(state, tx_id, tx, expect),
             Step::ScQuery {
                 tx_id,
                 comment,
                 tx,
                 expect,
-            } => mandos_step::sc_query::execute(state.clone(), contract_map, tx_id, tx, expect),
+            } => mandos_step::sc_query::execute(state.clone(), tx_id, tx, expect),
             Step::ScDeploy {
                 tx_id,
                 comment,
                 tx,
                 expect,
-            } => mandos_step::sc_deploy::execute(state, contract_map, tx_id, tx, expect),
+            } => mandos_step::sc_deploy::execute(state, tx_id, tx, expect),
             Step::Transfer { tx_id, comment, tx } => mandos_step::transfer::execute(state, tx),
             Step::ValidatorReward { tx_id, comment, tx } => {
                 Rc::get_mut(state)

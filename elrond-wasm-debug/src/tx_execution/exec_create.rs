@@ -26,7 +26,6 @@ pub fn sc_create(
     mut tx_input: TxInput,
     contract_path: &[u8],
     state: &mut Rc<BlockchainMock>,
-    contract_map: &ContractMap<DebugApi>,
 ) -> Result<(TxResult, Option<AsyncCallTxData>), BlockchainMockError> {
     let new_address = get_new_address(&tx_input, state.clone());
     tx_input.to = new_address.clone();
@@ -51,7 +50,7 @@ pub fn sc_create(
         .blockchain_cache
         .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-    let tx_result = execute_tx_context(tx_context.clone(), contract_map);
+    let tx_result = execute_tx_context(tx_context.clone());
 
     let blockchain_updates = tx_context.into_blockchain_updates();
     blockchain_updates.apply(Rc::get_mut(state).unwrap());

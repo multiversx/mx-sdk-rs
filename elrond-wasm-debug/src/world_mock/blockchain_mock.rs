@@ -8,6 +8,7 @@ use crate::{
     esdt_transfer_event_log,
     tx_mock::{SendBalance, TxCache, TxContext, TxContextRef, TxInput, TxLog},
     world_mock::AccountEsdt,
+    ContractMap, DebugApi,
 };
 
 use super::{AccountData, BlockInfo, BlockchainMockError};
@@ -20,6 +21,7 @@ pub struct BlockchainMock {
     pub new_addresses: HashMap<(Address, u64), Address>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
+    pub contract_map: ContractMap<DebugApi>,
 }
 
 impl BlockchainMock {
@@ -29,6 +31,7 @@ impl BlockchainMock {
             new_addresses: HashMap::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
+            contract_map: ContractMap::default(),
         }
     }
 }
