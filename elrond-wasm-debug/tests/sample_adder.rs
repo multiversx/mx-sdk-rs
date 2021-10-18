@@ -14,6 +14,8 @@ use elrond_wasm::{
 use crate::module_1::VersionModule;
 
 mod module_1 {
+    use elrond_wasm::abi::EndpointMutabilityAbi;
+
     elrond_wasm::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +90,7 @@ mod module_1 {
                 docs: &[],
                 name: "version",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Mutable,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -117,6 +120,8 @@ mod module_1 {
 }
 
 mod sample_adder {
+    use elrond_wasm::abi::EndpointMutabilityAbi;
+
     elrond_wasm::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,6 +334,7 @@ mod sample_adder {
                 docs: &[],
                 name: "getSum",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Mutable,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -340,6 +346,7 @@ mod sample_adder {
                 docs: &[],
                 name: "init",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Mutable,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -351,6 +358,7 @@ mod sample_adder {
                 docs: &["Add desired amount to the storage variable."],
                 name: "add",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Mutable,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
