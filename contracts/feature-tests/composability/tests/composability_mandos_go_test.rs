@@ -14,6 +14,28 @@ fn forw_raw_async_echo_go() {
 }
 
 #[test]
+fn forw_raw_async_send_and_retrieve_multi_transfer_funds_go() {
+    elrond_wasm_debug::mandos_go(
+        "mandos/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
+    );
+}
+
+#[test]
+fn forw_raw_call_async_retrieve_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_call_async_retrieve_multi_transfer.scen.json");
+}
+
+#[test]
+fn forw_raw_contract_deploy_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_deploy.scen.json");
+}
+
+#[test]
+fn forw_raw_contract_upgrade_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade.scen.json");
+}
+
+#[test]
 fn forw_raw_direct_egld_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_egld.scen.json");
 }
