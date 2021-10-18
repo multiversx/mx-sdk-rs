@@ -12,10 +12,10 @@ fn contract_map() -> ContractMap<DebugApi> {
 
 #[test]
 fn unwrap_egld_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/unwrap_egld.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/unwrap_egld.scen.json", contract_map());
 }
 
 #[test]
 fn wrap_egld_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/wrap_egld.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/wrap_egld.scen.json", contract_map());
 }
