@@ -11,5 +11,5 @@ fn contract_map() -> ContractMap<DebugApi> {
 
 #[test]
 fn test_str_repeat_mandos_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/str_repeat.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/str_repeat.scen.json", contract_map());
 }
