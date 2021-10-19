@@ -10,7 +10,7 @@ use std::{
     rc::Rc,
 };
 
-use super::{TxCache, TxCacheSource, TxInput, TxManagedTypes, TxResult};
+use super::{TxCache, TxInput, TxManagedTypes, TxResult};
 
 #[derive(Debug)]
 pub struct TxContext {

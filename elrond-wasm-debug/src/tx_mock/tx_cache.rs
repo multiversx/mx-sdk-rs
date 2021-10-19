@@ -93,6 +93,13 @@ impl TxCache {
             accounts: self.accounts.into_inner(),
         }
     }
+
+    pub fn commit_other_cache(&self, other: TxCache) {
+        let blockchain_updates = other.into_blockchain_updates();
+        self.accounts
+            .borrow_mut()
+            .extend(blockchain_updates.accounts.into_iter());
+    }
 }
 
 pub struct BlockchainUpdate {
