@@ -24,8 +24,7 @@ impl SendApi for DebugApi {
 
         let contract_address = &self.input_ref().to;
         self.blockchain_cache()
-            .subtract_egld_balance(contract_address, &amount_value)
-            .unwrap();
+            .subtract_egld_balance(contract_address, &amount_value);
 
         let recipient = &to.to_address();
         self.blockchain_cache()

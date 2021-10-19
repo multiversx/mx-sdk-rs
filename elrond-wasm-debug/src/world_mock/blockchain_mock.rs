@@ -100,19 +100,4 @@ impl BlockchainMock {
             .storage
             .insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
     }
-
-    pub fn try_set_username(&mut self, address: &Address, username: &[u8]) -> bool {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
-        if account.username.is_empty() {
-            account.username = username.to_vec();
-            true
-        } else {
-            false
-        }
-    }
 }
