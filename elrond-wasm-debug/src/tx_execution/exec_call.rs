@@ -1,12 +1,12 @@
 use std::{collections::HashMap, rc::Rc};
 
 use crate::{
-    async_call_tx_input, async_callback_tx_input, merge_results, try_execute_builtin_function,
+    async_call_tx_input, async_callback_tx_input, merge_results,
     tx_mock::{TxCache, TxContextRef, TxInput, TxResult, TxResultCalls},
     world_mock::{AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
 };
 
-use super::execute_tx_context;
+use super::{execute_tx_context, try_execute_builtin_function};
 
 pub fn sc_query(tx_input: TxInput, state: Rc<BlockchainMock>) -> TxResult {
     let tx_context = TxContextRef::new(tx_input, state);
@@ -28,7 +28,6 @@ pub fn sc_call(
         return Ok(tx_result);
     }
 
-    let func_name_empty = tx_input.func_name.is_empty();
     let tx_context = TxContextRef::new(tx_input, state.clone());
 
     tx_context.tx_cache.subtract_egld_balance(
@@ -56,7 +55,7 @@ pub fn sc_call(
         );
     }
 
-    let tx_result = if func_name_empty {
+    let tx_result = if tx_context.tx_input_box.func_name.is_empty() {
         // direct EGLD transfer
         TxResult::empty()
     } else {
