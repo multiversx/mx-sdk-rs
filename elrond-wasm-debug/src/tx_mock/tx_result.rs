@@ -1,9 +1,6 @@
 use alloc::vec::Vec;
-use elrond_wasm::types::{Address, BoxedBytes};
-use num_bigint::BigUint;
-use std::{collections::HashMap, fmt};
 
-use crate::AsyncCallTxData;
+use std::fmt;
 
 use super::{TxLog, TxPanic, TxResultCalls};
 

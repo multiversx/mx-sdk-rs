@@ -1,11 +1,10 @@
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 use elrond_wasm::types::Address;
 
 use crate::{
-    tx_mock::{TxContext, TxContextRef, TxInput, TxOutput, TxResult},
-    world_mock::{AccountData, BlockchainMock, BlockchainMockError},
-    AsyncCallTxData, ContractMap, DebugApi,
+    tx_mock::{TxContextRef, TxInput, TxResult},
+    world_mock::{BlockchainMock, BlockchainMockError},
 };
 
 use super::execute_tx_context;

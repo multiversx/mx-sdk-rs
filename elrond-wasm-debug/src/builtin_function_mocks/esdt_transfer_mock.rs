@@ -1,10 +1,10 @@
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 
 use crate::{
-    tx_mock::{TxCache, TxContext, TxInput, TxLog, TxResult, TxResultCalls},
+    tx_mock::{TxCache, TxInput, TxLog, TxResult, TxResultCalls},
     world_mock::BlockchainMock,
 };
 

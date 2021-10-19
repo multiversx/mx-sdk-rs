@@ -18,7 +18,6 @@ pub struct TxContext {
     pub blockchain_cache: TxCache,
     pub managed_types: RefCell<TxManagedTypes>,
     pub tx_result_cell: RefCell<TxResult>,
-    // pub tx_output_cell: RefCell<TxOutput>,
 }
 
 impl TxContext {
@@ -61,26 +60,6 @@ impl TxContext {
             tx_result_cell: RefCell::new(TxResult::empty()),
         }
     }
-
-    // pub fn get_account(&self, address: &Address) -> &AccountData {
-    //     self.blockchain_cache.get_account(address)
-    // }
-
-    // pub fn get_sender_account(&self) -> &AccountData {
-    //     self.get_account(&self.tx_input_box.from)
-    // }
-
-    // pub fn get_contract_account(&self) -> &AccountData {
-    //     self.get_account(&self.tx_input_box.to)
-    // }
-
-    // pub fn get_account_mut(&self, address: &Address) -> &mut AccountData {
-    //     self.blockchain_cache.get_account_mut(address)
-    // }
-
-    // pub fn get_contract_account_mut(&self) -> &mut AccountData {
-    //     self.get_account_mut(&self.tx_input_box.to)
-    // }
 
     pub fn input_ref(&self) -> &TxInput {
         self.tx_input_box.as_ref()
@@ -144,17 +123,6 @@ impl TxContext {
         contract_path: Vec<u8>,
         contract_owner: Address,
     ) {
-        // let sender_nonce_before_tx = self
-        //     .blockchain_cache
-        //     .with_account(&self.tx_input_box.from, |account| account.nonce - 1);
-        // let new_address = self
-        //     .blockchain_cache
-        //     .blockchain_ref()
-        //     .get_new_address(self.tx_input_box.from.clone(), sender_nonce_before_tx)
-        //     .unwrap_or_else(|| {
-        //         panic!("Missing new address. Only explicit new deploy addresses supported")
-        //     });
-
         assert!(
             !self
                 .blockchain_cache

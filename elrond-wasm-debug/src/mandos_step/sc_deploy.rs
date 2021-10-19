@@ -7,7 +7,6 @@ use crate::{
     tx_execution::sc_create,
     tx_mock::{generate_tx_hash_dummy, TxInput},
     world_mock::BlockchainMock,
-    ContractMap, DebugApi,
 };
 
 use super::check_tx_output;

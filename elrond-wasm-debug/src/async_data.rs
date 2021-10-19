@@ -1,7 +1,6 @@
 use crate::tx_mock::{TxInput, TxResult};
 use elrond_wasm::{
     elrond_codec::*,
-    hex_call_data::HexCallDataDeserializer,
     types::{Address, H256},
 };
 
