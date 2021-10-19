@@ -38,7 +38,7 @@ impl TxContextRef {
 
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         let tx_context = Rc::try_unwrap(self.0).unwrap();
-        tx_context.blockchain_cache.into_blockchain_updates()
+        tx_context.tx_cache.into_blockchain_updates()
     }
 
     /// Consumes the current API and returns the contained output.

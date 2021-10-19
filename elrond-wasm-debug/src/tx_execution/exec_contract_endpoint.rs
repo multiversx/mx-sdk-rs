@@ -20,7 +20,7 @@ pub fn execute_tx_context(tx_context_ref: TxContextRef) -> TxResult {
 
 fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
     tx_context
-        .blockchain_cache
+        .tx_cache
         .with_account(&tx_context.tx_input_box.to, |account| {
             account
                 .contract_path

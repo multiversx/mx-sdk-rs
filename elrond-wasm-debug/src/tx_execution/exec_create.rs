@@ -38,7 +38,7 @@ pub fn sc_create(
     let tx_input_ref = &*tx_context.tx_input_box;
 
     tx_context
-        .blockchain_cache
+        .tx_cache
         .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)?;
     tx_context.create_new_contract(
         &new_address,
@@ -46,7 +46,7 @@ pub fn sc_create(
         tx_input_ref.from.clone(),
     );
     tx_context
-        .blockchain_cache
+        .tx_cache
         .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
     let tx_result = execute_tx_context(tx_context.clone());
