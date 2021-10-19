@@ -1,14 +1,8 @@
-use std::{
-    cell::{Ref, RefCell, RefMut},
-    ops::Deref,
-    rc::Rc,
-};
-
-use elrond_wasm::types::Address;
+use std::{ops::Deref, rc::Rc};
 
 use crate::{
-    tx_mock::{TxCache, TxContext, TxInput, TxManagedTypes, TxOutput, TxResult},
-    world_mock::{AccountData, BlockchainMock, BlockchainTxInfo},
+    tx_mock::{TxContext, TxInput, TxResult},
+    world_mock::BlockchainMock,
 };
 
 use super::BlockchainUpdate;
@@ -38,10 +32,6 @@ impl TxContextRef {
         Self(Rc::new(TxContext::new(tx_input, blockchain_ref)))
     }
 
-    // pub fn new(tx_context: TxContext) -> Self {
-    //     Self(Rc::new(tx_context))
-    // }
-
     pub fn dummy() -> Self {
         Self(Rc::new(TxContext::dummy()))
     }
@@ -60,17 +50,4 @@ impl TxContextRef {
         // let tx_context = Rc::try_unwrap(self.0).unwrap();
         self.tx_result_cell.replace(TxResult::default())
     }
-
-    // /// Extracts the output and replaces the one in the TxContext with an empty one.
-    // pub fn consume_output(&self) -> TxOutput {
-    //     self.0.tx_output_cell.replace(TxOutput::default())
-    // }
-
-    // pub fn output_borrow(&self) -> Ref<TxOutput> {
-    //     self.0.tx_output_cell.borrow()
-    // }
-
-    // pub fn output_borrow_mut(&self) -> RefMut<TxOutput> {
-    //     self.0.tx_output_cell.borrow_mut()
-    // }
 }

@@ -2,8 +2,8 @@ use alloc::boxed::Box;
 use elrond_wasm::contract_base::CallableContract;
 
 use crate::{
-    tx_mock::{TxContext, TxContextRef, TxOutput, TxPanic, TxResult},
-    ContractMap, DebugApi,
+    tx_mock::{TxContext, TxContextRef, TxPanic, TxResult},
+    DebugApi,
 };
 
 /// Runs contract code using the auto-generated function selector.

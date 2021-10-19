@@ -1,5 +1,4 @@
 #![allow(clippy::type_complexity)]
-#![allow(unused_imports)] // TEMP
 
 pub mod abi_json;
 pub mod api;

@@ -1,11 +1,9 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
 use crate::{
-    address_hex, async_call_tx_input, async_callback_tx_input, merge_results,
-    try_execute_builtin_function,
-    tx_mock::{TxCache, TxContext, TxContextRef, TxInput, TxOutput, TxResult, TxResultCalls},
+    async_call_tx_input, async_callback_tx_input, merge_results, try_execute_builtin_function,
+    tx_mock::{TxCache, TxContextRef, TxInput, TxResult, TxResultCalls},
     world_mock::{AccountData, AccountEsdt, BlockchainMock, BlockchainMockError},
-    AsyncCallTxData, ContractMap, DebugApi,
 };
 
 use super::execute_tx_context;
@@ -101,7 +99,6 @@ pub fn sc_call_with_async_and_callback(
                 );
                 tx_result = merge_results(tx_result, callback_result);
             } else {
-                // panic!("async cross shard simuation not supported")
                 let tx_cache = TxCache::new(state.clone());
                 tx_cache
                     .subtract_egld_balance(&contract_address, &async_data.call_value)

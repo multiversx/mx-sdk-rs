@@ -1,17 +1,14 @@
-use alloc::vec::Vec;
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, rc::Rc};
 
 use crate::{
-    esdt_transfer_event_log,
-    tx_mock::{SendBalance, TxCache, TxContext, TxContextRef, TxInput, TxLog},
-    world_mock::AccountEsdt,
+    tx_mock::{TxCache, TxContextRef},
     ContractMap, DebugApi,
 };
 
-use super::{AccountData, BlockInfo, BlockchainMockError};
+use super::{AccountData, BlockInfo};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 

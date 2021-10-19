@@ -1,52 +1,11 @@
-use crate::{
-    async_data::AsyncCallTxData,
-    tx_mock::{SendBalance, TxContextRef, TxPanic},
-    DebugApi,
-};
+use crate::{async_data::AsyncCallTxData, tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_TRANSFER_STRING},
     types::{
-        BigUint, BoxedBytes, CodeMetadata, ContractCall, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
+        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedInto, ManagedVec, TokenIdentifier,
     },
-    HexCallDataSerializer,
 };
-
-impl DebugApi {
-    // fn get_available_egld_balance(&self) -> num_bigint::BigUint {
-    //     self.with_contract_account(|account| account.egld_balance.clone())
-    // }
-
-    // fn get_available_esdt_balance(
-    //     &self,
-    //     token_identifier: &[u8],
-    //     nonce: u64,
-    // ) -> num_bigint::BigUint {
-    //     // start with the pre-existing balance
-    //     let mut available_balance = self
-    //         .get_contract_account()
-    //         .esdt
-    //         .get_esdt_balance(token_identifier, nonce);
-
-    //     // // add amount received (if the same token)
-    //     // for esdt_value in self.input_ref().esdt_values.iter() {
-    //     //     if esdt_value.token_identifier == token_identifier && esdt_value.nonce == nonce {
-    //     //         available_balance += &esdt_value.value;
-    //     //     }
-    //     // }
-
-    //     // let tx_output = self.output_borrow();
-
-    //     // // already sent
-    //     // for send_balance in &tx_output.send_balance_list {
-    //     //     if send_balance.token_identifier.as_slice() == token_identifier {
-    //     //         available_balance -= &send_balance.amount;
-    //     //     }
-    //     // }
-
-    //     available_balance
-    // }
-}
 
 impl SendApi for DebugApi {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, _data: D)
@@ -71,14 +30,6 @@ impl SendApi for DebugApi {
         let recipient = &to.to_address();
         self.blockchain_cache()
             .increase_egld_balance(recipient, &amount_value);
-
-        // let mut tx_result = self.result_borrow_mut();
-        // tx_output.send_balance_list.push(SendBalance {
-        //     recipient,
-        //     token_identifier: BoxedBytes::empty(),
-        //     amount: amount_value,
-        //     nonce: 0u64,
-        // });
     }
 
     fn direct_egld_execute(
@@ -146,26 +97,6 @@ impl SendApi for DebugApi {
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_calls.transfer_execute.push(call);
         Ok(())
-        // let amount_value = self.big_uint_value(amount);
-        // if amount_value
-        //     > self.get_available_esdt_balance(token.to_esdt_identifier().as_slice(), 0u64)
-        // {
-        //     std::panic::panic_any(TxPanic {
-        //         status: 10,
-        //         message: b"insufficient funds".to_vec(),
-        //     });
-        // }
-
-        // let recipient = to.to_address();
-        // let token_identifier = token.to_esdt_identifier();
-        // let mut tx_result = self.result_borrow_mut();
-        // tx_output.send_balance_list.push(SendBalance {
-        //     recipient,
-        //     token_identifier,
-        //     amount: amount_value,
-        //     nonce: 0u64,
-        // });
-        // Ok(())
     }
 
     fn direct_esdt_nft_execute(

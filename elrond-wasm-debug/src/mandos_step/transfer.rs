@@ -3,10 +3,7 @@ use std::rc::Rc;
 use elrond_wasm::types::H256;
 use mandos::model::TxTransfer;
 
-use crate::{
-    sc_call::tx_esdt_transfers_from_mandos, tx_execution::sc_call, tx_mock::TxInput,
-    world_mock::BlockchainMock, ContractMap,
-};
+use crate::{tx_execution::sc_call, tx_mock::TxInput, world_mock::BlockchainMock};
 
 pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
     match tx_transfer.esdt_value.len() {
