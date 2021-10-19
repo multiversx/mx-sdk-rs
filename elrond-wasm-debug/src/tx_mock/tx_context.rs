@@ -21,10 +21,10 @@ pub struct TxContext {
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, blockchain_ref: Rc<BlockchainMock>) -> Self {
+    pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
         TxContext {
             tx_input_box: Box::new(tx_input),
-            tx_cache: TxCache::new(blockchain_ref),
+            tx_cache,
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
         }

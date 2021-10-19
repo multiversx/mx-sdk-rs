@@ -2,22 +2,18 @@ use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::{address_hex, tx_mock::TxInputESDT, world_mock::BlockchainMockError};
+use crate::{address_hex, tx_mock::TxInputESDT};
 
 use super::TxCache;
 
 impl TxCache {
-    pub fn subtract_egld_balance(
-        &self,
-        address: &Address,
-        call_value: &BigUint,
-    ) -> Result<(), BlockchainMockError> {
+    pub fn subtract_egld_balance(&self, address: &Address, call_value: &BigUint) {
         self.with_account_mut(address, |account| {
-            if &account.egld_balance < call_value {
-                return Err("failed transfer (insufficient funds)".into());
-            }
+            assert!(
+                &account.egld_balance >= call_value,
+                "failed transfer (insufficient funds)"
+            );
             account.egld_balance -= call_value;
-            Ok(())
         })
     }
 

@@ -107,6 +107,12 @@ pub struct BlockchainUpdate {
 }
 
 impl BlockchainUpdate {
+    pub fn empty() -> Self {
+        BlockchainUpdate {
+            accounts: HashMap::new(),
+        }
+    }
+
     pub fn apply(self, blockchain: &mut BlockchainMock) {
         blockchain.accounts.extend(self.accounts.into_iter());
     }
