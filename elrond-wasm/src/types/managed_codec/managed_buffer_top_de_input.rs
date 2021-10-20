@@ -41,7 +41,7 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBufferNestedDecodeInput::new(self.into())
+        ManagedBufferNestedDecodeInput::new(self)
     }
 }
 
@@ -50,8 +50,7 @@ impl<M> TopDecodeInput for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type NestedBuffer =
-        ManagedBufferNestedDecodeInput<M, ManagedRef<ManagedBuffer<M>, ManagedBuffer<M>>>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M, ManagedRef<M, ManagedBuffer<M>>>;
 
     fn byte_len(&self) -> usize {
         self.len()
