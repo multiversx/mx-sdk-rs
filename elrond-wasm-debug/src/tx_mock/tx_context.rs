@@ -15,7 +15,7 @@ use super::{TxCache, TxInput, TxManagedTypes, TxResult};
 #[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
-    pub tx_cache: TxCache,
+    pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
     pub tx_result_cell: RefCell<TxResult>,
 }
@@ -24,16 +24,16 @@ impl TxContext {
     pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
         TxContext {
             tx_input_box: Box::new(tx_input),
-            tx_cache,
+            tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
         }
     }
 
     pub fn dummy() -> Self {
-        let blockchain_cache = TxCache::new(Rc::new(BlockchainMock::new()));
+        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new()));
         let contract_address = Address::from(&[b'c'; 32]);
-        blockchain_cache.insert_account(AccountData {
+        tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
             nonce: 0,
             egld_balance: BigUint::zero(),
@@ -55,7 +55,7 @@ impl TxContext {
                 gas_price: 0,
                 tx_hash: b"dummy...........................".into(),
             }),
-            tx_cache: blockchain_cache,
+            tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
         }
@@ -67,6 +67,10 @@ impl TxContext {
 
     pub fn blockchain_cache(&self) -> &TxCache {
         &self.tx_cache
+    }
+
+    pub fn blockchain_cache_rc(&self) -> Rc<TxCache> {
+        self.tx_cache.clone()
     }
 
     pub fn blockchain_ref(&self) -> &BlockchainMock {

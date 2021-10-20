@@ -144,18 +144,18 @@ fn forwarder_call_async_accept_egld_rs() {
 // 	);
 // }
 
-// #[test]
-// fn forwarder_call_sync_accept_then_read_egld_rs() {
-// 	elrond_wasm_debug::mandos_rs(
-// 		"mandos/forwarder_call_sync_accept_then_read_egld.scen.json",
-// 		contract_map(),
-// 	);
-// }
+#[test]
+fn forwarder_call_sync_accept_then_read_egld_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_call_sync_accept_then_read_egld.scen.json",
+        contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_call_sync_accept_then_read_esdt_rs() {
 // 	elrond_wasm_debug::mandos_rs(
-// 		"mandos/forwarder_call_sync_accept_then_read_esdt.scen.json",
+// 		"/home/andreim/elrond/smartcontract/elrond-wasm-rs/contracts/feature-tests/composability/mandos/forwarder_call_sync_accept_then_read_esdt.scen.json",
 // 		contract_map(),
 // 	);
 // }
@@ -309,10 +309,10 @@ fn forwarder_call_transf_exec_accept_egld_twice_rs() {
 // 	);
 // }
 
-// #[test]
-// fn forwarder_sync_echo_rs() {
-// 	elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo.scen.json", contract_map());
-// }
+#[test]
+fn forwarder_sync_echo_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo.scen.json", contract_map());
+}
 
 // #[test]
 // fn forwarder_sync_echo_range_rs() {

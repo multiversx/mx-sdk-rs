@@ -4,7 +4,7 @@ use num_traits::Zero;
 use std::{collections::HashMap, rc::Rc};
 
 use crate::{
-    tx_mock::{TxCache, TxContextRef},
+    tx_mock::{BlockchainUpdate, TxCache},
     ContractMap, DebugApi,
 };
 
@@ -44,14 +44,12 @@ impl BlockchainMock {
         self.accounts.contains_key(address)
     }
 
-    pub fn commit_tx_cache(self: &mut Rc<Self>, tx_cache: TxCache) {
-        let blockchain_updates = tx_cache.into_blockchain_updates();
-        blockchain_updates.apply(Rc::get_mut(self).unwrap());
+    pub fn commit_updates(self: &mut Rc<Self>, updates: BlockchainUpdate) {
+        updates.apply(Rc::get_mut(self).unwrap());
     }
 
-    pub fn commit_tx(&mut self, tx_context: TxContextRef) {
-        let blockchain_updates = tx_context.into_blockchain_updates();
-        blockchain_updates.apply(self);
+    pub fn commit_tx_cache(self: &mut Rc<Self>, tx_cache: TxCache) {
+        self.commit_updates(tx_cache.into_blockchain_updates())
     }
 
     pub fn increase_account_nonce(self: &mut Rc<Self>, address: &Address) {
