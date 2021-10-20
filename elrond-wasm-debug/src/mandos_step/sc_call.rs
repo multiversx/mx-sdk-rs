@@ -1,15 +1,17 @@
+use std::rc::Rc;
+
 use mandos::model::{TxCall, TxESDT, TxExpect};
 
 use crate::{
-    execute_helper_functions::{self, check_tx_output, sc_call_with_async_and_callback},
-    tx_mock::{TxInput, TxInputESDT},
+    tx_execution::sc_call_with_async_and_callback,
+    tx_mock::{generate_tx_hash_dummy, TxInput, TxInputESDT},
     world_mock::BlockchainMock,
-    ContractMap, DebugApi,
 };
 
+use super::check_tx_output;
+
 pub fn execute(
-    state: &mut BlockchainMock,
-    contract_map: &ContractMap<DebugApi>,
+    state: &mut Rc<BlockchainMock>,
     tx_id: &str,
     tx: &TxCall,
     expect: &Option<TxExpect>,
@@ -27,10 +29,9 @@ pub fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: execute_helper_functions::generate_tx_hash_dummy(tx_id),
+        tx_hash: generate_tx_hash_dummy(tx_id),
     };
-    state.increase_nonce(&tx_input.from);
-    let tx_result = sc_call_with_async_and_callback(tx_input, state, contract_map).unwrap();
+    let tx_result = sc_call_with_async_and_callback(tx_input, state, true).unwrap();
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
     }

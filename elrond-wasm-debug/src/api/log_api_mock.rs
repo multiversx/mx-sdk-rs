@@ -25,8 +25,8 @@ impl LogApi for DebugApi {
             current_index += arg_len;
         }
 
-        let mut tx_output_cell = self.output_borrow_mut();
-        tx_output_cell.result.result_logs.push(TxLog {
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_logs.push(TxLog {
             address: self.input_ref().to.clone(),
             endpoint: self.input_ref().func_name.clone(),
             topics,
@@ -37,8 +37,8 @@ impl LogApi for DebugApi {
     fn write_legacy_log(&self, topics: &[[u8; 32]], data: &[u8]) {
         let topics_vec = topics.iter().map(|array| array.to_vec()).collect();
 
-        let mut tx_output_cell = self.output_borrow_mut();
-        tx_output_cell.result.result_logs.push(TxLog {
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_logs.push(TxLog {
             address: self.input_ref().to.clone(),
             endpoint: self.input_ref().func_name.clone(),
             topics: topics_vec,
