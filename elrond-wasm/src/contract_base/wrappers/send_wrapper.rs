@@ -84,8 +84,8 @@ where
     ) where
         D: ManagedInto<A, ManagedBuffer<A>>,
     {
-        let empty_arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         let endpoint_name = data.managed_into(self.type_manager());
+        let empty_arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
 
         if token.is_egld() {
             let _ =
