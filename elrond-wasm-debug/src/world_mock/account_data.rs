@@ -9,6 +9,7 @@ use super::AccountEsdt;
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 
+#[derive(Clone, Debug)]
 pub struct AccountData {
     pub address: Address,
     pub nonce: u64,
