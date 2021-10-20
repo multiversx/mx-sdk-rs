@@ -14,6 +14,8 @@ use elrond_wasm::{
 use crate::module_1::VersionModule;
 
 mod module_1 {
+    use elrond_wasm::abi::EndpointMutabilityAbi;
+
     elrond_wasm::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +90,7 @@ mod module_1 {
                 docs: &[],
                 name: "version",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Mutable,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -109,6 +112,7 @@ mod module_1 {
                 ___api___.clone(),
                 ___address___,
                 &b"version"[..],
+                ManagedVec::new(___api___.clone()),
             );
             ___contract_call___
         }
@@ -116,6 +120,8 @@ mod module_1 {
 }
 
 mod sample_adder {
+    use elrond_wasm::abi::EndpointMutabilityAbi;
+
     elrond_wasm::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,6 +252,7 @@ mod sample_adder {
                 ___api___.clone(),
                 ___address___,
                 &b"get_sum"[..],
+                ManagedVec::new(___api___.clone()),
             );
             ___contract_call___
         }
@@ -259,6 +266,7 @@ mod sample_adder {
                 ___api___.clone(),
                 ___address___,
                 &b"add"[..],
+                ManagedVec::new(___api___.clone()),
             );
             ___contract_call___.push_endpoint_arg(amount);
             ___contract_call___
@@ -326,6 +334,7 @@ mod sample_adder {
                 docs: &[],
                 name: "getSum",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Readonly,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -337,6 +346,7 @@ mod sample_adder {
                 docs: &[],
                 name: "init",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Pure,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -348,6 +358,7 @@ mod sample_adder {
                 docs: &["Add desired amount to the storage variable."],
                 name: "add",
                 only_owner: false,
+                mutability: EndpointMutabilityAbi::Mutable,
                 payable_in_tokens: &[],
                 inputs: Vec::new(),
                 outputs: Vec::new(),
@@ -442,10 +453,10 @@ mod sample_adder {
 
 #[test]
 fn test_add() {
-    use elrond_wasm_debug::TxContext;
+    use elrond_wasm_debug::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let tx_context = TxContext::dummy();
+    let tx_context = DebugApi::dummy();
 
     let adder = sample_adder::contract_obj(tx_context.clone());
 
@@ -474,7 +485,7 @@ fn test_add() {
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::TxContext> {
+fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::DebugApi> {
     let mut contract_map = elrond_wasm_debug::ContractMap::new();
     contract_map.register_contract(
         "file:../output/adder.wasm",
@@ -487,6 +498,6 @@ fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::TxContext
 fn test_mandos() {
     elrond_wasm_debug::mandos_rs(
         "../contracts/examples/adder/mandos/adder.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }

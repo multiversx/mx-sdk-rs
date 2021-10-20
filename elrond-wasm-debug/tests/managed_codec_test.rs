@@ -1,11 +1,11 @@
 use elrond_wasm::types::{
     BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedFrom, ManagedVec,
 };
-use elrond_wasm_debug::{check_managed_top_encode_decode, TxContext};
+use elrond_wasm_debug::{check_managed_top_encode_decode, DebugApi};
 
 #[test]
 fn test_big_uint_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
 
     check_managed_top_encode_decode(
         api.clone(),
@@ -16,7 +16,7 @@ fn test_big_uint_serialization() {
 
 #[test]
 fn test_vec_of_big_uint_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let v = vec![
         BigUint::managed_from(api.clone(), 5u32),
         BigUint::managed_from(api.clone(), 6u32),
@@ -27,7 +27,7 @@ fn test_vec_of_big_uint_serialization() {
 
 #[test]
 fn test_big_int_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
 
     check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api.clone(), 5), &[5u8]);
     check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api, -5), &[251u8]);
@@ -35,7 +35,7 @@ fn test_big_int_serialization() {
 
 #[test]
 fn test_vec_of_big_int_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let v = vec![
         BigInt::from_i32(api.clone(), 5),
         BigInt::from_i32(api.clone(), 6),
@@ -46,7 +46,7 @@ fn test_vec_of_big_int_serialization() {
 
 #[test]
 fn test_man_buf_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
 
     check_managed_top_encode_decode(
         api.clone(),
@@ -57,7 +57,7 @@ fn test_man_buf_serialization() {
 
 #[test]
 fn test_vec_of_man_buf_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let v = vec![
         ManagedBuffer::new_from_bytes(api.clone(), &b"abc"[..]),
         ManagedBuffer::new_from_bytes(api.clone(), &b"de"[..]),
@@ -72,7 +72,7 @@ fn test_vec_of_man_buf_serialization() {
 
 #[test]
 fn test_man_address_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let v = ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]);
 
     check_managed_top_encode_decode(api, v, &[7u8; 32]);
@@ -80,7 +80,7 @@ fn test_man_address_serialization() {
 
 #[test]
 fn test_managed_vec_of_man_address_serialization() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let mut v = ManagedVec::new(api.clone());
     v.push(ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]));
     v.push(ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]));

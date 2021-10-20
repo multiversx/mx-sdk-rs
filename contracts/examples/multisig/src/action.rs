@@ -84,13 +84,13 @@ where
 
 #[cfg(test)]
 mod test {
-    use elrond_wasm_debug::TxContext;
+    use elrond_wasm_debug::DebugApi;
 
     use super::Action;
 
     #[test]
     fn test_is_pending() {
-        assert!(!Action::<TxContext>::Nothing.is_pending());
-        assert!(Action::<TxContext>::ChangeQuorum(5).is_pending());
+        assert!(!Action::<DebugApi>::Nothing.is_pending());
+        assert!(Action::<DebugApi>::ChangeQuorum(5).is_pending());
     }
 }

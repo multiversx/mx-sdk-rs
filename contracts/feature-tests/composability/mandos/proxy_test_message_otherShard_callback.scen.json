@@ -7,9 +7,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0x10000000000000e8d4a51000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x10000000000000e8d4a51000"
                 },
                 "sc:proxy-first": {
                     "nonce": "0",
@@ -27,7 +25,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "value": "0",
                 "function": "messageOtherContract",
                 "arguments": [],
                 "gasLimit": "0x1000000000000",

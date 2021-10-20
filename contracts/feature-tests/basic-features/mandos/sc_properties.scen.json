@@ -8,15 +8,12 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm",
                     "owner": "address:someone_else"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -78,7 +75,6 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "value": "0",
                 "contractCode": "file:../output/basic-features.wasm",
                 "arguments": [],
                 "gasLimit": "50,000,000",

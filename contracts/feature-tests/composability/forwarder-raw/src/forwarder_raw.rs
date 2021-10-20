@@ -362,4 +362,55 @@ pub trait ForwarderRaw {
             )
             .into()
     }
+
+    #[endpoint]
+    fn deploy_from_source(
+        &self,
+        source_contract_address: ManagedAddress,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+    ) -> ManagedAddress {
+        let (address, _) = self.raw_vm_api().deploy_from_source_contract(
+            self.blockchain().get_gas_left(),
+            &self.types().big_uint_zero(),
+            &source_contract_address,
+            CodeMetadata::DEFAULT,
+            &arguments.to_arg_buffer(),
+        );
+
+        address
+    }
+
+    #[endpoint]
+    fn upgrade(
+        &self,
+        child_sc_address: &ManagedAddress,
+        new_code: &ManagedBuffer,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+    ) {
+        self.raw_vm_api().upgrade_contract(
+            child_sc_address,
+            self.blockchain().get_gas_left(),
+            &self.types().big_uint_zero(),
+            new_code,
+            CodeMetadata::UPGRADEABLE,
+            &arguments.to_arg_buffer(),
+        );
+    }
+
+    #[endpoint]
+    fn upgrade_from_source(
+        &self,
+        sc_address: ManagedAddress,
+        source_contract_address: ManagedAddress,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+    ) {
+        self.raw_vm_api().upgrade_from_source_contract(
+            &sc_address,
+            self.blockchain().get_gas_left(),
+            &self.types().big_uint_zero(),
+            &source_contract_address,
+            CodeMetadata::DEFAULT,
+            &arguments.to_arg_buffer(),
+        )
+    }
 }

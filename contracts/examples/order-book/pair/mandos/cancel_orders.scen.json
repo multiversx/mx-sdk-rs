@@ -15,7 +15,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "cancelOrders",
                 "arguments": [
                     "u64:0"
@@ -36,7 +35,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "getAddressOrderIds",
                 "arguments": [
                     "address:user1"

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::serde_raw::ValueSubTree;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct TxESDTRaw {
     #[serde(default)]

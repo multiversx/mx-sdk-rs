@@ -13,7 +13,6 @@
             "tx": {
                 "from": "address:creator",
                 "to": "sc:ownership_contract",
-                "value": "0",
                 "function": "safeTransferFrom",
                 "arguments": [
                     "address:creator",

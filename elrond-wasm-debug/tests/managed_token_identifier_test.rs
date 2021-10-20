@@ -1,24 +1,24 @@
 use elrond_wasm::types::{BoxedBytes, TokenIdentifier};
-use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode_decode, TxContext};
+use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode_decode, DebugApi};
 
 #[test]
 fn test_egld() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     assert!(TokenIdentifier::egld(api).is_egld());
 }
 
 #[test]
 fn test_codec() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     check_managed_top_encode_decode(
         api.clone(),
         TokenIdentifier::egld(api.clone()),
-        TokenIdentifier::<TxContext>::EGLD_REPRESENTATION,
+        TokenIdentifier::<DebugApi>::EGLD_REPRESENTATION,
     );
 
     let expected = BoxedBytes::from_concat(&[
         &[0, 0, 0, 4],
-        &TokenIdentifier::<TxContext>::EGLD_REPRESENTATION[..],
+        &TokenIdentifier::<DebugApi>::EGLD_REPRESENTATION[..],
     ]);
     check_managed_top_encode_decode(
         api.clone(),
@@ -29,18 +29,18 @@ fn test_codec() {
     // also allowed
     assert_eq!(
         TokenIdentifier::egld(api.clone()),
-        check_managed_top_decode::<TokenIdentifier<TxContext>>(api.clone(), &[])
+        check_managed_top_decode::<TokenIdentifier<DebugApi>>(api.clone(), &[])
     );
     assert_eq!(
         vec![TokenIdentifier::egld(api.clone())],
-        check_managed_top_decode::<Vec<TokenIdentifier<TxContext>>>(api, &[0, 0, 0, 0])
+        check_managed_top_decode::<Vec<TokenIdentifier<DebugApi>>>(api, &[0, 0, 0, 0])
     );
 }
 
 #[test]
 #[rustfmt::skip]
 fn test_is_valid_esdt_identifier() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
 
     // valid identifier
     assert!(TokenIdentifier::from_esdt_bytes(api.clone(), &b"ALC-6258d2"[..]).is_valid_esdt_identifier());

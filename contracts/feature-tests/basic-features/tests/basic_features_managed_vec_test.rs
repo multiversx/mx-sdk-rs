@@ -5,7 +5,7 @@ use basic_features::managed_vec_features::ManagedVecFeatures;
 
 #[test]
 fn test_managed_vec_new() {
-    let context = TxContext::dummy();
+    let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
     let result = bf.managed_vec_new();
     assert_eq!(ManagedVec::new(context), result);
@@ -13,7 +13,7 @@ fn test_managed_vec_new() {
 
 #[test]
 fn test_managed_vec_eq() {
-    let context = TxContext::dummy();
+    let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
 
     let mut mv1 = ManagedVec::new(context.clone());

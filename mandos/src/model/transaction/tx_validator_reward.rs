@@ -4,17 +4,19 @@ use crate::{
     serde_raw::TxValidatorRewardRaw,
 };
 
+use super::tx_interpret_util::interpret_egld_value;
+
 #[derive(Debug)]
 pub struct TxValidatorReward {
     pub to: AddressValue,
-    pub value: BigUintValue,
+    pub egld_value: BigUintValue,
 }
 
 impl InterpretableFrom<TxValidatorRewardRaw> for TxValidatorReward {
     fn interpret_from(from: TxValidatorRewardRaw, context: &InterpreterContext) -> Self {
         TxValidatorReward {
             to: AddressValue::interpret_from(from.to, context),
-            value: BigUintValue::interpret_from(from.value, context),
+            egld_value: interpret_egld_value(from.value, from.egld_value, context),
         }
     }
 }

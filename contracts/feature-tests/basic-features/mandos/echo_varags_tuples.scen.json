@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -25,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_varags_tuples",
                 "arguments": [
                     "10",
@@ -55,7 +51,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_varags_tuples",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -71,12 +66,11 @@
         },
         {
             "step": "scCall",
-            "comment": "only even number of arguments possible",
             "txId": "1",
+            "comment": "only even number of arguments possible",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_varags_tuples",
                 "arguments": [
                     "10",

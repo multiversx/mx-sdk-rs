@@ -1,0 +1,150 @@
+{
+    "name": "Deploy vault from forwarder raw",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:child"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:child-with-arg"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "2",
+                    "newAddress": "sc:child-src-with-arg"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-vault",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "deploy_contract",
+                "arguments": [
+                    "file:../vault/output/vault.wasm"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "sc:child",
+                    ""
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-vault-with-arg",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "deploy_contract",
+                "arguments": [
+                    "file:../vault/output/vault.wasm",
+                    "str:some_argument"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:some_argument",
+                    "sc:child-with-arg",
+                    "nested:str:some_argument"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child-with-arg": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "deploy-from-source-with-arg",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "deploy_from_source",
+                "arguments": [
+                    "sc:child",
+                    "str:some_argument"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:some_argument",
+                    "sc:child-src-with-arg"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child-src-with-arg": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

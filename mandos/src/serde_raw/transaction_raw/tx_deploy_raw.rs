@@ -5,7 +5,15 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct TxDeployRaw {
     pub from: ValueSubTree,
-    pub value: ValueSubTree,
+
+    /// Backwards compatibility only.
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<ValueSubTree>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub egld_value: Option<ValueSubTree>,
 
     pub contract_code: ValueSubTree,
 

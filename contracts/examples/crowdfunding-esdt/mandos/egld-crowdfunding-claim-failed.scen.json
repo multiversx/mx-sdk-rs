@@ -10,8 +10,7 @@
             "accounts": {
                 "address:donor2": {
                     "nonce": "0",
-                    "balance": "1,000,000,000,000",
-                    "storage": {}
+                    "balance": "1,000,000,000,000"
                 }
             }
         },
@@ -21,13 +20,14 @@
             "tx": {
                 "from": "address:donor2",
                 "to": "sc:crowdfunding",
-                "value": "200,000,000,000",
+                "egldValue": "200,000,000,000",
                 "function": "fund",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"
@@ -77,13 +77,13 @@
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "claim",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -95,13 +95,13 @@
             "tx": {
                 "from": "address:donor2",
                 "to": "sc:crowdfunding",
-                "value": "0",
                 "function": "claim",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

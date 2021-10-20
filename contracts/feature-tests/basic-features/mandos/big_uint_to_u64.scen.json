@@ -7,14 +7,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -68,8 +65,8 @@
         },
         {
             "step": "scQuery",
-            "comment": "too big because we are first converting to int64; TODO: change conversion to completely unsigned",
             "txId": "5",
+            "comment": "too big because we are first converting to int64; TODO: change conversion to completely unsigned",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_uint_to_u64",

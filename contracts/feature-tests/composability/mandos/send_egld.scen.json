@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "200",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -25,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
@@ -47,7 +43,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
@@ -68,7 +63,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
