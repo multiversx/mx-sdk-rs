@@ -17,6 +17,9 @@ path = "proxy-test-first"
 [dependencies.proxy-test-second]
 path = "proxy-test-second"
 
+[dependencies.recursive-caller]
+path = "recursive-caller"
+
 [dependencies.vault]
 path = "vault"
 
