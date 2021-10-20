@@ -152,13 +152,13 @@ fn forwarder_call_sync_accept_then_read_egld_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_call_sync_accept_then_read_esdt_rs() {
-// 	elrond_wasm_debug::mandos_rs(
-// 		"/home/andreim/elrond/smartcontract/elrond-wasm-rs/contracts/feature-tests/composability/mandos/forwarder_call_sync_accept_then_read_esdt.scen.json",
-// 		contract_map(),
-// 	);
-// }
+#[test]
+fn forwarder_call_sync_accept_then_read_esdt_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_call_sync_accept_then_read_esdt.scen.json",
+        contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_call_sync_accept_then_read_nft_rs() {

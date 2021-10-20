@@ -1,4 +1,7 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxContextRef, TxInput, TxResult};
+use crate::{
+    tx_mock::{BlockchainUpdate, TxCache, TxContextRef, TxInput, TxResult},
+    world_mock::BlockchainMock,
+};
 
 use super::execute_tx_context;
 
@@ -30,7 +33,9 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         );
     }
 
-    let tx_result = if tx_context.tx_input_box.func_name.is_empty() {
+    let tx_result = if !BlockchainMock::is_smart_contract_address(&tx_context.tx_input_box.to)
+        || tx_context.tx_input_box.func_name.is_empty()
+    {
         // direct EGLD transfer
         TxResult::empty()
     } else {
