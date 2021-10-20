@@ -203,8 +203,8 @@ where
         if self.buffer == other.buffer {
             return true;
         }
-        let self_len = self.buffer.byte_len();
-        let other_len = other.buffer.byte_len();
+        let self_len = self.buffer.len();
+        let other_len = other.buffer.len();
         if self_len != other_len {
             return false;
         }
