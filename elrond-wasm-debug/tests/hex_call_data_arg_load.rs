@@ -3,11 +3,11 @@ use elrond_wasm::{
     types::{AsyncCallResult, BigUint, ManagedFrom, MultiArg2, OptionalArg, VarArgs},
     ArgId, CallDataArgLoader, DynArgInput, HexCallDataDeserializer,
 };
-use elrond_wasm_debug::TxContext;
+use elrond_wasm_debug::DebugApi;
 
 #[test]
 fn test_simple_args() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -22,11 +22,11 @@ fn test_simple_args() {
 
 #[test]
 fn test_simple_managed_arg() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"some_other_func@05";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api.clone());
-    let arg1: BigUint<TxContext> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let arg1: BigUint<DebugApi> = load_dyn_arg(&mut cd_loader, ArgId::empty());
     assert_eq!(arg1, BigUint::managed_from(api, 5u32));
 
     cd_loader.assert_no_more_args();
@@ -34,7 +34,7 @@ fn test_simple_managed_arg() {
 
 #[test]
 fn test_simple_vec_arg() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"some_other_func@000000020000000300000006";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -46,7 +46,7 @@ fn test_simple_vec_arg() {
 
 #[test]
 fn test_var_args() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -59,7 +59,7 @@ fn test_var_args() {
 
 #[test]
 fn test_multi_arg_2() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -71,7 +71,7 @@ fn test_multi_arg_2() {
 
 #[test]
 fn test_var_multi_arg_2() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -86,7 +86,7 @@ fn test_var_multi_arg_2() {
 
 #[test]
 fn test_opt_multi_arg_2() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -106,7 +106,7 @@ fn test_opt_multi_arg_2() {
 
 #[test]
 fn test_async_call_result_ok() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@@1111@2222";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -125,7 +125,7 @@ fn test_async_call_result_ok() {
 
 #[test]
 fn test_async_call_result_ok2() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@00";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);
@@ -143,7 +143,7 @@ fn test_async_call_result_ok2() {
 
 #[test]
 fn test_async_call_result_err() {
-    let api = TxContext::dummy();
+    let api = DebugApi::dummy();
     let input: &[u8] = b"func@0123@1111";
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api);

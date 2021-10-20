@@ -1,7 +1,7 @@
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn contract_map() -> ContractMap<TxContext> {
+fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
         "file:../output/crowdfunding-esdt.wasm",
@@ -12,17 +12,14 @@ fn contract_map() -> ContractMap<TxContext> {
 
 #[test]
 fn crowdfunding_claim_failed_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/crowdfunding-claim-failed.scen.json",
-        &contract_map(),
-    );
+    elrond_wasm_debug::mandos_rs("mandos/crowdfunding-claim-failed.scen.json", contract_map());
 }
 
 #[test]
 fn crowdfunding_claim_successful_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/crowdfunding-claim-successful.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
@@ -30,33 +27,33 @@ fn crowdfunding_claim_successful_rs() {
 fn crowdfunding_claim_too_early_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/crowdfunding-claim-too-early.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
 #[test]
 fn crowdfunding_fund_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crowdfunding-fund.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/crowdfunding-fund.scen.json", contract_map());
 }
 
 #[test]
 fn crowdfunding_fund_too_late_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/crowdfunding-fund-too-late.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
 #[test]
 fn crowdfunding_init_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crowdfunding-init.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/crowdfunding-init.scen.json", contract_map());
 }
 
 #[test]
 fn egld_crowdfunding_claim_failed_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/egld-crowdfunding-claim-failed.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
@@ -64,7 +61,7 @@ fn egld_crowdfunding_claim_failed_rs() {
 fn egld_crowdfunding_claim_successful_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/egld-crowdfunding-claim-successful.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
@@ -72,24 +69,24 @@ fn egld_crowdfunding_claim_successful_rs() {
 fn egld_crowdfunding_claim_too_early_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/egld-crowdfunding-claim-too-early.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
 #[test]
 fn egld_crowdfunding_fund_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/egld-crowdfunding-fund.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/egld-crowdfunding-fund.scen.json", contract_map());
 }
 
 #[test]
 fn egld_crowdfunding_fund_too_late_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/egld-crowdfunding-fund-too-late.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
 #[test]
 fn egld_crowdfunding_init_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/egld-crowdfunding-init.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/egld-crowdfunding-init.scen.json", contract_map());
 }

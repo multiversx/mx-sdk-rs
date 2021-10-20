@@ -16,10 +16,18 @@ pub struct OutputAbi {
 }
 
 #[derive(Clone, Debug)]
+pub enum EndpointMutabilityAbi {
+    Mutable,
+    Readonly,
+    Pure,
+}
+
+#[derive(Clone, Debug)]
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
     pub name: &'static str,
     pub only_owner: bool,
+    pub mutability: EndpointMutabilityAbi,
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
     pub outputs: Vec<OutputAbi>,

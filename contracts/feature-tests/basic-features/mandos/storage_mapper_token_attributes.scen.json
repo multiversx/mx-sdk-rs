@@ -8,14 +8,11 @@
                 "sc:contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "1000"
                 }
             }
         },
@@ -25,7 +22,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_set",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -48,7 +44,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_set",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -71,7 +66,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_set",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -94,7 +88,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_set",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -142,7 +135,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -166,7 +158,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -188,7 +179,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -212,7 +202,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_attributes",
                 "arguments": [
                     "str:BOB2-abcdef",
@@ -234,7 +223,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_nonce",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -258,7 +246,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_nonce",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -280,7 +267,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_nonce",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -304,7 +290,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_get_nonce",
                 "arguments": [
                     "str:BOB2-abcdef",
@@ -326,7 +311,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -350,7 +334,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -374,7 +357,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -398,7 +380,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_has_attributes",
                 "arguments": [
                     "str:BOB2-abcdef",
@@ -422,7 +403,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_update",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -446,7 +426,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_update",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -469,7 +448,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_update",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -493,7 +471,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_update",
                 "arguments": [
                     "str:BOB2-abcdef",
@@ -541,7 +518,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_clear",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -564,7 +540,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_clear",
                 "arguments": [
                     "str:ALICE-abcdef",
@@ -586,7 +561,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_clear",
                 "arguments": [
                     "str:BOB-abcdef",
@@ -609,7 +583,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "token_attributes_clear",
                 "arguments": [
                     "str:BOB2-abcdef",

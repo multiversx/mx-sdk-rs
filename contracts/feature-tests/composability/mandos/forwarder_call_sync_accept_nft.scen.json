@@ -20,9 +20,7 @@
                                 "ESDTRoleNFTCreate"
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -32,7 +30,6 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -43,12 +40,13 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:NFT-0001",
-                    "value": "1",
-                    "nonce": "5"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-0001",
+                        "nonce": "5",
+                        "value": "1"
+                    }
+                ],
                 "function": "forward_sync_accept_funds",
                 "arguments": [
                     "sc:vault"
@@ -125,9 +123,6 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds_echo_payment": "1"
-                    },
                     "esdt": {
                         "str:NFT-0001": {
                             "instances": [
@@ -137,6 +132,9 @@
                                 }
                             ]
                         }
+                    },
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds_echo_payment": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },

@@ -1,22 +1,22 @@
+use std::rc::Rc;
+
 use mandos::model::{TxExpect, TxQuery};
 use num_bigint::BigUint;
 
-use crate::{execute_helper_functions::*, BlockchainMock, ContractMap, TxContext, TxInput};
+use crate::{
+    tx_execution::sc_query,
+    tx_mock::{generate_tx_hash_dummy, TxInput},
+    world_mock::BlockchainMock,
+};
 
-pub fn execute(
-    state: &mut BlockchainMock,
-    contract_map: &ContractMap<TxContext>,
-    tx_id: &str,
-    tx: &TxQuery,
-    expect: &Option<TxExpect>,
-) {
+use super::check_tx_output;
+
+pub fn execute(state: Rc<BlockchainMock>, tx_id: &str, tx: &TxQuery, expect: &Option<TxExpect>) {
     let tx_input = TxInput {
         from: tx.to.value.into(),
         to: tx.to.value.into(),
-        call_value: BigUint::from(0u32),
-        esdt_value: BigUint::from(0u32),
-        esdt_token_identifier: Vec::new(),
-        nonce: 0u64,
+        egld_value: BigUint::from(0u32),
+        esdt_values: Vec::new(),
         func_name: tx.function.as_bytes().to_vec(),
         args: tx
             .arguments
@@ -28,9 +28,9 @@ pub fn execute(
         tx_hash: generate_tx_hash_dummy(tx_id),
     };
 
-    let (tx_result, opt_async_data) = sc_call(tx_input, state, contract_map).unwrap();
+    let tx_result = sc_query(tx_input, state);
     assert!(
-        tx_result.result_status != 0 || !opt_async_data.is_some(),
+        tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
         "Can't query a view function that performs an async call"
     );
     if let Some(tx_expect) = expect {

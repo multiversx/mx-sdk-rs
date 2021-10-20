@@ -1,11 +1,22 @@
-use crate::{TxContext, TxPanic};
+use crate::{tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
     api::CallValueApi,
     err_msg,
-    types::{BigUint, EsdtTokenType, ManagedBuffer, TokenIdentifier},
+    types::{BigUint, EsdtTokenType, TokenIdentifier},
 };
 
-impl CallValueApi for TxContext {
+impl DebugApi {
+    fn fail_if_more_than_one_esdt_transfer(&self) {
+        if self.esdt_num_transfers() > 1 {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::TOO_MANY_ESDT_TRANSFERS.to_vec(),
+            });
+        }
+    }
+}
+
+impl CallValueApi for DebugApi {
     fn check_not_payable(&self) {
         if self.egld_value() > 0 {
             std::panic::panic_any(TxPanic {
@@ -23,59 +34,73 @@ impl CallValueApi for TxContext {
 
     #[inline]
     fn egld_value(&self) -> BigUint<Self> {
-        self.insert_new_big_uint(self.tx_input_box.call_value.clone())
+        self.insert_new_big_uint(self.input_ref().egld_value.clone())
     }
 
     #[inline]
     fn esdt_value(&self) -> BigUint<Self> {
-        self.insert_new_big_uint(self.tx_input_box.esdt_value.clone())
+        self.fail_if_more_than_one_esdt_transfer();
+        self.esdt_value_by_index(0)
     }
 
     #[inline]
     fn token(&self) -> TokenIdentifier<Self> {
-        ManagedBuffer::new_from_bytes(
-            self.clone(),
-            self.tx_input_box.esdt_token_identifier.as_slice(),
-        )
-        .into()
+        self.fail_if_more_than_one_esdt_transfer();
+        self.token_by_index(0)
     }
 
     #[inline]
     fn esdt_token_nonce(&self) -> u64 {
-        // TODO: Add ESDT nonce in mock
-        0u64
+        self.fail_if_more_than_one_esdt_transfer();
+        self.esdt_token_nonce_by_index(0)
     }
 
     #[inline]
     fn esdt_token_type(&self) -> EsdtTokenType {
-        // TODO: Add ESDT token type in mock
-        EsdtTokenType::Fungible
+        self.fail_if_more_than_one_esdt_transfer();
+        self.esdt_token_type_by_index(0)
     }
-
-    // TODO: Mock multi-transfers
 
     #[inline]
     fn esdt_num_transfers(&self) -> usize {
-        0
+        self.input_ref().esdt_values.len()
     }
 
     #[inline]
-    fn esdt_value_by_index(&self, _index: usize) -> BigUint<Self> {
-        self.insert_new_big_uint_zero()
+    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self> {
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
+            self.insert_new_big_uint(esdt_value.value.clone())
+        } else {
+            self.insert_new_big_uint_zero()
+        }
     }
 
     #[inline]
-    fn token_by_index(&self, _index: usize) -> TokenIdentifier<Self> {
-        TokenIdentifier::egld(self.clone())
+    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self> {
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
+            TokenIdentifier::from(
+                self.insert_new_managed_buffer(esdt_value.token_identifier.clone()),
+            )
+        } else {
+            TokenIdentifier::egld(self.clone())
+        }
     }
 
     #[inline]
-    fn esdt_token_nonce_by_index(&self, _index: usize) -> u64 {
-        0
+    fn esdt_token_nonce_by_index(&self, index: usize) -> u64 {
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
+            esdt_value.nonce
+        } else {
+            0
+        }
     }
 
     #[inline]
-    fn esdt_token_type_by_index(&self, _index: usize) -> EsdtTokenType {
-        EsdtTokenType::Fungible
+    fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType {
+        if self.esdt_token_nonce_by_index(index) == 0 {
+            EsdtTokenType::Fungible
+        } else {
+            EsdtTokenType::NonFungible
+        }
     }
 }

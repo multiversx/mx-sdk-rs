@@ -6,20 +6,16 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "2000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "2000"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -30,7 +26,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "2000",
+                "egldValue": "2000",
                 "function": "forward_transf_exec_accept_funds_twice",
                 "arguments": [
                     "sc:vault"

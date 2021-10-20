@@ -16,9 +16,7 @@
                                 }
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -37,7 +35,6 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -67,8 +64,6 @@
                     "2"
                 ],
                 "status": "0",
-                "gas": "*",
-                "refund": "*",
                 "logs": [
                     {
                         "address": "sc:forwarder",
@@ -115,7 +110,9 @@
                         ],
                         "data": ""
                     }
-                ]
+                ],
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -137,10 +134,10 @@
                                     "creator": "sc:forwarder",
                                     "royalties": "0",
                                     "hash": "str:nft-create-hash-----------------",
-                                    "attributes": "0x808080",
                                     "uri": [
                                         "str:nft-create-uri"
-                                    ]
+                                    ],
+                                    "attributes": "0x808080"
                                 }
                             ]
                         }

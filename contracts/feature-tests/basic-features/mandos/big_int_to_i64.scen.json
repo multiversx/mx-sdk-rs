@@ -7,14 +7,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -84,8 +81,8 @@
         },
         {
             "step": "scQuery",
-            "comment": "too big",
             "txId": "4",
+            "comment": "too big",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",
@@ -115,8 +112,8 @@
         },
         {
             "step": "scQuery",
-            "comment": "too small",
             "txId": "6",
+            "comment": "too small",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",

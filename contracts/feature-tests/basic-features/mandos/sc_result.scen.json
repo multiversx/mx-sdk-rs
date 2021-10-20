@@ -9,14 +9,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -26,7 +23,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "return_sc_error",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -47,7 +43,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_ok",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -68,7 +63,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_err_from_bytes_1",
                 "arguments": [
                     "str:test error message"
@@ -91,7 +85,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_err_from_bytes_2",
                 "arguments": [
                     "str:test error message"
@@ -114,7 +107,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_err_from_bytes_3",
                 "arguments": [
                     "str:test error message"
@@ -137,7 +129,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_err_from_string",
                 "arguments": [
                     "str:test error message"
@@ -160,7 +151,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_err_from_str",
                 "arguments": [
                     "str:test error message"
@@ -183,7 +173,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo",
                 "arguments": [
                     "0",
@@ -207,7 +196,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo",
                 "arguments": [
                     "0",
@@ -231,7 +219,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo",
                 "arguments": [
                     "1|nested:str:test string echo",
@@ -257,7 +244,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo_2",
                 "arguments": [
                     "0"
@@ -280,7 +266,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo_2",
                 "arguments": [
                     "1|nested:str:test string echo 2"
@@ -305,7 +290,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo_3",
                 "arguments": [
                     "0"
@@ -328,7 +312,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "result_echo_3",
                 "arguments": [
                     "1|nested:str:test string echo 3"

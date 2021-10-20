@@ -9,14 +9,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -26,7 +23,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "verify_bls_signature",
                 "arguments": [
                     "0xb5823f6e564251cc03ce7bad3da83e72576e92795d3500bba1acb30ec9a94dce87bb8aa794d67b2d61d15c33f28f6c0c23ba1dfcbf21e8f8b46286ff871afabac925303ddcaddce6254fcff6d3155797db40b3d3b5865e8fc0bd770b3d79b381",
@@ -52,7 +48,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "verify_ed25519_signature",
                 "arguments": [
                     "0xf2445fdaca6607728fa06e0610062c3468cad6d54f19549916ef577f69c7eb86",
@@ -78,7 +73,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "verify_secp256k1_signature",
                 "arguments": [
                     "0x02a673638cb9587cb68ea08dbef685c6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5",
@@ -104,7 +98,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "verify_secp256k1_signature",
                 "arguments": [
                     "0x04a673638cb9587cb68ea08dbef685c6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5ca1d22fe57c6103dbaac10cf15d15c0791cab8bb9a04f800e4d215276cb3e008",
@@ -130,7 +123,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "compute_secp256k1_der_signature",
                 "arguments": [
                     "0x90f27b8b488db00b00606796d2987f6a5f59ae62ea05effe84fef5b8b0e54998",
@@ -155,7 +147,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "verify_custom_secp256k1_signature",
                 "arguments": [
                     "0x04e32df42865e97135acfb65f3bae71bdc86f4d49150ad6a440b6f15878109880a0a2b2667f7e725ceea70c673093bf67663e0312623c8e091b13cf2c0f11ef652",

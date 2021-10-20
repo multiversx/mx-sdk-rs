@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -25,7 +22,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -45,7 +41,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper_insert",
                 "arguments": [
                     "123"
@@ -91,7 +86,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -113,7 +107,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper_insert",
                 "arguments": [
                     "111"
@@ -137,7 +130,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -185,7 +177,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper_contains",
                 "arguments": [
                     "111"
@@ -209,7 +200,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper_remove",
                 "arguments": [
                     "123"
@@ -255,7 +245,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "set_mapper_remove",
                 "arguments": [
                     "111"
@@ -296,7 +285,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "queue_mapper_front",
                 "arguments": [],
                 "gasLimit": "50,000,000",

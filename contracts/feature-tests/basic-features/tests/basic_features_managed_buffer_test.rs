@@ -5,7 +5,7 @@ use basic_features::managed_buffer_features::ManagedBufferFeatures;
 
 #[test]
 fn test_managed_buffer_new_empty() {
-    let context = TxContext::dummy();
+    let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
     let result = bf.mbuffer_new();
     assert_eq!(ManagedBuffer::new(context), result);
@@ -13,7 +13,7 @@ fn test_managed_buffer_new_empty() {
 
 #[test]
 fn test_managed_buffer_from() {
-    let context = TxContext::dummy();
+    let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
     let result = bf.mbuffer_from_slice(&[1, 2, 3][..]);
     assert_eq!(
@@ -29,7 +29,7 @@ fn test_managed_buffer_from() {
 
 #[test]
 fn test_managed_address_zero() {
-    let context = TxContext::dummy();
+    let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
     let result = bf.managed_address_zero();
     assert_eq!(ManagedAddress::zero(context), result);
@@ -37,7 +37,7 @@ fn test_managed_address_zero() {
 
 #[test]
 fn test_managed_address_from() {
-    let context = TxContext::dummy();
+    let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
     assert_eq!(
         bf.managed_address_zero(),

@@ -24,7 +24,6 @@
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "proposeSCDeploy",
                 "arguments": [
                     "0",
@@ -52,7 +51,6 @@
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "sign",
                 "arguments": [
                     "3"
@@ -74,7 +72,6 @@
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "sign",
                 "arguments": [
                     "3"
@@ -106,7 +103,6 @@
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "performAction",
                 "arguments": [
                     "3"

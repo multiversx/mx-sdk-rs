@@ -39,7 +39,7 @@
                 "address:the-address": {
                     "storage": {
                         "str:key-a": "str:value-a",
-                        "+": "any text is actually accepted here"
+                        "+": ""
                     }
                 }
             }

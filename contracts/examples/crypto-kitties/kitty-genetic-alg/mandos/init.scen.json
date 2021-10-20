@@ -7,8 +7,7 @@
             "accounts": {
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             },
             "newAddresses": [
@@ -25,12 +24,12 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/kitty-genetic-alg.wasm",
-                "value": "0",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

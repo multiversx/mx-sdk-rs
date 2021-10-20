@@ -6,24 +6,21 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:TEST-SFT": {
+                            "lastNonce": "2",
                             "roles": [
                                 "ESDTRoleNFTCreate",
                                 "ESDTRoleNFTAddQuantity",
                                 "ESDTRoleNFTBurn"
-                            ],
-                            "lastNonce": "2"
+                            ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
@@ -43,8 +40,7 @@
                             ]
                         }
                     },
-                    "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw-new.wasm"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         },
@@ -54,7 +50,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forwarder_async_send_and_retrieve_multi_transfer_funds",
                 "arguments": [
                     "sc:vault",
@@ -93,12 +88,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:TEST-SFT": {
+                            "lastNonce": "4",
                             "roles": [
                                 "ESDTRoleNFTCreate",
                                 "ESDTRoleNFTAddQuantity",
                                 "ESDTRoleNFTBurn"
-                            ],
-                            "lastNonce": "4"
+                            ]
                         }
                     },
                     "storage": {},
@@ -142,7 +137,7 @@
                         },
                         "str:callback_payments.len": "2"
                     },
-                    "code": "file:../forwarder-raw/output/forwarder-raw-new.wasm"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         }
