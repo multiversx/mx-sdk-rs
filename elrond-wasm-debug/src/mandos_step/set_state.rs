@@ -65,7 +65,7 @@ pub fn execute(
     }
     for new_address in new_addresses.iter() {
         assert!(
-            state.is_smart_contract_address(&new_address.new_address.value.into()),
+            BlockchainMock::is_smart_contract_address(&new_address.new_address.value.into()),
             "field should have SC format"
         );
         state.put_new_address(
