@@ -2,7 +2,10 @@ use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::{address_hex, tx_mock::TxInputESDT};
+use crate::{
+    address_hex,
+    tx_mock::{TxInputESDT, TxPanic},
+};
 
 use super::TxCache;
 
@@ -62,12 +65,12 @@ impl TxCache {
                 )
             });
             let esdt_balance = &mut esdt_instance.balance;
-            assert!(
-                &*esdt_balance >= value,
-                "Not enough esdt balance, have {}, need at least {}",
-                esdt_balance,
-                value
-            );
+            if &*esdt_balance < value {
+                std::panic::panic_any(TxPanic {
+                    status: 10,
+                    message: b"insufficient funds".to_vec(),
+                });
+            }
 
             *esdt_balance -= value;
         });

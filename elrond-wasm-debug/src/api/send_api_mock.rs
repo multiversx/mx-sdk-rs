@@ -7,10 +7,53 @@ use crate::{
 use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_TRANSFER_STRING},
     types::{
-        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
+        Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
     },
 };
+use num_traits::Zero;
+
+impl DebugApi {
+    fn perform_execute_on_dest_context(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: Vec<u8>,
+        args: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        let contract_address = &self.input_ref().to;
+        let tx_hash = self.get_tx_hash_legacy();
+        let tx_input = TxInput {
+            from: contract_address.clone(),
+            to,
+            egld_value,
+            esdt_values: Vec::new(),
+            func_name,
+            args,
+            gas_limit: 1000,
+            gas_price: 0,
+            tx_hash,
+        };
+
+        let tx_cache = TxCache::new(self.blockchain_cache_rc());
+        let (tx_result, blockchain_updates) =
+            execute_builtin_function_or_default(tx_input, tx_cache);
+
+        if tx_result.result_status == 0 {
+            self.blockchain_cache().commit_updates(blockchain_updates);
+
+            self.result_borrow_mut().merge_after_sync_call(&tx_result);
+
+            tx_result.result_values
+        } else {
+            // also kill current execution
+            std::panic::panic_any(TxPanic {
+                status: tx_result.result_status,
+                message: tx_result.result_message.into_bytes(),
+            })
+        }
+    }
+}
 
 impl SendApi for DebugApi {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, _data: D)
@@ -44,18 +87,16 @@ impl SendApi for DebugApi {
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
-        let amount_value = self.big_uint_value(amount);
+        let egld_value = self.big_uint_value(amount);
         let recipient = to.to_address();
-        let tx_hash = self.get_tx_hash_legacy();
-        let call = AsyncCallTxData {
-            to: recipient,
-            call_value: amount_value,
-            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
-            arguments: arg_buffer.to_raw_args_vec(),
-            tx_hash,
-        };
-        let mut tx_result = self.result_borrow_mut();
-        tx_result.result_calls.transfer_execute.push(call);
+
+        let _ = self.perform_execute_on_dest_context(
+            recipient,
+            egld_value,
+            endpoint_name.to_boxed_bytes().into_vec(),
+            arg_buffer.to_raw_args_vec(),
+        );
+
         Ok(())
     }
 
@@ -68,38 +109,27 @@ impl SendApi for DebugApi {
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
+        let recipient = to.to_address();
         let token_bytes = token.as_name();
         let amount_value = self.big_uint_value(amount);
-        let available_esdt_balance = self.with_contract_account(|account| {
-            account.esdt.get_esdt_balance(token_bytes.as_slice(), 0)
-        });
-        if amount_value > available_esdt_balance {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: b"insufficient funds".to_vec(),
-            });
-        }
 
-        let recipient = to.to_address();
-        let tx_hash = self.get_tx_hash_legacy();
-        let mut arguments = vec![token_bytes.into_vec(), amount_value.to_bytes_be()];
+        let mut args = vec![token_bytes.into_vec(), amount_value.to_bytes_be()];
         if !endpoint_name.is_empty() {
-            arguments.push(endpoint_name.to_boxed_bytes().into_vec());
-            arguments.extend(
+            args.push(endpoint_name.to_boxed_bytes().into_vec());
+            args.extend(
                 arg_buffer
                     .raw_arg_iter()
                     .map(|mb| mb.to_boxed_bytes().into_vec()),
             );
         }
-        let call = AsyncCallTxData {
-            to: recipient,
-            call_value: amount_value,
-            endpoint_name: ESDT_TRANSFER_STRING.to_vec(),
-            arguments,
-            tx_hash,
-        };
-        let mut tx_result = self.result_borrow_mut();
-        tx_result.result_calls.transfer_execute.push(call);
+
+        let _ = self.perform_execute_on_dest_context(
+            recipient,
+            num_bigint::BigUint::zero(),
+            ESDT_TRANSFER_STRING.to_vec(),
+            args,
+        );
+
         Ok(())
     }
 
@@ -135,9 +165,11 @@ impl SendApi for DebugApi {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ! {
         let amount_value = self.big_uint_value(amount);
+        let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
         let call = AsyncCallTxData {
+            from: contract_address,
             to: recipient,
             call_value: amount_value,
             endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
@@ -205,32 +237,16 @@ impl SendApi for DebugApi {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         let egld_value = self.big_uint_value(value);
-        let contract_address = &self.input_ref().to;
         let recipient = to.to_address();
-        let tx_hash = self.get_tx_hash_legacy();
-        let tx_input = TxInput {
-            from: contract_address.clone(),
-            to: recipient,
+
+        let result = self.perform_execute_on_dest_context(
+            recipient,
             egld_value,
-            esdt_values: Vec::new(),
-            func_name: endpoint_name.to_boxed_bytes().into_vec(),
-            args: arg_buffer.to_raw_args_vec(),
-            gas_limit: 1000,
-            gas_price: 0,
-            tx_hash,
-        };
+            endpoint_name.to_boxed_bytes().into_vec(),
+            arg_buffer.to_raw_args_vec(),
+        );
 
-        let tx_cache = TxCache::new(self.blockchain_cache_rc());
-        let (tx_result, blockchain_updates) =
-            execute_builtin_function_or_default(tx_input, tx_cache);
-
-        if tx_result.result_status == 0 {
-            self.blockchain_cache().commit_updates(blockchain_updates);
-
-            self.result_borrow_mut().merge_after_sync_call(&tx_result);
-        }
-
-        ManagedVec::managed_from(self.clone(), tx_result.result_values)
+        ManagedVec::managed_from(self.clone(), result)
     }
 
     fn execute_on_dest_context_raw_custom_result_range<F>(
