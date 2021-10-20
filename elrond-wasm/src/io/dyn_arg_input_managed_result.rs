@@ -1,7 +1,7 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedRef, ManagedType, ManagedVec},
+    types::{ManagedBuffer, ManagedType, ManagedVec},
     DynArgInput,
 };
 
@@ -32,7 +32,7 @@ impl<A> DynArgInput for ManagedResultArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    type ItemInput = ManagedRef<A, ManagedBuffer<A>>;
+    type ItemInput = ManagedBuffer<A>;
 
     type ErrorApi = A;
 
@@ -49,7 +49,7 @@ where
     fn next_arg_input(&mut self) -> Self::ItemInput {
         if let Some(buffer) = self.data.get(self.next_index) {
             self.next_index += 1;
-            buffer.into()
+            buffer
         } else {
             self.dyn_arg_vm_api()
                 .signal_error(err_msg::ARG_WRONG_NUMBER)

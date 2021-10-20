@@ -1,4 +1,4 @@
-use core::{marker::PhantomData, ops::Deref};
+use core::marker::PhantomData;
 
 use elrond_codec::{
     try_execute_then_cast, DecodeError, NestedDecode, NestedDecodeInput, TryStaticCast,
@@ -12,23 +12,21 @@ use crate::{
 /// Nested decode buffer based on a managed buffer.
 /// Uses the load/copy slice API to extract pieces of the managed buffer for deserialization.
 
-pub struct ManagedBufferNestedDecodeInput<M, MB>
+pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
-    MB: Deref<Target = ManagedBuffer<M>>,
 {
-    pub managed_buffer: MB,
+    pub managed_buffer: ManagedBuffer<M>,
     pub decode_index: usize,
     pub buffer_len: usize,
     _phantom: PhantomData<M>,
 }
 
-impl<M, MB> ManagedBufferNestedDecodeInput<M, MB>
+impl<M> ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
-    MB: Deref<Target = ManagedBuffer<M>>,
 {
-    pub fn new(managed_buffer: MB) -> Self {
+    pub fn new(managed_buffer: ManagedBuffer<M>) -> Self {
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
@@ -109,10 +107,9 @@ where
     }
 }
 
-impl<M, MB> NestedDecodeInput for ManagedBufferNestedDecodeInput<M, MB>
+impl<M> NestedDecodeInput for ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
-    MB: Deref<Target = ManagedBuffer<M>>,
 {
     fn remaining_len(&self) -> usize {
         self.buffer_len - self.decode_index

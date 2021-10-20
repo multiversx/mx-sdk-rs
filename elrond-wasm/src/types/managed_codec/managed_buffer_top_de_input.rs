@@ -3,16 +3,16 @@ use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStatic
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedRef},
+    types::{BigInt, BigUint, ManagedBuffer},
 };
 
 use super::ManagedBufferNestedDecodeInput;
 
-impl<M> TopDecodeInput for ManagedRef<M, ManagedBuffer<M>>
+impl<M> TopDecodeInput for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<M, ManagedRef<M, ManagedBuffer<M>>>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M>;
 
     fn byte_len(&self) -> usize {
         self.len()
