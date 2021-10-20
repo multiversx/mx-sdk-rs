@@ -73,6 +73,7 @@ where
         self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
     }
 
+    #[clippy::allow(too_many_arguments)]
     fn direct_with_gas_limit<D>(
         &self,
         to: &ManagedAddress<A>,
