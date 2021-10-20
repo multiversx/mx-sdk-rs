@@ -3,7 +3,7 @@ use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStatic
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedRef},
 };
 
 use super::ManagedBufferNestedDecodeInput;
@@ -41,7 +41,7 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBufferNestedDecodeInput::new(self)
+        ManagedBufferNestedDecodeInput::new(self.into())
     }
 }
 
@@ -50,7 +50,8 @@ impl<M> TopDecodeInput for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<M, ManagedBuffer<M>>;
+    type NestedBuffer =
+        ManagedBufferNestedDecodeInput<M, ManagedRef<ManagedBuffer<M>, ManagedBuffer<M>>>;
 
     fn byte_len(&self) -> usize {
         self.len()
@@ -69,6 +70,6 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBufferNestedDecodeInput::new(self)
+        ManagedBufferNestedDecodeInput::new(self.into())
     }
 }

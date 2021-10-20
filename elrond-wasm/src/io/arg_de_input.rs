@@ -1,6 +1,8 @@
 use crate::{
     api::{EndpointArgumentApi, ManagedTypeApi},
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
+    types::{
+        BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
+    },
     Box,
 };
 use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
@@ -54,7 +56,8 @@ impl<AA> TopDecodeInput for ArgDecodeInput<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<AA, ManagedBuffer<AA>>;
+    type NestedBuffer =
+        ManagedBufferNestedDecodeInput<AA, ManagedRef<ManagedBuffer<AA>, ManagedBuffer<AA>>>;
 
     #[inline]
     fn byte_len(&self) -> usize {
@@ -95,6 +98,6 @@ where
 
     #[inline]
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBufferNestedDecodeInput::new(self.to_managed_buffer())
+        ManagedBufferNestedDecodeInput::new(self.to_managed_buffer().into())
     }
 }

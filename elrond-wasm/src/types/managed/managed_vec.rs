@@ -1,6 +1,6 @@
 use super::{
-    ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem,
-    ManagedVecIterator,
+    ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedRef, ManagedType,
+    ManagedVecItem, ManagedVecIterator,
 };
 use crate::{
     abi::TypeAbi,
@@ -275,7 +275,10 @@ where
         let buffer = ManagedBuffer::top_decode(input)?;
         if T::NEEDS_RESERIALIZATION {
             let mut result = ManagedVec::new(buffer.type_manager());
-            let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
+            let mut nested_de_input: ManagedBufferNestedDecodeInput<
+                M,
+                ManagedRef<ManagedBuffer<M>, ManagedBuffer<M>>,
+            > = ManagedBufferNestedDecodeInput::new(buffer.into());
             while nested_de_input.remaining_len() > 0 {
                 result.push(T::dep_decode(&mut nested_de_input)?);
             }

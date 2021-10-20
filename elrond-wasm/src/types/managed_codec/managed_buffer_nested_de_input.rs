@@ -1,4 +1,4 @@
-use core::{borrow::Borrow, marker::PhantomData};
+use core::{marker::PhantomData, ops::Deref};
 
 use elrond_codec::{
     try_execute_then_cast, DecodeError, NestedDecode, NestedDecodeInput, TryStaticCast,
@@ -15,7 +15,7 @@ use crate::{
 pub struct ManagedBufferNestedDecodeInput<M, MB>
 where
     M: ManagedTypeApi,
-    MB: Borrow<ManagedBuffer<M>>,
+    MB: Deref<Target = ManagedBuffer<M>>,
 {
     pub managed_buffer: MB,
     pub decode_index: usize,
@@ -23,12 +23,16 @@ where
     _phantom: PhantomData<M>,
 }
 
-impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> ManagedBufferNestedDecodeInput<M, MB> {
+impl<M, MB> ManagedBufferNestedDecodeInput<M, MB>
+where
+    M: ManagedTypeApi,
+    MB: Deref<Target = ManagedBuffer<M>>,
+{
     pub fn new(managed_buffer: MB) -> Self {
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
-        let buffer_len = managed_buffer.borrow().len();
+        let buffer_len = managed_buffer.len();
 
         ManagedBufferNestedDecodeInput {
             managed_buffer,
@@ -47,11 +51,7 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> ManagedBufferNestedDecodeI
         &mut self,
         size: usize,
     ) -> Result<ManagedBuffer<M>, DecodeError> {
-        if let Some(managed_buffer) = self
-            .managed_buffer
-            .borrow()
-            .copy_slice(self.decode_index, size)
-        {
+        if let Some(managed_buffer) = self.managed_buffer.copy_slice(self.decode_index, size) {
             self.decode_index += size;
             Ok(managed_buffer)
         } else {
@@ -74,11 +74,7 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> ManagedBufferNestedDecodeI
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> ManagedBuffer<M> {
-        if let Some(managed_buffer) = self
-            .managed_buffer
-            .borrow()
-            .copy_slice(self.decode_index, size)
-        {
+        if let Some(managed_buffer) = self.managed_buffer.copy_slice(self.decode_index, size) {
             self.decode_index += size;
             managed_buffer
         } else {
@@ -113,18 +109,17 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> ManagedBufferNestedDecodeI
     }
 }
 
-impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> NestedDecodeInput
-    for ManagedBufferNestedDecodeInput<M, MB>
+impl<M, MB> NestedDecodeInput for ManagedBufferNestedDecodeInput<M, MB>
+where
+    M: ManagedTypeApi,
+    MB: Deref<Target = ManagedBuffer<M>>,
 {
     fn remaining_len(&self) -> usize {
         self.buffer_len - self.decode_index
     }
 
     fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
-        let err_result = self
-            .managed_buffer
-            .borrow()
-            .load_slice(self.decode_index, into);
+        let err_result = self.managed_buffer.load_slice(self.decode_index, into);
         if err_result.is_ok() {
             self.decode_index += into.len();
             Ok(())
@@ -139,10 +134,7 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> NestedDecodeInput
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) {
-        let err_result = self
-            .managed_buffer
-            .borrow()
-            .load_slice(self.decode_index, into);
+        let err_result = self.managed_buffer.load_slice(self.decode_index, into);
         if err_result.is_err() {
             exit(c, DecodeError::INPUT_TOO_SHORT);
         }
@@ -156,12 +148,7 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> NestedDecodeInput
         C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<T, DecodeError>,
     {
-        if let Some(result) = self
-            .managed_buffer
-            .borrow()
-            .type_manager()
-            .try_cast_ref::<T>()
-        {
+        if let Some(result) = self.managed_buffer.type_manager().try_cast_ref::<T>() {
             // API for instancing empty Vec
             Ok(result.clone())
         } else if let Some(result) = try_execute_then_cast(|| {
@@ -195,12 +182,7 @@ impl<M: ManagedTypeApi, MB: Borrow<ManagedBuffer<M>>> NestedDecodeInput
         F: FnOnce(&mut Self, ExitCtx) -> T,
         ExitCtx: Clone,
     {
-        if let Some(result) = self
-            .managed_buffer
-            .borrow()
-            .type_manager()
-            .try_cast_ref::<T>()
-        {
+        if let Some(result) = self.managed_buffer.type_manager().try_cast_ref::<T>() {
             // API for instancing empty Vec
             result.clone()
         } else if let Some(result) = try_execute_then_cast(|| {
