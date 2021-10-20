@@ -47,14 +47,13 @@ pub fn sc_call_with_async_and_callback(
     if tx_result.result_status == 0 {
         if let Some(async_data) = result_calls.async_call {
             if state.accounts.contains_key(&async_data.to) {
-                let async_input = async_call_tx_input(&async_data, &contract_address);
+                let async_input = async_call_tx_input(&async_data);
 
                 let async_result = sc_call_with_async_and_callback(async_input, state, false);
 
                 tx_result = merge_results(tx_result, async_result.clone());
 
-                let callback_input =
-                    async_callback_tx_input(&async_data, &contract_address, &async_result);
+                let callback_input = async_callback_tx_input(&async_data, &async_result);
                 let callback_result = sc_call(callback_input, state, false);
                 assert!(
                     tx_result.result_calls.async_call.is_none(),
@@ -79,7 +78,7 @@ pub fn sc_call_with_async_and_callback(
         }
 
         for te_call in result_calls.transfer_execute {
-            let te_input = async_call_tx_input(&te_call, &contract_address);
+            let te_input = async_call_tx_input(&te_call);
 
             let te_result = sc_call(te_input, state, false);
 
