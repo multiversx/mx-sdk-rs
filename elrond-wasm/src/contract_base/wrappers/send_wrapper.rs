@@ -70,16 +70,35 @@ where
     ) where
         D: ManagedInto<A, ManagedBuffer<A>>,
     {
+        self.direct_with_gas_limit(to, token, nonce, amount, 0, data);
+    }
+
+    fn direct_with_gas_limit<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        token: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        gas: u64,
+        data: D,
+    ) where
+        D: ManagedInto<A, ManagedBuffer<A>>,
+    {
+        let empty_arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let endpoint_name = data.managed_into(self.type_manager());
+
         if token.is_egld() {
-            self.direct_egld(to, amount, data);
+            let _ =
+                self.api
+                    .direct_egld_execute(to, amount, gas, &endpoint_name, &empty_arg_buffer);
         } else if nonce == 0 {
             let _ = self.api.direct_esdt_execute(
                 to,
                 token,
                 amount,
-                0,
-                &data.managed_into(self.type_manager()),
-                &ManagedArgBuffer::new_empty(self.type_manager()),
+                gas,
+                &endpoint_name,
+                &empty_arg_buffer,
             );
         } else {
             let _ = self.api.direct_esdt_nft_execute(
@@ -87,9 +106,9 @@ where
                 token,
                 nonce,
                 amount,
-                0,
-                &data.managed_into(self.type_manager()),
-                &ManagedArgBuffer::new_empty(self.type_manager()),
+                gas,
+                &endpoint_name,
+                &empty_arg_buffer,
             );
         }
     }
